@@ -1796,10 +1796,10 @@ READ16_MEMBER(cps_state::cps1_cps_b_r)
 				m_cps_b_regs[m_game_config->mult_factor2 / 2]) >> 16;
 
 	if (offset == m_game_config->in2_addr / 2)  /* Extra input ports (on C-board) */
-		return ioport("IN2")->read();
+		return m_io_in2->read();
 
 	if (offset == m_game_config->in3_addr / 2)  /* Player 4 controls (on C-board) ("Captain Commando") */
-		return ioport("IN3")->read();
+		return m_io_in3->read();
 
 	if (m_cps_version == 2)
 	{
@@ -1832,12 +1832,12 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 		}
 		if (offset == 0x10/2)
 		{
-			m_scanline1 = (data & 0x1ff);
+			m_scanline[0] = (data & 0x1ff);
 			return;
 		}
 		if (offset == 0x12/2)
 		{
-			m_scanline2 = (data & 0x1ff);
+			m_scanline[1] = (data & 0x1ff);
 			return;
 		}
 	}
@@ -1920,8 +1920,8 @@ void cps_state::cps2_gfx_decode()
 
 DRIVER_INIT_MEMBER(cps_state,cps1)
 {
-	m_scanline1 = 0;
-	m_scanline2 = 0;
+	m_scanline[0] = 0;
+	m_scanline[1] = 0;
 	m_scancalls = 0;
 	m_last_sprite_offset = 0;
 	m_pri_ctrl = 0;
@@ -1934,8 +1934,8 @@ DRIVER_INIT_MEMBER(cps_state,cps2_video)
 {
 	cps2_gfx_decode();
 
-	m_scanline1 = 262;
-	m_scanline2 = 262;
+	m_scanline[0] = 262;
+	m_scanline[1] = 262;
 	m_scancalls = 0;
 	m_last_sprite_offset = 0;
 	m_cps2_last_sprite_offset = 0;
@@ -1949,19 +1949,19 @@ void cps_state::cps1_get_video_base()
 	int layercontrol=0, videocontrol=0, scroll1xoff=0, scroll2xoff=0, scroll3xoff=0;
 
 	/* Re-calculate the VIDEO RAM base */
-	if (m_scroll1 != cps1_base(CPS1_SCROLL1_BASE, m_scroll_size))
+	if (m_scroll[0] != cps1_base(CPS1_SCROLL1_BASE, m_scroll_size))
 	{
-		m_scroll1 = cps1_base(CPS1_SCROLL1_BASE, m_scroll_size);
+		m_scroll[0] = cps1_base(CPS1_SCROLL1_BASE, m_scroll_size);
 		m_bg_tilemap[0]->mark_all_dirty();
 	}
-	if (m_scroll2 != cps1_base(CPS1_SCROLL2_BASE, m_scroll_size))
+	if (m_scroll[1] != cps1_base(CPS1_SCROLL2_BASE, m_scroll_size))
 	{
-		m_scroll2 = cps1_base(CPS1_SCROLL2_BASE, m_scroll_size);
+		m_scroll[1] = cps1_base(CPS1_SCROLL2_BASE, m_scroll_size);
 		m_bg_tilemap[1]->mark_all_dirty();
 	}
-	if (m_scroll3 != cps1_base(CPS1_SCROLL3_BASE, m_scroll_size))
+	if (m_scroll[2] != cps1_base(CPS1_SCROLL3_BASE, m_scroll_size))
 	{
-		m_scroll3 = cps1_base(CPS1_SCROLL3_BASE, m_scroll_size);
+		m_scroll[2] = cps1_base(CPS1_SCROLL3_BASE, m_scroll_size);
 		m_bg_tilemap[2]->mark_all_dirty();
 	}
 
@@ -2019,16 +2019,16 @@ void cps_state::cps1_get_video_base()
 	m_other = cps1_base(CPS1_OTHER_BASE, m_other_size);
 
 	/* Get scroll values */
-	m_scroll1x = m_cps_a_regs[CPS1_SCROLL1_SCROLLX] + scroll1xoff;
-	m_scroll1y = m_cps_a_regs[CPS1_SCROLL1_SCROLLY];
-	m_scroll2x = m_cps_a_regs[CPS1_SCROLL2_SCROLLX] + scroll2xoff;
-	m_scroll2y = m_cps_a_regs[CPS1_SCROLL2_SCROLLY];
-	m_scroll3x = m_cps_a_regs[CPS1_SCROLL3_SCROLLX] + scroll3xoff;
-	m_scroll3y = m_cps_a_regs[CPS1_SCROLL3_SCROLLY];
-	m_stars1x = m_cps_a_regs[CPS1_STARS1_SCROLLX];
-	m_stars1y = m_cps_a_regs[CPS1_STARS1_SCROLLY];
-	m_stars2x = m_cps_a_regs[CPS1_STARS2_SCROLLX];
-	m_stars2y = m_cps_a_regs[CPS1_STARS2_SCROLLY];
+	m_scrollx[0] = m_cps_a_regs[CPS1_SCROLL1_SCROLLX] + scroll1xoff;
+	m_scrolly[0] = m_cps_a_regs[CPS1_SCROLL1_SCROLLY];
+	m_scrollx[1] = m_cps_a_regs[CPS1_SCROLL2_SCROLLX] + scroll2xoff;
+	m_scrolly[1] = m_cps_a_regs[CPS1_SCROLL2_SCROLLY];
+	m_scrollx[2] = m_cps_a_regs[CPS1_SCROLL3_SCROLLX] + scroll3xoff;
+	m_scrolly[2] = m_cps_a_regs[CPS1_SCROLL3_SCROLLY];
+	m_starsx[0] = m_cps_a_regs[CPS1_STARS1_SCROLLX];
+	m_starsy[0] = m_cps_a_regs[CPS1_STARS1_SCROLLY];
+	m_starsx[1] = m_cps_a_regs[CPS1_STARS2_SCROLLX];
+	m_starsy[1] = m_cps_a_regs[CPS1_STARS2_SCROLLY];
 
 	/* Get layer enable bits */
 	layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
@@ -2157,8 +2157,8 @@ TILEMAP_MAPPER_MEMBER(cps_state::tilemap2_scan)
 
 TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
 {
-	int code = m_scroll1[2 * tile_index];
-	int attr = m_scroll1[2 * tile_index + 1];
+	int code = m_scroll[0][2 * tile_index];
+	int attr = m_scroll[0][2 * tile_index + 1];
 	int gfxset;
 
 	code = gfxrom_bank_mapper(GFXTYPE_SCROLL1, code);
@@ -2182,8 +2182,8 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
 
 TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
 {
-	int code = m_scroll2[2 * tile_index];
-	int attr = m_scroll2[2 * tile_index + 1];
+	int code = m_scroll[1][2 * tile_index];
+	int attr = m_scroll[1][2 * tile_index + 1];
 
 	code = gfxrom_bank_mapper(GFXTYPE_SCROLL2, code);
 
@@ -2200,8 +2200,8 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
 
 TILE_GET_INFO_MEMBER(cps_state::get_tile2_info)
 {
-	int code = m_scroll3[2 * tile_index] & 0x3fff;
-	int attr = m_scroll3[2 * tile_index + 1];
+	int code = m_scroll[2][2 * tile_index] & 0x3fff;
+	int attr = m_scroll[2][2 * tile_index + 1];
 
 	code = gfxrom_bank_mapper(GFXTYPE_SCROLL3, code);
 
@@ -2280,8 +2280,8 @@ VIDEO_START_MEMBER(cps_state,cps)
 
 	if (m_cps_version == 2)
 	{
-		memset(m_objram1, 0, m_cps2_obj_size);
-		memset(m_objram2, 0, m_cps2_obj_size);
+		memset(m_objram[0], 0, m_cps2_obj_size);
+		memset(m_objram[1], 0, m_cps2_obj_size);
 	}
 
 	/* Put in some defaults */
@@ -2296,30 +2296,23 @@ VIDEO_START_MEMBER(cps_state,cps)
 
 
 	/* Set up old base */
-	m_scroll1 = nullptr;
-	m_scroll2 = nullptr;
-	m_scroll3 = nullptr;
+	m_scroll[0] = nullptr;
+	m_scroll[1] = nullptr;
+	m_scroll[2] = nullptr;
 	m_obj = nullptr;
 	m_other = nullptr;
 	cps1_get_video_base();   /* Calculate base pointers */
 	cps1_get_video_base();   /* Calculate old base pointers */
 
 	/* state save register */
-	save_item(NAME(m_scanline1));
-	save_item(NAME(m_scanline2));
+	save_item(NAME(m_scanline));
 	save_item(NAME(m_scancalls));
 #if 0
 	/* these do not need to be saved, because they are recovered from cps_a_regs in cps1_postload */
-	save_item(NAME(m_scroll1x));
-	save_item(NAME(m_scroll1y));
-	save_item(NAME(m_scroll2x));
-	save_item(NAME(m_scroll2y));
-	save_item(NAME(m_scroll3x));
-	save_item(NAME(m_scroll3y));
-	save_item(NAME(m_stars1x));
-	save_item(NAME(m_stars1y));
-	save_item(NAME(m_stars2x));
-	save_item(NAME(m_stars2y));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_starsx));
+	save_item(NAME(m_starsy));
 	save_item(NAME(m_stars_enabled));
 #endif
 	save_item(NAME(m_last_sprite_offset));
@@ -2630,38 +2623,6 @@ WRITE16_MEMBER(cps_state::cps2_objram_bank_w)
 		m_objram_bank = data & 1;
 }
 
-READ16_MEMBER(cps_state::cps2_objram1_r)
-{
-	if (m_objram_bank & 1)
-		return m_objram2[offset];
-	else
-		return m_objram1[offset];
-}
-
-READ16_MEMBER(cps_state::cps2_objram2_r)
-{
-	if (m_objram_bank & 1)
-		return m_objram1[offset];
-	else
-		return m_objram2[offset];
-}
-
-WRITE16_MEMBER(cps_state::cps2_objram1_w)
-{
-	if (m_objram_bank & 1)
-		COMBINE_DATA(&m_objram2[offset]);
-	else
-		COMBINE_DATA(&m_objram1[offset]);
-}
-
-WRITE16_MEMBER(cps_state::cps2_objram2_w)
-{
-	if (m_objram_bank & 1)
-		COMBINE_DATA(&m_objram1[offset]);
-	else
-		COMBINE_DATA(&m_objram2[offset]);
-}
-
 uint16_t *cps_state::cps2_objbase()
 {
 	int baseptr;
@@ -2673,9 +2634,9 @@ uint16_t *cps_state::cps2_objbase()
 //popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), m_objram_bank & 1);
 
 	if (baseptr == 0x7000)
-		return m_objram1;
+		return m_objram[0];
 	else //if (baseptr == 0x7080)
-		return m_objram2;
+		return m_objram[1];
 }
 
 
@@ -2869,8 +2830,8 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 			{
 				int sx = (offs / 256) * 32;
 				int sy = (offs % 256);
-				sx = (sx - m_stars2x + (col & 0x1f)) & 0x1ff;
-				sy = (sy - m_stars2y) & 0xff;
+				sx = (sx - m_starsx[1] + (col & 0x1f)) & 0x1ff;
+				sy = (sy - m_starsy[1]) & 0xff;
 				if (flip_screen())
 				{
 					sx = 512 - sx;
@@ -2894,8 +2855,8 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 			{
 				int sx = (offs / 256) * 32;
 				int sy = (offs % 256);
-				sx = (sx - m_stars1x + (col & 0x1f)) & 0x1ff;
-				sy = (sy - m_stars1y) & 0xff;
+				sx = (sx - m_starsx[0] + (col & 0x1f)) & 0x1ff;
+				sy = (sy - m_starsy[0]) & 0xff;
 				if (flip_screen())
 				{
 					sx = 512 - sx;
@@ -2970,28 +2931,28 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 
 	cps1_update_transmasks();
 
-	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x);
-	m_bg_tilemap[0]->set_scrolly(0, m_scroll1y);
+	m_bg_tilemap[0]->set_scrollx(0, m_scrollx[0]);
+	m_bg_tilemap[0]->set_scrolly(0, m_scrolly[0]);
 
 	if (videocontrol & 0x01)    /* linescroll enable */
 	{
-		int scrly = -m_scroll2y;
+		int scrly = -m_scrolly[1];
 
 		m_bg_tilemap[1]->set_scroll_rows(1024);
 
 		int otheroffs = m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (int i = 0; i < 256; i++)
-			m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, m_scroll2x + m_other[(i + otheroffs) & 0x3ff]);
+			m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, m_scrollx[1] + m_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
 	{
 		m_bg_tilemap[1]->set_scroll_rows(1);
-		m_bg_tilemap[1]->set_scrollx(0, m_scroll2x);
+		m_bg_tilemap[1]->set_scrollx(0, m_scrollx[1]);
 	}
-	m_bg_tilemap[1]->set_scrolly(0, m_scroll2y);
-	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x);
-	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
+	m_bg_tilemap[1]->set_scrolly(0, m_scrolly[1]);
+	m_bg_tilemap[2]->set_scrollx(0, m_scrollx[2]);
+	m_bg_tilemap[2]->set_scrolly(0, m_scrolly[2]);
 
 
 	/* Blank screen */

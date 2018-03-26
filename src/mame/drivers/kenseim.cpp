@@ -150,15 +150,15 @@ class kenseim_state : public cps_state
 {
 public:
 	kenseim_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps_state(mconfig, type, tag),
-		m_to_68k_cmd_low(0),
-		m_to_68k_cmd_d9(0),
-		m_to_68k_cmd_req(0),
-		m_to_68k_cmd_LVm(0),
-		m_from68k_ack(0),
-		m_from68k_st4(0),
-		m_from68k_st3(0),
-		m_from68k_st2(0)
+		: cps_state(mconfig, type, tag)
+		, m_to_68k_cmd_low(0)
+		, m_to_68k_cmd_d9(0)
+		, m_to_68k_cmd_req(0)
+		, m_to_68k_cmd_LVm(0)
+		, m_from68k_ack(0)
+		, m_from68k_st4(0)
+		, m_from68k_st3(0)
+		, m_from68k_st2(0)
 
 	{
 		for (int i = 0; i < 6; i++)
@@ -201,16 +201,12 @@ public:
 		}
 	}
 
-
 	/* kenseim */
 	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
 	DECLARE_DRIVER_INIT(kenseim);
 
 	// certain
-
 	DECLARE_WRITE8_MEMBER(mb8936_portc_w); // 20x LEDs
-
-
 
 	// uncertain
 	DECLARE_WRITE8_MEMBER(cpu_portc_w); // 4 bit out (lamps, coinlock etc.?)
@@ -362,9 +358,6 @@ WRITE8_MEMBER(kenseim_state::cpu_portc_w)
 }
 
 
-
-
-
 /*******************************
   Comms
  ******************************/
@@ -451,11 +444,6 @@ WRITE8_MEMBER(kenseim_state::cpu_porte_w)
 }
 
 
-
-
-
-
-
 void kenseim_state::kenseim_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -466,7 +454,6 @@ void kenseim_state::kenseim_io_map(address_map &map)
 {
 	map(0x20, 0x27).mirror(0xff00).rw("mb89363b", FUNC(mb89363b_device::read), FUNC(mb89363b_device::write));
 }
-
 
 
 static const z80_daisy_config daisy_chain_gamecpu[] =
@@ -662,9 +649,8 @@ ROM_START( kenseim )
 	ROMX_LOAD( "knm_12.5c",  0x400004, 0x80000, CRC(5da8303a) SHA1(de30149e323f7892bb9967a98a0d3cd9c261dc69) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "knm_13.6c",  0x400006, 0x80000, CRC(889bb671) SHA1(c7952ed801343e79c06be8ed765a293e7322307b) , ROM_GROUPWORD | ROM_SKIP(6) )
 
-	ROM_REGION( 0x28000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
-	ROM_LOAD( "knm_09.12a",  0x00000, 0x08000, CRC(15394dd7) SHA1(d96413cc8fa6cd3cfdafb2ab6305e41cfd2b8874) )
-	ROM_CONTINUE(            0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "knm_09.12a",  0x00000, 0x20000, CRC(15394dd7) SHA1(d96413cc8fa6cd3cfdafb2ab6305e41cfd2b8874) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "knm_18.11c",  0x00000, 0x20000, CRC(9e3e4773) SHA1(6e750a9610fabc4bf4964b5a754414d612d43dec) )
