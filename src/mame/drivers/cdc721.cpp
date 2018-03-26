@@ -11,9 +11,10 @@ Control Data Corporation CDC 721 Terminal (Viking)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
-//#include "machine/nvram.h"
+#include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "video/tms9927.h"
 #include "screen.h"
@@ -25,8 +26,10 @@ public:
 	cdc721_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_bank_16k(*this, {"block0", "block4", "block8", "blockc"})
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
+		, m_p_nvram(*this, "nvram")
 	{ }
 
 	void cdc721(machine_config &config);
@@ -37,9 +40,14 @@ private:
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(lights_w);
 	DECLARE_WRITE8_MEMBER(bank_select_w);
+	DECLARE_WRITE8_MEMBER(nvram_w);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+	void block0_map(address_map &map);
+	void block4_map(address_map &map);
+	void block8_map(address_map &map);
+	void blockc_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -47,8 +55,10 @@ private:
 	u8 m_flashcnt;
 
 	required_device<cpu_device> m_maincpu;
+	required_device_array<address_map_bank_device, 4> m_bank_16k;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_p_videoram;
+	required_shared_ptr<u8> m_p_nvram;
 };
 
 WRITE8_MEMBER(cdc721_state::interrupt_mask_w)
@@ -69,16 +79,49 @@ WRITE8_MEMBER(cdc721_state::lights_w)
 WRITE8_MEMBER(cdc721_state::bank_select_w)
 {
 	logerror("%s: Bank select = %02X\n", machine().describe_context(), data);
-	//membank("bankr0")->set_entry(BIT(data, 3));
+	for (int b = 0; b < 4; b++)
+	{
+		m_bank_16k[b]->set_bank(data & 3);
+		data >>= 2;
+	}
+}
+
+WRITE8_MEMBER(cdc721_state::nvram_w)
+{
+	m_p_nvram[offset] = data & 0x0f;
 }
 
 void cdc721_state::mem_map(address_map &map)
 {
+	map(0x0000, 0x3fff).rw("block0", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x7fff).rw("block4", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x8000, 0xbfff).rw("block8", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xc000, 0xffff).rw("blockc", FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+}
+
+void cdc721_state::block0_map(address_map &map)
+{
 	map(0x0000, 0x3fff).rom().region("resident", 0);
-	map(0x4000, 0x7fff).rom().region("rompack", 0);
-//  AM_RANGE(0x0000, 0x4fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	map(0x8000, 0xdfff).ram();
-	map(0xe000, 0xffff).ram().share("videoram");
+	map(0x8000, 0xbfff).ram();
+}
+
+void cdc721_state::block4_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("nvram").w(this, FUNC(cdc721_state::nvram_w));
+	map(0x0800, 0x0bff).ram();
+	map(0x8000, 0xbfff).rom().region("rompack", 0);
+	map(0xc000, 0xffff).ram();
+}
+
+void cdc721_state::block8_map(address_map &map)
+{
+	map(0x4000, 0x7fff).ram();
+}
+
+void cdc721_state::blockc_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x3fff).ram().share("videoram");
 }
 
 void cdc721_state::io_map(address_map &map)
@@ -100,8 +143,8 @@ INPUT_PORTS_END
 
 void cdc721_state::machine_reset()
 {
-//  membank("bankr0")->set_entry(0);
-//  membank("bankw0")->set_entry(0);
+	for (auto &bank : m_bank_16k)
+		bank->set_bank(0);
 }
 
 void cdc721_state::machine_start()
@@ -198,7 +241,31 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(cdc721_daisy_chain)
 
-	//MCFG_NVRAM_0FILL_ADD("nvram") // MCM51L01C45 (256x4) + battery
+	MCFG_DEVICE_ADD("block0", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADDRESS_MAP(0, block0_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("block4", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADDRESS_MAP(0, block4_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("block8", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADDRESS_MAP(0, block8_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("blockc", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_ADDRESS_MAP(0, blockc_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_NVRAM_ADD_0FILL("nvram") // MCM51L01C45 (256x4) + battery
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

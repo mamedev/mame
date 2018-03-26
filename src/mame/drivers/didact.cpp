@@ -445,6 +445,8 @@ void mp68a_state::machine_start()
 {
 	LOG("--->%s()\n", FUNCNAME);
 
+	m_7segs.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_shift));
 	save_item(NAME(m_led));

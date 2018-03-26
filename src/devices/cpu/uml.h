@@ -392,7 +392,7 @@ namespace uml
 	{
 	public:
 		// construction/destruction
-		constexpr instruction() { }
+		constexpr instruction() : m_param{ } { }
 
 		// getters
 		constexpr opcode_t opcode() const { return m_opcode; }
