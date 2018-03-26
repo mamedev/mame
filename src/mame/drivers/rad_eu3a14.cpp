@@ -11,6 +11,7 @@
     Known to be on this hardware
 
     Golden Tee Golf Home Edition (developed by FarSight Studios)
+	Connectv Football (developed by Medialink)
 
     Also on this hardware
 
@@ -87,6 +88,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void radica_eu3a14(machine_config &config);
+	void radica_eu3a14_adc(machine_config &config);
 
 	int m_custom_irq;
 	uint16_t m_custom_irq_vector;
@@ -109,8 +111,12 @@ public:
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
+	DECLARE_DRIVER_INIT(rad_gtg);
+	DECLARE_DRIVER_INIT(rad_foot);
+
 	void bank_map(address_map &map);
 	void radica_eu3a14_map(address_map &map);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -133,6 +139,8 @@ private:
 
 	uint8_t m_rombank_hi;
 	uint8_t m_rombank_lo;
+	int m_tilerambase;
+	int m_spriterambase;
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase);
@@ -204,7 +212,7 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 	int ydraw = ybase;
 	int count = 0;
 
-	for (int i = 0x800+0x1c0*which; i < 0x800+0x1c0*(which+1); i+=2)
+	for (int i = m_tilerambase+0x1c0*which; i < m_tilerambase+0x1c0*(which+1); i+=2)
 	{
 		int tile = m_mainram[i+0] | (m_mainram[i+1] << 8);
 
@@ -250,7 +258,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 {
 	// first 4 sprite entries seem to be garbage sprites, so we start at 0x20
 	// likely we're just interpreting them wrong and they're used for blanking things or clipping?
-	for (int i = 0x20; i < 0x800; i += 8)
+	for (int i = m_spriterambase; i < m_spriterambase+0x7e0; i += 8)
 	{
 		/*
 		+0  e--f hhww  flip, enable, height, width
@@ -470,9 +478,7 @@ void radica_eu3a14_state::bank_map(address_map &map)
 void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x1fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
-
-	map(0x3000, 0x3fff).ram(); // runs code from here
+	map(0x0200, 0x3fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
 
 	map(0x4800, 0x4bff).ram().share("palram");
 
@@ -562,8 +568,8 @@ WRITE8_MEMBER(radica_eu3a14_state::dma_trigger_w)
 }
 
 
-
-static INPUT_PORTS_START( radica_eu3a14 )
+// hold back/backspin and left during power on for test mode
+static INPUT_PORTS_START( rad_gtg )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -575,7 +581,7 @@ static INPUT_PORTS_START( radica_eu3a14 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // up and down in the menus should be the trackball?!
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // up and down in the menus should be the trackball, maybe these are leftovers from real swing golf or just from development?
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
 	PORT_START("IN1")
@@ -588,6 +594,55 @@ static INPUT_PORTS_START( radica_eu3a14 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+// hold enter and left during power on for test mode
+static INPUT_PORTS_START( radica_eu3a14 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) // enter?
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void radica_eu3a14_state::machine_start()
@@ -692,7 +747,6 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 	MCFG_CPU_ADD("maincpu",M6502,XTAL(21'477'272)/2) // marked as 21'477'270
 	MCFG_CPU_PROGRAM_MAP(radica_eu3a14_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_eu3a14_state,  interrupt)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", radica_eu3a14_state, scanline_cb, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)
@@ -723,9 +777,38 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14_adc)
+	radica_eu3a14(config);
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", radica_eu3a14_state, scanline_cb, "screen", 0, 1)
+MACHINE_CONFIG_END
+
+DRIVER_INIT_MEMBER(radica_eu3a14_state, rad_gtg)
+{
+	// must be registers to control this
+	m_tilerambase = 0x0a00 - 0x200;
+	m_spriterambase = 0x0220 - 0x200;
+}
+
+DRIVER_INIT_MEMBER(radica_eu3a14_state, rad_foot)
+{
+	// must be registers to control this
+	m_tilerambase = 0x0200 - 0x200;
+	m_spriterambase = 0x2800 - 0x200;
+}
+
+
 ROM_START( rad_gtg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x000000, 0x400000, CRC(b1985c63) SHA1(c42a59fcb665eb801d9ca5312b90e39333e52de4) )
 ROM_END
 
-CONS( 2006, rad_gtg,  0,   0,  radica_eu3a14,  radica_eu3a14, radica_eu3a14_state, 0, "Radica (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
+ROM_START( rad_foot )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "connectvfootball.bin", 0x000000, 0x400000, CRC(00ac4fc0) SHA1(2b60ae5c6bc7e9ef7cdbd3f6a0a0657ed3ab5afe) )
+ROM_END
+
+CONS( 2006, rad_gtg,  0,   0,  radica_eu3a14_adc,  rad_gtg,       radica_eu3a14_state, rad_gtg, "Radica (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
+
+// also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
+CONS( 2006, rad_foot, 0,   0,  radica_eu3a14,      radica_eu3a14, radica_eu3a14_state, rad_foot, "Radica", "Connectv Football", MACHINE_NOT_WORKING ) 
