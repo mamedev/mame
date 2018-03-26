@@ -313,10 +313,13 @@ class namcos11_state : public driver_device
 {
 public:
 	namcos11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_sharedram(*this,"sharedram"),
-		m_maincpu(*this,"maincpu"),
-		m_mcu(*this,"c76")
+		: driver_device(mconfig, type, tag)
+		, m_sharedram(*this, "sharedram")
+		, m_maincpu(*this, "maincpu")
+		, m_mcu(*this, "c76")
+		, m_bankedroms(*this, "bankedroms")
+		, m_bank(*this, "bank%u", 1)
+		, m_lightgun_io(*this, {"GUN1X", "GUN1Y", "GUN2X", "GUN2Y"})
 	{
 	}
 
@@ -361,7 +364,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 
-	memory_bank *m_bank[8];
+	optional_memory_region m_bankedroms;
+	optional_memory_bank_array<8> m_bank;
+	optional_ioport_array<4> m_lightgun_io;
+
 	uint32_t m_n_bankoffset;
 	uint8_t m_su_83;
 
@@ -427,27 +433,27 @@ READ16_MEMBER(namcos11_state::lightgun_r)
 	switch( offset )
 	{
 	case 0:
-		data = ioport( "GUN1X" )->read();
+		data = m_lightgun_io[0]->read();
 		break;
 
 	case 2:
-		data = ioport( "GUN1Y" )->read();
+		data = m_lightgun_io[1]->read();
 		break;
 
 	case 3:
-		data =  ioport( "GUN1Y" )->read() + 1;
+		data =  m_lightgun_io[1]->read() + 1;
 		break;
 
 	case 4:
-		data = ioport( "GUN2X" )->read();
+		data = m_lightgun_io[2]->read();
 		break;
 
 	case 6:
-		data = ioport( "GUN2Y" )->read();
+		data = m_lightgun_io[3]->read();
 		break;
 
 	case 7:
-		data = ioport( "GUN2Y" )->read() + 1;
+		data = m_lightgun_io[3]->read() + 1;
 		break;
 	}
 	verboselog(2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -565,17 +571,13 @@ void namcos11_state::driver_start()
 		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos11_state::c76_speedup_r),this), write16_delegate(FUNC(namcos11_state::c76_speedup_w),this));
 	}
 
-	memory_region *bankedroms = memregion( "bankedroms" );
-	if( bankedroms != nullptr )
+	if( m_bankedroms != nullptr )
 	{
-		uint8_t *base = bankedroms->base();
-		int entries = bankedroms->bytes() / ( 1024 * 1024 );
-
-		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
+		uint8_t *base = m_bankedroms->base();
+		int entries = m_bankedroms->bytes() / ( 1024 * 1024 );
 
 		for( int bank = 0; bank < 8; bank++ )
 		{
-			m_bank[ bank ] = membank( bankname[ bank ] );
 			if( m_bank[ bank ] != nullptr )
 			{
 				m_bank[ bank ]->configure_entries( 0, entries, base, 1024 * 1024 );
