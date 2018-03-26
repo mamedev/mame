@@ -37955,6 +37955,7 @@ zone40                          // Zone 40
 zone60                          // Zone 60
 rad_skat                        //
 rad_skatp                       //
+rad_crik                        //
 
 @source:vsmilepro.cpp
 vsmilpro
