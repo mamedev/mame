@@ -1828,7 +1828,7 @@ void info_xml_creator::output_ramoptions(device_t &root)
 			{
 				assert(!havedefault);
 				havedefault = true;
-				fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"1\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
+				fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
 			}
 			else
 			{
@@ -1836,7 +1836,7 @@ void info_xml_creator::output_ramoptions(device_t &root)
 			}
 		}
 		if (!havedefault)
-			fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"1\">%u</ramoption>\n", ram.default_size_string(), defsize);
+			fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
 	}
 }
 
