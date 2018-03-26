@@ -58,8 +58,8 @@ WRITE_LINE_MEMBER(lemmings_state::screen_vblank_lemmings)
 	// rising edge
 	if (state)
 	{
-		std::copy(&m_spriteram[0]->buffer()[0], &m_spriteram[0]->buffer()[0x800/2], &m_sprite_triple_buffer[0][0]);
-		std::copy(&m_spriteram[1]->buffer()[0], &m_spriteram[1]->buffer()[0x800/2], &m_sprite_triple_buffer[1][0]);
+		for (int chip = 0; chip < 2; chip++)
+			std::copy_n(&m_spriteram[chip]->buffer()[0], 0x800/2, &m_sprite_triple_buffer[chip][0]);
 	}
 }
 
