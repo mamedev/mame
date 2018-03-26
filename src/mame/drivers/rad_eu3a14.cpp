@@ -74,6 +74,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palram(*this, "palram"),
 		m_scrollregs(*this, "scrollregs"),
+		m_tilecfg(*this, "tilecfg"),
 		m_tilebase(*this, "tilebase"),
 		m_mainram(*this, "mainram"),
 		m_dmaparams(*this, "dmaparams"),
@@ -130,6 +131,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_scrollregs;
+	required_shared_ptr<uint8_t> m_tilecfg;
 	required_shared_ptr<uint8_t> m_tilebase;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_dmaparams;
@@ -143,7 +145,7 @@ private:
 	int m_spriterambase;
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase);
+	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -202,11 +204,26 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
-void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase)
+void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size)
 {
-	gfx_element *gfx =  m_gfxdecode->gfx(3);
-
+	gfx_element *gfx;
+	
 	int base = (m_tilebase[1] << 8) | m_tilebase[0];
+	if (m_tilecfg[2] & 0x04)
+	{
+		gfx = m_gfxdecode->gfx(4);
+		base <<= 1;
+
+		if (size == 8)
+		{
+			gfx = m_gfxdecode->gfx(5);
+			base <<= 2;
+		}
+	}
+	else
+	{
+		gfx = m_gfxdecode->gfx(3);
+	}
 
 	int xdraw = xbase;
 	int ydraw = ybase;
@@ -217,13 +234,13 @@ void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap,
 		int tile = m_mainram[i+0] | (m_mainram[i+1] << 8);
 
 		gfx->transpen(bitmap, cliprect, tile+base, 0, 0, 0, xdraw, ydraw, 0);
-		xdraw+=16;
+		xdraw+=size;
 
 		count++;
 		if (((count % 16) == 0))
 		{
-			xdraw -= 256;
-			ydraw += 16;
+			xdraw -= size*16;
+			ydraw += size;
 		}
 	}
 }
@@ -233,25 +250,32 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	int xscroll = m_scrollregs[0] | (m_scrollregs[1] << 8);
 	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
 
-	draw_page(screen,bitmap,cliprect,0, 0-xscroll, 0-yscroll);
-	draw_page(screen,bitmap,cliprect,1, 256-xscroll, 0-yscroll);
-	draw_page(screen,bitmap,cliprect,2, 0-xscroll, 224-yscroll);
-	draw_page(screen,bitmap,cliprect,3, 256-xscroll, 224-yscroll);
+	int size = 16;
+	// or 0x10?
+	if (m_tilecfg[0] & 0x80)
+	{
+		size = 8;
+	}
 
-	draw_page(screen,bitmap,cliprect,0, 512+0-xscroll, 0-yscroll);
-	draw_page(screen,bitmap,cliprect,1, 512+256-xscroll, 0-yscroll);
-	draw_page(screen,bitmap,cliprect,2, 512+0-xscroll, 224-yscroll);
-	draw_page(screen,bitmap,cliprect,3, 512+256-xscroll, 224-yscroll);
+	draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, 0 - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 1, (size * 16) - xscroll, 0 - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * 14) - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 3, (size * 16) - xscroll, (size * 14) - yscroll, size);
 
-	draw_page(screen,bitmap,cliprect,0, 0-xscroll, 448+0-yscroll);
-	draw_page(screen,bitmap,cliprect,1, 256-xscroll, 448+0-yscroll);
-	draw_page(screen,bitmap,cliprect,2, 0-xscroll, 448+224-yscroll);
-	draw_page(screen,bitmap,cliprect,3, 256-xscroll, 448+224-yscroll);
+	draw_page(screen, bitmap, cliprect, 0, (size * 16 * 2) + 0 - xscroll, 0 - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 1, (size * 16 * 3) - xscroll, 0 - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 2, (size * 16 * 2) + 0 - xscroll, (size * 14) - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 3, (size * 16 * 3) - xscroll, (size * 14) - yscroll, size);
 
-	draw_page(screen,bitmap,cliprect,0, 512+0-xscroll, 448+0-yscroll);
-	draw_page(screen,bitmap,cliprect,1, 512+256-xscroll, 448+0-yscroll);
-	draw_page(screen,bitmap,cliprect,2, 512+0-xscroll, 448+224-yscroll);
-	draw_page(screen,bitmap,cliprect,3, 512+256-xscroll, 448+224-yscroll);
+	draw_page(screen, bitmap, cliprect, 0, 0 - xscroll, (size * 14 * 2) + 0 - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 1, (size * 16) - xscroll, (size * 14 * 2) + 0 - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 2, 0 - xscroll, (size * 14 * 3) - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 3, (size * 16) - xscroll, (size * 14 * 3) - yscroll, size);
+
+	draw_page(screen, bitmap, cliprect, 0, (size * 16 * 2) + 0 - xscroll, (size * 14 * 2) + 0 - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 1, (size * 16 * 3) - xscroll, (size * 14 * 2) + 0 - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 2, (size * 16 * 2) + 0 - xscroll, (size * 14 * 3) - yscroll, size);
+	draw_page(screen, bitmap, cliprect, 3, (size * 16 * 3) - xscroll, (size * 14 * 3) - yscroll, size);
 }
 
 void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -521,7 +545,7 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5103, 0x5106).ram();
 	map(0x5107, 0x5107).ram(); // on transitions, maybe layer disables?
 
-	map(0x5110, 0x5112).ram(); // startup
+	map(0x5110, 0x5112).ram().share("tilecfg");
 	map(0x5113, 0x5113).ram(); // written with tilebase?
 	map(0x5114, 0x5115).ram().share("tilebase");
 	map(0x5116, 0x5117).ram();
@@ -733,11 +757,36 @@ static const gfx_layout helper16x16x8_layout =
 	16 * 16 * 8
 };
 
+static const gfx_layout helper16x16x4_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP16(0,4) },
+	{ STEP16(0,16*4)  },
+	16 * 16 * 4
+};
+
+static const gfx_layout helper8x8x4_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,8*4)  },
+	8 * 8 * 4
+};
+
+
 static GFXDECODE_START( helper )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x2_layout,    0x0, 128  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x4_layout,    0x0, 32  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x8_layout,    0x0, 2  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x8_layout,    0x0, 2  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x8_layout,  0x0, 2  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper16x16x4_layout,  0x0, 32  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper8x8x4_layout,    0x0, 32  )
 GFXDECODE_END
 
 
