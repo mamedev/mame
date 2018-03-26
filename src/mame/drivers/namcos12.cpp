@@ -1185,6 +1185,7 @@ public:
 
 	void coh700(machine_config &config);
 	void coh716(machine_config &config);
+	void namcos12_mobo(machine_config &config);
 	void golgo13_h8iomap(address_map &map);
 	void jvsiomap(address_map &map);
 	void jvsmap(address_map &map);
@@ -1717,17 +1718,10 @@ DRIVER_INIT_MEMBER(namcos12_state,golgo13)
 	m_alt_bank = 1;
 }
 
-MACHINE_CONFIG_START(namcos12_state::coh700)
+// SYSTEM12 MOTHER PCB
+MACHINE_CONFIG_START(namcos12_state::namcos12_mobo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL(100'000'000))
-	MCFG_CPU_PROGRAM_MAP( namcos12_map)
-
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
-
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
-
 	MCFG_CPU_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
 	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
 	MCFG_CPU_IO_MAP(s12h8iomap)
@@ -1743,10 +1737,6 @@ MACHINE_CONFIG_START(namcos12_state::coh700)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
 
 	MCFG_AT28C16_ADD("at28c16", nullptr)
-
-	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, this ) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1758,8 +1748,26 @@ MACHINE_CONFIG_START(namcos12_state::coh700)
 	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(namcos12_state::coh716)
+// CPU PCB COH700
+MACHINE_CONFIG_START(namcos12_state::coh700)
+	namcos12_mobo(config);
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL(100'000'000))
+	MCFG_CPU_PROGRAM_MAP( namcos12_map)
 
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("4M")
+
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
+
+	/* video hardware */
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, this ) )
+MACHINE_CONFIG_END
+
+// CPU PCB COH716
+MACHINE_CONFIG_START(namcos12_state::coh716)
+	namcos12_mobo(config);
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CXD8606BQ, XTAL(100'000'000))
 	MCFG_CPU_PROGRAM_MAP( namcos12_map)
@@ -1769,34 +1777,9 @@ MACHINE_CONFIG_START(namcos12_state::coh716)
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
 
-	MCFG_CPU_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
-	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
-	MCFG_CPU_IO_MAP(s12h8iomap)
-
-	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
-
-	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("sub:sci1", h8_sci_device, rx_w))
-
-	MCFG_DEVICE_MODIFY("sub:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
-
-	MCFG_AT28C16_ADD("at28c16", nullptr)
-
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x400000, XTAL(53'693'175) )
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, this ) )
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_C352_ADD("c352", 25401600, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos12_boothack_state::ptblank2)
