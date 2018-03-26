@@ -760,7 +760,7 @@ WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
 			machine().bookkeeping().coin_counter_w(1, data & 0x0002);
 		}
 
-		if (!m_cps2lockoutreversebit)
+		if (m_cps2lockoutreversebit)
 		{
 			machine().bookkeeping().coin_lockout_w(0, data & 0x0010);
 			machine().bookkeeping().coin_lockout_w(1, data & 0x0020);
