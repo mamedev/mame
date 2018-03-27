@@ -892,21 +892,22 @@ WRITE16_MEMBER(neogeo_state::write_banksel)
  *
  *************************************/
 
-void neogeo_state::set_outputs(  )
+void neogeo_state::set_outputs()
 {
-	static const uint8_t led_map[0x10] =
-		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
+	static constexpr uint8_t led_map[0x10] =
+			{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-	/* EL */
-	output().set_digit_value(0, led_map[m_el_value]);
+	// EL
+	for (unsigned i = 0; 6U > i; ++i)
+		m_lamps[i] = (m_el_value & 0x07) == (i + 1);
 
-	/* LED1 */
-	output().set_digit_value(1, led_map[m_led1_value >> 4]);
-	output().set_digit_value(2, led_map[m_led1_value & 0x0f]);
+	// LED1
+	m_digits[0] = led_map[m_led1_value >> 4];
+	m_digits[1] = led_map[m_led1_value & 0x0f];
 
-	/* LED2 */
-	output().set_digit_value(3, led_map[m_led2_value >> 4]);
-	output().set_digit_value(4, led_map[m_led2_value & 0x0f]);
+	// LED2
+	m_digits[2] = led_map[m_led2_value >> 4];
+	m_digits[3] = led_map[m_led2_value & 0x0f];
 }
 
 
@@ -1321,6 +1322,9 @@ void neogeo_state::common_machine_start()
 
 void neogeo_state::machine_start()
 {
+	m_digits.resolve();
+	m_lamps.resolve();
+
 	m_type = NEOGEO_MVS;
 	common_machine_start();
 
@@ -1330,13 +1334,6 @@ void neogeo_state::machine_start()
 	m_upd4990a->c0_w(1);
 	m_upd4990a->c1_w(1);
 	m_upd4990a->c2_w(1);
-
-	if (m_slot1) { m_slots[0] = m_slot1; } else { m_slots[0] = nullptr; }
-	if (m_slot2) { m_slots[1] = m_slot2; } else { m_slots[1] = nullptr; }
-	if (m_slot3) { m_slots[2] = m_slot3; } else { m_slots[2] = nullptr; }
-	if (m_slot4) { m_slots[3] = m_slot4; } else { m_slots[3] = nullptr; }
-	if (m_slot5) { m_slots[4] = m_slot5; } else { m_slots[4] = nullptr; }
-	if (m_slot6) { m_slots[5] = m_slot6; } else { m_slots[5] = nullptr; }
 
 	m_sprgen->m_fixed_layer_bank_type = 0;
 	m_sprgen->set_screen(m_screen);
@@ -1742,13 +1739,6 @@ MACHINE_START_MEMBER(aes_state, aes)
 {
 	m_type = NEOGEO_AES;
 	common_machine_start();
-
-	m_slots[0] = m_slot1;
-	m_slots[1] = nullptr;
-	m_slots[2] = nullptr;
-	m_slots[3] = nullptr;
-	m_slots[4] = nullptr;
-	m_slots[5] = nullptr;
 
 	m_sprgen->m_fixed_layer_bank_type = 0;
 	m_sprgen->set_screen(m_screen);

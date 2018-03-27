@@ -7,29 +7,21 @@
  * Rockwell AIM-65
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_AIM65_H
 #define MAME_INCLUDES_AIM65_H
 
-#include "cpu/m6502/m6502.h"
-#include "video/dl1416.h"
-#include "machine/6522via.h"
-#include "machine/mos6530n.h"
-#include "machine/6821pia.h"
-#include "machine/ram.h"
-#include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "bus/generic/slot.h"
+#pragma once
+
 #include "bus/generic/carts.h"
-
-
-/** R6502 Clock.
- *
- * The R6502 on AIM65 operates at 1 MHz. The frequency reference is a 4 MHz
- * crystal controlled oscillator. Dual D-type flip-flop Z10 divides the 4 MHz
- * signal by four to drive the R6502 phase 0 (O0) input with a 1 MHz clock.
- */
-#define AIM65_CLOCK  XTAL(4'000'000)/4
+#include "bus/generic/slot.h"
+#include "cpu/m6502/m6502.h"
+#include "imagedev/cassette.h"
+#include "machine/6522via.h"
+#include "machine/6821pia.h"
+#include "machine/mos6530n.h"
+#include "machine/ram.h"
+#include "sound/wave.h"
+#include "video/dl1416.h"
 
 
 class aim65_state : public driver_device
@@ -49,8 +41,14 @@ public:
 		, m_z15(*this, "z15")
 		, m_ram(*this, RAM_TAG)
 		, m_ds(*this, "ds%u", 1)
+		, m_digits(*this, "digit%u", 0U)
 	{
 	}
+
+	void aim65(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(aim65_pia_a_w);
 	DECLARE_WRITE8_MEMBER(aim65_pia_b_w);
@@ -69,13 +67,11 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z14_load) { return load_cart(image, m_z14, "z14"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z15_load) { return load_cart(image, m_z15, "z15"); }
 
-	void aim65(machine_config &config);
-	void aim65_mem(address_map &map);
-protected:
-	virtual void machine_start() override;
-
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *slot_tag);
 
+	void aim65_mem(address_map &map);
+
+private:
 	uint8_t m_riot_port_a;
 	uint8_t m_pb_save;
 
@@ -91,6 +87,7 @@ protected:
 	required_device<generic_slot_device> m_z15;
 	required_device<ram_device> m_ram;
 	required_device_array<dl1416_device, 5> m_ds;
+	output_finder<20> m_digits;
 };
 
 
