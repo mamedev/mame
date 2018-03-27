@@ -31,15 +31,23 @@ public:
 	z80dev_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void z80dev(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER( display_w );
 	DECLARE_READ8_MEMBER( test_r );
-	void z80dev(machine_config &config);
+
+	virtual void machine_start() override;
+
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+
 private:
 	required_device<cpu_device> m_maincpu;
+	output_finder<6> m_digits;
 };
 
 WRITE8_MEMBER( z80dev_state::display_w )
@@ -48,12 +56,17 @@ WRITE8_MEMBER( z80dev_state::display_w )
 	// xxxx ---- ???
 	static const uint8_t hex_7seg[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71};
 
-	output().set_digit_value(offset, hex_7seg[data&0x0f]);
+	m_digits[offset] = hex_7seg[data & 0x0f];
 }
 
 READ8_MEMBER( z80dev_state::test_r )
 {
 	return machine().rand();
+}
+
+void z80dev_state::machine_start()
+{
+	m_digits.resolve();
 }
 
 void z80dev_state::mem_map(address_map &map)
@@ -113,7 +126,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(z80dev_state::z80dev)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
