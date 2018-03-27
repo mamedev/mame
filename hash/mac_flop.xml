@@ -32,7 +32,7 @@
 	
 	<!-- S/N: Z93350-001A -->
 	<software name="clarisw">
-		<description>ClarisWorks (Swe)</description>
+		<description>ClarisWorks (Swedish)</description>
 		<year>1993</year>
 		<publisher>Claris</publisher>
 		<info name="version" value="2.0" />

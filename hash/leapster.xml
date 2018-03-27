@@ -120,8 +120,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13453-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- EEPROM (24C16A?) -->
+			<!-- PCB has an epoxy blob ROM at U1 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13453-a.u1" size="8388608" crc="de5fb26e" sha1="2a1df737ec907d1f1b837f9b58323ee908cb45a9" offset="0" />
 			</dataarea>
@@ -135,8 +134,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12711-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- EEPROM (24C16A?) -->
+			<!-- PCB has an epoxy blob ROM at U1 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12711-a.u1" size="8388608" crc="7c934681" sha1="8db48ba9caa2f87922cb289520acd97d9931a178" offset="0" />
 			</dataarea>
@@ -150,8 +148,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11972-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-1XXXX-A" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11972-a.u1" size="8388608" crc="a0a362aa" sha1="442455a0bf2c3ca4c1084a1e8761eb80a4cd71e2" offset="0" />
 			</dataarea>
@@ -165,8 +162,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12098-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-1XXXX-A" />
-+			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-+			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12098-a.u1" size="8388608" crc="d4a7e5d4" sha1="c831db237e73e61e863e4f477dcc0298488b3d69" offset="0" />
 			</dataarea>
@@ -180,8 +176,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12171-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-1XXXX-A" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12171-a.u1" size="8388608" crc="c7b62602" sha1="bbc2b70e588710b2096741046ae3e08095397ee9" offset="0" />
 			</dataarea>
@@ -207,8 +202,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12712-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24C16AN -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24C16AN EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12712-a.u1" size="8388608" crc="beca3909" sha1="8cda80251d6e45427dba6acbae5dff306eb84d34" offset="0" />
 			</dataarea>
@@ -222,8 +216,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12466-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12466-a.u1" size="8388608" crc="0134af49" sha1="29c3e2e9d56aeee09c752776bfd8c096e02b75c5" offset="0" />
 			</dataarea>
@@ -237,8 +230,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11994-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10308-A" />
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and a 24LC02B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11994-a.u3" size="4194304" crc="979346d5" sha1="ecd8d3f7bae4fea1710ee99c5637224180021dd6" offset="0" />
 			</dataarea>
@@ -264,9 +256,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11603-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10029-A" />
-			<feature name="u1" value="U1" /> <!-- TE28F640 FLASH ROM -->
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
-			<feature name="u3" value="U3" /> <!-- Unpopulated slot -->
+			<!-- PCB has a TE28F640 FLASH ROM at U1, a 24LC02B EEPROM at U2 and an unpopulated U3 slot. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11603-a.u1" size="8388608" crc="71062cd7" sha1="eaf0656d29f61d89b97c6d66e73a2fa7021a92e3" offset="0" />
 			</dataarea>
@@ -280,8 +270,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13681-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24C16A -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24C16A EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13681-a.u1" size="8388608" crc="822ca3da" sha1="ff0ac7f5fded346553e1a4697b45c27fc04ee3fe" offset="0" />
 			</dataarea>
@@ -295,8 +284,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13514-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24C16A? -->
+			<!-- PCB has an epoxy blob ROM at U1 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13514-a.u1" size="8388608" crc="5ccb2ad3" sha1="42740f6597f4a2eb878a54ddbf75452a2cca301d" offset="0" />
 			</dataarea>
@@ -310,8 +298,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11496-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and a 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11496-a.u3" size="8388608" crc="bb6d5375" sha1="743d07ee756b54e2c72bf94da56dd8d18c4cd106" offset="0" />
 			</dataarea>
@@ -325,8 +312,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13448-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MX64Mb" />
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and a 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13448-a.u3" size="8388608" crc="2465f01d" sha1="d37d7ea21cf8ed01ecf497c3c99185529aee59af" offset="0" />
 			</dataarea>
@@ -340,8 +326,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12562-B" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-1XXXX-A" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12562-b.u1" size="8388608" crc="242907d4" sha1="262ee3e208fff0fc362bc879416cbdf31bf38304" offset="0" />
 			</dataarea>
@@ -355,8 +340,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-10775-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-1XXXX-A" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24LC02B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-10775-a.u1" size="8388608" crc="1895f946" sha1="8baf4f44f64d17333a82ce29e59c62e51e45c0c0" offset="0" />
 			</dataarea>
@@ -370,8 +354,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11495-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and a 24LC02B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11495-a.u3" size="8388608" crc="6a5e20ba" sha1="984638e1d9b869611de8900d8f5a6a760cd40539" offset="0" />
 			</dataarea>
@@ -385,8 +368,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12715-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24C16AN -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24C16AN EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12715-a.u1" size="8388608" crc="e62d1684" sha1="e43820efe9dbd8dddf6312493a7967c75a29431a" offset="0" />
 			</dataarea>
@@ -400,8 +382,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12692-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24C16AN -->
+			<!-- PCB has an epoxy blob ROM at U1 and a 24C16AN EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12692-a.u1" size="8388608" crc="05b608f0" sha1="04b3181f39e88b6cd47e39a7efb50fa14618ff2c" offset="0" />
 			</dataarea>
@@ -415,8 +396,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13447-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24C16A? -->
+			<!-- PCB has an epoxy blob ROM at U1 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13447-a.u1" size="8388608" crc="ebbf83a0" sha1="2412607b40f8e46881368607b4fe15ecf2f2e9eb" offset="0" />
 			</dataarea>
@@ -430,8 +410,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-10935-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and a 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-10935-a.u3" size="8388608" crc="6fd44f1a" sha1="fe6e8e1aaf72901820ee99d22dcc40a01d627fac" offset="0" />
 			</dataarea>
@@ -445,8 +424,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11494-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and a 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11494-a.u3" size="8388608" crc="96d30f93" sha1="61dd156ae456a370a021061da9b3a4e33bda371e" offset="0" />
 			</dataarea>
@@ -460,9 +438,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13298-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="300-30033" />
-			<feature name="u1" value="U1" /> <!-- 24C16A -->
-			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u3" value="U3" /> <!-- Unpopulated slot -->
+			<!-- PCB has a 24C16A at U1, an epoxy blob ROM at U2 and an unpopulated U3 slot. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13298-a.u2" size="8388608" crc="7c716016" sha1="35512ea5c267f5540cbfa64a4d35ebc54464fd31" offset="0" />
 			</dataarea>
@@ -500,8 +476,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11078-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- EEPROM -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11078-a.u3" size="8388608" crc="e1f505e7" sha1="935eb17d3b6f9df2115a12445b3c8c977005481a" offset="0" />
 			</dataarea>
@@ -515,9 +490,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11493-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10061-02" />
-			<feature name="u1" value="U1" /> <!-- Unpopulated slot -->
-			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u3" value="U3" /> <!-- 39VF040 FLASH -->
+			<!-- PCB has a 39VF040 FLASH at U3, an epoxy blob ROM at U2 and an unpopulated U1 slot. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11493-a.u2" size="8388608" crc="e58eac06" sha1="a2f8c6df81fd5f72f6894b153306fd871fd20aac" offset="0" />
 			</dataarea>
@@ -543,9 +516,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11003" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10061-02" />
-			<feature name="u1" value="U1" /> <!-- Unpopulated slot -->
-			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u3" value="U3" /> <!-- 39VF040 FLASH -->
+			<!-- PCB has a 39VF040 FLASH at U3, an epoxy blob ROM at U2 and an unpopulated U1 slot. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11003.u2" size="8388608" crc="dbb767cc" sha1="280b18a8cdf3ae09c5c7b32b8e592a8e2890302c" offset="0" />
 			</dataarea>
@@ -559,8 +530,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13682-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MX64Mb" />
-			<feature name="u2" value="U2" /> <!-- 24C16A? -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13682-a.u3" size="8388608" crc="2fc77c9d" sha1="266e08439be2c91fbc9942c3620f49459c157fcc" offset="0" />
 			</dataarea>
@@ -586,8 +556,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13446-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MX64Mb" />
-			<feature name="u2" value="U2" /> <!-- 24C16A? -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13446-a.u3" size="8388608" crc="3c428a13" sha1="b90cdd518178849efabf7e3e17bf99072d964fad" offset="0" />
 			</dataarea>
@@ -613,9 +582,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12738-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="300-30033" />
-			<feature name="u1" value="U1" /> <!-- 24C16AN -->
-			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u3" value="U3" /> <!-- Unpopulated slot -->
+			<!-- PCB has a 24C16AN at U1, an epoxy blob ROM at U2 and an unpopulated U3 slot. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12738-a.u2" size="8388608" crc="df729fe7" sha1="af3c6b80d075f469388395cb065efa8bd6aeeab1" offset="0" />
 			</dataarea>
@@ -629,8 +596,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-10829-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an 24LC02B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-10829-a.u3" size="8388608" crc="2c6e623e" sha1="c298181f00109b7f863fdb12b5bd462085c4ff4f" offset="0" />
 			</dataarea>
@@ -692,8 +658,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12296-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
+			<!-- PCB has an epoxy blob ROM at U1 and an 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12296-a.u1" size="8388608" crc="a9d2cdbd" sha1="e239b209239252f0f6cd2a4c71d2a46a3abfd5eb" offset="0" />
 			</dataarea>
@@ -708,8 +673,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11002" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10113-A" />
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an 24LC02B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11002.u3" size="8388608" crc="0f2ad725" sha1="258e5b006086a7fd4cfa4460f3008604a5d87e1d" offset="0" />
 			</dataarea>
@@ -723,8 +687,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-10933-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an 24LC02B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-10933-a.u3" size="8388608" crc="d11e7c30" sha1="71a844d9f38f7bc915e716d3d5485f558e9bffe9" offset="0" />
 			</dataarea>
@@ -738,8 +701,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13273-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="300-10308" />
-			<feature name="u2" value="U2" /> <!-- 24C16A? -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13273-a.u3" size="4194304" crc="8761fc61" sha1="90b0e1faf6964ec74643a45b46f0b064ebf9ea8a" offset="0" />
 			</dataarea>
@@ -753,8 +715,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-10825-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an 24LC02B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-10825-a.u3" size="8388608" crc="0ef61cbb" sha1="ff00b91ca8bcd2a5d1ead2c353d6d1c048994d69" offset="0" />
 			</dataarea>
@@ -768,8 +729,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11497-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- 24LC16B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an 24LC16B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11497-a.u3" size="8388608" crc="9dc2e5f6" sha1="089e6739142edaaa5c0e72ba7faf6f443e1ddc59" offset="0" />
 			</dataarea>
@@ -783,8 +743,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13306-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MR27V6402L" />
-			<feature name="u2" value="U2" /> <!-- EEPROM -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13306-a.u3" size="8388608" crc="27000674" sha1="a7e8e63ab74931ad9546aba20755714df572badb" offset="0" />
 			</dataarea>
@@ -834,8 +793,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13982-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MX64Mb" />
-			<feature name="u2" value="U2" /> <!-- 24C16AN -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an 24C16AN EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13982-a.u3" size="8388608" crc="a72c61fd" sha1="3524a9167e6139101a27fccef4a97ef30dd928fe" offset="0" />
 			</dataarea>
@@ -861,8 +819,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-10934-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10028-02" />
-			<feature name="u2" value="U2" /> <!-- 24LC01B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an 24LC01B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-10934-a.u3" size="8388608" crc="4c5e775e" sha1="87819e1a95f0d435fc94697423fcfca13f463a34" offset="0" />
 			</dataarea>
@@ -888,9 +845,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13441-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="300-30033" />
-			<feature name="u1" value="U1" /> <!-- 24C16A -->
-			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
-			<feature name="u3" value="U3" /> <!-- Unpopulated slot -->
+			<!-- PCB has a 24C16A at U1, an epoxy blob ROM at U2 and an unpopulated U3 slot. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13441-a.u2" size="8388608" crc="ee2c39ea" sha1="3606a63fb783ba1e16d0466766dd456eb84b4116" offset="0" />
 			</dataarea>
@@ -904,8 +859,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12140-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10308-A" />
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an 24LC02B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12140-a.u3" size="4194304" crc="75164c8e" sha1="6bebaef0d3b6f8a1a4b2bb957a00a0cce4ed65a2" offset="0" />
 			</dataarea>
@@ -919,8 +873,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-13744-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="MX64Mb" />
-			<feature name="u2" value="U2" /> <!-- 24C16A? -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13744-a.u3" size="8388608" crc="67bd4a6a" sha1="70c35a12e368e19956ff43101f7125f9c5679cb2" offset="0" />
 			</dataarea>
@@ -934,8 +887,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12142-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10308-A" />
-			<feature name="u2" value="U2" /> <!-- EEPROM -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12142-a.u3" size="4194304" crc="a707de61" sha1="76689979f08d8c585576a138579fcfb147449db5" offset="0" />
 			</dataarea>
@@ -949,8 +901,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-12141-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10308-A" />
-			<feature name="u2" value="U2" /> <!-- 24LC02B -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an 24LC02B EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12141-a.u3" size="4194304" crc="334ab5d0" sha1="00eb76e267bfaded25fdf8361e933dc4ec72d059" offset="0" />
 			</dataarea>
@@ -1014,8 +965,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<info name="serial" value="500-11777-A" />
 		<part name="cart" interface="leapster_cart">
 			<feature name="pcb" value="FAB-300-10113-A" />
-			<feature name="u2" value="U2" /> <!-- EEPROM -->
-			<feature name="u3" value="U3" /> <!-- EPOXY BLOB ROM -->
+			<!-- PCB has an epoxy blob ROM at U3 and an EEPROM at U2. -->
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11777-a.u3" size="8388608" crc="01f12ce7" sha1="6e468f68b57d93777347d6a2e8ce15b79ccefb7f" offset="0" />
 			</dataarea>
