@@ -1686,131 +1686,141 @@ WRITE16_MEMBER( segas16b_state::sjryuko_custom_io_w )
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16b_state::system16b_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
+void segas16b_state::system16b_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0xffffff).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write)).umask16(0x00ff);
 
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("tileram")
-	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0x100000, 0x1007ff).ram().share("sprites");
+	map(0x200000, 0x200fff).ram().share("paletteram");
+	map(0x300000, 0x30ffff).ram().share("tileram");
+	map(0x400000, 0x400fff).ram().share("textram");
+	map(0x500000, 0x503fff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(segas16b_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16b_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(segas16b_state::system16c_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
+void segas16b_state::system16c_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0xffffff).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write)).umask16(0x00ff);
 
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("tileram")
-	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_SHARE("workram") // only change from system16b_map
-ADDRESS_MAP_END
+	map(0x100000, 0x1007ff).ram().share("sprites");
+	map(0x200000, 0x200fff).ram().share("paletteram");
+	map(0x300000, 0x30ffff).ram().share("tileram");
+	map(0x400000, 0x400fff).ram().share("textram");
+	map(0x500000, 0x53ffff).ram().share("workram"); // only change from system16b_map
+}
 
-ADDRESS_MAP_START(segas16b_state::system16b_bootleg_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
-	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc43fff) AM_READWRITE(bootleg_custom_io_r, bootleg_custom_io_w)
-	AM_RANGE(0x123406, 0x123407) AM_WRITE(sound_w16)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+void segas16b_state::system16b_bootleg_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x200000, 0x23ffff).ram(); // used during startup for decompression
+	map(0x3f0000, 0x3fffff).w(this, FUNC(segas16b_state::rom_5704_bank_w));
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).ram().share("sprites");
+	map(0x840000, 0x840fff).ram().w(this, FUNC(segas16b_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc43fff).rw(this, FUNC(segas16b_state::bootleg_custom_io_r), FUNC(segas16b_state::bootleg_custom_io_w));
+	map(0x123406, 0x123407).w(this, FUNC(segas16b_state::sound_w16));
+	map(0xffc000, 0xffffff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(segas16b_state::map_fpointbla)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x02000e, 0x02000f) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0000, 0x0a001f) AM_RAM AM_SHARE("bootleg_scroll")
-	AM_RANGE(0x0a0020, 0x0a0027) AM_RAM AM_SHARE("bootleg_page")
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x443002, 0x443003) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x843018, 0x843019) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfe0004, 0xfe0005) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xfe000c, 0xfe000d) AM_READ_PORT("P1")
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+void segas16b_state::map_fpointbla(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x02000e, 0x02000f).portr("P2");
+	map(0x0a0000, 0x0a001f).ram().share("bootleg_scroll");
+	map(0x0a0020, 0x0a0027).ram().share("bootleg_page");
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).ram().share("sprites");
+	map(0x443002, 0x443003).portr("SERVICE");
+	map(0x840000, 0x840fff).ram().w(this, FUNC(segas16b_state::paletteram_w)).share("paletteram");
+	map(0x843018, 0x843019).portr("DSW1");
+	map(0xfe0005, 0xfe0005).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xfe000c, 0xfe000d).portr("P1");
+	map(0xffc000, 0xffffff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(segas16b_state::decrypted_opcodes_map_x)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16b_state::decrypted_opcodes_map_x(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(segas16b_state::decrypted_opcodes_map_fpointbla)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void segas16b_state::decrypted_opcodes_map_fpointbla(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x01ffff).rom().share("decrypted_opcodes");
+}
 
-ADDRESS_MAP_START(segas16b_state::lockonph_map)
+void segas16b_state::lockonph_map(address_map &map)
+{
 	// this still appears to have a mapper device, does the hardware use it? should we move this to all be configured by it?
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x840000, 0x841fff) AM_RAM_WRITE(philko_paletteram_w) AM_SHARE("paletteram")
+	map(0x000000, 0x0bffff).rom();
+	map(0x3f0000, 0x3fffff).w(this, FUNC(segas16b_state::rom_5704_bank_w));
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).ram().share("sprites");
+	map(0x840000, 0x841fff).ram().w(this, FUNC(segas16b_state::philko_paletteram_w)).share("paletteram");
 
-	AM_RANGE(0xC40000, 0xC40001) AM_WRITENOP // coin counters etc.?
+	map(0xC40000, 0xC40001).nopw(); // coin counters etc.?
 
-	AM_RANGE(0xC41000, 0xC41001) AM_READ_PORT("P1")
-	AM_RANGE(0xC41002, 0xC41003) AM_READ_PORT("P2")
-	AM_RANGE(0xC41004, 0xC41005) AM_READ_PORT("SERVICE")
+	map(0xC41000, 0xC41001).portr("P1");
+	map(0xC41002, 0xC41003).portr("P2");
+	map(0xC41004, 0xC41005).portr("SERVICE");
 
-	AM_RANGE(0xC42000, 0xC42001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xC42002, 0xC42003) AM_READ_PORT("DSW2")
+	map(0xC42000, 0xC42001).portr("DSW1");
+	map(0xC42002, 0xC42003).portr("DSW2");
 
-	AM_RANGE(0x777706, 0x777707) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	map(0x777707, 0x777707).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram().share("workram");
+}
 
 
 
-ADDRESS_MAP_START(segas16b_state::fpointbl_map)
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+void segas16b_state::fpointbl_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom();
 
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x440fff).ram().share("sprites");
 
-	AM_RANGE(0x600006, 0x600007) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x601000, 0x601001) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x601002, 0x601003) AM_READ_PORT("P1")
-	AM_RANGE(0x601004, 0x601005) AM_READ_PORT("P2")
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW2")
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("DSW1")
+	map(0x600007, 0x600007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x601000, 0x601001).portr("SERVICE");
+	map(0x601002, 0x601003).portr("P1");
+	map(0x601004, 0x601005).portr("P2");
+	map(0x600000, 0x600001).portr("DSW2");
+	map(0x600002, 0x600003).portr("DSW1");
 
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x843000, 0x843001) AM_WRITENOP
+	map(0x840000, 0x840fff).ram().w(this, FUNC(segas16b_state::paletteram_w)).share("paletteram");
+	map(0x843000, 0x843001).nopw();
 
-	AM_RANGE(0xC46000, 0xC4601f) AM_RAM AM_SHARE("bootleg_scroll")
-	AM_RANGE(0xC46020, 0xC46027) AM_RAM AM_SHARE("bootleg_page")
+	map(0xC46000, 0xC4601f).ram().share("bootleg_scroll");
+	map(0xC46020, 0xC46027).ram().share("bootleg_page");
 
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0xffc000, 0xffffff).ram().share("workram");
+}
 /*
     Flash Point (Datsu bootlegs = fpointbl, fpointbj)
     Has sound latch at $E000 instead of I/O ports $C0-FF
 */
-ADDRESS_MAP_START(segas16b_state::fpointbl_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas16b_state::fpointbl_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf800, 0xffff).ram();
+}
 
 
 READ16_MEMBER(segas16b_state::bootleg_custom_io_r)
@@ -1828,60 +1838,67 @@ WRITE16_MEMBER(segas16b_state::bootleg_custom_io_w)
 //  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(segas16b_state::sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("mapper", sega_315_5195_mapper_device, pread)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas16b_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xdfff).bankr("soundbank");
+	map(0xe800, 0xe800).r(m_mapper, FUNC(sega_315_5195_mapper_device::pread));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segas16b_state::sound_decrypted_opcodes_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("sound_decrypted_opcodes")
-	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
-ADDRESS_MAP_END
+void segas16b_state::sound_decrypted_opcodes_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom().share("sound_decrypted_opcodes");
+	map(0x8000, 0xdfff).bankr("soundbank");
+}
 
-ADDRESS_MAP_START(segas16b_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_WRITE(upd7759_control_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_READ(upd7759_status_r) AM_DEVWRITE("upd", upd7759_device, port_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("mapper", sega_315_5195_mapper_device, pread)
-ADDRESS_MAP_END
+void segas16b_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).w(this, FUNC(segas16b_state::upd7759_control_w));
+	map(0x80, 0x80).mirror(0x3f).r(this, FUNC(segas16b_state::upd7759_status_r)).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_mapper, FUNC(sega_315_5195_mapper_device::pread));
+}
 
-ADDRESS_MAP_START(segas16b_state::bootleg_sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas16b_state::bootleg_sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xdfff).bankr("soundbank");
+	map(0xe800, 0xe800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segas16b_state::bootleg_sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_WRITE(upd7759_control_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_READ(upd7759_status_r) AM_DEVWRITE("upd", upd7759_device, port_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void segas16b_state::bootleg_sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).w(this, FUNC(segas16b_state::upd7759_control_w));
+	map(0x80, 0x80).mirror(0x3f).r(this, FUNC(segas16b_state::upd7759_status_r)).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 // similar to whizz / other philko games in sidearms.cpp, but with the m6295
-ADDRESS_MAP_START(segas16b_state::lockonph_sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas16b_state::lockonph_sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segas16b_state::lockonph_sound_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_WRITENOP // ??
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void segas16b_state::lockonph_sound_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).nopw(); // ??
+	map(0x80, 0x80).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 //**************************************************************************
@@ -1896,11 +1913,12 @@ WRITE8_MEMBER(segas16b_state::spin_68k_w)
 	m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(20000));
 }
 
-ADDRESS_MAP_START(segas16b_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
-ADDRESS_MAP_END
+void segas16b_state::mcu_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x1f).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write));
+}
 
 
 
@@ -4772,29 +4790,29 @@ ROM_END
 //
 ROM_START( lockonph )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "B2", 0x000001, 0x40000, CRC(fc1c9f81) SHA1(09c51fbf4cc440ad3166407d1b96b4a4dcc9e412) )
-	ROM_LOAD16_BYTE( "B4", 0x000000, 0x40000, CRC(fbb896f4) SHA1(36fe1199d27c6b106164ed359ddd735a75bcb85b) )
-	ROM_LOAD16_BYTE( "B1", 0x080001, 0x20000, CRC(f11a72ac) SHA1(e3010114abc79e4787f9e68fac40fdc231a22a5f) )
-	ROM_LOAD16_BYTE( "B3", 0x080000, 0x20000, CRC(3f8c0215) SHA1(3d8081c2e2a8dea398b390d5bcde5b1684c136ad) )
+	ROM_LOAD16_BYTE( "b2", 0x000001, 0x40000, CRC(fc1c9f81) SHA1(09c51fbf4cc440ad3166407d1b96b4a4dcc9e412) )
+	ROM_LOAD16_BYTE( "b4", 0x000000, 0x40000, CRC(fbb896f4) SHA1(36fe1199d27c6b106164ed359ddd735a75bcb85b) )
+	ROM_LOAD16_BYTE( "b1", 0x080001, 0x20000, CRC(f11a72ac) SHA1(e3010114abc79e4787f9e68fac40fdc231a22a5f) )
+	ROM_LOAD16_BYTE( "b3", 0x080000, 0x20000, CRC(3f8c0215) SHA1(3d8081c2e2a8dea398b390d5bcde5b1684c136ad) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // z80
-	ROM_LOAD( "B6",  0x00000, 0x10000, CRC(aa7b1880) SHA1(866c057e076178da2395ce0351f7060cccd7bd81) )
+	ROM_LOAD( "b6",  0x00000, 0x10000, CRC(aa7b1880) SHA1(866c057e076178da2395ce0351f7060cccd7bd81) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // m6295
-	ROM_LOAD( "B5",  0x00000, 0x20000, CRC(d6369a39) SHA1(354075ec6eb7861567917f61d2dda23652dbec60) )
+	ROM_LOAD( "b5",  0x00000, 0x20000, CRC(d6369a39) SHA1(354075ec6eb7861567917f61d2dda23652dbec60) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "B10", 0x00000, 0x20000, CRC(d3a8bd15) SHA1(06fc030d4325aaf181578ae8b7da671190ca9548) )
-	ROM_LOAD( "B7",  0x20000, 0x20000, CRC(787c382e) SHA1(4e1912c891d69a9fbeecfa16ff0fc1377ae5ad8e) )
-	ROM_LOAD( "B9",  0x40000, 0x20000, CRC(aae2cef1) SHA1(3f83cf8b605822561bd0f745f7568cae86d3a3b8) )
-	ROM_LOAD( "B8",  0x60000, 0x20000, CRC(cd30abe0) SHA1(9fb19b9d2bee033fc81a47fb00ab4a59ea77ecb1) )
+	ROM_LOAD( "b10", 0x00000, 0x20000, CRC(d3a8bd15) SHA1(06fc030d4325aaf181578ae8b7da671190ca9548) )
+	ROM_LOAD( "b7",  0x20000, 0x20000, CRC(787c382e) SHA1(4e1912c891d69a9fbeecfa16ff0fc1377ae5ad8e) )
+	ROM_LOAD( "b9",  0x40000, 0x20000, CRC(aae2cef1) SHA1(3f83cf8b605822561bd0f745f7568cae86d3a3b8) )
+	ROM_LOAD( "b8",  0x60000, 0x20000, CRC(cd30abe0) SHA1(9fb19b9d2bee033fc81a47fb00ab4a59ea77ecb1) )
 
 
 	ROM_REGION16_BE( 0x100000, "sprites", ROMREGION_ERASEFF ) // sprites
-	ROM_LOAD16_BYTE( "B12", 0x000000, 0x40000, CRC(9088d980) SHA1(bc6c24d4b56472a4bd2f2b0999b850fc99b6c556) )
-	ROM_LOAD16_BYTE( "B14", 0x000001, 0x40000, CRC(af943525) SHA1(fe1accca30602c8b5db799c7cb038230b0113810) )
-	ROM_LOAD16_BYTE( "B11", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
-	ROM_LOAD16_BYTE( "B13", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
+	ROM_LOAD16_BYTE( "b12", 0x000000, 0x40000, CRC(9088d980) SHA1(bc6c24d4b56472a4bd2f2b0999b850fc99b6c556) )
+	ROM_LOAD16_BYTE( "b14", 0x000001, 0x40000, CRC(af943525) SHA1(fe1accca30602c8b5db799c7cb038230b0113810) )
+	ROM_LOAD16_BYTE( "b11", 0x080000, 0x20000, CRC(5da3dfcd) SHA1(02d409c2fff4fdc405f7d5b4e0ca0c43dc6f6899) )
+	ROM_LOAD16_BYTE( "b13", 0x080001, 0x20000, CRC(62f4b64f) SHA1(719f9d4faf2bd04bb47131fe4082def3d809c56b) )
 ROM_END
 
 
@@ -6384,20 +6402,20 @@ ROM_END
 
 ROM_START( fpointbla )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "B3-ic59.bin", 0x000000, 0x10000, CRC(3b7d3b3a) SHA1(6c440f7706d392336a1e9165ac125b45695b9e0c) )
-	ROM_LOAD16_BYTE( "B2-ic55.bin", 0x000001, 0x10000, CRC(4b7e2a54) SHA1(598d16be99491fe13485ec2b546444d92dad49c7) )
+	ROM_LOAD16_BYTE( "b3-ic59.bin", 0x000000, 0x10000, CRC(3b7d3b3a) SHA1(6c440f7706d392336a1e9165ac125b45695b9e0c) )
+	ROM_LOAD16_BYTE( "b2-ic55.bin", 0x000001, 0x10000, CRC(4b7e2a54) SHA1(598d16be99491fe13485ec2b546444d92dad49c7) )
 
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_INVERT ) // tiles
-	ROM_LOAD( "B8-9.bin", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
-	ROM_LOAD( "B7-8.bin", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
-	ROM_LOAD( "B6-7.bin", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
+	ROM_LOAD( "b8-9.bin", 0x00000, 0x10000, CRC(c539727d) SHA1(56674effe1d273128dddd2ff9e02974ec10f3fff) )
+	ROM_LOAD( "b7-8.bin", 0x10000, 0x10000, CRC(82c0b8b0) SHA1(e1e2e721cb8ad53df33065582dc90edeba9c3cab) )
+	ROM_LOAD( "b6-7.bin", 0x20000, 0x10000, CRC(522426ae) SHA1(90fd0a19b30a8a61dc4cfa66a64115596333dcc6) )
 
 	ROM_REGION16_BE( 0x10000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "B5-5.bin", 0x00001, 0x08000, CRC(93181d2e) SHA1(1d25bfea889012a9616ed03791f830f2a8139367) )
-	ROM_LOAD16_BYTE( "B4-3.bin", 0x00000, 0x08000, CRC(ae466f37) SHA1(5fb423695a1d862f628ad2ea7651831ef48f6f0b) )
+	ROM_LOAD16_BYTE( "b5-5.bin", 0x00001, 0x08000, CRC(93181d2e) SHA1(1d25bfea889012a9616ed03791f830f2a8139367) )
+	ROM_LOAD16_BYTE( "b4-3.bin", 0x00000, 0x08000, CRC(ae466f37) SHA1(5fb423695a1d862f628ad2ea7651831ef48f6f0b) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "B1-ic19.bin", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
+	ROM_LOAD( "b1-ic19.bin", 0x0000, 0x8000, CRC(9a8c11bb) SHA1(399f8e9bdd7aaa4d25817fa9cd4bbf413e5baebe) )
 ROM_END
 
 
@@ -9588,36 +9606,37 @@ WRITE16_MEMBER( isgsm_state::main_bank_change_w )
 		membank(ISGSM_MAIN_BANK)->set_base(memregion("maincpu")->base());
 }
 
-ADDRESS_MAP_START(isgsm_state::isgsm_map)
+void isgsm_state::isgsm_map(address_map &map)
+{
 
-	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK(ISGSM_MAIN_BANK) AM_REGION("bios", 0) // this area is ALWAYS read-only, even when the game is banked in
-	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
-	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(rom_5704_bank_w)
-	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x410000, 0x410fff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc43fff) AM_READWRITE(standard_io_r, standard_io_w)
+	map(0x000000, 0x0fffff).bankr(ISGSM_MAIN_BANK).region("bios", 0); // this area is ALWAYS read-only, even when the game is banked in
+	map(0x200000, 0x23ffff).ram(); // used during startup for decompression
+	map(0x3f0000, 0x3fffff).w(this, FUNC(isgsm_state::rom_5704_bank_w));
+	map(0x400000, 0x40ffff).rw(m_segaic16vid, FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x410000, 0x410fff).rw(m_segaic16vid, FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x440000, 0x4407ff).ram().share("sprites");
+	map(0x840000, 0x840fff).ram().w(this, FUNC(isgsm_state::paletteram_w)).share("paletteram");
+	map(0xc40000, 0xc43fff).rw(this, FUNC(isgsm_state::standard_io_r), FUNC(isgsm_state::standard_io_w));
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(data_w) // writes decompressed data here (copied from RAM..)
-	AM_RANGE(0xe00002, 0xe00003) AM_WRITE(datatype_w) // selects which 'type' of data we're writing
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(addr_high_w) // high address, and some mode bits
-	AM_RANGE(0xe00006, 0xe00007) AM_WRITE(addr_low_w)  // low address
+	map(0xe00000, 0xe00001).w(this, FUNC(isgsm_state::data_w)); // writes decompressed data here (copied from RAM..)
+	map(0xe00002, 0xe00003).w(this, FUNC(isgsm_state::datatype_w)); // selects which 'type' of data we're writing
+	map(0xe00004, 0xe00005).w(this, FUNC(isgsm_state::addr_high_w)); // high address, and some mode bits
+	map(0xe00006, 0xe00007).w(this, FUNC(isgsm_state::addr_low_w));  // low address
 
-	AM_RANGE(0xe80000, 0xe80001) AM_READ(cart_data_r) // 8-bit port that the entire cart can be read from
-	AM_RANGE(0xe80002, 0xe80003) AM_READ_PORT("CARDDSW")
-	AM_RANGE(0xe80004, 0xe80005) AM_WRITE(cart_addr_high_w)
-	AM_RANGE(0xe80006, 0xe80007) AM_WRITE(cart_addr_low_w)
-	AM_RANGE(0xe80008, 0xe80009) AM_READWRITE(cart_security_high_r, cart_security_high_w) // 32-bit bitswap device..
-	AM_RANGE(0xe8000a, 0xe8000b) AM_READWRITE(cart_security_low_r,  cart_security_low_w)
+	map(0xe80000, 0xe80001).r(this, FUNC(isgsm_state::cart_data_r)); // 8-bit port that the entire cart can be read from
+	map(0xe80002, 0xe80003).portr("CARDDSW");
+	map(0xe80004, 0xe80005).w(this, FUNC(isgsm_state::cart_addr_high_w));
+	map(0xe80006, 0xe80007).w(this, FUNC(isgsm_state::cart_addr_low_w));
+	map(0xe80008, 0xe80009).rw(this, FUNC(isgsm_state::cart_security_high_r), FUNC(isgsm_state::cart_security_high_w)); // 32-bit bitswap device..
+	map(0xe8000a, 0xe8000b).rw(this, FUNC(isgsm_state::cart_security_low_r), FUNC(isgsm_state::cart_security_low_w));
 
-	AM_RANGE(0xee0000, 0xefffff) AM_ROM AM_REGION("gamecart_rgn", 0) // only the first 0x20000 bytes of the cart are visible here..
+	map(0xee0000, 0xefffff).rom().region("gamecart_rgn", 0); // only the first 0x20000 bytes of the cart are visible here..
 
-	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITE(sound_w16)
-	AM_RANGE(0xfe0008, 0xfe0009) AM_WRITE(sound_reset_w)
-	AM_RANGE(0xfe000a, 0xfe000b) AM_WRITE(main_bank_change_w)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0xfe0006, 0xfe0007).w(this, FUNC(isgsm_state::sound_w16));
+	map(0xfe0008, 0xfe0009).w(this, FUNC(isgsm_state::sound_reset_w));
+	map(0xfe000a, 0xfe000b).w(this, FUNC(isgsm_state::main_bank_change_w));
+	map(0xffc000, 0xffffff).ram().share("workram");
+}
 
 
 

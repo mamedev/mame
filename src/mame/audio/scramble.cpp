@@ -276,19 +276,21 @@ WRITE8_MEMBER( scramble_state::ad2083_tms5110_ctrl_w )
 	m_tmsprom->enable_w(1);
 }
 
-ADDRESS_MAP_START(scramble_state::ad2083_sound_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void scramble_state::ad2083_sound_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
 
-ADDRESS_MAP_START(scramble_state::ad2083_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ad2083_tms5110_ctrl_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay2", ay8910_device, address_w)
-ADDRESS_MAP_END
+void scramble_state::ad2083_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).w(this, FUNC(scramble_state::ad2083_tms5110_ctrl_w));
+	map(0x10, 0x10).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x20, 0x20).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x40, 0x40).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).w("ay2", FUNC(ay8910_device::address_w));
+}
 
 MACHINE_CONFIG_START(scramble_state::ad2083_audio)
 

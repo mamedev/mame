@@ -611,21 +611,24 @@ WRITE8_MEMBER(mario_state::mario_sh3_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(mario_state::mario_sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1") AM_REGION("audiocpu", 0)
-	AM_RANGE(0x0800, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void mario_state::mario_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).bankr("bank1").region("audiocpu", 0);
+	map(0x0800, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(mario_state::mario_sound_io_map)
-	AM_RANGE(0x00, 0xff) AM_READ(mario_sh_tune_r) AM_WRITE(mario_sh_sound_w)
-ADDRESS_MAP_END
+void mario_state::mario_sound_io_map(address_map &map)
+{
+	map(0x00, 0xff).r(this, FUNC(mario_state::mario_sh_tune_r)).w(this, FUNC(mario_state::mario_sh_sound_w));
+}
 
-ADDRESS_MAP_START(mario_state::masao_sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+void mario_state::masao_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x4000).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x6000, 0x6000).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
 
 /*************************************

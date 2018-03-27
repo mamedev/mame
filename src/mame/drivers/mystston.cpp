@@ -101,21 +101,22 @@ WRITE8_MEMBER(mystston_state::mystston_ay8910_select_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(mystston_state::main_map)
-	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x07e0, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("fg_videoram")
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("bg_videoram")
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1f8f) AM_READ_PORT("IN0") AM_WRITE(mystston_video_control_w) AM_SHARE("video_control")
-	AM_RANGE(0x2010, 0x2010) AM_MIRROR(0x1f8f) AM_READ_PORT("IN1") AM_WRITE(irq_clear_w)
-	AM_RANGE(0x2020, 0x2020) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW0") AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x2030, 0x2030) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW1") AM_WRITEONLY AM_SHARE("ay8910_data")
-	AM_RANGE(0x2040, 0x2040) AM_MIRROR(0x1f8f) AM_READNOP AM_WRITE(mystston_ay8910_select_w) AM_SHARE("ay8910_select")
-	AM_RANGE(0x2050, 0x2050) AM_MIRROR(0x1f8f) AM_NOP
-	AM_RANGE(0x2060, 0x207f) AM_MIRROR(0x1f80) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void mystston_state::main_map(address_map &map)
+{
+	map(0x0000, 0x077f).ram();
+	map(0x0780, 0x07df).ram().share("spriteram");
+	map(0x07e0, 0x0fff).ram();
+	map(0x1000, 0x17ff).ram().share("fg_videoram");
+	map(0x1800, 0x1fff).ram().share("bg_videoram");
+	map(0x2000, 0x2000).mirror(0x1f8f).portr("IN0").w(this, FUNC(mystston_state::mystston_video_control_w)).share("video_control");
+	map(0x2010, 0x2010).mirror(0x1f8f).portr("IN1").w(this, FUNC(mystston_state::irq_clear_w));
+	map(0x2020, 0x2020).mirror(0x1f8f).portr("DSW0").writeonly().share("scroll");
+	map(0x2030, 0x2030).mirror(0x1f8f).portr("DSW1").writeonly().share("ay8910_data");
+	map(0x2040, 0x2040).mirror(0x1f8f).nopr().w(this, FUNC(mystston_state::mystston_ay8910_select_w)).share("ay8910_select");
+	map(0x2050, 0x2050).mirror(0x1f8f).noprw();
+	map(0x2060, 0x207f).mirror(0x1f80).ram().share("paletteram");
+	map(0x4000, 0xffff).rom();
+}
 
 
 

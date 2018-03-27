@@ -1151,146 +1151,162 @@ DRIVER_INIT_MEMBER(fidel6502_state, chesster)
 
 // CSC, SU9, RSC
 
-ADDRESS_MAP_START(fidel6502_state::csc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x4000) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x4400) AM_RAM
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x47fc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x47fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::csc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x4000).ram();
+	map(0x0800, 0x0bff).mirror(0x4400).ram();
+	map(0x1000, 0x1003).mirror(0x47fc).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1800, 0x1803).mirror(0x47fc).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x3fff).mirror(0x4000).rom();
+	map(0xa000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(fidel6502_state::su9_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x1800, 0x1803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::su9_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1003).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1800, 0x1803).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x3fff).rom();
+	map(0xa000, 0xa7ff).rom();
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(fidel6502_state::rsc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::rsc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).ram();
+	map(0x2000, 0x2003).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf000, 0xffff).rom();
+}
 
 
 // EAS, EAG
 
-ADDRESS_MAP_START(fidel6502_state::eas_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x5fff) AM_READ(cartridge_r)
-	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x7020, 0x7027) AM_WRITE(eas_segment_w) AM_READNOP
-	AM_RANGE(0x7030, 0x7037) AM_WRITE(eas_led_w) AM_READNOP
-	AM_RANGE(0x7050, 0x7050) AM_READ(eas_input_r)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::eas_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram().share("nvram");
+	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
+	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
+	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
+	map(0x8000, 0x9fff).rom();
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(fidel6502_state::eag_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x5fff) AM_READ(cartridge_r)
-	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x7020, 0x7027) AM_WRITE(eas_segment_w) AM_READNOP
-	AM_RANGE(0x7030, 0x7037) AM_WRITE(eas_led_w) AM_READNOP
-	AM_RANGE(0x7050, 0x7050) AM_READ(eas_input_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROM //AM_WRITENOP
-ADDRESS_MAP_END
+void fidel6502_state::eag_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).ram().share("nvram");
+	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x7000, 0x7003).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
+	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
+	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
+	map(0x8000, 0xffff).rom(); //AM_WRITENOP
+}
 
 
 // SC9
 
-ADDRESS_MAP_START(fidel6502_state::sc9_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x2000, 0x5fff) AM_READ(cartridge_r)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(sc9_control_w)
-	AM_RANGE(0x8000, 0x8007) AM_MIRROR(0x1ff8) AM_WRITE(sc9_led_w) AM_READNOP
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_READ(sc9_input_r)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::sc9_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x1800).ram();
+	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::sc9_control_w));
+	map(0x8000, 0x8007).mirror(0x1ff8).w(this, FUNC(fidel6502_state::sc9_led_w)).nopr();
+	map(0xa000, 0xa000).mirror(0x1fff).r(this, FUNC(fidel6502_state::sc9_input_r));
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(fidel6502_state::sc9d_map)
-	AM_IMPORT_FROM( sc9_map )
-	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_READ(sc9d_input_r)
-ADDRESS_MAP_END
+void fidel6502_state::sc9d_map(address_map &map)
+{
+	sc9_map(map);
+	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::sc9d_input_r));
+}
 
 
 // SC12
 
-ADDRESS_MAP_START(fidel6502_state::sc12_trampoline)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(sc12_trampoline_r, sc12_trampoline_w)
-ADDRESS_MAP_END
+void fidel6502_state::sc12_trampoline(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(fidel6502_state::sc12_trampoline_r), FUNC(fidel6502_state::sc12_trampoline_w));
+}
 
-ADDRESS_MAP_START(fidel6502_state::sc12_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x2000, 0x5fff) AM_READ(cartridge_r)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(sc12_control_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_READ(sc12_input_r)
-	AM_RANGE(0xc000, 0xcfff) AM_MIRROR(0x1000) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::sc12_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram();
+	map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x6000, 0x6000).mirror(0x1fff).w(this, FUNC(fidel6502_state::sc12_control_w));
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xa007).mirror(0x1ff8).r(this, FUNC(fidel6502_state::sc12_input_r));
+	map(0xc000, 0xcfff).mirror(0x1000).rom();
+	map(0xe000, 0xffff).rom();
+}
 
 
 // Excellence
 
-ADDRESS_MAP_START(fidel6502_state::fexcel_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
+void fidel6502_state::fexcel_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x3800).ram();
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
 	//AM_RANGE(0x8000, 0x8000) AM_READNOP // checks for opening book module, but hw doesn't have a module slot
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(fidel6502_state::fexcelp_map)
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcel_ttl_r, fexcel_ttl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::fexcelp_map(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x2000).ram();
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(fidel6502_state::fexcelb_map)
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(fexcelb_ttl_r, fexcel_ttl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::fexcelb_map(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x2000).ram();
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcelb_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
+	map(0x8000, 0xffff).rom();
+}
 
 
 // Designer Display, Phantom, Chesster
 
-ADDRESS_MAP_START(fidel6502_state::fdesdis_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, fdesdis_control_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0x6007) AM_MIRROR(0x1ff8) AM_WRITE(fdesdis_lcd_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::fdesdis_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::fdesdis_control_w));
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x6000, 0x6007).mirror(0x1ff8).w(this, FUNC(fidel6502_state::fdesdis_lcd_w));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(fidel6502_state::fphantom_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::fphantom_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(fidel6502_state::chesster_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, chesster_control_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac8", dac_byte_interface, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void fidel6502_state::chesster_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::chesster_control_w));
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x6000, 0x6000).mirror(0x1fff).w("dac8", FUNC(dac_byte_interface::write));
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(fidel6502_state::kishon_map)
-	AM_IMPORT_FROM( chesster_map )
-	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, kishon_control_w)
-ADDRESS_MAP_END
+void fidel6502_state::kishon_map(address_map &map)
+{
+	chesster_map(map);
+	map(0x2000, 0x2007).mirror(0x1ff8).rw(this, FUNC(fidel6502_state::fdesdis_input_r), FUNC(fidel6502_state::kishon_control_w));
+}
 
 
 

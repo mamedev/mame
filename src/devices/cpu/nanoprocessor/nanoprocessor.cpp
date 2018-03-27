@@ -42,7 +42,7 @@ enum {
 #define NANO_E_BIT  (NANO_DC0_BIT + HP_NANO_DC_NO)  // Extend flag
 #define NANO_I_BIT  (NANO_E_BIT + 1)    // Interrupt flag
 
-DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "HP-Nanoprocessor")
+DEFINE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device, "nanoprocessor", "Hewlett Packard HP-Nanoprocessor")
 
 hp_nanoprocessor_device::hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, HP_NANOPROCESSOR, tag, owner, clock),
@@ -170,9 +170,9 @@ void hp_nanoprocessor_device::state_string_export(const device_state_entry &entr
 
 }
 
-util::disasm_interface *hp_nanoprocessor_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hp_nanoprocessor_device::create_disassembler()
 {
-	return new hp_nanoprocessor_disassembler;
+	return std::make_unique<hp_nanoprocessor_disassembler>();
 }
 
 void hp_nanoprocessor_device::execute_one(uint8_t opcode)

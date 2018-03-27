@@ -70,18 +70,20 @@ WRITE8_MEMBER(epos_state::dealer_decrypt_rom)
  *
  *************************************/
 
-ADDRESS_MAP_START(epos_state::epos_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void epos_state::epos_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(epos_state::dealer_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void epos_state::dealer_map(address_map &map)
+{
+	map(0x0000, 0x5fff).bankr("bank1");
+	map(0x6000, 0x6fff).bankr("bank2");
+	map(0x7000, 0x7fff).ram().share("nvram");
+	map(0x8000, 0xffff).ram().share("videoram");
+}
 
 /*************************************
  *
@@ -89,25 +91,27 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(epos_state::epos_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(port_1_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS") AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("UNK")
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-ADDRESS_MAP_END
+void epos_state::epos_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x01, 0x01).portr("SYSTEM").w(this, FUNC(epos_state::port_1_w));
+	map(0x02, 0x02).portr("INPUTS").w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x03, 0x03).portr("UNK");
+	map(0x06, 0x06).w("aysnd", FUNC(ay8910_device::address_w));
+}
 
-ADDRESS_MAP_START(epos_state::dealer_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_WRITE(dealer_pal_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
-	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x38, 0x38) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x3c, 0x3c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void epos_state::dealer_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x0f).w(this, FUNC(epos_state::dealer_pal_w));
+	map(0x10, 0x13).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x20, 0x24).w(this, FUNC(epos_state::dealer_decrypt_rom));
+	map(0x34, 0x34).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x38, 0x38).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x3c, 0x3c).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x40, 0x40).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
 READ8_MEMBER(epos_state::i8255_porta_r)
 {
@@ -695,10 +699,10 @@ Sound: AY-3-8910   0.691200 MHz [22.1184MHz/32]
 
 ROM_START( revngr84 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "u_1__revenger__r06254__(c)_epos_corp.m5l2764k.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) /* labeled as "U 1 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
-	ROM_LOAD( "u_2__revenger__r06254__(c)_epos_corp.m5l2764k.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) /* labeled as "U 2 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
-	ROM_LOAD( "u_3__revenger__r06254__(c)_epos_corp.m5l2764k.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) /* labeled as "U 3 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
-	ROM_LOAD( "u_4__revenger__r06254__(c)_epos_corp.m5l2764k.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) /* labeled as "U 4 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
+	ROM_LOAD( "u_1__revenger__r06254__=c=_epos_corp.m5l2764k.u1",  0x0000, 0x2000, CRC(308f231f) SHA1(cf06695601bd0387e4fcb64d9b34143323e98b07) ) /* labeled as "U 1 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
+	ROM_LOAD( "u_2__revenger__r06254__=c=_epos_corp.m5l2764k.u2",  0x2000, 0x2000, CRC(e80bbfb4) SHA1(9302beaef8bbb7376b6a20e9ee5adbcf60d66dd8) ) /* labeled as "U 2 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
+	ROM_LOAD( "u_3__revenger__r06254__=c=_epos_corp.m5l2764k.u3",  0x4000, 0x2000, CRC(d9270929) SHA1(a95034b5387a40e02f04bdfa79e1d8e65dad30fe) ) /* labeled as "U 3 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
+	ROM_LOAD( "u_4__revenger__r06254__=c=_epos_corp.m5l2764k.u4",  0x6000, 0x2000, CRC(d6e6cfa8) SHA1(f10131bb2e9d088c7b6d6a5d5520073d78ad69cc) ) /* labeled as "U 4 // REVENGER // R06254 // (C) EPOS CORP" (hand written R06254 over R06124) */
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "dm74s288n.u60", 0x0000, 0x0020, CRC(be2b0641) SHA1(26982903b6d942af8e0a526412d8e01978d76420) ) // unknown purpose

@@ -43,7 +43,7 @@
 #define OPR_GROUP1_VAL  0000
 #define OPR_GROUP2_VAL  0400
 
-DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "PDP8")
+DEFINE_DEVICE_TYPE(PDP8, pdp8_device, "pdp8_cpu", "DEC PDP8")
 
 //-------------------------------------------------
 //  pdp8_device - constructor
@@ -151,9 +151,9 @@ void pdp8_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *pdp8_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pdp8_cpu_device::create_disassembler()
 {
-	return new pdp8_disassembler;
+	return std::make_unique<pdp8_disassembler>();
 }
 
 

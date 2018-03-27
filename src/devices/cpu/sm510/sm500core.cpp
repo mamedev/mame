@@ -17,7 +17,7 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "SM500") // 1.2K ROM, 4x10x4 RAM, shift registers for LCD
+DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "Sharp SM500") // 1.2K ROM, 4x10x4 RAM, shift registers for LCD
 
 
 // internal memory maps
@@ -48,9 +48,9 @@ sm500_device::sm500_device(const machine_config &mconfig, device_type type, cons
 
 
 // disasm
-util::disasm_interface *sm500_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm500_device::create_disassembler()
 {
-	return new sm500_disassembler;
+	return std::make_unique<sm500_disassembler>();
 }
 
 

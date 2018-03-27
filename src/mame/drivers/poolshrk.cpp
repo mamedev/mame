@@ -101,23 +101,24 @@ READ8_MEMBER(poolshrk_state::irq_reset_r)
 }
 
 
-ADDRESS_MAP_START(poolshrk_state::poolshrk_cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x2300) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x2000) AM_WRITEONLY AM_SHARE("playfield_ram")
-	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_SHARE("hpos_ram")
-	AM_RANGE(0x0c00, 0x0c0f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_SHARE("vpos_ram")
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2000) AM_READWRITE(input_r, watchdog_w)
-	AM_RANGE(0x1400, 0x17ff) AM_MIRROR(0x2000) AM_WRITE(scratch_sound_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x2000) AM_WRITE(score_sound_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x2000) AM_WRITE(click_sound_w)
-	AM_RANGE(0x4000, 0x4000) AM_NOP /* diagnostic ROM location */
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(da_latch_w)
-	AM_RANGE(0x6400, 0x67ff) AM_WRITE(bump_sound_w)
-	AM_RANGE(0x6800, 0x6bff) AM_READ(irq_reset_r)
-	AM_RANGE(0x6c00, 0x6fff) AM_WRITE(led_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void poolshrk_state::poolshrk_cpu_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x00ff).mirror(0x2300).ram();
+	map(0x0400, 0x07ff).mirror(0x2000).writeonly().share("playfield_ram");
+	map(0x0800, 0x080f).mirror(0x23f0).writeonly().share("hpos_ram");
+	map(0x0c00, 0x0c0f).mirror(0x23f0).writeonly().share("vpos_ram");
+	map(0x1000, 0x13ff).mirror(0x2000).rw(this, FUNC(poolshrk_state::input_r), FUNC(poolshrk_state::watchdog_w));
+	map(0x1400, 0x17ff).mirror(0x2000).w(this, FUNC(poolshrk_state::scratch_sound_w));
+	map(0x1800, 0x1bff).mirror(0x2000).w(this, FUNC(poolshrk_state::score_sound_w));
+	map(0x1c00, 0x1fff).mirror(0x2000).w(this, FUNC(poolshrk_state::click_sound_w));
+	map(0x4000, 0x4000).noprw(); /* diagnostic ROM location */
+	map(0x6000, 0x63ff).w(this, FUNC(poolshrk_state::da_latch_w));
+	map(0x6400, 0x67ff).w(this, FUNC(poolshrk_state::bump_sound_w));
+	map(0x6800, 0x6bff).r(this, FUNC(poolshrk_state::irq_reset_r));
+	map(0x6c00, 0x6fff).w(this, FUNC(poolshrk_state::led_w));
+	map(0x7000, 0x7fff).rom();
+}
 
 
 static INPUT_PORTS_START( poolshrk )

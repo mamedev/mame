@@ -470,39 +470,41 @@ RTC write bits: 76543210
 	m_rtc->oe_w(1);
 }
 
-ADDRESS_MAP_START(apc_state::apc_map)
-	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("cmos")
+void apc_state::apc_map(address_map &map)
+{
+	map(0x00000, 0x9ffff).ram();
+	map(0xa0000, 0xa0fff).ram().share("cmos");
 //  AM_RANGE(0xa1000, 0xbffff) mirror CMOS
 //  AM_RANGE(0xc0000, 0xcffff) standard character ROM
-	AM_RANGE(0xd8000, 0xd9fff) AM_RAM AM_REGION("aux_pcg", 0) // AUX character RAM
+	map(0xd8000, 0xd9fff).ram().region("aux_pcg", 0); // AUX character RAM
 //  AM_RANGE(0xe0000, 0xeffff) Special Character RAM
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+	map(0xfe000, 0xfffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(apc_state::apc_io)
+void apc_state::apc_io(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE8(apc_dma_r, apc_dma_w,0xff00)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) // i8259
-	AM_RANGE(0x28, 0x2f) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff) // i8259 (even) / pit8253 (odd)
+	map(0x00, 0x1f).rw(this, FUNC(apc_state::apc_dma_r), FUNC(apc_state::apc_dma_w)).umask16(0xff00);
+	map(0x20, 0x23).rw(m_i8259_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
+	map(0x28, 0x2f).rw(this, FUNC(apc_state::apc_port_28_r), FUNC(apc_state::apc_port_28_w)); // i8259 (even) / pit8253 (odd)
 //  0x30, 0x37 serial port 0/1 (i8251) (even/odd)
-	AM_RANGE(0x38, 0x3f) AM_WRITE8(apc_dma_segments_w,0x00ff)
-	AM_RANGE(0x40, 0x43) AM_READWRITE8(apc_gdc_r, apc_gdc_w, 0xffff)
-	AM_RANGE(0x46, 0x47) AM_WRITE8(apc_irq_ack_w, 0x00ff)
-	AM_RANGE(0x48, 0x4f) AM_READWRITE8(apc_kbd_r, apc_kbd_w, 0x00ff)
-	AM_RANGE(0x50, 0x53) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff ) // upd765
-	AM_RANGE(0x58, 0x59) AM_READWRITE8(apc_rtc_r, apc_rtc_w, 0x00ff)
+	map(0x38, 0x3f).w(this, FUNC(apc_state::apc_dma_segments_w)).umask16(0x00ff);
+	map(0x40, 0x43).rw(this, FUNC(apc_state::apc_gdc_r), FUNC(apc_state::apc_gdc_w));
+	map(0x46, 0x46).w(this, FUNC(apc_state::apc_irq_ack_w));
+	map(0x48, 0x4f).rw(this, FUNC(apc_state::apc_kbd_r), FUNC(apc_state::apc_kbd_w)).umask16(0x00ff);
+	map(0x50, 0x53).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // upd765
+	map(0x58, 0x58).rw(this, FUNC(apc_state::apc_rtc_r), FUNC(apc_state::apc_rtc_w));
 //  0x59 CMOS enable
 //  0x5a  APU data (Arithmetic Processing Unit!)
 //  0x5b, Power Off
 //  0x5e  APU status/command
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE8("upd1771c", upd1771c_device, read, write, 0x00ff)
+	map(0x60, 0x60).rw("upd1771c", FUNC(upd1771c_device::read), FUNC(upd1771c_device::write));
 //  AM_RANGE(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
 //  0x70, 0x76 AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
 //  0x71, 0x77 IDA Controller
 //  0x80, 0x90 Communication Adapter
 //  0xf0, 0xf6 ASOP Controller
-ADDRESS_MAP_END
+}
 
 /* TODO: key repeat, remove port impulse! */
 INPUT_CHANGED_MEMBER(apc_state::key_stroke)
@@ -792,13 +794,15 @@ GFXDECODE_END
 
 
 
-ADDRESS_MAP_START(apc_state::upd7220_1_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_1")
-ADDRESS_MAP_END
+void apc_state::upd7220_1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram().share("video_ram_1");
+}
 
-ADDRESS_MAP_START(apc_state::upd7220_2_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram_2")
-ADDRESS_MAP_END
+void apc_state::upd7220_2_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram().share("video_ram_2");
+}
 
 /*
 irq assignment:

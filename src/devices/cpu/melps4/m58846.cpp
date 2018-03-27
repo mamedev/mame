@@ -10,7 +10,7 @@
 #include "m58846.h"
 
 
-DEFINE_DEVICE_TYPE(M58846, m58846_device, "m58846", "M58846")
+DEFINE_DEVICE_TYPE(M58846, m58846_device, "m58846", "Mitsubishi M58846")
 
 
 // internal memory maps

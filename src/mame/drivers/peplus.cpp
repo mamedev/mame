@@ -1011,63 +1011,65 @@ GFXDECODE_END
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(peplus_state::peplus_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
-ADDRESS_MAP_END
+void peplus_state::peplus_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share("prograram");
+}
 
-ADDRESS_MAP_START(peplus_state::peplus_iomap)
+void peplus_state::peplus_iomap(address_map &map)
+{
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(peplus_cmos_w) AM_SHARE("cmos")
+	map(0x0000, 0x1fff).ram().w(this, FUNC(peplus_state::peplus_cmos_w)).share("cmos");
 
 	// CRT Controller
-	AM_RANGE(0x2008, 0x2008) AM_WRITE(peplus_crtc_mode_w)
-	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2083, 0x2083) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(peplus_crtc_display_w)
+	map(0x2008, 0x2008).w(this, FUNC(peplus_state::peplus_crtc_mode_w));
+	map(0x2080, 0x2080).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x2081, 0x2081).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2083, 0x2083).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(peplus_state::peplus_crtc_display_w));
 
 	// Superboard Data
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("s3000_ram")
+	map(0x3000, 0x3fff).ram().share("s3000_ram");
 
 	// Sound and Dipswitches
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	map(0x4000, 0x4000).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x4004, 0x4004).portr("SW1") /* likely ay8910 input port, not direct */ .w("aysnd", FUNC(ay8910_device::data_w));
 
 	// Superboard Data
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("s5000_ram")
+	map(0x5000, 0x5fff).ram().share("s5000_ram");
 
 	// Background Color Latch
-	AM_RANGE(0x6000, 0x6000) AM_READ(peplus_bgcolor_r) AM_WRITE(peplus_bgcolor_w)
+	map(0x6000, 0x6000).r(this, FUNC(peplus_state::peplus_bgcolor_r)).w(this, FUNC(peplus_state::peplus_bgcolor_w));
 
 	// Bogus Location for Video RAM
-	AM_RANGE(0x06001, 0x06400) AM_RAM AM_SHARE("videoram")
+	map(0x06001, 0x06400).ram().share("videoram");
 
 	// Superboard Data
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("s7000_ram")
+	map(0x7000, 0x7fff).ram().share("s7000_ram");
 
 	// Input Bank A, Output Bank C
-	AM_RANGE(0x8000, 0x8000) AM_READ(peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
+	map(0x8000, 0x8000).r(this, FUNC(peplus_state::peplus_input_bank_a_r)).w(this, FUNC(peplus_state::peplus_output_bank_c_w));
 
 	// Drop Door, I2C EEPROM Writes
-	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_WRITE(i2c_nvram_w)
+	map(0x9000, 0x9000).r(this, FUNC(peplus_state::peplus_dropdoor_r)).w(this, FUNC(peplus_state::i2c_nvram_w));
 
 	// Input Banks B & C, Output Bank B
-	AM_RANGE(0xa000, 0xa000) AM_READ(peplus_input0_r) AM_WRITE(peplus_output_bank_b_w)
+	map(0xa000, 0xa000).r(this, FUNC(peplus_state::peplus_input0_r)).w(this, FUNC(peplus_state::peplus_output_bank_b_w));
 
 	// Superboard Data
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("sb000_ram")
+	map(0xb000, 0xbfff).ram().share("sb000_ram");
 
 	// Output Bank A
-	AM_RANGE(0xc000, 0xc000) AM_READ(peplus_watchdog_r) AM_WRITE(peplus_output_bank_a_w)
+	map(0xc000, 0xc000).r(this, FUNC(peplus_state::peplus_watchdog_r)).w(this, FUNC(peplus_state::peplus_output_bank_a_w));
 
 	// Superboard Data
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("sd000_ram")
+	map(0xd000, 0xdfff).ram().share("sd000_ram");
 
 	// DUART
-	AM_RANGE(0xe000, 0xe00f) AM_READWRITE(peplus_duart_r, peplus_duart_w)
+	map(0xe000, 0xe00f).rw(this, FUNC(peplus_state::peplus_duart_r), FUNC(peplus_state::peplus_duart_w));
 
 	// Superboard Data
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sf000_ram")
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram().share("sf000_ram");
+}
 
 
 /*************************

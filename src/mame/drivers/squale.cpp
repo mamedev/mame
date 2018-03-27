@@ -617,23 +617,24 @@ TIMER_DEVICE_CALLBACK_MEMBER( squale_state::squale_scanline )
 	m_ef9365->update_scanline((uint16_t)param);
 }
 
-ADDRESS_MAP_START(squale_state::squale_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0xefff) AM_RAM
-	AM_RANGE(0xf000,0xf00f) AM_DEVREADWRITE("ef9365", ef9365_device, data_r, data_w)
-	AM_RANGE(0xf010,0xf01f) AM_WRITE( ctrl_w )
-	AM_RANGE(0xf020,0xf02f) AM_READ( video_ram_read_reg1 )
-	AM_RANGE(0xf030,0xf03f) AM_READ( video_ram_read_reg2 )
-	AM_RANGE(0xf044,0xf047) AM_DEVREADWRITE("pia_u75", pia6821_device, read, write)
-	AM_RANGE(0xf048,0xf04b) AM_DEVREADWRITE("pia_u72", pia6821_device, read, write)
-	AM_RANGE(0xf050,0xf05f) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
-	AM_RANGE(0xf060,0xf06f) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0xf080,0xf083) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)
-	AM_RANGE(0xf08a,0xf08a) AM_READWRITE( fdc_sel0_r, fdc_sel0_w )
-	AM_RANGE(0xf08b,0xf08b) AM_READWRITE( fdc_sel1_r, fdc_sel1_w )
-	AM_RANGE(0xf100,0xffff) AM_ROMBANK("rom_bank");
+void squale_state::squale_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).ram();
+	map(0xf000, 0xf00f).rw(m_ef9365, FUNC(ef9365_device::data_r), FUNC(ef9365_device::data_w));
+	map(0xf010, 0xf01f).w(this, FUNC(squale_state::ctrl_w));
+	map(0xf020, 0xf02f).r(this, FUNC(squale_state::video_ram_read_reg1));
+	map(0xf030, 0xf03f).r(this, FUNC(squale_state::video_ram_read_reg2));
+	map(0xf044, 0xf047).rw(m_pia_u75, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf048, 0xf04b).rw(m_pia_u72, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf050, 0xf05f).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
+	map(0xf060, 0xf06f).rw(m_ay8910, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0xf080, 0xf083).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0xf08a, 0xf08a).rw(this, FUNC(squale_state::fdc_sel0_r), FUNC(squale_state::fdc_sel0_w));
+	map(0xf08b, 0xf08b).rw(this, FUNC(squale_state::fdc_sel1_r), FUNC(squale_state::fdc_sel1_w));
+	map(0xf100, 0xffff).bankr("rom_bank");
 
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( squale )

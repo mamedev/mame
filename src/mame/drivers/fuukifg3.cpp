@@ -206,30 +206,31 @@ WRITE32_MEMBER(fuuki32_state::vregs_w)
 	}
 }
 
-ADDRESS_MAP_START(fuuki32_state::fuuki32_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                                                     // ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM                                                                     // Work RAM
-	AM_RANGE(0x410000, 0x41ffff) AM_RAM                                                                     // Work RAM (used by asurabus)
+void fuuki32_state::fuuki32_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();                                                                     // ROM
+	map(0x400000, 0x40ffff).ram();                                                                     // Work RAM
+	map(0x410000, 0x41ffff).ram();                                                                     // Work RAM (used by asurabus)
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram.0")  // Tilemap 1
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram.1")  // Tilemap 2
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram.2")  // Tilemap bg
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(vram_3_w) AM_SHARE("vram.3")  // Tilemap bg2
-	AM_RANGE(0x508000, 0x517fff) AM_RAM                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_DEVREADWRITE16("fuukivid", fuukivid_device, fuuki_sprram_r, fuuki_sprram_w, 0xffffffff) // Sprites
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette",  palette_device, write32) AM_SHARE("palette") // Palette
+	map(0x500000, 0x501fff).ram().w(this, FUNC(fuuki32_state::vram_0_w)).share("vram.0");  // Tilemap 1
+	map(0x502000, 0x503fff).ram().w(this, FUNC(fuuki32_state::vram_1_w)).share("vram.1");  // Tilemap 2
+	map(0x504000, 0x505fff).ram().w(this, FUNC(fuuki32_state::vram_2_w)).share("vram.2");  // Tilemap bg
+	map(0x506000, 0x507fff).ram().w(this, FUNC(fuuki32_state::vram_3_w)).share("vram.3");  // Tilemap bg2
+	map(0x508000, 0x517fff).ram();                                                                     // More tilemap, or linescroll? Seems to be empty all of the time
+	map(0x600000, 0x601fff).ram().rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)); // Sprites
+	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // Palette
 
-	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("800000") AM_WRITENOP                                         // Coin
-	AM_RANGE(0x810000, 0x810003) AM_READ_PORT("810000") AM_WRITENOP                                         // Player Inputs
-	AM_RANGE(0x880000, 0x880003) AM_READ_PORT("880000")                                                     // Service + DIPS
-	AM_RANGE(0x890000, 0x890003) AM_READ_PORT("890000")                                                     // More DIPS
+	map(0x800000, 0x800003).portr("800000").nopw();                                         // Coin
+	map(0x810000, 0x810003).portr("810000").nopw();                                         // Player Inputs
+	map(0x880000, 0x880003).portr("880000");                                                     // Service + DIPS
+	map(0x890000, 0x890003).portr("890000");                                                     // More DIPS
 
-	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")        // Video Registers
-	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM                                                                     // Flipscreen Related
-	AM_RANGE(0x8e0000, 0x8e0003) AM_RAM AM_SHARE("priority")                            // Controls layer order
-	AM_RANGE(0x903fe0, 0x903fff) AM_READWRITE(snd_020_r, snd_020_w)                                         // Shared with Z80
-	AM_RANGE(0xa00000, 0xa00003) AM_WRITEONLY AM_SHARE("tilebank")                      // Tilebank
-ADDRESS_MAP_END
+	map(0x8c0000, 0x8c001f).ram().w(this, FUNC(fuuki32_state::vregs_w)).share("vregs");        // Video Registers
+	map(0x8d0000, 0x8d0003).ram();                                                                     // Flipscreen Related
+	map(0x8e0000, 0x8e0003).ram().share("priority");                            // Controls layer order
+	map(0x903fe0, 0x903fff).rw(this, FUNC(fuuki32_state::snd_020_r), FUNC(fuuki32_state::snd_020_w));                                         // Shared with Z80
+	map(0xa00000, 0xa00003).writeonly().share("tilebank");                      // Tilebank
+}
 
 
 /***************************************************************************
@@ -259,19 +260,21 @@ WRITE8_MEMBER(fuuki32_state::snd_ymf278b_w)
 	machine().device<ymf278b_device>("ymf1")->write(space, offset, data);
 }
 
-ADDRESS_MAP_START(fuuki32_state::fuuki32_sound_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM                             // ROM
-	AM_RANGE(0x6000, 0x6fff) AM_RAM                             // RAM
-	AM_RANGE(0x7ff0, 0x7fff) AM_READWRITE(snd_z80_r, snd_z80_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")                // ROM
-ADDRESS_MAP_END
+void fuuki32_state::fuuki32_sound_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();                             // ROM
+	map(0x6000, 0x6fff).ram();                             // RAM
+	map(0x7ff0, 0x7fff).rw(this, FUNC(fuuki32_state::snd_z80_r), FUNC(fuuki32_state::snd_z80_w));
+	map(0x8000, 0xffff).bankr("bank1");                // ROM
+}
 
-ADDRESS_MAP_START(fuuki32_state::fuuki32_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bw_w)
-	AM_RANGE(0x30, 0x30) AM_WRITENOP // leftover/unused nmi handler related
-	AM_RANGE(0x40, 0x45) AM_DEVREAD("ymf1", ymf278b_device, read) AM_WRITE(snd_ymf278b_w)
-ADDRESS_MAP_END
+void fuuki32_state::fuuki32_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(fuuki32_state::sound_bw_w));
+	map(0x30, 0x30).nopw(); // leftover/unused nmi handler related
+	map(0x40, 0x45).r("ymf1", FUNC(ymf278b_device::read)).w(this, FUNC(fuuki32_state::snd_ymf278b_w));
+}
 
 /***************************************************************************
 

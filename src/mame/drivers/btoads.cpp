@@ -166,33 +166,34 @@ WRITE8_MEMBER( btoads_state::bsmt2000_port_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(btoads_state::main_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x20000000, 0x2000007f) AM_READ_PORT("P1")
-	AM_RANGE(0x20000080, 0x200000ff) AM_READ_PORT("P2")
-	AM_RANGE(0x20000100, 0x2000017f) AM_READ_PORT("P3")
-	AM_RANGE(0x20000180, 0x200001ff) AM_READ_PORT("UNK")
-	AM_RANGE(0x20000200, 0x2000027f) AM_READ_PORT("SPECIAL")
-	AM_RANGE(0x20000280, 0x200002ff) AM_READ_PORT("SW1")
-	AM_RANGE(0x20000000, 0x200000ff) AM_WRITEONLY AM_SHARE("sprite_scale")
-	AM_RANGE(0x20000100, 0x2000017f) AM_WRITEONLY AM_SHARE("sprite_control")
-	AM_RANGE(0x20000180, 0x200001ff) AM_WRITE(display_control_w)
-	AM_RANGE(0x20000200, 0x2000027f) AM_WRITE(scroll0_w)
-	AM_RANGE(0x20000280, 0x200002ff) AM_WRITE(scroll1_w)
-	AM_RANGE(0x20000300, 0x2000037f) AM_READWRITE(paletteram_r, paletteram_w)
-	AM_RANGE(0x20000380, 0x200003ff) AM_READWRITE(main_sound_r, main_sound_w)
-	AM_RANGE(0x20000400, 0x2000047f) AM_WRITE(misc_control_w)
-	AM_RANGE(0x40000000, 0x4000000f) AM_WRITENOP    /* watchdog? */
-	AM_RANGE(0x60000000, 0x6003ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa0000000, 0xa03fffff) AM_READWRITE(vram_fg_display_r, vram_fg_display_w) AM_SHARE("vram_fg0")
-	AM_RANGE(0xa4000000, 0xa43fffff) AM_READWRITE(vram_fg_draw_r, vram_fg_draw_w) AM_SHARE("vram_fg1")
-	AM_RANGE(0xa8000000, 0xa87fffff) AM_RAM AM_SHARE("vram_fg_data")
-	AM_RANGE(0xa8800000, 0xa8ffffff) AM_WRITENOP
-	AM_RANGE(0xb0000000, 0xb03fffff) AM_READWRITE(vram_bg0_r, vram_bg0_w) AM_SHARE("vram_bg0")
-	AM_RANGE(0xb4000000, 0xb43fffff) AM_READWRITE(vram_bg1_r, vram_bg1_w) AM_SHARE("vram_bg1")
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_DEVREADWRITE("maincpu", tms34020_device, io_register_r, io_register_w)
-	AM_RANGE(0xfc000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void btoads_state::main_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram();
+	map(0x20000000, 0x2000007f).portr("P1");
+	map(0x20000080, 0x200000ff).portr("P2");
+	map(0x20000100, 0x2000017f).portr("P3");
+	map(0x20000180, 0x200001ff).portr("UNK");
+	map(0x20000200, 0x2000027f).portr("SPECIAL");
+	map(0x20000280, 0x200002ff).portr("SW1");
+	map(0x20000000, 0x200000ff).writeonly().share("sprite_scale");
+	map(0x20000100, 0x2000017f).writeonly().share("sprite_control");
+	map(0x20000180, 0x200001ff).w(this, FUNC(btoads_state::display_control_w));
+	map(0x20000200, 0x2000027f).w(this, FUNC(btoads_state::scroll0_w));
+	map(0x20000280, 0x200002ff).w(this, FUNC(btoads_state::scroll1_w));
+	map(0x20000300, 0x2000037f).rw(this, FUNC(btoads_state::paletteram_r), FUNC(btoads_state::paletteram_w));
+	map(0x20000380, 0x200003ff).rw(this, FUNC(btoads_state::main_sound_r), FUNC(btoads_state::main_sound_w));
+	map(0x20000400, 0x2000047f).w(this, FUNC(btoads_state::misc_control_w));
+	map(0x40000000, 0x4000000f).nopw();    /* watchdog? */
+	map(0x60000000, 0x6003ffff).ram().share("nvram");
+	map(0xa0000000, 0xa03fffff).rw(this, FUNC(btoads_state::vram_fg_display_r), FUNC(btoads_state::vram_fg_display_w)).share("vram_fg0");
+	map(0xa4000000, 0xa43fffff).rw(this, FUNC(btoads_state::vram_fg_draw_r), FUNC(btoads_state::vram_fg_draw_w)).share("vram_fg1");
+	map(0xa8000000, 0xa87fffff).ram().share("vram_fg_data");
+	map(0xa8800000, 0xa8ffffff).nopw();
+	map(0xb0000000, 0xb03fffff).rw(this, FUNC(btoads_state::vram_bg0_r), FUNC(btoads_state::vram_bg0_w)).share("vram_bg0");
+	map(0xb4000000, 0xb43fffff).rw(this, FUNC(btoads_state::vram_bg1_r), FUNC(btoads_state::vram_bg1_w)).share("vram_bg1");
+	map(0xc0000000, 0xc00003ff).rw(m_maincpu, FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
+	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 
@@ -202,19 +203,21 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(btoads_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void btoads_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(btoads_state::sound_io_map)
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(bsmt2000_port_w)
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(sound_data_r, sound_data_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(sound_int_state_w)
-	AM_RANGE(0x8004, 0x8004) AM_READ(sound_data_ready_r)
-	AM_RANGE(0x8005, 0x8005) AM_READ(sound_ready_to_send_r)
-	AM_RANGE(0x8006, 0x8006) AM_READ(bsmt_ready_r)
-ADDRESS_MAP_END
+void btoads_state::sound_io_map(address_map &map)
+{
+	map(0x0000, 0x7fff).w(this, FUNC(btoads_state::bsmt2000_port_w));
+	map(0x8000, 0x8000).rw(this, FUNC(btoads_state::sound_data_r), FUNC(btoads_state::sound_data_w));
+	map(0x8002, 0x8002).w(this, FUNC(btoads_state::sound_int_state_w));
+	map(0x8004, 0x8004).r(this, FUNC(btoads_state::sound_data_ready_r));
+	map(0x8005, 0x8005).r(this, FUNC(btoads_state::sound_ready_to_send_r));
+	map(0x8006, 0x8006).r(this, FUNC(btoads_state::bsmt_ready_r));
+}
 
 
 

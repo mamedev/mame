@@ -1779,7 +1779,7 @@ int lc8670_cpu_device::op_xor()
 	return 1;
 }
 
-util::disasm_interface *lc8670_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> lc8670_cpu_device::create_disassembler()
 {
-	return new lc8670_disassembler;
+	return std::make_unique<lc8670_disassembler>();
 }

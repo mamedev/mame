@@ -76,27 +76,29 @@ WRITE8_MEMBER(anes_state::blit_trigger_w)
 	//printf("%02x%02x%02x\n",m_vram_offset[0],m_vram_offset[1],m_vram_offset[2]);
 }
 
-ADDRESS_MAP_START(anes_state::prg_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void anes_state::prg_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(anes_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
+void anes_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
 
-	AM_RANGE(0x07, 0x07) AM_WRITENOP // mux write
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ym", ym2413_device, write)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(blit_trigger_w)
+	map(0x07, 0x07).nopw(); // mux write
+	map(0x08, 0x09).w("ym", FUNC(ym2413_device::write));
+	map(0x0a, 0x0a).w(this, FUNC(anes_state::blit_trigger_w));
 //  AM_RANGE(0x0b, 0x0b) AM_WRITE(blit_mode_w)
-	AM_RANGE(0x0c, 0x0e) AM_WRITE(vram_offset_w)
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("DSW1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("DSW2")
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW3")
-	AM_RANGE(0x14, 0x15) AM_READNOP // mux read
-	AM_RANGE(0x16, 0x16) AM_READ_PORT("IN0") AM_WRITENOP
+	map(0x0c, 0x0e).w(this, FUNC(anes_state::vram_offset_w));
+	map(0x11, 0x11).portr("DSW1");
+	map(0x12, 0x12).portr("DSW2");
+	map(0x13, 0x13).portr("DSW3");
+	map(0x14, 0x15).nopr(); // mux read
+	map(0x16, 0x16).portr("IN0").nopw();
 //  AM_RANGE(0xfe, 0xfe) banking? unknown ROM range
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( anes )

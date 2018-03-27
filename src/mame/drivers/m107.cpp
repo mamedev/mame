@@ -96,37 +96,40 @@ WRITE16_MEMBER(m107_state::sound_reset_w)
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(m107_state::main_map)
-	AM_RANGE(0x00000, 0x9ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(vram_w) AM_SHARE("vram_data")
-	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
-	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
-ADDRESS_MAP_END
+void m107_state::main_map(address_map &map)
+{
+	map(0x00000, 0x9ffff).rom();
+	map(0xa0000, 0xbffff).bankr("bank1");
+	map(0xd0000, 0xdffff).ram().w(this, FUNC(m107_state::vram_w)).share("vram_data");
+	map(0xe0000, 0xeffff).ram(); /* System ram */
+	map(0xf8000, 0xf8fff).ram().share("spriteram");
+	map(0xf9000, 0xf9fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffff0, 0xfffff).rom().region("maincpu", 0x7fff0);
+}
 
-ADDRESS_MAP_START(m107_state::main_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff)   // answer from sound CPU
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(coincounter_w, 0x00ff)
-	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x9f) AM_WRITE(control_w)
-	AM_RANGE(0xa0, 0xaf) AM_WRITENOP /* Written with 0's in interrupt */
-	AM_RANGE(0xb0, 0xb1) AM_WRITE(spritebuffer_w)
-	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(sound_reset_w)
-ADDRESS_MAP_END
+void m107_state::main_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("P1_P2");
+	map(0x02, 0x03).portr("COINS_DSW3");
+	map(0x04, 0x05).portr("DSW");
+	map(0x06, 0x07).portr("P3_P4");
+	map(0x08, 0x08).r("soundlatch2", FUNC(generic_latch_8_device::read));   // answer from sound CPU
+	map(0x00, 0x00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m107_state::coincounter_w));
+	map(0x04, 0x05).nopw(); /* ??? 0008 */
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x9f).w(this, FUNC(m107_state::control_w));
+	map(0xa0, 0xaf).nopw(); /* Written with 0's in interrupt */
+	map(0xb0, 0xb1).w(this, FUNC(m107_state::spritebuffer_w));
+	map(0xc0, 0xc3).nopr(); /* Only wpksoc: ticket related? */
+	map(0xc0, 0xc1).w(this, FUNC(m107_state::sound_reset_w));
+}
 
-ADDRESS_MAP_START(m107_state::dsoccr94_io_map)
-	AM_IMPORT_FROM(main_portmap)
-	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
-ADDRESS_MAP_END
+void m107_state::dsoccr94_io_map(address_map &map)
+{
+	main_portmap(map);
+	map(0x06, 0x06).w(this, FUNC(m107_state::bankswitch_w));
+}
 
 /* same as M107 but with an extra i/o board */
 WRITE16_MEMBER(m107_state::wpksoc_output_w)
@@ -139,31 +142,34 @@ WRITE16_MEMBER(m107_state::wpksoc_output_w)
 		popmessage("%04x",data);
 }
 
-ADDRESS_MAP_START(m107_state::wpksoc_map)
-	AM_IMPORT_FROM(main_map)
-	AM_RANGE(0xf0000, 0xf0001) AM_READ_PORT("WPK_DSW0")
-	AM_RANGE(0xf0002, 0xf0003) AM_READ_PORT("WPK_DSW1")
-	AM_RANGE(0xf0004, 0xf0005) AM_READ_PORT("WPK_DSW2")
-ADDRESS_MAP_END
+void m107_state::wpksoc_map(address_map &map)
+{
+	main_map(map);
+	map(0xf0000, 0xf0001).portr("WPK_DSW0");
+	map(0xf0002, 0xf0003).portr("WPK_DSW1");
+	map(0xf0004, 0xf0005).portr("WPK_DSW2");
+}
 
-ADDRESS_MAP_START(m107_state::wpksoc_io_map)
-	AM_IMPORT_FROM(main_portmap)
-	AM_RANGE(0x22, 0x23) AM_WRITE(wpksoc_output_w)
-	AM_RANGE(0xc0, 0xc1) AM_READ_PORT("WPK_IN0")
-	AM_RANGE(0xc2, 0xc3) AM_READ_PORT("WPK_IN1")
-ADDRESS_MAP_END
+void m107_state::wpksoc_io_map(address_map &map)
+{
+	main_portmap(map);
+	map(0x22, 0x23).w(this, FUNC(m107_state::wpksoc_output_w));
+	map(0xc0, 0xc1).portr("WPK_IN0");
+	map(0xc2, 0xc3).portr("WPK_IN1");
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(m107_state::sound_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
-	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
-	AM_RANGE(0xa8044, 0xa8045) AM_DEVREADWRITE8("soundlatch", generic_latch_8_device, read, acknowledge_w, 0x00ff)
-	AM_RANGE(0xa8046, 0xa8047) AM_DEVWRITE8("soundlatch2", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
-ADDRESS_MAP_END
+void m107_state::sound_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0xa0000, 0xa3fff).ram();
+	map(0xa8000, 0xa803f).rw("irem", FUNC(iremga20_device::irem_ga20_r), FUNC(iremga20_device::irem_ga20_w)).umask16(0x00ff);
+	map(0xa8040, 0xa8043).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0xa8044, 0xa8044).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0xa8046, 0xa8046).w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0xffff0, 0xfffff).rom().region("soundcpu", 0x1fff0);
+}
 
 /******************************************************************************/
 

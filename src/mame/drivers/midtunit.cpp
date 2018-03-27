@@ -44,29 +44,30 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(midtunit_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_r, midtunit_vram_w)
-	AM_RANGE(0x01000000, 0x013fffff) AM_RAM
-	AM_RANGE(0x01400000, 0x0141ffff) AM_READWRITE(midtunit_cmos_r, midtunit_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0x01480000, 0x014fffff) AM_WRITE(midtunit_cmos_enable_w)
-	AM_RANGE(0x01600000, 0x0160000f) AM_READ_PORT("IN0")
-	AM_RANGE(0x01600010, 0x0160001f) AM_READ_PORT("IN1")
-	AM_RANGE(0x01600020, 0x0160002f) AM_READ_PORT("IN2")
-	AM_RANGE(0x01600030, 0x0160003f) AM_READ_PORT("DSW")
-	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x01a80000, 0x01a800ff) AM_READWRITE(midtunit_dma_r, midtunit_dma_w)
-	AM_RANGE(0x01b00000, 0x01b0001f) AM_WRITE(midtunit_control_w)
+void midtunit_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x003fffff).rw(this, FUNC(midtunit_state::midtunit_vram_r), FUNC(midtunit_state::midtunit_vram_w));
+	map(0x01000000, 0x013fffff).ram();
+	map(0x01400000, 0x0141ffff).rw(this, FUNC(midtunit_state::midtunit_cmos_r), FUNC(midtunit_state::midtunit_cmos_w)).share("nvram");
+	map(0x01480000, 0x014fffff).w(this, FUNC(midtunit_state::midtunit_cmos_enable_w));
+	map(0x01600000, 0x0160000f).portr("IN0");
+	map(0x01600010, 0x0160001f).portr("IN1");
+	map(0x01600020, 0x0160002f).portr("IN2");
+	map(0x01600030, 0x0160003f).portr("DSW");
+	map(0x01800000, 0x0187ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x01a80000, 0x01a800ff).rw(this, FUNC(midtunit_state::midtunit_dma_r), FUNC(midtunit_state::midtunit_dma_w));
+	map(0x01b00000, 0x01b0001f).w(this, FUNC(midtunit_state::midtunit_control_w));
 /*  AM_RANGE(0x01c00060, 0x01c0007f) AM_WRITE(midtunit_cmos_enable_w) */
-	AM_RANGE(0x01d00000, 0x01d0001f) AM_READ(midtunit_sound_state_r)
-	AM_RANGE(0x01d01020, 0x01d0103f) AM_READWRITE(midtunit_sound_r, midtunit_sound_w)
-	AM_RANGE(0x01d81060, 0x01d8107f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x01f00000, 0x01f0001f) AM_WRITE(midtunit_control_w)
-	AM_RANGE(0x02000000, 0x07ffffff) AM_READ(midtunit_gfxrom_r) AM_SHARE("gfxrom")
-	AM_RANGE(0x1f800000, 0x1fffffff) AM_ROM AM_REGION("maincpu", 0) /* mirror used by MK */
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+	map(0x01d00000, 0x01d0001f).r(this, FUNC(midtunit_state::midtunit_sound_state_r));
+	map(0x01d01020, 0x01d0103f).rw(this, FUNC(midtunit_state::midtunit_sound_r), FUNC(midtunit_state::midtunit_sound_w));
+	map(0x01d81060, 0x01d8107f).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x01f00000, 0x01f0001f).w(this, FUNC(midtunit_state::midtunit_control_w));
+	map(0x02000000, 0x07ffffff).r(this, FUNC(midtunit_state::midtunit_gfxrom_r)).share("gfxrom");
+	map(0x1f800000, 0x1fffffff).rom().region("maincpu", 0); /* mirror used by MK */
+	map(0xc0000000, 0xc00001ff).rw("maincpu", FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xff800000, 0xffffffff).rom().region("maincpu", 0);
+}
 
 
 

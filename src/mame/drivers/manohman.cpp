@@ -173,8 +173,12 @@ void manohman_state::machine_start()
 
 IRQ_CALLBACK_MEMBER(manohman_state::iack_handler)
 {
-	// TODO: fetch 68230 vector
-	return m_duart->get_irq_vector();
+	if (irqline >= M68K_IRQ_4)
+		return m_duart->get_irq_vector();
+	else if (irqline >= M68K_IRQ_2)
+		return m_pit->irq_tiack();
+	else
+		return M68K_INT_ACK_SPURIOUS; // doesn't really matter
 }
 
 
@@ -182,15 +186,18 @@ IRQ_CALLBACK_MEMBER(manohman_state::iack_handler)
 *           Memory Map Definition            *
 *********************************************/
 
-ADDRESS_MAP_START(manohman_state::mem_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10003f) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff) AM_READNOP
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("nvram") //work RAM
-	AM_RANGE(0x600006, 0x600007) AM_NOP //(r) is discarded (watchdog?)
-ADDRESS_MAP_END
+void manohman_state::mem_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x100000, 0x10003f).rw(m_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
+	map(0x200000, 0x20001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x300000, 0x300003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff).nopr();
+	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
+	map(0x500000, 0x503fff).ram().share("nvram"); //work RAM
+	map(0x600002, 0x600003).nopw(); // output through shift register?
+	map(0x600004, 0x600005).nopr();
+	map(0x600006, 0x600007).noprw(); //(r) is discarded (watchdog?)
+}
 
 /*
 
@@ -242,6 +249,7 @@ MACHINE_CONFIG_START(manohman_state::manohman)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(manohman_state, iack_handler)
 
 	MCFG_DEVICE_ADD("pit", PIT68230, XTAL(8'000'000)) // MC68230P8
+	MCFG_PIT68230_TIMER_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_2))
 
 	MCFG_DEVICE_ADD("duart", MC68681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))

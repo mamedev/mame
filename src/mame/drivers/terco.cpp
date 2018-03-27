@@ -278,15 +278,16 @@ private:
 	//required_device<ay3600_device> m_ay3600;
 };
 
-ADDRESS_MAP_START(t4490_state::t4490_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x3000)
-	AM_RANGE(0x9500, 0x95ff) AM_RAM
-	AM_RANGE(0x9030, 0x9031) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x9034, 0x9037) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x9038, 0x903b) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION("maincpu", 0xa000)
-ADDRESS_MAP_END
+void t4490_state::t4490_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x3000, 0x3fff).rom().region("maincpu", 0x3000);
+	map(0x9500, 0x95ff).ram();
+	map(0x9030, 0x9031).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x9034, 0x9037).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x9038, 0x903b).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xffff).rom().region("maincpu", 0xa000);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( t4490 )
@@ -305,12 +306,12 @@ MACHINE_CONFIG_END
 ROM_START( t4490 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "terco4490-3861104.bin", 0x3000, 0x1000, CRC(d5fd17cc) SHA1(9a3564fa69b897ec51b49ad34f2d2696cb78ee9b) )
-	ROM_LOAD( "terco4490-A861104.bin", 0xa000, 0x1000, CRC(65b8e7d0) SHA1(633217fc4aa301d87790bb8744b72ef030a4c262) )
-	ROM_LOAD( "terco4490-B861104.bin", 0xb000, 0x1000, CRC(5a0ce3f2) SHA1(7ec455b9075454ce5943011a1dfb5725857168f5) )
-	ROM_LOAD( "terco4490-C861104.bin", 0xc000, 0x1000, CRC(0627c68c) SHA1(bf733d3ffad3f1e75684e833afc9d10d33ca870f) )
-	ROM_LOAD( "terco4490-D861104.bin", 0xd000, 0x1000, CRC(2156476d) SHA1(0d70c6285541746ef15cad0d47b2d752e228abfc) )
-	ROM_LOAD( "terco4490-E861104.bin", 0xe000, 0x1000, CRC(b317fa37) SHA1(a2e037a3a88b5d780067a86e52c6f7c103711a98) )
-	ROM_LOAD( "terco4490-F861104.bin", 0xf000, 0x1000, CRC(a45bc3e7) SHA1(e12efa9a4c72e4bce1d59ad359ee66d7c3babfa6) )
+	ROM_LOAD( "terco4490-a861104.bin", 0xa000, 0x1000, CRC(65b8e7d0) SHA1(633217fc4aa301d87790bb8744b72ef030a4c262) )
+	ROM_LOAD( "terco4490-b861104.bin", 0xb000, 0x1000, CRC(5a0ce3f2) SHA1(7ec455b9075454ce5943011a1dfb5725857168f5) )
+	ROM_LOAD( "terco4490-c861104.bin", 0xc000, 0x1000, CRC(0627c68c) SHA1(bf733d3ffad3f1e75684e833afc9d10d33ca870f) )
+	ROM_LOAD( "terco4490-d861104.bin", 0xd000, 0x1000, CRC(2156476d) SHA1(0d70c6285541746ef15cad0d47b2d752e228abfc) )
+	ROM_LOAD( "terco4490-e861104.bin", 0xe000, 0x1000, CRC(b317fa37) SHA1(a2e037a3a88b5d780067a86e52c6f7c103711a98) )
+	ROM_LOAD( "terco4490-f861104.bin", 0xf000, 0x1000, CRC(a45bc3e7) SHA1(e12efa9a4c72e4bce1d59ad359ee66d7c3babfa6) )
 ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS        INIT     COMPANY             FULLNAME                       FLAGS

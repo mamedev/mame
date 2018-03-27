@@ -137,24 +137,26 @@ WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
 }
 
 
-ADDRESS_MAP_START(mogura_state::mogura_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM // main ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_SHARE("gfxram") // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_SHARE("tileram") // tilemap
-ADDRESS_MAP_END
+void mogura_state::mogura_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xdfff).ram(); // main ram
+	map(0xe000, 0xefff).ram().w(this, FUNC(mogura_state::mogura_gfxram_w)).share("gfxram"); // ram based characters
+	map(0xf000, 0xffff).ram().w(this, FUNC(mogura_state::mogura_tileram_w)).share("tileram"); // tilemap
+}
 
-ADDRESS_MAP_START(mogura_state::mogura_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP    // ??
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("P1")
-	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("P2")
-	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("P3")
-	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("P4")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x14, 0x14) AM_WRITE(mogura_dac_w) /* 4 bit DAC x 2. MSB = left, LSB = right */
-ADDRESS_MAP_END
+void mogura_state::mogura_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw();    // ??
+	map(0x08, 0x08).portr("SYSTEM");
+	map(0x0c, 0x0c).portr("P1");
+	map(0x0d, 0x0d).portr("P2");
+	map(0x0e, 0x0e).portr("P3");
+	map(0x0f, 0x0f).portr("P4");
+	map(0x10, 0x10).portr("SERVICE");
+	map(0x14, 0x14).w(this, FUNC(mogura_state::mogura_dac_w)); /* 4 bit DAC x 2. MSB = left, LSB = right */
+}
 
 static INPUT_PORTS_START( mogura )
 	PORT_START("SYSTEM")

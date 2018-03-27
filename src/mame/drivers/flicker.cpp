@@ -90,27 +90,32 @@ private:
 };
 
 
-ADDRESS_MAP_START(flicker_state::flicker_rom)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void flicker_state::flicker_rom(address_map &map)
+{
+	map(0x0000, 0x03ff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(flicker_state::flicker_memory)
-	AM_RANGE(0x0000, 0x003f) AM_RAM AM_SHARE("memory")
-ADDRESS_MAP_END
+void flicker_state::flicker_memory(address_map &map)
+{
+	map(0x0000, 0x003f).ram().share("memory");
+}
 
-ADDRESS_MAP_START(flicker_state::flicker_status)
-	AM_RANGE(0x0000, 0x000f) AM_RAM AM_SHARE("status")
-ADDRESS_MAP_END
+void flicker_state::flicker_status(address_map &map)
+{
+	map(0x0000, 0x000f).ram().share("status");
+}
 
-ADDRESS_MAP_START(flicker_state::flicker_rom_ports)
-	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x0700) AM_WRITE(rom0_out)
-	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x0700) AM_WRITE(rom1_out)
-	AM_RANGE(0x0020, 0x002f) AM_MIRROR(0x0700) AM_READ(rom2_in)
-ADDRESS_MAP_END
+void flicker_state::flicker_rom_ports(address_map &map)
+{
+	map(0x0000, 0x000f).mirror(0x0700).w(this, FUNC(flicker_state::rom0_out));
+	map(0x0010, 0x001f).mirror(0x0700).w(this, FUNC(flicker_state::rom1_out));
+	map(0x0020, 0x002f).mirror(0x0700).r(this, FUNC(flicker_state::rom2_in));
+}
 
-ADDRESS_MAP_START(flicker_state::flicker_ram_ports)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ram0_out)
-ADDRESS_MAP_END
+void flicker_state::flicker_ram_ports(address_map &map)
+{
+	map(0x00, 0x00).w(this, FUNC(flicker_state::ram0_out));
+}
 
 static INPUT_PORTS_START( flicker )
 	PORT_START("TEST")

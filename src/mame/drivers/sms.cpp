@@ -264,114 +264,122 @@ DC00      - Selection buttons #2, 9-16 (R)
 #define MASTER_CLOCK_PAL    53203425.0  /* 12 * subcarrier freq. (4.43361875MHz) */
 
 
-ADDRESS_MAP_START(sms_state::sms1_mem)
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(write_cart)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(read_8000)
-	AM_RANGE(0xc000, 0xfff7) AM_READWRITE(read_ram, write_ram)
-	AM_RANGE(0xfff8, 0xfffb) AM_READWRITE(sms_sscope_r, sms_sscope_w)       /* 3-D glasses */
-	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
-ADDRESS_MAP_END
+void sms_state::sms1_mem(address_map &map)
+{
+	map(0x0000, 0xbfff).w(this, FUNC(sms_state::write_cart));
+	map(0x0000, 0x3fff).r(this, FUNC(sms_state::read_0000));
+	map(0x4000, 0x7fff).r(this, FUNC(sms_state::read_4000));
+	map(0x8000, 0xbfff).r(this, FUNC(sms_state::read_8000));
+	map(0xc000, 0xfff7).rw(this, FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
+	map(0xfff8, 0xfffb).rw(this, FUNC(sms_state::sms_sscope_r), FUNC(sms_state::sms_sscope_w));       /* 3-D glasses */
+	map(0xfffc, 0xffff).rw(this, FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
+}
 
-ADDRESS_MAP_START(sms_state::sms_mem)
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(write_cart)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(read_8000)
-	AM_RANGE(0xc000, 0xfffb) AM_READWRITE(read_ram, write_ram)
-	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
-ADDRESS_MAP_END
+void sms_state::sms_mem(address_map &map)
+{
+	map(0x0000, 0xbfff).w(this, FUNC(sms_state::write_cart));
+	map(0x0000, 0x3fff).r(this, FUNC(sms_state::read_0000));
+	map(0x4000, 0x7fff).r(this, FUNC(sms_state::read_4000));
+	map(0x8000, 0xbfff).r(this, FUNC(sms_state::read_8000));
+	map(0xc000, 0xfffb).rw(this, FUNC(sms_state::read_ram), FUNC(sms_state::write_ram));
+	map(0xfffc, 0xffff).rw(this, FUNC(sms_state::sms_mapper_r), FUNC(sms_state::sms_mapper_w));       /* Bankswitch control */
+}
 
-ADDRESS_MAP_START(smssdisp_state::sms_store_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM                     /* BIOS */
-	AM_RANGE(0x4000, 0x47ff) AM_RAM                     /* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(store_cart_peek)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW") AM_WRITE(sms_store_control_w) /* Control */
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(sms_store_cart_select_r, sms_store_cart_select_w) /* cartridge/card slot selector */
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("GAMESEL1")         /* Game selector port #1 */
-	AM_RANGE(0xdc00, 0xdc00) AM_READ_PORT("GAMESEL2")         /* Game selector port #2 */
-ADDRESS_MAP_END
+void smssdisp_state::sms_store_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();                     /* BIOS */
+	map(0x4000, 0x47ff).ram();                     /* RAM */
+	map(0x6000, 0x7fff).r(this, FUNC(smssdisp_state::store_cart_peek));
+	map(0x8000, 0x8000).portr("DSW").w(this, FUNC(smssdisp_state::sms_store_control_w)); /* Control */
+	map(0xc000, 0xc000).rw(this, FUNC(smssdisp_state::sms_store_cart_select_r), FUNC(smssdisp_state::sms_store_cart_select_w)); /* cartridge/card slot selector */
+	map(0xd800, 0xd800).portr("GAMESEL1");         /* Game selector port #1 */
+	map(0xdc00, 0xdc00).portr("GAMESEL2");         /* Game selector port #2 */
+}
 
 // I/O ports $3E and $3F do not exist on Mark III
-ADDRESS_MAP_START(sms_state::sg1000m3_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc7) AM_MIRROR(0x38) AM_READWRITE(sg1000m3_peripheral_r, sg1000m3_peripheral_w)
-ADDRESS_MAP_END
+void sms_state::sg1000m3_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc7).mirror(0x38).rw(this, FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
+}
 
 
-ADDRESS_MAP_START(sms_state::sms_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_mem_control_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3e) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3e) AM_READ(sms_input_port_dd_r)
-ADDRESS_MAP_END
+void sms_state::sms_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x00).mirror(0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
+	map(0x01, 0x01).mirror(0x3e).w(this, FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc0).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dd_r));
+}
 
 
 // It seems the Korean versions do some more strict decoding on the I/O
 // addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
 // Leaving the mirrors breaks the Korean cartridge bublboky.
-ADDRESS_MAP_START(sms_state::smskr_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
-	AM_RANGE(0x3f, 0x3f)                 AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3e) AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3e) AM_READ(sms_input_port_dd_r)
-ADDRESS_MAP_END
+void sms_state::smskr_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x3e, 0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(this, FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc0).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).mirror(0x3e).r(this, FUNC(sms_state::sms_input_port_dd_r));
+}
 
 
 // Mirrors for I/O ports $3E/$3F don't exist on the Japanese SMS.
 // Also, $C0/$C1 are the only mirrors for I/O ports $DC/$DD.
-ADDRESS_MAP_START(sms_state::smsj_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
-	AM_RANGE(0x3f, 0x3f)                 AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0)                 AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xc1, 0xc1)                 AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xdc, 0xdc)                 AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xdd, 0xdd)                 AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xf0, 0xf0)                 AM_WRITE(smsj_ym2413_register_port_w)
-	AM_RANGE(0xf1, 0xf1)                 AM_WRITE(smsj_ym2413_data_port_w)
-	AM_RANGE(0xf2, 0xf2)                 AM_READWRITE(smsj_audio_control_r, smsj_audio_control_w)
-ADDRESS_MAP_END
+void sms_state::smsj_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x3e, 0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(this, FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::sms_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc0).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).r(this, FUNC(sms_state::sms_input_port_dd_r));
+	map(0xdc, 0xdc).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xdd, 0xdd).r(this, FUNC(sms_state::sms_input_port_dd_r));
+	map(0xf0, 0xf0).w(this, FUNC(sms_state::smsj_ym2413_register_port_w));
+	map(0xf1, 0xf1).w(this, FUNC(sms_state::smsj_ym2413_data_port_w));
+	map(0xf2, 0xf2).rw(this, FUNC(sms_state::smsj_audio_control_r), FUNC(sms_state::smsj_audio_control_w));
+}
 
 
 // It seems the mirrors for I/O ports $3E/$3F also don't seem to exist on the
 // Game Gear. Leaving the mirrors breaks 'gloc' (it freezes after 1st stage).
-ADDRESS_MAP_START(sms_state::gg_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00)                 AM_READ(gg_input_port_00_r)
-	AM_RANGE(0x01, 0x05)                 AM_READWRITE(gg_sio_r, gg_sio_w)
-	AM_RANGE(0x06, 0x06)                 AM_WRITE(gg_psg_stereo_w)
-	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
-	AM_RANGE(0x3f, 0x3f)                 AM_WRITE(sms_io_control_w)
-	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, gg_psg_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0)                 AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xc1, 0xc1)                 AM_READ(sms_input_port_dd_r)
-	AM_RANGE(0xdc, 0xdc)                 AM_READ(sms_input_port_dc_r)
-	AM_RANGE(0xdd, 0xdd)                 AM_READ(sms_input_port_dd_r)
-ADDRESS_MAP_END
+void sms_state::gg_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x00).r(this, FUNC(sms_state::gg_input_port_00_r));
+	map(0x01, 0x05).rw(this, FUNC(sms_state::gg_sio_r), FUNC(sms_state::gg_sio_w));
+	map(0x06, 0x06).w(this, FUNC(sms_state::gg_psg_stereo_w));
+	map(0x3e, 0x3e).w(this, FUNC(sms_state::sms_mem_control_w));
+	map(0x3f, 0x3f).w(this, FUNC(sms_state::sms_io_control_w));
+	map(0x40, 0x7f).rw(this, FUNC(sms_state::sms_count_r), FUNC(sms_state::gg_psg_w));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+	map(0xc0, 0xc0).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xc1, 0xc1).r(this, FUNC(sms_state::sms_input_port_dd_r));
+	map(0xdc, 0xdc).r(this, FUNC(sms_state::sms_input_port_dc_r));
+	map(0xdd, 0xdd).r(this, FUNC(sms_state::sms_input_port_dd_r));
+}
 
 
 static INPUT_PORTS_START( sms )

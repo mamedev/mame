@@ -716,31 +716,33 @@ READ8_MEMBER(mlanding_state::motor_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(mlanding_state::main_map)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_SHARE("g_ram")
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM AM_SHARE("cha_ram")
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAMBANK("dma_ram")
-	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
-	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(dma_start_w)
-	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(dma_stop_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x240004, 0x240005) AM_READNOP // Watchdog
-	AM_RANGE(0x240006, 0x240007) AM_READ(input_r)
-	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(power_ram_r, power_ram_w)
-	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
-	AM_RANGE(0x290002, 0x290003) AM_READ_PORT("IN0")
-	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(output_w)
-	AM_RANGE(0x2b0000, 0x2b0001) AM_READ(analog1_msb_r)
-	AM_RANGE(0x2b0002, 0x2b0003) AM_READ(analog1_lsb_r)
-	AM_RANGE(0x2b0004, 0x2b0005) AM_READ(analog2_msb_r)
-	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(analog2_lsb_r)
-	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(analog3_msb_r)
-	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(analog3_lsb_r)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
-	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
-ADDRESS_MAP_END
+void mlanding_state::main_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x080000, 0x08ffff).ram();
+	map(0x100000, 0x17ffff).ram().share("g_ram");
+	map(0x180000, 0x1bffff).ram().share("cha_ram");
+	map(0x1c0000, 0x1c3fff).bankrw("dma_ram");
+	map(0x1c4000, 0x1cffff).ram().share("sub_com_ram");
+	map(0x1d0000, 0x1d0001).w(this, FUNC(mlanding_state::dma_start_w));
+	map(0x1d0002, 0x1d0003).w(this, FUNC(mlanding_state::dma_stop_w));
+	map(0x200000, 0x20ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x240004, 0x240005).nopr(); // Watchdog
+	map(0x240006, 0x240007).r(this, FUNC(mlanding_state::input_r));
+	map(0x280000, 0x280fff).rw(this, FUNC(mlanding_state::power_ram_r), FUNC(mlanding_state::power_ram_w));
+	map(0x290000, 0x290001).portr("IN1");
+	map(0x290002, 0x290003).portr("IN0");
+	map(0x2a0000, 0x2a0001).w(this, FUNC(mlanding_state::output_w));
+	map(0x2b0000, 0x2b0001).r(this, FUNC(mlanding_state::analog1_msb_r));
+	map(0x2b0002, 0x2b0003).r(this, FUNC(mlanding_state::analog1_lsb_r));
+	map(0x2b0004, 0x2b0005).r(this, FUNC(mlanding_state::analog2_msb_r));
+	map(0x2b0006, 0x2b0007).r(this, FUNC(mlanding_state::analog2_lsb_r));
+	map(0x2c0000, 0x2c0001).r(this, FUNC(mlanding_state::analog3_msb_r));
+	map(0x2c0002, 0x2c0003).r(this, FUNC(mlanding_state::analog3_lsb_r));
+	map(0x2d0000, 0x2d0001).nopr();
+	map(0x2d0001, 0x2d0001).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x2d0003, 0x2d0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+}
 
 
 
@@ -750,16 +752,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mlanding_state::sub_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE("dsp_prog")
-	AM_RANGE(0x060000, 0x060001) AM_WRITE(dsp_control_w)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAMBANK("dma_ram")
-	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM
-	AM_RANGE(0x200800, 0x203fff) AM_RAM AM_SHARE("dot_ram")
-ADDRESS_MAP_END
+void mlanding_state::sub_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x040000, 0x043fff).ram();
+	map(0x050000, 0x0503ff).ram().share("dsp_prog");
+	map(0x060000, 0x060001).w(this, FUNC(mlanding_state::dsp_control_w));
+	map(0x1c0000, 0x1c3fff).bankrw("dma_ram");
+	map(0x1c4000, 0x1cffff).ram().share("sub_com_ram");
+	map(0x200000, 0x2007ff).ram();
+	map(0x200800, 0x203fff).ram().share("dot_ram");
+}
 
 
 
@@ -769,13 +772,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mlanding_state::dsp_map_prog)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dsp_prog")
-ADDRESS_MAP_END
+void mlanding_state::dsp_map_prog(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("dsp_prog");
+}
 
-ADDRESS_MAP_START(mlanding_state::dsp_map_data)
-	AM_RANGE(0x0400, 0x1fff) AM_RAM AM_SHARE("dot_ram")
-ADDRESS_MAP_END
+void mlanding_state::dsp_map_data(address_map &map)
+{
+	map(0x0400, 0x1fff).ram().share("dot_ram");
+}
 
 /*************************************
  *
@@ -783,28 +788,30 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mlanding_state::audio_map_prog)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(msm5205_2_start_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(msm5205_2_stop_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(msm5205_1_start_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(msm5205_1_stop_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(msm5205_1_addr_lo_w)
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(msm5205_1_addr_hi_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITENOP
-	AM_RANGE(0xf600, 0xf600) AM_WRITENOP // MSM5205 2 volume?
-	AM_RANGE(0xf800, 0xf800) AM_WRITENOP
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITENOP
-ADDRESS_MAP_END
+void mlanding_state::audio_map_prog(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xa000, 0xa000).w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xa001, 0xa001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+	map(0xb000, 0xb000).w(this, FUNC(mlanding_state::msm5205_2_start_w));
+	map(0xc000, 0xc000).w(this, FUNC(mlanding_state::msm5205_2_stop_w));
+	map(0xd000, 0xd000).w(this, FUNC(mlanding_state::msm5205_1_start_w));
+	map(0xe000, 0xe000).w(this, FUNC(mlanding_state::msm5205_1_stop_w));
+	map(0xf000, 0xf000).w(this, FUNC(mlanding_state::msm5205_1_addr_lo_w));
+	map(0xf200, 0xf200).w(this, FUNC(mlanding_state::msm5205_1_addr_hi_w));
+	map(0xf400, 0xf400).nopw();
+	map(0xf600, 0xf600).nopw(); // MSM5205 2 volume?
+	map(0xf800, 0xf800).nopw();
+	map(0xfa00, 0xfa00).nopw();
+}
 
-ADDRESS_MAP_START(mlanding_state::audio_map_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void mlanding_state::audio_map_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 
@@ -814,13 +821,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mlanding_state::mecha_map_prog)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("power_ram")
-	AM_RANGE(0x9000, 0x9003) AM_WRITENOP
-	AM_RANGE(0x9800, 0x9805) AM_READ(motor_r)
-ADDRESS_MAP_END
+void mlanding_state::mecha_map_prog(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8fff).ram().share("power_ram");
+	map(0x9000, 0x9003).nopw();
+	map(0x9800, 0x9805).r(this, FUNC(mlanding_state::motor_r));
+}
 
 
 

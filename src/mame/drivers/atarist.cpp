@@ -1203,117 +1203,122 @@ WRITE16_MEMBER( stbook_state::lcd_control_w )
 //  ADDRESS_MAP( ikbd_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(st_state::ikbd_map)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_TAG, hd6301_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6301V1_TAG, 0)
-ADDRESS_MAP_END
+void st_state::ikbd_map(address_map &map)
+{
+	map(0x0000, 0x001f).rw(HD6301V1_TAG, FUNC(hd6301_cpu_device::m6801_io_r), FUNC(hd6301_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0xf000, 0xffff).rom().region(HD6301V1_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( ikbd_io_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(st_state::ikbd_io_map)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(ikbd_port1_r)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(ikbd_port2_r, ikbd_port2_w)
-	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_WRITE(ikbd_port3_w)
-	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_READWRITE(ikbd_port4_r, ikbd_port4_w)
-ADDRESS_MAP_END
+void st_state::ikbd_io_map(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).r(this, FUNC(st_state::ikbd_port1_r));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(st_state::ikbd_port2_r), FUNC(st_state::ikbd_port2_w));
+	map(M6801_PORT3, M6801_PORT3).w(this, FUNC(st_state::ikbd_port3_w));
+	map(M6801_PORT4, M6801_PORT4).rw(this, FUNC(st_state::ikbd_port4_r), FUNC(st_state::ikbd_port4_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( st_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(st_state::st_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0) AM_WRITE(berr_w)
-	AM_RANGE(0x000008, 0x1fffff) AM_RAM
-	AM_RANGE(0x200000, 0x3fffff) AM_RAM
-	AM_RANGE(0x400000, 0xf9ffff) AM_READWRITE(berr_r, berr_w)
+void st_state::st_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x000007).rom().region(M68000_TAG, 0).w(this, FUNC(st_state::berr_w));
+	map(0x000008, 0x1fffff).ram();
+	map(0x200000, 0x3fffff).ram();
+	map(0x400000, 0xf9ffff).rw(this, FUNC(st_state::berr_r), FUNC(st_state::berr_w));
 	//AM_RANGE(0xfa0000, 0xfbffff)      // mapped by the cartslot
-	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0) AM_WRITE(berr_w)
-	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE8(mmu_r, mmu_w, 0x00ff)
-	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE8(shifter_base_r, shifter_base_w, 0x00ff)
-	AM_RANGE(0xff8204, 0xff8209) AM_READ8(shifter_counter_r, 0x00ff)
-	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE8(shifter_sync_r, shifter_sync_w, 0xff00)
-	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE(shifter_palette_r, shifter_palette_w)
-	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(shifter_mode_r, shifter_mode_w, 0xff00)
-	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(fdc_data_r, fdc_data_w)
-	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(dma_status_r, dma_mode_w)
-	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(dma_counter_r, dma_base_w, 0x00ff)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_device, data_r, address_w, 0xff00) AM_MIRROR(0xfc)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVREADWRITE8(YM2149_TAG, ay8910_device, data_r, data_w, 0xff00) AM_MIRROR(0xfc)
+	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(this, FUNC(st_state::berr_w));
+	map(0xff8001, 0xff8001).rw(this, FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
+	map(0xff8200, 0xff8203).rw(this, FUNC(st_state::shifter_base_r), FUNC(st_state::shifter_base_w)).umask16(0x00ff);
+	map(0xff8204, 0xff8209).r(this, FUNC(st_state::shifter_counter_r)).umask16(0x00ff);
+	map(0xff820a, 0xff820a).rw(this, FUNC(st_state::shifter_sync_r), FUNC(st_state::shifter_sync_w));
+	map(0xff8240, 0xff825f).rw(this, FUNC(st_state::shifter_palette_r), FUNC(st_state::shifter_palette_w));
+	map(0xff8260, 0xff8260).rw(this, FUNC(st_state::shifter_mode_r), FUNC(st_state::shifter_mode_w));
+	map(0xff8604, 0xff8605).rw(this, FUNC(st_state::fdc_data_r), FUNC(st_state::fdc_data_w));
+	map(0xff8606, 0xff8607).rw(this, FUNC(st_state::dma_status_r), FUNC(st_state::dma_mode_w));
+	map(0xff8608, 0xff860d).rw(this, FUNC(st_state::dma_counter_r), FUNC(st_state::dma_base_w)).umask16(0x00ff);
+	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
+	map(0xff8802, 0xff8802).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
 #if 0
-	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
-	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
-	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
-	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
-	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
-	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
-	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
-	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
-	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
-	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
+	map(0xff8a00, 0xff8a1f).rw(this, FUNC(st_state::blitter_halftone_r), FUNC(st_state::blitter_halftone_w));
+	map(0xff8a20, 0xff8a21).rw(this, FUNC(st_state::blitter_src_inc_x_r), FUNC(st_state::blitter_src_inc_x_w));
+	map(0xff8a22, 0xff8a23).rw(this, FUNC(st_state::blitter_src_inc_y_r), FUNC(st_state::blitter_src_inc_y_w));
+	map(0xff8a24, 0xff8a27).rw(this, FUNC(st_state::blitter_src_r), FUNC(st_state::blitter_src_w));
+	map(0xff8a28, 0xff8a2d).rw(this, FUNC(st_state::blitter_end_mask_r), FUNC(st_state::blitter_end_mask_w));
+	map(0xff8a2e, 0xff8a2f).rw(this, FUNC(st_state::blitter_dst_inc_x_r), FUNC(st_state::blitter_dst_inc_x_w));
+	map(0xff8a30, 0xff8a31).rw(this, FUNC(st_state::blitter_dst_inc_y_r), FUNC(st_state::blitter_dst_inc_y_w));
+	map(0xff8a32, 0xff8a35).rw(this, FUNC(st_state::blitter_dst_r), FUNC(st_state::blitter_dst_w));
+	map(0xff8a36, 0xff8a37).rw(this, FUNC(st_state::blitter_count_x_r), FUNC(st_state::blitter_count_x_w));
+	map(0xff8a38, 0xff8a39).rw(this, FUNC(st_state::blitter_count_y_r), FUNC(st_state::blitter_count_y_w));
+	map(0xff8a3a, 0xff8a3b).rw(this, FUNC(st_state::blitter_op_r), FUNC(st_state::blitter_op_w));
+	map(0xff8a3c, 0xff8a3d).rw(this, FUNC(st_state::blitter_ctrl_r), FUNC(st_state::blitter_ctrl_w));
 #endif
-	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
-	AM_RANGE(0xfffc00, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, read, write, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, read, write, 0xff00)
-ADDRESS_MAP_END
+	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xfffc00, 0xfffc03).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+	map(0xfffc04, 0xfffc07).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( megast_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(megast_state::megast_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION(M68000_TAG, 0)
-	AM_RANGE(0x000008, 0x1fffff) AM_RAM
-	AM_RANGE(0x200000, 0x3fffff) AM_RAM
+void megast_state::megast_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x000007).rom().region(M68000_TAG, 0);
+	map(0x000008, 0x1fffff).ram();
+	map(0x200000, 0x3fffff).ram();
 	//AM_RANGE(0xfa0000, 0xfbffff)      // mapped by the cartslot
-	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0)
+	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 //  AM_RANGE(0xff7f30, 0xff7f31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w) // for TOS 1.02
-	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE8(mmu_r, mmu_w, 0x00ff)
-	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE8(shifter_base_r, shifter_base_w, 0x00ff)
-	AM_RANGE(0xff8204, 0xff8209) AM_READ8(shifter_counter_r, 0x00ff)
-	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE8(shifter_sync_r, shifter_sync_w, 0xff00)
-	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE(shifter_palette_r, shifter_palette_w)
-	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(shifter_mode_r, shifter_mode_w, 0xff00)
-	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(fdc_data_r, fdc_data_w)
-	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(dma_status_r, dma_mode_w)
-	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(dma_counter_r, dma_base_w, 0x00ff)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_device, data_r, address_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM2149_TAG, ay8910_device, data_w, 0xff00)
-	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
-	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
-	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
-	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
-	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
-	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
-	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
-	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
-	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
-	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
-	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
-	AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(fpu_r, fpu_w)
-	AM_RANGE(0xfffc00, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, read, write, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, read, write, 0xff00)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0xff8001, 0xff8001).rw(this, FUNC(megast_state::mmu_r), FUNC(megast_state::mmu_w));
+	map(0xff8200, 0xff8203).rw(this, FUNC(megast_state::shifter_base_r), FUNC(megast_state::shifter_base_w)).umask16(0x00ff);
+	map(0xff8204, 0xff8209).r(this, FUNC(megast_state::shifter_counter_r)).umask16(0x00ff);
+	map(0xff820a, 0xff820a).rw(this, FUNC(megast_state::shifter_sync_r), FUNC(megast_state::shifter_sync_w));
+	map(0xff8240, 0xff825f).rw(this, FUNC(megast_state::shifter_palette_r), FUNC(megast_state::shifter_palette_w));
+	map(0xff8260, 0xff8260).rw(this, FUNC(megast_state::shifter_mode_r), FUNC(megast_state::shifter_mode_w));
+	map(0xff8604, 0xff8605).rw(this, FUNC(megast_state::fdc_data_r), FUNC(megast_state::fdc_data_w));
+	map(0xff8606, 0xff8607).rw(this, FUNC(megast_state::dma_status_r), FUNC(megast_state::dma_mode_w));
+	map(0xff8608, 0xff860d).rw(this, FUNC(megast_state::dma_counter_r), FUNC(megast_state::dma_base_w)).umask16(0x00ff);
+	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0xff8802, 0xff8802).w(YM2149_TAG, FUNC(ay8910_device::data_w));
+	map(0xff8a00, 0xff8a1f).rw(this, FUNC(megast_state::blitter_halftone_r), FUNC(megast_state::blitter_halftone_w));
+	map(0xff8a20, 0xff8a21).rw(this, FUNC(megast_state::blitter_src_inc_x_r), FUNC(megast_state::blitter_src_inc_x_w));
+	map(0xff8a22, 0xff8a23).rw(this, FUNC(megast_state::blitter_src_inc_y_r), FUNC(megast_state::blitter_src_inc_y_w));
+	map(0xff8a24, 0xff8a27).rw(this, FUNC(megast_state::blitter_src_r), FUNC(megast_state::blitter_src_w));
+	map(0xff8a28, 0xff8a2d).rw(this, FUNC(megast_state::blitter_end_mask_r), FUNC(megast_state::blitter_end_mask_w));
+	map(0xff8a2e, 0xff8a2f).rw(this, FUNC(megast_state::blitter_dst_inc_x_r), FUNC(megast_state::blitter_dst_inc_x_w));
+	map(0xff8a30, 0xff8a31).rw(this, FUNC(megast_state::blitter_dst_inc_y_r), FUNC(megast_state::blitter_dst_inc_y_w));
+	map(0xff8a32, 0xff8a35).rw(this, FUNC(megast_state::blitter_dst_r), FUNC(megast_state::blitter_dst_w));
+	map(0xff8a36, 0xff8a37).rw(this, FUNC(megast_state::blitter_count_x_r), FUNC(megast_state::blitter_count_x_w));
+	map(0xff8a38, 0xff8a39).rw(this, FUNC(megast_state::blitter_count_y_r), FUNC(megast_state::blitter_count_y_w));
+	map(0xff8a3a, 0xff8a3b).rw(this, FUNC(megast_state::blitter_op_r), FUNC(megast_state::blitter_op_w));
+	map(0xff8a3c, 0xff8a3d).rw(this, FUNC(megast_state::blitter_ctrl_r), FUNC(megast_state::blitter_ctrl_w));
+	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xfffa40, 0xfffa57).rw(this, FUNC(megast_state::fpu_r), FUNC(megast_state::fpu_w));
+	map(0xfffc00, 0xfffc03).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+	map(0xfffc04, 0xfffc07).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( ste_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(ste_state::ste_map)
-	AM_IMPORT_FROM(st_map)
+void ste_state::ste_map(address_map &map)
+{
+	st_map(map);
 /*  AM_RANGE(0xe00000, 0xe3ffff) AM_ROM AM_REGION(M68000_TAG, 0)
     AM_RANGE(0xff8204, 0xff8209) AM_READWRITE8(shifter_counter_r, shifter_counter_w, 0x00ff)
     AM_RANGE(0xff820c, 0xff820d) AM_READWRITE8(shifter_base_low_r, shifter_base_low_w, 0x00ff)
@@ -1338,23 +1343,24 @@ ADDRESS_MAP_START(ste_state::ste_map)
     AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
     AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
     AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)*/
-	AM_RANGE(0xff9200, 0xff9201) AM_READ_PORT("JOY0")
-	AM_RANGE(0xff9202, 0xff9203) AM_READ_PORT("JOY1")
-	AM_RANGE(0xff9210, 0xff9211) AM_READ_PORT("PADDLE0X")
-	AM_RANGE(0xff9212, 0xff9213) AM_READ_PORT("PADDLE0Y")
-	AM_RANGE(0xff9214, 0xff9215) AM_READ_PORT("PADDLE1X")
-	AM_RANGE(0xff9216, 0xff9217) AM_READ_PORT("PADDLE1Y")
-	AM_RANGE(0xff9220, 0xff9221) AM_READ_PORT("GUNX")
-	AM_RANGE(0xff9222, 0xff9223) AM_READ_PORT("GUNY")
-ADDRESS_MAP_END
+	map(0xff9200, 0xff9201).portr("JOY0");
+	map(0xff9202, 0xff9203).portr("JOY1");
+	map(0xff9210, 0xff9211).portr("PADDLE0X");
+	map(0xff9212, 0xff9213).portr("PADDLE0Y");
+	map(0xff9214, 0xff9215).portr("PADDLE1X");
+	map(0xff9216, 0xff9217).portr("PADDLE1Y");
+	map(0xff9220, 0xff9221).portr("GUNX");
+	map(0xff9222, 0xff9223).portr("GUNY");
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( megaste_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(megaste_state::megaste_map)
-	AM_IMPORT_FROM(st_map)
+void megaste_state::megaste_map(address_map &map)
+{
+	st_map(map);
 /*  AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(shifter_counter_r, shifter_counter_w)
     AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(shifter_base_low_r, shifter_base_low_w)
     AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(shifter_lineofs_r, shifter_lineofs_w)
@@ -1381,23 +1387,24 @@ ADDRESS_MAP_START(megaste_state::megaste_map)
     AM_RANGE(0xff8e00, 0xff8e0f) AM_READWRITE(vme_r, vme_w)
     AM_RANGE(0xff8e20, 0xff8e21) AM_READWRITE(cache_r, cache_w)
 //  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(fpu_r, fpu_w)*/
-	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8(Z8530_TAG, scc8530_t, reg_r, reg_w, 0x00ff)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE8(RP5C15_TAG, rp5c15_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w)).umask16(0x00ff);
+	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( stbook_map )
 //-------------------------------------------------
 #if 0
-ADDRESS_MAP_START(stbook_state::stbook_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM
-	AM_RANGE(0x200000, 0x3fffff) AM_RAM
+void stbook_state::stbook_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).ram();
+	map(0x200000, 0x3fffff).ram();
 //  AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
-	AM_RANGE(0xe00000, 0xe3ffff) AM_ROM AM_REGION(M68000_TAG, 0)
+	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
 //  AM_RANGE(0xe80000, 0xebffff) AM_ROM
 //  AM_RANGE(0xfa0000, 0xfbffff) AM_ROM // cartridge
-	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0)
+	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 /*  AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
     AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
     AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(stbook_shifter_base_r, stbook_shifter_base_w)
@@ -1409,8 +1416,8 @@ ADDRESS_MAP_START(stbook_state::stbook_map)
     AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(stbook_shifter_mode_r, stbook_shifter_mode_w, 0xff00)
     AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(stbook_shifter_pixelofs_r, stbook_shifter_pixelofs_w)
     AM_RANGE(0xff827e, 0xff827f) AM_WRITE(lcd_control_w)*/
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM3439_TAG, ay8910_device, data_r, address_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM3439_TAG, ay8910_device, data_w, 0xff00)
+	map(0xff8800, 0xff8800).rw(YM3439_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0xff8802, 0xff8802).w(YM3439_TAG, FUNC(ay8910_device::data_w));
 /*  AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
     AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
     AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
@@ -1434,7 +1441,7 @@ ADDRESS_MAP_START(stbook_state::stbook_map)
     AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(lcd_contrast_r, lcd_contrast_w)
     AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(power_r, power_w)
     AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(reference_r, reference_w)*/
-ADDRESS_MAP_END
+}
 #endif
 
 

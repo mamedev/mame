@@ -75,57 +75,60 @@ WRITE8_MEMBER(wc90_state::bankswitch1_w)
 
 
 
-ADDRESS_MAP_START(wc90_state::wc90_map_1)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM     /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram") /* fg video ram */
-	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram") /* tx video ram */
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1")
-	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("P2")
-	AM_RANGE(0xfc05, 0xfc05) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfc06, 0xfc06) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc07, 0xfc07) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITEONLY AM_SHARE("scroll0ylo")
-	AM_RANGE(0xfc03, 0xfc03) AM_WRITEONLY AM_SHARE("scroll0yhi")
-	AM_RANGE(0xfc06, 0xfc06) AM_WRITEONLY AM_SHARE("scroll0xlo")
-	AM_RANGE(0xfc07, 0xfc07) AM_WRITEONLY AM_SHARE("scroll0xhi")
-	AM_RANGE(0xfc22, 0xfc22) AM_WRITEONLY AM_SHARE("scroll1ylo")
-	AM_RANGE(0xfc23, 0xfc23) AM_WRITEONLY AM_SHARE("scroll1yhi")
-	AM_RANGE(0xfc26, 0xfc26) AM_WRITEONLY AM_SHARE("scroll1xlo")
-	AM_RANGE(0xfc27, 0xfc27) AM_WRITEONLY AM_SHARE("scroll1xhi")
-	AM_RANGE(0xfc42, 0xfc42) AM_WRITEONLY AM_SHARE("scroll2ylo")
-	AM_RANGE(0xfc43, 0xfc43) AM_WRITEONLY AM_SHARE("scroll2yhi")
-	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_SHARE("scroll2xlo")
-	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_SHARE("scroll2xhi")
-	AM_RANGE(0xfcc0, 0xfcc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xfcd0, 0xfcd0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(bankswitch_w)
-ADDRESS_MAP_END
+void wc90_state::wc90_map_1(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();     /* Main RAM */
+	map(0xa000, 0xafff).ram().w(this, FUNC(wc90_state::fgvideoram_w)).share("fgvideoram"); /* fg video ram */
+	map(0xb000, 0xbfff).ram();
+	map(0xc000, 0xcfff).ram().w(this, FUNC(wc90_state::bgvideoram_w)).share("bgvideoram");
+	map(0xd000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().w(this, FUNC(wc90_state::txvideoram_w)).share("txvideoram"); /* tx video ram */
+	map(0xf000, 0xf7ff).bankr("mainbank");
+	map(0xf800, 0xfbff).ram().share("share1");
+	map(0xfc00, 0xfc00).portr("P1");
+	map(0xfc02, 0xfc02).portr("P2");
+	map(0xfc05, 0xfc05).portr("SYSTEM");
+	map(0xfc06, 0xfc06).portr("DSW1");
+	map(0xfc07, 0xfc07).portr("DSW2");
+	map(0xfc02, 0xfc02).writeonly().share("scroll0ylo");
+	map(0xfc03, 0xfc03).writeonly().share("scroll0yhi");
+	map(0xfc06, 0xfc06).writeonly().share("scroll0xlo");
+	map(0xfc07, 0xfc07).writeonly().share("scroll0xhi");
+	map(0xfc22, 0xfc22).writeonly().share("scroll1ylo");
+	map(0xfc23, 0xfc23).writeonly().share("scroll1yhi");
+	map(0xfc26, 0xfc26).writeonly().share("scroll1xlo");
+	map(0xfc27, 0xfc27).writeonly().share("scroll1xhi");
+	map(0xfc42, 0xfc42).writeonly().share("scroll2ylo");
+	map(0xfc43, 0xfc43).writeonly().share("scroll2yhi");
+	map(0xfc46, 0xfc46).writeonly().share("scroll2xlo");
+	map(0xfc47, 0xfc47).writeonly().share("scroll2xhi");
+	map(0xfcc0, 0xfcc0).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xfcd0, 0xfcd0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xfce0, 0xfce0).w(this, FUNC(wc90_state::bankswitch_w));
+}
 
-ADDRESS_MAP_START(wc90_state::wc90_map_2)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void wc90_state::wc90_map_2(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().share("spriteram");
+	map(0xd800, 0xdfff).ram();
+	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf7ff).bankr("subbank");
+	map(0xf800, 0xfbff).ram().share("share1");
+	map(0xfc00, 0xfc00).w(this, FUNC(wc90_state::bankswitch1_w));
+	map(0xfc01, 0xfc01).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
-ADDRESS_MAP_START(wc90_state::sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_NOP // IRQ acknowledge? (data read and immediately written back)
-	AM_RANGE(0xfc10, 0xfc10) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void wc90_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf803).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
+	map(0xfc00, 0xfc00).noprw(); // IRQ acknowledge? (data read and immediately written back)
+	map(0xfc10, 0xfc10).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( wc90 )

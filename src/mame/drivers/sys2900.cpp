@@ -77,25 +77,27 @@ protected:
 };
 
 
-ADDRESS_MAP_START(sys2900_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
-	AM_RANGE( 0x0800, 0xefff ) AM_RAM
-	AM_RANGE( 0xf000, 0xf7ff ) AM_ROM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void sys2900_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0xefff).ram();
+	map(0xf000, 0xf7ff).rom();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sys2900_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("sio1", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("pio",  z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("sio2", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("ctc",  z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) // unknown device, disk related?
-	AM_RANGE(0xa0, 0xaf) // unknown device
-	AM_RANGE(0xc0, 0xc3) // unknown device
-ADDRESS_MAP_END
+void sys2900_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x20, 0x23).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x24, 0x27).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x28, 0x2b).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x2c, 0x2f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83); // unknown device, disk related?
+	map(0xa0, 0xaf); // unknown device
+	map(0xc0, 0xc3); // unknown device
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sys2900 )

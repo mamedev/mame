@@ -117,20 +117,23 @@ READ8_MEMBER(cd2650_state::keyin_r)
 	return ret;
 }
 
-ADDRESS_MAP_START(cd2650_state::cd2650_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x1000, 0x7fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void cd2650_state::cd2650_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom().region("roms", 0);
+	map(0x1000, 0x7fff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(cd2650_state::cd2650_io)
-	ADDRESS_MAP_UNMAP_HIGH
+void cd2650_state::cd2650_io(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x80, 0x84) disk i/o
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(cd2650_state::cd2650_data)
-	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READ(keyin_r) AM_DEVWRITE("outlatch", f9334_device, write_nibble_d3)
-ADDRESS_MAP_END
+void cd2650_state::cd2650_data(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( cd2650 )

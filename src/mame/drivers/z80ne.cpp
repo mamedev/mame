@@ -113,67 +113,74 @@
 
 /* LX.382 CPU Board RAM */
 /* LX.382 CPU Board EPROM */
-ADDRESS_MAP_START(z80ne_state::z80ne_mem)
-	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x0400, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0x83ff ) AM_ROMBANK("bank2")
-	AM_RANGE( 0x8400, 0xffff ) AM_READNOP AM_WRITENOP
-ADDRESS_MAP_END
+void z80ne_state::z80ne_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).bankrw("bank1");
+	map(0x0400, 0x7fff).ram();
+	map(0x8000, 0x83ff).bankr("bank2");
+	map(0x8400, 0xffff).nopr().nopw();
+}
 
-ADDRESS_MAP_START(z80ne_state::z80net_mem)
-	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x0400, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0x83ff ) AM_ROMBANK("bank2")
-	AM_RANGE( 0x8400, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_SHARE("videoram") /* (6847) */
-	AM_RANGE( 0xee00, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void z80ne_state::z80net_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).bankrw("bank1");
+	map(0x0400, 0x7fff).ram();
+	map(0x8000, 0x83ff).bankr("bank2");
+	map(0x8400, 0xebff).ram();
+	map(0xec00, 0xedff).ram().share("videoram"); /* (6847) */
+	map(0xee00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(z80ne_state::z80netb_mem)
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_SHARE("videoram") /* (6847) */
-	AM_RANGE( 0xee00, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void z80ne_state::z80netb_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0xebff).ram();
+	map(0xec00, 0xedff).ram().share("videoram"); /* (6847) */
+	map(0xee00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(z80ne_state::z80ne_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xee, 0xee) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
-ADDRESS_MAP_END
+void z80ne_state::z80ne_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xee, 0xee).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xef, 0xef).rw(this, FUNC(z80ne_state::lx385_ctrl_r), FUNC(z80ne_state::lx385_ctrl_w));
+	map(0xf0, 0xff).rw(this, FUNC(z80ne_state::lx383_r), FUNC(z80ne_state::lx383_w));
+}
 
-ADDRESS_MAP_START(z80ne_state::z80net_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xea, 0xea) AM_READ(lx387_data_r )
-	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
-ADDRESS_MAP_END
+void z80ne_state::z80net_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xea, 0xea).r(this, FUNC(z80ne_state::lx387_data_r));
+	map(0xeb, 0xeb).r(this, FUNC(z80ne_state::lx388_read_field_sync));
+	map(0xee, 0xee).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xef, 0xef).rw(this, FUNC(z80ne_state::lx385_ctrl_r), FUNC(z80ne_state::lx385_ctrl_w));
+	map(0xf0, 0xff).rw(this, FUNC(z80ne_state::lx383_r), FUNC(z80ne_state::lx383_w));
+}
 
-ADDRESS_MAP_START(z80ne_state::z80netf_mem)
-	AM_RANGE( 0x0000, 0x03ff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x0400, 0x3fff ) AM_RAMBANK("bank2")
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0x83ff ) AM_RAMBANK("bank3")
-	AM_RANGE( 0x8400, 0xdfff ) AM_RAM
-	AM_RANGE( 0xe000, 0xebff ) AM_READNOP AM_WRITENOP
-	AM_RANGE( 0xec00, 0xedff ) AM_RAM AM_SHARE("videoram") /* (6847) */
-	AM_RANGE( 0xee00, 0xefff ) AM_READNOP AM_WRITENOP
-	AM_RANGE( 0xf000, 0xf3ff ) AM_RAMBANK("bank4")
-	AM_RANGE( 0xf400, 0xffff ) AM_READNOP AM_WRITENOP
-ADDRESS_MAP_END
+void z80ne_state::z80netf_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).bankrw("bank1");
+	map(0x0400, 0x3fff).bankrw("bank2");
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0x83ff).bankrw("bank3");
+	map(0x8400, 0xdfff).ram();
+	map(0xe000, 0xebff).nopr().nopw();
+	map(0xec00, 0xedff).ram().share("videoram"); /* (6847) */
+	map(0xee00, 0xefff).nopr().nopw();
+	map(0xf000, 0xf3ff).bankrw("bank4");
+	map(0xf400, 0xffff).nopr().nopw();
+}
 
-ADDRESS_MAP_START(z80ne_state::z80netf_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xd0, 0xd7) AM_READWRITE(lx390_fdc_r, lx390_fdc_w)
-	AM_RANGE(0xea, 0xea) AM_READ(lx387_data_r )
-	AM_RANGE(0xeb, 0xeb) AM_READ(lx388_read_field_sync )
-	AM_RANGE(0xee, 0xee) AM_DEVREADWRITE("uart", ay31015_device, receive, transmit)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(lx385_ctrl_r, lx385_ctrl_w )
-	AM_RANGE(0xf0, 0xff) AM_READWRITE(lx383_r, lx383_w )
-ADDRESS_MAP_END
+void z80ne_state::z80netf_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xd0, 0xd7).rw(this, FUNC(z80ne_state::lx390_fdc_r), FUNC(z80ne_state::lx390_fdc_w));
+	map(0xea, 0xea).r(this, FUNC(z80ne_state::lx387_data_r));
+	map(0xeb, 0xeb).r(this, FUNC(z80ne_state::lx388_read_field_sync));
+	map(0xee, 0xee).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0xef, 0xef).rw(this, FUNC(z80ne_state::lx385_ctrl_r), FUNC(z80ne_state::lx385_ctrl_w));
+	map(0xf0, 0xff).rw(this, FUNC(z80ne_state::lx383_r), FUNC(z80ne_state::lx383_w));
+}
 
 
 

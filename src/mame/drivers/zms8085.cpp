@@ -87,17 +87,19 @@ READ8_MEMBER(zms8085_state::uart_status_r)
 }
 
 
-ADDRESS_MAP_START(zms8085_state::mem_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0) AM_WRITENOP
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("mainram")
-ADDRESS_MAP_END
+void zms8085_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("maincpu", 0).nopw();
+	map(0x1000, 0x1fff).ram().share("mainram");
+}
 
-ADDRESS_MAP_START(zms8085_state::io_map)
-	AM_RANGE(0x61, 0x61) AM_READ(special_r) AM_DEVWRITE("uart", ay51013_device, transmit)
-	AM_RANGE(0x62, 0x62) AM_DEVREAD("uart", ay51013_device, receive)
-	AM_RANGE(0x63, 0x63) AM_READ(uart_status_r)
-	AM_RANGE(0x68, 0x68) AM_WRITENOP
-ADDRESS_MAP_END
+void zms8085_state::io_map(address_map &map)
+{
+	map(0x61, 0x61).r(this, FUNC(zms8085_state::special_r)).w(m_uart, FUNC(ay51013_device::transmit));
+	map(0x62, 0x62).r(m_uart, FUNC(ay51013_device::receive));
+	map(0x63, 0x63).r(this, FUNC(zms8085_state::uart_status_r));
+	map(0x68, 0x68).nopw();
+}
 
 
 static INPUT_PORTS_START( zephyr )

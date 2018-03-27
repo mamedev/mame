@@ -56,35 +56,37 @@ const tiny_rom_entry *wangpc_rtc_device::device_rom_region() const
 //  ADDRESS_MAP( wangpc_rtc_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wangpc_rtc_device::wangpc_rtc_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x1000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void wangpc_rtc_device::wangpc_rtc_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region(Z80_TAG, 0);
+	map(0x1000, 0xffff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( wangpc_rtc_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(wangpc_rtc_device::wangpc_rtc_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE(AM9517A_TAG, am9517a_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE(Z80CTC_0_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x30, 0x30) //AM_WRITE(clear_char_w)
-	AM_RANGE(0x31, 0x31) //AM_WRITE(set_char_w)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("SW1") //AM_WRITE(control_w)
-	AM_RANGE(0x44, 0x44) //AM_READ(i8086_status_r) AM_WRITE(reset_w)
-	AM_RANGE(0x48, 0x48) //AM_WRITE(dte_ready_w)
-	AM_RANGE(0x4c, 0x4c) //AM_READWRITE(8232_acu_r, 8232_acu_w)
-	AM_RANGE(0x50, 0x50) //AM_READ(outbound_data_r)
-	AM_RANGE(0x51, 0x52) //AM_WRITE(status_w)
-	AM_RANGE(0x54, 0x54) //AM_WRITE(enable_inbound_data_w)
-	AM_RANGE(0x51, 0x52) //AM_WRITE(inbound_data_w)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(Z80CTC_1_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x70, 0x70) //AM_READWRITE(led_toggle_r, odd_parity_w)
-	AM_RANGE(0x71, 0x71) //AM_WRITE(even_parity_w)
-ADDRESS_MAP_END
+void wangpc_rtc_device::wangpc_rtc_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(Z80SIO_TAG, FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
+	map(0x10, 0x1f).rw(AM9517A_TAG, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x20, 0x23).rw(Z80CTC_0_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x30, 0x30); //AM_WRITE(clear_char_w)
+	map(0x31, 0x31); //AM_WRITE(set_char_w)
+	map(0x40, 0x40).portr("SW1"); //AM_WRITE(control_w)
+	map(0x44, 0x44); //AM_READ(i8086_status_r) AM_WRITE(reset_w)
+	map(0x48, 0x48); //AM_WRITE(dte_ready_w)
+	map(0x4c, 0x4c); //AM_READWRITE(8232_acu_r, 8232_acu_w)
+	map(0x50, 0x50); //AM_READ(outbound_data_r)
+	map(0x51, 0x52); //AM_WRITE(status_w)
+	map(0x54, 0x54); //AM_WRITE(enable_inbound_data_w)
+	map(0x51, 0x52); //AM_WRITE(inbound_data_w)
+	map(0x60, 0x63).rw(Z80CTC_1_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x70, 0x70); //AM_READWRITE(led_toggle_r, odd_parity_w)
+	map(0x71, 0x71); //AM_WRITE(even_parity_w)
+}
 
 
 //-------------------------------------------------

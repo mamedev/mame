@@ -455,7 +455,7 @@ public:
 
 protected:
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
 
@@ -473,7 +473,7 @@ public:
 
 protected:
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
 

@@ -222,20 +222,20 @@ enum
 };
 
 
-DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "I8031")
-DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "I8032")
-DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "I8051")
-DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "I8751")
-DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "I8052")
-DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "I8752")
-DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "I80C31")
-DEFINE_DEVICE_TYPE(I80C51, i80c51_device, "i80c51", "I80C51")
-DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "I87C51")
-DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "I80C32")
-DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "I80C52")
-DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "I87C52")
-DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "AT89C4051")
-DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "DS5002FP")
+DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "Intel I8031")
+DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "Intel I8032")
+DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "Intel I8051")
+DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "Intel I8751")
+DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "Intel I8052")
+DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "Intel I8752")
+DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "Intel I80C31")
+DEFINE_DEVICE_TYPE(I80C51, i80c51_device, "i80c51", "Intel I80C51")
+DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "Intel I87C51")
+DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "Intel I80C32")
+DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "Intel I80C52")
+DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "Intel I87C52")
+DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "Atmel AT89C4051")
+DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
 
 
 /***************************************************************************
@@ -2466,32 +2466,32 @@ void ds5002fp_device::nvram_write( emu_file &file )
 	file.write( m_sfr_ram, 0x80 );
 }
 
-util::disasm_interface *mcs51_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mcs51_cpu_device::create_disassembler()
 {
-	return new i8051_disassembler;
+	return std::make_unique<i8051_disassembler>();
 }
 
-util::disasm_interface *i8052_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8052_device::create_disassembler()
 {
-	return new i8052_disassembler;
+	return std::make_unique<i8052_disassembler>();
 }
 
-util::disasm_interface *i80c31_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i80c31_device::create_disassembler()
 {
-	return new i80c51_disassembler;
+	return std::make_unique<i80c51_disassembler>();
 }
 
-util::disasm_interface *i80c51_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i80c51_device::create_disassembler()
 {
-	return new i80c51_disassembler;
+	return std::make_unique<i80c51_disassembler>();
 }
 
-util::disasm_interface *i80c52_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i80c52_device::create_disassembler()
 {
-	return new i80c52_disassembler;
+	return std::make_unique<i80c52_disassembler>();
 }
 
-util::disasm_interface *ds5002fp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ds5002fp_device::create_disassembler()
 {
-	return new ds5002fp_disassembler;
+	return std::make_unique<ds5002fp_disassembler>();
 }

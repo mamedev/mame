@@ -64,12 +64,12 @@ struct EVENT_LIST_ITEM
 class spectrum_state : public driver_device
 {
 public:
-        enum
-        {
-                TIMER_IRQ_ON,
-                TIMER_IRQ_OFF,
-                TIMER_SCANLINE
-        };
+		enum
+		{
+				TIMER_IRQ_ON,
+				TIMER_IRQ_OFF,
+				TIMER_SCANLINE
+		};
 	spectrum_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),

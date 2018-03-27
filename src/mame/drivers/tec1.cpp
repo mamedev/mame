@@ -327,37 +327,41 @@ void tec1_state::machine_reset()
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(tec1_state::tec1_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM // on main board
-	AM_RANGE(0x1000, 0x3fff) AM_RAM // expansion
-ADDRESS_MAP_END
+void tec1_state::tec1_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x0fff).ram(); // on main board
+	map(0x1000, 0x3fff).ram(); // expansion
+}
 
-ADDRESS_MAP_START(tec1_state::tec1_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(tec1_digit_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tec1_segment_w)
-ADDRESS_MAP_END
+void tec1_state::tec1_io(address_map &map)
+{
+	map.global_mask(0x07);
+	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(this, FUNC(tec1_state::tec1_digit_w));
+	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
+}
 
 
-ADDRESS_MAP_START(tec1_state::tecjmon_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void tec1_state::tecjmon_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x37ff).ram();
+	map(0x3800, 0x3fff).rom();
+}
 
-ADDRESS_MAP_START(tec1_state::tecjmon_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(tecjmon_digit_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tec1_segment_w)
-	AM_RANGE(0x03, 0x03) AM_READ(latch_r)
+void tec1_state::tecjmon_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(this, FUNC(tec1_state::tecjmon_digit_w));
+	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
+	map(0x03, 0x03).r(this, FUNC(tec1_state::latch_r));
 	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
 	//AM_RANGE(0x84, 0x84) AM_WRITE(lcd_2nd_w)
-ADDRESS_MAP_END
+}
 
 
 /**************************************************************************

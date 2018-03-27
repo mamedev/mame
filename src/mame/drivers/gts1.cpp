@@ -129,24 +129,27 @@ private:
 	uint16_t m_z30_out;           //!< 4-to-16 decoder outputs
 };
 
-ADDRESS_MAP_START(gts1_state::gts1_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void gts1_state::gts1_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(gts1_state::gts1_data)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void gts1_state::gts1_data(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x0100, 0x01ff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(gts1_state::gts1_io)
-	AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r ) AM_WRITE( gts1_io_w )         // catch undecoded I/O accesss
+void gts1_state::gts1_io(address_map &map)
+{
+	map(0x0000, 0x00ff).r(this, FUNC(gts1_state::gts1_io_r)).w(this, FUNC(gts1_state::gts1_io_w));         // catch undecoded I/O accesss
 
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE ( "u4", ra17xx_device, io_r, io_w ) // (U4) solenoid
-	AM_RANGE(0x0030, 0x003f) AM_DEVREADWRITE ( "u3", r10696_device, io_r, io_w ) // (U3) solenoid + dips
-	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE ( "u5", ra17xx_device, io_r, io_w ) // (U5) switch matrix
-	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE ( "u2", r10696_device, io_r, io_w ) // (U2) NVRAM io chip
-	AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "u6", r10788_device, io_r, io_w ) // (U6) display chip
-ADDRESS_MAP_END
+	map(0x0020, 0x002f).rw("u4", FUNC(ra17xx_device::io_r), FUNC(ra17xx_device::io_w)); // (U4) solenoid
+	map(0x0030, 0x003f).rw("u3", FUNC(r10696_device::io_r), FUNC(r10696_device::io_w)); // (U3) solenoid + dips
+	map(0x0040, 0x004f).rw("u5", FUNC(ra17xx_device::io_r), FUNC(ra17xx_device::io_w)); // (U5) switch matrix
+	map(0x0060, 0x006f).rw("u2", FUNC(r10696_device::io_r), FUNC(r10696_device::io_w)); // (U2) NVRAM io chip
+	map(0x00d0, 0x00df).rw("u6", FUNC(r10788_device::io_r), FUNC(r10788_device::io_w)); // (U6) display chip
+}
 
 static INPUT_PORTS_START( gts1_dips )
 	PORT_START("DSW0")

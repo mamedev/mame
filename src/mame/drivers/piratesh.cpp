@@ -383,34 +383,35 @@ WRITE16_MEMBER(piratesh_state::control3_w)
 }
 
 
-ADDRESS_MAP_START(piratesh_state::piratesh_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x084000, 0x087fff) AM_RAM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff) // CRTC
-	AM_RANGE(0x180000, 0x18003f) AM_DEVWRITE("k056832", k056832_device, word_w) // TILEMAP
-	AM_RANGE(0x280000, 0x280007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w) // SPRITES
-	AM_RANGE(0x290000, 0x29000f) AM_DEVREAD("k055673", k055673_device, k055673_ps_rom_word_r) // SPRITES
-	AM_RANGE(0x290010, 0x29001f) AM_DEVWRITE("k055673", k055673_device, k055673_reg_word_w) // SPRITES
-	AM_RANGE(0x2a0000, 0x2a0fff) AM_DEVREADWRITE("k055673", k055673_device, k053247_word_r, k053247_word_w) // SPRITES
-	AM_RANGE(0x2a1000, 0x2a3fff) AM_WRITENOP
-	AM_RANGE(0x2b0000, 0x2b000f) AM_DEVREADWRITE("k053250", k053250ps_device, reg_r, reg_w) // LVC
-	AM_RANGE(0x300000, 0x3000ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
-	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0")
-	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN1")
-	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("DSW1")
-	AM_RANGE(0x400006, 0x400007) AM_READ_PORT("DSW2")
-	AM_RANGE(0x400008, 0x400009) AM_READ_PORT("SPECIAL")
-	AM_RANGE(0x40000c, 0x40000d) AM_WRITE(control1_w)
-	AM_RANGE(0x400010, 0x400011) AM_WRITE(control2_w)
-	AM_RANGE(0x400014, 0x400015) AM_WRITE(control3_w)
-	AM_RANGE(0x500000, 0x50ffff) AM_READ(K056832_rom_r) // VRAM ROM
-	AM_RANGE(0x580000, 0x581fff) AM_DEVREAD("k053250", k053250ps_device, rom_r) // LVC ROM access
-	AM_RANGE(0x600000, 0x6004ff) AM_DEVREADWRITE8("k054539", k054539_device, read, write, 0xff00) // SOUND
-	AM_RANGE(0x680000, 0x681fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w) // TILEMAP
-	AM_RANGE(0x700000, 0x703fff) AM_DEVREADWRITE("k053250", k053250ps_device, ram_r, ram_w) // LVC
-ADDRESS_MAP_END
+void piratesh_state::piratesh_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x083fff).ram().share("nvram");
+	map(0x084000, 0x087fff).ram();
+	map(0x100000, 0x10001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); // CRTC
+	map(0x180000, 0x18003f).w(m_k056832, FUNC(k056832_device::word_w)); // TILEMAP
+	map(0x280000, 0x280007).w(m_k055673, FUNC(k055673_device::k053246_word_w)); // SPRITES
+	map(0x290000, 0x29000f).r(m_k055673, FUNC(k055673_device::k055673_ps_rom_word_r)); // SPRITES
+	map(0x290010, 0x29001f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w)); // SPRITES
+	map(0x2a0000, 0x2a0fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w)); // SPRITES
+	map(0x2a1000, 0x2a3fff).nopw();
+	map(0x2b0000, 0x2b000f).rw(m_k053250, FUNC(k053250ps_device::reg_r), FUNC(k053250ps_device::reg_w)); // LVC
+	map(0x300000, 0x3000ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
+	map(0x380000, 0x381fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x400001).portr("IN0");
+	map(0x400002, 0x400003).portr("IN1");
+	map(0x400004, 0x400005).portr("DSW1");
+	map(0x400006, 0x400007).portr("DSW2");
+	map(0x400008, 0x400009).portr("SPECIAL");
+	map(0x40000c, 0x40000d).w(this, FUNC(piratesh_state::control1_w));
+	map(0x400010, 0x400011).w(this, FUNC(piratesh_state::control2_w));
+	map(0x400014, 0x400015).w(this, FUNC(piratesh_state::control3_w));
+	map(0x500000, 0x50ffff).r(this, FUNC(piratesh_state::K056832_rom_r)); // VRAM ROM
+	map(0x580000, 0x581fff).r(m_k053250, FUNC(k053250ps_device::rom_r)); // LVC ROM access
+	map(0x600000, 0x6004ff).rw("k054539", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00); // SOUND
+	map(0x680000, 0x681fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // TILEMAP
+	map(0x700000, 0x703fff).rw(m_k053250, FUNC(k053250ps_device::ram_r), FUNC(k053250ps_device::ram_w)); // LVC
+}
 
 
 WRITE_LINE_MEMBER(piratesh_state::k054539_nmi_gen)

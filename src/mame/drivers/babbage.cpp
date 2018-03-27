@@ -78,18 +78,20 @@ private:
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(babbage_state::babbage_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-ADDRESS_MAP_END
+void babbage_state::babbage_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x1000, 0x17ff).ram();
+}
 
-ADDRESS_MAP_START(babbage_state::babbage_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("z80pio_2", z80pio_device, read_alt, write_alt)
-ADDRESS_MAP_END
+void babbage_state::babbage_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x13).rw(m_pio_1, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x20, 0x23).rw(m_pio_2, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+}
 
 
 

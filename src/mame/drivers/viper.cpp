@@ -2073,35 +2073,36 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 
 /*****************************************************************************/
 
-ADDRESS_MAP_START(viper_state::viper_map)
+void viper_state::viper_map(address_map &map)
+{
 //  ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,0xffffffffffffffffU)
-	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
-	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE(voodoo3_lfb_r, voodoo3_lfb_w)
-	AM_RANGE(0xfe800000, 0xfe8000ff) AM_READWRITE(voodoo3_io_r, voodoo3_io_w)
-	AM_RANGE(0xfec00000, 0xfedfffff) AM_READWRITE(pci_config_addr_r, pci_config_addr_w)
-	AM_RANGE(0xfee00000, 0xfeefffff) AM_READWRITE(pci_config_data_r, pci_config_data_w)
+	map(0x00000000, 0x00ffffff).mirror(0x1000000).ram().share("workram");
+	map(0x80000000, 0x800fffff).rw(this, FUNC(viper_state::epic_r), FUNC(viper_state::epic_w));
+	map(0x82000000, 0x83ffffff).rw(this, FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
+	map(0x84000000, 0x85ffffff).rw(this, FUNC(viper_state::voodoo3_lfb_r), FUNC(viper_state::voodoo3_lfb_w));
+	map(0xfe800000, 0xfe8000ff).rw(this, FUNC(viper_state::voodoo3_io_r), FUNC(viper_state::voodoo3_io_w));
+	map(0xfec00000, 0xfedfffff).rw(this, FUNC(viper_state::pci_config_addr_r), FUNC(viper_state::pci_config_addr_w));
+	map(0xfee00000, 0xfeefffff).rw(this, FUNC(viper_state::pci_config_data_r), FUNC(viper_state::pci_config_data_w));
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
 //  AM_RANGE(0xff400xxx, 0xff400xxx) ppp2nd sense device
-	AM_RANGE(0xffe00000, 0xffe00007) AM_READ(e00000_r)
-	AM_RANGE(0xffe00008, 0xffe0000f) AM_READWRITE(e00008_r, e00008_w)
-	AM_RANGE(0xffe08000, 0xffe08007) AM_NOP
-	AM_RANGE(0xffe10000, 0xffe10007) AM_READ8(input_r, 0xffffffffffffffffU)
-	AM_RANGE(0xffe28000, 0xffe28007) AM_WRITENOP // ppp2nd lamps
-	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffffffffffffU)
-	AM_RANGE(0xffe40000, 0xffe4000f) AM_NOP
-	AM_RANGE(0xffe50000, 0xffe50007) AM_WRITE(unk2_w)
-	AM_RANGE(0xffe60000, 0xffe60007) AM_NOP
-	AM_RANGE(0xffe70000, 0xffe7000f) AM_READWRITE(e70000_r, e70000_w)
-	AM_RANGE(0xffe80000, 0xffe80007) AM_WRITE(unk1a_w)
-	AM_RANGE(0xffe88000, 0xffe88007) AM_WRITE(unk1b_w)
-	AM_RANGE(0xffe98000, 0xffe98007) AM_NOP
-	AM_RANGE(0xffe9a000, 0xffe9bfff) AM_RAM                             // World Combat uses this
-	AM_RANGE(0xfff00000, 0xfff3ffff) AM_ROM AM_REGION("user1", 0)       // Boot ROM
-ADDRESS_MAP_END
+	map(0xffe00000, 0xffe00007).r(this, FUNC(viper_state::e00000_r));
+	map(0xffe00008, 0xffe0000f).rw(this, FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
+	map(0xffe08000, 0xffe08007).noprw();
+	map(0xffe10000, 0xffe10007).r(this, FUNC(viper_state::input_r));
+	map(0xffe28000, 0xffe28007).nopw(); // ppp2nd lamps
+	map(0xffe30000, 0xffe31fff).rw("m48t58", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
+	map(0xffe40000, 0xffe4000f).noprw();
+	map(0xffe50000, 0xffe50007).w(this, FUNC(viper_state::unk2_w));
+	map(0xffe60000, 0xffe60007).noprw();
+	map(0xffe70000, 0xffe7000f).rw(this, FUNC(viper_state::e70000_r), FUNC(viper_state::e70000_w));
+	map(0xffe80000, 0xffe80007).w(this, FUNC(viper_state::unk1a_w));
+	map(0xffe88000, 0xffe88007).w(this, FUNC(viper_state::unk1b_w));
+	map(0xffe98000, 0xffe98007).noprw();
+	map(0xffe9a000, 0xffe9bfff).ram();                             // World Combat uses this
+	map(0xfff00000, 0xfff3ffff).rom().region("user1", 0);       // Boot ROM
+}
 
 /*****************************************************************************/
 
@@ -2506,7 +2507,7 @@ ROM_START(code1db) //*
 	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("m48t58_UAB.u39", 0x00000, 0x2000, CRC(6059cdad) SHA1(67f9d9239c3e3ef8c967f26c45fa9201981ad848) )
+	ROM_LOAD("m48t58_uab.u39", 0x00000, 0x2000, CRC(6059cdad) SHA1(67f9d9239c3e3ef8c967f26c45fa9201981ad848) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
@@ -2919,7 +2920,7 @@ ROM_START(wcombatu) //*
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, NO_DUMP )
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("Warzaid u39 c22d02", 0x00000, 0x2000, CRC(71744990) SHA1(19ed07572f183e7b3a712704ebddf7a848c48a78) )
+	ROM_LOAD("warzaid u39 c22d02", 0x00000, 0x2000, CRC(71744990) SHA1(19ed07572f183e7b3a712704ebddf7a848c48a78) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	// CHD image provided had evidence of being altered by Windows, probably was put in a Windows machine without write protection hardware (bad idea)

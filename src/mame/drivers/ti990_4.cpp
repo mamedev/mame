@@ -213,12 +213,13 @@ READ8_MEMBER( ti990_4_state::interrupt_level )
     Memory map - see description above
 */
 
-ADDRESS_MAP_START(ti990_4_state::memmap)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM /* dynamic RAM */
-	AM_RANGE(0x8000, 0xf7ff) AM_NOP /* reserved for expansion */
-	AM_RANGE(0xf800, 0xfbff) AM_RAM /* static RAM? */
-	AM_RANGE(0xfc00, 0xffff) AM_ROM /* LOAD ROM */
-ADDRESS_MAP_END
+void ti990_4_state::memmap(address_map &map)
+{
+	map(0x0000, 0x7fff).ram(); /* dynamic RAM */
+	map(0x8000, 0xf7ff).noprw(); /* reserved for expansion */
+	map(0xf800, 0xfbff).ram(); /* static RAM? */
+	map(0xfc00, 0xffff).rom(); /* LOAD ROM */
+}
 
 
 /*
@@ -243,27 +244,29 @@ ADDRESS_MAP_END
     0x0a0-0x0bf: VDT3 (int ??? - wired to int 9, unused)
 */
 
-ADDRESS_MAP_START(ti990_4_state::cru_map)
-	AM_RANGE(0x00, 0x01) AM_DEVREAD("asr733", asr733_device, cru_r)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("asr733", asr733_device, cru_w)
+void ti990_4_state::cru_map(address_map &map)
+{
+	map(0x00, 0x01).r("asr733", FUNC(asr733_device::cru_r));
+	map(0x00, 0x0f).w("asr733", FUNC(asr733_device::cru_w));
 
-	AM_RANGE(0x08, 0x0b) AM_DEVREAD( "fd800", fd800_legacy_device, cru_r )
-	AM_RANGE(0x40, 0x5f) AM_DEVWRITE( "fd800", fd800_legacy_device, cru_w )
+	map(0x08, 0x0b).r(m_fd800, FUNC(fd800_legacy_device::cru_r));
+	map(0x40, 0x5f).w(m_fd800, FUNC(fd800_legacy_device::cru_w));
 
-	AM_RANGE(0x1fe, 0x1ff) AM_READ( panel_read )
-	AM_RANGE(0xff0, 0xfff) AM_WRITE( panel_write )
-ADDRESS_MAP_END
+	map(0x1fe, 0x1ff).r(this, FUNC(ti990_4_state::panel_read));
+	map(0xff0, 0xfff).w(this, FUNC(ti990_4_state::panel_write));
+}
 
-ADDRESS_MAP_START(ti990_4_state::cru_map_v)
-	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_device, cru_r)
-	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_device, cru_w)
+void ti990_4_state::cru_map_v(address_map &map)
+{
+	map(0x10, 0x11).r("vdt911", FUNC(vdt911_device::cru_r));
+	map(0x80, 0x8f).w("vdt911", FUNC(vdt911_device::cru_w));
 
-	AM_RANGE(0x08, 0x0b) AM_DEVREAD( "fd800", fd800_legacy_device, cru_r )
-	AM_RANGE(0x40, 0x5f) AM_DEVWRITE( "fd800", fd800_legacy_device, cru_w )
+	map(0x08, 0x0b).r(m_fd800, FUNC(fd800_legacy_device::cru_r));
+	map(0x40, 0x5f).w(m_fd800, FUNC(fd800_legacy_device::cru_w));
 
-	AM_RANGE(0x1fe, 0x1ff) AM_READ( panel_read )
-	AM_RANGE(0xff0, 0xfff) AM_WRITE( panel_write )
-ADDRESS_MAP_END
+	map(0x1fe, 0x1ff).r(this, FUNC(ti990_4_state::panel_read));
+	map(0xff0, 0xfff).w(this, FUNC(ti990_4_state::panel_write));
+}
 
 
 /* static const floppy_interface ti990_4_floppy_interface =

@@ -341,22 +341,23 @@ WRITE8_MEMBER(boxer_state::led_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(boxer_state::boxer_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_SHARE("tile_ram")
-	AM_RANGE(0x0800, 0x08ff) AM_READ(input_r)
-	AM_RANGE(0x1000, 0x17ff) AM_READ(misc_r)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(pot_w)
-	AM_RANGE(0x1900, 0x19ff) AM_WRITE(led_w)
-	AM_RANGE(0x1a00, 0x1aff) AM_WRITE(sound_w)
-	AM_RANGE(0x1b00, 0x1bff) AM_WRITE(crowd_w)
-	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(irq_reset_w)
-	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(bell_w)
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_SHARE("sprite_ram")
-	AM_RANGE(0x1f00, 0x1fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x3000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void boxer_state::boxer_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x03ff).ram().share("tile_ram");
+	map(0x0800, 0x08ff).r(this, FUNC(boxer_state::input_r));
+	map(0x1000, 0x17ff).r(this, FUNC(boxer_state::misc_r));
+	map(0x1800, 0x1800).w(this, FUNC(boxer_state::pot_w));
+	map(0x1900, 0x19ff).w(this, FUNC(boxer_state::led_w));
+	map(0x1a00, 0x1aff).w(this, FUNC(boxer_state::sound_w));
+	map(0x1b00, 0x1bff).w(this, FUNC(boxer_state::crowd_w));
+	map(0x1c00, 0x1cff).w(this, FUNC(boxer_state::irq_reset_w));
+	map(0x1d00, 0x1dff).w(this, FUNC(boxer_state::bell_w));
+	map(0x1e00, 0x1eff).writeonly().share("sprite_ram");
+	map(0x1f00, 0x1fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x3000, 0x3fff).rom();
+}
 
 
 /*************************************

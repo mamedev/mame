@@ -38,28 +38,31 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(galaxy_state::galaxyp_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x01)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-ADDRESS_MAP_END
+void galaxy_state::galaxyp_io(address_map &map)
+{
+	map.global_mask(0x01);
+	map.unmap_value_high();
+	map(0x00, 0x00).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).w("ay8910", FUNC(ay8910_device::data_w));
+}
 
 
-ADDRESS_MAP_START(galaxy_state::galaxy_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ(galaxy_keyboard_r )
-	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_WRITE(galaxy_latch_w )
-ADDRESS_MAP_END
+void galaxy_state::galaxy_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x2000, 0x2037).mirror(0x07c0).r(this, FUNC(galaxy_state::galaxy_keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(this, FUNC(galaxy_state::galaxy_latch_w));
+}
 
-ADDRESS_MAP_START(galaxy_state::galaxyp_mem)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM // ROM A
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // ROM B
-	AM_RANGE(0x2000, 0x2037) AM_MIRROR(0x07c0) AM_READ(galaxy_keyboard_r )
-	AM_RANGE(0x2038, 0x203f) AM_MIRROR(0x07c0) AM_WRITE(galaxy_latch_w )
-	AM_RANGE(0xe000, 0xefff) AM_ROM // ROM C
-	AM_RANGE(0xf000, 0xffff) AM_ROM // ROM D
-ADDRESS_MAP_END
+void galaxy_state::galaxyp_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom(); // ROM A
+	map(0x1000, 0x1fff).rom(); // ROM B
+	map(0x2000, 0x2037).mirror(0x07c0).r(this, FUNC(galaxy_state::galaxy_keyboard_r));
+	map(0x2038, 0x203f).mirror(0x07c0).w(this, FUNC(galaxy_state::galaxy_latch_w));
+	map(0xe000, 0xefff).rom(); // ROM C
+	map(0xf000, 0xffff).rom(); // ROM D
+}
 
 /* 2008-05 FP:
 Small note about natural keyboard support. Currently:

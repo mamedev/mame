@@ -5,7 +5,7 @@
 #include "superfx.h"
 
 
-DEFINE_DEVICE_TYPE(SUPERFX, superfx_device, "superfx", "SuperFX")
+DEFINE_DEVICE_TYPE(SUPERFX, superfx_device, "superfx", "Nintendo SuperFX")
 
 superfx_device::superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SUPERFX, tag, owner, clock)
@@ -1450,7 +1450,7 @@ u16 superfx_device::get_alt() const
 	return m_sfr & SUPERFX_SFR_ALT;
 }
 
-util::disasm_interface *superfx_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> superfx_device::create_disassembler()
 {
-	return new superfx_disassembler(this);
+	return std::make_unique<superfx_disassembler>(this);
 }

@@ -133,31 +133,33 @@ const tiny_rom_entry *luxor_55_21056_device::device_rom_region() const
 //  ADDRESS_MAP( luxor_55_21056_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(luxor_55_21056_device::luxor_55_21056_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x1800) AM_RAM
-ADDRESS_MAP_END
+void luxor_55_21056_device::luxor_55_21056_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).mirror(0x1000).rom().region(Z80_TAG, 0);
+	map(0x2000, 0x27ff).mirror(0x1800).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( luxor_55_21056_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(luxor_55_21056_device::luxor_55_21056_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xf8)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xf0) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
-	AM_RANGE(0x08, 0x08) AM_READ(sasi_status_r)
-	AM_RANGE(0x18, 0x18) AM_WRITE(stat_w)
-	AM_RANGE(0x28, 0x28) AM_READ(out_r)
-	AM_RANGE(0x38, 0x38) AM_WRITE(inp_w)
-	AM_RANGE(0x48, 0x48) AM_READWRITE(sasi_data_r, sasi_data_w)
-	AM_RANGE(0x58, 0x58) AM_READWRITE(rdy_reset_r, rdy_reset_w)
-	AM_RANGE(0x68, 0x68) AM_READWRITE(sasi_sel_r, sasi_sel_w)
-	AM_RANGE(0x78, 0x78) AM_READWRITE(sasi_rst_r, sasi_rst_w)
-ADDRESS_MAP_END
+void luxor_55_21056_device::luxor_55_21056_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xf8);
+	map(0x00, 0x00).mirror(0xf0).rw(Z80DMA_TAG, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0x08, 0x08).r(this, FUNC(luxor_55_21056_device::sasi_status_r));
+	map(0x18, 0x18).w(this, FUNC(luxor_55_21056_device::stat_w));
+	map(0x28, 0x28).r(this, FUNC(luxor_55_21056_device::out_r));
+	map(0x38, 0x38).w(this, FUNC(luxor_55_21056_device::inp_w));
+	map(0x48, 0x48).rw(this, FUNC(luxor_55_21056_device::sasi_data_r), FUNC(luxor_55_21056_device::sasi_data_w));
+	map(0x58, 0x58).rw(this, FUNC(luxor_55_21056_device::rdy_reset_r), FUNC(luxor_55_21056_device::rdy_reset_w));
+	map(0x68, 0x68).rw(this, FUNC(luxor_55_21056_device::sasi_sel_r), FUNC(luxor_55_21056_device::sasi_sel_w));
+	map(0x78, 0x78).rw(this, FUNC(luxor_55_21056_device::sasi_rst_r), FUNC(luxor_55_21056_device::sasi_rst_w));
+}
 
 
 //-------------------------------------------------

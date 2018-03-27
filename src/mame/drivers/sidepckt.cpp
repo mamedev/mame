@@ -197,37 +197,40 @@ WRITE8_MEMBER(sidepckt_state::i8751_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(sidepckt_state::sidepckt_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x400) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x400) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2100, 0x24ff) AM_WRITENOP // ??? (Unused spriteram? The game writes some values at boot, but never read)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3004, 0x3004) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x300c, 0x300c) AM_READWRITE(scroll_y_r, scroll_y_w)
-	AM_RANGE(0x3014, 0x3014) AM_READ(i8751_r)
-	AM_RANGE(0x3018, 0x3018) AM_WRITE(i8751_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void sidepckt_state::sidepckt_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x13ff).mirror(0x400).ram().w(this, FUNC(sidepckt_state::videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).mirror(0x400).ram().w(this, FUNC(sidepckt_state::colorram_w)).share("colorram");
+	map(0x2000, 0x20ff).ram().share("spriteram");
+	map(0x2100, 0x24ff).nopw(); // ??? (Unused spriteram? The game writes some values at boot, but never read)
+	map(0x3000, 0x3000).portr("P1");
+	map(0x3001, 0x3001).portr("P2");
+	map(0x3002, 0x3002).portr("DSW1");
+	map(0x3003, 0x3003).portr("DSW2");
+	map(0x3004, 0x3004).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x300c, 0x300c).rw(this, FUNC(sidepckt_state::scroll_y_r), FUNC(sidepckt_state::scroll_y_w));
+	map(0x3014, 0x3014).r(this, FUNC(sidepckt_state::i8751_r));
+	map(0x3018, 0x3018).w(this, FUNC(sidepckt_state::i8751_w));
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(sidepckt_state::sidepcktb_map)
-	AM_IMPORT_FROM( sidepckt_map )
-	AM_RANGE(0x3014, 0x3014) AM_READNOP
-	AM_RANGE(0x3018, 0x3018) AM_WRITENOP
-ADDRESS_MAP_END
+void sidepckt_state::sidepcktb_map(address_map &map)
+{
+	sidepckt_map(map);
+	map(0x3014, 0x3014).nopr();
+	map(0x3018, 0x3018).nopw();
+}
 
 
-ADDRESS_MAP_START(sidepckt_state::sound_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void sidepckt_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1001).w("ym1", FUNC(ym2203_device::write));
+	map(0x2000, 0x2001).w("ym2", FUNC(ym3526_device::write));
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0xffff).rom();
+}
 
 
 /******************************************************************************/

@@ -190,27 +190,29 @@ protected:
 };
 
 /* Ram is 64K, with 16K hidden by the rom.  The 300-3ff is also hidden by the i/o */
-ADDRESS_MAP_START(oric_state::oric_mem)
-	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write) AM_MIRROR(0xf0)
-	AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank_c000_r") AM_WRITE_BANK("bank_c000_w")
-	AM_RANGE( 0xe000, 0xf7ff) AM_READ_BANK("bank_e000_r") AM_WRITE_BANK("bank_e000_w")
-	AM_RANGE( 0xf800, 0xffff) AM_READ_BANK("bank_f800_r") AM_WRITE_BANK("bank_f800_w")
-ADDRESS_MAP_END
+void oric_state::oric_mem(address_map &map)
+{
+	map(0x0000, 0xffff).ram().share("ram");
+	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).mirror(0xf0);
+	map(0xc000, 0xdfff).bankr("bank_c000_r").bankw("bank_c000_w");
+	map(0xe000, 0xf7ff).bankr("bank_e000_r").bankw("bank_e000_w");
+	map(0xf800, 0xffff).bankr("bank_f800_r").bankw("bank_f800_w");
+}
 
 /*
 The telestrat has the memory regions split into 16k blocks.
 Memory region &c000-&ffff can be ram or rom. */
-ADDRESS_MAP_START(telestrat_state::telestrat_mem)
-	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
-	AM_RANGE( 0x0310, 0x0313) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE( 0x0314, 0x0314) AM_READWRITE(port_314_r, port_314_w)
-	AM_RANGE( 0x0318, 0x0318) AM_READ(port_318_r)
-	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia", mos6551_device, read, write)
-	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)
-	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank_c000_r") AM_WRITE_BANK("bank_c000_w")
-ADDRESS_MAP_END
+void telestrat_state::telestrat_mem(address_map &map)
+{
+	map(0x0000, 0xffff).ram().share("ram");
+	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0310, 0x0313).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x0314, 0x0314).rw(this, FUNC(telestrat_state::port_314_r), FUNC(telestrat_state::port_314_w));
+	map(0x0318, 0x0318).r(this, FUNC(telestrat_state::port_318_r));
+	map(0x031c, 0x031f).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x0320, 0x032f).rw(m_via2, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xc000, 0xffff).bankr("bank_c000_r").bankw("bank_c000_w");
+}
 
 uint32_t oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

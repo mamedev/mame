@@ -46,8 +46,8 @@ typedef uint32_t DWORD;
 #include "v25priv.h"
 #include "necdasm.h"
 
-DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "V25")
-DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "V35")
+DEFINE_DEVICE_TYPE(V25, v25_device, "v25", "NEC V25")
+DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "NEC V35")
 
 
 v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
@@ -419,9 +419,9 @@ void v25_common_device::execute_set_input(int irqline, int state)
 	}
 }
 
-util::disasm_interface *v25_common_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v25_common_device::create_disassembler()
 {
-	return new nec_disassembler(m_v25v35_decryptiontable);
+	return std::make_unique<nec_disassembler>(m_v25v35_decryptiontable);
 }
 
 void v25_common_device::device_start()

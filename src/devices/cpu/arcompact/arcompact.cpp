@@ -24,7 +24,7 @@
 #include "arcompactdasm.h"
 
 
-DEFINE_DEVICE_TYPE(ARCA5, arcompact_device, "arc_a5", "ARCtangent A5")
+DEFINE_DEVICE_TYPE(ARCA5, arcompact_device, "arc_a5", "Argonaut ARCtangent A5")
 
 
 READ32_MEMBER( arcompact_device::arcompact_auxreg002_LPSTART_r) { return m_LP_START&0xfffffffe; }
@@ -64,9 +64,9 @@ device_memory_interface::space_config_vector arcompact_device::memory_space_conf
 	};
 }
 
-util::disasm_interface *arcompact_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> arcompact_device::create_disassembler()
 {
-	return new arcompact_disassembler;
+	return std::make_unique<arcompact_disassembler>();
 }
 
 

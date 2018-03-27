@@ -468,27 +468,28 @@ void exidy440_state::machine_reset()
  *
  *************************************/
 
-ADDRESS_MAP_START(exidy440_state::exidy440_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("imageram")
-	AM_RANGE(0x2000, 0x209f) AM_RAM_WRITE(exidy440_spriteram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x20a0, 0x29ff) AM_RAM
-	AM_RANGE(0x2a00, 0x2aff) AM_READWRITE(exidy440_videoram_r, exidy440_videoram_w)
-	AM_RANGE(0x2b00, 0x2b00) AM_READ(exidy440_vertical_pos_r)
-	AM_RANGE(0x2b01, 0x2b01) AM_READWRITE(exidy440_horizontal_pos_r, exidy440_interrupt_clear_w)
-	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_SHARE("scanline")
-	AM_RANGE(0x2b03, 0x2b03) AM_READ_PORT("IN0") AM_WRITE(exidy440_control_w)
-	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(exidy440_paletteram_r, exidy440_paletteram_w)
-	AM_RANGE(0x2e00, 0x2e1f) AM_RAM_WRITE(sound_command_w)
-	AM_RANGE(0x2e20, 0x2e3f) AM_READWRITE(exidy440_input_port_3_r, exidy440_input_port_3_w)
-	AM_RANGE(0x2e40, 0x2e5f) AM_READNOP AM_WRITE(exidy440_coin_counter_w)   /* read: clear coin counters I/O2 */
-	AM_RANGE(0x2e60, 0x2e7f) AM_READ_PORT("IN1") AM_WRITENOP
-	AM_RANGE(0x2e80, 0x2e9f) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0x2ea0, 0x2ebf) AM_READ(sound_command_ack_r) AM_WRITENOP
-	AM_RANGE(0x2ec0, 0x2eff) AM_NOP
-	AM_RANGE(0x3000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE(bankram_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void exidy440_state::exidy440_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("imageram");
+	map(0x2000, 0x209f).ram().w(this, FUNC(exidy440_state::exidy440_spriteram_w)).share("spriteram");
+	map(0x20a0, 0x29ff).ram();
+	map(0x2a00, 0x2aff).rw(this, FUNC(exidy440_state::exidy440_videoram_r), FUNC(exidy440_state::exidy440_videoram_w));
+	map(0x2b00, 0x2b00).r(this, FUNC(exidy440_state::exidy440_vertical_pos_r));
+	map(0x2b01, 0x2b01).rw(this, FUNC(exidy440_state::exidy440_horizontal_pos_r), FUNC(exidy440_state::exidy440_interrupt_clear_w));
+	map(0x2b02, 0x2b02).ram().share("scanline");
+	map(0x2b03, 0x2b03).portr("IN0").w(this, FUNC(exidy440_state::exidy440_control_w));
+	map(0x2c00, 0x2dff).rw(this, FUNC(exidy440_state::exidy440_paletteram_r), FUNC(exidy440_state::exidy440_paletteram_w));
+	map(0x2e00, 0x2e1f).ram().w(this, FUNC(exidy440_state::sound_command_w));
+	map(0x2e20, 0x2e3f).rw(this, FUNC(exidy440_state::exidy440_input_port_3_r), FUNC(exidy440_state::exidy440_input_port_3_w));
+	map(0x2e40, 0x2e5f).nopr().w(this, FUNC(exidy440_state::exidy440_coin_counter_w));   /* read: clear coin counters I/O2 */
+	map(0x2e60, 0x2e7f).portr("IN1").nopw();
+	map(0x2e80, 0x2e9f).portr("IN2").nopw();
+	map(0x2ea0, 0x2ebf).r(this, FUNC(exidy440_state::sound_command_ack_r)).nopw();
+	map(0x2ec0, 0x2eff).noprw();
+	map(0x3000, 0x3fff).ram();
+	map(0x4000, 0x7fff).bankr("bank1").w(this, FUNC(exidy440_state::bankram_w));
+	map(0x8000, 0xffff).rom();
+}
 
 
 /*************************************
@@ -497,19 +498,20 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(exidy440_state::exidy440_audio_map)
-	AM_RANGE(0x0000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", exidy440_sound_device, m6844_r, m6844_w)
-	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", exidy440_sound_device, sound_volume_r, sound_volume_w)
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_DEVREAD("custom", exidy440_sound_device, sound_command_r) AM_WRITENOP
-	AM_RANGE(0x8c00, 0x93ff) AM_NOP
-	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_banks_w)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READNOP AM_DEVWRITE("custom", exidy440_sound_device, sound_interrupt_clear_w)
-	AM_RANGE(0x9c00, 0x9fff) AM_NOP
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_NOP
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void exidy440_state::exidy440_audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).noprw();
+	map(0x8000, 0x801f).mirror(0x03e0).rw(m_custom, FUNC(exidy440_sound_device::m6844_r), FUNC(exidy440_sound_device::m6844_w));
+	map(0x8400, 0x840f).mirror(0x03f0).rw(m_custom, FUNC(exidy440_sound_device::sound_volume_r), FUNC(exidy440_sound_device::sound_volume_w));
+	map(0x8800, 0x8800).mirror(0x03ff).r(m_custom, FUNC(exidy440_sound_device::sound_command_r)).nopw();
+	map(0x8c00, 0x93ff).noprw();
+	map(0x9400, 0x9403).mirror(0x03fc).nopr().w(m_custom, FUNC(exidy440_sound_device::sound_banks_w));
+	map(0x9800, 0x9800).mirror(0x03ff).nopr().w(m_custom, FUNC(exidy440_sound_device::sound_interrupt_clear_w));
+	map(0x9c00, 0x9fff).noprw();
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xdfff).noprw();
+	map(0xe000, 0xffff).rom();
+}
 
 
 

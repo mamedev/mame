@@ -141,62 +141,66 @@ WRITE16_MEMBER(lastduel_state::lastduel_sound_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(lastduel_state::lastduel_map)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfc0003) AM_WRITENOP /* Written rarely */
-	AM_RANGE(0xfc0800, 0xfc0fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("P1_P2") AM_WRITE(lastduel_flip_w)
-	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("SYSTEM") AM_WRITE(lastduel_sound_w)
-	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc8000, 0xfc800f) AM_WRITE(lastduel_scroll_w)
-	AM_RANGE(0xfcc000, 0xfcdfff) AM_RAM_WRITE(lastduel_vram_w) AM_SHARE("vram")
-	AM_RANGE(0xfd0000, 0xfd3fff) AM_RAM_WRITE(lastduel_scroll1_w) AM_SHARE("scroll1")
-	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE(lastduel_scroll2_w) AM_SHARE("scroll2")
-	AM_RANGE(0xfd8000, 0xfd87ff) AM_RAM_WRITE(lastduel_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void lastduel_state::lastduel_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0xfc0000, 0xfc0003).nopw(); /* Written rarely */
+	map(0xfc0800, 0xfc0fff).ram().share("spriteram");
+	map(0xfc4000, 0xfc4001).portr("P1_P2").w(this, FUNC(lastduel_state::lastduel_flip_w));
+	map(0xfc4002, 0xfc4003).portr("SYSTEM").w(this, FUNC(lastduel_state::lastduel_sound_w));
+	map(0xfc4004, 0xfc4005).portr("DSW1");
+	map(0xfc4006, 0xfc4007).portr("DSW2");
+	map(0xfc8000, 0xfc800f).w(this, FUNC(lastduel_state::lastduel_scroll_w));
+	map(0xfcc000, 0xfcdfff).ram().w(this, FUNC(lastduel_state::lastduel_vram_w)).share("vram");
+	map(0xfd0000, 0xfd3fff).ram().w(this, FUNC(lastduel_state::lastduel_scroll1_w)).share("scroll1");
+	map(0xfd4000, 0xfd7fff).ram().w(this, FUNC(lastduel_state::lastduel_scroll2_w)).share("scroll2");
+	map(0xfd8000, 0xfd87ff).ram().w(this, FUNC(lastduel_state::lastduel_palette_word_w)).share("paletteram");
+	map(0xfe0000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(lastduel_state::madgear_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xfc1800, 0xfc1fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("DSW1") AM_WRITE(lastduel_flip_w)
-	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("DSW2") AM_WRITE(lastduel_sound_w)
-	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfc8000, 0xfc9fff) AM_RAM_WRITE(lastduel_vram_w) AM_SHARE("vram")
-	AM_RANGE(0xfcc000, 0xfcc7ff) AM_RAM_WRITE(lastduel_palette_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0xfd0000, 0xfd000f) AM_WRITE(lastduel_scroll_w)
-	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE(madgear_scroll1_w) AM_SHARE("scroll1")
-	AM_RANGE(0xfd8000, 0xfdffff) AM_RAM_WRITE(madgear_scroll2_w) AM_SHARE("scroll2")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void lastduel_state::madgear_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0xfc1800, 0xfc1fff).ram().share("spriteram");
+	map(0xfc4000, 0xfc4001).portr("DSW1").w(this, FUNC(lastduel_state::lastduel_flip_w));
+	map(0xfc4002, 0xfc4003).portr("DSW2").w(this, FUNC(lastduel_state::lastduel_sound_w));
+	map(0xfc4004, 0xfc4005).portr("P1_P2");
+	map(0xfc4006, 0xfc4007).portr("SYSTEM");
+	map(0xfc8000, 0xfc9fff).ram().w(this, FUNC(lastduel_state::lastduel_vram_w)).share("vram");
+	map(0xfcc000, 0xfcc7ff).ram().w(this, FUNC(lastduel_state::lastduel_palette_word_w)).share("paletteram");
+	map(0xfd0000, 0xfd000f).w(this, FUNC(lastduel_state::lastduel_scroll_w));
+	map(0xfd4000, 0xfd7fff).ram().w(this, FUNC(lastduel_state::madgear_scroll1_w)).share("scroll1");
+	map(0xfd8000, 0xfdffff).ram().w(this, FUNC(lastduel_state::madgear_scroll2_w)).share("scroll2");
+	map(0xff0000, 0xffffff).ram();
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(lastduel_state::sound_map)
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void lastduel_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xe801).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf000, 0xf001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 WRITE8_MEMBER(lastduel_state::mg_bankswitch_w)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-ADDRESS_MAP_START(lastduel_state::madgear_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xcfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xf004, 0xf004) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xf006, 0xf006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf00a, 0xf00a) AM_WRITE(mg_bankswitch_w)
-ADDRESS_MAP_END
+void lastduel_state::madgear_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xcfff).bankr("bank1");
+	map(0xd000, 0xd7ff).ram();
+	map(0xf000, 0xf001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf002, 0xf003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf004, 0xf004).w("oki", FUNC(okim6295_device::write));
+	map(0xf006, 0xf006).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf00a, 0xf00a).w(this, FUNC(lastduel_state::mg_bankswitch_w));
+}
 
 /******************************************************************************/
 

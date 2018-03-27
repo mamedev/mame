@@ -100,28 +100,30 @@ WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 	m_beep->set_state(1);
 }
 
-ADDRESS_MAP_START(zrt80_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM // Z25 - Main firmware
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // Z24 - Expansion
-	AM_RANGE(0x4000, 0x43ff) AM_RAM // Board RAM
+void zrt80_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom(); // Z25 - Main firmware
+	map(0x1000, 0x1fff).rom(); // Z24 - Expansion
+	map(0x4000, 0x43ff).ram(); // Board RAM
 	// Normally video RAM is 0x800 but could be expanded up to 8K
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram") // Video RAM
+	map(0xc000, 0xdfff).ram().share("videoram"); // Video RAM
 
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(zrt80_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w )
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x10, 0x17) AM_READ(zrt80_10_r)
-	AM_RANGE(0x18, 0x1F) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0x20, 0x27) AM_READ_PORT("DIPSW3")
-	AM_RANGE(0x30, 0x37) AM_WRITE(zrt80_30_w)
-	AM_RANGE(0x38, 0x3F) AM_WRITE(zrt80_38_w)
-ADDRESS_MAP_END
+void zrt80_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x07).rw(m_8250, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
+	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x10, 0x17).r(this, FUNC(zrt80_state::zrt80_10_r));
+	map(0x18, 0x1F).portr("DIPSW2");
+	map(0x20, 0x27).portr("DIPSW3");
+	map(0x30, 0x37).w(this, FUNC(zrt80_state::zrt80_30_w));
+	map(0x38, 0x3F).w(this, FUNC(zrt80_state::zrt80_38_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( zrt80 )

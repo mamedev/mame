@@ -22,14 +22,15 @@ DEFINE_DEVICE_TYPE(MIDWAY_CHEAP_SQUEAK_DELUXE, midway_cheap_squeak_deluxe_device
 //-------------------------------------------------
 
 // address map determined by PAL; verified
-ADDRESS_MAP_START(midway_cheap_squeak_deluxe_device::csdeluxe_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x07fff) AM_ROM
-	AM_RANGE(0x18000, 0x18007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE8("pia", pia6821_device, read_alt, write_alt, 0xff00) // Spy Hunter accesses the MSB
-	AM_RANGE(0x18000, 0x18007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE8("pia", pia6821_device, read_alt, write_alt, 0x00ff) // Turbo Tag access via the LSB
-	AM_RANGE(0x1c000, 0x1cfff) AM_RAM
-ADDRESS_MAP_END
+void midway_cheap_squeak_deluxe_device::csdeluxe_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x1ffff);
+	map(0x00000, 0x07fff).rom();
+	map(0x18000, 0x18007).mirror(0x3ff8).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt)).umask16(0xff00); // Spy Hunter accesses the MSB
+	map(0x18000, 0x18007).mirror(0x3ff8).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt)).umask16(0x00ff); // Turbo Tag access via the LSB
+	map(0x1c000, 0x1cfff).ram();
+}
 
 //-------------------------------------------------
 //  machine configuration

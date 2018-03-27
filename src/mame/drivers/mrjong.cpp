@@ -72,21 +72,23 @@ READ8_MEMBER(mrjong_state::io_0x03_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(mrjong_state::mrjong_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(mrjong_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(mrjong_colorram_w) AM_SHARE("colorram")
-ADDRESS_MAP_END
+void mrjong_state::mrjong_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa7ff).ram();
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(mrjong_state::mrjong_videoram_w)).share("videoram");
+	map(0xe400, 0xe7ff).ram().w(this, FUNC(mrjong_state::mrjong_colorram_w)).share("colorram");
+}
 
-ADDRESS_MAP_START(mrjong_state::mrjong_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P2") AM_WRITE(mrjong_flipscreen_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW") AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x03, 0x03) AM_READ(io_0x03_r)     // Unknown
-ADDRESS_MAP_END
+void mrjong_state::mrjong_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P2").w(this, FUNC(mrjong_state::mrjong_flipscreen_w));
+	map(0x01, 0x01).portr("P1").w("sn1", FUNC(sn76489_device::write));
+	map(0x02, 0x02).portr("DSW").w("sn2", FUNC(sn76489_device::write));
+	map(0x03, 0x03).r(this, FUNC(mrjong_state::io_0x03_r));     // Unknown
+}
 
 /*************************************
  *

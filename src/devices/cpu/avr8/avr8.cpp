@@ -564,10 +564,10 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "ATmega88")
-DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "ATmega644")
-DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "ATmega1280")
-DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "ATmega2560")
+DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "Atmel ATmega88")
+DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "Atmel ATmega644")
+DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "Atmel ATmega1280")
+DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "Atmel ATmega2560")
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -916,9 +916,9 @@ void avr8_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *avr8_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> avr8_device::create_disassembler()
 {
-	return new avr8_disassembler;
+	return std::make_unique<avr8_disassembler>();
 }
 
 

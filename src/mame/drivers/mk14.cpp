@@ -107,16 +107,17 @@ WRITE8_MEMBER( mk14_state::display_w )
 	}
 }
 
-ADDRESS_MAP_START(mk14_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
-	AM_RANGE(0x000, 0x1ff) AM_MIRROR(0x600) AM_ROM // ROM
-	AM_RANGE(0x800, 0x87f) AM_MIRROR(0x600) AM_DEVREADWRITE("ic8", ins8154_device, ins8154_r, ins8154_w) // I/O
-	AM_RANGE(0x880, 0x8ff) AM_MIRROR(0x600) AM_RAM // 128 I/O chip RAM
-	AM_RANGE(0x900, 0x9ff) AM_MIRROR(0x400) AM_READWRITE(keyboard_r, display_w)
-	AM_RANGE(0xb00, 0xbff) AM_RAM // VDU RAM
-	AM_RANGE(0xf00, 0xfff) AM_RAM // Standard RAM
-ADDRESS_MAP_END
+void mk14_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x0fff);
+	map(0x000, 0x1ff).mirror(0x600).rom(); // ROM
+	map(0x800, 0x87f).mirror(0x600).rw("ic8", FUNC(ins8154_device::ins8154_r), FUNC(ins8154_device::ins8154_w)); // I/O
+	map(0x880, 0x8ff).mirror(0x600).ram(); // 128 I/O chip RAM
+	map(0x900, 0x9ff).mirror(0x400).rw(this, FUNC(mk14_state::keyboard_r), FUNC(mk14_state::display_w));
+	map(0xb00, 0xbff).ram(); // VDU RAM
+	map(0xf00, 0xfff).ram(); // Standard RAM
+}
 
 
 /* Input ports */

@@ -48,8 +48,8 @@ Dumped by Chackn
 class pinkiri8_state : public driver_device
 {
 public:
-	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_janshi_back_vram(*this, "janshivdp:back_vram"),
 		m_janshi_vram1(*this, "janshivdp:vram1"),
 		m_janshi_unk1(*this, "janshivdp:unk1"),
@@ -61,8 +61,32 @@ public:
 		m_janshi_crtc_regs(*this, "janshivdp:crtc_regs"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	DECLARE_DRIVER_INIT(ronjan);
+	void pinkiri8(machine_config &config);
+
+protected:
+	DECLARE_WRITE8_MEMBER(output_regs_w);
+	DECLARE_WRITE8_MEMBER(pinkiri8_vram_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_READ8_MEMBER(mux_p2_r);
+	DECLARE_READ8_MEMBER(mux_p1_r);
+	DECLARE_READ8_MEMBER(ronjan_prot_r);
+	DECLARE_WRITE8_MEMBER(ronjan_prot_w);
+	DECLARE_READ8_MEMBER(ronjan_prot_status_r);
+	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
+	virtual void video_start() override;
+	uint32_t screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void pinkiri8_io(address_map &map);
+	void pinkiri8_map(address_map &map);
+
+private:
 	required_shared_ptr<uint8_t> m_janshi_back_vram;
 	required_shared_ptr<uint8_t> m_janshi_vram1;
 	required_shared_ptr<uint8_t> m_janshi_unk1;
@@ -78,43 +102,29 @@ public:
 	uint8_t m_prot_read_index;
 	uint8_t m_prot_char[5];
 	uint8_t m_prot_index;
-	DECLARE_WRITE8_MEMBER(output_regs_w);
-	DECLARE_WRITE8_MEMBER(pinkiri8_vram_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(mux_p2_r);
-	DECLARE_READ8_MEMBER(mux_p1_r);
-	DECLARE_READ8_MEMBER(ronjan_prot_r);
-	DECLARE_WRITE8_MEMBER(ronjan_prot_w);
-	DECLARE_READ8_MEMBER(ronjan_prot_status_r);
-	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
-	DECLARE_DRIVER_INIT(ronjan);
-	virtual void video_start() override;
-	uint32_t screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
-	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void pinkiri8(machine_config &config);
-	void pinkiri8_io(address_map &map);
-	void pinkiri8_map(address_map &map);
 };
 
 
 
 /* VDP device to give us our own memory map */
-class janshi_vdp_device : public device_t,
-							public device_memory_interface
+class janshi_vdp_device : public device_t, public device_memory_interface
 {
 public:
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	void map(address_map &map);
+
 protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
+
+private:
 	address_space_config        m_space_config;
 };
 
@@ -376,12 +386,13 @@ uint32_t pinkiri8_state::screen_update_pinkiri8(screen_device &screen, bitmap_in
 	return 0;
 }
 
-ADDRESS_MAP_START(pinkiri8_state::pinkiri8_map)
-	AM_RANGE(0x00000, 0x0bfff) AM_ROM
-	AM_RANGE(0x0c000, 0x0dfff) AM_RAM
-	AM_RANGE(0x0e000, 0x0ffff) AM_ROM
-	AM_RANGE(0x10000, 0x1ffff) AM_ROM
-ADDRESS_MAP_END
+void pinkiri8_state::pinkiri8_map(address_map &map)
+{
+	map(0x00000, 0x0bfff).rom();
+	map(0x0c000, 0x0dfff).ram();
+	map(0x0e000, 0x0ffff).rom();
+	map(0x10000, 0x1ffff).rom();
+}
 
 WRITE8_MEMBER(pinkiri8_state::output_regs_w)
 {
@@ -461,42 +472,43 @@ READ8_MEMBER(pinkiri8_state::mux_p1_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(pinkiri8_state::pinkiri8_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_RAM //Z180 internal I/O
-	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)
-	AM_RANGE(0x80, 0x83) AM_WRITE(pinkiri8_vram_w)
+void pinkiri8_state::pinkiri8_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x3f).ram(); //Z180 internal I/O
+	map(0x60, 0x60).w(this, FUNC(pinkiri8_state::output_regs_w));
+	map(0x80, 0x83).w(this, FUNC(pinkiri8_state::pinkiri8_vram_w));
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_device, read, write) //correct?
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(mux_w) //mux
-	AM_RANGE(0xb0, 0xb0) AM_READ(mux_p2_r) // mux inputs
-	AM_RANGE(0xb1, 0xb1) AM_READ(mux_p1_r) // mux inputs
-	AM_RANGE(0xb2, 0xb2) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("DSW3")
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW4")
+	map(0xa0, 0xa0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); //correct?
+	map(0xb0, 0xb0).w(this, FUNC(pinkiri8_state::mux_w)); //mux
+	map(0xb0, 0xb0).r(this, FUNC(pinkiri8_state::mux_p2_r)); // mux inputs
+	map(0xb1, 0xb1).r(this, FUNC(pinkiri8_state::mux_p1_r)); // mux inputs
+	map(0xb2, 0xb2).portr("SYSTEM");
+	map(0xf8, 0xf8).portr("DSW1");
+	map(0xf9, 0xf9).portr("DSW2");
+	map(0xfa, 0xfa).portr("DSW3");
+	map(0xfb, 0xfb).portr("DSW4");
 
 	/* Wing custom sound chip, same as Lucky Girl Z180 */
-	AM_RANGE(0xc3, 0xc3) AM_WRITENOP
-	AM_RANGE(0xc7, 0xc7) AM_WRITENOP
-	AM_RANGE(0xcb, 0xcb) AM_WRITENOP
-	AM_RANGE(0xcf, 0xcf) AM_WRITENOP
+	map(0xc3, 0xc3).nopw();
+	map(0xc7, 0xc7).nopw();
+	map(0xcb, 0xcb).nopw();
+	map(0xcf, 0xcf).nopw();
 
-	AM_RANGE(0xd3, 0xd3) AM_WRITENOP
-	AM_RANGE(0xd7, 0xd7) AM_WRITENOP
-	AM_RANGE(0xdb, 0xdb) AM_WRITENOP
-	AM_RANGE(0xdf, 0xdf) AM_WRITENOP
+	map(0xd3, 0xd3).nopw();
+	map(0xd7, 0xd7).nopw();
+	map(0xdb, 0xdb).nopw();
+	map(0xdf, 0xdf).nopw();
 
-	AM_RANGE(0xe3, 0xe3) AM_WRITENOP
-	AM_RANGE(0xe7, 0xe7) AM_WRITENOP
-	AM_RANGE(0xeb, 0xeb) AM_WRITENOP
-	AM_RANGE(0xef, 0xef) AM_WRITENOP
+	map(0xe3, 0xe3).nopw();
+	map(0xe7, 0xe7).nopw();
+	map(0xeb, 0xeb).nopw();
+	map(0xef, 0xef).nopw();
 
-	AM_RANGE(0xf3, 0xf3) AM_WRITENOP
-	AM_RANGE(0xf7, 0xf7) AM_WRITENOP
+	map(0xf3, 0xf3).nopw();
+	map(0xf7, 0xf7).nopw();
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( base_inputs )
 	PORT_START("SYSTEM")
@@ -1142,7 +1154,7 @@ ROM_END
 ROM_START( janshi )
 	ROM_REGION( 0x24000, "maincpu", 0 )
 	ROM_LOAD( "11.1l",    0x00000, 0x20000, CRC(a7692ddf) SHA1(5e7f43d8337583977baf22a28bbcd9b2182c0cde) )
-	ROM_LOAD( "[3] 9009 1992.1 new jansh.bin", 0x0000, 0x4000, CRC(63cd3f12) SHA1(aebac739bffaf043e6acffa978e935f73ee1385f) ) //overlapped internal ROM
+	ROM_LOAD( "=3= 9009 1992.1 new jansh.bin", 0x0000, 0x4000, CRC(63cd3f12) SHA1(aebac739bffaf043e6acffa978e935f73ee1385f) ) //overlapped internal ROM
 
 	ROM_REGION( 0x140000, "gfx1", 0 )
 	ROM_LOAD( "1.1a", 0x000000, 0x40000, CRC(92b140a5) SHA1(f3b38563f74650604ed0faaf84460e0b04b386b7) )

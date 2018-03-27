@@ -243,41 +243,45 @@ WRITE8_MEMBER(sprcros2_state::bg_scrolly_w)
 	m_bg_scrolly = data;
 }
 
-ADDRESS_MAP_START(sprcros2_state::master_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("master", 0)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("master_rombank")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("fgvram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("fgattr")
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_SHARE("sprram")
-	AM_RANGE(0xe840, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
+void sprcros2_state::master_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().region("master", 0);
+	map(0xc000, 0xdfff).bankr("master_rombank");
+	map(0xe000, 0xe3ff).ram().share("fgvram");
+	map(0xe400, 0xe7ff).ram().share("fgattr");
+	map(0xe800, 0xe83f).ram().share("sprram");
+	map(0xe840, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("shared_ram");
+}
 
-ADDRESS_MAP_START(sprcros2_state::master_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("EXTRA") AM_DEVWRITE("sn3", sn76489_device, write)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07, 0x07) AM_WRITE(master_output_w)
-ADDRESS_MAP_END
+void sprcros2_state::master_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::write));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::write));
+	map(0x02, 0x02).portr("EXTRA").w("sn3", FUNC(sn76489_device::write));
+	map(0x04, 0x04).portr("DSW1");
+	map(0x05, 0x05).portr("DSW2");
+	map(0x07, 0x07).w(this, FUNC(sprcros2_state::master_output_w));
+}
 
-ADDRESS_MAP_START(sprcros2_state::slave_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("slave", 0)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("slave_rombank")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("bgvram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("bgattr")
-	AM_RANGE(0xe800, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
+void sprcros2_state::slave_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().region("slave", 0);
+	map(0xc000, 0xdfff).bankr("slave_rombank");
+	map(0xe000, 0xe3ff).ram().share("bgvram");
+	map(0xe400, 0xe7ff).ram().share("bgattr");
+	map(0xe800, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("shared_ram");
+}
 
-ADDRESS_MAP_START(sprcros2_state::slave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(bg_scrollx_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(bg_scrolly_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(slave_output_w)
-ADDRESS_MAP_END
+void sprcros2_state::slave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(sprcros2_state::bg_scrollx_w));
+	map(0x01, 0x01).w(this, FUNC(sprcros2_state::bg_scrolly_w));
+	map(0x03, 0x03).w(this, FUNC(sprcros2_state::slave_output_w));
+}
 
 static INPUT_PORTS_START( sprcros2 )
 	PORT_START("P1")

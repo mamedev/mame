@@ -24,6 +24,16 @@ u32 g65816_disassembler::opcode_alignment() const
 	return 1;
 }
 
+u32 g65816_disassembler::interface_flags() const
+{
+	return PAGED;
+}
+
+u32 g65816_disassembler::page_address_bits() const
+{
+	return 16;
+}
+
 const char *g65816_disassembler::opcode_struct::name() const
 {
 	return g65816_disassembler::s_opnames[unsigned(m_name)];

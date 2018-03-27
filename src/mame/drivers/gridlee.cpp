@@ -299,22 +299,26 @@ WRITE_LINE_MEMBER(gridlee_state::coin_counter_w)
  *************************************/
 
 /* CPU 1 read addresses */
-ADDRESS_MAP_START(gridlee_state::cpu1_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_SHARE("videoram")
-	;map(0x9000, 0x9000).select(0x0070).lw8("latch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_latch->write_d0(space, offset >> 4, data, mem_mask); });
-	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
-	AM_RANGE(0x9380, 0x9380) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
-	AM_RANGE(0x9502, 0x9502) AM_READ_PORT("IN0")
-	AM_RANGE(0x9503, 0x9503) AM_READ_PORT("IN1")
-	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("DSW")
-	AM_RANGE(0x9700, 0x9700) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0x9820, 0x9820) AM_READ(random_num_r)
-	AM_RANGE(0x9828, 0x993f) AM_DEVWRITE("gridlee", gridlee_sound_device, gridlee_sound_w)
-	AM_RANGE(0x9c00, 0x9cff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gridlee_state::cpu1_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("spriteram");
+	map(0x0800, 0x7fff).ram().w(this, FUNC(gridlee_state::gridlee_videoram_w)).share("videoram");
+	map(0x9000, 0x9000).select(0x0070).lw8("latch_w",
+										   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+											   m_latch->write_d0(space, offset >> 4, data, mem_mask);
+										   });
+	map(0x9200, 0x9200).w(this, FUNC(gridlee_state::gridlee_palette_select_w));
+	map(0x9380, 0x9380).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x9500, 0x9501).r(this, FUNC(gridlee_state::analog_port_r));
+	map(0x9502, 0x9502).portr("IN0");
+	map(0x9503, 0x9503).portr("IN1");
+	map(0x9600, 0x9600).portr("DSW");
+	map(0x9700, 0x9700).portr("IN2").nopw();
+	map(0x9820, 0x9820).r(this, FUNC(gridlee_state::random_num_r));
+	map(0x9828, 0x993f).w("gridlee", FUNC(gridlee_sound_device::gridlee_sound_w));
+	map(0x9c00, 0x9cff).ram().share("nvram");
+	map(0xa000, 0xffff).rom();
+}
 
 
 

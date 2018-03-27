@@ -56,23 +56,25 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(dsb46_state::dsb46_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("read") AM_WRITE_BANK("write")
-	AM_RANGE(0x0800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void dsb46_state::dsb46_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).bankr("read").bankw("write");
+	map(0x0800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(dsb46_state::dsb46_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(port1a_w)
+void dsb46_state::dsb46_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x08, 0x0b).rw("ctc1", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1a, 0x1a).w(this, FUNC(dsb46_state::port1a_w));
 	//AM_RANGE(0x10, 0x10) disk related
 	//AM_RANGE(0x14, 0x14) ?? (read after CTC1 TRG3)
 	//AM_RANGE(0x18, 0x18) ??
 	//AM_RANGE(0x1c, 0x1c) disk data
 	//AM_RANGE(0x1d, 0x1d) disk status (FF = no fdc)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( dsb46 )
 INPUT_PORTS_END

@@ -334,20 +334,22 @@ WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
  *
  *************************************/
 
-ADDRESS_MAP_START(jantotsu_state::jantotsu_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(jantotsu_bitmap_r, jantotsu_bitmap_w)
-ADDRESS_MAP_END
+void jantotsu_state::jantotsu_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xffff).rw(this, FUNC(jantotsu_state::jantotsu_bitmap_r), FUNC(jantotsu_state::jantotsu_bitmap_w));
+}
 
-ADDRESS_MAP_START(jantotsu_state::jantotsu_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0x02, 0x03) AM_WRITE(jan_adpcm_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(jantotsu_mux_r, jantotsu_mux_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(bankaddr_w)
-ADDRESS_MAP_END
+void jantotsu_state::jantotsu_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW1").w("sn1", FUNC(sn76489a_device::write));
+	map(0x01, 0x01).r(this, FUNC(jantotsu_state::jantotsu_dsw2_r)).w("sn2", FUNC(sn76489a_device::write));
+	map(0x02, 0x03).w(this, FUNC(jantotsu_state::jan_adpcm_w));
+	map(0x04, 0x04).rw(this, FUNC(jantotsu_state::jantotsu_mux_r), FUNC(jantotsu_state::jantotsu_mux_w));
+	map(0x07, 0x07).w(this, FUNC(jantotsu_state::bankaddr_w));
+}
 
 
 /*************************************

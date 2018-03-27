@@ -110,26 +110,27 @@ READ16_MEMBER(shuuz_state::special_port0_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(shuuz_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x101000, 0x101fff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x102000, 0x102001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x103000, 0x103003) AM_READ(leta_r)
-	AM_RANGE(0x105000, 0x105001) AM_READWRITE(special_port0_r, latch_w)
-	AM_RANGE(0x105002, 0x105003) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x106000, 0x106001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x107000, 0x107007) AM_NOP
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x3effc0, 0x3effff) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
-	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_latched_msb_w) AM_SHARE("vad:playfield")
-	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_SHARE("vad:eof")
-	AM_RANGE(0x3f5f80, 0x3f5fff) AM_SHARE("vad:mob:slip")
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
-	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
-	AM_RANGE(0x3fd000, 0x3fd3ff) AM_RAM AM_SHARE("vad:mob")
-	AM_RANGE(0x3fd400, 0x3fffff) AM_RAM
-ADDRESS_MAP_END
+void shuuz_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x101000, 0x101fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x102000, 0x102001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x103000, 0x103003).r(this, FUNC(shuuz_state::leta_r));
+	map(0x105000, 0x105001).rw(this, FUNC(shuuz_state::special_port0_r), FUNC(shuuz_state::latch_w));
+	map(0x105002, 0x105003).portr("BUTTONS");
+	map(0x106001, 0x106001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x107000, 0x107007).noprw();
+	map(0x3e0000, 0x3e07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
+	map(0x3f4000, 0x3f5eff).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_msb_w)).share("vad:playfield");
+	map(0x3f5f00, 0x3f5f7f).ram().share("vad:eof");
+	map(0x3f5f80, 0x3f5fff).share("vad:mob:slip");
+	map(0x3f6000, 0x3f7fff).ram().w(m_vad, FUNC(atari_vad_device::playfield_upper_w)).share("vad:playfield_ext");
+	map(0x3f8000, 0x3fcfff).ram();
+	map(0x3fd000, 0x3fd3ff).ram().share("vad:mob");
+	map(0x3fd400, 0x3fffff).ram();
+}
 
 
 

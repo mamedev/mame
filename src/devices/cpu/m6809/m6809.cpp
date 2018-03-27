@@ -128,8 +128,8 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MC6809, mc6809_device, "mc6809", "MC6809")
-DEFINE_DEVICE_TYPE(MC6809E, mc6809e_device, "mc6809e", "MC6809E")
+DEFINE_DEVICE_TYPE(MC6809, mc6809_device, "mc6809", "Motorola MC6809")
+DEFINE_DEVICE_TYPE(MC6809E, mc6809e_device, "mc6809e", "Motorola MC6809E")
 DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "MC6809 (legacy)")
 
 
@@ -380,9 +380,9 @@ void m6809_base_device::state_string_export(const device_state_entry &entry, std
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *m6809_base_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6809_base_device::create_disassembler()
 {
-	return new m6809_disassembler;
+	return std::make_unique<m6809_disassembler>();
 }
 
 

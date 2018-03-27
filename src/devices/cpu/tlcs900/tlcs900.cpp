@@ -21,8 +21,8 @@ TODO:
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(TMP95C061, tmp95c061_device, "tmp95c061", "TMP95C061")
-DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "TMP95C063")
+DEFINE_DEVICE_TYPE(TMP95C061, tmp95c061_device, "tmp95c061", "Toshiba TMP95C061")
+DEFINE_DEVICE_TYPE(TMP95C063, tmp95c063_device, "tmp95c063", "Toshiba TMP95C063")
 
 
 ADDRESS_MAP_START(tmp95c061_device::tmp95c061_mem8)
@@ -149,9 +149,9 @@ void tmp95c063_device::device_config_complete()
 }
 
 
-util::disasm_interface *tlcs900h_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tlcs900h_device::create_disassembler()
 {
-	return new tlcs900_disassembler;
+	return std::make_unique<tlcs900_disassembler>();
 }
 
 

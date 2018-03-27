@@ -483,41 +483,43 @@ WRITE8_MEMBER(witch_state::yscroll_w)
 	m_scrolly=data;
 }
 
-ADDRESS_MAP_START(witch_state::map_main)
-	AM_RANGE(0x0000, UNBANKED_SIZE-1) AM_ROM
-	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(main_write_a008)
-	AM_RANGE(0xa00c, 0xa00c) AM_READ_PORT("SERVICE")    // stats / reset
-	AM_RANGE(0xa00e, 0xa00e) AM_READ_PORT("COINS")      // coins/attendant keys
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_WRITE(gfx0_vram_w) AM_SHARE("gfx0_vram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_WRITE(gfx0_cram_w) AM_SHARE("gfx0_cram")
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_SHARE("gfx1_vram")
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(gfx1_cram_r, gfx1_cram_w) AM_SHARE("gfx1_cram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf100, 0xf1ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf200, 0xffff) AM_RAM AM_SHARE("share2")
-ADDRESS_MAP_END
+void witch_state::map_main(address_map &map)
+{
+	map(0x0000, UNBANKED_SIZE-1).rom();
+	map(UNBANKED_SIZE, 0x7fff).bankr("mainbank");
+	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8008, 0x8009).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
+	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
+	map(0xa00e, 0xa00e).portr("COINS");      // coins/attendant keys
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(witch_state::gfx0_cram_w)).share("gfx0_cram");
+	map(0xc800, 0xcbff).rw(this, FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
+	map(0xcc00, 0xcfff).rw(this, FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
+	map(0xd000, 0xdfff).ram().share("sprite_ram");
+	map(0xe000, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe800, 0xefff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf000, 0xf0ff).ram().share("share1");
+	map(0xf100, 0xf1ff).ram().share("nvram");
+	map(0xf200, 0xffff).ram().share("share2");
+}
 
 
-ADDRESS_MAP_START(witch_state::map_sub)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE("essnd", es8712_device, read, write)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
-	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(sub_write_a008)
-	AM_RANGE(0xa00c, 0xa00c) AM_READ_PORT("SERVICE")    // stats / reset
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf200, 0xffff) AM_RAM AM_SHARE("share2")
-ADDRESS_MAP_END
+void witch_state::map_sub(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8008, 0x8009).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8010, 0x8016).rw("essnd", FUNC(es8712_device::read), FUNC(es8712_device::write));
+	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
+	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
+	map(0xf000, 0xf0ff).ram().share("share1");
+	map(0xf200, 0xffff).ram().share("share2");
+}
 
 static INPUT_PORTS_START( witch )
 	PORT_START("SERVICE")

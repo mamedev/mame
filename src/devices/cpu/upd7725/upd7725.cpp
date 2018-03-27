@@ -22,8 +22,8 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "uPD7725")
-DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "uPD96050")
+DEFINE_DEVICE_TYPE(UPD7725,  upd7725_device,  "upd7725",  "NEC uPD7725")
+DEFINE_DEVICE_TYPE(UPD96050, upd96050_device, "upd96050", "NEC uPD96050")
 
 necdsp_device::necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits)
 	: cpu_device(mconfig, type, tag, owner, clock),
@@ -321,9 +321,9 @@ void necdsp_device::execute_set_input(int inputnum, int state)
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *necdsp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> necdsp_device::create_disassembler()
 {
-	return new necdsp_disassembler;
+	return std::make_unique<necdsp_disassembler>();
 }
 
 void necdsp_device::execute_run()

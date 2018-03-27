@@ -249,49 +249,53 @@ INPUT_PORTS_END
 
 
 
-ADDRESS_MAP_START(pce_state::pce_mem)
-	AM_RANGE( 0x000000, 0x0FFFFF) AM_DEVREADWRITE("cartslot", pce_cart_slot_device, read_cart, write_cart)
-	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
-	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
-	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_DEVREADWRITE("pce_cd", pce_cd_device, bram_r, bram_w)
-	AM_RANGE( 0x1EE800, 0x1EFFFF) AM_NOP
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_SHARE("user_ram")
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( C6280_TAG, c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE( "maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( mess_pce_joystick_r, mess_pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE( "maincpu", h6280_device, irq_status_r, irq_status_w )
-	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
-ADDRESS_MAP_END
+void pce_state::pce_mem(address_map &map)
+{
+	map(0x000000, 0x0FFFFF).rw(m_cartslot, FUNC(pce_cart_slot_device::read_cart), FUNC(pce_cart_slot_device::write_cart));
+	map(0x100000, 0x10FFFF).ram().share("cd_ram");
+	map(0x110000, 0x1EDFFF).noprw();
+	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
+	map(0x1EE800, 0x1EFFFF).noprw();
+	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000).share("user_ram");
+	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1FE800, 0x1FEBFF).rw(C6280_TAG, FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
+	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
+	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(pce_state::mess_pce_joystick_r), FUNC(pce_state::mess_pce_joystick_w));
+	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
+	map(0x1FF800, 0x1FFBFF).rw(this, FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
+}
 
-ADDRESS_MAP_START(pce_state::pce_io)
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(pce_state::sgx_mem)
-	AM_RANGE( 0x000000, 0x0FFFFF) AM_DEVREADWRITE("cartslot", pce_cart_slot_device, read_cart, write_cart)
-	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
-	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
-	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_DEVREADWRITE("pce_cd", pce_cd_device, bram_r, bram_w)
-	AM_RANGE( 0x1EE800, 0x1EFFFF) AM_NOP
-	AM_RANGE( 0x1F0000, 0x1F7FFF) AM_RAM AM_SHARE("user_ram")
-	AM_RANGE( 0x1FE000, 0x1FE007) AM_DEVREADWRITE( "huc6270_0", huc6270_device, read, write ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1FE008, 0x1FE00F) AM_DEVREADWRITE( "huc6202", huc6202_device, read, write ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1FE010, 0x1FE017) AM_DEVREADWRITE( "huc6270_1", huc6270_device, read, write ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE(C6280_TAG, c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(mess_pce_joystick_r, mess_pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
-	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE(pce_cd_intf_r, pce_cd_intf_w )
-ADDRESS_MAP_END
+void pce_state::pce_io(address_map &map)
+{
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+}
 
 
-ADDRESS_MAP_START(pce_state::sgx_io)
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6202", huc6202_device, io_read, io_write )
-ADDRESS_MAP_END
+void pce_state::sgx_mem(address_map &map)
+{
+	map(0x000000, 0x0FFFFF).rw(m_cartslot, FUNC(pce_cart_slot_device::read_cart), FUNC(pce_cart_slot_device::write_cart));
+	map(0x100000, 0x10FFFF).ram().share("cd_ram");
+	map(0x110000, 0x1EDFFF).noprw();
+	map(0x1EE000, 0x1EE7FF).rw(m_cd, FUNC(pce_cd_device::bram_r), FUNC(pce_cd_device::bram_w));
+	map(0x1EE800, 0x1EFFFF).noprw();
+	map(0x1F0000, 0x1F7FFF).ram().share("user_ram");
+	map(0x1FE000, 0x1FE007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1FE008, 0x1FE00F).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03E0);
+	map(0x1FE010, 0x1FE017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03E0);
+	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1FE800, 0x1FEBFF).rw(C6280_TAG, FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
+	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
+	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(pce_state::mess_pce_joystick_r), FUNC(pce_state::mess_pce_joystick_w));
+	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
+	map(0x1FF800, 0x1FFBFF).rw(this, FUNC(pce_state::pce_cd_intf_r), FUNC(pce_state::pce_cd_intf_w));
+}
+
+
+void pce_state::sgx_io(address_map &map)
+{
+	map(0x00, 0x03).rw("huc6202", FUNC(huc6202_device::io_read), FUNC(huc6202_device::io_write));
+}
 
 
 uint32_t pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

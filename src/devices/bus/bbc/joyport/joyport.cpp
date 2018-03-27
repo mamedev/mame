@@ -52,7 +52,9 @@ device_bbc_joyport_interface::~device_bbc_joyport_interface()
 bbc_joyport_slot_device::bbc_joyport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BBC_JOYPORT_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_device(nullptr)
+	m_device(nullptr),
+	m_cb1_handler(*this),
+	m_cb2_handler(*this)
 {
 }
 
@@ -78,23 +80,12 @@ void bbc_joyport_slot_device::device_start()
 	m_device = dynamic_cast<device_bbc_joyport_interface *>(carddev);
 	if (carddev && !m_device)
 		fatalerror("Card device %s (%s) does not implement device_bbc_joyport_interface\n", carddev->tag(), carddev->name());
+
+  // resolve callbacks
+	m_cb1_handler.resolve_safe();
+	m_cb2_handler.resolve_safe();
 }
 
-uint8_t bbc_joyport_slot_device::cb_r()
-{
-	if (m_device)
-		return m_device->cb_r();
-	else
-		return 0xff;
-}
-
-uint8_t bbc_joyport_slot_device::pb_r()
-{
-	if (m_device)
-		return m_device->pb_r();
-	else
-		return 0x1f;
-}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -102,6 +93,30 @@ uint8_t bbc_joyport_slot_device::pb_r()
 
 void bbc_joyport_slot_device::device_reset()
 {
+}
+
+
+//-------------------------------------------------
+//  pb_r
+//-------------------------------------------------
+
+READ8_MEMBER(bbc_joyport_slot_device::pb_r)
+{
+	if (m_device)
+		return m_device->pb_r(space, 0);
+	else
+		return 0xff;
+}
+
+
+//-------------------------------------------------
+//  pb_w
+//-------------------------------------------------
+
+WRITE8_MEMBER(bbc_joyport_slot_device::pb_w)
+{
+	if (m_device)
+		m_device->pb_w(space, 0, data);
 }
 
 

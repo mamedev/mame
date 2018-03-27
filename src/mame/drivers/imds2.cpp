@@ -110,50 +110,54 @@
 // Frequency of beeper
 #define IOC_BEEP_FREQ   3300
 
-ADDRESS_MAP_START(imds2_state::ipc_mem_map)
-	AM_RANGE(0x0000 , 0xffff) AM_READWRITE(ipc_mem_read, ipc_mem_write)
-ADDRESS_MAP_END
+void imds2_state::ipc_mem_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(imds2_state::ipc_mem_read), FUNC(imds2_state::ipc_mem_write));
+}
 
-ADDRESS_MAP_START(imds2_state::ipc_io_map)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0xc0 , 0xc0) AM_READWRITE(imds2_ipc_dbbout_r , imds2_ipc_dbbin_data_w)
-	AM_RANGE(0xc1 , 0xc1) AM_READWRITE(imds2_ipc_status_r , imds2_ipc_dbbin_cmd_w)
-		AM_RANGE(0xf0 , 0xf3) AM_DEVREADWRITE("ipctimer" , pit8253_device , read , write)
-		AM_RANGE(0xf4 , 0xf4) AM_DEVREADWRITE("ipcusart0" , i8251_device , data_r , data_w)
-		AM_RANGE(0xf5 , 0xf5) AM_DEVREADWRITE("ipcusart0" , i8251_device , status_r , control_w)
-		AM_RANGE(0xf6 , 0xf6) AM_DEVREADWRITE("ipcusart1" , i8251_device , data_r , data_w)
-		AM_RANGE(0xf7 , 0xf7) AM_DEVREADWRITE("ipcusart1" , i8251_device , status_r , control_w)
-	AM_RANGE(0xf8 , 0xf9) AM_DEVREADWRITE("iocpio" , i8041_device , upi41_master_r , upi41_master_w)
-	AM_RANGE(0xfa , 0xfb) AM_READWRITE(imds2_ipclocpic_r , imds2_ipclocpic_w)
-	AM_RANGE(0xfc , 0xfd) AM_READWRITE(imds2_ipcsyspic_r , imds2_ipcsyspic_w)
-	AM_RANGE(0xff , 0xff) AM_WRITE(imds2_ipc_control_w)
-ADDRESS_MAP_END
+void imds2_state::ipc_io_map(address_map &map)
+{
+	map.unmap_value_low();
+	map(0xc0, 0xc0).rw(this, FUNC(imds2_state::imds2_ipc_dbbout_r), FUNC(imds2_state::imds2_ipc_dbbin_data_w));
+	map(0xc1, 0xc1).rw(this, FUNC(imds2_state::imds2_ipc_status_r), FUNC(imds2_state::imds2_ipc_dbbin_cmd_w));
+		map(0xf0, 0xf3).rw(m_ipctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+		map(0xf4, 0xf4).rw(m_ipcusart0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+		map(0xf5, 0xf5).rw(m_ipcusart0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+		map(0xf6, 0xf6).rw(m_ipcusart1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+		map(0xf7, 0xf7).rw(m_ipcusart1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf8, 0xf9).rw(m_iocpio, FUNC(i8041_device::upi41_master_r), FUNC(i8041_device::upi41_master_w));
+	map(0xfa, 0xfb).rw(this, FUNC(imds2_state::imds2_ipclocpic_r), FUNC(imds2_state::imds2_ipclocpic_w));
+	map(0xfc, 0xfd).rw(this, FUNC(imds2_state::imds2_ipcsyspic_r), FUNC(imds2_state::imds2_ipcsyspic_w));
+	map(0xff, 0xff).w(this, FUNC(imds2_state::imds2_ipc_control_w));
+}
 
-ADDRESS_MAP_START(imds2_state::ioc_mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000 , 0x1fff) AM_ROM
-	AM_RANGE(0x4000 , 0x5fff) AM_RAM
-ADDRESS_MAP_END
+void imds2_state::ioc_mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x5fff).ram();
+}
 
-ADDRESS_MAP_START(imds2_state::ioc_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00 , 0x0f) AM_WRITE(imds2_ioc_dbbout_w)
-	AM_RANGE(0x20 , 0x2f) AM_WRITE(imds2_ioc_f0_w)
-	AM_RANGE(0x30 , 0x3f) AM_WRITE(imds2_ioc_set_f1_w)
-	AM_RANGE(0x40 , 0x4f) AM_WRITE(imds2_ioc_reset_f1_w)
-	AM_RANGE(0x50 , 0x5f) AM_WRITE(imds2_start_timer_w)
-	AM_RANGE(0x60 , 0x6f) AM_WRITE(imds2_miscout_w)
-	AM_RANGE(0x80 , 0x8f) AM_READ(imds2_miscin_r)
-	AM_RANGE(0x90 , 0x9f) AM_READ(imds2_kb_read)
-	AM_RANGE(0xa0 , 0xaf) AM_READ(imds2_ioc_status_r)
-	AM_RANGE(0xb0 , 0xbf) AM_READ(imds2_ioc_dbbin_r)
-	AM_RANGE(0xc0 , 0xcf) AM_DEVICE("iocfdc" , i8271_device, map)
-	AM_RANGE(0xd0 , 0xdf) AM_DEVREADWRITE("ioccrtc" , i8275_device , read , write)
-	AM_RANGE(0xe0 , 0xef) AM_DEVREADWRITE("ioctimer" , pit8253_device , read , write);
+void imds2_state::ioc_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x0f).w(this, FUNC(imds2_state::imds2_ioc_dbbout_w));
+	map(0x20, 0x2f).w(this, FUNC(imds2_state::imds2_ioc_f0_w));
+	map(0x30, 0x3f).w(this, FUNC(imds2_state::imds2_ioc_set_f1_w));
+	map(0x40, 0x4f).w(this, FUNC(imds2_state::imds2_ioc_reset_f1_w));
+	map(0x50, 0x5f).w(this, FUNC(imds2_state::imds2_start_timer_w));
+	map(0x60, 0x6f).w(this, FUNC(imds2_state::imds2_miscout_w));
+	map(0x80, 0x8f).r(this, FUNC(imds2_state::imds2_miscin_r));
+	map(0x90, 0x9f).r(this, FUNC(imds2_state::imds2_kb_read));
+	map(0xa0, 0xaf).r(this, FUNC(imds2_state::imds2_ioc_status_r));
+	map(0xb0, 0xbf).r(this, FUNC(imds2_state::imds2_ioc_dbbin_r));
+	map(0xc0, 0xcf).m(m_iocfdc, FUNC(i8271_device::map));
+	map(0xd0, 0xdf).rw(m_ioccrtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0xe0, 0xef).rw(m_ioctimer, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 // DMA controller range doesn't extend to 0xff because register 0xfd needs to be read as 0xff
 // This register is used by IOC firmware to detect DMA controller model (either 8237 or 8257)
-	AM_RANGE(0xf0 , 0xf8) AM_DEVREADWRITE("iocdma" , i8257_device , read , write)
-ADDRESS_MAP_END
+	map(0xf0, 0xf8).rw(m_iocdma, FUNC(i8257_device::read), FUNC(i8257_device::write));
+}
 
 imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig , type , tag),

@@ -124,21 +124,23 @@ WRITE_LINE_MEMBER(spcforce_state::unknown_w)
 	// written very frequently
 }
 
-ADDRESS_MAP_START(spcforce_state::spcforce_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x7001, 0x7001) AM_READ_PORT("P1") AM_WRITE(soundtrigger_w)
-	AM_RANGE(0x7002, 0x7002) AM_READ_PORT("P2") AM_WRITE(misc_outputs_w)
-	AM_RANGE(0x7008, 0x700f) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_SHARE("scrollram")
-ADDRESS_MAP_END
+void spcforce_state::spcforce_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x7000, 0x7000).portr("DSW").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x7001, 0x7001).portr("P1").w(this, FUNC(spcforce_state::soundtrigger_w));
+	map(0x7002, 0x7002).portr("P2").w(this, FUNC(spcforce_state::misc_outputs_w));
+	map(0x7008, 0x700f).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x8000, 0x83ff).ram().share("videoram");
+	map(0x9000, 0x93ff).ram().share("colorram");
+	map(0xa000, 0xa3ff).ram().share("scrollram");
+}
 
-ADDRESS_MAP_START(spcforce_state::spcforce_sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void spcforce_state::spcforce_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
 static INPUT_PORTS_START( spcforce )

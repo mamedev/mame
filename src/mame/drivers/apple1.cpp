@@ -432,12 +432,13 @@ WRITE8_MEMBER(apple1_state::ram_w)
 	}
 }
 
-ADDRESS_MAP_START(apple1_state::apple1_map)
-	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0xd010, 0xd013) AM_MIRROR(0x0fec) AM_DEVREADWRITE(A1_PIA_TAG, pia6821_device, read, write)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(A1_BASICRAM_TAG)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(A1_CPU_TAG, 0)
-ADDRESS_MAP_END
+void apple1_state::apple1_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(this, FUNC(apple1_state::ram_r), FUNC(apple1_state::ram_w));
+	map(0xd010, 0xd013).mirror(0x0fec).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xe000, 0xefff).ram().share(A1_BASICRAM_TAG);
+	map(0xff00, 0xffff).rom().region(A1_CPU_TAG, 0);
+}
 
 READ8_MEMBER(apple1_state::pia_keyboard_r)
 {

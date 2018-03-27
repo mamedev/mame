@@ -78,15 +78,16 @@ READ32_MEMBER(nexus3d_state::nexus3d_unk_r)
 //
 //}
 
-ADDRESS_MAP_START(nexus3d_state::nexus3d_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
+void nexus3d_state::nexus3d_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("mainram");
 
-	AM_RANGE(0x00400000, 0x01ffffff) AM_RAM // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related
+	map(0x00400000, 0x01ffffff).ram(); // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related
 
 	// flash
-	AM_RANGE(0x9C000000, 0x9C000003) AM_DEVREAD8( "flash", serflash_device, n3d_flash_r, 0xffffffff)
-	AM_RANGE(0x9C000010, 0x9C000013) AM_DEVWRITE8("flash", serflash_device, n3d_flash_cmd_w, 0xffffffff)
-	AM_RANGE(0x9C000018, 0x9C00001b) AM_DEVWRITE8("flash", serflash_device, n3d_flash_addr_w, 0xffffffff)
+	map(0x9C000000, 0x9C000003).r(m_serflash, FUNC(serflash_device::n3d_flash_r));
+	map(0x9C000010, 0x9C000013).w(m_serflash, FUNC(serflash_device::n3d_flash_cmd_w));
+	map(0x9C000018, 0x9C00001b).w(m_serflash, FUNC(serflash_device::n3d_flash_addr_w));
 
 	// lots of accesses in this range
 	// 0xc00018xx seems CRTC related
@@ -94,10 +95,10 @@ ADDRESS_MAP_START(nexus3d_state::nexus3d_map)
 //  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE(nexus3d_unk2_r, nexus3d_unk2_w ) // often, status for something.
 //  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE(nexus3d_unk3_r, nexus3d_unk3_w ) // often
 
-	AM_RANGE(0xE0000014, 0xE0000017) AM_READ(nexus3d_unk_r ) // sits waiting for this
+	map(0xE0000014, 0xE0000017).r(this, FUNC(nexus3d_state::nexus3d_unk_r)); // sits waiting for this
 
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( nexus3d )
 

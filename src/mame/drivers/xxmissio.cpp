@@ -90,52 +90,54 @@ void xxmissio_state::machine_start()
 
 /****************************************************************************/
 
-ADDRESS_MAP_START(xxmissio_state::map1)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void xxmissio_state::map1(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
+	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(status_m_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(flipscreen_w)
+	map(0xa000, 0xa000).portr("P1");
+	map(0xa001, 0xa001).portr("P2");
+	map(0xa002, 0xa002).portr("STATUS");
+	map(0xa002, 0xa002).w(this, FUNC(xxmissio_state::status_m_w));
+	map(0xa003, 0xa003).w(this, FUNC(xxmissio_state::flipscreen_w));
 
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("fgram")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(bgram_r, bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
+	map(0xc000, 0xc7ff).ram().share("fgram");
+	map(0xc800, 0xcfff).rw(this, FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w)).share("bgram");
+	map(0xd000, 0xd7ff).ram().share("spriteram");
 
-	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0xe000, 0xefff) AM_SHARE("share5") AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_SHARE("share6") AM_RAM
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).share("share5").ram();
+	map(0xf000, 0xffff).share("share6").ram();
+}
 
 
-ADDRESS_MAP_START(xxmissio_state::map2)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+void xxmissio_state::map2(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
 
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(bank_sel_w)
+	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8006, 0x8006).w(this, FUNC(xxmissio_state::bank_sel_w));
 
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(status_s_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(flipscreen_w)
+	map(0xa000, 0xa000).portr("P1");
+	map(0xa001, 0xa001).portr("P2");
+	map(0xa002, 0xa002).portr("STATUS");
+	map(0xa002, 0xa002).w(this, FUNC(xxmissio_state::status_s_w));
+	map(0xa003, 0xa003).w(this, FUNC(xxmissio_state::flipscreen_w));
 
-	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("fgram") AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE("bgram") AM_READWRITE(bgram_r, bgram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("spriteram") AM_RAM
+	map(0xc000, 0xc7ff).share("fgram").ram();
+	map(0xc800, 0xcfff).share("bgram").rw(this, FUNC(xxmissio_state::bgram_r), FUNC(xxmissio_state::bgram_w));
+	map(0xd000, 0xd7ff).share("spriteram").ram();
 
-	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xd800, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0xe000, 0xefff) AM_SHARE("share6") AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_SHARE("share5") AM_RAM
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).share("share6").ram();
+	map(0xf000, 0xffff).share("share5").ram();
+}
 
 
 /****************************************************************************/

@@ -548,66 +548,74 @@ static INPUT_PORTS_START( t1000_101key )
 	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(tandy1000_state::tandy1000_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE("pcvideo_t1000:vram", address_map_bank_device, amap8)
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void tandy1000_state::tandy1000_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
+	map(0xe0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(tandy1000_state::tandy1000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", t1000_mb_device, map)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r, tandy1000_pio_w)
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(nmi_vram_bank_w)
-	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", ncr7496_device, write)
-	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("pc_joy", pc_joy_device, joy_port_r, joy_port_w)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r, pc_t1t_p37x_w)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD("pcvideo_t1000", pcvideo_t1000_device, read) AM_DEVWRITE("pcvideo_t1000", pcvideo_t1000_device, write)
-ADDRESS_MAP_END
+void tandy1000_state::tandy1000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
+	map(0x0060, 0x0063).rw(this, FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
+	map(0x00a0, 0x00a0).w(this, FUNC(tandy1000_state::nmi_vram_bank_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr7496_device::write));
+	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
+	map(0x0378, 0x037f).rw(this, FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
+	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
+}
 
-ADDRESS_MAP_START(tandy1000_state::tandy1000_bank_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE8("pcvideo_t1000:vram", address_map_bank_device, amap8, 0xffff)
-	AM_RANGE(0xe0000, 0xeffff) AM_DEVICE("biosbank", address_map_bank_device, amap16)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION( "rom", 0x70000 )
-ADDRESS_MAP_END
+void tandy1000_state::tandy1000_bank_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
+	map(0xe0000, 0xeffff).m(m_biosbank, FUNC(address_map_bank_device::amap16));
+	map(0xf0000, 0xfffff).rom().region("rom", 0x70000);
+}
 
-ADDRESS_MAP_START(tandy1000_state::biosbank_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80000, 0xfffff) AM_ROM AM_REGION("rom", 0)
-ADDRESS_MAP_END
+void tandy1000_state::biosbank_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x80000, 0xfffff).rom().region("rom", 0);
+}
 
-ADDRESS_MAP_START(tandy1000_state::tandy1000_16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", t1000_mb_device, map, 0xffff)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r, tandy1000_pio_w, 0xffff)
-	AM_RANGE(0x0064, 0x0065) AM_WRITE8(devctrl_w, 0xff00)
-	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff)
-	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496", ncr7496_device, write, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r, pc_t1t_p37x_w, 0xffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD8("pcvideo_t1000", pcvideo_t1000_device, read, 0xffff) AM_DEVWRITE8("pcvideo_t1000", pcvideo_t1000_device, write, 0xffff)
-	AM_RANGE(0xffe8, 0xffe9) AM_WRITE8(vram_bank_w, 0x00ff)
-ADDRESS_MAP_END
+void tandy1000_state::tandy1000_16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
+	map(0x0060, 0x0063).rw(this, FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
+	map(0x0065, 0x0065).w(this, FUNC(tandy1000_state::devctrl_w));
+	map(0x00a0, 0x00a0).r(this, FUNC(tandy1000_state::unk_r));
+	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr7496_device::write));
+	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
+	map(0x0378, 0x037f).rw(this, FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
+	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
+	map(0xffe8, 0xffe8).w(this, FUNC(tandy1000_state::vram_bank_w));
+}
 
-ADDRESS_MAP_START(tandy1000_state::tandy1000_bank_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(tandy1000_16_io)
-	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
-ADDRESS_MAP_END
+void tandy1000_state::tandy1000_bank_io(address_map &map)
+{
+	map.unmap_value_high();
+	tandy1000_16_io(map);
+	map(0xffea, 0xffeb).rw(this, FUNC(tandy1000_state::tandy1000_bank_r), FUNC(tandy1000_state::tandy1000_bank_w));
+}
 
-ADDRESS_MAP_START(tandy1000_state::tandy1000tx_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(tandy1000_16_io)
-	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_vram_bank_w, 0x00ff)
-ADDRESS_MAP_END
+void tandy1000_state::tandy1000tx_io(address_map &map)
+{
+	map.unmap_value_high();
+	tandy1000_16_io(map);
+	map(0x00a0, 0x00a0).w(this, FUNC(tandy1000_state::nmi_vram_bank_w));
+}
 
-ADDRESS_MAP_START(tandy1000_state::tandy1000_286_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x000fffff)
-	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE8("pcvideo_t1000:vram", address_map_bank_device, amap8, 0xffff)
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void tandy1000_state::tandy1000_286_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x000fffff);
+	map(0xb8000, 0xbffff).m("pcvideo_t1000:vram", FUNC(address_map_bank_device::amap8));
+	map(0xe0000, 0xfffff).rom().region("bios", 0);
+}
 
 static const gfx_layout t1000_charlayout =
 {

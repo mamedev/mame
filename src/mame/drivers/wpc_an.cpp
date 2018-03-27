@@ -71,13 +71,14 @@ private:
 };
 
 
-ADDRESS_MAP_START(wpc_an_state::wpc_an_map)
-	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(ram_r,ram_w)
-	AM_RANGE(0x3000, 0x3faf) AM_RAM
-	AM_RANGE(0x3fb0, 0x3fff) AM_DEVREADWRITE("wpc",wpc_device,read,write) // WPC device
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("cpubank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("fixed",0)
-ADDRESS_MAP_END
+void wpc_an_state::wpc_an_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rw(this, FUNC(wpc_an_state::ram_r), FUNC(wpc_an_state::ram_w));
+	map(0x3000, 0x3faf).ram();
+	map(0x3fb0, 0x3fff).rw(m_wpc, FUNC(wpc_device::read), FUNC(wpc_device::write)); // WPC device
+	map(0x4000, 0x7fff).bankr("cpubank");
+	map(0x8000, 0xffff).rom().region("fixed", 0);
+}
 
 static INPUT_PORTS_START( wpc_an )
 	PORT_START("INP0")

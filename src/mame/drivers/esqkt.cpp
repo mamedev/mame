@@ -120,7 +120,7 @@ public:
 	required_device<scn2681_device> m_duart;
 	required_device<esqpanel2x16_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
-	
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -151,14 +151,15 @@ void esqkt_state::machine_reset()
 	m_bCalibSecondByte = false;
 }
 
-ADDRESS_MAP_START(esqkt_state::kt_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("osrom", 0)
-	AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq1", es5506_device, read, write, 0xffffffff)
-	AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)
-	AM_RANGE(0x280000, 0x2801ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0xffffffff)
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0xffffffff)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
-ADDRESS_MAP_END
+void esqkt_state::kt_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("osrom", 0);
+	map(0x200000, 0x20003f).rw("ensoniq1", FUNC(es5506_device::read), FUNC(es5506_device::write));
+	map(0x240000, 0x24003f).rw("ensoniq2", FUNC(es5506_device::read), FUNC(es5506_device::write));
+	map(0x280000, 0x2801ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w));
+	map(0x300000, 0x30001f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0xff0000, 0xffffff).ram().share("osram");
+}
 
 WRITE_LINE_MEMBER(esqkt_state::esq5506_otto_irq)
 {
@@ -241,7 +242,7 @@ MACHINE_CONFIG_START(esqkt_state::kt)
 	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
+
 	MCFG_SOUND_ADD("ensoniq1", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */

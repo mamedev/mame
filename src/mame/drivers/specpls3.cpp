@@ -305,23 +305,25 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
-ADDRESS_MAP_START(spectrum_state::spectrum_plus3_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(spectrum_plus3_port_1ffd_w) AM_MIRROR(0x0ffd)
-	AM_RANGE(0x2000, 0x2000) AM_READ(spectrum_plus3_port_2ffd_r) AM_MIRROR(0x0ffd)
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
-ADDRESS_MAP_END
+void spectrum_state::spectrum_plus3_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0000).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x4000, 0x4000).w(this, FUNC(spectrum_state::spectrum_plus3_port_7ffd_w)).mirror(0x3ffd);
+	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
+	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
+	map(0x1000, 0x1000).w(this, FUNC(spectrum_state::spectrum_plus3_port_1ffd_w)).mirror(0x0ffd);
+	map(0x2000, 0x2000).r(this, FUNC(spectrum_state::spectrum_plus3_port_2ffd_r)).mirror(0x0ffd);
+	map(0x3000, 0x3000).rw(this, FUNC(spectrum_state::spectrum_plus3_port_3ffd_r), FUNC(spectrum_state::spectrum_plus3_port_3ffd_w)).mirror(0x0ffd);
+}
 
-ADDRESS_MAP_START(spectrum_state::spectrum_plus3_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void spectrum_state::spectrum_plus3_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 {

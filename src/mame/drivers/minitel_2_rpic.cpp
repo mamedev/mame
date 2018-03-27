@@ -277,9 +277,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(minitel_state::minitel_scanline)
 	m_ts9347->update_scanline((uint16_t)param);
 }
 
-ADDRESS_MAP_START(minitel_state::mem_prg)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void minitel_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 ADDRESS_MAP_START(minitel_state::mem_io)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dev_keyb_ser_r, dev_crtl_reg_w)
@@ -424,7 +425,7 @@ ROM_START( minitel2 )
 	ROM_DEFAULT_BIOS("ft_bv4")
 
 	ROM_SYSTEM_BIOS(0, "ft_bv4", "Minitel 2 ROM BV4")
-	ROMX_LOAD( "MINITEL2_BV4.BIN",   0x0000, 0x8000, CRC(8844A0A7) SHA1(D3E9079B080DBCEE27AD870EC6C39AC42E7DEACF), ROM_BIOS(1) )
+	ROMX_LOAD( "minitel2_bv4.bin",   0x0000, 0x8000, CRC(8844A0A7) SHA1(D3E9079B080DBCEE27AD870EC6C39AC42E7DEACF), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(1, "demov1", "Minitel 2 Demo")
 	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607F2482) SHA1(7965EDBEF68E45D09DC67A4684DA56003EFF6328), ROM_BIOS(2) )

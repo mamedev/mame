@@ -78,27 +78,29 @@ WRITE_LINE_MEMBER(wiping_state::sound_irq_mask_w)
 	m_sound_irq_mask = state;
 }
 
-ADDRESS_MAP_START(wiping_state::main_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_SHARE("colorram")
-	AM_RANGE(0x8800, 0x88ff) AM_SHARE("spriteram")
-	AM_RANGE(0x8000, 0x8bff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xa800, 0xa807) AM_READ(ports_r)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM
-	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void wiping_state::main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0x83ff).share("videoram");
+	map(0x8400, 0x87ff).share("colorram");
+	map(0x8800, 0x88ff).share("spriteram");
+	map(0x8000, 0x8bff).ram();
+	map(0x9000, 0x93ff).ram().share("share1");
+	map(0x9800, 0x9bff).ram().share("share2");
+	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xa800, 0xa807).r(this, FUNC(wiping_state::ports_r));
+	map(0xb000, 0xb7ff).ram();
+	map(0xb800, 0xb800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
-ADDRESS_MAP_START(wiping_state::sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("wiping", wiping_sound_device, sound_w)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void wiping_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x7fff).w("wiping", FUNC(wiping_sound_device::sound_w));
+	map(0x9000, 0x93ff).ram().share("share1");
+	map(0x9800, 0x9bff).ram().share("share2");
+	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
 static INPUT_PORTS_START( wiping )

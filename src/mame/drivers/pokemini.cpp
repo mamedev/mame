@@ -125,12 +125,13 @@ READ8_MEMBER( pokemini_state::rom_r )
 	return m_cart->read_rom(space, offset & 0x1fffff);
 }
 
-ADDRESS_MAP_START(pokemini_state::pokemini_mem_map)
-	AM_RANGE( 0x000000, 0x000fff )  AM_ROM                            /* bios */
-	AM_RANGE( 0x001000, 0x001fff )  AM_RAM AM_SHARE("p_ram")          /* VRAM/RAM */
-	AM_RANGE( 0x002000, 0x0020ff )  AM_READWRITE(hwreg_r, hwreg_w)    /* hardware registers */
-	AM_RANGE( 0x002100, 0x1fffff )  AM_READ(rom_r)                    /* cartridge area */
-ADDRESS_MAP_END
+void pokemini_state::pokemini_mem_map(address_map &map)
+{
+	map(0x000000, 0x000fff).rom();                            /* bios */
+	map(0x001000, 0x001fff).ram().share("p_ram");          /* VRAM/RAM */
+	map(0x002000, 0x0020ff).rw(this, FUNC(pokemini_state::hwreg_r), FUNC(pokemini_state::hwreg_w));    /* hardware registers */
+	map(0x002100, 0x1fffff).r(this, FUNC(pokemini_state::rom_r));                    /* cartridge area */
+}
 
 
 static INPUT_PORTS_START( pokemini )

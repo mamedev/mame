@@ -1724,20 +1724,21 @@ WRITE32_MEMBER(namcos22_state::namcos22s_chipselect_w)
 
 
 // System 22
-ADDRESS_MAP_START(namcos22_state::namcos22_am)
+void namcos22_state::namcos22_am(address_map &map)
+{
 	/**
 	 * Program ROM (2M bytes)
 	 * Mounted position: LLB: CPU 4D, LMB: CPU 2D, UMB: CPU 8D, UUB: CPU 6D
 	 * Known ROM chip type: TI TMS27C040-10, ST M27C4001-10, M27C4001-12Z
 	 */
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
+	map(0x00000000, 0x001fffff).rom();
 
 	/**
 	 * Main RAM (128K bytes)
 	 * Mounted position: CPU 3D, 5D, 7D, 9D
 	 * Known DRAM chip type: TC55328P-25, N3441256P-15
 	 */
-	AM_RANGE(0x10000000, 0x1001ffff) AM_RAM AM_MIRROR(0x08000000)
+	map(0x10000000, 0x1001ffff).ram().mirror(0x08000000);
 
 	/**
 	 * KEYCUS
@@ -1748,7 +1749,7 @@ ADDRESS_MAP_START(namcos22_state::namcos22_am)
 	 *     C389? (Cyber Cycles)
 	 *     C392? (Ace Driver Victory Lap)
 	 */
-	AM_RANGE(0x20000000, 0x2000000f) AM_READWRITE16(namcos22_keycus_r, namcos22_keycus_w, 0xffffffff)
+	map(0x20000000, 0x2000000f).rw(this, FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
 
 	/**
 	 * C139 SCI Buffer
@@ -1760,7 +1761,7 @@ ADDRESS_MAP_START(namcos22_state::namcos22_am)
 	 *     20010000 - 20011fff  TX Buffer
 	 *     20012000 - 20013fff  RX FIFO Buffer (also used for TX Buffer)
 	 */
-	AM_RANGE(0x20010000, 0x20013fff) AM_RAM
+	map(0x20010000, 0x20013fff).ram();
 
 	/**
 	 * C139 SCI Register
@@ -1791,13 +1792,13 @@ ADDRESS_MAP_START(namcos22_state::namcos22_am)
 	 *     2002000c  2  R/W RX FIFO Pointer (0x0000 - 0x0fff)
 	 *     2002000e  2  W   TX FIFO Pointer (0x0000 - 0x1fff)
 	 */
-	AM_RANGE(0x20020000, 0x2002000f) AM_READ(namcos22_sci_r) AM_WRITEONLY
+	map(0x20020000, 0x2002000f).r(this, FUNC(namcos22_state::namcos22_sci_r)).writeonly();
 
 	/**
 	 * System Controller: Interrupt Control, Peripheral Control
 	 *
 	 */
-	AM_RANGE(0x40000000, 0x4000001f) AM_READWRITE8(namcos22_system_controller_r, namcos22_system_controller_w, 0xffffffff)
+	map(0x40000000, 0x4000001f).rw(this, FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22_system_controller_w));
 
 	/**
 	 * Unknown Device (optional for diagnostics?)
@@ -1805,22 +1806,22 @@ ADDRESS_MAP_START(namcos22_state::namcos22_am)
 	 * zero means not-connected.
 	 * may be related to device at 0x94000000
 	 */
-	AM_RANGE(0x48000000, 0x4800003f) AM_READNOP AM_WRITENOP
+	map(0x48000000, 0x4800003f).nopr().nopw();
 
 	/**
 	 * DIPSW
 	 *     0x50000000 - DIPSW3
 	 *     0x50000001 - DIPSW2
 	 */
-	AM_RANGE(0x50000000, 0x50000003) AM_READWRITE16(namcos22_dipswitch_r, namcos22_cpuleds_w, 0xffffffff)
-	AM_RANGE(0x50000008, 0x5000000b) AM_READWRITE16(namcos22_portbit_r, namcos22_portbit_w, 0xffffffff)
+	map(0x50000000, 0x50000003).rw(this, FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
+	map(0x50000008, 0x5000000b).rw(this, FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
 
 	/**
 	 * EEPROM
 	 * Mounted position: CPU 9E
 	 * Known chip type: HN58C65P-25 (8k x 8bit EEPROM)
 	 */
-	AM_RANGE(0x58000000, 0x58001fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
+	map(0x58000000, 0x58001fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 
 	/**
 	 * C74 (Mitsubishi M37702 MCU) Shared RAM (0x60004000 - 0x6000bfff)
@@ -1861,8 +1862,8 @@ ADDRESS_MAP_START(namcos22_state::namcos22_am)
 	 * +0x0100 - 0x02ff Parameter RAM from Main MPU (for SEs)
 	 * +0x0300 - 0x03ff?    Song Title (put messages here from Sound CPU)
 	 */
-	AM_RANGE(0x60000000, 0x60003fff) AM_WRITENOP
-	AM_RANGE(0x60004000, 0x6000bfff) AM_RAM AM_SHARE("shareram")
+	map(0x60000000, 0x60003fff).nopw();
+	map(0x60004000, 0x6000bfff).ram().share("shareram");
 
 	/**
 	 * C71 (TI TMS320C25 DSP) Shared RAM (0x70000000 - 0x70020000)
@@ -1872,43 +1873,43 @@ ADDRESS_MAP_START(namcos22_state::namcos22_am)
 	 * Known chip type: TC55328P-25, N341256P-15
 	 * Notes: connected bits = 0x00ffffff (24bit)
 	 */
-	AM_RANGE(0x70000000, 0x7001ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_SHARE("polygonram")
+	map(0x70000000, 0x7001ffff).rw(this, FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
 
 	/**
 	 * LED on PCB(?)
 	 */
-	AM_RANGE(0x90000000, 0x90000003) AM_RAM
+	map(0x90000000, 0x90000003).ram();
 
 	/**
 	 * Depth-cueing Look-up Table (fog density between near to far)
 	 * Mounted position: VIDEO 8P
 	 * Known chip type: TC55328P-25
 	 */
-	AM_RANGE(0x90010000, 0x90017fff) AM_RAM AM_SHARE("czram")
+	map(0x90010000, 0x90017fff).ram().share("czram");
 
 	/**
 	 * C305 (Display Controller)
 	 * Mounted position: VIDEO 7D (C305)
 	 * Notes: Boot time check: 0x90020100 - 0x9002027f
 	 */
-	AM_RANGE(0x90020000, 0x90027fff) AM_RAM AM_SHARE("video_mixer")
+	map(0x90020000, 0x90027fff).ram().share("video_mixer");
 
 	/**
 	 * Mounted position: VIDEO 6B, 7B, 8B (near C305)
 	 * Note: 0xff00-0xffff are for Tilemap (16 x 16)
 	 */
-	AM_RANGE(0x90028000, 0x9003ffff) AM_RAM_WRITE(namcos22_paletteram_w) AM_SHARE("paletteram")
+	map(0x90028000, 0x9003ffff).ram().w(this, FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
 
 	/**
 	 * unknown (option)
 	 * Note: This device may be optional. This may relate to device at 0x40000000
 	 */
-	AM_RANGE(0x90040000, 0x9007ffff) AM_RAM /* diagnostic ROM? */
+	map(0x90040000, 0x9007ffff).ram(); /* diagnostic ROM? */
 
 	/**
 	 * Tilemap PCG Memory
 	 */
-	AM_RANGE(0x90080000, 0x9009dfff) AM_RAM_WRITE(namcos22_cgram_w) AM_SHARE("cgram")
+	map(0x90080000, 0x9009dfff).ram().w(this, FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
 
 	/**
 	 * Tilemap Memory (64 x 64)
@@ -1916,43 +1917,44 @@ ADDRESS_MAP_START(namcos22_state::namcos22_am)
 	 * Known chip type: HM511664 (64k x 16bit SRAM)
 	 * Note: Self test: 90084000 - 9009ffff
 	 */
-	AM_RANGE(0x9009e000, 0x9009ffff) AM_RAM_WRITE(namcos22_textram_w) AM_SHARE("textram")
+	map(0x9009e000, 0x9009ffff).ram().w(this, FUNC(namcos22_state::namcos22_textram_w)).share("textram");
 
 	/**
 	 * Tilemap Register
 	 * Mounted position: unknown
 	 */
-	AM_RANGE(0x900a0000, 0x900a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_SHARE("tilemapattr")
-ADDRESS_MAP_END
+	map(0x900a0000, 0x900a000f).rw(this, FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
+}
 
 
 // Super System 22
-ADDRESS_MAP_START(namcos22_state::namcos22s_am)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40001f) AM_READWRITE16(namcos22_keycus_r, namcos22_keycus_w, 0xffffffff)
-	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
-	AM_RANGE(0x420000, 0x42000f) AM_READ(namcos22_sci_r) AM_WRITEONLY /* C139 SCI registers */
-	AM_RANGE(0x440000, 0x440003) AM_READWRITE16(namcos22_dipswitch_r, namcos22_cpuleds_w, 0xffffffff)
-	AM_RANGE(0x450008, 0x45000b) AM_READWRITE16(namcos22_portbit_r, namcos22_portbit_w, 0xffffffff)
-	AM_RANGE(0x460000, 0x463fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xff00ff00)
-	AM_RANGE(0x700000, 0x70001f) AM_READWRITE8(namcos22_system_controller_r, namcos22s_system_controller_w, 0xffffffff)
-	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22s_chipselect_w)
-	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_SHARE("czattr")
-	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE(namcos22s_czram_r, namcos22s_czram_w)
-	AM_RANGE(0x820000, 0x8202ff) AM_WRITENOP /* leftover of old (non-super) video mixer device */
-	AM_RANGE(0x824000, 0x8243ff) AM_RAM AM_SHARE("video_mixer")
-	AM_RANGE(0x828000, 0x83ffff) AM_RAM_WRITE(namcos22_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x860000, 0x860007) AM_READWRITE(namcos22s_spotram_r, namcos22s_spotram_w)
-	AM_RANGE(0x880000, 0x89dfff) AM_RAM_WRITE(namcos22_cgram_w) AM_SHARE("cgram")
-	AM_RANGE(0x89e000, 0x89ffff) AM_RAM_WRITE(namcos22_textram_w) AM_SHARE("textram")
-	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_SHARE("tilemapattr")
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("vics_data")
-	AM_RANGE(0x940000, 0x94007f) AM_READWRITE(namcos22s_vics_control_r, namcos22s_vics_control_w) AM_SHARE("vics_control")
-	AM_RANGE(0x980000, 0x9affff) AM_RAM AM_SHARE("spriteram") /* C374 */
-	AM_RANGE(0xa04000, 0xa0bfff) AM_RAM AM_SHARE("shareram") /* COM RAM */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_SHARE("polygonram")
-	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM /* workram */
-ADDRESS_MAP_END
+void namcos22_state::namcos22s_am(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x400000, 0x40001f).rw(this, FUNC(namcos22_state::namcos22_keycus_r), FUNC(namcos22_state::namcos22_keycus_w));
+	map(0x410000, 0x413fff).ram(); /* C139 SCI buffer */
+	map(0x420000, 0x42000f).r(this, FUNC(namcos22_state::namcos22_sci_r)).writeonly(); /* C139 SCI registers */
+	map(0x440000, 0x440003).rw(this, FUNC(namcos22_state::namcos22_dipswitch_r), FUNC(namcos22_state::namcos22_cpuleds_w));
+	map(0x450008, 0x45000b).rw(this, FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
+	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
+	map(0x700000, 0x70001f).rw(this, FUNC(namcos22_state::namcos22_system_controller_r), FUNC(namcos22_state::namcos22s_system_controller_w));
+	map(0x800000, 0x800003).w(this, FUNC(namcos22_state::namcos22s_chipselect_w));
+	map(0x810000, 0x81000f).ram().share("czattr");
+	map(0x810200, 0x8103ff).rw(this, FUNC(namcos22_state::namcos22s_czram_r), FUNC(namcos22_state::namcos22s_czram_w));
+	map(0x820000, 0x8202ff).nopw(); /* leftover of old (non-super) video mixer device */
+	map(0x824000, 0x8243ff).ram().share("video_mixer");
+	map(0x828000, 0x83ffff).ram().w(this, FUNC(namcos22_state::namcos22_paletteram_w)).share("paletteram");
+	map(0x860000, 0x860007).rw(this, FUNC(namcos22_state::namcos22s_spotram_r), FUNC(namcos22_state::namcos22s_spotram_w));
+	map(0x880000, 0x89dfff).ram().w(this, FUNC(namcos22_state::namcos22_cgram_w)).share("cgram");
+	map(0x89e000, 0x89ffff).ram().w(this, FUNC(namcos22_state::namcos22_textram_w)).share("textram");
+	map(0x8a0000, 0x8a000f).rw(this, FUNC(namcos22_state::namcos22_tilemapattr_r), FUNC(namcos22_state::namcos22_tilemapattr_w)).share("tilemapattr");
+	map(0x900000, 0x90ffff).ram().share("vics_data");
+	map(0x940000, 0x94007f).rw(this, FUNC(namcos22_state::namcos22s_vics_control_r), FUNC(namcos22_state::namcos22s_vics_control_w)).share("vics_control");
+	map(0x980000, 0x9affff).ram().share("spriteram"); /* C374 */
+	map(0xa04000, 0xa0bfff).ram().share("shareram"); /* COM RAM */
+	map(0xc00000, 0xc1ffff).rw(this, FUNC(namcos22_state::namcos22_dspram_r), FUNC(namcos22_state::namcos22_dspram_w)).share("polygonram");
+	map(0xe00000, 0xe3ffff).ram(); /* workram */
+}
 
 
 // Time Crisis gun
@@ -1976,10 +1978,11 @@ READ32_MEMBER(namcos22_state::namcos22_gun_r)
 	}
 }
 
-ADDRESS_MAP_START(namcos22_state::timecris_am)
-	AM_IMPORT_FROM( namcos22s_am )
-	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r)
-ADDRESS_MAP_END
+void namcos22_state::timecris_am(address_map &map)
+{
+	namcos22s_am(map);
+	map(0x430000, 0x43000f).r(this, FUNC(namcos22_state::namcos22_gun_r));
+}
 
 
 // Alpine Surfer protection
@@ -2009,11 +2012,12 @@ WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
 	}
 }
 
-ADDRESS_MAP_START(namcos22_state::alpinesa_am)
-	AM_IMPORT_FROM( namcos22s_am )
-	AM_RANGE(0x200000, 0x200003) AM_READ(alpinesa_prot_r)
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(alpinesa_prot_w)
-ADDRESS_MAP_END
+void namcos22_state::alpinesa_am(address_map &map)
+{
+	namcos22s_am(map);
+	map(0x200000, 0x200003).r(this, FUNC(namcos22_state::alpinesa_prot_r));
+	map(0x300000, 0x300003).w(this, FUNC(namcos22_state::alpinesa_prot_w));
+}
 
 
 
@@ -2539,33 +2543,36 @@ WRITE16_MEMBER(namcos22_state::master_render_device_w)
 	}
 }
 
-ADDRESS_MAP_START(namcos22_state::master_dsp_program)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM (4k words) */
-	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_SHARE("masterextram")
-ADDRESS_MAP_END
+void namcos22_state::master_dsp_program(address_map &map)
+{
+	map(0x0000, 0x0fff).rom(); /* internal ROM (4k words) */
+	map(0x4000, 0x7fff).rom().share("masterextram");
+}
 
-ADDRESS_MAP_START(namcos22_state::master_dsp_data)
-	AM_RANGE(0x1000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(master_external_ram_r) AM_WRITE(master_external_ram_w)
-	AM_RANGE(0x8000, 0xffff) AM_READ(namcos22_dspram16_r) AM_WRITE(namcos22_dspram16_w)
-ADDRESS_MAP_END
+void namcos22_state::master_dsp_data(address_map &map)
+{
+	map(0x1000, 0x3fff).ram();
+	map(0x4000, 0x7fff).r(this, FUNC(namcos22_state::master_external_ram_r)).w(this, FUNC(namcos22_state::master_external_ram_w));
+	map(0x8000, 0xffff).r(this, FUNC(namcos22_state::namcos22_dspram16_r)).w(this, FUNC(namcos22_state::namcos22_dspram16_w));
+}
 
-ADDRESS_MAP_START(namcos22_state::master_dsp_io)
-	AM_RANGE(0x0, 0x0) AM_READWRITE(point_loword_r, point_loword_iw)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(point_hiword_ir, point_hiword_w)
-	AM_RANGE(0x2, 0x2) AM_READWRITE(pdp_begin_r, dsp_unk2_w)
-	AM_RANGE(0x3, 0x3) AM_READWRITE(dsp_unk_port3_r, point_address_w)
-	AM_RANGE(0x4, 0x4) AM_WRITENOP /* unknown */
-	AM_RANGE(0x7, 0x7) AM_WRITE(upload_code_to_slave_dsp_w)
-	AM_RANGE(0x8, 0x8) AM_READWRITE(dsp_unk8_r, dsp_unk8_w) /* trigger irq? */
-	AM_RANGE(0x9, 0x9) AM_READ(custom_ic_status_r) AM_WRITENOP /* trigger irq? */
-	AM_RANGE(0xa, 0xa) AM_WRITE(dsp_unk_porta_w)
-	AM_RANGE(0xb, 0xb) AM_WRITENOP /* RINT-related? */
-	AM_RANGE(0xc, 0xc) AM_WRITE(master_render_device_w)
-	AM_RANGE(0xd, 0xd) AM_WRITE(namcos22_dspram16_bank_w)
-	AM_RANGE(0xe, 0xe) AM_WRITE(dsp_led_w)
-	AM_RANGE(0xf, 0xf) AM_READ(dsp_upload_status_r) AM_WRITENOP
-ADDRESS_MAP_END
+void namcos22_state::master_dsp_io(address_map &map)
+{
+	map(0x0, 0x0).rw(this, FUNC(namcos22_state::point_loword_r), FUNC(namcos22_state::point_loword_iw));
+	map(0x1, 0x1).rw(this, FUNC(namcos22_state::point_hiword_ir), FUNC(namcos22_state::point_hiword_w));
+	map(0x2, 0x2).rw(this, FUNC(namcos22_state::pdp_begin_r), FUNC(namcos22_state::dsp_unk2_w));
+	map(0x3, 0x3).rw(this, FUNC(namcos22_state::dsp_unk_port3_r), FUNC(namcos22_state::point_address_w));
+	map(0x4, 0x4).nopw(); /* unknown */
+	map(0x7, 0x7).w(this, FUNC(namcos22_state::upload_code_to_slave_dsp_w));
+	map(0x8, 0x8).rw(this, FUNC(namcos22_state::dsp_unk8_r), FUNC(namcos22_state::dsp_unk8_w)); /* trigger irq? */
+	map(0x9, 0x9).r(this, FUNC(namcos22_state::custom_ic_status_r)).nopw(); /* trigger irq? */
+	map(0xa, 0xa).w(this, FUNC(namcos22_state::dsp_unk_porta_w));
+	map(0xb, 0xb).nopw(); /* RINT-related? */
+	map(0xc, 0xc).w(this, FUNC(namcos22_state::master_render_device_w));
+	map(0xd, 0xd).w(this, FUNC(namcos22_state::namcos22_dspram16_bank_w));
+	map(0xe, 0xe).w(this, FUNC(namcos22_state::dsp_led_w));
+	map(0xf, 0xf).r(this, FUNC(namcos22_state::dsp_upload_status_r)).nopw();
+}
 
 
 READ16_MEMBER(namcos22_state::dsp_bioz_r)
@@ -2625,31 +2632,34 @@ WRITE16_MEMBER(namcos22_state::dsp_slave_portb_w)
 	/* The slave dsp uses this to transmit a command sequence to an external device. */
 }
 
-ADDRESS_MAP_START(namcos22_state::slave_dsp_program)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM */
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_SHARE("slaveextram")
-ADDRESS_MAP_END
+void namcos22_state::slave_dsp_program(address_map &map)
+{
+	map(0x0000, 0x0fff).rom(); /* internal ROM */
+	map(0x8000, 0x9fff).rom().share("slaveextram");
+}
 
-ADDRESS_MAP_START(namcos22_state::slave_dsp_data)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(slave_external_ram_r, slave_external_ram_w)
-ADDRESS_MAP_END
+void namcos22_state::slave_dsp_data(address_map &map)
+{
+	map(0x8000, 0x9fff).rw(this, FUNC(namcos22_state::slave_external_ram_r), FUNC(namcos22_state::slave_external_ram_w));
+}
 
-ADDRESS_MAP_START(namcos22_state::slave_dsp_io)
+void namcos22_state::slave_dsp_io(address_map &map)
+{
 	/* unknown signal */
-	AM_RANGE(0x3, 0x3) AM_READ(dsp_slave_port3_r)
+	map(0x3, 0x3).r(this, FUNC(namcos22_state::dsp_slave_port3_r));
 
-	AM_RANGE(0x4, 0x4) AM_READ(dsp_slave_port4_r)
-	AM_RANGE(0x5, 0x5) AM_READ(dsp_slave_port5_r)
-	AM_RANGE(0x6, 0x6) AM_READ(dsp_slave_port6_r) AM_WRITENOP
+	map(0x4, 0x4).r(this, FUNC(namcos22_state::dsp_slave_port4_r));
+	map(0x5, 0x5).r(this, FUNC(namcos22_state::dsp_slave_port5_r));
+	map(0x6, 0x6).r(this, FUNC(namcos22_state::dsp_slave_port6_r)).nopw();
 
 	/* render device state */
-	AM_RANGE(0x8, 0x8) AM_READ(dsp_slave_port8_r) AM_WRITENOP
+	map(0x8, 0x8).r(this, FUNC(namcos22_state::dsp_slave_port8_r)).nopw();
 
 	/* render device */
-	AM_RANGE(0xb, 0xb) AM_READWRITE(dsp_slave_portb_r, dsp_slave_portb_w)
+	map(0xb, 0xb).rw(this, FUNC(namcos22_state::dsp_slave_portb_r), FUNC(namcos22_state::dsp_slave_portb_w));
 
-	AM_RANGE(0xc, 0xc) AM_WRITE(dsp_slave_portc_w)
-ADDRESS_MAP_END
+	map(0xc, 0xc).w(this, FUNC(namcos22_state::dsp_slave_portc_w));
+}
 
 
 /*********************************************************************************************/
@@ -2705,28 +2715,32 @@ READ8_MEMBER(namcos22_state::iomcu_port4_s22_r)
 	return 0x00;
 }
 
-ADDRESS_MAP_START(namcos22_state::mcu_s22_program)
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE(s22mcu_shared_r, s22mcu_shared_w )
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mcu", 0)
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("mcu", 0)
-	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION("mcu", 0)
-	AM_RANGE(0x301000, 0x301001) AM_NOP // watchdog? LEDs?
-	AM_RANGE(0x308000, 0x308003) AM_NOP // volume control IC?
-ADDRESS_MAP_END
+void namcos22_state::mcu_s22_program(address_map &map)
+{
+	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0x004000, 0x00bfff).rw(this, FUNC(namcos22_state::s22mcu_shared_r), FUNC(namcos22_state::s22mcu_shared_w));
+	map(0x080000, 0x0fffff).rom().region("mcu", 0);
+	map(0x200000, 0x27ffff).rom().region("mcu", 0);
+	map(0x280000, 0x2fffff).rom().region("mcu", 0);
+	map(0x301000, 0x301001).noprw(); // watchdog? LEDs?
+	map(0x308000, 0x308003).noprw(); // volume control IC?
+}
 
-ADDRESS_MAP_START(namcos22_state::iomcu_s22_program)
+void namcos22_state::iomcu_s22_program(address_map &map)
+{
 	// is there any external memory or MMIO on this one?
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(namcos22_state::mcu_s22_io)
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ(mcu_port4_s22_r)
-ADDRESS_MAP_END
+void namcos22_state::mcu_s22_io(address_map &map)
+{
+	map(M37710_PORT4, M37710_PORT4).r(this, FUNC(namcos22_state::mcu_port4_s22_r));
+}
 
-ADDRESS_MAP_START(namcos22_state::iomcu_s22_io)
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ(iomcu_port4_s22_r)
-	AM_RANGE(0x00, 0xff) AM_NOP
-ADDRESS_MAP_END
+void namcos22_state::iomcu_s22_io(address_map &map)
+{
+	map(M37710_PORT4, M37710_PORT4).r(this, FUNC(namcos22_state::iomcu_port4_s22_r));
+	map(0x00, 0xff).noprw();
+}
 
 
 // Super System 22 M37710
@@ -2794,24 +2808,26 @@ READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
 	return (offset & 1) ? adc >> 8 : adc;
 }
 
-ADDRESS_MAP_START(namcos22_state::mcu_program)
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE(s22mcu_shared_r, s22mcu_shared_w )
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0xc000)
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mcu", 0)
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("mcu", 0)
-	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION("mcu", 0)
-	AM_RANGE(0x301000, 0x301001) AM_NOP // watchdog? LEDs?
-	AM_RANGE(0x308000, 0x308003) AM_NOP // volume control IC?
-ADDRESS_MAP_END
+void namcos22_state::mcu_program(address_map &map)
+{
+	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0x004000, 0x00bfff).rw(this, FUNC(namcos22_state::s22mcu_shared_r), FUNC(namcos22_state::s22mcu_shared_w));
+	map(0x00c000, 0x00ffff).rom().region("mcu", 0xc000);
+	map(0x080000, 0x0fffff).rom().region("mcu", 0);
+	map(0x200000, 0x27ffff).rom().region("mcu", 0);
+	map(0x280000, 0x2fffff).rom().region("mcu", 0);
+	map(0x301000, 0x301001).noprw(); // watchdog? LEDs?
+	map(0x308000, 0x308003).noprw(); // volume control IC?
+}
 
-ADDRESS_MAP_START(namcos22_state::mcu_io)
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READWRITE(mcu_port4_r, mcu_port4_w)
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READWRITE(mcu_port5_r, mcu_port5_w)
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(mcu_port6_r, mcu_port6_w)
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READWRITE(mcu_port7_r, mcu_port7_w)
-	AM_RANGE(M37710_ADC0_L, M37710_ADC7_H) AM_READ(namcos22s_mcu_adc_r)
-ADDRESS_MAP_END
+void namcos22_state::mcu_io(address_map &map)
+{
+	map(M37710_PORT4, M37710_PORT4).rw(this, FUNC(namcos22_state::mcu_port4_r), FUNC(namcos22_state::mcu_port4_w));
+	map(M37710_PORT5, M37710_PORT5).rw(this, FUNC(namcos22_state::mcu_port5_r), FUNC(namcos22_state::mcu_port5_w));
+	map(M37710_PORT6, M37710_PORT6).rw(this, FUNC(namcos22_state::mcu_port6_r), FUNC(namcos22_state::mcu_port6_w));
+	map(M37710_PORT7, M37710_PORT7).rw(this, FUNC(namcos22_state::mcu_port7_r), FUNC(namcos22_state::mcu_port7_w));
+	map(M37710_ADC0_L, M37710_ADC7_H).r(this, FUNC(namcos22_state::namcos22s_mcu_adc_r));
+}
 
 /*********************************************************************************************/
 
@@ -2954,10 +2970,11 @@ WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
 	}
 }
 
-ADDRESS_MAP_START(namcos22_state::alpine_io_map)
-	AM_IMPORT_FROM( mcu_io )
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_WRITE(alpine_mcu_port5_w)
-ADDRESS_MAP_END
+void namcos22_state::alpine_io_map(address_map &map)
+{
+	mcu_io(map);
+	map(M37710_PORT5, M37710_PORT5).w(this, FUNC(namcos22_state::alpine_mcu_port5_w));
+}
 
 
 // Prop Cycle
@@ -2971,10 +2988,11 @@ WRITE8_MEMBER(namcos22_state::propcycle_mcu_port5_w)
 	output().set_led_value(0, data & 2);
 }
 
-ADDRESS_MAP_START(namcos22_state::propcycl_io_map)
-	AM_IMPORT_FROM( mcu_io )
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_WRITE(propcycle_mcu_port5_w)
-ADDRESS_MAP_END
+void namcos22_state::propcycl_io_map(address_map &map)
+{
+	mcu_io(map);
+	map(M37710_PORT5, M37710_PORT5).w(this, FUNC(namcos22_state::propcycle_mcu_port5_w));
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
 {

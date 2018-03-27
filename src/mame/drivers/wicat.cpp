@@ -160,62 +160,67 @@ private:
 };
 
 
-ADDRESS_MAP_START(wicat_state::wicat_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_REGION("c2", 0x0000)
-	AM_RANGE(0x020000, 0x1fffff) AM_RAM
-	AM_RANGE(0x200000, 0x2fffff) AM_RAM
-	AM_RANGE(0x300000, 0xdfffff) AM_READWRITE(invalid_r,invalid_w)
-	AM_RANGE(0xeff800, 0xeffbff) AM_RAM  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
-	AM_RANGE(0xeffc00, 0xeffc01) AM_READWRITE(memmap_r,memmap_w)
-	AM_RANGE(0xf00000, 0xf00007) AM_DEVREADWRITE8("uart0",mc2661_device,read,write,0xff00)  // UARTs
-	AM_RANGE(0xf00008, 0xf0000f) AM_DEVREADWRITE8("uart1",mc2661_device,read,write,0xff00)
-	AM_RANGE(0xf00010, 0xf00017) AM_DEVREADWRITE8("uart2",mc2661_device,read,write,0xff00)
-	AM_RANGE(0xf00018, 0xf0001f) AM_DEVREADWRITE8("uart3",mc2661_device,read,write,0xff00)
-	AM_RANGE(0xf00020, 0xf00027) AM_DEVREADWRITE8("uart4",mc2661_device,read,write,0xff00)
-	AM_RANGE(0xf00028, 0xf0002f) AM_DEVREADWRITE8("uart5",mc2661_device,read,write,0xff00)
-	AM_RANGE(0xf00030, 0xf00037) AM_DEVREADWRITE8("uart6",mc2661_device,read,write,0xff00)
-	AM_RANGE(0xf00040, 0xf0005f) AM_READWRITE(via_r, via_w)
-	AM_RANGE(0xf00060, 0xf0007f) AM_DEVREADWRITE8("rtc",mm58274c_device,read,write,0xff00)
-	AM_RANGE(0xf000d0, 0xf000d1) AM_WRITE(parallel_led_w)
-	AM_RANGE(0xf00180, 0xf0018f) AM_READWRITE8(hdc_r,hdc_w,0xffff)  // WD1000
-	AM_RANGE(0xf00190, 0xf0019f) AM_READWRITE8(fdc_r,fdc_w,0xffff)  // FD1795
-	AM_RANGE(0xf00f00, 0xf00fff) AM_READWRITE(invalid_r,invalid_w)
-ADDRESS_MAP_END
+void wicat_state::wicat_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map.global_mask(0xffffff);
+	map(0x000000, 0x001fff).rom().region("c2", 0x0000);
+	map(0x020000, 0x1fffff).ram();
+	map(0x200000, 0x2fffff).ram();
+	map(0x300000, 0xdfffff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0xeff800, 0xeffbff).ram();  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
+	map(0xeffc00, 0xeffc01).rw(this, FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
+	map(0xf00000, 0xf00007).rw(m_uart0, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);  // UARTs
+	map(0xf00008, 0xf0000f).rw(m_uart1, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00010, 0xf00017).rw(m_uart2, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00018, 0xf0001f).rw(m_uart3, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00020, 0xf00027).rw(m_uart4, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00028, 0xf0002f).rw(m_uart5, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00030, 0xf00037).rw(m_uart6, FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0xff00);
+	map(0xf00040, 0xf0005f).rw(this, FUNC(wicat_state::via_r), FUNC(wicat_state::via_w));
+	map(0xf00060, 0xf0007f).rw(m_rtc, FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)).umask16(0xff00);
+	map(0xf000d0, 0xf000d1).w(this, FUNC(wicat_state::parallel_led_w));
+	map(0xf00180, 0xf0018f).rw(this, FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
+	map(0xf00190, 0xf0019f).rw(this, FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
+	map(0xf00f00, 0xf00fff).rw(this, FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+}
 
-ADDRESS_MAP_START(wicat_state::wicat_video_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("g1", 0x0000)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void wicat_state::wicat_video_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("g1", 0x0000);
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(wicat_state::wicat_video_io)
+void wicat_state::wicat_video_io(address_map &map)
+{
 	// these are largely wild guesses...
-	AM_RANGE(0x0000,0x0003) AM_READWRITE(video_timer_r,video_timer_w)  // some sort of timer?
-	AM_RANGE(0x0100,0x0107) AM_READWRITE(video_uart0_r,video_uart0_w)  // INS2651 UART #1
-	AM_RANGE(0x0200,0x0207) AM_READWRITE(video_uart1_r,video_uart1_w)  // INS2651 UART #2
-	AM_RANGE(0x0304,0x0304) AM_READ(video_status_r)
-	AM_RANGE(0x0400,0x047f) AM_READWRITE(videosram_r,videosram_w)  // XD2210  4-bit NOVRAM
-	AM_RANGE(0x0500,0x0500) AM_WRITE(videosram_recall_w)
-	AM_RANGE(0x0600,0x0600) AM_WRITE(videosram_store_w)
-	AM_RANGE(0x0800,0x080f) AM_READWRITE(video_ctrl_r,video_ctrl_w)
-	AM_RANGE(0x0a00,0x0a1f) AM_READWRITE(video_dma_r,video_dma_w) // AM9517A DMA
-	AM_RANGE(0x0b00,0x0b03) AM_READWRITE(video_r,video_w)  // i8275 CRTC
-	AM_RANGE(0x0e00,0x0eff) AM_RAM
-	AM_RANGE(0x4000,0x5fff) AM_RAM AM_SHARE("vram") // video RAM?
-	AM_RANGE(0x8000,0x8fff) AM_ROM AM_REGION("g2char",0x0000)
-	AM_RANGE(0x9000,0x9fff) AM_ROM AM_REGION("g2char",0x0000)
-ADDRESS_MAP_END
+	map(0x0000, 0x0003).rw(this, FUNC(wicat_state::video_timer_r), FUNC(wicat_state::video_timer_w));  // some sort of timer?
+	map(0x0100, 0x0107).rw(this, FUNC(wicat_state::video_uart0_r), FUNC(wicat_state::video_uart0_w));  // INS2651 UART #1
+	map(0x0200, 0x0207).rw(this, FUNC(wicat_state::video_uart1_r), FUNC(wicat_state::video_uart1_w));  // INS2651 UART #2
+	map(0x0304, 0x0304).r(this, FUNC(wicat_state::video_status_r));
+	map(0x0400, 0x047f).rw(this, FUNC(wicat_state::videosram_r), FUNC(wicat_state::videosram_w));  // XD2210  4-bit NOVRAM
+	map(0x0500, 0x0500).w(this, FUNC(wicat_state::videosram_recall_w));
+	map(0x0600, 0x0600).w(this, FUNC(wicat_state::videosram_store_w));
+	map(0x0800, 0x080f).rw(this, FUNC(wicat_state::video_ctrl_r), FUNC(wicat_state::video_ctrl_w));
+	map(0x0a00, 0x0a1f).rw(this, FUNC(wicat_state::video_dma_r), FUNC(wicat_state::video_dma_w)); // AM9517A DMA
+	map(0x0b00, 0x0b03).rw(this, FUNC(wicat_state::video_r), FUNC(wicat_state::video_w));  // i8275 CRTC
+	map(0x0e00, 0x0eff).ram();
+	map(0x4000, 0x5fff).ram().share("vram"); // video RAM?
+	map(0x8000, 0x8fff).rom().region("g2char", 0x0000);
+	map(0x9000, 0x9fff).rom().region("g2char", 0x0000);
+}
 
-ADDRESS_MAP_START(wicat_state::wicat_wd1000_mem)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM AM_REGION("wd3", 0x0000)
-	AM_RANGE(0x1800, 0x1fff) AM_NOP
-ADDRESS_MAP_END
+void wicat_state::wicat_wd1000_mem(address_map &map)
+{
+	map(0x0000, 0x17ff).rom().region("wd3", 0x0000);
+	map(0x1800, 0x1fff).noprw();
+}
 
-ADDRESS_MAP_START(wicat_state::wicat_wd1000_io)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM  // left bank  - RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM  // right bank - I/O ports (TODO)
-ADDRESS_MAP_END
+void wicat_state::wicat_wd1000_io(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();  // left bank  - RAM
+	map(0x0100, 0x01ff).ram();  // right bank - I/O ports (TODO)
+}
 
 
 /* Input ports */

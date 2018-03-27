@@ -54,9 +54,9 @@ device_memory_interface::space_config_vector f8_cpu_device::memory_space_config(
 	};
 }
 
-util::disasm_interface *f8_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> f8_cpu_device::create_disassembler()
 {
-	return new f8_disassembler;
+	return std::make_unique<f8_disassembler>();
 }
 
 void f8_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const

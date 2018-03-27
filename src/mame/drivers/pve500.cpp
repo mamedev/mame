@@ -133,25 +133,29 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 };
 
 
-ADDRESS_MAP_START(pve500_state::maincpu_io)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_sio", z80sio0_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0B) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void pve500_state::maincpu_io(address_map &map)
+{
+	map(0x00, 0x03).mirror(0xff00).rw("external_sio", FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
+	map(0x08, 0x0B).mirror(0xff00).rw("external_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
-ADDRESS_MAP_START(pve500_state::maincpu_prg)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM // ICB7: 48kbytes EPROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM // ICD6: 8kbytes of RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_DEVREADWRITE("mb8421", mb8421_device, left_r, left_w)
-ADDRESS_MAP_END
+void pve500_state::maincpu_prg(address_map &map)
+{
+	map(0x0000, 0xbfff).rom(); // ICB7: 48kbytes EPROM
+	map(0xc000, 0xdfff).ram(); // ICD6: 8kbytes of RAM
+	map(0xe000, 0xe7ff).mirror(0x1800).rw("mb8421", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+}
 
-ADDRESS_MAP_START(pve500_state::subcpu_io)
-ADDRESS_MAP_END
+void pve500_state::subcpu_io(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(pve500_state::subcpu_prg)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM // ICG5: 32kbytes EPROM
-	AM_RANGE(0x8000, 0x8007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE("cxdio", cxd1095_device, read, write)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
-ADDRESS_MAP_END
+void pve500_state::subcpu_prg(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // ICG5: 32kbytes EPROM
+	map(0x8000, 0x8007).mirror(0x3ff8).rw(m_cxdio, FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
+	map(0xc000, 0xc7ff).mirror(0x3800).rw("mb8421", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w));
+}
 
 DRIVER_INIT_MEMBER( pve500_state, pve500 )
 {

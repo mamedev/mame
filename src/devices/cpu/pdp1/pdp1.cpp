@@ -378,7 +378,7 @@
 #define PREVIOUS_PC     ((PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
 
 
-DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "PDP1")
+DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "DEC PDP1")
 
 
 pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -419,9 +419,9 @@ void pdp1_device::device_config_complete()
 }
 
 
-util::disasm_interface *pdp1_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pdp1_device::create_disassembler()
 {
-	return new pdp1_disassembler;
+	return std::make_unique<pdp1_disassembler>();
 }
 
 

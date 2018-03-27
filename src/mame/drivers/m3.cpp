@@ -40,17 +40,19 @@ private:
 	required_device<palette_device> m_palette;
 };
 
-ADDRESS_MAP_START(m3_state::mem_map)
-	AM_RANGE(0x0000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void m3_state::mem_map(address_map &map)
+{
+	map(0x0000, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().share("videoram");
+	map(0xf000, 0xffff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(m3_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
-	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x85, 0x85) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+void m3_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x84, 0x84).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x85, 0x85).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 static INPUT_PORTS_START( m3 )
 INPUT_PORTS_END
@@ -134,14 +136,14 @@ MACHINE_CONFIG_END
 
 ROM_START( m3 )
 	ROM_REGION( 0x3000, "roms", 0 )
-	ROM_LOAD( "bootstrap_prom_(034).bin",    0x0000, 0x0800, CRC(7fdb051e) SHA1(7aa24d4f44b6a0c8f7f647667f4997432c186cac) )
+	ROM_LOAD( "bootstrap_prom,034.bin",    0x0000, 0x0800, CRC(7fdb051e) SHA1(7aa24d4f44b6a0c8f7f647667f4997432c186cac) )
 	ROM_LOAD( "monitor_prom_v1.7_2015-12-09.bin", 0x0800, 0x0800, CRC(85b5c541) SHA1(92b4ec87a4d0d8c0f7b49eec0c5457f237de0a01) )
 
 	ROM_REGION( 0x0800, "chargen", 0 ) // bit 7 set on every byte - bad?
-	ROM_LOAD( "6845crt_font_prom_(033).bin", 0x0000, 0x0800, CRC(cc29f664) SHA1(4197530d9455d665fd4773f95bb6394f6b056dec) )
+	ROM_LOAD( "6845crt_font_prom,033.bin", 0x0000, 0x0800, CRC(cc29f664) SHA1(4197530d9455d665fd4773f95bb6394f6b056dec) )
 
 	ROM_REGION( 0x0800, "keyboard", 0 )
-	ROM_LOAD( "keyboard_prom_(032).bin",     0x0000, 0x0800, CRC(21548355) SHA1(ee4ce4af9c78474263dd58e0f19e79e5b00926fa) )
+	ROM_LOAD( "keyboard_prom,032.bin",     0x0000, 0x0800, CRC(21548355) SHA1(ee4ce4af9c78474263dd58e0f19e79e5b00926fa) )
 ROM_END
 
 COMP( 19??, m3, 0, 0, m3, m3, m3_state, 0, "LSI", "M3", MACHINE_IS_SKELETON )

@@ -332,32 +332,34 @@ PALETTE_INIT_MEMBER(acefruit_state, acefruit)
 	palette.set_pen_color( 15, rgb_t(0xff, 0x00, 0x00) );
 }
 
-ADDRESS_MAP_START(acefruit_state::acefruit_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(acefruit_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
-	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
-	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN4")
-	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("IN5")
-	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("IN6")
-	AM_RANGE(0x8007, 0x8007) AM_READ_PORT("IN7")
-	AM_RANGE(0x6000, 0x6005) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa001) AM_WRITE(acefruit_lamp_w)
-	AM_RANGE(0xa002, 0xa003) AM_WRITE(acefruit_coin_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(acefruit_solenoid_w)
-	AM_RANGE(0xa005, 0xa006) AM_WRITE(acefruit_sound_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void acefruit_state::acefruit_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x20ff).ram().share("nvram");
+	map(0x4000, 0x43ff).ram().share("videoram");
+	map(0x4400, 0x47ff).ram().w(this, FUNC(acefruit_state::acefruit_colorram_w)).share("colorram");
+	map(0x8000, 0x8000).portr("IN0");
+	map(0x8001, 0x8001).portr("IN1");
+	map(0x8002, 0x8002).portr("IN2");
+	map(0x8003, 0x8003).portr("IN3");
+	map(0x8004, 0x8004).portr("IN4");
+	map(0x8005, 0x8005).portr("IN5");
+	map(0x8006, 0x8006).portr("IN6");
+	map(0x8007, 0x8007).portr("IN7");
+	map(0x6000, 0x6005).ram().share("spriteram");
+	map(0xa000, 0xa001).w(this, FUNC(acefruit_state::acefruit_lamp_w));
+	map(0xa002, 0xa003).w(this, FUNC(acefruit_state::acefruit_coin_w));
+	map(0xa004, 0xa004).w(this, FUNC(acefruit_state::acefruit_solenoid_w));
+	map(0xa005, 0xa006).w(this, FUNC(acefruit_state::acefruit_sound_w));
+	map(0xc000, 0xc000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(acefruit_state::acefruit_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_NOP /* ? */
-ADDRESS_MAP_END
+void acefruit_state::acefruit_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).noprw(); /* ? */
+}
 
 static INPUT_PORTS_START( sidewndr )
 	PORT_START("IN0")   // 0

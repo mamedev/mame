@@ -2753,10 +2753,10 @@ uint32_t tms99xx_device::execute_input_lines() const
 
 // device_disasm_interface overrides
 
-util::disasm_interface *tms99xx_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms99xx_device::create_disassembler()
 {
-	return new tms9900_disassembler(TMS9900_ID);
+	return std::make_unique<tms9900_disassembler>(TMS9900_ID);
 }
 
 
-DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "TMS9900")
+DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "Texas Instruments TMS9900")

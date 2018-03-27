@@ -25,19 +25,21 @@ DEFINE_DEVICE_TYPE(EPSON_PF10, epson_pf10_device, "epson_pf10", "EPSON PF-10 Por
 //  address maps
 //-------------------------------------------------
 
-ADDRESS_MAP_START(epson_pf10_device::cpu_mem)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("maincpu", hd6303y_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM /* 192 bytes internal ram */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* external 2k ram */
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(fdc_tc_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void epson_pf10_device::cpu_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw("maincpu", FUNC(hd6303y_cpu_device::m6801_io_r), FUNC(hd6303y_cpu_device::m6801_io_w));
+	map(0x0040, 0x00ff).ram(); /* 192 bytes internal ram */
+	map(0x0800, 0x0fff).ram(); /* external 2k ram */
+	map(0x1000, 0x17ff).rw(this, FUNC(epson_pf10_device::fdc_r), FUNC(epson_pf10_device::fdc_w));
+	map(0x1800, 0x1fff).w(this, FUNC(epson_pf10_device::fdc_tc_w));
+	map(0xe000, 0xffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(epson_pf10_device::cpu_io)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(port1_r, port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w)
-ADDRESS_MAP_END
+void epson_pf10_device::cpu_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(epson_pf10_device::port1_r), FUNC(epson_pf10_device::port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(epson_pf10_device::port2_r), FUNC(epson_pf10_device::port2_w));
+}
 
 
 //-------------------------------------------------

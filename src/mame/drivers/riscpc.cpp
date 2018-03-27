@@ -760,8 +760,9 @@ WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
 	}
 }
 
-ADDRESS_MAP_START(riscpc_state::a7000_mem)
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x00800000) AM_ROM AM_REGION("user1", 0)
+void riscpc_state::a7000_mem(address_map &map)
+{
+	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
 //  AM_RANGE(0x01000000, 0x01ffffff) AM_NOP //expansion ROM
 //  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM //VRAM
 //  I/O 03000000 - 033fffff
@@ -770,16 +771,16 @@ ADDRESS_MAP_START(riscpc_state::a7000_mem)
 //  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
 //  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
 //  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
-	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(a7000_iomd_r,a7000_iomd_w) //IOMD Registers //mirrored at 0x03000000-0x1ff?
+	map(0x03200000, 0x032001ff).rw(this, FUNC(riscpc_state::a7000_iomd_r), FUNC(riscpc_state::a7000_iomd_w)); //IOMD Registers //mirrored at 0x03000000-0x1ff?
 //  AM_RANGE(0x03310000, 0x03310003) //Mouse Buttons
 
-	AM_RANGE(0x03400000, 0x037fffff) AM_WRITE(a7000_vidc20_w)
+	map(0x03400000, 0x037fffff).w(this, FUNC(riscpc_state::a7000_vidc20_w));
 //  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
-	AM_RANGE(0x10000000, 0x13ffffff) AM_RAM //SIMM 0 bank 0
-	AM_RANGE(0x14000000, 0x17ffffff) AM_RAM //SIMM 0 bank 1
+	map(0x10000000, 0x13ffffff).ram(); //SIMM 0 bank 0
+	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
 //  AM_RANGE(0x18000000, 0x18ffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 0
 //  AM_RANGE(0x1c000000, 0x1cffffff) AM_MIRROR(0x03000000) AM_RAM //SIMM 1 bank 1
-ADDRESS_MAP_END
+}
 
 
 /* Input ports */

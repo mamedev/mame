@@ -241,22 +241,24 @@ protected:
 };
 
 
-ADDRESS_MAP_START(by35_state::by35_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)     // A15 is not connected
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_READWRITE(nibble_nvram_r, nibble_nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x1000, 0x7fff) AM_ROM // AM_REGION("roms", 0 )
-ADDRESS_MAP_END
+void by35_state::by35_map(address_map &map)
+{
+	map.global_mask(0x7fff);     // A15 is not connected
+	map(0x0000, 0x007f).ram();
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0200, 0x02ff).ram().rw(this, FUNC(by35_state::nibble_nvram_r), FUNC(by35_state::nibble_nvram_w)).share("nvram");
+	map(0x1000, 0x7fff).rom(); // AM_REGION("roms", 0 )
+}
 
-ADDRESS_MAP_START(by35_state::nuovo_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+void by35_state::nuovo_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
 //  AM_RANGE(0x0000, 0x007f) AM_RAM     // Schematics infer that the M6802 internal RAM is disabled.
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0xffff).rom();
+}
 
 
 
@@ -1894,7 +1896,7 @@ ROM_END
 /-------------------------------*/
 ROM_START(xsandos)
 	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD( "x&os2732.u2", 0x1000, 0x0800, CRC(068dfe5a) SHA1(028baf79852b14cac51a7cdc8e751a8173beeccb))
+	ROM_LOAD( "x+os2732.u2", 0x1000, 0x0800, CRC(068dfe5a) SHA1(028baf79852b14cac51a7cdc8e751a8173beeccb))
 	ROM_CONTINUE( 0x5000, 0x0800)
 	ROM_LOAD( "720-5332.u6", 0x1800, 0x0800, CRC(c2e92f80) SHA1(61de956a4b6e9fb9ef2b25c01bff1fb5972284ad) )
 	ROM_CONTINUE( 0x5800, 0x0800)
@@ -2141,8 +2143,8 @@ ROM_END
 
 ROM_START(bullseyn)                     // Later version dumbed down with traditional Pinball scoring
 	ROM_REGION(0x8000, "maincpu", 0)    // Actually seems to have an address mask of 0x3fff
-	ROM_LOAD("301NEW_normalscoring.U2", 0x2000, 0x1000, CRC(febebc63) SHA1(9221b02bc5952203f5b2527e4c40d17d5986abdf))
-	ROM_LOAD("301NEW_normalscoring.U6", 0x3000, 0x1000, CRC(1357cd6a) SHA1(4e02c96b141dab6cdea1a15539214976eb052838))
+	ROM_LOAD("301new_normalscoring.u2", 0x2000, 0x1000, CRC(febebc63) SHA1(9221b02bc5952203f5b2527e4c40d17d5986abdf))
+	ROM_LOAD("301new_normalscoring.u6", 0x3000, 0x1000, CRC(1357cd6a) SHA1(4e02c96b141dab6cdea1a15539214976eb052838))
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
 	ROM_LOAD("bull.snd", 0x8000, 0x0800, CRC(c0482a2f) SHA1(a6aa698ad517cdc078129d702ee936af576260ed))

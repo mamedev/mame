@@ -208,71 +208,73 @@ WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
 //  printf("%02x\n",data);
 }
 
-ADDRESS_MAP_START(kongambl_state::kongambl_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM // main program
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM // work RAM
+void kongambl_state::kongambl_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom(); // main program
+	map(0x100000, 0x11ffff).ram(); // work RAM
 
-	AM_RANGE(0x200000, 0x207fff) AM_RAM // backup RAM 24F
+	map(0x200000, 0x207fff).ram(); // backup RAM 24F
 
-	AM_RANGE(0x300000, 0x307fff) AM_RAM // backup RAM 24H
+	map(0x300000, 0x307fff).ram(); // backup RAM 24H
 
 	// override konami chips with custom areas until that code is removed
-	AM_RANGE(0x400000, 0x401fff) AM_ROM AM_REGION("gfx1",0)
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM AM_SHARE("vram")
+	map(0x400000, 0x401fff).rom().region("gfx1", 0);
+	map(0x420000, 0x43ffff).ram().share("vram");
 	//AM_RANGE(0x480000, 0x48003f) AM_RAM // vregs
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
 //  AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
 //  AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
-	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device, long_w)
+	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::long_w));
 
 
 
-	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
+	map(0x440000, 0x443fff).ram(); // OBJ RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
+	map(0x460000, 0x47ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
-	AM_RANGE(0x4b0000, 0x4b001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00ff00)
+	map(0x4b0000, 0x4b001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask32(0xff00ff00);
 
-	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE16("k055673", k055673_device, k053246_word_w, 0xffffffff)
+	map(0x4c0000, 0x4c0007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
 	//AM_RANGE(0x4c4000, 0x4c4003) AM_WRITENOP
 	//AM_RANGE(0x4c4004, 0x4c4007) AM_WRITENOP
 	//AM_RANGE(0x4c801c, 0x4c801f) AM_WRITENOP
 	//AM_RANGE(0x4cc01c, 0x4cc01f) AM_WRITENOP
 
-	AM_RANGE(0x4cc000, 0x4cc00f) AM_DEVREAD16("k055673", k055673_device, k055673_rom_word_r, 0xffffffff)
+	map(0x4cc000, 0x4cc00f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 
-	AM_RANGE(0x4d0000, 0x4d0003) AM_WRITE8(kongambl_ff_w,0xff000000)
+	map(0x4d0000, 0x4d0000).w(this, FUNC(kongambl_state::kongambl_ff_w));
 
-	AM_RANGE(0x500000, 0x5007ff) AM_RAM
-	AM_RANGE(0x500380, 0x500383) AM_READ(test_r)
+	map(0x500000, 0x5007ff).ram();
+	map(0x500380, 0x500383).r(this, FUNC(kongambl_state::test_r));
 //  AM_RANGE(0x500400, 0x500403) AM_NOP //dual port?
 //  AM_RANGE(0x500420, 0x500423) AM_NOP //dual port?
 //  AM_RANGE(0x500500, 0x500503) AM_NOP // reads sound ROM in here, polled from m68k?
-	AM_RANGE(0x580000, 0x580007) AM_READ(test_r)
+	map(0x580000, 0x580007).r(this, FUNC(kongambl_state::test_r));
 
-	AM_RANGE(0x600000, 0x60000f) AM_READ(test_r)
+	map(0x600000, 0x60000f).r(this, FUNC(kongambl_state::test_r));
 
-	AM_RANGE(0x700000, 0x700003) AM_READ(eeprom_r)
-	AM_RANGE(0x700004, 0x700007) AM_READ_PORT("IN1")
-	AM_RANGE(0x700008, 0x70000b) AM_READ_PORT("IN3")
-	AM_RANGE(0x780000, 0x780003) AM_WRITE8(eeprom_w,0xffffffff)
+	map(0x700000, 0x700003).r(this, FUNC(kongambl_state::eeprom_r));
+	map(0x700004, 0x700007).portr("IN1");
+	map(0x700008, 0x70000b).portr("IN3");
+	map(0x780000, 0x780003).w(this, FUNC(kongambl_state::eeprom_w));
 	//AM_RANGE(0x780004, 0x780007) AM_WRITENOP
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(kongambl_state::kongamaud_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM // main program (mirrored?)
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // work RAM
-	AM_RANGE(0x180000, 0x180001) AM_WRITENOP
-	AM_RANGE(0x190000, 0x190001) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITENOP
-	AM_RANGE(0x1b0000, 0x1b0001) AM_READNOP
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READNOP
-	AM_RANGE(0x200000, 0x2000ff) AM_RAM // unknown (YMZ280b?  Shared with 68020?)
-	AM_RANGE(0x280000, 0x2800ff) AM_RAM
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM
-ADDRESS_MAP_END
+void kongambl_state::kongamaud_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom(); // main program (mirrored?)
+	map(0x100000, 0x10ffff).ram(); // work RAM
+	map(0x180000, 0x180001).nopw();
+	map(0x190000, 0x190001).nopw();
+	map(0x1a0000, 0x1a0001).nopw();
+	map(0x1b0000, 0x1b0001).nopr();
+	map(0x1c0000, 0x1c0001).nopr();
+	map(0x200000, 0x2000ff).ram(); // unknown (YMZ280b?  Shared with 68020?)
+	map(0x280000, 0x2800ff).ram();
+	map(0x300000, 0x3007ff).ram();
+}
 
 
 

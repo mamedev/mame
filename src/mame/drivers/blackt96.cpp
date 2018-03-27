@@ -240,26 +240,30 @@ WRITE16_MEMBER(blackt96_state::tx_vram_w)
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-ADDRESS_MAP_START(blackt96_state::blackt96_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE8(sound_cmd_w,0xff00) // soundlatch
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE8(output_w,0x00ff) // COIN INPUT
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ( random_r ) // unk, from sound? - called in tandem with result discarded, watchdog?
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READ( random_r ) // unk, from sound? /
-	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2") AM_WRITENOP // service mode, left-over?
+void blackt96_state::blackt96_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x080001).portr("P1_P2");
+	map(0x080000, 0x080000).w(this, FUNC(blackt96_state::sound_cmd_w)); // soundlatch
+	map(0x0c0000, 0x0c0001).portr("IN1");  // COIN INPUT
+	map(0x0c0001, 0x0c0001).w(this, FUNC(blackt96_state::output_w));
+	map(0x0e0000, 0x0e0001).r(this, FUNC(blackt96_state::random_r)); // unk, from sound? - called in tandem with result discarded, watchdog?
+	map(0x0e8000, 0x0e8001).r(this, FUNC(blackt96_state::random_r)); // unk, from sound? /
+	map(0x0f0000, 0x0f0001).portr("DSW1");
+	map(0x0f0008, 0x0f0009).portr("DSW2").nopw(); // service mode, left-over?
 
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("tilemapram") // text tilemap
-	AM_RANGE(0x200000, 0x207fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x100000, 0x100fff).ram().w(this, FUNC(blackt96_state::tx_vram_w)).share("tilemapram"); // text tilemap
+	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
+	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
-ADDRESS_MAP_END
+	map(0xc00000, 0xc03fff).ram(); // main ram
+}
 
-ADDRESS_MAP_START(blackt96_state::oki1_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki1bank")
-ADDRESS_MAP_END
+void blackt96_state::oki1_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("oki1bank");
+}
 
 
 

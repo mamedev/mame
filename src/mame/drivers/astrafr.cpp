@@ -247,23 +247,27 @@ WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 
 
 
-ADDRESS_MAP_START(astrafr_state::astrafr_master_map)
-	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_mem_r, astrafr_mem_w)
-ADDRESS_MAP_END
+void astrafr_state::astrafr_master_map(address_map &map)
+{
+	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
+}
 
 
-ADDRESS_MAP_START(astrafr_state::astrafr_master_alt_map)
-	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_mem_r, astrafr_mem_w)
-ADDRESS_MAP_END
+void astrafr_state::astrafr_master_alt_map(address_map &map)
+{
+	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
+}
 
-ADDRESS_MAP_START(astrafr_state::astra_map)
-	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_mem_r, astrafr_mem_w)
-ADDRESS_MAP_END
+void astrafr_state::astra_map(address_map &map)
+{
+	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_mem_r), FUNC(astrafr_state::astrafr_mem_w));
+}
 
 // probably identical, afaik they're linked units..
-ADDRESS_MAP_START(astrafr_state::astrafr_slave_map)
-	AM_RANGE(0x000000, 0xffffffff) AM_READWRITE(astrafr_slave_mem_r, astrafr_slave_mem_w)
-ADDRESS_MAP_END
+void astrafr_state::astrafr_slave_map(address_map &map)
+{
+	map(0x000000, 0xffffffff).rw(this, FUNC(astrafr_state::astrafr_slave_mem_r), FUNC(astrafr_state::astrafr_slave_mem_w));
+}
 
 
 static INPUT_PORTS_START( astrafr )

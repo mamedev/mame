@@ -34,13 +34,15 @@ public:
 	DECLARE_DRIVER_INIT(astropc);
 };
 
-ADDRESS_MAP_START(astropc_state::astropc_map)
-	AM_RANGE(0x000c0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+void astropc_state::astropc_map(address_map &map)
+{
+	map(0x000c0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(astropc_state::astropc_io)
-ADDRESS_MAP_END
+void astropc_state::astropc_io(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( astropc )

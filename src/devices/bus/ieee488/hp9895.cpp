@@ -847,25 +847,27 @@ ROM_START(hp9895)
 	ROM_LOAD("1818-1391a.bin" , 0 , 0x2000 , CRC(b50dbfb5) SHA1(96edf9af78be75fbad2a0245b8af43958ba32752))
 ROM_END
 
-ADDRESS_MAP_START(hp9895_device::z80_program_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000 , 0x1fff) AM_ROM AM_REGION("cpu" , 0)
-	AM_RANGE(0x6000 , 0x63ff) AM_RAM
-ADDRESS_MAP_END
+void hp9895_device::z80_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom().region("cpu", 0);
+	map(0x6000, 0x63ff).ram();
+}
 
-ADDRESS_MAP_START(hp9895_device::z80_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10 , 0x17) AM_DEVWRITE("phi" , phi_device , reg8_w) AM_READ(phi_reg_r)
-	AM_RANGE(0x60 , 0x60) AM_READWRITE(data_r , data_w)
-	AM_RANGE(0x61 , 0x61) AM_READWRITE(clock_r , clock_w)
-	AM_RANGE(0x62 , 0x62) AM_READWRITE(drivstat_r , reset_w)
-	AM_RANGE(0x63 , 0x63) AM_READWRITE(switches_r , leds_w)
-	AM_RANGE(0x64 , 0x64) AM_WRITE(cntl_w)
-	AM_RANGE(0x65 , 0x65) AM_WRITE(drv_w)
-	AM_RANGE(0x66 , 0x66) AM_WRITE(xv_w)
-	AM_RANGE(0x67 , 0x67) AM_READ(switches2_r)
-ADDRESS_MAP_END
+void hp9895_device::z80_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x10, 0x17).w("phi", FUNC(phi_device::reg8_w)).r(this, FUNC(hp9895_device::phi_reg_r));
+	map(0x60, 0x60).rw(this, FUNC(hp9895_device::data_r), FUNC(hp9895_device::data_w));
+	map(0x61, 0x61).rw(this, FUNC(hp9895_device::clock_r), FUNC(hp9895_device::clock_w));
+	map(0x62, 0x62).rw(this, FUNC(hp9895_device::drivstat_r), FUNC(hp9895_device::reset_w));
+	map(0x63, 0x63).rw(this, FUNC(hp9895_device::switches_r), FUNC(hp9895_device::leds_w));
+	map(0x64, 0x64).w(this, FUNC(hp9895_device::cntl_w));
+	map(0x65, 0x65).w(this, FUNC(hp9895_device::drv_w));
+	map(0x66, 0x66).w(this, FUNC(hp9895_device::xv_w));
+	map(0x67, 0x67).r(this, FUNC(hp9895_device::switches2_r));
+}
 
 static SLOT_INTERFACE_START(hp9895_floppies)
 	SLOT_INTERFACE("8dsdd" , FLOPPY_8_DSDD)

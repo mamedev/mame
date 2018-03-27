@@ -121,26 +121,28 @@ private:
 	required_region_ptr<u8> m_p_chargen;
 };
 
-ADDRESS_MAP_START(ms6102_state::ms6102_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x0000, 0x2fff) AM_ROM
-	AM_RANGE (0x3800, 0x3bff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE (0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void ms6102_state::ms6102_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x2fff).rom();
+	map(0x3800, 0x3bff).ram().share("nvram");
+	map(0xc000, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(ms6102_state::ms6102_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
-	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
-	AM_RANGE (0x10, 0x18) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
-	AM_RANGE (0x20, 0x23) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+void ms6102_state::ms6102_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	//AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE("589wa1", ay31015_device, receive, transmit)
-	AM_RANGE (0x30, 0x3f) AM_READ(kbd_get)
-	AM_RANGE (0x40, 0x41) AM_READWRITE(crtc_r, crtc_w)
-	AM_RANGE (0x50, 0x5f) AM_NOP // video disable?
-	AM_RANGE (0x60, 0x6f) AM_WRITE(pic_w)
-	AM_RANGE (0x70, 0x7f) AM_READ(misc_r)
-ADDRESS_MAP_END
+	map(0x30, 0x3f).r(this, FUNC(ms6102_state::kbd_get));
+	map(0x40, 0x41).rw(this, FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
+	map(0x50, 0x5f).noprw(); // video disable?
+	map(0x60, 0x6f).w(this, FUNC(ms6102_state::pic_w));
+	map(0x70, 0x7f).r(this, FUNC(ms6102_state::misc_r));
+}
 
 static const gfx_layout ms6102_charlayout =
 {
@@ -360,18 +362,18 @@ MACHINE_CONFIG_END
 
 ROM_START( ms6102 )
 	ROM_REGION(0x3000, "maincpu", 0)
-	ROM_LOAD("MC6102_02_KS573RF2_DD26",   0x0000, 0x0800, CRC(f96ba806) SHA1(60d155b781e97e86d31dc2194ad367030470eeb6))
-	ROM_LOAD("MC6102_02_KS573RF2_DD30",   0x0800, 0x0800, CRC(1d69ba62) SHA1(bf7d19400fe606239ce8a057850cf4c63ff4cdb2))
-	ROM_LOAD("MC6102_02_KS573RF2_0034",   0x1000, 0x0800, CRC(4bce121a) SHA1(e97c635c2fab70a71a31db3b53284209b5881f2c))
-	ROM_LOAD("MC6102_02_KS573RF2_0037",   0x1800, 0x0800, CRC(1b22543f) SHA1(fc6cc54baf3abadca30dfaf39a50cae7fbf601b2))
-	ROM_LOAD("MC6102_02_KS573RF2_0045",   0x2000, 0x0800, CRC(fd741cfe) SHA1(153abb57ca4833286811082ff50c7b36136274dc))
-	ROM_LOAD("MC6102_02_KS573RF2_DD49",   0x2800, 0x0800, CRC(748f6cee) SHA1(a35e6495ea108824f2f1f9907f5e651174e9cf15))
+	ROM_LOAD("mc6102_02_ks573rf2_dd26",   0x0000, 0x0800, CRC(f96ba806) SHA1(60d155b781e97e86d31dc2194ad367030470eeb6))
+	ROM_LOAD("mc6102_02_ks573rf2_dd30",   0x0800, 0x0800, CRC(1d69ba62) SHA1(bf7d19400fe606239ce8a057850cf4c63ff4cdb2))
+	ROM_LOAD("mc6102_02_ks573rf2_0034",   0x1000, 0x0800, CRC(4bce121a) SHA1(e97c635c2fab70a71a31db3b53284209b5881f2c))
+	ROM_LOAD("mc6102_02_ks573rf2_0037",   0x1800, 0x0800, CRC(1b22543f) SHA1(fc6cc54baf3abadca30dfaf39a50cae7fbf601b2))
+	ROM_LOAD("mc6102_02_ks573rf2_0045",   0x2000, 0x0800, CRC(fd741cfe) SHA1(153abb57ca4833286811082ff50c7b36136274dc))
+	ROM_LOAD("mc6102_02_ks573rf2_dd49",   0x2800, 0x0800, CRC(748f6cee) SHA1(a35e6495ea108824f2f1f9907f5e651174e9cf15))
 
 	ROM_REGION(0x2000, "chargen", ROMREGION_ERASE00)
-	ROM_LOAD("MC6102_02_K555RE4_chargen", 0x1000, 0x0800, CRC(b0e3546b) SHA1(25aca264cc64f368ffcefdfd356120a314a44947))
+	ROM_LOAD("mc6102_02_k555re4_chargen", 0x1000, 0x0800, CRC(b0e3546b) SHA1(25aca264cc64f368ffcefdfd356120a314a44947))
 
 	ROM_REGION(0x0100, "charmap", 0)
-	ROM_LOAD("MC6102_02_K556RT4_D64",     0x0000, 0x0100, CRC(a59fdaa7) SHA1(0851a8b12e838e8f7e5ce840a0262facce303442))
+	ROM_LOAD("mc6102_02_k556rt4_d64",     0x0000, 0x0100, CRC(a59fdaa7) SHA1(0851a8b12e838e8f7e5ce840a0262facce303442))
 ROM_END
 
 /* Driver */

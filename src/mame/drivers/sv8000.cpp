@@ -99,21 +99,23 @@ private:
 };
 
 
-ADDRESS_MAP_START(sv8000_state::sv8000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void sv8000_state::sv8000_mem(address_map &map)
+{
+	map.unmap_value_high();
 	//AM_RANGE(0x0000, 0x0fff)      // mapped by the cartslot
-	AM_RANGE( 0x8000, 0x83ff ) AM_RAM // Work RAM??
-	AM_RANGE( 0xc000, 0xcbff ) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+	map(0x8000, 0x83ff).ram(); // Work RAM??
+	map(0xc000, 0xcbff).ram().share("videoram");
+}
 
 
-ADDRESS_MAP_START(sv8000_state::sv8000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("i8255", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("ay8910", ay8910_device, data_w)   // Not sure yet
-	AM_RANGE(0xc1, 0xc1) AM_DEVWRITE("ay8910", ay8910_device, address_w) // Not sure yet
-ADDRESS_MAP_END
+void sv8000_state::sv8000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc0, 0xc0).w("ay8910", FUNC(ay8910_device::data_w));   // Not sure yet
+	map(0xc1, 0xc1).w("ay8910", FUNC(ay8910_device::address_w)); // Not sure yet
+}
 
 
 /* Input ports */

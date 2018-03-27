@@ -3501,11 +3501,11 @@ uint32_t tms9995_device::execute_input_lines() const
 	return 2;
 }
 
-util::disasm_interface *tms9995_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms9995_device::create_disassembler()
 {
-	return new tms9900_disassembler(TMS9995_ID);
+	return std::make_unique<tms9900_disassembler>(TMS9995_ID);
 }
 
 
-DEFINE_DEVICE_TYPE(TMS9995, tms9995_device, "tms9995", "TMS9995")
-DEFINE_DEVICE_TYPE(TMS9995_MP9537, tms9995_mp9537_device, "tms9995_mp9537", "TMS9995-MP9537")
+DEFINE_DEVICE_TYPE(TMS9995, tms9995_device, "tms9995", "Texas Instruments TMS9995")
+DEFINE_DEVICE_TYPE(TMS9995_MP9537, tms9995_mp9537_device, "tms9995_mp9537", "Texas Instruments TMS9995-MP9537")

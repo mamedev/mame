@@ -1052,7 +1052,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 
 	int windowwidth  = width >> 2;
 	int windowheight = height >> 3;
-	
+
 	int dx = m_tilemap_scrolldx[layer] * (m_screen_flip ? 1 : -1);
 	int dy = m_tilemap_scrolldy[layer] * (m_screen_flip ? 1 : -1);
 
@@ -1060,7 +1060,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 	sy += dy;
 
 	int min_x, max_x, min_y, max_y;
-	
+
 	if (dx != 0)
 	{
 		min_x = 0;
@@ -1082,7 +1082,7 @@ void imagetek_i4100_device::draw_tilemap( screen_device &screen, bitmap_ind16 &b
 		min_y = cliprect.min_y;
 		max_y = cliprect.max_y;
 	}
-	
+
 	for (y = min_y; y <= max_y; y++)
 	{
 		int scrolly = (sy+y-wy)&(windowheight-1);

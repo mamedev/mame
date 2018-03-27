@@ -56,44 +56,48 @@ private:
 };
 
 
-ADDRESS_MAP_START(mice_state::mice_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("mcp", 0)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM //(U13)
-	AM_RANGE(0x6000, 0x60ff) AM_DEVREADWRITE("rpt", i8155_device, memory_r, memory_w)
-ADDRESS_MAP_END
+void mice_state::mice_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().region("mcp", 0);
+	map(0x4400, 0x47ff).ram(); //(U13)
+	map(0x6000, 0x60ff).rw("rpt", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+}
 
-ADDRESS_MAP_START(mice_state::mice_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("rpt", i8155_device, io_r, io_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+void mice_state::mice_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x50, 0x50).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x51, 0x51).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x60, 0x67).rw("rpt", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(mice_state::mice2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("cep", 0)
-	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE("rpt", i8155_device, memory_r, memory_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("rtt8155", i8155_device, memory_r, memory_w)
-ADDRESS_MAP_END
+void mice_state::mice2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom().region("cep", 0);
+	map(0x9000, 0x90ff).rw("rpt", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0xb000, 0xb7ff).ram();
+	map(0xe800, 0xe8ff).rw("rtt8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+}
 
-ADDRESS_MAP_START(mice_state::mice2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x90, 0x97) AM_DEVREADWRITE("rpt", i8155_device, io_r, io_w)
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("rttppi1", i8255_device, read, write)
-	AM_RANGE(0xc8, 0xcb) AM_DEVREADWRITE("rttppi2", i8255_device, read, write)
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("rttppi3", i8255_device, read, write)
-	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("rttppi4", i8255_device, read, write)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("rttppi5", i8255_device, read, write)
-	AM_RANGE(0xe8, 0xed) AM_DEVREADWRITE("rtt8155", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+void mice_state::mice2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x80).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x81, 0x81).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x90, 0x97).rw("rpt", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xa0, 0xa3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc0, 0xc3).rw("rttppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc8, 0xcb).rw("rttppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xd0, 0xd3).rw("rttppi3", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xd8, 0xdb).rw("rttppi4", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe0, 0xe3).rw("rttppi5", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe8, 0xed).rw("rtt8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mice )

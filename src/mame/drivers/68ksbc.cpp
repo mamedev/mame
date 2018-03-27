@@ -47,12 +47,13 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(c68ksbc_state::c68ksbc_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x002fff) AM_ROM
-	AM_RANGE(0x003000, 0x5fffff) AM_RAM
-	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void c68ksbc_state::c68ksbc_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x002fff).rom();
+	map(0x003000, 0x5fffff).ram();
+	map(0x600000, 0x600003).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+}
 
 
 /* Input ports */

@@ -16,8 +16,8 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM5A, sm5a_device, "sm5a", "SM5A") // 1.8K ROM, 5x13x4 RAM, shift registers for LCD
-DEFINE_DEVICE_TYPE(SM5L, sm5l_device, "sm5l", "SM5L") // low-power version of SM5A
+DEFINE_DEVICE_TYPE(SM5A, sm5a_device, "sm5a", "Sharp SM5A") // 1.8K ROM, 5x13x4 RAM, shift registers for LCD
+DEFINE_DEVICE_TYPE(SM5L, sm5l_device, "sm5l", "Sharp SM5L") // low-power version of SM5A
 DEFINE_DEVICE_TYPE(KB1013VK12, kb1013vk12_device, "kb1013vk1_2", "KB1013VK1-2") // Soviet-era clone of SM5A
 
 
@@ -64,9 +64,9 @@ kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *
 
 
 // disasm
-util::disasm_interface *sm5a_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm5a_device::create_disassembler()
 {
-	return new sm5a_disassembler;
+	return std::make_unique<sm5a_disassembler>();
 }
 
 

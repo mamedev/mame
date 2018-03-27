@@ -315,28 +315,29 @@ READ32_MEMBER(aleck64_state::aleck_dips_r)
     4MB @ 0xd0800000 - 0xd0bfffff doncdoon, hipai, kurufev, twrshaft, srmvs : unused
  */
 
-ADDRESS_MAP_START(aleck64_state::n64_map)
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM /*AM_MIRROR(0xc0000000)*/ AM_SHARE("rdram")             // RDRAM
+void aleck64_state::n64_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).ram() /*.mirror(0xc0000000)*/ .share("rdram");             // RDRAM
 
-	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
-	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")                    // RSP DMEM
-	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("rsp_imem")                    // RSP IMEM
-	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE("rcp", n64_periphs, sp_reg_r, sp_reg_w)  // RSP
-	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE("rcp", n64_periphs, dp_reg_r, dp_reg_w)  // RDP
-	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE("rcp", n64_periphs, mi_reg_r, mi_reg_w)    // MIPS Interface
-	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE("rcp", n64_periphs, vi_reg_r, vi_reg_w)    // Video Interface
-	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE("rcp", n64_periphs, ai_reg_r, ai_reg_w)    // Audio Interface
-	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE("rcp", n64_periphs, pi_reg_r, pi_reg_w)    // Peripheral Interface
-	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE("rcp", n64_periphs, ri_reg_r, ri_reg_w)    // RDRAM Interface
-	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE("rcp", n64_periphs, si_reg_r, si_reg_w)    // Serial Interface
-	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)   // Cartridge
-	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)   // PIF ROM
-	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
+	map(0x03f00000, 0x03f00027).rw("rcp", FUNC(n64_periphs::rdram_reg_r), FUNC(n64_periphs::rdram_reg_w));
+	map(0x04000000, 0x04000fff).ram().share("rsp_dmem");                    // RSP DMEM
+	map(0x04001000, 0x04001fff).ram().share("rsp_imem");                    // RSP IMEM
+	map(0x04040000, 0x040fffff).rw("rcp", FUNC(n64_periphs::sp_reg_r), FUNC(n64_periphs::sp_reg_w));  // RSP
+	map(0x04100000, 0x041fffff).rw("rcp", FUNC(n64_periphs::dp_reg_r), FUNC(n64_periphs::dp_reg_w));  // RDP
+	map(0x04300000, 0x043fffff).rw("rcp", FUNC(n64_periphs::mi_reg_r), FUNC(n64_periphs::mi_reg_w));    // MIPS Interface
+	map(0x04400000, 0x044fffff).rw("rcp", FUNC(n64_periphs::vi_reg_r), FUNC(n64_periphs::vi_reg_w));    // Video Interface
+	map(0x04500000, 0x045fffff).rw("rcp", FUNC(n64_periphs::ai_reg_r), FUNC(n64_periphs::ai_reg_w));    // Audio Interface
+	map(0x04600000, 0x046fffff).rw("rcp", FUNC(n64_periphs::pi_reg_r), FUNC(n64_periphs::pi_reg_w));    // Peripheral Interface
+	map(0x04700000, 0x047fffff).rw("rcp", FUNC(n64_periphs::ri_reg_r), FUNC(n64_periphs::ri_reg_w));    // RDRAM Interface
+	map(0x04800000, 0x048fffff).rw("rcp", FUNC(n64_periphs::si_reg_r), FUNC(n64_periphs::si_reg_w));    // Serial Interface
+	map(0x10000000, 0x13ffffff).rom().region("user2", 0);   // Cartridge
+	map(0x1fc00000, 0x1fc007bf).rom().region("user1", 0);   // PIF ROM
+	map(0x1fc007c0, 0x1fc007ff).rw("rcp", FUNC(n64_periphs::pif_ram_r), FUNC(n64_periphs::pif_ram_w));
 
-	AM_RANGE(0xc0000000, 0xc07fffff) AM_RAM // SDRAM, Aleck 64 specific
+	map(0xc0000000, 0xc07fffff).ram(); // SDRAM, Aleck 64 specific
 
-	AM_RANGE(0xc0800000, 0xc0800fff) AM_READWRITE(aleck_dips_r,aleck_dips_w)
-ADDRESS_MAP_END
+	map(0xc0800000, 0xc0800fff).rw(this, FUNC(aleck64_state::aleck_dips_r), FUNC(aleck64_state::aleck_dips_w));
+}
 
 /*
  E90 protection handlers
@@ -369,19 +370,21 @@ WRITE16_MEMBER(aleck64_state::e90_prot_w)
 	}
 }
 
-ADDRESS_MAP_START(aleck64_state::e90_map)
-	AM_IMPORT_FROM( n64_map )
-	AM_RANGE(0xd0000000, 0xd0000fff) AM_RAM AM_SHARE("e90vram")// x/y offsets
-	AM_RANGE(0xd0010000, 0xd0010fff) AM_RAM AM_SHARE("e90pal")// RGB555 palette
-	AM_RANGE(0xd0030000, 0xd003001f) AM_READWRITE16(e90_prot_r, e90_prot_w,0xffffffff)
-ADDRESS_MAP_END
+void aleck64_state::e90_map(address_map &map)
+{
+	n64_map(map);
+	map(0xd0000000, 0xd0000fff).ram().share("e90vram");// x/y offsets
+	map(0xd0010000, 0xd0010fff).ram().share("e90pal");// RGB555 palette
+	map(0xd0030000, 0xd003001f).rw(this, FUNC(aleck64_state::e90_prot_r), FUNC(aleck64_state::e90_prot_w));
+}
 
-ADDRESS_MAP_START(aleck64_state::rsp_map)
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("rsp_dmem")
-	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("rsp_imem")
-	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("rsp_dmem")
-	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("rsp_imem")
-ADDRESS_MAP_END
+void aleck64_state::rsp_map(address_map &map)
+{
+	map(0x00000000, 0x00000fff).ram().share("rsp_dmem");
+	map(0x00001000, 0x00001fff).ram().share("rsp_imem");
+	map(0x04000000, 0x04000fff).ram().share("rsp_dmem");
+	map(0x04001000, 0x04001fff).ram().share("rsp_imem");
+}
 
 static INPUT_PORTS_START( aleck64 )
 	PORT_START("input")

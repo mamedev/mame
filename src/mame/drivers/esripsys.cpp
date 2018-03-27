@@ -564,50 +564,54 @@ WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(esripsys_state::game_cpu_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_SHARE("pal_ram")
-	AM_RANGE(0x4300, 0x4300) AM_WRITE(esripsys_bg_intensity_w)
-	AM_RANGE(0x4400, 0x47ff) AM_NOP // Collision detection RAM
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(g_status_r, g_status_w)
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(g_iobus_r, g_iobus_w)
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(g_ioadd_w)
-	AM_RANGE(0x5400, 0x57ff) AM_NOP
-	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(uart_r, uart_w)
-	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void esripsys_state::game_cpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("share1");
+	map(0x4000, 0x42ff).ram().share("pal_ram");
+	map(0x4300, 0x4300).w(this, FUNC(esripsys_state::esripsys_bg_intensity_w));
+	map(0x4400, 0x47ff).noprw(); // Collision detection RAM
+	map(0x4800, 0x4bff).rw(this, FUNC(esripsys_state::g_status_r), FUNC(esripsys_state::g_status_w));
+	map(0x4c00, 0x4fff).rw(this, FUNC(esripsys_state::g_iobus_r), FUNC(esripsys_state::g_iobus_w));
+	map(0x5000, 0x53ff).w(this, FUNC(esripsys_state::g_ioadd_w));
+	map(0x5400, 0x57ff).noprw();
+	map(0x5c00, 0x5fff).rw(this, FUNC(esripsys_state::uart_r), FUNC(esripsys_state::uart_w));
+	map(0x6000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(esripsys_state::frame_cpu_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(fdt_r, fdt_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(f_status_r, f_status_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(frame_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void esripsys_state::frame_cpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("share1");
+	map(0x4000, 0x4fff).rw(this, FUNC(esripsys_state::fdt_r), FUNC(esripsys_state::fdt_w));
+	map(0x6000, 0x6000).rw(this, FUNC(esripsys_state::f_status_r), FUNC(esripsys_state::f_status_w));
+	map(0x8000, 0x8000).w(this, FUNC(esripsys_state::frame_w));
+	map(0xc000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(esripsys_state::sound_cpu_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM // Not installed on later PCBs
-	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
-	AM_RANGE(0x200a, 0x200b) AM_WRITE(esripsys_dac_w)
-	AM_RANGE(0x200c, 0x200c) AM_DEVWRITE("dacvol", dac_byte_interface, write)
-	AM_RANGE(0x200d, 0x200d) AM_WRITE(control_w)
-	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)
-	AM_RANGE(0x200f, 0x200f) AM_READWRITE(s_200f_r, s_200f_w)
-	AM_RANGE(0x2020, 0x2027) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void esripsys_state::sound_cpu_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0fff).ram(); // Not installed on later PCBs
+	map(0x2008, 0x2009).rw(this, FUNC(esripsys_state::tms5220_r), FUNC(esripsys_state::tms5220_w));
+	map(0x200a, 0x200b).w(this, FUNC(esripsys_state::esripsys_dac_w));
+	map(0x200c, 0x200c).w("dacvol", FUNC(dac_byte_interface::write));
+	map(0x200d, 0x200d).w(this, FUNC(esripsys_state::control_w));
+	map(0x200e, 0x200e).rw(this, FUNC(esripsys_state::s_200e_r), FUNC(esripsys_state::s_200e_w));
+	map(0x200f, 0x200f).rw(this, FUNC(esripsys_state::s_200f_r), FUNC(esripsys_state::s_200f_w));
+	map(0x2020, 0x2027).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x8000, 0x9fff).bankr("bank2");
+	map(0xa000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xdfff).bankr("bank4");
+	map(0xe000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(esripsys_state::video_cpu_map)
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
+void esripsys_state::video_cpu_map(address_map &map)
+{
+	map(0x000, 0x1ff).rom();
+}
 
 
 /*************************************

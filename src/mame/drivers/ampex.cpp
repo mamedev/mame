@@ -157,20 +157,21 @@ WRITE_LINE_MEMBER(ampex_state::dav_w)
 	// DAV should generate RST 7
 }
 
-ADDRESS_MAP_START(ampex_state::mem_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM // main RAM
-	AM_RANGE(0x4400, 0x57ff) AM_RAM // expansion RAM
-	AM_RANGE(0x5840, 0x5840) AM_READWRITE(read_5840, write_5840)
-	AM_RANGE(0x5841, 0x5841) AM_READWRITE(read_5841, write_5841)
-	AM_RANGE(0x5842, 0x5842) AM_READ(read_5842) AM_DEVWRITE("uart", ay31015_device, transmit)
-	AM_RANGE(0x5843, 0x5843) AM_DEVREAD("uart", ay31015_device, receive) AM_WRITE(write_5843)
-	AM_RANGE(0x5846, 0x5846) AM_READ(read_5846)
-	AM_RANGE(0x5847, 0x5847) AM_READ(read_5847)
-	AM_RANGE(0x5c00, 0x5c0f) AM_DEVREADWRITE("vtac", crt5037_device, read, write)
-	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(page_r, page_w)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM // video RAM
-ADDRESS_MAP_END
+void ampex_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom().region("roms", 0);
+	map(0x4000, 0x43ff).ram(); // main RAM
+	map(0x4400, 0x57ff).ram(); // expansion RAM
+	map(0x5840, 0x5840).rw(this, FUNC(ampex_state::read_5840), FUNC(ampex_state::write_5840));
+	map(0x5841, 0x5841).rw(this, FUNC(ampex_state::read_5841), FUNC(ampex_state::write_5841));
+	map(0x5842, 0x5842).r(this, FUNC(ampex_state::read_5842)).w(m_uart, FUNC(ay31015_device::transmit));
+	map(0x5843, 0x5843).r(m_uart, FUNC(ay31015_device::receive)).w(this, FUNC(ampex_state::write_5843));
+	map(0x5846, 0x5846).r(this, FUNC(ampex_state::read_5846));
+	map(0x5847, 0x5847).r(this, FUNC(ampex_state::read_5847));
+	map(0x5c00, 0x5c0f).rw("vtac", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
+	map(0x8000, 0x97ff).rw(this, FUNC(ampex_state::page_r), FUNC(ampex_state::page_w));
+	map(0xc000, 0xcfff).ram(); // video RAM
+}
 
 static INPUT_PORTS_START( ampex )
 INPUT_PORTS_END

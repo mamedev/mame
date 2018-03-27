@@ -496,18 +496,20 @@ static INPUT_PORTS_START( europc )
 	PORT_BIT(0xfffe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(europc_pc_state::europc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void europc_pc_state::europc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(europc_pc_state::europc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
-	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r, europc_jim_w)
-	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
-ADDRESS_MAP_END
+void europc_pc_state::europc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
+	map(0x0060, 0x0063).rw(this, FUNC(europc_pc_state::europc_pio_r), FUNC(europc_pc_state::europc_pio_w));
+	map(0x0250, 0x025f).rw(this, FUNC(europc_pc_state::europc_jim_r), FUNC(europc_pc_state::europc_jim_w));
+	map(0x02e0, 0x02e0).r(this, FUNC(europc_pc_state::europc_jim2_r));
+}
 
 /* single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive */
 void europc_pc_state::cfg_builtin_720K(device_t *device)

@@ -420,21 +420,23 @@ READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
 }
 
 
-ADDRESS_MAP_START(ghosteo_state::bballoon_map)
-	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
-	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
-	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
-	AM_RANGE(0x10300000, 0x10300003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
-ADDRESS_MAP_END
+void ghosteo_state::bballoon_map(address_map &map)
+{
+	map(0x10000000, 0x10000003).portr("10000000");
+	map(0x10100000, 0x10100003).portr("10100000");
+	map(0x10200000, 0x10200003).portr("10200000");
+	map(0x10300000, 0x10300000).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0x30000000, 0x31ffffff).ram().share("systememory").mirror(0x02000000);
+}
 
-ADDRESS_MAP_START(ghosteo_state::touryuu_map)
-	AM_RANGE(0x10000000, 0x10000003) AM_READ(touryuu_port_10000000_r)
-	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
-	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
-	AM_RANGE(0x10300000, 0x10300003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff).cswidth(32)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
-ADDRESS_MAP_END
+void ghosteo_state::touryuu_map(address_map &map)
+{
+	map(0x10000000, 0x10000003).r(this, FUNC(ghosteo_state::touryuu_port_10000000_r));
+	map(0x10100000, 0x10100003).portr("10100000");
+	map(0x10200000, 0x10200003).portr("10200000");
+	map(0x10300000, 0x10300000).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0x30000000, 0x31ffffff).ram().share("systememory").mirror(0x02000000);
+}
 
 
 /*
@@ -746,10 +748,10 @@ ROM_START( touryuu )
 
 	// banked every 0x10000 bytes ?
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 )
-	ROM_LOAD( "4m.eeprom_c.s(bad1h).u20",       0x000000, 0x080000, CRC(f81a6530) SHA1(c7fa412102328d06823e73d7d07cadfc25db6d28) )
+	ROM_LOAD( "4m.eeprom_c.s,bad1h.u20",       0x000000, 0x080000, CRC(f81a6530) SHA1(c7fa412102328d06823e73d7d07cadfc25db6d28) )
 
 	ROM_REGION( 0x1000000, "qs1000", 0 )
-	ROM_LOAD( "8m.eprom_c.s(f8b1h).u16",       0x000000, 0x100000, CRC(238a85ab) SHA1(ddd79429c0c1e67fcbca1e4ebded97ea46229f0b) ) /* QDSP samples (SFX) */
+	ROM_LOAD( "8m.eprom_c.s,f8b1h.u16",       0x000000, 0x100000, CRC(238a85ab) SHA1(ddd79429c0c1e67fcbca1e4ebded97ea46229f0b) ) /* QDSP samples (SFX) */
 	ROM_LOAD( "qs1001a.u17",  0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) /* QDSP wavetable rom */
 ROM_END
 

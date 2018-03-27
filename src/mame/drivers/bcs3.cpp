@@ -133,31 +133,34 @@ READ8_MEMBER( bcs3_state::zx_r )
 	return 0xf7;
 }
 
-ADDRESS_MAP_START(bcs3_state::bcs3_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_MIRROR(0x2000) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x1000, 0x13ff ) AM_MIRROR(0x2000) AM_READ(keyboard_r)
-	AM_RANGE( 0x1400, 0x17ff ) AM_MIRROR(0x2000) AM_NOP //  /WAIT circuit
-	AM_RANGE( 0x1800, 0x1bff ) AM_MIRROR(0x2000) AM_READ(video_r)
-	AM_RANGE( 0x1c00, 0x1fff ) AM_MIRROR(0x2000) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void bcs3_state::bcs3_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).mirror(0x2000).rom().region("roms", 0);
+	map(0x1000, 0x13ff).mirror(0x2000).r(this, FUNC(bcs3_state::keyboard_r));
+	map(0x1400, 0x17ff).mirror(0x2000).noprw(); //  /WAIT circuit
+	map(0x1800, 0x1bff).mirror(0x2000).r(this, FUNC(bcs3_state::video_r));
+	map(0x1c00, 0x1fff).mirror(0x2000).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(bcs3_state::bcs3a_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_MIRROR(0x2000) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x1000, 0x13ff ) AM_MIRROR(0x2000) AM_READ(keyboard_r)
-	AM_RANGE( 0x1400, 0x17ff ) AM_MIRROR(0x2000) AM_NOP //  /WAIT circuit
-	AM_RANGE( 0x1800, 0x1bff ) AM_MIRROR(0x2000) AM_READ(zx_r)
-	AM_RANGE( 0x3c00, 0x7fff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM AM_REGION("roms", 0x1000)
-ADDRESS_MAP_END
+void bcs3_state::bcs3a_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).mirror(0x2000).rom().region("roms", 0);
+	map(0x1000, 0x13ff).mirror(0x2000).r(this, FUNC(bcs3_state::keyboard_r));
+	map(0x1400, 0x17ff).mirror(0x2000).noprw(); //  /WAIT circuit
+	map(0x1800, 0x1bff).mirror(0x2000).r(this, FUNC(bcs3_state::zx_r));
+	map(0x3c00, 0x7fff).ram().share("videoram");
+	map(0xf000, 0xf3ff).rom().region("roms", 0x1000);
+}
 
-ADDRESS_MAP_START(bcs3_state::bcs3_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(3)
+void bcs3_state::bcs3_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(3);
 	// coded in the rom as F8 to FB
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+	map(0x00, 0x03).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( bcs3 )

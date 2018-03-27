@@ -80,7 +80,7 @@ void segas24_tile_device::device_start()
 	tile_ram = std::make_unique<uint16_t[]>(0x10000/2);
 	m_xhout_write_cb.resolve_safe();
 	m_xvout_write_cb.resolve_safe();
-	
+
 	tile_layer[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(segas24_tile_device::tile_info_0s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 	tile_layer[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(segas24_tile_device::tile_info_0w),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 	tile_layer[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(segas24_tile_device::tile_info_1s),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);

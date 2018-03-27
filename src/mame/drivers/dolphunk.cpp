@@ -184,19 +184,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::dauphin_c)
 		m_cass->output(BIT(m_cass_data, 0) ? -1.0 : +1.0); // 2000Hz
 }
 
-ADDRESS_MAP_START(dauphin_state::dauphin_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x01ff) AM_ROM
-	AM_RANGE( 0x0200, 0x02ff) AM_RAM
-	AM_RANGE( 0x0c00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void dauphin_state::dauphin_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x01ff).rom();
+	map(0x0200, 0x02ff).ram();
+	map(0x0c00, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(dauphin_state::dauphin_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_WRITE(port00_w) // 4-led display
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)  // speaker (NOT a keyclick)
-	AM_RANGE(0x07, 0x07) AM_READ(port07_r) // pushbuttons
-ADDRESS_MAP_END
+void dauphin_state::dauphin_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x03).w(this, FUNC(dauphin_state::port00_w)); // 4-led display
+	map(0x06, 0x06).w(this, FUNC(dauphin_state::port06_w));  // speaker (NOT a keyclick)
+	map(0x07, 0x07).r(this, FUNC(dauphin_state::port07_r)); // pushbuttons
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dauphin )

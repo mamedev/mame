@@ -465,40 +465,44 @@ WRITE8_MEMBER(sfkick_state::page3_w)
 
 
 
-ADDRESS_MAP_START(sfkick_state::sfkick_map)
-	AM_RANGE( 0x0000, 0x1fff) AM_ROMBANK("bank1")
-	AM_RANGE( 0x2000, 0x3fff) AM_ROMBANK("bank2")
-	AM_RANGE( 0x4000, 0x5fff) AM_ROMBANK("bank3")
-	AM_RANGE( 0x6000, 0x7fff) AM_ROMBANK("bank4")
-	AM_RANGE( 0x8000, 0x9fff) AM_ROMBANK("bank5")
-	AM_RANGE( 0xa000, 0xbfff) AM_ROMBANK("bank6")
-	AM_RANGE( 0xc000, 0xdfff) AM_ROMBANK("bank7")
-	AM_RANGE( 0xe000, 0xffff) AM_ROMBANK("bank8")
-	AM_RANGE( 0x0000, 0x3fff) AM_WRITE(page0_w )
-	AM_RANGE( 0x4000, 0x7fff) AM_WRITE(page1_w )
-	AM_RANGE( 0x8000, 0xbfff) AM_WRITE(page2_w )
-	AM_RANGE( 0xc000, 0xffff) AM_WRITE(page3_w )
-ADDRESS_MAP_END
+void sfkick_state::sfkick_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank1");
+	map(0x2000, 0x3fff).bankr("bank2");
+	map(0x4000, 0x5fff).bankr("bank3");
+	map(0x6000, 0x7fff).bankr("bank4");
+	map(0x8000, 0x9fff).bankr("bank5");
+	map(0xa000, 0xbfff).bankr("bank6");
+	map(0xc000, 0xdfff).bankr("bank7");
+	map(0xe000, 0xffff).bankr("bank8");
+	map(0x0000, 0x3fff).w(this, FUNC(sfkick_state::page0_w));
+	map(0x4000, 0x7fff).w(this, FUNC(sfkick_state::page1_w));
+	map(0x8000, 0xbfff).w(this, FUNC(sfkick_state::page2_w));
+	map(0xc000, 0xffff).w(this, FUNC(sfkick_state::page3_w));
+}
 
-ADDRESS_MAP_START(sfkick_state::sfkick_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0xa0, 0xa7) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE( "v9938", v9938_device, read, write)
-	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0xb4, 0xb5) AM_RAM /* loopback ? req by sfkicka (MSX Bios leftover)*/
-ADDRESS_MAP_END
+void sfkick_state::sfkick_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xa0, 0xa7).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb4, 0xb5).ram(); /* loopback ? req by sfkicka (MSX Bios leftover)*/
+}
 
-ADDRESS_MAP_START(sfkick_state::sfkick_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void sfkick_state::sfkick_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(sfkick_state::sfkick_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-ADDRESS_MAP_END
+void sfkick_state::sfkick_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x04, 0x05).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 WRITE8_MEMBER(sfkick_state::ppi_port_c_w)
 {

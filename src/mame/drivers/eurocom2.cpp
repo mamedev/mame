@@ -330,26 +330,28 @@ uint32_t eurocom2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(eurocom2_state::eurocom2_map)
-	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xfcef) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xfcf0, 0xfcf3) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0xfcf4, 0xfcf5) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0xfcf6, 0xfcf7) AM_WRITE(vico_w)
-	AM_RANGE(0xfcf8, 0xfcfb) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0xfd30, 0xfd37) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0xfd38, 0xfd38) AM_READWRITE(fdc_aux_r, fdc_aux_w)
-	AM_RANGE(0xfd40, 0xffff) AM_ROM AM_REGION("maincpu", 0xd40) AM_WRITENOP
-ADDRESS_MAP_END
+void eurocom2_state::eurocom2_map(address_map &map)
+{
+	map(0x0000, 0xefff).ram().share("videoram");
+	map(0xf000, 0xfcef).rom().region("maincpu", 0);
+	map(0xfcf0, 0xfcf3).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xfcf4, 0xfcf5).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xfcf6, 0xfcf7).w(this, FUNC(eurocom2_state::vico_w));
+	map(0xfcf8, 0xfcfb).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xfd30, 0xfd37).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0xfd38, 0xfd38).rw(this, FUNC(eurocom2_state::fdc_aux_r), FUNC(eurocom2_state::fdc_aux_w));
+	map(0xfd40, 0xffff).rom().region("maincpu", 0xd40).nopw();
+}
 
-ADDRESS_MAP_START(waveterm_state::waveterm_map)
-	AM_IMPORT_FROM(eurocom2_map)
-	AM_RANGE(0xfd00, 0xfd03) AM_DEVREADWRITE("pia3", pia6821_device, read, write)
-	AM_RANGE(0xfd08, 0xfd0f) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
-	AM_RANGE(0xfd10, 0xfd17) AM_UNMAP
-	AM_RANGE(0xfd18, 0xfd18) AM_READ(waveterm_adc)  //  AD558 ADC
+void waveterm_state::waveterm_map(address_map &map)
+{
+	eurocom2_map(map);
+	map(0xfd00, 0xfd03).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xfd08, 0xfd0f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0xfd10, 0xfd17).unmaprw();
+	map(0xfd18, 0xfd18).r(this, FUNC(waveterm_state::waveterm_adc));  //  AD558 ADC
 //  AM_RANGE(0xfd20, 0xfd20) AM_READ(waveterm_dac)  //  ZN432 DAC ??
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START(eurocom2)
 	PORT_START("S1")

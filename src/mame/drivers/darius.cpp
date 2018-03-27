@@ -192,40 +192,43 @@ WRITE16_MEMBER(darius_state::coin_w)
                      MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(darius_state::darius_map)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM                                             /* main RAM */
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0xc00000, 0xc00001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
-	AM_RANGE(0xc00002, 0xc00003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xc00008, 0xc00009) AM_READ_PORT("P1")
-	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("P2")
-	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(coin_r)
-	AM_RANGE(0xc00010, 0xc00011) AM_READ_PORT("DSW")
-	AM_RANGE(0xc00050, 0xc00051) AM_NOP // unknown, written by both cpus - always 0?
-	AM_RANGE(0xc00060, 0xc00061) AM_WRITE(coin_w)
-	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)  /* tilemaps */
-	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
-	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
-	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE("pc080sn", pc080sn_device, ctrl_word_w)
-	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")/* palette */
-	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("fg_ram")
-	AM_RANGE(0xe10000, 0xe10fff) AM_RAM                                             /* ??? */
-ADDRESS_MAP_END
+void darius_state::darius_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x080000, 0x08ffff).ram();                                             /* main RAM */
+	map(0x0a0000, 0x0a0001).w(this, FUNC(darius_state::cpua_ctrl_w));
+	map(0x0b0000, 0x0b0001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0xc00000, 0xc00001).nopr();
+	map(0xc00001, 0xc00001).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0xc00003, 0xc00003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0xc00008, 0xc00009).portr("P1");
+	map(0xc0000a, 0xc0000b).portr("P2");
+	map(0xc0000c, 0xc0000d).portr("SYSTEM");
+	map(0xc0000e, 0xc0000f).r(this, FUNC(darius_state::coin_r));
+	map(0xc00010, 0xc00011).portr("DSW");
+	map(0xc00050, 0xc00051).noprw(); // unknown, written by both cpus - always 0?
+	map(0xc00060, 0xc00061).w(this, FUNC(darius_state::coin_w));
+	map(0xd00000, 0xd0ffff).rw(m_pc080sn, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));  /* tilemaps */
+	map(0xd20000, 0xd20003).w(m_pc080sn, FUNC(pc080sn_device::yscroll_word_w));
+	map(0xd40000, 0xd40003).w(m_pc080sn, FUNC(pc080sn_device::xscroll_word_w));
+	map(0xd50000, 0xd50003).w(m_pc080sn, FUNC(pc080sn_device::ctrl_word_w));
+	map(0xd80000, 0xd80fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");/* palette */
+	map(0xe00100, 0xe00fff).ram().share("spriteram");
+	map(0xe01000, 0xe02fff).ram().share("share2");
+	map(0xe08000, 0xe0ffff).ram().w(this, FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
+	map(0xe10000, 0xe10fff).ram();                                             /* ??? */
+}
 
-ADDRESS_MAP_START(darius_state::darius_cpub_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_RAM             /* local RAM */
-	AM_RANGE(0xc00050, 0xc00051) AM_NOP // unknown, written by both cpus - always 0?
-	AM_RANGE(0xd80000, 0xd80fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("fg_ram")
-ADDRESS_MAP_END
+void darius_state::darius_cpub_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x04ffff).ram();             /* local RAM */
+	map(0xc00050, 0xc00051).noprw(); // unknown, written by both cpus - always 0?
+	map(0xd80000, 0xd80fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xe00100, 0xe00fff).ram().share("spriteram");
+	map(0xe01000, 0xe02fff).ram().share("share2");
+	map(0xe08000, 0xe0ffff).ram().w(this, FUNC(darius_state::darius_fg_layer_w)).share("fg_ram");
+}
 
 
 /*****************************************************
@@ -418,28 +421,30 @@ WRITE8_MEMBER(darius_state::darius_write_portB1)
            Sound memory structures / ADPCM
 *****************************************************/
 
-ADDRESS_MAP_START(darius_state::darius_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(darius_psg0_pan)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(darius_psg1_pan)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(darius_da_pan)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(adpcm_command_w)  /* ADPCM command for second Z80 to read from port 0x00 */
+void darius_state::darius_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb000, 0xb000).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xb001, 0xb001).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+	map(0xc000, 0xc000).w(this, FUNC(darius_state::darius_fm0_pan));
+	map(0xc400, 0xc400).w(this, FUNC(darius_state::darius_fm1_pan));
+	map(0xc800, 0xc800).w(this, FUNC(darius_state::darius_psg0_pan));
+	map(0xcc00, 0xcc00).w(this, FUNC(darius_state::darius_psg1_pan));
+	map(0xd000, 0xd000).w(this, FUNC(darius_state::darius_da_pan));
+	map(0xd400, 0xd400).w(this, FUNC(darius_state::adpcm_command_w));  /* ADPCM command for second Z80 to read from port 0x00 */
 //  AM_RANGE(0xd800, 0xd800) AM_WRITE(display_value)    /* ??? */
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(sound_bankswitch_w)
-ADDRESS_MAP_END
+	map(0xdc00, 0xdc00).w(this, FUNC(darius_state::sound_bankswitch_w));
+}
 
-ADDRESS_MAP_START(darius_state::darius_sound2_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
+void darius_state::darius_sound2_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().nopw();
 	/* yes, no RAM */
-ADDRESS_MAP_END
+}
 
 
 WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
@@ -482,13 +487,14 @@ WRITE8_MEMBER(darius_state::adpcm_data_w)
 	m_msm->reset_w(!(data & 0x20));    /* my best guess, but it could be output enable as well */
 }
 
-ADDRESS_MAP_START(darius_state::darius_sound2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(adpcm_command_read, adpcm_nmi_disable)
-	AM_RANGE(0x01, 0x01) AM_WRITE(adpcm_nmi_enable)
-	AM_RANGE(0x02, 0x02) AM_READ(readport2) AM_WRITE(adpcm_data_w)  /* readport2 ??? */
-	AM_RANGE(0x03, 0x03) AM_READ(readport3) /* ??? */
-ADDRESS_MAP_END
+void darius_state::darius_sound2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(this, FUNC(darius_state::adpcm_command_read), FUNC(darius_state::adpcm_nmi_disable));
+	map(0x01, 0x01).w(this, FUNC(darius_state::adpcm_nmi_enable));
+	map(0x02, 0x02).r(this, FUNC(darius_state::readport2)).w(this, FUNC(darius_state::adpcm_data_w));  /* readport2 ??? */
+	map(0x03, 0x03).r(this, FUNC(darius_state::readport3)); /* ??? */
+}
 
 
 /***********************************************************

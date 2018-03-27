@@ -1053,9 +1053,9 @@ ATTR_HOT void netlist_mame_cpu_device::execute_run()
 	}
 }
 
-util::disasm_interface *netlist_mame_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> netlist_mame_cpu_device::create_disassembler()
 {
-	return new netlist_disassembler(this);
+	return std::make_unique<netlist_disassembler>(this);
 }
 
 netlist_disassembler::netlist_disassembler(netlist_mame_cpu_device *dev) : m_dev(dev)

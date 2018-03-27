@@ -703,7 +703,7 @@ void am29000_cpu_device::execute_set_input(int inputnum, int state)
 	// TODO : CHECK IRQs
 }
 
-util::disasm_interface *am29000_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> am29000_cpu_device::create_disassembler()
 {
-	return new am29000_disassembler;
+	return std::make_unique<am29000_disassembler>();
 }

@@ -117,8 +117,9 @@ const tiny_rom_entry *abc80_keyboard_device::device_rom_region() const
 //  ADDRESS_MAP( abc80_keyboard_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc80_keyboard_device::abc80_keyboard_io)
-ADDRESS_MAP_END
+void abc80_keyboard_device::abc80_keyboard_io(address_map &map)
+{
+}
 
 
 //-------------------------------------------------

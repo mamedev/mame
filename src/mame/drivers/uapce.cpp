@@ -243,14 +243,15 @@ void uapce_state::machine_reset()
 	m_jamma_if_control_latch = 0;
 }
 
-ADDRESS_MAP_START(uapce_state::z80_map)
-	AM_RANGE( 0x0000, 0x07FF) AM_ROM
-	AM_RANGE( 0x0800, 0x0FFF) AM_RAM
-	AM_RANGE( 0x1000, 0x17FF) AM_WRITE(jamma_if_control_latch_w )
-	AM_RANGE( 0x1800, 0x1FFF) AM_READ(jamma_if_read_dsw )
-	AM_RANGE( 0x2000, 0x27FF) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x2800, 0x2FFF) AM_READ(jamma_if_control_latch_r )
-ADDRESS_MAP_END
+void uapce_state::z80_map(address_map &map)
+{
+	map(0x0000, 0x07FF).rom();
+	map(0x0800, 0x0FFF).ram();
+	map(0x1000, 0x17FF).w(this, FUNC(uapce_state::jamma_if_control_latch_w));
+	map(0x1800, 0x1FFF).r(this, FUNC(uapce_state::jamma_if_read_dsw));
+	map(0x2000, 0x27FF).portr("COIN");
+	map(0x2800, 0x2FFF).r(this, FUNC(uapce_state::jamma_if_control_latch_r));
+}
 
 
 static INPUT_PORTS_START( uapce )
@@ -286,20 +287,22 @@ static INPUT_PORTS_START( uapce )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(uapce_state::pce_mem)
-	AM_RANGE( 0x000000, 0x09FFFF) AM_ROM
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE("c6280", c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(pce_joystick_r, pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
-ADDRESS_MAP_END
+void uapce_state::pce_mem(address_map &map)
+{
+	map(0x000000, 0x09FFFF).rom();
+	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
+	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
+	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
+	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(uapce_state::pce_joystick_r), FUNC(uapce_state::pce_joystick_w));
+	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
+}
 
-ADDRESS_MAP_START(uapce_state::pce_io)
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-ADDRESS_MAP_END
+void uapce_state::pce_io(address_map &map)
+{
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+}
 
 
 MACHINE_CONFIG_START(uapce_state::uapce)

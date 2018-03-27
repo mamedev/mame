@@ -47,7 +47,6 @@ Note about version levels using Mutant Fighter as the example:
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "machine/decocrpt.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
@@ -106,63 +105,65 @@ READ16_MEMBER(cninja_state::cninjabl2_sprite_dma_r)
 }
 
 
-ADDRESS_MAP_START(cninja_state::cninja_map)
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+void cninja_state::cninja_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom();
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
-	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
+	map(0x144000, 0x144fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x146000, 0x146fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x14c000, 0x14c7ff).writeonly().share("pf1_rowscroll");
+	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITE(cninja_pf34_control_w)
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_SHARE("pf3_rowscroll")
-	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_SHARE("pf4_rowscroll")
+	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));
+	map(0x154000, 0x154fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x156000, 0x156fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
+	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
 
-	AM_RANGE(0x184000, 0x187fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x190000, 0x190007) AM_DEVICE8("irq", deco_irq_device, map, 0x00ff)
-	AM_RANGE(0x19c000, 0x19dfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x184000, 0x187fff).ram().share("ram");
+	map(0x190000, 0x190007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
+	map(0x19c000, 0x19dfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x1a4000, 0x1a47ff) AM_RAM AM_SHARE("spriteram")           /* Sprites */
-	AM_RANGE(0x1b4000, 0x1b4001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
-	AM_RANGE(0x1bc000, 0x1bffff) AM_READWRITE(cninja_protection_region_0_104_r,cninja_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
+	map(0x1a4000, 0x1a47ff).ram().share("spriteram");           /* Sprites */
+	map(0x1b4000, 0x1b4001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* DMA flag */
+	map(0x1bc000, 0x1bffff).rw(this, FUNC(cninja_state::cninja_protection_region_0_104_r), FUNC(cninja_state::cninja_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
 
 
-	AM_RANGE(0x308000, 0x308fff) AM_WRITENOP /* Bootleg only */
-ADDRESS_MAP_END
+	map(0x308000, 0x308fff).nopw(); /* Bootleg only */
+}
 
-ADDRESS_MAP_START(cninja_state::cninjabl_map)
-	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+void cninja_state::cninjabl_map(address_map &map)
+{
+	map(0x000000, 0x0bffff).rom();
 
-	AM_RANGE(0x138000, 0x1387ff) AM_RAM AM_SHARE("spriteram") /* bootleg sprite-ram (sprites rewritten here in new format) */
+	map(0x138000, 0x1387ff).ram().share("spriteram"); /* bootleg sprite-ram (sprites rewritten here in new format) */
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
-	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x14c000, 0x14c7ff) AM_WRITEONLY AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
+	map(0x144000, 0x144fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x146000, 0x146fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x14c000, 0x14c7ff).writeonly().share("pf1_rowscroll");
+	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITE(cninja_pf34_control_w)    // not used / incorrect on this
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_SHARE("pf3_rowscroll")
-	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_SHARE("pf4_rowscroll")
+	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));    // not used / incorrect on this
+	map(0x154000, 0x154fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x156000, 0x156fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
+	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
 
-	AM_RANGE(0x17ff22, 0x17ff23) AM_READ_PORT("DSW")
-	AM_RANGE(0x17ff28, 0x17ff29) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x17ff2a, 0x17ff2b) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x17ff2c, 0x17ff2d) AM_READ_PORT("INPUTS")
+	map(0x17ff22, 0x17ff23).portr("DSW");
+	map(0x17ff28, 0x17ff29).portr("SYSTEM");
+	map(0x17ff2b, 0x17ff2b).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x17ff2c, 0x17ff2d).portr("INPUTS");
 
-	AM_RANGE(0x180000, 0x187fff) AM_RAM // more ram on bootleg?
+	map(0x180000, 0x187fff).ram(); // more ram on bootleg?
 
-	AM_RANGE(0x190000, 0x190007) AM_DEVICE8("irq", deco_irq_device, map, 0x00ff)
-	AM_RANGE(0x19c000, 0x19dfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x190000, 0x190007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
+	map(0x19c000, 0x19dfff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x1b4000, 0x1b4001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
-ADDRESS_MAP_END
+	map(0x1b4000, 0x1b4001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* DMA flag */
+}
 
 READ16_MEMBER( cninja_state::sshangha_protection_region_8_146_r )
 {
@@ -208,68 +209,70 @@ WRITE16_MEMBER( cninja_state::sshangha_protection_region_6_146_w )
 	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
-ADDRESS_MAP_START(cninja_state::edrandy_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+void cninja_state::edrandy_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
-	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
+	map(0x144000, 0x144fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x146000, 0x146fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x14c000, 0x14c7ff).ram().share("pf1_rowscroll");
+	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITE(cninja_pf34_control_w)
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_SHARE("pf3_rowscroll")
-	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_SHARE("pf4_rowscroll")
+	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));
+	map(0x154000, 0x154fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x156000, 0x156fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
+	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
 
-	AM_RANGE(0x188000, 0x189fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x194000, 0x197fff) AM_RAM AM_SHARE("ram") /* Main ram */
-	AM_RANGE(0x198000, 0x19bfff) AM_READWRITE(sshangha_protection_region_6_146_r,sshangha_protection_region_6_146_w) AM_SHARE("prot16ram") /* Protection device */
+	map(0x188000, 0x189fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x194000, 0x197fff).ram().share("ram"); /* Main ram */
+	map(0x198000, 0x19bfff).rw(this, FUNC(cninja_state::sshangha_protection_region_6_146_r), FUNC(cninja_state::sshangha_protection_region_6_146_w)).share("prot16ram"); /* Protection device */
 //  AM_RANGE(0x198000, 0x1987ff) AM_READWRITE(sshangha_protection_region_6_146_r,sshangha_protection_region_6_146_w) AM_SHARE("prot16ram") /* Protection device */
 
-	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(sshangha_protection_region_8_146_r,sshangha_protection_region_8_146_w)
+	map(0x1a0000, 0x1a3fff).rw(this, FUNC(cninja_state::sshangha_protection_region_8_146_r), FUNC(cninja_state::sshangha_protection_region_8_146_w));
 
-	AM_RANGE(0x1a4000, 0x1a4007) AM_DEVICE8("irq", deco_irq_device, map, 0x00ff)
-	AM_RANGE(0x1ac000, 0x1ac001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
-	AM_RANGE(0x1bc000, 0x1bc7ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0x1bc800, 0x1bcfff) AM_WRITENOP /* Another bug in game code?  Sprite list can overrun.  Doesn't seem to mirror */
-ADDRESS_MAP_END
+	map(0x1a4000, 0x1a4007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
+	map(0x1ac000, 0x1ac001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* DMA flag */
+	map(0x1bc000, 0x1bc7ff).ram().share("spriteram"); /* Sprites */
+	map(0x1bc800, 0x1bcfff).nopw(); /* Another bug in game code?  Sprite list can overrun.  Doesn't seem to mirror */
+}
 
 WRITE16_MEMBER(cninja_state::robocop2_priority_w)
 {
 	COMBINE_DATA(&m_priority);
 }
 
-ADDRESS_MAP_START(cninja_state::robocop2_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+void cninja_state::robocop2_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
 
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
-	AM_RANGE(0x144000, 0x144fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x146000, 0x146fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x14c000, 0x14c7ff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x140000, 0x14000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
+	map(0x144000, 0x144fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x146000, 0x146fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x14c000, 0x14c7ff).ram().share("pf1_rowscroll");
+	map(0x14e000, 0x14e7ff).ram().share("pf2_rowscroll");
 
-	AM_RANGE(0x150000, 0x15000f) AM_WRITE(cninja_pf34_control_w)
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_SHARE("pf3_rowscroll")
-	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_SHARE("pf4_rowscroll")
+	map(0x150000, 0x15000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));
+	map(0x154000, 0x154fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x156000, 0x156fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x15c000, 0x15c7ff).ram().share("pf3_rowscroll");
+	map(0x15e000, 0x15e7ff).ram().share("pf4_rowscroll");
 
-	AM_RANGE(0x180000, 0x1807ff) AM_RAM AM_SHARE("spriteram")
+	map(0x180000, 0x1807ff).ram().share("spriteram");
 //  AM_RANGE(0x18c000, 0x18c0ff) AM_WRITE(cninja_loopback_w) /* Protection writes */
 //  AM_RANGE(0x18c000, 0x18c7ff) AM_DEVREAD("ioprot", deco146_device,robocop2_prot_r) /* Protection device */
 //  AM_RANGE(0x18c064, 0x18c065) AM_WRITE(cninja_sound_w)
-	AM_RANGE(0x18c000, 0x18ffff) AM_READWRITE(mutantf_protection_region_0_146_r,mutantf_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
+	map(0x18c000, 0x18ffff).rw(this, FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
 
 
-AM_RANGE(0x198000, 0x198001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
-	AM_RANGE(0x1a8000, 0x1a9fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x1b0000, 0x1b0007) AM_DEVICE8("irq", deco_irq_device, map, 0x00ff)
-	AM_RANGE(0x1b8000, 0x1bbfff) AM_RAM AM_SHARE("ram") /* Main ram */
-	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE(robocop2_priority_w)
-	AM_RANGE(0x1f8000, 0x1f8001) AM_READ_PORT("DSW3") /* Dipswitch #3 */
-ADDRESS_MAP_END
+map(0x198000, 0x198001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* DMA flag */
+	map(0x1a8000, 0x1a9fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x1b0000, 0x1b0007).m("irq", FUNC(deco_irq_device::map)).umask16(0x00ff);
+	map(0x1b8000, 0x1bbfff).ram().share("ram"); /* Main ram */
+	map(0x1f0000, 0x1f0001).w(this, FUNC(cninja_state::robocop2_priority_w));
+	map(0x1f8000, 0x1f8001).portr("DSW3"); /* Dipswitch #3 */
+}
 
 
 
@@ -296,87 +299,94 @@ READ16_MEMBER( cninja_state::mutantf_71_r )
 	return 0xffff; // todo
 }
 
-ADDRESS_MAP_START(cninja_state::mutantf_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x160000, 0x161fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180001) AM_WRITE(robocop2_priority_w)
-	AM_RANGE(0x180002, 0x180003) AM_WRITENOP /* VBL irq ack */
-	AM_RANGE(0x1a0000, 0x1a3fff) AM_READWRITE(mutantf_protection_region_0_146_r,mutantf_protection_region_0_146_w)AM_SHARE("prot16ram") /* Protection device */
-	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) AM_READ(mutantf_71_r)
-	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
+void cninja_state::mutantf_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x103fff).ram();
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x140000, 0x1407ff).ram().share("spriteram2");
+	map(0x160000, 0x161fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180001).w(this, FUNC(cninja_state::robocop2_priority_w));
+	map(0x180002, 0x180003).nopw(); /* VBL irq ack */
+	map(0x1a0000, 0x1a3fff).rw(this, FUNC(cninja_state::mutantf_protection_region_0_146_r), FUNC(cninja_state::mutantf_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
+	map(0x1c0000, 0x1c0001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)).r(this, FUNC(cninja_state::mutantf_71_r));
+	map(0x1e0000, 0x1e0001).w(m_spriteram2, FUNC(buffered_spriteram16_device::write));
 
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(cninja_pf12_control_w)
-	AM_RANGE(0x304000, 0x305fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x306000, 0x307fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x30a000, 0x30a7ff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x300000, 0x30000f).w(this, FUNC(cninja_state::cninja_pf12_control_w));
+	map(0x304000, 0x305fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x306000, 0x307fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x308000, 0x3087ff).ram().share("pf1_rowscroll");
+	map(0x30a000, 0x30a7ff).ram().share("pf2_rowscroll");
 
-	AM_RANGE(0x310000, 0x31000f) AM_WRITE(cninja_pf34_control_w)
-	AM_RANGE(0x314000, 0x315fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x316000, 0x317fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x318000, 0x3187ff) AM_RAM AM_SHARE("pf3_rowscroll")
-	AM_RANGE(0x31a000, 0x31a7ff) AM_RAM AM_SHARE("pf4_rowscroll")
+	map(0x310000, 0x31000f).w(this, FUNC(cninja_state::cninja_pf34_control_w));
+	map(0x314000, 0x315fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x316000, 0x317fff).rw(m_deco_tilegen2, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x318000, 0x3187ff).ram().share("pf3_rowscroll");
+	map(0x31a000, 0x31a7ff).ram().share("pf4_rowscroll");
 
-	AM_RANGE(0xad00ac, 0xad00ff) AM_READNOP /* Reads from here seem to be a game code bug */
-ADDRESS_MAP_END
+	map(0xad00ac, 0xad00ff).nopr(); /* Reads from here seem to be a game code bug */
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(cninja_state::sound_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void cninja_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x110000, 0x110001).rw("ym2", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");
+	map(0x1fec00, 0x1fec01).w("audiocpu", FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+}
 
-ADDRESS_MAP_START(cninja_state::sound_map_mutantf)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void cninja_state::sound_map_mutantf(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).noprw();
+	map(0x110000, 0x110001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x140000, 0x140001).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");
+	map(0x1fec00, 0x1fec01).w("audiocpu", FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+}
 
-ADDRESS_MAP_START(cninja_state::stoneage_s_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
-ADDRESS_MAP_END
+void cninja_state::stoneage_s_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9800, 0x9800).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
+}
 
-ADDRESS_MAP_START(cninja_state::cninjabl_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void cninja_state::cninjabl_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9800, 0x9800).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(cninja_state::cninjabl2_s_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(cninjabl2_oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("ioprot", deco_146_base_device, soundlatch_r)
-ADDRESS_MAP_END
+void cninja_state::cninjabl2_s_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(this, FUNC(cninja_state::cninjabl2_oki_bank_w));
+	map(0x9800, 0x9800).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
+}
 
-ADDRESS_MAP_START(cninja_state::cninjabl2_oki_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM AM_REGION("oki1", 0)
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void cninja_state::cninjabl2_oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom().region("oki1", 0);
+	map(0x30000, 0x3ffff).bankr("okibank");
+}
 
 /***********************************************************
               Basic INPUT PORTS, DIPs

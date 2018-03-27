@@ -72,20 +72,21 @@ private:
 };
 
 
-ADDRESS_MAP_START(techno_state::techno_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("nvram") // battery backed-up
-	AM_RANGE(0x06000, 0x0ffff) AM_ROM
-	AM_RANGE(0x14000, 0x147ff) AM_READWRITE(key_r,lamp1_w)
-	AM_RANGE(0x14800, 0x14fff) AM_READWRITE(sound_r,lamp2_w)
-	AM_RANGE(0x15000, 0x157ff) AM_READWRITE(rtrg_r,sol1_w)
-	AM_RANGE(0x15800, 0x15fff) AM_READNOP AM_WRITE(sol2_w) // reads from 15800, but shown as not connected
-	AM_RANGE(0x16000, 0x167ff) AM_WRITE(sound_w)
-	AM_RANGE(0x16800, 0x16fff) AM_WRITE(disp1_w)
-	AM_RANGE(0x17000, 0x177ff) AM_WRITE(disp2_w)
-	AM_RANGE(0x17800, 0x17fff) AM_WRITE(setout_w)
-ADDRESS_MAP_END
+void techno_state::techno_map(address_map &map)
+{
+	map.global_mask(0x1ffff);
+	map(0x00000, 0x03fff).rom();
+	map(0x04000, 0x04fff).ram().share("nvram"); // battery backed-up
+	map(0x06000, 0x0ffff).rom();
+	map(0x14000, 0x147ff).rw(this, FUNC(techno_state::key_r), FUNC(techno_state::lamp1_w));
+	map(0x14800, 0x14fff).rw(this, FUNC(techno_state::sound_r), FUNC(techno_state::lamp2_w));
+	map(0x15000, 0x157ff).rw(this, FUNC(techno_state::rtrg_r), FUNC(techno_state::sol1_w));
+	map(0x15800, 0x15fff).nopr().w(this, FUNC(techno_state::sol2_w)); // reads from 15800, but shown as not connected
+	map(0x16000, 0x167ff).w(this, FUNC(techno_state::sound_w));
+	map(0x16800, 0x16fff).w(this, FUNC(techno_state::disp1_w));
+	map(0x17000, 0x177ff).w(this, FUNC(techno_state::disp2_w));
+	map(0x17800, 0x17fff).w(this, FUNC(techno_state::setout_w));
+}
 
 ADDRESS_MAP_START(techno_state::techno_sub_map)
 //       no ram here, must be internal to the cpu

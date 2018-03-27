@@ -233,47 +233,52 @@ WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
 }
 
 
-ADDRESS_MAP_START(dacholer_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8800, 0x97ff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE(background_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void dacholer_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8800, 0x97ff).ram();
+	map(0xc000, 0xc3ff).mirror(0x400).ram().w(this, FUNC(dacholer_state::background_w)).share("bgvideoram");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(dacholer_state::foreground_w)).share("fgvideoram");
+	map(0xe000, 0xe0ff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(dacholer_state::itaten_main_map)
-	AM_IMPORT_FROM( main_map )
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xb7ff) AM_RAM
-ADDRESS_MAP_END
+void dacholer_state::itaten_main_map(address_map &map)
+{
+	main_map(map);
+	map(0x0000, 0x9fff).rom();
+	map(0xa000, 0xb7ff).ram();
+}
 
-ADDRESS_MAP_START(dacholer_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWA")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWB")
-	AM_RANGE(0x05, 0x05) AM_READNOP // watchdog in itaten
-	AM_RANGE(0x20, 0x20) AM_WRITE(coins_w)
-	AM_RANGE(0x21, 0x21) AM_WRITE(bg_bank_w)
-	AM_RANGE(0x22, 0x22) AM_WRITE(bg_scroll_x_w)
-	AM_RANGE(0x23, 0x23) AM_WRITE(bg_scroll_y_w)
-	AM_RANGE(0x24, 0x24) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x27, 0x27) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(dacholer_state::snd_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xd000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void dacholer_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1");
+	map(0x01, 0x01).portr("P2");
+	map(0x02, 0x02).portr("SYSTEM");
+	map(0x03, 0x03).portr("DSWA");
+	map(0x04, 0x04).portr("DSWB");
+	map(0x05, 0x05).nopr(); // watchdog in itaten
+	map(0x20, 0x20).w(this, FUNC(dacholer_state::coins_w));
+	map(0x21, 0x21).w(this, FUNC(dacholer_state::bg_bank_w));
+	map(0x22, 0x22).w(this, FUNC(dacholer_state::bg_scroll_x_w));
+	map(0x23, 0x23).w(this, FUNC(dacholer_state::bg_scroll_y_w));
+	map(0x24, 0x24).w(this, FUNC(dacholer_state::main_irq_ack_w));
+	map(0x27, 0x27).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+}
 
 
-ADDRESS_MAP_START(dacholer_state::itaten_snd_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-ADDRESS_MAP_END
+void dacholer_state::snd_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0xd000, 0xe7ff).ram();
+}
+
+
+void dacholer_state::itaten_snd_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0xe000, 0xe7ff).ram();
+}
 
 
 WRITE8_MEMBER(dacholer_state::adpcm_w)
@@ -302,25 +307,27 @@ WRITE8_MEMBER(dacholer_state::music_irq_w)
 	m_music_interrupt_enable = data;
 }
 
-ADDRESS_MAP_START(dacholer_state::snd_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(adpcm_w)
-	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void dacholer_state::snd_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x04, 0x04).w(this, FUNC(dacholer_state::music_irq_w));
+	map(0x08, 0x08).w(this, FUNC(dacholer_state::snd_irq_w));
+	map(0x0c, 0x0c).w(this, FUNC(dacholer_state::snd_ack_w));
+	map(0x80, 0x80).w(this, FUNC(dacholer_state::adpcm_w));
+	map(0x86, 0x87).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x8a, 0x8b).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x8e, 0x8f).w("ay3", FUNC(ay8910_device::data_address_w));
+}
 
-ADDRESS_MAP_START(dacholer_state::itaten_snd_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void dacholer_state::itaten_snd_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x86, 0x87).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x8a, 0x8b).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x8e, 0x8f).w("ay3", FUNC(ay8910_device::data_address_w));
+}
 
 
 static INPUT_PORTS_START( dacholer )

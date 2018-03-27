@@ -189,80 +189,88 @@ static const uint8_t MHB2501[] = {
 
 
 /* Address maps */
-ADDRESS_MAP_START(sapi1_state::sapi1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x27ff) AM_READWRITE(sapi1_keyboard_r, sapi1_keyboard_w) // PORT 0 - keyboard
+void sapi1_state::sapi1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x1fff).rom(); // Extension ROM
+	map(0x2000, 0x23ff).ram();
+	map(0x2400, 0x27ff).rw(this, FUNC(sapi1_state::sapi1_keyboard_r), FUNC(sapi1_state::sapi1_keyboard_w)); // PORT 0 - keyboard
 	//AM_RANGE(0x2800, 0x2bff) AM_NOP // PORT 1
 	//AM_RANGE(0x2c00, 0x2fff) AM_NOP // PORT 2
 	//AM_RANGE(0x3000, 0x33ff) AM_NOP // 3214
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("videoram") // AND-1 (video RAM)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
-ADDRESS_MAP_END
+	map(0x3800, 0x3fff).ram().share("videoram"); // AND-1 (video RAM)
+	map(0x4000, 0x7fff).ram(); // REM-1
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x1fff) AM_ROM // Extension ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x27ff) AM_READ(sapi2_keyboard_status_r)
-	AM_RANGE(0x2800, 0x28ff) AM_READ(sapi2_keyboard_data_r)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("videoram") // AND-1 (video RAM)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM // REM-1
-ADDRESS_MAP_END
+void sapi1_state::sapi2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x1fff).rom(); // Extension ROM
+	map(0x2000, 0x23ff).ram();
+	map(0x2400, 0x27ff).r(this, FUNC(sapi1_state::sapi2_keyboard_status_r));
+	map(0x2800, 0x28ff).r(this, FUNC(sapi1_state::sapi2_keyboard_data_r));
+	map(0x3800, 0x3fff).ram().share("videoram"); // AND-1 (video RAM)
+	map(0x4000, 0x7fff).ram(); // REM-1
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
-	AM_RANGE(0x0800, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void sapi1_state::sapi3_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram().bankrw("bank1");
+	map(0x0800, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3a_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
-	AM_RANGE(0x0800, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfdff) AM_ROM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sapi1_state::sapi3a_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram().bankrw("bank1");
+	map(0x0800, 0xf7ff).ram();
+	map(0xf800, 0xfdff).rom();
+	map(0xfe00, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3b_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_RAMBANK("bank1")
-	AM_RANGE(0x0800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xb800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sapi1_state::sapi3b_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram().bankrw("bank1");
+	map(0x0800, 0xafff).ram();
+	map(0xb000, 0xb7ff).ram().share("videoram");
+	map(0xb800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
-ADDRESS_MAP_END
+void sapi1_state::sapi3_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(sapi1_state::sapi3_00_w));
+	map(0x25, 0x25).rw(this, FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3a_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(uart_status_r, modem_control_w)
-	AM_RANGE(0x11, 0x11) AM_READWRITE(uart_ready_r, uart_mode_w)
-	AM_RANGE(0x12, 0x12) AM_DEVREADWRITE("uart", ay51013_device, receive, transmit)
-	AM_RANGE(0x13, 0x13) AM_WRITE(uart_reset_w)
-	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
-ADDRESS_MAP_END
+void sapi1_state::sapi3a_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(sapi1_state::sapi3_00_w));
+	map(0x10, 0x10).rw(this, FUNC(sapi1_state::uart_status_r), FUNC(sapi1_state::modem_control_w));
+	map(0x11, 0x11).rw(this, FUNC(sapi1_state::uart_ready_r), FUNC(sapi1_state::uart_mode_w));
+	map(0x12, 0x12).rw(m_uart, FUNC(ay51013_device::receive), FUNC(ay51013_device::transmit));
+	map(0x13, 0x13).w(this, FUNC(sapi1_state::uart_reset_w));
+	map(0x25, 0x25).rw(this, FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+}
 
-ADDRESS_MAP_START(sapi1_state::sapi3b_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sapi3_00_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(sapi3_0c_r)
-	AM_RANGE(0x25, 0x25) AM_READWRITE(sapi3_25_r,sapi3_25_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0xe1, 0xe1) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+void sapi1_state::sapi3b_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(sapi1_state::sapi3_00_w));
+	map(0x0c, 0x0c).r(this, FUNC(sapi1_state::sapi3_0c_r));
+	map(0x25, 0x25).rw(this, FUNC(sapi1_state::sapi3_25_r), FUNC(sapi1_state::sapi3_25_w));
+	map(0xe0, 0xe0).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xe1, 0xe1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sapi1 )

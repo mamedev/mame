@@ -246,19 +246,21 @@ WRITE8_MEMBER(re900_state::watchdog_reset_w)
 *    Memory Map Information    *
 *******************************/
 
-ADDRESS_MAP_START(re900_state::mem_prg)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("rom")
-ADDRESS_MAP_END
+void re900_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share("rom");
+}
 
-ADDRESS_MAP_START(re900_state::mem_io)
-	AM_RANGE(0x0000, 0xbfff) AM_READ(rom_r)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("tms9128", tms9928a_device, vram_write)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("tms9128", tms9928a_device, register_write)
-	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ay_re900", ay8910_device, address_data_w)
-	AM_RANGE(0xe802, 0xe802) AM_DEVREAD("ay_re900", ay8910_device, data_r)
-ADDRESS_MAP_END
+void re900_state::mem_io(address_map &map)
+{
+	map(0x0000, 0xbfff).r(this, FUNC(re900_state::rom_r));
+	map(0xc000, 0xdfff).ram().share("nvram");
+	map(0xe000, 0xefff).w(this, FUNC(re900_state::watchdog_reset_w));
+	map(0xe000, 0xe000).w("tms9128", FUNC(tms9928a_device::vram_write));
+	map(0xe001, 0xe001).w("tms9128", FUNC(tms9928a_device::register_write));
+	map(0xe800, 0xe801).w("ay_re900", FUNC(ay8910_device::address_data_w));
+	map(0xe802, 0xe802).r("ay_re900", FUNC(ay8910_device::data_r));
+}
 
 
 /************************

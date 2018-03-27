@@ -38,23 +38,26 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(barni_state::maincpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0xa100, 0xa7ff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void barni_state::maincpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).ram();
+	map(0xa100, 0xa7ff).ram();
+	map(0xc000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(barni_state::subcpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void barni_state::subcpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).ram();
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(barni_state::audiocpu_map)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void barni_state::audiocpu_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0xc000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( barni )
 INPUT_PORTS_END

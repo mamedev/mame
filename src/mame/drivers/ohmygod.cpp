@@ -41,31 +41,33 @@ WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)
 	}
 }
 
-ADDRESS_MAP_START(ohmygod_state::ohmygod_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM
-	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE(ohmygod_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x308000, 0x30ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(ohmygod_scrollx_w)
-	AM_RANGE(0x400002, 0x400003) AM_WRITE(ohmygod_scrolly_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x704000, 0x707fff) AM_RAM
-	AM_RANGE(0x708000, 0x70ffff) AM_RAM     /* Work RAM */
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("P2")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(ohmygod_ctrl_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(ohmygod_spritebank_w)
-ADDRESS_MAP_END
+void ohmygod_state::ohmygod_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x300000, 0x303fff).ram();
+	map(0x304000, 0x307fff).ram().w(this, FUNC(ohmygod_state::ohmygod_videoram_w)).share("videoram");
+	map(0x308000, 0x30ffff).ram();
+	map(0x400000, 0x400001).w(this, FUNC(ohmygod_state::ohmygod_scrollx_w));
+	map(0x400002, 0x400003).w(this, FUNC(ohmygod_state::ohmygod_scrolly_w));
+	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x700000, 0x703fff).ram().share("spriteram");
+	map(0x704000, 0x707fff).ram();
+	map(0x708000, 0x70ffff).ram();     /* Work RAM */
+	map(0x800000, 0x800001).portr("P1");
+	map(0x800002, 0x800003).portr("P2");
+	map(0x900000, 0x900001).w(this, FUNC(ohmygod_state::ohmygod_ctrl_w));
+	map(0xa00000, 0xa00001).portr("DSW1");
+	map(0xa00002, 0xa00003).portr("DSW2");
+	map(0xb00001, 0xb00001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc00000, 0xc00001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0xd00000, 0xd00001).w(this, FUNC(ohmygod_state::ohmygod_spritebank_w));
+}
 
-ADDRESS_MAP_START(ohmygod_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void ohmygod_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 static INPUT_PORTS_START( ohmygod )
 	PORT_START("P1")

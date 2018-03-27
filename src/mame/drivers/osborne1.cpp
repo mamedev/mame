@@ -100,26 +100,29 @@ TODO:
 static constexpr XTAL MAIN_CLOCK = 15.9744_MHz_XTAL;
 
 
-ADDRESS_MAP_START(osborne1_state::osborne1_mem)
-	AM_RANGE( 0x0000, 0x0FFF ) AM_READ_BANK("bank_0xxx") AM_WRITE(bank_0xxx_w)
-	AM_RANGE( 0x1000, 0x1FFF ) AM_READ_BANK("bank_1xxx") AM_WRITE(bank_1xxx_w)
-	AM_RANGE( 0x2000, 0x3FFF ) AM_READWRITE(bank_2xxx_3xxx_r, bank_2xxx_3xxx_w)
-	AM_RANGE( 0x4000, 0xEFFF ) AM_RAM
-	AM_RANGE( 0xF000, 0xFFFF ) AM_READ_BANK("bank_fxxx") AM_WRITE(videoram_w)
-ADDRESS_MAP_END
+void osborne1_state::osborne1_mem(address_map &map)
+{
+	map(0x0000, 0x0FFF).bankr("bank_0xxx").w(this, FUNC(osborne1_state::bank_0xxx_w));
+	map(0x1000, 0x1FFF).bankr("bank_1xxx").w(this, FUNC(osborne1_state::bank_1xxx_w));
+	map(0x2000, 0x3FFF).rw(this, FUNC(osborne1_state::bank_2xxx_3xxx_r), FUNC(osborne1_state::bank_2xxx_3xxx_w));
+	map(0x4000, 0xEFFF).ram();
+	map(0xF000, 0xFFFF).bankr("bank_fxxx").w(this, FUNC(osborne1_state::videoram_w));
+}
 
 
-ADDRESS_MAP_START(osborne1_state::osborne1_op)
-	AM_RANGE( 0x0000, 0xFFFF ) AM_READ(opcode_r)
-ADDRESS_MAP_END
+void osborne1_state::osborne1_op(address_map &map)
+{
+	map(0x0000, 0xFFFF).r(this, FUNC(osborne1_state::opcode_r));
+}
 
 
-ADDRESS_MAP_START(osborne1_state::osborne1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void osborne1_state::osborne1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 
-	AM_RANGE( 0x00, 0x03 ) AM_MIRROR( 0xfc ) AM_WRITE(bankswitch_w)
-ADDRESS_MAP_END
+	map(0x00, 0x03).mirror(0xfc).w(this, FUNC(osborne1_state::bankswitch_w));
+}
 
 ADDRESS_MAP_START(osborne1_state::osborne1nv_io)
 	ADDRESS_MAP_UNMAP_HIGH

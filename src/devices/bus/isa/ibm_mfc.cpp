@@ -113,22 +113,24 @@ void isa8_ibm_mfc_device::update_z80_interrupts(void)
 //  Z80 memory map
 //-------------------------------------------------
 
-ADDRESS_MAP_START(isa8_ibm_mfc_device::prg_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_RAM // Unknown - tested on startup
-	AM_RANGE(0xbfff, 0xbfff) AM_RAM // Unknown - tested on startup
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void isa8_ibm_mfc_device::prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8000).ram(); // Unknown - tested on startup
+	map(0xbfff, 0xbfff).ram(); // Unknown - tested on startup
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(isa8_ibm_mfc_device::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("d71051", i8251_device, data_r, data_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("d71051", i8251_device, status_r, control_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("d71055c_1", i8255_device, read, write)
-ADDRESS_MAP_END
+void isa8_ibm_mfc_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x10, 0x10).rw("d71051", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x11, 0x11).rw("d71051", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x23).rw("d71055c_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 //-------------------------------------------------

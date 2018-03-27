@@ -75,7 +75,7 @@ inline void ssem_device::program_write32(uint32_t address, uint32_t data)
 
 /*****************************************************************************/
 
-DEFINE_DEVICE_TYPE(SSEMCPU, ssem_device, "ssem_cpu", "SSEM CPU")
+DEFINE_DEVICE_TYPE(SSEMCPU, ssem_device, "ssem_cpu", "Manchester SSEM")
 
 //-------------------------------------------------
 //  ssem_device - constructor
@@ -163,9 +163,9 @@ void ssem_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *ssem_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ssem_device::create_disassembler()
 {
-	return new ssem_disassembler;
+	return std::make_unique<ssem_disassembler>();
 }
 
 

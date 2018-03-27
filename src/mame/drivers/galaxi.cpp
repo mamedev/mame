@@ -302,53 +302,55 @@ CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
                             Memory Maps
 ***************************************************************************/
 
-ADDRESS_MAP_START(galaxi_state::galaxi_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void galaxi_state::galaxi_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg1_w) AM_SHARE("bg1_ram")
-	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE(galaxi_bg2_w) AM_SHARE("bg2_ram")
-	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE(galaxi_bg3_w) AM_SHARE("bg3_ram")
-	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE(galaxi_bg4_w) AM_SHARE("bg4_ram")
+	map(0x100000, 0x1003ff).ram().w(this, FUNC(galaxi_state::galaxi_bg1_w)).share("bg1_ram");
+	map(0x100400, 0x1007ff).ram().w(this, FUNC(galaxi_state::galaxi_bg2_w)).share("bg2_ram");
+	map(0x100800, 0x100bff).ram().w(this, FUNC(galaxi_state::galaxi_bg3_w)).share("bg3_ram");
+	map(0x100c00, 0x100fff).ram().w(this, FUNC(galaxi_state::galaxi_bg4_w)).share("bg4_ram");
 
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
-	AM_RANGE(0x102000, 0x107fff) AM_READNOP // unknown
+	map(0x101000, 0x101fff).ram().w(this, FUNC(galaxi_state::galaxi_fg_w)).share("fg_ram");
+	map(0x102000, 0x107fff).nopr(); // unknown
 
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x300000, 0x3007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(galaxi_500000_w)
-	AM_RANGE(0x500002, 0x500003) AM_WRITE(galaxi_500002_w)
-	AM_RANGE(0x500004, 0x500005) AM_WRITE(galaxi_500004_w)
+	map(0x500000, 0x500001).portr("INPUTS");
+	map(0x500000, 0x500001).w(this, FUNC(galaxi_state::galaxi_500000_w));
+	map(0x500002, 0x500003).w(this, FUNC(galaxi_state::galaxi_500002_w));
+	map(0x500004, 0x500005).w(this, FUNC(galaxi_state::galaxi_500004_w));
 
-	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("nvram")   // 2x DS1230Y (non volatile SRAM)
-ADDRESS_MAP_END
+	map(0x600000, 0x607fff).ram().share("nvram");   // 2x DS1230Y (non volatile SRAM)
+}
 
 
-ADDRESS_MAP_START(galaxi_state::lastfour_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void galaxi_state::lastfour_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
 	// bg3+4 / 1+2 seem to be swapped, order, palettes, scroll register etc. all suggest this
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg3_w) AM_SHARE("bg3_ram")
-	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE(galaxi_bg4_w) AM_SHARE("bg4_ram")
-	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE(galaxi_bg1_w) AM_SHARE("bg1_ram")
-	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE(galaxi_bg2_w) AM_SHARE("bg2_ram")
+	map(0x100000, 0x1003ff).ram().w(this, FUNC(galaxi_state::galaxi_bg3_w)).share("bg3_ram");
+	map(0x100400, 0x1007ff).ram().w(this, FUNC(galaxi_state::galaxi_bg4_w)).share("bg4_ram");
+	map(0x100800, 0x100bff).ram().w(this, FUNC(galaxi_state::galaxi_bg1_w)).share("bg1_ram");
+	map(0x100c00, 0x100fff).ram().w(this, FUNC(galaxi_state::galaxi_bg2_w)).share("bg2_ram");
 
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
-	AM_RANGE(0x102000, 0x107fff) AM_READNOP // unknown
+	map(0x101000, 0x101fff).ram().w(this, FUNC(galaxi_state::galaxi_fg_w)).share("fg_ram");
+	map(0x102000, 0x107fff).nopr(); // unknown
 
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x300000, 0x3007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(galaxi_500000_w)
-	AM_RANGE(0x500002, 0x500003) AM_WRITE(galaxi_500002_w)
-	AM_RANGE(0x500004, 0x500005) AM_WRITE(galaxi_500004_w)
+	map(0x500000, 0x500001).portr("INPUTS");
+	map(0x500000, 0x500001).w(this, FUNC(galaxi_state::galaxi_500000_w));
+	map(0x500002, 0x500003).w(this, FUNC(galaxi_state::galaxi_500002_w));
+	map(0x500004, 0x500005).w(this, FUNC(galaxi_state::galaxi_500004_w));
 
-	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("nvram")   // 2x DS1230Y (non volatile SRAM)
-ADDRESS_MAP_END
+	map(0x600000, 0x607fff).ram().share("nvram");   // 2x DS1230Y (non volatile SRAM)
+}
 
 
 /***************************************************************************

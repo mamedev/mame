@@ -94,28 +94,31 @@ WRITE8_MEMBER( coleco_state::paddle_on_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(coleco_state::coleco_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) AM_SHARE("ram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void coleco_state::coleco_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x6000, 0x63ff).ram().mirror(0x1c00).share("ram");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(coleco_state::coleco_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(paddle_on_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE("sn76489a", sn76489a_device, write)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(paddle_1_r)
-	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(paddle_2_r)
-ADDRESS_MAP_END
+void coleco_state::coleco_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x80).mirror(0x1f).w(this, FUNC(coleco_state::paddle_off_w));
+	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0xc0, 0xc0).mirror(0x1f).w(this, FUNC(coleco_state::paddle_on_w));
+	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::write));
+	map(0xe0, 0xe0).mirror(0x1d).r(this, FUNC(coleco_state::paddle_1_r));
+	map(0xe2, 0xe2).mirror(0x1d).r(this, FUNC(coleco_state::paddle_2_r));
+}
 
-ADDRESS_MAP_START(coleco_state::czz50_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) AM_SHARE("ram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void coleco_state::czz50_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x6000, 0x63ff).ram().mirror(0x1c00).share("ram");
+	map(0x8000, 0xffff).rom();
+}
 
 
 /* Input Ports */

@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "h8s2245.h"
 
-DEFINE_DEVICE_TYPE(H8S2241, h8s2241_device, "h8s2241", "H8S/2241")
-DEFINE_DEVICE_TYPE(H8S2242, h8s2242_device, "h8s2242", "H8S/2242")
-DEFINE_DEVICE_TYPE(H8S2245, h8s2245_device, "h8s2245", "H8S/2245")
-DEFINE_DEVICE_TYPE(H8S2246, h8s2246_device, "h8s2246", "H8S/2246")
+DEFINE_DEVICE_TYPE(H8S2241, h8s2241_device, "h8s2241", "Hitachi H8S/2241")
+DEFINE_DEVICE_TYPE(H8S2242, h8s2242_device, "h8s2242", "Hitachi H8S/2242")
+DEFINE_DEVICE_TYPE(H8S2245, h8s2245_device, "h8s2245", "Hitachi H8S/2245")
+DEFINE_DEVICE_TYPE(H8S2246, h8s2246_device, "h8s2246", "Hitachi H8S/2246")
 
 
 h8s2245_device::h8s2245_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :

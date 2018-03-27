@@ -3,10 +3,10 @@
 #include "emu.h"
 #include "h83048.h"
 
-DEFINE_DEVICE_TYPE(H83044, h83044_device, "h83044", "H8/3044")
-DEFINE_DEVICE_TYPE(H83045, h83045_device, "h83045", "H8/3045")
-DEFINE_DEVICE_TYPE(H83047, h83047_device, "h83047", "H8/3047")
-DEFINE_DEVICE_TYPE(H83048, h83048_device, "h83048", "H8/3048")
+DEFINE_DEVICE_TYPE(H83044, h83044_device, "h83044", "Hitachi H8/3044")
+DEFINE_DEVICE_TYPE(H83045, h83045_device, "h83045", "Hitachi H8/3045")
+DEFINE_DEVICE_TYPE(H83047, h83047_device, "h83047", "Hitachi H8/3047")
+DEFINE_DEVICE_TYPE(H83048, h83048_device, "h83048", "Hitachi H8/3048")
 
 h83048_device::h83048_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
 	h8h_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h83048_device::map), this)),

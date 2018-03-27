@@ -105,27 +105,31 @@ static SLOT_INTERFACE_START( altos486_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-ADDRESS_MAP_START(altos486_state::altos486_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mmu_ram_r, mmu_ram_w) AM_SHARE("main_ram")
-ADDRESS_MAP_END
+void altos486_state::altos486_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xfffff).rw(this, FUNC(altos486_state::mmu_ram_r), FUNC(altos486_state::mmu_ram_w)).share("main_ram");
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_io)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
-ADDRESS_MAP_END
+void altos486_state::altos486_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(altos486_state::mmu_io_r), FUNC(altos486_state::mmu_io_w));
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_z80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("iocpu", 0)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
+void altos486_state::altos486_z80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom().region("iocpu", 0);
+	map(0x2000, 0x27ff).ram();
 	//AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_shared_r, z80_shared_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(altos486_state::altos486_z80_io)
+void altos486_state::altos486_z80_io(address_map &map)
+{
 	//AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio0", z80sio0_device, read, write)
 	//AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio1", z80sio0_device, read, write)
 	//AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio2", z80sio0_device, read, write)
-ADDRESS_MAP_END
+}
 
 MACHINE_CONFIG_START(altos486_state::altos486)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL(8'000'000))
@@ -226,8 +230,8 @@ ROM_START( altos486 )
 	ROMX_LOAD("16577_lo_v1.1.bin",   0x0000, 0x2000, CRC(65a9db18) SHA1(3ac2b87f1fc0b28ed4907c9b4091aaa170609674), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("16576_hi_v1.1.bin",   0x0001, 0x2000, CRC(cea4cd8d) SHA1(f9f49828bd5e3281bd7cc34d4460ca1b677530b0), ROM_SKIP(1) | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "v12", "Altos 486 v1.2")
-	ROMX_LOAD("16577-003_4D_v1.2.bin",   0x0000, 0x2000, CRC(e2ac806b) SHA1(9b358246e26b3e85a6dff418899a180370884537), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("16576-003_3D_v1.2.bin",   0x0001, 0x2000, CRC(912f4c12) SHA1(df5088e8610513b577926b0c752e3b54bc880167), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("16577-003_4d_v1.2.bin",   0x0000, 0x2000, CRC(e2ac806b) SHA1(9b358246e26b3e85a6dff418899a180370884537), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("16576-003_3d_v1.2.bin",   0x0001, 0x2000, CRC(912f4c12) SHA1(df5088e8610513b577926b0c752e3b54bc880167), ROM_SKIP(1) | ROM_BIOS(2))
 
 	ROM_REGION( 0x1000, "iocpu", 0 )
 	ROM_LOAD("16019_z80.bin", 0x0000, 0x1000, CRC(68b1b2e1) SHA1(5d83609a465029212d5e3f72ac9c520b3dbed838))

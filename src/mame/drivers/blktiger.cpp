@@ -74,58 +74,62 @@ WRITE8_MEMBER(blktiger_state::blktiger_coinlockout_w)
 }
 
 
-ADDRESS_MAP_START(blktiger_state::blktiger_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void blktiger_state::blktiger_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xcfff).rw(this, FUNC(blktiger_state::blktiger_bgvideoram_r), FUNC(blktiger_state::blktiger_bgvideoram_w));
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(blktiger_state::blktiger_txvideoram_w)).share("txvideoram");
+	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xdc00, 0xdfff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xe000, 0xfdff).ram();
+	map(0xfe00, 0xffff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(blktiger_state::blktiger_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(blktiger_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(blktiger_coinlockout_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1") AM_WRITE(blktiger_video_control_w)
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(blktiger_from_mcu_r,blktiger_to_mcu_w)     /* Software protection (7) */
-	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(blktiger_video_enable_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(blktiger_bgvideoram_bank_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
-ADDRESS_MAP_END
+void blktiger_state::blktiger_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(blktiger_state::blktiger_bankswitch_w));
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).portr("DSW0").w(this, FUNC(blktiger_state::blktiger_coinlockout_w));
+	map(0x04, 0x04).portr("DSW1").w(this, FUNC(blktiger_state::blktiger_video_control_w));
+	map(0x05, 0x05).portr("FREEZE");
+	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x07, 0x07).rw(this, FUNC(blktiger_state::blktiger_from_mcu_r), FUNC(blktiger_state::blktiger_to_mcu_w));     /* Software protection (7) */
+	map(0x08, 0x09).w(this, FUNC(blktiger_state::blktiger_scrollx_w));
+	map(0x0a, 0x0b).w(this, FUNC(blktiger_state::blktiger_scrolly_w));
+	map(0x0c, 0x0c).w(this, FUNC(blktiger_state::blktiger_video_enable_w));
+	map(0x0d, 0x0d).w(this, FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
+	map(0x0e, 0x0e).w(this, FUNC(blktiger_state::blktiger_screen_layout_w));
+}
 
-ADDRESS_MAP_START(blktiger_state::blktigerbl_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(blktiger_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(blktiger_coinlockout_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1") AM_WRITE(blktiger_video_control_w)
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x07, 0x07) AM_NOP  /* Software protection (7) */
-	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(blktiger_video_enable_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(blktiger_bgvideoram_bank_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
-ADDRESS_MAP_END
+void blktiger_state::blktigerbl_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(blktiger_state::blktiger_bankswitch_w));
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).portr("DSW0").w(this, FUNC(blktiger_state::blktiger_coinlockout_w));
+	map(0x04, 0x04).portr("DSW1").w(this, FUNC(blktiger_state::blktiger_video_control_w));
+	map(0x05, 0x05).portr("FREEZE");
+	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x07, 0x07).noprw();  /* Software protection (7) */
+	map(0x08, 0x09).w(this, FUNC(blktiger_state::blktiger_scrollx_w));
+	map(0x0a, 0x0b).w(this, FUNC(blktiger_state::blktiger_scrolly_w));
+	map(0x0c, 0x0c).w(this, FUNC(blktiger_state::blktiger_video_enable_w));
+	map(0x0d, 0x0d).w(this, FUNC(blktiger_state::blktiger_bgvideoram_bank_w));
+	map(0x0e, 0x0e).w(this, FUNC(blktiger_state::blktiger_screen_layout_w));
+}
 
-ADDRESS_MAP_START(blktiger_state::blktiger_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-ADDRESS_MAP_END
+void blktiger_state::blktiger_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xc800).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xe002, 0xe003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 

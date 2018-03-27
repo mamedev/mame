@@ -105,8 +105,8 @@ enum {
 // Part of r32-r37 that is actually output as address extension (6 bits of "BSC": block select code)
 #define BSC_REG_MASK    0x3f
 
-DEFINE_DEVICE_TYPE(HP_5061_3001, hp_5061_3001_cpu_device, "5061_3001", "HP-5061-3001")
-DEFINE_DEVICE_TYPE(HP_5061_3011, hp_5061_3011_cpu_device, "5061_3011", "HP-5061-3011")
+DEFINE_DEVICE_TYPE(HP_5061_3001, hp_5061_3001_cpu_device, "5061_3001", "Hewlett-Packard HP-5061-3001")
+DEFINE_DEVICE_TYPE(HP_5061_3011, hp_5061_3011_cpu_device, "5061_3011", "Hewlett-Packard HP-5061-3011")
 
 WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
 {
@@ -682,9 +682,9 @@ void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-util::disasm_interface *hp_hybrid_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hp_hybrid_cpu_device::create_disassembler()
 {
-	return new hp_hybrid_disassembler;
+	return std::make_unique<hp_hybrid_disassembler>();
 }
 
 uint16_t hp_hybrid_cpu_device::remove_mae(uint32_t addr)
@@ -1541,9 +1541,9 @@ uint16_t hp_5061_3001_cpu_device::execute_no_bpc_ioc(uint16_t opcode)
 	return m_reg_P + 1;
 }
 
-util::disasm_interface *hp_5061_3001_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hp_5061_3001_cpu_device::create_disassembler()
 {
-	return new hp_5061_3001_disassembler;
+	return std::make_unique<hp_5061_3001_disassembler>();
 }
 
 uint32_t hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , uint16_t addr)

@@ -108,17 +108,18 @@ WRITE8_MEMBER(taito_zoom_device::tms_ctrl_w)
 }
 
 
-ADDRESS_MAP_START(taito_zoom_device::taitozoom_mn_map)
+void taito_zoom_device::taitozoom_mn_map(address_map &map)
+{
 	if(m_use_flash) {
-		AM_RANGE(0x080000, 0x0fffff) AM_DEVREAD(":pgmflash", intelfsh16_device, read);
+		map(0x080000, 0x0fffff).r(":pgmflash", FUNC(intelfsh16_device::read));
 	} else {
-		AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0);
+		map(0x080000, 0x0fffff).rom().region("mn10200", 0);
 	}
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM
-	AM_RANGE(0x800000, 0x8007ff) AM_DEVREADWRITE("zsg2", zsg2_device, read, write)
-	AM_RANGE(0xc00000, 0xc00001) AM_RAM // TMS57002 comms
-	AM_RANGE(0xe00000, 0xe000ff) AM_READWRITE8(shared_ram_r, shared_ram_w, 0xffff) // M66220FP for comms with maincpu
-ADDRESS_MAP_END
+	map(0x400000, 0x41ffff).ram();
+	map(0x800000, 0x8007ff).rw("zsg2", FUNC(zsg2_device::read), FUNC(zsg2_device::write));
+	map(0xc00000, 0xc00001).ram(); // TMS57002 comms
+	map(0xe00000, 0xe000ff).rw(this, FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)); // M66220FP for comms with maincpu
+}
 
 
 /***************************************************************************

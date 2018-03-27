@@ -146,28 +146,29 @@ WRITE16_MEMBER(sparkz_state::latch_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(sparkz_state::main_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("bitmap")
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0xff00) AM_SHARE("palette")
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM
-	AM_RANGE(0x3effc0, 0x3effff) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0x640000, 0x640001) AM_READ_PORT("PLAYER1")
-	AM_RANGE(0x640002, 0x640003) AM_READ_PORT("PLAYER2")
-	AM_RANGE(0x640010, 0x640011) AM_READ_PORT("STATUS")
-	AM_RANGE(0x640012, 0x640013) AM_READ_PORT("COIN")
-	AM_RANGE(0x640020, 0x640021) AM_READ_PORT("TRACKX2")
-	AM_RANGE(0x640022, 0x640023) AM_READ_PORT("TRACKY2")
-	AM_RANGE(0x640024, 0x640025) AM_READ_PORT("TRACKX1")
-	AM_RANGE(0x640026, 0x640027) AM_READ_PORT("TRACKY1")
-	AM_RANGE(0x640040, 0x64004f) AM_WRITE(latch_w)
-	AM_RANGE(0x640060, 0x64006f) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0x641000, 0x641fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x646000, 0x646fff) AM_WRITE(scanline_int_ack_w)
-	AM_RANGE(0x647000, 0x647fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-ADDRESS_MAP_END
+void sparkz_state::main_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x21ffff).ram().share("bitmap");
+	map(0x3c0000, 0x3c07ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0x3e0000, 0x3e07ff).ram().share("mob");
+	map(0x3e0800, 0x3effbf).ram();
+	map(0x3effc0, 0x3effff).ram().share("mob:slip");
+	map(0x640000, 0x640001).portr("PLAYER1");
+	map(0x640002, 0x640003).portr("PLAYER2");
+	map(0x640010, 0x640011).portr("STATUS");
+	map(0x640012, 0x640013).portr("COIN");
+	map(0x640020, 0x640021).portr("TRACKX2");
+	map(0x640022, 0x640023).portr("TRACKY2");
+	map(0x640024, 0x640025).portr("TRACKX1");
+	map(0x640026, 0x640027).portr("TRACKY1");
+	map(0x640040, 0x64004f).w(this, FUNC(sparkz_state::latch_w));
+	map(0x640060, 0x64006f).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0x641000, 0x641fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x642000, 0x642000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x646000, 0x646fff).w(this, FUNC(sparkz_state::scanline_int_ack_w));
+	map(0x647000, 0x647fff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+}
 
 
 

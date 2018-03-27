@@ -262,9 +262,10 @@ uint32_t monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-ADDRESS_MAP_START(monzagp_state::monzagp_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void monzagp_state::monzagp_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
 READ8_MEMBER(monzagp_state::port_r)
@@ -405,9 +406,10 @@ WRITE8_MEMBER(monzagp_state::port2_w)
 }
 
 
-ADDRESS_MAP_START(monzagp_state::monzagp_io)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(port_r, port_w)
-ADDRESS_MAP_END
+void monzagp_state::monzagp_io(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(monzagp_state::port_r), FUNC(monzagp_state::port_w));
+}
 
 static INPUT_PORTS_START( monzagp )
 	PORT_START("WHEEL")

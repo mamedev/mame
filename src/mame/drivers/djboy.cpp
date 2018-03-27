@@ -244,60 +244,66 @@ WRITE8_MEMBER(djboy_state::cpu2_bankswitch_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(djboy_state::cpu0_am)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_ROMBANK("bank4")
-	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_r, spriteram_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void djboy_state::cpu0_am(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xafff).bankr("bank4");
+	map(0xb000, 0xbfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
+	map(0xc000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xefff).ram().share("share1");
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(djboy_state::cpu0_port_am)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cpu0_bankswitch_w)
-ADDRESS_MAP_END
-
-/******************************************************************************/
-
-ADDRESS_MAP_START(djboy_state::cpu1_am)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd400, 0xd8ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(djboy_state::cpu1_port_am)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(beast_data_r, beast_data_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(djboy_scrolly_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(djboy_scrollx_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(trigger_nmi_on_cpu0)
-	AM_RANGE(0x0c, 0x0c) AM_READ(beast_status_r)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(coin_count_w)
-ADDRESS_MAP_END
+void djboy_state::cpu0_port_am(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(djboy_state::cpu0_bankswitch_w));
+}
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(djboy_state::cpu2_am)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-ADDRESS_MAP_END
+void djboy_state::cpu1_am(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank2");
+	map(0xc000, 0xcfff).ram().w(this, FUNC(djboy_state::djboy_videoram_w)).share("videoram");
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(djboy_state::djboy_paletteram_w)).share("paletteram");
+	map(0xd400, 0xd8ff).ram();
+	map(0xe000, 0xffff).ram().share("share1");
+}
 
-ADDRESS_MAP_START(djboy_state::cpu2_port_am)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cpu2_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-ADDRESS_MAP_END
+void djboy_state::cpu1_port_am(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(djboy_state::cpu1_bankswitch_w));
+	map(0x02, 0x02).w(this, FUNC(djboy_state::trigger_nmi_on_sound_cpu2));
+	map(0x04, 0x04).rw(this, FUNC(djboy_state::beast_data_r), FUNC(djboy_state::beast_data_w));
+	map(0x06, 0x06).w(this, FUNC(djboy_state::djboy_scrolly_w));
+	map(0x08, 0x08).w(this, FUNC(djboy_state::djboy_scrollx_w));
+	map(0x0a, 0x0a).w(this, FUNC(djboy_state::trigger_nmi_on_cpu0));
+	map(0x0c, 0x0c).r(this, FUNC(djboy_state::beast_status_r));
+	map(0x0e, 0x0e).w(this, FUNC(djboy_state::coin_count_w));
+}
+
+/******************************************************************************/
+
+void djboy_state::cpu2_am(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xdfff).ram();
+}
+
+void djboy_state::cpu2_port_am(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(djboy_state::cpu2_bankswitch_w));
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x04, 0x04).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x06, 0x06).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x07, 0x07).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 /******************************************************************************/
 

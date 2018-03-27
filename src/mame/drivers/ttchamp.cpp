@@ -502,9 +502,10 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 
 
 
-ADDRESS_MAP_START(ttchamp_state::ttchamp_map)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void ttchamp_state::ttchamp_map(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(ttchamp_state::mem_r), FUNC(ttchamp_state::mem_w));
+}
 
 /* Re-use same parameters as before (one-shot) */
 READ16_MEMBER(ttchamp_state::port1e_r)
@@ -544,29 +545,30 @@ WRITE16_MEMBER(ttchamp_state::port62_w)
 	m_rombank = 0;
 }
 
-ADDRESS_MAP_START(ttchamp_state::ttchamp_io)
-	AM_RANGE(0x0000, 0x0001) AM_WRITENOP // startup only, nmi enable?
+void ttchamp_state::ttchamp_io(address_map &map)
+{
+	map(0x0000, 0x0001).nopw(); // startup only, nmi enable?
 
-	AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0004, 0x0005) AM_READ_PORT("P1_P2")
+	map(0x0002, 0x0003).portr("SYSTEM");
+	map(0x0004, 0x0005).portr("P1_P2");
 
-	AM_RANGE(0x0006, 0x0007) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x0006, 0x0006).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x0018, 0x0019) AM_READ(blit_start_r) // read before using bus write offset as blit parameters
-	AM_RANGE(0x001e, 0x001f) AM_READ(port1e_r) // read before some blit operations (but not all)
+	map(0x0018, 0x0019).r(this, FUNC(ttchamp_state::blit_start_r)); // read before using bus write offset as blit parameters
+	map(0x001e, 0x001f).r(this, FUNC(ttchamp_state::port1e_r)); // read before some blit operations (but not all)
 
-	AM_RANGE(0x0008, 0x0009) AM_WRITE(paldat_w)
-	AM_RANGE(0x000a, 0x000b) AM_WRITE(paloff_w) // bit 0x8000 sometimes gets set, why?
+	map(0x0008, 0x0009).w(this, FUNC(ttchamp_state::paldat_w));
+	map(0x000a, 0x000b).w(this, FUNC(ttchamp_state::paloff_w)); // bit 0x8000 sometimes gets set, why?
 
-	AM_RANGE(0x0010, 0x0011) AM_WRITE(port10_w)
+	map(0x0010, 0x0011).w(this, FUNC(ttchamp_state::port10_w));
 
-	AM_RANGE(0x0020, 0x0021) AM_WRITE(port20_w)
+	map(0x0020, 0x0021).w(this, FUNC(ttchamp_state::port20_w));
 
-	AM_RANGE(0x0034, 0x0035) AM_READWRITE(pic_r, pic_w)
+	map(0x0034, 0x0035).rw(this, FUNC(ttchamp_state::pic_r), FUNC(ttchamp_state::pic_w));
 
-	AM_RANGE(0x0062, 0x0063) AM_WRITE(port62_w)
+	map(0x0062, 0x0063).w(this, FUNC(ttchamp_state::port62_w));
 
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START(ttchamp)

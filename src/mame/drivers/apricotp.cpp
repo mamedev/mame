@@ -425,55 +425,59 @@ WRITE16_MEMBER( fp_state::mem_w )
 //  ADDRESS_MAP( fp_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(fp_state::fp_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xf7fff) AM_READWRITE(mem_r, mem_w)
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
-ADDRESS_MAP_END
+void fp_state::fp_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xf7fff).rw(this, FUNC(fp_state::mem_r), FUNC(fp_state::mem_w));
+	map(0xf8000, 0xfffff).rom().region(I8086_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( fp_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(fp_state::fp_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
-	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8(I8253A5_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8(Z80SIO0_TAG, z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
-	AM_RANGE(0x020, 0x021) AM_DEVWRITE8("cent_data_out", output_latch_device, write, 0x00ff)
-	AM_RANGE(0x022, 0x023) AM_WRITE8(pint_clr_w, 0x00ff)
-	AM_RANGE(0x024, 0x025) AM_READ8(prtr_snd_r, 0x00ff)
-	AM_RANGE(0x026, 0x027) AM_DEVWRITE8(SN76489AN_TAG, sn76489a_device, write, 0x00ff)
-	AM_RANGE(0x028, 0x029) AM_WRITE8(contrast_w, 0x00ff)
-	AM_RANGE(0x02a, 0x02b) AM_WRITE8(palette_w, 0x00ff)
-	AM_RANGE(0x02e, 0x02f) AM_WRITE(video_w)
-	AM_RANGE(0x040, 0x05f) AM_DEVREADWRITE8(I8237_TAG, am9517a_device, read, write, 0x00ff)
-	AM_RANGE(0x068, 0x06b) AM_DEVREADWRITE8(I8259A_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x06c, 0x06d) AM_DEVWRITE8(MC6845_TAG, mc6845_device, address_w, 0x00ff)
-	AM_RANGE(0x06e, 0x06f) AM_DEVREADWRITE8(MC6845_TAG, mc6845_device, register_r, register_w, 0x00ff)
-ADDRESS_MAP_END
+void fp_state::fp_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x007).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
+	map(0x008, 0x00f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x018, 0x01f).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
+	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x022, 0x022).w(this, FUNC(fp_state::pint_clr_w));
+	map(0x024, 0x024).r(this, FUNC(fp_state::prtr_snd_r));
+	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0x028, 0x028).w(this, FUNC(fp_state::contrast_w));
+	map(0x02a, 0x02a).w(this, FUNC(fp_state::palette_w));
+	map(0x02e, 0x02f).w(this, FUNC(fp_state::video_w));
+	map(0x040, 0x05f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
+	map(0x068, 0x06b).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x06c, 0x06c).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x06e, 0x06e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( sound_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(fp_state::sound_mem)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD63B01V1_TAG, 0)
-ADDRESS_MAP_END
+void fp_state::sound_mem(address_map &map)
+{
+	map(0xf000, 0xffff).rom().region(HD63B01V1_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( sound_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(fp_state::sound_io)
-	AM_RANGE(M6801_PORT1, M6801_PORT1)
-	AM_RANGE(M6801_PORT2, M6801_PORT2)
-	AM_RANGE(M6801_PORT3, M6801_PORT3)
-	AM_RANGE(M6801_PORT4, M6801_PORT4)
-ADDRESS_MAP_END
+void fp_state::sound_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1);
+	map(M6801_PORT2, M6801_PORT2);
+	map(M6801_PORT3, M6801_PORT3);
+	map(M6801_PORT4, M6801_PORT4);
+}
 
 
 

@@ -3,12 +3,12 @@
 #include "emu.h"
 #include "h8s2357.h"
 
-DEFINE_DEVICE_TYPE(H8S2357, h8s2357_device, "h8s2357", "H8S/2357")
-DEFINE_DEVICE_TYPE(H8S2352, h8s2352_device, "h8s2352", "H8S/2352")
-DEFINE_DEVICE_TYPE(H8S2398, h8s2398_device, "h8s2398", "H8S/2398")
-DEFINE_DEVICE_TYPE(H8S2394, h8s2394_device, "h8s2394", "H8S/2394")
-DEFINE_DEVICE_TYPE(H8S2392, h8s2392_device, "h8s2392", "H8S/2392")
-DEFINE_DEVICE_TYPE(H8S2390, h8s2390_device, "h8s2390", "H8S/2390")
+DEFINE_DEVICE_TYPE(H8S2357, h8s2357_device, "h8s2357", "Hitachi H8S/2357")
+DEFINE_DEVICE_TYPE(H8S2352, h8s2352_device, "h8s2352", "Hitachi H8S/2352")
+DEFINE_DEVICE_TYPE(H8S2398, h8s2398_device, "h8s2398", "Hitachi H8S/2398")
+DEFINE_DEVICE_TYPE(H8S2394, h8s2394_device, "h8s2394", "Hitachi H8S/2394")
+DEFINE_DEVICE_TYPE(H8S2392, h8s2392_device, "h8s2392", "Hitachi H8S/2392")
+DEFINE_DEVICE_TYPE(H8S2390, h8s2390_device, "h8s2390", "Hitachi H8S/2390")
 
 h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :
 	h8s2000_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2357_device::map), this)),

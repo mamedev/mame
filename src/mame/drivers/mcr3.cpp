@@ -481,30 +481,32 @@ READ8_MEMBER(mcr3_state::turbotag_kludge_r)
  *************************************/
 
 /* address map verified from schematics */
-ADDRESS_MAP_START(mcr3_state::mcrmono_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xea00, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE(mcr_paletteram9_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xffff) AM_ROM     /* schematics show a 2716 @ 2B here, but nobody used it */
-ADDRESS_MAP_END
+void mcr3_state::mcrmono_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram().share("nvram");
+	map(0xe800, 0xe9ff).ram().share("spriteram");
+	map(0xea00, 0xebff).ram();
+	map(0xec00, 0xec7f).mirror(0x0380).w(this, FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(mcr3_state::mcr3_videoram_w)).share("videoram");
+	map(0xf800, 0xffff).rom();     /* schematics show a 2716 @ 2B here, but nobody used it */
+}
 
 /* I/O map verified from schematics */
-ADDRESS_MAP_START(mcr3_state::mcrmono_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP3")
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP4")
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_WRITE(mcrmono_control_port_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x78) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xf0, 0xf3) AM_MIRROR(0x0c) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void mcr3_state::mcrmono_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x78).portr("MONO.IP0");
+	map(0x01, 0x01).mirror(0x78).portr("MONO.IP1");
+	map(0x02, 0x02).mirror(0x78).portr("MONO.IP2");
+	map(0x03, 0x03).mirror(0x78).portr("MONO.IP3");
+	map(0x04, 0x04).mirror(0x78).portr("MONO.IP4");
+	map(0x05, 0x05).mirror(0x78).w(this, FUNC(mcr3_state::mcrmono_control_port_w));
+	map(0x07, 0x07).mirror(0x78).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xf0, 0xf3).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 
@@ -515,26 +517,28 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-ADDRESS_MAP_START(mcr3_state::spyhunt_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_SHARE("spyhunt_alpha")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_WRITE(mcr_paletteram9_w) AM_SHARE("paletteram")
-ADDRESS_MAP_END
+void mcr3_state::spyhunt_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(mcr3_state::spyhunt_videoram_w)).share("videoram");
+	map(0xe800, 0xebff).mirror(0x0400).ram().w(this, FUNC(mcr3_state::spyhunt_alpharam_w)).share("spyhunt_alpha");
+	map(0xf000, 0xf7ff).ram().share("nvram");
+	map(0xf800, 0xf9ff).ram().share("spriteram");
+	map(0xfa00, 0xfa7f).mirror(0x0180).w(this, FUNC(mcr3_state::mcr_paletteram9_w)).share("paletteram");
+}
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
-ADDRESS_MAP_START(mcr3_state::spyhunt_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	SSIO_INPUT_PORTS("ssio")
-	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void mcr3_state::spyhunt_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	m_ssio->ssio_input_ports(map, "ssio");
+	map(0x84, 0x86).w(this, FUNC(mcr3_state::spyhunt_scroll_value_w));
+	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe8, 0xe8).nopw();
+	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 /*************************************

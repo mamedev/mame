@@ -281,62 +281,67 @@ WRITE8_MEMBER(a7150_state::a7150_kgs_w)
 }
 
 
-ADDRESS_MAP_START(a7150_state::a7150_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0xf7fff) AM_RAM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void a7150_state::a7150_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0xf7fff).ram();
+	map(0xf8000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(a7150_state::a7150_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x004a, 0x004b) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff) // KES board
-	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00c8, 0x00cf) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x00d0, 0x00d7) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x00d8, 0x00d9) AM_DEVREADWRITE8("uart8251", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00da, 0x00db) AM_DEVREADWRITE8("uart8251", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x0200, 0x0203) AM_READWRITE8(a7150_kgs_r, a7150_kgs_w, 0x00ff) // ABS/KGS board
-	AM_RANGE(0x0300, 0x031f) AM_UNMAP // ASP board #1
-	AM_RANGE(0x0320, 0x033f) AM_UNMAP // ASP board #2
-ADDRESS_MAP_END
+void a7150_state::a7150_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x004a, 0x004a).w("isbc_215g", FUNC(isbc_215g_device::write)); // KES board
+	map(0x00c0, 0x00c3).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00c8, 0x00cf).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x00d0, 0x00d7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x0200, 0x0203).rw(this, FUNC(a7150_state::a7150_kgs_r), FUNC(a7150_state::a7150_kgs_w)).umask16(0x00ff); // ABS/KGS board
+	map(0x0300, 0x031f).unmaprw(); // ASP board #1
+	map(0x0320, 0x033f).unmaprw(); // ASP board #2
+}
 
-ADDRESS_MAP_START(a7150_state::k7070_cpu_banked)
-	ADDRESS_MAP_UNMAP_HIGH
+void a7150_state::k7070_cpu_banked(address_map &map)
+{
+	map.unmap_value_high();
 	// default map: IML=0, MSEL=0.  ROM + local RAM.
-	AM_RANGE(0x00000, 0x01fff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x02000, 0x07fff) AM_RAMBANK("kgs_ram1")
-	AM_RANGE(0x08000, 0x0ffff) AM_RAMBANK("kgs_ram2")
+	map(0x00000, 0x01fff).rom().region("user2", 0);
+	map(0x02000, 0x07fff).bankrw("kgs_ram1");
+	map(0x08000, 0x0ffff).bankrw("kgs_ram2");
 	// IML=1, MSEL=0.   local RAM only.
-	AM_RANGE(0x10000, 0x11fff) AM_RAMBANK("kgs_ram0")
-	AM_RANGE(0x12000, 0x17fff) AM_RAMBANK("kgs_ram1")
-	AM_RANGE(0x18000, 0x1ffff) AM_RAMBANK("kgs_ram2")
+	map(0x10000, 0x11fff).bankrw("kgs_ram0");
+	map(0x12000, 0x17fff).bankrw("kgs_ram1");
+	map(0x18000, 0x1ffff).bankrw("kgs_ram2");
 	// IML=0, MSEL=1.  ROM + local RAM.
-	AM_RANGE(0x20000, 0x21fff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x22000, 0x27fff) AM_RAMBANK("kgs_ram1")
+	map(0x20000, 0x21fff).rom().region("user2", 0);
+	map(0x22000, 0x27fff).bankrw("kgs_ram1");
 	// IML=1, MSEL=1.   local RAM only.
-	AM_RANGE(0x30000, 0x31fff) AM_RAMBANK("kgs_ram0")
-	AM_RANGE(0x32000, 0x37fff) AM_RAMBANK("kgs_ram1")
-	AM_RANGE(0x38000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+	map(0x30000, 0x31fff).bankrw("kgs_ram0");
+	map(0x32000, 0x37fff).bankrw("kgs_ram1");
+	map(0x38000, 0x3ffff).ram().share("video_ram");
+}
 
-ADDRESS_MAP_START(a7150_state::k7070_cpu_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("video_bankdev", address_map_bank_device, read8, write8)
-ADDRESS_MAP_END
+void a7150_state::k7070_cpu_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(m_video_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+}
 
 
-ADDRESS_MAP_START(a7150_state::k7070_cpu_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x0008, 0x000b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x0010, 0x0017) AM_READWRITE(kgs_host_r, kgs_host_w) // p. 11 of KGS-K7070.pdf
+void a7150_state::k7070_cpu_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x0000, 0x0003).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0008, 0x000b).rw(Z80SIO_TAG, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x0010, 0x0017).rw(this, FUNC(a7150_state::kgs_host_r), FUNC(a7150_state::kgs_host_w)); // p. 11 of KGS-K7070.pdf
 
-	AM_RANGE(0x0020, 0x0021) AM_NOP // address register
-	AM_RANGE(0x0022, 0x0022) AM_NOP // function register (p. 6 of ABG-K7072.pdf)
-	AM_RANGE(0x0023, 0x0023) AM_NOP // split register
-	AM_RANGE(0x0030, 0x003f) AM_NOP // palette register
-ADDRESS_MAP_END
+	map(0x0020, 0x0021).noprw(); // address register
+	map(0x0022, 0x0022).noprw(); // function register (p. 6 of ABG-K7072.pdf)
+	map(0x0023, 0x0023).noprw(); // split register
+	map(0x0030, 0x003f).noprw(); // palette register
+}
 
 /* Input ports */
 static INPUT_PORTS_START( a7150 )
@@ -520,10 +525,10 @@ ROM_START( a7150 )
 
 	// A7100
 	ROM_SYSTEM_BIOS(0, "1.1", "ACT 1.1")
-	ROMX_LOAD("Q259.BIN", 0x4001, 0x2000, CRC(fb5b547b) SHA1(1d17fcededa91cad321a7b237a46a308142d902b),ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD("Q260.BIN", 0x0001, 0x2000, CRC(b51f8ed6) SHA1(9aa6291bf8ab49a343741717366992649e2957b3),ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD("Q261.BIN", 0x4000, 0x2000, CRC(43c08ea3) SHA1(ea697180b415b71d834968be84431a6efe9490c2),ROM_BIOS(1)|ROM_SKIP(1))
-	ROMX_LOAD("Q262.BIN", 0x0000, 0x2000, CRC(9df1c396) SHA1(a627889e1162e5b2fe95804de52bb78e41aaf7cc),ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD("q259.bin", 0x4001, 0x2000, CRC(fb5b547b) SHA1(1d17fcededa91cad321a7b237a46a308142d902b),ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD("q260.bin", 0x0001, 0x2000, CRC(b51f8ed6) SHA1(9aa6291bf8ab49a343741717366992649e2957b3),ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD("q261.bin", 0x4000, 0x2000, CRC(43c08ea3) SHA1(ea697180b415b71d834968be84431a6efe9490c2),ROM_BIOS(1)|ROM_SKIP(1))
+	ROMX_LOAD("q262.bin", 0x0000, 0x2000, CRC(9df1c396) SHA1(a627889e1162e5b2fe95804de52bb78e41aaf7cc),ROM_BIOS(1)|ROM_SKIP(1))
 
 	// A7150
 	ROM_SYSTEM_BIOS(1, "2.1", "ACT 2.1")
@@ -539,16 +544,16 @@ ROM_START( a7150 )
 	ROMX_LOAD("272.bin",  0x0000, 0x2000, CRC(5001c528) SHA1(ce67c35326fbfd17f086a37ffe81b79aefaef0cb),ROM_BIOS(3)|ROM_SKIP(1))
 
 	ROM_SYSTEM_BIOS(3, "2.3", "ACT 2.3")
-	ROMX_LOAD("273.ROM",  0x4001, 0x2000, CRC(67ca9b78) SHA1(bcb6221f6df28b24b602846b149ac12e93b5e356),ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("274.ROM",  0x0001, 0x2000, CRC(6fa68834) SHA1(49abe48bbb5ae151f977a9c63b27336c15e8a08d),ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("275.ROM",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60),ROM_BIOS(4)|ROM_SKIP(1))
-	ROMX_LOAD("276.ROM",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946),ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("273.rom",  0x4001, 0x2000, CRC(67ca9b78) SHA1(bcb6221f6df28b24b602846b149ac12e93b5e356),ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("274.rom",  0x0001, 0x2000, CRC(6fa68834) SHA1(49abe48bbb5ae151f977a9c63b27336c15e8a08d),ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("275.rom",  0x4000, 0x2000, CRC(0da54426) SHA1(7492caff98b1d1a896c5964942b17beadf996b60),ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("276.rom",  0x0000, 0x2000, CRC(5924192a) SHA1(eb494d9f96a0b3ea69f4b9cb2b7add66a8c16946),ROM_BIOS(4)|ROM_SKIP(1))
 
 	ROM_REGION( 0x10000, "user2", ROMREGION_ERASEFF )
 	// ROM from A7100
-	ROM_LOAD( "KGS7070-152.bin", 0x0000, 0x2000, CRC(403f4235) SHA1(d07ccd40f8b600651d513f588bcf1ea4f15ed094))
-//  ROM_LOAD( "KGS7070-153.rom", 0x0000, 0x2000, CRC(a72fe820) SHA1(4b77ab2b59ea8c3632986847ff359df26b16196b))
-//  ROM_LOAD( "KGS7070-154.rom", 0x0000, 0x2000, CRC(2995ade0) SHA1(62516f2e1cb62698445f80fd823d39a1a78a7807))
+	ROM_LOAD( "kgs7070-152.bin", 0x0000, 0x2000, CRC(403f4235) SHA1(d07ccd40f8b600651d513f588bcf1ea4f15ed094))
+//  ROM_LOAD( "kgs7070-153.rom", 0x0000, 0x2000, CRC(a72fe820) SHA1(4b77ab2b59ea8c3632986847ff359df26b16196b))
+//  ROM_LOAD( "kgs7070-154.rom", 0x0000, 0x2000, CRC(2995ade0) SHA1(62516f2e1cb62698445f80fd823d39a1a78a7807))
 ROM_END
 
 /* Driver */

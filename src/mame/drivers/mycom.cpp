@@ -216,24 +216,26 @@ WRITE8_MEMBER( mycom_state::vram_data_w )
 	m_p_videoram[m_i_videoram] = data;
 }
 
-ADDRESS_MAP_START(mycom_state::mycom_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(mycom_upper_r,mycom_upper_w)
-ADDRESS_MAP_END
+void mycom_state::mycom_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).bankrw("boot");
+	map(0x1000, 0xbfff).ram();
+	map(0xc000, 0xffff).rw(this, FUNC(mycom_state::mycom_upper_r), FUNC(mycom_state::mycom_upper_w));
+}
 
-ADDRESS_MAP_START(mycom_state::mycom_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(mycom_00_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(vram_data_r,vram_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1771_device, read, write)
-ADDRESS_MAP_END
+void mycom_state::mycom_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(mycom_state::mycom_00_w));
+	map(0x01, 0x01).rw(this, FUNC(mycom_state::vram_data_r), FUNC(mycom_state::vram_data_w));
+	map(0x02, 0x02).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x03, 0x03).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x04, 0x07).rw(m_ppi0, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw(m_ppi1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0c, 0x0f).rw(m_ppi2, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x13).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mycom )

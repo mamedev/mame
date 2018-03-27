@@ -299,48 +299,52 @@ uint32_t scyclone_state::screen_update_scyclone(screen_device &screen, bitmap_rg
 
 
 
-ADDRESS_MAP_START(scyclone_state::scyclone_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4400, 0x5fff) AM_READWRITE(vram_r,vram_w)
-	AM_RANGE(0x6000, 0x60ff) AM_NOP // this just seems to be overflow from the VRAM writes, probably goes nowhere
-ADDRESS_MAP_END
+void scyclone_state::scyclone_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x4400, 0x5fff).rw(this, FUNC(scyclone_state::vram_r), FUNC(scyclone_state::vram_w));
+	map(0x6000, 0x60ff).noprw(); // this just seems to be overflow from the VRAM writes, probably goes nowhere
+}
 
 
-ADDRESS_MAP_START(scyclone_state::scyclone_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(vidctrl_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(sprite_xpos_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(sprite_ypos_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w) // possible watchdog, unlikely to be twinkle related.
-	AM_RANGE(0x08, 0x08) AM_WRITE(sprite_colour_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(sprite_tile_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(starscroll_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(port0e_w)
-	AM_RANGE(0x0f, 0x0f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x40, 0x40) AM_WRITE(videomask1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(videomask2_w)
-ADDRESS_MAP_END
+void scyclone_state::scyclone_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("mb14241", FUNC(mb14241_device::shift_result_r)).w("mb14241", FUNC(mb14241_device::shift_count_w));
+	map(0x01, 0x01).portr("IN0").w("mb14241", FUNC(mb14241_device::shift_data_w));
+	map(0x02, 0x02).portr("IN1");
+	map(0x03, 0x03).portr("DSW0").w(this, FUNC(scyclone_state::vidctrl_w));
+	map(0x04, 0x04).w(this, FUNC(scyclone_state::sprite_xpos_w));
+	map(0x05, 0x05).w(this, FUNC(scyclone_state::sprite_ypos_w));
+	map(0x06, 0x06).w(this, FUNC(scyclone_state::port06_w)); // possible watchdog, unlikely to be twinkle related.
+	map(0x08, 0x08).w(this, FUNC(scyclone_state::sprite_colour_w));
+	map(0x09, 0x09).w(this, FUNC(scyclone_state::sprite_tile_w));
+	map(0x0a, 0x0a).w(this, FUNC(scyclone_state::starscroll_w));
+	map(0x0e, 0x0e).w(this, FUNC(scyclone_state::port0e_w));
+	map(0x0f, 0x0f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x40, 0x40).w(this, FUNC(scyclone_state::videomask1_w));
+	map(0x80, 0x80).w(this, FUNC(scyclone_state::videomask2_w));
+}
 
 
-ADDRESS_MAP_START(scyclone_state::scyclone_sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
+void scyclone_state::scyclone_sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
 
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("dac", dac_byte_interface, write) // music
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(snd_3001_w) // written at the same time, with the same data as 0x3005
-	AM_RANGE(0x3002, 0x3002) AM_DEVWRITE("dac2", dac_byte_interface, write) // speech
+	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac", FUNC(dac_byte_interface::write)); // music
+	map(0x3001, 0x3001).w(this, FUNC(scyclone_state::snd_3001_w)); // written at the same time, with the same data as 0x3005
+	map(0x3002, 0x3002).w("dac2", FUNC(dac_byte_interface::write)); // speech
 //  AM_RANGE(0x3003, 0x3003) AM_WRITE(snd_3003_w) // writes 02 or 00
 //  AM_RANGE(0x3004, 0x3004) AM_WRITE(snd_3004_w) // always writes 00?
-	AM_RANGE(0x3005, 0x3005) AM_WRITE(snd_3005_w) // written at the same time, with the same data as 0x3001
-ADDRESS_MAP_END
+	map(0x3005, 0x3005).w(this, FUNC(scyclone_state::snd_3005_w)); // written at the same time, with the same data as 0x3001
+}
 
-ADDRESS_MAP_START(scyclone_state::scyclone_sub_iomap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void scyclone_state::scyclone_sub_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 
 // appears to be when a white bitmap pixel (col 0x7) collides with a large sprite?
@@ -665,31 +669,31 @@ MACHINE_CONFIG_END
 
 ROM_START( scyclone )
 	ROM_REGION( 0x3000, "maincpu", 0 )
-	ROM_LOAD( "DE07.1H.2716", 0x0000, 0x0800, CRC(fa9c93a3) SHA1(701a3196ee67533d69f1264e14085d04dfb1b915) )
-	ROM_LOAD( "DE08.3H.2716", 0x0800, 0x0800, CRC(bdff3e77) SHA1(e3fc6840348fa6df834cb1fb8b3832db05b5c585) )
-	ROM_LOAD( "DE09.4H.2716", 0x1000, 0x0800, CRC(eed05875) SHA1(e00a1b2d2d723c2deedf5f5e3159936a5d27891d) )
-	ROM_LOAD( "DE10.5H.2716", 0x1800, 0x0800, CRC(71301be6) SHA1(70c1983d256a6a9e18c7a15b93f5e3781d884fdb) )
-	ROM_LOAD( "DE11.6H.2716", 0x2000, 0x0800, CRC(d241db51) SHA1(53c6489d715baf5f03032a7ac367a6af64bce040) )
-	ROM_LOAD( "DE12.7H.2716", 0x2800, 0x0800, CRC(208e3e9a) SHA1(07f0e6c5417584eef171d8dcad83d741f88c9348) )
+	ROM_LOAD( "de07.1h.2716", 0x0000, 0x0800, CRC(fa9c93a3) SHA1(701a3196ee67533d69f1264e14085d04dfb1b915) )
+	ROM_LOAD( "de08.3h.2716", 0x0800, 0x0800, CRC(bdff3e77) SHA1(e3fc6840348fa6df834cb1fb8b3832db05b5c585) )
+	ROM_LOAD( "de09.4h.2716", 0x1000, 0x0800, CRC(eed05875) SHA1(e00a1b2d2d723c2deedf5f5e3159936a5d27891d) )
+	ROM_LOAD( "de10.5h.2716", 0x1800, 0x0800, CRC(71301be6) SHA1(70c1983d256a6a9e18c7a15b93f5e3781d884fdb) )
+	ROM_LOAD( "de11.6h.2716", 0x2000, 0x0800, CRC(d241db51) SHA1(53c6489d715baf5f03032a7ac367a6af64bce040) )
+	ROM_LOAD( "de12.7h.2716", 0x2800, 0x0800, CRC(208e3e9a) SHA1(07f0e6c5417584eef171d8dcad83d741f88c9348) )
 
 	ROM_REGION( 0x2000, "subcpu", 0 )
-	ROM_LOAD( "DE18.IC1.2716",  0x0000, 0x0800, CRC(182a5c24) SHA1(0ba29b6b3e7ec97c0b0748a6e60bb1a737dc55fa) )
-	ROM_LOAD( "DE04.IC9.2716",  0x0800, 0x0800, CRC(098269ac) SHA1(138af858bbbd73380086f971bcdd52ae47e2b667) )
-	ROM_LOAD( "DE05.IC14.2716", 0x1000, 0x0800, CRC(878f68b2) SHA1(2c2fa1b9053664ec26452ab0b35e2ae550601cc9) )
-	ROM_LOAD( "DE06.IC19.2716", 0x1800, 0x0800, CRC(0b1ead90) SHA1(38322b39f4420408c223cdbed3b75692a3d70746) )
+	ROM_LOAD( "de18.ic1.2716",  0x0000, 0x0800, CRC(182a5c24) SHA1(0ba29b6b3e7ec97c0b0748a6e60bb1a737dc55fa) )
+	ROM_LOAD( "de04.ic9.2716",  0x0800, 0x0800, CRC(098269ac) SHA1(138af858bbbd73380086f971bcdd52ae47e2b667) )
+	ROM_LOAD( "de05.ic14.2716", 0x1000, 0x0800, CRC(878f68b2) SHA1(2c2fa1b9053664ec26452ab0b35e2ae550601cc9) )
+	ROM_LOAD( "de06.ic19.2716", 0x1800, 0x0800, CRC(0b1ead90) SHA1(38322b39f4420408c223cdbed3b75692a3d70746) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // 32x32x2 sprites
-	ROM_LOAD( "DE01.11C.2716", 0x0000, 0x0800, CRC(bf770730) SHA1(1d0f9235b0618e3f4dd6db47efbdf92e2b00f5f6) )
+	ROM_LOAD( "de01.11c.2716", 0x0000, 0x0800, CRC(bf770730) SHA1(1d0f9235b0618e3f4dd6db47efbdf92e2b00f5f6) )
 
 	ROM_REGION( 0x0400, "gfx1pal", 0 ) // only 16 bytes of this are actually used
-	ROM_LOAD( "DE02.5B.82S137", 0x0000, 0x0400, CRC(fe4b278c) SHA1(c03080ab4d3fb84b8eec7087b925d1a1d8565fcc) )
+	ROM_LOAD( "de02.5b.82s137", 0x0000, 0x0400, CRC(fe4b278c) SHA1(c03080ab4d3fb84b8eec7087b925d1a1d8565fcc) )
 
 	ROM_REGION( 0x0840, "stars", 0 ) // probably the starfield bitmap
-	ROM_LOAD( "DE15.3A.82S137", 0x0000, 0x0400, CRC(c2816161) SHA1(2d0e7b4dbdb2af1481a4b7e45b1f9e3640f69aec) )
+	ROM_LOAD( "de15.3a.82s137", 0x0000, 0x0400, CRC(c2816161) SHA1(2d0e7b4dbdb2af1481a4b7e45b1f9e3640f69aec) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "DE16.4A.82S123", 0x0000, 0x0020, CRC(5178e9c5) SHA1(dd2f81894069282f37feae21c5cfacf50f77dcd5) )
-	ROM_LOAD( "DE17.2E.82S123", 0x0020, 0x0020, CRC(3c8572e4) SHA1(c908c4ed99828fff576c3d0963cd8b99edeb993b) )
+	ROM_LOAD( "de16.4a.82s123", 0x0000, 0x0020, CRC(5178e9c5) SHA1(dd2f81894069282f37feae21c5cfacf50f77dcd5) )
+	ROM_LOAD( "de17.2e.82s123", 0x0020, 0x0020, CRC(3c8572e4) SHA1(c908c4ed99828fff576c3d0963cd8b99edeb993b) )
 ROM_END
 
 GAME( 1980, scyclone,  0,    scyclone, scyclone, scyclone_state, 0, ROT270, "Taito Corporation", "Space Cyclone", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

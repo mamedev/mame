@@ -474,21 +474,23 @@ WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 	m_cpu_db7->write((data >> 7) & 1);
 }
 
-ADDRESS_MAP_START(hazl1500_state::hazl1500_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x3000, 0x377f) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0x3780, 0x37ff) AM_RAM
-ADDRESS_MAP_END
+void hazl1500_state::hazl1500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x3000, 0x377f).rw(this, FUNC(hazl1500_state::ram_r), FUNC(hazl1500_state::ram_w));
+	map(0x3780, 0x37ff).ram();
+}
 
-ADDRESS_MAP_START(hazl1500_state::hazl1500_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_READWRITE(status_reg_2_r, status_reg_3_w)
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE(uart_r, uart_w)
-	AM_RANGE(0xdf, 0xdf) AM_READ(kbd_encoder_r)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(system_test_r, refresh_address_w)
-	AM_RANGE(0xf7, 0xf7) AM_READ(kbd_status_latch_r)
-ADDRESS_MAP_END
+void hazl1500_state::hazl1500_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).rw(this, FUNC(hazl1500_state::status_reg_2_r), FUNC(hazl1500_state::status_reg_3_w));
+	map(0xbf, 0xbf).rw(this, FUNC(hazl1500_state::uart_r), FUNC(hazl1500_state::uart_w));
+	map(0xdf, 0xdf).r(this, FUNC(hazl1500_state::kbd_encoder_r));
+	map(0xef, 0xef).rw(this, FUNC(hazl1500_state::system_test_r), FUNC(hazl1500_state::refresh_address_w));
+	map(0xf7, 0xf7).r(this, FUNC(hazl1500_state::kbd_status_latch_r));
+}
 
 	/*
 	  Hazeltine 1500 key matrix (from ref[1])
@@ -777,7 +779,7 @@ ROM_START( hazl1500 )
 	ROM_REGION( 0x10000, NETLIST_TAG, ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x10000, CPU_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "h15s-00I-10-3.bin", 0x0000, 0x0800, CRC(a2015f72) SHA1(357cde517c3dcf693de580881add058c7b26dfaa))
+	ROM_LOAD( "h15s-00i-10-3.bin", 0x0000, 0x0800, CRC(a2015f72) SHA1(357cde517c3dcf693de580881add058c7b26dfaa))
 
 	ROM_REGION( 0x800, CHAR_EPROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u83_chr.bin", 0x0000, 0x0800, CRC(e0c6b734) SHA1(7c42947235c66c41059fd4384e09f4f3a17c9857))

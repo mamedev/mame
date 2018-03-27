@@ -64,22 +64,23 @@ WRITE_LINE_MEMBER(pooyan_state::coin_counter_2_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(pooyan_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9400, 0x94ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa080, 0xa080) AM_MIRROR(0x5e1f) AM_READ_PORT("IN0")
-	AM_RANGE(0xa0a0, 0xa0a0) AM_MIRROR(0x5e1f) AM_READ_PORT("IN1")
-	AM_RANGE(0xa0c0, 0xa0c0) AM_MIRROR(0x5e1f) AM_READ_PORT("IN2")
-	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x5e1f) AM_READ_PORT("DSW0")
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x5e7f) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sound_data_w)
-	AM_RANGE(0xa180, 0xa187) AM_MIRROR(0x5e78) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void pooyan_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram().w(this, FUNC(pooyan_state::colorram_w)).share("colorram");
+	map(0x8400, 0x87ff).ram().w(this, FUNC(pooyan_state::videoram_w)).share("videoram");
+	map(0x8800, 0x8fff).ram();
+	map(0x9000, 0x90ff).mirror(0x0b00).ram().share("spriteram");
+	map(0x9400, 0x94ff).mirror(0x0b00).ram().share("spriteram2");
+	map(0xa000, 0xa000).mirror(0x5e7f).portr("DSW1");
+	map(0xa080, 0xa080).mirror(0x5e1f).portr("IN0");
+	map(0xa0a0, 0xa0a0).mirror(0x5e1f).portr("IN1");
+	map(0xa0c0, 0xa0c0).mirror(0x5e1f).portr("IN2");
+	map(0xa0e0, 0xa0e0).mirror(0x5e1f).portr("DSW0");
+	map(0xa000, 0xa000).mirror(0x5e7f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xa100, 0xa100).mirror(0x5e7f).w("timeplt_audio", FUNC(timeplt_audio_device::sound_data_w));
+	map(0xa180, 0xa187).mirror(0x5e78).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
 

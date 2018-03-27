@@ -214,35 +214,37 @@ READ32_MEMBER(mjsenpu_state::muxed_inputs_r)
 	return 0x00000000;// 0xffffffff;
 }
 
-ADDRESS_MAP_START(mjsenpu_state::mjsenpu_32bit_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x40000000, 0x401fffff) AM_ROM AM_REGION("user2",0) // main game rom
+void mjsenpu_state::mjsenpu_32bit_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().share("mainram");
+	map(0x40000000, 0x401fffff).rom().region("user2", 0); // main game rom
 
-	AM_RANGE(0x80000000, 0x8001ffff) AM_READWRITE(vram_r,vram_w)
+	map(0x80000000, 0x8001ffff).rw(this, FUNC(mjsenpu_state::vram_r), FUNC(mjsenpu_state::vram_w));
 
-	AM_RANGE(0xffc00000, 0xffc000ff) AM_READWRITE8(palette_low_r, palette_low_w, 0xffffffff)
-	AM_RANGE(0xffd00000, 0xffd000ff) AM_READWRITE8(palette_high_r, palette_high_w, 0xffffffff)
+	map(0xffc00000, 0xffc000ff).rw(this, FUNC(mjsenpu_state::palette_low_r), FUNC(mjsenpu_state::palette_low_w));
+	map(0xffd00000, 0xffd000ff).rw(this, FUNC(mjsenpu_state::palette_high_r), FUNC(mjsenpu_state::palette_high_w));
 
-	AM_RANGE(0xffe00000, 0xffe007ff) AM_RAM AM_SHARE("nvram")
+	map(0xffe00000, 0xffe007ff).ram().share("nvram");
 
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0) // boot rom
-ADDRESS_MAP_END
+	map(0xfff80000, 0xffffffff).rom().region("user1", 0); // boot rom
+}
 
 
-ADDRESS_MAP_START(mjsenpu_state::mjsenpu_io)
-	AM_RANGE(0x4000, 0x4003)  AM_READ(muxed_inputs_r)
-	AM_RANGE(0x4010, 0x4013)  AM_READ_PORT("IN1")
+void mjsenpu_state::mjsenpu_io(address_map &map)
+{
+	map(0x4000, 0x4003).r(this, FUNC(mjsenpu_state::muxed_inputs_r));
+	map(0x4010, 0x4013).portr("IN1");
 
-	AM_RANGE(0x4020, 0x4023)  AM_WRITE8( control_w, 0x000000ff)
+	map(0x4023, 0x4023).w(this, FUNC(mjsenpu_state::control_w));
 
-	AM_RANGE(0x4030, 0x4033)  AM_READ_PORT("DSW1")
-	AM_RANGE(0x4040, 0x4043)  AM_READ_PORT("DSW2")
-	AM_RANGE(0x4050, 0x4053)  AM_READ_PORT("DSW3")
+	map(0x4030, 0x4033).portr("DSW1");
+	map(0x4040, 0x4043).portr("DSW2");
+	map(0x4050, 0x4053).portr("DSW3");
 
-	AM_RANGE(0x4060, 0x4063)  AM_WRITE8( mux_w, 0x000000ff)
+	map(0x4063, 0x4063).w(this, FUNC(mjsenpu_state::mux_w));
 
-	AM_RANGE(0x4070, 0x4073)  AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x000000ff)
-ADDRESS_MAP_END
+	map(0x4073, 0x4073).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 static INPUT_PORTS_START( mjsenpu )
 
@@ -490,13 +492,13 @@ MACHINE_CONFIG_END
 
 ROM_START( mjsenpu )
 	ROM_REGION32_BE( 0x80000, "user1", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "U1", 0x000000, 0x080000, CRC(ebfb1079) SHA1(9d676c635d5ee464df5730518399e141ebc515ed) )
+	ROM_LOAD( "u1", 0x000000, 0x080000, CRC(ebfb1079) SHA1(9d676c635d5ee464df5730518399e141ebc515ed) )
 
 	ROM_REGION32_BE( 0x200000, "user2", 0 ) /* Hyperstone CPU Code */
-	ROM_LOAD16_WORD_SWAP( "U13", 0x000000, 0x200000, CRC(a803c5a5) SHA1(61c7386a1bb6224b788de01293697d0e896839a8) )
+	ROM_LOAD16_WORD_SWAP( "u13", 0x000000, 0x200000, CRC(a803c5a5) SHA1(61c7386a1bb6224b788de01293697d0e896839a8) )
 
 	ROM_REGION( 0x080000, "oki", 0 )
-	ROM_LOAD( "SU2", 0x000000, 0x080000, CRC(848045d5) SHA1(4d32e1a5bd0937069dd8d50dfd8b63d4a45e40e6) )
+	ROM_LOAD( "su2", 0x000000, 0x080000, CRC(848045d5) SHA1(4d32e1a5bd0937069dd8d50dfd8b63d4a45e40e6) )
 ROM_END
 
 

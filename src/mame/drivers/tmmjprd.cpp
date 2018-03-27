@@ -692,37 +692,38 @@ WRITE32_MEMBER(tmmjprd_state::brt_2_w)
 	}
 }
 
-ADDRESS_MAP_START(tmmjprd_state::tmmjprd_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200010, 0x200013) AM_READ(randomtmmjprds) // gfx chip status?
+void tmmjprd_state::tmmjprd_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200010, 0x200013).r(this, FUNC(tmmjprd_state::randomtmmjprds)); // gfx chip status?
 	/* check these are used .. */
 //  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_SHARE("viewregs0")
-	AM_RANGE(0x200100, 0x200117) AM_WRITEONLY AM_SHARE("tilemap_regs.0" ) // tilemap regs1
-	AM_RANGE(0x200120, 0x200137) AM_WRITEONLY AM_SHARE("tilemap_regs.1" ) // tilemap regs2
-	AM_RANGE(0x200140, 0x200157) AM_WRITEONLY AM_SHARE("tilemap_regs.2" ) // tilemap regs3
-	AM_RANGE(0x200160, 0x200177) AM_WRITEONLY AM_SHARE("tilemap_regs.3" ) // tilemap regs4
-	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_SHARE("spriteregs" ) // sprregs?
+	map(0x200100, 0x200117).writeonly().share("tilemap_regs.0"); // tilemap regs1
+	map(0x200120, 0x200137).writeonly().share("tilemap_regs.1"); // tilemap regs2
+	map(0x200140, 0x200157).writeonly().share("tilemap_regs.2"); // tilemap regs3
+	map(0x200160, 0x200177).writeonly().share("tilemap_regs.3"); // tilemap regs4
+	map(0x200200, 0x20021b).writeonly().share("spriteregs"); // sprregs?
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE(rombank_w) // used during rom testing, rombank/area select + something else?
-	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(brt_1_w)
-	AM_RANGE(0x200410, 0x200413) AM_WRITE(brt_2_w)
+	map(0x20040c, 0x20040f).w(this, FUNC(tmmjprd_state::brt_1_w));
+	map(0x200410, 0x200413).w(this, FUNC(tmmjprd_state::brt_2_w));
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("viewregs7")
 //  AM_RANGE(0x200700, 0x20070f) AM_WRITE(blitter_w) AM_SHARE("blitterregs")
 //  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_SHARE("viewregs9") // never changes?
-	AM_RANGE(0x200900, 0x2009ff) AM_DEVREADWRITE16("i5000snd", i5000snd_device, read, write, 0xffffffff)
+	map(0x200900, 0x2009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
 //  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("viewregs10")
 	/* tilemaps */
-	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(tilemap0_r,tilemap0_w)
-	AM_RANGE(0x284000, 0x287fff) AM_READWRITE(tilemap1_r,tilemap1_w)
-	AM_RANGE(0x288000, 0x28bfff) AM_READWRITE(tilemap2_r,tilemap2_w)
-	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE(tilemap3_r,tilemap3_w)
+	map(0x280000, 0x283fff).rw(this, FUNC(tmmjprd_state::tilemap0_r), FUNC(tmmjprd_state::tilemap0_w));
+	map(0x284000, 0x287fff).rw(this, FUNC(tmmjprd_state::tilemap1_r), FUNC(tmmjprd_state::tilemap1_w));
+	map(0x288000, 0x28bfff).rw(this, FUNC(tmmjprd_state::tilemap2_r), FUNC(tmmjprd_state::tilemap2_w));
+	map(0x28c000, 0x28ffff).rw(this, FUNC(tmmjprd_state::tilemap3_r), FUNC(tmmjprd_state::tilemap3_w));
 	/* ?? is palette ram shared with sprites in this case or just a different map */
-	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
+	map(0x290000, 0x29bfff).ram().share("spriteram");
+	map(0x29c000, 0x29ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 
-	AM_RANGE(0x400000, 0x400003) AM_READ(mux_r) AM_WRITE(eeprom_write)
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x400000, 0x400003).r(this, FUNC(tmmjprd_state::mux_r)).w(this, FUNC(tmmjprd_state::eeprom_write));
+	map(0xf00000, 0xffffff).ram();
+}
 
 
 

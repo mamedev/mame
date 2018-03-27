@@ -118,44 +118,49 @@ WRITE8_MEMBER( alesis_state::mmt8_p3_w )
 	m_cassette->output(data & 0x10 ? -1.0 : +1.0);
 }
 
-ADDRESS_MAP_START(alesis_state::hr16_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-ADDRESS_MAP_END
+void alesis_state::hr16_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).mirror(0x8000).rom();
+}
 
-ADDRESS_MAP_START(alesis_state::hr16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_READ(kb_r)
-	AM_RANGE(0x0002, 0x0002) AM_DEVWRITE("dm3ag", alesis_dm3ag_device, write)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(led_w)
-	AM_RANGE(0x0006, 0x0007) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
-	AM_RANGE(0x0008, 0x0008) AM_WRITE(kb_matrix_w)
-	AM_RANGE(0x8000, 0xffff) AM_RAM     AM_SHARE("nvram")   // 32Kx8 SRAM, (battery-backed)
-ADDRESS_MAP_END
+void alesis_state::hr16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0000).r(this, FUNC(alesis_state::kb_r));
+	map(0x0002, 0x0002).w("dm3ag", FUNC(alesis_dm3ag_device::write));
+	map(0x0004, 0x0004).w(this, FUNC(alesis_state::led_w));
+	map(0x0006, 0x0007).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
+	map(0x0008, 0x0008).w(this, FUNC(alesis_state::kb_matrix_w));
+	map(0x8000, 0xffff).ram().share("nvram");   // 32Kx8 SRAM, (battery-backed)
+}
 
-ADDRESS_MAP_START(alesis_state::sr16_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void alesis_state::sr16_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(alesis_state::sr16_io)
+void alesis_state::sr16_io(address_map &map)
+{
 	//ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0xff) AM_DEVWRITE("dm3ag", alesis_dm3ag_device, write)
-	AM_RANGE(0x0200, 0x0200) AM_MIRROR(0xff) AM_WRITE(sr16_lcd_w)
-	AM_RANGE(0x0300, 0x0300) AM_MIRROR(0xff) AM_WRITE(kb_matrix_w)
-	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0xff) AM_READ(kb_r)
-	AM_RANGE(0x8000, 0xffff) AM_RAM     AM_SHARE("nvram")   // 32Kx8 SRAM, (battery-backed)
-ADDRESS_MAP_END
+	map(0x0000, 0x0000).mirror(0xff).w("dm3ag", FUNC(alesis_dm3ag_device::write));
+	map(0x0200, 0x0200).mirror(0xff).w(this, FUNC(alesis_state::sr16_lcd_w));
+	map(0x0300, 0x0300).mirror(0xff).w(this, FUNC(alesis_state::kb_matrix_w));
+	map(0x0400, 0x0400).mirror(0xff).r(this, FUNC(alesis_state::kb_r));
+	map(0x8000, 0xffff).ram().share("nvram");   // 32Kx8 SRAM, (battery-backed)
+}
 
-ADDRESS_MAP_START(alesis_state::mmt8_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM     AM_SHARE("nvram")   // 2x32Kx8 SRAM, (battery-backed)
-	AM_RANGE(0xff02, 0xff02) AM_WRITE(track_led_w)
-	AM_RANGE(0xff04, 0xff04) AM_READWRITE(mmt8_led_r, mmt8_led_w)
-	AM_RANGE(0xff06, 0xff06) AM_WRITE(kb_matrix_w)
-	AM_RANGE(0xff08, 0xff09) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
-	AM_RANGE(0xff0e, 0xff0e) AM_READNOP
-ADDRESS_MAP_END
+void alesis_state::mmt8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram().share("nvram");   // 2x32Kx8 SRAM, (battery-backed)
+	map(0xff02, 0xff02).w(this, FUNC(alesis_state::track_led_w));
+	map(0xff04, 0xff04).rw(this, FUNC(alesis_state::mmt8_led_r), FUNC(alesis_state::mmt8_led_w));
+	map(0xff06, 0xff06).w(this, FUNC(alesis_state::kb_matrix_w));
+	map(0xff08, 0xff09).rw(m_lcdc, FUNC(hd44780_device::read), FUNC(hd44780_device::write));
+	map(0xff0e, 0xff0e).nopr();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( hr16 )

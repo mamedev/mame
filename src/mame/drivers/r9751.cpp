@@ -619,16 +619,17 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
  Address Maps
 ******************************************************************************/
 
-ADDRESS_MAP_START(r9751_state::r9751_mem)
+void r9751_state::r9751_mem(address_map &map)
+{
 	//ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_SHARE("main_ram") // 16MB
-	AM_RANGE(0x08000000,0x0800ffff) AM_ROM AM_REGION("prom", 0)
-	AM_RANGE(0x5FF00000,0x5FFFFFFF) AM_READWRITE(r9751_mmio_5ff_r, r9751_mmio_5ff_w)
-	AM_RANGE(0xFF010000,0xFF01FFFF) AM_READWRITE(r9751_mmio_ff01_r, r9751_mmio_ff01_w)
-	AM_RANGE(0xFF050000,0xFF06FFFF) AM_READWRITE(r9751_mmio_ff05_r, r9751_mmio_ff05_w)
-	AM_RANGE(0xFFF80000,0xFFF8FFFF) AM_READWRITE(r9751_mmio_fff8_r, r9751_mmio_fff8_w)
+	map(0x00000000, 0x00ffffff).ram().share("main_ram"); // 16MB
+	map(0x08000000, 0x0800ffff).rom().region("prom", 0);
+	map(0x5FF00000, 0x5FFFFFFF).rw(this, FUNC(r9751_state::r9751_mmio_5ff_r), FUNC(r9751_state::r9751_mmio_5ff_w));
+	map(0xFF010000, 0xFF01FFFF).rw(this, FUNC(r9751_state::r9751_mmio_ff01_r), FUNC(r9751_state::r9751_mmio_ff01_w));
+	map(0xFF050000, 0xFF06FFFF).rw(this, FUNC(r9751_state::r9751_mmio_ff05_r), FUNC(r9751_state::r9751_mmio_ff05_w));
+	map(0xFFF80000, 0xFFF8FFFF).rw(this, FUNC(r9751_state::r9751_mmio_fff8_r), FUNC(r9751_state::r9751_mmio_fff8_w));
 	//AM_RANGE(0xffffff00,0xffffffff) AM_RAM // Unknown area
-ADDRESS_MAP_END
+}
 
 /******************************************************************************
  Input Ports
@@ -674,7 +675,7 @@ MACHINE_CONFIG_END
 ROM_START(r9751)
 	ROM_REGION32_BE(0x00010000, "prom", 0)
 	ROM_SYSTEM_BIOS(0, "prom34",  "PROM Version 3.4")
-	ROMX_LOAD( "p-n_98d4643__abaco_v3.4__(49fe7a)__j221.27512.bin", 0x0000, 0x10000, CRC(9fb19a85) SHA1(c861e15a2fc9a4ef689c2034c53fbb36f17f7da6), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: "P/N 98D4643 // ABACO V3.4 // (49FE7A) // J221" 27512 @Unknown
+	ROMX_LOAD( "p-n_98d4643__abaco_v3.4__=49fe7a=__j221.27512.bin", 0x0000, 0x10000, CRC(9fb19a85) SHA1(c861e15a2fc9a4ef689c2034c53fbb36f17f7da6), ROM_GROUPWORD | ROM_BIOS(1) ) // Label: "P/N 98D4643 // ABACO V3.4 // (49FE7A) // J221" 27512 @Unknown
 
 	ROM_SYSTEM_BIOS(1, "prom42", "PROM Version 4.2")
 	ROMX_LOAD( "98d5731__zebra_v4.2__4cd79d.u5", 0x0000, 0x10000, CRC(e640f8df) SHA1(a9e4fa271d7f2f3a134e2120932ec088d5b8b007), ROM_GROUPWORD | ROM_BIOS(2) ) // Label: 98D5731 // ZEBRA V4.2 // 4CD79D 27512 @Unknown

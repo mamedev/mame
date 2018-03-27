@@ -60,7 +60,7 @@
 #include "dsp56mem.h"
 
 
-DEFINE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device, "dsp56156", "DSP56156")
+DEFINE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device, "dsp56156", "Motorola DSP56156")
 
 
 namespace DSP56K {
@@ -504,9 +504,9 @@ void dsp56k_device::execute_run()
 }
 
 
-util::disasm_interface *dsp56k_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> dsp56k_device::create_disassembler()
 {
-	return new dsp56k_disassembler;
+	return std::make_unique<dsp56k_disassembler>();
 }
 
 } // namespace DSP56K

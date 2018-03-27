@@ -11,7 +11,7 @@
  *  Current implementation is based from :
  *  gcpinbal.cpp, by David Graves & R. Belmont.
  *  splitted by cam900
- * 
+ *
  *  It seems that the ES8712 is actually a programmable counter which can stream
  *  ADPCM samples when hooked up to a ROM and a M5205 or M6585 (whose VCK signal
  *  can drive the counter). Neither of these seem to be used in conjunction with

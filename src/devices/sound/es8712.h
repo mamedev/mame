@@ -47,7 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(msm_w);
 	DECLARE_WRITE_LINE_MEMBER(msm_int);
-	
+
 	void play();
 
 protected:
@@ -63,7 +63,7 @@ private:
 
 	required_device<hct157_device> m_adpcm_select;
 	optional_device<msm5205_device> m_msm;
-	
+
 	// device callbacks
 	devcb_write_line m_reset_handler;
 	devcb_write8 m_msm_write_cb;

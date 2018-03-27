@@ -355,51 +355,56 @@ WRITE8_MEMBER(namcos16_state::pal_bank_w)
 	m_pal_bank = offset & 1;
 }
 
-ADDRESS_MAP_START(namcos16_state::namcos16_master_base_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fgvram")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("fgattr")
-	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("master_workram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("slave_sharedram")
+void namcos16_state::namcos16_master_base_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("fgvram");
+	map(0x0400, 0x07ff).ram().share("fgattr");
+	map(0x0800, 0x1fff).ram().share("master_workram");
+	map(0x2800, 0x2fff).ram().share("slave_sharedram");
 
 	// 0x6000 - 0x7fff i/o specific, guessing PAL controlled.
 
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(slave_halt_ctrl_w)
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(sound_halt_ctrl_w)
-	AM_RANGE(0xa000, 0xa001) AM_WRITE(pal_bank_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("master_rom",0)
-ADDRESS_MAP_END
+	map(0x8000, 0x8fff).w(this, FUNC(namcos16_state::slave_halt_ctrl_w));
+	map(0x9000, 0x9fff).w(this, FUNC(namcos16_state::sound_halt_ctrl_w));
+	map(0xa000, 0xa001).w(this, FUNC(namcos16_state::pal_bank_w));
+	map(0x8000, 0xffff).rom().region("master_rom", 0);
+}
 
-ADDRESS_MAP_START(namcos16_state::master_liblrabl_map)
-	AM_IMPORT_FROM( namcos16_master_base_map )
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)
-	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("58xx", namco58xx_device, read, write)
-	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("56xx_1", namco56xx_device, read, write)
-	AM_RANGE(0x6820, 0x682f) AM_DEVREADWRITE("56xx_2", namco56xx_device, read, write)
-	AM_RANGE(0x7000, 0x7fff) AM_READNOP AM_WRITE(irq_ctrl_w)
-ADDRESS_MAP_END
+void namcos16_state::master_liblrabl_map(address_map &map)
+{
+	namcos16_master_base_map(map);
+	map(0x6000, 0x63ff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
+	map(0x6800, 0x680f).rw(m_namco58xx, FUNC(namco58xx_device::read), FUNC(namco58xx_device::write));
+	map(0x6810, 0x681f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
+	map(0x6820, 0x682f).rw(m_namco56xx_2, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
+	map(0x7000, 0x7fff).nopr().w(this, FUNC(namcos16_state::irq_ctrl_w));
+}
 
-ADDRESS_MAP_START(namcos16_state::master_toypop_map)
-	AM_IMPORT_FROM( namcos16_master_base_map )
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("58xx", namco58xx_device, read, write)
-	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("56xx_1", namco56xx_device, read, write)
-	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE("56xx_2", namco56xx_device, read, write)
-	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE(irq_enable_r,irq_disable_w)
-ADDRESS_MAP_END
+void namcos16_state::master_toypop_map(address_map &map)
+{
+	namcos16_master_base_map(map);
+	map(0x6000, 0x600f).rw(m_namco58xx, FUNC(namco58xx_device::read), FUNC(namco58xx_device::write));
+	map(0x6010, 0x601f).rw(m_namco56xx_1, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
+	map(0x6020, 0x602f).rw(m_namco56xx_2, FUNC(namco56xx_device::read), FUNC(namco56xx_device::write));
+	map(0x6800, 0x6bff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
+	map(0x7000, 0x7000).rw(this, FUNC(namcos16_state::irq_enable_r), FUNC(namcos16_state::irq_disable_w));
+}
 
-ADDRESS_MAP_START(namcos16_state::slave_map)
-	AM_RANGE(0x000000, 0x007fff) AM_ROM AM_REGION("slave_rom", 0)
-	AM_RANGE(0x080000, 0x0bffff) AM_RAM
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE8(slave_shared_r,slave_shared_w,0x00ff)
-	AM_RANGE(0x180000, 0x187fff) AM_READWRITE8(bg_rmw_r,bg_rmw_w,0xffff)
-	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_SHARE("bgvram")
-	AM_RANGE(0x300000, 0x3fffff) AM_WRITE(slave_irq_enable_w)
-ADDRESS_MAP_END
+void namcos16_state::slave_map(address_map &map)
+{
+	map(0x000000, 0x007fff).rom().region("slave_rom", 0);
+	map(0x080000, 0x0bffff).ram();
+	map(0x100000, 0x100fff).rw(this, FUNC(namcos16_state::slave_shared_r), FUNC(namcos16_state::slave_shared_w)).umask16(0x00ff);
+	map(0x180000, 0x187fff).rw(this, FUNC(namcos16_state::bg_rmw_r), FUNC(namcos16_state::bg_rmw_w));
+	map(0x190000, 0x1dffff).ram().share("bgvram");
+	map(0x300000, 0x3fffff).w(this, FUNC(namcos16_state::slave_irq_enable_w));
+}
 
-ADDRESS_MAP_START(namcos16_state::sound_map)
-	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_15xx_device, sharedram_r, sharedram_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("sound_rom", 0)
-ADDRESS_MAP_END
+void namcos16_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rw(m_namco15xx, FUNC(namco_15xx_device::sharedram_r), FUNC(namco_15xx_device::sharedram_w));
+	map(0xe000, 0xffff).rom().region("sound_rom", 0);
+}
 
 
 

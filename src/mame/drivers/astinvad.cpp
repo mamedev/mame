@@ -475,35 +475,39 @@ WRITE8_MEMBER(astinvad_state::spaceint_sound2_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(astinvad_state::kamikaze_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void astinvad_state::kamikaze_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x1bff).rom();
+	map(0x1c00, 0x1fff).ram();
+	map(0x2000, 0x3fff).ram().share("videoram");
+}
 
 
-ADDRESS_MAP_START(astinvad_state::spaceint_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void astinvad_state::spaceint_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x5fff).ram().w(this, FUNC(astinvad_state::spaceint_videoram_w)).share("videoram");
+}
 
 
-ADDRESS_MAP_START(astinvad_state::kamikaze_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(kamikaze_ppi_r, kamikaze_ppi_w)
-ADDRESS_MAP_END
+void astinvad_state::kamikaze_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(astinvad_state::kamikaze_ppi_r), FUNC(astinvad_state::kamikaze_ppi_w));
+}
 
 
-ADDRESS_MAP_START(astinvad_state::spaceint_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_WRITE(spaceint_sound1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(color_latch_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(spaceint_sound2_w)
-ADDRESS_MAP_END
+void astinvad_state::spaceint_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).w(this, FUNC(astinvad_state::spaceint_sound1_w));
+	map(0x03, 0x03).w(this, FUNC(astinvad_state::color_latch_w));
+	map(0x04, 0x04).w(this, FUNC(astinvad_state::spaceint_sound2_w));
+}
 
 
 

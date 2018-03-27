@@ -176,25 +176,26 @@ WRITE16_MEMBER(rungun_state::palette_write)
 	cur_paldevice.set_pen_color(offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-ADDRESS_MAP_START(rungun_state::rungun_map)
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM                                         // main program + data
-	AM_RANGE(0x300000, 0x3007ff) AM_READWRITE(palette_read,palette_write)
-	AM_RANGE(0x380000, 0x39ffff) AM_RAM                                         // work RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_READ8(rng_53936_rom_r,0x00ff)               // '936 ROM readback window
-	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_SHARE("sysreg")
-	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                        // CCU (for scanline and vblank polling)
-	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x580000, 0x58001f) AM_DEVICE8("k054321", k054321_device, main_map, 0xff00)
-	AM_RANGE(0x5c0000, 0x5c000f) AM_DEVREAD("k055673", k055673_device, k055673_rom_word_r)                       // 246A ROM readback window
-	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE("k055673", k055673_device, k055673_reg_word_w)
-	AM_RANGE(0x600000, 0x601fff) AM_RAMBANK("spriteram_bank")                                                // OBJ RAM
-	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE("k055673", k055673_device, k053246_word_w)                      // '246A registers
-	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)          // '936 registers
-	AM_RANGE(0x6c0000, 0x6cffff) AM_READWRITE(rng_psac2_videoram_r,rng_psac2_videoram_w) // PSAC2 ('936) RAM (34v + 35v)
-	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)          // PSAC "Line RAM"
-	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r, rng_ttl_ram_w)     // text plane RAM
-	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP                                    // watchdog
-ADDRESS_MAP_END
+void rungun_state::rungun_map(address_map &map)
+{
+	map(0x000000, 0x2fffff).rom();                                         // main program + data
+	map(0x300000, 0x3007ff).rw(this, FUNC(rungun_state::palette_read), FUNC(rungun_state::palette_write));
+	map(0x380000, 0x39ffff).ram();                                         // work RAM
+	map(0x400000, 0x43ffff).r(this, FUNC(rungun_state::rng_53936_rom_r)).umask16(0x00ff);               // '936 ROM readback window
+	map(0x480000, 0x48001f).rw(this, FUNC(rungun_state::rng_sysregs_r), FUNC(rungun_state::rng_sysregs_w)).share("sysreg");
+	map(0x4c0000, 0x4c001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);                        // CCU (for scanline and vblank polling)
+	map(0x540000, 0x540001).w(this, FUNC(rungun_state::sound_irq_w));
+	map(0x580000, 0x58001f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
+	map(0x5c0000, 0x5c000f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));                       // 246A ROM readback window
+	map(0x5c0010, 0x5c001f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
+	map(0x600000, 0x601fff).bankrw("spriteram_bank");                                                // OBJ RAM
+	map(0x640000, 0x640007).w(m_k055673, FUNC(k055673_device::k053246_word_w));                      // '246A registers
+	map(0x680000, 0x68001f).w(m_k053936, FUNC(k053936_device::ctrl_w));          // '936 registers
+	map(0x6c0000, 0x6cffff).rw(this, FUNC(rungun_state::rng_psac2_videoram_r), FUNC(rungun_state::rng_psac2_videoram_w)); // PSAC2 ('936) RAM (34v + 35v)
+	map(0x700000, 0x7007ff).rw(m_k053936, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w));          // PSAC "Line RAM"
+	map(0x740000, 0x741fff).rw(this, FUNC(rungun_state::rng_ttl_ram_r), FUNC(rungun_state::rng_ttl_ram_w));     // text plane RAM
+	map(0x7c0000, 0x7c0001).nopw();                                    // watchdog
+}
 
 
 /**********************************************************************************/
@@ -236,23 +237,25 @@ WRITE_LINE_MEMBER(rungun_state::k054539_nmi_gen)
 
 /* sound (this should be split into audio/xexex.c or pregx.c or so someday) */
 
-ADDRESS_MAP_START(rungun_state::rungun_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
-	AM_RANGE(0xe230, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_device, read, write)
-	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
-	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
-ADDRESS_MAP_END
+void rungun_state::rungun_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank2");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe22f).rw(m_k054539_1, FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xe230, 0xe3ff).ram();
+	map(0xe400, 0xe62f).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xe630, 0xe7ff).ram();
+	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
+	map(0xf800, 0xf800).w(this, FUNC(rungun_state::sound_ctrl_w));
+	map(0xfff0, 0xfff3).nopw();
+}
 
 
-ADDRESS_MAP_START(rungun_state::rungun_k054539_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("k054539", 0)
-ADDRESS_MAP_END
+void rungun_state::rungun_k054539_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom().region("k054539", 0);
+}
 
 
 static INPUT_PORTS_START( rng )

@@ -277,26 +277,28 @@ WRITE16_MEMBER(invqix_state::vctl_w)
 	m_vctl = data;
 }
 
-ADDRESS_MAP_START(invqix_state::invqix_prg_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM AM_REGION("program", 0)
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write_tmp_register, 0x00ff)
-	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("oki", okim9810_device, write, 0xff00)
-	AM_RANGE(0x400002, 0x400003) AM_DEVREAD8("oki", okim9810_device, read, 0xff00)
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x620004, 0x620005) AM_WRITE(vctl_w)
-ADDRESS_MAP_END
+void invqix_state::invqix_prg_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom().region("program", 0);
+	map(0x200000, 0x21ffff).ram();
+	map(0x400001, 0x400001).w("oki", FUNC(okim9810_device::write_tmp_register));
+	map(0x400000, 0x400000).w("oki", FUNC(okim9810_device::write));
+	map(0x400002, 0x400002).r("oki", FUNC(okim9810_device::read));
+	map(0x600000, 0x61ffff).ram().share("vram");
+	map(0x620004, 0x620005).w(this, FUNC(invqix_state::vctl_w));
+}
 
-ADDRESS_MAP_START(invqix_state::invqix_io_map)
-	AM_RANGE(h8_device::PORT_1, h8_device::PORT_1) AM_READ_PORT("P1")
-	AM_RANGE(h8_device::PORT_2, h8_device::PORT_2) AM_READ_PORT("SYSTEM") AM_WRITENOP
-	AM_RANGE(h8_device::PORT_3, h8_device::PORT_3) AM_READWRITE(port3_r, port3_w)
-	AM_RANGE(h8_device::PORT_4, h8_device::PORT_4) AM_READ_PORT("P4")
-	AM_RANGE(h8_device::PORT_5, h8_device::PORT_5) AM_READWRITE(port5_r, port5_w)
-	AM_RANGE(h8_device::PORT_6, h8_device::PORT_6) AM_READWRITE(port6_r, port6_w)
-	AM_RANGE(h8_device::PORT_A, h8_device::PORT_A) AM_READ(porta_r)
-	AM_RANGE(h8_device::PORT_G, h8_device::PORT_G) AM_READ(portg_r) AM_WRITENOP
-ADDRESS_MAP_END
+void invqix_state::invqix_io_map(address_map &map)
+{
+	map(h8_device::PORT_1, h8_device::PORT_1).portr("P1");
+	map(h8_device::PORT_2, h8_device::PORT_2).portr("SYSTEM").nopw();
+	map(h8_device::PORT_3, h8_device::PORT_3).rw(this, FUNC(invqix_state::port3_r), FUNC(invqix_state::port3_w));
+	map(h8_device::PORT_4, h8_device::PORT_4).portr("P4");
+	map(h8_device::PORT_5, h8_device::PORT_5).rw(this, FUNC(invqix_state::port5_r), FUNC(invqix_state::port5_w));
+	map(h8_device::PORT_6, h8_device::PORT_6).rw(this, FUNC(invqix_state::port6_r), FUNC(invqix_state::port6_w));
+	map(h8_device::PORT_A, h8_device::PORT_A).r(this, FUNC(invqix_state::porta_r));
+	map(h8_device::PORT_G, h8_device::PORT_G).r(this, FUNC(invqix_state::portg_r)).nopw();
+}
 
 static INPUT_PORTS_START( invqix )
 	PORT_START("SYSTEM")

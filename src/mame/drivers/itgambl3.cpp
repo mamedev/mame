@@ -141,10 +141,11 @@ uint32_t itgambl3_state::screen_update_itgambl3(screen_device &screen, bitmap_rg
 * Memory map information *
 *************************/
 
-ADDRESS_MAP_START(itgambl3_state::itgambl3_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
+void itgambl3_state::itgambl3_map(address_map &map)
+{
+	map.global_mask(0xffffff);
+	map(0x000000, 0xffffff).rom();
+}
 
 
 /*************************

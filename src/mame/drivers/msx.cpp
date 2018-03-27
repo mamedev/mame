@@ -539,10 +539,11 @@ PCB Layouts missing
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(msx_state::msx_memory_map)
-	AM_RANGE(0x0000, 0xfffe) AM_READWRITE(msx_mem_read, msx_mem_write)
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE(msx_sec_slot_r, msx_sec_slot_w)
-ADDRESS_MAP_END
+void msx_state::msx_memory_map(address_map &map)
+{
+	map(0x0000, 0xfffe).rw(this, FUNC(msx_state::msx_mem_read), FUNC(msx_state::msx_mem_write));
+	map(0xffff, 0xffff).rw(this, FUNC(msx_state::msx_sec_slot_r), FUNC(msx_state::msx_sec_slot_w));
+}
 
 
 WRITE8_MEMBER(msx_state::msx_ay8910_w)
@@ -554,56 +555,59 @@ WRITE8_MEMBER(msx_state::msx_ay8910_w)
 }
 
 
-ADDRESS_MAP_START(msx_state::msx_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void msx_state::msx_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	AM_RANGE( 0x90, 0x90) AM_DEVREAD("cent_status_in", input_buffer_device, read)
-	AM_RANGE( 0x90, 0x90) AM_DEVWRITE("cent_ctrl_out", output_latch_device, write)
-	AM_RANGE( 0x91, 0x91) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD("ay8910", ay8910_device, data_r) AM_WRITE(msx_ay8910_w)
-	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0x98, 0x98) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE( 0x99, 0x99) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE( 0xd8, 0xd9) AM_READWRITE(msx_kanji_r, msx_kanji_w)
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(this, FUNC(msx_state::msx_ay8910_w));
+	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x98, 0x98).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0x99, 0x99).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0xd8, 0xd9).rw(this, FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(msx_state::msx2_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x40, 0x4f) AM_READWRITE(msx_switched_r, msx_switched_w)
+void msx_state::msx2_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x40, 0x4f).rw(this, FUNC(msx_state::msx_switched_r), FUNC(msx_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	AM_RANGE( 0x90, 0x90) AM_DEVREAD("cent_status_in", input_buffer_device, read)
-	AM_RANGE( 0x90, 0x90) AM_DEVWRITE("cent_ctrl_out", output_latch_device, write)
-	AM_RANGE( 0x91, 0x91) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD("ay8910", ay8910_device, data_r) AM_WRITE(msx_ay8910_w)
-	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE("v9938", v9938_device, read, write)
-	AM_RANGE( 0xb4, 0xb4) AM_WRITE(msx_rtc_latch_w)
-	AM_RANGE( 0xb5, 0xb5) AM_READWRITE(msx_rtc_reg_r, msx_rtc_reg_w)
-	AM_RANGE( 0xd8, 0xd9) AM_READWRITE(msx_kanji_r, msx_kanji_w)
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(this, FUNC(msx_state::msx_ay8910_w));
+	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0xb4, 0xb4).w(this, FUNC(msx_state::msx_rtc_latch_w));
+	map(0xb5, 0xb5).rw(this, FUNC(msx_state::msx_rtc_reg_r), FUNC(msx_state::msx_rtc_reg_w));
+	map(0xd8, 0xd9).rw(this, FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(msx_state::msx2p_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x40, 0x4f) AM_READWRITE(msx_switched_r, msx_switched_w)
+void msx_state::msx2p_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x40, 0x4f).rw(this, FUNC(msx_state::msx_switched_r), FUNC(msx_state::msx_switched_w));
 	// 0x7c - 0x7d : MSX-MUSIC/FM-PAC write port. Handlers will be installed if MSX-MUSIC is present in a system
-	AM_RANGE( 0x90, 0x90) AM_DEVREAD("cent_status_in", input_buffer_device, read)
-	AM_RANGE( 0x90, 0x90) AM_DEVWRITE("cent_ctrl_out", output_latch_device, write)
-	AM_RANGE( 0x91, 0x91) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD("ay8910", ay8910_device, data_r) AM_WRITE(msx_ay8910_w)
-	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE("v9958", v9958_device, read, write)
-	AM_RANGE( 0xb4, 0xb4) AM_WRITE(msx_rtc_latch_w)
-	AM_RANGE( 0xb5, 0xb5) AM_READWRITE(msx_rtc_reg_r, msx_rtc_reg_w)
-	AM_RANGE( 0xd8, 0xd9) AM_READWRITE(msx_kanji_r, msx_kanji_w)
+	map(0x90, 0x90).r("cent_status_in", FUNC(input_buffer_device::read));
+	map(0x90, 0x90).w("cent_ctrl_out", FUNC(output_latch_device::write));
+	map(0x91, 0x91).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0xa0, 0xa7).r(m_ay8910, FUNC(ay8910_device::data_r)).w(this, FUNC(msx_state::msx_ay8910_w));
+	map(0xa8, 0xab).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+	map(0xb4, 0xb4).w(this, FUNC(msx_state::msx_rtc_latch_w));
+	map(0xb5, 0xb5).rw(this, FUNC(msx_state::msx_rtc_reg_r), FUNC(msx_state::msx_rtc_reg_w));
+	map(0xd8, 0xd9).rw(this, FUNC(msx_state::msx_kanji_r), FUNC(msx_state::msx_kanji_w));
 	// 0xfc - 0xff : Memory mapper I/O ports. I/O handlers will be installed if a memory mapper is present in a system
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( msx_dips )

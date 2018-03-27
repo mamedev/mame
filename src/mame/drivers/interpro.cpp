@@ -325,110 +325,122 @@ READ8_MEMBER(interpro_state::nodeid_r)
 	return space.unmap();
 }
 
-ADDRESS_MAP_START(interpro_state::interpro_common_map)
+void interpro_state::interpro_common_map(address_map &map)
+{
 	// FIXME: don't know what this range is for
-	AM_RANGE(0x08000000, 0x08000fff) AM_NOP
+	map(0x08000000, 0x08000fff).noprw();
 
-	AM_RANGE(0x4f007e00, 0x4f007eff) AM_DEVICE(INTERPRO_SGA_TAG, interpro_sga_device, map)
+	map(0x4f007e00, 0x4f007eff).m(m_sga, FUNC(interpro_sga_device::map));
 
-	AM_RANGE(0x7f000100, 0x7f00011f) AM_DEVICE8(INTERPRO_FDC_TAG, upd765_family_device, map, 0x000000ff)
-	AM_RANGE(0x7f000300, 0x7f000303) AM_READ16(sreg_error_r, 0x0000ffff)
-	AM_RANGE(0x7f000304, 0x7f000307) AM_READWRITE16(sreg_status_r, sreg_led_w, 0x0000ffff)
-	AM_RANGE(0x7f000308, 0x7f00030b) AM_READWRITE16(sreg_ctrl1_r, sreg_ctrl1_w, 0x0000ffff)
-	AM_RANGE(0x7f00030c, 0x7f00030f) AM_READWRITE16(sreg_ctrl2_r, sreg_ctrl2_w, 0x0000ffff)
+	map(0x7f000100, 0x7f00011f).m(m_fdc, FUNC(upd765_family_device::map)).umask32(0x000000ff);
+	map(0x7f000300, 0x7f000301).r(this, FUNC(interpro_state::sreg_error_r));
+	map(0x7f000304, 0x7f000305).rw(this, FUNC(interpro_state::sreg_status_r), FUNC(interpro_state::sreg_led_w));
+	map(0x7f000308, 0x7f000309).rw(this, FUNC(interpro_state::sreg_ctrl1_r), FUNC(interpro_state::sreg_ctrl1_w));
+	map(0x7f00030c, 0x7f00030d).rw(this, FUNC(interpro_state::sreg_ctrl2_r), FUNC(interpro_state::sreg_ctrl2_w));
 
-	AM_RANGE(0x7f00031c, 0x7f00031f) AM_READWRITE16(sreg_ctrl3_r, sreg_ctrl3_w, 0x0000ffff)
+	map(0x7f00031c, 0x7f00031d).rw(this, FUNC(interpro_state::sreg_ctrl3_r), FUNC(interpro_state::sreg_ctrl3_w));
 
-	AM_RANGE(0x7f000400, 0x7f00040f) AM_DEVREADWRITE8(INTERPRO_SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0x000000ff)
-	AM_RANGE(0x7f000410, 0x7f00041f) AM_DEVREADWRITE8(INTERPRO_SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0x000000ff)
-
-	;map(0x7f000500, 0x7f000503).lrw8("rtc_rw", [this](address_space &space, offs_t offset, u8 mem_mask){ return m_rtc->read(space, offset^1, mem_mask); }, [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_rtc->write(space, offset^1, data, mem_mask); }).umask32(0x000000ff);
-	AM_RANGE(0x7f000600, 0x7f000603) AM_DEVWRITE8(INTERPRO_RTC_TAG, mc146818_device, write, 0x000000ff)
+	map(0x7f000400, 0x7f00040f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
+	map(0x7f000410, 0x7f00041f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
+	map(0x7f000500, 0x7f000503).lrw8("rtc_rw",
+									 [this](address_space &space, offs_t offset, u8 mem_mask) {
+										 return m_rtc->read(space, offset^1, mem_mask);
+									 },
+									 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+										 m_rtc->write(space, offset^1, data, mem_mask);
+									 }).umask32(0x000000ff);
+	map(0x7f000600, 0x7f000600).w(m_rtc, FUNC(mc146818_device::write));
 
 	// the system board id prom
-	AM_RANGE(0x7f000700, 0x7f00077f) AM_ROM AM_REGION(INTERPRO_IDPROM_TAG, 0)
+	map(0x7f000700, 0x7f00077f).rom().region(INTERPRO_IDPROM_TAG, 0);
 
-	AM_RANGE(0x7f0fff00, 0x7f0fffff) AM_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, map)
-ADDRESS_MAP_END
+	map(0x7f0fff00, 0x7f0fffff).m(m_ioga, FUNC(interpro_ioga_device::map));
+}
 
-ADDRESS_MAP_START(turquoise_state::turquoise_base_map)
-	AM_IMPORT_FROM(interpro_common_map)
+void turquoise_state::turquoise_base_map(address_map &map)
+{
+	interpro_common_map(map);
 
-	AM_RANGE(0x40000000, 0x4000003f) AM_DEVICE(INTERPRO_MCGA_TAG, interpro_mcga_device, map)
-
-	// scsi registers have unusual address mapping
-	AM_RANGE(0x7f000200, 0x7f000203) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, tcounter_lo_r, tcount_lo_w, 0x0000ff00)
-	AM_RANGE(0x7f000204, 0x7f000207) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, tcounter_hi_r, tcount_hi_w, 0x0000ff00)
-	AM_RANGE(0x7f000208, 0x7f00020b) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, fifo_r, fifo_w, 0x0000ff00)
-	AM_RANGE(0x7f00020c, 0x7f00020f) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, command_r, command_w, 0x0000ff00)
-	AM_RANGE(0x7f000210, 0x7f000213) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, status_r, bus_id_w, 0x0000ff00)
-	AM_RANGE(0x7f000214, 0x7f000217) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, istatus_r, timeout_w, 0x0000ff00)
-	AM_RANGE(0x7f000218, 0x7f00021b) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, seq_step_r, sync_period_w, 0x0000ff00)
-	AM_RANGE(0x7f00021c, 0x7f00021f) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, fifo_flags_r, sync_offset_w, 0x0000ff00)
-	AM_RANGE(0x7f000220, 0x7f000223) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, conf_r, conf_w, 0x0000ff00)
-	AM_RANGE(0x7f000224, 0x7f000227) AM_DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, clock_w, 0x0000ff00)
-	AM_RANGE(0x7f000228, 0x7f00022b) AM_DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, test_w, 0x0000ff00)
-	AM_RANGE(0x7f00022c, 0x7f00022f) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c90a_device, conf2_r, conf2_w, 0x0000ff00)
-
-	AM_RANGE(0x7f000300, 0x7f000303) AM_WRITE8(sreg_error_w, 0x000000ff)
-
-	AM_RANGE(0x7f000600, 0x7f00067f) AM_ROM AM_REGION(INTERPRO_NODEID_TAG, 0)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(turquoise_state::turquoise_main_map)
-	AM_IMPORT_FROM(turquoise_base_map)
-
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE(RAM_TAG)
-	AM_RANGE(0x7f100000, 0x7f13ffff) AM_ROM AM_REGION(INTERPRO_EPROM_TAG, 0)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(sapphire_state::sapphire_base_map)
-	AM_IMPORT_FROM(interpro_common_map)
-
-	AM_RANGE(0x40000000, 0x4000004f) AM_DEVICE(INTERPRO_MCGA_TAG, interpro_fmcc_device, map)
-	AM_RANGE(0x7f000200, 0x7f0002ff) AM_DEVICE(INTERPRO_ARBGA_TAG, interpro_arbga_device, map)
-
-	AM_RANGE(0x7f000600, 0x7f00060f) AM_READ8(nodeid_r, 0xff)
+	map(0x40000000, 0x4000003f).m(m_mcga, FUNC(interpro_mcga_device::map));
 
 	// scsi registers have unusual address mapping
-	AM_RANGE(0x7f001000, 0x7f001003) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, tcounter_lo_r, tcount_lo_w, 0x0000ff00)
-	AM_RANGE(0x7f001100, 0x7f001103) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, tcounter_hi_r, tcount_hi_w, 0x0000ff00)
-	AM_RANGE(0x7f001200, 0x7f001203) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, fifo_r, fifo_w, 0x0000ff00)
-	AM_RANGE(0x7f001300, 0x7f001303) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, command_r, command_w, 0x0000ff00)
-	AM_RANGE(0x7f001400, 0x7f001403) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, status_r, bus_id_w, 0x0000ff00)
-	AM_RANGE(0x7f001500, 0x7f001503) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, istatus_r, timeout_w, 0x0000ff00)
-	AM_RANGE(0x7f001600, 0x7f001603) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, seq_step_r, sync_period_w, 0x0000ff00)
-	AM_RANGE(0x7f001700, 0x7f001703) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, fifo_flags_r, sync_offset_w, 0x0000ff00)
-	AM_RANGE(0x7f001800, 0x7f001803) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, conf_r, conf_w, 0x0000ff00)
-	AM_RANGE(0x7f001900, 0x7f001903) AM_DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, clock_w, 0x0000ff00)
-	AM_RANGE(0x7f001a00, 0x7f001a03) AM_DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, test_w, 0x0000ff00)
-	AM_RANGE(0x7f001b00, 0x7f001b03) AM_DEVREADWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, conf2_r, conf2_w, 0x0000ff00)
-	AM_RANGE(0x7f001c00, 0x7f001c03) AM_DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, conf3_w, 0x0000ff00)
-	AM_RANGE(0x7f001f00, 0x7f001f03) AM_DEVWRITE8(INTERPRO_SCSI_DEVICE_TAG, ncr53c94_device, fifo_align_w, 0x0000ff00)
-ADDRESS_MAP_END
+	map(0x7f000201, 0x7f000201).rw(m_scsi, FUNC(ncr53c90a_device::tcounter_lo_r), FUNC(ncr53c90a_device::tcount_lo_w));
+	map(0x7f000205, 0x7f000205).rw(m_scsi, FUNC(ncr53c90a_device::tcounter_hi_r), FUNC(ncr53c90a_device::tcount_hi_w));
+	map(0x7f000209, 0x7f000209).rw(m_scsi, FUNC(ncr53c90a_device::fifo_r), FUNC(ncr53c90a_device::fifo_w));
+	map(0x7f00020d, 0x7f00020d).rw(m_scsi, FUNC(ncr53c90a_device::command_r), FUNC(ncr53c90a_device::command_w));
+	map(0x7f000211, 0x7f000211).rw(m_scsi, FUNC(ncr53c90a_device::status_r), FUNC(ncr53c90a_device::bus_id_w));
+	map(0x7f000215, 0x7f000215).rw(m_scsi, FUNC(ncr53c90a_device::istatus_r), FUNC(ncr53c90a_device::timeout_w));
+	map(0x7f000219, 0x7f000219).rw(m_scsi, FUNC(ncr53c90a_device::seq_step_r), FUNC(ncr53c90a_device::sync_period_w));
+	map(0x7f00021d, 0x7f00021d).rw(m_scsi, FUNC(ncr53c90a_device::fifo_flags_r), FUNC(ncr53c90a_device::sync_offset_w));
+	map(0x7f000221, 0x7f000221).rw(m_scsi, FUNC(ncr53c90a_device::conf_r), FUNC(ncr53c90a_device::conf_w));
+	map(0x7f000225, 0x7f000225).w(m_scsi, FUNC(ncr53c90a_device::clock_w));
+	map(0x7f000229, 0x7f000229).w(m_scsi, FUNC(ncr53c90a_device::test_w));
+	map(0x7f00022d, 0x7f00022d).rw(m_scsi, FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
 
-ADDRESS_MAP_START(sapphire_state::sapphire_main_map)
-	AM_IMPORT_FROM(sapphire_base_map)
+	map(0x7f000300, 0x7f000300).w(this, FUNC(turquoise_state::sreg_error_w));
 
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE(RAM_TAG)
-	AM_RANGE(0x7f100000, 0x7f11ffff) AM_ROM AM_REGION(INTERPRO_EPROM_TAG, 0)
-	AM_RANGE(0x7f180000, 0x7f1fffff) AM_DEVREADWRITE8(INTERPRO_FLASH_TAG "_lo", intel_28f010_device, read, write, 0x00ff00ff) AM_MASK(0x3ffff)
-	AM_RANGE(0x7f180000, 0x7f1fffff) AM_DEVREADWRITE8(INTERPRO_FLASH_TAG "_hi", intel_28f010_device, read, write, 0xff00ff00) AM_MASK(0x3ffff)
-ADDRESS_MAP_END
+	map(0x7f000600, 0x7f00067f).rom().region(INTERPRO_NODEID_TAG, 0);
+}
 
-ADDRESS_MAP_START(turquoise_state::turquoise_io_map)
-	AM_IMPORT_FROM(turquoise_base_map)
+void turquoise_state::turquoise_main_map(address_map &map)
+{
+	turquoise_base_map(map);
 
-	AM_RANGE(0x00000800, 0x000009ff) AM_DEVICE(INTERPRO_MMU_TAG "_d", cammu_c3_device, map)
-	AM_RANGE(0x00000a00, 0x00000bff) AM_DEVICE(INTERPRO_MMU_TAG "_i", cammu_c3_device, map)
-	AM_RANGE(0x00000c00, 0x00000dff) AM_DEVICE(INTERPRO_MMU_TAG "_d", cammu_c3_device, map_global)
-ADDRESS_MAP_END
+	map(0x00000000, 0x00ffffff).ram().share(RAM_TAG);
+	map(0x7f100000, 0x7f13ffff).rom().region(INTERPRO_EPROM_TAG, 0);
+}
 
-ADDRESS_MAP_START(sapphire_state::sapphire_io_map)
-	AM_IMPORT_FROM(sapphire_base_map)
+void sapphire_state::sapphire_base_map(address_map &map)
+{
+	interpro_common_map(map);
 
-	AM_RANGE(0x00000000, 0x00001fff) AM_DEVICE(INTERPRO_MMU_TAG, cammu_c4_device, map)
-ADDRESS_MAP_END
+	map(0x40000000, 0x4000004f).m(INTERPRO_MCGA_TAG, FUNC(interpro_fmcc_device::map));
+	map(0x7f000200, 0x7f0002ff).m(m_arbga, FUNC(interpro_arbga_device::map));
+
+	map(0x7f000600, 0x7f00060f).r(this, FUNC(sapphire_state::nodeid_r)).umask32(0x000000ff);
+
+	// scsi registers have unusual address mapping
+	map(0x7f001001, 0x7f001001).rw(m_scsi, FUNC(ncr53c94_device::tcounter_lo_r), FUNC(ncr53c94_device::tcount_lo_w));
+	map(0x7f001101, 0x7f001101).rw(m_scsi, FUNC(ncr53c94_device::tcounter_hi_r), FUNC(ncr53c94_device::tcount_hi_w));
+	map(0x7f001201, 0x7f001201).rw(m_scsi, FUNC(ncr53c94_device::fifo_r), FUNC(ncr53c94_device::fifo_w));
+	map(0x7f001301, 0x7f001301).rw(m_scsi, FUNC(ncr53c94_device::command_r), FUNC(ncr53c94_device::command_w));
+	map(0x7f001401, 0x7f001401).rw(m_scsi, FUNC(ncr53c94_device::status_r), FUNC(ncr53c94_device::bus_id_w));
+	map(0x7f001501, 0x7f001501).rw(m_scsi, FUNC(ncr53c94_device::istatus_r), FUNC(ncr53c94_device::timeout_w));
+	map(0x7f001601, 0x7f001601).rw(m_scsi, FUNC(ncr53c94_device::seq_step_r), FUNC(ncr53c94_device::sync_period_w));
+	map(0x7f001701, 0x7f001701).rw(m_scsi, FUNC(ncr53c94_device::fifo_flags_r), FUNC(ncr53c94_device::sync_offset_w));
+	map(0x7f001801, 0x7f001801).rw(m_scsi, FUNC(ncr53c94_device::conf_r), FUNC(ncr53c94_device::conf_w));
+	map(0x7f001901, 0x7f001901).w(m_scsi, FUNC(ncr53c94_device::clock_w));
+	map(0x7f001a01, 0x7f001a01).w(m_scsi, FUNC(ncr53c94_device::test_w));
+	map(0x7f001b01, 0x7f001b01).rw(m_scsi, FUNC(ncr53c94_device::conf2_r), FUNC(ncr53c94_device::conf2_w));
+	map(0x7f001c01, 0x7f001c01).w(m_scsi, FUNC(ncr53c94_device::conf3_w));
+	map(0x7f001f01, 0x7f001f01).w(m_scsi, FUNC(ncr53c94_device::fifo_align_w));
+}
+
+void sapphire_state::sapphire_main_map(address_map &map)
+{
+	sapphire_base_map(map);
+
+	map(0x00000000, 0x00ffffff).ram().share(RAM_TAG);
+	map(0x7f100000, 0x7f11ffff).rom().region(INTERPRO_EPROM_TAG, 0);
+	map(0x7f180000, 0x7f1fffff).rw(INTERPRO_FLASH_TAG "_lo", FUNC(intel_28f010_device::read), FUNC(intel_28f010_device::write)).umask32(0x00ff00ff).mask(0x3ffff);
+	map(0x7f180000, 0x7f1fffff).rw(INTERPRO_FLASH_TAG "_hi", FUNC(intel_28f010_device::read), FUNC(intel_28f010_device::write)).umask32(0xff00ff00).mask(0x3ffff);
+}
+
+void turquoise_state::turquoise_io_map(address_map &map)
+{
+	turquoise_base_map(map);
+
+	map(0x00000800, 0x000009ff).m(INTERPRO_MMU_TAG "_d", FUNC(cammu_c3_device::map));
+	map(0x00000a00, 0x00000bff).m(INTERPRO_MMU_TAG "_i", FUNC(cammu_c3_device::map));
+	map(0x00000c00, 0x00000dff).m(INTERPRO_MMU_TAG "_d", FUNC(cammu_c3_device::map_global));
+}
+
+void sapphire_state::sapphire_io_map(address_map &map)
+{
+	sapphire_base_map(map);
+
+	map(0x00000000, 0x00001fff).m(m_mmu, FUNC(cammu_c4_device::map));
+}
 
 ADDRESS_MAP_START(interpro_state::interpro_boot_map)
 	// FIXME: the real system may have some initial boot instructions in this boot
@@ -438,13 +450,15 @@ ADDRESS_MAP_START(interpro_state::interpro_boot_map)
 	AM_RANGE(0x00000000, 0x00001fff) AM_RAM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(turquoise_state::interpro_82586_map)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_DEVREADWRITE(INTERPRO_IOGA_TAG, turquoise_ioga_device, eth_r, eth_w)
-ADDRESS_MAP_END
+void turquoise_state::interpro_82586_map(address_map &map)
+{
+	map(0x00000000, 0x00ffffff).rw(INTERPRO_IOGA_TAG, FUNC(turquoise_ioga_device::eth_r), FUNC(turquoise_ioga_device::eth_w));
+}
 
-ADDRESS_MAP_START(sapphire_state::interpro_82596_map)
-	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE(INTERPRO_IOGA_TAG, sapphire_ioga_device, eth_r, eth_w)
-ADDRESS_MAP_END
+void sapphire_state::interpro_82596_map(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(INTERPRO_IOGA_TAG, FUNC(sapphire_ioga_device::eth_r), FUNC(sapphire_ioga_device::eth_w));
+}
 
 FLOPPY_FORMATS_MEMBER(interpro_state::floppy_formats)
 	FLOPPY_PC_FORMAT

@@ -76,10 +76,11 @@ uint32_t iqunlim_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-ADDRESS_MAP_START(iqunlim_state::iqunlim_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1FFFFF) AM_ROM
-ADDRESS_MAP_END
+void iqunlim_state::iqunlim_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1FFFFF).rom();
+}
 
 static INPUT_PORTS_START( iqunlim )
 INPUT_PORTS_END

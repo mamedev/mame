@@ -9,14 +9,16 @@
 
 DEFINE_DEVICE_TYPE(GAELCO_DS5002FP, gaelco_ds5002fp_device, "gaelco_ds5002fp", "Gaelco DS5002FP")
 
-ADDRESS_MAP_START(gaelco_ds5002fp_device::dallas_rom)
-	AM_RANGE(0x00000, 0x07fff) AM_READONLY AM_SHARE("sram")
-ADDRESS_MAP_END
+void gaelco_ds5002fp_device::dallas_rom(address_map &map)
+{
+	map(0x00000, 0x07fff).readonly().share("sram");
+}
 
-ADDRESS_MAP_START(gaelco_ds5002fp_device::dallas_ram)
-	AM_RANGE(0x00000, 0x0ffff) AM_READWRITE(hostmem_r, hostmem_w)
-	AM_RANGE(0x10000, 0x17fff) AM_RAM AM_SHARE("sram") // yes, the games access it as data and use it for temporary storage!!
-ADDRESS_MAP_END
+void gaelco_ds5002fp_device::dallas_ram(address_map &map)
+{
+	map(0x00000, 0x0ffff).rw(this, FUNC(gaelco_ds5002fp_device::hostmem_r), FUNC(gaelco_ds5002fp_device::hostmem_w));
+	map(0x10000, 0x17fff).ram().share("sram"); // yes, the games access it as data and use it for temporary storage!!
+}
 
 gaelco_ds5002fp_device::gaelco_ds5002fp_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, GAELCO_DS5002FP, tag, owner, clock)

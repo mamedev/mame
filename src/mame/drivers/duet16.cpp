@@ -143,34 +143,36 @@ READ16_MEMBER(duet16_state::sysstat_r)
 	return 0xb484;
 }
 
-ADDRESS_MAP_START(duet16_state::duet16_mem)
-	AM_RANGE(0x00000, 0x8ffff) AM_RAM
-	AM_RANGE(0xa8000, 0xbffff) AM_RAM AM_SHARE("gvram")
-	AM_RANGE(0xc0000, 0xc0fff) AM_RAM AM_SHARE("cvram")
-	AM_RANGE(0xf8000, 0xf801f) AM_READWRITE8(dmapg_r, dmapg_w, 0x00ff)
-	AM_RANGE(0xf8000, 0xf801f) AM_DEVREADWRITE8("dmac", am9517a_device, read, write, 0xff00)
-	AM_RANGE(0xf8020, 0xf8023) AM_READWRITE8(pic_r, pic_w, 0x00ff)
-	AM_RANGE(0xf8040, 0xf804f) AM_DEVREADWRITE8("itm", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0xf8060, 0xf8067) AM_DEVREADWRITE8("bgpit", pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0xf8080, 0xf8087) AM_DEVREADWRITE8("sio", upd7201_new_device, ba_cd_r, ba_cd_w, 0x00ff)
-	AM_RANGE(0xf80a0, 0xf80a1) AM_DEVREADWRITE8("kbusart", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xf80a2, 0xf80a3) AM_DEVREADWRITE8("kbusart", i8251_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xf80c0, 0xf80c1) AM_DEVREADWRITE8("crtc", h46505_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0xf80c2, 0xf80c3) AM_DEVREADWRITE8("crtc", h46505_device, register_r, register_w, 0x00ff)
-	AM_RANGE(0xf80e0, 0xf80e3) AM_DEVREADWRITE8("i8741", upi41_cpu_device, upi41_master_r, upi41_master_w, 0x00ff)
-	AM_RANGE(0xf8100, 0xf8103) AM_DEVICE8("fdc", upd765a_device, map, 0x00ff)
-	AM_RANGE(0xf8120, 0xf8121) AM_READWRITE8(rtc_r, rtc_w, 0x00ff)
-	AM_RANGE(0xf8160, 0xf819f) AM_WRITE8(pal_w, 0xffff)
-	AM_RANGE(0xf8200, 0xf8201) AM_READ(sysstat_r)
-	AM_RANGE(0xf8220, 0xf8221) AM_WRITE8(fdcctrl_w, 0x00ff)
-	AM_RANGE(0xf8260, 0xf8261) AM_WRITE8(rtc_addr_w, 0x00ff)
-	AM_RANGE(0xf8280, 0xf8281) AM_READ8(rtc_stat_r, 0x00ff)
-	AM_RANGE(0xf8280, 0xf8281) AM_WRITE8(dispctrl_w, 0x00ff)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("rom", 0)
-ADDRESS_MAP_END
+void duet16_state::duet16_mem(address_map &map)
+{
+	map(0x00000, 0x8ffff).ram();
+	map(0xa8000, 0xbffff).ram().share("gvram");
+	map(0xc0000, 0xc0fff).ram().share("cvram");
+	map(0xf8000, 0xf801f).rw(this, FUNC(duet16_state::dmapg_r), FUNC(duet16_state::dmapg_w)).umask16(0x00ff);
+	map(0xf8000, 0xf801f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00);
+	map(0xf8020, 0xf8023).rw(this, FUNC(duet16_state::pic_r), FUNC(duet16_state::pic_w)).umask16(0x00ff);
+	map(0xf8040, 0xf804f).rw("itm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0xf8060, 0xf8067).rw("bgpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0xf8080, 0xf8087).rw("sio", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0x00ff);
+	map(0xf80a0, 0xf80a0).rw("kbusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf80a2, 0xf80a2).rw("kbusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xf80c0, 0xf80c0).rw("crtc", FUNC(h46505_device::status_r), FUNC(h46505_device::address_w));
+	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(h46505_device::register_r), FUNC(h46505_device::register_w));
+	map(0xf80e0, 0xf80e3).rw("i8741", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
+	map(0xf8100, 0xf8103).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0xf8120, 0xf8120).rw(this, FUNC(duet16_state::rtc_r), FUNC(duet16_state::rtc_w));
+	map(0xf8160, 0xf819f).w(this, FUNC(duet16_state::pal_w));
+	map(0xf8200, 0xf8201).r(this, FUNC(duet16_state::sysstat_r));
+	map(0xf8220, 0xf8220).w(this, FUNC(duet16_state::fdcctrl_w));
+	map(0xf8260, 0xf8260).w(this, FUNC(duet16_state::rtc_addr_w));
+	map(0xf8280, 0xf8280).r(this, FUNC(duet16_state::rtc_stat_r));
+	map(0xf8280, 0xf8280).w(this, FUNC(duet16_state::dispctrl_w));
+	map(0xfe000, 0xfffff).rom().region("rom", 0);
+}
 
-ADDRESS_MAP_START(duet16_state::duet16_io)
-ADDRESS_MAP_END
+void duet16_state::duet16_io(address_map &map)
+{
+}
 
 WRITE8_MEMBER(duet16_state::pal_w)
 {

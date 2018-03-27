@@ -88,10 +88,10 @@ constexpr u16 M68705_INT_MASK           = 0x03;
  * Global variables
  ****************************************************************************/
 
-DEFINE_DEVICE_TYPE(M68705P3, m68705p3_device, "m68705p3", "MC68705P3")
-DEFINE_DEVICE_TYPE(M68705P5, m68705p5_device, "m68705p5", "MC68705P5")
-DEFINE_DEVICE_TYPE(M68705R3, m68705r3_device, "m68705r3", "MC68705R3")
-DEFINE_DEVICE_TYPE(M68705U3, m68705u3_device, "m68705u3", "MC68705U3")
+DEFINE_DEVICE_TYPE(M68705P3, m68705p3_device, "m68705p3", "Motorola MC68705P3")
+DEFINE_DEVICE_TYPE(M68705P5, m68705p5_device, "m68705p5", "Motorola MC68705P5")
+DEFINE_DEVICE_TYPE(M68705R3, m68705r3_device, "m68705r3", "Motorola MC68705R3")
+DEFINE_DEVICE_TYPE(M68705U3, m68705u3_device, "m68705u3", "Motorola MC68705U3")
 
 
 /****************************************************************************
@@ -698,9 +698,9 @@ void m68705p_device::device_start()
 	state_add(M68705_MOR, "MOR", get_user_rom()[0x0784]).mask(0xff);
 }
 
-util::disasm_interface *m68705p_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68705p_device::create_disassembler()
 {
-	return new m6805_disassembler(m68705p_syms);
+	return std::make_unique<m6805_disassembler>(m68705p_syms);
 }
 
 
@@ -772,9 +772,9 @@ void m68705u_device::device_start()
 	// TODO: MISC register
 }
 
-util::disasm_interface *m68705u_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68705u_device::create_disassembler()
 {
-	return new m6805_disassembler(m68705u_syms);
+	return std::make_unique<m6805_disassembler>(m68705u_syms);
 }
 
 
@@ -825,9 +825,9 @@ void m68705r_device::device_start()
 	// TODO: ADC
 }
 
-util::disasm_interface *m68705r_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68705r_device::create_disassembler()
 {
-	return new m6805_disassembler(m68705r_syms);
+	return std::make_unique<m6805_disassembler>(m68705r_syms);
 }
 
 /****************************************************************************

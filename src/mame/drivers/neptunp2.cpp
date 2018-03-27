@@ -54,25 +54,27 @@ READ8_MEMBER( neptunp2_state::test_r )
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(neptunp2_state::neptunp2_map)
-	AM_RANGE(0x00000, 0xbffff) AM_ROM
-	AM_RANGE(0xe0000, 0xeffff) AM_RAM
+void neptunp2_state::neptunp2_map(address_map &map)
+{
+	map(0x00000, 0xbffff).rom();
+	map(0xe0000, 0xeffff).ram();
 
-	AM_RANGE(0xd0000, 0xd7fff) AM_RAM //videoram
-	AM_RANGE(0xdb004, 0xdb007) AM_RAM
-	AM_RANGE(0xdb00c, 0xdb00f) AM_RAM
+	map(0xd0000, 0xd7fff).ram(); //videoram
+	map(0xdb004, 0xdb007).ram();
+	map(0xdb00c, 0xdb00f).ram();
 
-	AM_RANGE(0xff806, 0xff806) AM_READ(test_r)
-	AM_RANGE(0xff810, 0xff810) AM_READ(test_r)
-	AM_RANGE(0xff812, 0xff812) AM_READ(test_r)
+	map(0xff806, 0xff806).r(this, FUNC(neptunp2_state::test_r));
+	map(0xff810, 0xff810).r(this, FUNC(neptunp2_state::test_r));
+	map(0xff812, 0xff812).r(this, FUNC(neptunp2_state::test_r));
 
-	AM_RANGE(0xff980, 0xff980) AM_WRITENOP
+	map(0xff980, 0xff980).nopw();
 
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(neptunp2_state::neptunp2_io)
-ADDRESS_MAP_END
+void neptunp2_state::neptunp2_io(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( neptunp2 )

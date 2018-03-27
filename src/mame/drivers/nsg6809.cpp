@@ -45,22 +45,29 @@ class nsg6809_state : public driver_device
 {
 public:
 	nsg6809_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") {}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
-	required_device<cpu_device> m_maincpu;
 	void pitchhit(machine_config &config);
+
+protected:
 	void main_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 
-ADDRESS_MAP_START(nsg6809_state::main_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE("via", via6522_device, read, write)
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("acia", mos6551_device, read, write)
-	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE("deadman", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void nsg6809_state::main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2800, 0x280f).rw("via", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x3000, 0x3003).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x3e00, 0x3e00).w("deadman", FUNC(watchdog_timer_device::reset_w));
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( pitchhit )
 INPUT_PORTS_END
@@ -94,7 +101,7 @@ IC label "PH101C"  and  "CK# $A790"
 
 ROM_START( pitchhit )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "PH101C__CK_A790.U14", 0x0000, 0x8000, CRC(1d306ab7) SHA1(13faf7c6dca8e5482672b2d09a99616896c4ae55) )
+	ROM_LOAD( "ph101c__ck_a790.u14", 0x0000, 0x8000, CRC(1d306ab7) SHA1(13faf7c6dca8e5482672b2d09a99616896c4ae55) )
 ROM_END
 
 

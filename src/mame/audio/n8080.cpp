@@ -460,15 +460,17 @@ SOUND_RESET_MEMBER(n8080_state,helifire)
 }
 
 
-ADDRESS_MAP_START(n8080_state::n8080_sound_cpu_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
+void n8080_state::n8080_sound_cpu_map(address_map &map)
+{
+	map.global_mask(0x3ff);
+	map(0x0000, 0x03ff).rom();
+}
 
 
-ADDRESS_MAP_START(n8080_state::helifire_sound_io_map)
-	AM_RANGE(0x00, 0x7f) AM_READ(helifire_8035_external_ram_r)
-ADDRESS_MAP_END
+void n8080_state::helifire_sound_io_map(address_map &map)
+{
+	map(0x00, 0x7f).r(this, FUNC(n8080_state::helifire_8035_external_ram_r));
+}
 
 
 MACHINE_CONFIG_START(n8080_state::spacefev_sound)

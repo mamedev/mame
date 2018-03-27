@@ -36,8 +36,9 @@
 //  ADDRESS_MAP( dragon_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(dragon_state::dragon_mem)
-ADDRESS_MAP_END
+void dragon_state::dragon_mem(address_map &map)
+{
+}
 
 
 //**************************************************************************

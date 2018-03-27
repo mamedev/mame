@@ -261,27 +261,28 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 	}
 }
 
-ADDRESS_MAP_START(wackygtr_state::program_map)
-	AM_RANGE(0x0200, 0x0200) AM_READNOP AM_WRITE(irq_ack_w)
-	AM_RANGE(0x0400, 0x0400) AM_READNOP AM_WRITE(firq_ack_w)
-	AM_RANGE(0x0600, 0x0600) AM_WRITE(disp_w<0>)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(disp_w<1>)
-	AM_RANGE(0x0a00, 0x0a00) AM_WRITE(disp_w<2>)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(disp_w<3>)
-	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(sample_ctrl_w)
+void wackygtr_state::program_map(address_map &map)
+{
+	map(0x0200, 0x0200).nopr().w(this, FUNC(wackygtr_state::irq_ack_w));
+	map(0x0400, 0x0400).nopr().w(this, FUNC(wackygtr_state::firq_ack_w));
+	map(0x0600, 0x0600).w(this, FUNC(wackygtr_state::disp_w<0>));
+	map(0x0800, 0x0800).w(this, FUNC(wackygtr_state::disp_w<1>));
+	map(0x0a00, 0x0a00).w(this, FUNC(wackygtr_state::disp_w<2>));
+	map(0x0c00, 0x0c00).w(this, FUNC(wackygtr_state::disp_w<3>));
+	map(0x0e00, 0x0e00).w(this, FUNC(wackygtr_state::sample_ctrl_w));
 
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	map(0x1000, 0x1001).w("ymsnd", FUNC(ym2413_device::write));
 
-	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pit8253_0", pit8253_device, read, write)
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pit8253_1", pit8253_device, read, write)
+	map(0x2000, 0x2003).rw(m_pit8253_0, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x3000, 0x3003).rw(m_pit8253_1, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("i8255_0", i8255_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("i8255_1", i8255_device, read, write)
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("i8255_2", i8255_device, read, write)
+	map(0x4000, 0x4003).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw("i8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6000, 0x6003).rw("i8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom();
+}
 
 MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 

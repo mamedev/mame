@@ -82,27 +82,28 @@ WRITE8_MEMBER(runaway_state::runaway_irq_ack_w)
 }
 
 
-ADDRESS_MAP_START(runaway_state::runaway_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(runaway_video_ram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(runaway_irq_ack_w)
-	AM_RANGE(0x1400, 0x143f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITE(runaway_paletteram_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* coin counter? */
-	AM_RANGE(0x2001, 0x2001) AM_WRITENOP /* coin counter? */
-	AM_RANGE(0x2003, 0x2004) AM_WRITE(runaway_led_w)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE(runaway_tile_bank_w)
+void runaway_state::runaway_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07bf).ram().w(this, FUNC(runaway_state::runaway_video_ram_w)).share("video_ram");
+	map(0x07c0, 0x07ff).ram().share("sprite_ram");
+	map(0x1000, 0x1000).w(this, FUNC(runaway_state::runaway_irq_ack_w));
+	map(0x1400, 0x143f).w("earom", FUNC(atari_vg_earom_device::write));
+	map(0x1800, 0x1800).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
+	map(0x1c00, 0x1c0f).w(this, FUNC(runaway_state::runaway_paletteram_w));
+	map(0x2000, 0x2000).nopw(); /* coin counter? */
+	map(0x2001, 0x2001).nopw(); /* coin counter? */
+	map(0x2003, 0x2004).w(this, FUNC(runaway_state::runaway_led_w));
+	map(0x2005, 0x2005).w(this, FUNC(runaway_state::runaway_tile_bank_w));
 
-	AM_RANGE(0x3000, 0x3007) AM_READ(runaway_input_r)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("4000")
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x7000, 0x700f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x8000, 0xcfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the interrupt vectors */
-ADDRESS_MAP_END
+	map(0x3000, 0x3007).r(this, FUNC(runaway_state::runaway_input_r));
+	map(0x4000, 0x4000).portr("4000");
+	map(0x5000, 0x5000).r("earom", FUNC(atari_vg_earom_device::read));
+	map(0x6000, 0x600f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x7000, 0x700f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x8000, 0xcfff).rom();
+	map(0xf000, 0xffff).rom(); /* for the interrupt vectors */
+}
 
 
 static INPUT_PORTS_START( qwak )

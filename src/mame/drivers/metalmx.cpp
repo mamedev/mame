@@ -505,30 +505,31 @@ WRITE32_MEMBER(metalmx_state::timer_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::main_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x4000ff) AM_READWRITE(host_gsp_r, host_gsp_w)
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(host_dram_r, host_dram_w)
-	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(host_vram_r, host_vram_w)
-	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(dsp32c_2_r, dsp32c_2_w)
-	AM_RANGE(0x800020, 0x85ffff) AM_NOP         /* Unknown */
-	AM_RANGE(0x880000, 0x88001f) AM_READWRITE(dsp32c_1_r, dsp32c_1_w)
-	AM_RANGE(0x980000, 0x9800ff) AM_WRITE(reset_w)
-	AM_RANGE(0xb40000, 0xb40003) AM_READWRITE(sound_data_r, sound_data_w)
-	AM_RANGE(0xf00000, 0xf00003) AM_RAM         /* Network message port */
-	AM_RANGE(0xf02000, 0xf02003) AM_READWRITE(watchdog_r, shifter_w)
-	AM_RANGE(0xf03000, 0xf03003) AM_READ_PORT("P1") AM_WRITE(motor_w)
-	AM_RANGE(0xf04000, 0xf04003) AM_READ_PORT("P2")
-	AM_RANGE(0xf05000, 0xf05fff) AM_WRITENOP    /* Lamps */ // f06000 = ADC  // f01xxx = ADC
-	AM_RANGE(0xf19000, 0xf19003) AM_WRITENOP    /* Network */
-	AM_RANGE(0xf1a000, 0xf1a003) AM_WRITENOP
-	AM_RANGE(0xf1b000, 0xf1b003) AM_WRITENOP
-	AM_RANGE(0xf1e000, 0xf1e003) AM_RAM         /* Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG */
-	AM_RANGE(0xf20000, 0xf2ffff) AM_WRITE(timer_w)
-	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM         /* Zero power RAM */
-	AM_RANGE(0xfd0000, 0xffffff) AM_RAM         /* Scratch RAM */
-ADDRESS_MAP_END
+void metalmx_state::main_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x3fffff).rom();
+	map(0x400000, 0x4000ff).rw(this, FUNC(metalmx_state::host_gsp_r), FUNC(metalmx_state::host_gsp_w));
+	map(0x600000, 0x6fffff).rw(this, FUNC(metalmx_state::host_dram_r), FUNC(metalmx_state::host_dram_w));
+	map(0x700000, 0x7fffff).rw(this, FUNC(metalmx_state::host_vram_r), FUNC(metalmx_state::host_vram_w));
+	map(0x800000, 0x80001f).rw(this, FUNC(metalmx_state::dsp32c_2_r), FUNC(metalmx_state::dsp32c_2_w));
+	map(0x800020, 0x85ffff).noprw();         /* Unknown */
+	map(0x880000, 0x88001f).rw(this, FUNC(metalmx_state::dsp32c_1_r), FUNC(metalmx_state::dsp32c_1_w));
+	map(0x980000, 0x9800ff).w(this, FUNC(metalmx_state::reset_w));
+	map(0xb40000, 0xb40003).rw(this, FUNC(metalmx_state::sound_data_r), FUNC(metalmx_state::sound_data_w));
+	map(0xf00000, 0xf00003).ram();         /* Network message port */
+	map(0xf02000, 0xf02003).rw(this, FUNC(metalmx_state::watchdog_r), FUNC(metalmx_state::shifter_w));
+	map(0xf03000, 0xf03003).portr("P1").w(this, FUNC(metalmx_state::motor_w));
+	map(0xf04000, 0xf04003).portr("P2");
+	map(0xf05000, 0xf05fff).nopw();    /* Lamps */ // f06000 = ADC  // f01xxx = ADC
+	map(0xf19000, 0xf19003).nopw();    /* Network */
+	map(0xf1a000, 0xf1a003).nopw();
+	map(0xf1b000, 0xf1b003).nopw();
+	map(0xf1e000, 0xf1e003).ram();         /* Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG */
+	map(0xf20000, 0xf2ffff).w(this, FUNC(metalmx_state::timer_w));
+	map(0xfc0000, 0xfc1fff).ram();         /* Zero power RAM */
+	map(0xfd0000, 0xffffff).ram();         /* Scratch RAM */
+}
 
 
 /*************************************
@@ -537,15 +538,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::adsp_program_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("adsp_intprog")
-ADDRESS_MAP_END
+void metalmx_state::adsp_program_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("adsp_intprog");
+}
 
-ADDRESS_MAP_START(metalmx_state::adsp_data_map)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x2000, 0x2007) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_RAM // TODO: CPU control registers
-ADDRESS_MAP_END
+void metalmx_state::adsp_data_map(address_map &map)
+{
+	map(0x3800, 0x39ff).ram();
+	map(0x2000, 0x2007).ram();
+	map(0x3fe0, 0x3fff).ram(); // TODO: CPU control registers
+}
 
 
 /*************************************
@@ -554,13 +557,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::gsp_map)
-	AM_RANGE(0x88800000, 0x8880000f) AM_RAM /* ? */
-	AM_RANGE(0x88c00000, 0x88c0000f) AM_RAM /* ? */
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_DEVREADWRITE("gsp", tms34020_device, io_register_r, io_register_w)
-	AM_RANGE(0xff000000, 0xff7fffff) AM_RAM AM_SHARE("gsp_dram")
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_SHARE("gsp_vram")
-ADDRESS_MAP_END
+void metalmx_state::gsp_map(address_map &map)
+{
+	map(0x88800000, 0x8880000f).ram(); /* ? */
+	map(0x88c00000, 0x88c0000f).ram(); /* ? */
+	map(0xc0000000, 0xc00003ff).rw(m_gsp, FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
+	map(0xff000000, 0xff7fffff).ram().share("gsp_dram");
+	map(0xff800000, 0xffffffff).ram().share("gsp_vram");
+}
 
 
 /*************************************
@@ -569,16 +573,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::dsp32c_1_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM
-	AM_RANGE(0x700000, 0x700003) AM_WRITENOP    /* LEDs? */
-	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
-	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
-	AM_RANGE(0xc00000, 0xc00003) AM_RAM         /* FIFO? */
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM         /* 3D registers */
-ADDRESS_MAP_END
+void metalmx_state::dsp32c_1_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).ram();
+	map(0x600000, 0x67ffff).ram();
+	map(0x700000, 0x700003).nopw();    /* LEDs? */
+	map(0xa00000, 0xa00003).r(this, FUNC(metalmx_state::unk_r));
+	map(0xb00000, 0xb00003).r(this, FUNC(metalmx_state::unk_r));
+	map(0xc00000, 0xc00003).ram();         /* FIFO? */
+	map(0xf00000, 0xffffff).ram();         /* 3D registers */
+}
 
 /*************************************
  *
@@ -586,16 +591,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(metalmx_state::dsp32c_2_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM
-	AM_RANGE(0x600000, 0x67ffff) AM_RAM
-	AM_RANGE(0x700000, 0x700003) AM_WRITENOP    /* LEDs? */
-	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
-	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
-	AM_RANGE(0xc00000, 0xc00003) AM_RAM         /* FIFO? */
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM         /* 3D registers */
-ADDRESS_MAP_END
+void metalmx_state::dsp32c_2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).ram();
+	map(0x600000, 0x67ffff).ram();
+	map(0x700000, 0x700003).nopw();    /* LEDs? */
+	map(0xa00000, 0xa00003).r(this, FUNC(metalmx_state::unk_r));
+	map(0xb00000, 0xb00003).r(this, FUNC(metalmx_state::unk_r));
+	map(0xc00000, 0xc00003).ram();         /* FIFO? */
+	map(0xf00000, 0xffffff).ram();         /* 3D registers */
+}
 
 
 /*************************************

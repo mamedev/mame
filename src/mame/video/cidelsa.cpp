@@ -102,15 +102,17 @@ WRITE_LINE_MEMBER( cidelsa_state::prd_w )
 
 /* Page RAM */
 
-ADDRESS_MAP_START(cidelsa_state::cidelsa_page_ram)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x3ff) AM_RAM
-ADDRESS_MAP_END
+void cidelsa_state::cidelsa_page_ram(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x3ff).ram();
+}
 
-ADDRESS_MAP_START(draco_state::draco_page_ram)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x7ff) AM_RAM
-ADDRESS_MAP_END
+void draco_state::draco_page_ram(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x7ff).ram();
+}
 
 /* Video Start */
 

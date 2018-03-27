@@ -171,7 +171,7 @@ public:
 
 	void jclub2(machine_config &config);
 	void jclub2_map(address_map &map);
-private:
+protected:
 	required_device<st0020_device> m_st0020;
 };
 
@@ -579,50 +579,51 @@ WRITE32_MEMBER(jclub2o_state::cmd2_word_w)
 	}
 }
 
-ADDRESS_MAP_START(jclub2o_state::jclub2o_map)
-	AM_RANGE(0x000000, 0x27ffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
+void jclub2o_state::jclub2o_map(address_map &map)
+{
+	map(0x000000, 0x27ffff).rom();
+	map(0x400000, 0x41ffff).ram().share("nvram"); // battery
 
-	AM_RANGE(0x490000, 0x490003) AM_WRITE(eeprom_s29290_w)
+	map(0x490000, 0x490003).w(this, FUNC(jclub2o_state::eeprom_s29290_w));
 
-	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(out2_w)
+	map(0x4a0000, 0x4a0003).w(this, FUNC(jclub2o_state::out2_w));
 //  AM_RANGE(0x4a0010, 0x4a0013) AM_WRITE
 //  AM_RANGE(0x4a0020, 0x4a0023) AM_WRITE
 //  AM_RANGE(0x4a0030, 0x4a0033) AM_WRITE
 
 	// ST-0016
-	AM_RANGE(0x4b0000, 0x4b0003) AM_READWRITE(cmd1_word_r, cmd1_word_w)
-	AM_RANGE(0x4b0004, 0x4b0007) AM_READWRITE(cmd2_word_r, cmd2_word_w)
-	AM_RANGE(0x4b0008, 0x4b000b) AM_READ(cmd_stat_word_r)
+	map(0x4b0000, 0x4b0003).rw(this, FUNC(jclub2o_state::cmd1_word_r), FUNC(jclub2o_state::cmd1_word_w));
+	map(0x4b0004, 0x4b0007).rw(this, FUNC(jclub2o_state::cmd2_word_r), FUNC(jclub2o_state::cmd2_word_w));
+	map(0x4b0008, 0x4b000b).r(this, FUNC(jclub2o_state::cmd_stat_word_r));
 
-	AM_RANGE(0x4d0000, 0x4d0003) AM_READNOP AM_WRITENOP // reads seem unused? this write would go to two 7-segs (but the code is never called)
-	AM_RANGE(0x4d0004, 0x4d0007) AM_READNOP
-	AM_RANGE(0x4d0008, 0x4d000b) AM_READNOP
-	AM_RANGE(0x4d000c, 0x4d000f) AM_READNOP
+	map(0x4d0000, 0x4d0003).nopr().nopw(); // reads seem unused? this write would go to two 7-segs (but the code is never called)
+	map(0x4d0004, 0x4d0007).nopr();
+	map(0x4d0008, 0x4d000b).nopr();
+	map(0x4d000c, 0x4d000f).nopr();
 
-	AM_RANGE(0x4e0000, 0x4e0003) AM_READ(p2_r) AM_WRITE(input_sel2_w)
+	map(0x4e0000, 0x4e0003).r(this, FUNC(jclub2o_state::p2_r)).w(this, FUNC(jclub2o_state::input_sel2_w));
 
-	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x580004, 0x580007) AM_READ(p1_r)
-	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("COIN")
-	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(input_sel1_out3_w)
-	AM_RANGE(0x580010, 0x580013) AM_WRITE(out1_w)
+	map(0x580000, 0x580003).portr("EEPROM");
+	map(0x580004, 0x580007).r(this, FUNC(jclub2o_state::p1_r));
+	map(0x580008, 0x58000b).portr("COIN");
+	map(0x58000c, 0x58000f).w(this, FUNC(jclub2o_state::input_sel1_out3_w));
+	map(0x580010, 0x580013).w(this, FUNC(jclub2o_state::out1_w));
 //  AM_RANGE(0x580018, 0x58001b) AM_WRITE
 //  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
 
-	AM_RANGE(0x580200, 0x580203) AM_DEVREAD16("watchdog", watchdog_timer_device, reset16_r, 0xffff0000)
+	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
-	AM_RANGE(0x580400, 0x580403) AM_READWRITE8(console_r, console_w, 0x00ff0000)
-	AM_RANGE(0x580420, 0x580423) AM_READ8(console_status_r, 0x00ff0000) //AM_WRITE
+	map(0x580401, 0x580401).rw(this, FUNC(jclub2o_state::console_r), FUNC(jclub2o_state::console_w));
+	map(0x580421, 0x580421).r(this, FUNC(jclub2o_state::console_status_r)); //AM_WRITE
 //  AM_RANGE(0x580440, 0x580443) AM_WRITE
 
 	// ST-0020
-	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
-	AM_RANGE(0x680000, 0x69ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x6a0000, 0x6bffff) AM_RAM
-	AM_RANGE(0x6c0000, 0x6c00ff) AM_DEVREADWRITE16( "st0020", st0020_device, regs_r,   regs_w,   0xffffffff );
-	AM_RANGE(0x700000, 0x7fffff) AM_DEVREADWRITE16( "st0020", st0020_device, gfxram_r, gfxram_w, 0xffffffff );
-ADDRESS_MAP_END
+	map(0x600000, 0x67ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
+	map(0x680000, 0x69ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x6a0000, 0x6bffff).ram();
+	map(0x6c0000, 0x6c00ff).rw(m_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
+	map(0x700000, 0x7fffff).rw(m_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
+}
 
 
 // ST-0016 map
@@ -661,25 +662,27 @@ WRITE8_MEMBER(jclub2o_state::cmd2_w)
 	logerror("%s: cmd2_w %02x\n", machine().describe_context(), m_cmd2);
 }
 
-ADDRESS_MAP_START(jclub2o_state::st0016_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM
+void jclub2o_state::st0016_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");
+	map(0xe800, 0xe8ff).ram();
 	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
 	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(jclub2o_state::st0016_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void jclub2o_state::st0016_io(address_map &map)
+{
+	map.global_mask(0xff);
 	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(cmd1_r, cmd1_w)
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE(cmd2_r, cmd2_w)
-	AM_RANGE(0xc2, 0xc2) AM_READ(cmd_stat_r)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
-	AM_RANGE(0xe7, 0xe7) AM_WRITENOP // watchdog?
+	map(0xc0, 0xc0).rw(this, FUNC(jclub2o_state::cmd1_r), FUNC(jclub2o_state::cmd1_w));
+	map(0xc1, 0xc1).rw(this, FUNC(jclub2o_state::cmd2_r), FUNC(jclub2o_state::cmd2_w));
+	map(0xc2, 0xc2).r(this, FUNC(jclub2o_state::cmd_stat_r));
+	map(0xe1, 0xe1).w(this, FUNC(jclub2o_state::st0016_rom_bank_w));
+	map(0xe7, 0xe7).nopw(); // watchdog?
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
-ADDRESS_MAP_END
+}
 
 
 // Newer hardware (ST-0032) only
@@ -702,45 +705,46 @@ WRITE32_MEMBER(common_state::eeprom_93c46_w)
 	}
 }
 
-ADDRESS_MAP_START(jclub2_state::jclub2_map)
-	AM_RANGE(0x000000, 0x27ffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
+void jclub2_state::jclub2_map(address_map &map)
+{
+	map(0x000000, 0x27ffff).rom();
+	map(0x400000, 0x41ffff).ram().share("nvram"); // battery
 
-	AM_RANGE(0x490000, 0x490003) AM_WRITE(eeprom_93c46_w)
+	map(0x490000, 0x490003).w(this, FUNC(jclub2_state::eeprom_93c46_w));
 
-	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(out2_w)
+	map(0x4a0000, 0x4a0003).w(this, FUNC(jclub2_state::out2_w));
 
-	AM_RANGE(0x4d0000, 0x4d0003) AM_READNOP AM_WRITENOP // reads seem unused? this write would go to two 7-segs (but the code is never called)
-	AM_RANGE(0x4d0004, 0x4d0007) AM_READNOP
-	AM_RANGE(0x4d0008, 0x4d000b) AM_READNOP
-	AM_RANGE(0x4d000c, 0x4d000f) AM_READNOP
+	map(0x4d0000, 0x4d0003).nopr().nopw(); // reads seem unused? this write would go to two 7-segs (but the code is never called)
+	map(0x4d0004, 0x4d0007).nopr();
+	map(0x4d0008, 0x4d000b).nopr();
+	map(0x4d000c, 0x4d000f).nopr();
 
-	AM_RANGE(0x4e0000, 0x4e0003) AM_READ(p2_r) AM_WRITE(input_sel2_w)
+	map(0x4e0000, 0x4e0003).r(this, FUNC(jclub2_state::p2_r)).w(this, FUNC(jclub2_state::input_sel2_w));
 
-	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x580004, 0x580007) AM_READ(p1_r)
-	AM_RANGE(0x580008, 0x58000b) AM_READ_PORT("COIN")
-	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(input_sel1_out3_w)
-	AM_RANGE(0x580010, 0x580013) AM_WRITE(out1_w)
+	map(0x580000, 0x580003).portr("EEPROM");
+	map(0x580004, 0x580007).r(this, FUNC(jclub2_state::p1_r));
+	map(0x580008, 0x58000b).portr("COIN");
+	map(0x58000c, 0x58000f).w(this, FUNC(jclub2_state::input_sel1_out3_w));
+	map(0x580010, 0x580013).w(this, FUNC(jclub2_state::out1_w));
 //  AM_RANGE(0x580018, 0x58001b) AM_WRITE
 //  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
 
-	AM_RANGE(0x580200, 0x580203) AM_DEVREAD16("watchdog", watchdog_timer_device, reset16_r, 0xffff0000)
+	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
-	AM_RANGE(0x580400, 0x580403) AM_READWRITE8(console_r, console_w, 0x00ff0000)
-	AM_RANGE(0x580420, 0x580423) AM_READ8(console_status_r, 0x00ff0000) //AM_WRITE
+	map(0x580401, 0x580401).rw(this, FUNC(jclub2_state::console_r), FUNC(jclub2_state::console_w));
+	map(0x580421, 0x580421).r(this, FUNC(jclub2_state::console_status_r)); //AM_WRITE
 //  AM_RANGE(0x580440, 0x580443) AM_WRITE
 
 	// ST-0032
-	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020", st0020_device, sprram_r, sprram_w, 0xffffffff );
-	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
-	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE16( "st0020", st0020_device, regs_r,   regs_w,   0xffffffff );
-	AM_RANGE(0x8e0000, 0x8e01ff) AM_RAM // sound?
-	AM_RANGE(0x8e0200, 0x8e0203) AM_RAM
-	AM_RANGE(0x8e0210, 0x8e0213) AM_RAM
-	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE16( "st0020", st0020_device, gfxram_r, gfxram_w, 0xffffffff );
-ADDRESS_MAP_END
+	map(0x800000, 0x87ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
+	map(0x880000, 0x89ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x8a0000, 0x8bffff).ram();   // this should still be palette ram!
+	map(0x8c0000, 0x8c00ff).rw(m_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
+	map(0x8e0000, 0x8e01ff).ram(); // sound?
+	map(0x8e0200, 0x8e0203).ram();
+	map(0x8e0210, 0x8e0213).ram();
+	map(0x900000, 0x9fffff).rw(m_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
+}
 
 
 // bootleg darkhors hardware
@@ -791,37 +795,38 @@ WRITE32_MEMBER(darkhors_state::out1_w)
 	}
 }
 
-ADDRESS_MAP_START(darkhors_state::darkhors_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram") // battery
+void darkhors_state::darkhors_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x400000, 0x41ffff).ram().share("nvram"); // battery
 
-	AM_RANGE(0x490040, 0x490043) AM_WRITE(eeprom_93c46_w)
-	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("SERVICE") AM_WRITE(out1_w)
+	map(0x490040, 0x490043).w(this, FUNC(darkhors_state::eeprom_93c46_w));
+	map(0x4e0080, 0x4e0083).portr("SERVICE").w(this, FUNC(darkhors_state::out1_w));
 
-	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("UNKNOWN")
-	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("COIN")
-	AM_RANGE(0x580008, 0x58000b) AM_READ(input_r)
-	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(input_sel_w)
+	map(0x580000, 0x580003).portr("UNKNOWN");
+	map(0x580004, 0x580007).portr("COIN");
+	map(0x580008, 0x58000b).r(this, FUNC(darkhors_state::input_r));
+	map(0x58000c, 0x58000f).w(this, FUNC(darkhors_state::input_sel_w));
 //  AM_RANGE(0x580010, 0x580013) AM_WRITE
 //  AM_RANGE(0x580018, 0x58001b) AM_WRITE
 //  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
-	AM_RANGE(0x580084, 0x580087) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff000000)
+	map(0x580084, 0x580084).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  AM_RANGE(0x58008c, 0x58008f) AM_WRITE
-	AM_RANGE(0x580200, 0x580203) AM_DEVREAD16("watchdog", watchdog_timer_device, reset16_r, 0xffff0000)
+	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
-	AM_RANGE(0x580400, 0x580403) AM_READWRITE8(console_r, console_w, 0x00ff0000)
-	AM_RANGE(0x580420, 0x580423) AM_READ8(console_status_r, 0x00ff0000)
+	map(0x580401, 0x580401).rw(this, FUNC(darkhors_state::console_r), FUNC(darkhors_state::console_w));
+	map(0x580421, 0x580421).r(this, FUNC(darkhors_state::console_status_r));
 
-	AM_RANGE(0x800000, 0x86bfff) AM_RAM
-	AM_RANGE(0x86c000, 0x86ffff) AM_RAM_WRITE(tmapram_w)  AM_SHARE("tmapram")
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(tmapram2_w) AM_SHARE("tmapram2")
-	AM_RANGE(0x874000, 0x87dfff) AM_RAM
-	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x880000, 0x89ffff) AM_RAM AM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM   // this should still be palette ram!
-	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_SHARE("tmapscroll")
-	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_SHARE("tmapscroll2")
-ADDRESS_MAP_END
+	map(0x800000, 0x86bfff).ram();
+	map(0x86c000, 0x86ffff).ram().w(this, FUNC(darkhors_state::tmapram_w)).share("tmapram");
+	map(0x870000, 0x873fff).ram().w(this, FUNC(darkhors_state::tmapram2_w)).share("tmapram2");
+	map(0x874000, 0x87dfff).ram();
+	map(0x87e000, 0x87ffff).ram().share("spriteram");
+	map(0x880000, 0x89ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x8a0000, 0x8bffff).ram();   // this should still be palette ram!
+	map(0x8c0120, 0x8c012f).writeonly().share("tmapscroll");
+	map(0x8c0130, 0x8c013f).writeonly().share("tmapscroll2");
+}
 
 
 /***************************************************************************

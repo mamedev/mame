@@ -57,39 +57,40 @@ WRITE8_MEMBER(tbowl_state::boardc_bankswitch_w)
 
 /* Board B */
 
-ADDRESS_MAP_START(tbowl_state::_6206B_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(bg2videoram_w) AM_SHARE("bg2videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
+void tbowl_state::_6206B_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xbfff).ram().w(this, FUNC(tbowl_state::bg2videoram_w)).share("bg2videoram");
+	map(0xc000, 0xdfff).ram().w(this, FUNC(tbowl_state::bgvideoram_w)).share("bgvideoram");
+	map(0xe000, 0xefff).ram().w(this, FUNC(tbowl_state::txvideoram_w)).share("txvideoram");
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("mainbank")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("shared_ram") /* check */
-	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE(boardb_bankswitch_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("P2")
+	map(0xf000, 0xf7ff).bankr("mainbank");
+	map(0xf800, 0xfbff).ram().share("shared_ram"); /* check */
+	map(0xfc00, 0xfc00).portr("P1").w(this, FUNC(tbowl_state::boardb_bankswitch_w));
+	map(0xfc01, 0xfc01).portr("P2");
 //  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
-	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("P3")
+	map(0xfc02, 0xfc02).portr("P3");
 //  AM_RANGE(0xfc02, 0xfc02) AM_WRITE(unknown_write) /* written during start-up, not again */
-	AM_RANGE(0xfc03, 0xfc03) AM_READ_PORT("P4") AM_WRITE(coincounter_w)
+	map(0xfc03, 0xfc03).portr("P4").w(this, FUNC(tbowl_state::coincounter_w));
 //  AM_RANGE(0xfc05, 0xfc05) AM_WRITE(unknown_write) /* no idea */
 //  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r)        /* Read During NMI */
-	AM_RANGE(0xfc07, 0xfc07) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfc08, 0xfc08) AM_READ_PORT("DSW1")
+	map(0xfc07, 0xfc07).portr("SYSTEM");
+	map(0xfc08, 0xfc08).portr("DSW1");
 //  AM_RANGE(0xfc08, 0xfc08) AM_WRITE(unknown_write) /* hardly used .. */
-	AM_RANGE(0xfc09, 0xfc09) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc0a, 0xfc0a) AM_READ_PORT("DSW3")
+	map(0xfc09, 0xfc09).portr("DSW2");
+	map(0xfc0a, 0xfc0a).portr("DSW3");
 //  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE(unknown_write) /* hardly used .. */
-	AM_RANGE(0xfc0d, 0xfc0d) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xfc10, 0xfc10) AM_WRITE(bg2xscroll_lo)
-	AM_RANGE(0xfc11, 0xfc11) AM_WRITE(bg2xscroll_hi)
-	AM_RANGE(0xfc12, 0xfc12) AM_WRITE(bg2yscroll_lo)
-	AM_RANGE(0xfc13, 0xfc13) AM_WRITE(bg2yscroll_hi)
-	AM_RANGE(0xfc14, 0xfc14) AM_WRITE(bgxscroll_lo)
-	AM_RANGE(0xfc15, 0xfc15) AM_WRITE(bgxscroll_hi)
-	AM_RANGE(0xfc16, 0xfc16) AM_WRITE(bgyscroll_lo)
-	AM_RANGE(0xfc17, 0xfc17) AM_WRITE(bgyscroll_hi)
-ADDRESS_MAP_END
+	map(0xfc0d, 0xfc0d).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xfc10, 0xfc10).w(this, FUNC(tbowl_state::bg2xscroll_lo));
+	map(0xfc11, 0xfc11).w(this, FUNC(tbowl_state::bg2xscroll_hi));
+	map(0xfc12, 0xfc12).w(this, FUNC(tbowl_state::bg2yscroll_lo));
+	map(0xfc13, 0xfc13).w(this, FUNC(tbowl_state::bg2yscroll_hi));
+	map(0xfc14, 0xfc14).w(this, FUNC(tbowl_state::bgxscroll_lo));
+	map(0xfc15, 0xfc15).w(this, FUNC(tbowl_state::bgxscroll_hi));
+	map(0xfc16, 0xfc16).w(this, FUNC(tbowl_state::bgyscroll_lo));
+	map(0xfc17, 0xfc17).w(this, FUNC(tbowl_state::bgyscroll_hi));
+}
 
 /* Board C */
 WRITE8_MEMBER(tbowl_state::trigger_nmi)
@@ -98,20 +99,21 @@ WRITE8_MEMBER(tbowl_state::trigger_nmi)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-ADDRESS_MAP_START(tbowl_state::_6206C_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_READONLY
-	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
-	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // 2x palettes, one for each monitor?
-	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(boardc_bankswitch_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITENOP /* ? */
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(trigger_nmi) /* ? */
-	AM_RANGE(0xfc03, 0xfc03) AM_WRITENOP /* ? */
-	AM_RANGE(0xfc06, 0xfc06) AM_WRITENOP /* ? */
-ADDRESS_MAP_END
+void tbowl_state::_6206C_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).readonly();
+	map(0xc000, 0xd7ff).writeonly();
+	map(0xd800, 0xdfff).writeonly().share("spriteram");
+	map(0xe000, 0xefff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 2x palettes, one for each monitor?
+	map(0xf000, 0xf7ff).bankr("subbank");
+	map(0xf800, 0xfbff).ram().share("shared_ram");
+	map(0xfc00, 0xfc00).w(this, FUNC(tbowl_state::boardc_bankswitch_w));
+	map(0xfc01, 0xfc01).nopw(); /* ? */
+	map(0xfc02, 0xfc02).w(this, FUNC(tbowl_state::trigger_nmi)); /* ? */
+	map(0xfc03, 0xfc03).nopw(); /* ? */
+	map(0xfc06, 0xfc06).nopw(); /* ? */
+}
 
 /* Board A */
 
@@ -162,18 +164,19 @@ WRITE_LINE_MEMBER(tbowl_state::adpcm_int_2)
 	adpcm_int(m_msm2, 1);
 }
 
-ADDRESS_MAP_START(tbowl_state::_6206A_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ym1", ym3812_device, write)
-	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0xe000, 0xe001) AM_WRITE(adpcm_end_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(adpcm_start_w)
-	AM_RANGE(0xe004, 0xe005) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0xe007, 0xe007) AM_WRITENOP // sound watchdog
-	AM_RANGE(0xe010, 0xe010) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void tbowl_state::_6206A_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd001).w("ym1", FUNC(ym3812_device::write));
+	map(0xd800, 0xd801).w("ym2", FUNC(ym3812_device::write));
+	map(0xe000, 0xe001).w(this, FUNC(tbowl_state::adpcm_end_w));
+	map(0xe002, 0xe003).w(this, FUNC(tbowl_state::adpcm_start_w));
+	map(0xe004, 0xe005).w(this, FUNC(tbowl_state::adpcm_vol_w));
+	map(0xe006, 0xe006).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+	map(0xe007, 0xe007).nopw(); // sound watchdog
+	map(0xe010, 0xe010).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 /*** Input Ports
 

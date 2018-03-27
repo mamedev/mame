@@ -63,9 +63,10 @@ public:
 	void aceex2814_map(address_map &map);
 };
 
-ADDRESS_MAP_START(aceex2814_state::aceex2814_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void aceex2814_state::aceex2814_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 static INPUT_PORTS_START( aceex2814 )
 INPUT_PORTS_END

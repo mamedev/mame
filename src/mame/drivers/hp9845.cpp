@@ -3699,35 +3699,37 @@ MACHINE_CONFIG_END
     - all LPU RAM is dynamically mapped at machine start according to -ramsize option
 */
 
-ADDRESS_MAP_START(hp9845_base_state::global_mem_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3f7fff)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x014000 , 0x017fff) AM_RAM AM_SHARE("ppu_ram")
-	AM_RANGE(0x030000 , 0x037fff) AM_ROM AM_REGION("lpu" , 0)
-	AM_RANGE(0x050000 , 0x057fff) AM_ROM AM_REGION("ppu" , 0)
-ADDRESS_MAP_END
+void hp9845_base_state::global_mem_map(address_map &map)
+{
+	map.global_mask(0x3f7fff);
+	map.unmap_value_low();
+	map(0x014000, 0x017fff).ram().share("ppu_ram");
+	map(0x030000, 0x037fff).rom().region("lpu", 0);
+	map(0x050000, 0x057fff).rom().region("ppu", 0);
+}
 
-ADDRESS_MAP_START(hp9845_base_state::ppu_io_map)
-	ADDRESS_MAP_UNMAP_LOW
+void hp9845_base_state::ppu_io_map(address_map &map)
+{
+	map.unmap_value_low();
 	// PA = 0, IC = 0..1
 	// Internal printer
-	AM_RANGE(HP_MAKE_IOADDR(PRINTER_PA , 0) , HP_MAKE_IOADDR(PRINTER_PA , 1)) AM_DEVREADWRITE("printer" , hp9845_printer_device , printer_r , printer_w)
+	map(HP_MAKE_IOADDR(PRINTER_PA, 0), HP_MAKE_IOADDR(PRINTER_PA, 1)).rw("printer", FUNC(hp9845_printer_device::printer_r), FUNC(hp9845_printer_device::printer_w));
 	// PA = 0, IC = 2
 	// Keyboard scancode input
-	AM_RANGE(HP_MAKE_IOADDR(0 , 2) , HP_MAKE_IOADDR(0 , 2)) AM_READ(kb_scancode_r)
+	map(HP_MAKE_IOADDR(0, 2), HP_MAKE_IOADDR(0, 2)).r(this, FUNC(hp9845_base_state::kb_scancode_r));
 	// PA = 0, IC = 3
 	// Keyboard status input & keyboard interrupt clear
-	AM_RANGE(HP_MAKE_IOADDR(0 , 3) , HP_MAKE_IOADDR(0 , 3)) AM_READWRITE(kb_status_r , kb_irq_clear_w)
+	map(HP_MAKE_IOADDR(0, 3), HP_MAKE_IOADDR(0, 3)).rw(this, FUNC(hp9845_base_state::kb_status_r), FUNC(hp9845_base_state::kb_irq_clear_w));
 	// PA = 13, IC = 0..3
 	// Graphic video
-	AM_RANGE(HP_MAKE_IOADDR(GVIDEO_PA , 0) , HP_MAKE_IOADDR(GVIDEO_PA , 3)) AM_READWRITE(graphic_r , graphic_w)
+	map(HP_MAKE_IOADDR(GVIDEO_PA, 0), HP_MAKE_IOADDR(GVIDEO_PA, 3)).rw(this, FUNC(hp9845_base_state::graphic_r), FUNC(hp9845_base_state::graphic_w));
 	// PA = 14, IC = 0..3
 	// Left-hand side tape drive (T14)
-	AM_RANGE(HP_MAKE_IOADDR(T14_PA , 0) , HP_MAKE_IOADDR(T14_PA , 3))        AM_DEVREADWRITE("t14" , hp_taco_device , reg_r , reg_w)
+	map(HP_MAKE_IOADDR(T14_PA, 0), HP_MAKE_IOADDR(T14_PA, 3)).rw("t14", FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
 	// PA = 15, IC = 0..3
 	// Right-hand side tape drive (T15)
-	AM_RANGE(HP_MAKE_IOADDR(T15_PA , 0) , HP_MAKE_IOADDR(T15_PA , 3))        AM_DEVREADWRITE("t15" , hp_taco_device , reg_r , reg_w)
-ADDRESS_MAP_END
+	map(HP_MAKE_IOADDR(T15_PA, 0), HP_MAKE_IOADDR(T15_PA, 3)).rw("t15", FUNC(hp_taco_device::reg_r), FUNC(hp_taco_device::reg_w));
+}
 
 MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 	MCFG_CPU_ADD("lpu", HP_5061_3001, 5700000)
@@ -3902,11 +3904,11 @@ ROM_START( hp9845b )
 	ROM_REGION(0x800 , "optional_chargen" , 0)
 	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
-		ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-		ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
-		ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-		ROM_LOAD("9845-PPU-Standard-Graphics.bin", 0, 0x10000, CRC(f866510f) SHA1(3e22cd2072e3a5f3603a1eb8477b6b4a198d184d))
+	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
+	ROM_LOAD("9845-ppu-standard-graphics.bin", 0, 0x10000, CRC(f866510f) SHA1(3e22cd2072e3a5f3603a1eb8477b6b4a198d184d))
 
 #if 0
 	ROM_REGION( 0200000, "lpu", ROMREGION_16BIT | ROMREGION_BE )
@@ -3971,10 +3973,10 @@ ROM_START( hp9845c )
 	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
+	ROM_LOAD("9845-ppu-color-enhanced-graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
 ROM_END
 
 ROM_START( hp9845t )
@@ -3982,10 +3984,10 @@ ROM_START( hp9845t )
 	ROM_LOAD("1818-1395.bin" , 0 , 0x1000 , CRC(7b555edf) SHA1(3b08e094635ef02aef9a2e37b049c61bcf1ec037))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
+	ROM_LOAD("9845-ppu-color-enhanced-graphics.bin", 0, 0x10000, CRC(96e11edc) SHA1(3f1da50edb35dfc57ec2ecfd816a8c8230e110bd))
 ROM_END
 
 ROM_START( hp9845b_de )
@@ -3996,10 +3998,10 @@ ROM_START( hp9845b_de )
 	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Standard-Graphics-Ger.bin", 0, 0x10000, CRC(c968363d) SHA1(bc6805403371ca49d1a137f22cd254e3b0e0dbb4))
+	ROM_LOAD("9845-ppu-standard-graphics-ger.bin", 0, 0x10000, CRC(c968363d) SHA1(bc6805403371ca49d1a137f22cd254e3b0e0dbb4))
 ROM_END
 
 ROM_START( hp9845c_de )
@@ -4010,10 +4012,10 @@ ROM_START( hp9845c_de )
 	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics-Ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
+	ROM_LOAD("9845-ppu-color-enhanced-graphics-ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
 ROM_END
 
 ROM_START( hp9845t_de )
@@ -4021,10 +4023,10 @@ ROM_START( hp9845t_de )
 	ROM_LOAD("1818-1395.bin" , 0 , 0x1000 , CRC(7b555edf) SHA1(3b08e094635ef02aef9a2e37b049c61bcf1ec037))
 
 	ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
+	ROM_LOAD("9845-lpu-standard-processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))
 
 	ROM_REGION(0x10000, "ppu", ROMREGION_16BIT | ROMREGION_BE)
-	ROM_LOAD("9845-PPU-Color-Enhanced-Graphics-Ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
+	ROM_LOAD("9845-ppu-color-enhanced-graphics-ger.bin", 0, 0x10000, CRC(a7ef79ee) SHA1(637742ed8fc8201a8e7bac62654f21c5409dfb76))
 ROM_END
 
 //    YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT           STATE          INIT  COMPANY             FULLNAME  FLAGS

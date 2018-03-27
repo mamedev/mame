@@ -162,33 +162,35 @@ TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::scanline)
  *
  *************************************/
 
-ADDRESS_MAP_START(bionicc_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xfe0000, 0xfe07ff) AM_RAM /* RAM? */
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfe0d00, 0xfe3fff) AM_RAM              /* RAM? */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(gfxctrl_w)    /* + coin counters */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("DSW")
-	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(scroll_w)
-	AM_RANGE(0xfe8018, 0xfe8019) AM_WRITENOP // vblank irq ack?
-	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(mpu_trigger_w)    /* ??? not sure, but looks like it */
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xffc000, 0xfffff7) AM_RAM /* working RAM */
-	AM_RANGE(0xfffff8, 0xfffff9) AM_READWRITE(hacked_soundcommand_r, hacked_soundcommand_w)      /* hack */
-	AM_RANGE(0xfffffa, 0xffffff) AM_READWRITE(hacked_controls_r, hacked_controls_w) /* hack */
-ADDRESS_MAP_END
+void bionicc_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0xfe0000, 0xfe07ff).ram(); /* RAM? */
+	map(0xfe0800, 0xfe0cff).ram().share("spriteram");
+	map(0xfe0d00, 0xfe3fff).ram();              /* RAM? */
+	map(0xfe4000, 0xfe4001).w(this, FUNC(bionicc_state::gfxctrl_w));    /* + coin counters */
+	map(0xfe4000, 0xfe4001).portr("SYSTEM");
+	map(0xfe4002, 0xfe4003).portr("DSW");
+	map(0xfe8010, 0xfe8017).w(this, FUNC(bionicc_state::scroll_w));
+	map(0xfe8018, 0xfe8019).nopw(); // vblank irq ack?
+	map(0xfe801a, 0xfe801b).w(this, FUNC(bionicc_state::mpu_trigger_w));    /* ??? not sure, but looks like it */
+	map(0xfec000, 0xfecfff).ram().w(this, FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
+	map(0xff0000, 0xff3fff).ram().w(this, FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
+	map(0xff4000, 0xff7fff).ram().w(this, FUNC(bionicc_state::bgvideoram_w)).share("bgvideoram");
+	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xffc000, 0xfffff7).ram(); /* working RAM */
+	map(0xfffff8, 0xfffff9).rw(this, FUNC(bionicc_state::hacked_soundcommand_r), FUNC(bionicc_state::hacked_soundcommand_w));      /* hack */
+	map(0xfffffa, 0xffffff).rw(this, FUNC(bionicc_state::hacked_controls_r), FUNC(bionicc_state::hacked_controls_w)); /* hack */
+}
 
 
-ADDRESS_MAP_START(bionicc_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void bionicc_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc7ff).ram();
+}
 
 
 /*************************************

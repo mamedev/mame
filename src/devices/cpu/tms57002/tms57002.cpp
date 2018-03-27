@@ -14,7 +14,7 @@
 #include "57002dsm.h"
 
 
-DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "TMS57002")
+DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "Texas Instruments TMS57002 \"DASP\"")
 
 // Can't use a DEVICE_ADDRESS_MAP, not yet anyway
 ADDRESS_MAP_START(tms57002_device::internal_pgm)
@@ -30,9 +30,9 @@ tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-util::disasm_interface *tms57002_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms57002_device::create_disassembler()
 {
-	return new tms57002_disassembler;
+	return std::make_unique<tms57002_disassembler>();
 }
 
 WRITE_LINE_MEMBER(tms57002_device::pload_w)

@@ -690,29 +690,31 @@ WRITE8_MEMBER(agat7_state::agat7_ram_w)
  * and are supported only on motherboards with 32K onboard.
  * all extra RAM (onboard or addon) is accessible via 16K window at 0x8000.
  */
-ADDRESS_MAP_START(agat7_state::agat7_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(agat7_ram_r, agat7_ram_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0xf) AM_READ(keyb_data_r) AM_WRITENOP
-	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0xf) AM_READWRITE(keyb_strobe_r, keyb_strobe_w)
-	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0xf) AM_READWRITE(cassette_toggle_r, cassette_toggle_w)
-	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0xf) AM_READWRITE(speaker_toggle_r, speaker_toggle_w)
-	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0xf) AM_READWRITE(interrupts_on_r, interrupts_on_w)
-	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0xf) AM_READWRITE(interrupts_off_r, interrupts_off_w)
-	AM_RANGE(0xc060, 0xc067) AM_MIRROR(0x8) AM_READ(flags_r) AM_WRITENOP
-	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0xf) AM_READWRITE(controller_strobe_r, controller_strobe_w)
-	AM_RANGE(0xc080, 0xc0ef) AM_READWRITE(c080_r, c080_w)
-	AM_RANGE(0xc0f0, 0xc0ff) AM_READWRITE(agat7_membank_r, agat7_membank_w)
-	AM_RANGE(0xc100, 0xc6ff) AM_READWRITE(c100_r, c100_w)
-	AM_RANGE(0xc700, 0xc7ff) AM_DEVREADWRITE("a7video", agat7video_device, read, write)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(c800_r, c800_w)
-	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A7_UPPERBANK_TAG, address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void agat7_state::agat7_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).rw(this, FUNC(agat7_state::agat7_ram_r), FUNC(agat7_state::agat7_ram_w));
+	map(0xc000, 0xc000).mirror(0xf).r(this, FUNC(agat7_state::keyb_data_r)).nopw();
+	map(0xc010, 0xc010).mirror(0xf).rw(this, FUNC(agat7_state::keyb_strobe_r), FUNC(agat7_state::keyb_strobe_w));
+	map(0xc020, 0xc020).mirror(0xf).rw(this, FUNC(agat7_state::cassette_toggle_r), FUNC(agat7_state::cassette_toggle_w));
+	map(0xc030, 0xc030).mirror(0xf).rw(this, FUNC(agat7_state::speaker_toggle_r), FUNC(agat7_state::speaker_toggle_w));
+	map(0xc040, 0xc040).mirror(0xf).rw(this, FUNC(agat7_state::interrupts_on_r), FUNC(agat7_state::interrupts_on_w));
+	map(0xc050, 0xc050).mirror(0xf).rw(this, FUNC(agat7_state::interrupts_off_r), FUNC(agat7_state::interrupts_off_w));
+	map(0xc060, 0xc067).mirror(0x8).r(this, FUNC(agat7_state::flags_r)).nopw();
+	map(0xc070, 0xc070).mirror(0xf).rw(this, FUNC(agat7_state::controller_strobe_r), FUNC(agat7_state::controller_strobe_w));
+	map(0xc080, 0xc0ef).rw(this, FUNC(agat7_state::c080_r), FUNC(agat7_state::c080_w));
+	map(0xc0f0, 0xc0ff).rw(this, FUNC(agat7_state::agat7_membank_r), FUNC(agat7_state::agat7_membank_w));
+	map(0xc100, 0xc6ff).rw(this, FUNC(agat7_state::c100_r), FUNC(agat7_state::c100_w));
+	map(0xc700, 0xc7ff).rw("a7video", FUNC(agat7video_device::read), FUNC(agat7video_device::write));
+	map(0xc800, 0xcfff).rw(this, FUNC(agat7_state::c800_r), FUNC(agat7_state::c800_w));
+	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(agat7_state::inhbank_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("maincpu", 0x1000) AM_WRITE(inh_w)
-	AM_RANGE(0x3000, 0x5fff) AM_READWRITE(inh_r, inh_w)
-ADDRESS_MAP_END
+void agat7_state::inhbank_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom().region("maincpu", 0x1000).w(this, FUNC(agat7_state::inh_w));
+	map(0x3000, 0x5fff).rw(this, FUNC(agat7_state::inh_r), FUNC(agat7_state::inh_w));
+}
 
 /***************************************************************************
     KEYBOARD

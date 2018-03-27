@@ -74,17 +74,19 @@ WRITE8_MEMBER( elf2_state::memory_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(elf2_state::elf2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void elf2_state::elf2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x0000, 0x00ff).bankrw("bank1");
+}
 
-ADDRESS_MAP_START(elf2_state::elf2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_READ(dispon_r)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(data_r, data_w)
-ADDRESS_MAP_END
+void elf2_state::elf2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x01, 0x01).r(this, FUNC(elf2_state::dispon_r));
+	map(0x04, 0x04).rw(this, FUNC(elf2_state::data_r), FUNC(elf2_state::data_w));
+}
 
 /* Input Ports */
 
@@ -201,6 +203,7 @@ void elf2_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* initialize LED displays */
+	m_7segs.resolve();
 	m_led_l->rbi_w(1);
 	m_led_h->rbi_w(1);
 
@@ -263,9 +266,9 @@ MACHINE_CONFIG_START(elf2_state::elf2)
 	MCFG_MM74C922_X4_CALLBACK(IOPORT("X4"))
 
 	MCFG_DEVICE_ADD(DM9368_H_TAG, DM9368, 0)
-	MCFG_OUTPUT_NAME("digit0")
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(elf2_state, digit_w<0>))
 	MCFG_DEVICE_ADD(DM9368_L_TAG, DM9368, 0)
-	MCFG_OUTPUT_NAME("digit1")
+	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(elf2_state, digit_w<1>))
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

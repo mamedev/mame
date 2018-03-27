@@ -697,69 +697,73 @@ WRITE8_MEMBER( m5_state::mem64KRX_w ) //out 0x7f
 //  ADDRESS_MAP( m5_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(m5_state::m5_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1r") AM_WRITE_BANK("bank1w") //monitor rom(bios)
-	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2r") AM_WRITE_BANK("bank2w")
-	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3r") AM_WRITE_BANK("bank3w")
-	AM_RANGE(0x6000, 0x6fff) AM_READ_BANK("bank4r") AM_WRITE_BANK("bank4w")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM                                         //4kb internal RAM
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank5r") AM_WRITE_BANK("bank5w")
-	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank6r") AM_WRITE_BANK("bank6w")
-ADDRESS_MAP_END
+void m5_state::m5_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).bankr("bank1r").bankw("bank1w"); //monitor rom(bios)
+	map(0x2000, 0x3fff).bankr("bank2r").bankw("bank2w");
+	map(0x4000, 0x5fff).bankr("bank3r").bankw("bank3w");
+	map(0x6000, 0x6fff).bankr("bank4r").bankw("bank4w");
+	map(0x7000, 0x7fff).ram();                                         //4kb internal RAM
+	map(0x8000, 0xbfff).bankr("bank5r").bankw("bank5w");
+	map(0xc000, 0xffff).bankr("bank6r").bankw("bank6w");
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( m5_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(m5_state::m5_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0x30, 0x30) AM_MIRROR(0x08) AM_READ_PORT("Y0") AM_WRITE( mem64KBF_w) // 64KBF paging
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0x08) AM_READ_PORT("Y1")
-	AM_RANGE(0x32, 0x32) AM_MIRROR(0x08) AM_READ_PORT("Y2")
-	AM_RANGE(0x33, 0x33) AM_MIRROR(0x08) AM_READ_PORT("Y3")
-	AM_RANGE(0x34, 0x34) AM_MIRROR(0x08) AM_READ_PORT("Y4")
-	AM_RANGE(0x35, 0x35) AM_MIRROR(0x08) AM_READ_PORT("Y5")
-	AM_RANGE(0x36, 0x36) AM_MIRROR(0x08) AM_READ_PORT("Y6")
-	AM_RANGE(0x37, 0x37) AM_MIRROR(0x08) AM_READ_PORT("JOY")
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READWRITE(sts_r, com_w)
+void m5_state::m5_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0x30, 0x30).mirror(0x08).portr("Y0").w(this, FUNC(m5_state::mem64KBF_w)); // 64KBF paging
+	map(0x31, 0x31).mirror(0x08).portr("Y1");
+	map(0x32, 0x32).mirror(0x08).portr("Y2");
+	map(0x33, 0x33).mirror(0x08).portr("Y3");
+	map(0x34, 0x34).mirror(0x08).portr("Y4");
+	map(0x35, 0x35).mirror(0x08).portr("Y5");
+	map(0x36, 0x36).mirror(0x08).portr("Y6");
+	map(0x37, 0x37).mirror(0x08).portr("JOY");
+	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x50).mirror(0x0f).rw(this, FUNC(m5_state::sts_r), FUNC(m5_state::com_w));
 //  AM_RANGE(0x60, 0x63) SIO
-	AM_RANGE(0x6c, 0x6c) AM_READWRITE(mem64KBI_r, mem64KBI_w) //EM-64/64KBI paging
-	AM_RANGE(0x70, 0x73) /*AM_MIRROR(0x0c) don't know if necessary mirror this*/ AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x7f, 0x7f) AM_WRITE( mem64KRX_w) //64KRD/64KRX paging
-ADDRESS_MAP_END
+	map(0x6c, 0x6c).rw(this, FUNC(m5_state::mem64KBI_r), FUNC(m5_state::mem64KBI_w)); //EM-64/64KBI paging
+	map(0x70, 0x73) /*.mirror(0x0c) don't know if necessary mirror this*/ .rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7f, 0x7f).w(this, FUNC(m5_state::mem64KRX_w)); //64KRD/64KRX paging
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( fd5_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(m5_state::fd5_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void m5_state::fd5_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0xffff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( fd5_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(m5_state::fd5_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVICE(UPD765_TAG, upd765a_device, map)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(fd5_data_r, fd5_data_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(fd5_com_w)
-	AM_RANGE(0x30, 0x30) AM_READ(fd5_com_r)
-	AM_RANGE(0x40, 0x40) AM_WRITE(fd5_ctrl_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(fd5_tc_w)
-ADDRESS_MAP_END
+void m5_state::fd5_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x10, 0x10).rw(this, FUNC(m5_state::fd5_data_r), FUNC(m5_state::fd5_data_w));
+	map(0x20, 0x20).w(this, FUNC(m5_state::fd5_com_w));
+	map(0x30, 0x30).r(this, FUNC(m5_state::fd5_com_r));
+	map(0x40, 0x40).w(this, FUNC(m5_state::fd5_ctrl_w));
+	map(0x50, 0x50).w(this, FUNC(m5_state::fd5_tc_w));
+}
 
 
 
@@ -1006,54 +1010,56 @@ static const z80_daisy_config m5_daisy_chain[] =
 //-------------------------------------------------
 
 
-ADDRESS_MAP_START(brno_state::m5_mem_brno)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE_BANK("bank1")
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE_BANK("bank2")
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE_BANK("bank3")
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE_BANK("bank4")
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE_BANK("bank5")
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE_BANK("bank6")
-	AM_RANGE(0x6000, 0x6fff) AM_READWRITE_BANK("bank7")
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE_BANK("bank8")
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_BANK("bank9")
-	AM_RANGE(0x9000, 0x9fff) AM_READWRITE_BANK("bank10")
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE_BANK("bank11")
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE_BANK("bank12")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE_BANK("bank13")
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE_BANK("bank14")
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE_BANK("bank15")
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE_BANK("bank16")
-ADDRESS_MAP_END
+void brno_state::m5_mem_brno(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).bankrw("bank1");
+	map(0x1000, 0x1fff).bankrw("bank2");
+	map(0x2000, 0x2fff).bankrw("bank3");
+	map(0x3000, 0x3fff).bankrw("bank4");
+	map(0x4000, 0x4fff).bankrw("bank5");
+	map(0x5000, 0x5fff).bankrw("bank6");
+	map(0x6000, 0x6fff).bankrw("bank7");
+	map(0x7000, 0x7fff).bankrw("bank8");
+	map(0x8000, 0x8fff).bankrw("bank9");
+	map(0x9000, 0x9fff).bankrw("bank10");
+	map(0xa000, 0xafff).bankrw("bank11");
+	map(0xb000, 0xbfff).bankrw("bank12");
+	map(0xc000, 0xcfff).bankrw("bank13");
+	map(0xd000, 0xdfff).bankrw("bank14");
+	map(0xe000, 0xefff).bankrw("bank15");
+	map(0xf000, 0xffff).bankrw("bank16");
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( brno_io )
 //-------------------------------------------------
-ADDRESS_MAP_START(brno_state::brno_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("Y0")
-	AM_RANGE(0x31, 0x31) AM_READ_PORT("Y1")
-	AM_RANGE(0x32, 0x32) AM_READ_PORT("Y2")
-	AM_RANGE(0x33, 0x33) AM_READ_PORT("Y3")
-	AM_RANGE(0x34, 0x34) AM_READ_PORT("Y4")
-	AM_RANGE(0x35, 0x35) AM_READ_PORT("Y5")
-	AM_RANGE(0x36, 0x36) AM_READ_PORT("Y6")
-	AM_RANGE(0x37, 0x37) AM_READ_PORT("JOY")
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READWRITE(sts_r, com_w)
+void brno_state::brno_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x0c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x10).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0x11, 0x11).mirror(0x0e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x20, 0x20).mirror(0x0f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0x30, 0x30).portr("Y0");
+	map(0x31, 0x31).portr("Y1");
+	map(0x32, 0x32).portr("Y2");
+	map(0x33, 0x33).portr("Y3");
+	map(0x34, 0x34).portr("Y4");
+	map(0x35, 0x35).portr("Y5");
+	map(0x36, 0x36).portr("Y6");
+	map(0x37, 0x37).portr("JOY");
+	map(0x40, 0x40).mirror(0x0f).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x50, 0x50).mirror(0x0f).rw(this, FUNC(brno_state::sts_r), FUNC(brno_state::com_w));
 //  AM_RANGE(0x60, 0x63)                                                                            //  SIO
-	AM_RANGE(0x64, 0x67) AM_READWRITE(mmu_r, mmu_w)                                                 //  MMU - page select (ramdisk memory paging)
-	AM_RANGE(0x68, 0x6b) AM_READWRITE(ramsel_r, ramsel_w)                                           //  CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
-	AM_RANGE(0x6c, 0x6f) AM_READWRITE(romsel_r, romsel_w)                                           //  RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
+	map(0x64, 0x67).rw(this, FUNC(brno_state::mmu_r), FUNC(brno_state::mmu_w));                                                 //  MMU - page select (ramdisk memory paging)
+	map(0x68, 0x6b).rw(this, FUNC(brno_state::ramsel_r), FUNC(brno_state::ramsel_w));                                           //  CASEN 0=access to ramdisk enabled, 0xff=ramdisk access disabled(data protection), &80=ROM2+48k RAM, &81=ROM2+4k RAM
+	map(0x6c, 0x6f).rw(this, FUNC(brno_state::romsel_r), FUNC(brno_state::romsel_w));                                           //  RAMEN 0=rom enable; 0xff=rom+sord ram disabled (ramdisk visible)
 //  AM_RANGE(0x70, 0x73) AM_MIRROR(0x04) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)     //  PIO
-	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE(WD2797_TAG, wd_fdc_device_base, read, write)               //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
-	AM_RANGE(0x7c, 0x7c) AM_READWRITE(fd_r, fd_w)                                                   //  drive select
-ADDRESS_MAP_END
+	map(0x78, 0x7b).rw(m_fdc, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));               //  WD2797 registers -> 78 - status/cmd, 79 - track #, 7a - sector #, 7b - data
+	map(0x7c, 0x7c).rw(this, FUNC(brno_state::fd_r), FUNC(brno_state::fd_w));                                                   //  drive select
+}
 
 
 READ8_MEMBER( brno_state::mmu_r )

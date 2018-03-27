@@ -1626,12 +1626,12 @@ void tms340x0_device::state_string_export(const device_state_entry &entry, std::
 	}
 }
 
-util::disasm_interface *tms34010_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms34010_device::create_disassembler()
 {
-	return new tms34010_disassembler(false);
+	return std::make_unique<tms34010_disassembler>(false);
 }
 
-util::disasm_interface *tms34020_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms34020_device::create_disassembler()
 {
-	return new tms34010_disassembler(true);
+	return std::make_unique<tms34010_disassembler>(true);
 }

@@ -377,11 +377,11 @@ STOP            01001000  10111011          12  stop
 #include "upd7810_dasm.h"
 
 
-DEFINE_DEVICE_TYPE(UPD7810,  upd7810_device,  "upd7810",  "uPD7810")
-DEFINE_DEVICE_TYPE(UPD7807,  upd7807_device,  "upd7807",  "uPD7807")
-DEFINE_DEVICE_TYPE(UPD7801,  upd7801_device,  "upd7801",  "uPD7801")
-DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "uPD78C05")
-DEFINE_DEVICE_TYPE(UPD78C06, upd78c06_device, "upd78c06", "uPD78C06")
+DEFINE_DEVICE_TYPE(UPD7810,  upd7810_device,  "upd7810",  "NEC uPD7810")
+DEFINE_DEVICE_TYPE(UPD7807,  upd7807_device,  "upd7807",  "NEC uPD7807")
+DEFINE_DEVICE_TYPE(UPD7801,  upd7801_device,  "upd7801",  "NEC uPD7801")
+DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "NEC uPD78C05")
+DEFINE_DEVICE_TYPE(UPD78C06, upd78c06_device, "upd78c06", "NEC uPD78C06")
 
 
 ADDRESS_MAP_START(upd7810_device::upd_internal_128_ram_map)
@@ -520,24 +520,24 @@ device_memory_interface::space_config_vector upd7810_device::memory_space_config
 	};
 }
 
-util::disasm_interface *upd7810_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd7810_device::create_disassembler()
 {
-	return new upd7810_disassembler;
+	return std::make_unique<upd7810_disassembler>();
 }
 
-util::disasm_interface *upd7807_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd7807_device::create_disassembler()
 {
-	return new upd7807_disassembler;
+	return std::make_unique<upd7807_disassembler>();
 }
 
-util::disasm_interface *upd7801_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd7801_device::create_disassembler()
 {
-	return new upd7801_disassembler;
+	return std::make_unique<upd7801_disassembler>();
 }
 
-util::disasm_interface *upd78c05_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd78c05_device::create_disassembler()
 {
-	return new upd78c05_disassembler;
+	return std::make_unique<upd78c05_disassembler>();
 }
 
 WRITE8_MEMBER(upd7810_device::pa_w)

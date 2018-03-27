@@ -285,56 +285,61 @@ private:
 };
 
 
-ADDRESS_MAP_START(octopus_state::octopus_mem)
-	AM_RANGE(0x00000, 0xcffff) AM_RAMBANK("main_ram_bank")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xe0000, 0xe3fff) AM_NOP
-	AM_RANGE(0xe4000, 0xe5fff) AM_RAM AM_SHARE("fram")
-	AM_RANGE(0xe6000, 0xe7fff) AM_ROM AM_REGION("chargen",0)
-	AM_RANGE(0xe8000, 0xfbfff) AM_NOP
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void octopus_state::octopus_mem(address_map &map)
+{
+	map(0x00000, 0xcffff).bankrw("main_ram_bank");
+	map(0xd0000, 0xdffff).ram().share("vram");
+	map(0xe0000, 0xe3fff).noprw();
+	map(0xe4000, 0xe5fff).ram().share("fram");
+	map(0xe6000, 0xe7fff).rom().region("chargen", 0);
+	map(0xe8000, 0xfbfff).noprw();
+	map(0xfc000, 0xfffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(octopus_state::octopus_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("dma1", am9517a_device, read, write)
-	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma2", am9517a_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWA")
-	AM_RANGE(0x21, 0x2f) AM_READWRITE(system_r, system_w)
-	AM_RANGE(0x31, 0x33) AM_READWRITE(bank_sel_r, bank_sel_w)
-	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("keyboard", i8251_device, data_r, data_w)
-	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE("keyboard", i8251_device, status_r, control_w)
+void octopus_state::octopus_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x0f).rw(m_dma1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x10, 0x1f).rw(m_dma2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x20, 0x20).portr("DSWA");
+	map(0x21, 0x2f).rw(this, FUNC(octopus_state::system_r), FUNC(octopus_state::system_w));
+	map(0x31, 0x33).rw(this, FUNC(octopus_state::bank_sel_r), FUNC(octopus_state::bank_sel_w));
+	map(0x50, 0x50).rw(m_kb_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x51, 0x51).rw(m_kb_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// 0x70-73: HD controller
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("serial", z80sio_device, da_r, da_w)
-	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("serial", z80sio_device, ca_r, ca_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREADWRITE("serial", z80sio_device, db_r, db_w)
-	AM_RANGE(0xa3, 0xa3) AM_DEVREADWRITE("serial", z80sio_device, cb_r, cb_w)
-	AM_RANGE(0xb0, 0xb1) AM_DEVREADWRITE("pic_master", pic8259_device, read, write)
-	AM_RANGE(0xb4, 0xb5) AM_DEVREADWRITE("pic_slave", pic8259_device, read, write)
-	AM_RANGE(0xc0, 0xc7) AM_DEVREADWRITE("crtc", scn2674_device, read, write)
-	AM_RANGE(0xc8, 0xc8) AM_READWRITE(vidcontrol_r, vidcontrol_w)
-	AM_RANGE(0xc9, 0xca) AM_READWRITE(video_latch_r, video_latch_w)
+	map(0x80, 0x83).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xa0, 0xa0).rw(m_serial, FUNC(z80sio_device::da_r), FUNC(z80sio_device::da_w));
+	map(0xa1, 0xa1).rw(m_serial, FUNC(z80sio_device::ca_r), FUNC(z80sio_device::ca_w));
+	map(0xa2, 0xa2).rw(m_serial, FUNC(z80sio_device::db_r), FUNC(z80sio_device::db_w));
+	map(0xa3, 0xa3).rw(m_serial, FUNC(z80sio_device::cb_r), FUNC(z80sio_device::cb_w));
+	map(0xb0, 0xb1).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xb4, 0xb5).rw(m_pic2, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xc0, 0xc7).rw(m_crtc, FUNC(scn2674_device::read), FUNC(scn2674_device::write));
+	map(0xc8, 0xc8).rw(this, FUNC(octopus_state::vidcontrol_r), FUNC(octopus_state::vidcontrol_w));
+	map(0xc9, 0xca).rw(this, FUNC(octopus_state::video_latch_r), FUNC(octopus_state::video_latch_w));
 	// 0xcf: mode control
-	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0xe0, 0xe4) AM_READWRITE(z80_vector_r, z80_vector_w)
-	AM_RANGE(0xf0, 0xf1) AM_READWRITE(parallel_r, parallel_w)
-	AM_RANGE(0xf8, 0xff) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-ADDRESS_MAP_END
+	map(0xd0, 0xd3).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0xe0, 0xe4).rw(this, FUNC(octopus_state::z80_vector_r), FUNC(octopus_state::z80_vector_w));
+	map(0xf0, 0xf1).rw(this, FUNC(octopus_state::parallel_r), FUNC(octopus_state::parallel_w));
+	map(0xf8, 0xff).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
-ADDRESS_MAP_START(octopus_state::octopus_sub_mem)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("z80_bank", address_map_bank_device, read8, write8)
-ADDRESS_MAP_END
+void octopus_state::octopus_sub_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(m_z80_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+}
 
-ADDRESS_MAP_START(octopus_state::octopus_sub_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(z80_io_r, z80_io_w)
-ADDRESS_MAP_END
+void octopus_state::octopus_sub_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(octopus_state::z80_io_r), FUNC(octopus_state::z80_io_w));
+}
 
-ADDRESS_MAP_START(octopus_state::octopus_vram)
-	AM_RANGE(0x0000,0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void octopus_state::octopus_vram(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(octopus_state::vram_r), FUNC(octopus_state::vram_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( octopus )

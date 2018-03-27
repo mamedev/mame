@@ -418,21 +418,22 @@ uint32_t sbrkout_state::screen_update_sbrkout(screen_device &screen, bitmap_ind1
  *************************************/
 
 /* full memory map derived from schematics */
-ADDRESS_MAP_START(sbrkout_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0800, 0x083f) AM_READ(switches_r)
-	AM_RANGE(0x0840, 0x0840) AM_MIRROR(0x003f) AM_READ_PORT("COIN")
-	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")
-	AM_RANGE(0x08c0, 0x08c0) AM_MIRROR(0x003f) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_READ(sync_r)
-	AM_RANGE(0x0c00, 0x0c7f) AM_WRITE(output_latch_w)
-	AM_RANGE(0x0c80, 0x0c80) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_MIRROR(0x007f) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03ff) AM_READ(sync2_r)
-	AM_RANGE(0x2800, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void sbrkout_state::main_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x007f).mirror(0x380).bankrw("bank1");
+	map(0x0400, 0x07ff).ram().w(this, FUNC(sbrkout_state::sbrkout_videoram_w)).share("videoram");
+	map(0x0800, 0x083f).r(this, FUNC(sbrkout_state::switches_r));
+	map(0x0840, 0x0840).mirror(0x003f).portr("COIN");
+	map(0x0880, 0x0880).mirror(0x003f).portr("START");
+	map(0x08c0, 0x08c0).mirror(0x003f).portr("SERVICE");
+	map(0x0c00, 0x0c00).mirror(0x03ff).r(this, FUNC(sbrkout_state::sync_r));
+	map(0x0c00, 0x0c7f).w(this, FUNC(sbrkout_state::output_latch_w));
+	map(0x0c80, 0x0c80).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0e00, 0x0e00).mirror(0x007f).w(this, FUNC(sbrkout_state::irq_ack_w));
+	map(0x1000, 0x1000).mirror(0x03ff).r(this, FUNC(sbrkout_state::sync2_r));
+	map(0x2800, 0x3fff).rom();
+}
 
 
 /*************************************

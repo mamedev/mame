@@ -58,21 +58,22 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 #include "screen.h"
 
 
-ADDRESS_MAP_START(travrusa_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)    /* + coin counters - not written by shtrider */
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("SYSTEM")     /* IN0 */
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P1")         /* IN1 */
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("P2")         /* IN2 */
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")       /* DSW1 */
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")       /* DSW2 */
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void travrusa_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().w(this, FUNC(travrusa_state::travrusa_videoram_w)).share("videoram");
+	map(0x9000, 0x9000).w(this, FUNC(travrusa_state::travrusa_scroll_x_low_w));
+	map(0xa000, 0xa000).w(this, FUNC(travrusa_state::travrusa_scroll_x_high_w));
+	map(0xc800, 0xc9ff).writeonly().share("spriteram");
+	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
+	map(0xd001, 0xd001).w(this, FUNC(travrusa_state::travrusa_flipscreen_w));    /* + coin counters - not written by shtrider */
+	map(0xd000, 0xd000).portr("SYSTEM");     /* IN0 */
+	map(0xd001, 0xd001).portr("P1");         /* IN1 */
+	map(0xd002, 0xd002).portr("P2");         /* IN2 */
+	map(0xd003, 0xd003).portr("DSW1");       /* DSW1 */
+	map(0xd004, 0xd004).portr("DSW2");       /* DSW2 */
+	map(0xe000, 0xefff).ram();
+}
 
 static INPUT_PORTS_START( travrusa )
 	PORT_START("SYSTEM")

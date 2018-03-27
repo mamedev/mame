@@ -164,28 +164,29 @@ WRITE8_MEMBER( bmjr_state::xor_display_w )
 	m_xor_display = data;
 }
 
-ADDRESS_MAP_START(bmjr_state::bmjr_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void bmjr_state::bmjr_mem(address_map &map)
+{
+	map.unmap_value_high();
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
 	//0x2100, 0x38ff vram, modes 0x44 / 0xcc
-	AM_RANGE(0x0000, 0xafff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0xb000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_ROM
+	map(0x0000, 0xafff).ram().share("wram");
+	map(0xb000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).rom();
 //  AM_RANGE(0xe890, 0xe890) W MP-1710 tile color
 //  AM_RANGE(0xe891, 0xe891) W MP-1710 background color
 //  AM_RANGE(0xe892, 0xe892) W MP-1710 monochrome / color setting
-	AM_RANGE(0xee00, 0xee00) AM_READ(tape_stop_r) //R stop tape
-	AM_RANGE(0xee20, 0xee20) AM_READ(tape_start_r) //R start tape
-	AM_RANGE(0xee40, 0xee40) AM_WRITE(xor_display_w) //W Picture reverse
-	AM_RANGE(0xee80, 0xee80) AM_READWRITE(tape_r,tape_w)//RW tape input / output
-	AM_RANGE(0xeec0, 0xeec0) AM_READWRITE(key_r,key_w)//RW keyboard
-	AM_RANGE(0xef00, 0xef00) AM_READ(ff_r) //R timer
-	AM_RANGE(0xef40, 0xef40) AM_READ(ff_r) //R unknown
-	AM_RANGE(0xef80, 0xef80) AM_READ(unk_r) //R unknown
+	map(0xee00, 0xee00).r(this, FUNC(bmjr_state::tape_stop_r)); //R stop tape
+	map(0xee20, 0xee20).r(this, FUNC(bmjr_state::tape_start_r)); //R start tape
+	map(0xee40, 0xee40).w(this, FUNC(bmjr_state::xor_display_w)); //W Picture reverse
+	map(0xee80, 0xee80).rw(this, FUNC(bmjr_state::tape_r), FUNC(bmjr_state::tape_w));//RW tape input / output
+	map(0xeec0, 0xeec0).rw(this, FUNC(bmjr_state::key_r), FUNC(bmjr_state::key_w));//RW keyboard
+	map(0xef00, 0xef00).r(this, FUNC(bmjr_state::ff_r)); //R timer
+	map(0xef40, 0xef40).r(this, FUNC(bmjr_state::ff_r)); //R unknown
+	map(0xef80, 0xef80).r(this, FUNC(bmjr_state::unk_r)); //R unknown
 //  AM_RANGE(0xefe0, 0xefe0) W screen mode
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).rom();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( bmjr )

@@ -171,24 +171,26 @@ const tiny_rom_entry *luxor_55_10828_device::device_rom_region() const
 //  ADDRESS_MAP( luxor_55_10828_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(luxor_55_10828_device::luxor_55_10828_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM
-ADDRESS_MAP_END
+void luxor_55_10828_device::luxor_55_10828_mem(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x07ff).mirror(0x0800).rom().region(Z80_TAG, 0);
+	map(0x1000, 0x13ff).mirror(0x0c00).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( luxor_55_10828_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(luxor_55_10828_device::luxor_55_10828_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0xb0, 0xb3) AM_MIRROR(0x0c) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_WRITE(status_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_WRITE(ctrl_w)
-ADDRESS_MAP_END
+void luxor_55_10828_device::luxor_55_10828_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x70, 0x73).mirror(0x0c).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xb0, 0xb3).mirror(0x0c).rw(this, FUNC(luxor_55_10828_device::fdc_r), FUNC(luxor_55_10828_device::fdc_w));
+	map(0xd0, 0xd0).mirror(0x0f).w(this, FUNC(luxor_55_10828_device::status_w));
+	map(0xe0, 0xe0).mirror(0x0f).w(this, FUNC(luxor_55_10828_device::ctrl_w));
+}
 
 
 //-------------------------------------------------

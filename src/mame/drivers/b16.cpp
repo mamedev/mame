@@ -122,14 +122,15 @@ WRITE8_MEMBER( b16_state::b16_pcg_w )
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 }
 
-ADDRESS_MAP_START(b16_state::b16_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00000, 0x9ffff ) AM_RAM // probably not all of it.
-	AM_RANGE( 0xa0000, 0xaffff ) AM_RAM // bitmap?
-	AM_RANGE( 0xb0000, 0xb7fff ) AM_RAM AM_SHARE("vram") // tvram
-	AM_RANGE( 0xb8000, 0xbbfff ) AM_WRITE8(b16_pcg_w,0x00ff) // pcg
-	AM_RANGE( 0xfc000, 0xfffff ) AM_ROM AM_REGION("ipl",0)
-ADDRESS_MAP_END
+void b16_state::b16_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x9ffff).ram(); // probably not all of it.
+	map(0xa0000, 0xaffff).ram(); // bitmap?
+	map(0xb0000, 0xb7fff).ram().share("vram"); // tvram
+	map(0xb8000, 0xbbfff).w(this, FUNC(b16_state::b16_pcg_w)).umask16(0x00ff); // pcg
+	map(0xfc000, 0xfffff).rom().region("ipl", 0);
+}
 
 READ16_MEMBER( b16_state::vblank_r )
 {
@@ -215,14 +216,15 @@ WRITE8_MEMBER( b16_state::unk_dev_w )
 
 }
 
-ADDRESS_MAP_START(b16_state::b16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x0f) AM_READWRITE8(unk_dev_r,unk_dev_w,0x00ff) // DMA device?
-	AM_RANGE(0x20, 0x21) AM_WRITE8(b16_6845_address_w,0x00ff)
-	AM_RANGE(0x22, 0x23) AM_WRITE8(b16_6845_data_w,0x00ff)
+void b16_state::b16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x0f).rw(this, FUNC(b16_state::unk_dev_r), FUNC(b16_state::unk_dev_w)).umask16(0x00ff); // DMA device?
+	map(0x20, 0x20).w(this, FUNC(b16_state::b16_6845_address_w));
+	map(0x22, 0x22).w(this, FUNC(b16_state::b16_6845_data_w));
 	//0x79 bit 0 DSW?
-	AM_RANGE(0x80, 0x81) AM_READ(vblank_r) // TODO
-ADDRESS_MAP_END
+	map(0x80, 0x81).r(this, FUNC(b16_state::vblank_r)); // TODO
+}
 
 
 /* Input ports */

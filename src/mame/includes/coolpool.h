@@ -17,7 +17,7 @@ public:
 		m_vram_base(*this, "vram_base"),
 		m_nvram(*this, "nvram") { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34010_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	optional_device<tlc34076_device> m_tlc34076;
 

@@ -60,24 +60,25 @@ READ64_MEMBER( macpci_state::unk2_r )
 	return 0;
 }
 
-ADDRESS_MAP_START(macpci_state::pippin_mem)
-	AM_RANGE(0x00000000, 0x005fffff) AM_RAM
+void macpci_state::pippin_mem(address_map &map)
+{
+	map(0x00000000, 0x005fffff).ram();
 
 	/* writes at 0x0*c01000 the string "Mr. Kesh" and wants it to be read back, true color VRAMs perhaps? */
-	AM_RANGE(0x00c00000, 0x00c01007) AM_RAM
-	AM_RANGE(0x01c00000, 0x01c01007) AM_RAM
-	AM_RANGE(0x02c00000, 0x02c01007) AM_RAM
-	AM_RANGE(0x03c00000, 0x03c01007) AM_RAM
+	map(0x00c00000, 0x00c01007).ram();
+	map(0x01c00000, 0x01c01007).ram();
+	map(0x02c00000, 0x02c01007).ram();
+	map(0x03c00000, 0x03c01007).ram();
 
-	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0fc00000)   // mirror of ROM for 680x0 emulation
+	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);   // mirror of ROM for 680x0 emulation
 
-	AM_RANGE(0xf00dfff8, 0xf00dffff) AM_READ(unk2_r)
-	AM_RANGE(0xf3008800, 0xf3008807) AM_READ(unk1_r)
+	map(0xf00dfff8, 0xf00dffff).r(this, FUNC(macpci_state::unk2_r));
+	map(0xf3008800, 0xf3008807).r(this, FUNC(macpci_state::unk1_r));
 
-	AM_RANGE(0xf3016000, 0xf3017fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffffffffffffU)
+	map(0xf3016000, 0xf3017fff).rw(this, FUNC(macpci_state::mac_via_r), FUNC(macpci_state::mac_via_w));
 
-	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom",0)
-ADDRESS_MAP_END
+	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pippin )
@@ -153,10 +154,10 @@ MACHINE_CONFIG_END
 ROM_START( pippin )
 	ROM_REGION( 0x400000, "bootrom",  ROMREGION_64BIT | ROMREGION_BE )
 	ROM_SYSTEM_BIOS(0, "v13", "Kinka v 1.3")
-	ROMX_LOAD( "bandai pippin (19960920 - kinka 1.3) - 3e6b3ee4-a52528e9ce8c.rom", 0x000000, 0x400000, CRC(87a1337d) SHA1(8e512af6e34dd823f3defec77d43ecbff1ecad54), ROM_BIOS(1) )
+	ROMX_LOAD( "bandai pippin,19960920 - kinka 1.3,- 3e6b3ee4-a52528e9ce8c.rom", 0x000000, 0x400000, CRC(87a1337d) SHA1(8e512af6e34dd823f3defec77d43ecbff1ecad54), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(1, "v12", "Kinka v 1.2")
-	ROMX_LOAD( "bandai pippin (19960628 - kinka 1.2) - 3e10e14c-72c40c1af23a.rom", 0x000000, 0x400000, CRC(4fead4b3) SHA1(3fa02e9b0fa702ac6e02edc08911eac8b50e2d1f), ROM_BIOS(2) )
+	ROMX_LOAD( "bandai pippin,19960628 - kinka 1.2,- 3e10e14c-72c40c1af23a.rom", 0x000000, 0x400000, CRC(4fead4b3) SHA1(3fa02e9b0fa702ac6e02edc08911eac8b50e2d1f), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS(2, "v1", "Kinka v 1.0")
 	ROMX_LOAD( "341s0251.u1", 0x000006, 0x100000, CRC(aaea2449) SHA1(2f63e215260a42fb7c5f2364682d5e8c0604646f),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(3))
@@ -165,7 +166,7 @@ ROM_START( pippin )
 	ROMX_LOAD( "341s0254.u4", 0x000000, 0x100000, CRC(3e2851ba) SHA1(7cbf5d6999e890f5e9ab2bc4b10ca897c4dc2016),ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6) | ROM_BIOS(3))
 
 	ROM_SYSTEM_BIOS(3, "vgm", "Kinka GM version")
-	ROMX_LOAD( "bandai pippin (19960128 - kinka gm flash) - 2bf65931-318e40f6a1f4.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb), ROM_BIOS(4) )
+	ROMX_LOAD( "bandai pippin,19960128 - kinka gm flash,- 2bf65931-318e40f6a1f4.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb), ROM_BIOS(4) )
 
 	ROM_SYSTEM_BIOS(4, "pre", "Kinka pre-release")
 	ROMX_LOAD( "kinka-pre.rom", 0x000000, 0x400000, CRC(4ff875e6) SHA1(eb8739cab1807c6c7c51acc7f4a3afc1f9c6ddbb),ROM_BIOS(5) )

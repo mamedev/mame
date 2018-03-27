@@ -20,7 +20,7 @@
 //   * page select doesn't flip in the middle
 // - 32-term mpla at bottom-right, different order
 // - 32-term opla at bottom-left, ordered O7-O0(0 or 1), and A8,4,2,1,S
-DEFINE_DEVICE_TYPE(TMS1000C, tms1000c_cpu_device, "tms1000c", "TMS1000C") // 28-pin SDIP, 10 R pins
+DEFINE_DEVICE_TYPE(TMS1000C, tms1000c_cpu_device, "tms1000c", "Texas Instruments TMS1000C") // 28-pin SDIP, 10 R pins
 
 
 // device definitions

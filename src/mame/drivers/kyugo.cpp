@@ -40,23 +40,25 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(kyugo_state::kyugo_main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(bgattribram_w) AM_SHARE("bgattribram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(spriteram_2_r) AM_SHARE("spriteram_2")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram_1")
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(scroll_x_lo_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(gfxctrl_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(scroll_y_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
+void kyugo_state::kyugo_main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(this, FUNC(kyugo_state::bgvideoram_w)).share("bgvideoram");
+	map(0x8800, 0x8fff).ram().w(this, FUNC(kyugo_state::bgattribram_w)).share("bgattribram");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(kyugo_state::fgvideoram_w)).share("fgvideoram");
+	map(0x9800, 0x9fff).ram().r(this, FUNC(kyugo_state::spriteram_2_r)).share("spriteram_2");
+	map(0xa000, 0xa7ff).ram().share("spriteram_1");
+	map(0xa800, 0xa800).w(this, FUNC(kyugo_state::scroll_x_lo_w));
+	map(0xb000, 0xb000).w(this, FUNC(kyugo_state::gfxctrl_w));
+	map(0xb800, 0xb800).w(this, FUNC(kyugo_state::scroll_y_w));
+	map(0xf000, 0xf7ff).ram().share("shared_ram");
+}
 
-ADDRESS_MAP_START(kyugo_state::gyrodine_main_map)
-	AM_IMPORT_FROM(kyugo_main_map)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-ADDRESS_MAP_END
+void kyugo_state::gyrodine_main_map(address_map &map)
+{
+	kyugo_main_map(map);
+	map(0xe000, 0xe000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+}
 
 
 
@@ -71,10 +73,11 @@ WRITE_LINE_MEMBER(kyugo_state::nmi_mask_w)
 	m_nmi_mask = state;
 }
 
-ADDRESS_MAP_START(kyugo_state::kyugo_main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void kyugo_state::kyugo_main_portmap(address_map &map)
+{
+	map.global_mask(0x07);
+	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
 
@@ -85,49 +88,54 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(kyugo_state::gyrodine_sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
-	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("P1")
-	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
+void kyugo_state::gyrodine_sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram().share("shared_ram");
+	map(0x8000, 0x8000).portr("P2");
+	map(0x8040, 0x8040).portr("P1");
+	map(0x8080, 0x8080).portr("SYSTEM");
+}
 
 
-ADDRESS_MAP_START(kyugo_state::repulse_sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P2")
-	AM_RANGE(0xc040, 0xc040) AM_READ_PORT("P1")
-	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
+void kyugo_state::repulse_sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa7ff).ram().share("shared_ram");
+	map(0xc000, 0xc000).portr("P2");
+	map(0xc040, 0xc040).portr("P1");
+	map(0xc080, 0xc080).portr("SYSTEM");
+}
 
 
-ADDRESS_MAP_START(kyugo_state::srdmissn_sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P1")
-	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P2")
-ADDRESS_MAP_END
+void kyugo_state::srdmissn_sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("shared_ram");
+	map(0xf400, 0xf400).portr("SYSTEM");
+	map(0xf401, 0xf401).portr("P1");
+	map(0xf402, 0xf402).portr("P2");
+}
 
 
-ADDRESS_MAP_START(kyugo_state::legend_sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P1")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("P2")
-ADDRESS_MAP_END
+void kyugo_state::legend_sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().share("shared_ram");
+	map(0xf800, 0xf800).portr("SYSTEM");
+	map(0xf801, 0xf801).portr("P1");
+	map(0xf802, 0xf802).portr("P2");
+}
 
 
-ADDRESS_MAP_START(kyugo_state::flashgala_sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc040, 0xc040) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("P1")
-	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("shared_ram")
-ADDRESS_MAP_END
+void kyugo_state::flashgala_sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc040, 0xc040).portr("SYSTEM");
+	map(0xc080, 0xc080).portr("P1");
+	map(0xc0c0, 0xc0c0).portr("P2");
+	map(0xe000, 0xe7ff).ram().share("shared_ram");
+}
 
 
 
@@ -142,39 +150,43 @@ WRITE8_MEMBER(kyugo_state::coin_counter_w)
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
-ADDRESS_MAP_START(kyugo_state::gyrodine_sub_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void kyugo_state::gyrodine_sub_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xc0, 0xc1).w("ay2", FUNC(ay8910_device::address_data_w));
+}
 
 
-ADDRESS_MAP_START(kyugo_state::repulse_sub_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(coin_counter_w)
-ADDRESS_MAP_END
+void kyugo_state::repulse_sub_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xc0, 0xc1).w(this, FUNC(kyugo_state::coin_counter_w));
+}
 
 
-ADDRESS_MAP_START(kyugo_state::flashgala_sub_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x42, 0x42) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(coin_counter_w)
-ADDRESS_MAP_END
+void kyugo_state::flashgala_sub_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x41).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x42, 0x42).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x80, 0x81).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xc0, 0xc1).w(this, FUNC(kyugo_state::coin_counter_w));
+}
 
 
-ADDRESS_MAP_START(kyugo_state::srdmissn_sub_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x82, 0x82) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x84, 0x85) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x90, 0x91) AM_WRITE(coin_counter_w)
-ADDRESS_MAP_END
+void kyugo_state::srdmissn_sub_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x81).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x82, 0x82).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x84, 0x85).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x90, 0x91).w(this, FUNC(kyugo_state::coin_counter_w));
+}
 
 
 

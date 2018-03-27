@@ -207,39 +207,40 @@ WRITE8_MEMBER(fgoal_state::sound2_w)
 }
 
 
-ADDRESS_MAP_START(fgoal_state::cpu_map)
+void fgoal_state::cpu_map(address_map &map)
+{
 
-	AM_RANGE(0x0000, 0x00ef) AM_RAM
+	map(0x0000, 0x00ef).ram();
 
-	AM_RANGE(0x00f0, 0x00f0) AM_READ(row_r)
-	AM_RANGE(0x00f1, 0x00f1) AM_READ(analog_r)
-	AM_RANGE(0x00f2, 0x00f2) AM_READ_PORT("IN0")
-	AM_RANGE(0x00f3, 0x00f3) AM_READ_PORT("IN1")
-	AM_RANGE(0x00f4, 0x00f4) AM_READ(address_hi_r)
-	AM_RANGE(0x00f5, 0x00f5) AM_READ(address_lo_r)
-	AM_RANGE(0x00f6, 0x00f6) AM_READ(shifter_r)
-	AM_RANGE(0x00f7, 0x00f7) AM_READ(shifter_reverse_r)
-	AM_RANGE(0x00f8, 0x00fb) AM_READ(nmi_reset_r)
-	AM_RANGE(0x00fc, 0x00ff) AM_READ(irq_reset_r)
+	map(0x00f0, 0x00f0).r(this, FUNC(fgoal_state::row_r));
+	map(0x00f1, 0x00f1).r(this, FUNC(fgoal_state::analog_r));
+	map(0x00f2, 0x00f2).portr("IN0");
+	map(0x00f3, 0x00f3).portr("IN1");
+	map(0x00f4, 0x00f4).r(this, FUNC(fgoal_state::address_hi_r));
+	map(0x00f5, 0x00f5).r(this, FUNC(fgoal_state::address_lo_r));
+	map(0x00f6, 0x00f6).r(this, FUNC(fgoal_state::shifter_r));
+	map(0x00f7, 0x00f7).r(this, FUNC(fgoal_state::shifter_reverse_r));
+	map(0x00f8, 0x00fb).r(this, FUNC(fgoal_state::nmi_reset_r));
+	map(0x00fc, 0x00ff).r(this, FUNC(fgoal_state::irq_reset_r));
 
-	AM_RANGE(0x00f0, 0x00f0) AM_WRITE(row_w)
-	AM_RANGE(0x00f1, 0x00f1) AM_WRITE(col_w)
-	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(row_w)
-	AM_RANGE(0x00f3, 0x00f3) AM_WRITE(col_w)
-	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
-	AM_RANGE(0x00f8, 0x00fb) AM_WRITE(sound1_w)
-	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(sound2_w)
+	map(0x00f0, 0x00f0).w(this, FUNC(fgoal_state::row_w));
+	map(0x00f1, 0x00f1).w(this, FUNC(fgoal_state::col_w));
+	map(0x00f2, 0x00f2).w(this, FUNC(fgoal_state::row_w));
+	map(0x00f3, 0x00f3).w(this, FUNC(fgoal_state::col_w));
+	map(0x00f4, 0x00f7).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x00f8, 0x00fb).w(this, FUNC(fgoal_state::sound1_w));
+	map(0x00fc, 0x00ff).w(this, FUNC(fgoal_state::sound2_w));
 
-	AM_RANGE(0x0100, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("video_ram")
+	map(0x0100, 0x03ff).ram();
+	map(0x4000, 0x7fff).ram().share("video_ram");
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(ypos_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(xpos_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(color_w)
+	map(0x8000, 0x8000).w(this, FUNC(fgoal_state::ypos_w));
+	map(0x8001, 0x8001).w(this, FUNC(fgoal_state::xpos_w));
+	map(0x8002, 0x8002).w(this, FUNC(fgoal_state::color_w));
 
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xa000, 0xbfff).rom();
+	map(0xd000, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( fgoal )

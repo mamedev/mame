@@ -114,22 +114,24 @@ WRITE8_MEMBER( abc_fd2_device::status_w )
 //  ADDRESS_MAP( abc_fd2_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc_fd2_device::abc_fd2_mem)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM
-ADDRESS_MAP_END
+void abc_fd2_device::abc_fd2_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).rom().region(Z80_TAG, 0);
+	map(0x0800, 0x0bff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc_fd2_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc_fd2_device::abc_fd2_io)
-	ADDRESS_MAP_GLOBAL_MASK(0x73)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(FD1771_TAG, fd1771_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(status_w)
-ADDRESS_MAP_END
+void abc_fd2_device::abc_fd2_io(address_map &map)
+{
+	map.global_mask(0x73);
+	map(0x30, 0x33).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x50, 0x53).rw(FD1771_TAG, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
+	map(0x60, 0x60).w(this, FUNC(abc_fd2_device::status_w));
+}
 
 
 //-------------------------------------------------

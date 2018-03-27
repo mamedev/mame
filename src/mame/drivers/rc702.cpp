@@ -97,24 +97,26 @@ private:
 };
 
 
-ADDRESS_MAP_START(rc702_state::rc702_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x0800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void rc702_state::rc702_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).bankr("bankr0").bankw("bankw0");
+	map(0x0800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(rc702_state::rc702_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("crtc", i8275_device, read, write)
-	AM_RANGE(0x04, 0x05) AM_DEVICE("fdc", upd765a_device, map)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio1", z80dart_device, cd_ba_r, cd_ba_w) // boot sequence doesn't program this
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ctc1", z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("pio", z80pio_device, read, write)
-	AM_RANGE(0x14, 0x17) AM_READ_PORT("DSW") AM_WRITE(port14_w) // motors
-	AM_RANGE(0x18, 0x1b) AM_WRITE(port18_w) // memory banking
-	AM_RANGE(0x1c, 0x1f) AM_WRITE(port1c_w) // sound
-	AM_RANGE(0xf0, 0xff) AM_DEVREADWRITE("dma", am9517a_device, read, write)
-ADDRESS_MAP_END
+void rc702_state::rc702_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x01).rw("crtc", FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x04, 0x05).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x08, 0x0b).rw("sio1", FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w)); // boot sequence doesn't program this
+	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x14, 0x17).portr("DSW").w(this, FUNC(rc702_state::port14_w)); // motors
+	map(0x18, 0x1b).w(this, FUNC(rc702_state::port18_w)); // memory banking
+	map(0x1c, 0x1f).w(this, FUNC(rc702_state::port1c_w)); // sound
+	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( rc702 )

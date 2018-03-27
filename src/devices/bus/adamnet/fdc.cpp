@@ -53,9 +53,9 @@ ROM_START( adam_fdc )
 	ROM_SYSTEM_BIOS( 3, "320doug", "320KB DSDD (Doug Slopsema)" )
 	ROMX_LOAD( "doug.u10", 0x0000, 0x1000, CRC(2b2a9c6d) SHA1(e40304cbb6b9f174d9f5762d920983c79c899b3e), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 4, "a720dipi", "720KB 3.5\" A720DIPI 7607 MMSG" )
-	ROMX_LOAD( "a720dipi 7607 mmsg (c) 1988.u10", 0x0000, 0x1000, CRC(5f248557) SHA1(15b3aaebba38af84f6a1a6ccdf840ca3d58635da), ROM_BIOS(5) )
+	ROMX_LOAD( "a720dipi 7607 mmsg =c= 1988.u10", 0x0000, 0x1000, CRC(5f248557) SHA1(15b3aaebba38af84f6a1a6ccdf840ca3d58635da), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 5, "fp720at", "720KB 3.5\" FastPack 720A(T)" )
-	ROMX_LOAD( "fastpack 720a(t).u10", 0x0000, 0x1000, CRC(8f952c88) SHA1(e593a89d7c6e7ea99e7ce376ffa2732d7b646d49), ROM_BIOS(6) )
+	ROMX_LOAD( "fastpack 720a,t.u10", 0x0000, 0x1000, CRC(8f952c88) SHA1(e593a89d7c6e7ea99e7ce376ffa2732d7b646d49), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 6, "mihddd", "1.44MB 3.5\" Micro Innovations HD-DD" )
 	ROMX_LOAD( "1440k micro innovations hd-dd.u10", 0x0000, 0x1000, CRC(2efec8c0) SHA1(f6df22339c93dca938b65d0cbe23abcad89ec230), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 7, "pmhd", "1.44MB 3.5\" Powermate High Density" )
@@ -77,34 +77,36 @@ const tiny_rom_entry *adam_fdc_device::device_rom_region() const
 //  ADDRESS_MAP( fdc6801_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_fdc_device::adam_fdc_mem)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(M6801_TAG, m6801_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITEONLY AM_SHARE("ram")
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_device, status_r)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_READONLY AM_SHARE("ram")
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_device, cmd_w)
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_device, track_r)
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_device, track_w)
-	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_device, sector_r)
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_device, sector_w)
-	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x3ff) AM_DEVREAD(WD2793_TAG, wd2793_device, data_r)
-	AM_RANGE(0x6c00, 0x6fff) AM_READ(data_r)
-	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x3ff) AM_DEVWRITE(WD2793_TAG, wd2793_device, data_w)
-	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM AM_REGION(M6801_TAG, 0)
-ADDRESS_MAP_END
+void adam_fdc_device::adam_fdc_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(M6801_TAG, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0x0400, 0x07ff).ram().writeonly().share("ram");
+	map(0x0800, 0x0800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::status_r));
+	map(0x1400, 0x17ff).ram().readonly().share("ram");
+	map(0x1800, 0x1800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::cmd_w));
+	map(0x2800, 0x2800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::track_r));
+	map(0x3800, 0x3800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::track_w));
+	map(0x4800, 0x4800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::sector_r));
+	map(0x5800, 0x5800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::sector_w));
+	map(0x6800, 0x6800).mirror(0x3ff).r(WD2793_TAG, FUNC(wd2793_device::data_r));
+	map(0x6c00, 0x6fff).r(this, FUNC(adam_fdc_device::data_r));
+	map(0x7800, 0x7800).mirror(0x3ff).w(WD2793_TAG, FUNC(wd2793_device::data_w));
+	map(0x8000, 0x8fff).mirror(0x7000).rom().region(M6801_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( fdc6801_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(adam_fdc_device::adam_fdc_io)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(p1_r, p1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(p2_r, p2_w)
-	AM_RANGE(M6801_PORT3, M6801_PORT3)
-	AM_RANGE(M6801_PORT4, M6801_PORT4)
-ADDRESS_MAP_END
+void adam_fdc_device::adam_fdc_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(adam_fdc_device::p1_r), FUNC(adam_fdc_device::p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(adam_fdc_device::p2_r), FUNC(adam_fdc_device::p2_w));
+	map(M6801_PORT3, M6801_PORT3);
+	map(M6801_PORT4, M6801_PORT4);
+}
 
 
 //-------------------------------------------------

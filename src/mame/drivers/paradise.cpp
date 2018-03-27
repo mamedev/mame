@@ -128,54 +128,60 @@ WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(0, data ^ 0xff);
 }
 
-ADDRESS_MAP_START(paradise_state::base_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("prgbank")    /* ROM (banked) */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2") /* Background */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") /* Midground */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") /* Foreground */
-ADDRESS_MAP_END
+void paradise_state::base_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); /* ROM */
+	map(0x8000, 0xbfff).bankr("prgbank");    /* ROM (banked) */
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(paradise_state::vram_2_w)).share("vram_2"); /* Background */
+	map(0xc800, 0xcfff).ram().w(this, FUNC(paradise_state::vram_1_w)).share("vram_1"); /* Midground */
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(paradise_state::vram_0_w)).share("vram_0"); /* Foreground */
+}
 
-ADDRESS_MAP_START(paradise_state::paradise_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM // RAM
-	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xe100, 0xffff) AM_RAM // RAM
-ADDRESS_MAP_END
+void paradise_state::paradise_map(address_map &map)
+{
+	base_map(map);
+	map(0xd800, 0xd8ff).ram(); // RAM
+	map(0xd900, 0xe0ff).ram().share("spriteram");   // Sprites
+	map(0xe100, 0xffff).ram(); // RAM
+}
 
-ADDRESS_MAP_START(paradise_state::tgtball_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM // RAM
-	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xda00, 0xffff) AM_RAM // RAM
-ADDRESS_MAP_END
+void paradise_state::tgtball_map(address_map &map)
+{
+	base_map(map);
+	map(0xd800, 0xd8ff).ram(); // RAM
+	map(0xd900, 0xd9ff).ram().share("spriteram");   // Sprites
+	map(0xda00, 0xffff).ram(); // RAM
+}
 
-ADDRESS_MAP_START(paradise_state::torus_map)
-	AM_IMPORT_FROM(base_map)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("spriteram")   // Sprites
-	AM_RANGE(0xe000, 0xffff) AM_RAM // RAM
-ADDRESS_MAP_END
+void paradise_state::torus_map(address_map &map)
+{
+	base_map(map);
+	map(0xd800, 0xdfff).ram().share("spriteram");   // Sprites
+	map(0xe000, 0xffff).ram(); // RAM
+}
 
-ADDRESS_MAP_START(paradise_state::torus_io_map)
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")    // Palette
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(priority_w)  // Layers priority
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(flipscreen_w)    // Flip Screen
-	AM_RANGE(0x2004, 0x2004) AM_WRITE(palbank_w)   // Layers palette bank
-	AM_RANGE(0x2006, 0x2006) AM_WRITE(rombank_w)   // ROM bank
-	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_device, read, write)  // OKI 0
-	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1")
-	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
-	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(pixmap_w) AM_SHARE("videoram")   // Pixmap
-ADDRESS_MAP_END
+void paradise_state::torus_io_map(address_map &map)
+{
+	map(0x0000, 0x17ff).ram().w(this, FUNC(paradise_state::palette_w)).share("paletteram");    // Palette
+	map(0x1800, 0x1800).w(this, FUNC(paradise_state::priority_w));  // Layers priority
+	map(0x2001, 0x2001).w(this, FUNC(paradise_state::flipscreen_w));    // Flip Screen
+	map(0x2004, 0x2004).w(this, FUNC(paradise_state::palbank_w));   // Layers palette bank
+	map(0x2006, 0x2006).w(this, FUNC(paradise_state::rombank_w));   // ROM bank
+	map(0x2010, 0x2010).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 0
+	map(0x2020, 0x2020).portr("DSW1");
+	map(0x2021, 0x2021).portr("DSW2");
+	map(0x2022, 0x2022).portr("P1");
+	map(0x2023, 0x2023).portr("P2");
+	map(0x2024, 0x2024).portr("SYSTEM");
+	map(0x8000, 0xffff).ram().w(this, FUNC(paradise_state::pixmap_w)).share("videoram");   // Pixmap
+}
 
-ADDRESS_MAP_START(paradise_state::paradise_io_map)
-	AM_IMPORT_FROM(torus_io_map)
-	AM_RANGE(0x2007, 0x2007) AM_WRITE(paradise_okibank_w)   // OKI 1 samples bank
-	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_device, read, write)  // OKI 1
-ADDRESS_MAP_END
+void paradise_state::paradise_io_map(address_map &map)
+{
+	torus_io_map(map);
+	map(0x2007, 0x2007).w(this, FUNC(paradise_state::paradise_okibank_w));   // OKI 1 samples bank
+	map(0x2030, 0x2030).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 1
+}
 
 
 /***************************************************************************
@@ -897,7 +903,7 @@ ROM_END
 
 ROM_START( paradisea )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "a-19.U128", 0x00000, 0x40000, CRC(d47ecb7e) SHA1(74e7a33f2fc4c7c830c53c50541c3d0efd152e98) )
+	ROM_LOAD( "a-19.u128", 0x00000, 0x40000, CRC(d47ecb7e) SHA1(74e7a33f2fc4c7c830c53c50541c3d0efd152e98) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "a-19.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
@@ -923,7 +929,7 @@ ROM_END
 
 ROM_START( paradisee ) /* YS-1600 PCB. All labels are simply labeled "Escape" */
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "escape.U128", 0x00000, 0x40000, CRC(19b4e854) SHA1(7d7292017df67b7ed3a3e0059334866890c58b83) )
+	ROM_LOAD( "escape.u128", 0x00000, 0x40000, CRC(19b4e854) SHA1(7d7292017df67b7ed3a3e0059334866890c58b83) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT)  /* 16x16x8 Sprites */
 	ROM_LOAD( "escape.u114", 0x00000, 0x40000, CRC(c748ba3b) SHA1(ad23bda4e001ca539f849c1ca256de5daf7c233b) )
@@ -1188,25 +1194,25 @@ ROM_END
 
 ROM_START( penkyi )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Z80 Code */
-	ROM_LOAD( "U128", 0x00000, 0x80000, CRC(17c8c97c) SHA1(8f5a88670f64ae5591b4ac1b6ddd7aa7db60e042) ) // 27C040, but 1st and 2nd half identical
+	ROM_LOAD( "u128", 0x00000, 0x80000, CRC(17c8c97c) SHA1(8f5a88670f64ae5591b4ac1b6ddd7aa7db60e042) ) // 27C040, but 1st and 2nd half identical
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT) /* 16x16x8 Sprites */
-	ROM_LOAD( "U114", 0x00000, 0x80000, CRC(593e7b15) SHA1(bf2719e86bb23b2f149b6721fd3e8131b388ceca) ) // 27C040
-	ROM_LOAD( "U115", 0x80000, 0x80000, CRC(29449fa2) SHA1(6aae7967952d3ed1a95201b4f467f3b73e8df4f6) ) // 27C040
+	ROM_LOAD( "u114", 0x00000, 0x80000, CRC(593e7b15) SHA1(bf2719e86bb23b2f149b6721fd3e8131b388ceca) ) // 27C040
+	ROM_LOAD( "u115", 0x80000, 0x80000, CRC(29449fa2) SHA1(6aae7967952d3ed1a95201b4f467f3b73e8df4f6) ) // 27C040
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_INVERT)  /* 8x8x4 Background */
-	ROM_LOAD( "U94", 0x00000, 0x10000, CRC(d45bac24) SHA1(fc869647873f29bb44f4d58333fdb023d99028de) ) // 27C512, half size of the one in the penky set, mostly 0 filled anyway
+	ROM_LOAD( "u94", 0x00000, 0x10000, CRC(d45bac24) SHA1(fc869647873f29bb44f4d58333fdb023d99028de) ) // 27C512, half size of the one in the penky set, mostly 0 filled anyway
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT) /* 8x8x8 Foreground */
-	ROM_LOAD( "U92", 0x00000, 0x80000, CRC(31993a6c) SHA1(8cdcae52472768f40dc7cbefaa459982d008deaa) ) // 27C040
-	ROM_LOAD( "U93", 0x80000, 0x80000, CRC(b570dc0c) SHA1(1f55681412db144e2d5cbb7a89783edc5059add7) ) // 27C040
+	ROM_LOAD( "u92", 0x00000, 0x80000, CRC(31993a6c) SHA1(8cdcae52472768f40dc7cbefaa459982d008deaa) ) // 27C040
+	ROM_LOAD( "u93", 0x80000, 0x80000, CRC(b570dc0c) SHA1(1f55681412db144e2d5cbb7a89783edc5059add7) ) // 27C040
 
 	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT) /* 8x8x8 Midground */
-	ROM_LOAD( "U110", 0x00000, 0x80000, CRC(c6501e3a) SHA1(f6fa7925a395a226714c4f5536866bc87c1bf0ca) ) // 27C040
-	ROM_LOAD( "U111", 0x80000, 0x80000, CRC(de405c6f) SHA1(715e111438d4cbecc435a519ae370842f5531163) ) // 27C040
+	ROM_LOAD( "u110", 0x00000, 0x80000, CRC(c6501e3a) SHA1(f6fa7925a395a226714c4f5536866bc87c1bf0ca) ) // 27C040
+	ROM_LOAD( "u111", 0x80000, 0x80000, CRC(de405c6f) SHA1(715e111438d4cbecc435a519ae370842f5531163) ) // 27C040
 
 	ROM_REGION( 0x80000, "oki1", 0 )    /* Samples */
-	ROM_LOAD( "U85", 0x00000, 0x80000, CRC(452578cd) SHA1(a86ce33df0a5dc9d58233820689d52943844a7ea) )// 27C040, but 1st and 2nd half identical
+	ROM_LOAD( "u85", 0x00000, 0x80000, CRC(452578cd) SHA1(a86ce33df0a5dc9d58233820689d52943844a7ea) )// 27C040, but 1st and 2nd half identical
 
 	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 )    /* Samples (banked) */
 	/* not populated for this game */

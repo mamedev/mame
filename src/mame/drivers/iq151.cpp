@@ -206,24 +206,26 @@ WRITE8_MEMBER(iq151_state::cartslot_io_w)
 		elem->io_write(offset, data);
 }
 
-ADDRESS_MAP_START(iq151_state::iq151_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(cartslot_r, cartslot_w)
+void iq151_state::iq151_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(iq151_state::cartslot_r), FUNC(iq151_state::cartslot_w));
 
-	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
-	AM_RANGE( 0x0800, 0x7fff ) AM_RAM
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM
-ADDRESS_MAP_END
+	map(0x0000, 0x07ff).bankrw("boot");
+	map(0x0800, 0x7fff).ram();
+	map(0xf000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(iq151_state::iq151_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(cartslot_io_r, cartslot_io_w)
+void iq151_state::iq151_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(iq151_state::cartslot_io_r), FUNC(iq151_state::cartslot_io_w));
 
-	AM_RANGE( 0x80, 0x80 ) AM_WRITE(boot_bank_w)
-	AM_RANGE( 0x84, 0x87 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0x88, 0x89 ) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-ADDRESS_MAP_END
+	map(0x80, 0x80).w(this, FUNC(iq151_state::boot_bank_w));
+	map(0x84, 0x87).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x88, 0x89).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+}
 
 
 INPUT_CHANGED_MEMBER(iq151_state::iq151_break)

@@ -153,25 +153,26 @@ CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(pirates_state::pirates_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM // main ram
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM")
+void pirates_state::pirates_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10ffff).ram(); // main ram
+	map(0x300000, 0x300001).portr("INPUTS");
+	map(0x400000, 0x400001).portr("SYSTEM");
 //  AM_RANGE(0x500000, 0x5007ff) AM_RAM
-	AM_RANGE(0x500000, 0x5007ff) AM_WRITEONLY AM_SHARE("spriteram")
+	map(0x500000, 0x5007ff).writeonly().share("spriteram");
 //  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(out_w)
-	AM_RANGE(0x700000, 0x700001) AM_WRITEONLY AM_SHARE("scroll")    // scroll reg
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x900000, 0x90017f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE(tx_tileram_w) AM_SHARE("tx_tileram")
-	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE(fg_tileram_w) AM_SHARE("fg_tileram")
+	map(0x600000, 0x600001).w(this, FUNC(pirates_state::out_w));
+	map(0x700000, 0x700001).writeonly().share("scroll");    // scroll reg
+	map(0x800000, 0x803fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x900000, 0x90017f).ram();  // more of tilemaps ?
+	map(0x900180, 0x90137f).ram().w(this, FUNC(pirates_state::tx_tileram_w)).share("tx_tileram");
+	map(0x901380, 0x902a7f).ram().w(this, FUNC(pirates_state::fg_tileram_w)).share("fg_tileram");
 //  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE(bg_tileram_w) AM_SHARE("bg_tileram")
+	map(0x902a80, 0x904187).ram().w(this, FUNC(pirates_state::bg_tileram_w)).share("bg_tileram");
 //  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0xa00001, 0xa00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /* Input Ports */
@@ -307,23 +308,23 @@ ROM_END
 
 ROM_START( piratesb )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code (encrypted) */
-	ROM_LOAD16_BYTE( "U15",  0x00000, 0x80000, CRC(0cfd6415) SHA1(ff5d3631702f64351afa3b7435a6977ae856dff7) )
-	ROM_LOAD16_BYTE( "U16",  0x00001, 0x80000, CRC(98cece02) SHA1(79858623a2b6ae24067e0ba1af009444bafba490) )
+	ROM_LOAD16_BYTE( "u15",  0x00000, 0x80000, CRC(0cfd6415) SHA1(ff5d3631702f64351afa3b7435a6977ae856dff7) )
+	ROM_LOAD16_BYTE( "u16",  0x00001, 0x80000, CRC(98cece02) SHA1(79858623a2b6ae24067e0ba1af009444bafba490) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* GFX (encrypted) */
-	ROM_LOAD( "U34", 0x000000, 0x080000, CRC(89fda216) SHA1(ea31e750460e67a24972b04171230633eb2b6d9d) )
-	ROM_LOAD( "U35", 0x080000, 0x080000, CRC(40e069b4) SHA1(515d12cbb29bdbf3f3016e5bbe14941209978095) )
-	ROM_LOAD( "U48", 0x100000, 0x080000, CRC(26d78518) SHA1(c293f1194f8ef38241d149cf1db1a511a7fb4936) )
-	ROM_LOAD( "U49", 0x180000, 0x080000, CRC(f31696ea) SHA1(f5ab59e441317b02b615a1cdc6d075c5bdcdea73) )
+	ROM_LOAD( "u34", 0x000000, 0x080000, CRC(89fda216) SHA1(ea31e750460e67a24972b04171230633eb2b6d9d) )
+	ROM_LOAD( "u35", 0x080000, 0x080000, CRC(40e069b4) SHA1(515d12cbb29bdbf3f3016e5bbe14941209978095) )
+	ROM_LOAD( "u48", 0x100000, 0x080000, CRC(26d78518) SHA1(c293f1194f8ef38241d149cf1db1a511a7fb4936) )
+	ROM_LOAD( "u49", 0x180000, 0x080000, CRC(f31696ea) SHA1(f5ab59e441317b02b615a1cdc6d075c5bdcdea73) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* GFX (encrypted) */
-	ROM_LOAD( "U69", 0x000000, 0x080000, CRC(c78a276f) SHA1(d5127593e68f9e8f2878803c652a35a1c6d82b2c) )
-	ROM_LOAD( "U70", 0x080000, 0x080000, CRC(9f0bad96) SHA1(b8f910aa259192e261815392f5d7c9c7dabe0b4d) )
-	ROM_LOAD( "U71", 0x100000, 0x080000, CRC(0bb7c816) SHA1(bc786b6d04ae964f0ea5d6dd314fd7b18f8872e8) ) // 1 bit different, is one of them bad?
-	ROM_LOAD( "U72", 0x180000, 0x080000, CRC(1c41bd2c) SHA1(fba264a3c195f303337223a74cbad5eec5c457ec) )
+	ROM_LOAD( "u69", 0x000000, 0x080000, CRC(c78a276f) SHA1(d5127593e68f9e8f2878803c652a35a1c6d82b2c) )
+	ROM_LOAD( "u70", 0x080000, 0x080000, CRC(9f0bad96) SHA1(b8f910aa259192e261815392f5d7c9c7dabe0b4d) )
+	ROM_LOAD( "u71", 0x100000, 0x080000, CRC(0bb7c816) SHA1(bc786b6d04ae964f0ea5d6dd314fd7b18f8872e8) ) // 1 bit different, is one of them bad?
+	ROM_LOAD( "u72", 0x180000, 0x080000, CRC(1c41bd2c) SHA1(fba264a3c195f303337223a74cbad5eec5c457ec) )
 
 	ROM_REGION( 0x080000, "oki", 0) /* OKI samples (encrypted) */
-	ROM_LOAD( "U31", 0x000000, 0x080000, CRC(63a739ec) SHA1(c57f657225e62b3c9c5f0c7185ad7a87794d55f4) )
+	ROM_LOAD( "u31", 0x000000, 0x080000, CRC(63a739ec) SHA1(c57f657225e62b3c9c5f0c7185ad7a87794d55f4) )
 ROM_END
 
 

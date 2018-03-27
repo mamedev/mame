@@ -125,20 +125,22 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 }
 
 
-ADDRESS_MAP_START(midcoin24cdjuke_state::midcoin24cdjuke_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x7800, 0x780f) AM_WRITE(digit_w)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void midcoin24cdjuke_state::midcoin24cdjuke_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x7800, 0x780f).w(this, FUNC(midcoin24cdjuke_state::digit_w));
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(midcoin24cdjuke_state::midcoin24cdjuke_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ic31", i8255_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ic11", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ic25", i8255_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_WRITENOP
-	AM_RANGE(0x10, 0x1f) AM_READ(unknown_r)
-ADDRESS_MAP_END
+void midcoin24cdjuke_state::midcoin24cdjuke_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ic31", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw("ic11", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw("ic25", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0c, 0x0c).nopw();
+	map(0x10, 0x1f).r(this, FUNC(midcoin24cdjuke_state::unknown_r));
+}
 
 static INPUT_PORTS_START( midcoin24cdjuke )
 	PORT_START("ROW0")

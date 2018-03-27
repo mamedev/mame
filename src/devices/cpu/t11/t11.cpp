@@ -36,7 +36,7 @@
 #define PSW     m_psw.b.l
 
 
-DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "T11")
+DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "DEC T11")
 DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 
 
@@ -423,7 +423,7 @@ void t11_device::execute_run()
 	} while (m_icount > 0);
 }
 
-util::disasm_interface *t11_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> t11_device::create_disassembler()
 {
-	return new t11_disassembler;
+	return std::make_unique<t11_disassembler>();
 }

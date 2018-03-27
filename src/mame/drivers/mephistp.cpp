@@ -103,29 +103,32 @@ WRITE8_MEMBER(mephisto_pinball_state::sound_rombank_w)
 	m_soundbank->set_entry(data & 0xf);
 }
 
-ADDRESS_MAP_START(mephisto_pinball_state::mephisto_map)
-	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_MIRROR(0x08000) AM_REGION("maincpu", 0)
-	AM_RANGE(0x10000, 0x107ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x12000, 0x1201f) AM_NOP //AM_DEVREADWRITE("muart", i8256_device, read, write)
-	AM_RANGE(0x13000, 0x130ff) AM_DEVREADWRITE("ic20", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x13800, 0x13807) AM_DEVREADWRITE("ic20", i8155_device, io_r, io_w)
-	AM_RANGE(0x14000, 0x140ff) AM_DEVREADWRITE("ic9", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x14800, 0x14807) AM_DEVREADWRITE("ic9", i8155_device, io_r, io_w)
-	AM_RANGE(0x16000, 0x16000) AM_WRITE(shift_load_w)
-	AM_RANGE(0x17000, 0x17001) AM_WRITENOP //???
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void mephisto_pinball_state::mephisto_map(address_map &map)
+{
+	map(0x00000, 0x07fff).rom().mirror(0x08000).region("maincpu", 0);
+	map(0x10000, 0x107ff).ram().share("nvram");
+	map(0x12000, 0x1201f).noprw(); //AM_DEVREADWRITE("muart", i8256_device, read, write)
+	map(0x13000, 0x130ff).rw("ic20", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x13800, 0x13807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x14000, 0x140ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x14800, 0x14807).rw("ic9", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x16000, 0x16000).w(this, FUNC(mephisto_pinball_state::shift_load_w));
+	map(0x17000, 0x17001).nopw(); //???
+	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(mephisto_pinball_state::mephisto_8051_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("soundbank")
-ADDRESS_MAP_END
+void mephisto_pinball_state::mephisto_8051_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).bankr("soundbank");
+}
 
-ADDRESS_MAP_START(mephisto_pinball_state::mephisto_8051_io)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(sound_rombank_w)
-	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac", dac08_device, write)
-ADDRESS_MAP_END
+void mephisto_pinball_state::mephisto_8051_io(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0800).w(this, FUNC(mephisto_pinball_state::sound_rombank_w));
+	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::write));
+}
 
 #ifdef UNUSED_DEFINITION
 ADDRESS_MAP_START(mephisto_pinball_state::sport2k_8051_io)

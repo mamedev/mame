@@ -257,32 +257,34 @@ READ8_MEMBER(hitpoker_state::test_r)
 #endif
 
 /* overlap empty rom addresses */
-ADDRESS_MAP_START(hitpoker_state::hitpoker_map)
-	AM_RANGE(0x0000, 0xbdff) AM_ROM
-	AM_RANGE(0xbf00, 0xffff) AM_ROM
+void hitpoker_state::hitpoker_map(address_map &map)
+{
+	map(0x0000, 0xbdff).rom();
+	map(0xbf00, 0xffff).rom();
 
-	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
-	AM_RANGE(0x1000, 0x103f) AM_RAM // internal I/O
-	AM_RANGE(0x8000, 0xb5ff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w)
-	AM_RANGE(0xb600, 0xbdff) AM_RAM
-	AM_RANGE(0xbe0a, 0xbe0a) AM_READ_PORT("IN0")
-	AM_RANGE(0xbe0c, 0xbe0c) AM_READ_PORT("IN2") //irq ack?
-	AM_RANGE(0xbe0d, 0xbe0d) AM_READ(rtc_r)
-	AM_RANGE(0xbe0e, 0xbe0e) AM_READ_PORT("IN1")
-	AM_RANGE(0xbe50, 0xbe51) AM_WRITE(eeprom_offset_w)
-	AM_RANGE(0xbe53, 0xbe53) AM_READWRITE(eeprom_r, eeprom_w)
-	AM_RANGE(0xbe80, 0xbe80) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xbe81, 0xbe81) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_data_w)
-	AM_RANGE(0xbea0, 0xbea0) AM_READ_PORT("VBLANK") //probably other bits as well
+	map(0x0000, 0x00ff).ram(); // stack ram
+	map(0x1000, 0x103f).ram(); // internal I/O
+	map(0x8000, 0xb5ff).rw(this, FUNC(hitpoker_state::hitpoker_vram_r), FUNC(hitpoker_state::hitpoker_vram_w));
+	map(0xb600, 0xbdff).ram();
+	map(0xbe0a, 0xbe0a).portr("IN0");
+	map(0xbe0c, 0xbe0c).portr("IN2"); //irq ack?
+	map(0xbe0d, 0xbe0d).r(this, FUNC(hitpoker_state::rtc_r));
+	map(0xbe0e, 0xbe0e).portr("IN1");
+	map(0xbe50, 0xbe51).w(this, FUNC(hitpoker_state::eeprom_offset_w));
+	map(0xbe53, 0xbe53).rw(this, FUNC(hitpoker_state::eeprom_r), FUNC(hitpoker_state::eeprom_w));
+	map(0xbe80, 0xbe80).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xbe81, 0xbe81).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xbe90, 0xbe91).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0xbea0, 0xbea0).portr("VBLANK"); //probably other bits as well
 //  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(hitpoker_paletteram_r,hitpoker_paletteram_w)
-ADDRESS_MAP_END
+	map(0xc000, 0xdfff).rw(this, FUNC(hitpoker_state::hitpoker_cram_r), FUNC(hitpoker_state::hitpoker_cram_w));
+	map(0xe000, 0xefff).rw(this, FUNC(hitpoker_state::hitpoker_paletteram_r), FUNC(hitpoker_state::hitpoker_paletteram_w));
+}
 
-ADDRESS_MAP_START(hitpoker_state::hitpoker_io)
-	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_SHARE("sys_regs")
-ADDRESS_MAP_END
+void hitpoker_state::hitpoker_io(address_map &map)
+{
+	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(this, FUNC(hitpoker_state::hitpoker_pic_r), FUNC(hitpoker_state::hitpoker_pic_w)).share("sys_regs");
+}
 
 static INPUT_PORTS_START( hitpoker )
 	PORT_START("VBLANK")

@@ -98,7 +98,7 @@ static const uint16_t irq_vector[] = {0x0032, 0x0042, 0x0052, 0x0062, 0x0072};
 //  HD61700 DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(HD61700, hd61700_cpu_device, "hd61700", "HD61700")
+DEFINE_DEVICE_TYPE(HD61700, hd61700_cpu_device, "hd61700", "Hitachi HD61700")
 
 //-------------------------------------------------
 //  hd61700_cpu_device - constructor
@@ -301,9 +301,9 @@ void hd61700_cpu_device::state_string_export(const device_state_entry &entry, st
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *hd61700_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hd61700_cpu_device::create_disassembler()
 {
-	return new hd61700_disassembler;
+	return std::make_unique<hd61700_disassembler>();
 }
 
 //-------------------------------------------------

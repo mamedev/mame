@@ -106,55 +106,58 @@ WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
 }
 
 
-ADDRESS_MAP_START(dbz_state::dbz_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x480000, 0x48ffff) AM_RAM
-	AM_RANGE(0x490000, 0x491fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  // '157 RAM is mirrored twice
-	AM_RANGE(0x492000, 0x493fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0x498000, 0x49ffff) AM_DEVREAD("k056832", k056832_device, rom_word_8000_r)  // code near a60 in dbz2, subroutine at 730 in dbz
-	AM_RANGE(0x4a0000, 0x4a0fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
-	AM_RANGE(0x4a1000, 0x4a3fff) AM_RAM
-	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette
-	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
-	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
-	AM_RANGE(0x4c4000, 0x4c4007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
-	AM_RANGE(0x4c8000, 0x4c8007) AM_DEVWRITE("k056832", k056832_device, b_word_w)
-	AM_RANGE(0x4cc000, 0x4cc03f) AM_DEVWRITE("k056832", k056832_device, word_w)
-	AM_RANGE(0x4d0000, 0x4d001f) AM_DEVWRITE("k053936_1", k053936_device, ctrl_w)
-	AM_RANGE(0x4d4000, 0x4d401f) AM_DEVWRITE("k053936_2", k053936_device, ctrl_w)
-	AM_RANGE(0x4e0000, 0x4e0001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x4e0002, 0x4e0003) AM_READ_PORT("SYSTEM_DSW1")
-	AM_RANGE(0x4e4000, 0x4e4001) AM_READ_PORT("DSW2")
-	AM_RANGE(0x4e8000, 0x4e8001) AM_WRITENOP
-	AM_RANGE(0x4ec000, 0x4ec001) AM_WRITE(dbzcontrol_w)
-	AM_RANGE(0x4f0000, 0x4f0001) AM_WRITE(dbz_sound_command_w)
-	AM_RANGE(0x4f4000, 0x4f4001) AM_WRITE(dbz_sound_cause_nmi)
-	AM_RANGE(0x4f8000, 0x4f801f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00)      // 251 #1
-	AM_RANGE(0x4fc000, 0x4fc01f) AM_DEVWRITE("k053251", k053251_device, lsb_w)   // 251 #2
+void dbz_state::dbz_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x480000, 0x48ffff).ram();
+	map(0x490000, 0x491fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));  // '157 RAM is mirrored twice
+	map(0x492000, 0x493fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0x498000, 0x49ffff).r(m_k056832, FUNC(k056832_device::rom_word_8000_r));  // code near a60 in dbz2, subroutine at 730 in dbz
+	map(0x4a0000, 0x4a0fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w));
+	map(0x4a1000, 0x4a3fff).ram();
+	map(0x4a8000, 0x4abfff).ram().w("palette", FUNC(palette_device::write16)).share("palette"); // palette
+	map(0x4c0000, 0x4c0001).r(m_k053246, FUNC(k053247_device::k053246_word_r));
+	map(0x4c0000, 0x4c0007).w(m_k053246, FUNC(k053247_device::k053246_word_w));
+	map(0x4c4000, 0x4c4007).w(m_k053246, FUNC(k053247_device::k053246_word_w));
+	map(0x4c8000, 0x4c8007).w(m_k056832, FUNC(k056832_device::b_word_w));
+	map(0x4cc000, 0x4cc03f).w(m_k056832, FUNC(k056832_device::word_w));
+	map(0x4d0000, 0x4d001f).w(m_k053936_1, FUNC(k053936_device::ctrl_w));
+	map(0x4d4000, 0x4d401f).w(m_k053936_2, FUNC(k053936_device::ctrl_w));
+	map(0x4e0000, 0x4e0001).portr("P1_P2");
+	map(0x4e0002, 0x4e0003).portr("SYSTEM_DSW1");
+	map(0x4e4000, 0x4e4001).portr("DSW2");
+	map(0x4e8000, 0x4e8001).nopw();
+	map(0x4ec000, 0x4ec001).w(this, FUNC(dbz_state::dbzcontrol_w));
+	map(0x4f0000, 0x4f0001).w(this, FUNC(dbz_state::dbz_sound_command_w));
+	map(0x4f4000, 0x4f4001).w(this, FUNC(dbz_state::dbz_sound_cause_nmi));
+	map(0x4f8000, 0x4f801f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0xff00);      // 251 #1
+	map(0x4fc000, 0x4fc01f).w(m_k053251, FUNC(k053251_device::lsb_w));   // 251 #2
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(dbz_bg2_videoram_w) AM_SHARE("bg2_videoram")
-	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(dbz_bg1_videoram_w) AM_SHARE("bg1_videoram")
-	AM_RANGE(0x510000, 0x513fff) AM_DEVREADWRITE("k053936_1", k053936_device, linectrl_r, linectrl_w) // ?? guess, it might not be
-	AM_RANGE(0x518000, 0x51bfff) AM_DEVREADWRITE("k053936_2", k053936_device, linectrl_r, linectrl_w) // ?? guess, it might not be
-	AM_RANGE(0x600000, 0x6fffff) AM_READNOP             // PSAC 1 ROM readback window
-	AM_RANGE(0x700000, 0x7fffff) AM_READNOP             // PSAC 2 ROM readback window
-ADDRESS_MAP_END
+	map(0x500000, 0x501fff).ram().w(this, FUNC(dbz_state::dbz_bg2_videoram_w)).share("bg2_videoram");
+	map(0x508000, 0x509fff).ram().w(this, FUNC(dbz_state::dbz_bg1_videoram_w)).share("bg1_videoram");
+	map(0x510000, 0x513fff).rw(m_k053936_1, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
+	map(0x518000, 0x51bfff).rw(m_k053936_2, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // ?? guess, it might not be
+	map(0x600000, 0x6fffff).nopr();             // PSAC 1 ROM readback window
+	map(0x700000, 0x7fffff).nopr();             // PSAC 2 ROM readback window
+}
 
 /* dbz sound */
 /* IRQ: from YM2151.  NMI: from 68000.  Port 0: write to ack NMI */
 
-ADDRESS_MAP_START(dbz_state::dbz_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xd000, 0xd002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void dbz_state::dbz_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).ram();
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xd000, 0xd002).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe000, 0xe001).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(dbz_state::dbz_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP
-ADDRESS_MAP_END
+void dbz_state::dbz_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopw();
+}
 
 /**********************************************************************************/
 

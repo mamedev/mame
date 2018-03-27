@@ -52,21 +52,24 @@ public:
 };
 
 /* all memory accesses are decoded by the gate array... */
-ADDRESS_MAP_START(tg100_state::tg100_map)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM /* gate array stuff */
-	AM_RANGE(0x00080000, 0x0009ffff) AM_ROM AM_REGION("prgrom", 0x00000)
-ADDRESS_MAP_END
+void tg100_state::tg100_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).ram(); /* gate array stuff */
+	map(0x00080000, 0x0009ffff).rom().region("prgrom", 0x00000);
+}
 
-ADDRESS_MAP_START(tg100_state::tg100_io_map)
+void tg100_state::tg100_io_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( tg100 )
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(tg100_state::ymw258_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-ADDRESS_MAP_END
+void tg100_state::ymw258_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+}
 
 MACHINE_CONFIG_START(tg100_state::tg100)
 	/* basic machine hardware */

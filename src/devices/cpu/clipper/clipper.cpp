@@ -1921,7 +1921,7 @@ void clipper_c400_device::execute_instruction()
 	}
 }
 
-util::disasm_interface *clipper_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> clipper_device::create_disassembler()
 {
-	return new clipper_disassembler;
+	return std::make_unique<clipper_disassembler>();
 }

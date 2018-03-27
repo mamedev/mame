@@ -49,34 +49,37 @@ READ8_MEMBER(tr175_state::fff400_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(tr175_state::mem_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xfe8000, 0xfebfff) AM_RAM // 8-bit?
-	AM_RANGE(0xfefe00, 0xfefedd) AM_WRITENOP // 8-bit; cleared at startup
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM // main RAM
-	AM_RANGE(0xff0000, 0xff7fff) AM_RAM // video RAM?
-	AM_RANGE(0xffe000, 0xffe01f) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0xff00)
-	AM_RANGE(0xffe400, 0xffe40f) AM_DEVREADWRITE8("avdc", scn2674_device, read, write, 0xff00)
-	AM_RANGE(0xffe800, 0xffe805) AM_UNMAP //AM_DEVREADWRITE8("pai", um82c11_device, read, write, 0xff00)
-	AM_RANGE(0xffec00, 0xffec01) AM_WRITE8(ffec01_w, 0x00ff)
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE8(fff000_w, 0xff00)
-	AM_RANGE(0xfff400, 0xfff401) AM_READ8(fff400_r, 0xff00)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
-ADDRESS_MAP_END
+void tr175_state::mem_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom().region("maincpu", 0);
+	map(0xfe8000, 0xfebfff).ram(); // 8-bit?
+	map(0xfefe00, 0xfefedd).nopw(); // 8-bit; cleared at startup
+	map(0xff8000, 0xffbfff).ram(); // main RAM
+	map(0xff0000, 0xff7fff).ram(); // video RAM?
+	map(0xffe000, 0xffe01f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
+	map(0xffe400, 0xffe40f).rw("avdc", FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0xff00);
+	map(0xffe800, 0xffe805).unmaprw(); //AM_DEVREADWRITE8("pai", um82c11_device, read, write, 0xff00)
+	map(0xffec01, 0xffec01).w(this, FUNC(tr175_state::ffec01_w));
+	map(0xfff000, 0xfff000).w(this, FUNC(tr175_state::fff000_w));
+	map(0xfff400, 0xfff400).r(this, FUNC(tr175_state::fff400_r));
+	map(0xfffc01, 0xfffc01).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0xfffc03, 0xfffc03).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0xfffc05, 0xfffc05).w("ramdac", FUNC(ramdac_device::mask_w));
+}
 
 SCN2674_DRAW_CHARACTER_MEMBER(tr175_state::draw_character)
 {
 }
 
-ADDRESS_MAP_START(tr175_state::vram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READNOP
-ADDRESS_MAP_END
+void tr175_state::vram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).nopr();
+}
 
-ADDRESS_MAP_START(tr175_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void tr175_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 static INPUT_PORTS_START( tr175 )
 INPUT_PORTS_END

@@ -257,27 +257,29 @@ WRITE8_MEMBER( superslave_state::cmd_w )
 //  ADDRESS_MAP( superslave_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(superslave_state::superslave_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void superslave_state::superslave_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(superslave_state::read), FUNC(superslave_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( superslave_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(superslave_state::superslave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80DART_0_TAG, z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_1_TAG, z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_WRITE(baud_w)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0x02) AM_DEVREADWRITE(AM9519_TAG, am9519_device, data_r, data_w)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0x02) AM_DEVREADWRITE(AM9519_TAG, am9519_device, stat_r, cmd_w)
-	AM_RANGE(0x1d, 0x1d) AM_WRITE(memctrl_w)
-	AM_RANGE(0x1e, 0x1e) AM_NOP // master communications
-	AM_RANGE(0x1f, 0x1f) AM_READWRITE(status_r, cmd_w)
-ADDRESS_MAP_END
+void superslave_state::superslave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(Z80DART_0_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x0c, 0x0f).rw(Z80DART_1_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x10, 0x10).mirror(0x03).w(this, FUNC(superslave_state::baud_w));
+	map(0x14, 0x17).rw(Z80PIO_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x18, 0x18).mirror(0x02).rw(AM9519_TAG, FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
+	map(0x19, 0x19).mirror(0x02).rw(AM9519_TAG, FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
+	map(0x1d, 0x1d).w(this, FUNC(superslave_state::memctrl_w));
+	map(0x1e, 0x1e).noprw(); // master communications
+	map(0x1f, 0x1f).rw(this, FUNC(superslave_state::status_r), FUNC(superslave_state::cmd_w));
+}
 
 
 

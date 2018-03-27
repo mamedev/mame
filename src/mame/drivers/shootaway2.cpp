@@ -66,14 +66,16 @@ uint32_t m74_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
-ADDRESS_MAP_START(m74_state::c68_map)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
-ADDRESS_MAP_END
+void m74_state::c68_map(address_map &map)
+{
+	map(0x8000, 0xffff).rom().region("maincpu", 0x0000);
+}
 
-ADDRESS_MAP_START(m74_state::sub_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("subcpu", 0)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void m74_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("subcpu", 0);
+	map(0x8000, 0xffff).ram();
+}
 
 static INPUT_PORTS_START( m74 )
 INPUT_PORTS_END

@@ -691,25 +691,27 @@ WRITE8_MEMBER(mcr_state::demoderb_op4_w)
  *************************************/
 
 /* address map verified from schematics */
-ADDRESS_MAP_START(mcr_state::cpu_90009_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf1ff) AM_MIRROR(0x0200) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf400, 0xf41f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf800, 0xf81f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(mcr_90009_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void mcr_state::cpu_90009_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x77ff).mirror(0x0800).ram().share("nvram");
+	map(0xf000, 0xf1ff).mirror(0x0200).ram().share("spriteram");
+	map(0xf400, 0xf41f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf800, 0xf81f).mirror(0x03e0).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xfc00, 0xffff).ram().w(this, FUNC(mcr_state::mcr_90009_videoram_w)).share("videoram");
+}
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
-ADDRESS_MAP_START(mcr_state::cpu_90009_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	SSIO_INPUT_PORTS("ssio")
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void mcr_state::cpu_90009_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	m_ssio->ssio_input_ports(map, "ssio");
+	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe8, 0xe8).nopw();
+	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 
@@ -720,23 +722,25 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-ADDRESS_MAP_START(mcr_state::cpu_90010_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xe1ff) AM_MIRROR(0x1600) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xefff) AM_MIRROR(0x1000) AM_RAM_WRITE(mcr_90010_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void mcr_state::cpu_90010_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("nvram");
+	map(0xe000, 0xe1ff).mirror(0x1600).ram().share("spriteram");
+	map(0xe800, 0xefff).mirror(0x1000).ram().w(this, FUNC(mcr_state::mcr_90010_videoram_w)).share("videoram");
+}
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
-ADDRESS_MAP_START(mcr_state::cpu_90010_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	SSIO_INPUT_PORTS("ssio")
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void mcr_state::cpu_90010_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	m_ssio->ssio_input_ports(map, "ssio");
+	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe8, 0xe8).nopw();
+	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 
@@ -747,24 +751,26 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-ADDRESS_MAP_START(mcr_state::cpu_91490_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xe9ff) AM_MIRROR(0x0200) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr_91490_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf800, 0xf87f) AM_MIRROR(0x0780) AM_WRITE(mcr_paletteram9_w) AM_SHARE("paletteram")
-ADDRESS_MAP_END
+void mcr_state::cpu_91490_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe7ff).ram().share("nvram");
+	map(0xe800, 0xe9ff).mirror(0x0200).ram().share("spriteram");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(mcr_state::mcr_91490_videoram_w)).share("videoram");
+	map(0xf800, 0xf87f).mirror(0x0780).w(this, FUNC(mcr_state::mcr_paletteram9_w)).share("paletteram");
+}
 
 /* upper I/O map determined by PAL; only SSIO ports are verified from schematics */
-ADDRESS_MAP_START(mcr_state::cpu_91490_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	SSIO_INPUT_PORTS("ssio")
-	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void mcr_state::cpu_91490_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	m_ssio->ssio_input_ports(map, "ssio");
+	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe8, 0xe8).nopw();
+	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 
@@ -775,23 +781,25 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-ADDRESS_MAP_START(mcr_nflfoot_state::ipu_91695_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mcr_nflfoot_state::ipu_91695_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
 /* I/O verified from schematics */
-ADDRESS_MAP_START(mcr_nflfoot_state::ipu_91695_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio0", z80pio_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_sio", z80dart_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_ctc", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio1", z80pio_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0xe0) AM_WRITE(ipu_laserdisk_w)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xe0) AM_READWRITE(ipu_watchdog_r, ipu_watchdog_w)
-ADDRESS_MAP_END
+void mcr_nflfoot_state::ipu_91695_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0xe0).rw(m_ipu_pio0, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x04, 0x07).mirror(0xe0).rw(m_ipu_sio, FUNC(z80dart_device::cd_ba_r), FUNC(z80dart_device::cd_ba_w));
+	map(0x08, 0x0b).mirror(0xe0).rw(m_ipu_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0c, 0x0f).mirror(0xe0).rw(m_ipu_pio1, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x10, 0x13).mirror(0xe0).w(this, FUNC(mcr_nflfoot_state::ipu_laserdisk_w));
+	map(0x1c, 0x1f).mirror(0xe0).rw(this, FUNC(mcr_nflfoot_state::ipu_watchdog_r), FUNC(mcr_nflfoot_state::ipu_watchdog_w));
+}
 
 
 

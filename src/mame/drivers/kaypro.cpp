@@ -64,36 +64,39 @@ READ8_MEMBER( kaypro_state::kaypro484_87_r ) { return 0x7f; }    /* to bypass un
 
 ************************************************************/
 
-ADDRESS_MAP_START(kaypro_state::kaypro_map)
-	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
-ADDRESS_MAP_END
+void kaypro_state::kaypro_map(address_map &map)
+{
+	map(0x0000, 0x2fff).bankr("bankr0").bankw("bankw0");
+	map(0x3000, 0x3fff).bankrw("bank3");
+	map(0x4000, 0xffff).ram().region("rambank", 0x4000);
+}
 
-ADDRESS_MAP_START(kaypro_state::kayproii_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, stt_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0c, 0x0f) AM_DEVWRITE("brg", com8116_device, str_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", z80pio_device, read_alt, write_alt)
-ADDRESS_MAP_END
+void kaypro_state::kayproii_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).w("brg", FUNC(com8116_device::stt_w));
+	map(0x04, 0x07).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x08, 0x0b).rw(m_pio_g, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0c, 0x0f).w("brg", FUNC(com8116_device::str_w));
+	map(0x10, 0x13).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x1c, 0x1f).rw(m_pio_s, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+}
 
-ADDRESS_MAP_START(kaypro_state::kaypro484_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, str_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio_1", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("brg", com8116_device, stt_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("sio_2", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0x14, 0x17) AM_READWRITE(kaypro484_system_port_r,kaypro484_system_port_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x1c, 0x1c) AM_READWRITE(kaypro484_status_r,kaypro484_index_w)
-	AM_RANGE(0x1d, 0x1d) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(kaypro484_register_w)
-	AM_RANGE(0x1f, 0x1f) AM_READWRITE(kaypro484_videoram_r,kaypro484_videoram_w)
+void kaypro_state::kaypro484_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).w("brg", FUNC(com8116_device::str_w));
+	map(0x04, 0x07).rw("sio_1", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x08, 0x0b).w("brg", FUNC(com8116_device::stt_w));
+	map(0x0c, 0x0f).rw("sio_2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x10, 0x13).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x14, 0x17).rw(this, FUNC(kaypro_state::kaypro484_system_port_r), FUNC(kaypro_state::kaypro484_system_port_w));
+	map(0x18, 0x1b).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x1c, 0x1c).rw(this, FUNC(kaypro_state::kaypro484_status_r), FUNC(kaypro_state::kaypro484_index_w));
+	map(0x1d, 0x1d).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(kaypro_state::kaypro484_register_w));
+	map(0x1f, 0x1f).rw(this, FUNC(kaypro_state::kaypro484_videoram_r), FUNC(kaypro_state::kaypro484_videoram_w));
 
 	/* The below are not emulated */
 /*  AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("z80pio", kaypro484_pio_r, kaypro484_pio_w) - for RTC and Modem
@@ -106,9 +109,9 @@ ADDRESS_MAP_START(kaypro_state::kaypro484_io)
     AM_RANGE(0x85, 0x85) Hard Drive Cylinder high register I/O
     AM_RANGE(0x86, 0x86) Hard Drive Size / Drive / Head register I/O
     AM_RANGE(0x87, 0x87) Hard Drive READ status register, WRITE command register */
-	AM_RANGE(0x20, 0x86) AM_NOP
-	AM_RANGE(0x87, 0x87) AM_READ(kaypro484_87_r)
-ADDRESS_MAP_END
+	map(0x20, 0x86).noprw();
+	map(0x87, 0x87).r(this, FUNC(kaypro_state::kaypro484_87_r));
+}
 
 
 static INPUT_PORTS_START(kaypro)

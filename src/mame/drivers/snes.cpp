@@ -1012,17 +1012,19 @@ WRITE8_MEMBER( snes_console_state::pfest94_lo_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(snes_console_state::snes_map)
+void snes_console_state::snes_map(address_map &map)
+{
 //  AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes20_lo_r, snes20_lo_w)
-	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                                     /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	map(0x7e0000, 0x7fffff).ram();                                     /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
 //  AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes20_hi_r, snes20_hi_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(snes_console_state::spc_map)
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", snes_sound_device, spc_ram_r, spc_ram_w) /* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", snes_sound_device, spc_io_r, spc_io_w)   /* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
-ADDRESS_MAP_END
+void snes_console_state::spc_map(address_map &map)
+{
+	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
+	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
+	map(0x0100, 0xffff).rw(this, FUNC(snes_console_state::spc_ram_100_r), FUNC(snes_console_state::spc_ram_100_w));
+}
 
 
 /*************************************

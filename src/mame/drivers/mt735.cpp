@@ -50,13 +50,14 @@ READ8_MEMBER(mt735_state::p5_r)
 	return 0x00;
 }
 
-ADDRESS_MAP_START(mt735_state::mt735_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x278000, 0x287fff) AM_RAM
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM
-	AM_RANGE(0xff8004, 0xff8005) AM_READ8(p4_r, 0xff00)
-	AM_RANGE(0xff8004, 0xff8005) AM_READ8(p5_r, 0x00ff)
-ADDRESS_MAP_END
+void mt735_state::mt735_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
+	map(0x278000, 0x287fff).ram();
+	map(0x400000, 0x4fffff).ram();
+	map(0xff8004, 0xff8004).r(this, FUNC(mt735_state::p4_r));
+	map(0xff8005, 0xff8005).r(this, FUNC(mt735_state::p5_r));
+}
 
 static INPUT_PORTS_START( mt735 )
 INPUT_PORTS_END

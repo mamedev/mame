@@ -46,8 +46,8 @@ K051649 (sound)
 class konmedal_state : public driver_device
 {
 public:
-	konmedal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	konmedal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_k052109(*this, "k052109"),
@@ -225,69 +225,64 @@ WRITE8_MEMBER(konmedal_state::bankswitch_w)
 	m_control = data & 0xf;
 }
 
-ADDRESS_MAP_START(konmedal_state::medal_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xafff) AM_RAM // work RAM?
-	AM_RANGE(0xb800, 0xbfff) AM_RAM // stack goes here
-	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
-	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
-	AM_RANGE(0xc700, 0xc700) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc701, 0xc701) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc702, 0xc702) AM_READ_PORT("IN1")
-	AM_RANGE(0xc703, 0xc703) AM_READ_PORT("IN2")
-	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
-	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
-	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void konmedal_state::medal_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xafff).ram(); // work RAM?
+	map(0xb800, 0xbfff).ram(); // stack goes here
+	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
+	map(0xc100, 0xc100).w(this, FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(this, FUNC(konmedal_state::bankswitch_w));
+	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc700, 0xc700).portr("DSW2");
+	map(0xc701, 0xc701).portr("DSW1");
+	map(0xc702, 0xc702).portr("IN1");
+	map(0xc703, 0xc703).portr("IN2");
+	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
+	map(0xd000, 0xd001).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+}
 
-ADDRESS_MAP_START(konmedal_state::ddboy_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM // work RAM
-	AM_RANGE(0xc000, 0xc03f) AM_DEVWRITE("k056832", k056832_device, write)
-	AM_RANGE(0xc100, 0xc100) AM_WRITE(control2_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xc500, 0xc500) AM_NOP // read to reset watchdog
-	AM_RANGE(0xc702, 0xc702) AM_READ_PORT("IN1")
-	AM_RANGE(0xc703, 0xc703) AM_READ_PORT("IN2")
-	AM_RANGE(0xc800, 0xc80f) AM_DEVWRITE("k056832", k056832_device, b_w)
-	AM_RANGE(0xc80f, 0xc80f) AM_READ(magic_r)
-	AM_RANGE(0xcc00, 0xcc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP    // ???  writes 00 and 3f every frame
-	AM_RANGE(0xd800, 0xd87f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0xd880, 0xd889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
-	AM_RANGE(0xd88a, 0xd88e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
-	AM_RANGE(0xd88f, 0xd88f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0xd8e0, 0xd8ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void konmedal_state::ddboy_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram(); // work RAM
+	map(0xc000, 0xc03f).w(m_k056832, FUNC(k056832_device::write));
+	map(0xc100, 0xc100).w(this, FUNC(konmedal_state::control2_w));
+	map(0xc400, 0xc400).w(this, FUNC(konmedal_state::bankswitch_w));
+	map(0xc500, 0xc500).noprw(); // read to reset watchdog
+	map(0xc702, 0xc702).portr("IN1");
+	map(0xc703, 0xc703).portr("IN2");
+	map(0xc800, 0xc80f).w(m_k056832, FUNC(k056832_device::b_w));
+	map(0xc80f, 0xc80f).r(this, FUNC(konmedal_state::magic_r));
+	map(0xcc00, 0xcc00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xd000, 0xd000).nopw();    // ???  writes 00 and 3f every frame
+	map(0xd800, 0xd8ff).m("k051649", FUNC(k051649_device::scc_map));
+	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::vram_r), FUNC(konmedal_state::vram_w));
+}
 
-ADDRESS_MAP_START(konmedal_state::shuriboy_main)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN2")
-	AM_RANGE(0x8801, 0x8801) AM_READ_PORT("IN1")
-	AM_RANGE(0x8802, 0x8802) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8803, 0x8803) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8b00, 0x8b00) AM_WRITENOP    // watchdog?
-	AM_RANGE(0x8c00, 0x8c00) AM_WRITE(shuri_bank_w)
-	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdbff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
-	AM_RANGE(0xdd00, 0xdd00) AM_READWRITE(shuri_irq_r, shuri_irq_w)
-	AM_RANGE(0xdd80, 0xdd80) AM_WRITE(shuri_control_w)
-	AM_RANGE(0xde00, 0xde00) AM_WRITE(shuri_vrom_addr_w)
-	AM_RANGE(0xdf00, 0xdf00) AM_WRITE(shuri_vrom_bank_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(shuri_video_r, shuri_video_w)
-ADDRESS_MAP_END
+void konmedal_state::shuriboy_main(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8800).portr("IN2");
+	map(0x8801, 0x8801).portr("IN1");
+	map(0x8802, 0x8802).portr("DSW1");
+	map(0x8803, 0x8803).portr("DSW2");
+	map(0x8b00, 0x8b00).nopw();    // watchdog?
+	map(0x8c00, 0x8c00).w(this, FUNC(konmedal_state::shuri_bank_w));
+	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
+	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdbff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0xdd00, 0xdd00).rw(this, FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
+	map(0xdd80, 0xdd80).w(this, FUNC(konmedal_state::shuri_control_w));
+	map(0xde00, 0xde00).w(this, FUNC(konmedal_state::shuri_vrom_addr_w));
+	map(0xdf00, 0xdf00).w(this, FUNC(konmedal_state::shuri_vrom_bank_w));
+	map(0xe000, 0xffff).rw(this, FUNC(konmedal_state::shuri_video_r), FUNC(konmedal_state::shuri_video_w));
+}
 
 static INPUT_PORTS_START( konmedal )
 	PORT_START("DSW1")
@@ -631,7 +626,7 @@ ROM_END
 // this is a slightly different version on the same PCB as tsukande
 ROM_START( ddboya )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
-	ROM_LOAD( "342-f02-4g-(p).bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
+	ROM_LOAD( "342-f02-4g-=p=.bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
 	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) )
@@ -640,8 +635,8 @@ ROM_START( ddboya )
 	ROM_LOAD32_BYTE( "342_a06.27c010.4j", 0x000001, 0x020000, CRC(49f35d66) SHA1(3d5cf3b6eb6a3497609117acd002169a31130418) )
 
 	ROM_REGION( 0x100000, "oki", 0 )
-	ROM_LOAD( "342-a11-10d-(s1).bin", 0x000000, 0x080000, CRC(b523bced) SHA1(87a814035af4dcf24454667d4346d301303d697e) )
-	ROM_LOAD( "342-a12-10e-(s2).bin", 0x080000, 0x080000, CRC(6febafe7) SHA1(69e550dd067f326b4d20a859345f193b43a5af99) )
+	ROM_LOAD( "342-a11-10d-=s1=.bin", 0x000000, 0x080000, CRC(b523bced) SHA1(87a814035af4dcf24454667d4346d301303d697e) )
+	ROM_LOAD( "342-a12-10e-=s2=.bin", 0x080000, 0x080000, CRC(6febafe7) SHA1(69e550dd067f326b4d20a859345f193b43a5af99) )
 
 	ROM_REGION( 0x400, "proms", 0 )
 	// R
@@ -659,13 +654,13 @@ ROM_START( shuriboy )
 	ROM_LOAD( "gs-341-b01.13g", 0x000000, 0x010000, CRC(3c0f36b6) SHA1(1d3838f45969228a8b2054cd5baf8892db68b644) )
 
 	ROM_REGION( 0x40000, "k052109", 0 )   /* tilemaps */
-	ROM_LOAD32_BYTE( "341-A03.2H", 0x000000, 0x010000, CRC(8e9e9835) SHA1(f8dc4579f238d91c0aef59167be7e5de87dc4ba7) )
-	ROM_LOAD32_BYTE( "341-A04.4H", 0x000001, 0x010000, CRC(ac82d67b) SHA1(65869adfbb67cf10c92e50239fd747fc5ad4714d) )
-	ROM_LOAD32_BYTE( "341-A05.5H", 0x000002, 0x010000, CRC(31403832) SHA1(d13c54d3768a0c2d60a3751db8980199f60db243) )
-	ROM_LOAD32_BYTE( "341-A06.7H", 0x000003, 0x010000, CRC(361e26eb) SHA1(7b5ad6a6067afb3350d85a3f2026e4d685429e20) )
+	ROM_LOAD32_BYTE( "341-a03.2h", 0x000000, 0x010000, CRC(8e9e9835) SHA1(f8dc4579f238d91c0aef59167be7e5de87dc4ba7) )
+	ROM_LOAD32_BYTE( "341-a04.4h", 0x000001, 0x010000, CRC(ac82d67b) SHA1(65869adfbb67cf10c92e50239fd747fc5ad4714d) )
+	ROM_LOAD32_BYTE( "341-a05.5h", 0x000002, 0x010000, CRC(31403832) SHA1(d13c54d3768a0c2d60a3751db8980199f60db243) )
+	ROM_LOAD32_BYTE( "341-a06.7h", 0x000003, 0x010000, CRC(361e26eb) SHA1(7b5ad6a6067afb3350d85a3f2026e4d685429e20) )
 
 	ROM_REGION( 0x200000, "upd", 0 )
-	ROM_LOAD( "341-A02.13C", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
+	ROM_LOAD( "341-a02.13c", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
 ROM_END
 
 GAME( 1995, tsukande,    0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)

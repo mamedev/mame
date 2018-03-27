@@ -123,51 +123,56 @@ READ8_MEMBER(cop01_state::cop01_sound_irq_ack_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(cop01_state::cop01_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_SHARE("fgvideoram")
-ADDRESS_MAP_END
+void cop01_state::cop01_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram(); /* c000-c7ff in cop01 */
+	map(0xd000, 0xdfff).ram().w(this, FUNC(cop01_state::cop01_background_w)).share("bgvideoram");
+	map(0xe000, 0xe0ff).writeonly().share("spriteram");
+	map(0xf000, 0xf3ff).w(this, FUNC(cop01_state::cop01_foreground_w)).share("fgvideoram");
+}
 
-ADDRESS_MAP_START(cop01_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x40, 0x43) AM_WRITE(cop01_vreg_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(cop01_sound_command_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
-ADDRESS_MAP_END
+void cop01_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1");
+	map(0x01, 0x01).portr("P2");
+	map(0x02, 0x02).portr("SYSTEM");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x40, 0x43).w(this, FUNC(cop01_state::cop01_vreg_w));
+	map(0x44, 0x44).w(this, FUNC(cop01_state::cop01_sound_command_w));
+	map(0x45, 0x45).w(this, FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
+}
 
-ADDRESS_MAP_START(cop01_state::mightguy_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x40, 0x43) AM_WRITE(cop01_vreg_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(cop01_sound_command_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
-ADDRESS_MAP_END
+void cop01_state::mightguy_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1");
+	map(0x01, 0x01).portr("P2");
+	map(0x02, 0x02).portr("SYSTEM");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x40, 0x43).w(this, FUNC(cop01_state::cop01_vreg_w));
+	map(0x44, 0x44).w(this, FUNC(cop01_state::cop01_sound_command_w));
+	map(0x45, 0x45).w(this, FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
+}
 
-ADDRESS_MAP_START(cop01_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READ(cop01_sound_irq_ack_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void cop01_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8000).r(this, FUNC(cop01_state::cop01_sound_irq_ack_w));
+	map(0xc000, 0xc7ff).ram();
+}
 
-ADDRESS_MAP_START(cop01_state::audio_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
-ADDRESS_MAP_END
+void cop01_state::audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x04, 0x05).w("ay3", FUNC(ay8910_device::address_data_w));
+	map(0x06, 0x06).r(this, FUNC(cop01_state::cop01_sound_command_r));
+}
 
 
 /*
@@ -239,14 +244,15 @@ WRITE8_MEMBER(cop01_state::prot_data_w)
 	}
 }
 
-ADDRESS_MAP_START(cop01_state::mightguy_audio_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0x02, 0x02) AM_WRITE(prot_address_w)    /* 1412M2 address? */
-	AM_RANGE(0x03, 0x03) AM_WRITE(prot_data_w)    /* 1412M2 data? */
-	AM_RANGE(0x03, 0x03) AM_READ(prot_data_r)    /* 1412M2? */
-	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
-ADDRESS_MAP_END
+void cop01_state::mightguy_audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ymsnd", FUNC(ym3526_device::write));
+	map(0x02, 0x02).w(this, FUNC(cop01_state::prot_address_w));    /* 1412M2 address? */
+	map(0x03, 0x03).w(this, FUNC(cop01_state::prot_data_w));    /* 1412M2 data? */
+	map(0x03, 0x03).r(this, FUNC(cop01_state::prot_data_r));    /* 1412M2? */
+	map(0x06, 0x06).r(this, FUNC(cop01_state::cop01_sound_command_r));
+}
 
 
 /*************************************

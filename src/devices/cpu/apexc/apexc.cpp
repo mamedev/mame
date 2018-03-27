@@ -331,7 +331,7 @@ field:      X address   D           Function    Y address   D (part 2)
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APEXC")
+DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APE(X)C")
 
 
 /* decrement ICount by n */
@@ -857,7 +857,7 @@ void apexc_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-util::disasm_interface *apexc_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> apexc_cpu_device::create_disassembler()
 {
-	return new apexc_disassembler;
+	return std::make_unique<apexc_disassembler>();
 }

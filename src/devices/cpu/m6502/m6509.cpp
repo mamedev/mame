@@ -12,7 +12,7 @@
 #include "m6509.h"
 #include "m6509d.h"
 
-DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "M6509")
+DEFINE_DEVICE_TYPE(M6509, m6509_device, "m6509", "MOS Technology M6509")
 
 m6509_device::m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6509, tag, owner, clock), bank_i(0), bank_y(0)
@@ -50,9 +50,9 @@ offs_t m6509_device::pc_to_external(u16 pc)
 	return adr_in_bank_i(pc);
 }
 
-util::disasm_interface *m6509_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6509_device::create_disassembler()
 {
-	return new m6509_disassembler;
+	return std::make_unique<m6509_disassembler>();
 }
 
 m6509_device::mi_6509_normal::mi_6509_normal(m6509_device *_base)

@@ -93,43 +93,47 @@ WRITE8_MEMBER(speedspn_state::okibank_w)
 
 /* main cpu */
 
-ADDRESS_MAP_START(speedspn_state::program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") /* RAM COLOUR */
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(attram_w) AM_SHARE("attram")
-	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(vidram_r, vidram_w)  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xbfff) AM_RAM                                             /* RAM PROGRAM */
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("prgbank")                              /* banked ROM */
-ADDRESS_MAP_END
+void speedspn_state::program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); /* RAM COLOUR */
+	map(0x8800, 0x8fff).ram().w(this, FUNC(speedspn_state::attram_w)).share("attram");
+	map(0x9000, 0x9fff).rw(this, FUNC(speedspn_state::vidram_r), FUNC(speedspn_state::vidram_w));  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
+	map(0xa000, 0xa7ff).ram();
+	map(0xa800, 0xafff).ram();
+	map(0xb000, 0xbfff).ram();                                             /* RAM PROGRAM */
+	map(0xc000, 0xffff).bankr("prgbank");                              /* banked ROM */
+}
 
-ADDRESS_MAP_START(speedspn_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x07, 0x07) AM_WRITE(display_disable_w)
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("P1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("P2") AM_WRITE(rombank_w)
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW1") AM_WRITE(sound_w)
-	AM_RANGE(0x14, 0x14) AM_READ_PORT("DSW2")
-	AM_RANGE(0x16, 0x16) AM_READ(irq_ack_r) // @@@ could be watchdog, value is discarded
-	AM_RANGE(0x17, 0x17) AM_WRITE(vidram_bank_w)
-ADDRESS_MAP_END
+void speedspn_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x07, 0x07).w(this, FUNC(speedspn_state::display_disable_w));
+	map(0x10, 0x10).portr("SYSTEM");
+	map(0x11, 0x11).portr("P1");
+	map(0x12, 0x12).portr("P2").w(this, FUNC(speedspn_state::rombank_w));
+	map(0x13, 0x13).portr("DSW1").w(this, FUNC(speedspn_state::sound_w));
+	map(0x14, 0x14).portr("DSW2");
+	map(0x16, 0x16).r(this, FUNC(speedspn_state::irq_ack_r)); // @@@ could be watchdog, value is discarded
+	map(0x17, 0x17).w(this, FUNC(speedspn_state::vidram_bank_w));
+}
 
 /* sound cpu */
 
-ADDRESS_MAP_START(speedspn_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void speedspn_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(this, FUNC(speedspn_state::okibank_w));
+	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(speedspn_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void speedspn_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
 /*** INPUT PORT **************************************************************/
 

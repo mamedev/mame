@@ -139,44 +139,47 @@ WRITE_LINE_MEMBER(pengo_state::irq_mask_w)
 	m_irq_mask = state;
 }
 
-ADDRESS_MAP_START(pengo_state::pengo_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram") /* video and color RAM, scratchpad RAM, sprite codes */
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x9000, 0x903f) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9040, 0x907f) AM_READ_PORT("DSW0")
-	AM_RANGE(0x9040, 0x9047) AM_DEVWRITE("latch", ls259_device, write_d0)
-	AM_RANGE(0x9070, 0x9070) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("IN1")
-	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("IN0")
-ADDRESS_MAP_END
+void pengo_state::pengo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram().w(this, FUNC(pengo_state::pacman_videoram_w)).share("videoram"); /* video and color RAM, scratchpad RAM, sprite codes */
+	map(0x8400, 0x87ff).ram().w(this, FUNC(pengo_state::pacman_colorram_w)).share("colorram");
+	map(0x8800, 0x8fef).ram().share("mainram");
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x9020, 0x902f).writeonly().share("spriteram2");
+	map(0x9000, 0x903f).portr("DSW1");
+	map(0x9040, 0x907f).portr("DSW0");
+	map(0x9040, 0x9047).w("latch", FUNC(ls259_device::write_d0));
+	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x9080, 0x90bf).portr("IN1");
+	map(0x90c0, 0x90ff).portr("IN0");
+}
 
 
-ADDRESS_MAP_START(pengo_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void pengo_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8800, 0x8fef).ram().share("mainram");
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+}
 
 
-ADDRESS_MAP_START(pengo_state::jrpacmbl_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
-	AM_RANGE(0x9040, 0x904f) AM_READ_PORT("DSW")
-	AM_RANGE(0x9040, 0x9047) AM_DEVWRITE("latch", ls259_device, write_d0)
-	AM_RANGE(0x9070, 0x9070) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x9080, 0x90bf) AM_READ_PORT("P2")
-	AM_RANGE(0x90c0, 0x90ff) AM_READ_PORT("P1")
-ADDRESS_MAP_END
+void pengo_state::jrpacmbl_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().w(this, FUNC(pengo_state::jrpacman_videoram_w)).share("videoram");
+	map(0x8800, 0x8fef).ram();
+	map(0x8ff0, 0x8fff).ram().share("spriteram");
+	map(0x9000, 0x901f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x9020, 0x902f).writeonly().share("spriteram2");
+	map(0x9030, 0x9030).w(this, FUNC(pengo_state::jrpacman_scroll_w));
+	map(0x9040, 0x904f).portr("DSW");
+	map(0x9040, 0x9047).w("latch", FUNC(ls259_device::write_d0));
+	map(0x9070, 0x9070).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x9080, 0x90bf).portr("P2");
+	map(0x90c0, 0x90ff).portr("P1");
+}
 
 
 
@@ -590,14 +593,14 @@ ROM_END
 
 ROM_START( pengo5 ) // PCB has an additional label Bally N.E.
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "0_OCT6-82.bin",   0x0000, 0x1000, CRC(43e45441) SHA1(e94a9f9971e57cd53fe425059a6cb7cadbd206f1) )
-	ROM_LOAD( "1_OCT11-82.bin",  0x1000, 0x1000, CRC(30a52a90) SHA1(e5ff7e16f40b42e56847d63ecbf4a0793f510c42) )
-	ROM_LOAD( "2_OCT11-82.bin",  0x2000, 0x1000, CRC(09783cc2) SHA1(793559c86c690837041e611107589b94ed5831ed) )
-	ROM_LOAD( "3_OCT6-82.bin",   0x3000, 0x1000, CRC(452c80c9) SHA1(2432930b88b9b5e7acc19cdcac7262199545ac2a) )
-	ROM_LOAD( "4_OCT6-82.bin",   0x4000, 0x1000, CRC(b72084ec) SHA1(c0508951c2ad8dc31481be8b3bfee2063e3fb0d7) )
-	ROM_LOAD( "5_OCT11-82.bin",  0x5000, 0x1000, CRC(770570cf) SHA1(43ead8236f53d39041ffc21bdeef10b3a77ce7f2) )
-	ROM_LOAD( "6_OCT11-82.bin",  0x6000, 0x1000, CRC(af7b12c4) SHA1(207ed466546f40ca60a38031b83aef61446902e2) )
-	ROM_LOAD( "7_OCT11-82.bin",  0x7000, 0x1000, CRC(1350ca0e) SHA1(40619973d69176b05fa160372306ad50693db021) )
+	ROM_LOAD( "0_oct6-82.bin",   0x0000, 0x1000, CRC(43e45441) SHA1(e94a9f9971e57cd53fe425059a6cb7cadbd206f1) )
+	ROM_LOAD( "1_oct11-82.bin",  0x1000, 0x1000, CRC(30a52a90) SHA1(e5ff7e16f40b42e56847d63ecbf4a0793f510c42) )
+	ROM_LOAD( "2_oct11-82.bin",  0x2000, 0x1000, CRC(09783cc2) SHA1(793559c86c690837041e611107589b94ed5831ed) )
+	ROM_LOAD( "3_oct6-82.bin",   0x3000, 0x1000, CRC(452c80c9) SHA1(2432930b88b9b5e7acc19cdcac7262199545ac2a) )
+	ROM_LOAD( "4_oct6-82.bin",   0x4000, 0x1000, CRC(b72084ec) SHA1(c0508951c2ad8dc31481be8b3bfee2063e3fb0d7) )
+	ROM_LOAD( "5_oct11-82.bin",  0x5000, 0x1000, CRC(770570cf) SHA1(43ead8236f53d39041ffc21bdeef10b3a77ce7f2) )
+	ROM_LOAD( "6_oct11-82.bin",  0x6000, 0x1000, CRC(af7b12c4) SHA1(207ed466546f40ca60a38031b83aef61446902e2) )
+	ROM_LOAD( "7_oct11-82.bin",  0x7000, 0x1000, CRC(1350ca0e) SHA1(40619973d69176b05fa160372306ad50693db021) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "ep1640.92",    0x0000, 0x1000, CRC(d7eec6cd) SHA1(e542bcc28f292be9a0a29d949de726e0b55e654a) ) /* tiles (bank 1), not dumped for this set but same label */

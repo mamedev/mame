@@ -321,27 +321,28 @@ WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
 	m_sc_layer[3]->mark_tile_dirty(offset);
 }
 
-ADDRESS_MAP_START(seicupbl_state::cupsocbl_mem)
+void seicupbl_state::cupsocbl_mem(address_map &map)
+{
 //  AM_IMPORT_FROM( legionna_cop_mem )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100400, 0x1005ff) AM_DEVREADWRITE("seibucop_boot", seibu_cop_bootleg_device, copdxbl_0_r,copdxbl_0_w) AM_SHARE("cop_mcu_ram")
-	AM_RANGE(0x100660, 0x10066f) AM_RAM AM_SHARE("vregs")
-	AM_RANGE(0x100700, 0x100701) AM_READ_PORT("DSW1")
-	AM_RANGE(0x100704, 0x100705) AM_READ_PORT("PLAYERS12")
-	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")
-	AM_RANGE(0x10070c, 0x10070d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x10071c, 0x10071d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100740, 0x100741) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(vram_sc0_w) AM_SHARE("back_data")
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(vram_sc2_w) AM_SHARE("fore_data")
-	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(vram_sc1_w) AM_SHARE("mid_data")
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(vram_sc3_w) AM_SHARE("textram")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x104000, 0x106fff) AM_RAM
-	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x107800, 0x107fff) AM_RAM
-	AM_RANGE(0x108000, 0x11ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x000000, 0x0fffff).rom();
+	map(0x100400, 0x1005ff).rw("seibucop_boot", FUNC(seibu_cop_bootleg_device::copdxbl_0_r), FUNC(seibu_cop_bootleg_device::copdxbl_0_w)).share("cop_mcu_ram");
+	map(0x100660, 0x10066f).ram().share("vregs");
+	map(0x100700, 0x100701).portr("DSW1");
+	map(0x100704, 0x100705).portr("PLAYERS12");
+	map(0x100708, 0x100709).portr("PLAYERS34");
+	map(0x10070c, 0x10070d).portr("SYSTEM");
+	map(0x10071c, 0x10071d).portr("DSW2");
+	map(0x100741, 0x100741).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x100800, 0x100fff).ram().w(this, FUNC(seicupbl_state::vram_sc0_w)).share("back_data");
+	map(0x101000, 0x1017ff).ram().w(this, FUNC(seicupbl_state::vram_sc2_w)).share("fore_data");
+	map(0x101800, 0x101fff).ram().w(this, FUNC(seicupbl_state::vram_sc1_w)).share("mid_data");
+	map(0x102000, 0x102fff).ram().w(this, FUNC(seicupbl_state::vram_sc3_w)).share("textram");
+	map(0x103000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x104000, 0x106fff).ram();
+	map(0x107000, 0x1077ff).ram().share("spriteram");
+	map(0x107800, 0x107fff).ram();
+	map(0x108000, 0x11ffff).ram();
+}
 
 WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
 {
@@ -349,13 +350,14 @@ WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
 	m_oki->set_rom_bank(data & 0x7);
 }
 
-ADDRESS_MAP_START(seicupbl_state::cupsocbl_sound_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(okim_rombank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void seicupbl_state::cupsocbl_sound_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(this, FUNC(seicupbl_state::okim_rombank_w));
+	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( cupsoc )

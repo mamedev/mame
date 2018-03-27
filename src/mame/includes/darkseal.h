@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail
 
 #include "machine/gen_latch.h"
+#include "cpu/h6280/h6280.h"
 #include "video/deco16ic.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
@@ -26,7 +27,7 @@ public:
 		m_generic_paletteram2_16(*this, "paletteram2") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<h6280_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;

@@ -182,25 +182,27 @@ READ8_MEMBER(sderby2_state::sub_io_0_r)
  2KB of palette per screen? (0x7FF)
 
 */
-ADDRESS_MAP_START(sderby2_state::main_program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM // Is this banked?
-ADDRESS_MAP_END
+void sderby2_state::main_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xcfff).ram();
+	map(0xe000, 0xe3ff).ram();
+	map(0xe400, 0xe7ff).ram();
+	map(0xe800, 0xebff).ram();
+	map(0xec00, 0xefff).ram();
+	map(0xf000, 0xffff).ram(); // Is this banked?
+}
 
-ADDRESS_MAP_START(sderby2_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ(host_r)
-	AM_RANGE(0x20, 0x20) AM_WRITE(sub_nmi)
-	AM_RANGE(0x30, 0x30) AM_WRITENOP // Written with 0x12 byte sequence at start
-	AM_RANGE(0x40, 0x40) AM_WRITE(host_io_40_w) // Occasionally written
-ADDRESS_MAP_END
+void sderby2_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).r(this, FUNC(sderby2_state::host_r));
+	map(0x20, 0x20).w(this, FUNC(sderby2_state::sub_nmi));
+	map(0x30, 0x30).nopw(); // Written with 0x12 byte sequence at start
+	map(0x40, 0x40).w(this, FUNC(sderby2_state::host_io_40_w)); // Occasionally written
+}
 
 
 /*
@@ -210,25 +212,27 @@ ADDRESS_MAP_END
 18 x 2148  (1024x4) Side
  4 x 2148  (1024x4) Near 316-5012 and 316-5011
 */
-ADDRESS_MAP_START(sderby2_state::sub_program_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+void sderby2_state::sub_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 
-	AM_RANGE(0xc000, 0xcfff) AM_RAM // Tested at FFF, 1016, 102D
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM // 2KB Tested
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM // 2KB Tested at 105B
-	AM_RANGE(0xd800, 0xdbff) AM_RAM // 2KB Tested at 105B
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM // 2KB Tested at 10B7
+	map(0xc000, 0xcfff).ram(); // Tested at FFF, 1016, 102D
+	map(0xd000, 0xd3ff).ram(); // 2KB Tested
+	map(0xd400, 0xd7ff).ram(); // 2KB Tested at 105B
+	map(0xd800, 0xdbff).ram(); // 2KB Tested at 105B
+	map(0xdc00, 0xdfff).ram(); // 2KB Tested at 10B7
 
-	AM_RANGE(0xe000, 0xffff) AM_RAM // Tested at FE8
-ADDRESS_MAP_END
+	map(0xe000, 0xffff).ram(); // Tested at FE8
+}
 
-ADDRESS_MAP_START(sderby2_state::sub_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sub_io_0_r)
-	AM_RANGE(0x20, 0x20) AM_READ(sub_r)
-	AM_RANGE(0x40, 0x40) AM_WRITE(main_nmi)
-	AM_RANGE(0x60, 0x60) AM_WRITENOP // Written with 0x12 byte sequence at start
-ADDRESS_MAP_END
+void sderby2_state::sub_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(sderby2_state::sub_io_0_r));
+	map(0x20, 0x20).r(this, FUNC(sderby2_state::sub_r));
+	map(0x40, 0x40).w(this, FUNC(sderby2_state::main_nmi));
+	map(0x60, 0x60).nopw(); // Written with 0x12 byte sequence at start
+}
 
 
 /*************************************

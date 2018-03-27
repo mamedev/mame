@@ -690,46 +690,48 @@ WRITE32_MEMBER(namconb1_state::share_w)
 	COMBINE_DATA(m_namconb_shareram+offset*2);
 }
 
-ADDRESS_MAP_START(namconb1_state::namconb1_am)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_READ(gunbulet_gun_r)
-	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
-	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(share_r, share_w)
-	AM_RANGE(0x208000, 0x2fffff) AM_RAM
-	AM_RANGE(0x400000, 0x40001f) AM_READWRITE8(namconb1_cpureg_r, namconb1_cpureg_w, 0xffffffff)
-	AM_RANGE(0x580000, 0x5807ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
-	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
-	AM_RANGE(0x620000, 0x620007) AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
-	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE16(c123_tilemap_videoram_r,c123_tilemap_videoram_w,0xffffffff)
-	AM_RANGE(0x660000, 0x66003f) AM_READWRITE16(c123_tilemap_control_r,c123_tilemap_control_w,0xffffffff)
-	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_SHARE("spritebank32")
-	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0x700000, 0x707fff) AM_DEVREADWRITE8("c116", namco_c116_device, read, write, 0xffffffff)
-ADDRESS_MAP_END
+void namconb1_state::namconb1_am(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x10001f).r(this, FUNC(namconb1_state::gunbulet_gun_r));
+	map(0x1c0000, 0x1cffff).ram();
+	map(0x1e4000, 0x1e4003).rw(this, FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
+	map(0x200000, 0x207fff).rw(this, FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
+	map(0x208000, 0x2fffff).ram();
+	map(0x400000, 0x40001f).rw(this, FUNC(namconb1_state::namconb1_cpureg_r), FUNC(namconb1_state::namconb1_cpureg_w));
+	map(0x580000, 0x5807ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0x600000, 0x61ffff).rw(this, FUNC(namconb1_state::c355_obj_ram_r), FUNC(namconb1_state::c355_obj_ram_w)).share("objram");
+	map(0x620000, 0x620007).rw(this, FUNC(namconb1_state::c355_obj_position_r), FUNC(namconb1_state::c355_obj_position_w));
+	map(0x640000, 0x64ffff).rw(this, FUNC(namconb1_state::c123_tilemap_videoram_r), FUNC(namconb1_state::c123_tilemap_videoram_w));
+	map(0x660000, 0x66003f).rw(this, FUNC(namconb1_state::c123_tilemap_control_r), FUNC(namconb1_state::c123_tilemap_control_w));
+	map(0x680000, 0x68000f).ram().share("spritebank32");
+	map(0x6e0000, 0x6e001f).r(this, FUNC(namconb1_state::custom_key_r)).nopw();
+	map(0x700000, 0x707fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
+}
 
-ADDRESS_MAP_START(namconb1_state::namconb2_am)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
-	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(share_r, share_w)
-	AM_RANGE(0x208000, 0x2fffff) AM_RAM
-	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("data", 0)
-	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE16(c355_obj_ram_r,c355_obj_ram_w,0xffffffff) AM_SHARE("objram")
-	AM_RANGE(0x620000, 0x620007) AM_READWRITE16(c355_obj_position_r,c355_obj_position_w,0xffffffff)
-	AM_RANGE(0x640000, 0x64000f) AM_RAM /* unknown xy offset */
-	AM_RANGE(0x680000, 0x68ffff) AM_READWRITE16(c123_tilemap_videoram_r,c123_tilemap_videoram_w,0xffffffff)
-	AM_RANGE(0x6c0000, 0x6c003f) AM_READWRITE16(c123_tilemap_control_r,c123_tilemap_control_w,0xffffffff)
-	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE16(c169_roz_videoram_r,c169_roz_videoram_w,0xffffffff) AM_SHARE("rozvideoram")
-	AM_RANGE(0x740000, 0x74001f) AM_READWRITE16(c169_roz_control_r,c169_roz_control_w,0xffffffff)
-	AM_RANGE(0x800000, 0x807fff) AM_DEVREADWRITE8("c116", namco_c116_device, read, write, 0xffffffff)
-	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_SHARE("spritebank32")
-	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_SHARE("tilebank32")
-	AM_RANGE(0x980000, 0x98000f) AM_READWRITE16(c169_roz_bank_r,c169_roz_bank_w,0xffffffff)
-	AM_RANGE(0xa00000, 0xa007ff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xffffffff)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE8(namconb2_cpureg_r, namconb2_cpureg_w, 0xffffffff)
-ADDRESS_MAP_END
+void namconb1_state::namconb2_am(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x1c0000, 0x1cffff).ram();
+	map(0x1e4000, 0x1e4003).rw(this, FUNC(namconb1_state::randgen_r), FUNC(namconb1_state::srand_w));
+	map(0x200000, 0x207fff).rw(this, FUNC(namconb1_state::share_r), FUNC(namconb1_state::share_w));
+	map(0x208000, 0x2fffff).ram();
+	map(0x400000, 0x4fffff).rom().region("data", 0);
+	map(0x600000, 0x61ffff).rw(this, FUNC(namconb1_state::c355_obj_ram_r), FUNC(namconb1_state::c355_obj_ram_w)).share("objram");
+	map(0x620000, 0x620007).rw(this, FUNC(namconb1_state::c355_obj_position_r), FUNC(namconb1_state::c355_obj_position_w));
+	map(0x640000, 0x64000f).ram(); /* unknown xy offset */
+	map(0x680000, 0x68ffff).rw(this, FUNC(namconb1_state::c123_tilemap_videoram_r), FUNC(namconb1_state::c123_tilemap_videoram_w));
+	map(0x6c0000, 0x6c003f).rw(this, FUNC(namconb1_state::c123_tilemap_control_r), FUNC(namconb1_state::c123_tilemap_control_w));
+	map(0x700000, 0x71ffff).rw(this, FUNC(namconb1_state::c169_roz_videoram_r), FUNC(namconb1_state::c169_roz_videoram_w)).share("rozvideoram");
+	map(0x740000, 0x74001f).rw(this, FUNC(namconb1_state::c169_roz_control_r), FUNC(namconb1_state::c169_roz_control_w));
+	map(0x800000, 0x807fff).rw(m_c116, FUNC(namco_c116_device::read), FUNC(namco_c116_device::write));
+	map(0x900008, 0x90000f).ram().share("spritebank32");
+	map(0x940000, 0x94000f).ram().share("tilebank32");
+	map(0x980000, 0x98000f).rw(this, FUNC(namconb1_state::c169_roz_bank_r), FUNC(namconb1_state::c169_roz_bank_w));
+	map(0xa00000, 0xa007ff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0xc00000, 0xc0001f).r(this, FUNC(namconb1_state::custom_key_r)).nopw();
+	map(0xf00000, 0xf0001f).rw(this, FUNC(namconb1_state::namconb2_cpureg_r), FUNC(namconb1_state::namconb2_cpureg_w));
+}
 
 WRITE16_MEMBER(namconb1_state::mcu_shared_w)
 {
@@ -752,11 +754,12 @@ WRITE16_MEMBER(namconb1_state::mcu_shared_w)
 	}
 }
 
-ADDRESS_MAP_START(namconb1_state::namcoc75_am)
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_SHARE("namconb_share")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
-ADDRESS_MAP_END
+void namconb1_state::namcoc75_am(address_map &map)
+{
+	map(0x002000, 0x002fff).rw("c352", FUNC(c352_device::read), FUNC(c352_device::write));
+	map(0x004000, 0x00bfff).ram().w(this, FUNC(namconb1_state::mcu_shared_w)).share("namconb_share");
+	map(0x200000, 0x27ffff).rom().region("c75data", 0);
+}
 
 
 READ8_MEMBER(namconb1_state::port6_r)
@@ -835,18 +838,19 @@ READ8_MEMBER(namconb1_state::dac0_r)// bit 6
 	return (m_p3.read_safe(0xff)<<7)&0x80;
 }
 
-ADDRESS_MAP_START(namconb1_state::namcoc75_io)
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(port6_r, port6_w)
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ(port7_r)
-	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ(dac7_r)
-	AM_RANGE(M37710_ADC6_L, M37710_ADC6_L) AM_READ(dac6_r)
-	AM_RANGE(M37710_ADC5_L, M37710_ADC5_L) AM_READ(dac5_r)
-	AM_RANGE(M37710_ADC4_L, M37710_ADC4_L) AM_READ(dac4_r)
-	AM_RANGE(M37710_ADC3_L, M37710_ADC3_L) AM_READ(dac3_r)
-	AM_RANGE(M37710_ADC2_L, M37710_ADC2_L) AM_READ(dac2_r)
-	AM_RANGE(M37710_ADC1_L, M37710_ADC1_L) AM_READ(dac1_r)
-	AM_RANGE(M37710_ADC0_L, M37710_ADC0_L) AM_READ(dac0_r)
-ADDRESS_MAP_END
+void namconb1_state::namcoc75_io(address_map &map)
+{
+	map(M37710_PORT6, M37710_PORT6).rw(this, FUNC(namconb1_state::port6_r), FUNC(namconb1_state::port6_w));
+	map(M37710_PORT7, M37710_PORT7).r(this, FUNC(namconb1_state::port7_r));
+	map(M37710_ADC7_L, M37710_ADC7_L).r(this, FUNC(namconb1_state::dac7_r));
+	map(M37710_ADC6_L, M37710_ADC6_L).r(this, FUNC(namconb1_state::dac6_r));
+	map(M37710_ADC5_L, M37710_ADC5_L).r(this, FUNC(namconb1_state::dac5_r));
+	map(M37710_ADC4_L, M37710_ADC4_L).r(this, FUNC(namconb1_state::dac4_r));
+	map(M37710_ADC3_L, M37710_ADC3_L).r(this, FUNC(namconb1_state::dac3_r));
+	map(M37710_ADC2_L, M37710_ADC2_L).r(this, FUNC(namconb1_state::dac2_r));
+	map(M37710_ADC1_L, M37710_ADC1_L).r(this, FUNC(namconb1_state::dac1_r));
+	map(M37710_ADC0_L, M37710_ADC0_L).r(this, FUNC(namconb1_state::dac0_r));
+}
 
 
 /****************************************************************************/

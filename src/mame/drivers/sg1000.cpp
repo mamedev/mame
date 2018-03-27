@@ -123,48 +123,52 @@ WRITE8_MEMBER( sg1000_state::peripheral_w )
     ADDRESS_MAP( sg1000_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::sg1000_map)
-	AM_RANGE(0x0000, 0xbfff) AM_DEVREADWRITE(CARTSLOT_TAG, sega8_cart_slot_device, read_cart, write_cart)
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_RAM
-ADDRESS_MAP_END
+void sg1000_state::sg1000_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(m_cart, FUNC(sega8_cart_slot_device::read_cart), FUNC(sega8_cart_slot_device::write_cart));
+	map(0xc000, 0xc3ff).mirror(0x3c00).ram();
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( sg1000_io_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::sg1000_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-	AM_RANGE(0xdc, 0xdf) AM_READWRITE(peripheral_r, peripheral_w)
-ADDRESS_MAP_END
+void sg1000_state::sg1000_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
+	map(0xdc, 0xdf).rw(this, FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( omv_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::omv_map)
-	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(omv_r, omv_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
-ADDRESS_MAP_END
+void sg1000_state::omv_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(this, FUNC(sg1000_state::omv_r), FUNC(sg1000_state::omv_w));
+	map(0xc000, 0xc7ff).mirror(0x3800).ram();
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( omv_io_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::omv_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x38) AM_READ_PORT("C0")
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x38) AM_READ_PORT("C1")
-	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x38) AM_READ_PORT("C2")
-	AM_RANGE(0xc3, 0xc3) AM_MIRROR(0x38) AM_READ_PORT("C3")
-	AM_RANGE(0xc4, 0xc4) AM_MIRROR(0x3a) AM_READ_PORT("C4")
-	AM_RANGE(0xc5, 0xc5) AM_MIRROR(0x3a) AM_READ_PORT("C5")
-ADDRESS_MAP_END
+void sg1000_state::omv_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
+	map(0xc0, 0xc0).mirror(0x38).portr("C0");
+	map(0xc1, 0xc1).mirror(0x38).portr("C1");
+	map(0xc2, 0xc2).mirror(0x38).portr("C2");
+	map(0xc3, 0xc3).mirror(0x38).portr("C3");
+	map(0xc4, 0xc4).mirror(0x3a).portr("C4");
+	map(0xc5, 0xc5).mirror(0x3a).portr("C5");
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( sc3000_map )
@@ -202,26 +206,28 @@ ADDRESS_MAP_END
     ADDRESS_MAP( sf7000_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sf7000_state::sf7000_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void sf7000_state::sf7000_map(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1").bankw("bank2");
+	map(0x4000, 0xffff).ram();
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( sf7000_io_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sf7000_state::sf7000_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-	AM_RANGE(0xdc, 0xdf) AM_READWRITE(peripheral_r, peripheral_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVICE(UPD765_TAG, upd765a_device, map)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(UPD9255_1_TAG, i8255_device, read, write)
-	AM_RANGE(0xe8, 0xe8) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0xe9, 0xe9) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void sf7000_state::sf7000_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
+	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
+	map(0xdc, 0xdf).rw(this, FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
+	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
+	map(0xe4, 0xe7).rw(UPD9255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe8, 0xe8).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xe9, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 /***************************************************************************
     INPUT PORTS

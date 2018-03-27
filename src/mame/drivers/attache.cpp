@@ -183,7 +183,7 @@ public:
 	void attache(machine_config &config);
 	void attache_io(address_map &map);
 	void attache_map(address_map &map);
-private:
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_rom;
 	required_device<ram_device> m_ram;
@@ -900,55 +900,60 @@ WRITE_LINE_MEMBER(attache816_state::x86_dsr)
 	// TODO: /DSR to Z8530 SCC
 }
 
-ADDRESS_MAP_START(attache_state::attache_map)
-	AM_RANGE(0x0000,0x1fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x2000,0x3fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x4000,0x5fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x6000,0x7fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x8000,0x9fff) AM_RAMBANK("bank5")
-	AM_RANGE(0xa000,0xbfff) AM_RAMBANK("bank6")
-	AM_RANGE(0xc000,0xdfff) AM_RAMBANK("bank7")
-	AM_RANGE(0xe000,0xffff) AM_RAMBANK("bank8")
-ADDRESS_MAP_END
+void attache_state::attache_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankrw("bank1");
+	map(0x2000, 0x3fff).bankrw("bank2");
+	map(0x4000, 0x5fff).bankrw("bank3");
+	map(0x6000, 0x7fff).bankrw("bank4");
+	map(0x8000, 0x9fff).bankrw("bank5");
+	map(0xa000, 0xbfff).bankrw("bank6");
+	map(0xc000, 0xdfff).bankrw("bank7");
+	map(0xe000, 0xffff).bankrw("bank8");
+}
 
-ADDRESS_MAP_START(attache_state::attache_io)
-	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
-	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xf0, 0xf1) AM_DEVREADWRITE("sio",z80sio_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write) AM_MIRROR(0xff00)
-	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
-	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(display_data_r, display_data_w) AM_SELECT(0xff00)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(memmap_r, memmap_w) AM_MIRROR(0xff00)
-ADDRESS_MAP_END
+void attache_state::attache_io(address_map &map)
+{
+	map(0xe0, 0xed).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).mirror(0xff00);
+	map(0xee, 0xee).w(this, FUNC(attache_state::display_command_w)).mirror(0xff00);
+	map(0xef, 0xef).rw(this, FUNC(attache_state::dma_mask_r), FUNC(attache_state::dma_mask_w)).mirror(0xff00);
+	map(0xf0, 0xf1).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).mirror(0xff00);
+	map(0xf4, 0xf7).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).mirror(0xff00);
+	map(0xf8, 0xfb).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).mirror(0xff00);
+	map(0xfc, 0xfd).m(m_fdc, FUNC(upd765a_device::map)).mirror(0xff00);
+	map(0xfe, 0xfe).rw(this, FUNC(attache_state::display_data_r), FUNC(attache_state::display_data_w)).select(0xff00);
+	map(0xff, 0xff).rw(this, FUNC(attache_state::memmap_r), FUNC(attache_state::memmap_w)).mirror(0xff00);
+}
 
-ADDRESS_MAP_START(attache816_state::attache816_io)
-	AM_RANGE(0xb8, 0xb8) AM_READWRITE(z80_comms_status_r, z80_comms_ctrl_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xb9, 0xb9) AM_READWRITE(z80_comms_r, z80_comms_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xe0, 0xed) AM_DEVREADWRITE("dma",am9517a_device,read,write) AM_MIRROR(0xff00)
-	AM_RANGE(0xee, 0xee) AM_WRITE(display_command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xef, 0xef) AM_READWRITE(dma_mask_r, dma_mask_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xf0, 0xf1) AM_DEVREADWRITE("sio",z80sio_device,ba_cd_r, ba_cd_w) AM_MIRROR(0xff00)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("ctc",z80ctc_device,read,write) AM_MIRROR(0xff00)
-	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("pio",z80pio_device,read_alt,write_alt) AM_MIRROR(0xff00)
-	AM_RANGE(0xfc, 0xfd) AM_DEVICE("fdc",upd765a_device,map) AM_MIRROR(0xff00)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(display_data_r, display_data_w) AM_SELECT(0xff00)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(memmap_r, memmap_w) AM_MIRROR(0xff00)
-ADDRESS_MAP_END
+void attache816_state::attache816_io(address_map &map)
+{
+	map(0xb8, 0xb8).rw(this, FUNC(attache816_state::z80_comms_status_r), FUNC(attache816_state::z80_comms_ctrl_w)).mirror(0xff00);
+	map(0xb9, 0xb9).rw(this, FUNC(attache816_state::z80_comms_r), FUNC(attache816_state::z80_comms_w)).mirror(0xff00);
+	map(0xe0, 0xed).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).mirror(0xff00);
+	map(0xee, 0xee).w(this, FUNC(attache816_state::display_command_w)).mirror(0xff00);
+	map(0xef, 0xef).rw(this, FUNC(attache816_state::dma_mask_r), FUNC(attache816_state::dma_mask_w)).mirror(0xff00);
+	map(0xf0, 0xf1).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).mirror(0xff00);
+	map(0xf4, 0xf7).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).mirror(0xff00);
+	map(0xf8, 0xfb).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt)).mirror(0xff00);
+	map(0xfc, 0xfd).m(m_fdc, FUNC(upd765a_device::map)).mirror(0xff00);
+	map(0xfe, 0xfe).rw(this, FUNC(attache816_state::display_data_r), FUNC(attache816_state::display_data_w)).select(0xff00);
+	map(0xff, 0xff).rw(this, FUNC(attache816_state::memmap_r), FUNC(attache816_state::memmap_w)).mirror(0xff00);
+}
 
-ADDRESS_MAP_START(attache816_state::attache_x86_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0xb0000, 0xbffff) AM_NOP  // triggers IRQ?
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("x86bios",0x0000)
-ADDRESS_MAP_END
+void attache816_state::attache_x86_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+	map(0xb0000, 0xbffff).noprw();  // triggers IRQ?
+	map(0xfe000, 0xfffff).rom().region("x86bios", 0x0000);
+}
 
-ADDRESS_MAP_START(attache816_state::attache_x86_io)
-	AM_RANGE(0x100, 0x107) AM_DEVREADWRITE8("ppi",i8255_device,read,write,0x00ff)
-	AM_RANGE(0x108, 0x10d) AM_WRITE8(x86_iobf_enable_w,0xffff);
+void attache816_state::attache_x86_io(address_map &map)
+{
+	map(0x100, 0x107).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x108, 0x10d).w(this, FUNC(attache816_state::x86_iobf_enable_w));
 // 0x140/2/4/6 - Z8530 SCC serial
 // 0x180/2/4/6/8/a/c/e - GPIB (TMS9914A)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START(attache)
 	PORT_START("row0")

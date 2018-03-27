@@ -153,26 +153,27 @@ WRITE_LINE_MEMBER(mpu4dealem_state::dealem_vsync_changed)
  *
  *************************************/
 
-ADDRESS_MAP_START(mpu4dealem_state::dealem_memmap)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+void mpu4dealem_state::dealem_memmap(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
 /*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
+	map(0x0900, 0x0907).rw(m_6840ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));/* PTM6840 IC2 */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)        /* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)        /* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)        /* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)        /* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)        /* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)        /* PIA6821 IC8 */
+	map(0x0a00, 0x0a03).rw(m_pia3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC3 */
+	map(0x0b00, 0x0b03).rw(m_pia4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC4 */
+	map(0x0c00, 0x0c03).rw(m_pia5, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC5 */
+	map(0x0d00, 0x0d03).rw(m_pia6, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC6 */
+	map(0x0e00, 0x0e03).rw(m_pia7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC7 */
+	map(0x0f00, 0x0f03).rw(m_pia8, FUNC(pia6821_device::read), FUNC(pia6821_device::write));        /* PIA6821 IC8 */
 
-	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_SHARE("dealem_videoram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITENOP/* 64k  paged ROM (4 pages) */
-ADDRESS_MAP_END
+	map(0x1000, 0x2fff).ram().share("dealem_videoram");
+	map(0x8000, 0xffff).rom().nopw();/* 64k  paged ROM (4 pages) */
+}
 
 MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
 {

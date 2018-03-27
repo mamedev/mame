@@ -644,83 +644,88 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(alpha68k_state::kyros_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM                       // main program
-	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_SHARE("shared_ram")  // work RAM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM AM_SHARE("spriteram") // sprite RAM
-	AM_RANGE(0x060000, 0x060001) AM_RAM AM_SHARE("videoram")  // MSB: watchdog, LSB: BGC
-	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE(kyros_alpha_trigger_r, alpha_microcontroller_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE(kyros_dip_r, kyros_sound_w)
-ADDRESS_MAP_END
+void alpha68k_state::kyros_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();                       // main program
+	map(0x020000, 0x020fff).ram().share("shared_ram");  // work RAM
+	map(0x040000, 0x041fff).ram().share("spriteram"); // sprite RAM
+	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
+	map(0x080000, 0x0801ff).rw(this, FUNC(alpha68k_state::kyros_alpha_trigger_r), FUNC(alpha68k_state::alpha_microcontroller_w));
+	map(0x0c0000, 0x0c0001).portr("IN0");
+	map(0x0e0000, 0x0e0001).rw(this, FUNC(alpha68k_state::kyros_dip_r), FUNC(alpha68k_state::kyros_sound_w));
+}
 
-ADDRESS_MAP_START(alpha68k_state::alpha68k_I_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM                         // main program
-	AM_RANGE(0x080000, 0x083fff) AM_RAM                         // work RAM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")   // video RAM
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN3") AM_WRITENOP // LSB: DSW0, MSB: watchdog(?)
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("IN4")            // LSB: DSW1
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")            // joy1, joy2
-	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("IN1")            // coin, start, service
-	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN2") AM_WRITE(paddlema_soundlatch_w) // LSB: sound latch write and RST38 trigger, joy3, joy4
-ADDRESS_MAP_END
+void alpha68k_state::alpha68k_I_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();                         // main program
+	map(0x080000, 0x083fff).ram();                         // work RAM
+	map(0x100000, 0x103fff).ram().share("spriteram");   // video RAM
+	map(0x180000, 0x180001).portr("IN3").nopw(); // LSB: DSW0, MSB: watchdog(?)
+	map(0x180008, 0x180009).portr("IN4");            // LSB: DSW1
+	map(0x300000, 0x300001).portr("IN0");            // joy1, joy2
+	map(0x340000, 0x340001).portr("IN1");            // coin, start, service
+	map(0x380000, 0x380001).portr("IN2").w(this, FUNC(alpha68k_state::paddlema_soundlatch_w)); // LSB: sound latch write and RST38 trigger, joy3, joy4
+}
 
-ADDRESS_MAP_START(alpha68k_state::alpha68k_II_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r) /* Joysticks */
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(alpha68k_II_sound_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(control_2_r) /* CN1 & Dip 1 */
-	AM_RANGE(0x0c0000, 0x0c00ff) AM_WRITE(alpha68k_II_video_bank_w)
-	AM_RANGE(0x0c8000, 0x0c8001) AM_READ(control_3_r) /* Bottom of CN2 */
-	AM_RANGE(0x0d0000, 0x0d0001) AM_READ(control_4_r) /* Top of CN1 & CN2 */
-	AM_RANGE(0x0d8000, 0x0d8001) AM_READNOP /* IRQ ack? */
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* IRQ ack? */
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP /* watchdog? */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(alpha68k_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x300000, 0x3001ff) AM_READWRITE(alpha_II_trigger_r, alpha_microcontroller_w)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
-ADDRESS_MAP_END
+void alpha68k_state::alpha68k_II_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x040fff).ram().share("shared_ram");
+	map(0x080000, 0x080001).r(this, FUNC(alpha68k_state::control_1_r)); /* Joysticks */
+	map(0x080000, 0x080001).w(this, FUNC(alpha68k_state::alpha68k_II_sound_w));
+	map(0x0c0000, 0x0c0001).r(this, FUNC(alpha68k_state::control_2_r)); /* CN1 & Dip 1 */
+	map(0x0c0000, 0x0c00ff).w(this, FUNC(alpha68k_state::alpha68k_II_video_bank_w));
+	map(0x0c8000, 0x0c8001).r(this, FUNC(alpha68k_state::control_3_r)); /* Bottom of CN2 */
+	map(0x0d0000, 0x0d0001).r(this, FUNC(alpha68k_state::control_4_r)); /* Top of CN1 & CN2 */
+	map(0x0d8000, 0x0d8001).nopr(); /* IRQ ack? */
+	map(0x0e0000, 0x0e0001).nopr(); /* IRQ ack? */
+	map(0x0e8000, 0x0e8001).nopr(); /* watchdog? */
+	map(0x100000, 0x100fff).ram().w(this, FUNC(alpha68k_state::alpha68k_videoram_w)).share("videoram");
+	map(0x200000, 0x207fff).ram().share("spriteram");
+	map(0x300000, 0x3001ff).rw(this, FUNC(alpha68k_state::alpha_II_trigger_r), FUNC(alpha68k_state::alpha_microcontroller_w));
+	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x800000, 0x83ffff).bankr("bank8");
+}
 
-ADDRESS_MAP_START(alpha68k_state::alpha68k_V_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("shared_ram")
-	AM_RANGE(0x080000, 0x080001) AM_READWRITE(control_1_r, alpha68k_V_sound_w) /* Joysticks */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(control_2_V_r) /* Dip 2 */
-	AM_RANGE(0x0c0000, 0x0c00ff) AM_WRITE(alpha68k_V_video_control_w)
-	AM_RANGE(0x0d8000, 0x0d8001) AM_READNOP /* IRQ ack? */
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* IRQ ack? */
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP /* watchdog? */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(alpha68k_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x300000, 0x303fff) AM_READ(alpha_V_trigger_r)
-	AM_RANGE(0x300000, 0x3001ff) AM_WRITE(alpha_microcontroller_w)
-	AM_RANGE(0x303e00, 0x303fff) AM_WRITE(alpha_microcontroller_w) /* Gang Wars mirror */
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
-ADDRESS_MAP_END
+void alpha68k_state::alpha68k_V_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x043fff).ram().share("shared_ram");
+	map(0x080000, 0x080001).rw(this, FUNC(alpha68k_state::control_1_r), FUNC(alpha68k_state::alpha68k_V_sound_w)); /* Joysticks */
+	map(0x0c0000, 0x0c0001).r(this, FUNC(alpha68k_state::control_2_V_r)); /* Dip 2 */
+	map(0x0c0000, 0x0c00ff).w(this, FUNC(alpha68k_state::alpha68k_V_video_control_w));
+	map(0x0d8000, 0x0d8001).nopr(); /* IRQ ack? */
+	map(0x0e0000, 0x0e0001).nopr(); /* IRQ ack? */
+	map(0x0e8000, 0x0e8001).nopr(); /* watchdog? */
+	map(0x100000, 0x100fff).ram().w(this, FUNC(alpha68k_state::alpha68k_videoram_w)).share("videoram");
+	map(0x200000, 0x207fff).ram().share("spriteram");
+	map(0x300000, 0x303fff).r(this, FUNC(alpha68k_state::alpha_V_trigger_r));
+	map(0x300000, 0x3001ff).w(this, FUNC(alpha68k_state::alpha_microcontroller_w));
+	map(0x303e00, 0x303fff).w(this, FUNC(alpha68k_state::alpha_microcontroller_w)); /* Gang Wars mirror */
+	map(0x400000, 0x401fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x800000, 0x83ffff).bankr("bank8");
+}
 
 READ16_MEMBER(alpha68k_state::sound_cpu_r){ return 1; }
 
-ADDRESS_MAP_START(alpha68k_state::tnextspc_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x070000, 0x073fff) AM_RAM
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0d0000, 0x0d0001) AM_WRITENOP // unknown write port (0)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("P1")
-	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("P2")
-	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0e0006, 0x0e0007) AM_WRITENOP // unknown write port (0)
-	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0e000e, 0x0e000f) AM_WRITENOP // unknown write port (0)
-	AM_RANGE(0x0e0018, 0x0e0019) AM_READ(sound_cpu_r)
-	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(tnextspc_unknown_w)
-	AM_RANGE(0x0f0002, 0x0f0005) AM_WRITE(tnextspc_coin_counters_w)
-	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(tnextspc_soundlatch_w)
-ADDRESS_MAP_END
+void alpha68k_state::tnextspc_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x070000, 0x073fff).ram();
+	map(0x0a0000, 0x0a3fff).ram().share("spriteram");
+	map(0x0d0000, 0x0d0001).nopw(); // unknown write port (0)
+	map(0x0e0000, 0x0e0001).portr("P1");
+	map(0x0e0002, 0x0e0003).portr("P2");
+	map(0x0e0004, 0x0e0005).portr("SYSTEM");
+	map(0x0e0006, 0x0e0007).nopw(); // unknown write port (0)
+	map(0x0e0008, 0x0e0009).portr("DSW1");
+	map(0x0e000a, 0x0e000b).portr("DSW2");
+	map(0x0e000e, 0x0e000f).nopw(); // unknown write port (0)
+	map(0x0e0018, 0x0e0019).r(this, FUNC(alpha68k_state::sound_cpu_r));
+	map(0x0f0000, 0x0f0001).w(this, FUNC(alpha68k_state::tnextspc_unknown_w));
+	map(0x0f0002, 0x0f0005).w(this, FUNC(alpha68k_state::tnextspc_coin_counters_w));
+	map(0x0f0008, 0x0f0009).w(this, FUNC(alpha68k_state::tnextspc_soundlatch_w));
+}
 
 /******************************************************************************/
 
@@ -729,19 +734,21 @@ WRITE8_MEMBER(alpha68k_state::sound_bank_w)
 	membank("bank7")->set_entry(data);
 }
 
-ADDRESS_MAP_START(alpha68k_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank7")
-ADDRESS_MAP_END
+void alpha68k_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xc000, 0xffff).bankr("bank7");
+}
 
-ADDRESS_MAP_START(alpha68k_state::kyros_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe006, 0xe00e) AM_WRITENOP // soundboard I/O's, ignored
+void alpha68k_state::kyros_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xe002, 0xe002).w(m_soundlatch, FUNC(generic_latch_8_device::clear_w));
+	map(0xe004, 0xe004).w("dac", FUNC(dac_byte_interface::write));
+	map(0xe006, 0xe00e).nopw(); // soundboard I/O's, ignored
 /* reference only
     AM_RANGE(0xe006, 0xe006) AM_WRITENOP // NMI: diminishing saw-tooth
     AM_RANGE(0xe008, 0xe008) AM_WRITENOP // NMI: 00
@@ -749,72 +756,80 @@ ADDRESS_MAP_START(alpha68k_state::kyros_sound_map)
     AM_RANGE(0xe00c, 0xe00c) AM_WRITENOP // RST30: 00 on entry
     AM_RANGE(0xe00e, 0xe00e) AM_WRITENOP // RST30: 00,02,ff on exit(0x1d88)
 */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(alpha68k_state::sstingry_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc100, 0xc100) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc102, 0xc102) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0xc104, 0xc104) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xc106, 0xc10e) AM_WRITENOP // soundboard I/O's, ignored
-ADDRESS_MAP_END
+void alpha68k_state::sstingry_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xc100, 0xc100).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc102, 0xc102).w(m_soundlatch, FUNC(generic_latch_8_device::clear_w));
+	map(0xc104, 0xc104).w("dac", FUNC(dac_byte_interface::write));
+	map(0xc106, 0xc10e).nopw(); // soundboard I/O's, ignored
+}
 
-ADDRESS_MAP_START(alpha68k_state::jongbou_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void alpha68k_state::jongbou_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
 
-ADDRESS_MAP_START(alpha68k_state::alpha68k_I_s_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
-	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xfc00, 0xfc00) AM_RAM // unknown port
-ADDRESS_MAP_END
+void alpha68k_state::alpha68k_I_s_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xe000, 0xe000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::clear_w));
+	map(0xe800, 0xe800).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0xec00, 0xec00).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0xf000, 0xf7ff).ram();
+	map(0xfc00, 0xfc00).ram(); // unknown port
+}
 
 
-ADDRESS_MAP_START(alpha68k_state::tnextspc_sound_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
-ADDRESS_MAP_END
+void alpha68k_state::tnextspc_sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::clear_w));
+}
 
-ADDRESS_MAP_START(alpha68k_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x0a, 0x0b) AM_DEVWRITE("ym2", ym2413_device, write)
-	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(sound_bank_w)
-ADDRESS_MAP_END
+void alpha68k_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::clear_w));
+	map(0x08, 0x08).w("dac", FUNC(dac_byte_interface::write));
+	map(0x0a, 0x0b).w("ym2", FUNC(ym2413_device::write));
+	map(0x0c, 0x0d).w("ym1", FUNC(ym2203_device::write));
+	map(0x0e, 0x0e).w(this, FUNC(alpha68k_state::sound_bank_w));
+}
 
-ADDRESS_MAP_START(alpha68k_state::kyros_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ym2", ym2203_device, write_port_w)
-	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ym2", ym2203_device, control_port_w)
-	AM_RANGE(0x90, 0x90) AM_DEVWRITE("ym3", ym2203_device, write_port_w)
-	AM_RANGE(0x91, 0x91) AM_DEVWRITE("ym3", ym2203_device, control_port_w)
-ADDRESS_MAP_END
+void alpha68k_state::kyros_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x11).w("ym1", FUNC(ym2203_device::write));
+	map(0x80, 0x80).w("ym2", FUNC(ym2203_device::write_port_w));
+	map(0x81, 0x81).w("ym2", FUNC(ym2203_device::control_port_w));
+	map(0x90, 0x90).w("ym3", FUNC(ym2203_device::write_port_w));
+	map(0x91, 0x91).w("ym3", FUNC(ym2203_device::control_port_w));
+}
 
-ADDRESS_MAP_START(alpha68k_state::jongbou_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
-	AM_RANGE(0x06, 0x06) AM_WRITENOP
-ADDRESS_MAP_END
+void alpha68k_state::jongbou_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::clear_w));
+	map(0x06, 0x06).nopw();
+}
 
-ADDRESS_MAP_START(alpha68k_state::tnextspc_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
-	AM_RANGE(0x3b, 0x3b) AM_READNOP // unknown read port
-	AM_RANGE(0x3d, 0x3d) AM_READNOP // unknown read port
-	AM_RANGE(0x7b, 0x7b) AM_READNOP // unknown read port
-ADDRESS_MAP_END
+void alpha68k_state::tnextspc_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0x3b, 0x3b).nopr(); // unknown read port
+	map(0x3d, 0x3d).nopr(); // unknown read port
+	map(0x7b, 0x7b).nopr(); // unknown read port
+}
 
 /******************************************************************************/
 

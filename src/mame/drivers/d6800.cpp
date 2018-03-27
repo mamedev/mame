@@ -110,13 +110,14 @@ private:
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(d6800_state::d6800_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0200, 0x0fff) AM_RAM
-	AM_RANGE(0x8010, 0x8013) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_ROM
-ADDRESS_MAP_END
+void d6800_state::d6800_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x0100, 0x01ff).ram().share("videoram");
+	map(0x0200, 0x0fff).ram();
+	map(0x8010, 0x8013).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc000, 0xc7ff).mirror(0x3800).rom();
+}
 
 /* Input Ports */
 

@@ -219,8 +219,9 @@ DRIVER_INIT_MEMBER(ssystem3_state,ssystem3)
 	ssystem3_lcd_reset();
 }
 
-ADDRESS_MAP_START(ssystem3_state::ssystem3_map)
-	AM_RANGE( 0x0000, 0x03ff) AM_RAM
+void ssystem3_state::ssystem3_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
 					/*
 67-de playfield ($40 means white, $80 black)
 					*/
@@ -229,10 +230,10 @@ ADDRESS_MAP_START(ssystem3_state::ssystem3_map)
   probably zusatzger??t memory (battery powered ram 256x4? at 0x4000)
   $40ff low nibble ram if playfield module (else init with normal playfield)
  */
-	AM_RANGE( 0x6000, 0x600f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
-	AM_RANGE( 0xc000, 0xdfff) AM_ROM
-	AM_RANGE( 0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x6000, 0x600f).rw(m_via6522_0, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xc000, 0xdfff).rom();
+	map(0xf000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( ssystem3 )
 /*

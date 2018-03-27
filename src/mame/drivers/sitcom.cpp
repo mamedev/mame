@@ -141,25 +141,28 @@ protected:
 };
 
 
-ADDRESS_MAP_START(sitcom_state::sitcom_bank)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("bootstrap", 0)
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void sitcom_state::sitcom_bank(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom().region("bootstrap", 0);
+	map(0x8000, 0xffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(sitcom_state::sitcom_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_DEVICE("bank", address_map_bank_device, amap8)
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void sitcom_state::sitcom_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).m(m_bank, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(sitcom_state::sitcom_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x1c) AM_DEVREADWRITE("pia", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x1c) AM_DEVWRITE("ds0", dl1414_device, bus_w)
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x1c) AM_DEVWRITE("ds1", dl1414_device, bus_w)
-ADDRESS_MAP_END
+void sitcom_state::sitcom_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x1c).rw("pia", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc0, 0xc3).mirror(0x1c).w("ds0", FUNC(dl1414_device::bus_w));
+	map(0xe0, 0xe3).mirror(0x1c).w("ds1", FUNC(dl1414_device::bus_w));
+}
 
 
 INPUT_PORTS_START( sitcom )

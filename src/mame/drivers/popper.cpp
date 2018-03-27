@@ -120,36 +120,38 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(popper_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_NOP
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM
-	AM_RANGE(0xc100, 0xc6ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xc700, 0xc8ff) AM_RAM
-	AM_RANGE(0xc900, 0xceff) AM_RAM AM_SHARE("attribute_ram")
-	AM_RANGE(0xcf00, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("shared")
-	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0x03fc) AM_READ(inputs_r)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_WRITE(nmi_control_w)
-	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_WRITE(crt_direction_w)
-	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_WRITE(back_color_select_w)
-	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_WRITE(vram_page_select_w)
-	AM_RANGE(0xe004, 0xe007) AM_MIRROR(0x1ff8) AM_WRITE(intcycle_w)
-	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ(subcpu_nmi_r)
-	AM_RANGE(0xe800, 0xf7ff) AM_NOP
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03ff) AM_READ(subcpu_reset_r)
-	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x03ff) AM_READ(watchdog_clear_r)
-ADDRESS_MAP_END
+void popper_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).noprw();
+	map(0xc000, 0xc0ff).ram();
+	map(0xc100, 0xc6ff).ram().share("video_ram");
+	map(0xc700, 0xc8ff).ram();
+	map(0xc900, 0xceff).ram().share("attribute_ram");
+	map(0xcf00, 0xcfff).ram();
+	map(0xd000, 0xd7ff).ram().share("sprite_ram");
+	map(0xd800, 0xdfff).ram().share("shared");
+	map(0xe000, 0xe003).mirror(0x03fc).r(this, FUNC(popper_state::inputs_r));
+	map(0xe000, 0xe000).mirror(0x1ff8).w(this, FUNC(popper_state::nmi_control_w));
+	map(0xe001, 0xe001).mirror(0x1ff8).w(this, FUNC(popper_state::crt_direction_w));
+	map(0xe002, 0xe002).mirror(0x1ff8).w(this, FUNC(popper_state::back_color_select_w));
+	map(0xe003, 0xe003).mirror(0x1ff8).w(this, FUNC(popper_state::vram_page_select_w));
+	map(0xe004, 0xe007).mirror(0x1ff8).w(this, FUNC(popper_state::intcycle_w));
+	map(0xe400, 0xe400).mirror(0x03ff).r(this, FUNC(popper_state::subcpu_nmi_r));
+	map(0xe800, 0xf7ff).noprw();
+	map(0xf800, 0xf800).mirror(0x03ff).r(this, FUNC(popper_state::subcpu_reset_r));
+	map(0xfc00, 0xfc00).mirror(0x03ff).r(this, FUNC(popper_state::watchdog_clear_r));
+}
 
-ADDRESS_MAP_START(popper_state::sub_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(ay1_w)
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay2", ay8910_device, write_bc1_bc2)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("shared")
-	AM_RANGE(0xe000, 0xffff) AM_NOP
-ADDRESS_MAP_END
+void popper_state::sub_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).noprw();
+	map(0x8000, 0x8003).mirror(0x1ffc).w(this, FUNC(popper_state::ay1_w));
+	map(0xa000, 0xa003).mirror(0x1ffc).w("ay2", FUNC(ay8910_device::write_bc1_bc2));
+	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("shared");
+	map(0xe000, 0xffff).noprw();
+}
 
 
 //**************************************************************************

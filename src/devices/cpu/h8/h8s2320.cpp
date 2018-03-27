@@ -3,15 +3,15 @@
 #include "emu.h"
 #include "h8s2320.h"
 
-DEFINE_DEVICE_TYPE(H8S2320, h8s2320_device, "h8s2320", "H8S/2320")
-DEFINE_DEVICE_TYPE(H8S2321, h8s2321_device, "h8s2321", "H8S/2321")
-DEFINE_DEVICE_TYPE(H8S2322, h8s2322_device, "h8s2322", "H8S/2322")
-DEFINE_DEVICE_TYPE(H8S2323, h8s2323_device, "h8s2323", "H8S/2323")
-DEFINE_DEVICE_TYPE(H8S2324, h8s2324_device, "h8s2324", "H8S/2324")
-DEFINE_DEVICE_TYPE(H8S2326, h8s2326_device, "h8s2326", "H8S/2326")
-DEFINE_DEVICE_TYPE(H8S2327, h8s2327_device, "h8s2327", "H8S/2327")
-DEFINE_DEVICE_TYPE(H8S2328, h8s2328_device, "h8s2328", "H8S/2328")
-DEFINE_DEVICE_TYPE(H8S2329, h8s2329_device, "h8s2329", "H8S/2329")
+DEFINE_DEVICE_TYPE(H8S2320, h8s2320_device, "h8s2320", "Hitachi H8S/2320")
+DEFINE_DEVICE_TYPE(H8S2321, h8s2321_device, "h8s2321", "Hitachi H8S/2321")
+DEFINE_DEVICE_TYPE(H8S2322, h8s2322_device, "h8s2322", "Hitachi H8S/2322")
+DEFINE_DEVICE_TYPE(H8S2323, h8s2323_device, "h8s2323", "Hitachi H8S/2323")
+DEFINE_DEVICE_TYPE(H8S2324, h8s2324_device, "h8s2324", "Hitachi H8S/2324")
+DEFINE_DEVICE_TYPE(H8S2326, h8s2326_device, "h8s2326", "Hitachi H8S/2326")
+DEFINE_DEVICE_TYPE(H8S2327, h8s2327_device, "h8s2327", "Hitachi H8S/2327")
+DEFINE_DEVICE_TYPE(H8S2328, h8s2328_device, "h8s2328", "Hitachi H8S/2328")
+DEFINE_DEVICE_TYPE(H8S2329, h8s2329_device, "h8s2329", "Hitachi H8S/2329")
 
 
 h8s2320_device::h8s2320_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :

@@ -37,11 +37,12 @@ public:
 };
 
 
-ADDRESS_MAP_START(mk90_state::mk90_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM // RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROM // Extension ROM
-	AM_RANGE(0x8000, 0xffff) AM_ROM // Main ROM
+void mk90_state::mk90_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram(); // RAM
+	map(0x4000, 0x7fff).rom(); // Extension ROM
+	map(0x8000, 0xffff).rom(); // Main ROM
 //  AM_RANGE(0xe800, 0xe801) LCD address
 //  AM_RANGE(0xe802, 0xe803) LCD data
 //  AM_RANGE(0xe810, 0xe810) serial bus controller data
@@ -49,7 +50,7 @@ ADDRESS_MAP_START(mk90_state::mk90_mem)
 //  AM_RANGE(0xe814, 0xe814) serial bus controller control/status
 //  AM_RANGE(0xe816, 0xe816) serial bus controller command
 //  AM_RANGE(0xea00, 0xea7e) RTC
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mk90 )

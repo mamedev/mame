@@ -23,11 +23,12 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_CASPER, bbc_tube_casper_device, "bbc_tube_casper", "
 //  ADDRESS_MAP( tube_casper_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_casper_device::tube_casper_mem)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_REGION("casper_rom", 0)
-	AM_RANGE(0x10000, 0x1001f) AM_DEVREADWRITE8("via6522_1",via6522_device, read, write, 0xff)
-	AM_RANGE(0x20000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+void bbc_tube_casper_device::tube_casper_mem(address_map &map)
+{
+	map(0x00000, 0x03fff).rom().region("casper_rom", 0);
+	map(0x10000, 0x1001f).rw("via6522_1", FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+	map(0x20000, 0x3ffff).ram();
+}
 
 //-------------------------------------------------
 //  ROM( tube_casper )
