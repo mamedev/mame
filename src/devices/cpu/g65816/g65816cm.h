@@ -11,7 +11,7 @@
 
 
 #undef G65816_CALL_DEBUGGER
-#define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(this, x)
+#define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(x)
 
 #define g65816_read_8(addr)             m_data_space->read_byte(addr)
 #define g65816_write_8(addr,data)       m_data_space->write_byte(addr,data)

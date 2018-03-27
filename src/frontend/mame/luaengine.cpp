@@ -1231,16 +1231,13 @@ void lua_engine::initialize()
 			"visible_cpu", sol::property([](debugger_manager &debug) { debug.cpu().get_visible_cpu(); },
 				[](debugger_manager &debug, device_t &dev) { debug.cpu().set_visible_cpu(&dev); }),
 			"execution_state", sol::property([](debugger_manager &debug) {
-					int execstate = debug.cpu().execution_state();
-					if(execstate == 0)
-						return "stop";
-					return "run";
+					return debug.cpu().is_stopped() ? "stop" : "run";
 				},
 				[](debugger_manager &debug, const std::string &state) {
-					int execstate = 1;
 					if(state == "stop")
-						execstate = 0;
-					debug.cpu().set_execution_state(execstate);
+						debug.cpu().set_execution_stopped();
+					else
+						debug.cpu().set_execution_running();
 				}));
 
 	sol().registry().new_usertype<wrap_textbuf>("text_buffer", "new", sol::no_constructor,

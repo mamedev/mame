@@ -3329,7 +3329,7 @@ void i386_device::i386_common_init()
 	m_ferr_handler.resolve_safe();
 	m_ferr_handler(0);
 
-	m_icountptr = &m_cycles;
+	set_icountptr(m_cycles);
 }
 
 void i386_device::device_start()
@@ -3964,7 +3964,7 @@ void i386_device::execute_run()
 		m_segment_prefix = 0;
 		m_prev_eip = m_eip;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if(m_delayed_interrupt_enable != 0)
 		{

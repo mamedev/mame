@@ -134,7 +134,7 @@ mcs40_cpu_device_base::mcs40_cpu_device_base(
 
 void mcs40_cpu_device_base::device_start()
 {
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_spaces[AS_ROM]            = &space(AS_ROM);
 	m_spaces[AS_RAM_MEMORY]     = &space(AS_RAM_MEMORY);
@@ -594,7 +594,7 @@ inline void mcs40_cpu_device_base::do_a1()
 	{
 		m_pcbase = rom_bank() | m_rom_addr;
 		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-			debugger_instruction_hook(this, pc());
+			debugger_instruction_hook(pc());
 		if (m_stop_latch)
 		{
 			m_stp = (ASSERT_LINE == m_stp) ? ASSERT_LINE : CLEAR_LINE;

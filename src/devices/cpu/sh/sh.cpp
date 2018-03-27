@@ -80,7 +80,7 @@ void sh_common_execution::device_start()
 	state_add(STATE_GENSP, "GENSP", m_sh2_state->r[15]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sh2_state->sr).formatstr("%20s").noshow();
 
-	m_icountptr = &m_sh2_state->icount;
+	set_icountptr(m_sh2_state->icount);
 
 	m_program = &space(AS_PROGRAM);
 }

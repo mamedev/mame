@@ -1669,7 +1669,7 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void upd7810_device::device_start()
@@ -1900,7 +1900,7 @@ void upd7810_device::execute_run()
 	{
 		int cc;
 
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		PPC = PC;
 		RDOP(OP);

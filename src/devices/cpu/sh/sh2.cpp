@@ -393,7 +393,7 @@ void sh2_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, m_sh2_state->pc);
+		debugger_instruction_hook(m_sh2_state->pc);
 
 		const uint16_t opcode = m_program->read_word(m_sh2_state->pc & SH12_AM);
 

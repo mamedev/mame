@@ -286,7 +286,7 @@ void i8257_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_out_hrq_cb.resolve_safe();

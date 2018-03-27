@@ -220,7 +220,7 @@ void tx0_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("0%06O").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_ir).noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -255,7 +255,7 @@ void tx0_64kw_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 
 		if (m_ioh && m_ios)
@@ -358,7 +358,7 @@ void tx0_8kw_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 
 		if (m_ioh && m_ios)

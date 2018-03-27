@@ -234,13 +234,17 @@ private:
 	void program_map(address_map &map);
 
 	// instruction execution
-	void execute_one_rom();
-	void execute_one_cache();
+	template <bool Debugger, bool Caching> void execute_some_rom();
+	template <bool Debugger> void execute_some_cache();
 	void overlap_rom_data_read();
 	void yaau_short_immediate_load(u16 op);
 	s16 yaau_read(u16 op);
 	void yaau_write(u16 op, s16 value);
 	void yaau_write_z(u16 op);
+
+	// built-in peripherals
+	void sio_step();
+	void pio_step();
 
 	// inline helpers
 	static bool op_interruptible(u16 op);

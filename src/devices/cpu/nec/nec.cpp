@@ -443,7 +443,7 @@ void nec_common_device::device_start()
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void nec_common_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -525,7 +525,7 @@ void nec_common_device::execute_run()
 	if (m_halted)
 	{
 		m_icount = 0;
-		debugger_instruction_hook(this, (Sreg(PS)<<4) + m_ip);
+		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
 		return;
 	}
 
@@ -543,7 +543,7 @@ void nec_common_device::execute_run()
 		if (m_no_interrupt)
 			m_no_interrupt--;
 
-		debugger_instruction_hook(this, (Sreg(PS)<<4) + m_ip);
+		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
 		prev_ICount = m_icount;
 		(this->*s_nec_instruction[fetchop()])();
 		do_prefetch(prev_ICount);

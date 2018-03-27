@@ -588,7 +588,7 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_FL2,     "FL2",       m_fl2).mask(1);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1156,7 +1156,7 @@ void adsp21xx_device::execute_set_input(int inputnum, int state)
 void adsp21xx_device::execute_run()
 {
 	// Return if CPU is halted
-	if (m_input[INPUT_LINE_HALT].m_curstate) {
+	if (current_input_state(INPUT_LINE_HALT)) {
 		m_icount = 0;
 		return;
 	}
@@ -1170,7 +1170,7 @@ void adsp21xx_device::execute_run()
 		// debugging
 		m_ppc = m_pc;   // copy PC to previous PC
 		if (check_debugger)
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 
 #if ADSP_TRACK_HOTSPOTS
 		m_pcbucket[m_pc & 0x3fff]++;
