@@ -79,8 +79,7 @@ public:
 	DECLARE_READ32_MEMBER(s1945_input_r);
 	DECLARE_READ32_MEMBER(s1945bl_oki_r);
 	DECLARE_WRITE32_MEMBER(s1945bl_oki_w);
-	DECLARE_WRITE8_MEMBER(sngkace_sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(gunbird_sound_bankswitch_w);
+	template<int Shift> DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(z80_nmi_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);

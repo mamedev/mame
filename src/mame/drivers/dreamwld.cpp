@@ -319,7 +319,7 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 		// Test mode only, Other size is enable?
 		int size = (layer_ctrl[layer] & 0x0400) >> 10;
 		tmptilemap[layer] = m_tilemap[layer][size];
-		int row_mask = size ? 0x1ff : 0x3ff;
+		int row_mask = 0x3ff >> size;
 
 		tmptilemap[layer]->set_scrolly(0, scrolly[layer]);
 

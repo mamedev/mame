@@ -70,6 +70,7 @@ This was pointed out by Bart Puype
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
 #include "sound/okim6295.h"
@@ -261,6 +262,12 @@ void psikyo_state::psikyo_map(address_map &map)
 	map(0xfe0000, 0xffffff).ram();                                                     // RAM
 }
 
+template<int Shift>
+WRITE8_MEMBER(psikyo_state::sound_bankswitch_w)
+{
+	m_audiobank->set_entry((data >> Shift) & 0x03);
+}
+
 READ32_MEMBER(psikyo_state::s1945bl_oki_r)
 {
 	uint8_t dat = m_oki->read(space, 0);
@@ -336,11 +343,6 @@ void psikyo_state::sngkace_map(address_map &map)
 	map(0xc00013, 0xc00013).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
-WRITE8_MEMBER(psikyo_state::sngkace_sound_bankswitch_w)
-{
-	m_audiobank->set_entry(data & 0x03);
-}
-
 void psikyo_state::sngkace_sound_map(address_map &map)
 {
 	map(0x0000, 0x77ff).rom();                         // ROM
@@ -352,7 +354,7 @@ void psikyo_state::sngkace_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0x04, 0x04).w(this, FUNC(psikyo_state::sngkace_sound_bankswitch_w));
+	map(0x04, 0x04).w(this, FUNC(psikyo_state::sound_bankswitch_w<0>));
 	map(0x08, 0x08).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0c, 0x0c).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
@@ -387,11 +389,6 @@ void psikyo_state::s1945jn_map(address_map &map)
 	map(0xc00011, 0xc00011).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
-WRITE8_MEMBER(psikyo_state::gunbird_sound_bankswitch_w)
-{
-	m_audiobank->set_entry((data >> 4) & 0x03);
-}
-
 void psikyo_state::gunbird_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();                         // ROM
@@ -402,7 +399,7 @@ void psikyo_state::gunbird_sound_map(address_map &map)
 void psikyo_state::gunbird_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(psikyo_state::gunbird_sound_bankswitch_w));
+	map(0x00, 0x00).w(this, FUNC(psikyo_state::sound_bankswitch_w<4>));
 	map(0x04, 0x07).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x08, 0x08).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0c, 0x0c).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
@@ -435,7 +432,7 @@ void psikyo_state::s1945_map(address_map &map)
 void psikyo_state::s1945_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(psikyo_state::gunbird_sound_bankswitch_w));
+	map(0x00, 0x00).w(this, FUNC(psikyo_state::sound_bankswitch_w<4>));
 	map(0x02, 0x03).nopw();
 	map(0x08, 0x0d).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 	map(0x10, 0x10).r(m_soundlatch, FUNC(generic_latch_8_device::read));
@@ -1037,7 +1034,6 @@ MACHINE_CONFIG_START(psikyo_state::sngkace)
 	MCFG_CPU_PROGRAM_MAP(sngkace_sound_map)
 	MCFG_CPU_IO_MAP(sngkace_sound_io_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.3)
@@ -1084,7 +1080,6 @@ MACHINE_CONFIG_START(psikyo_state::gunbird)
 	MCFG_CPU_PROGRAM_MAP(gunbird_sound_map)
 	MCFG_CPU_IO_MAP(gunbird_sound_io_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.3)
@@ -1125,7 +1120,6 @@ MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unp
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
 	MCFG_CPU_PROGRAM_MAP(psikyo_bootleg_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1169,8 +1163,8 @@ MACHINE_CONFIG_START(psikyo_state::s1945)
 	MCFG_CPU_PROGRAM_MAP(gunbird_sound_map)
 	MCFG_CPU_IO_MAP(s1945_sound_io_map)
 
-	/* MCU should go here */
-
+	MCFG_CPU_ADD("mcu", PIC16C57, 4000000)  /* 4 MHz? */
+	MCFG_DEVICE_DISABLE()   /* Internal ROM aren't dumped */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1199,9 +1193,6 @@ MACHINE_CONFIG_START(psikyo_state::s1945)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 MACHINE_CONFIG_END
-
-
-
 
 
 /***************************************************************************
@@ -1371,7 +1362,6 @@ ROM_START( gunbirdk )
 
 	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
-
 ROM_END
 
 ROM_START( gunbirdj )
@@ -1399,7 +1389,6 @@ ROM_START( gunbirdj )
 
 	ROM_REGION( 0x040000, "spritelut", 0 )  /* Sprites LUT */
 	ROM_LOAD( "u3.bin",  0x000000, 0x040000, CRC(0905aeb2) SHA1(8cca09f7dfe3f804e77515f7b1b1bdbeb7bb3d80) )
-
 ROM_END
 
 
@@ -1432,7 +1421,6 @@ ROM_START( btlkroad )
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u69", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "tibpal16l8.u19", 0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-
 ROM_END
 
 
@@ -1465,7 +1453,6 @@ ROM_START( btlkroadk )
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u69", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 	ROM_LOAD( "tibpal16l8.u19", 0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-
 ROM_END
 
 /***************************************************************************
@@ -1621,7 +1608,7 @@ ROM_START( s1945 )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 
-	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU? */
+	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU? */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
@@ -1649,7 +1636,7 @@ ROM_START( s1945a )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 
-	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU? */
+	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU? */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
@@ -1677,7 +1664,7 @@ ROM_START( s1945j )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 
-	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU */
+	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
@@ -1705,7 +1692,7 @@ ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no eff
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 
-	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU */
+	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
@@ -1755,7 +1742,7 @@ ROM_START( tengai )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
-	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU */
+	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
 	ROM_REGION( 0x600000, "gfx1", 0 )   /* Sprites */
@@ -1783,7 +1770,7 @@ ROM_START( tengaij )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
-	ROM_REGION( 0x000100, "cpu2", 0 )       /* MCU */
+	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU */
 	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
 
 	ROM_REGION( 0x600000, "gfx1", 0 )   /* Sprites */
