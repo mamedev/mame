@@ -18,6 +18,7 @@ local extlibs = {
 	utf8proc   = { "utf8proc",  "3rdparty/utf8proc" },
 	glm        = { "glm",       "3rdparty/glm" },
 	rapidjson  = { "rapidjson", "3rdparty/rapidjson/include" },
+	pugixml    = { "pugixml",   "3rdparty/pugixml/src" },
 }
 
 -- system lib options
@@ -79,6 +80,11 @@ newoption {
 newoption {
 	trigger = "with-system-rapidjson",
 	description = "Use system rapidjson library",
+}
+
+newoption {
+	trigger = "with-system-pugixml",
+	description = "Use system pugixml library",
 }
 
 -- build helpers

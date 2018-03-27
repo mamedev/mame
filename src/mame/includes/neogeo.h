@@ -30,8 +30,8 @@
 class neogeo_state : public driver_device
 {
 public:
-	neogeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	neogeo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_upd4990a(*this, "upd4990a"),
@@ -59,12 +59,9 @@ public:
 		m_ctrl2(*this, "ctrl2"),
 		m_use_cart_vectors(0),
 		m_use_cart_audio(0),
-		m_slot1(*this, "cslot1"),
-		m_slot2(*this, "cslot2"),
-		m_slot3(*this, "cslot3"),
-		m_slot4(*this, "cslot4"),
-		m_slot5(*this, "cslot5"),
-		m_slot6(*this, "cslot6")
+		m_slots(*this, "cslot%u", 1U),
+		m_digits(*this, "digit%u", 1U),
+		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	DECLARE_READ16_MEMBER(memcard_r);
@@ -254,15 +251,11 @@ protected:
 	// temporary helper to restore memory banking while bankswitch is handled in the driver...
 	uint32_t m_bank_base;
 
-	optional_device<neogeo_cart_slot_device> m_slot1;
-	optional_device<neogeo_cart_slot_device> m_slot2;
-	optional_device<neogeo_cart_slot_device> m_slot3;
-	optional_device<neogeo_cart_slot_device> m_slot4;
-	optional_device<neogeo_cart_slot_device> m_slot5;
-	optional_device<neogeo_cart_slot_device> m_slot6;
+	optional_device_array<neogeo_cart_slot_device, 6> m_slots;
+	output_finder<4> m_digits;
+	output_finder<6> m_lamps;
 
 	int m_curr_slot;
-	neogeo_cart_slot_device* m_slots[6];
 
 private:
 	void update_interrupts();

@@ -83,7 +83,6 @@ public:
 
 	void set_cpuregion(const char *tag) { m_cputag = tag; }
 
-	void decocpu1_map(address_map &map);
 protected:
 	static constexpr device_timer_id TIMER_IRQ = 0;
 
@@ -94,6 +93,8 @@ protected:
 	virtual void device_start() override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	void decocpu1_map(address_map &map);
 
 	required_device<cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia21;

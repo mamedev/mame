@@ -2640,7 +2640,7 @@ ROM_START( explbrkr ) /* MASTER UP= 92/10/08 20:10:16 */
 	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
 ROM_END
 
-ROM_START( explbrkrk ) /* MASTER UP= 92/10/08 21:35:56 - No "For use in Korea.." but as the KA+<cat image> logo which was only used in Korea */
+ROM_START( explbrkrk ) /* MASTER UP= 92/10/08 21:35:56 - No "For use in Korea.." but has the KA+<cat image> logo which was only used in Korea; the Kaneko logo is scratched out on all custom ICs */
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* 68000 Code */
 	ROM_LOAD16_BYTE( "u18", 0x000000, 0x040000, CRC(08267644) SHA1(8a5c638b414d2b1a8bb68e0d8ba6747253734e82) ) /* TMS 27C020 with non descript label "MF" */
 	ROM_LOAD16_BYTE( "u19", 0x000001, 0x040000, CRC(f0a243b1) SHA1(3448c85c9388b590ea28b9adcaf81b68c14c678c) ) /* TMS 27C020 with non descript label "MF" */

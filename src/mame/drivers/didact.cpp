@@ -101,6 +101,7 @@ class didact_state : public driver_device
 		, m_led(0)
 		, m_rs232(*this, "rs232")
 	{ }
+
 	required_ioport_array<5> m_io_lines;
 	uint8_t m_lines[4];
 	uint8_t m_reset;
@@ -155,13 +156,15 @@ public:
 		: didact_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_tb16_74145(*this, "tb16_74145")
-		, m_segments(0)
 		, m_pia1(*this, PIA1_TAG)
 		, m_pia2(*this, PIA2_TAG)
+		, m_7segs(*this, "digit%u", 0U)
+		, m_segments(0)
 	{ }
-	required_device<m6802_cpu_device> m_maincpu;
-	required_device<ttl74145_device> m_tb16_74145;
-	uint8_t m_segments;
+
+	void md6802(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER( pia2_kbA_r );
 	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
 	DECLARE_READ8_MEMBER( pia2_kbB_r );
@@ -170,11 +173,16 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	void md6802(machine_config &config);
+
 	void md6802_map(address_map &map);
-protected:
+
+private:
+	required_device<m6802_cpu_device> m_maincpu;
+	required_device<ttl74145_device> m_tb16_74145;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
+	output_finder<6> m_7segs;
+	uint8_t m_segments;
 };
 
 /* Keyboard */
@@ -210,16 +218,12 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 /* Pull the cathodes low enabling the correct digit and lit the segments held by port B */
 WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 {
-	uint8_t digit_nbr;
-
 //  LOG("--->%s(%02x)\n", FUNCNAME, data);
 
-	digit_nbr = (data >> 4) & 0x07;
-	m_tb16_74145->write( digit_nbr );
+	uint8_t const digit_nbr((data >> 4) & 0x07);
+	m_tb16_74145->write(digit_nbr);
 	if (digit_nbr < 6)
-	{
-		output().set_digit_value( digit_nbr, m_segments);
-	}
+		m_7segs[digit_nbr] = m_segments;
 }
 
 /* PIA 2 Port B is all outputs to drive the display so it is very unlikelly that this function is called */
@@ -253,9 +257,12 @@ WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
 void md6802_state::machine_start()
 {
 	LOG("--->%s()\n", FUNCNAME);
+
+	m_7segs.resolve();
+
+	save_item(NAME(m_reset));
 	save_item(NAME(m_shift));
 	save_item(NAME(m_led));
-	save_item(NAME(m_reset));
 }
 
 void md6802_state::machine_reset()
