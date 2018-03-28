@@ -513,10 +513,11 @@ uint32_t psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 
 		tmptilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
 
+	// TODO : is this correct?
 	if (layers_ctrl & 1)
 		bgpen = ((layer_ctrl[0] & 8) ? 0x800 : 0x80f);
 	else if (layers_ctrl & 2)
-		bgpen = ((layer_ctrl[0] & 8) ? 0xc00 : 0xc0f);
+		bgpen = ((layer_ctrl[1] & 8) ? 0xc00 : 0xc0f);
 	else
 		bgpen = m_palette->black_pen(); // TODO
 
@@ -639,10 +640,11 @@ uint32_t psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitma
 		tmptilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
 	
+	// TODO : is this correct?
 	if (layers_ctrl & 1)
 		bgpen = ((layer_ctrl[0] & 8) ? 0x800 : 0x80f);
 	else if (layers_ctrl & 2)
-		bgpen = ((layer_ctrl[0] & 8) ? 0xc00 : 0xc0f);
+		bgpen = ((layer_ctrl[1] & 8) ? 0xc00 : 0xc0f);
 	else
 		bgpen = m_palette->black_pen(); // TODO
 
