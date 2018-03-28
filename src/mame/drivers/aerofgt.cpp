@@ -1391,13 +1391,6 @@ static GFXDECODE_START( turbofrc )
 	GFXDECODE_ENTRY( "gfx4", 0, pspikes_spritelayout, 768, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( aerofgtb )
-	GFXDECODE_ENTRY( "gfx1", 0, pspikes_charlayout,      0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, pspikes_charlayout,    256, 16 )
-	GFXDECODE_ENTRY( "spritegfx", 0, pspikes_spritelayout, 512, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, pspikes_spritelayout, 768, 16 )
-GFXDECODE_END
-
 static GFXDECODE_START( aerofgt )
 	GFXDECODE_ENTRY( "gfx1", 0, aerofgt_charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, aerofgt_charlayout,   256, 16 )
@@ -1927,7 +1920,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_SCREEN_UPDATE_DRIVER(aerofgt_state, screen_update_turbofrc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aerofgtb)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
