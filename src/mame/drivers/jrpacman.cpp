@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jrpacman_state, screen_update_pacman)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jrpacman_state, i,kvblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jrpacman_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jrpacman)
 	MCFG_PALETTE_ADD("palette", 128*4)
