@@ -40,8 +40,10 @@ class amico2k_state : public driver_device
 {
 public:
 	amico2k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	void machine_start() override;
 
@@ -50,15 +52,16 @@ public:
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi_pb_w );
 
-	int m_ls145_p;
-	uint8_t m_segment;
-
 	// timers
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
-	required_device<cpu_device> m_maincpu;
 	void amico2k(machine_config &config);
 	void amico2k_mem(address_map &map);
+private:
+	int m_ls145_p;
+	uint8_t m_segment;
+	required_device<cpu_device> m_maincpu;
+	output_finder<6> m_digits;
 };
 
 
@@ -109,7 +112,7 @@ TIMER_CALLBACK_MEMBER(amico2k_state::led_refresh)
 {
 	if (m_ls145_p > 3)
 	{
-		output().set_digit_value(m_ls145_p - 4, m_segment);
+		m_digits[m_ls145_p - 4] = m_segment;
 	}
 }
 
@@ -202,6 +205,7 @@ WRITE8_MEMBER( amico2k_state::ppi_pb_w )
 
 void amico2k_state::machine_start()
 {
+	m_digits.resolve();
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(amico2k_state::led_refresh),this));
 
 	// state saving
