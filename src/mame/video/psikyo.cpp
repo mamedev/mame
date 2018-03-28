@@ -421,6 +421,7 @@ int psikyo_state::tilemap_width( int size )
 
 uint32_t psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	uint16_t bgpen = 0;
 	int i, layers_ctrl = -1;
 
 	uint32_t tmsize[2];
@@ -512,7 +513,14 @@ uint32_t psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 
 		tmptilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	if (layers_ctrl & 1)
+		bgpen = ((layer_ctrl[0] & 8) ? 0x800 : 0x80f);
+	else if (layers_ctrl & 2)
+		bgpen = ((layer_ctrl[0] & 8) ? 0xc00 : 0xc0f);
+	else
+		bgpen = m_palette->black_pen(); // TODO
+
+	bitmap.fill(bgpen, cliprect);
 
 	screen.priority().fill(0, cliprect);
 
@@ -538,6 +546,7 @@ uint32_t psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 
 
 uint32_t psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	uint16_t bgpen = 0;
 	int i, layers_ctrl = -1;
 
 	uint32_t tmsize[2];
@@ -629,8 +638,15 @@ uint32_t psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitma
 		}
 		tmptilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
+	
+	if (layers_ctrl & 1)
+		bgpen = ((layer_ctrl[0] & 8) ? 0x800 : 0x80f);
+	else if (layers_ctrl & 2)
+		bgpen = ((layer_ctrl[0] & 8) ? 0xc00 : 0xc0f);
+	else
+		bgpen = m_palette->black_pen(); // TODO
 
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(bgpen, cliprect);
 
 	screen.priority().fill(0, cliprect);
 
