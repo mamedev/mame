@@ -367,7 +367,7 @@ static const gfx_layout layout_16x16x8 =
 	RGN_FRAC(1,1),
 	8,
 	{ STEP4(0,1), STEP4(16,1) },
-	{ STEP4(0,4), STEP4(4*8,4), STEP4(8*8,4), STEP4(12*8,4) },
+	{ STEP4(0,4), STEP4(16*2,4), STEP4(16*4,4), STEP4(16*6,4) },
 	{ STEP16(0,16*8) },
 	16*16*8
 };
