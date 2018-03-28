@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_pspikes_tile_info)
 	uint16_t code = m_vram[0][tile_index];
 	int bank = (code & 0x1000) >> 12;
 	SET_TILE_INFO_MEMBER(0,
-			(code & 0x0fff) + (m_gfxbank[bank] << 12),
+			(code & 0x0fff) | (m_gfxbank[bank] << 12),
 			((code & 0xe000) >> 13) + 8 * m_charpalettebank,
 			0);
 }
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_tile_info)
 {
 	uint16_t code = m_vram[Layer][tile_index];
 	SET_TILE_INFO_MEMBER(Layer,
-			(code & 0x1fff) + (m_gfxbank[Layer] << 13),
+			(code & 0x1fff) | (m_gfxbank[Layer] << 13),
 			(code & 0xe000) >> 13,
 			0);
 }
@@ -36,7 +36,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::spinlbrk_tile_info)
 {
 	uint16_t code = m_vram[Layer][tile_index];
 	SET_TILE_INFO_MEMBER(Layer,
-			(code & 0x0fff) + (m_gfxbank[Layer] << 12),
+			(code & 0x0fff) | (m_gfxbank[Layer] << 12),
 			(code & 0xf000) >> 12,
 			0);
 }
@@ -45,9 +45,9 @@ template<int Layer>
 TILE_GET_INFO_MEMBER(aerofgt_state::get_tile_info)
 {
 	uint16_t code = m_vram[Layer][tile_index];
-	int bank = (Layer << 2) + (code & 0x1800) >> 11;
+	int bank = (Layer << 2) | (code & 0x1800) >> 11;
 	SET_TILE_INFO_MEMBER(Layer,
-			(code & 0x07ff) + (m_gfxbank[bank] << 11),
+			(code & 0x07ff) | (m_gfxbank[bank] << 11),
 			(code & 0xe000) >> 13,
 			0);
 }
