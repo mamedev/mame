@@ -12,6 +12,7 @@
 #include "machine/namco_c148.h"
 #include "machine/timer.h"
 #include "video/c45.h"
+#include "video/namco_c116.h"
 
 #include "cpu/m6502/m3745x.h"
 #include "screen.h"
@@ -100,28 +101,32 @@ class namcos2_shared_state : public driver_device
 {
 public:
 	namcos2_shared_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_dspmaster(*this, "dspmaster"),
-			m_dspslave(*this, "dspslave"),
-			m_c68(*this, "c68"),
-			m_master_intc(*this, "master_intc"),
-			m_slave_intc(*this, "slave_intc"),
-			m_sci(*this, "sci"),
-			m_gpu(*this, "gpu"),
-			m_gametype(0),
-			m_c169_roz_videoram(*this, "rozvideoram", 0),
-			m_c169_roz_gfxbank(0),
-			m_c169_roz_mask(nullptr),
-			m_c355_obj_gfxbank(0),
-			m_c355_obj_palxor(0),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_slave(*this, "slave"),
-			m_mcu(*this, "mcu"),
-			m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
-
+		: driver_device(mconfig, type, tag)
+		, m_c116(*this, "c116")
+		, m_dspmaster(*this, "dspmaster")
+		, m_dspslave(*this, "dspslave")
+		, m_c68(*this, "c68")
+		, m_master_intc(*this, "master_intc")
+		, m_slave_intc(*this, "slave_intc")
+		, m_sci(*this, "sci")
+		, m_gpu(*this, "gpu")
+		, m_audiobank(*this, "audiobank")
+		, m_gametype(0)
+		, m_c169_roz_videoram(*this, "rozvideoram", 0)
+		, m_c169_roz_gfxbank(0)
+		, m_c169_roz_mask(nullptr)
+		, m_c355_obj_gfxbank(0)
+		, m_c355_obj_palxor(0)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_slave(*this, "slave")
+		, m_mcu(*this, "mcu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+	{ }
+		
+	optional_device<namco_c116_device> m_c116;
 	optional_device<cpu_device> m_dspmaster;
 	optional_device<cpu_device> m_dspslave;
 	optional_device<m37450_device> m_c68;
@@ -129,6 +134,8 @@ public:
 	optional_device<namco_c148_device> m_slave_intc;
 	optional_device<namco_c139_device> m_sci;
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
+
+	optional_memory_bank m_audiobank;
 
 	// game type helpers
 	bool is_system21();
@@ -152,18 +159,11 @@ public:
 	DECLARE_READ16_MEMBER( c123_tilemap_videoram_r );
 	DECLARE_WRITE16_MEMBER( c123_tilemap_control_w );
 	DECLARE_READ16_MEMBER( c123_tilemap_control_r );
-	TILE_GET_INFO_MEMBER( get_tile_info0 );
-	TILE_GET_INFO_MEMBER( get_tile_info1 );
-	TILE_GET_INFO_MEMBER( get_tile_info2 );
-	TILE_GET_INFO_MEMBER( get_tile_info3 );
-	TILE_GET_INFO_MEMBER( get_tile_info4 );
-	TILE_GET_INFO_MEMBER( get_tile_info5 );
+	template<int Offset> TILE_GET_INFO_MEMBER( get_tile_info );
 	typedef delegate<void (uint16_t, int*, int*)> c123_tilemap_delegate;
 	void c123_tilemap_init(int gfxbank, void *pMaskROM, c123_tilemap_delegate tilemap_cb);
 	void c123_tilemap_invalidate(void);
 	void c123_tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	void c123_SetTilemapVideoram(int offset, uint16_t newword);
-	void c123_SetTilemapControl(int offset, uint16_t newword);
 
 	struct c123_mTilemapInfo
 	{
@@ -211,9 +211,7 @@ protected:
 	void c169_roz_unpack_params(const uint16_t *source, roz_parameters &params);
 	void c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params);
 	void c169_roz_draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect);
-	void c169_roz_get_info(tile_data &tileinfo, int tile_index, int which);
-	TILE_GET_INFO_MEMBER( c169_roz_get_info0 );
-	TILE_GET_INFO_MEMBER( c169_roz_get_info1 );
+	 template<int Layer> TILE_GET_INFO_MEMBER( c169_roz_get_info );
 	TILEMAP_MAPPER_MEMBER( c169_roz_mapper );
 
 	static const int ROZ_TILEMAP_COUNT = 2;
@@ -249,15 +247,12 @@ protected:
 	int m_c355_obj_gfxbank;
 	int m_c355_obj_palxor;
 	uint16_t m_c355_obj_position[4];
-	uint16_t m_c355_obj_ram[0x20000/2];
-
-	uint8_t m_player_mux;
-	inline void namcoic_get_tile_info(tile_data &tileinfo,int tile_index,uint16_t *vram);
+	std::unique_ptr<uint16_t[]> m_c355_obj_ram;
 
 public:
 	// general
-	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
-	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
+	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos, bool swapxy = false);
+	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos, bool swapxy = false);
 
 	DECLARE_WRITE8_MEMBER( namcos2_68k_eeprom_w );
 	DECLARE_READ8_MEMBER( namcos2_68k_eeprom_r );
@@ -283,13 +278,12 @@ class namcos2_state : public namcos2_shared_state
 {
 public:
 	namcos2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag),
-			m_dpram(*this, "dpram"),
-			m_paletteram(*this, "paletteram"),
-			m_spriteram(*this, "spriteram"),
-			m_rozram(*this, "rozram"),
-			m_roz_ctrl(*this, "rozctrl"),
-			m_c45_road(*this, "c45_road")
+		: namcos2_shared_state(mconfig, type, tag)
+		, m_dpram(*this, "dpram")
+		, m_spriteram(*this, "spriteram")
+		, m_rozram(*this, "rozram")
+		, m_roz_ctrl(*this, "rozctrl")
+		, m_c45_road(*this, "c45_road")
 	{ }
 
 	DECLARE_READ8_MEMBER(c68_p5_r);
@@ -299,6 +293,7 @@ public:
 	DECLARE_READ8_MEMBER(dpram_byte_r);
 	DECLARE_WRITE8_MEMBER(dpram_byte_w);
 	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
+	DECLARE_MACHINE_RESET(sgunner2);
 	DECLARE_DRIVER_INIT(cosmogng);
 	DECLARE_DRIVER_INIT(sgunner2);
 	DECLARE_DRIVER_INIT(kyukaidk);
@@ -348,25 +343,20 @@ public:
 
 	TILE_GET_INFO_MEMBER( roz_tile_info );
 
-	DECLARE_READ16_MEMBER( paletteram_word_r );
-	DECLARE_WRITE16_MEMBER( paletteram_word_w );
 	DECLARE_WRITE16_MEMBER( rozram_word_w );
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
 
 	void draw_sprite_init();
-	void update_palette();
 	void apply_clip( rectangle &clip, const rectangle &cliprect );
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int control );
 	void draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	uint16_t get_palette_register( int which );
 
-	int get_pos_irq_scanline() { return (get_palette_register(5) - 32) & 0xff; }
+	int get_pos_irq_scanline() { return (m_c116->get_reg(5) - 32) & 0xff; }
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
-	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_rozram;
 	optional_shared_ptr<uint16_t> m_roz_ctrl;
@@ -375,6 +365,7 @@ public:
 	uint16_t m_serial_comms_ctrl[0x8];
 	unsigned m_finallap_prot_count;
 	int m_sendval;
+	uint8_t m_player_mux; // sgunner2 specific
 
 	optional_device<namco_c45_road_device> m_c45_road;
 
@@ -445,24 +436,3 @@ extern void (*namcos2_kickstart)(running_machine &machine, int internal);
 #define NAMCOS2_C148_POSIRQ     5       /* 0x1ca000 */
 #define NAMCOS2_C148_SERIRQ     6       /* 0x1cc000 */
 #define NAMCOS2_C148_VBLANKIRQ  7       /* 0x1ce000 */
-
-/**************************************************************/
-/* MASTER CPU RAM MEMORY                                      */
-/**************************************************************/
-
-#define NAMCOS2_68K_MASTER_RAM  "bank3"
-
-/**************************************************************/
-/* SLAVE CPU RAM MEMORY                                       */
-/**************************************************************/
-
-#define NAMCOS2_68K_SLAVE_RAM   "bank4"
-
-/**************************************************************/
-/*                                                            */
-/**************************************************************/
-#define BANKED_SOUND_ROM        "bank6"
-
-/**************************************************************/
-/* Sound CPU support handlers - 6809                          */
-/**************************************************************/

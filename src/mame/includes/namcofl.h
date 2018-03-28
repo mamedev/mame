@@ -3,7 +3,6 @@
 
 #include "namcos2.h"
 #include "machine/timer.h"
-#include "video/namco_c116.h"
 
 #define NAMCOFL_HTOTAL      (288)   /* wrong */
 #define NAMCOFL_HBSTART (288)
@@ -24,18 +23,19 @@ class namcofl_state : public namcos2_shared_state
 {
 public:
 	namcofl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcos2_shared_state(mconfig, type, tag),
-		m_c116(*this,"c116"),
-		m_in0(*this, "IN0"),
-		m_in1(*this, "IN1"),
-		m_in2(*this, "IN2"),
-		m_misc(*this, "MISC"),
-		m_accel(*this, "ACCEL"),
-		m_brake(*this, "BRAKE"),
-		m_wheel(*this, "WHEEL"),
-		m_shareram(*this, "shareram", 32) { }
+		: namcos2_shared_state(mconfig, type, tag)
+		, m_mainbank(*this, "mainbank%u",1)
+		, m_in0(*this, "IN0")
+		, m_in1(*this, "IN1")
+		, m_in2(*this, "IN2")
+		, m_misc(*this, "MISC")
+		, m_accel(*this, "ACCEL")
+		, m_brake(*this, "BRAKE")
+		, m_wheel(*this, "WHEEL")
+		, m_shareram(*this, "shareram", 32)
+	{ }
 
-	required_device<namco_c116_device> m_c116;
+	required_memory_bank_array<2> m_mainbank;
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_in2;

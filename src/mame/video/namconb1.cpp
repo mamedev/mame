@@ -56,16 +56,14 @@ void namconb1_state::NB2TilemapCB(uint16_t code, int *tile, int *mask )
 		/*  00010203 04050607 00010203 04050607 (normal) */
 		/*  00010718 191a1b07 00010708 090a0b07 (alt bank) */
 		int bank = nth_byte32( m_tilebank32, (code>>13)+8 );
-		mangle = (code&0x1fff) + bank*0x2000;
+		mangle = (code&0x1fff) | (bank<<13);
 		*tile = mangle;
 		*mask = mangle;
 	}
 	else
 	{
 		/* the pixmap index is mangled, the transparency bitmask index is not */
-		mangle = code&~(0x140);
-		if( code&0x100 ) mangle |= 0x040;
-		if( code&0x040 ) mangle |= 0x100;
+		mangle = (code&~(0x1c0)) | (bitswap<3>(code>>6,0,1,2)<<6);
 		*tile = mangle;
 		*mask = code;
 	}
@@ -121,7 +119,7 @@ uint32_t namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_in
 int namconb1_state::NB1objcode2tile( int code )
 {
 	int bank = nth_word32( m_spritebank32, code>>11 );
-	return (code&0x7ff) + bank*0x800;
+	return (code&0x7ff) | (bank<<11);
 }
 
 VIDEO_START_MEMBER(namconb1_state,namconb1)
@@ -163,21 +161,11 @@ int namconb1_state::NB2objcode2tile( int code )
 	code &= 0x7ff;
 	if( m_gametype == NAMCONB2_MACH_BREAKERS )
 	{
-		if( bank&0x01 ) code |= 0x01*0x800;
-		if( bank&0x02 ) code |= 0x02*0x800;
-		if( bank&0x04 ) code |= 0x04*0x800;
-		if( bank&0x08 ) code |= 0x08*0x800;
-		if( bank&0x10 ) code |= 0x10*0x800;
-		if( bank&0x40 ) code |= 0x20*0x800;
+		code |= (bitswap<6>(bank,6,4,3,2,1,0) << 11);
 	}
 	else
 	{
-		if( bank&0x01 ) code |= 0x01*0x800;
-		if( bank&0x02 ) code |= 0x04*0x800;
-		if( bank&0x04 ) code |= 0x02*0x800;
-		if( bank&0x08 ) code |= 0x08*0x800;
-		if( bank&0x10 ) code |= 0x10*0x800;
-		if( bank&0x40 ) code |= 0x20*0x800;
+		code |= (bitswap<6>(bank,6,4,3,1,2,0) << 11);
 	}
 	return code;
 } /* NB2objcode2tile */

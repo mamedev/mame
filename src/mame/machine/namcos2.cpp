@@ -134,6 +134,17 @@ void namcos2_shared_state::reset_all_subcpus(int state)
 
 MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 {
+	if (m_audiobank.found())
+	{
+		int max = memregion("audiocpu")->bytes() / 0x4000;
+		int ind = 0;
+		while (ind < 16)
+		{
+			m_audiobank->configure_entries(ind,max,memregion("audiocpu")->base(),0x4000);
+			ind += max;
+		}
+	}
+
 	namcos2_kickstart = nullptr;
 	m_eeprom = std::make_unique<uint8_t[]>(m_eeprom_size);
 	machine().device<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
@@ -142,20 +153,23 @@ MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
 {
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
-	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
 
 	m_mcu_analog_ctrl = 0;
 	m_mcu_analog_data = 0xaa;
 	m_mcu_analog_complete = 0;
 
 	/* Initialise the bank select in the sound CPU */
-	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
+	m_audiobank->set_entry(0); /* Page in bank 0 */
 
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
 
 	/* Place CPU2 & CPU3 into the reset condition */
 	reset_all_subcpus(ASSERT_LINE);
+}
 
+MACHINE_RESET_MEMBER(namcos2_state, sgunner2)
+{
+	MACHINE_RESET_CALL_MEMBER(namcos2);
 	m_player_mux = 0;
 }
 
@@ -433,10 +447,7 @@ bool namcos2_shared_state::is_system21()
 
 WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
 {
-	uint8_t *RAM= memregion("audiocpu")->base();
-	uint32_t max = (memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
-	int bank = ( data >> 4 ) % max; /* 991104.CAB */
-	membank(BANKED_SOUND_ROM)->set_base(&RAM[ 0x10000 + ( 0x4000 * bank ) ] );
+	m_audiobank->set_entry(data >> 4);
 }
 
 /**************************************************************/
