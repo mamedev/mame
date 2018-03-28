@@ -107,7 +107,7 @@ void arcompact_device::device_start()
 	}
 
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 

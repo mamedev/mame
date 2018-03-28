@@ -1101,7 +1101,7 @@ void i80286_cpu_device::execute_run()
 				}
 			}
 
-			debugger_instruction_hook( this, update_pc() & m_amask );
+			debugger_instruction_hook( update_pc() & m_amask );
 
 			uint8_t op = fetch_op();
 

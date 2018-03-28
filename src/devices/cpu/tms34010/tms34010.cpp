@@ -627,7 +627,7 @@ void tms340x0_device::device_start()
 	save_pointer(NAME(&m_regs[0].reg), ARRAY_LENGTH(m_regs));
 	machine().save().register_postload(save_prepost_delegate(FUNC(tms340x0_device::tms34010_state_postload), this));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void tms340x0_device::device_reset()
@@ -751,7 +751,7 @@ void tms340x0_device::execute_run()
 		{
 			uint16_t op;
 			m_ppc = m_pc;
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 			op = ROPCODE();
 			(this->*s_opcode_table[op >> 4])(op);
 		} while (m_icount > 0);

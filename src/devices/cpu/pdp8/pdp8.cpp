@@ -94,7 +94,7 @@ void pdp8_device::device_start()
 	save_item(NAME(m_halt));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void pdp8_device::device_stop()
@@ -216,7 +216,7 @@ void pdp8_device::execute_run()
 	{
 		m_pc &= 07777;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		uint16_t op = m_program->read_word(m_pc);
 

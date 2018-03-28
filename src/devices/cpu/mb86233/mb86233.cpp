@@ -167,7 +167,7 @@ void mb86233_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%2s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1004,7 +1004,7 @@ void mb86233_cpu_device::execute_run()
 		uint32_t      val;
 		uint32_t      opcode;
 
-		debugger_instruction_hook(this, GETPC());
+		debugger_instruction_hook(GETPC());
 
 		opcode = ROPCODE(GETPC());
 

@@ -226,7 +226,7 @@ void tms1k_base_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_rom_address).formatstr("%03X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 device_memory_interface::space_config_vector tms1k_base_device::memory_space_config() const
@@ -295,7 +295,7 @@ void tms1k_base_device::next_pc()
 
 void tms1k_base_device::read_opcode()
 {
-	debugger_instruction_hook(this, m_rom_address);
+	debugger_instruction_hook(m_rom_address);
 	m_opcode = m_program->read_byte(m_rom_address);
 	m_c4 = bitswap<8>(m_opcode,7,6,5,4,0,1,2,3) & 0xf; // opcode operand is bitswapped for most opcodes
 

@@ -251,7 +251,7 @@ void mn10200_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_psw).formatstr("%26s").noshow();
 
-	m_icountptr = &m_cycles;
+	set_icountptr(m_cycles);
 }
 
 
@@ -565,7 +565,7 @@ void mn10200_device::execute_run()
 		check_irq();
 	}
 
-	debugger_instruction_hook(this, m_pc);
+	debugger_instruction_hook(m_pc);
 
 	m_cycles -= 1;
 	uint8_t op = read_arg8(m_pc);

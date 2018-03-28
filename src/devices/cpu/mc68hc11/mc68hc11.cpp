@@ -452,7 +452,7 @@ void mc68hc11_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_ccr).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -599,7 +599,7 @@ void mc68hc11_cpu_device::execute_run()
 		check_irq_lines();
 
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		op = FETCH();
 		(this->*hc11_optable[op])();

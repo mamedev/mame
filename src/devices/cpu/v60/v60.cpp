@@ -498,7 +498,7 @@ void v60_device::device_start()
 	state_add( STATE_GENSP, "GENSP", SP ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -606,7 +606,7 @@ void v60_device::execute_run()
 	{
 		uint32_t inc;
 		m_PPC = PC;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		m_icount -= 8;  /* fix me -- this is just an average */
 		inc = (this->*s_OpCodeTable[OpRead8(PC)])();
 		PC += inc;

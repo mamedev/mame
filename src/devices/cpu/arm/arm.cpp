@@ -342,7 +342,7 @@ void arm_cpu_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, R15 & ADDRESS_MASK);
+		debugger_instruction_hook(R15 & ADDRESS_MASK);
 
 		/* load instruction */
 		pc = R15;
@@ -550,7 +550,7 @@ void arm_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_sArmRegister[15]).mask(ADDRESS_MASK).formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_sArmRegister[15]).formatstr("%11s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
