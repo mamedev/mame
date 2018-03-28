@@ -2117,44 +2117,44 @@ MACHINE_CONFIG_END
 /*************************************************************/
 
 #define NAMCOS2_GFXROM_LOAD_128K(romname,start,chksum)\
-	ROM_LOAD( romname       , (start + 0x000000), 0x020000, chksum )\
-	ROM_RELOAD(               (start + 0x020000), 0x020000 )\
-	ROM_RELOAD(               (start + 0x040000), 0x020000 )\
-	ROM_RELOAD(               (start + 0x060000), 0x020000 )
+	ROM_LOAD( romname       , (start + 0x000000), 0x20000, chksum )\
+	ROM_RELOAD(               (start + 0x020000), 0x20000 )\
+	ROM_RELOAD(               (start + 0x040000), 0x20000 )\
+	ROM_RELOAD(               (start + 0x060000), 0x20000 )
 
 #define NAMCOS2_GFXROM_LOAD_256K(romname,start,chksum)\
-	ROM_LOAD( romname       , (start + 0x000000), 0x040000, chksum )\
-	ROM_RELOAD(               (start + 0x040000), 0x040000 )
+	ROM_LOAD( romname       , (start + 0x000000), 0x40000, chksum )\
+	ROM_RELOAD(               (start + 0x040000), 0x40000 )
 
 #define NAMCOS2_SPRROM_LOAD_128K(romname,start,chksum)\
-	ROM_LOAD32_BYTE( romname, (start + 0x000000), 0x020000, chksum )\
-	ROM_RELOAD(               (start + 0x080000), 0x020000 )\
-	ROM_RELOAD(               (start + 0x100000), 0x020000 )\
-	ROM_RELOAD(               (start + 0x180000), 0x020000 )
+	ROM_LOAD32_BYTE( romname, (start + 0x000000), 0x20000, chksum )\
+	ROM_RELOAD(               (start + 0x080000), 0x20000 )\
+	ROM_RELOAD(               (start + 0x100000), 0x20000 )\
+	ROM_RELOAD(               (start + 0x180000), 0x20000 )
 
 #define NAMCOS2_SPRROM_LOAD_256K(romname,start,chksum)\
-	ROM_LOAD32_BYTE( romname, (start + 0x000000), 0x040000, chksum )\
-	ROM_RELOAD(               (start + 0x100000), 0x040000 )
+	ROM_LOAD32_BYTE( romname, (start + 0x000000), 0x40000, chksum )\
+	ROM_RELOAD(               (start + 0x100000), 0x40000 )
 
 #define NAMCOS2_DATA_LOAD_E_128K(romname,start,chksum)\
-	ROM_LOAD16_BYTE(romname , (start + 0x000000), 0x020000, chksum )\
-	ROM_RELOAD(               (start + 0x040000), 0x020000 )\
-	ROM_RELOAD(               (start + 0x080000), 0x020000 )\
-	ROM_RELOAD(               (start + 0x0c0000), 0x020000 )
+	ROM_LOAD16_BYTE(romname , (start + 0x000000), 0x20000, chksum )\
+	ROM_RELOAD(               (start + 0x040000), 0x20000 )\
+	ROM_RELOAD(               (start + 0x080000), 0x20000 )\
+	ROM_RELOAD(               (start + 0x0c0000), 0x20000 )
 
 #define NAMCOS2_DATA_LOAD_O_128K(romname,start,chksum)\
-	ROM_LOAD16_BYTE( romname, (start + 0x000001), 0x020000, chksum )\
-	ROM_RELOAD(               (start + 0x040001), 0x020000 )\
-	ROM_RELOAD(               (start + 0x080001), 0x020000 )\
-	ROM_RELOAD(               (start + 0x0c0001), 0x020000 )
+	ROM_LOAD16_BYTE( romname, (start + 0x000001), 0x20000, chksum )\
+	ROM_RELOAD(               (start + 0x040001), 0x20000 )\
+	ROM_RELOAD(               (start + 0x080001), 0x20000 )\
+	ROM_RELOAD(               (start + 0x0c0001), 0x20000 )
 
 #define NAMCOS2_DATA_LOAD_E_256K(romname,start,chksum)\
-	ROM_LOAD16_BYTE(romname , (start + 0x000000), 0x040000, chksum )\
-	ROM_RELOAD(               (start + 0x080000), 0x040000 )
+	ROM_LOAD16_BYTE(romname , (start + 0x000000), 0x40000, chksum )\
+	ROM_RELOAD(               (start + 0x080000), 0x40000 )
 
 #define NAMCOS2_DATA_LOAD_O_256K(romname,start,chksum)\
-	ROM_LOAD16_BYTE( romname, (start + 0x000001), 0x040000, chksum )\
-	ROM_RELOAD(               (start + 0x080001), 0x040000 )
+	ROM_LOAD16_BYTE( romname, (start + 0x000001), 0x40000, chksum )\
+	ROM_RELOAD(               (start + 0x080001), 0x40000 )
 
 #define NAMCOS2_DATA_LOAD_E_512K(romname,start,chksum)\
 	ROM_LOAD16_BYTE(romname , (start + 0x000000), 0x80000, chksum )
@@ -2992,7 +2992,7 @@ ROM_START( finalap2 )
 	ROM_REGION( 0x200000, "tiles", 0 ) /* Tiles */
 	ROM_LOAD( "fls2chr0",  0x000000, 0x40000, CRC(7bbda499) SHA1(cf6ff072a40063cbe41eae1f60b29447a0020926) )
 	ROM_LOAD( "fls2chr1",  0x040000, 0x40000, CRC(ac8940e5) SHA1(449687d38cf830445df713ed4d675ed94ca5b375) )
-	ROM_LOAD( "fls2chr2",  0x80000, 0x40000, CRC(1756173d) SHA1(c912163979098387aea9a0580e9ca55c1f7275f3) )
+	ROM_LOAD( "fls2chr2",  0x080000, 0x40000, CRC(1756173d) SHA1(c912163979098387aea9a0580e9ca55c1f7275f3) )
 	ROM_LOAD( "fls2chr3",  0x0c0000, 0x40000, CRC(69032785) SHA1(cfcd12bea730f724444188c206adcdb5e755eb7d) )
 	ROM_LOAD( "fls2chr4",  0x100000, 0x40000, CRC(8216cf42) SHA1(79820435584d769b63649b554574486dbcd6f468) )
 	ROM_LOAD( "fls2chr5",  0x140000, 0x40000, CRC(dc3e8e1c) SHA1(a7968cfa0ca2639364507b42526f10cf1b2000f4) )
@@ -3048,7 +3048,7 @@ ROM_START( finalap2j )
 	ROM_REGION( 0x200000, "tiles", 0 ) /* Tiles */
 	ROM_LOAD( "fls2chr0",  0x000000, 0x40000, BAD_DUMP CRC(7bbda499) SHA1(cf6ff072a40063cbe41eae1f60b29447a0020926) )
 	ROM_LOAD( "fls2chr1",  0x040000, 0x40000, BAD_DUMP CRC(ac8940e5) SHA1(449687d38cf830445df713ed4d675ed94ca5b375) )
-	ROM_LOAD( "fls2chr2",  0x80000, 0x40000, BAD_DUMP CRC(1756173d) SHA1(c912163979098387aea9a0580e9ca55c1f7275f3) )
+	ROM_LOAD( "fls2chr2",  0x080000, 0x40000, BAD_DUMP CRC(1756173d) SHA1(c912163979098387aea9a0580e9ca55c1f7275f3) )
 	ROM_LOAD( "fls2chr3",  0x0c0000, 0x40000, BAD_DUMP CRC(69032785) SHA1(cfcd12bea730f724444188c206adcdb5e755eb7d) )
 	ROM_LOAD( "fls2chr4",  0x100000, 0x40000, BAD_DUMP CRC(8216cf42) SHA1(79820435584d769b63649b554574486dbcd6f468) )
 	ROM_LOAD( "fls2chr5",  0x140000, 0x40000, BAD_DUMP CRC(dc3e8e1c) SHA1(a7968cfa0ca2639364507b42526f10cf1b2000f4) )
@@ -3835,7 +3835,7 @@ ROM_START( metlhawk )
 	ROM_REGION( 0x200000, "roztiles", 0 ) /* ROZ Tiles */
 	ROM_LOAD( "mhr0z-0.2d",  0x000000, 0x40000, CRC(30ade98f) SHA1(6bf3d2f729e9f5e2c3f1a69845afbbfcafbf2d56) )
 	ROM_LOAD( "mhr0z-1.2c",  0x040000, 0x40000, CRC(a7fff42a) SHA1(5e13a11b8277842f6e1ae3a7f772f51ab07d0bfe) )
-	ROM_LOAD( "mhr0z-2.2b",  0x80000, 0x40000, CRC(6abec820) SHA1(bcacda96f6e69046dc59125374f169753ddda683) )
+	ROM_LOAD( "mhr0z-2.2b",  0x080000, 0x40000, CRC(6abec820) SHA1(bcacda96f6e69046dc59125374f169753ddda683) )
 	ROM_LOAD( "mhr0z-3.2a",  0x0c0000, 0x40000, CRC(d53cec6d) SHA1(433112d199c92fbc5df90d5b2d7b2e46665d144a) )
 	ROM_LOAD( "mhr0z-4.3d",  0x100000, 0x40000, CRC(922213e2) SHA1(cbb6ac73c1a48b328c2c1e5999f6d4f194bbaa76) )
 	ROM_LOAD( "mhr0z-5.3c",  0x140000, 0x40000, CRC(78418a54) SHA1(af5bbc0c2643a25000c8f25bbdd773bfe08ae362) )
@@ -3904,7 +3904,7 @@ ROM_START( metlhawkj )
 	ROM_REGION( 0x200000, "roztiles", 0 ) /* ROZ Tiles */
 	ROM_LOAD( "mhr0z-0.2d",  0x000000, 0x40000, CRC(30ade98f) SHA1(6bf3d2f729e9f5e2c3f1a69845afbbfcafbf2d56) )
 	ROM_LOAD( "mhr0z-1.2c",  0x040000, 0x40000, CRC(a7fff42a) SHA1(5e13a11b8277842f6e1ae3a7f772f51ab07d0bfe) )
-	ROM_LOAD( "mhr0z-2.2b",  0x80000, 0x40000, CRC(6abec820) SHA1(bcacda96f6e69046dc59125374f169753ddda683) )
+	ROM_LOAD( "mhr0z-2.2b",  0x080000, 0x40000, CRC(6abec820) SHA1(bcacda96f6e69046dc59125374f169753ddda683) )
 	ROM_LOAD( "mhr0z-3.2a",  0x0c0000, 0x40000, CRC(d53cec6d) SHA1(433112d199c92fbc5df90d5b2d7b2e46665d144a) )
 	ROM_LOAD( "mhr0z-4.3d",  0x100000, 0x40000, CRC(922213e2) SHA1(cbb6ac73c1a48b328c2c1e5999f6d4f194bbaa76) )
 	ROM_LOAD( "mhr0z-5.3c",  0x140000, 0x40000, CRC(78418a54) SHA1(af5bbc0c2643a25000c8f25bbdd773bfe08ae362) )
