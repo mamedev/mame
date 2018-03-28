@@ -1763,7 +1763,7 @@ void se3208_device::execute_run()
 		uint16_t Opcode=m_direct->read_word(m_PC, WORD_XOR_LE(0));
 
 		m_PPC = m_PC;
-		debugger_instruction_hook(this, m_PC);
+		debugger_instruction_hook(m_PC);
 
 		(this->*OpTable[Opcode])(Opcode);
 		m_PC+=2;
@@ -1815,7 +1815,7 @@ void se3208_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_SP).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).formatstr("%10s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 

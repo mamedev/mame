@@ -794,7 +794,7 @@ void m68000_base_device::execute_run()
 			m_ppc = m_pc;
 
 			/* Call external hook to peek at CPU */
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 
 			try
 			{
@@ -981,7 +981,7 @@ void m68000_base_device::init_cpu_common(void)
 	machine().save().register_presave(save_prepost_delegate(FUNC(m68000_base_device::presave), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(m68000_base_device::postload), this));
 
-	m_icountptr = &m_remaining_cycles;
+	set_icountptr(m_remaining_cycles);
 	m_remaining_cycles = 0;
 
 }

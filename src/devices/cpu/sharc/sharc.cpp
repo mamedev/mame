@@ -863,7 +863,7 @@ void adsp21062_device::device_start()
 	state_add( STATE_GENPC, "GENPC", m_core->pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
-	m_icountptr = &m_core->icount;
+	set_icountptr(m_core->icount);
 }
 
 void adsp21062_device::device_reset()
@@ -1014,7 +1014,7 @@ void adsp21062_device::execute_run()
 		if (m_core->idle && m_core->irq_pending == 0)
 		{
 			m_core->icount = 0;
-			debugger_instruction_hook(this, m_core->daddr);
+			debugger_instruction_hook(m_core->daddr);
 		}
 		if (m_core->irq_pending != 0)
 		{
@@ -1033,7 +1033,7 @@ void adsp21062_device::execute_run()
 			m_core->astat_old_old = m_core->astat_old;
 			m_core->astat_old = m_core->astat;
 
-			debugger_instruction_hook(this, m_core->pc);
+			debugger_instruction_hook(m_core->pc);
 
 			m_core->opcode = m_program->read_qword(m_core->pc);
 

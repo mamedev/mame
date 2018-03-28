@@ -146,7 +146,7 @@ void ccpu_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_PC).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%6s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -220,7 +220,7 @@ void ccpu_cpu_device::execute_run()
 		opcode = READOP(m_PC);
 		if (opcode == 0x51 || opcode == 0x59)
 			m_extinput = m_external_input();
-		debugger_instruction_hook(this, m_PC);
+		debugger_instruction_hook(m_PC);
 		m_PC++;
 
 		switch (opcode)

@@ -58,7 +58,7 @@ i8089_device::i8089_device(const machine_config &mconfig, const char *tag, devic
 void i8089_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_write_sintr1.resolve_safe();

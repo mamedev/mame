@@ -109,7 +109,7 @@ void diablo1300_cpu_device::device_start()
 	save_item(NAME(m_power_on));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void diablo1300_cpu_device::device_stop()
@@ -190,7 +190,7 @@ void diablo1300_cpu_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if( m_power_on == ASSERT_LINE )
 		{

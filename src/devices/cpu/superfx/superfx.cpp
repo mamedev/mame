@@ -704,7 +704,7 @@ void superfx_device::device_start()
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().formatstr("%06X");
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().formatstr("%06X");
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -787,7 +787,7 @@ void superfx_device::execute_run()
 			break;
 		}
 
-		debugger_instruction_hook(this, (m_pbr << 16) | m_r[15]);
+		debugger_instruction_hook((m_pbr << 16) | m_r[15]);
 
 		op = superfx_peekpipe();
 

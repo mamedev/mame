@@ -153,13 +153,13 @@ TODO:
 
 /* operate one instruction for */
 #define ONE_MORE_INSN() {       \
-	uint8_t ireg;                             \
+	uint8_t ireg;                           \
 	pPPC = pPC;                             \
-	debugger_instruction_hook(this, PCD);                       \
+	debugger_instruction_hook(PCD);         \
 	ireg=M_RDOP(PCD);                       \
 	PC++;                                   \
-	(this->*m_insn[ireg])();               \
-	increment_counter(m_cycles[ireg]);    \
+	(this->*m_insn[ireg])();                \
+	increment_counter(m_cycles[ireg]);      \
 }
 
 /* CC masks                       HI NZVC
@@ -499,7 +499,7 @@ void m6800_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc.w.l).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_cc).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void m6800_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -570,7 +570,7 @@ void m6800_cpu_device::execute_run()
 		else
 		{
 			pPPC = pPC;
-			debugger_instruction_hook(this, PCD);
+			debugger_instruction_hook(PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 			(this->*m_insn[ireg])();

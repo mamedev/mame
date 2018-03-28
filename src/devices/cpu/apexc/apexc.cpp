@@ -787,7 +787,7 @@ void apexc_cpu_device::device_start()
 	state_add( STATE_GENPC, "PC", m_pc ).mask(0x7ffc).callimport().formatstr("%04X");
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).mask(0x7ffc).callimport().noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -846,7 +846,7 @@ void apexc_cpu_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if (m_running)
 			execute();
