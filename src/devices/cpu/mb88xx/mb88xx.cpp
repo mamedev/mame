@@ -163,9 +163,9 @@ device_memory_interface::space_config_vector mb88_cpu_device::memory_space_confi
 	};
 }
 
-util::disasm_interface *mb88_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mb88_cpu_device::create_disassembler()
 {
-	return new mb88_disassembler;
+	return std::make_unique<mb88_disassembler>();
 }
 
 
@@ -232,7 +232,7 @@ void mb88_cpu_device::device_start()
 	state_add( STATE_GENPC, "GENPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_flags ).callimport().callexport().formatstr("%6s").noshow();
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -471,7 +471,7 @@ void mb88_cpu_device::execute_run()
 		uint8_t opcode, arg, oc;
 
 		/* fetch the opcode */
-		debugger_instruction_hook(this, GETPC());
+		debugger_instruction_hook(GETPC());
 		opcode = READOP(GETPC());
 
 		/* increment the PC */

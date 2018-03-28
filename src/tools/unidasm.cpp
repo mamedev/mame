@@ -10,9 +10,6 @@
 
 #include "emu.h"
 
-#include <algorithm>
-#include <cstring>
-
 #include <ctype.h>
 
 #include "cpu/8x300/8x300dasm.h"
@@ -149,6 +146,10 @@
 #include "cpu/z8/z8dasm.h"
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
+
+#include <algorithm>
+#include <cstring>
+#include <stdexcept>
 
 // Configuration classes
 
@@ -313,7 +314,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "cquestrot",       be, -3, []() -> util::disasm_interface * { return new cquestrot_disassembler; } },
 	{ "cquestsnd",       be, -3, []() -> util::disasm_interface * { return new cquestsnd_disassembler; } },
 	{ "ds5002fp",        le,  0, []() -> util::disasm_interface * { return new ds5002fp_disassembler; } },
-	{ "dsp16a",          le, -1, []() -> util::disasm_interface * { return new dsp16a_disassembler; } },
+	{ "dsp16",           le, -1, []() -> util::disasm_interface * { return new dsp16_disassembler; } },
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },
 	{ "dsp56k",          le, -1, []() -> util::disasm_interface * { return new dsp56k_disassembler; } },
 	{ "e0c6200",         be, -1, []() -> util::disasm_interface * { return new e0c6200_disassembler; } },
@@ -351,8 +352,8 @@ static const dasm_table_entry dasm_table[] =
 	{ "i8xc196",         le,  0, []() -> util::disasm_interface * { return new i8xc196_disassembler; } },
 	{ "i960",            le,  0, []() -> util::disasm_interface * { return new i960_disassembler; } },
 	{ "ie15",            le,  0, []() -> util::disasm_interface * { return new ie15_disassembler; } },
-	{ "jaguardsp",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_DSP); } },
-	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_GPU); } },
+	{ "jaguardsp",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::DSP); } },
+	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::GPU); } },
 	{ "konami",          le,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
 	{ "lc8670",          be,  0, []() -> util::disasm_interface * { return new lc8670_disassembler; } },
 	{ "lh5801",          le,  0, []() -> util::disasm_interface * { return new lh5801_disassembler; } },
@@ -532,7 +533,7 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 	if(flags & util::disasm_interface::NONLINEAR_PC) {
 		switch(entry->pcshift) {
 		case -1:
-			lr8  = [](offs_t pc) -> u8  { throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer: r8 access on 16-bits granularity bus\n"); };
+			lr8  = [](offs_t pc) -> u8  { throw std::logic_error("debug_disasm_buffer::debug_data_buffer: r8 access on 16-bits granularity bus\n"); };
 			lr16 = [this](offs_t pc) -> u16 {
 				const u16 *src = get_ptr<u16>(pc);
 				return src[0];

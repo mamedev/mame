@@ -1198,7 +1198,7 @@ ROM_START( m1monov )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 GAMEL( 199?, m1monov  ,m1mono   ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 23)",GAME_FLAGS,layout_m1monou)
 ROM_START( m1monow )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("mono5p", 0x0000, 0x010000, CRC(805d33e8) SHA1(4d946ee37f8d25f0f7bb3497a538974e1bae14b1) )                                   m1_mono_sound ROM_END_M1A_MCU
 GAMEL( 199?, m1monow  ,m1mono   ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 24)",GAME_FLAGS,layout_m1monou)
-ROM_START( m1monox )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("mox3&1", 0x0000, 0x010000, CRC(8a790928) SHA1(91594136eb133b6112beb036a973756d0b54b648) )                                   m1_mono_sound ROM_END_M1A_MCU
+ROM_START( m1monox )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("mox3+1", 0x0000, 0x010000, CRC(8a790928) SHA1(91594136eb133b6112beb036a973756d0b54b648) )                                   m1_mono_sound ROM_END_M1A_MCU
 GAMEL( 199?, m1monox  ,m1mono   ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 25)",GAME_FLAGS,layout_m1monou)
 ROM_START( m1monoy )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-205.bin", 0x0000, 0x010000, CRC(7461f169) SHA1(5d54d259d252fddd0c222790cdcd098267a8f9a7) )                              m1_mono_sound ROM_END_M1A_MCU
 GAMEL( 199?, m1monoy  ,m1mono   ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Monopoly (Maygay) (M1A/B) (set 26)",GAME_FLAGS,layout_m1monou)
@@ -1238,7 +1238,7 @@ GAMEL( 199?, m1monoaa ,m1mono   ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "sound1.dig1-049.u2", 0x000000, 0x080000, CRC(ab0ef8aa) SHA1(e9cd8c7c0fd0bec44d0531eff6272aa10b88b08c) ) \
 	ROM_LOAD( "sound2.dig1-049.u3", 0x080000, 0x080000, CRC(44c05fb6) SHA1(8d40d62d7c55224ddca8ff2f90779d5fad2af3ba) )
-ROM_START( m1glad )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("game.gladiatorsstd(fb8b)1.u6", 0x0000, 0x010000, CRC(eae9f323) SHA1(1a345480b37ff88f263beb0ba3715954e0c6ecb0) )  m1_glad_sound ROM_END_M1A_MCU
+ROM_START( m1glad )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("game.gladiatorsstd,fb8b,1.u6", 0x0000, 0x010000, CRC(eae9f323) SHA1(1a345480b37ff88f263beb0ba3715954e0c6ecb0) )  m1_glad_sound ROM_END_M1A_MCU
 GAMEL( 199?, m1glad  ,0      ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1gladg) // aka sa6-295
 ROM_START( m1glada ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("glad20p", 0x0000, 0x010000, CRC(b8803541) SHA1(a7c96501c031a84638bacf34a3e2c76dcd26bfe2) )                       m1_glad_sound ROM_END_M1A_MCU
 GAMEL( 199?, m1glada ,m1glad ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Gladiators (Maygay) (M1A/B) (set 2)",GAME_FLAGS,layout_m1gladg)
@@ -1944,8 +1944,8 @@ GAMEL( 199?, m1fantfbl ,m1fantfb ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, 
 
 #define m1_wldzne_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
-	ROM_LOAD( "wildzone(maygay)sound-p1.bin", 0x000000, 0x080000, CRC(9d512949) SHA1(65411c906f51f7d6d53ac897bedeab8fdd89d0a9) ) \
-	ROM_LOAD( "wildzone(maygay)sound-p2.bin", 0x080000, 0x080000, CRC(78390d2c) SHA1(89c9d0f6deb74fee258bc614f61f0a82b3ef3959) )
+	ROM_LOAD( "wildzone,maygay_sound-p1.bin", 0x000000, 0x080000, CRC(9d512949) SHA1(65411c906f51f7d6d53ac897bedeab8fdd89d0a9) ) \
+	ROM_LOAD( "wildzone,maygay_sound-p2.bin", 0x080000, 0x080000, CRC(78390d2c) SHA1(89c9d0f6deb74fee258bc614f61f0a82b3ef3959) )
 ROM_START( m1wldzne )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-522",      0x0000, 0x010000, CRC(814ab843) SHA1(e2b076fd69abbd0186d4748f59be22db1e017a23) ) m1_wldzne_sound ROM_END_M1A_MCU
 GAMEL( 199?, m1wldzne  ,0        ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Wild Zone (Maygay) (M1A/B) (set 1)",GAME_FLAGS,layout_m1wldzner)
 ROM_START( m1wldznea ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-527",      0x0000, 0x010000, CRC(eec99c71) SHA1(a142ea4929c3b9483aa87b076dfb192c520c16a8) ) m1_wldzne_sound ROM_END_M1A_MCU
@@ -2582,7 +2582,7 @@ GAMEL( 199?, m1mongamb ,m1mongam ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec,
 // uPD7759 rom?
 #define m1_moncls_sound \
 	ROM_REGION( 0x100000, "upd", ROMREGION_ERASE00  ) \
-	ROM_LOAD( "classicmonopoly(maygay)soundromdig1-027.bin", 0x0000, 0x040000, CRC(d5243b51) SHA1(c7e3a61071c566e8ea9c8842839b70242ca67308) )
+	ROM_LOAD( "classicmonopoly,maygay_soundromdig1-027.bin", 0x0000, 0x040000, CRC(d5243b51) SHA1(c7e3a61071c566e8ea9c8842839b70242ca67308) )
 ROM_START( m1moncls )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa3-316", 0x0000, 0x010000, CRC(98f9d6b0) SHA1(f30fa1fb88bfd4098b189cf03a7e0b9dcc5bfdef) ) m1_moncls_sound ROM_END_M1A_MCU
 GAME( 199?, m1moncls  ,0        ,maygay_m1_nec,maygay_m1, maygay1b_state,m1nec, ROT0, "Maygay", "Monopoly Classic (Maygay) (M1A/B) (set 1)",GAME_FLAGS )
 ROM_START( m1monclsa ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa3-318", 0x0000, 0x010000, CRC(01e8224c) SHA1(dfad509c00d6311eb1e8bbbfe1ca5fd6aeb9da43) ) m1_moncls_sound ROM_END_M1A_MCU

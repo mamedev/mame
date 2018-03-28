@@ -265,53 +265,35 @@ int rom_load_manager::set_disk_handle(const char *region, const char *fullpath)
 
 void rom_load_manager::determine_bios_rom(device_t &device, const char *specbios)
 {
-	device.set_system_bios(0);
-
-	/* first determine the default BIOS name */
-	char const *defaultname(nullptr);
-	for (const rom_entry &rom : device.rom_region_vector())
+	// default is applied by the device at config complete time
+	if (specbios && *specbios && core_stricmp(specbios, "default"))
 	{
-		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+		bool found(false);
+		for (const rom_entry &rom : device.rom_region_vector())
 		{
-			defaultname = ROM_GETNAME(&rom);
-			break;
-		}
-	}
+			if (ROMENTRY_ISSYSTEM_BIOS(&rom))
+			{
+				char const *const biosname = ROM_GETNAME(&rom);
+				int const bios_flags = ROM_GETBIOSFLAGS(&rom);
+				char bios_number[20];
 
-	/* look for a BIOS with a matching name */
-	int bios_count = 0, default_no = 1;
-	for (const rom_entry &rom : device.rom_region_vector())
-	{
-		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
-		{
-			char const *const biosname = ROM_GETNAME(&rom);
-			int const bios_flags = ROM_GETBIOSFLAGS(&rom);
-			char bios_number[20];
-
-			/* Allow '-bios n' to still be used */
-			sprintf(bios_number, "%d", bios_flags - 1);
-			if (!core_stricmp(bios_number, specbios) || !core_stricmp(biosname, specbios))
-				device.set_system_bios(bios_flags);
-			if (defaultname && !core_stricmp(biosname, defaultname))
-				default_no = bios_flags;
-			bios_count++;
-		}
-	}
-
-	/* if none found, use the default */
-	if (device.system_bios() == 0 && bios_count > 0)
-	{
-		/* if we got neither an empty string nor 'default' then warn the user */
-		if (specbios[0] && !core_stricmp(specbios, "default"))
-		{
-			m_errorstring.append(string_format("%s: invalid bios, reverting to default\n", specbios));
-			m_warnings++;
+				// Allow '-bios n' to still be used
+				sprintf(bios_number, "%d", bios_flags - 1);
+				if (!core_stricmp(bios_number, specbios) || !core_stricmp(biosname, specbios))
+				{
+					found = true;
+					device.set_system_bios(bios_flags);
+					break;
+				}
+			}
 		}
 
-		/* set to default */
-		device.set_system_bios(default_no);
+		// if we got neither an empty string nor 'default' then warn the user
+		if (!found)
+			m_errorstring.append(util::string_format("%s: invalid BIOS \"%s\", reverting to default\n", device.tag(), specbios));
 	}
-	device.set_default_bios(default_no);
+
+	// log final result
 	LOG("For \"%s\" using System BIOS: %d\n", device.tag(), device.system_bios());
 }
 
@@ -1490,7 +1472,7 @@ void rom_load_manager::process_region_list()
 rom_load_manager::rom_load_manager(running_machine &machine)
 	: m_machine(machine)
 {
-	/* figure out which BIOS we are using */
+	// figure out which BIOS we are using
 	std::map<std::string, std::string> card_bios;
 	for (device_t &device : device_iterator(machine.config().root_device()))
 	{
@@ -1523,16 +1505,16 @@ rom_load_manager::rom_load_manager(running_machine &machine)
 		}
 	}
 
-	/* count the total number of ROMs */
+	// count the total number of ROMs
 	count_roms();
 
-	/* reset the disk list */
+	// reset the disk list
 	m_chd_list.clear();
 
-	/* process the ROM entries we were passed */
+	// process the ROM entries we were passed
 	process_region_list();
 
-	/* display the results and exit */
+	// display the results and exit
 	display_rom_load_results(false);
 }
 

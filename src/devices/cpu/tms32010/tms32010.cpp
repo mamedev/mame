@@ -135,9 +135,9 @@ device_memory_interface::space_config_vector tms32010_device::memory_space_confi
 	};
 }
 
-util::disasm_interface *tms32010_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms32010_device::create_disassembler()
 {
-	return new tms32010_disassembler;
+	return std::make_unique<tms32010_disassembler>();
 }
 
 
@@ -871,7 +871,7 @@ void tms32010_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_STACK[3]).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_STR).formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -965,7 +965,7 @@ void tms32010_device::execute_run()
 
 		m_PREVPC = m_PC;
 
-		debugger_instruction_hook(this, m_PC);
+		debugger_instruction_hook(m_PC);
 
 		m_opcode.d = M_RDOP(m_PC);
 		m_PC++;

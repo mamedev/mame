@@ -334,8 +334,8 @@ ROM_END
 
 ROM_START( targetha )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "th2_n_c_23.C23", 0x000000, 0x040000, CRC(b99b25dc) SHA1(1bf35b2c05a58f934d06eb6ef93f592d9f16344a) ) // The "N" was hand written
-	ROM_LOAD16_BYTE( "th2_n_c_22.C22", 0x000001, 0x040000, CRC(6d34f0cf) SHA1(f44a1231f4fac1f9d443990e8fe2b4aaa3f338be) ) // The "N" was hand written
+	ROM_LOAD16_BYTE( "th2_n_c_23.c23", 0x000000, 0x040000, CRC(b99b25dc) SHA1(1bf35b2c05a58f934d06eb6ef93f592d9f16344a) ) // The "N" was hand written
+	ROM_LOAD16_BYTE( "th2_n_c_22.c22", 0x000001, 0x040000, CRC(6d34f0cf) SHA1(f44a1231f4fac1f9d443990e8fe2b4aaa3f338be) ) // The "N" was hand written
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "targeth_ds5002fp.bin", 0x00000, 0x8000, CRC(abcdfee4) SHA1(c5955d5dbbcecbe1c2ae77d59671ae40eb814d30) )

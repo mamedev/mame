@@ -32,7 +32,7 @@ public:
 		, m_system_io(*this, "SYSTEM")
 	{
 	}
-	
+
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport m_system_io;
 

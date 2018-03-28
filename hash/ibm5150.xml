@@ -1630,7 +1630,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="musicset">
-		<description>Will Harvey's Music Construction Set</description>
+		<description>Will Harvey's Music Construction Set [cr]</description>
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="usage" value="PC Booter" />
@@ -2702,6 +2702,47 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="bodywrks">
+		<description>Bodyworks - An Adventure in Anatomy</description>
+		<year>1991</year>
+		<publisher>Software Marketing Corporation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bodyworks - An Adventure in Anatomy (1991)(Software Marketing Corporation)(Disk 1 of 7).img" size="368640" crc="d8957023" sha1="6c41ad40eedd3c6a1823bd303a830cc1b17a6efb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bodyworks - An Adventure in Anatomy (1991)(Software Marketing Corporation)(Disk 2 of 7).img" size="368640" crc="afde12df" sha1="379cfe18a997c2f1c654ac09537081bdacfc8bdd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bodyworks - An Adventure in Anatomy (1991)(Software Marketing Corporation)(Disk 3 of 7).img" size="368640" crc="693d30ec" sha1="3294ac219fb833c51ec58199d672a48a2e2bc895" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bodyworks - An Adventure in Anatomy (1991)(Software Marketing Corporation)(Disk 4 of 7).img" size="368640" crc="d2e1bf92" sha1="a86fef522c1dbfd472360eec7ca1db86e7a77d97" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bodyworks - An Adventure in Anatomy (1991)(Software Marketing Corporation)(Disk 5 of 7).img" size="368640" crc="2d4bb881" sha1="a78fe549c06a538aba93c4e2c37855de48c3b9ca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bodyworks - An Adventure in Anatomy (1991)(Software Marketing Corporation)(Disk 6 of 7).img" size="368640" crc="fc4bf16c" sha1="61ca5002b2457a37fec0c89d50dd631143c59a2d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Bodyworks - An Adventure in Anatomy (1991)(Software Marketing Corporation)(Disk 7 of 7).img" size="368640" crc="71decb8b" sha1="d53e84e534f53691142662e1d37dc2a1079eb21b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="croschex">
 		<description>Cross-chex</description>
 		<year>198?</year>
@@ -2709,6 +2750,28 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="389376">
 				<rom name="award software's cross-chex.dsk" size="389376" crc="2a6366b7" sha1="54249d55f0c1cfbecee5f034dc7080941579fd7b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlxpnt2fr">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>DeluxePaint II-PC (French)</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Dan Silva, Brent Iverson" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="disk_serial" value="E01551FL(1)" />
+			<feature name="part_id" value="Logiciel français" />
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] DeluxePaint II-PC [5.25DD] [Disk 1 of 2].img" size="368640" crc="379c455a" sha1="42ff3be95420881c7522d6296a2497915d2f8f00" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="disk_serial" value="E01551FL(2)" />
+			<feature name="part_id" value="Exemples et utilites" />
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] DeluxePaint II-PC [5.25DD] [Disk 2 of 2].img" size="368640" crc="dcde1902" sha1="a64ac861fb615a59d7402b3f7d46701a73ae2e59" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2866,6 +2929,28 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] EDITEXTE [5.25].img" size="368640" crc="bbf2d707" sha1="e3a2e08005b6beb097e3db74ce894007b6cebfb5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpterm">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>HP Terminal Program HP24597A</description>
+		<year>1988</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="version" value="A.00.03" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="disk_serial" value="24597-15001" />
+			<feature name="part_id" value="Terminal Master Disc #1/2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] HP Terminal Master Disk [5.25DD] [Disk 1 of 2].img" size="368640" crc="33953c19" sha1="44bbefda24ef11cc7fabda6d19bb4ef9e7e14c27" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="disk_serial" value="24597-15002" />
+			<feature name="part_id" value="Terminal Master Disc #2/2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] HP Terminal Master Disk [5.25DD] [Disk 2 of 2].img" size="368640" crc="07ec5253" sha1="3ad04dc7e1d33db84afdbaabc472611672fec8ce" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8148,9 +8233,44 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="links">
-		<description>Links - The Challenge of Golf v1.10</description>
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
+		<description>Links - The Challenge of Golf (v1.45)</description>
 		<year>1990</year>
 		<publisher>Access Software</publisher>
+		<info name="version" value="1.45" />
+		<info name="usage" value="VGA or MCGA required" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Links - The Challenge of Golf [5.25DD] [Disk 1 of 5].img" size="368640" crc="af35aa1b" sha1="2f65f7fcfc4e63317cc00bdbae106ecec5222b9e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Links - The Challenge of Golf [5.25DD] [Disk 2 of 5].img" size="368640" crc="9b384161" sha1="5b1127278326c332127f8635a52a27006f1b7d0a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Links - The Challenge of Golf [5.25DD] [Disk 3 of 5].img" size="368640" crc="04c91f40" sha1="529c1df6c7668d827cec1f040086a6038fdb35db" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Links - The Challenge of Golf [5.25DD] [Disk 4 of 5].img" size="368640" crc="0a8090f9" sha1="0622d2b227179480691a46a44e36a5c49bf468f7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Links - The Challenge of Golf [5.25DD] [Disk 5 of 5].img" size="368640" crc="26c18083" sha1="8ff9414b9ca0365a124fd6407025eece4f1ab25d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="linksa" cloneof="links">
+		<description>Links - The Challenge of Golf (v1.10)</description>
+		<year>1990</year>
+		<publisher>Access Software</publisher>
+		<info name="version" value="1.10" />
 		<info name="usage" value="VGA or MCGA required" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -8191,6 +8311,25 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Links - Championship Course - Bountiful Golf Course (1991)(Access Software)(Disk 2 of 2).dsk" size="368640" crc="0c9664aa" sha1="a6977e88cf98a673164d9ac9698585edc01e3dc8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lombrall">
+		<description>Lombard RAC Rally</description>
+		<year>1989</year>
+		<publisher>Mandarin Software</publisher>
+		<info name="developer" value="Red Rat Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, custom format with copy protection -->
+			<dataarea name="flop" size = "3219415">
+				<rom name="[PC] Lombard RAC Rally [5.25DD] [Disk 1 of 2].mfm" size="3219415" crc="06ec54eb" sha1="4a61730740f9d4394ab6f1f361311d183db04af8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<!-- Dumped via Kryoflux, two tracks show as modified -->
+			<dataarea name="flop" size = "368640">
+				<rom name="[PC] Lombard RAC Rally [5.25DD] [Disk 2 of 2].img" size="368640" crc="cc4c8cfe" sha1="3edaa3fc5f4d875148c2286dfc0d885e65816bdf" offset="0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9218,6 +9357,19 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Savage [5.25].img" size="368640" crc="336dd3b9" sha1="68ba386d590f2bd85c64adabcceb4e7d1679c5ca" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="secretag">
+		<description>Secret Agent</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Apogee Software" />
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Secret Agent [Apogee Software] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="d7e85d89" sha1="f9e1ff73e40f28bf7b9eec7e78406d9063892e24" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

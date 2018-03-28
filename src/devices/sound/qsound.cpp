@@ -27,6 +27,9 @@
     assumed that reading PIO with PSEL low when INT is asserted will
     return the address and cause INT to be de-asserted, and reading PIO
     with PSEL low when int is not asserted will return the data word.
+    The DSP program will only respond to one external interrupt per
+    sample interval (i.e. the maximum command rate is the same as the
+    sample rate).
 
     The DSP program uses 2 kilowords of internal RAM and reads data from
     external ROM while executing from internal ROM.  As such, it
@@ -61,18 +64,27 @@
     and external space from 0x8000 onwards.  The additional ROM could
     be anywhere in between.
 
-    Meanings for known command words (0x00 to 0x8f mostly understood):
+    Meanings for known command words:
     (((ch - 1) << 3) & 0x78     sample bank
-    (ch << 3) | 0x01            current/starting sample offset
-    (ch << 3) | 0x02            rate (zero for key-off)
-    (ch << 3) | 0x03            key-on
-    (ch << 3) | 0x04            loop offset (relative to end)
-    (ch << 3) | 0x05            end sample offset
+    (ch << 3) | 0x01            channel sample offset within bank
+    (ch << 3) | 0x02            channel playback rate
+    (ch << 3) | 0x03            channel sample period counter
+    (ch << 3) | 0x04            channel loop offset (relative to end)
+    (ch << 3) | 0x05            channel end sample offset
     (ch << 3) | 0x06            channel volume
-    ch | 0x80                   position on sound stage
-
-    The games don't seem to use (ch << 3) | 0x07 for anything.  The
-    games use 0xba to 0xcb, but the purpose is not understood.
+    ch | 0x80                   left/right position on sound stage
+    0x93                        delayed reverb volume
+    ch + 0xba                   channel reverb contribution
+    0xd9                        reverb delay (need to add 0x0554)
+    0xde                        left output filtered component delay
+    0xdf                        left output unfiltered component delay
+    0xe0                        right output filtered component delay
+    0xe1                        right output unfiltered component delay
+    0xe2                        write non-zero to set delays
+    0xe4                        left output filtered component volume
+    0xe5                        left output unfiltered component volume
+    0xe6                        right output filtered component volume
+    0xe7                        right output unfiltered component volume
 
     The weird way of setting the sample bank is due to the one-read
     latency described above.  Since the bank applies to the next read,
@@ -358,6 +370,24 @@ void qsound_device::set_dsp_ready(void *ptr, s32 param)
 
 void qsound_device::set_cmd(void *ptr, s32 param)
 {
+	/*
+	 *  I don't believe the data word is actually double-buffered in
+	 *  real life.  In practice it works because the DSP's instruction
+	 *  throughput is so much higher than the Z80's that it can always
+	 *  read the data word before the Z80 can realise it's read the
+	 *  address.
+	 *
+	 *  In MAME, there's a scheduler synchronisation barrier when the
+	 *  DSP reads the address but before it reads the data.  When this
+	 *  happens, MAME may give the Z80 enough time to see that the DSP
+	 *  has read the address and write more data before scheduling the
+	 *  DSP again.  The DSP then reads the new data and stores it at
+	 *  the old command address.
+	 *
+	 *  You can see this happening in megaman2 test mode by playing
+	 *  command 0x11 (Gyro Man's theme).  Within two minutes, some
+	 *  channels' sample banks/offsets will likely be overwritten.
+	 */
 	LOGCOMMAND("QSound: DSP command @%02X = %04X\n", u32(param) >> 16, u16(u32(param)));
 	m_cmd_addr = u16(u32(param) >> 16);
 	m_cmd_data = u16(u32(param));

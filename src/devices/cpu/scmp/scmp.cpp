@@ -55,9 +55,9 @@ ins8060_device::ins8060_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-util::disasm_interface *scmp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> scmp_device::create_disassembler()
 {
-	return new scmp_disassembler;
+	return std::make_unique<scmp_disassembler>();
 }
 
 
@@ -475,7 +475,7 @@ void scmp_device::execute_run()
 		if ((m_SR & 0x08) && (m_sensea_func())) {
 			take_interrupt();
 		}
-		debugger_instruction_hook(this, m_PC.d);
+		debugger_instruction_hook(m_PC.d);
 		execute_one(ROP());
 
 	} while (m_icount > 0);
@@ -520,7 +520,7 @@ void scmp_device::device_start()
 	save_item(NAME(m_ER));
 	save_item(NAME(m_SR));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 

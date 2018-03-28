@@ -56,17 +56,40 @@ Notes:
 class k3_state : public driver_device
 {
 public:
-	k3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_oki2(*this, "oki2"),
-			m_oki1(*this, "oki1") ,
+	k3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_oki2(*this, "oki2"),
+		m_oki1(*this, "oki1") ,
 		m_spriteram_1(*this, "spritera1"),
 		m_spriteram_2(*this, "spritera2"),
 		m_bgram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	void flagrall(machine_config &config);
+	void k3(machine_config &config);
+
+protected:
+	DECLARE_WRITE16_MEMBER(k3_bgram_w);
+	DECLARE_WRITE16_MEMBER(k3_scrollx_w);
+	DECLARE_WRITE16_MEMBER(k3_scrolly_w);
+	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
+	DECLARE_WRITE16_MEMBER(flagrall_soundbanks_w);
+	TILE_GET_INFO_MEMBER(get_k3_bg_tile_info);
+
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void k3_map(address_map &map);
+	void flagrall_map(address_map &map);
+	void k3_base_map(address_map &map);
+
+private:
 	/* devices */
 	optional_device<okim6295_device> m_oki2;
 	required_device<okim6295_device> m_oki1;
@@ -77,25 +100,9 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-
-	DECLARE_WRITE16_MEMBER(k3_bgram_w);
-	DECLARE_WRITE16_MEMBER(k3_scrollx_w);
-	DECLARE_WRITE16_MEMBER(k3_scrolly_w);
-	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
-	DECLARE_WRITE16_MEMBER(flagrall_soundbanks_w);
-	TILE_GET_INFO_MEMBER(get_k3_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void flagrall(machine_config &config);
-	void k3(machine_config &config);
-	void flagrall_map(address_map &map);
-	void k3_base_map(address_map &map);
-	void k3_map(address_map &map);
 };
 
 
@@ -437,8 +444,8 @@ ROM_END
 
 ROM_START( 1945kiiin )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "U34", 0x00001, 0x80000, CRC(d0cf4f03) SHA1(3455927221afae5103c02b12c1b855f416c47e91) ) /* 27C040 ROM had no label */
-	ROM_LOAD16_BYTE( "U35", 0x00000, 0x80000, CRC(056c64ed) SHA1(b0eddad9c950676b94316d3aeb32f3ed4b9ade0f) ) /* 27C040 ROM had no label */
+	ROM_LOAD16_BYTE( "u34", 0x00001, 0x80000, CRC(d0cf4f03) SHA1(3455927221afae5103c02b12c1b855f416c47e91) ) /* 27C040 ROM had no label */
+	ROM_LOAD16_BYTE( "u35", 0x00000, 0x80000, CRC(056c64ed) SHA1(b0eddad9c950676b94316d3aeb32f3ed4b9ade0f) ) /* 27C040 ROM had no label */
 
 	ROM_REGION( 0x080000, "oki2", 0 ) /* Samples */
 	ROM_LOAD( "snd-2.su4", 0x00000, 0x80000, CRC(47e3952e) SHA1(d56524621a3f11981e4434e02f5fdb7e89fff0b4) ) /* ROM had no label, but same data as SND-2.SU4 */
@@ -447,50 +454,50 @@ ROM_START( 1945kiiin )
 	ROM_LOAD( "snd-1.su7", 0x00000, 0x80000, CRC(bbb7f0ff) SHA1(458cf3a0c2d42110bc2427db675226c6b8d30999) ) /* ROM had no label, but same data as SND-1.SU7 */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites
-	ROM_LOAD32_BYTE( "U5",  0x000000, 0x080000, CRC(f328f85e) SHA1(fe1e1b86a77a9b6da0f69b20da64e69b874d8ef9) ) /* These 4 27C040 ROMs had no label */
-	ROM_LOAD32_BYTE( "U6",  0x000001, 0x080000, CRC(cfdabf1b) SHA1(9822def10e5213d1b5c86034637481b5349bfb70) )
-	ROM_LOAD32_BYTE( "U7",  0x000002, 0x080000, CRC(59a6a944) SHA1(20a109edddd8ab9530b94b3b2d2f8a85af2c08f8) )
-	ROM_LOAD32_BYTE( "U8",  0x000003, 0x080000, CRC(59995aaf) SHA1(29c2c638b0dd2bf1e79707ea6f5b38b37f45b822) )
+	ROM_LOAD32_BYTE( "u5",  0x000000, 0x080000, CRC(f328f85e) SHA1(fe1e1b86a77a9b6da0f69b20da64e69b874d8ef9) ) /* These 4 27C040 ROMs had no label */
+	ROM_LOAD32_BYTE( "u6",  0x000001, 0x080000, CRC(cfdabf1b) SHA1(9822def10e5213d1b5c86034637481b5349bfb70) )
+	ROM_LOAD32_BYTE( "u7",  0x000002, 0x080000, CRC(59a6a944) SHA1(20a109edddd8ab9530b94b3b2d2f8a85af2c08f8) )
+	ROM_LOAD32_BYTE( "u8",  0x000003, 0x080000, CRC(59995aaf) SHA1(29c2c638b0dd2bf1e79707ea6f5b38b37f45b822) )
 
-	ROM_LOAD32_BYTE( "U58", 0x200000, 0x080000, CRC(6acf2ce4) SHA1(4b18678a9e03beb24494270d19c57bca32a72592) ) /* These 4 27C040  ROMs had no label */
-	ROM_LOAD32_BYTE( "U59", 0x200001, 0x080000, CRC(ca6ff210) SHA1(d7e476bb41c193654495f5ed6ba39980cb3660bc) )
-	ROM_LOAD32_BYTE( "U60", 0x200002, 0x080000, CRC(91eb038a) SHA1(b24082ba1675e87881a321ba87e079a1a027dfa4) )
-	ROM_LOAD32_BYTE( "U61", 0x200003, 0x080000, CRC(1b358c6d) SHA1(1abe6422b420fd064a32ed9ca9a28c85996d4e57) )
+	ROM_LOAD32_BYTE( "u58", 0x200000, 0x080000, CRC(6acf2ce4) SHA1(4b18678a9e03beb24494270d19c57bca32a72592) ) /* These 4 27C040  ROMs had no label */
+	ROM_LOAD32_BYTE( "u59", 0x200001, 0x080000, CRC(ca6ff210) SHA1(d7e476bb41c193654495f5ed6ba39980cb3660bc) )
+	ROM_LOAD32_BYTE( "u60", 0x200002, 0x080000, CRC(91eb038a) SHA1(b24082ba1675e87881a321ba87e079a1a027dfa4) )
+	ROM_LOAD32_BYTE( "u61", 0x200003, 0x080000, CRC(1b358c6d) SHA1(1abe6422b420fd064a32ed9ca9a28c85996d4e57) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "5.U102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* These 4 ROMs had no label */
-	ROM_LOAD32_BYTE( "6.U103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) ) /* Same data as M16M-3.U61, just split up */
-	ROM_LOAD32_BYTE( "7.U104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
-	ROM_LOAD32_BYTE( "8.U105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
+	ROM_LOAD32_BYTE( "5.u102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* These 4 ROMs had no label */
+	ROM_LOAD32_BYTE( "6.u103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) ) /* Same data as M16M-3.U61, just split up */
+	ROM_LOAD32_BYTE( "7.u104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
+	ROM_LOAD32_BYTE( "8.u105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
 ROM_END
 
 ROM_START( 1945kiiio )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "3.U34", 0x00001, 0x80000, CRC(5515baa0) SHA1(6fd4c9b7cc27035d6baaafa73f5f5930bfde62a4) )
-	ROM_LOAD16_BYTE( "4.U35", 0x00000, 0x80000, CRC(fd177664) SHA1(0ea1854be8d88577129546a56d13bcdc4739ae52) )
+	ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x80000, CRC(5515baa0) SHA1(6fd4c9b7cc27035d6baaafa73f5f5930bfde62a4) )
+	ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x80000, CRC(fd177664) SHA1(0ea1854be8d88577129546a56d13bcdc4739ae52) )
 
 	ROM_REGION( 0x080000, "oki2", 0 ) /* Samples */
-	ROM_LOAD( "S21.SU5", 0x00000, 0x80000, CRC(9d96fd55) SHA1(80025cc2c44e8cd938620818e0b0974026377f5c) )
+	ROM_LOAD( "s21.su5", 0x00000, 0x80000, CRC(9d96fd55) SHA1(80025cc2c44e8cd938620818e0b0974026377f5c) )
 
 	ROM_REGION( 0x080000, "oki1", 0 ) /* Samples */
-	ROM_LOAD( "S13.SU4", 0x00000, 0x80000, CRC(d45aec3b) SHA1(fc182a10e19687eb2f2f4a1d2ad976814185f0fc))
+	ROM_LOAD( "s13.su4", 0x00000, 0x80000, CRC(d45aec3b) SHA1(fc182a10e19687eb2f2f4a1d2ad976814185f0fc))
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) // sprites
-	ROM_LOAD32_BYTE( "9.U5",   0x000000, 0x080000, CRC(be0f432e) SHA1(7d63f97a8cb38c5351f2cd2f720de16a0c4ab1d7) )
-	ROM_LOAD32_BYTE( "10.U6",  0x000001, 0x080000, CRC(cf9127b2) SHA1(e02f436662f47d8bb5a9d726889c6e86cf64bdcf) )
-	ROM_LOAD32_BYTE( "11.U7",  0x000002, 0x080000, CRC(644ee8cc) SHA1(1742e31ba48a93c005cce0dc575d9b5d739d1dce) )
-	ROM_LOAD32_BYTE( "12.U8",  0x000003, 0x080000, CRC(0900c208) SHA1(9446382d274dc7b6ccdf18738aa4db636fd9e3c9) )
+	ROM_LOAD32_BYTE( "9.u5",   0x000000, 0x080000, CRC(be0f432e) SHA1(7d63f97a8cb38c5351f2cd2f720de16a0c4ab1d7) )
+	ROM_LOAD32_BYTE( "10.u6",  0x000001, 0x080000, CRC(cf9127b2) SHA1(e02f436662f47d8bb5a9d726889c6e86cf64bdcf) )
+	ROM_LOAD32_BYTE( "11.u7",  0x000002, 0x080000, CRC(644ee8cc) SHA1(1742e31ba48a93c005cce0dc575d9b5d739d1dce) )
+	ROM_LOAD32_BYTE( "12.u8",  0x000003, 0x080000, CRC(0900c208) SHA1(9446382d274dc7b6ccdf18738aa4db636fd9e3c9) )
 
-	ROM_LOAD32_BYTE( "13.U58", 0x200000, 0x080000, CRC(8ea9c6be) SHA1(baf3af389417e1f14d0c38d8c872839a54008909) )
-	ROM_LOAD32_BYTE( "14.U59", 0x200001, 0x080000, CRC(10c18fb4) SHA1(68934e73cfb6a49a4c1639dcb4c49246f16179b2) )
-	ROM_LOAD32_BYTE( "15.U60", 0x200002, 0x080000, CRC(86ab6c7c) SHA1(59acaee6ba78a22f1423832a116ad41e19522aa1) )
-	ROM_LOAD32_BYTE( "16.U61", 0x200003, 0x080000, CRC(ff419080) SHA1(542819bdd60976bddfa96570321ba3f7fb6fbf23) )
+	ROM_LOAD32_BYTE( "13.u58", 0x200000, 0x080000, CRC(8ea9c6be) SHA1(baf3af389417e1f14d0c38d8c872839a54008909) )
+	ROM_LOAD32_BYTE( "14.u59", 0x200001, 0x080000, CRC(10c18fb4) SHA1(68934e73cfb6a49a4c1639dcb4c49246f16179b2) )
+	ROM_LOAD32_BYTE( "15.u60", 0x200002, 0x080000, CRC(86ab6c7c) SHA1(59acaee6ba78a22f1423832a116ad41e19522aa1) )
+	ROM_LOAD32_BYTE( "16.u61", 0x200003, 0x080000, CRC(ff419080) SHA1(542819bdd60976bddfa96570321ba3f7fb6fbf23) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) // bg tiles
-	ROM_LOAD32_BYTE( "5.U102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* Same data as M16M-3.U61, just split up */
-	ROM_LOAD32_BYTE( "6.U103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) )
-	ROM_LOAD32_BYTE( "7.U104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
-	ROM_LOAD32_BYTE( "8.U105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
+	ROM_LOAD32_BYTE( "5.u102", 0x000000, 0x80000, CRC(91b70a6b) SHA1(e53f62212d6e3ab5f892944b1933385a85e0ba8a) ) /* Same data as M16M-3.U61, just split up */
+	ROM_LOAD32_BYTE( "6.u103", 0x000001, 0x80000, CRC(7b5bfb85) SHA1(ef59d64513c7f7e6ee3dcc9bb7bb0e14a71ca957) )
+	ROM_LOAD32_BYTE( "7.u104", 0x000002, 0x80000, CRC(cdafcedf) SHA1(82becd002a16185220131085db6576eb763429c8) )
+	ROM_LOAD32_BYTE( "8.u105", 0x000003, 0x80000, CRC(2c3895d5) SHA1(ab5837d996c1bb70071db02f07412c182d7547f8) )
 ROM_END
 
 

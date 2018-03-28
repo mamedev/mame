@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "machine/vt100_kbd.h"
 
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -29,7 +31,7 @@ static INPUT_PORTS_START(vt100_kbd)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 7") PORT_CODE(KEYCODE_7_PAD)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num .") PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 9") PORT_CODE(KEYCODE_9_PAD)\
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Num 9") PORT_CODE(KEYCODE_9_PAD)
 
 	PORT_START("LINE1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -307,10 +309,18 @@ WRITE8_MEMBER(vt100_keyboard_device::key_scan_w)
 	{
 		u8 input_row = m_key_row[(data >> 1) & 15]->read();
 		if (!BIT(input_row, (data >> 5) & 7))
+		{
+			if (data != 0xff)
+				LOG("Keycode pressed: %02X\n", (data >> 1) & 0x7f);
 			m_uart->set_transmit_data((data >> 1) & 0x7f);
+		}
 	}
-	else if (!BIT(data, 7) && BIT(m_last_scan, 7))
-		m_scan_counter->reset_w(1);
 
-	m_last_scan = data;
+	if (!BIT(data, 7) && BIT(m_last_scan, 7))
+	{
+		m_last_scan = 0;
+		m_scan_counter->reset_w(1);
+	}
+	else
+		m_last_scan = data;
 }

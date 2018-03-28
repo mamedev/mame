@@ -223,7 +223,7 @@ void hp_hybrid_cpu_device::device_start()
 	save_item(NAME(m_reg_I));
 	save_item(NAME(m_forced_bsc_25));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_pa_changed_func.resolve_safe();
 }
@@ -241,7 +241,7 @@ void hp_hybrid_cpu_device::execute_run()
 		if (BIT(m_flags , HPHYBRID_DMAEN_BIT) && BIT(m_flags , HPHYBRID_DMAR_BIT)) {
 			handle_dma();
 		} else {
-			debugger_instruction_hook(this, m_genpc);
+			debugger_instruction_hook(m_genpc);
 
 			m_reg_I = execute_one(m_reg_I);
 
@@ -682,9 +682,9 @@ void hp_hybrid_cpu_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-util::disasm_interface *hp_hybrid_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hp_hybrid_cpu_device::create_disassembler()
 {
-	return new hp_hybrid_disassembler;
+	return std::make_unique<hp_hybrid_disassembler>();
 }
 
 uint16_t hp_hybrid_cpu_device::remove_mae(uint32_t addr)
@@ -1541,9 +1541,9 @@ uint16_t hp_5061_3001_cpu_device::execute_no_bpc_ioc(uint16_t opcode)
 	return m_reg_P + 1;
 }
 
-util::disasm_interface *hp_5061_3001_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hp_5061_3001_cpu_device::create_disassembler()
 {
-	return new hp_5061_3001_disassembler;
+	return std::make_unique<hp_5061_3001_disassembler>();
 }
 
 uint32_t hp_5061_3001_cpu_device::add_mae(aec_cases_t aec_case , uint16_t addr)

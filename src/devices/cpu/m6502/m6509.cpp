@@ -50,9 +50,9 @@ offs_t m6509_device::pc_to_external(u16 pc)
 	return adr_in_bank_i(pc);
 }
 
-util::disasm_interface *m6509_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6509_device::create_disassembler()
 {
-	return new m6509_disassembler;
+	return std::make_unique<m6509_disassembler>();
 }
 
 m6509_device::mi_6509_normal::mi_6509_normal(m6509_device *_base)

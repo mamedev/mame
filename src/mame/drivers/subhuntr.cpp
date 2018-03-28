@@ -29,13 +29,14 @@ class subhuntr_state : public driver_device
 {
 public:
 	subhuntr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
+	void subhuntr(machine_config &config);
 
+protected:
 	INTERRUPT_GEN_MEMBER(subhuntr_interrupt);
 
 	virtual void machine_start() override;
@@ -43,10 +44,13 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(subhuntr);
 	uint32_t screen_update_subhuntr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void subhuntr(machine_config &config);
+
 	void subhuntr_data_map(address_map &map);
 	void subhuntr_io_map(address_map &map);
 	void subhuntr_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -179,13 +183,13 @@ MACHINE_CONFIG_END
 
 ROM_START( subhuntr )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "MR21.6F",  0x0000, 0x0400, CRC(27847939) SHA1(e6b41b511fefac1e1e207eff2dac8c2963d47c5c) )
-	ROM_LOAD( "MR22.6G",  0x0400, 0x0400, CRC(e9af1ee8) SHA1(451e88407a120444377a58b06b65152c57503533) )
-	ROM_LOAD( "MR25.6L",  0x0800, 0x0400, CRC(8271c975) SHA1(c7192658b50d781ab1b94c2e8cb75c5be3539820) )
-	ROM_LOAD( "MR24.6N",  0x0c00, 0x0400, CRC(385c4944) SHA1(84050b0356c9a3a36528dba768f2684e28c6c7c4) )
+	ROM_LOAD( "mr21.6f",  0x0000, 0x0400, CRC(27847939) SHA1(e6b41b511fefac1e1e207eff2dac8c2963d47c5c) )
+	ROM_LOAD( "mr22.6g",  0x0400, 0x0400, CRC(e9af1ee8) SHA1(451e88407a120444377a58b06b65152c57503533) )
+	ROM_LOAD( "mr25.6l",  0x0800, 0x0400, CRC(8271c975) SHA1(c7192658b50d781ab1b94c2e8cb75c5be3539820) )
+	ROM_LOAD( "mr24.6n",  0x0c00, 0x0400, CRC(385c4944) SHA1(84050b0356c9a3a36528dba768f2684e28c6c7c4) )
 
 	ROM_REGION( 0x0200, "gfx1", 0 )
-	ROM_LOAD( "82S115.2B",   0x0000, 0x0200, CRC(6946c9de) SHA1(956b4bebe6960a73609deb75e1493c4127fd7f77) ) // ASCII, not much else
+	ROM_LOAD( "82s115.2b",   0x0000, 0x0200, CRC(6946c9de) SHA1(956b4bebe6960a73609deb75e1493c4127fd7f77) ) // ASCII, not much else
 ROM_END
 
 GAME(1979, subhuntr,  0,        subhuntr, subhuntr, subhuntr_state, 0, ROT0, "Model Racing", "Sub Hunter (Model Racing)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

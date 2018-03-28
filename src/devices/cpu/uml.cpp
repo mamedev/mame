@@ -124,7 +124,7 @@ using namespace uml;
 #define OPINFO4(op,str,sizes,cond,iflag,oflag,mflag,p0,p1,p2,p3)    { OP_##op, str, sizes, cond, OPFLAGS_##iflag, OPFLAGS_##oflag, OPFLAGS_##mflag, { p0, p1, p2, p3 } },
 
 // opcode validation table
-const opcode_info instruction::s_opcode_info_table[OP_MAX] =
+opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 {
 	OPINFO0(INVALID, "invalid",  4,   false, NONE, NONE, NONE)
 
@@ -227,7 +227,7 @@ const opcode_info instruction::s_opcode_info_table[OP_MAX] =
 //  rol32 - perform a 32-bit left rotate
 //-------------------------------------------------
 
-inline uint32_t rol32(uint32_t source, uint8_t count)
+inline u32 rol32(u32 source, u8 count)
 {
 	count &= 31;
 	return (source << count) | (source >> (32 - count));
@@ -238,7 +238,7 @@ inline uint32_t rol32(uint32_t source, uint8_t count)
 //  rol64 - perform a 64-bit left rotate
 //-------------------------------------------------
 
-inline uint64_t rol64(uint64_t source, uint8_t count)
+inline u64 rol64(u64 source, u8 count)
 {
 	count &= 63;
 	return (source << count) | (source >> (64 - count));
@@ -255,12 +255,12 @@ inline uint64_t rol64(uint64_t source, uint8_t count)
 //-------------------------------------------------
 
 uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
-	: m_code(reinterpret_cast<drccodeptr *>(drcuml.cache().alloc_near(sizeof(drccodeptr)))),
-		m_string(name),
-		m_next(nullptr),
-		m_drcuml(drcuml)
+	: m_code(reinterpret_cast<drccodeptr *>(drcuml.cache().alloc_near(sizeof(drccodeptr))))
+	, m_string(name)
+	, m_drcuml(drcuml)
 {
-	if (m_code == nullptr)
+	(void)m_drcuml; // without this, non-debug builds fail because the asserts are preprocessed out
+	if (!m_code)
 		throw std::bad_alloc();
 	*m_code = nullptr;
 }
@@ -284,28 +284,14 @@ void uml::code_handle::set_codeptr(drccodeptr code)
 //**************************************************************************
 
 //-------------------------------------------------
-//  instruction - constructor
-//-------------------------------------------------
-
-uml::instruction::instruction()
-	: m_opcode(OP_INVALID),
-		m_condition(COND_ALWAYS),
-		m_flags(0),
-		m_size(4),
-		m_numparams(0)
-{
-}
-
-
-//-------------------------------------------------
 //  configure - configure an opcode with no
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, uint8_t size, condition_t condition)
+void uml::instruction::configure(opcode_t op, u8 size, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(uint8_t)op;
+	m_opcode = opcode_t(u8(op));
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -321,10 +307,10 @@ void uml::instruction::configure(opcode_t op, uint8_t size, condition_t conditio
 //  parameter
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, condition_t condition)
+void uml::instruction::configure(opcode_t op, u8 size, parameter p0, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(uint8_t)op;
+	m_opcode = opcode_t(u8(op));
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -341,10 +327,10 @@ void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, condit
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parameter p1, condition_t condition)
+void uml::instruction::configure(opcode_t op, u8 size, parameter p0, parameter p1, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(uint8_t)op;
+	m_opcode = opcode_t(u8(op));
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -362,10 +348,10 @@ void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parame
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parameter p1, parameter p2, condition_t condition)
+void uml::instruction::configure(opcode_t op, u8 size, parameter p0, parameter p1, parameter p2, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(uint8_t)op;
+	m_opcode = opcode_t(u8(op));
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -384,10 +370,10 @@ void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parame
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parameter p1, parameter p2, parameter p3, condition_t condition)
+void uml::instruction::configure(opcode_t op, u8 size, parameter p0, parameter p1, parameter p2, parameter p3, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(uint8_t)op;
+	m_opcode = opcode_t(u8(op));
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -414,8 +400,8 @@ void uml::instruction::simplify()
 	if (m_flags != 0)
 		return;
 
-	static const uint64_t instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
-	static const uint64_t paramsizemask[] = { 0xff, 0xffff, 0xffffffff, 0xffffffffffffffffU };
+	static constexpr u64 instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
+	static constexpr u64 paramsizemask[] = { 0xff, 0xffff, 0xffffffff, 0xffffffffffffffffU };
 
 	// loop until we've simplified all we can
 	opcode_t origop;
@@ -425,316 +411,316 @@ void uml::instruction::simplify()
 		origop = m_opcode;
 		switch (m_opcode)
 		{
-			// READM: convert to READ if the mask is wide open
-			case OP_READM:
-				if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
+		// READM: convert to READ if the mask is wide open
+		case OP_READM:
+			if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
+			{
+				m_opcode = OP_READ;
+				m_numparams = 2;
+				m_param[2] = m_param[3];
+			}
+			break;
+
+		// WRITEM: convert to WRITE if the mask is wide open
+		case OP_WRITEM:
+			if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
+			{
+				m_opcode = OP_WRITE;
+				m_numparams = 2;
+				m_param[2] = m_param[3];
+			}
+			break;
+
+		// SET: convert to MOV if constant condition
+		case OP_SET:
+			if (m_condition == COND_ALWAYS)
+				convert_to_mov_immediate(1);
+			break;
+
+		// MOV: convert to NOP if move-to-self
+		case OP_MOV:
+			if (m_param[0] == m_param[1])
+				nop();
+			break;
+
+		// SEXT: convert immediates to MOV
+		case OP_SEXT:
+			if (m_param[1].is_immediate())
+				switch (m_param[2].size())
 				{
-					m_opcode = OP_READ;
-					m_numparams = 2;
-					m_param[2] = m_param[3];
+				case SIZE_BYTE:     convert_to_mov_immediate(s8(m_param[1].immediate()));     break;
+				case SIZE_WORD:     convert_to_mov_immediate(s16(m_param[1].immediate()));    break;
+				case SIZE_DWORD:    convert_to_mov_immediate(s32(m_param[1].immediate()));    break;
+				case SIZE_QWORD:    convert_to_mov_immediate(s64(m_param[1].immediate()));    break;
+				case SIZE_DQWORD:   fatalerror("Invalid SEXT target size\n");
 				}
-				break;
+			break;
 
-			// WRITEM: convert to WRITE if the mask is wide open
-			case OP_WRITEM:
-				if (m_param[2].is_immediate_value(paramsizemask[m_param[3].size()]))
-				{
-					m_opcode = OP_WRITE;
-					m_numparams = 2;
-					m_param[2] = m_param[3];
-				}
-				break;
+		// ROLAND: convert to MOV if all immediate, or to ROL or AND if one is not needed, or to SHL/SHR if the mask is right
+		case OP_ROLAND:
+			if (m_param[1].is_immediate() && m_param[2].is_immediate() && m_param[3].is_immediate())
+			{
+				assert(m_size == 4 || m_size == 8);
+				if (m_size == 4)
+					convert_to_mov_immediate(rol32(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
+				else
+					convert_to_mov_immediate(rol64(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
+			}
+			else if (m_param[2].is_immediate_value(0))
+			{
+				m_opcode = OP_AND;
+				m_numparams = 3;
+				m_param[2] = m_param[3];
+			}
+			else if (m_param[3].is_immediate_value(instsizemask[m_size]))
+			{
+				m_opcode = OP_ROL;
+				m_numparams = 3;
+			}
+			else if (m_param[2].is_immediate() && m_param[3].is_immediate_value((0xffffffffffffffffU << m_param[2].immediate()) & instsizemask[m_size]))
+			{
+				m_opcode = OP_SHL;
+				m_numparams = 3;
+			}
+			else if (m_param[2].is_immediate() && m_param[3].is_immediate_value(instsizemask[m_size] >> (8 * m_size - m_param[2].immediate())))
+			{
+				m_opcode = OP_SHR;
+				m_numparams = 3;
+				m_param[2] = 8 * m_size - m_param[2].immediate();
+			}
+			break;
 
-			// SET: convert to MOV if constant condition
-			case OP_SET:
-				if (m_condition == COND_ALWAYS)
-					convert_to_mov_immediate(1);
-				break;
+		// ROLINS: convert to ROLAND if the mask is full
+		case OP_ROLINS:
+			if (m_param[3].is_immediate_value(instsizemask[m_size]))
+				m_opcode = OP_ROLAND;
+			break;
 
-			// MOV: convert to NOP if move-to-self
-			case OP_MOV:
-				if (m_param[0] == m_param[1])
-					nop();
-				break;
+		// ADD: convert to MOV if immediate, or if adding 0
+		case OP_ADD:
+			if (m_param[1].is_immediate() && m_param[2].is_immediate())
+				convert_to_mov_immediate(m_param[1].immediate() + m_param[2].immediate());
+			else if (m_param[1].is_immediate_value(0))
+				convert_to_mov_param(2);
+			else if (m_param[2].is_immediate_value(0))
+				convert_to_mov_param(1);
+			break;
 
-			// SEXT: convert immediates to MOV
-			case OP_SEXT:
-				if (m_param[1].is_immediate())
-					switch (m_param[2].size())
-					{
-						case SIZE_BYTE:     convert_to_mov_immediate((int8_t)m_param[1].immediate());     break;
-						case SIZE_WORD:     convert_to_mov_immediate((int16_t)m_param[1].immediate());    break;
-						case SIZE_DWORD:    convert_to_mov_immediate((int32_t)m_param[1].immediate());    break;
-						case SIZE_QWORD:    convert_to_mov_immediate((int64_t)m_param[1].immediate());    break;
-						case SIZE_DQWORD:   fatalerror("Invalid SEXT target size\n");
-					}
-				break;
+		// SUB: convert to MOV if immediate, or if subtracting 0
+		case OP_SUB:
+			if (m_param[1].is_immediate() && m_param[2].is_immediate())
+				convert_to_mov_immediate(m_param[1].immediate() - m_param[2].immediate());
+			else if (m_param[2].is_immediate_value(0))
+				convert_to_mov_param(1);
+			break;
 
-			// ROLAND: convert to MOV if all immediate, or to ROL or AND if one is not needed, or to SHL/SHR if the mask is right
-			case OP_ROLAND:
-				if (m_param[1].is_immediate() && m_param[2].is_immediate() && m_param[3].is_immediate())
-				{
-					assert(m_size == 4 || m_size == 8);
-					if (m_size == 4)
-						convert_to_mov_immediate(rol32(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
-					else
-						convert_to_mov_immediate(rol64(m_param[1].immediate(), m_param[2].immediate()) & m_param[3].immediate());
-				}
-				else if (m_param[2].is_immediate_value(0))
-				{
-					m_opcode = OP_AND;
-					m_numparams = 3;
-					m_param[2] = m_param[3];
-				}
-				else if (m_param[3].is_immediate_value(instsizemask[m_size]))
-				{
-					m_opcode = OP_ROL;
-					m_numparams = 3;
-				}
-				else if (m_param[2].is_immediate() && m_param[3].is_immediate_value((0xffffffffffffffffU << m_param[2].immediate()) & instsizemask[m_size]))
-				{
-					m_opcode = OP_SHL;
-					m_numparams = 3;
-				}
-				else if (m_param[2].is_immediate() && m_param[3].is_immediate_value(instsizemask[m_size] >> (8 * m_size - m_param[2].immediate())))
-				{
-					m_opcode = OP_SHR;
-					m_numparams = 3;
-					m_param[2] = 8 * m_size - m_param[2].immediate();
-				}
-				break;
+		// CMP: no-op if no flags needed, compare i0 to i0 if the parameters are equal
+		case OP_CMP:
+			if (m_flags == 0)
+				nop();
+			else if (m_param[0] == m_param[1])
+				cmp(I0, I0);
+			break;
 
-			// ROLINS: convert to ROLAND if the mask is full
-			case OP_ROLINS:
-				if (m_param[3].is_immediate_value(instsizemask[m_size]))
-					m_opcode = OP_ROLAND;
-				break;
-
-			// ADD: convert to MOV if immediate, or if adding 0
-			case OP_ADD:
-				if (m_param[1].is_immediate() && m_param[2].is_immediate())
-					convert_to_mov_immediate(m_param[1].immediate() + m_param[2].immediate());
-				else if (m_param[1].is_immediate_value(0))
-					convert_to_mov_param(2);
-				else if (m_param[2].is_immediate_value(0))
-					convert_to_mov_param(1);
-				break;
-
-			// SUB: convert to MOV if immediate, or if subtracting 0
-			case OP_SUB:
-				if (m_param[1].is_immediate() && m_param[2].is_immediate())
-					convert_to_mov_immediate(m_param[1].immediate() - m_param[2].immediate());
-				else if (m_param[2].is_immediate_value(0))
-					convert_to_mov_param(1);
-				break;
-
-			// CMP: no-op if no flags needed, compare i0 to i0 if the parameters are equal
-			case OP_CMP:
-				if (m_flags == 0)
-					nop();
-				else if (m_param[0] == m_param[1])
-					cmp(I0, I0);
-				break;
-
-			// MULU: convert simple form to MOV if immediate, or if multiplying by 0
-			case OP_MULU:
-				if (m_param[0] == m_param[1])
-				{
-					if (m_param[2].is_immediate_value(0) || m_param[3].is_immediate_value(0))
-						convert_to_mov_immediate(0);
-					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
-					{
-						if (m_size == 4)
-							convert_to_mov_immediate((uint32_t)((uint32_t)m_param[1].immediate() * (uint32_t)m_param[2].immediate()));
-						else if (m_size == 8)
-							convert_to_mov_immediate((uint64_t)((uint64_t)m_param[1].immediate() * (uint64_t)m_param[2].immediate()));
-					}
-				}
-				break;
-
-			// MULS: convert simple form to MOV if immediate, or if multiplying by 0
-			case OP_MULS:
-				if (m_param[0] == m_param[1])
-				{
-					if (m_param[2].is_immediate_value(0) || m_param[3].is_immediate_value(0))
-						convert_to_mov_immediate(0);
-					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
-					{
-						if (m_size == 4)
-							convert_to_mov_immediate((int32_t)((int32_t)m_param[1].immediate() * (int32_t)m_param[2].immediate()));
-						else if (m_size == 8)
-							convert_to_mov_immediate((int64_t)((int64_t)m_param[1].immediate() * (int64_t)m_param[2].immediate()));
-					}
-				}
-				break;
-
-			// DIVU: convert simple form to MOV if immediate, or if dividing with 0
-			case OP_DIVU:
-				if (m_param[0] == m_param[1] && !m_param[3].is_immediate_value(0))
-				{
-					if (m_param[2].is_immediate_value(0))
-						convert_to_mov_immediate(0);
-					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
-					{
-						if (m_size == 4)
-							convert_to_mov_immediate((uint32_t)((uint32_t)m_param[1].immediate() / (uint32_t)m_param[2].immediate()));
-						else if (m_size == 8)
-							convert_to_mov_immediate((uint64_t)((uint64_t)m_param[1].immediate() / (uint64_t)m_param[2].immediate()));
-					}
-				}
-				break;
-
-			// DIVS: convert simple form to MOV if immediate, or if dividing with 0
-			case OP_DIVS:
-				if (m_param[0] == m_param[1] && !m_param[3].is_immediate_value(0))
-				{
-					if (m_param[2].is_immediate_value(0))
-						convert_to_mov_immediate(0);
-					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
-					{
-						if (m_size == 4)
-							convert_to_mov_immediate((int32_t)((int32_t)m_param[1].immediate() / (int32_t)m_param[2].immediate()));
-						else if (m_size == 8)
-							convert_to_mov_immediate((int64_t)((int64_t)m_param[1].immediate() / (int64_t)m_param[2].immediate()));
-					}
-				}
-				break;
-
-			// AND: convert to MOV if immediate, or if anding against 0 or 0xffffffff
-			case OP_AND:
-				if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
+		// MULU: convert simple form to MOV if immediate, or if multiplying by 0
+		case OP_MULU:
+			if (m_param[0] == m_param[1])
+			{
+				if (m_param[2].is_immediate_value(0) || m_param[3].is_immediate_value(0))
 					convert_to_mov_immediate(0);
-				else if (m_param[1].is_immediate() && m_param[2].is_immediate())
-					convert_to_mov_immediate(m_param[1].immediate() & m_param[2].immediate());
-				else if (m_param[1].is_immediate_value(instsizemask[m_size]))
-					convert_to_mov_param(2);
-				else if (m_param[2].is_immediate_value(instsizemask[m_size]))
-					convert_to_mov_param(1);
-				break;
-
-			// TEST: no-op if no flags needed
-			case OP_TEST:
-				if (m_flags == 0)
-					nop();
-				break;
-
-			// OR: convert to MOV if immediate, or if oring against 0 or 0xffffffff
-			case OP_OR:
-				if (m_param[1].is_immediate_value(instsizemask[m_size]) || m_param[2].is_immediate_value(instsizemask[m_size]))
-					convert_to_mov_immediate(instsizemask[m_size]);
-				else if (m_param[1].is_immediate() && m_param[2].is_immediate())
-					convert_to_mov_immediate(m_param[1].immediate() | m_param[2].immediate());
-				else if (m_param[1].is_immediate_value(0))
-					convert_to_mov_param(2);
-				else if (m_param[2].is_immediate_value(0))
-					convert_to_mov_param(1);
-				break;
-
-			// XOR: convert to MOV if immediate, or if xoring against 0
-			case OP_XOR:
-				if (m_param[1].is_immediate() && m_param[2].is_immediate())
-					convert_to_mov_immediate(m_param[1].immediate() ^ m_param[2].immediate());
-				else if (m_param[1].is_immediate_value(0))
-					convert_to_mov_param(2);
-				else if (m_param[2].is_immediate_value(0))
-					convert_to_mov_param(1);
-				break;
-
-			// LZCNT: convert to MOV if immediate
-			case OP_LZCNT:
-				if (m_param[1].is_immediate())
+				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(count_leading_zeros(m_param[1].immediate()));
+						convert_to_mov_immediate(u32(u32(m_param[1].immediate()) * u32(m_param[2].immediate())));
 					else if (m_size == 8)
-					{
-						if ((m_param[1].immediate() >> 32) == 0)
-							convert_to_mov_immediate(32 + count_leading_zeros(m_param[1].immediate()));
-						else
-							convert_to_mov_immediate(count_leading_zeros(m_param[1].immediate() >> 32));
-					}
+						convert_to_mov_immediate(u64(u64(m_param[1].immediate()) * u64(m_param[2].immediate())));
 				}
-				break;
+			}
+			break;
 
-			// BSWAP: convert to MOV if immediate
-			case OP_BSWAP:
-				if (m_param[1].is_immediate())
+		// MULS: convert simple form to MOV if immediate, or if multiplying by 0
+		case OP_MULS:
+			if (m_param[0] == m_param[1])
+			{
+				if (m_param[2].is_immediate_value(0) || m_param[3].is_immediate_value(0))
+					convert_to_mov_immediate(0);
+				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(flipendian_int32(m_param[1].immediate()));
+						convert_to_mov_immediate(s32(s32(m_param[1].immediate()) * s32(m_param[2].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate(flipendian_int64(m_param[1].immediate()));
+						convert_to_mov_immediate(s64(s64(m_param[1].immediate()) * s64(m_param[2].immediate())));
 				}
-				break;
+			}
+			break;
 
-			// SHL: convert to MOV if immediate or shifting by 0
-			case OP_SHL:
-				if (m_param[1].is_immediate() && m_param[2].is_immediate())
-					convert_to_mov_immediate(m_param[1].immediate() << m_param[2].immediate());
-				else if (m_param[2].is_immediate_value(0))
-					convert_to_mov_param(1);
-				break;
-
-			// SHR: convert to MOV if immediate or shifting by 0
-			case OP_SHR:
-				if (m_param[1].is_immediate() && m_param[2].is_immediate())
+		// DIVU: convert simple form to MOV if immediate, or if dividing with 0
+		case OP_DIVU:
+			if (m_param[0] == m_param[1] && !m_param[3].is_immediate_value(0))
+			{
+				if (m_param[2].is_immediate_value(0))
+					convert_to_mov_immediate(0);
+				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate((uint32_t)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate(u32(u32(m_param[1].immediate()) / u32(m_param[2].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate((uint64_t)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate(u64(u64(m_param[1].immediate()) / u64(m_param[2].immediate())));
 				}
-				else if (m_param[2].is_immediate_value(0))
-					convert_to_mov_param(1);
-				break;
+			}
+			break;
 
-			// SAR: convert to MOV if immediate or shifting by 0
-			case OP_SAR:
-				if (m_param[1].is_immediate() && m_param[2].is_immediate())
+		// DIVS: convert simple form to MOV if immediate, or if dividing with 0
+		case OP_DIVS:
+			if (m_param[0] == m_param[1] && !m_param[3].is_immediate_value(0))
+			{
+				if (m_param[2].is_immediate_value(0))
+					convert_to_mov_immediate(0);
+				else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate((int32_t)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate(s32(s32(m_param[1].immediate()) / s32(m_param[2].immediate())));
 					else if (m_size == 8)
-						convert_to_mov_immediate((int64_t)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate(s64(s64(m_param[1].immediate()) / s64(m_param[2].immediate())));
 				}
-				else if (m_param[2].is_immediate_value(0))
-					convert_to_mov_param(1);
-				break;
+			}
+			break;
 
-			// ROL: convert to NOP if immediate or rotating by 0
-			case OP_ROL:
-				if (m_param[1].is_immediate() && m_param[2].is_immediate())
+		// AND: convert to MOV if immediate, or if anding against 0 or 0xffffffff
+		case OP_AND:
+			if (m_param[1].is_immediate_value(0) || m_param[2].is_immediate_value(0))
+				convert_to_mov_immediate(0);
+			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
+				convert_to_mov_immediate(m_param[1].immediate() & m_param[2].immediate());
+			else if (m_param[1].is_immediate_value(instsizemask[m_size]))
+				convert_to_mov_param(2);
+			else if (m_param[2].is_immediate_value(instsizemask[m_size]))
+				convert_to_mov_param(1);
+			break;
+
+		// TEST: no-op if no flags needed
+		case OP_TEST:
+			if (m_flags == 0)
+				nop();
+			break;
+
+		// OR: convert to MOV if immediate, or if oring against 0 or 0xffffffff
+		case OP_OR:
+			if (m_param[1].is_immediate_value(instsizemask[m_size]) || m_param[2].is_immediate_value(instsizemask[m_size]))
+				convert_to_mov_immediate(instsizemask[m_size]);
+			else if (m_param[1].is_immediate() && m_param[2].is_immediate())
+				convert_to_mov_immediate(m_param[1].immediate() | m_param[2].immediate());
+			else if (m_param[1].is_immediate_value(0))
+				convert_to_mov_param(2);
+			else if (m_param[2].is_immediate_value(0))
+				convert_to_mov_param(1);
+			break;
+
+		// XOR: convert to MOV if immediate, or if xoring against 0
+		case OP_XOR:
+			if (m_param[1].is_immediate() && m_param[2].is_immediate())
+				convert_to_mov_immediate(m_param[1].immediate() ^ m_param[2].immediate());
+			else if (m_param[1].is_immediate_value(0))
+				convert_to_mov_param(2);
+			else if (m_param[2].is_immediate_value(0))
+				convert_to_mov_param(1);
+			break;
+
+		// LZCNT: convert to MOV if immediate
+		case OP_LZCNT:
+			if (m_param[1].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(count_leading_zeros(m_param[1].immediate()));
+				else if (m_size == 8)
 				{
-					if (m_size == 4)
-						convert_to_mov_immediate(rol32(m_param[1].immediate(), m_param[2].immediate()));
-					else if (m_size == 8)
-						convert_to_mov_immediate(rol64(m_param[1].immediate(), m_param[2].immediate()));
+					if ((m_param[1].immediate() >> 32) == 0)
+						convert_to_mov_immediate(32 + count_leading_zeros(m_param[1].immediate()));
+					else
+						convert_to_mov_immediate(count_leading_zeros(m_param[1].immediate() >> 32));
 				}
-				else if (m_param[2].is_immediate_value(0))
-					convert_to_mov_param(1);
-				break;
+			}
+			break;
 
-			// ROR: convert to NOP if immediate or rotating by 0
-			case OP_ROR:
-				if (m_param[1].is_immediate() && m_param[2].is_immediate())
-				{
-					if (m_size == 4)
-						convert_to_mov_immediate(rol32(m_param[1].immediate(), 32 - m_param[2].immediate()));
-					else if (m_size == 8)
-						convert_to_mov_immediate(rol64(m_param[1].immediate(), 64 - m_param[2].immediate()));
-				}
-				else if (m_param[2].is_immediate_value(0))
-					convert_to_mov_param(1);
-				break;
+		// BSWAP: convert to MOV if immediate
+		case OP_BSWAP:
+			if (m_param[1].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(flipendian_int32(m_param[1].immediate()));
+				else if (m_size == 8)
+					convert_to_mov_immediate(flipendian_int64(m_param[1].immediate()));
+			}
+			break;
 
-			// FMOV: convert to NOP if move-to-self
-			case OP_FMOV:
-				if (m_param[0] == m_param[1])
-					nop();
-				break;
+		// SHL: convert to MOV if immediate or shifting by 0
+		case OP_SHL:
+			if (m_param[1].is_immediate() && m_param[2].is_immediate())
+				convert_to_mov_immediate(m_param[1].immediate() << m_param[2].immediate());
+			else if (m_param[2].is_immediate_value(0))
+				convert_to_mov_param(1);
+			break;
 
-			default:
-				break;
+		// SHR: convert to MOV if immediate or shifting by 0
+		case OP_SHR:
+			if (m_param[1].is_immediate() && m_param[2].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(u32(m_param[1].immediate()) >> m_param[2].immediate());
+				else if (m_size == 8)
+					convert_to_mov_immediate(u64(m_param[1].immediate()) >> m_param[2].immediate());
+			}
+			else if (m_param[2].is_immediate_value(0))
+				convert_to_mov_param(1);
+			break;
+
+		// SAR: convert to MOV if immediate or shifting by 0
+		case OP_SAR:
+			if (m_param[1].is_immediate() && m_param[2].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(s32(m_param[1].immediate()) >> m_param[2].immediate());
+				else if (m_size == 8)
+					convert_to_mov_immediate(s64(m_param[1].immediate()) >> m_param[2].immediate());
+			}
+			else if (m_param[2].is_immediate_value(0))
+				convert_to_mov_param(1);
+			break;
+
+		// ROL: convert to NOP if immediate or rotating by 0
+		case OP_ROL:
+			if (m_param[1].is_immediate() && m_param[2].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(rol32(m_param[1].immediate(), m_param[2].immediate()));
+				else if (m_size == 8)
+					convert_to_mov_immediate(rol64(m_param[1].immediate(), m_param[2].immediate()));
+			}
+			else if (m_param[2].is_immediate_value(0))
+				convert_to_mov_param(1);
+			break;
+
+		// ROR: convert to NOP if immediate or rotating by 0
+		case OP_ROR:
+			if (m_param[1].is_immediate() && m_param[2].is_immediate())
+			{
+				if (m_size == 4)
+					convert_to_mov_immediate(rol32(m_param[1].immediate(), 32 - m_param[2].immediate()));
+				else if (m_size == 8)
+					convert_to_mov_immediate(rol64(m_param[1].immediate(), 64 - m_param[2].immediate()));
+			}
+			else if (m_param[2].is_immediate_value(0))
+				convert_to_mov_param(1);
+			break;
+
+		// FMOV: convert to NOP if move-to-self
+		case OP_FMOV:
+			if (m_param[0] == m_param[1])
+				nop();
+			break;
+
+		default:
+			break;
 		}
 
 	/*
@@ -782,7 +768,7 @@ void uml::instruction::validate()
 	// make sure we aren't missing any parameters
 	if (m_numparams < ARRAY_LENGTH(opinfo.param))
 		assert(opinfo.param[m_numparams].typemask == 0);
-#endif
+#endif // MAME_DEBUG
 }
 
 
@@ -792,9 +778,9 @@ void uml::instruction::validate()
 //  instruction
 //-------------------------------------------------
 
-uint8_t uml::instruction::input_flags() const
+u8 uml::instruction::input_flags() const
 {
-	static const uint8_t flags_for_condition[] =
+	static constexpr u8 flags_for_condition[] =
 	{
 		FLAG_Z,                     // COND_Z
 		FLAG_Z,                     // COND_NZ
@@ -814,7 +800,7 @@ uint8_t uml::instruction::input_flags() const
 		FLAG_S | FLAG_V             // COND_GE
 	};
 
-	uint8_t flags = s_opcode_info_table[m_opcode].inflags;
+	u8 flags = s_opcode_info_table[m_opcode].inflags;
 	if (flags & 0x80)
 		flags = m_param[flags - OPFLAGS_P1].immediate() & OPFLAGS_ALL;
 	if (m_condition != COND_ALWAYS)
@@ -829,9 +815,9 @@ uint8_t uml::instruction::input_flags() const
 //  instruction
 //-------------------------------------------------
 
-uint8_t uml::instruction::output_flags() const
+u8 uml::instruction::output_flags() const
 {
-	uint8_t flags = s_opcode_info_table[m_opcode].outflags;
+	u8 flags = s_opcode_info_table[m_opcode].outflags;
 	if (flags & 0x80)
 		flags = m_param[flags - OPFLAGS_P1].immediate() & OPFLAGS_ALL;
 	return flags;
@@ -844,7 +830,7 @@ uint8_t uml::instruction::output_flags() const
 //  instruction
 //-------------------------------------------------
 
-uint8_t uml::instruction::modified_flags() const
+u8 uml::instruction::modified_flags() const
 {
 	return s_opcode_info_table[m_opcode].modflags;
 }
@@ -857,20 +843,20 @@ uint8_t uml::instruction::modified_flags() const
 
 std::string uml::instruction::disasm(drcuml_state *drcuml) const
 {
-	static const char *const conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
-	static const char *const pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
-	static const char *const bang_size[] = { "?", "b", "h", "?", "", "?", "?", "?", "d" };
-	static const char *const fmods[] = { "trunc", "round", "ceil", "floor", "default" };
-	static const char *const spaces[] = { "program", "data", "io", "3", "4", "5", "6", "7" };
-	static const char *const sizes[] = { "byte", "word", "dword", "qword" };
-
-	const opcode_info &opinfo = s_opcode_info_table[m_opcode];
+	static char const *const conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
+	static char const *const pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
+	static char const *const bang_size[] = { "?", "b", "h", "?", "", "?", "?", "?", "d" };
+	static char const *const fmods[] = { "trunc", "round", "ceil", "floor", "default" };
+	static char const *const spaces[] = { "program", "data", "io", "3", "4", "5", "6", "7" };
+	static char const *const sizes[] = { "byte", "word", "dword", "qword" };
 
 	assert(m_opcode != OP_INVALID && m_opcode < OP_MAX);
 
+	opcode_info const &opinfo = s_opcode_info_table[m_opcode];
+
 	// start with the raw mnemonic and substitute sizes
 	std::ostringstream buffer;
-	for (const char *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
+	for (char const *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
 			util::stream_format(buffer, "%s", bang_size[m_size]);
 		else if (*opsrc == '#')
@@ -879,12 +865,8 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 			util::stream_format(buffer, "%c", *opsrc);
 
 	// pad to 8 spaces
-	int pad = 8 - buffer.tellp();
-	while (pad > 0)
-	{
+	for (int pad = 8 - buffer.tellp(); (pad > 0); --pad)
 		buffer.put(' ');
-		pad--;
-	}
 
 	// iterate through parameters
 	for (int pnum = 0; pnum < m_numparams; pnum++)
@@ -898,82 +880,79 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 		// ouput based on type
 		switch (param.type())
 		{
-			// immediates have several special cases
-			case parameter::PTYPE_IMMEDIATE:
+		// immediates have several special cases
+		case parameter::PTYPE_IMMEDIATE:
+			{
+				// determine the size of the immediate
+				int size;
+				switch (opinfo.param[pnum].size)
 				{
-					// determine the size of the immediate
-					int size;
-					switch (opinfo.param[pnum].size)
-					{
-						case PSIZE_4:   size = 4; break;
-						case PSIZE_8:   size = 8; break;
-						case PSIZE_P1:  size = 1 << m_param[0].size(); break;
-						case PSIZE_P2:  size = 1 << m_param[1].size(); break;
-						case PSIZE_P3:  size = 1 << m_param[2].size(); break;
-						case PSIZE_P4:  size = 1 << m_param[3].size(); break;
-						default:
-						case PSIZE_OP:  size = m_size; break;
-					}
-
-					// truncate to size
-					uint64_t value = param.immediate();
-					if (size == 1) value = (uint8_t)value;
-					if (size == 2) value = (uint16_t)value;
-					if (size == 4) value = (uint32_t)value;
-					if ((uint32_t)value == value)
-						util::stream_format(buffer, "$%X", (uint32_t)value);
-					else
-						util::stream_format(buffer, "$%X%08X", (uint32_t)(value >> 32), (uint32_t)value);
+					case PSIZE_4:   size = 4; break;
+					case PSIZE_8:   size = 8; break;
+					case PSIZE_P1:  size = 1 << m_param[0].size(); break;
+					case PSIZE_P2:  size = 1 << m_param[1].size(); break;
+					case PSIZE_P3:  size = 1 << m_param[2].size(); break;
+					case PSIZE_P4:  size = 1 << m_param[3].size(); break;
+					default:
+					case PSIZE_OP:  size = m_size; break;
 				}
-				break;
 
-			// immediates have several special cases
-			case parameter::PTYPE_SIZE:
-				util::stream_format(buffer, "%s", sizes[param.size()]);
-				break;
+				// truncate to size
+				u64 value = param.immediate();
+				if (size == 1) value = u8(value);
+				if (size == 2) value = u16(value);
+				if (size == 4) value = u32(value);
+				util::stream_format(buffer, "$%X", value);
+			}
+			break;
 
-			// size + address space immediate
-			case parameter::PTYPE_SIZE_SPACE:
-				util::stream_format(buffer, "%s_%s", spaces[param.space()], sizes[param.size()]);
-				break;
+		// immediates have several special cases
+		case parameter::PTYPE_SIZE:
+			util::stream_format(buffer, "%s", sizes[param.size()]);
+			break;
 
-			// size + scale immediate
-			case parameter::PTYPE_SIZE_SCALE:
-				{
-					int scale = param.scale();
-					int size  = param.size();
-					if (scale == size)
-						util::stream_format(buffer, "%s", sizes[size]);
-					else
-						util::stream_format(buffer, "%s_x%d", sizes[size], 1 << scale);
-				}
-				break;
+		// size + address space immediate
+		case parameter::PTYPE_SIZE_SPACE:
+			util::stream_format(buffer, "%s_%s", spaces[param.space()], sizes[param.size()]);
+			break;
 
-			// fmod immediate
-			case parameter::PTYPE_ROUNDING:
-				util::stream_format(buffer, "%s", fmods[param.rounding()]);
-				break;
+		// size + scale immediate
+		case parameter::PTYPE_SIZE_SCALE:
+			{
+				int const scale = param.scale();
+				int const size  = param.size();
+				if (scale == size)
+					util::stream_format(buffer, "%s", sizes[size]);
+				else
+					util::stream_format(buffer, "%s_x%d", sizes[size], 1 << scale);
+			}
+			break;
 
-			// integer registers
-			case parameter::PTYPE_INT_REGISTER:
-				util::stream_format(buffer, "i%d", param.ireg() - REG_I0);
-				break;
+		// fmod immediate
+		case parameter::PTYPE_ROUNDING:
+			util::stream_format(buffer, "%s", fmods[param.rounding()]);
+			break;
 
-			// floating point registers
-			case parameter::PTYPE_FLOAT_REGISTER:
-				util::stream_format(buffer, "f%d", param.freg() - REG_F0);
-				break;
+		// integer registers
+		case parameter::PTYPE_INT_REGISTER:
+			util::stream_format(buffer, "i%d", param.ireg() - REG_I0);
+			break;
 
-			// map variables
-			case parameter::PTYPE_MAPVAR:
-				util::stream_format(buffer, "m%d", param.mapvar() - MAPVAR_M0);
-				break;
+		// floating point registers
+		case parameter::PTYPE_FLOAT_REGISTER:
+			util::stream_format(buffer, "f%d", param.freg() - REG_F0);
+			break;
 
-			// memory
-			case parameter::PTYPE_MEMORY:
+		// map variables
+		case parameter::PTYPE_MAPVAR:
+			util::stream_format(buffer, "m%d", param.mapvar() - MAPVAR_M0);
+			break;
+
+		// memory
+		case parameter::PTYPE_MEMORY:
 			{
 				const char *symbol;
-				uint32_t symoffset;
+				u32 symoffset;
 
 				// symbol
 				if (drcuml != nullptr && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != nullptr)
@@ -986,32 +965,32 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 
 				// cache memory
 				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
-					util::stream_format(buffer, "[+$%X]", (uint32_t)(uintptr_t)((drccodeptr)param.memory() - drcuml->cache().near()));
+					util::stream_format(buffer, "[+$%X]", u32(uintptr_t(drccodeptr(param.memory()) - drcuml->cache().near())));
 
 				// general memory
 				else
 					util::stream_format(buffer, "[[$%p]]", param.memory());
-				break;
 			}
+			break;
 
-			// string pointer
-			case parameter::PTYPE_STRING:
-				util::stream_format(buffer, "%s", (const char *)(uintptr_t)param.string());
-				break;
+		// string pointer
+		case parameter::PTYPE_STRING:
+			util::stream_format(buffer, "%s", reinterpret_cast<char const *>(uintptr_t(param.string())));
+			break;
 
-			// handle pointer
-			case parameter::PTYPE_CODE_HANDLE:
-				util::stream_format(buffer, "%s", param.handle().string());
-				break;
+		// handle pointer
+		case parameter::PTYPE_CODE_HANDLE:
+			util::stream_format(buffer, "%s", param.handle().string());
+			break;
 
-			// label
-			case parameter::PTYPE_CODE_LABEL:
-				util::stream_format(buffer, "$%8X", param.label().label());
-				break;
+		// label
+		case parameter::PTYPE_CODE_LABEL:
+			util::stream_format(buffer, "$%8X", param.label().label());
+			break;
 
-			default:
-				util::stream_format(buffer, "???");
-				break;
+		default:
+			util::stream_format(buffer, "???");
+			break;
 		}
 	}
 

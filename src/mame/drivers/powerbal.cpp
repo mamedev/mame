@@ -697,7 +697,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(powerbal_state::atombjt)
 
 	powerbal(config);
-	
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atombjt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", powerbal_state,  irq6_line_hold)

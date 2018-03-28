@@ -30,7 +30,7 @@ protected:
 	virtual void device_reset() override;
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;

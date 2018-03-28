@@ -832,7 +832,7 @@ MACHINE_CONFIG_END
 
 #define BIOS_ROM \
 	ROM_REGION( 0x10000, "maincpu", 0 ) \
-	ROM_LOAD( "Magnet-Master-VID-E03.BIN", 0x00000, 0x02000, CRC(86c4a4f0) SHA1(6db1a006b2e0b2a7cc9748ade881debb098b6757) )
+	ROM_LOAD( "magnet-master-vid-e03.bin", 0x00000, 0x02000, CRC(86c4a4f0) SHA1(6db1a006b2e0b2a7cc9748ade881debb098b6757) )
 
 
 

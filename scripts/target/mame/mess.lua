@@ -61,7 +61,7 @@ CPUS["MIPS"] = true
 CPUS["R3000"] = true
 CPUS["PSX"] = true
 CPUS["SH"] = true
-CPUS["DSP16A"] = true
+CPUS["DSP16"] = true
 CPUS["DSP32C"] = true
 CPUS["PIC16C5X"] = true
 CPUS["PIC16C62X"] = true
@@ -270,6 +270,7 @@ SOUNDS["MEA8000"] = true
 --SOUNDS["MM5837"] = true
 SOUNDS["DAVE"] = true
 --SOUNDS["LC7535"] = true
+SOUNDS["UPD934G"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -878,6 +879,7 @@ FORMATS["PC98_DSK"] = true
 FORMATS["PC_DSK"] = true
 FORMATS["PHC25_CAS"] = true
 FORMATS["PK8020_DSK"] = true
+FORMATS["POLY_DSK"] = true
 FORMATS["PPG_DSK"] = true
 FORMATS["PMD_CAS"] = true
 FORMATS["PRIMOPTP"] = true
@@ -1068,9 +1070,11 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"pel",
 		"philips",
 		"pitronic",
+		"poly",
 		"poly88",
 		"prodigy",
 		"psion",
+		"qume",
 		"radio",
 		"rca",
 		"regnecentralen",
@@ -1670,9 +1674,11 @@ createMESSProjects(_target, _subtarget, "casio")
 files {
 	MAME_DIR .. "src/mame/drivers/casloopy.cpp",
 	MAME_DIR .. "src/mame/drivers/cfx9850.cpp",
+	MAME_DIR .. "src/mame/drivers/cz101.cpp",
 	MAME_DIR .. "src/mame/drivers/fp200.cpp",
 	MAME_DIR .. "src/mame/drivers/fp1100.cpp",
 	MAME_DIR .. "src/mame/drivers/fp6000.cpp",
+	MAME_DIR .. "src/mame/drivers/ht6000.cpp",
 	MAME_DIR .. "src/mame/drivers/pb1000.cpp",
 	MAME_DIR .. "src/mame/drivers/pv1000.cpp",
 	MAME_DIR .. "src/mame/drivers/pv2000.cpp",
@@ -2681,7 +2687,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/galeb.cpp",
 	MAME_DIR .. "src/mame/includes/galeb.h",
 	MAME_DIR .. "src/mame/video/galeb.cpp",
-		MAME_DIR .. "src/mame/drivers/orao.cpp",
+	MAME_DIR .. "src/mame/drivers/orao.cpp",
 	MAME_DIR .. "src/mame/includes/orao.h",
 	MAME_DIR .. "src/mame/machine/orao.cpp",
 	MAME_DIR .. "src/mame/video/orao.cpp",
@@ -2694,6 +2700,12 @@ files {
 	MAME_DIR .. "src/mame/machine/p2000t.cpp",
 	MAME_DIR .. "src/mame/video/p2000t.cpp",
 	MAME_DIR .. "src/mame/drivers/vg5k.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "poly")
+files {
+	MAME_DIR .. "src/mame/drivers/poly.cpp",
+	MAME_DIR .. "src/mame/drivers/proteus.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "poly88")
@@ -2720,6 +2732,14 @@ files {
 	MAME_DIR .. "src/mame/includes/psion.h",
 	MAME_DIR .. "src/mame/machine/psion_pack.cpp",
 	MAME_DIR .. "src/mame/machine/psion_pack.h",
+}
+
+createMESSProjects(_target, _subtarget, "qume")
+files {
+	MAME_DIR .. "src/mame/drivers/qvt70.cpp",
+	MAME_DIR .. "src/mame/drivers/qvt103.cpp",
+	MAME_DIR .. "src/mame/drivers/qvt201.cpp",
+	MAME_DIR .. "src/mame/drivers/qvt6800.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "radio")
@@ -3125,6 +3145,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/tv910.cpp",
 	MAME_DIR .. "src/mame/drivers/tv912.cpp",
 	MAME_DIR .. "src/mame/drivers/tv950.cpp",
+	MAME_DIR .. "src/mame/drivers/tv955.cpp",
+	MAME_DIR .. "src/mame/drivers/tv965.cpp",
 	MAME_DIR .. "src/mame/drivers/tv990.cpp",
 	MAME_DIR .. "src/mame/drivers/ts3000.cpp",
 }
@@ -3478,6 +3500,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "skeleton")
 files {
+	MAME_DIR .. "src/mame/drivers/aaa.cpp",
 	MAME_DIR .. "src/mame/drivers/acd.cpp",
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
 	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
@@ -3628,7 +3651,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/plan80.cpp",
 	MAME_DIR .. "src/mame/drivers/pm68k.cpp",
 	MAME_DIR .. "src/mame/drivers/pockchal.cpp",
-	MAME_DIR .. "src/mame/drivers/poly.cpp",
 	MAME_DIR .. "src/mame/drivers/powerstack.cpp",
 	MAME_DIR .. "src/mame/drivers/proteus3.cpp",
 	MAME_DIR .. "src/mame/drivers/pt68k4.cpp",
@@ -3636,9 +3658,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/pulsar.cpp",
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
-	MAME_DIR .. "src/mame/drivers/qvt103.cpp",
-	MAME_DIR .. "src/mame/drivers/qvt201.cpp",
-	MAME_DIR .. "src/mame/drivers/qvt6800.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
 	MAME_DIR .. "src/mame/drivers/rad_eu3a14.cpp",
 	MAME_DIR .. "src/mame/drivers/rad_eu3a05.cpp",
@@ -3667,7 +3686,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",
 	MAME_DIR .. "src/mame/drivers/terak.cpp",
 	MAME_DIR .. "src/mame/drivers/terco.cpp",
-	MAME_DIR .. "src/mame/drivers/terminals.cpp",
 	MAME_DIR .. "src/mame/drivers/ti630.cpp",
 	MAME_DIR .. "src/mame/drivers/tr175.cpp",
 	MAME_DIR .. "src/mame/drivers/trs80dt1.cpp",

@@ -33,9 +33,8 @@ public:
 
 protected:
 	// device_t implementation
-	tiny_rom_entry const *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -46,29 +45,21 @@ protected:
 private:
 
 	// MAME resources
-	required_device<dsp16_device_base> m_dsp;
 	sound_stream *m_stream;
 
 	struct qsound_channel
 	{
-		uint32_t bank;        // bank
-		uint32_t address;     // start/cur address
-		uint16_t loop;        // loop address
-		uint16_t end;         // end address
-		uint32_t freq;        // frequency
-		uint16_t vol;         // master volume
+		uint16_t reg[8];    // channel control registers
 
 		// work variables
-		bool enabled;       // key on / key off
 		int lvol;           // left volume
 		int rvol;           // right volume
-		uint32_t step_ptr;    // current offset counter
 	} m_channel[16];
 
 	int m_pan_table[33];    // pan volume table
-	uint16_t m_data;          // register latch data
+	uint16_t m_data;        // register latch data
 
-	inline int8_t read_sample(uint32_t offset) { return (int8_t)read_byte(offset); }
+	inline int16_t read_sample(uint32_t offset) { return uint16_t(read_byte(offset)) << 8; }
 	void write_data(uint8_t address, uint16_t data);
 };
 

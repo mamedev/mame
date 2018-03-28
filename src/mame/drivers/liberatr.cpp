@@ -324,7 +324,8 @@ void liberatr_state::liberat2_map(address_map &map)
 	map(0x0002, 0x0002).rw(this, FUNC(liberatr_state::bitmap_xy_r), FUNC(liberatr_state::bitmap_xy_w));
 	map(0x4000, 0x4000).r(this, FUNC(liberatr_state::port0_r));
 	map(0x4001, 0x4001).portr("IN1");
-	map(0x4000, 0x400f).nopr().writeonly().share("base_ram");
+	map(0x4002, 0x400f).nopr();
+	map(0x4000, 0x400f).writeonly().share("base_ram");
 	map(0x4200, 0x421f).nopr().writeonly().share("colorram");
 	map(0x4400, 0x4400).nopw();
 	map(0x4600, 0x4600).w(this, FUNC(liberatr_state::earom_control_w));

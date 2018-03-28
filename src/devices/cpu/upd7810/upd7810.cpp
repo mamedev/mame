@@ -520,24 +520,24 @@ device_memory_interface::space_config_vector upd7810_device::memory_space_config
 	};
 }
 
-util::disasm_interface *upd7810_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd7810_device::create_disassembler()
 {
-	return new upd7810_disassembler;
+	return std::make_unique<upd7810_disassembler>();
 }
 
-util::disasm_interface *upd7807_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd7807_device::create_disassembler()
 {
-	return new upd7807_disassembler;
+	return std::make_unique<upd7807_disassembler>();
 }
 
-util::disasm_interface *upd7801_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd7801_device::create_disassembler()
 {
-	return new upd7801_disassembler;
+	return std::make_unique<upd7801_disassembler>();
 }
 
-util::disasm_interface *upd78c05_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> upd78c05_device::create_disassembler()
 {
-	return new upd78c05_disassembler;
+	return std::make_unique<upd78c05_disassembler>();
 }
 
 WRITE8_MEMBER(upd7810_device::pa_w)
@@ -1669,7 +1669,7 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_int1));
 	save_item(NAME(m_int2));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void upd7810_device::device_start()
@@ -1900,7 +1900,7 @@ void upd7810_device::execute_run()
 	{
 		int cc;
 
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		PPC = PC;
 		RDOP(OP);

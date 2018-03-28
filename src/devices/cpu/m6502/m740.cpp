@@ -28,9 +28,9 @@ u32 m740_device::get_state_base() const
 	return inst_state_base;
 }
 
-util::disasm_interface *m740_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m740_device::create_disassembler()
 {
-	return new m740_disassembler(this);
+	return std::make_unique<m740_disassembler>(this);
 }
 
 void m740_device::device_start()

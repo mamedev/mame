@@ -37,10 +37,10 @@ Configurations
 --------------
 There are many options that comes with the Diablo 1300 series and while many are mechanical the electronics are built up with cards
 interconnected by a backplane. The backplane has well defined slots for each type of cards and there are also many external cables
-between the cards, sensors and motors of the printer. The backplane consists of up to 8 female connectors for 56 signals card edge 
-connectors numbered A-H ordered in two rows, D,C,B,A on top with the fans to the left and H,G,F,E bellow. The signals are routed as 
+between the cards, sensors and motors of the printer. The backplane consists of up to 8 female connectors for 56 signals card edge
+connectors numbered A-H ordered in two rows, D,C,B,A on top with the fans to the left and H,G,F,E bellow. The signals are routed as
 needed and the slots are NOT generic, a specific card goes in at a specific slot but can be interchanged to accomodate improved
-performance or replaced for repair. Slots E and F are used for feature expansions such as serial, network cards etc. 
+performance or replaced for repair. Slots E and F are used for feature expansions such as serial, network cards etc.
 
 The slots are populated as follows:
 
@@ -53,12 +53,12 @@ F: Optional slot with all signals of slot F
 G: Transducer
 H: Print Wheel Power Amp
 
-In case the serial/IEEE488/network interface card is missing in the printer the host computer is supposed to drive which 
+In case the serial/IEEE488/network interface card is missing in the printer the host computer is supposed to drive which
 connects to the printer over the 50 pin ribbon cable instead of the printer hosted interface card.
 
 Logic #1 Card - printer command management
 ------------------------------------------
-The board is marked 40505 and has an option field at the top and a J7 connector for the 50 pin ribbon cable. It produces the 
+The board is marked 40505 and has an option field at the top and a J7 connector for the 50 pin ribbon cable. It produces the
 system clock of 5 MHz that is used by the TTL CPU at Logic #2 Card,
 
  Identified IC:s
@@ -69,7 +69,7 @@ system clock of 5 MHz that is used by the TTL CPU at Logic #2 Card,
  1 7451     7849 Dual AND+OR invert gates
  1 7486     7849 Quad XOR gates
  3 74LS170  7906 4 by 4 register file
- 4 8837     7736 
+ 4 8837     7736
  2 7408     7906 Quad AND gales
  2 74LS42   7906 BCD to decimal decoder
  1 7426     7906 Quad NAND gates
@@ -96,7 +96,7 @@ The board is marked 40510 and has no connectors except the 56 signal bus edge co
  4 74S289        4x16 bit RAM
  1 74107         Dual J-K M/S flip flops w clear
  1 74LS155  7731 1/2/3 to 4/8 lines decoder nwih totem pole ouputs
- 2 74161    7904 synchronous binary 4 bit counter 
+ 2 74161    7904 synchronous binary 4 bit counter
  4 74LS259  7906 8 bit addressable latches
  4 74298    7849 Quad 2 input mux with storage
  1 74367    7840 Non inverted 3 state outputs, 2 and 4 line enabled inputs
@@ -114,7 +114,7 @@ The serial interface card is z80 based and marked DIABLO-1300-V24
  2 Z80-PIO 7852 Zilog Paralell IO interface
 10 74367   7845 Non inverted 3 state outputs, 2 and 4 line enabled inputs
  2 UPB7400 7845 Quad NAND gates
- 3 7432N   7832 QUAD OR gates 
+ 3 7432N   7832 QUAD OR gates
  1 1489    7841 Quad line receivers
  1 1488    7823 Quad line tranceivers
  1 74163   7827 Synchrounous 4 bit counters
@@ -143,7 +143,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
   { }
-  
+
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

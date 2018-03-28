@@ -2241,8 +2241,15 @@ INPUT_PORTS_END
 INPUT_PORTS_START( boxingm )
 	PORT_INCLUDE( viper )
 
+	PORT_MODIFY("IN4")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("BodyPad L")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Select R")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select L")
+
 	PORT_MODIFY("IN5")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // memory card check for boxingm (actually comms enable?)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("BodyPad R")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // memory card check for boxingm (actually comms enable?)
+
 INPUT_PORTS_END
 
 // TODO: left/right escape, 2nd service switch?
@@ -2286,15 +2293,16 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 {
-	mpc8240_interrupt(MPC8240_IRQ0);
+	//mpc8240_interrupt(MPC8240_IRQ0);
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }
 
 WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 {
-	// FIXME: The driver seems to hang using the voodoo vblank signa
-	//if (state)
-	//  mpc8240_interrupt(MPC8240_IRQ0);
+	// FIXME: The driver seems to hang using the voodoo vblank signal
+	// Seems to only work if using negative vsync
+	if (!state)
+	  mpc8240_interrupt(MPC8240_IRQ0);
 	//mpc8240_interrupt(MPC8240_IRQ3);
 }
 
@@ -2375,7 +2383,7 @@ void viper_state::machine_reset()
 MACHINE_CONFIG_START(viper_state::viper)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MPC8240, 200000000)
+	MCFG_CPU_ADD("maincpu", MPC8240, 166666666) // Unknown
 	MCFG_PPC_BUS_FREQUENCY(100000000)
 	MCFG_CPU_PROGRAM_MAP(viper_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", viper_state, viper_vblank)
@@ -2507,7 +2515,7 @@ ROM_START(code1db) //*
 	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("m48t58_UAB.u39", 0x00000, 0x2000, CRC(6059cdad) SHA1(67f9d9239c3e3ef8c967f26c45fa9201981ad848) )
+	ROM_LOAD("m48t58_uab.u39", 0x00000, 0x2000, CRC(6059cdad) SHA1(67f9d9239c3e3ef8c967f26c45fa9201981ad848) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
@@ -2920,7 +2928,7 @@ ROM_START(wcombatu) //*
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, NO_DUMP )
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("Warzaid u39 c22d02", 0x00000, 0x2000, CRC(71744990) SHA1(19ed07572f183e7b3a712704ebddf7a848c48a78) )
+	ROM_LOAD("warzaid u39 c22d02", 0x00000, 0x2000, CRC(71744990) SHA1(19ed07572f183e7b3a712704ebddf7a848c48a78) )
 
 	DISK_REGION( "ata:0:hdd:image" )
 	// CHD image provided had evidence of being altered by Windows, probably was put in a Windows machine without write protection hardware (bad idea)

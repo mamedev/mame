@@ -274,7 +274,7 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 	memset(&m_r, 0, sizeof(m_r));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 #if (TMS_3203X_LOG_OPCODE_USAGE)
 	memset(m_hits, 0, sizeof(m_hits));
@@ -558,9 +558,9 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *tms3203x_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms3203x_device::create_disassembler()
 {
-	return new tms32031_disassembler;
+	return std::make_unique<tms32031_disassembler>();
 }
 
 
@@ -805,7 +805,7 @@ void tms3203x_device::execute_run()
 				continue;
 			}
 
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 			execute_one();
 		}
 	}

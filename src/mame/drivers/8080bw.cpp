@@ -3,7 +3,7 @@
 // thanks-to:Michael Strutts, Marco Cassili
 /*****************************************************************************
 
-    8080bw.c
+    8080bw.cpp
 
     Michael Strutts, Nicola Salmoria, Tormod Tjaberg, Mirko Buffoni
     Lee Taylor, Valerio Verrando, Marco Cassili, Zsolt Vasvari, and others
@@ -2545,23 +2545,68 @@ MACHINE_CONFIG_END
 
 /*****************************************************
 
- Omori "Shuttle Invader" ??
+Guru Readme for Shuttle Invader (Omori 1979)
 
- 8080 CPU
+PCB Layout
+----------
 
- 1x  SN76477
-g 2x  SN75452
- 4x  8216 RAM
- 2x  TMS4045 RAM
- 16x MCM4027 RAM
- 1x  empty small socket. maybe (missing) PROM?
- 1x  8 position dipsw
- 1x  556
- 1x  458
- 1x  lm380 (amp chip)
+OEC-3C
+|----------------------------------------------------------|
+| LM556   DIP16                                            |
+|VR1                                                       |
+| LM458  SN76477                                           |
+|VR2                 5.545MHz                              |
+| LM380                                                    |
+|                                   4045 4045              |
+|                      2.11C   1.13C                       |
+|                18MHz                 4027 4027 4027 4027 |
+|                      4.11D   3.13D                       |
+|               AM8224                 4027 4027 4027 4027 |
+|                i8080 DIP24   5.13E                       |
+|      DSW                             4027 4027 4027 4027 |
+|                                                          |
+|SN75452  SN75452      8.11F           4027 4027 4027 4027 |
+|      CN2     8216 8216                        CN1        |
+|----------------------------------------------------------|
+Notes:
+      i8080   - Intel 8080 CPU. Clock input 2.000MHz [18/9]. Note the /9 comes from the AM8224
+      SN76477 - Texas Instruments SN76477 Complex Sound Generator
+      SN75452 - Texas Instruments SN75452 Dual High Speed High Current Peripheral Driver
+      8216    - NEC uPB8216 4 Bit Parallel Bi-Directional Bus Driver
+      4045    - Texas Instruments TMS4045 1k x 4-bit Static RAM (Work RAM)
+      4027    - Motorola MCM4027 4k x 1-bit Dynamic RAM (Video RAM)
+      AM8224  - AMD AM8224 Clock Generator and Driver for 8080-Compatible Microprocessors
+      DIP16   - DIP16 socket for connection of 16-wire flat cable joining to OEC-4A PCB
+      LM556   - Texas Instruments LM556 Dual Timer
+      LM458   - Texas Instruments LM458 Low Power Dual Operational Amplifier
+      LM380   - Texas Instruments LM380 2.5W Audio Power Amplifier
+      CN1     - 11-pin Power Input Connector. Pinout (left to right) is GND,GND,GND,+5V,+5V,+5V,+12V,+12V,+12V,[SPACE],-5V
+      CN2     - 25-pin Connector for Control Inputs/Audio Output etc.
+      VR1     - Potentiometer (Master Volume)
+      VR2     - Potentiometer (volume of other sounds? maybe background sounds?)
+      DSW     - 8-position DIP Switch
 
- xtal 18MHz
- xtal 5.545MHz
+Additional PCB (more sounds?)
+--------------
+
+OEC-4A
+|-------------------|
+|   VR1  74121      |
+| 7400 7404 74S287  |
+|75452 CN2 CN1 LM723|
+|75452              |
+|                   |
+|--|    22-WAY   |--|
+   |-------------|
+Notes: (All IC's shown)
+      LM723  - Texas Instruments LM723 Voltage Regulator
+      74S287 - Texas Instruments SN74S287 256-bit x 4-bit Bi-Polar PROM at location 2B
+      75452  - Texas Instruments SN75452 Dual High Speed High Current Peripheral Driver
+      VR1    - Potentiometer connected to LM723 pin 5
+      CN1    - DIP16 socket for connection of 16-wire flat cable joining to Main PCB
+      CN2    - Empty DIP16 socket
+      22-WAY - Single-Sided 22-WAY Card Edge Connector. Has many tracks coming from it, as well as power.
+               It's purpose and what it plugs into is unknown.
 
 ******************************************************/
 
@@ -2698,8 +2743,8 @@ void _8080bw_state::shuttlei_io_map(address_map &map)
 MACHINE_CONFIG_START(_8080bw_state::shuttlei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(18'000'000) / 10) // divider guessed
-	// TODO: move irq handling away from mw8080.c, this game runs on custom hardware
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(18'000'000) / 9)
+	// TODO: move irq handling away from mw8080.cpp, this game runs on custom hardware
 	MCFG_CPU_PROGRAM_MAP(shuttlei_map)
 	MCFG_CPU_IO_MAP(shuttlei_io_map)
 
@@ -3587,10 +3632,10 @@ ROM_END
    Contains same data as spaceatt but with added 00 fill to make larger roms (b+a=E1, 00fill+c=F1, f+00fill=G1, h+sv02=H1) */
 ROM_START( spaceatt2k )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "H1.bin",     0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
-	ROM_LOAD( "G1.bin",     0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
-	ROM_LOAD( "F1.bin",     0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
-	ROM_LOAD( "E1.bin",     0x1800, 0x0800, CRC(19971ca7) SHA1(373900e6796aa681f35158e2c4c7665574990906) )
+	ROM_LOAD( "h1.bin",     0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
+	ROM_LOAD( "g1.bin",     0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
+	ROM_LOAD( "f1.bin",     0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
+	ROM_LOAD( "e1.bin",     0x1800, 0x0800, CRC(19971ca7) SHA1(373900e6796aa681f35158e2c4c7665574990906) )
 ROM_END
 
 ROM_START( spaceat2 )
@@ -3603,10 +3648,10 @@ ROM_END
 
 ROM_START( cosmicin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "CN7472N-7921.bin",     0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
-	ROM_LOAD( "CN7471N-7918.bin",     0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
-	ROM_LOAD( "CN7470N-7918.bin",     0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
-	ROM_LOAD( "CN7469N-7921.bin",     0x1800, 0x0800, CRC(5733048c) SHA1(e9197925396b723f5dda4653238e6e1ea287fdae) )
+	ROM_LOAD( "cn7472n-7921.bin",     0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
+	ROM_LOAD( "cn7471n-7918.bin",     0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
+	ROM_LOAD( "cn7470n-7918.bin",     0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
+	ROM_LOAD( "cn7469n-7921.bin",     0x1800, 0x0800, CRC(5733048c) SHA1(e9197925396b723f5dda4653238e6e1ea287fdae) )
 ROM_END
 
 ROM_START( galmonst )
@@ -4648,11 +4693,11 @@ ROM_END
 
 ROM_START( schaserm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "MR26.71",     0x0000, 0x0800, CRC(4e547879) SHA1(464fab35373d6bd6218474e7f5109425376f1db2) )
-	ROM_LOAD( "RT08.70",     0x0800, 0x0800, CRC(825fc8ac) SHA1(176ff0f4d0cd55be30efb184bd5bef62b92d0333) )
-	ROM_LOAD( "RT09.69",     0x1000, 0x0800, CRC(de9d3f85) SHA1(13a71fdd889023cfc65ed2c0a65236884b79b1f0) )
-	ROM_LOAD( "MR27.62",     0x1800, 0x0800, CRC(069ec108) SHA1(b12cd288d7e42002d01290f0572f9074adf2cdca) )
-	ROM_LOAD( "RT11.61",     0x4000, 0x0800, CRC(17a7ef7a) SHA1(1a7b3f9393dceddcd1e220cadbff7e619594f884) )
+	ROM_LOAD( "mr26.71",     0x0000, 0x0800, CRC(4e547879) SHA1(464fab35373d6bd6218474e7f5109425376f1db2) )
+	ROM_LOAD( "rt08.70",     0x0800, 0x0800, CRC(825fc8ac) SHA1(176ff0f4d0cd55be30efb184bd5bef62b92d0333) )
+	ROM_LOAD( "rt09.69",     0x1000, 0x0800, CRC(de9d3f85) SHA1(13a71fdd889023cfc65ed2c0a65236884b79b1f0) )
+	ROM_LOAD( "mr27.62",     0x1800, 0x0800, CRC(069ec108) SHA1(b12cd288d7e42002d01290f0572f9074adf2cdca) )
+	ROM_LOAD( "rt11.61",     0x4000, 0x0800, CRC(17a7ef7a) SHA1(1a7b3f9393dceddcd1e220cadbff7e619594f884) )
 
 	ROM_REGION( 0x0400, "proms", 0 )        /* background color map */
 	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )
@@ -4660,11 +4705,11 @@ ROM_END
 
 ROM_START( crashrd )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2716-5M.bin",  0x0000, 0x0800, CRC(53749427) SHA1(213828eea2d5baeae9c6553a531ec4127d795a67) )
-	ROM_LOAD( "2716-5N.bin",  0x0800, 0x0800, CRC(e391d768) SHA1(22a52f4a01b586489ec79d53817152594cc3189d) )
-	ROM_LOAD( "2716-5P.bin",  0x1000, 0x0800, CRC(fededc5d) SHA1(205079ddc5893884476672d378a457b5a603f5ae) )
-	ROM_LOAD( "2716-5R.bin",  0x1800, 0x0800, CRC(30830779) SHA1(dff2fa9244cd3769a167673668acb53a17c395b4) )
-	ROM_LOAD( "2716-5S.bin",  0x4000, 0x0800, CRC(6a974917) SHA1(4f1a4003652ef47de3d5c270f5f624d172970ec5) )
+	ROM_LOAD( "2716-5m.bin",  0x0000, 0x0800, CRC(53749427) SHA1(213828eea2d5baeae9c6553a531ec4127d795a67) )
+	ROM_LOAD( "2716-5n.bin",  0x0800, 0x0800, CRC(e391d768) SHA1(22a52f4a01b586489ec79d53817152594cc3189d) )
+	ROM_LOAD( "2716-5p.bin",  0x1000, 0x0800, CRC(fededc5d) SHA1(205079ddc5893884476672d378a457b5a603f5ae) )
+	ROM_LOAD( "2716-5r.bin",  0x1800, 0x0800, CRC(30830779) SHA1(dff2fa9244cd3769a167673668acb53a17c395b4) )
+	ROM_LOAD( "2716-5s.bin",  0x4000, 0x0800, CRC(6a974917) SHA1(4f1a4003652ef47de3d5c270f5f624d172970ec5) )
 
 	ROM_REGION( 0x0400, "proms", 0 )        /* background color map (should this have one, or should it be b+w?) */
 	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )

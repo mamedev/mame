@@ -28,7 +28,7 @@ protected:
 	virtual u32 decode_fixed(u16 op) override { return 0; } // not yet
 	virtual u32 decode_micro(u8 sel) override;
 	virtual void device_reset() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 };

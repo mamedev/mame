@@ -1552,7 +1552,7 @@ void taitoz_state::bsharkjjs_map(address_map &map)
 	map(0x110000, 0x113fff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x600000, 0x600001).w(this, FUNC(taitoz_state::cpua_ctrl_w));
-//	map(0x800000, 0x800007).rw(this, FUNC(taitoz_state::bshark_stick_r), FUNC(taitoz_state::bshark_stick_w)); /* No analog stick, this is the Joystick version */
+//  map(0x800000, 0x800007).rw(this, FUNC(taitoz_state::bshark_stick_r), FUNC(taitoz_state::bshark_stick_w)); /* No analog stick, this is the Joystick version */
 	map(0xa00000, 0xa01fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */

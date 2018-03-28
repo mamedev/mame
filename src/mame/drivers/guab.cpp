@@ -19,13 +19,13 @@
 
     Known issues:
         * Neither game registers coins and I can't find where the credit
-        count gets updated in the code. Each game requires a unique
-        security PAL - maybe this is related? I'm poking the coin values
-        directly into RAM for now.
-        * Game hangs when you try to 'collect' cash
+          count gets updated in the code. Each game requires a unique
+          security PAL - maybe this is related? I'm poking the coin values
+          directly into RAM for now.
+        * Game hangs when nothing is connected to the first ACIA when
+          you try to 'collect' cash
         * Verify WD FDC type
-        * Are IRQs 1 or 2 connected to something?
-        * Hook up ACIA properly (IRQ 4)
+        * Hook up ACIA properly
         * Hook up watchdog NMI
         * Verify clocks
         * Use real video timings
@@ -34,15 +34,23 @@
     Notes:
         * Toggle both 'Back door' and 'Key switch' to enter test mode
         * Video hardware seems to match JPM System 5
+        * IRQ 1 inits the PPIs, IRQ 2 does nothing
+        * Values send to the first ACIA serial port:
+          - Game ID: "JPMNA305v.." (guab) or "..JPMNN101}" (tenup)
+          - Coin 1-4: 1-4
+          - Game start: /
+          - Collect: D
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "bus/rs232/rs232.h"
 #include "formats/guab_dsk.h"
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/wd_fdc.h"
 #include "sound/sn76496.h"
@@ -416,6 +424,15 @@ WRITE8_MEMBER( guab_state::output6_w )
 	output().set_value("led_47", BIT(data, 7));
 }
 
+static DEVICE_INPUT_DEFAULTS_START( acia_1_rs232_defaults )
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_ODD)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
 
 //**************************************************************************
 //  AUDIO
@@ -473,6 +490,7 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
 	MCFG_TMS34061_VRAM_SIZE(0x40000)
 	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", 5))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -507,6 +525,18 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(guab_state, watchdog_w))
 
 	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
+	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232_1", rs232_port_device, write_rts))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", 4))
+
+	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_cts))
+	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", acia_1_rs232_defaults)
+
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600) // source? the ptm doesn't seem to output any common baud values
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia6850_1", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
 

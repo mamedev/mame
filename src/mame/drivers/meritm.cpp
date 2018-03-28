@@ -1523,7 +1523,19 @@ It's unknown if the above is used for regional versions of the game or left over
 It's currently unknown how to access / enable those features or if it's possible to do so.
 
 */
-ROM_START( realbrod ) /* Dallas DS1204U-3 security key labeled 9131-20-00-U5-R0A */
+ROM_START( realbrod ) /* Dallas DS1204U-3 security key labeled 9131-20-00-U5-R0 */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	/* U32 Empty */
+	/* U36 Empty */
+	/* U37 Empty */
+	ROM_LOAD( "9131-20-00_u38-r0c", 0x300000, 0x080000, CRC(1e6150d1) SHA1(c7963f829d9cfa5b478ed53a802c03128c961db9) ) /* Location U38, 9131-20-00 R0C 01/02/1996   16:50:06 */
+	ROM_RELOAD(                     0x380000, 0x080000)
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9131-20-00-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(89e45123) SHA1(6eddd33e1b465112e9442be46aee69d95130d780) )
+ROM_END
+
+ROM_START( realbroda ) /* Dallas DS1204U-3 security key labeled 9131-20-00-U5-R0 */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	/* U32 Empty */
 	/* U36 Empty */
@@ -1532,7 +1544,7 @@ ROM_START( realbrod ) /* Dallas DS1204U-3 security key labeled 9131-20-00-U5-R0A
 	ROM_RELOAD(                     0x380000, 0x080000)
 
 	ROM_REGION( 0x000022, "ds1204", 0 )
-	ROM_LOAD( "9131-20-00-u5-r0a", 0x000000, 0x000022, BAD_DUMP CRC(89e45123) SHA1(6eddd33e1b465112e9442be46aee69d95130d780) )
+	ROM_LOAD( "9131-20-00-u5-r0", 0x000000, 0x000022, BAD_DUMP CRC(89e45123) SHA1(6eddd33e1b465112e9442be46aee69d95130d780) )
 ROM_END
 
 
@@ -2335,7 +2347,8 @@ GAME( 1994, pitbossm,  0,        meritm_crt250_questions, pitbossm, meritm_state
 GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions, pitbossa, meritm_state, 0, ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-260 NON-touchscreen based */
-GAME( 1995, realbrod,  0,        meritm_crt260, realbrod,    meritm_state, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, realbrod,  0,        meritm_crt260, realbrod,    meritm_state, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, realbroda, realbrod, meritm_crt260, realbrod,    meritm_state, 0,        ROT0, "Merit", "The Real Broadway (9131-20-00 R0A)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-260 */
 GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, meritm_state, 0,        ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROG, Standard version)", MACHINE_IMPERFECT_GRAPHICS )

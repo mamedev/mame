@@ -42,9 +42,9 @@ sm510_device::sm510_device(const machine_config &mconfig, const char *tag, devic
 
 
 // disasm
-util::disasm_interface *sm510_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm510_device::create_disassembler()
 {
-	return new sm510_disassembler;
+	return std::make_unique<sm510_disassembler>();
 }
 
 

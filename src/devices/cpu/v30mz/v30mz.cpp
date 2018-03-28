@@ -191,7 +191,7 @@ void v30mz_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().formatstr("%05X");
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).callimport().callexport().formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1305,9 +1305,9 @@ void v30mz_cpu_device::execute_set_input( int inptnum, int state )
 }
 
 
-util::disasm_interface *v30mz_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v30mz_cpu_device::create_disassembler()
 {
-	return new nec_disassembler;
+	return std::make_unique<nec_disassembler>();
 }
 
 
@@ -1361,7 +1361,7 @@ void v30mz_cpu_device::execute_run()
 			}
 		}
 
-		debugger_instruction_hook( this, pc() );
+		debugger_instruction_hook( pc() );
 
 		uint8_t op = fetch_op();
 

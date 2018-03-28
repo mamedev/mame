@@ -32,8 +32,8 @@ probably an original bug?
 class spartanxtec_state : public driver_device
 {
 public:
-	spartanxtec_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spartanxtec_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_m62_tileram(*this, "m62_tileram"),
 		m_spriteram(*this, "spriteram"),
 		m_scroll_lo(*this, "scroll_lo"),
@@ -45,6 +45,27 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void spartanxtec(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(spartanxtec);
+
+	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
+	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
+	DECLARE_WRITE8_MEMBER(a801_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack);
+	DECLARE_WRITE8_MEMBER(irq_ack);
+
+	void spartanxtec_map(address_map &map);
+	void spartanxtec_sound_io(address_map &map);
+	void spartanxtec_sound_map(address_map &map);
+
+private:
 	required_shared_ptr<uint8_t> m_m62_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_scroll_lo;
@@ -55,23 +76,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(spartanxtec);
-
 	tilemap_t*             m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
-	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(a801_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack);
-	DECLARE_WRITE8_MEMBER(irq_ack);
-	void spartanxtec(machine_config &config);
-	void spartanxtec_map(address_map &map);
-	void spartanxtec_sound_io(address_map &map);
-	void spartanxtec_sound_map(address_map &map);
 };
 
 
@@ -430,16 +435,16 @@ ROM_START( spartanxtec )
 
 	ROM_REGION( 0x600, "cprom", 0 )
 	// first half of all of these is empty
-	ROM_LOAD( "4_MCM7643_82s137.BIN", 0x0000, 0x0200, CRC(548a0ab1) SHA1(e414b61feba73bcc1a53e17c848aceea3b8100e7) ) ROM_CONTINUE(0x0000,0x0200)
-	ROM_LOAD( "5_MCM7643_82s137.BIN", 0x0200, 0x0200, CRC(a678480e) SHA1(515fa2b09c666a46dc145313eda3c465afff4451) ) ROM_CONTINUE(0x0200,0x0200)
-	ROM_LOAD( "6_MCM7643_82s137.BIN", 0x0400, 0x0200, CRC(5a707f85) SHA1(35932daf453787780550464b78465581e1ef35e1) ) ROM_CONTINUE(0x0400,0x0200)
+	ROM_LOAD( "4_mcm7643_82s137.bin", 0x0000, 0x0200, CRC(548a0ab1) SHA1(e414b61feba73bcc1a53e17c848aceea3b8100e7) ) ROM_CONTINUE(0x0000,0x0200)
+	ROM_LOAD( "5_mcm7643_82s137.bin", 0x0200, 0x0200, CRC(a678480e) SHA1(515fa2b09c666a46dc145313eda3c465afff4451) ) ROM_CONTINUE(0x0200,0x0200)
+	ROM_LOAD( "6_mcm7643_82s137.bin", 0x0400, 0x0200, CRC(5a707f85) SHA1(35932daf453787780550464b78465581e1ef35e1) ) ROM_CONTINUE(0x0400,0x0200)
 
 	ROM_REGION( 0x18000, "timing", 0 ) // i think
-	ROM_LOAD( "7_82s147.BIN", 0x0000, 0x0200, CRC(54a9e294) SHA1(d44d21ab8141bdfe697fd303cdc1b5c4177909bc) )
+	ROM_LOAD( "7_82s147.bin", 0x0000, 0x0200, CRC(54a9e294) SHA1(d44d21ab8141bdfe697fd303cdc1b5c4177909bc) )
 
 	ROM_REGION( 0x18000, "unkprom", 0 ) // just linear increasing value
-	ROM_LOAD( "1_tbp24s10_82s129.BIN", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
-	ROM_LOAD( "2_tbp24s10_82s129.BIN", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
+	ROM_LOAD( "1_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
+	ROM_LOAD( "2_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
 ROM_END
 
 

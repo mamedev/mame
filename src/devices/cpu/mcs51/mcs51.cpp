@@ -1986,7 +1986,7 @@ void mcs51_cpu_device::execute_run()
 	{
 		/* Read next opcode */
 		PPC = PC;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		op = m_direct->read_byte(PC++);
 
 		/* process opcode and count cycles */
@@ -2163,7 +2163,7 @@ void mcs51_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_rtemp).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void mcs51_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -2466,32 +2466,32 @@ void ds5002fp_device::nvram_write( emu_file &file )
 	file.write( m_sfr_ram, 0x80 );
 }
 
-util::disasm_interface *mcs51_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mcs51_cpu_device::create_disassembler()
 {
-	return new i8051_disassembler;
+	return std::make_unique<i8051_disassembler>();
 }
 
-util::disasm_interface *i8052_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8052_device::create_disassembler()
 {
-	return new i8052_disassembler;
+	return std::make_unique<i8052_disassembler>();
 }
 
-util::disasm_interface *i80c31_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i80c31_device::create_disassembler()
 {
-	return new i80c51_disassembler;
+	return std::make_unique<i80c51_disassembler>();
 }
 
-util::disasm_interface *i80c51_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i80c51_device::create_disassembler()
 {
-	return new i80c51_disassembler;
+	return std::make_unique<i80c51_disassembler>();
 }
 
-util::disasm_interface *i80c52_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i80c52_device::create_disassembler()
 {
-	return new i80c52_disassembler;
+	return std::make_unique<i80c52_disassembler>();
 }
 
-util::disasm_interface *ds5002fp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> ds5002fp_device::create_disassembler()
 {
-	return new ds5002fp_disassembler;
+	return std::make_unique<ds5002fp_disassembler>();
 }

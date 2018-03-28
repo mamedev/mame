@@ -30,7 +30,7 @@ protected:
 	// overrides
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual u32 decode_micro(u8 sel);
 };

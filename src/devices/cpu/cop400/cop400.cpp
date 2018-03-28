@@ -1143,7 +1143,7 @@ void cop400_cpu_device::device_start()
 	state_add(COP400_SKIP, "SKIP", m_skip).mask(1);
 #endif
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_q = 0;
 	m_sa = 0;
@@ -1218,7 +1218,7 @@ void cop400_cpu_device::execute_run()
 		{
 			// debugger hook
 			m_prevpc = PC;
-			debugger_instruction_hook(this, PC);
+			debugger_instruction_hook(PC);
 		}
 
 		// halt logic
@@ -1366,24 +1366,16 @@ void cop400_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-util::disasm_interface *cop400_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> cop400_cpu_device::create_disassembler()
 {
 	if ( m_featuremask & COP424C_FEATURE )
-	{
-		return new cop424_disassembler;
-	}
-
-	if ( m_featuremask & COP444L_FEATURE )
-	{
-		return new cop444_disassembler;
-	}
-
-	if ( m_featuremask & COP420_FEATURE )
-	{
-		return new cop420_disassembler;
-	}
-
-	return new cop410_disassembler;
+		return std::make_unique<cop424_disassembler>();
+	else if ( m_featuremask & COP444L_FEATURE )
+		return std::make_unique<cop444_disassembler>();
+	else if ( m_featuremask & COP420_FEATURE )
+		return std::make_unique<cop420_disassembler>();
+	else
+		return std::make_unique<cop410_disassembler>();
 }
 
 READ8_MEMBER( cop400_cpu_device::microbus_rd )

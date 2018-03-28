@@ -7,10 +7,6 @@
   lacks any form of protection PIC.
 
 */
-
-
-
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -19,13 +15,18 @@ class ecoinf1_state : public driver_device
 {
 public:
 	ecoinf1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
-	DECLARE_DRIVER_INIT(ecoinf1);
-	required_device<cpu_device> m_maincpu;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
+
 	void ecoinf1_older(machine_config &config);
+
+protected:
 	void older_memmap(address_map &map);
 	void older_portmap(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -289,7 +290,7 @@ ROM_START( ec_barxo )
 	ROM_REGION( 0x3000, "altrevs", 0 )
 	/* alt 'rom 2' dumps */
 	ROM_LOAD( "a410p.bin", 0x0000, 0x1000, CRC(6c19d237) SHA1(9fa79bd0ab78685fed974e5b82ec419381337252) )
-	ROM_LOAD( "a410p~.bin", 0x0000, 0x1000, CRC(0f1020f1) SHA1(e29cd3954f3cd0ae5c4a113f8922bd1f3be0e740) )
+	ROM_LOAD( "a410p-.bin", 0x0000, 0x1000, CRC(0f1020f1) SHA1(e29cd3954f3cd0ae5c4a113f8922bd1f3be0e740) )
 
 	/* incomplete set(?), no ROM 4 */
 	ROM_LOAD( "barx6a3", 0x0000, 0x1000, CRC(8884d188) SHA1(64716d214ada873cca64a511fa569e96f1ade062) )
@@ -359,18 +360,14 @@ ROM_START( ec_casbxoa )
 	ROM_LOAD( "bx5c10p.a2", 0x2000, 0x1000, CRC(0bd21303) SHA1(eb60749d3097ce77f0955586fc8ed1d16993286a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ecoinf1_state,ecoinf1)
-{
-}
-
 // all roms might really be for the same game, just in different cabinet styles
 // these ALL contain "Ver 3 BAR-X V1:84 TYPE T" strings
-GAME( 19??, ec_barxo,  0         , ecoinf1_older,   ecoinf1, ecoinf1_state,   ecoinf1,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 1)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxoa, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   ecoinf1,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 2)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxob, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   ecoinf1,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 3)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxoc, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   ecoinf1,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 4)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxod, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   ecoinf1,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 5)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_barxoe, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   ecoinf1,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 6)",        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 19??, ec_bar5,   ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   ecoinf1,  ROT0,  "Electrocoin", "Bar 5 (older PCB) (Electrocoin)",                MACHINE_IS_SKELETON_MECHANICAL) // or just another Bar X set?
-GAME( 19??, ec_casbxo, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   ecoinf1,  ROT0,  "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 1)", MACHINE_IS_SKELETON_MECHANICAL) // this one actually has some code offset changes
-GAME( 19??, ec_casbxoa,ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   ecoinf1,  ROT0,  "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxo,  0         , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 1)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxoa, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 2)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxob, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 3)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxoc, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 4)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxod, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 5)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_barxoe, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar X (older PCB) (Electrocoin) (set 6)",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 19??, ec_bar5,   ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Bar 5 (older PCB) (Electrocoin)",                MACHINE_IS_SKELETON_MECHANICAL) // or just another Bar X set?
+GAME( 19??, ec_casbxo, ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 1)", MACHINE_IS_SKELETON_MECHANICAL) // this one actually has some code offset changes
+GAME( 19??, ec_casbxoa,ec_barxo  , ecoinf1_older,   ecoinf1, ecoinf1_state,   0,  ROT0,  "Electrocoin", "Casino Bar X (older PCB) (Electrocoin) (set 2)", MACHINE_IS_SKELETON_MECHANICAL)

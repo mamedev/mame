@@ -64,9 +64,9 @@ kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *
 
 
 // disasm
-util::disasm_interface *sm5a_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm5a_device::create_disassembler()
 {
-	return new sm5a_disassembler;
+	return std::make_unique<sm5a_disassembler>();
 }
 
 

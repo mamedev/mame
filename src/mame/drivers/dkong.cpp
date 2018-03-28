@@ -451,9 +451,10 @@ WRITE8_MEMBER(dkong_state::memory_write_byte)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
+WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
 /*************************************
@@ -789,6 +790,8 @@ WRITE8_MEMBER(dkong_state::dkong_z80dma_rdy_w)
 WRITE8_MEMBER(dkong_state::nmi_mask_w)
 {
 	m_nmi_mask = data & 1;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /*************************************
@@ -1672,10 +1675,10 @@ void dkong_state::braze_decrypt_rom(uint8_t *dest)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(dkong_state::vblank_irq)
+WRITE_LINE_MEMBER(dkong_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(dkong_state::busreq_w )
@@ -1694,7 +1697,6 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK_1H)
 	MCFG_CPU_PROGRAM_MAP(dkong_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  vblank_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
@@ -1712,6 +1714,7 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dkong_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
 	MCFG_PALETTE_ADD("palette", DK2B_PALETTE_LENGTH)
@@ -1791,7 +1794,6 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2) /* verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(dkong3_map)
 	MCFG_CPU_IO_MAP(dkong3_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, vblank_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
 
@@ -1805,6 +1807,9 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dkong_state, vblank_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03a", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03b", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
 	MCFG_PALETTE_ADD("palette", DK3_PALETTE_LENGTH)
@@ -1862,7 +1867,9 @@ MACHINE_CONFIG_START(dkong_state::s2650)
 	MCFG_CPU_DATA_MAP(s2650_data_map)
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(dkong_state, s2650_fo_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  s2650_interrupt)
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dkong_state, s2650_interrupt))
 
 	MCFG_DEVICE_MODIFY("dma8257")
 	MCFG_I8257_IN_MEMR_CB(READ8(dkong_state, hb_dma_read_byte))
@@ -3647,56 +3654,56 @@ DRIVER_INIT_MEMBER(dkong_state,dkingjr)
  *
  *************************************/
 
-GAME( 1980, radarscp,  0,        radarscp,  radarscp, dkong_state, 0,        ROT90,  "Nintendo", "Radar Scope",         MACHINE_SUPPORTS_SAVE )
-GAME( 1980, radarscp1, radarscp, radarscp1, radarscp, dkong_state, 0,        ROT90,  "Nintendo", "Radar Scope (TRS01)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, radarscp,  0,        radarscp,  radarscp, dkong_state, 0,        ROT270, "Nintendo", "Radar Scope",         MACHINE_SUPPORTS_SAVE )
+GAME( 1980, radarscp1, radarscp, radarscp1, radarscp, dkong_state, 0,        ROT270, "Nintendo", "Radar Scope (TRS01)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, dkong,     0,        dkong2b,   dkong,    dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong (US set 1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dkonghrd,  dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong (hard kit)",    MACHINE_SUPPORTS_SAVE ) // not sure if original or bootleg (see notes on top of driver file)
-GAME( 1981, dkongo,    dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong (US set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dkongj,    dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dkongjo,   dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dkongjo1,  dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong (Japan set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dkong,     0,        dkong2b,   dkong,    dkong_state, 0,        ROT270, "Nintendo of America", "Donkey Kong (US set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dkonghrd,  dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT270, "Nintendo of America", "Donkey Kong (hard kit)",    MACHINE_SUPPORTS_SAVE ) // not sure if original or bootleg (see notes on top of driver file)
+GAME( 1981, dkongo,    dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT270, "Nintendo",            "Donkey Kong (US set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dkongj,    dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT270, "Nintendo",            "Donkey Kong (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dkongjo,   dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT270, "Nintendo",            "Donkey Kong (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dkongjo1,  dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT270, "Nintendo",            "Donkey Kong (Japan set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, dkongf,    dkong,    dkong2b,   dkongf,   dkong_state, 0,        ROT90,  "hack (Jeff Kulczycki)",             "Donkey Kong Foundry (hack)",                      MACHINE_SUPPORTS_SAVE ) /* from Jeff's Romhack */
-GAME( 2001, dkonghs,   dkong,    dk_braze,  dkongx,   dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Donkey Kong High Score Kit (hack,V1.2)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2001, dkongike,  dkong,    dk_braze,  dkongike, dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Donkey Kong/DK (Japan) (hack,V1.1 IKE)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2001, dkongjrhs, dkongjr,  dkj_braze, dkongx,   dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Donkey Junior High Score Kit (hack,V1.2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 2001, dkongjrc,  dkong,    dkj_braze, dkongike, dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Donkey Kong/JR (combo) (hack,V1.2)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) /* Graphic roms not switched */
-GAME( 2001, dkongddk,  dkongjr,  ddk_braze, dkongx,   dkong_state, dkonghs,  ROT90,  "hack (Braze Technologies)",         "Double Donkey Kong (hack,V1.2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) /* Graphic roms not switched */
-GAME( 2006, dkongx,    dkong,    dk_braze,  dkongx,   dkong_state, dkongx,   ROT90,  "hack (Braze Technologies)",         "Donkey Kong II: Jumpman Returns (hack, V1.2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2006, dkongx11,  dkong,    dk_braze,  dkongx,   dkong_state, dkongx,   ROT90,  "hack (Braze Technologies)",         "Donkey Kong II: Jumpman Returns (hack, V1.1)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2013, dkongpe,   dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT90,  "hack (Clay Cowgill and Mike Mika)", "Donkey Kong: Pauline Edition Rev 5 (2013-04-22)", MACHINE_SUPPORTS_SAVE )
+GAME( 2004, dkongf,    dkong,    dkong2b,   dkongf,   dkong_state, 0,        ROT270, "hack (Jeff Kulczycki)",             "Donkey Kong Foundry (hack)",                      MACHINE_SUPPORTS_SAVE ) /* from Jeff's Romhack */
+GAME( 2001, dkonghs,   dkong,    dk_braze,  dkongx,   dkong_state, dkonghs,  ROT270, "hack (Braze Technologies)",         "Donkey Kong High Score Kit (hack,V1.2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dkongike,  dkong,    dk_braze,  dkongike, dkong_state, dkonghs,  ROT270, "hack (Braze Technologies)",         "Donkey Kong/DK (Japan) (hack,V1.1 IKE)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dkongjrhs, dkongjr,  dkj_braze, dkongx,   dkong_state, dkonghs,  ROT270, "hack (Braze Technologies)",         "Donkey Junior High Score Kit (hack,V1.2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dkongjrc,  dkong,    dkj_braze, dkongike, dkong_state, dkonghs,  ROT270, "hack (Braze Technologies)",         "Donkey Kong/JR (combo) (hack,V1.2)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) /* Graphic roms not switched */
+GAME( 2001, dkongddk,  dkongjr,  ddk_braze, dkongx,   dkong_state, dkonghs,  ROT270, "hack (Braze Technologies)",         "Double Donkey Kong (hack,V1.2)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) /* Graphic roms not switched */
+GAME( 2006, dkongx,    dkong,    dk_braze,  dkongx,   dkong_state, dkongx,   ROT270, "hack (Braze Technologies)",         "Donkey Kong II: Jumpman Returns (hack, V1.2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2006, dkongx11,  dkong,    dk_braze,  dkongx,   dkong_state, dkongx,   ROT270, "hack (Braze Technologies)",         "Donkey Kong II: Jumpman Returns (hack, V1.1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2013, dkongpe,   dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT270, "hack (Clay Cowgill and Mike Mika)", "Donkey Kong: Pauline Edition Rev 5 (2013-04-22)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, dkongjr,   0,        dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (US set F-2)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjrj,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong Jr. (Japan)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjnrj, dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong Junior (Japan set F-1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjrb,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "bootleg",             "Donkey Kong Jr. (bootleg)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjre,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong Junior (E kit)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkongjrpb, dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "bootleg",             "Donkey Kong Junior (P kit, bootleg)",          MACHINE_SUPPORTS_SAVE ) // definitely not issued by Nintendo
-GAME( 1982, jrking,    dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT90,  "bootleg",             "Junior King (bootleg of Donkey Kong Jr.)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dkingjr,   dkongjr,  dkongjr,   dkongjr,  dkong_state, dkingjr,  ROT90,  "bootleg",             "Donkey King Jr. (bootleg of Donkey Kong Jr.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, maguila,   dkongjr,  dkongjr,   dkongjr,  dkong_state, dkingjr,  ROT90,  "bootleg (Aguipa)",    "Up Maguila (bootleg of Donkey Kong Jr.)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjr,   0,        dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "Nintendo of America", "Donkey Kong Junior (US set F-2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrj,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "Nintendo",            "Donkey Kong Jr. (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjnrj, dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "Nintendo",            "Donkey Kong Junior (Japan set F-1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrb,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "bootleg",             "Donkey Kong Jr. (bootleg)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjre,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "Nintendo of America", "Donkey Kong Junior (E kit)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjrpb, dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "bootleg",             "Donkey Kong Junior (P kit, bootleg)",          MACHINE_SUPPORTS_SAVE ) // definitely not issued by Nintendo
+GAME( 1982, jrking,    dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "bootleg",             "Junior King (bootleg of Donkey Kong Jr.)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkingjr,   dkongjr,  dkongjr,   dkongjr,  dkong_state, dkingjr,  ROT270, "bootleg",             "Donkey King Jr. (bootleg of Donkey Kong Jr.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, maguila,   dkongjr,  dkongjr,   dkongjr,  dkong_state, dkingjr,  ROT270, "bootleg (Aguipa)",    "Up Maguila (bootleg of Donkey Kong Jr.)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, dkong3,    0,        dkong3,    dkong3,   dkong_state, 0,        ROT90,  "Nintendo of America", "Donkey Kong 3 (US)",                                  MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dkong3j,   dkong3,   dkong3,    dkong3,   dkong_state, 0,        ROT90,  "Nintendo",            "Donkey Kong 3 (Japan)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  dkong_state, 0,        ROT90,  "bootleg",             "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, dkong3hs,  dkong3,   dk3_braze, dkong3,   dkong_state, dkong3hs, ROT90,  "hack (Braze Technologies)", "Donkey Kong High Score Kit (hack,V1.0a)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3,    0,        dkong3,    dkong3,   dkong_state, 0,        ROT270, "Nintendo of America", "Donkey Kong 3 (US)",                                  MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3j,   dkong3,   dkong3,    dkong3,   dkong_state, 0,        ROT270, "Nintendo",            "Donkey Kong 3 (Japan)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dkong3b,   dkong3,   dkong3b,   dkong3b,  dkong_state, 0,        ROT270, "bootleg",             "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dkong3hs,  dkong3,   dk3_braze, dkong3,   dkong_state, dkong3hs, ROT270, "hack (Braze Technologies)", "Donkey Kong High Score Kit (hack,V1.0a)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, pestplce,  mario,    pestplce,  pestplce, dkong_state, 0,        ROT180, "bootleg", "Pest Place", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pestplce,  mario,    pestplce,  pestplce, dkong_state, 0,        ROT0,   "bootleg", "Pest Place", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* 2650 based */
-GAME( 1984, herbiedk,  huncholy, herbiedk,  herbiedk, dkong_state, 0,        ROT90,  "Century Electronics / Seatongrove Ltd",             "Herbie at the Olympics (DK conversion)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hunchbkd,  hunchbak, s2650,     hunchbkd, dkong_state, 0,        ROT90,  "Century Electronics",                               "Hunchback (DK conversion)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sbdk,      superbik, s2650,     sbdk,     dkong_state, 0,        ROT90,  "Century Electronics",                               "Super Bike (DK conversion)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, herodk,    hero,     s2650,     herodk,   dkong_state, herodk,   ROT90,  "Seatongrove Ltd (Crown license)",                   "Hero in the Castle of Doom (DK conversion)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, herodku,   hero,     s2650,     herodk,   dkong_state, 0,        ROT90,  "Seatongrove Ltd (Crown license)",                   "Hero in the Castle of Doom (DK conversion not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 8ballact,  0,        herbiedk,  8ballact, dkong_state, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DK conversion)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1984, 8ballact2, 8ballact, herbiedk,  8ballact, dkong_state, 0,        ROT90,  "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DKJr conversion)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1984, shootgal,  0,        s2650,     shootgal, dkong_state, 0,        ROT180, "Seatongrove Ltd (Zaccaria license)",                "Shooting Gallery",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces",                                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, 0,        ROT90,  "Senko Industries (Magic Electronics Inc. license)", "Special Forces II",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, herbiedk,  huncholy, herbiedk,  herbiedk, dkong_state, 0,        ROT270, "Century Electronics / Seatongrove Ltd",             "Herbie at the Olympics (DK conversion)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hunchbkd,  hunchbak, s2650,     hunchbkd, dkong_state, 0,        ROT270, "Century Electronics",                               "Hunchback (DK conversion)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sbdk,      superbik, s2650,     sbdk,     dkong_state, 0,        ROT270, "Century Electronics",                               "Super Bike (DK conversion)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, herodk,    hero,     s2650,     herodk,   dkong_state, herodk,   ROT270, "Seatongrove Ltd (Crown license)",                   "Hero in the Castle of Doom (DK conversion)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, herodku,   hero,     s2650,     herodk,   dkong_state, 0,        ROT270, "Seatongrove Ltd (Crown license)",                   "Hero in the Castle of Doom (DK conversion not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 8ballact,  0,        herbiedk,  8ballact, dkong_state, 0,        ROT270, "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DK conversion)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1984, 8ballact2, 8ballact, herbiedk,  8ballact, dkong_state, 0,        ROT270, "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DKJr conversion)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, shootgal,  0,        s2650,     shootgal, dkong_state, 0,        ROT0,   "Seatongrove Ltd (Zaccaria license)",                "Shooting Gallery",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, 0,        ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces",                                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, 0,        ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces II",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* EPOS */
-GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state, drakton,  ROT90,  "Epos Corporation", "Drakton (DK conversion)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, drktnjr,   drakton,  drktnjr,   drakton,  dkong_state, drakton,  ROT90,  "Epos Corporation", "Drakton (DKJr conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state, strtheat, ROT90,  "Epos Corporation", "Street Heat",               MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)
+GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state, drakton,  ROT270, "Epos Corporation", "Drakton (DK conversion)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1984, drktnjr,   drakton,  drktnjr,   drakton,  dkong_state, drakton,  ROT270, "Epos Corporation", "Drakton (DKJr conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state, strtheat, ROT270, "Epos Corporation", "Street Heat",               MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)

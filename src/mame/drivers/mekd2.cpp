@@ -102,6 +102,7 @@ public:
 		, m_pia_u(*this, "pia_u")
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
@@ -124,11 +125,13 @@ private:
 	uint8_t m_keydata;
 	bool m_cass_state;
 	bool m_cassold;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;
 	required_device<acia6850_device> m_acia;
 	required_device<cassette_image_device> m_cass;
+	output_finder<6> m_digits;
 };
 
 
@@ -285,7 +288,7 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 		for (i = 0; i < 6; i++)
 		{
 			if (BIT(data, i))
-				output().set_digit_value(i, ~m_segment & 0x7f);
+				m_digits[i] = ~m_segment & 0x7f;
 		}
 	}
 	m_digit = data;
@@ -357,6 +360,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 		m_acia->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
+}
+
+void mekd2_state::machine_start()
+{
+	m_digits.resolve();
 }
 
 /***********************************************************

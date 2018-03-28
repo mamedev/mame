@@ -30,7 +30,7 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-11603-A |GER| DEMO - Herbst 2004 II                                     | LEAPSTER       |
 | 500-11777-A |ENG| Numbers on the Run - Counting on Zero                     | LEAPSTER L-MAX |
 | 500-11779-A |ENG| Letters on the Loose                                      | LEAPSTER L-MAX |
-| 500-11903-A |ENG| Spider-Man - The Case of The Sinister Speller            | LEAPSTER L-MAX |
+| 500-11903-A |ENG| Spider-Man - The Case of The Sinister Speller             | LEAPSTER L-MAX |
 | 500-11904-A |ENG| Dora the Explorer - Wildlife Rescue                       | LEAPSTER L-MAX |
 | 500-11905-A |ENG| Spongebob Squarepants - Saves the Day                     | LEAPSTER L-MAX |
 | 500-11929-A |ENG| Scholastic I Spy - Challenger                             | LEAPSTER       |
@@ -44,8 +44,10 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-12141-A |GER| Zahlenjäger - Lernen im Arcade-Stil!                      | LEAPSTER       |
 | 500-12142-A |GER| Wörterjäger - Lernen im Arcade-Stil!                      | LEAPSTER       |
 | 500-12160-A |ENG| Scooby Doo! - Spooky Snacks!                              | LEAPSTER       |
-| 500-12161-A |ENG| Dora the Explorer - Pinata Party - Arcade-Style Learning! | LEAPSTER       | (*)
+| 500-12161-A |ENG| Dora the Explorer - Piñata Party - Arcade-Style Learning! | LEAPSTER       |
 | 500-12171-A |GER| Cars                                                      | LEAPSTER       |
+| 500-12218-A |SPA| Disney Princesa - La Magia De Aprender                    | LEAPSTER       |
+| 500-12223-A |SPA| Cars                                                      | LEAPSTER       |
 | 500-12293-A |ENG| Animal Genius                                             | LEAPSTER       |
 | 500-12296-A |ENG| SonicX                                                    | LEAPSTER       |
 | 500-12350-A |ENG| Letterpillar                                              | LEAPSTER       |
@@ -57,12 +59,17 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-12711-A |ENG| Batman - Strength in numbers                              | LEAPSTER       |
 | 500-12712-A |ENG| Cars : Supercharged                                       | LEAPSTER       |
 | 500-12715-A |ENG| Foster's Home for Imaginary Friends                       | LEAPSTER       |
+| 500-12719-A |ENG| Spongebob Squarepants - Through The Wormhole              | LEAPSTER       |
 | 500-12738-A |GER| Ratatouille                                               | LEAPSTER       |
+| 500-12830-A |SPA| The Batman - El Poder De Los Números                      | LEAPSTER       |
 | 500-13272-A |ENG| Wall-E                                                    | LEAPSTER       |
 | 500-13273-A |GER| Spongebob Schwammkopf - Zeitreise durch das Wurmloch      | LEAPSTER       |
 | 500-13298-A |ENG| I Spy - Treasure Hunt!                                    | LEAPSTER       |
 | 500-13299-A |ENG| Scholastic OutWit!                                        | LEAPSTER       |
 | 500-13306-A |ENG| Star Wars - Jedi Math                                     | LEAPSTER       |
+| 500-13405-A |ENG| Dora the Explorer - Camping Adventure                     | LEAPSTER       |
+| 500-13414-A |SPA| Wall-E                                                    | LEAPSTER       |
+| 500-13417-A |SPA| Star Wars - Matemáticas Jedi                              | LEAPSTER       |
 | 500-13441-A |GER| Wall-E                                                    | LEAPSTER       |
 | 500-13445-A |ENG| Ratatouille                                               | LEAPSTER       |
 | 500-13446-A |ENG| Pet Pals                                                  | LEAPSTER       |
@@ -74,10 +81,12 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-13514-A |ENG| Disney Princess                                           | LEAPSTER       |
 | 500-13563-A |ENG| Up                                                        | LEAPSTER       |
 | 500-13629-A |ENG| nihao, kai-lan                                            | LEAPSTER       | (*)
+| 500-13643-A |SPA| Up                                                        | LEAPSTER       |
 | 500-13681-A |ENG| Digging for Dinosaurs                                     | LEAPSTER       |
 | 500-13682-A |ENG| My Amusement Park                                         | LEAPSTER       |
 | 500-13744-A |ENG| Wolverine and the X-Men                                   | LEAPSTER       |
 | 500-13748-A |ENG| Disney Fairies                                            | LEAPSTER       | (*)
+| 500-13763-A |SPA| Disney Fairies                                            | LEAPSTER       |
 | 500-13982-A |ENG| Toy Story 3                                               | LEAPSTER       |
 | 500-14005-A |ENG| Scooby Doo!                                               | LEAPSTER       |
 | 500-14320-A |ENG| Cars 2                                                    | LEAPSTER       |
@@ -149,6 +158,18 @@ Known games listed by part-no, (*) denotes undumped:
 		</part>
 	</software>
 
+	<software name="batmans" cloneof="batman" supported="no">
+		<description>The Batman - El Poder De Los Números (Spa)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12830-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12830-a.bin" size="8388608" crc="6a7afd1c" sha1="3ae1372253b852b2cef8bfd549050b324375bda9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cars" supported="no">
 		<description>Cars (USA)</description>
 		<year>2003</year>
@@ -169,6 +190,18 @@ Known games listed by part-no, (*) denotes undumped:
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-12171-a.bin" size="8388608" crc="c7b62602" sha1="bbc2b70e588710b2096741046ae3e08095397ee9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carss" cloneof="cars" supported="no">
+		<description>Cars (Spa)</description>
+		<year>2006</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12223-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12223-a.bin" size="8388608" crc="2a704606" sha1="069f0e139231a3786472ab139e3d28bb2f2e098e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -257,6 +290,18 @@ Known games listed by part-no, (*) denotes undumped:
 		</part>
 	</software>
 
+	<software name="fairiess" supported="no">
+		<description>Disney Fairies (Spa)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13763-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13763-a.bin" size="8388608" crc="d2f560c7" sha1="7a9a8f78eb245c3b8600b0658f1d1b1fa99e6a5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="princess" supported="no">
 		<description>Disney Princess (USA)</description>
 		<year>2003</year>
@@ -269,7 +314,7 @@ Known games listed by part-no, (*) denotes undumped:
 		</part>
 	</software>
 
-	<software name="princzhl" supported="no">
+	<software name="princelg" supported="no">
 		<description>Disney Prinzessinnen - Zauberhaftes Lernen (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -277,6 +322,18 @@ Known games listed by part-no, (*) denotes undumped:
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-11496-a.bin" size="8388608" crc="bb6d5375" sha1="743d07ee756b54e2c72bf94da56dd8d18c4cd106" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="princels" cloneof="princelg" supported="no">
+		<description>Disney Princesa - La Magia De Aprender (Spa)</description>
+		<year>2006</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12218-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-12218-a.bin" size="8388608" crc="5a52d3f0" sha1="072353a79c124855c5904137f15e8a84ad622914" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -289,6 +346,30 @@ Known games listed by part-no, (*) denotes undumped:
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13448-a.bin" size="8388608" crc="2465f01d" sha1="d37d7ea21cf8ed01ecf497c3c99185529aee59af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doraca" supported="no">
+		<description>Dora the Explorer - Camping Adventure (USA)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13405-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13405-a.bin" size="8388608" crc="71778536" sha1="9f8c5e02519def049078614dacc76b990e911add" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorapp" supported="no">
+		<description>Dora the Explorer - Piñata Party! (USA)</description>
+		<year>2006</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12161-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="500-12161-a.bin" size="4194304" crc="ea544030" sha1="a9aaf73e5259db303f8bfc39bd6d7b40bddb127f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -455,7 +536,7 @@ Known games listed by part-no, (*) denotes undumped:
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12350-A" />
 		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="8388608">
+			<dataarea name="rom" size="4194304">
 				<rom name="500-12350-A - Letterpillar (US).bin" size="4194304" crc="9b86a0fb" sha1="c7d5381205340f85b302342cbe518f20c959a193" offset="0" />
 			</dataarea>
 		</part>
@@ -630,13 +711,25 @@ Known games listed by part-no, (*) denotes undumped:
 		</part>
 	</software>
 
-	<software name="spongez" supported="no">
+	<software name="spongewrm" supported="no">
+		<description>Spongebob Squarepants - Through The Wormhole (USA)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12719-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="500-12719-a.bin" size="4194304" crc="6b24a3ef" sha1="34dfb9ddef02731440085f3a1dad80654ad29c76" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongewrmg" cloneof="spongewrm" supported="no">
 		<description>Spongebob Schwammkopf - Zeitreise durch das Wurmloch (Ger)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-13273-A" />
 		<part name="cart" interface="leapster_cart">
-			<dataarea name="rom" size="8388608">
+			<dataarea name="rom" size="4194304">
 				<rom name="500-13273-a.bin" size="4194304" crc="8761fc61" sha1="90b0e1faf6964ec74643a45b46f0b064ebf9ea8a" offset="0" />
 			</dataarea>
 		</part>
@@ -674,6 +767,18 @@ Known games listed by part-no, (*) denotes undumped:
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13306-a.bin" size="8388608" crc="27000674" sha1="a7e8e63ab74931ad9546aba20755714df572badb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jedimaths" cloneof="jedimath" supported="no">
+		<description>Star Wars - Matemáticas Jedi (Spa)</description>
+		<year>2008</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13417-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13417-a.bin" size="8388608" crc="cf835b84" sha1="31ab97019d5e1fafa05cdb3a359e3c512a089b01" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -738,6 +843,18 @@ Known games listed by part-no, (*) denotes undumped:
 		</part>
 	</software>
 
+	<software name="ups" cloneof="up" supported="no">
+		<description>Up (Spa)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13643-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13643-a.bin" size="8388608" crc="975a0a85" sha1="d89e05c3afb2377efcdddf3099819541c28ee640" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vorschul" supported="no">
 		<description>Vorschule (Ger)</description>
 		<year>2003</year>
@@ -770,6 +887,18 @@ Known games listed by part-no, (*) denotes undumped:
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="500-13441-a.bin" size="8388608" crc="ee2c39ea" sha1="3606a63fb783ba1e16d0466766dd456eb84b4116" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="walles" cloneof="walle" supported="no">
+		<description>Wall-E (Spa)</description>
+		<year>2008</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-13414-A" />
+		<part name="cart" interface="leapster_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="500-13414-a.bin" size="8388608" crc="c10ab3dd" sha1="001d00815e42cd01c650d4cce81ea2a9de6d422c" offset="0" />
 			</dataarea>
 		</part>
 	</software>

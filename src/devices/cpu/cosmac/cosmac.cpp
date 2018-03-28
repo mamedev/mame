@@ -385,7 +385,7 @@ void cosmac_device::device_start()
 	save_item(NAME(m_q));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -484,15 +484,15 @@ void cosmac_device::state_string_export(const device_state_entry &entry, std::st
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *cdp1801_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> cdp1801_device::create_disassembler()
 {
-	return new cosmac_disassembler(cosmac_disassembler::TYPE_1801);
+	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1801);
 }
 
 
-util::disasm_interface *cdp1802_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> cdp1802_device::create_disassembler()
 {
-	return new cosmac_disassembler(cosmac_disassembler::TYPE_1802);
+	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1802);
 }
 
 //**************************************************************************
@@ -766,7 +766,7 @@ inline void cosmac_device::debug()
 {
 	if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debugger_instruction_hook(this, R[P]);
+		debugger_instruction_hook(R[P]);
 	}
 }
 

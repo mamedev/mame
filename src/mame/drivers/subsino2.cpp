@@ -3030,7 +3030,7 @@ Other:
 
 ROM_START( xtrain )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "x-train(top)_out_1_v1.3.u14", 0x00000, 0x40000, CRC(019812b4) SHA1(33c73c53f8cf730c35fa310868f5b8360dfaad9e) )
+	ROM_LOAD( "x-train=top=_out_1_v1.3.u14", 0x00000, 0x40000, CRC(019812b4) SHA1(33c73c53f8cf730c35fa310868f5b8360dfaad9e) )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "x-train_rom_3_v1.2.u20", 0x00000, 0x80000, CRC(0e18ca82) SHA1(8fbc62a16ab109994086f58c9b9915a92bda0448) )
@@ -3093,7 +3093,7 @@ Other:
 
 ROM_START( ptrain )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "panda(top)-novam_1-v1.4.u14", 0x00000, 0x40000, CRC(75b12734) SHA1(d05d0cba2de9d7021736bbd7c67d9b3c552374ee) )
+	ROM_LOAD( "panda=top=-novam_1-v1.4.u14", 0x00000, 0x40000, CRC(75b12734) SHA1(d05d0cba2de9d7021736bbd7c67d9b3c552374ee) )
 
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD32_BYTE( "panda-novam_3-v1.4.0.u20", 0x00000, 0x80000, CRC(2d5ab471) SHA1(3df42b7f762d738a4409498984e90c80625fae1f) )

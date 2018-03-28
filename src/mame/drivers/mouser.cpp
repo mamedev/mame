@@ -19,6 +19,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -29,29 +30,17 @@
 WRITE_LINE_MEMBER(mouser_state::nmi_enable_w)
 {
 	m_nmi_enable = state;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mouser_state::mouser_nmi_interrupt)
+WRITE_LINE_MEMBER(mouser_state::mouser_nmi_interrupt)
 {
-	if (m_nmi_enable)
-		nmi_line_pulse(device);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 /* Sound CPU interrupted on write */
-
-WRITE8_MEMBER(mouser_state::mouser_sound_interrupt_w)
-{
-	//logerror("int %02x\n", data);
-	m_sound_byte = data;
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
-READ8_MEMBER(mouser_state::mouser_sound_byte_r)
-{
-	//logerror("sound r\n");
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_sound_byte;
-}
 
 WRITE8_MEMBER(mouser_state::mouser_sound_nmi_clear_w)
 {
@@ -76,7 +65,7 @@ void mouser_state::mouser_map(address_map &map)
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).portr("SYSTEM");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb800, 0xb800).portr("P2").w(this, FUNC(mouser_state::mouser_sound_interrupt_w)); /* byte to sound cpu */
+	map(0xb800, 0xb800).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write)); /* byte to sound cpu */
 }
 
 void mouser_state::decrypted_opcodes_map(address_map &map)
@@ -88,7 +77,7 @@ void mouser_state::mouser_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r(this, FUNC(mouser_state::mouser_sound_byte_r));
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x4000, 0x4000).w(this, FUNC(mouser_state::mouser_sound_nmi_clear_w));
 }
 
@@ -194,13 +183,11 @@ GFXDECODE_END
 
 void mouser_state::machine_start()
 {
-	save_item(NAME(m_sound_byte));
 	save_item(NAME(m_nmi_enable));
 }
 
 void mouser_state::machine_reset()
 {
-	m_sound_byte = 0;
 }
 
 MACHINE_CONFIG_START(mouser_state::mouser)
@@ -209,7 +196,6 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(mouser_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mouser_state,  mouser_nmi_interrupt) /* NMI is masked externally */
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ??? */
 	MCFG_CPU_PROGRAM_MAP(mouser_sound_map)
@@ -221,6 +207,9 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mouser_state, flip_screen_x_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mouser_state, flip_screen_y_w))
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -229,6 +218,7 @@ MACHINE_CONFIG_START(mouser_state::mouser)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mouser_state, screen_update_mouser)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mouser_state, mouser_nmi_interrupt))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mouser)
 	MCFG_PALETTE_ADD("palette", 64)

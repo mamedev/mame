@@ -45,6 +45,7 @@ public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
@@ -56,7 +57,9 @@ public:
 	void sdk86_mem(address_map &map);
 private:
 	uint8_t m_digit;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
+	output_finder<8> m_digits;
 };
 
 void sdk86_state::sdk86_mem(address_map &map)
@@ -116,7 +119,7 @@ WRITE8_MEMBER( sdk86_state::scanlines_w )
 WRITE8_MEMBER( sdk86_state::digit_w )
 {
 	if (m_digit < 8)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 }
 
 READ8_MEMBER( sdk86_state::kbd_r )

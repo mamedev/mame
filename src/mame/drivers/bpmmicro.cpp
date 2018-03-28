@@ -402,14 +402,14 @@ ROM_START(bp1200)
 	ROMX_LOAD("bp-1200_version_1.11_u8_1992_1995.at27c256r-12pc.u8", 0x10001, 0x8000, CRC(d1c051e4) SHA1(b27007a931b0662b3dc7e2d41c6ec5ed0cd49308), ROM_SKIP(1) | ROM_BIOS(4))
 	ROMX_LOAD("bp-1200_version_1.11_u9_1992_1995.at27c256r-12pc.u9", 0x10000, 0x8000, CRC(99d46ba1) SHA1(144dbe6ed989ea88cfc1f6d1142508bb92519f87), ROM_SKIP(1) | ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 4, "v105", "BP-1200 V1.05")
-	ROMX_LOAD("bp-1200_1.05_u8__(c)_1993_rev_c__bp_microsystems.27c64-12pc.u8", 0x1c001, 0x2000, CRC(2c13a43c) SHA1(5dd67a09f72f693c085160b9beedd2454ba4ec37), ROM_SKIP(1) | ROM_BIOS(5)) // "BP-1200 1.05 U8 // (C) 1993 REV C // BP Microsystems" 27C64-12PC @U8
-	ROMX_LOAD("bp-1200_1.05_u9__(c)_1993_rev_c__bp_microsystems.27c64-12pc.u9", 0x1c000, 0x2000, CRC(b88a311c) SHA1(fb5e0543c811cbbf8f24d1de204b4c0c1bd2f485), ROM_SKIP(1) | ROM_BIOS(5)) // "BP-1200 1.05 U9 // (C) 1993 REV C // BP Microsystems" 27C64-12PC @U9
+	ROMX_LOAD("bp-1200_1.05_u8__=c=_1993_rev_c__bp_microsystems.27c64-12pc.u8", 0x1c001, 0x2000, CRC(2c13a43c) SHA1(5dd67a09f72f693c085160b9beedd2454ba4ec37), ROM_SKIP(1) | ROM_BIOS(5)) // "BP-1200 1.05 U8 // (C) 1993 REV C // BP Microsystems" 27C64-12PC @U8
+	ROMX_LOAD("bp-1200_1.05_u9__=c=_1993_rev_c__bp_microsystems.27c64-12pc.u9", 0x1c000, 0x2000, CRC(b88a311c) SHA1(fb5e0543c811cbbf8f24d1de204b4c0c1bd2f485), ROM_SKIP(1) | ROM_BIOS(5)) // "BP-1200 1.05 U9 // (C) 1993 REV C // BP Microsystems" 27C64-12PC @U9
 	ROM_SYSTEM_BIOS( 5, "v104", "BP-1200 V1.04")
-	ROMX_LOAD("bp-1200_1.04_u8__(c)_1992_rev_c__bp_microsystems.27c64.u8", 0x1c001, 0x2000, CRC(2ab47324) SHA1(052e578dae5db023f94b35d686a5352ffceec414), ROM_SKIP(1) | ROM_BIOS(6)) // "BP-1200 1.04 U8 // (C) 1992 REV C // BP Microsystems" OTP 27C64 @ U8
-	ROMX_LOAD("bp-1200_1.04_u9__(c)_1993_rev_c__bp_microsystems.27c64.u9", 0x1c000, 0x2000, CRC(17b94d7a) SHA1(7ceed660dbdc638ac86ca8ba7fa456c297d88766), ROM_SKIP(1) | ROM_BIOS(6)) // "BP-1200 1.04 U9 // (C) 1993 REV C // BP Microsystems" OTP 27C64 @ U9
+	ROMX_LOAD("bp-1200_1.04_u8__=c=_1992_rev_c__bp_microsystems.27c64.u8", 0x1c001, 0x2000, CRC(2ab47324) SHA1(052e578dae5db023f94b35d686a5352ffceec414), ROM_SKIP(1) | ROM_BIOS(6)) // "BP-1200 1.04 U8 // (C) 1992 REV C // BP Microsystems" OTP 27C64 @ U8
+	ROMX_LOAD("bp-1200_1.04_u9__=c=_1993_rev_c__bp_microsystems.27c64.u9", 0x1c000, 0x2000, CRC(17b94d7a) SHA1(7ceed660dbdc638ac86ca8ba7fa456c297d88766), ROM_SKIP(1) | ROM_BIOS(6)) // "BP-1200 1.04 U9 // (C) 1993 REV C // BP Microsystems" OTP 27C64 @ U9
 	ROM_SYSTEM_BIOS( 6, "v103", "BP-1200 V1.03")
-	ROMX_LOAD("bp-1200_1.03_u8__(c)_1992_rev_c__bp_microsystems.27c64a-12.u8", 0x1c001, 0x2000, CRC(b01968b6) SHA1(d0c6aa0f0fe47b0915658e8c27286ab6ea90972e), ROM_SKIP(1) | ROM_BIOS(7)) // "BP-1200 1.03 U8 // (C) 1992 REV C // BP Microsystems" 27C64A-12 @ U8
-	ROMX_LOAD("bp-1200_1.03_u9__(c)_1992_rev_c__bp_microsystems.27c64a-12.u9", 0x1c000, 0x2000, CRC(f58ffebb) SHA1(700d3ffed269fff6dc1cf2190bde8b989715c22a), ROM_SKIP(1) | ROM_BIOS(7)) // "BP-1200 1.03 U9 // (C) 1992 REV C // BP Microsystems" 27C64A-12 @ U9
+	ROMX_LOAD("bp-1200_1.03_u8__=c=_1992_rev_c__bp_microsystems.27c64a-12.u8", 0x1c001, 0x2000, CRC(b01968b6) SHA1(d0c6aa0f0fe47b0915658e8c27286ab6ea90972e), ROM_SKIP(1) | ROM_BIOS(7)) // "BP-1200 1.03 U8 // (C) 1992 REV C // BP Microsystems" 27C64A-12 @ U8
+	ROMX_LOAD("bp-1200_1.03_u9__=c=_1992_rev_c__bp_microsystems.27c64a-12.u9", 0x1c000, 0x2000, CRC(f58ffebb) SHA1(700d3ffed269fff6dc1cf2190bde8b989715c22a), ROM_SKIP(1) | ROM_BIOS(7)) // "BP-1200 1.03 U9 // (C) 1992 REV C // BP Microsystems" 27C64A-12 @ U9
 ROM_END
 
 

@@ -1187,7 +1187,7 @@ ROM_END
 */
 ROM_START( crystalc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "crystals_colours_1__(1.02).u2", 0x8000, 0x8000, CRC(a803d857) SHA1(8eb34f6b4f820776459d92f9c589794bec7547ea) )
+	ROM_LOAD( "crystals_colours_1__,1.02.u2", 0x8000, 0x8000, CRC(a803d857) SHA1(8eb34f6b4f820776459d92f9c589794bec7547ea) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "crystals_colours_2_l.425.u16", 0x0000, 0x8000, CRC(834aba76) SHA1(86c1f282c11a4bb058ab702c237b76a620b99cc7) )
@@ -1205,7 +1205,7 @@ ROM_END
 
 ROM_START( crystalca )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "crystals_colours_1__(1.01).u2", 0x8000, 0x8000, CRC(ee7a6f62) SHA1(bb3f438ca563eeb4b365d344066b10b9aedb77bb) )
+	ROM_LOAD( "crystals_colours_1__,1.01.u2", 0x8000, 0x8000, CRC(ee7a6f62) SHA1(bb3f438ca563eeb4b365d344066b10b9aedb77bb) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "crystals_colours_2.u16", 0x0000, 0x8000, CRC(527c07f6) SHA1(53ceb1d0267e1d76fa1a9325c9a1d2e8e034958d) )

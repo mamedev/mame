@@ -64,10 +64,9 @@
     the current value in the input register and initiates a read.
 
     TODO:
-    * Remaining instructions
-    * PSW overflow bits
+    * PSW overflow bits - are they sticky, how are they reset?
     * Clarify rounding behaviour (F2 1011)
-    * Random condition
+    * Random condition (CON 01000/01001)
     * Clarify serial behaviour
     * Serial input
     * More serial I/O signals
@@ -78,7 +77,8 @@
 
 #include "emu.h"
 #include "dsp16.h"
-#include "dsp16dis.h"
+#include "dsp16core.ipp"
+#include "dsp16rc.h"
 
 #include "debugger.h"
 
@@ -185,19 +185,17 @@ dsp16_device_base::dsp16_device_base(
 			{ "rom", ENDIANNESS_BIG, 16, 16, -1, address_map_constructor(FUNC(dsp16_device_base::program_map), this) },
 			{ "ram", ENDIANNESS_BIG, 16, yaau_bits, -1, std::move(data_map) },
 			{ "exm", ENDIANNESS_BIG, 16, 16, -1 } }
-	, m_yaau_mask(u16((u32(1) << yaau_bits) - 1)), m_yaau_sign(u16(1) << (yaau_bits - 1))
-	, m_spaces{ nullptr, nullptr, nullptr }, m_direct(nullptr)
-	, m_icount(0), m_cache_mode(cache::NONE), m_phase(phase::PURGE), m_int_enable{ 0U, 0U }, m_flags(FLAGS_NONE), m_cache_ptr(0U), m_cache_limit(0U), m_cache_iterations(0U)
+	, m_yaau_bits(yaau_bits)
+	, m_workram(*this, "workram"), m_spaces{ nullptr, nullptr, nullptr }, m_direct(nullptr), m_workram_mask(0U)
+	, m_drc_cache(CACHE_SIZE), m_core(nullptr, [] (core_state *core) { core->~core_state(); }), m_recompiler()
+	, m_cache_mode(cache::NONE), m_phase(phase::PURGE), m_int_enable{ 0U, 0U }, m_flags(FLAGS_NONE), m_cache_ptr(0U), m_cache_limit(0U), m_cache_iterations(0U)
 	, m_exm_in(1U), m_int_in(CLEAR_LINE), m_iack_out(1U)
 	, m_ick_in(1U), m_ild_in(CLEAR_LINE), m_do_out(1U), m_ock_in(1U), m_old_in(CLEAR_LINE), m_ose_out(1U)
 	, m_psel_out(0U), m_pids_out(1U), m_pods_out(1U)
-	, m_xaau_pc(0U), m_xaau_pt(0U), m_xaau_pr(0U), m_xaau_pi(0U), m_xaau_i(0)
-	, m_yaau_r{ 0U, 0U, 0U, 0U }, m_yaau_rb(0U), m_yaau_re(0U), m_yaau_j(0), m_yaau_k(0)
-	, m_dau_x(0), m_dau_y(0), m_dau_p(0), m_dau_a{ 0, 0 }, m_dau_c{ 0, 0, 0 }, m_dau_auc(0U), m_dau_psw(0U), m_dau_temp(0)
 	, m_sio_sioc(0U), m_sio_obuf(0U), m_sio_osr(0U), m_sio_ofsr(0U)
-	, m_sio_clk(1U), m_sio_clk_div(0U), m_sio_ld(1U), m_sio_ld_div(0U), m_sio_flags(SIO_FLAGS_NONE)
+	, m_sio_clk(1U), m_sio_clk_div(0U), m_sio_clk_res(0U), m_sio_ld(1U), m_sio_ld_div(0U), m_sio_flags(SIO_FLAGS_NONE)
 	, m_pio_pioc(0U), m_pio_pdx_in(0U), m_pio_pdx_out(0U), m_pio_pids_cnt(0U), m_pio_pods_cnt(0U)
-	, m_cache_pcbase(0U), m_st_pcbase(0U), m_st_yh(0), m_st_ah{ 0, 0 }, m_st_yl(0U), m_st_al{ 0U, 0U }
+	, m_cache_pcbase(0U), m_st_pcbase(0U), m_st_genflags(0U), m_st_yh(0), m_st_ah{ 0, 0 }, m_st_yl(0U), m_st_al{ 0U, 0U }
 {
 }
 
@@ -226,43 +224,52 @@ void dsp16_device_base::device_resolve_objects()
 
 void dsp16_device_base::device_start()
 {
-	m_icountptr = &m_icount;
+	m_core.reset(reinterpret_cast<core_state *>(m_drc_cache.alloc_near(sizeof(core_state))));
+	new (m_core.get()) core_state(m_yaau_bits);
+	set_icountptr(m_core->icount);
 
 	m_spaces[AS_PROGRAM] = &space(AS_PROGRAM);
 	m_spaces[AS_DATA] = &space(AS_DATA);
 	m_spaces[AS_IO] = &space(AS_IO);
 	m_direct = m_spaces[AS_PROGRAM]->direct<-1>();
+	m_workram_mask = u16((m_workram.bytes() >> 1) - 1);
 
-	state_add(STATE_GENPC, "PC", m_xaau_pc);
+	if (allow_drc())
+		m_recompiler.reset(new recompiler(*this, 0)); // TODO: what are UML flags for?
+
+	state_add(STATE_GENPC, "PC", m_core->xaau_pc);
 	state_add(STATE_GENPCBASE, "CURPC", m_st_pcbase).noshow();
-	state_add(DSP16_PT, "PT", m_xaau_pt);
-	state_add(DSP16_PR, "PR", m_xaau_pr);
-	state_add(DSP16_PI, "PI", m_xaau_pi);
-	state_add(DSP16_I, "I", m_xaau_i).mask((s16(1) << 12) - 1).callimport();
-	state_add(DSP16_R0, "R0", m_yaau_r[0]).mask(m_yaau_mask);
-	state_add(DSP16_R1, "R1", m_yaau_r[1]).mask(m_yaau_mask);
-	state_add(DSP16_R2, "R2", m_yaau_r[2]).mask(m_yaau_mask);
-	state_add(DSP16_R3, "R3", m_yaau_r[3]).mask(m_yaau_mask);
-	state_add(DSP16_RB, "RB", m_yaau_rb).mask(m_yaau_mask);
-	state_add(DSP16_RE, "RE", m_yaau_re).mask(m_yaau_mask);
-	state_add(DSP16_J, "J", m_yaau_j).mask(m_yaau_mask).callimport();
-	state_add(DSP16_K, "K", m_yaau_k).mask(m_yaau_mask).callimport();
-	state_add(DSP16_X, "X", m_dau_x);
-	state_add(DSP16_Y, "Y", m_dau_y);
-	state_add(DSP16_P, "P", m_dau_p);
-	state_add(DSP16_A0, "A0", m_dau_a[0]).mask(DAU_A_MASK).callimport();
-	state_add(DSP16_A1, "A1", m_dau_a[1]).mask(DAU_A_MASK).callimport();
-	state_add(DSP16_C0, "C0", m_dau_c[0]);
-	state_add(DSP16_C1, "C1", m_dau_c[1]);
-	state_add(DSP16_C2, "C2", m_dau_c[2]);
-	state_add(DSP16_AUC, "AUC", m_dau_auc).mask(0x7fU);
-	state_add(DSP16_PSW, "PSW", m_dau_psw).callimport().callexport();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_st_genflags).mask(0x0fU).noshow().callexport().formatstr("%16s");
+	state_add(DSP16_PT, "PT", m_core->xaau_pt);
+	state_add(DSP16_PR, "PR", m_core->xaau_pr);
+	state_add(DSP16_PI, "PI", m_core->xaau_pi);
+	state_add(DSP16_I, "I", m_core->xaau_i).mask((s16(1) << 12) - 1).callimport();
+	state_add(DSP16_R0, "R0", m_core->yaau_r[0]).mask(m_core->yaau_mask);
+	state_add(DSP16_R1, "R1", m_core->yaau_r[1]).mask(m_core->yaau_mask);
+	state_add(DSP16_R2, "R2", m_core->yaau_r[2]).mask(m_core->yaau_mask);
+	state_add(DSP16_R3, "R3", m_core->yaau_r[3]).mask(m_core->yaau_mask);
+	state_add(DSP16_RB, "RB", m_core->yaau_rb).mask(m_core->yaau_mask);
+	state_add(DSP16_RE, "RE", m_core->yaau_re).mask(m_core->yaau_mask);
+	state_add(DSP16_J, "J", m_core->yaau_j).mask(m_core->yaau_mask).callimport();
+	state_add(DSP16_K, "K", m_core->yaau_k).mask(m_core->yaau_mask).callimport();
+	state_add(DSP16_X, "X", m_core->dau_x);
+	state_add(DSP16_Y, "Y", m_core->dau_y);
+	state_add(DSP16_P, "P", m_core->dau_p);
+	state_add(DSP16_A0, "A0", m_core->dau_a[0]).mask(DAU_A_MASK).callimport();
+	state_add(DSP16_A1, "A1", m_core->dau_a[1]).mask(DAU_A_MASK).callimport();
+	state_add(DSP16_C0, "C0", m_core->dau_c[0]);
+	state_add(DSP16_C1, "C1", m_core->dau_c[1]);
+	state_add(DSP16_C2, "C2", m_core->dau_c[2]);
+	state_add(DSP16_AUC, "AUC", m_core->dau_auc).mask(0x7fU);
+	state_add(DSP16_PSW, "PSW", m_core->dau_psw).callimport().callexport();
 	state_add(DSP16_YH, "YH", m_st_yh).noshow().callimport().callexport();
 	state_add(DSP16_A0H, "A0H", m_st_ah[0]).noshow().callimport().callexport();
 	state_add(DSP16_A1H, "A1H", m_st_ah[1]).noshow().callimport().callexport();
 	state_add(DSP16_YL, "YL", m_st_yl).noshow().callimport().callexport();
 	state_add(DSP16_A0L, "A0L", m_st_al[0]).noshow().callimport().callexport();
 	state_add(DSP16_A1L, "A1L", m_st_al[1]).noshow().callimport().callexport();
+
+	m_core->register_save_items(*this);
 
 	save_item(NAME(m_cache_mode));
 	save_item(NAME(m_phase));
@@ -289,33 +296,13 @@ void dsp16_device_base::device_start()
 	save_item(NAME(m_pids_out));
 	save_item(NAME(m_pods_out));
 
-	save_item(NAME(m_xaau_pc));
-	save_item(NAME(m_xaau_pt));
-	save_item(NAME(m_xaau_pr));
-	save_item(NAME(m_xaau_pi));
-	save_item(NAME(m_xaau_i));
-
-	save_item(NAME(m_yaau_r));
-	save_item(NAME(m_yaau_rb));
-	save_item(NAME(m_yaau_re));
-	save_item(NAME(m_yaau_j));
-	save_item(NAME(m_yaau_k));
-
-	save_item(NAME(m_dau_x));
-	save_item(NAME(m_dau_y));
-	save_item(NAME(m_dau_p));
-	save_item(NAME(m_dau_a));
-	save_item(NAME(m_dau_c));
-	save_item(NAME(m_dau_auc));
-	save_item(NAME(m_dau_psw));
-	save_item(NAME(m_dau_temp));
-
 	save_item(NAME(m_sio_sioc));
 	save_item(NAME(m_sio_obuf));
 	save_item(NAME(m_sio_osr));
 	save_item(NAME(m_sio_ofsr));
 	save_item(NAME(m_sio_clk));
 	save_item(NAME(m_sio_clk_div));
+	save_item(NAME(m_sio_clk_res));
 	save_item(NAME(m_sio_ld));
 	save_item(NAME(m_sio_ld_div));
 	save_item(NAME(m_sio_flags));
@@ -332,6 +319,11 @@ void dsp16_device_base::device_start()
 	external_memory_enable(*m_spaces[AS_PROGRAM], !m_exm_in);
 }
 
+void dsp16_device_base::device_stop()
+{
+	m_recompiler.reset();
+}
+
 void dsp16_device_base::device_reset()
 {
 	cpu_device::device_reset();
@@ -341,13 +333,14 @@ void dsp16_device_base::device_reset()
 	std::fill(std::begin(m_int_enable), std::end(m_int_enable), 0U);
 	m_flags = FLAGS_NONE;
 	m_cache_ptr = 0U;
-	m_xaau_pc = 0U;
-	m_yaau_rb = 0U;
-	m_yaau_re = 0U;
+	m_core->xaau_pc = 0U;
+	m_core->yaau_rb = 0U;
+	m_core->yaau_re = 0U;
 	m_sio_sioc = 0U;
 	m_sio_ofsr = 0U;
 	m_sio_clk = 1U;
 	m_sio_clk_div = 0U;
+	m_sio_clk_res = 0U;
 	m_pio_pioc = 0x0008U;
 	m_pio_pids_cnt = 0U;
 	m_pio_pods_cnt = 0U;
@@ -389,84 +382,40 @@ void dsp16_device_base::device_reset()
 
 void dsp16_device_base::execute_run()
 {
-	while (0 < m_icount)
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		// execute one cycle of an instruction
-		switch (m_cache_mode)
+		while (m_core->icount_remaining())
 		{
-		case cache::NONE:
-		case cache::LOAD:
-			execute_one_rom();
-			break;
-		case cache::EXECUTE:
-			execute_one_cache();
-			break;
-		}
-		--m_icount;
-
-		// step the serial I/O clock divider
-		if (m_sio_clk_div)
-		{
-			--m_sio_clk_div;
-		}
-		else
-		{
-			bool const active(!m_sio_clk);
-			m_sio_clk = active ? 1U : 0U;
-			if (sio_ick_active())
+			switch (m_cache_mode)
 			{
-				if (active)
-					sio_ick_active_edge();
-				m_ick_cb(m_sio_clk);
-			}
-			if (sio_ock_active())
-			{
-				m_ock_cb(m_sio_clk);
-				if (active)
-					sio_ock_active_edge();
-			}
-			switch ((m_sio_sioc >> 7) & 0x0003U)
-			{
-			case 0x0: m_sio_clk_div = (4 / 4) - 1; break; // CKI÷4
-			case 0x1: m_sio_clk_div = (12 / 4) - 1; break; // CKI÷12
-			case 0x2: m_sio_clk_div = (16 / 4) - 1; break; // CKI÷16
-			case 0x3: m_sio_clk_div = (20 / 4) - 1; break; // CKI÷20
+			case cache::NONE:
+				execute_some_rom<true, false>();
+				break;
+			case cache::LOAD:
+				execute_some_rom<true, true>();
+				break;
+			case cache::EXECUTE:
+				execute_some_cache<true>();
+				break;
 			}
 		}
-
-		// udpate parallel input strobe
-		if (m_pio_pids_cnt)
+	}
+	else
+	{
+		while (m_core->icount_remaining())
 		{
-			assert(!m_pids_out);
-			if (!--m_pio_pids_cnt)
+			switch (m_cache_mode)
 			{
-				if (!m_pio_r_cb.isnull())
-					m_pio_pdx_in = m_pio_r_cb(machine().dummy_space(), m_psel_out, 0xffffU);
-				m_pids_cb(m_pids_out = 1U);
-				LOGPIO("DSP16: PIO read active edge PSEL = %u, PDX = %04X (PC = %04X)\n", m_psel_out, m_pio_pdx_in, m_st_pcbase);
+			case cache::NONE:
+				execute_some_rom<false, false>();
+				break;
+			case cache::LOAD:
+				execute_some_rom<false, true>();
+				break;
+			case cache::EXECUTE:
+				execute_some_cache<false>();
+				break;
 			}
-		}
-		else
-		{
-			assert(m_pids_out);
-		}
-
-		// udpate parallel output strobe
-		if (m_pio_pods_cnt)
-		{
-			assert(!m_pods_out);
-			if (!--m_pio_pods_cnt)
-			{
-				LOGPIO("DSP16: PIO write active edge PSEL = %u, PDX = %04X (PC = %04X)\n", m_psel_out, m_pio_pdx_out, m_st_pcbase);
-				m_pods_cb(1U);
-				m_pio_w_cb(machine().dummy_space(), m_psel_out, m_pio_pdx_out, 0xffffU);
-				m_pods_out = 1U;
-				m_pdb_w_cb(machine().dummy_space(), m_psel_out, 0xffffU, 0x0000U);
-			}
-		}
-		else
-		{
-			assert(m_pods_out);
 		}
 	}
 }
@@ -542,46 +491,33 @@ void dsp16_device_base::state_import(device_state_entry const &entry)
 	switch (entry.index())
 	{
 	// extend signed registers that aren't a power-of-two size
-	case DSP16_I:
-		m_xaau_i = (m_xaau_i & XAAU_I_MASK) | ((m_xaau_i & XAAU_I_SIGN) ? XAAU_I_EXT : 0);
-		break;
-	case DSP16_J:
-		m_yaau_j = (m_yaau_j & m_yaau_mask) | ((m_yaau_j & m_yaau_sign) ? ~m_yaau_mask : 0);
-		break;
-	case DSP16_K:
-		m_yaau_k = (m_yaau_k & m_yaau_mask) | ((m_yaau_k & m_yaau_sign) ? ~m_yaau_mask : 0);
-		break;
-	case DSP16_A0:
-		m_dau_a[0] = (m_dau_a[0] & DAU_A_MASK) | ((m_dau_a[0] & DAU_A_SIGN) ? DAU_A_EXT : 0);
-		break;
-	case DSP16_A1:
-		m_dau_a[1] = (m_dau_a[1] & DAU_A_MASK) | ((m_dau_a[1] & DAU_A_SIGN) ? DAU_A_EXT : 0);
-		break;
+	case DSP16_I: m_core->xaau_extend_i(); break;
+	case DSP16_J: m_core->yaau_extend_j(); break;
+	case DSP16_K: m_core->yaau_extend_k(); break;
+	case DSP16_A0: m_core->dau_extend_a<0>(); break;
+	case DSP16_A1: m_core->dau_extend_a<1>(); break;
 
 	// guard bits of accumulators are accessible via status word
-	case DSP16_PSW:
-		m_dau_a[0] = u64(u32(m_dau_a[0])) | (u64(m_dau_psw & 0x000fU) << 32) | (BIT(m_dau_psw, 3) ? DAU_A_EXT : 0U);
-		m_dau_a[1] = u64(u32(m_dau_a[1])) | (u64(m_dau_psw & 0x01e0U) << 27) | (BIT(m_dau_psw, 8) ? DAU_A_EXT : 0U);
-		break;
+	case DSP16_PSW: m_core->dau_import_psw(); break;
 
 	// put partial registers in the appropriate places
 	case DSP16_YH:
-		m_dau_y = (s32(m_st_yh) << 16) | (m_dau_y & ((s32(1) << 16) - 1));
+		m_core->dau_y = (s32(m_st_yh) << 16) | (m_core->dau_y & ((s32(1) << 16) - 1));
 		break;
 	case DSP16_A0H:
-		m_dau_a[0] = (s32(m_st_ah[0]) << 16) | s32(m_dau_a[0] & ((s32(1) << 16) - 1));
+		m_core->dau_a[0] = (s32(m_st_ah[0]) << 16) | s32(m_core->dau_a[0] & ((s32(1) << 16) - 1));
 		break;
 	case DSP16_A1H:
-		m_dau_a[1] = (s32(m_st_ah[1]) << 16) | s32(m_dau_a[1] & ((s32(1) << 16) - 1));
+		m_core->dau_a[1] = (s32(m_st_ah[1]) << 16) | s32(m_core->dau_a[1] & ((s32(1) << 16) - 1));
 		break;
 	case DSP16_YL:
-		m_dau_y = (m_dau_y & ~((s32(1) << 16) - 1)) | u32(m_st_yl);
+		m_core->dau_y = (m_core->dau_y & ~((s32(1) << 16) - 1)) | u32(m_st_yl);
 		break;
 	case DSP16_A0L:
-		m_dau_a[0] = (m_dau_a[0] & ~((s64(1) << 16) - 1)) | u64(m_st_al[0]);
+		m_core->dau_a[0] = (m_core->dau_a[0] & ~((s64(1) << 16) - 1)) | u64(m_st_al[0]);
 		break;
 	case DSP16_A1L:
-		m_dau_a[1] = (m_dau_a[1] & ~((s64(1) << 16) - 1)) | u64(m_st_al[1]);
+		m_core->dau_a[1] = (m_core->dau_a[1] & ~((s64(1) << 16) - 1)) | u64(m_st_al[1]);
 		break;
 	}
 }
@@ -591,28 +527,42 @@ void dsp16_device_base::state_export(device_state_entry const &entry)
 	switch (entry.index())
 	{
 	// guard bits of accumulators are accessible via status word
-	case DSP16_PSW:
-		m_dau_psw = (m_dau_psw & 0xfe10U) | (u16(u64(m_dau_a[0]) >> 32) & 0x000fU) | (u16(u64(m_dau_a[1]) >> 27) & 0x01e0U);
-		break;
+	case DSP16_PSW: m_core->dau_export_psw(); break;
 
 	// put partial registers in the appropriate places
 	case DSP16_YH:
-		m_st_yh = m_dau_y >> 16;
+		m_st_yh = m_core->dau_y >> 16;
 		break;
 	case DSP16_A0H:
-		m_st_ah[0] = u16(u64(m_dau_a[0]) >> 16);
+		m_st_ah[0] = u16(u64(m_core->dau_a[0]) >> 16);
 		break;
 	case DSP16_A1H:
-		m_st_ah[1] = u16(u64(m_dau_a[1]) >> 16);
+		m_st_ah[1] = u16(u64(m_core->dau_a[1]) >> 16);
 		break;
 	case DSP16_YL:
-		m_st_yl = u16(u32(m_dau_y));
+		m_st_yl = u16(u32(m_core->dau_y));
 		break;
 	case DSP16_A0L:
-		m_st_al[0] = u16(u64(m_dau_a[0]));
+		m_st_al[0] = u16(u64(m_core->dau_a[0]));
 		break;
 	case DSP16_A1L:
-		m_st_al[1] = u16(u64(m_dau_a[1]));
+		m_st_al[1] = u16(u64(m_core->dau_a[1]));
+		break;
+	}
+}
+
+void dsp16_device_base::state_string_export(device_state_entry const &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+	// show DAU flags
+	case STATE_GENFLAGS:
+		str = util::string_format(
+				"%s%s%s%s",
+				m_core->dau_psw_lmi() ? "LMI " : "",
+				m_core->dau_psw_leq() ? "LEQ " : "",
+				m_core->dau_psw_llv() ? "LLV " : "",
+				m_core->dau_psw_lmv() ? "LMV " : "");
 		break;
 	}
 }
@@ -621,9 +571,68 @@ void dsp16_device_base::state_export(device_state_entry const &entry)
     device_disasm_interface implementation
 ***********************************************************************/
 
-util::disasm_interface *dsp16_device_base::create_disassembler()
+std::unique_ptr<util::disasm_interface> dsp16_device_base::create_disassembler()
 {
-	return new dsp16a_disassembler;
+	return std::make_unique<dsp16_disassembler>(static_cast<dsp16_disassembler::cpu const &>(*this));
+}
+
+/***********************************************************************
+    dsp16_disassembler::cpu implementation
+***********************************************************************/
+
+dsp16_disassembler::cpu::predicate dsp16_device_base::check_con(offs_t pc, u16 op) const
+{
+	if (pc != m_st_pcbase)
+	{
+		return predicate::INDETERMINATE;
+	}
+	else
+	{
+		bool result;
+		u16 const con(op_con(op));
+		switch (con >> 1)
+		{
+		case 0x0: // mi/pl
+			result = m_core->dau_psw_lmi();
+			break;
+		case 0x1: // eq/ne
+			result = m_core->dau_psw_leq();
+			break;
+		case 0x2: // lvs/lvc
+			result = m_core->dau_psw_llv();
+			break;
+		case 0x3: // mvs/mvc
+			result = m_core->dau_psw_lmv();
+			break;
+		case 0x4: // heads/tails
+			return predicate::INDETERMINATE; // FIXME: implement PRNG
+		case 0x5: // c0ge/c0lt
+		case 0x6: // c1ge/c1lt
+			result = 0 <= m_core->dau_c[(con >> 1) - 0x05];
+			break;
+		case 0x7: // true/false
+			result = true;
+			break;
+		case 0x8: // gt/le
+			result = !m_core->dau_psw_lmi() && !m_core->dau_psw_leq();
+			break;
+		default: // Reserved
+			return predicate::INDETERMINATE;
+		}
+		return (bool(BIT(con, 0)) == result) ? predicate::SKIPPED : predicate::TAKEN;
+	}
+}
+
+dsp16_disassembler::cpu::predicate dsp16_device_base::check_branch(offs_t pc) const
+{
+	if (pc != m_st_pcbase)
+		return predicate::INDETERMINATE;
+	else if (FLAGS_PRED_TRUE == (m_flags & FLAGS_PRED_MASK))
+		return predicate::TAKEN;
+	else if (FLAGS_PRED_FALSE == (m_flags & FLAGS_PRED_MASK))
+		return predicate::SKIPPED;
+	else
+		return predicate::INDETERMINATE;
 }
 
 template <offs_t Base> READ16_MEMBER(dsp16_device_base::external_memory_r)
@@ -645,69 +654,433 @@ void dsp16_device_base::program_map(address_map &map)
     instruction execution
 ***********************************************************************/
 
-inline void dsp16_device_base::execute_one_rom()
+template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_some_rom()
 {
-	u16 const op(m_cache[m_cache_ptr]);
-	bool const cache_load(cache::LOAD == m_cache_mode);
-	bool const last_cache_load(cache_load && (m_cache_ptr == m_cache_limit));
-	u16 const cache_next((m_cache_ptr + (cache_load ? 1 : 0)) & 0x0fU);
-	u16 *fetch_target(&m_cache[cache_next]);
-	u16 fetch_addr(0U);
-	flags predicate(FLAGS_PRED_NONE);
-
-	switch (m_phase)
+	assert(bool(machine().debug_flags & DEBUG_FLAG_ENABLED) == Debugger);
+	for (bool mode_change = false; !mode_change && m_core->icount_remaining(); m_core->decrement_icount())
 	{
-	case phase::PURGE:
-		fetch_addr = m_xaau_pc;
-		m_phase = phase::OP1;
-		break;
+		assert((cache::LOAD == m_cache_mode) == Caching);
 
-	case phase::OP1:
-		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-			debugger_instruction_hook(this, m_st_pcbase);
+		u16 const op(m_cache[m_cache_ptr]);
+		bool const last_cache_load(Caching && (m_cache_ptr == m_cache_limit));
+		u16 const cache_next((m_cache_ptr + (Caching ? 1 : 0)) & 0x0fU);
+		u16 *fetch_target(&m_cache[cache_next]);
+		u16 fetch_addr(0U);
+		flags predicate(FLAGS_PRED_NONE);
 
-		// IACK is updated for the next instruction
-		switch (m_flags & FLAGS_IACK_MASK)
+		switch (m_phase)
 		{
-		case FLAGS_IACK_SET:
-			if (m_iack_out)
-			{
-				LOGINT("DSP16: asserting IACK (PC = %04X)\n", m_st_pcbase);
-				m_iack_cb(m_iack_out = 0U);
-				standard_irq_callback(DSP16_INT_LINE);
-			}
+		case phase::PURGE:
+			fetch_addr = m_core->xaau_pc;
+			m_phase = phase::OP1;
 			break;
-		case FLAGS_IACK_CLEAR:
-			if (!m_iack_out)
-			{
-				LOGINT("DSP16: de-asserting IACK (PC = %04X)\n", m_st_pcbase);
-				m_iack_cb(m_iack_out = 1U);
-				m_pio_pioc &= 0xfffeU;
-			}
-			break;
-		default:
-			break;
-		}
-		set_iack(FLAGS_IACK_NONE);
 
-		// if we're not servicing an interrupt or caching
-		if (m_iack_out && (cache::NONE == m_cache_mode))
-		{
-			// TODO: is INT sampled on any instruction or only interruptible instructions?
-			// if an unmasked interrupt is pending
-			if ((m_pio_pioc & m_int_enable[0] & 0x001eU) || (BIT(m_int_enable[0], 0) && (CLEAR_LINE != m_int_in)))
+		case phase::OP1:
+			if (Debugger)
 			{
-				// if the current instruction is interruptible
-				if (op_interruptible(op))
+				if (FLAGS_PRED_NONE == (m_flags & FLAGS_PRED_MASK))
 				{
-					if (pio_int_enable() && (CLEAR_LINE != m_int_in))
+					debugger_instruction_hook(m_st_pcbase);
+				}
+				else
+				{
+					switch (op >> 11)
 					{
-						if (ASSERT_LINE != m_int_in)
-							m_int_in = CLEAR_LINE;
-						m_pio_pioc |= 0x0001U;
+					case 0x00: // goto JA
+					case 0x01:
+					case 0x10: // call JA
+					case 0x11:
+						break;
+					case 0x18: // goto B
+						switch (op_b(op))
+						{
+						case 0x0: // return
+						case 0x2: // goto pt
+						case 0x3: // call pt
+							break;
+						default:
+							debugger_instruction_hook(m_st_pcbase);
+						}
+						break;
+					default:
+						debugger_instruction_hook(m_st_pcbase);
 					}
+				}
+			}
+
+			// IACK is updated for the next instruction
+			switch (m_flags & FLAGS_IACK_MASK)
+			{
+			case FLAGS_IACK_SET:
+				if (m_iack_out)
+				{
+					LOGINT("DSP16: asserting IACK (PC = %04X)\n", m_st_pcbase);
+					m_iack_cb(m_iack_out = 0U);
+					standard_irq_callback(DSP16_INT_LINE);
+				}
+				break;
+			case FLAGS_IACK_CLEAR:
+				if (!m_iack_out)
+				{
+					LOGINT("DSP16: de-asserting IACK (PC = %04X)\n", m_st_pcbase);
+					m_iack_cb(m_iack_out = 1U);
+					m_pio_pioc &= 0xfffeU;
+				}
+				break;
+			default:
+				break;
+			}
+			set_iack(FLAGS_IACK_NONE);
+
+			// if we're not servicing an interrupt or caching
+			if (m_iack_out && !Caching)
+			{
+				// TODO: is INT sampled on any instruction or only interruptible instructions?
+				// if an unmasked interrupt is pending
+				if ((m_pio_pioc & m_int_enable[0] & 0x001eU) || (BIT(m_int_enable[0], 0) && (CLEAR_LINE != m_int_in)))
+				{
+					// if the current instruction is interruptible
+					if (op_interruptible(op))
+					{
+						if (pio_int_enable() && (CLEAR_LINE != m_int_in))
+						{
+							if (ASSERT_LINE != m_int_in)
+								m_int_in = CLEAR_LINE;
+							m_pio_pioc |= 0x0001U;
+						}
+						LOGINT(
+								"DSP16: servicing interrupts%s%s%s%s%s (PC = %04X)\n",
+								(pio_ibf_enable() && pio_ibf_status()) ? " IBF" : "",
+								(pio_obe_enable() && pio_obe_status()) ? " OBE" : "",
+								(pio_pids_enable() && pio_pids_status()) ? " PIDS" : "",
+								(pio_pods_enable() && pio_pods_status()) ? " PODS" : "",
+								(pio_int_enable() && pio_int_status()) ? " INT" : "",
+								m_st_pcbase);
+						set_iack(FLAGS_IACK_SET);
+						fetch_addr = m_core->xaau_next_pc();
+						m_int_enable[0] = m_int_enable[1];
+						m_core->xaau_pc = 0x0001U;
+						m_phase = phase::PURGE;
+						break;
+					}
+				}
+			}
+
+			// normal opcode execution
+			fetch_addr = set_xaau_pc_offset(m_core->xaau_pc + 1);
+			m_int_enable[0] = m_int_enable[1];
+			switch (op >> 11)
+			{
+			case 0x00: // goto JA
+			case 0x01:
+			case 0x10: // call JA
+			case 0x11:
+				if (check_predicate())
+				{
+					if (BIT(op, 15))
+						m_core->xaau_pr = m_core->xaau_pc;
+					set_xaau_pc_offset(op_ja(op));
+				}
+				m_phase = phase::PURGE;
+				break;
+
+			case 0x02: // R = M
+			case 0x03:
+				yaau_short_immediate_load(op);
+				break;
+
+			case 0x04: // F1 ; Y = a1[l]
+			case 0x1c: // F1 ; Y = a0[l]
+				fetch_target = nullptr;
+				m_phase = phase::OP2;
+				break;
+
+			case 0x05: // F1 ; Z : aT[l]
+				{
+					fetch_target = nullptr;
+					s64 const d(m_core->dau_f1(op));
+					m_core->dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
+					m_core->op_dau_ad(op) = d;
+					m_core->dau_set_at(op, yaau_read<Debugger>(op));
+					m_phase = phase::OP2;
+				}
+				break;
+
+			case 0x06: // F1 ; Y
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				yaau_read<Debugger>(op);
+				break;
+
+			case 0x07: // F1 ; aT[l] = Y
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_set_at(op, yaau_read<Debugger>(op));
+				break;
+
+			case 0x08: // aT = R
+				assert(!(op & 0x000fU)); // reserved field?
+				fetch_target = nullptr;
+				m_core->dau_set_at(op, get_r(op));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x09: // R = a0
+			case 0x0b: // R = a1
+				assert(!(op & 0x040fU)); // reserved fields?
+				fetch_target = nullptr;
+				set_r(op, u16(u64(dau_saturate(BIT(op, 12))) >> 16));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x0a: // R = N
+				assert(!(op & 0x040fU)); // reserved fields?
+				m_phase = phase::OP2;
+				fetch_target = &m_rom_data;
+				break;
+
+			case 0x0c: // Y = R
+				assert(!(op & 0x0400U)); // reserved field?
+				fetch_target = nullptr;
+				m_phase = phase::OP2;
+				break;
+
+			case 0x0d: // Z : R
+				fetch_target = nullptr;
+				m_core->dau_temp = get_r(op);
+				set_r(op, yaau_read<Debugger>(op));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x0e: // do K { instr1...instrIN } # redo K
+				{
+					u16 const ni(op_ni(op));
+					if (ni)
+					{
+						mode_change = true;
+						fetch_target = &m_cache[m_cache_ptr = 1U];
+						m_cache_mode = cache::LOAD;
+						m_cache_limit = ni;
+						m_cache_pcbase = m_st_pcbase;
+					}
+					else
+					{
+						mode_change = true;
+						fetch_target = nullptr;
+						m_cache_mode = cache::EXECUTE;
+						m_phase = phase::PREFETCH;
+						m_cache_ptr = 1U;
+					}
+					m_cache_iterations = op_k(op);
+					assert(m_cache_iterations >= 2U); // p3-25: "The iteration count can be between 2 and 127, inclusive"
+				}
+				break;
+
+			case 0x0f: // R = Y
+				assert(!(op & 0x0400U)); // reserved field?
+				fetch_target = nullptr;
+				set_r(op, yaau_read<Debugger>(op));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x12: // ifc CON F2
+				{
+					bool const con(op_dau_con(op, false));
+					++m_core->dau_c[1];
+					if (con)
+					{
+						m_core->dau_f2(op);
+						m_core->dau_c[2] = m_core->dau_c[1];
+					}
+				}
+				break;
+
+			case 0x13: // if CON F2
+				if (op_dau_con(op, true))
+					m_core->dau_f2(op);
+				break;
+
+			case 0x14: // F1 ; Y = y[l]
+				fetch_target = nullptr;
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_phase = phase::OP2;
+				break;
+
+			case 0x15: // F1 ; Z : y[l]
+				fetch_target = nullptr;
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_temp = m_core->dau_get_y(op);
+				m_core->dau_set_y(op, yaau_read<Debugger>(op));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x16: // F1 ; x = Y
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_x = yaau_read<Debugger>(op);
+				break;
+
+			case 0x17: // F1 ; y[l] = Y
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_set_y(op, yaau_read<Debugger>(op));
+				break;
+
+			case 0x18: // goto B
+				assert(!(op & 0x00ffU)); // reserved field?
+				switch (op_b(op))
+				{
+				case 0x0: // return
+					if (check_predicate())
+						m_core->xaau_pc = m_core->xaau_pr;
+					break;
+				case 0x1: // ireturn
+					if (m_iack_out)
+						logerror("DSP16: ireturn when not servicing interrupt (PC = %04X)\n", m_st_pcbase);
+					LOGINT("DSP16: return from interrupt (PC = %04X)\n", m_st_pcbase);
+					set_iack(FLAGS_IACK_CLEAR);
+					m_core->xaau_pc = m_core->xaau_pi;
+					break;
+				case 0x2: // goto pt
+					if (check_predicate())
+						m_core->xaau_pc = m_core->xaau_pt;
+					break;
+				case 0x3: // call pt
+					if (check_predicate())
+					{
+						m_core->xaau_pr = m_core->xaau_pc;
+						m_core->xaau_pc = m_core->xaau_pt;
+					}
+					break;
+				case 0x4: // Reserved
+				case 0x5:
+				case 0x6:
+				case 0x7:
+					throw emu_fatalerror("DSP16: reserved B value %01X (PC = %04X)\n", op_b(op), m_st_pcbase);
+				}
+				if (m_iack_out)
+					m_core->xaau_pi = m_core->xaau_pc;
+				m_phase = phase::PURGE;
+				break;
+
+			case 0x19: // F1 ; y = a0 ; x = *pt++[i]
+			case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
+				{
+					assert(!(op & 0x000fU)); // reserved field?
+					s64 const d(m_core->dau_f1(op));
+					s64 a(m_core->dau_a[BIT(op, 12)]);
+					// FIXME: is saturation applied when transferring a to y?
+					m_core->dau_y = u32(u64(a));
+					m_core->op_dau_ad(op) = d;
+					fetch_target = nullptr;
+					m_rom_data = m_spaces[AS_PROGRAM]->read_word(m_core->xaau_pt);
+					m_phase = phase::OP2;
+				}
+				break;
+
+			case 0x1a: // if CON # icall
+				assert(!(op & 0x03e0U)); // reserved field?
+				predicate = op_dau_con(op, true) ? FLAGS_PRED_TRUE : FLAGS_PRED_FALSE;
+				if (BIT(op, 10))
+				{
+					fetch_target = nullptr;
+					assert(0x000eU == op_con(op)); // CON must be true for icall?
+					m_phase = phase::OP2;
+				}
+				break;
+
+			case 0x1d: // F1 ; Z : y ; x = *pt++[i]
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_temp = s16(m_core->dau_y >> 16);
+				m_core->dau_set_y(yaau_read<Debugger>(op));
+				fetch_target = nullptr;
+				m_rom_data = m_spaces[AS_PROGRAM]->read_word(m_core->xaau_pt);
+				m_phase = phase::OP2;
+				break;
+
+			case 0x1e: // Reserved
+				throw emu_fatalerror("DSP16: reserved op %u (PC = %04X)\n", op >> 11, m_st_pcbase);
+				break;
+
+			case 0x1f: // F1 ; y = Y ; x = *pt++[i]
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_set_y(yaau_read<Debugger>(op));
+				fetch_target = nullptr;
+				m_rom_data = m_spaces[AS_PROGRAM]->read_word(m_core->xaau_pt);
+				m_phase = phase::OP2;
+				break;
+
+			default:
+				throw emu_fatalerror("DSP16: unimplemented op %u (PC = %04X)\n", op >> 11, m_st_pcbase);
+			}
+
+			if (Caching && (phase::OP1 == m_phase))
+			{
+				// if the last instruction loaded to the cache completes in a single cycle, there's an extra cycle for a data fetch
+				if (last_cache_load)
+				{
+					mode_change = true;
+					fetch_target = nullptr;
+					m_cache_mode = cache::EXECUTE;
+					m_phase = phase::PREFETCH;
+					m_cache_ptr = 1U;
+					--m_cache_iterations;
+				}
+				else
+				{
+					m_cache_ptr = cache_next;
+				}
+			}
+			break;
+
+		case phase::OP2:
+			m_phase = phase::OP1;
+			switch (op >> 11)
+			{
+			case 0x04: // F1 ; Y = a1[l]
+			case 0x1c: // F1 ; Y = a0[l]
+				yaau_write<Debugger>(op, u16(u64(dau_saturate(BIT(~op, 14))) >> (op_x(op) ? 16 : 0)));
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				break;
+
+			case 0x05: // F1 ; Z : aT[l]
+			case 0x0d: // Z : R
+			case 0x15: // F1 ; Z : y[l]
+				yaau_write_z<Debugger>(op);
+				break;
+
+			case 0x08: // aT = R
+			case 0x09: // R = a0
+			case 0x0b: // R = a1
+				break;
+
+			case 0x0a: // R = N
+				set_xaau_pc_offset(m_core->xaau_pc + 1);
+				set_r(op, m_rom_data);
+				break;
+
+			case 0x0c: // Y = R
+				yaau_write<Debugger>(op, get_r(op));
+				break;
+
+			case 0x0f: // R = Y
+				break;
+
+			case 0x14: // F1 ; Y = y[l]
+				yaau_write<Debugger>(op, m_core->dau_get_y(op));
+				break;
+
+			case 0x19: // F1 ; y = a0 ; x = *pt++[i]
+			case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
+			case 0x1f: // F1 ; y = Y ; x = *pt++[i]
+				m_core->xaau_increment_pt(op);
+				m_core->dau_x = m_rom_data;
+				break;
+
+			case 0x1a: // icall
+				// TODO: does INT get sampled or could an external interrupt be lost here?
+				assert(BIT(op, 10));
+				assert(FLAGS_PRED_TRUE == (m_flags & FLAGS_PRED_MASK));
+				if (check_predicate())
+				{
 					LOGINT(
-							"DSP16: servicing interrupts%s%s%s%s%s (PC = %04X)\n",
+							"DSP16: servicing software interrupt%s%s%s%s%s (PC = %04X)\n",
 							(pio_ibf_enable() && pio_ibf_status()) ? " IBF" : "",
 							(pio_obe_enable() && pio_obe_status()) ? " OBE" : "",
 							(pio_pids_enable() && pio_pids_status()) ? " PIDS" : "",
@@ -715,559 +1088,321 @@ inline void dsp16_device_base::execute_one_rom()
 							(pio_int_enable() && pio_int_status()) ? " INT" : "",
 							m_st_pcbase);
 					set_iack(FLAGS_IACK_SET);
-					fetch_addr = (m_xaau_pc & 0xf000U) | ((m_xaau_pc + 1) & 0x0fffU);
-					m_int_enable[0] = m_int_enable[1];
-					m_xaau_pc = 0x0001U;
-					m_phase = phase::PURGE;
-					break;
+					m_core->xaau_pc = 0x0002U;
 				}
-			}
-		}
-
-		// normal opcode execution
-		fetch_addr = set_xaau_pc_offset(m_xaau_pc + 1);
-		m_int_enable[0] = m_int_enable[1];
-		switch (op >> 11)
-		{
-		case 0x00: // goto JA
-		case 0x01:
-		case 0x10: // call JA
-		case 0x11:
-			if (check_predicate())
-			{
-				if (BIT(op, 15))
-					m_xaau_pr = m_xaau_pc;
-				set_xaau_pc_offset(op_ja(op));
-			}
-			m_phase = phase::PURGE;
-			break;
-
-		case 0x02: // R = M
-		case 0x03:
-			yaau_short_immediate_load(op);
-			break;
-
-		case 0x04: // F1 ; Y = a1[l]
-		case 0x1c: // F1 ; Y = a0[l]
-			fetch_target = nullptr;
-			m_phase = phase::OP2;
-			break;
-
-		case 0x06: // F1 ; Y
-			op_dau_ad(op) = dau_f1(op);
-			yaau_read(op);
-			break;
-
-		case 0x07: // F1 ; aT[l] = Y
-			op_dau_ad(op) = dau_f1(op);
-			set_dau_at(op, yaau_read(op));
-			break;
-
-		case 0x08: // aT = R
-			assert(!(op & 0x000fU)); // reserved field?
-			fetch_target = nullptr;
-			set_dau_at(op, get_r(op));
-			m_phase = phase::OP2;
-			break;
-
-		case 0x09: // R = a0
-		case 0x0b: // R = a1
-			{
-				assert(!(op & 0x040fU)); // reserved fields?
-				fetch_target = nullptr;
-				s64 a(m_dau_a[BIT(op, 12)]);
-				if (!BIT(m_dau_auc, 2 + BIT(op, 12)))
-					a = std::min<s64>(std::max<s64>(a, std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
-				set_r(op, u16(u64(a) >> 16));
-				m_phase = phase::OP2;
-			}
-			break;
-
-		case 0x0a: // R = N
-			assert(!(op & 0x040fU)); // reserved fields?
-			m_phase = phase::OP2;
-			fetch_target = &m_rom_data;
-			break;
-
-		case 0x0c: // Y = R
-			assert(!(op & 0x0400U)); // reserved field?
-			fetch_target = nullptr;
-			m_phase = phase::OP2;
-			break;
-
-		case 0x0e: // do K { instr1...instrIN } # redo K
-			{
-				u16 const ni(op_ni(op));
-				if (ni)
-				{
-					m_cache_mode = cache::LOAD;
-					fetch_target = &m_cache[m_cache_ptr = 1U];
-					m_cache_limit = ni;
-					m_cache_pcbase = m_st_pcbase;
-				}
-				else
-				{
-					fetch_target = nullptr;
-					m_cache_mode = cache::EXECUTE;
-					m_phase = phase::PREFETCH;
-					m_cache_ptr = 1U;
-				}
-				m_cache_iterations = op_k(op);
-				assert(m_cache_iterations >= 2U); // p3-25: "The iteration count can be between 2 and 127, inclusive"
-			}
-			break;
-
-		case 0x0f: // R = Y
-			assert(!(op & 0x0400U)); // reserved field?
-			fetch_target = nullptr;
-			set_r(op, yaau_read(op));
-			m_phase = phase::OP2;
-			break;
-
-		case 0x12: // ifc CON F2
-			++m_dau_c[1];
-			if (op_dau_con(op))
-			{
-				op_dau_ad(op) = dau_f2(op);
-				m_dau_c[2] = m_dau_c[1];
-			}
-			break;
-
-		case 0x13: // if CON F2
-			if (op_dau_con(op))
-				op_dau_ad(op) = dau_f2(op);
-			break;
-
-		case 0x14: // F1 ; Y = y[l]
-			fetch_target = nullptr;
-			op_dau_ad(op) = dau_f1(op);
-			m_phase = phase::OP2;
-			break;
-
-		case 0x15: // F1 ; Z : y[l]
-			fetch_target = nullptr;
-			op_dau_ad(op) = dau_f1(op);
-			m_dau_temp = u16(u32(m_dau_y) >> (op_x(op) ? 16 : 0));
-			set_dau_y(op, yaau_read(op));
-			m_phase = phase::OP2;
-			break;
-
-		case 0x16: // F1 ; x = Y
-			op_dau_ad(op) = dau_f1(op);
-			m_dau_x = yaau_read(op);
-			break;
-
-		case 0x17: // F1 ; y[l] = Y
-			op_dau_ad(op) = dau_f1(op);
-			set_dau_y(op, yaau_read(op));
-			break;
-
-		case 0x18: // goto B
-			assert(!(op & 0x00ffU)); // reserved field?
-			switch (op_b(op))
-			{
-			case 0x0: // return
-				if (check_predicate())
-					m_xaau_pc = m_xaau_pr;
+				m_phase = phase::PURGE;
 				break;
-			case 0x1: // ireturn
-				if (m_iack_out)
-					logerror("DSP16: ireturn when not servicing interrupt (PC = %04X)\n", m_st_pcbase);
-				LOGINT("DSP16: return from interrupt (PC = %04X)\n", m_st_pcbase);
-				set_iack(FLAGS_IACK_CLEAR);
-				m_xaau_pc = m_xaau_pi;
+
+			case 0x1d: // F1 ; Z : y ; x = *pt++[i]
+				m_core->xaau_increment_pt(op);
+				m_core->dau_x = m_rom_data;
+				yaau_write_z<Debugger>(op);
 				break;
-			case 0x2: // goto pt
-				if (check_predicate())
-					m_xaau_pc = m_xaau_pt;
-				break;
-			case 0x3: // call pt
-				if (check_predicate())
-				{
-					m_xaau_pr = m_xaau_pc;
-					m_xaau_pc = m_xaau_pt;
-				}
-				break;
-			case 0x4: // Reserved
-			case 0x5:
-			case 0x6:
-			case 0x7:
-				throw emu_fatalerror("DSP16: reserved B value %01X (PC = %04X)\n", op_b(op), m_st_pcbase);
+
+			default:
+				throw emu_fatalerror("DSP16: op %u doesn't take two cycles to run from ROM\n", op >> 11);
 			}
-			if (m_iack_out)
-				m_xaau_pi = m_xaau_pc;
-			m_phase = phase::PURGE;
-			break;
 
-		case 0x19: // F1 ; y = a0 ; x = *pt++[i]
-		case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
-			{
-				assert(!(op & 0x000fU)); // reserved field?
-				s64 const d(dau_f1(op));
-				s64 a(m_dau_a[BIT(op, 12)]);
-				// FIXME: is saturation applied when transferring a to y?
-				m_dau_y = u32(u64(a));
-				op_dau_ad(op) = d;
-				fetch_target = nullptr;
-				m_rom_data = m_spaces[AS_PROGRAM]->read_word(m_xaau_pt);
-				m_phase = phase::OP2;
-			}
-			break;
-
-		case 0x1a: // if CON # icall
-			// FIXME: icall is a special case of this op
-			assert(!(op & 0x07e0U)); // reserved field?
-			predicate = op_dau_con(op) ? FLAGS_PRED_TRUE : FLAGS_PRED_FALSE;
-			break;
-
-		case 0x1e: // Reserved
-			throw emu_fatalerror("DSP16: reserved op %u (PC = %04X)\n", op >> 11, m_st_pcbase);
-			break;
-
-		case 0x1f: // F1 ; y = Y ; x = *pt++[i]
-			op_dau_ad(op) = dau_f1(op);
-			m_dau_y = (u32(u16(yaau_read(op))) << 16) | u32(BIT(m_dau_psw, 6) ? u16(u32(m_dau_y)) : u16(0));
-			fetch_target = nullptr;
-			m_rom_data = m_spaces[AS_PROGRAM]->read_word(m_xaau_pt);
-			m_phase = phase::OP2;
-			break;
-
-		default:
-			throw emu_fatalerror("DSP16: unimplemented op %u (PC = %04X)\n", op >> 11, m_st_pcbase);
-		}
-
-		if (cache_load && (phase::OP1 == m_phase))
-		{
-			// if the last instruction loaded to the cache completes in a single cycle, there's an extra cycle for a data fetch
 			if (last_cache_load)
 			{
+				mode_change = true;
 				fetch_target = nullptr;
 				m_cache_mode = cache::EXECUTE;
-				m_phase = phase::PREFETCH;
 				m_cache_ptr = 1U;
 				--m_cache_iterations;
+				overlap_rom_data_read();
 			}
 			else
 			{
-				m_cache_ptr = cache_next;
+				fetch_addr = m_core->xaau_pc;
+				if (Caching)
+					m_cache_ptr = cache_next;
 			}
-		}
-		break;
-
-	case phase::OP2:
-		m_phase = phase::OP1;
-		switch (op >> 11)
-		{
-		case 0x04: // F1 ; Y = a1[l]
-		case 0x1c: // F1 ; Y = a0[l]
-			{
-				s64 a(m_dau_a[BIT(~op, 14)]);
-				bool const sat(!BIT(m_dau_auc, 2 + BIT(~op, 14)));
-				if (sat)
-					a = std::min<s64>(std::max<s64>(a, std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
-				yaau_write(op, u16(u64(a) >> (op_x(op) ? 16 : 0)));
-				op_dau_ad(op) = dau_f1(op);
-			}
-			break;
-
-		case 0x08: // aT = R
-		case 0x09: // R = a0
-		case 0x0b: // R = a1
-			break;
-
-		case 0x0a: // R = N
-			set_xaau_pc_offset(m_xaau_pc + 1);
-			set_r(op, m_rom_data);
-			break;
-
-		case 0x0c: // Y = R
-			yaau_write(op, get_r(op));
-			break;
-
-		case 0x0f: // R = Y
-			break;
-
-		case 0x14: // F1 ; Y = y[l]
-			yaau_write(op, u16(u32(m_dau_y) >> (op_x(op) ? 16 : 0)));
-			break;
-
-		case 0x15: // F1 ; Z : y[l]
-			yaau_write_z(op);
-			break;
-
-		case 0x19: // F1 ; y = a0 ; x = *pt++[i]
-		case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
-		case 0x1f: // F1 ; y = Y ; x = *pt++[i]
-			xaau_increment_pt(op_xaau_increment(op));
-			m_dau_x = m_rom_data;
 			break;
 
 		default:
-			throw emu_fatalerror("DSP16: op %u doesn't take two cycles to run from ROM\n", op >> 11);
+			throw emu_fatalerror("DSP16: inappropriate phase for ROM execution\n");
 		}
 
-		if (last_cache_load)
+		if (FLAGS_PRED_NONE != (m_flags & FLAGS_PRED_MASK))
+			throw emu_fatalerror("DSP16: predicate applied to ineligible op %u (PC = %04X)\n", op >> 11, m_st_pcbase);
+		set_predicate(predicate);
+
+		if (fetch_target)
+			*fetch_target = m_direct->read_word(fetch_addr);
+
+		if (phase::OP1 == m_phase)
 		{
-			fetch_target = nullptr;
-			m_cache_mode = cache::EXECUTE;
-			m_cache_ptr = 1U;
-			--m_cache_iterations;
-			overlap_rom_data_read();
+			if (cache::EXECUTE != m_cache_mode)
+				m_st_pcbase = m_core->xaau_pc;
+			else
+				m_st_pcbase = (m_cache_pcbase & 0xf000U) | ((m_cache_pcbase + m_cache_ptr) & 0x0fffU);
 		}
-		else
-		{
-			fetch_addr = m_xaau_pc;
-			if (cache_load)
-				m_cache_ptr = cache_next;
-		}
-		break;
 
-	default:
-		throw emu_fatalerror("DSP16: inappropriate phase for ROM execution\n");
-	}
-
-	if (FLAGS_PRED_NONE != (m_flags & FLAGS_PRED_MASK))
-		throw emu_fatalerror("DSP16: predicate applied to ineligible op %u (PC = %04X)\n", op >> 11, m_st_pcbase);
-	set_predicate(predicate);
-
-	if (fetch_target)
-		*fetch_target = m_direct->read_word(fetch_addr);
-
-	if (phase::OP1 == m_phase)
-	{
-		if (cache::EXECUTE != m_cache_mode)
-			m_st_pcbase = m_xaau_pc;
-		else
-			m_st_pcbase = (m_cache_pcbase & 0xf000U) | ((m_cache_pcbase + m_cache_ptr) & 0x0fffU);
+		sio_step();
+		pio_step();
 	}
 }
 
-inline void dsp16_device_base::execute_one_cache()
+template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 {
-	u16 const op(m_cache[m_cache_ptr]);
-	bool const at_limit(m_cache_ptr == m_cache_limit);
-	bool const last_instruction(at_limit && (1U == m_cache_iterations));
-	switch (m_phase)
+	assert(bool(machine().debug_flags & DEBUG_FLAG_ENABLED) == Debugger);
+	for (bool mode_change = false; !mode_change && m_core->icount_remaining(); m_core->decrement_icount())
 	{
-	case phase::OP1:
-		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-			debugger_instruction_hook(this, m_st_pcbase);
-		m_int_enable[0] = m_int_enable[1];
-		switch (op >> 11)
+		u16 const op(m_cache[m_cache_ptr]);
+		bool const at_limit(m_cache_ptr == m_cache_limit);
+		bool const last_instruction(at_limit && (1U == m_cache_iterations));
+		switch (m_phase)
 		{
-		case 0x02: // R = M
-		case 0x03:
-			yaau_short_immediate_load(op);
-			break;
-
-		case 0x04: // F1 ; Y = a1[l]
-		case 0x1c: // F1 ; Y = a0[l]
-			m_phase = phase::OP2;
-			break;
-
-		case 0x06: // F1 ; Y
-			op_dau_ad(op) = dau_f1(op);
-			yaau_read(op);
-			break;
-
-		case 0x07: // F1 ; aT[l] = Y
-			op_dau_ad(op) = dau_f1(op);
-			set_dau_at(op, yaau_read(op));
-			break;
-
-		case 0x08: // aT = R
-			assert(!(op & 0x000fU)); // reserved field?
-			set_dau_at(op, get_r(op));
-			m_phase = phase::OP2;
-			break;
-
-		case 0x09: // R = a0
-		case 0x0b: // R = a1
+		case phase::OP1:
+			if (Debugger)
+				debugger_instruction_hook(m_st_pcbase);
+			m_int_enable[0] = m_int_enable[1];
+			switch (op >> 11)
 			{
-				assert(!(op & 0x040fU)); // reserved fields?
-				s64 a(m_dau_a[BIT(op, 12)]);
-				if (!BIT(m_dau_auc, 2 + BIT(op, 12)))
-					a = std::min<s64>(std::max<s64>(a, std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
-				set_r(op, u16(u64(a) >> 16));
+			case 0x02: // R = M
+			case 0x03:
+				yaau_short_immediate_load(op);
+				break;
+
+			case 0x04: // F1 ; Y = a1[l]
+			case 0x1c: // F1 ; Y = a0[l]
 				m_phase = phase::OP2;
-			}
-			break;
+				break;
 
-		case 0x0c: // Y = R
-			assert(!(op & 0x0400U)); // reserved field?
-			m_phase = phase::OP2;
-			break;
+			case 0x05: // F1 ; Z : aT[l]
+				{
+					s64 const d(m_core->dau_f1(op));
+					m_core->dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
+					m_core->op_dau_ad(op) = d;
+					m_core->dau_set_at(op, yaau_read<Debugger>(op));
+					m_phase = phase::OP2;
+				}
+				break;
 
-		case 0x0f: // R = Y
-			assert(!(op & 0x0400U)); // reserved field?
-			set_r(op, yaau_read(op));
-			m_phase = phase::OP2;
-			break;
+			case 0x06: // F1 ; Y
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				yaau_read<Debugger>(op);
+				break;
 
-		case 0x12: // ifc CON F2
-			++m_dau_c[1];
-			if (op_dau_con(op))
-			{
-				op_dau_ad(op) = dau_f2(op);
-				m_dau_c[2] = m_dau_c[1];
-			}
-			break;
+			case 0x07: // F1 ; aT[l] = Y
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_set_at(op, yaau_read<Debugger>(op));
+				break;
 
-		case 0x13: // if CON F2
-			if (op_dau_con(op))
-				op_dau_ad(op) = dau_f2(op);
-			break;
-
-		case 0x14: // F1 ; Y = y[l]
-			op_dau_ad(op) = dau_f1(op);
-			m_phase = phase::OP2;
-			break;
-
-		case 0x15: // F1 ; Z : y[l]
-			op_dau_ad(op) = dau_f1(op);
-			m_dau_temp = u16(u32(m_dau_y) >> (op_x(op) ? 16 : 0));
-			set_dau_y(op, yaau_read(op));
-			m_phase = phase::OP2;
-			break;
-
-		case 0x16: // F1 ; x = Y
-			op_dau_ad(op) = dau_f1(op);
-			m_dau_x = yaau_read(op);
-			break;
-
-		case 0x17: // F1 ; y[l] = Y
-			op_dau_ad(op) = dau_f1(op);
-			set_dau_y(op, yaau_read(op));
-			break;
-
-		case 0x19: // F1 ; y = a0 ; x = *pt++[i]
-		case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
-			{
+			case 0x08: // aT = R
 				assert(!(op & 0x000fU)); // reserved field?
-				s64 const d(dau_f1(op));
-				s64 a(m_dau_a[BIT(op, 12)]);
-				// FIXME: is saturation applied when transferring a to y?
-				m_dau_y = u32(u64(a));
-				op_dau_ad(op) = d;
+				m_core->dau_set_at(op, get_r(op));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x09: // R = a0
+			case 0x0b: // R = a1
+				assert(!(op & 0x040fU)); // reserved fields?
+				set_r(op, u16(u64(dau_saturate(BIT(op, 12))) >> 16));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x0c: // Y = R
+				assert(!(op & 0x0400U)); // reserved field?
+				m_phase = phase::OP2;
+				break;
+
+			case 0x0d: // Z : R
+				m_core->dau_temp = get_r(op);
+				set_r(op, yaau_read<Debugger>(op));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x0f: // R = Y
+				assert(!(op & 0x0400U)); // reserved field?
+				set_r(op, yaau_read<Debugger>(op));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x12: // ifc CON F2
+				{
+					bool const con(op_dau_con(op, false));
+					++m_core->dau_c[1];
+					if (con)
+					{
+						m_core->dau_f2(op);
+						m_core->dau_c[2] = m_core->dau_c[1];
+					}
+				}
+				break;
+
+			case 0x13: // if CON F2
+				if (op_dau_con(op, true))
+					m_core->dau_f2(op);
+				break;
+
+			case 0x14: // F1 ; Y = y[l]
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_phase = phase::OP2;
+				break;
+
+			case 0x15: // F1 ; Z : y[l]
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_temp = m_core->dau_get_y(op);
+				m_core->dau_set_y(op, yaau_read<Debugger>(op));
+				m_phase = phase::OP2;
+				break;
+
+			case 0x16: // F1 ; x = Y
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_x = yaau_read<Debugger>(op);
+				break;
+
+			case 0x17: // F1 ; y[l] = Y
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_set_y(op, yaau_read<Debugger>(op));
+				break;
+
+			case 0x19: // F1 ; y = a0 ; x = *pt++[i]
+			case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
+				{
+					assert(!(op & 0x000fU)); // reserved field?
+					s64 const d(m_core->dau_f1(op));
+					s64 a(m_core->dau_a[BIT(op, 12)]);
+					// FIXME: is saturation applied when transferring a to y?
+					m_core->dau_y = u32(u64(a));
+					m_core->op_dau_ad(op) = d;
+					if (last_instruction)
+					{
+						m_rom_data = m_direct->read_word(m_core->xaau_pt);
+						m_phase = phase::OP2;
+					}
+					else
+					{
+						m_core->xaau_increment_pt(op);
+						m_core->dau_x = m_rom_data;
+					}
+				}
+				break;
+
+			case 0x1d: // F1 ; Z : y ; x = *pt++[i]
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_temp = s16(m_core->dau_y >> 16);
+				m_core->dau_set_y(yaau_read<Debugger>(op));
+				m_rom_data = m_direct->read_word(m_core->xaau_pt);
+				m_phase = phase::OP2;
+				break;
+
+			case 0x1f: // F1 ; y = Y ; x = *pt++[i]
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				m_core->dau_set_y(yaau_read<Debugger>(op));
 				if (last_instruction)
 				{
-					m_rom_data = m_direct->read_word(m_xaau_pt);
+					m_rom_data = m_direct->read_word(m_core->xaau_pt);
 					m_phase = phase::OP2;
 				}
 				else
 				{
-					xaau_increment_pt(op_xaau_increment(op));
-					m_dau_x = m_rom_data;
+					m_core->xaau_increment_pt(op);
+					m_core->dau_x = m_rom_data;
 				}
+				break;
+
+			default:
+				throw emu_fatalerror("DSP16: inelligible op %u in cache (PC = %04X)\n", op >> 11, m_st_pcbase);
 			}
 			break;
 
-		case 0x1f: // F1 ; y = Y ; x = *pt++[i]
-			op_dau_ad(op) = dau_f1(op);
-			m_dau_y = (u32(u16(yaau_read(op))) << 16) | u32(BIT(m_dau_psw, 6) ? u16(u32(m_dau_y)) : u16(0));
-			if (last_instruction)
+		case phase::OP2:
+			m_phase = phase::OP1;
+			switch (op >> 11)
 			{
-				m_rom_data = m_direct->read_word(m_xaau_pt);
-				m_phase = phase::OP2;
+			case 0x04: // F1 ; Y = a1[l]
+			case 0x1c: // F1 ; Y = a0[l]
+				yaau_write<Debugger>(op, u16(u64(dau_saturate(BIT(~op, 14))) >> (op_x(op) ? 16 : 0)));
+				m_core->op_dau_ad(op) = m_core->dau_f1(op);
+				break;
+
+			case 0x05: // F1 ; Z : aT[l]
+			case 0x0d: // Z : R
+			case 0x15: // F1 ; Z : y[l]
+				yaau_write_z<Debugger>(op);
+				break;
+
+			case 0x08: // aT = R
+			case 0x09: // R = a0
+			case 0x0b: // R = a1
+				break;
+
+			case 0x0c: // Y = R
+				yaau_write<Debugger>(op, get_r(op));
+				break;
+
+			case 0x0f: // R = Y
+				break;
+
+			case 0x14: // F1 ; Y = y[l]
+				yaau_write<Debugger>(op, m_core->dau_get_y(op));
+				break;
+
+			case 0x19: // F1 ; y = a0 ; x = *pt++[i]
+			case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
+			case 0x1f: // F1 ; y = Y ; x = *pt++[i]
+				assert(last_instruction);
+				m_core->xaau_increment_pt(op);
+				m_core->dau_x = m_rom_data;
+				break;
+
+			case 0x1d: // F1 ; Z : y ; x = *pt++[i]
+				m_core->xaau_increment_pt(op);
+				m_core->dau_x = m_rom_data;
+				yaau_write_z<Debugger>(op);
+				break;
+
+			default:
+				throw emu_fatalerror("DSP16: op %u doesn't take two cycles to run from cache\n", op >> 11);
 			}
-			else
-			{
-				xaau_increment_pt(op_xaau_increment(op));
-				m_dau_x = m_rom_data;
-			}
+			break;
+
+		case phase::PREFETCH:
 			break;
 
 		default:
-			throw emu_fatalerror("DSP16: inelligible op %u in cache (PC = %04X)\n", op >> 11, m_st_pcbase);
+			throw emu_fatalerror("DSP16: inappropriate phase for cache execution\n");
 		}
-		break;
 
-	case phase::OP2:
-		m_phase = phase::OP1;
-		switch (op >> 11)
+		if (phase::PREFETCH == m_phase)
 		{
-		case 0x04: // F1 ; Y = a1[l]
-		case 0x1c: // F1 ; Y = a0[l]
-			{
-				s64 a(m_dau_a[BIT(~op, 14)]);
-				if (!BIT(m_dau_auc, 2 + BIT(~op, 14)))
-					a = std::min<s64>(std::max<s64>(a, std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
-				yaau_write(op, u16(u64(a) >> (op_x(op) ? 16 : 0)));
-				op_dau_ad(op) = dau_f1(op);
-			}
-			break;
-
-		case 0x08: // aT = R
-		case 0x09: // R = a0
-		case 0x0b: // R = a1
-			break;
-
-		case 0x0c: // Y = R
-			yaau_write(op, get_r(op));
-			break;
-
-		case 0x0f: // R = Y
-			break;
-
-		case 0x14: // F1 ; Y = y[l]
-			yaau_write(op, u16(u32(m_dau_y) >> (op_x(op) ? 16 : 0)));
-			break;
-
-		case 0x15: // F1 ; Z : y[l]
-			yaau_write_z(op);
-			break;
-
-		case 0x19: // F1 ; y = a0 ; x = *pt++[i]
-		case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
-		case 0x1f: // F1 ; y = Y ; x = *pt++[i]
-			assert(last_instruction);
-			xaau_increment_pt(op_xaau_increment(op));
-			m_dau_x = m_rom_data;
-			break;
-
-		default:
-			throw emu_fatalerror("DSP16: op %u doesn't take two cycles to run from cache\n", op >> 11);
-		}
-		break;
-
-	case phase::PREFETCH:
-		break;
-
-	default:
-		throw emu_fatalerror("DSP16: inappropriate phase for cache execution\n");
-	}
-
-	if (phase::PREFETCH == m_phase)
-	{
-		m_phase = phase::OP1;
-		overlap_rom_data_read();
-		m_st_pcbase = (m_cache_pcbase & 0xf000U) | ((m_cache_pcbase + m_cache_ptr) & 0x0fffU);
-	}
-	else if (phase::OP1 == m_phase)
-	{
-		if (last_instruction)
-		{
-			// overlapped fetch of next instruction from ROM
-			m_cache_mode = cache::NONE;
-			m_cache[m_cache_ptr = 0] = m_direct->read_word(m_xaau_pc);
-			m_st_pcbase = m_xaau_pc;
-		}
-		else
-		{
-			if (at_limit)
-			{
-				// loop to first cached instruction
-				m_cache_ptr = 1U;
-				--m_cache_iterations;
-			}
-			else
-			{
-				// move to next cached instruction
-				m_cache_ptr = (m_cache_ptr + 1) & 0x0fU;
-			}
+			m_phase = phase::OP1;
 			overlap_rom_data_read();
 			m_st_pcbase = (m_cache_pcbase & 0xf000U) | ((m_cache_pcbase + m_cache_ptr) & 0x0fffU);
 		}
+		else if (phase::OP1 == m_phase)
+		{
+			if (last_instruction)
+			{
+				// overlapped fetch of next instruction from ROM
+				mode_change = true;
+				m_cache_mode = cache::NONE;
+				m_cache[m_cache_ptr = 0] = m_direct->read_word(m_core->xaau_pc);
+				m_st_pcbase = m_core->xaau_pc;
+			}
+			else
+			{
+				if (at_limit)
+				{
+					// loop to first cached instruction
+					m_cache_ptr = 1U;
+					--m_cache_iterations;
+				}
+				else
+				{
+					// move to next cached instruction
+					m_cache_ptr = (m_cache_ptr + 1) & 0x0fU;
+				}
+				overlap_rom_data_read();
+				m_st_pcbase = (m_cache_pcbase & 0xf000U) | ((m_cache_pcbase + m_cache_ptr) & 0x0fffU);
+			}
+		}
+
+		sio_step();
+		pio_step();
 	}
 }
 
@@ -1281,7 +1416,7 @@ inline void dsp16_device_base::overlap_rom_data_read()
 	case 0x19: // F1 ; y = a0 ; x = *pt++[i]
 	case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 	case 0x1f: // F1 ; y = Y ; x = *pt++[i]
-		m_rom_data = m_direct->read_word(m_xaau_pt);
+		m_rom_data = m_direct->read_word(m_core->xaau_pt);
 		break;
 	}
 }
@@ -1293,49 +1428,56 @@ inline void dsp16_device_base::yaau_short_immediate_load(u16 op)
 	switch (r)
 	{
 	case 0x0: // j
-		m_yaau_j = m | ((m & m_yaau_sign) ? ~m_yaau_mask : 0);
+		m_core->yaau_j = m | ((m & m_core->yaau_sign) ? ~m_core->yaau_mask : 0);
 		break;
 	case 0x1: // k
-		m_yaau_k = m | ((m & m_yaau_sign) ? ~m_yaau_mask : 0);
+		m_core->yaau_k = m | ((m & m_core->yaau_sign) ? ~m_core->yaau_mask : 0);
 		break;
 	case 0x2: // rb
-		m_yaau_rb = m;
+		m_core->yaau_rb = m;
 		break;
 	case 0x3: // re
-		m_yaau_re = m;
+		m_core->yaau_re = m;
 		break;
 	case 0x4: // r0
 	case 0x5: // r1
 	case 0x6: // r2
 	case 0x7: // r3
-		m_yaau_r[r & 0x0003U] = m;
+		m_core->yaau_r[r & 0x0003U] = m;
 		break;
 	}
 }
 
-inline s16 dsp16_device_base::yaau_read(u16 op)
+template <bool Debugger> inline s16 dsp16_device_base::yaau_read(u16 op)
 {
-	s16 const result(m_spaces[AS_DATA]->read_word(op_yaau_r(op)));
-	yaau_postmodify_r(op);
+	u16 const &r(m_core->op_yaau_r(op));
+	s16 const result(Debugger ? m_spaces[AS_DATA]->read_word(r) : m_workram[r & m_workram_mask]);
+	m_core->yaau_postmodify_r(op);
 	return result;
 }
 
-inline void dsp16_device_base::yaau_write(u16 op, s16 value)
+template <bool Debugger> inline void dsp16_device_base::yaau_write(u16 op, s16 value)
 {
-	m_spaces[AS_DATA]->write_word(op_yaau_r(op), value);
-	yaau_postmodify_r(op);
+	u16 const &r(m_core->op_yaau_r(op));
+	if (Debugger)
+		m_spaces[AS_DATA]->write_word(r, value);
+	else
+		m_workram[r & m_workram_mask] = value;
+	m_core->yaau_postmodify_r(op);
 }
 
-void dsp16_device_base::yaau_write_z(u16 op)
+template <bool Debugger> void dsp16_device_base::yaau_write_z(u16 op)
 {
-	u16 &r(op_yaau_r(op));
-	m_spaces[AS_DATA]->write_word(r, m_dau_temp);
+	u16 &r(m_core->op_yaau_r(op));
+	if (Debugger)
+		m_spaces[AS_DATA]->write_word(r, m_core->dau_temp);
+	else
+		m_workram[r & m_workram_mask] = m_core->dau_temp;
 	switch (op & 0x0003U)
 	{
 	case 0x0: // *rNzp
-		// TODO: does virtual shift register addressing apply here?
-		if (m_yaau_re && (m_yaau_re == r))
-			r = m_yaau_rb;
+		if (m_core->yaau_re && (m_core->yaau_re == r))
+			r = m_core->yaau_rb;
 		else
 			++r;
 		break;
@@ -1345,134 +1487,79 @@ void dsp16_device_base::yaau_write_z(u16 op)
 		r += 2;
 		break;
 	case 0x3: // *rNjk;
-		r += m_yaau_k;
+		r += m_core->yaau_k;
 		break;
 	}
-	r &= m_yaau_mask;
+	r &= m_core->yaau_mask;
 }
 
-inline u64 dsp16_device_base::dau_f1(u16 op)
+/***********************************************************************
+    built-in peripherals
+***********************************************************************/
+
+inline void dsp16_device_base::sio_step()
 {
-	s64 const &s(op_dau_as(op));
-	s64 d(0);
-	switch (op_f1(op))
+	// step the serial I/O clock divider
+	if (m_sio_clk_div)
 	{
-	case 0x0: // aD = p ; p = x*y
-		d = get_dau_p_aligned();
-		m_dau_p = m_dau_x * (m_dau_y >> 16);
-		break;
-	case 0x1: // aD = aS + p ; p = x*y
-		d = s + get_dau_p_aligned();
-		m_dau_p = m_dau_x * (m_dau_y >> 16);
-		break;
-	case 0x2: // p = x*y
-		m_dau_p = m_dau_x * (m_dau_y >> 16);
-		return op_dau_ad(op);
-	case 0x3: // aD = aS - p ; p = x*y
-		d = s - get_dau_p_aligned();
-		m_dau_p = m_dau_x * (m_dau_y >> 16);
-		break;
-	case 0x4: // aD = p
-		d = get_dau_p_aligned();
-		break;
-	case 0x5: // aD = aS + p
-		d = s + get_dau_p_aligned();
-		break;
-	case 0x6: // NOP
-		return op_dau_ad(op);
-	case 0x7: // aD = aS - p
-		d = s - get_dau_p_aligned();
-		break;
-	case 0x8: // aD = aS | y
-		d = s | m_dau_y;
-		break;
-	case 0x9: // aD = aS ^ y
-		d = s ^ m_dau_y;
-		break;
-	case 0xa: // aS & y
-		set_dau_psw_flags(s & m_dau_y);
-		return op_dau_ad(op);
-	case 0xb: // aS - y
-		set_dau_psw_flags(s - m_dau_y);
-		return op_dau_ad(op);
-	case 0xc: // aD = y
-		d = m_dau_y;
-		break;
-	case 0xd: // aD = aS + y
-		d = s + m_dau_y;
-		break;
-	case 0xe: // aD = aS & y
-		d = s & m_dau_y;
-		break;
-	case 0xf: // aD = aS - y
-		d = s - m_dau_y;
-		break;
+		--m_sio_clk_div;
 	}
-	return set_dau_psw_flags(d);
+	else
+	{
+		bool const active(!m_sio_clk);
+		m_sio_clk = active ? 1U : 0U;
+		if (sio_ick_active())
+		{
+			if (active)
+				sio_ick_active_edge();
+			m_ick_cb(m_sio_clk);
+		}
+		if (sio_ock_active())
+		{
+			m_ock_cb(m_sio_clk);
+			if (active)
+				sio_ock_active_edge();
+		}
+		m_sio_clk_div = m_sio_clk_res;
+	}
 }
 
-inline u64 dsp16_device_base::dau_f2(u16 op)
+inline void dsp16_device_base::pio_step()
 {
-	s64 const &s(op_dau_as(op));
-	s64 d(0);
-	switch (op_f2(op))
+	// udpate parallel input strobe
+	if (m_pio_pids_cnt)
 	{
-	case 0x0: // aD = aS >> 1
-		d = s >> 1;
-		break;
-	case 0x1: // aD = aS << 1
-		d = s << 1;
-		break;
-	case 0x2: // aD = aS >> 4
-		d = s >> 4;
-		break;
-	case 0x3: // aD = aS << 4
-		d = s << 4;
-		break;
-	case 0x4: // aD = aS >> 8
-		d = s >> 8;
-		break;
-	case 0x5: // aD = aS << 8
-		d = d << 8;
-		break;
-	case 0x6: // aD = aS >> 16
-		d = s >> 16;
-		break;
-	case 0x7: // aD = aS << 16
-		d = s << 16;
-		break;
-	case 0x8: // aD = p
-		d = get_dau_p_aligned();
-		break;
-	case 0x9: // aDh = aSh + 1
-		d = s64(s32(u32(u64(s)) & ~((u32(1) << 16) - 1))) + (s32(1) << 16);
-		if (BIT(m_dau_auc, op_s(op) + 4))
-			d |= op_dau_ad(op) & ((s64(1) << 16) - 1);
-		break;
-	case 0xa: // Reserved
-		throw emu_fatalerror("DSP16: reserved F2 value %01X (PC = %04X)\n", op_f2(op), m_st_pcbase);
-	case 0xb: // aD = rnd(aS)
-		// FIXME: behaviour is not clear
-		// p 3-13: "Round upper 20 bits of accumulator."
-		// p 3-14: "The contents of the source accumulator, aS, are rounded to 16 bits, and the sign-extended result is placed in aD[35 - 16] with zeroes in aD[15 - 0]."
-		// It presumably rounds to nearest, but does it yield a 16-bit or 20-bit result, and what does it do about overflow?
-		d = (s + ((0 > s) ? -(s16(1) << 15) : (s16(1) << 15))) & ~((u64(1) << 16) - 1);
-		break;
-	case 0xc: // aD = y
-		d = m_dau_y;
-		break;
-	case 0xd: // aD = aS + 1
-		d = s + 1;
-		break;
-	case 0xe: // aD = aS
-		d = s;
-		break;
-	case 0xf: // aD = -aS
-		// FIXME: does this detect negation of largest negative number as overflow?
-		d = -s;
-		break;
+		assert(!m_pids_out);
+		if (!--m_pio_pids_cnt)
+		{
+			if (!m_pio_r_cb.isnull())
+				m_pio_pdx_in = m_pio_r_cb(machine().dummy_space(), m_psel_out, 0xffffU);
+			m_pids_cb(m_pids_out = 1U);
+			LOGPIO("DSP16: PIO read active edge PSEL = %u, PDX = %04X (PC = %04X)\n", m_psel_out, m_pio_pdx_in, m_st_pcbase);
+		}
 	}
-	return set_dau_psw_flags(d);
+	else
+	{
+		assert(m_pids_out);
+	}
+
+	// udpate parallel output strobe
+	if (m_pio_pods_cnt)
+	{
+		assert(!m_pods_out);
+		if (!--m_pio_pods_cnt)
+		{
+			LOGPIO("DSP16: PIO write active edge PSEL = %u, PDX = %04X (PC = %04X)\n", m_psel_out, m_pio_pdx_out, m_st_pcbase);
+			m_pods_cb(1U);
+			m_pio_w_cb(machine().dummy_space(), m_psel_out, m_pio_pdx_out, 0xffffU);
+			m_pods_out = 1U;
+			m_pdb_w_cb(machine().dummy_space(), m_psel_out, 0xffffU, 0x0000U);
+		}
+	}
+	else
+	{
+		assert(m_pods_out);
+	}
 }
 
 /***********************************************************************
@@ -1502,8 +1589,8 @@ inline bool dsp16_device_base::op_interruptible(u16 op)
 	case 0x15: // F1 ; Z : y[l]
 	case 0x16: // F1 ; x = Y
 	case 0x17: // F1 ; y[l] = Y
-	case 0x19: // y = a0 ; x = *pt++[i]
-	case 0x1b: // y = a1 ; x = *pt++[i]
+	case 0x19: // F1 ; y = a0 ; x = *pt++[i]
+	case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 	case 0x1c: // F1 ; Y = a0[l]
 	case 0x1d: // F1 ; Z : y ; x = *pt++[i]
 	case 0x1f: // F1 ; y = Y ; x = *pt++[i]
@@ -1530,10 +1617,10 @@ inline bool dsp16_device_base::check_predicate()
 
 inline u16 &dsp16_device_base::set_xaau_pc_offset(u16 offset)
 {
-	m_xaau_pc = (m_xaau_pc & 0xf000U) | (offset & 0x0fffU);
+	m_core->xaau_pc = (m_core->xaau_pc & XAAU_I_EXT) | (offset & XAAU_I_MASK);
 	if (m_iack_out)
-		m_xaau_pi = m_xaau_pc;
-	return m_xaau_pc;
+		m_core->xaau_pi = m_core->xaau_pc;
+	return m_core->xaau_pc;
 }
 
 inline s16 dsp16_device_base::get_r(u16 op)
@@ -1544,38 +1631,38 @@ inline s16 dsp16_device_base::get_r(u16 op)
 	case 0x01: // r1 (u)
 	case 0x02: // r2 (u)
 	case 0x03: // r3 (u)
-		return m_yaau_r[op_r(op)];
+		return m_core->yaau_r[op_r(op)];
 	case 0x04: // j (s)
-		return m_yaau_j;
+		return m_core->yaau_j;
 	case 0x05: // k (s)
-		return m_yaau_k;
+		return m_core->yaau_k;
 	case 0x06: // rb (u)
-		return m_yaau_rb;
+		return m_core->yaau_rb;
 	case 0x07: // re (u)
-		return m_yaau_re;
+		return m_core->yaau_re;
 	case 0x08: // pt
-		return m_xaau_pt;
+		return m_core->xaau_pt;
 	case 0x09: // pr
-		return m_xaau_pr;
+		return m_core->xaau_pr;
 	case 0x0a: // pi
-		return m_xaau_pi;
+		return m_core->xaau_pi;
 	case 0x0b: // i (s)
-		return m_xaau_i;
+		return m_core->xaau_i;
 	case 0x10: // x
-		return m_dau_x;
+		return m_core->dau_x;
 	case 0x11: // y
-		return u16(u32(m_dau_y >> 16));
+		return u16(u32(m_core->dau_y >> 16));
 	case 0x12: // yl
-		return u16(u32(m_dau_y));
+		return u16(u32(m_core->dau_y));
 		break;
 	case 0x13: // auc (u)
-		return m_dau_auc;
+		return m_core->dau_auc;
 	case 0x14: // psw
-		return m_dau_psw = (m_dau_psw & 0xfe10U) | (u16(u64(m_dau_a[0]) >> 32) & 0x000fU) | (u16(u64(m_dau_a[1]) >> 27) & 0x01e0U);
+		return m_core->dau_export_psw();
 	case 0x15: // c0 (s)
 	case 0x16: // c1 (s)
 	case 0x17: // c2 (s)
-		return m_dau_c[op_r(op) - 0x15];
+		return m_core->dau_c[op_r(op) - 0x15];
 	case 0x18: // sioc
 		return m_sio_sioc;
 	case 0x19: // srta
@@ -1605,55 +1692,54 @@ inline void dsp16_device_base::set_r(u16 op, s16 value)
 	case 0x01: // r1 (u)
 	case 0x02: // r2 (u)
 	case 0x03: // r3 (u)
-		m_yaau_r[op_r(op)] = value & m_yaau_mask;
+		m_core->yaau_r[op_r(op)] = value & m_core->yaau_mask;
 		break;
 	case 0x04: // j (s)
-		m_yaau_j = (value & m_yaau_mask) | ((value & m_yaau_sign) ? ~m_yaau_mask : 0);
+		m_core->yaau_set_j(value);
 		break;
 	case 0x05: // k (s)
-		m_yaau_k = (value & m_yaau_mask) | ((value & m_yaau_sign) ? ~m_yaau_mask : 0);
+		m_core->yaau_set_k(value);
 		break;
 	case 0x06: // rb (u)
-		m_yaau_rb = value & m_yaau_mask;
+		m_core->yaau_set_rb(value);
 		break;
 	case 0x07: // re (u)
-		m_yaau_re = value & m_yaau_mask;
+		m_core->yaau_set_re(value);
 		break;
 	case 0x08: // pt
-		m_xaau_pt = value;
+		m_core->xaau_pt = value;
 		break;
 	case 0x09: // pr
-		m_xaau_pr = value;
+		m_core->xaau_pr = value;
 		break;
 	case 0x0a: // pi
 		// FIXME: reset PRNG
 		if (!m_iack_out)
-			m_xaau_pi = value;
+			m_core->xaau_pi = value;
 		break;
 	case 0x0b: // i (s)
-		m_xaau_i = (value & XAAU_I_MASK) | ((value & XAAU_I_SIGN) ? XAAU_I_EXT : 0);
+		m_core->xaau_i = (value & XAAU_I_MASK) | ((value & XAAU_I_SIGN) ? XAAU_I_EXT : 0);
 		break;
 	case 0x10: // x
-		m_dau_x = value;
+		m_core->dau_x = value;
 		break;
 	case 0x11: // y
-		m_dau_y = (u32(u16(value)) << 16) | u32(BIT(m_dau_auc, 6) ? u16(u32(m_dau_y)) : u16(0));
+		m_core->dau_set_y(value);
 		break;
 	case 0x12: // yl
-		m_dau_y = (m_dau_y & 0xffff'0000) | u32(u16(value));
+		m_core->dau_set_yl(value);
 		break;
 	case 0x13: // auc (u)
-		m_dau_auc = u8(value & 0x007f);
+		m_core->dau_auc = u8(value & 0x007f);
 		break;
 	case 0x14: // psw
-		m_dau_psw = value;
-		m_dau_a[0] = u64(u32(m_dau_a[0])) | (u64(value & 0x000fU) << 32) | (BIT(value, 3) ? DAU_A_EXT : 0U);
-		m_dau_a[1] = u64(u32(m_dau_a[1])) | (u64(value & 0x01e0U) << 27) | (BIT(value, 8) ? DAU_A_EXT : 0U);
+		m_core->dau_psw = value;
+		m_core->dau_import_psw();
 		break;
 	case 0x15: // c0 (s)
 	case 0x16: // c1 (s)
 	case 0x17: // c2 (s)
-		m_dau_c[op_r(op) - 0x15] = u8(u16(value));
+		m_core->dau_c[op_r(op) - 0x15] = u8(u16(value));
 		break;
 	case 0x18: // sioc
 		sio_sioc_write(value);
@@ -1683,124 +1769,50 @@ inline void dsp16_device_base::set_r(u16 op, s16 value)
 	}
 }
 
-inline void dsp16_device_base::yaau_postmodify_r(u16 op)
+s64 dsp16_device_base::dau_saturate(u16 a) const
 {
-	u16 &r(op_yaau_r(op));
-	switch (op & 0x0003U)
-	{
-	case 0x0: // *rN
-		break;
-	case 0x1: // *rN++
-		if (m_yaau_re && (m_yaau_re == r))
-			r = m_yaau_rb;
-		else
-			++r;
-		break;
-	case 0x2: // *rN--
-		--r;
-		break;
-	case 0x3: // *rN++j
-		r += m_yaau_j;
-		break;
-	}
-	r &= m_yaau_mask;
-}
-
-inline void dsp16_device_base::set_dau_y(u16 op, s16 value)
-{
-	if (op_x(op))
-	{
-		bool const clear(!BIT(m_dau_psw, 6));
-		m_dau_y = (u32(u16(value)) << 16) | u32(clear ? u16(0) : u16(u32(m_dau_y)));
-	}
+	if (m_core->dau_auc_sat(a))
+		return m_core->dau_a[a];
 	else
-	{
-		m_dau_y = (m_dau_y & ~((s32(1) << 16) - 1)) | u32(u16(value));
-	}
+		return std::min<s64>(std::max<s64>(m_core->dau_a[a], std::numeric_limits<s32>::min()), std::numeric_limits<s32>::max());
 }
 
-inline void dsp16_device_base::set_dau_at(u16 op, s16 value)
-{
-	s64 &at(op_dau_at(op));
-	if (op_x(op))
-	{
-		bool const clear(!BIT(m_dau_psw, 4 + op_d(~op)));
-		at = s32((u32(u16(value)) << 16) | u32(clear ? u16(0) : u16(u64(at))));
-	}
-	else
-	{
-		at = (at & ~((s64(1) << 16) - 1)) | u64(u16(value));
-	}
-}
-
-inline u64 dsp16_device_base::set_dau_psw_flags(s64 d)
-{
-	m_dau_psw &= 0x0fffU;
-	bool const negative(d & DAU_A_SIGN);
-	if (negative)
-		m_dau_psw |= 0x8000U;
-	if (!(d & DAU_A_MASK))
-		m_dau_psw |= 0x4000U;
-	if ((d >> 36) != (negative ? -1 : 0))
-		m_dau_psw |= 0x2000U;
-	if (((d >> 32) & ((1 << 4) - 1)) != (BIT(d, 31) ? 15 : 0))
-		m_dau_psw |= 0x1000U;
-	if (negative)
-		return d | DAU_A_EXT;
-	else
-		return d & DAU_A_MASK;
-}
-
-inline u64 dsp16_device_base::get_dau_p_aligned() const
-{
-	// TODO: manual is contradictory
-	// p 2-10: "Bits 1 and 2 of the accumulator are not changed by the load of the accumulator with the data in p, since 00 is added to or copied into these accumulator bits as indicated in Figure 2-8."
-	// I'm reading this as copying p to aD clears the low two bits, but adding it leaves them unchanged.
-	switch (dau_auc_align())
-	{
-	case 0x0:
-		return m_dau_p;
-	case 0x1:
-		return m_dau_p >> 2;
-	case 0x2:
-		return u64(m_dau_p) << 2;
-	case 0x3:
-	default:
-		throw emu_fatalerror("DSP16: reserved ALIGN value %01X (PC = %04X)\n", dau_auc_align(), m_st_pcbase);
-	}
-}
-
-inline bool dsp16_device_base::op_dau_con(u16 op)
+inline bool dsp16_device_base::op_dau_con(u16 op, bool inc)
 {
 	bool result;
 	u16 const con(op_con(op));
 	switch (con >> 1)
 	{
 	case 0x0: // mi/pl
-		result = dau_psw_lmi();
+		result = m_core->dau_psw_lmi();
 		break;
 	case 0x1: // eq/ne
-		result = dau_psw_leq();
+		result = m_core->dau_psw_leq();
 		break;
 	case 0x2: // lvs/lvc
-		result = dau_psw_llv();
+		result = m_core->dau_psw_llv();
 		break;
 	case 0x3: // mvs/mvc
-		result = dau_psw_lmv();
+		result = m_core->dau_psw_lmv();
 		break;
 	case 0x4: // heads/tails
 		throw emu_fatalerror("DSP16: unimplemented CON value %02X (PC = %04X)\n", con, m_st_pcbase);
 	case 0x5: // c0ge/c0lt
 	case 0x6: // c1ge/c1lt
-		result = m_dau_c[(con >> 1) - 0x5]++ >= 0;
+		{
+			s8 &c(m_core->dau_c[(con >> 1) - 0x05]);
+			result = 0 <= c;
+			if (inc)
+				++c;
+		}
 		break;
 	case 0x7: // true/false
 		result = true;
 		break;
 	case 0x8: // gt/le
-		result = !dau_psw_lmi() && !dau_psw_leq();
+		result = !m_core->dau_psw_lmi() && !m_core->dau_psw_leq();
 		break;
-	default:
+	default: // Reserved
 		throw emu_fatalerror("DSP16: reserved CON value %02X (PC = %04X)\n", con, m_st_pcbase);
 	}
 	return BIT(con, 0) ? !result : result;
@@ -1831,19 +1843,35 @@ void dsp16_device_base::sio_sioc_write(u16 value)
 			sio_ilen(), BIT(value, 0) ? 8U : 16U,
 			m_st_pcbase);
 
-	//bool const ock_change(BIT(value ^ m_sio_sioc, 5));
-	//bool const ild_change(BIT(value ^ m_sio_sioc, 4));
+	bool const old_change(BIT(value ^ m_sio_sioc, 5));
+	bool const ild_change(BIT(value ^ m_sio_sioc, 4));
 	bool const ock_change(BIT(value ^ m_sio_sioc, 3));
 	bool const ick_change(BIT(value ^ m_sio_sioc, 2));
 	m_sio_sioc = value;
 
 	// we're using treating high-impedance and high as the same thing
+	if (!m_sio_ld)
+	{
+		if (ild_change)
+			m_ild_cb(sio_ild_active() ? 0 : 1);
+		if (old_change)
+			m_old_cb(sio_old_active() ? 0 : 1);
+	}
 	if (!m_sio_clk)
 	{
 		if (ick_change)
 			m_ick_cb(sio_ick_active() ? 0 : 1);
 		if (ock_change)
 			m_ock_cb(sio_ock_active() ? 0 : 1);
+	}
+
+	// precalculate divider preload
+	switch ((value >> 7) & 0x0003U)
+	{
+	case 0x0: m_sio_clk_res = (4 / 4) - 1; break; // CKI÷4
+	case 0x1: m_sio_clk_res = (12 / 4) - 1; break; // CKI÷12
+	case 0x2: m_sio_clk_res = (16 / 4) - 1; break; // CKI÷16
+	case 0x3: m_sio_clk_res = (20 / 4) - 1; break; // CKI÷20
 	}
 }
 
@@ -2069,7 +2097,7 @@ void dsp16_device::data_map(address_map &map)
 {
 	map.global_mask(0x01ff);
 	map.unmap_value_high();
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x01ff).ram().share("workram");
 }
 
 
@@ -2104,5 +2132,5 @@ void dsp16a_device::data_map(address_map &map)
 {
 	map.global_mask(0x07ff);
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).ram();
+	map(0x0000, 0x07ff).ram().share("workram");
 }

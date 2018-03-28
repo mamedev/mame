@@ -1293,7 +1293,7 @@ void hyperstone_device::init(int scale_mask)
 	save_item(NAME(m_core->clock_cycles_36));
 
 	// set our instruction counter
-	m_icountptr = &m_core->icount;
+	set_icountptr(m_core->icount);
 }
 
 void e116t_device::device_start()
@@ -1510,9 +1510,9 @@ void hyperstone_device::state_string_export(const device_state_entry &entry, std
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *hyperstone_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hyperstone_device::create_disassembler()
 {
-	return new hyperstone_disassembler(this);
+	return std::make_unique<hyperstone_disassembler>(this);
 }
 
 u8 hyperstone_device::get_fp() const
@@ -1641,7 +1641,7 @@ void hyperstone_device::execute_run()
 		dump_registers();
 #endif
 
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		OP = READ_OP(PC);
 		PC += 2;

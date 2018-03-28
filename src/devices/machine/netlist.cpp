@@ -1011,7 +1011,7 @@ void netlist_mame_cpu_device::device_start()
 	}
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1041,7 +1041,7 @@ ATTR_HOT void netlist_mame_cpu_device::execute_run()
 		{
 			m_genPC++;
 			m_genPC &= 255;
-			debugger_instruction_hook(this, m_genPC);
+			debugger_instruction_hook(m_genPC);
 			netlist().process_queue(m_div);
 			update_time_x();
 		}
@@ -1053,9 +1053,9 @@ ATTR_HOT void netlist_mame_cpu_device::execute_run()
 	}
 }
 
-util::disasm_interface *netlist_mame_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> netlist_mame_cpu_device::create_disassembler()
 {
-	return new netlist_disassembler(this);
+	return std::make_unique<netlist_disassembler>(this);
 }
 
 netlist_disassembler::netlist_disassembler(netlist_mame_cpu_device *dev) : m_dev(dev)

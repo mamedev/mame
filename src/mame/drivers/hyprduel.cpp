@@ -79,7 +79,7 @@ public:
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
 	DECLARE_WRITE_LINE_MEMBER(vdp_blit_end_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	
+
 	void magerror(machine_config &config);
 	void hyprduel(machine_config &config);
 	void i4220_config(machine_config &config);
