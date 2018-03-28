@@ -817,9 +817,22 @@ WRITE8_MEMBER( am9517a_device::write )
 		switch (offset & 0x0f)
 		{
 		case REGISTER_COMMAND:
-			m_command = data;
+			{
+				bool old_dack_active_high = COMMAND_DACK_ACTIVE_HIGH;
+				bool old_dreq_active_low = COMMAND_DREQ_ACTIVE_LOW;
+				m_command = data;
+				LOG("AM9517A Command Register: %02x\n", m_command);
 
-			LOG("AM9517A Command Register: %02x\n", m_command);
+				if (old_dack_active_high != COMMAND_DACK_ACTIVE_HIGH)
+				{
+					set_dack(); // Line values for DACK changed, update them to reflect the new state.
+				}
+				if (old_dreq_active_low != COMMAND_DREQ_ACTIVE_LOW)
+				{
+					// Invert the request bits because the interpretation of line levels has changed
+					m_status ^= 0xF0;
+				}
+			}
 			break;
 
 		case REGISTER_REQUEST:
