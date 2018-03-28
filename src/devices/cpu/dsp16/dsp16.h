@@ -238,9 +238,9 @@ private:
 	template <bool Debugger> void execute_some_cache();
 	void overlap_rom_data_read();
 	void yaau_short_immediate_load(u16 op);
-	s16 yaau_read(u16 op);
-	void yaau_write(u16 op, s16 value);
-	void yaau_write_z(u16 op);
+	template <bool Debugger> s16 yaau_read(u16 op);
+	template <bool Debugger> void yaau_write(u16 op, s16 value);
+	template <bool Debugger> void yaau_write_z(u16 op);
 
 	// built-in peripherals
 	void sio_step();
@@ -323,8 +323,10 @@ private:
 	u8 const                    m_yaau_bits;
 
 	// memory system access
+	required_shared_ptr<u16>    m_workram;
 	address_space               *m_spaces[3];
 	direct_read_data<-1>        *m_direct;
+	u16                         m_workram_mask;
 
 	// recompiler stuff
 	drc_cache                   m_drc_cache;

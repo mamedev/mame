@@ -186,7 +186,7 @@ dsp16_device_base::dsp16_device_base(
 			{ "ram", ENDIANNESS_BIG, 16, yaau_bits, -1, std::move(data_map) },
 			{ "exm", ENDIANNESS_BIG, 16, 16, -1 } }
 	, m_yaau_bits(yaau_bits)
-	, m_spaces{ nullptr, nullptr, nullptr }, m_direct(nullptr)
+	, m_workram(*this, "workram"), m_spaces{ nullptr, nullptr, nullptr }, m_direct(nullptr), m_workram_mask(0U)
 	, m_drc_cache(CACHE_SIZE), m_core(nullptr, [] (core_state *core) { core->~core_state(); }), m_recompiler()
 	, m_cache_mode(cache::NONE), m_phase(phase::PURGE), m_int_enable{ 0U, 0U }, m_flags(FLAGS_NONE), m_cache_ptr(0U), m_cache_limit(0U), m_cache_iterations(0U)
 	, m_exm_in(1U), m_int_in(CLEAR_LINE), m_iack_out(1U)
@@ -232,6 +232,7 @@ void dsp16_device_base::device_start()
 	m_spaces[AS_DATA] = &space(AS_DATA);
 	m_spaces[AS_IO] = &space(AS_IO);
 	m_direct = m_spaces[AS_PROGRAM]->direct<-1>();
+	m_workram_mask = u16((m_workram.bytes() >> 1) - 1);
 
 	if (allow_drc())
 		m_recompiler.reset(new recompiler(*this, 0)); // TODO: what are UML flags for?
@@ -800,19 +801,19 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 					s64 const d(m_core->dau_f1(op));
 					m_core->dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
 					m_core->op_dau_ad(op) = d;
-					m_core->dau_set_at(op, yaau_read(op));
+					m_core->dau_set_at(op, yaau_read<Debugger>(op));
 					m_phase = phase::OP2;
 				}
 				break;
 
 			case 0x06: // F1 ; Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				yaau_read(op);
+				yaau_read<Debugger>(op);
 				break;
 
 			case 0x07: // F1 ; aT[l] = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_at(op, yaau_read(op));
+				m_core->dau_set_at(op, yaau_read<Debugger>(op));
 				break;
 
 			case 0x08: // aT = R
@@ -845,7 +846,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 			case 0x0d: // Z : R
 				fetch_target = nullptr;
 				m_core->dau_temp = get_r(op);
-				set_r(op, yaau_read(op));
+				set_r(op, yaau_read<Debugger>(op));
 				m_phase = phase::OP2;
 				break;
 
@@ -876,7 +877,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 			case 0x0f: // R = Y
 				assert(!(op & 0x0400U)); // reserved field?
 				fetch_target = nullptr;
-				set_r(op, yaau_read(op));
+				set_r(op, yaau_read<Debugger>(op));
 				m_phase = phase::OP2;
 				break;
 
@@ -907,18 +908,18 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 				fetch_target = nullptr;
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
 				m_core->dau_temp = m_core->dau_get_y(op);
-				m_core->dau_set_y(op, yaau_read(op));
+				m_core->dau_set_y(op, yaau_read<Debugger>(op));
 				m_phase = phase::OP2;
 				break;
 
 			case 0x16: // F1 ; x = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_x = yaau_read(op);
+				m_core->dau_x = yaau_read<Debugger>(op);
 				break;
 
 			case 0x17: // F1 ; y[l] = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_y(op, yaau_read(op));
+				m_core->dau_set_y(op, yaau_read<Debugger>(op));
 				break;
 
 			case 0x18: // goto B
@@ -987,7 +988,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 			case 0x1d: // F1 ; Z : y ; x = *pt++[i]
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
 				m_core->dau_temp = s16(m_core->dau_y >> 16);
-				m_core->dau_set_y(yaau_read(op));
+				m_core->dau_set_y(yaau_read<Debugger>(op));
 				fetch_target = nullptr;
 				m_rom_data = m_spaces[AS_PROGRAM]->read_word(m_core->xaau_pt);
 				m_phase = phase::OP2;
@@ -999,7 +1000,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 
 			case 0x1f: // F1 ; y = Y ; x = *pt++[i]
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_y(yaau_read(op));
+				m_core->dau_set_y(yaau_read<Debugger>(op));
 				fetch_target = nullptr;
 				m_rom_data = m_spaces[AS_PROGRAM]->read_word(m_core->xaau_pt);
 				m_phase = phase::OP2;
@@ -1034,14 +1035,14 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 			{
 			case 0x04: // F1 ; Y = a1[l]
 			case 0x1c: // F1 ; Y = a0[l]
-				yaau_write(op, u16(u64(dau_saturate(BIT(~op, 14))) >> (op_x(op) ? 16 : 0)));
+				yaau_write<Debugger>(op, u16(u64(dau_saturate(BIT(~op, 14))) >> (op_x(op) ? 16 : 0)));
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
 				break;
 
 			case 0x05: // F1 ; Z : aT[l]
 			case 0x0d: // Z : R
 			case 0x15: // F1 ; Z : y[l]
-				yaau_write_z(op);
+				yaau_write_z<Debugger>(op);
 				break;
 
 			case 0x08: // aT = R
@@ -1055,14 +1056,14 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 				break;
 
 			case 0x0c: // Y = R
-				yaau_write(op, get_r(op));
+				yaau_write<Debugger>(op, get_r(op));
 				break;
 
 			case 0x0f: // R = Y
 				break;
 
 			case 0x14: // F1 ; Y = y[l]
-				yaau_write(op, m_core->dau_get_y(op));
+				yaau_write<Debugger>(op, m_core->dau_get_y(op));
 				break;
 
 			case 0x19: // F1 ; y = a0 ; x = *pt++[i]
@@ -1095,7 +1096,7 @@ template <bool Debugger, bool Caching> inline void dsp16_device_base::execute_so
 			case 0x1d: // F1 ; Z : y ; x = *pt++[i]
 				m_core->xaau_increment_pt(op);
 				m_core->dau_x = m_rom_data;
-				yaau_write_z(op);
+				yaau_write_z<Debugger>(op);
 				break;
 
 			default:
@@ -1174,19 +1175,19 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 					s64 const d(m_core->dau_f1(op));
 					m_core->dau_temp = u16(u64(dau_saturate(op_d(~op))) >> (op_x(op) ? 16 : 0));
 					m_core->op_dau_ad(op) = d;
-					m_core->dau_set_at(op, yaau_read(op));
+					m_core->dau_set_at(op, yaau_read<Debugger>(op));
 					m_phase = phase::OP2;
 				}
 				break;
 
 			case 0x06: // F1 ; Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				yaau_read(op);
+				yaau_read<Debugger>(op);
 				break;
 
 			case 0x07: // F1 ; aT[l] = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_at(op, yaau_read(op));
+				m_core->dau_set_at(op, yaau_read<Debugger>(op));
 				break;
 
 			case 0x08: // aT = R
@@ -1209,13 +1210,13 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 
 			case 0x0d: // Z : R
 				m_core->dau_temp = get_r(op);
-				set_r(op, yaau_read(op));
+				set_r(op, yaau_read<Debugger>(op));
 				m_phase = phase::OP2;
 				break;
 
 			case 0x0f: // R = Y
 				assert(!(op & 0x0400U)); // reserved field?
-				set_r(op, yaau_read(op));
+				set_r(op, yaau_read<Debugger>(op));
 				m_phase = phase::OP2;
 				break;
 
@@ -1244,18 +1245,18 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 			case 0x15: // F1 ; Z : y[l]
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
 				m_core->dau_temp = m_core->dau_get_y(op);
-				m_core->dau_set_y(op, yaau_read(op));
+				m_core->dau_set_y(op, yaau_read<Debugger>(op));
 				m_phase = phase::OP2;
 				break;
 
 			case 0x16: // F1 ; x = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_x = yaau_read(op);
+				m_core->dau_x = yaau_read<Debugger>(op);
 				break;
 
 			case 0x17: // F1 ; y[l] = Y
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_y(op, yaau_read(op));
+				m_core->dau_set_y(op, yaau_read<Debugger>(op));
 				break;
 
 			case 0x19: // F1 ; y = a0 ; x = *pt++[i]
@@ -1283,14 +1284,14 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 			case 0x1d: // F1 ; Z : y ; x = *pt++[i]
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
 				m_core->dau_temp = s16(m_core->dau_y >> 16);
-				m_core->dau_set_y(yaau_read(op));
+				m_core->dau_set_y(yaau_read<Debugger>(op));
 				m_rom_data = m_direct->read_word(m_core->xaau_pt);
 				m_phase = phase::OP2;
 				break;
 
 			case 0x1f: // F1 ; y = Y ; x = *pt++[i]
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
-				m_core->dau_set_y(yaau_read(op));
+				m_core->dau_set_y(yaau_read<Debugger>(op));
 				if (last_instruction)
 				{
 					m_rom_data = m_direct->read_word(m_core->xaau_pt);
@@ -1314,14 +1315,14 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 			{
 			case 0x04: // F1 ; Y = a1[l]
 			case 0x1c: // F1 ; Y = a0[l]
-				yaau_write(op, u16(u64(dau_saturate(BIT(~op, 14))) >> (op_x(op) ? 16 : 0)));
+				yaau_write<Debugger>(op, u16(u64(dau_saturate(BIT(~op, 14))) >> (op_x(op) ? 16 : 0)));
 				m_core->op_dau_ad(op) = m_core->dau_f1(op);
 				break;
 
 			case 0x05: // F1 ; Z : aT[l]
 			case 0x0d: // Z : R
 			case 0x15: // F1 ; Z : y[l]
-				yaau_write_z(op);
+				yaau_write_z<Debugger>(op);
 				break;
 
 			case 0x08: // aT = R
@@ -1330,14 +1331,14 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 				break;
 
 			case 0x0c: // Y = R
-				yaau_write(op, get_r(op));
+				yaau_write<Debugger>(op, get_r(op));
 				break;
 
 			case 0x0f: // R = Y
 				break;
 
 			case 0x14: // F1 ; Y = y[l]
-				yaau_write(op, m_core->dau_get_y(op));
+				yaau_write<Debugger>(op, m_core->dau_get_y(op));
 				break;
 
 			case 0x19: // F1 ; y = a0 ; x = *pt++[i]
@@ -1351,7 +1352,7 @@ template <bool Debugger> inline void dsp16_device_base::execute_some_cache()
 			case 0x1d: // F1 ; Z : y ; x = *pt++[i]
 				m_core->xaau_increment_pt(op);
 				m_core->dau_x = m_rom_data;
-				yaau_write_z(op);
+				yaau_write_z<Debugger>(op);
 				break;
 
 			default:
@@ -1447,23 +1448,31 @@ inline void dsp16_device_base::yaau_short_immediate_load(u16 op)
 	}
 }
 
-inline s16 dsp16_device_base::yaau_read(u16 op)
+template <bool Debugger> inline s16 dsp16_device_base::yaau_read(u16 op)
 {
-	s16 const result(m_spaces[AS_DATA]->read_word(m_core->op_yaau_r(op)));
+	u16 const &r(m_core->op_yaau_r(op));
+	s16 const result(Debugger ? m_spaces[AS_DATA]->read_word(r) : m_workram[r & m_workram_mask]);
 	m_core->yaau_postmodify_r(op);
 	return result;
 }
 
-inline void dsp16_device_base::yaau_write(u16 op, s16 value)
+template <bool Debugger> inline void dsp16_device_base::yaau_write(u16 op, s16 value)
 {
-	m_spaces[AS_DATA]->write_word(m_core->op_yaau_r(op), value);
+	u16 const &r(m_core->op_yaau_r(op));
+	if (Debugger)
+		m_spaces[AS_DATA]->write_word(r, value);
+	else
+		m_workram[r & m_workram_mask] = value;
 	m_core->yaau_postmodify_r(op);
 }
 
-void dsp16_device_base::yaau_write_z(u16 op)
+template <bool Debugger> void dsp16_device_base::yaau_write_z(u16 op)
 {
 	u16 &r(m_core->op_yaau_r(op));
-	m_spaces[AS_DATA]->write_word(r, m_core->dau_temp);
+	if (Debugger)
+		m_spaces[AS_DATA]->write_word(r, m_core->dau_temp);
+	else
+		m_workram[r & m_workram_mask] = m_core->dau_temp;
 	switch (op & 0x0003U)
 	{
 	case 0x0: // *rNzp
@@ -2088,7 +2097,7 @@ void dsp16_device::data_map(address_map &map)
 {
 	map.global_mask(0x01ff);
 	map.unmap_value_high();
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x01ff).ram().share("workram");
 }
 
 
@@ -2123,5 +2132,5 @@ void dsp16a_device::data_map(address_map &map)
 {
 	map.global_mask(0x07ff);
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).ram();
+	map(0x0000, 0x07ff).ram().share("workram");
 }
