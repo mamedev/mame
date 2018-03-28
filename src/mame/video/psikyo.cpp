@@ -639,7 +639,7 @@ uint32_t psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitma
 		}
 		tmptilemap[layer]->set_transparent_pen((layer_ctrl[layer] & 8 ? 0 : 15));
 	}
-	
+
 	// TODO : is this correct?
 	if (layers_ctrl & 1)
 		bgpen = ((layer_ctrl[0] & 8) ? 0x800 : 0x80f);
