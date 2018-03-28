@@ -44,6 +44,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_ledready(0)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -56,7 +57,9 @@ private:
 	uint8_t m_keyrow;
 	bool m_ledready;
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
+	output_finder<10> m_digits;
 };
 
 
@@ -78,7 +81,8 @@ WRITE8_MEMBER( pmi80_state::leds_w )
 	if (m_ledready)
 	{
 		m_ledready = false;
-		output().set_digit_value(m_keyrow^0xff, data^0xff);
+		if (m_keyrow > 0xF5)  // to be sure to be sure
+			m_digits[m_keyrow^0xff] = data^0xff;
 	}
 }
 
@@ -154,6 +158,11 @@ INPUT_PORTS_END
 
 void pmi80_state::machine_reset()
 {
+}
+
+void pmi80_state::machine_start()
+{
+	m_digits.resolve();
 }
 
 
