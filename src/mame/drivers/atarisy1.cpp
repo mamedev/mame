@@ -732,7 +732,6 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarisy1_state, video_int_gen)
 
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -776,6 +775,7 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy1_state, screen_update_atarisy1)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarisy1_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 

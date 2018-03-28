@@ -889,16 +889,16 @@ MACHINE_RESET_MEMBER(trackfld_state,trackfld)
 	m_old_gfx_bank = 0;
 }
 
-INTERRUPT_GEN_MEMBER(trackfld_state::vblank_irq)
+WRITE_LINE_MEMBER(trackfld_state::vblank_irq)
 {
-	if (m_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(trackfld_state::vblank_nmi)
+WRITE_LINE_MEMBER(trackfld_state::vblank_nmi)
 {
-	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(trackfld_state::trackfld)
@@ -906,7 +906,6 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/6/2)    /* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -936,6 +935,7 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(trackfld_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
@@ -966,7 +966,6 @@ MACHINE_CONFIG_START(trackfld_state::trackfldu)
 	trackfld(config);
 	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state, vblank_irq)
 
 MACHINE_CONFIG_END
 
@@ -981,7 +980,6 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(yieartf_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state,  vblank_irq)
 	MCFG_CPU_PERIODIC_INT_DRIVER(trackfld_state, yieartf_timer_irq, 480)
 
 //  z80 isn't used
@@ -1013,6 +1011,7 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(trackfld_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
@@ -1101,7 +1100,6 @@ MACHINE_CONFIG_START(trackfld_state::mastkin)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
 	MCFG_CPU_PROGRAM_MAP(mastkin_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state, vblank_irq)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // actually not used
@@ -1115,7 +1113,9 @@ MACHINE_CONFIG_START(trackfld_state::wizzquiz)
 	// right cpu?
 	MCFG_CPU_REPLACE("maincpu",M6800,2048000)       /* 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(wizzquiz_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state,  vblank_nmi)
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(trackfld_state, vblank_nmi))
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
@@ -1128,7 +1128,6 @@ MACHINE_CONFIG_START(trackfld_state::reaktor)
 	MCFG_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(reaktor_map)
 	MCFG_CPU_IO_MAP(reaktor_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state,  vblank_irq)
 MACHINE_CONFIG_END
 
 

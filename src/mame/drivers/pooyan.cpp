@@ -31,10 +31,10 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pooyan_state::interrupt)
+WRITE_LINE_MEMBER(pooyan_state::vblank_irq)
 {
-	if (m_irq_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_irq_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -198,7 +198,6 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pooyan_state,  interrupt)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pooyan_state, irq_enable_w))
@@ -218,6 +217,7 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pooyan_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pooyan_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pooyan)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
