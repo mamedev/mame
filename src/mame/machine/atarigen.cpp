@@ -991,14 +991,17 @@ WRITE16_MEMBER(atarigen_state::sound_int_ack_w)
 
 
 //-------------------------------------------------
-//  video_int_gen: Standard interrupt routine which
-//  sets the video interrupt state.
+//  video_int_write_line: Standard write line
+//  callback for the video interrupt.
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER(atarigen_state::video_int_gen)
+WRITE_LINE_MEMBER(atarigen_state::video_int_write_line)
 {
-	m_video_int_state = 1;
-	update_interrupts();
+	if (state)
+	{
+		m_video_int_state = 1;
+		update_interrupts();
+	}
 }
 
 

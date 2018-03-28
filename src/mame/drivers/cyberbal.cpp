@@ -406,7 +406,6 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 
 	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(extra_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", cyberbal_state, video_int_gen) /* or is it "right?" */
 
 	MCFG_CPU_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sound_68k_map)
@@ -444,6 +443,7 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(cyberbal_state, screen_update_cyberbal_left)
 	MCFG_SCREEN_PALETTE("lpalette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cyberbal_state, video_int_write_line)) /* or is it "right?" */
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -485,7 +485,6 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cyberbal2p_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cyberbal2p_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -509,6 +508,7 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(cyberbal2p_state, screen_update_cyberbal2p)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cyberbal2p_state, video_int_write_line))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -180,7 +180,6 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blstroid_state, video_int_gen)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -204,6 +203,7 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 320*2, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(blstroid_state, screen_update_blstroid)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(blstroid_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
 

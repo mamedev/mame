@@ -342,7 +342,6 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", foodf_state, video_int_gen)
 
 	MCFG_X2212_ADD_AUTOSAVE("nvram")
 
@@ -361,6 +360,7 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(foodf_state, screen_update_foodf)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(foodf_state, video_int_write_line))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
