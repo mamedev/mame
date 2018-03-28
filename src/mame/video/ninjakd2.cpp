@@ -516,5 +516,7 @@ WRITE_LINE_MEMBER(ninjakd2_state::screen_vblank_ninjakd2)
 			update_sprites();
 
 		m_sprites_updated = 0;
+
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 	}
 }

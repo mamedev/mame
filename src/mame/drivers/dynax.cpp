@@ -128,9 +128,10 @@ WRITE_LINE_MEMBER(dynax_state::blitter_ack_w)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(dynax_state::sprtmtch_vblank_interrupt)
+WRITE_LINE_MEMBER(dynax_state::sprtmtch_vblank_w)
 {
-	m_mainirq->rst2_w(1);
+	if (state)
+		m_mainirq->rst2_w(1);
 }
 
 
@@ -170,20 +171,19 @@ WRITE_LINE_MEMBER(dynax_state::jantouki_blitter2_ack_w)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(dynax_state::jantouki_vblank_interrupt)
+WRITE_LINE_MEMBER(dynax_state::jantouki_vblank_w)
 {
-	m_mainirq->rst4_w(1);
+	if (state)
+	{
+		m_mainirq->rst4_w(1);
+		m_soundirq->rst4_w(1);
+	}
 }
 
 
 /***************************************************************************
                             Jantouki - Sound CPU
 ***************************************************************************/
-
-INTERRUPT_GEN_MEMBER(dynax_state::jantouki_sound_vblank_interrupt)
-{
-	m_soundirq->rst4_w(1);
-}
 
 WRITE8_MEMBER(dynax_state::jantouki_sound_vblank_ack_w)
 {
@@ -4203,8 +4203,7 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/4) /* 5.3693175MHz measured */
 	MCFG_CPU_PROGRAM_MAP(cdracula_mem_map)
 	MCFG_CPU_IO_MAP(cdracula_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)  // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4227,6 +4226,7 @@ MACHINE_CONFIG_START(dynax_state::cdracula)
 	MCFG_SCREEN_VISIBLE_AREA(16, 512-16-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_cdracula)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4251,8 +4251,7 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
 	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
 	MCFG_CPU_IO_MAP(hanamai_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4280,6 +4279,7 @@ MACHINE_CONFIG_START(dynax_state::hanamai)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16+8, 255-8)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hanamai)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4319,8 +4319,7 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 	MCFG_CPU_ADD("maincpu",Z80,XTAL(22'000'000) / 4)    /* 5.5MHz */
 	MCFG_CPU_PROGRAM_MAP(hnoridur_mem_map)
 	MCFG_CPU_IO_MAP(hnoridur_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,dynax)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4354,6 +4353,7 @@ MACHINE_CONFIG_START(dynax_state::hnoridur)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -4386,8 +4386,7 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 	MCFG_CPU_ADD("maincpu",Z80, XTAL(22'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(hjingi_mem_map)
 	MCFG_CPU_IO_MAP(hjingi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hjingi)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4423,6 +4422,7 @@ MACHINE_CONFIG_START(dynax_state::hjingi)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_hnoridur)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 16*256)
 
@@ -4455,8 +4455,7 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	MCFG_CPU_ADD("maincpu", Z80,22000000 / 4)   /* 5.5MHz */
 	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
 	MCFG_CPU_IO_MAP(sprtmtch_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)   // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4481,6 +4480,7 @@ MACHINE_CONFIG_START(dynax_state::sprtmtch)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_sprtmtch)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynax_state, sprtmtch_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4505,13 +4505,18 @@ MACHINE_CONFIG_END
                             Mahjong Friday
 ***************************************************************************/
 
+WRITE_LINE_MEMBER(dynax_state::mjfriday_vblank_w)
+{
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
 MACHINE_CONFIG_START(dynax_state::mjfriday)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,24000000/4)  /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
 	MCFG_CPU_IO_MAP(mjfriday_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanamai)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4536,6 +4541,7 @@ MACHINE_CONFIG_START(dynax_state::mjfriday)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_mjdialq2)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynax_state, mjfriday_vblank_w))
 
 	MCFG_PALETTE_ADD("palette", 512)
 
@@ -4659,14 +4665,12 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)    /* 5.5MHz */
 	MCFG_CPU_PROGRAM_MAP(jantouki_mem_map)
 	MCFG_CPU_IO_MAP(jantouki_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", dynax_state,  jantouki_vblank_interrupt)  /* IM 0 needs an opcode on the data bus */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainirq", rst_pos_buffer_device, inta_cb)  // IM 0 needs an opcode on the data bus
 
 	MCFG_CPU_ADD("soundcpu",Z80,22000000 / 4)   /* 5.5MHz */
 	MCFG_CPU_PROGRAM_MAP(jantouki_sound_mem_map)
 	MCFG_CPU_IO_MAP(jantouki_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", dynax_state,  jantouki_sound_vblank_interrupt)    /* IM 0 needs an opcode on the data bus */
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_pos_buffer_device, inta_cb)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_pos_buffer_device, inta_cb)    // IM 0 needs an opcode on the data bus
 
 	MCFG_MACHINE_START_OVERRIDE(dynax_state,jantouki)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
@@ -4702,6 +4706,7 @@ MACHINE_CONFIG_START(dynax_state::jantouki)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_jantouki_top)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynax_state, jantouki_vblank_w))
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

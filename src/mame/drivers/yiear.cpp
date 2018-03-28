@@ -124,10 +124,10 @@ WRITE8_MEMBER(yiear_state::yiear_VLM5030_control_w)
 	m_vlm->rst((data >> 2) & 1);
 }
 
-INTERRUPT_GEN_MEMBER(yiear_state::yiear_vblank_interrupt)
+WRITE_LINE_MEMBER(yiear_state::vblank_irq)
 {
-	if (m_yiear_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_yiear_irq_enable)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -285,7 +285,6 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", yiear_state,  yiear_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(yiear_state, yiear_nmi_interrupt, 480) /* music tempo (correct frequency unknown) */
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -298,6 +297,7 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(yiear_state, screen_update_yiear)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(yiear_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yiear)
 	MCFG_PALETTE_ADD("palette", 32)
