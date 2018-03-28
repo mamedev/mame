@@ -1336,10 +1336,10 @@ static GFXDECODE_START( sqix )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(hotsmash_state::vblank_irq)
+WRITE_LINE_MEMBER(hotsmash_state::vblank_irq)
 {
-	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
@@ -1354,7 +1354,6 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)      /* 6 MHz, ROHM Z80B */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(pbillian_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hotsmash_state, vblank_irq)
 
 	MCFG_CPU_ADD("mcu", M68705P5, XTAL(12'000'000)/4) /* 3mhz???? */
 	MCFG_M68705_PORTA_R_CB(READ8(hotsmash_state, hotsmash_68705_portA_r))
@@ -1372,6 +1371,7 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hotsmash_state, screen_update_pbillian)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hotsmash_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
