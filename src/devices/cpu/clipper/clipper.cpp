@@ -998,7 +998,7 @@ void clipper_device::execute_instruction()
 		{
 			const s64 product = mul_32x32(m_r[R1], m_r[R2]);
 			m_r[R2] = s32(product);
-			FLAGS(0, (u64(product) >> 32) != BIT(product, 31) ? ~u32(0) : 0, 0, 0)
+			FLAGS(0, (u64(product) >> 32) != (BIT(product, 31) ? ~u32(0) : 0), 0, 0)
 			// FLAGS: 0V00
 		}
 		break;
@@ -1007,7 +1007,7 @@ void clipper_device::execute_instruction()
 		{
 			const s64 product = mul_32x32(m_r[R1], m_r[R2]);
 			set_64(R2, product);
-			FLAGS(0, (u64(product) >> 32) != BIT(product, 31) ? ~u32(0) : 0, 0, 0)
+			FLAGS(0, (u64(product) >> 32) != (BIT(product, 31) ? ~u32(0) : 0), 0, 0)
 			// FLAGS: 0V00
 		}
 		break;

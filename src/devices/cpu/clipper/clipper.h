@@ -193,12 +193,12 @@ protected:
 	// register pair helpers
 	u64 get_64(const u8 reg) const
 	{
-		return u64(m_r[reg + 1]) << 32 | u64(m_r[reg + 0]);
+		return u64(m_r[reg | 0x1]) << 32 | u64(m_r[reg & 0xe]);
 	}
 	void set_64(const u8 reg, const u64 data)
 	{
-		m_r[reg + 0] = u32(data & ~u32(0));
-		m_r[reg + 1] = u32(data >> 32);
+		m_r[reg & 0xe] = u32(data & ~u32(0));
+		m_r[reg | 0x1] = u32(data >> 32);
 	}
 
 	// floating point helpers
