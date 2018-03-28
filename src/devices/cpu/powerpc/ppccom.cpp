@@ -814,7 +814,7 @@ void ppc_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_core->r[31]).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).noshow().formatstr("%1s");
 
-	m_icountptr = &m_core->icount;
+	set_icountptr(m_core->icount);
 
 	uint32_t flags = 0;
 	/* initialize the UML generator */

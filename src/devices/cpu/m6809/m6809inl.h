@@ -238,7 +238,7 @@ inline void m6809_base_device::eat_remaining()
 	eat(m_icount);
 
 	m_pc.w = m_ppc.w;
-	debugger_instruction_hook(this, m_pc.w);
+	debugger_instruction_hook(m_pc.w);
 	m_pc.w = real_pc;
 }
 

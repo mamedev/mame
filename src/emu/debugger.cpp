@@ -23,68 +23,6 @@
 static running_machine *g_machine = nullptr;
 static bool g_atexit_registered = false;
 
-/*-------------------------------------------------
-    debugger_instruction_hook - CPU cores call
-    this once per instruction from CPU cores
--------------------------------------------------*/
-
-void debugger_instruction_hook(device_t *device, offs_t curpc)
-{
-#ifndef MAME_DEBUG_FAST
-	if ((device->machine().debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
-		device->debug()->instruction_hook(curpc);
-#endif
-}
-
-
-/*-------------------------------------------------
-    debugger_exception_hook - CPU cores call this
-    anytime an exception is generated
--------------------------------------------------*/
-
-void debugger_exception_hook(device_t *device, int exception)
-{
-	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		device->debug()->exception_hook(exception);
-}
-
-/*-------------------------------------------------
-    debugger_start_cpu_hook - the CPU execution
-    system calls this hook before beginning
-    execution for the given CPU
--------------------------------------------------*/
-
-void debugger_start_cpu_hook(device_t *device, const attotime &endtime)
-{
-	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		device->debug()->start_hook(endtime);
-}
-
-
-/*-------------------------------------------------
-    debugger_stop_cpu_hook - the CPU execution
-    system calls this hook when ending execution
-    for the given CPU
--------------------------------------------------*/
-
-void debugger_stop_cpu_hook(device_t *device)
-{
-	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		device->debug()->stop_hook();
-}
-
-
-/*-------------------------------------------------
-    debugger_interrupt_hook - the CPU execution
-    system calls this hook when an interrupt is
-    acknowledged
--------------------------------------------------*/
-
-void debugger_interrupt_hook(device_t *device, int irqline)
-{
-	if ((device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		device->debug()->interrupt_hook(irqline);
-}
 
 /*-------------------------------------------------
     debug_break - stop in the debugger at the next

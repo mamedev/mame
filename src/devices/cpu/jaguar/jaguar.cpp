@@ -405,7 +405,7 @@ void jaguar_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_ppc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", FLAGS).formatstr("%11s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -480,7 +480,7 @@ void jaguargpu_cpu_device::execute_run()
 		/* debugging */
 		//if (PC < 0xf03000 || PC > 0xf04000) { fatalerror("GPU: PC = %06X (ppc = %06X)\n", PC, m_ppc); }
 		m_ppc = PC;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		/* instruction fetch */
 		op = ROPCODE(PC);
@@ -517,7 +517,7 @@ void jaguardsp_cpu_device::execute_run()
 		/* debugging */
 		//if (PC < 0xf1b000 || PC > 0xf1d000) { fatalerror(stderr, "DSP: PC = %06X\n", PC); }
 		m_ppc = PC;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		/* instruction fetch */
 		op = ROPCODE(PC);
@@ -728,7 +728,7 @@ void jaguar_cpu_device::jr_cc_n(uint16_t op)
 	{
 		int32_t r1 = (int8_t)((op >> 2) & 0xf8) >> 2;
 		uint32_t newpc = PC + r1;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		op = ROPCODE(PC);
 		PC = newpc;
 		(this->*m_table[op >> 10])(op);
@@ -745,7 +745,7 @@ void jaguar_cpu_device::jump_cc_rn(uint16_t op)
 
 		/* special kludge for risky code in the cojag DSP interrupt handlers */
 		uint32_t newpc = (m_icount == m_bankswitch_icount) ? m_a[reg] : m_r[reg];
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		op = ROPCODE(PC);
 		PC = newpc;
 		(this->*m_table[op >> 10])(op);

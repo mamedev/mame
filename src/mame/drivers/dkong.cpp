@@ -451,9 +451,10 @@ WRITE8_MEMBER(dkong_state::memory_write_byte)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
+WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
 /*************************************
@@ -789,6 +790,8 @@ WRITE8_MEMBER(dkong_state::dkong_z80dma_rdy_w)
 WRITE8_MEMBER(dkong_state::nmi_mask_w)
 {
 	m_nmi_mask = data & 1;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /*************************************
@@ -1672,10 +1675,10 @@ void dkong_state::braze_decrypt_rom(uint8_t *dest)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(dkong_state::vblank_irq)
+WRITE_LINE_MEMBER(dkong_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(dkong_state::busreq_w )
@@ -1694,7 +1697,6 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK_1H)
 	MCFG_CPU_PROGRAM_MAP(dkong_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  vblank_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
@@ -1712,6 +1714,7 @@ MACHINE_CONFIG_START(dkong_state::dkong_base)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dkong_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
 	MCFG_PALETTE_ADD("palette", DK2B_PALETTE_LENGTH)
@@ -1791,7 +1794,6 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2) /* verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(dkong3_map)
 	MCFG_CPU_IO_MAP(dkong3_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, vblank_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
 
@@ -1805,6 +1807,9 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dkong_state, vblank_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03a", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("n2a03b", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dkong)
 	MCFG_PALETTE_ADD("palette", DK3_PALETTE_LENGTH)
@@ -1862,7 +1867,9 @@ MACHINE_CONFIG_START(dkong_state::s2650)
 	MCFG_CPU_DATA_MAP(s2650_data_map)
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(dkong_state, s2650_fo_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state,  s2650_interrupt)
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dkong_state, s2650_interrupt))
 
 	MCFG_DEVICE_MODIFY("dma8257")
 	MCFG_I8257_IN_MEMR_CB(READ8(dkong_state, hb_dma_read_byte))

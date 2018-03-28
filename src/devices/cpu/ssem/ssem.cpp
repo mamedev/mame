@@ -112,7 +112,7 @@ void ssem_device::device_start()
 	save_item(NAME(m_halt));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void ssem_device::device_stop()
@@ -230,7 +230,7 @@ void ssem_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		op = program_read32(m_pc);
 

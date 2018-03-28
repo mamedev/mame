@@ -51,11 +51,11 @@ uint8_t* NeoZ80ROMActive;
 uint8_t NeoSystem = NEOCD_REGION_JAPAN;
 
 
-class ngcd_state : public aes_state
+class ngcd_state : public aes_base_state
 {
 public:
 	ngcd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: aes_state(mconfig, type, tag)
+		: aes_base_state(mconfig, type, tag)
 		, m_tempcdc(*this,"tempcdc")
 	{
 		NeoCDDMAAddress1 = 0;
@@ -87,9 +87,6 @@ public:
 	DECLARE_WRITE8_MEMBER(neocd_transfer_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
-
-	DECLARE_MACHINE_START(neocd);
-	DECLARE_MACHINE_RESET(neocd);
 
 	// neoCD
 
@@ -137,7 +134,10 @@ public:
 	void neocd_audio_io_map(address_map &map);
 	void neocd_audio_map(address_map &map);
 	void neocd_main_map(address_map &map);
+
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	int32_t SekIdle(int32_t nCycles);
 };
@@ -828,17 +828,14 @@ if (NeoCDDMAAddress2 == 0x0800)  {
  *
  *************************************/
 
-MACHINE_START_MEMBER(ngcd_state,neocd)
+void ngcd_state::machine_start()
 {
-	m_type = NEOGEO_CD;
-	common_machine_start();
+	aes_base_state::machine_start();
 
 	// set curr_slot to 0, so to allow checking m_slots[m_curr_slot] != nullptr
 	m_curr_slot = 0;
 
 	// initialize sprite to point to memory regions
-	m_sprgen->m_fixed_layer_bank_type = 0;
-	m_sprgen->set_screen(m_screen);
 	m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
 	m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
 	m_sprgen->neogeo_set_fixed_layer_source(1);
@@ -853,8 +850,6 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
 	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
 	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
 
-	m_use_cart_vectors = 0;
-
 	m_tempcdc->reset_cd();
 }
 
@@ -865,9 +860,9 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(ngcd_state,neocd)
+void ngcd_state::machine_reset()
 {
-	neogeo_state::machine_reset();
+	aes_base_state::machine_reset();
 
 	NeoSpriteRAM = memregion("sprites")->base();
 	YM2610ADPCMAROM = memregion("ymsnd")->base();
@@ -1071,9 +1066,6 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type3 )
 
 	MCFG_NVRAM_ADD_0FILL("saveram")
-
-	MCFG_MACHINE_START_OVERRIDE(ngcd_state,neocd)
-	MCFG_MACHINE_RESET_OVERRIDE(ngcd_state,neocd)
 
 	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
 	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)

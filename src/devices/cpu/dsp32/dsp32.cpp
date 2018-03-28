@@ -179,7 +179,7 @@ dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, dev
 		m_output_pins_changed(*this)
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------

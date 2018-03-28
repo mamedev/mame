@@ -447,7 +447,7 @@ pcxport_dmac_device::pcxport_dmac_device(const machine_config &mconfig, const ch
 void am9517a_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_out_hreq_cb.resolve_safe();

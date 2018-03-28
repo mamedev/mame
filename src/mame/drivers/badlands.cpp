@@ -236,7 +236,7 @@ INTERRUPT_GEN_MEMBER(badlands_state::vblank_int)
 			m_pedal_value[i]++;
 	}
 
-	video_int_gen(device);
+	video_int_write_line(1);
 }
 
 

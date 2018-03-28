@@ -90,7 +90,7 @@ void hp_nanoprocessor_device::device_start()
 	save_item(NAME(m_reg_ISR));
 	save_item(NAME(m_flags));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_dc_changed_func.resolve_safe();
 	m_read_dc_func.resolve_safe(0xff);
@@ -132,7 +132,7 @@ void hp_nanoprocessor_device::execute_run()
 			// Need this to propagate the clearing of DC7 to the clearing of int. line
 			yield();
 		} else {
-			debugger_instruction_hook(this, m_reg_PA);
+			debugger_instruction_hook(m_reg_PA);
 
 			uint8_t opcode = fetch();
 			execute_one(opcode);

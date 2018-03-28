@@ -1440,10 +1440,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(harddriv_state::video_int_gen)
+WRITE_LINE_MEMBER(harddriv_state::video_int_write_line)
 {
-	m_video_int_state = 1;
-	update_interrupts();
+	if (state)
+	{
+		m_video_int_state = 1;
+		update_interrupts();
+	}
 }
 
 
@@ -1453,7 +1456,6 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, HARDDRIV_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(driver_68k_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", harddriv_state, video_int_gen)
 	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 117)
@@ -1492,6 +1494,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_SCREEN_UPDATE_DEVICE("gsp", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(harddriv_state, video_int_write_line))
 MACHINE_CONFIG_END
 
 

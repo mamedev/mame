@@ -2822,48 +2822,12 @@ msgstr "Fichero de nombres de puertos de entrada guardado en %s"
 msgid "Input ports"
 msgstr "Puertos de entrada"
 
-#~ msgid " total matches found"
-#~ msgstr " elementos encontrados"
-
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"
 #~ "Samples Audit Disabled\t\n"
 #~ msgstr ""
 #~ "Auditoría de ROMs deshabilitada\t\n"
 #~ "Auditoría de muestras deshabilitada\t\n"
-
-#~ msgid "Default name is "
-#~ msgstr "El nombre por defecto es "
-
-#~ msgid "Mechanical Machine\t%1$s\n"
-#~ msgstr "Máquina mecánica\t%1$s\n"
-
-#~ msgid "Requires Artwork\t%1$s\n"
-#~ msgstr "Requiere arte\t%1$s\n"
-
-#~ msgid "Requires Clickable Artwork\t%1$s\n"
-#~ msgstr "Requiere arte clicable\t%1$s\n"
-
-#~ msgid "Support Cocktail\t%1$s\n"
-#~ msgstr "Soporta cóctel\t%1$s\n"
-
-#~ msgid "Driver is BIOS\t%1$s\n"
-#~ msgstr "El controlador es una BIOS\t%1$s\n"
-
-#~ msgid "Support Save\t%1$s\n"
-#~ msgstr "Permite guardar\t%1$s\n"
-
-#~ msgid "Screen Orientation\t%1$s\n"
-#~ msgstr "Orientación de pantalla\t%1$s\n"
-
-#~ msgid "Vertical"
-#~ msgstr "Vertical"
-
-#~ msgid "Horizontal"
-#~ msgstr "Horizontal"
-
-#~ msgid "Requires CHD\t%1$s\n"
-#~ msgstr "Requiere CHD\t%1$s\n"
 
 #~ msgid "Roms Audit Pass\tOK\n"
 #~ msgstr "Auditoría de ROMs\tCORRECTA\n"
@@ -2887,29 +2851,5 @@ msgstr "Puertos de entrada"
 #~ "Auditoría de ROMs\tDeshabilitada\n"
 #~ "Auditoría de las muestras\tDeshabilitada\n"
 
-#~ msgid "Unimplemented"
-#~ msgstr "No implementado"
-
-#~ msgid "Imperfect"
-#~ msgstr "Imperfecto"
-
-#~ msgid "OK"
-#~ msgstr "Aceptable"
-
 #~ msgid "Gfx: %s, Sound: %s"
 #~ msgstr "Gráficos: %s, Sonido: %s"
-
-#~ msgid "Audit in progress..."
-#~ msgstr "Auditando..."
-
-#~ msgid "Extra INIs"
-#~ msgstr "INIs adicionales"
-
-#~ msgid " ^!File"
-#~ msgstr " ^!Archivo"
-
-#~ msgid "Main filter"
-#~ msgstr "Filtro principal"
-
-#~ msgid "Other filter"
-#~ msgstr "Otros filtros"

@@ -649,7 +649,7 @@ void pdp1_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_pf ).formatstr("%13s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	/* reset CPU flip-flops */
 	pulse_start_clear();
@@ -796,7 +796,7 @@ void pdp1_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 
 		/* ioh should be cleared at the end of the instruction cycle, and ios at the

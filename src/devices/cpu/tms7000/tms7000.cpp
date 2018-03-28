@@ -190,7 +190,7 @@ void tms7000_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = m_program->direct<0>();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_irq_state[TMS7000_INT1_LINE] = false;
 	m_irq_state[TMS7000_INT3_LINE] = false;
@@ -622,7 +622,7 @@ void tms7000_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		m_op = m_direct->read_byte(m_pc++);
 		execute_one(m_op);
