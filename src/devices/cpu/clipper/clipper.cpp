@@ -232,7 +232,7 @@ void clipper_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(m_ip);
+		debugger_instruction_hook(m_pc);
 
 		// fetch and decode an instruction
 		if (decode_instruction())
