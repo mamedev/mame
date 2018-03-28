@@ -799,7 +799,11 @@ void lua_engine::initialize()
 	emu["wait"] = lua_CFunction([](lua_State *L) {
 			lua_engine *engine = mame_machine_manager::instance()->lua();
 			luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), 0, L);
+			int ret = lua_pushthread(L);
+			if(ret == 1)
+				return luaL_error(L, "cannot wait from outside coroutine");
+			int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+			engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
 			return lua_yield(L, 0);
 		});
 	emu["lang_translate"] = &lang_translate;
@@ -2021,13 +2025,16 @@ void lua_engine::close()
 
 void lua_engine::resume(void *ptr, int nparam)
 {
-	lua_State *L = static_cast<lua_State *>(ptr);
+	lua_rawgeti(m_lua_state, LUA_REGISTRYINDEX, nparam);
+	lua_State *L = lua_tothread(m_lua_state, -1);
+	lua_pop(m_lua_state, 1);
 	int stat = lua_resume(L, nullptr, 0);
 	if((stat != LUA_OK) && (stat != LUA_YIELD))
 	{
 		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
+	luaL_unref(m_lua_state, LUA_REGISTRYINDEX, nparam);
 }
 
 void lua_engine::run(sol::load_result res)
