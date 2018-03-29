@@ -227,8 +227,6 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000) // HD68B09EP
 	MCFG_CPU_PROGRAM_MAP(compgolf_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", compgolf_state,  nmi_line_pulse)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -238,6 +236,7 @@ MACHINE_CONFIG_START(compgolf_state::compgolf)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(compgolf_state, screen_update_compgolf)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(compgolf_state, compgolf)
