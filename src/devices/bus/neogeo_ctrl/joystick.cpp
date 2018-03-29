@@ -39,6 +39,7 @@ static INPUT_PORTS_START( neogeo_joy )
 	PORT_START("START_SELECT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SELECT )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -64,7 +65,8 @@ neogeo_joystick_device::neogeo_joystick_device(const machine_config &mconfig, co
 	device_t(mconfig, NEOGEO_JOY, tag, owner, clock),
 	device_neogeo_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
-	m_ss(*this, "START_SELECT")
+	m_ss(*this, "START_SELECT"),
+	m_ctrl_sel(0x00)
 {
 }
 
@@ -75,15 +77,7 @@ neogeo_joystick_device::neogeo_joystick_device(const machine_config &mconfig, co
 
 void neogeo_joystick_device::device_start()
 {
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void neogeo_joystick_device::device_reset()
-{
+	save_item(NAME(m_ctrl_sel));
 }
 
 
@@ -93,7 +87,7 @@ void neogeo_joystick_device::device_reset()
 
 uint8_t neogeo_joystick_device::read_ctrl()
 {
-	return m_joy->read();
+	return m_joy->read() & (BIT(m_ctrl_sel, 2) ? 0x7f : 0xff);
 }
 
 //-------------------------------------------------
@@ -103,6 +97,15 @@ uint8_t neogeo_joystick_device::read_ctrl()
 uint8_t neogeo_joystick_device::read_start_sel()
 {
 	return m_ss->read();
+}
+
+//-------------------------------------------------
+//  write_ctrlsel
+//-------------------------------------------------
+
+void neogeo_joystick_device::write_ctrlsel(uint8_t data)
+{
+	m_ctrl_sel = data;
 }
 
 
