@@ -245,7 +245,6 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(rgum_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rgum_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -259,6 +258,7 @@ MACHINE_CONFIG_START(rgum_state::rgum)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 24000000/16)   /* unknown clock & type, hand tuned to get ~50 fps (?) */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))

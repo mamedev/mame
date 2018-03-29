@@ -15,6 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/upd1990a.h"
 #include "machine/ng_memcard.h"
 #include "video/neogeo_spr.h"
@@ -31,40 +32,43 @@
 #define NEOGEO_VBLANK_IRQ_HTIM (attotime::from_ticks(56+2, NEOGEO_MASTER_CLOCK))
 
 
-class neogeo_state : public driver_device
+class neogeo_base_state : public driver_device
 {
 public:
-	neogeo_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_ym(*this, "ymsnd"),
-		m_sprgen(*this, "spritegen"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_memcard(*this, "memcard"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
-		m_region_maincpu(*this, "maincpu"),
-		m_region_sprites(*this, "sprites"),
-		m_region_fixed(*this, "fixed"),
-		m_region_fixedbios(*this, "fixedbios"),
-		m_region_mainbios(*this, "mainbios"),
-		m_region_audiobios(*this, "audiobios"),
-		m_region_audiocpu(*this, "audiocpu"),
-		m_bank_audio_main(*this, "audio_main"),
-		m_edge(*this, "edge"),
-		m_ctrl1(*this, "ctrl1"),
-		m_ctrl2(*this, "ctrl2"),
-		m_use_cart_vectors(0),
-		m_use_cart_audio(0),
-		m_slots(*this, "cslot%u", 1U)
+	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
+
+protected:
+	neogeo_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_ym(*this, "ymsnd")
+		, m_sprgen(*this, "spritegen")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_memcard(*this, "memcard")
+		, m_soundlatch(*this, "soundlatch")
+		, m_soundlatch2(*this, "soundlatch2")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_sprites(*this, "sprites")
+		, m_region_fixed(*this, "fixed")
+		, m_region_fixedbios(*this, "fixedbios")
+		, m_region_mainbios(*this, "mainbios")
+		, m_region_audiobios(*this, "audiobios")
+		, m_region_audiocpu(*this, "audiocpu")
+		, m_bank_audio_main(*this, "audio_main")
+		, m_edge(*this, "edge")
+		, m_ctrl1(*this, "ctrl1")
+		, m_ctrl2(*this, "ctrl2")
+		, m_use_cart_vectors(0)
+		, m_use_cart_audio(0)
+		, m_slots(*this, "cslot%u", 1U)
+		, m_audionmi(*this, "audionmi")
 	{ }
 
 	DECLARE_READ16_MEMBER(memcard_r);
 	DECLARE_WRITE16_MEMBER(memcard_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
 	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
 	DECLARE_READ16_MEMBER(unmapped_r);
@@ -72,9 +76,6 @@ public:
 	DECLARE_WRITE16_MEMBER(paletteram_w);
 	DECLARE_READ16_MEMBER(video_register_r);
 	DECLARE_WRITE16_MEMBER(video_register_w);
-
-	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
 
 	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
@@ -98,10 +99,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(set_palette_bank);
 
 	void neogeo_base(machine_config &config);
+	void neogeo_stereo(machine_config &config);
+
+	void base_main_map(address_map &map);
 	void audio_io_map(address_map &map);
 	void audio_map(address_map &map);
 
-protected:
 	// device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -178,12 +181,8 @@ private:
 	void create_rgb_lookups();
 	void set_pens();
 
-	void audio_cpu_check_nmi();
-
 	// internal state
 	bool       m_recurse;
-	bool       m_audio_cpu_nmi_enabled;
-	bool       m_audio_cpu_nmi_pending;
 
 	emu_timer  *m_display_position_interrupt_timer;
 	emu_timer  *m_display_position_vblank_timer;
@@ -196,6 +195,8 @@ private:
 
 	uint16_t get_video_control();
 
+	required_device<input_merger_device> m_audionmi;
+
 	// color/palette related
 	std::vector<uint16_t> m_paletteram;
 	uint8_t        m_palette_lookup[32][4];
@@ -204,11 +205,11 @@ private:
 };
 
 
-class ngarcade_base_state : public neogeo_state
+class ngarcade_base_state : public neogeo_base_state
 {
 protected:
 	ngarcade_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: neogeo_state(mconfig, type, tag)
+		: neogeo_base_state(mconfig, type, tag)
 		, m_save_ram(*this, "saveram")
 		, m_upd4990a(*this, "upd4990a")
 		, m_dsw(*this, "DSW")
@@ -216,17 +217,20 @@ protected:
 	}
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	virtual DECLARE_WRITE8_MEMBER(io_control_w) override;
 	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);
 	DECLARE_WRITE16_MEMBER(save_ram_w);
-	DECLARE_READ16_MEMBER(in0_r);
-	DECLARE_READ16_MEMBER(in1_r);
+	DECLARE_READ16_MEMBER(in0_edge_r);
+	DECLARE_READ16_MEMBER(in0_edge_joy_r);
+	DECLARE_READ16_MEMBER(in1_edge_r);
+	DECLARE_READ16_MEMBER(in1_edge_joy_r);
 
 	void neogeo_arcade(machine_config &config);
+	void neogeo_mono(machine_config &config);
 
 	void neogeo_main_map(address_map &map);
-	void main_map_slot(address_map &map);
 
 private:
 	required_shared_ptr<uint16_t> m_save_ram;
@@ -237,14 +241,14 @@ private:
 };
 
 
-class aes_base_state : public neogeo_state
+class aes_base_state : public neogeo_base_state
 {
 public:
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
 protected:
 	aes_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: neogeo_state(mconfig, type, tag)
+		: neogeo_base_state(mconfig, type, tag)
 		, m_io_in2(*this, "IN2")
 	{
 	}
@@ -253,7 +257,7 @@ protected:
 
 	virtual void machine_start() override;
 
-	void aes_main_map(address_map &map);
+	void aes_base_main_map(address_map &map);
 
 private:
 	required_ioport m_io_in2;

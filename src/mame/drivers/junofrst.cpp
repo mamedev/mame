@@ -131,7 +131,7 @@ public:
 	DECLARE_MACHINE_START(junofrst);
 	DECLARE_MACHINE_RESET(junofrst);
 
-	INTERRUPT_GEN_MEMBER(_30hz_irq);
+	DECLARE_WRITE_LINE_MEMBER(_30hz_irq);
 	void junofrst(machine_config &config);
 	void audio_map(address_map &map);
 	void main_map(address_map &map);
@@ -385,12 +385,15 @@ MACHINE_RESET_MEMBER(junofrst_state,junofrst)
 	m_blitterdata[3] = 0;
 }
 
-INTERRUPT_GEN_MEMBER(junofrst_state::_30hz_irq)
+WRITE_LINE_MEMBER(junofrst_state::_30hz_irq)
 {
 	/* flip flops cause the interrupt to be signalled every other frame */
-	m_irq_toggle ^= 1;
-	if (m_irq_toggle && m_irq_enable)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state)
+	{
+		m_irq_toggle ^= 1;
+		if (m_irq_toggle && m_irq_enable)
+			m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 }
 
 MACHINE_CONFIG_START(junofrst_state::junofrst)
@@ -398,7 +401,6 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 1500000)         /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", junofrst_state,  _30hz_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,14318000/8)    /* 1.78975 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -432,6 +434,7 @@ MACHINE_CONFIG_START(junofrst_state::junofrst)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
 	MCFG_SCREEN_UPDATE_DRIVER(junofrst_state, screen_update_tutankhm)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(junofrst_state, _30hz_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

@@ -95,7 +95,7 @@ public:
 	void update_pixel(int vram, int x, int y);
 	void gfxdraw(int vram);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void musobana(machine_config &config);
 	void zokumahj(machine_config &config);

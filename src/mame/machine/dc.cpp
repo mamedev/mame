@@ -758,11 +758,3 @@ TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
 {
 	m_powervr2->pvr_scanline_timer(param);
 }
-
-// crude cheat pending SH4 DRC, especially useful for inp playback
-INPUT_CHANGED_MEMBER(dc_state::mastercpu_cheat_r)
-{
-	const u32 CPU_CLOCK = (200000000);
-	const u32 timing_value[4] = { CPU_CLOCK, CPU_CLOCK/2, CPU_CLOCK/4, CPU_CLOCK/16 };
-	m_maincpu->set_unscaled_clock(timing_value[newval]);
-}

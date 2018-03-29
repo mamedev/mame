@@ -52,9 +52,9 @@ WRITE8_MEMBER(scotrsht_state::ctrl_w)
 	flip_screen_set(data & 0x08);
 }
 
-INTERRUPT_GEN_MEMBER(scotrsht_state::interrupt)
+WRITE_LINE_MEMBER(scotrsht_state::vblank_irq)
 {
-	if (m_irq_enable)
+	if (state && m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -192,7 +192,6 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(scotrsht_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", scotrsht_state, interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 18432000/6)        /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(scotrsht_sound_map)
@@ -208,6 +207,7 @@ MACHINE_CONFIG_START(scotrsht_state::scotrsht)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(scotrsht_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(scotrsht_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", scotrsht)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)

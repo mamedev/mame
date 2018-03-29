@@ -682,7 +682,6 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)
 	MCFG_CPU_IO_MAP(fortecar_ports)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortecar_state, nmi_line_pulse)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* guess */
@@ -718,6 +717,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 1.5 MHz, measured */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

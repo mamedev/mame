@@ -394,16 +394,13 @@ MACHINE_CONFIG_START(twins_state::twins)
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(twins_map)
 	MCFG_CPU_IO_MAP(twins_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_24C02_ADD("i2cmem")
 
@@ -444,16 +441,13 @@ MACHINE_CONFIG_START(twins_state::twinsa)
 	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(twins_map)
 	MCFG_CPU_IO_MAP(twinsa_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_twins)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -574,16 +568,13 @@ MACHINE_CONFIG_START(twins_state::spider)
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(twins_map)
 	MCFG_CPU_IO_MAP(spider_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
 	MCFG_SCREEN_UPDATE_DRIVER(twins_state, screen_update_spider)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 

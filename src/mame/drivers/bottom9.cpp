@@ -25,10 +25,10 @@
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_interrupt)
+WRITE_LINE_MEMBER(bottom9_state::vblank_irq)
 {
-	if (m_k052109->is_irq_enabled())
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_k052109->is_irq_enabled())
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(bottom9_state::k052109_051960_r)
@@ -305,7 +305,6 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // 63C09E
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bottom9_state,  bottom9_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -321,6 +320,7 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(bottom9_state, screen_update_bottom9)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bottom9_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_ENABLE_SHADOWS()

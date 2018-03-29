@@ -358,7 +358,6 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
 	MCFG_CPU_PROGRAM_MAP(koikoi_map)
 	MCFG_CPU_IO_MAP(koikoi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", koikoi_state,  nmi_line_pulse)
 
 
 	/* video hardware */
@@ -369,6 +368,7 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(koikoi_state, screen_update_koikoi)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koikoi)
 	MCFG_PALETTE_ADD("palette", 8*32)
