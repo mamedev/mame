@@ -289,10 +289,10 @@ static GFXDECODE_START( roadf )
 	GFXDECODE_ENTRY( "gfx2", 0, roadf_charlayout,    16*16, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
+WRITE_LINE_MEMBER(hyperspt_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(hyperspt_state::hyperspt)
@@ -300,7 +300,6 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hyperspt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hyperspt_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hyperspt_sound_map)
@@ -326,6 +325,7 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hyperspt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hyperspt_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperspt)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)

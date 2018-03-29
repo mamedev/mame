@@ -68,10 +68,13 @@ WRITE8_MEMBER(xxmissio_state::status_s_w)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(xxmissio_state::interrupt_m)
+WRITE_LINE_MEMBER(xxmissio_state::interrupt_m)
 {
-	m_status &= ~0x20;
-	m_maincpu->set_input_line(0, HOLD_LINE);
+	if (state)
+	{
+		m_status &= ~0x20;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 INTERRUPT_GEN_MEMBER(xxmissio_state::interrupt_s)
@@ -267,7 +270,6 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4) /* 3.0MHz */
 	MCFG_CPU_PROGRAM_MAP(map1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xxmissio_state,  interrupt_m)
 
 	MCFG_CPU_ADD("sub", Z80,12000000/4) /* 3.0MHz */
 	MCFG_CPU_PROGRAM_MAP(map2)
@@ -283,6 +285,7 @@ MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xxmissio_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xxmissio_state, interrupt_m))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxmissio)
 	MCFG_PALETTE_ADD("palette", 768)

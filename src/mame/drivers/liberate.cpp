@@ -686,26 +686,30 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(liberate_state::deco16_interrupt)
+WRITE_LINE_MEMBER(liberate_state::deco16_interrupt)
 {
-	int p = ~ioport("IN3")->read();
-	if ((p & 0x43) && !m_latch)
+	if (state)
 	{
-		device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
-		m_latch = 1;
-	}
-	else
-	{
-		if (!(p & 0x43))
-			m_latch = 0;
+		int p = ~ioport("IN3")->read();
+		if ((p & 0x43) && !m_latch)
+		{
+			m_maincpu->set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
+			m_latch = 1;
+		}
+		else
+		{
+			if (!(p & 0x43))
+				m_latch = 0;
+		}
 	}
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
+WRITE_LINE_MEMBER(liberate_state::prosport_interrupt)
 {
 	/* ??? */
-	device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
+	if (state)
+		m_maincpu->set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
@@ -743,7 +747,6 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
 	MCFG_CPU_PROGRAM_MAP(liberate_map)
 	MCFG_CPU_IO_MAP(deco16_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 
 	MCFG_CPU_ADD("audiocpu",DECO_222, 1500000) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
 	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
@@ -762,6 +765,7 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(liberate_state, deco16_interrupt))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", liberate)
 	MCFG_PALETTE_ADD("palette", 33)
@@ -793,7 +797,6 @@ MACHINE_CONFIG_START(liberate_state::liberatb)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(liberatb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::boomrang)
@@ -834,7 +837,6 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_CPU_ADD("maincpu", DECO16, 2000000)
 	MCFG_CPU_PROGRAM_MAP(prosport_map)
 	MCFG_CPU_IO_MAP(deco16_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000/2) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
 	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
@@ -853,6 +855,7 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(liberate_state, deco16_interrupt))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prosport)
 	MCFG_PALETTE_ADD("palette", 256)

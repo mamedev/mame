@@ -41,7 +41,7 @@ public:
 	DECLARE_MACHINE_START(tutankhm);
 	DECLARE_MACHINE_RESET(tutankhm);
 	uint32_t screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(tutankhm_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void tutankhm(machine_config &config);
 	void main_map(address_map &map);
 };

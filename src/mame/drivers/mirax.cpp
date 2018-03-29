@@ -158,7 +158,7 @@ public:
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t draw_flag);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void mirax(machine_config &config);
 	void mirax_main_map(address_map &map);
 	void mirax_sound_map(address_map &map);
@@ -472,16 +472,15 @@ static GFXDECODE_START( mirax )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(mirax_state::vblank_irq)
+WRITE_LINE_MEMBER(mirax_state::vblank_irq)
 {
-	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
 	MCFG_CPU_PROGRAM_MAP(mirax_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mirax_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_CPU_PROGRAM_MAP(mirax_sound_map)
@@ -504,6 +503,7 @@ MACHINE_CONFIG_START(mirax_state::mirax)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mirax_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mirax_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(mirax_state, mirax)
