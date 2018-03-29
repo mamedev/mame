@@ -297,7 +297,7 @@ void esrip_device::device_start()
 	save_item(NAME(m_ipt_ram));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 }
 
@@ -1953,7 +1953,7 @@ void esrip_device::execute_run()
 			m_ipt_cnt = (m_ipt_cnt + 1) & 0x1fff;
 
 		if (calldebugger)
-			debugger_instruction_hook(this, RIP_PC);
+			debugger_instruction_hook(RIP_PC);
 
 		m_pc = next_pc;
 		m_rip_pc = (m_pc | ((m_status_out & 1) << 8));

@@ -180,6 +180,8 @@ READ8_MEMBER(fastfred_state::imago_sprites_offset_r)
 WRITE_LINE_MEMBER(fastfred_state::nmi_mask_w)
 {
 	m_nmi_mask = state;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
@@ -618,10 +620,10 @@ static GFXDECODE_START( imago )
 	GFXDECODE_ENTRY( "gfx4", 0,      imago_char_1bpp, 0x140,  1 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(fastfred_state::vblank_irq)
+WRITE_LINE_MEMBER(fastfred_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
@@ -635,7 +637,6 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'432'000)/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(fastfred_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fastfred_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'432'000)/8)  /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -660,6 +661,7 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_fastfred)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fastfred_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastfred)
 

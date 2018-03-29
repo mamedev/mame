@@ -1143,7 +1143,7 @@ void cop400_cpu_device::device_start()
 	state_add(COP400_SKIP, "SKIP", m_skip).mask(1);
 #endif
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_q = 0;
 	m_sa = 0;
@@ -1218,7 +1218,7 @@ void cop400_cpu_device::execute_run()
 		{
 			// debugger hook
 			m_prevpc = PC;
-			debugger_instruction_hook(this, PC);
+			debugger_instruction_hook(PC);
 		}
 
 		// halt logic

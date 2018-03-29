@@ -440,7 +440,7 @@ void alpha8201_cpu_device::device_start()
 	save_item(NAME(m_savec));
 	save_item(NAME(m_savez));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -665,7 +665,7 @@ osd_printf_debug("alpha8201 START ENTRY=%02X PC=%03X\n",pcptr,m_pc.w.l);
 
 		/* run */
 		m_PREVPC = m_pc.w.l;
-		debugger_instruction_hook(this, m_pc.w.l);
+		debugger_instruction_hook(m_pc.w.l);
 		opcode =M_RDOP(m_pc.w.l);
 #if TRACE_PC
 osd_printf_debug("alpha8201:  PC = %03x,  opcode = %02x\n", m_pc.w.l, opcode);

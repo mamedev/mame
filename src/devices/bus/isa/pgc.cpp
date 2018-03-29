@@ -155,7 +155,6 @@ MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(pgc_map)
 #if 0
-	MCFG_CPU_VBLANK_INT_DRIVER(PGC_SCREEN_NAME, isa8_pgc_device, vblank_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
 #endif
 
@@ -169,6 +168,9 @@ MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 		PGC_TOTAL_VERT, PGC_VERT_START, PGC_VERT_START+PGC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(isa8_pgc_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+#if 0
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(isa8_pgc_device, vblank_irq))
+#endif
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgc)
 	MCFG_PALETTE_ADD( "palette", 256 )
@@ -262,10 +264,13 @@ void isa8_pgc_device::device_reset()
 
 //
 
-INTERRUPT_GEN_MEMBER(isa8_pgc_device::vblank_irq)
+WRITE_LINE_MEMBER(isa8_pgc_device::vblank_irq)
 {
-	LOGCMD("vblank_irq\n");
-	m_cpu->set_input_line(0, ASSERT_LINE);
+	if (state)
+	{
+		LOGCMD("vblank_irq\n");
+		m_cpu->set_input_line(0, ASSERT_LINE);
+	}
 }
 
 IRQ_CALLBACK_MEMBER(isa8_pgc_device::irq_callback)

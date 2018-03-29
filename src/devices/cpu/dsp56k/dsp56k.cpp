@@ -346,7 +346,7 @@ void dsp56k_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_dsp56k_core.PCU.sp).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_dsp56k_core.PCU.sr).formatstr("%14s").noshow();
 
-	m_icountptr = &m_dsp56k_core.icount;
+	set_icountptr(m_dsp56k_core.icount);
 }
 
 
@@ -462,7 +462,8 @@ static size_t execute_one_new(dsp56k_core* cpustate)
 {
 	// For MAME
 	cpustate->ppc = PC;
-	debugger_instruction_hook(cpustate->device, PC);
+	if (cpustate->device->machine().debug_flags & DEBUG_FLAG_CALL_HOOK) // FIXME: if this was a member, the helper would work
+		cpustate->device->debug()->instruction_hook(PC);
 
 	cpustate->op = ROPCODE(PC);
 	uint16_t w0 = ROPCODE(PC);

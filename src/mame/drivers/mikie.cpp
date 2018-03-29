@@ -252,10 +252,10 @@ void mikie_state::machine_reset()
 	m_palettebank = 0;
 }
 
-INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
+WRITE_LINE_MEMBER(mikie_state::vblank_irq)
 {
-	if (m_irq_mask)
-		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(mikie_state::mikie)
@@ -263,7 +263,6 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, OSC/12) // 9A (surface scratched)
 	MCFG_CPU_PROGRAM_MAP(mikie_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mikie_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, CLK) // 4E (surface scratched)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -286,6 +285,7 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mikie_state, screen_update_mikie)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mikie_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikie)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)

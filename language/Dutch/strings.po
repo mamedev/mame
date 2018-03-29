@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-03-25 02:01+1100\n"
-"PO-Revision-Date: 2018-01-29 21:03+0100\n"
+"PO-Revision-Date: 2018-03-27 03:16+0200\n"
 "Last-Translator: Jos van Mourik\n"
 "Language-Team: MAME Language Team\n"
 "Language: nl\n"
@@ -2681,7 +2681,7 @@ msgstr "Sla huidige -- # op"
 #: plugins/cheatfind/init.lua:536
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "%d totale overeenkomsten gevonden"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Compare"

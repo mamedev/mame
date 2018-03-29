@@ -154,7 +154,7 @@ void unsp_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void unsp_device::state_export(const device_state_entry &entry)
@@ -238,7 +238,7 @@ void unsp_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, UNSP_LPC);
+		debugger_instruction_hook(UNSP_LPC);
 		op = READ16(UNSP_LPC);
 
 		UNSP_REG(PC)++;

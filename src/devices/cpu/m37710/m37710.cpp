@@ -1074,7 +1074,7 @@ void m37710_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_pc ).callimport().callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_p ).formatstr("%8s").noshow();
 
-	m_icountptr = &m_ICount;
+	set_icountptr(m_ICount);
 }
 
 

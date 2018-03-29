@@ -103,7 +103,7 @@ private:
 	DECLARE_PALETTE_INIT(playch10);
 	DECLARE_MACHINE_START(playch10_hboard);
 	DECLARE_VIDEO_START(playch10_hboard);
-	INTERRUPT_GEN_MEMBER(playch10_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void pc10_set_videorom_bank( int first, int count, int bank, int size );
 	void set_videoram_bank( int first, int count, int bank, int size );

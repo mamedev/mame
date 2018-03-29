@@ -70,6 +70,7 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 void circusc_state::machine_start()
 {
 	save_item(NAME(m_sn_latch));
+	save_item(NAME(m_irq_mask));
 }
 
 void circusc_state::machine_reset()
@@ -337,10 +338,10 @@ static DISCRETE_SOUND_START( circusc )
 
 DISCRETE_SOUND_END
 
-INTERRUPT_GEN_MEMBER(circusc_state::vblank_irq)
+WRITE_LINE_MEMBER(circusc_state::vblank_irq)
 {
-	if (m_irq_mask)
-		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(circusc_state::circusc)
@@ -348,7 +349,6 @@ MACHINE_CONFIG_START(circusc_state::circusc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 2048000)        /* 2 MHz? */
 	MCFG_CPU_PROGRAM_MAP(circusc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", circusc_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2C
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(circusc_state, flipscreen_w)) // FLIP
@@ -373,6 +373,7 @@ MACHINE_CONFIG_START(circusc_state::circusc)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(circusc_state, screen_update_circusc)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(circusc_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", circusc)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)

@@ -1725,7 +1725,7 @@ void tms32025_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_STACK[7]).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_STR0).formatstr("%33s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1952,7 +1952,7 @@ void tms32025_device::execute_run()
 	while (m_idle && m_icount > 0)
 		process_timer(m_icount);
 
-	if (m_icount <= 0) debugger_instruction_hook(this, m_PC);
+	if (m_icount <= 0) debugger_instruction_hook(m_PC);
 
 
 	while (m_icount > 0)
@@ -1965,7 +1965,7 @@ void tms32025_device::execute_run()
 
 		m_PREVPC = m_PC;
 
-		debugger_instruction_hook(this, m_PC);
+		debugger_instruction_hook(m_PC);
 
 		m_opcode.d = m_direct->read_word(m_PC);
 		m_PC++;
@@ -1999,7 +1999,7 @@ void tms32025_device::execute_run()
 			\****************************************************/
 			m_PREVPC = m_PC;
 
-			debugger_instruction_hook(this, m_PC);
+			debugger_instruction_hook(m_PC);
 
 			m_opcode.d = m_direct->read_word(m_PC);
 			m_PC++;

@@ -230,7 +230,7 @@ void i80186_cpu_device::execute_run()
 			}
 		}
 
-		debugger_instruction_hook( this, update_pc() );
+		debugger_instruction_hook( update_pc() );
 
 		uint8_t op = fetch_op();
 

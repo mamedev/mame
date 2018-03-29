@@ -309,7 +309,7 @@ WRITE32_MEMBER( psxcpu_device::biu_w )
 void psxcpu_device::stop()
 {
 	machine().debug_break();
-	debugger_instruction_hook( this,  m_pc );
+	debugger_instruction_hook( m_pc );
 }
 
 uint32_t psxcpu_device::cache_readword( uint32_t offset )
@@ -1964,7 +1964,7 @@ void psxcpu_device::device_start()
 	state_add( PSXCPU_CP2CR31, "flag", m_gte.m_cp2cr[ 31 ].d );
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_gpu_read_handler.resolve_safe( 0 );
 	m_gpu_write_handler.resolve_safe();
@@ -2316,7 +2316,7 @@ void psxcpu_device::execute_run()
 	do
 	{
 		if( LOG_BIOSCALL ) log_bioscall();
-		debugger_instruction_hook( this,  m_pc );
+		debugger_instruction_hook( m_pc );
 
 		int breakpoint = program_counter_breakpoint();
 

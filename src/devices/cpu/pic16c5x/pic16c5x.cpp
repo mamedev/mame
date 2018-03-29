@@ -945,7 +945,7 @@ void pic16c5x_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_PREVPC).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_OPTION).formatstr("%13s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1167,7 +1167,7 @@ void pic16c5x_device::execute_run()
 		{
 			m_count_pending = false;
 			m_inst_cycles = 1;
-			debugger_instruction_hook(this, m_PC);
+			debugger_instruction_hook(m_PC);
 			if (WDTE) {
 				pic16c5x_update_watchdog(1);
 			}
@@ -1181,7 +1181,7 @@ void pic16c5x_device::execute_run()
 
 			m_PREVPC = m_PC;
 
-			debugger_instruction_hook(this, m_PC);
+			debugger_instruction_hook(m_PC);
 
 			m_opcode.d = M_RDOP(m_PC);
 			m_PC++;

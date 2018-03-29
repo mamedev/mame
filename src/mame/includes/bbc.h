@@ -165,7 +165,6 @@ public:
 	DECLARE_MACHINE_START(cfa3000);
 
 	DECLARE_PALETTE_INIT(bbc);
-	INTERRUPT_GEN_MEMBER(bbcb_vsync);
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);

@@ -12,10 +12,10 @@
 #include "includes/toaplan1.h"
 
 
-INTERRUPT_GEN_MEMBER(toaplan1_state::toaplan1_interrupt)
+void toaplan1_state::toaplan1_interrupt()
 {
 	if (m_intenable)
-		device.execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 WRITE16_MEMBER(toaplan1_state::toaplan1_intenable_w)

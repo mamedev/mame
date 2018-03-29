@@ -14,7 +14,10 @@
 
 #include <stdio.h>
 #include <ctype.h>
+
 #include <algorithm>
+#include <functional>
+#include <set>
 
 
 namespace {
@@ -72,6 +75,10 @@ ram_device::extra_option_vector calculate_extra_options(const char *extra_option
 	bool done(false);
 	for (std::string::size_type start = 0, end = options.find_first_of(','); !done; start = end + 1, end = options.find_first_of(',', start))
 	{
+		// ignore spaces
+		while ((end > start) && (options.length() > start) && ((' ' == options[start]) || ('\t' == options[start])))
+			++start;
+
 		// parse the option
 		std::string ram_option_string(options.substr(start, (end == -1) ? -1 : end - start));
 		u32 const ram_option = parse_string(ram_option_string.c_str());
@@ -176,13 +183,25 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("Invalid default RAM option: %s\n", m_default_size);
 
 	// calculate any extra options
-	std::string bad_option;
 	if (m_extra_options_string)
-		calculate_extra_options(m_extra_options_string, &bad_option);
+	{
+		std::string bad_option;
+		extra_option_vector const extras(calculate_extra_options(m_extra_options_string, &bad_option));
 
-	// report any errors
-	if (!bad_option.empty())
-		osd_printf_error("Invalid RAM option: %s\n", bad_option.c_str());
+		// report any errors
+		if (!bad_option.empty())
+			osd_printf_error("Invalid RAM option: %s\n", bad_option.c_str());
+
+		// report duplicates
+		using extra_option_ref_set = std::set<std::reference_wrapper<extra_option const>, bool (*)(extra_option const &, extra_option const &)>;
+		extra_option_ref_set sorted([] (extra_option const &a, extra_option const &b) { return a.second < b.second; });
+		for (extra_option const &opt : extras)
+		{
+			auto const ins(sorted.emplace(opt));
+			if (!ins.second)
+				osd_printf_error("Duplicate RAM options: %s == %s (%u)\n", ins.first->get().first.c_str(), opt.first.c_str(), opt.second);
+		}
+	}
 }
 
 
