@@ -72,6 +72,10 @@ void neopcb_state::neogeo_postload()
 
 MACHINE_CONFIG_START(neopcb_state::neopcb)
 	neogeo_arcade(config);
+	neogeo_mono(config);
+
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", true)
+
 	MCFG_CMC_PROT_ADD("cmc50")
 	MCFG_PCM2_PROT_ADD("pcm2")
 	MCFG_PVC_PROT_ADD("pvc")
