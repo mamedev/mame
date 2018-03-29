@@ -592,7 +592,7 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_decoded_access_control));
 	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	state_add( ARM7_PC,    "PC", m_pc).callexport().formatstr("%08X");
 	state_add(STATE_GENPC, "GENPC", m_pc).callexport().noshow();
@@ -804,7 +804,7 @@ void arm7_cpu_device::execute_run()
 
 		update_insn_prefetch(pc);
 
-		debugger_instruction_hook(this, pc);
+		debugger_instruction_hook(pc);
 
 		/* handle Thumb instructions if active */
 		if (T_IS_SET(m_r[eCPSR]))

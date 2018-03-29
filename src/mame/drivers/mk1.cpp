@@ -52,20 +52,24 @@ class mk1_state : public driver_device
 {
 public:
 	mk1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	DECLARE_READ8_MEMBER(mk1_f8_r);
 	DECLARE_WRITE8_MEMBER(mk1_f8_w);
-	uint8_t m_f8[2];
-	uint8_t m_led[4];
-	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
 	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
-	required_device<cpu_device> m_maincpu;
 	void mk1(machine_config &config);
 	void mk1_io(address_map &map);
 	void mk1_mem(address_map &map);
+private:
+	uint8_t m_f8[2];
+	uint8_t m_led[4];
+	virtual void machine_start() override;
+	required_device<cpu_device> m_maincpu;
+	output_finder<4> m_digits;
 };
 
 
@@ -162,7 +166,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 {
 	for (int i = 0; i < 4; i++)
 	{
-		output().set_digit_value(i, m_led[i] >> 1);
+		m_digits[i] = m_led[i] >> 1;
 		output().set_led_value(i, m_led[i] & 0x01);
 		m_led[i] = 0;
 	}
@@ -171,6 +175,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
 
 void mk1_state::machine_start()
 {
+	m_digits.resolve();
 }
 
 

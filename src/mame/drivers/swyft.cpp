@@ -367,15 +367,6 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 
-	/* gate array 2 has a 16-bit counter inside which counts at 10mhz and
-	   rolls over at FFFF->0000; on roll-over (or likely at FFFF terminal count)
-	   it triggers the KTOBF output. It does this every 6.5535ms, which causes
-	   a 74LS74 d-latch at IC100 to invert the state of the DUART IP2 line;
-	   this causes the DUART to fire an interrupt, which makes the 68000 read
-	   the keyboard.
-	   The watchdog counter and the 6ms counter are both incremented
-	   every time the KTOBF pulses.
-	 */
 	uint8_t m_keyboard_line;
 	uint8_t m_floppy_control;
 

@@ -19,6 +19,7 @@
 
 #include <ctype.h>
 #include <sstream>
+#include <stdexcept>
 #include <type_traits>
 
 
@@ -53,11 +54,13 @@
 #include "svg.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-const int LAYOUT_VERSION = 2;
+constexpr int LAYOUT_VERSION = 2;
 
 enum
 {
@@ -65,14 +68,6 @@ enum
 	LINE_CAP_START = 1,
 	LINE_CAP_END = 2
 };
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-render_screen_list render_target::s_empty_screen_list;
 
 
 
@@ -128,6 +123,15 @@ inline void render_bounds_transform(render_bounds &bounds, render_bounds const &
 
 
 //**************************************************************************
+//  ERROR CLASSES
+//**************************************************************************
+
+class layout_syntax_error : public std::invalid_argument { using std::invalid_argument::invalid_argument; };
+class layout_reference_error : public std::out_of_range { using std::out_of_range::out_of_range; };
+
+
+
+//**************************************************************************
 //  SHARED PARSING HELPERS
 //**************************************************************************
 
@@ -136,7 +140,7 @@ inline void render_bounds_transform(render_bounds &bounds, render_bounds const &
 //  a variable in an XML attribute
 //-------------------------------------------------
 
-static int get_variable_value(running_machine &machine, const char *string, char **outputptr)
+int get_variable_value(running_machine &machine, const char *string, char **outputptr)
 {
 	char temp[100];
 
@@ -199,7 +203,7 @@ static int get_variable_value(running_machine &machine, const char *string, char
 //  substitution
 //-------------------------------------------------
 
-static const char *xml_get_attribute_string_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, const char *defvalue)
+const char *xml_get_attribute_string_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, const char *defvalue)
 {
 	const char *str = node.get_attribute_string(attribute, nullptr);
 	static char buffer[1000];
@@ -236,7 +240,7 @@ static const char *xml_get_attribute_string_with_subst(running_machine &machine,
 //  substitution
 //-------------------------------------------------
 
-static int xml_get_attribute_int_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, int defvalue)
+int xml_get_attribute_int_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, int defvalue)
 {
 	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, nullptr);
 	int value;
@@ -260,7 +264,7 @@ static int xml_get_attribute_int_with_subst(running_machine &machine, util::xml:
 //  substitution
 //-------------------------------------------------
 
-static float xml_get_attribute_float_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, float defvalue)
+float xml_get_attribute_float_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, float defvalue)
 {
 	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, nullptr);
 	float value;
@@ -303,12 +307,13 @@ void parse_bounds(running_machine &machine, util::xml::data_node const *boundsno
 		bounds.y1 = bounds.y0 + xml_get_attribute_float_with_subst(machine, *boundsnode, "height", 1.0f);
 	}
 	else
-		throw emu_fatalerror("Illegal bounds value in XML");
+	{
+		throw layout_syntax_error("bounds element requires either left or x attribute");
+	}
 
 	// check for errors
-	if (bounds.x0 > bounds.x1 || bounds.y0 > bounds.y1)
-		throw emu_fatalerror("Illegal bounds value in XML: (%f-%f)-(%f-%f)",
-				(double) bounds.x0, (double) bounds.x1, (double) bounds.y0, (double) bounds.y1);
+	if ((bounds.x0 > bounds.x1) || (bounds.y0 > bounds.y1))
+		throw layout_syntax_error(util::string_format("illegal bounds (%f-%f)-(%f-%f)", bounds.x0, bounds.x1, bounds.y0, bounds.y1));
 }
 
 
@@ -332,10 +337,9 @@ void parse_color(running_machine &machine, util::xml::data_node const *colornode
 	color.a = xml_get_attribute_float_with_subst(machine, *colornode, "alpha", 1.0);
 
 	// check for errors
-	if (color.r < 0.0f || color.r > 1.0f || color.g < 0.0f || color.g > 1.0f ||
-		color.b < 0.0f || color.b > 1.0f || color.a < 0.0f || color.a > 1.0f)
-		throw emu_fatalerror("Illegal ARGB color value in XML: %f,%f,%f,%f",
-				(double) color.r, (double) color.g, (double) color.b, (double) color.a);
+	if ((color.r < 0.0f) || (color.r > 1.0f) || (color.g < 0.0f) || (color.g > 1.0f) ||
+		(color.b < 0.0f) || (color.b > 1.0f) || (color.a < 0.0f) || (color.a > 1.0f))
+		throw layout_syntax_error(util::string_format("illegal RGBA color %f,%f,%f,%f", color.r, color.g, color.b, color.a));
 }
 
 
@@ -344,7 +348,7 @@ void parse_color(running_machine &machine, util::xml::data_node const *colornode
 //  node
 //-------------------------------------------------
 
-static void parse_orientation(running_machine &machine, util::xml::data_node const *orientnode, int &orientation)
+void parse_orientation(running_machine &machine, util::xml::data_node const *orientnode, int &orientation)
 {
 	// skip if nothing
 	if (orientnode == nullptr)
@@ -361,7 +365,7 @@ static void parse_orientation(running_machine &machine, util::xml::data_node con
 		case 90:    orientation = ROT90;    break;
 		case 180:   orientation = ROT180;   break;
 		case 270:   orientation = ROT270;   break;
-		default:    throw emu_fatalerror("Invalid rotation in XML orientation node: %d", rotate);
+		default:    throw layout_syntax_error(util::string_format("invalid rotate attribute %d", rotate));
 	}
 	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, *orientnode, "swapxy", "no")) == 0)
 		orientation ^= ORIENTATION_SWAP_XY;
@@ -370,6 +374,16 @@ static void parse_orientation(running_machine &machine, util::xml::data_node con
 	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, *orientnode, "flipy", "no")) == 0)
 		orientation ^= ORIENTATION_FLIP_Y;
 }
+
+} // anonymous namespace
+
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+render_screen_list render_target::s_empty_screen_list;
 
 
 
@@ -414,7 +428,7 @@ layout_element::layout_element(running_machine &machine, util::xml::data_node co
 	{
 		make_component_map::const_iterator const make_func(s_make_component.find(compnode->get_name()));
 		if (make_func == s_make_component.end())
-			throw emu_fatalerror("Unknown element component: %s", compnode->get_name());
+			throw layout_syntax_error(util::string_format("unknown element component %s", compnode->get_name()));
 
 		// insert the new component into the list
 		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(machine, *compnode, dirname)));
@@ -534,7 +548,7 @@ void layout_group::resolve_bounds(group_map &groupmap, std::vector<layout_group 
 		for (layout_group const *const group : seen)
 			path << ' ' << group->m_groupnode.get_name();
 		path << ' ' << m_groupnode.get_name();
-		throw emu_fatalerror("Recursively nested layout groups:%s", path.str().c_str());
+		throw layout_syntax_error(util::string_format("recursively nested groups %s", path.str()));
 	}
 
 	seen.push_back(this);
@@ -566,11 +580,11 @@ void layout_group::resolve_bounds(group_map &groupmap, std::vector<layout_group 
 				{
 					char const *ref(xml_get_attribute_string_with_subst(m_machine, *itemnode, "ref", nullptr));
 					if (!ref)
-						throw emu_fatalerror("Nested layout group must have a ref!");
+						throw layout_syntax_error("nested group must have ref attribute");
 
 					group_map::iterator const found(groupmap.find(ref));
 					if (groupmap.end() == found)
-						throw emu_fatalerror("Unable to find layout group %s", ref);
+						throw layout_syntax_error(util::string_format("unable to find group %s", ref));
 
 					found->second.resolve_bounds(groupmap, seen);
 					util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"));
@@ -587,7 +601,7 @@ void layout_group::resolve_bounds(group_map &groupmap, std::vector<layout_group 
 				}
 				else if (strcmp(itemnode->get_name(), "bounds"))
 				{
-					throw emu_fatalerror("Unknown group element: %s", itemnode->get_name());
+					throw layout_syntax_error(util::string_format("unknown group element %s", itemnode->get_name()));
 				}
 			}
 		}
@@ -2583,11 +2597,11 @@ void layout_view::add_items(
 		{
 			char const *ref(xml_get_attribute_string_with_subst(machine, *itemnode, "ref", nullptr));
 			if (!ref)
-				throw emu_fatalerror("Nested layout group must have a ref!");
+				throw layout_syntax_error("nested group must have ref attribute");
 
 			group_map::const_iterator const found(groupmap.find(ref));
 			if (groupmap.end() == found)
-				throw emu_fatalerror("Unable to find layout group %s", ref);
+				throw layout_syntax_error(util::string_format("unable to find group %s", ref));
 
 			render_bounds grouptrans(transform);
 			util::xml::data_node const *const itemboundsnode(itemnode->get_child("bounds"));
@@ -2602,7 +2616,7 @@ void layout_view::add_items(
 		}
 		else if (strcmp(itemnode->get_name(), "bounds"))
 		{
-			throw emu_fatalerror("Unknown view item: %s", itemnode->get_name());
+			throw layout_syntax_error(util::string_format("unknown view item %s", itemnode->get_name()));
 		}
 	}
 }
@@ -2640,7 +2654,7 @@ layout_view::item::item(
 		if (elemmap.end() != found)
 			m_element = &found->second;
 		else
-			throw emu_fatalerror("Unable to find layout element %s", name);
+			throw layout_syntax_error(util::string_format("unable to find element %s", name));
 	}
 
 	// outputs need resolving
@@ -2663,12 +2677,12 @@ layout_view::item::item(
 	if (strcmp(itemnode.get_name(), "screen") == 0)
 	{
 		if (m_screen == nullptr)
-			throw emu_fatalerror("Layout references invalid screen index %d", index);
+			throw layout_reference_error(util::string_format("invalid screen index %d", index));
 	}
 	else
 	{
 		if (m_element == nullptr)
-			throw emu_fatalerror("Layout item of type %s require an element tag", itemnode.get_name());
+			throw layout_syntax_error(util::string_format("item of type %s require an element tag", itemnode.get_name()));
 	}
 
 	if (has_input())
@@ -2753,54 +2767,62 @@ layout_file::layout_file(running_machine &machine, util::xml::data_node const &r
 	: m_elemmap()
 	, m_viewlist()
 {
-	// find the layout node
-	util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
-	if (mamelayoutnode == nullptr)
-		throw emu_fatalerror("Invalid XML file: missing mamelayout node");
-
-	// validate the config data version
-	int const version = mamelayoutnode->get_attribute_int("version", 0);
-	if (version != LAYOUT_VERSION)
-		throw emu_fatalerror("Invalid layout XML file: unsupported version");
-
-	// parse all the elements
-	for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("element"); elemnode; elemnode = elemnode->get_next_sibling("element"))
+	try
 	{
-		char const *const name(xml_get_attribute_string_with_subst(machine, *elemnode, "name", nullptr));
-		if (!name)
-			throw emu_fatalerror("All layout elements must have a name!");
-		if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(machine, *elemnode, dirname)).second)
-			throw emu_fatalerror("Duplicate layout element name: %s", name);
-	}
+		// find the layout node
+		util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
+		if (!mamelayoutnode)
+			throw layout_syntax_error("missing mamelayout node");
 
-	// parse all the groups
-	group_map groupmap;
-	for (util::xml::data_node const *groupnode = mamelayoutnode->get_child("group"); groupnode; groupnode = groupnode->get_next_sibling("group"))
-	{
-		char const *const name(xml_get_attribute_string_with_subst(machine, *groupnode, "name", nullptr));
-		if (!name)
-			throw emu_fatalerror("All layout groups must have a name!");
-		if (!groupmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(machine, *groupnode)).second)
-			throw emu_fatalerror("Duplicate layout group name: %s", name);
-	}
-	for (group_map::value_type &group : groupmap)
-		group.second.resolve_bounds(groupmap);
+		// validate the config data version
+		int const version = mamelayoutnode->get_attribute_int("version", 0);
+		if (version != LAYOUT_VERSION)
+			throw layout_syntax_error(util::string_format("unsupported version %d", version));
 
-	// parse all the views
-	for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
-	{
-		// the trouble with allowing emu_fatalerror to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
-		// e.g. intlc44 and intlc440 have a terminal on the tty port by default and have a view with the front panel above the terminal screen
-		// however, they have a second view with just the front panel which is very useful if you're using e.g. -tty null_modem with a socket
-		// if the emu_fatalerror is allowed to propagate, the entire layout is dropped so you can't select the useful view
-		try
+		// parse all the elements
+		for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("element"); elemnode; elemnode = elemnode->get_next_sibling("element"))
 		{
-			m_viewlist.emplace_back(machine, *viewnode, m_elemmap, groupmap);
+			char const *const name(xml_get_attribute_string_with_subst(machine, *elemnode, "name", nullptr));
+			if (!name)
+				throw layout_syntax_error("element lacks name attribute");
+			if (!m_elemmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(machine, *elemnode, dirname)).second)
+				throw layout_syntax_error(util::string_format("duplicate element name %s", name));
 		}
-		catch (emu_fatalerror const &)
+
+		// parse all the groups
+		group_map groupmap;
+		for (util::xml::data_node const *groupnode = mamelayoutnode->get_child("group"); groupnode; groupnode = groupnode->get_next_sibling("group"))
 		{
-			// the exception will print its own message before we get here
+			char const *const name(xml_get_attribute_string_with_subst(machine, *groupnode, "name", nullptr));
+			if (!name)
+				throw layout_syntax_error("group lacks name attribute");
+			if (!groupmap.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(machine, *groupnode)).second)
+				throw layout_syntax_error(util::string_format("duplicate group name %s", name));
 		}
+		for (group_map::value_type &group : groupmap)
+			group.second.resolve_bounds(groupmap);
+
+		// parse all the views
+		for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
+		{
+			// the trouble with allowing errors to propagate here is that it wreaks havoc with screenless systems that use a terminal by default
+			// e.g. intlc44 and intlc440 have a terminal on the tty port by default and have a view with the front panel with the terminal screen
+			// however, they have a second view with just the front panel which is very useful if you're using e.g. -tty null_modem with a socket
+			// if the error is allowed to propagate, the entire layout is dropped so you can't select the useful view
+			try
+			{
+				m_viewlist.emplace_back(machine, *viewnode, m_elemmap, groupmap);
+			}
+			catch (layout_reference_error const &err)
+			{
+				osd_printf_warning("Error instantiating layout view %s: %s\n", xml_get_attribute_string_with_subst(machine, *viewnode, "name", ""), err.what());
+			}
+		}
+	}
+	catch (layout_syntax_error const &err)
+	{
+		// syntax errors are always fatal
+		throw emu_fatalerror("Error parsing XML layout: %s", err.what());
 	}
 }
 

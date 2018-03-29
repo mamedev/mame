@@ -528,7 +528,6 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarig42_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -550,6 +549,7 @@ MACHINE_CONFIG_START(atarig42_state::atarig42)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarig42_state, screen_update_atarig42)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarig42_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarig42_state,atarig42)
 

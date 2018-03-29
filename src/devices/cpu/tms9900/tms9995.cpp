@@ -228,7 +228,7 @@ void tms9995_device::device_start()
 	m_dbin_line.resolve();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// Clear the interrupt flags
 	m_int_pending = 0;
@@ -1606,7 +1606,7 @@ void tms9995_device::next_command()
 			else logerror("%04x\n", PC-2);
 		}
 		PC_debug = PC - 2;
-		debugger_instruction_hook(this, PC_debug);
+		debugger_instruction_hook(PC_debug);
 		m_first_cycle = m_icount;
 	}
 }

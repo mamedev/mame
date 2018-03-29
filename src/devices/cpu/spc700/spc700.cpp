@@ -1249,7 +1249,7 @@ void spc700_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_debugger_temp).mask(0x1ff).callexport().formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_debugger_temp).formatstr("%8s").noshow();
 
-	m_icountptr = &m_ICount;
+	set_icountptr(m_ICount);
 }
 
 
@@ -1371,7 +1371,7 @@ void spc700_device::execute_run()
 	while(CLOCKS > 0)
 	{
 		REG_PPC = REG_PC;
-		debugger_instruction_hook(this, REG_PC);
+		debugger_instruction_hook(REG_PC);
 		REG_PC++;
 
 		switch(REG_IR = read_8_immediate(REG_PPC))

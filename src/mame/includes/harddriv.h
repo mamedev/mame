@@ -202,7 +202,7 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(hdgsp_write_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(hdgsp_read_from_shiftreg);
 
-	INTERRUPT_GEN_MEMBER(video_int_gen);
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
 	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 
 

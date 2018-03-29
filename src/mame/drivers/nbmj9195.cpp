@@ -212,13 +212,6 @@ WRITE8_MEMBER(nbmj9195_state::soundcpu_porte_w)
 
 
 
-/* CTC of main cpu, ch0 trigger is vblank */
-INTERRUPT_GEN_MEMBER(nbmj9195_state::ctc0_trg1)
-{
-	m_maincpu->trg1(1);
-	m_maincpu->trg1(0);
-}
-
 void nbmj9195_state::machine_reset()
 {
 }
@@ -2545,7 +2538,6 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_main)
 	MCFG_CPU_PROGRAM_MAP(sailorws_map)
 	MCFG_CPU_IO_MAP(sailorws_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj9195_state, ctc0_trg1) /* vblank is connect to ctc trigger */
 
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
@@ -2566,6 +2558,7 @@ MACHINE_CONFIG_START(nbmj9195_state::NBMJDRV1_base)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nbmj9195_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c011_device, trg1)) MCFG_DEVCB_INVERT
 
 	MCFG_PALETTE_ADD("palette", 256)
 

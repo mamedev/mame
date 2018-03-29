@@ -741,8 +741,11 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
+WRITE_LINE_MEMBER(karnov_state::vbint_w)
 {
+	if (!state)
+		return;
+
 	uint8_t port = ioport("FAKE")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
@@ -759,14 +762,14 @@ INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
 		else
 		{
 			m_i8751_return = port | 0x8000;
-			device.execute().set_input_line(6, HOLD_LINE);
+			m_maincpu->set_input_line(6, ASSERT_LINE);
 			m_i8751_needs_ack = 1;
 		}
 
 		m_latch = 0;
 	}
 
-	device.execute().set_input_line(7, HOLD_LINE);  /* VBL */
+	m_maincpu->set_input_line(7, ASSERT_LINE);
 }
 
 /*************************************
@@ -811,7 +814,6 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(karnov_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", karnov_state,  karnov_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)    /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)
@@ -827,6 +829,7 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(karnov_state, vbint_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
@@ -889,7 +892,6 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(karnov_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", karnov_state,  karnov_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)    /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)
@@ -905,6 +907,7 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(karnov_state, vbint_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting

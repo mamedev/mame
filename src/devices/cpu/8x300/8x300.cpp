@@ -152,7 +152,7 @@ void n8x300_cpu_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_genPC).mask(0x3ffe).callimport().noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_genPC).mask(0x3ffe).callimport().noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -206,7 +206,7 @@ void n8x300_cpu_device::execute_run()
 
 		/* fetch the opcode */
 		m_genPC = m_AR << 1;
-		debugger_instruction_hook(this, m_genPC);
+		debugger_instruction_hook(m_genPC);
 		opcode = FETCHOP(m_genPC);
 
 		if (m_increment_pc)

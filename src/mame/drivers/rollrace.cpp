@@ -47,6 +47,8 @@ WRITE8_MEMBER(rollrace_state::fake_d800_w)
 WRITE_LINE_MEMBER(rollrace_state::nmi_mask_w)
 {
 	m_nmi_mask = state;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(rollrace_state::sound_nmi_mask_w)
@@ -235,10 +237,10 @@ static GFXDECODE_START( rollrace )
 	GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,  0,  32 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(rollrace_state::vblank_irq)
+WRITE_LINE_MEMBER(rollrace_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
@@ -252,7 +254,6 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rollrace_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rollrace_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rollrace_sound_map)
@@ -275,6 +276,7 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rollrace_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rollrace)
 	MCFG_PALETTE_ADD("palette", 256)

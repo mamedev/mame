@@ -421,11 +421,14 @@ void itech32_state::itech32_update_interrupts(int vint, int xint, int qint)
 }
 
 
-INTERRUPT_GEN_MEMBER(itech32_state::generate_int1)
+WRITE_LINE_MEMBER(itech32_state::generate_int1)
 {
-	/* signal the NMI */
-	itech32_update_interrupts(1, -1, -1);
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+	if (state)
+	{
+		/* signal the NMI */
+		itech32_update_interrupts(1, -1, -1);
+		if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+	}
 }
 
 
@@ -1684,7 +1687,6 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(timekill_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech32_state,  generate_int1)
 
 	MCFG_CPU_ADD("soundcpu", MC6809, SOUND_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1705,7 +1707,7 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 //  MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256) // sftm, wcbowl and shufshot configure it this way
 	MCFG_SCREEN_UPDATE_DRIVER(itech32_state, screen_update_itech32)
 	MCFG_SCREEN_PALETTE("palette")
-
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(itech32_state, generate_int1))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1785,7 +1787,6 @@ MACHINE_CONFIG_START(itech32_state::sftm)
 
 	MCFG_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(itech020_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech32_state,  generate_int1)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(sound_020_map)

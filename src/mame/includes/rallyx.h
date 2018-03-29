@@ -53,10 +53,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t    m_main_irq_mask;
+	bool    m_main_irq_mask;
 	DECLARE_WRITE8_MEMBER(rallyx_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(bang_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_on_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE_LINE_MEMBER(led_0_w);
@@ -83,8 +84,8 @@ public:
 	uint32_t screen_update_rallyx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jungler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_locomotn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(rallyx_vblank_irq);
-	INTERRUPT_GEN_MEMBER(jungler_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(rallyx_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(jungler_vblank_irq);
 	inline void rallyx_get_tile_info( tile_data &tileinfo, int tile_index, int ram_offs);
 	inline void locomotn_get_tile_info(tile_data &tileinfo,int tile_index,int ram_offs);
 	void calculate_star_field(  );

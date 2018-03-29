@@ -59,4 +59,4 @@ private:
 // iterator
 typedef device_interface_iterator<device_disasm_interface> disasm_interface_iterator;
 
-#endif  // MAME_EMU_DIDISASM_H
+#endif // MAME_EMU_DIDISASM_H

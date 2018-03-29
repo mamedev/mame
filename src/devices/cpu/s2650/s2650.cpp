@@ -858,7 +858,7 @@ void s2650_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_ppc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void s2650_device::state_import(const device_state_entry &entry)
@@ -1002,7 +1002,7 @@ void s2650_device::execute_run()
 	{
 		m_ppc = m_page + m_iar;
 
-		debugger_instruction_hook(this, m_page + m_iar);
+		debugger_instruction_hook(m_page + m_iar);
 
 		m_ir = ROP();
 		m_r = m_ir & 3;         /* register / value */

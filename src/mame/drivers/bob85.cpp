@@ -31,30 +31,34 @@ class bob85_state : public driver_device
 {
 public:
 	bob85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_cass(*this, "cassette"),
-		m_line0(*this, "LINE0"),
-		m_line1(*this, "LINE1"),
-		m_line2(*this, "LINE2") { }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass;
-	DECLARE_READ8_MEMBER(bob85_keyboard_r);
-	DECLARE_WRITE8_MEMBER(bob85_7seg_w);
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_READ_LINE_MEMBER(sid_r);
-	uint8_t m_prev_key;
-	uint8_t m_count_key;
-	virtual void machine_reset() override;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_line0(*this, "LINE0")
+		, m_line1(*this, "LINE1")
+		, m_line2(*this, "LINE2")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	void bob85(machine_config &config);
 	void bob85_io(address_map &map);
 	void bob85_mem(address_map &map);
-protected:
+	DECLARE_READ8_MEMBER(bob85_keyboard_r);
+	DECLARE_WRITE8_MEMBER(bob85_7seg_w);
+	DECLARE_WRITE_LINE_MEMBER(sod_w);
+	DECLARE_READ_LINE_MEMBER(sid_r);
+
+private:
+	uint8_t m_prev_key;
+	uint8_t m_count_key;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;
 	required_ioport m_line1;
 	required_ioport m_line2;
+	output_finder<6> m_digits;
 };
 
 
@@ -140,7 +144,7 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 
 WRITE8_MEMBER(bob85_state::bob85_7seg_w)
 {
-	output().set_digit_value(offset, bitswap<8>( data,3,2,1,0,7,6,5,4 ));
+	m_digits[offset] = bitswap<8>( data,3,2,1,0,7,6,5,4 );
 }
 
 void bob85_state::bob85_mem(address_map &map)

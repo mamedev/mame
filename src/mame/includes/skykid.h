@@ -56,8 +56,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(skykid);
 	uint32_t screen_update_skykid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(main_vblank_irq);
-	INTERRUPT_GEN_MEMBER(mcu_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void skykid(machine_config &config);
 	void mcu_map(address_map &map);

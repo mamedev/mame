@@ -1149,7 +1149,7 @@ void mcs48_cpu_device::device_start()
 
 	save_item(NAME(m_a11));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1293,7 +1293,7 @@ void mcs48_cpu_device::execute_run()
 
 		/* fetch next opcode */
 		m_prevpc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		opcode = opcode_fetch();
 
 		/* process opcode and count cycles */

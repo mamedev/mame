@@ -283,7 +283,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(sound_int_gen);
 	DECLARE_WRITE16_MEMBER(sound_int_ack_w);
 
-	INTERRUPT_GEN_MEMBER(video_int_gen);
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
 	DECLARE_WRITE16_MEMBER(video_int_ack_w);
 
 	// slapstic helpers

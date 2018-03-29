@@ -481,9 +481,9 @@ void device_scheduler::timeslice()
 							exec->run();
 						else
 						{
-							debugger_start_cpu_hook(&exec->device(), target);
+							exec->debugger_start_cpu_hook(target);
 							exec->run();
-							debugger_stop_cpu_hook(&exec->device());
+							exec->debugger_stop_cpu_hook();
 						}
 
 						// adjust for any cycles we took back

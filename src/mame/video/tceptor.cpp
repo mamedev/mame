@@ -535,6 +535,19 @@ WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 	if (state)
 	{
 		memcpy(m_sprite_ram_buffered.get(), m_sprite_ram, 0x200);
+
+		if (m_m6809_irq_enable)
+			m_maincpu->set_input_line(0, HOLD_LINE);
+		else
+			m_m6809_irq_enable = 1;
+
+		if (m_m68k_irq_enable)
+			m_subcpu->set_input_line(1, HOLD_LINE);
+
+		if (m_mcu_irq_enable)
+			m_mcu->set_input_line(0, HOLD_LINE);
+		else
+			m_mcu_irq_enable = 1;
 	}
 }
 

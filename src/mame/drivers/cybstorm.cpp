@@ -234,7 +234,6 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cybstorm_state, video_int_gen)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -264,6 +263,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cybstorm_state, video_int_write_line))
 
 	MCFG_SCREEN_UPDATE_DRIVER(cybstorm_state, screen_update_cybstorm)
 MACHINE_CONFIG_END

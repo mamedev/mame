@@ -41,6 +41,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ppi8255(*this, "ppi8255")
+		, m_digits(*this, "digit%u", 0U)
 		{ }
 
 	DECLARE_READ8_MEMBER(savia84_8255_portc_r);
@@ -57,8 +58,10 @@ private:
 	uint8_t m_digit;
 	uint8_t m_digit_last;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
+	output_finder<9> m_digits;
 };
 
 void savia84_state::mem_map(address_map &map)
@@ -138,7 +141,8 @@ void savia84_state::machine_reset()
 WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
 {
 	m_segment = ~data & 0x7f;
-	if (m_digit && (m_digit != m_digit_last)) output().set_digit_value(m_digit, m_segment);
+	if (m_digit && (m_digit != m_digit_last))
+		m_digits[m_digit] = m_segment;
 	m_digit_last = m_digit;
 }
 

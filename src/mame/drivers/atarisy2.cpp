@@ -233,7 +233,7 @@ INTERRUPT_GEN_MEMBER(atarisy2_state::vblank_int)
 {
 	/* clock the VBLANK through */
 	if (m_interrupt_enable & 8)
-		video_int_gen(device);
+		video_int_write_line(1);
 }
 
 
