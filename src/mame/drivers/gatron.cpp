@@ -571,7 +571,6 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)   /* 666.66 kHz, guess */
 	MCFG_CPU_PROGRAM_MAP(gat_map)
 	MCFG_CPU_IO_MAP(gat_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gatron_state,  nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -588,6 +587,7 @@ MACHINE_CONFIG_START(gatron_state::gat)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 16*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gatron_state, screen_update_gat)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gat)
 	MCFG_PALETTE_ADD("palette", 8)

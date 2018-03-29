@@ -538,7 +538,6 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	MCFG_CPU_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
 	MCFG_CPU_PROGRAM_MAP(thedealr_sub)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedealr_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -558,6 +557,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0+30, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thedealr_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thedealr_state, screen_vblank))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("subcpu", INPUT_LINE_NMI))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedealr)
