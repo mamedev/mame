@@ -188,10 +188,10 @@ static GFXDECODE_START( sbasketb )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16*16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(sbasketb_state::vblank_irq)
+WRITE_LINE_MEMBER(sbasketb_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 MACHINE_CONFIG_START(sbasketb_state::sbasketb)
@@ -199,7 +199,6 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, 1400000)        /* 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbasketb_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181) / 4) /* 3.5795 MHz */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_sound_map)
@@ -223,6 +222,7 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketb)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sbasketb_state, screen_update_sbasketb)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sbasketb_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sbasketb)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16*16)
@@ -252,7 +252,6 @@ MACHINE_CONFIG_START(sbasketb_state::sbasketbu)
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", MC6809E, 1400000)        /* 6809E at 1.400 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sbasketb_state,  vblank_irq)
 MACHINE_CONFIG_END
 
 
