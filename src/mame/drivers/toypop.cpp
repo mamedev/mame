@@ -80,7 +80,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(slave_vblank_irq);
 
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	DECLARE_WRITE8_MEMBER(irq_disable_w);
@@ -658,10 +658,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
+WRITE_LINE_MEMBER(namcos16_state::slave_vblank_irq)
 {
-	if(m_slave_irq_enable == true)
-		device.execute().set_input_line(6,HOLD_LINE);
+	if (state && m_slave_irq_enable == true)
+		m_slave_cpu->set_input_line(6, HOLD_LINE);
 }
 
 MACHINE_CONFIG_START(namcos16_state::liblrabl)
@@ -671,7 +671,6 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 
 	MCFG_CPU_ADD("slave", M68000, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos16_state,  slave_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -700,6 +699,7 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK,384,0,288,264,0,224) // derived from Galaxian HW, 60.606060
 	MCFG_SCREEN_UPDATE_DRIVER(namcos16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos16_state, slave_vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toypop)
 	MCFG_PALETTE_ADD("palette", 128*4+64*4+16*2)

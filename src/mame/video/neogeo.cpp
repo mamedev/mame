@@ -22,7 +22,7 @@
  *
  *************************************/
 
-void neogeo_state::create_rgb_lookups()
+void neogeo_base_state::create_rgb_lookups()
 {
 	static const int resistances[] = {3900, 2200, 1000, 470, 220};
 
@@ -66,7 +66,7 @@ void neogeo_state::create_rgb_lookups()
 	}
 }
 
-void neogeo_state::set_pens()
+void neogeo_base_state::set_pens()
 {
 	const pen_t *pen_base = m_palette->pens() + m_palette_bank + (m_screen_shadow ? 0x2000 : 0);
 	m_sprgen->set_pens(pen_base);
@@ -74,27 +74,27 @@ void neogeo_state::set_pens()
 }
 
 
-WRITE_LINE_MEMBER(neogeo_state::set_screen_shadow)
+WRITE_LINE_MEMBER(neogeo_base_state::set_screen_shadow)
 {
 	m_screen_shadow = state;
 	set_pens();
 }
 
 
-WRITE_LINE_MEMBER(neogeo_state::set_palette_bank)
+WRITE_LINE_MEMBER(neogeo_base_state::set_palette_bank)
 {
 	m_palette_bank = state ? 0x1000 : 0;
 	set_pens();
 }
 
 
-READ16_MEMBER(neogeo_state::paletteram_r)
+READ16_MEMBER(neogeo_base_state::paletteram_r)
 {
 	return m_paletteram[m_palette_bank + offset];
 }
 
 
-WRITE16_MEMBER(neogeo_state::paletteram_w)
+WRITE16_MEMBER(neogeo_base_state::paletteram_w)
 {
 	offset += m_palette_bank;
 	data = COMBINE_DATA(&m_paletteram[offset]);
@@ -123,7 +123,7 @@ WRITE16_MEMBER(neogeo_state::paletteram_w)
  *
  *************************************/
 
-void neogeo_state::video_start()
+void neogeo_base_state::video_start()
 {
 	create_rgb_lookups();
 
@@ -136,7 +136,7 @@ void neogeo_state::video_start()
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_screen_shadow));
 	save_item(NAME(m_palette_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_state::set_pens), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_base_state::set_pens), this));
 
 	set_pens();
 }
@@ -149,7 +149,7 @@ void neogeo_state::video_start()
  *
  *************************************/
 
-void neogeo_state::video_reset()
+void neogeo_base_state::video_reset()
 {
 }
 
@@ -161,7 +161,7 @@ void neogeo_state::video_reset()
  *
  *************************************/
 
-uint32_t neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t neogeo_base_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(*m_bg_pen, cliprect);
@@ -181,7 +181,7 @@ uint32_t neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 
  *
  *************************************/
 
-uint16_t neogeo_state::get_video_control()
+uint16_t neogeo_base_state::get_video_control()
 {
 	uint16_t ret;
 	uint16_t v_counter;
@@ -221,7 +221,7 @@ uint16_t neogeo_state::get_video_control()
 }
 
 
-void neogeo_state::set_video_control(uint16_t data)
+void neogeo_base_state::set_video_control(uint16_t data)
 {
 	if (VERBOSE) logerror("%s: video control write %04x\n", machine().describe_context(), data);
 
@@ -232,7 +232,7 @@ void neogeo_state::set_video_control(uint16_t data)
 }
 
 
-READ16_MEMBER(neogeo_state::video_register_r)
+READ16_MEMBER(neogeo_base_state::video_register_r)
 {
 	uint16_t ret;
 
@@ -255,7 +255,7 @@ READ16_MEMBER(neogeo_state::video_register_r)
 }
 
 
-WRITE16_MEMBER(neogeo_state::video_register_w)
+WRITE16_MEMBER(neogeo_base_state::video_register_w)
 {
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)

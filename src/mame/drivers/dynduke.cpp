@@ -303,9 +303,13 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-INTERRUPT_GEN_MEMBER(dynduke_state::interrupt)
+WRITE_LINE_MEMBER(dynduke_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   // VBL
+	if (state)
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_slave->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+	}
 }
 
 /* Machine Driver */
@@ -314,11 +318,9 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
 	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynduke_state, interrupt)
 
 	MCFG_CPU_ADD("slave", V30, 16000000/2) // NEC V30-8 CPU
 	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynduke_state, interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -340,6 +342,7 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_SCREEN_UPDATE_DRIVER(dynduke_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynduke_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynduke)
 

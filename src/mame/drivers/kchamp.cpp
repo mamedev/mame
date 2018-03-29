@@ -355,10 +355,10 @@ GFXDECODE_END
 
 
 
-INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
+WRITE_LINE_MEMBER(kchamp_state::vblank_irq)
 {
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(kchamp_state::msmint)
@@ -410,7 +410,6 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_CPU_PROGRAM_MAP(kchampvs_map)
 	MCFG_CPU_IO_MAP(kchampvs_io_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_sound_map)
@@ -432,6 +431,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchampvs)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(kchamp_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -469,7 +469,6 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_map)
 	MCFG_CPU_IO_MAP(kchamp_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_sound_map)
@@ -492,6 +491,7 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchamp)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(kchamp_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
 	MCFG_PALETTE_ADD("palette", 256)

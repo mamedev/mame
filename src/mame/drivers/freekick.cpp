@@ -113,12 +113,14 @@ WRITE8_MEMBER(freekick_state::pbillrd_bankswitch_w)
 WRITE_LINE_MEMBER(freekick_state::nmi_enable_w)
 {
 	m_nmi_en = state;
+	if (!m_nmi_en)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(freekick_state::freekick_irqgen)
+WRITE_LINE_MEMBER(freekick_state::vblank_irq)
 {
-	if (m_nmi_en)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_en)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(freekick_state::oigas_5_w)
@@ -735,7 +737,6 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_CPU_IO_MAP(omega_io_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 3M
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))
@@ -749,6 +750,7 @@ MACHINE_CONFIG_START(freekick_state::omega)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 768/2, 0, 512/2, 263, 0+16, 224+16) // unknown divisor
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(freekick_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", freekick)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
@@ -775,7 +777,6 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(freekick_state, coin1_w))
@@ -787,6 +788,7 @@ MACHINE_CONFIG_START(freekick_state::base)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 768/2, 0, 512/2, 263, 0+16, 224+16)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_pbillrd)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(freekick_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", freekick)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x200)
@@ -824,7 +826,6 @@ MACHINE_CONFIG_START(freekick_state::pbillrdm)
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(freekick_state::freekick)
@@ -887,7 +888,6 @@ MACHINE_CONFIG_START(freekick_state::gigasm)
 	MCFG_CPU_IO_MAP(gigas_io_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_w))

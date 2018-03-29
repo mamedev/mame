@@ -367,10 +367,10 @@ void brkthru_state::machine_reset()
 	m_nmi_mask = 0;
 }
 
-INTERRUPT_GEN_MEMBER(brkthru_state::vblank_irq)
+WRITE_LINE_MEMBER(brkthru_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 MACHINE_CONFIG_START(brkthru_state::brkthru)
@@ -378,7 +378,6 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/8)        /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(brkthru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", brkthru_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", MC6809, MASTER_CLOCK/2)     /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -395,6 +394,7 @@ MACHINE_CONFIG_START(brkthru_state::brkthru)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(brkthru_state, vblank_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -419,7 +419,6 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(darwin_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", brkthru_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/8)     /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -447,6 +446,7 @@ MACHINE_CONFIG_START(brkthru_state::darwin)
 	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
 	MCFG_SCREEN_UPDATE_DRIVER(brkthru_state, screen_update_brkthru)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(brkthru_state, vblank_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

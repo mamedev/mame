@@ -2,37 +2,15 @@
 // copyright-holders:Sandro Ronco
 /***************************************************************************
 
-        Schachcomputer SC1
+Schachcomputer SC1
 
-        12/05/2009 Skeleton driver.
+2009-05-12 Skeleton driver.
 
 ToDo:
 - speaker
 - LEDs
 - 7seg sometimes flashes
 
-Port 80-83 could be a device
-
-This happens at the start:
-'maincpu' (04EF): unmapped i/o memory write to 0081 = 0F & FF
-'maincpu' (04F3): unmapped i/o memory write to 0083 = CF & FF
-'maincpu' (04F7): unmapped i/o memory write to 0083 = BB & FF
-'maincpu' (04FB): unmapped i/o memory write to 0082 = 01 & FF
-'maincpu' (0523): unmapped i/o memory write to 00FC = 02 & FF  **
-'maincpu' (0523): unmapped i/o memory write to 00FC = 04 & FF  **
-
-** These two happen for a while (making a tone from a speaker?)
-
-Then:
-'maincpu' (0523): unmapped i/o memory write to 00FC = 00 & FF
-'maincpu' (0075): unmapped i/o memory write to 0080 = 02 & FF
-'maincpu' (0523): unmapped i/o memory write to 00FC = 20 & FF
-
-Then this happens continuously:
-Port 80 out - 00, 02, FF
-Port FC out - 00, 01, 02, 04, 08, 10, 20, 40, 80 (selecting rows?)
-Port 80 in - upper byte = 20 thru 26
-Port 82 in - upper byte = 0 thru 7
 
 ****************************************************************************/
 
@@ -52,19 +30,22 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
-
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
 
 	DECLARE_WRITE8_MEMBER( matrix_w );
 	DECLARE_WRITE8_MEMBER( pio_port_a_w );
 	DECLARE_READ8_MEMBER( pio_port_b_r );
 
-	uint8_t m_matrix;
 	void sc1(machine_config &config);
 	void sc1_io(address_map &map);
 	void sc1_mem(address_map &map);
+private:
+	uint8_t m_matrix;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	output_finder<4> m_digits;
 };
 
 /***************************************************************************
@@ -75,16 +56,16 @@ public:
 
 WRITE8_MEMBER( sc1_state::pio_port_a_w )
 {
-	uint8_t digit = bitswap<8>( data,3,4,6,0,1,2,7,5 );
+	uint8_t digit = bitswap<8>( data,3,4,6,0,1,2,7,5 ) & 0x7f;
 
 	if (m_matrix & 0x04)
-		output().set_digit_value(3, digit & 0x7f);
+		m_digits[3] = digit;
 	if (m_matrix & 0x08)
-		output().set_digit_value(2, digit & 0x7f);
+		m_digits[2] = digit;
 	if (m_matrix & 0x10)
-		output().set_digit_value(1, digit & 0x7f);
+		m_digits[1] = digit;
 	if (m_matrix & 0x20)
-		output().set_digit_value(0, digit & 0x7f);
+		m_digits[0] = digit;
 }
 
 

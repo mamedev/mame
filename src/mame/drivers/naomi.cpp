@@ -1999,11 +1999,6 @@ INPUT_PORTS_START( naomi_debug )
 	PORT_CONFNAME( 0x02, 0x00, "Disable Render Calls" )
 	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_CONFNAME( 0x0c, 0x00, "Master CPU Clock Rate (Cheat)") PORT_CHANGED_MEMBER(DEVICE_SELF, dc_state, mastercpu_cheat_r, nullptr)
-	PORT_CONFSETTING(    0x00, "100%" )
-	PORT_CONFSETTING(    0x04, "50%" )
-	PORT_CONFSETTING(    0x08, "25%" )
-	PORT_CONFSETTING(    0x0c, "12.5%" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_mie )

@@ -1731,7 +1731,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 			// if an event got scheduled, resume
 			if (machine.scheduled_event_pending())
-				debugcpu.set_execution_stopped();
+				debugcpu.set_execution_running();
 		}
 		m_device.machine().sound().debugger_mute(false);
 

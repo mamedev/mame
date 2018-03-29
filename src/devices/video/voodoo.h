@@ -1698,13 +1698,15 @@ protected:
 		uint32_t              height;                 /* height of current frame buffer */
 		uint32_t              xoffs;                  /* horizontal offset (back porch) */
 		uint32_t              yoffs;                  /* vertical offset (back porch) */
-		uint32_t              vsyncscan;              /* vertical sync scanline */
+		uint32_t              vsyncstart;             /* vertical sync start scanline */
+		uint32_t              vsyncstop;              // veritcal sync stop
 		uint32_t              rowpixels;              /* pixels per row */
 		uint32_t              tile_width;             /* width of video tiles */
 		uint32_t              tile_height;            /* height of video tiles */
 		uint32_t              x_tiles;                /* number of tiles in the X direction */
 
-		emu_timer *         vblank_timer;           /* VBLANK timer */
+		emu_timer *           vsync_stop_timer;       /* VBLANK End timer */
+		emu_timer *           vsync_start_timer;      /* VBLANK timer */
 		uint8_t               vblank;                 /* VBLANK state */
 		uint8_t               vblank_count;           /* number of VBLANKs since last swap */
 		uint8_t               vblank_swap_pending;    /* a swap is pending, waiting for a vblank */
@@ -1825,6 +1827,7 @@ protected:
 	void stall_cpu(int state, attotime current_time);
 	void soft_reset();
 	void recompute_video_memory();
+	void adjust_vblank_timer();
 	static int32_t fastfill(voodoo_device *vd);
 	static int32_t triangle(voodoo_device *vd);
 	static int32_t begin_triangle(voodoo_device *vd);

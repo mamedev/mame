@@ -387,10 +387,10 @@ void _20pacgal_state::machine_reset()
 	m_game_selected = 0;
 }
 
-INTERRUPT_GEN_MEMBER(_20pacgal_state::vblank_irq)
+WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
 }
 
 MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
@@ -399,7 +399,6 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 	MCFG_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(_20pacgal_map)
 	MCFG_CPU_IO_MAP(_20pacgal_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _20pacgal_state,  vblank_irq)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 

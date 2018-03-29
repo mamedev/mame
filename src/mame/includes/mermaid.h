@@ -101,6 +101,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	uint8_t collision_check( rectangle& rect );
+	void collision_update();
 	DECLARE_WRITE_LINE_MEMBER(rougien_adpcm_int);
 	void rougien(machine_config &config);
 	void mermaid(machine_config &config);

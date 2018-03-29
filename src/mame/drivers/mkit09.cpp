@@ -49,6 +49,7 @@ public:
 		, m_pia(*this, "pia")
 		, m_cass(*this, "cassette")
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(pa_r);
@@ -64,9 +65,11 @@ public:
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<pia6821_device> m_pia;
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
+	output_finder<10> m_digits;
 };
 
 
@@ -175,7 +178,8 @@ WRITE8_MEMBER( mkit09_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output().set_digit_value(m_keydata, bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3));
+		if (m_keydata < 10)
+			m_digits[m_keydata] = bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3);
 		m_keydata = 0;
 	}
 
