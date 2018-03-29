@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ondra_port_09_w);
 	DECLARE_WRITE8_MEMBER(ondra_port_0a_w);
 	uint32_t screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ondra_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(nmi_check_callback);
 
 	void ondra(machine_config &config);
