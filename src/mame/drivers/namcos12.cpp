@@ -1778,7 +1778,7 @@ MACHINE_CONFIG_START(namcos12_state::coh716)
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&namcos12_state::namcos12_rom_read, this ))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x400000, XTAL(53'693'175) )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x400000, XTAL(53'693'175) )
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, this ) )
 MACHINE_CONFIG_END
 
