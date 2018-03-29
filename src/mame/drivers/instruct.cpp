@@ -63,6 +63,7 @@ public:
 		, m_p_smiram(*this, "smiram")
 		, m_p_extram(*this, "extram")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(port_r);
@@ -83,6 +84,7 @@ public:
 	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	uint16_t m_lar;
 	uint8_t m_digit;
 	bool m_valid_digit;
@@ -93,6 +95,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_smiram;
 	required_shared_ptr<uint8_t> m_p_extram;
 	required_device<cassette_image_device> m_cass;
+	output_finder<129> m_digits;
 };
 
 // flag led
@@ -127,7 +130,7 @@ WRITE8_MEMBER( instruct_state::portf8_w )
 WRITE8_MEMBER( instruct_state::portf9_w )
 {
 	if (m_valid_digit)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 	m_valid_digit = false;
 }
 

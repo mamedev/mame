@@ -85,7 +85,7 @@ void m6502_device::init()
 	save_item(NAME(irq_taken));
 	save_item(NAME(inhibit_interrupts));
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	PC = 0x0000;
 	NPC = 0x0000;
@@ -390,7 +390,7 @@ void m6502_device::execute_run()
 			PPC = NPC;
 			inst_state = IR | inst_state_base;
 			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debugger_instruction_hook(this, pc_to_external(NPC));
+				debugger_instruction_hook(pc_to_external(NPC));
 		}
 		do_exec_full();
 	}

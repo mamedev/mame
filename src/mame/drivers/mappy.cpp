@@ -621,8 +621,11 @@ void mappy_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::main_vblank_irq)
+WRITE_LINE_MEMBER(mappy_state::vblank_irq)
 {
+	if (!state)
+		return;
+
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
@@ -631,17 +634,11 @@ INTERRUPT_GEN_MEMBER(mappy_state::main_vblank_irq)
 
 	if (!m_namcoio[1]->read_reset_line())        // give the cpu a tiny bit of time to write the command before processing it
 		timer_set(attotime::from_usec(50), TIMER_IO_RUN, 1);
-}
 
-INTERRUPT_GEN_MEMBER(mappy_state::sub_vblank_irq)
-{
 	if (m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
-}
 
-INTERRUPT_GEN_MEMBER(mappy_state::sub2_vblank_irq)
-{
-	if (m_sub2_irq_mask)
+	if (m_subcpu2.found() && m_sub2_irq_mask)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);
 }
 
@@ -1324,11 +1321,9 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(superpac_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  main_vblank_irq)    // also update the custom I/O chips
 
 	MCFG_CPU_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(superpac_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2M on CPU board
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
@@ -1357,6 +1352,7 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_superpac)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
@@ -1436,15 +1432,12 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)  /* MAIN CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  main_vblank_irq)  // also update the custom I/O chips
 
 	MCFG_CPU_ADD("sub", MC6809E, PIXEL_CLOCK/4)  /* SOUND CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", MC6809E, PIXEL_CLOCK/4)  /* SUB CPU */
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub2_vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5C
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
@@ -1487,6 +1480,7 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_phozon)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mappy_state, vblank_irq))   // cause IRQs on all three CPUs; also update the custom I/O chips
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
@@ -1504,11 +1498,9 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(mappy_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  main_vblank_irq)   // also update the custom I/O chips
 
 	MCFG_CPU_ADD("sub", MC6809E, PIXEL_CLOCK/4)   /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(mappy_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2M on CPU board
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
@@ -1538,6 +1530,7 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mappy_state, screen_update_mappy)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mappy_state, vblank_irq))   // cause IRQs on both CPUs; also update the custom I/O chips
 
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 

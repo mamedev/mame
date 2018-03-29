@@ -65,8 +65,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gyruss);
 	uint32_t screen_update_gyruss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(master_vblank_irq);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void filter_w(address_space &space, int chip, int data );
 	void gyruss(machine_config &config);

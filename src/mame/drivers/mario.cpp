@@ -329,10 +329,10 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(mario_state::vblank_irq)
+WRITE_LINE_MEMBER(mario_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(mario_state::mario_base)
@@ -341,7 +341,6 @@ MACHINE_CONFIG_START(mario_state::mario_base)
 	MCFG_CPU_ADD("maincpu", Z80, Z80_CLOCK) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mario_map)
 	MCFG_CPU_IO_MAP(mario_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mario_state,  vblank_irq)
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80dma", Z80DMA, Z80_CLOCK)
@@ -364,6 +363,8 @@ MACHINE_CONFIG_START(mario_state::mario_base)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(mario_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mario_state, vblank_irq))
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mario)
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(mario_state, mario)

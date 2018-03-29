@@ -179,7 +179,7 @@ void saturn_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%2s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void saturn_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -349,7 +349,7 @@ void saturn_device::execute_run()
 	{
 		m_oldpc = m_pc;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if ( m_sleeping )
 		{

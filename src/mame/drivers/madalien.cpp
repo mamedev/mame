@@ -158,7 +158,6 @@ MACHINE_CONFIG_START(madalien_state::madalien)
 
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK / 8)        /* 512kHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", madalien_state,  nmi_line_pulse)
 
 	/* video hardware */
 	madalien_video(config);

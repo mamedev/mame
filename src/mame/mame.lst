@@ -12631,6 +12631,7 @@ punipic2                        // bootleg
 punipic3                        // bootleg
 sf2b                            // bootleg
 sf2b2                           // bootleg
+sf2ceb                          // bootleg
 sf2m1                           // hack
 sf2m9                           // bootleg
 sf2mdt                          // bootleg
@@ -17308,6 +17309,7 @@ brapboysp                       // (c) 1992 Kaneko
 brapboyspj                      // (c) 1992 Kaneko
 brapboyspu                      // (c) 1992 Kaneko
 explbrkr                        // (c) 1992 Kaneko
+explbrkrk                       // (c) 1992 Kaneko
 fjbuster                        // (c) 1992 Kaneko
 gtmr                            // (c) 1994 Kaneko
 gtmr2                           // (c) 1995 Kaneko
@@ -21079,6 +21081,7 @@ umk3r11                         // (c) 1994 Midway
 wwfmania                        // (c) 1995 Midway
 wwfmaniab                       // (c) 1995 Midway
 wwfmaniac                       // (c) 1995 Midway
+wwfmaniap                       // (c) 1995 Midway
 
 @source:midxunit.cpp
 revx                            // (c) 1994 Midway
@@ -29557,7 +29560,12 @@ salamandj                       // GX587 (c) 1986
 twinbee                         // GX412 (c) 1985
 
 @source:neogeo.cpp
-neogeo                          // NeoGeo MVS
+neogeo                          // NeoGeo MV-6F
+ng_mv4f                         // NeoGeo MV-4F
+ng_mv2f                         // NeoGeo MV-2F
+ng_mv1                          // NeoGeo MV-1
+ng_mv1f                         // NeoGeo MV-1F
+ng_mv1fz                        // NeoGeo MV-1FZ
 aes                             // NeoGeo AES
 2020bb                          // 0030 (c) 1991 SNK / Pallas
 2020bba                         // 0030 (c) 1991 SNK / Pallas
@@ -33406,6 +33414,7 @@ pzlestar                        // (c) 199? Sang Ho Soft
 sexyboom                        // (c) 1992 Sang Ho Soft
 
 @source:sanremmg.cpp
+elsypokr                        // Elsy
 sanremmg                        // San Remo / Elsy
 
 @source:sanremo.cpp

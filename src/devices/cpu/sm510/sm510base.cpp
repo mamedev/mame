@@ -130,7 +130,7 @@ void sm510_base_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_c).formatstr("%1s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// init peripherals
 	init_divider();
@@ -300,7 +300,7 @@ void sm510_base_device::execute_run()
 		m_prev_pc = m_pc;
 
 		// fetch next opcode
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		m_op = m_program->read_byte(m_pc);
 		increment_pc();
 		get_opcode_param();

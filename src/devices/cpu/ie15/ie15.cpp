@@ -38,7 +38,7 @@ ie15_cpu_device::ie15_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_program(nullptr), m_io(nullptr), m_direct(nullptr)
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -193,7 +193,7 @@ void ie15_cpu_device::execute_run()
 	{
 		do
 		{
-			debugger_instruction_hook(this, m_PC.d);
+			debugger_instruction_hook(m_PC.d);
 			execute_one(rop());
 		} while (m_icount > 0);
 	}

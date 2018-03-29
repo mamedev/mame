@@ -491,7 +491,6 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mpu12wbk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mpu12wbk_state,  nmi_line_pulse)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -511,6 +510,7 @@ MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

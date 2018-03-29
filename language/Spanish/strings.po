@@ -3,7 +3,7 @@
 # Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2016.
-# A. Viloria, 2016-2017.
+# A. Viloria, 2016-2018.
 # Ismael Ferreras Morezuelas <swyterzone+mame@gmail.com>, 2016.
 #
 msgid ""
@@ -1478,7 +1478,7 @@ msgstr "Guardado/recuperación automático/a"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Rewind capacity"
-msgstr ""
+msgstr "Capacidad de rebobinado"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Bilinear snapshot"
@@ -2169,7 +2169,7 @@ msgstr "[crear]"
 #: src/frontend/mame/ui/filesel.cpp:419
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "Error al acceder a %s"
 
 #: src/frontend/mame/ui/filesel.cpp:515
 msgid "Select access mode"
@@ -2685,7 +2685,7 @@ msgstr "Guardar actual -- #"
 #: plugins/cheatfind/init.lua:536
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "%d coincidencias encontradas"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Compare"
@@ -2806,24 +2806,21 @@ msgstr "Buscador de Trucos"
 
 #: plugins/portname/init.lua:67
 msgid "Save input names to file"
-msgstr ""
+msgstr "Guardar los nombres de entrada a fichero"
 
 #: plugins/portname/init.lua:87 plugins/portname/init.lua:92
 #: plugins/portname/init.lua:108
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "Error al guardar el fichero nombres de entrada"
 
 #: plugins/portname/init.lua:119
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "Fichero de nombres de puertos de entrada guardado en %s"
 
 #: plugins/portname/init.lua:124
 msgid "Input ports"
-msgstr ""
-
-#~ msgid " total matches found"
-#~ msgstr " elementos encontrados"
+msgstr "Puertos de entrada"
 
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"
@@ -2831,39 +2828,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Auditoría de ROMs deshabilitada\t\n"
 #~ "Auditoría de muestras deshabilitada\t\n"
-
-#~ msgid "Default name is "
-#~ msgstr "El nombre por defecto es "
-
-#~ msgid "Mechanical Machine\t%1$s\n"
-#~ msgstr "Máquina mecánica\t%1$s\n"
-
-#~ msgid "Requires Artwork\t%1$s\n"
-#~ msgstr "Requiere arte\t%1$s\n"
-
-#~ msgid "Requires Clickable Artwork\t%1$s\n"
-#~ msgstr "Requiere arte clicable\t%1$s\n"
-
-#~ msgid "Support Cocktail\t%1$s\n"
-#~ msgstr "Soporta cóctel\t%1$s\n"
-
-#~ msgid "Driver is BIOS\t%1$s\n"
-#~ msgstr "El controlador es una BIOS\t%1$s\n"
-
-#~ msgid "Support Save\t%1$s\n"
-#~ msgstr "Permite guardar\t%1$s\n"
-
-#~ msgid "Screen Orientation\t%1$s\n"
-#~ msgstr "Orientación de pantalla\t%1$s\n"
-
-#~ msgid "Vertical"
-#~ msgstr "Vertical"
-
-#~ msgid "Horizontal"
-#~ msgstr "Horizontal"
-
-#~ msgid "Requires CHD\t%1$s\n"
-#~ msgstr "Requiere CHD\t%1$s\n"
 
 #~ msgid "Roms Audit Pass\tOK\n"
 #~ msgstr "Auditoría de ROMs\tCORRECTA\n"
@@ -2887,29 +2851,5 @@ msgstr ""
 #~ "Auditoría de ROMs\tDeshabilitada\n"
 #~ "Auditoría de las muestras\tDeshabilitada\n"
 
-#~ msgid "Unimplemented"
-#~ msgstr "No implementado"
-
-#~ msgid "Imperfect"
-#~ msgstr "Imperfecto"
-
-#~ msgid "OK"
-#~ msgstr "Aceptable"
-
 #~ msgid "Gfx: %s, Sound: %s"
 #~ msgstr "Gráficos: %s, Sonido: %s"
-
-#~ msgid "Audit in progress..."
-#~ msgstr "Auditando..."
-
-#~ msgid "Extra INIs"
-#~ msgstr "INIs adicionales"
-
-#~ msgid " ^!File"
-#~ msgstr " ^!Archivo"
-
-#~ msgid "Main filter"
-#~ msgstr "Filtro principal"
-
-#~ msgid "Other filter"
-#~ msgstr "Otros filtros"

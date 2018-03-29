@@ -181,13 +181,12 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 
 	*/
 
-	uint8_t led_data = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = m_keylatch;
 
 	/* skip middle digit */
 	if (digit > 3) digit++;
 
-	output().set_digit_value(8 - digit, led_data);
+	m_digits[8 - digit] = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 }
 
 /* Z80 Daisy Chain */
@@ -202,6 +201,8 @@ static const z80_daisy_config vcs80_daisy_chain[] =
 
 void vcs80_state::machine_start()
 {
+	m_digits.resolve();
+
 	m_pio->strobe_a(1);
 	m_pio->strobe_b(1);
 

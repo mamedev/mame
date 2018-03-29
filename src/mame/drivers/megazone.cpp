@@ -280,6 +280,7 @@ void megazone_state::machine_start()
 {
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_i8039_status));
+	save_item(NAME(m_irq_mask));
 }
 
 void megazone_state::machine_reset()
@@ -287,10 +288,13 @@ void megazone_state::machine_reset()
 	m_i8039_status = 0;
 }
 
-INTERRUPT_GEN_MEMBER(megazone_state::vblank_irq)
+WRITE_LINE_MEMBER(megazone_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+
+	if (state)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -299,12 +303,10 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/9)        /* 2.048 MHz */
 	MCFG_CPU_PROGRAM_MAP(megazone_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", megazone_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)     /* Z80 Clock is derived from the H1 signal */
 	MCFG_CPU_PROGRAM_MAP(megazone_sound_map)
 	MCFG_CPU_IO_MAP(megazone_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", megazone_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("daccpu", I8039, XTAL(14'318'181)/2)    /* 7.15909MHz */
 	MCFG_CPU_PROGRAM_MAP(megazone_i8039_map)
@@ -330,6 +332,7 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(megazone_state, screen_update_megazone)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(megazone_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megazone)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)

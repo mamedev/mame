@@ -226,7 +226,7 @@ void tms99xx_device::device_start()
 	m_cru = &space(AS_IO);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_state_any = 0;
 	PC = 0;
@@ -1504,7 +1504,7 @@ void tms99xx_device::acquire_instruction()
 	{
 		decode(m_current_value);
 		if (TRACE_EXEC) logerror("%04x: %04x (%s)\n", PC, IR, opname[m_command]);
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		PC = (PC + 2) & 0xfffe & m_prgaddr_mask;
 		// IAQ will be cleared in the main loop
 	}

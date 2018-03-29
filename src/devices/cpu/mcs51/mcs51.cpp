@@ -1986,7 +1986,7 @@ void mcs51_cpu_device::execute_run()
 	{
 		/* Read next opcode */
 		PPC = PC;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		op = m_direct->read_byte(PC++);
 
 		/* process opcode and count cycles */
@@ -2163,7 +2163,7 @@ void mcs51_cpu_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_rtemp).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void mcs51_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const

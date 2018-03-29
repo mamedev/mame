@@ -53,7 +53,7 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(ron);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(p1_mux_r);
@@ -143,6 +143,8 @@ uint32_t ron_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 WRITE8_MEMBER(ron_state::output_w)
 {
 	m_nmi_enable = (data & 0x10) == 0x10;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	if(data & 0xef)
 		printf("%02x\n",data);
@@ -427,10 +429,10 @@ PALETTE_INIT_MEMBER(ron_state, ron)
 }
 
 
-INTERRUPT_GEN_MEMBER( ron_state::vblank_irq )
+WRITE_LINE_MEMBER(ron_state::vblank_irq)
 {
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(ron_state::audio_cmd_r)
@@ -487,7 +489,6 @@ MACHINE_CONFIG_START(ron_state::ron)
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ron_map)
 	MCFG_CPU_IO_MAP(ron_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ron_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", I8035, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ron_audio_map)
@@ -503,6 +504,7 @@ MACHINE_CONFIG_START(ron_state::ron)
 	MCFG_SCREEN_UPDATE_DRIVER(ron_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 264, 0, 240)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ron_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ron)
 

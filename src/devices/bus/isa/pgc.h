@@ -42,7 +42,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	DECLARE_WRITE8_MEMBER(vram_w);

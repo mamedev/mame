@@ -2615,7 +2615,7 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( explbrkr )
+ROM_START( explbrkr ) /* MASTER UP= 92/10/08 20:10:16 */
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* 68000 Code */
 	ROM_LOAD16_BYTE( "ts100e.u18", 0x000000, 0x040000, CRC(cc84a985) SHA1(1732a607cc1f894dd45cfc915dfe0407335f0073) )
 	ROM_LOAD16_BYTE( "ts101e.u19", 0x000001, 0x040000, CRC(88f4afb7) SHA1(08b8efd6bd935bc1b8cf9753d58b38ccf9a70b4d) )
@@ -2623,9 +2623,9 @@ ROM_START( explbrkr )
 	/* these actually match the other set but have different names on the board..*/
 	ROM_REGION( 0x240000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "ts001e.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
-	ROM_RELOAD(       0x100000, 0x080000             )
+	ROM_RELOAD(              0x100000, 0x080000  )
 	ROM_LOAD( "ts000e.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
-	ROM_RELOAD(       0x180000, 0x080000             )
+	ROM_RELOAD(              0x180000, 0x080000  )
 	ROM_LOAD( "ts002e.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles */
@@ -2640,16 +2640,41 @@ ROM_START( explbrkr )
 	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
 ROM_END
 
-ROM_START( bakubrkr )
+ROM_START( explbrkrk ) /* MASTER UP= 92/10/08 21:35:56 - No "For use in Korea.." but has the KA+<cat image> logo which was only used in Korea; the Kaneko logo is scratched out on all custom ICs */
+	ROM_REGION( 0x080000, "maincpu", 0 )            /* 68000 Code */
+	ROM_LOAD16_BYTE( "u18", 0x000000, 0x040000, CRC(08267644) SHA1(8a5c638b414d2b1a8bb68e0d8ba6747253734e82) ) /* TMS 27C020 with non descript label "MF" */
+	ROM_LOAD16_BYTE( "u19", 0x000001, 0x040000, CRC(f0a243b1) SHA1(3448c85c9388b590ea28b9adcaf81b68c14c678c) ) /* TMS 27C020 with non descript label "MF" */
+
+	/* these actually match the other set but have different names on the board..*/
+	ROM_REGION( 0x240000, "gfx1", 0 )   /* Sprites */
+	ROM_LOAD( "ts001e.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
+	ROM_RELOAD(              0x100000, 0x080000  )
+	ROM_LOAD( "ts000e.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
+	ROM_RELOAD(              0x180000, 0x080000  )
+	ROM_LOAD( "ts002e.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles */
+	ROM_LOAD( "ts010.u4",  0x000000, 0x100000, CRC(df935324) SHA1(73b7aff8800a4e88a47ad426190b73dabdfbf142) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles */
+	ROM_LOAD( "ts020.u33",  0x000000, 0x100000, CRC(eb58c35d) SHA1(762c5219de6f729a0fc1df90fce09cdf711c2a1e) )
+
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_REGION( 0x100000, "oki1", 0 )  /* OKI Sample ROM */
+	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
+ROM_END
+
+ROM_START( bakubrkr ) /* MASTER UP= 92/10/08 20:56:03 */
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* 68000 Code */
 	ROM_LOAD16_BYTE( "ts100j.u18", 0x000000, 0x040000, CRC(8cc0a4fd) SHA1(e7e18b5ea236522a79ba9db8f573ac8f7ade504b) )
 	ROM_LOAD16_BYTE( "ts101j.u19", 0x000001, 0x040000, CRC(aea92195) SHA1(e89f964e7e936fd7774f21956eb4ff5c9104837b) )
 
 	ROM_REGION( 0x240000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "ts001j.u37",  0x000000, 0x080000, CRC(70b66e7e) SHA1(307ba27b623f67ee4b4023179870c270bac8ea22) )
-	ROM_RELOAD(              0x100000, 0x080000             )
+	ROM_RELOAD(              0x100000, 0x080000  )
 	ROM_LOAD( "ts000j.u38",  0x080000, 0x080000, CRC(a7a94143) SHA1(d811a7597402c161850ddf98cdb00661ea506c7d) )
-	ROM_RELOAD(              0x180000, 0x080000             )
+	ROM_RELOAD(              0x180000, 0x080000  )
 	ROM_LOAD( "ts002j.u36",  0x200000, 0x040000, CRC(611271e6) SHA1(811c21822b074fbb4bb809fed29d48bbd51d57a0) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Tiles */
@@ -4410,8 +4435,9 @@ GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl, kaneko16_state,          k
 GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, blazeon,    0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Explosive Breaker", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Explosive Breaker (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, explbrkrk,  explbrkr, bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Explosive Breaker (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, wingforc,   0,        wingforc, wingforc, kaneko16_state,          bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )

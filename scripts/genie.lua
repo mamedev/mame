@@ -671,6 +671,16 @@ if not _OPTIONS["with-system-flac"]~=nil then
 	}
 end
 
+if not _OPTIONS["with-system-pugixml"] then
+	defines {
+		"PUGIXML_HEADER_ONLY",
+	}
+else
+	links {
+		ext_lib("pugixml"),
+	}
+end
+
 if _OPTIONS["NOASM"]=="1" then
 	defines {
 		"MAME_NOASM"

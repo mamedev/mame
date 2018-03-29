@@ -178,7 +178,7 @@ void capricorn_cpu_device::device_start()
 	save_item(NAME(m_reg_E));
 	save_item(NAME(m_flags));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void capricorn_cpu_device::device_reset()
@@ -201,7 +201,7 @@ void capricorn_cpu_device::execute_run()
 			// Handle interrupt
 			take_interrupt();
 		} else {
-			debugger_instruction_hook(this, m_genpc);
+			debugger_instruction_hook(m_genpc);
 
 			uint8_t opcode = fetch();
 			execute_one(opcode);

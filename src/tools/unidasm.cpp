@@ -10,9 +10,6 @@
 
 #include "emu.h"
 
-#include <algorithm>
-#include <cstring>
-
 #include <ctype.h>
 
 #include "cpu/8x300/8x300dasm.h"
@@ -149,6 +146,10 @@
 #include "cpu/z8/z8dasm.h"
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
+
+#include <algorithm>
+#include <cstring>
+#include <stdexcept>
 
 // Configuration classes
 
@@ -532,7 +533,7 @@ unidasm_data_buffer::unidasm_data_buffer(util::disasm_interface *_disasm, const 
 	if(flags & util::disasm_interface::NONLINEAR_PC) {
 		switch(entry->pcshift) {
 		case -1:
-			lr8  = [](offs_t pc) -> u8  { throw emu_fatalerror("debug_disasm_buffer::debug_data_buffer: r8 access on 16-bits granularity bus\n"); };
+			lr8  = [](offs_t pc) -> u8  { throw std::logic_error("debug_disasm_buffer::debug_data_buffer: r8 access on 16-bits granularity bus\n"); };
 			lr16 = [this](offs_t pc) -> u16 {
 				const u16 *src = get_ptr<u16>(pc);
 				return src[0];

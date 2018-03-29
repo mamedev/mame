@@ -1556,7 +1556,7 @@ void pps4_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, m_P);
+		debugger_instruction_hook(m_P);
 		execute_one();
 
 	} while (m_icount > 0);
@@ -1603,7 +1603,7 @@ void pps4_device::device_start()
 	state_add( STATE_GENPCBASE,"CURPC", m_P ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_C).formatstr("%3s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_dia_cb.resolve_safe(0);
 	m_dib_cb.resolve_safe(0);

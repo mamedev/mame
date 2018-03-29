@@ -372,7 +372,7 @@ void i8085a_cpu_device::device_start()
 	save_item(NAME(m_trap_im_copy));
 	save_item(NAME(m_sod_state));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -854,7 +854,7 @@ void i8085a_cpu_device::execute_run()
 
 	do
 	{
-		debugger_instruction_hook(this, m_PC.d);
+		debugger_instruction_hook(m_PC.d);
 
 		/* the instruction after an EI does not take an interrupt, so
 		   we cannot check immediately; handle post-EI behavior here */

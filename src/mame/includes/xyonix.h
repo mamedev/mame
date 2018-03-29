@@ -20,13 +20,17 @@ public:
 	int m_credits;
 	int m_coins;
 	int m_prev_coin;
+	bool m_nmi_mask;
 
+	DECLARE_WRITE_LINE_MEMBER(nmiclk_w);
 	DECLARE_WRITE8_MEMBER(irqack_w);
+	DECLARE_WRITE8_MEMBER(nmiack_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_WRITE8_MEMBER(vidram_w);
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_PALETTE_INIT(xyonix);

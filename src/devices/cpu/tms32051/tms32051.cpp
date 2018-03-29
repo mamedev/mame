@@ -251,7 +251,7 @@ void tms32051_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void tms32051_device::device_reset()
@@ -377,7 +377,7 @@ void tms32051_device::execute_run()
 
 		if (m_idle)
 		{
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 			CYCLES(1);
 		}
 		else
@@ -401,7 +401,7 @@ void tms32051_device::execute_run()
 			}
 
 			ppc = m_pc;
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 
 			m_op = ROPCODE();
 			(this->*s_opcode_table[m_op >> 8])();

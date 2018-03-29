@@ -820,7 +820,7 @@ void avr8_device::device_start()
 	save_item(NAME(m_elapsed_cycles));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -2954,7 +2954,7 @@ void avr8_device::execute_run()
 		m_pc &= m_addr_mask;
 		m_shifted_pc &= (m_addr_mask << 1) | 1;
 
-		debugger_instruction_hook(this, m_shifted_pc);
+		debugger_instruction_hook(m_shifted_pc);
 
 		op = (uint32_t)m_program->read_word(m_shifted_pc);
 

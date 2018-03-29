@@ -22,16 +22,13 @@
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(ddribble_state::ddribble_interrupt_0)
+WRITE_LINE_MEMBER(ddribble_state::vblank_irq)
 {
-	if (m_int_enable_0)
-		device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
-}
+	if (state && m_int_enable_0)
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 
-INTERRUPT_GEN_MEMBER(ddribble_state::ddribble_interrupt_1)
-{
-	if (m_int_enable_1)
-		device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	if (state && m_int_enable_1)
+		m_cpu1->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 
@@ -265,11 +262,9 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu0_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_0)
 
 	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_1)
 
 	MCFG_CPU_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
@@ -288,6 +283,7 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
     MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
 	MCFG_SCREEN_UPDATE_DRIVER(ddribble_state, screen_update_ddribble)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddribble_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddribble)
 	MCFG_PALETTE_ADD("palette", 64 + 256)
