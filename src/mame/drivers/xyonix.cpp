@@ -36,11 +36,30 @@ void xyonix_state::machine_start()
 	save_item(NAME(m_credits));
 	save_item(NAME(m_coins));
 	save_item(NAME(m_prev_coin));
+	save_item(NAME(m_nmi_mask));
+}
+
+void xyonix_state::machine_reset()
+{
+	m_nmi_mask = false;
 }
 
 WRITE8_MEMBER(xyonix_state::irqack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(xyonix_state::nmiclk_w)
+{
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(xyonix_state::nmiack_w)
+{
+	m_nmi_mask = BIT(data, 0);
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -155,7 +174,7 @@ void xyonix_state::port_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x20, 0x20).nopr().w("sn1", FUNC(sn76496_device::write));   /* SN76496 ready signal */
 	map(0x21, 0x21).nopr().w("sn2", FUNC(sn76496_device::write));
-	map(0x40, 0x40).nopw();        /* NMI ack? */
+	map(0x40, 0x40).w(this, FUNC(xyonix_state::nmiack_w));
 	map(0x50, 0x50).w(this, FUNC(xyonix_state::irqack_w));
 	map(0x60, 0x61).nopw();        /* mc6845 */
 	map(0xe0, 0xe0).rw(this, FUNC(xyonix_state::io_r), FUNC(xyonix_state::io_w));
@@ -232,7 +251,6 @@ MACHINE_CONFIG_START(xyonix_state::xyonix)
 	MCFG_CPU_ADD("maincpu", Z80,16000000 / 4)        /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xyonix_state,  nmi_line_pulse)
 	MCFG_CPU_PERIODIC_INT_DRIVER(xyonix_state, irq0_line_assert, 4*60)  /* ?? controls music tempo */
 
 	/* video hardware */
@@ -243,6 +261,7 @@ MACHINE_CONFIG_START(xyonix_state::xyonix)
 	MCFG_SCREEN_VISIBLE_AREA(0, 80*4-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xyonix_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xyonix_state, nmiclk_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xyonix)
 	MCFG_PALETTE_ADD("palette", 256)

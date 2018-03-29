@@ -753,13 +753,6 @@ static INPUT_PORTS_START(ltmpm)
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(bbc_state::bbcb_vsync)
-{
-	m_via6522_0->write_ca1(1);
-	m_via6522_0->write_ca1(0);
-}
-
-
 FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbc )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
@@ -838,7 +831,6 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 16_MHz_XTAL/8)         /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbca_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state, bbcb_vsync)      /* screen refresh interrupts */
 	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1309,7 +1301,6 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 	MCFG_CPU_ADD("maincpu", M65SC02, 16_MHz_XTAL/8)        /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbcm_mem)
 	MCFG_CPU_OPCODES_MAP(bbcm_fetch)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state, bbcb_vsync)      /* screen refresh interrupts */
 	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

@@ -325,9 +325,13 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(raiden_state::raiden_interrupt)
+WRITE_LINE_MEMBER(raiden_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); /* VBL */
+	if (state)
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+	}
 }
 
 MACHINE_CONFIG_START(raiden_state::raiden)
@@ -335,11 +339,9 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,XTAL(20'000'000)/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden_state, raiden_interrupt)
 
 	MCFG_CPU_ADD("sub", V30,XTAL(20'000'000)/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden_state, raiden_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
@@ -356,6 +358,7 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(raiden_state, screen_update_raiden)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(raiden_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", raiden)

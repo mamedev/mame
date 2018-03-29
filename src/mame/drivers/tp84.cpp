@@ -87,10 +87,12 @@ void tp84_state::machine_start()
 }
 
 
-INTERRUPT_GEN_MEMBER(tp84_state::main_vblank_irq)
+WRITE_LINE_MEMBER(tp84_state::vblank_irq)
 {
-	if (m_irq_enable)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_irq_enable)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	if (state && m_sub_irq_mask)
+		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -216,6 +218,8 @@ void tp84_state::tp84b_cpu1_map(address_map &map)
 WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 {
 	m_sub_irq_mask = data & 1;
+	if (!m_sub_irq_mask)
+		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -325,23 +329,15 @@ static GFXDECODE_START( tp84 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4*8, 16*8 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
-{
-	if(m_sub_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
-}
-
 
 MACHINE_CONFIG_START(tp84_state::tp84)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(18'432'000)/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tp84_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -366,6 +362,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tp84_state, screen_update_tp84)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tp84_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tp84)
 	MCFG_PALETTE_ADD("palette", 4096)

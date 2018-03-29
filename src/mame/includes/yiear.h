@@ -49,7 +49,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(yiear);
 	uint32_t screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(yiear_vblank_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(yiear_nmi_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void yiear(machine_config &config);
