@@ -153,6 +153,7 @@
     * JAMMA connector has high-level balanced mono output
     * Single-slot boards with stereo capability have a 4-pin stereo speaker header
     * Boards with stereo support have headphone connectors or headers for them
+    * Newer single-slot boards have an 8-pin header for the trackball or 4-player interface
 
 *****************************************************************************
 
@@ -832,8 +833,8 @@ WRITE8_MEMBER(neogeo_base_state::io_control_w)
 	case 0x18:
 	case 0x20:
 	case 0x28:
-//  case 0x30: break; // coin counters
-//  case 0x31: break; // coin counters
+	case 0x30:
+	case 0x31:
 //  case 0x32: break; // coin lockout
 //  case 0x33: break; // coin lockout
 		// arcade peripherals
@@ -854,8 +855,11 @@ WRITE8_MEMBER(ngarcade_base_state::io_control_w)
 		m_upd4990a->stb_w(BIT(data, 2));
 		break;
 
-//  case 0x30: break; // coin counters
-//  case 0x31: break; // coin counters
+	case 0x30: // coin 1 counter
+	case 0x31: // coin 2/3/4 counter
+		machine().bookkeeping().coin_counter_w(BIT(offset, 0), BIT(data, 4));
+		break;
+
 //  case 0x32: break; // coin lockout
 //  case 0x33: break; // coin lockout
 
