@@ -460,7 +460,7 @@ public:
 	DECLARE_PALETTE_INIT(amaticmg2);
 	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
+	DECLARE_WRITE_LINE_MEMBER(amaticmg2_irq);
 	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
 	required_device<cpu_device> m_maincpu;
@@ -837,7 +837,6 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)
 	MCFG_CPU_IO_MAP(amaticmg_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state, nmi_line_pulse) // no NMI mask?
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -864,6 +863,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // no NMI mask?
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amaticmg)
 
@@ -878,10 +878,10 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(amaticmg_state::amaticmg2_irq)
+WRITE_LINE_MEMBER(amaticmg_state::amaticmg2_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -890,12 +890,14 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg2_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
+
+	MCFG_DEVICE_MODIFY("crtc")
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amaticmg_state, amaticmg2_irq))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")
@@ -909,12 +911,14 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg4_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
+
+	MCFG_DEVICE_MODIFY("crtc")
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amaticmg_state, amaticmg2_irq))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")
@@ -1156,7 +1160,7 @@ DRIVER_INIT_MEMBER(amaticmg_state,ama8000_3_o)
 ************************************/
 
 /*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT         ROT     COMPANY                FULLNAME                      FLAGS                                                                                                                       LAYOUT */
-GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 MACHINE_IMPERFECT_SOUND,                                                                                                    layout_suprstar )
+GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING,                                                                              layout_suprstar )
 GAME(  2000, am_mg24,  0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg24a, 0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (unknown V2.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )  // needs proper decryption.
 GAME(  2000, am_mg3,   0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
