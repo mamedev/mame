@@ -511,7 +511,6 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(spaceg_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spaceg_state,  nmi_line_pulse) /* 60 Hz NMIs (verified) */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -521,6 +520,7 @@ MACHINE_CONFIG_START(spaceg_state::spaceg)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 32, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(spaceg_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // 60 Hz NMIs (verified)
 
 	MCFG_PALETTE_ADD("palette", 16+128-16)
 	MCFG_PALETTE_INIT_OWNER(spaceg_state, spaceg)

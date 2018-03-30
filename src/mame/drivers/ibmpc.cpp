@@ -524,9 +524,9 @@ ROM_START( ibm5160 )
 	           before.
 
 	    ** The Main Display Board (with one 48-pin custom, two 40 pin customs at least one of which
-               is an MCU, four 2016BP-10 srams, an 8254 and an 8255 on it, a SCN2672 (PVTC), two crystals
-               (16.257MHz and 21.676MHz) plus two mask roms ) is stickered "61X6579 // 983623 // 6390 SU"
-               on the front.
+	           is an MCU, four 2016BP-10 srams, an 8254 and an 8255 on it, a SCN2672 (PVTC), two crystals
+	           (16.257MHz and 21.676MHz) plus two mask roms ) is stickered "61X6579 // 983623 // 6390 SU"
+	           on the front.
 	    *  The pcb is trace-marked "6320987" on both the front and back.
 	    *  The card has a DE-9 connector on it for a monitor.
 	    *  The customs are marked:

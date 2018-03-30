@@ -250,7 +250,6 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	MCFG_CPU_ADD( "maincpu", Z80, 2500000 )
 	MCFG_CPU_PROGRAM_MAP( primo32_mem)
 	MCFG_CPU_IO_MAP( primoa_port)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", primo_state,  primo_vblank_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -260,6 +259,7 @@ MACHINE_CONFIG_START(primo_state::primoa32)
 	MCFG_SCREEN_VISIBLE_AREA( 0, 256-1, 0, 192-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(primo_state, screen_update_primo)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(primo_state, vblank_irq))
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

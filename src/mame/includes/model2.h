@@ -124,7 +124,7 @@ public:
 	raster_state *m_raster;
 	geo_state *m_geo;
 	bitmap_rgb32 m_sys24_bitmap;
-//	uint32_t m_soundack;
+//  uint32_t m_soundack;
 	void model2_check_irq_state();
 	void model2_check_irqack_state(uint32_t data);
 	uint8_t m_gearsel;
@@ -170,7 +170,7 @@ public:
 	DECLARE_WRITE32_MEMBER(model2_serial_w);
 	DECLARE_WRITE16_MEMBER(horizontal_sync_w);
 	DECLARE_WRITE16_MEMBER(vertical_sync_w);
-	
+
 	void raster_init(memory_region *texture_rom);
 	void geo_init(memory_region *polygon_rom);
 	DECLARE_READ32_MEMBER(render_mode_r);
@@ -217,8 +217,8 @@ public:
 	DECLARE_MACHINE_RESET(model2_common);
 	DECLARE_MACHINE_RESET(model2_scsp);
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//	DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
-//	DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
+//  DECLARE_WRITE_LINE_MEMBER(screen_vblank_model2);
+//  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
@@ -240,7 +240,7 @@ public:
 	void geo_parse( void );
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	
+
 	void model2_timers(machine_config &config);
 	void model2_screen(machine_config &config);
 	void model2_scsp(machine_config &config);
@@ -262,7 +262,7 @@ public:
 	void debug_geo_dasm_command(int ref, const std::vector<std::string> &params);
 	void debug_tri_dump_command(int ref, const std::vector<std::string> &params);
 	void debug_help_command(int ref, const std::vector<std::string> &params);
-	
+
 protected:
 	virtual void video_start() override;
 
@@ -291,19 +291,19 @@ private:
 	// geo commands
 	uint32_t *geo_nop( geo_state *geo, uint32_t opcode, uint32_t *input );
 	uint32_t *geo_object_data( geo_state *geo, uint32_t opcode, uint32_t *input );
-	uint32_t *geo_direct_data( geo_state *geo, uint32_t opcode, uint32_t *input );           
-	uint32_t *geo_window_data( geo_state *geo, uint32_t opcode, uint32_t *input );           
-	uint32_t *geo_texture_data( geo_state *geo, uint32_t opcode, uint32_t *input );          
-	uint32_t *geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *input );          
-	uint32_t *geo_texture_parameters( geo_state *geo, uint32_t opcode, uint32_t *input );    
-	uint32_t *geo_mode( geo_state *geo, uint32_t opcode, uint32_t *input );                  
-	uint32_t *geo_zsort_mode( geo_state *geo, uint32_t opcode, uint32_t *input );            
-	uint32_t *geo_focal_distance( geo_state *geo, uint32_t opcode, uint32_t *input );        
-	uint32_t *geo_light_source( geo_state *geo, uint32_t opcode, uint32_t *input );          
-	uint32_t *geo_matrix_write( geo_state *geo, uint32_t opcode, uint32_t *input );          
-	uint32_t *geo_translate_write( geo_state *geo, uint32_t opcode, uint32_t *input );       
-	uint32_t *geo_data_mem_push( geo_state *geo, uint32_t opcode, uint32_t *input );         
-	uint32_t *geo_test( geo_state *geo, uint32_t opcode, uint32_t *input );                  
+	uint32_t *geo_direct_data( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_window_data( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_texture_data( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_polygon_data( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_texture_parameters( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_mode( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_zsort_mode( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_focal_distance( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_light_source( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_matrix_write( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_translate_write( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_data_mem_push( geo_state *geo, uint32_t opcode, uint32_t *input );
+	uint32_t *geo_test( geo_state *geo, uint32_t opcode, uint32_t *input );
 	uint32_t *geo_end( geo_state *geo, uint32_t opcode, uint32_t *input );
 	uint32_t *geo_dummy( geo_state *geo, uint32_t opcode, uint32_t *input );
 	uint32_t *geo_log_data( geo_state *geo, uint32_t opcode, uint32_t *input );
@@ -315,7 +315,7 @@ private:
 	void geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t count );
 	void geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t count );
 	void geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t count );
-	
+
 	// raster functions
 	// main data input port
 	void model2_3d_push( raster_state *raster, uint32_t input );
@@ -388,11 +388,11 @@ public:
 	DECLARE_READ8_MEMBER(gtx_r);
 	void daytona_gtx(machine_config &config);
 	void model2o_gtx_mem(address_map &map);
-	
+
 private:
 	int m_gtx_state;
 };
- 
+
 /*****************************
  *
  * Model 2A
@@ -534,7 +534,7 @@ public:
 	void model2_3d_render(triangle *tri, const rectangle &cliprect);
 	void set_xoffset(int16 xoffs) { m_xoffs = xoffs; }
 	void set_yoffset(int16 yoffs) { m_yoffs = yoffs; }
-	
+
 	/* checker = 0, textured = 0, transparent = 0 */
 	#define MODEL2_FUNC 0
 	#define MODEL2_FUNC_NAME    model2_3d_render_0

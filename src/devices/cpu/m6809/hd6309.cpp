@@ -301,9 +301,9 @@ void hd6309_device::device_post_load()
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *hd6309_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> hd6309_device::create_disassembler()
 {
-	return new hd6309_disassembler;
+	return std::make_unique<hd6309_disassembler>();
 }
 
 

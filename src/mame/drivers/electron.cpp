@@ -98,6 +98,11 @@ void electron_state::electron_mem(address_map &map)
 	map(0xfe00, 0xfeff).rw(this, FUNC(electron_state::electron_sheila_r), FUNC(electron_state::electron_sheila_w));    /* SHEILA */
 }
 
+void electron_state::electron64_opcodes(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(electron_state::electron64_fetch_r));
+}
+
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -201,7 +206,7 @@ static INPUT_PORTS_START( electron64 )
 	PORT_INCLUDE(electron)
 
 	PORT_START("MRB")
-	PORT_CONFNAME(0x03, 0x01, "MRB Mode")
+	PORT_CONFNAME(0x03, 0x02, "MRB Mode")
 	PORT_CONFSETTING(0x00, "Normal")
 	PORT_CONFSETTING(0x01, "Turbo")
 	PORT_CONFSETTING(0x02, "64K")
@@ -261,6 +266,18 @@ MACHINE_CONFIG_START(electron_state::btm2105)
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_START(electron_state::electron64)
+	electron(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(electron_mem)
+	MCFG_CPU_OPCODES_MAP(electron64_opcodes)
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
+
 /* Electron Rom Load */
 ROM_START(electron)
 	ROM_REGION( 0x4000, "mos", 0 )
@@ -279,7 +296,7 @@ ROM_END
 #define rom_btm2105 rom_electron
 
 
-/*     YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT       CLASS           INIT  COMPANY                             FULLNAME                                 FLAGS */
-COMP ( 1983, electron,   0,        0,      electron, electron,   electron_state, 0,    "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-COMP ( 1985, btm2105,    electron, 0,      btm2105,  electron,   electron_state, 0,    "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
-COMP ( 1987, electron64, electron, 0,      electron, electron64, electron_state, 0,    "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_NOT_WORKING )
+/*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT  COMPANY                             FULLNAME                                 FLAGS */
+COMP ( 1983, electron,   0,        0,      electron,   electron,   electron_state, 0,    "Acorn",                            "Acorn Electron",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+COMP ( 1985, btm2105,    electron, 0,      btm2105,    electron,   electron_state, 0,    "British Telecom Business Systems", "BT Merlin M2105",                       MACHINE_NOT_WORKING )
+COMP ( 1987, electron64, electron, 0,      electron64, electron64, electron_state, 0,    "Acorn/Slogger",                    "Acorn Electron (64K Master RAM Board)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

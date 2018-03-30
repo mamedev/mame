@@ -104,7 +104,7 @@ protected:
 	void data_16x2x4(address_map &map);
 
 	virtual void device_reset() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual bool wake_me_up() override;
 	virtual void init_divider() override { }
 	virtual void init_lcd_driver() override { }

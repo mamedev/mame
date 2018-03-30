@@ -126,9 +126,9 @@ WRITE8_MEMBER(laserbat_state_base::ct_io_w)
 	    +-----+-----------------------------+--------------------+--------------+
 	*/
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
-	machine().bookkeeping().coin_counter_w(2, data & 0x04);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));
 	flip_screen_set((bool(data & 0x08) && !bool(m_row1->read() & 0x10)) ? 1 : 0);
 	m_input_mux = (data >> 4) & 0x03;
 

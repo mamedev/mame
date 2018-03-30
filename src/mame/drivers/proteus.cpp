@@ -130,9 +130,9 @@ void proteus_state::machine_start()
 		rom[i] = bitswapped[bitswap<16>(i, 15, 14, 13, 12, 10, 8, 4, 2, 0, 1, 3, 5, 6, 7, 9, 11)];
 
 	/*
-		The Proteus BIOS contains a serial ID for copy protection. Disks also contain the
-		OS serial ID which must match the BIOS serial ID. This can be negated by patching the
-		serial in the BIOS to 0x0000.
+	    The Proteus BIOS contains a serial ID for copy protection. Disks also contain the
+	    OS serial ID which must match the BIOS serial ID. This can be negated by patching the
+	    serial in the BIOS to 0x0000.
 	*/
 	rom[0x02] = 0x00;
 	rom[0x03] = 0x00;
@@ -271,12 +271,12 @@ void proteus_state::proteus_z80_io(address_map &map)
 
 
 //Parameter 1: Baud Rate from BIOS
-//	00 = 9600
-//	02 = 4800
-//	04 = 2400
-//	06 = 1200
-//	08 = 600
-//	0A = 300
+//  00 = 9600
+//  02 = 4800
+//  04 = 2400
+//  06 = 1200
+//  08 = 600
+//  0A = 300
 static INPUT_PORTS_START(proteus)
 	PORT_START("TERM_BAUD")
 	PORT_CONFNAME(0x07, 0x00, "Terminal Baud Rate")

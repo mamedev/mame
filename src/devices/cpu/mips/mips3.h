@@ -18,7 +18,6 @@
 #include "divtlb.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
 
 
 // NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
@@ -226,15 +225,6 @@ struct mips3_tlb_entry
 	uint64_t          entry_lo[2];
 };
 
-/* internal compiler state */
-struct compiler_state
-{
-	uint32_t              cycles;                     /* accumulated cycles */
-	uint8_t               checkints;                  /* need to check interrupts before next instruction */
-	uint8_t               checksoftints;              /* need to check software interrupts before next instruction */
-	uml::code_label  labelnum;                   /* index for local labels */
-};
-
 #define MIPS3_MAX_TLB_ENTRIES       48
 
 #define MCFG_MIPS3_ICACHE_SIZE(_size) \
@@ -312,7 +302,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 
 private:
@@ -529,8 +519,8 @@ private:
 	void swr_le(uint32_t op);
 	void sdl_le(uint32_t op);
 	void sdr_le(uint32_t op);
-	void load_fast_iregs(drcuml_block *block);
-	void save_fast_iregs(drcuml_block *block);
+	void load_fast_iregs(drcuml_block &block);
+	void save_fast_iregs(drcuml_block &block);
 	void code_flush_cache();
 	void code_compile_block(uint8_t mode, offs_t pc);
 public:
@@ -540,38 +530,49 @@ public:
 	void func_printf_probe();
 	void func_unimplemented();
 private:
+	/* internal compiler state */
+	struct compiler_state
+	{
+		compiler_state &operator=(compiler_state &) = delete;
+
+		uint32_t         cycles;                     /* accumulated cycles */
+		uint8_t          checkints;                  /* need to check interrupts before next instruction */
+		uint8_t          checksoftints;              /* need to check software interrupts before next instruction */
+		uml::code_label  labelnum;                   /* index for local labels */
+	};
+
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
 	void static_generate_tlb_mismatch();
 	void static_generate_exception(uint8_t exception, int recover, const char *name);
-	void static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, uml::code_handle **handleptr);
+	void static_generate_memory_accessor(int mode, int size, int iswrite, int ismasked, const char *name, uml::code_handle *&handleptr);
 
-	void generate_update_mode(drcuml_block *block);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
-	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
-	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t linkreg);
+	void generate_update_mode(drcuml_block &block);
+	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
+	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_delay_slot_and_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint8_t linkreg);
 
-	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_special(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_regimm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_idt(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	bool generate_special(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	bool generate_regimm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	bool generate_idt(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	bool generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg);
-	bool generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint8_t reg);
-	bool generate_cop0(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_cop1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_cop1x(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_set_cop0_reg(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint8_t reg);
+	bool generate_get_cop0_reg(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint8_t reg);
+	bool generate_cop0(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	bool generate_cop1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	bool generate_cop1x(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	void check_cop0_access(drcuml_block *block);
-	void check_cop1_access(drcuml_block *block);
-	void generate_badcop(drcuml_block *block, const int cop);
+	void check_cop0_access(drcuml_block &block);
+	void check_cop1_access(drcuml_block &block);
+	void generate_badcop(drcuml_block &block, const int cop);
 
-	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
+	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
 	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
-	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
+	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
+	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
 };
 

@@ -38,7 +38,7 @@ public:
 	DECLARE_MACHINE_RESET(xevios);
 	DECLARE_MACHINE_RESET(battles);
 	uint32_t screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(battles_interrupt_4);
+	DECLARE_WRITE_LINE_MEMBER(battles_interrupt_4);
 	TIMER_DEVICE_CALLBACK_MEMBER(battles_nmi_generate);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER( xevious_fg_videoram_w );

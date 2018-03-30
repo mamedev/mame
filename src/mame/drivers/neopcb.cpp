@@ -6,31 +6,76 @@
 #include "emu.h"
 #include "includes/neogeo.h"
 
+#include "bus/neogeo/prot_pcm2.h"
+#include "bus/neogeo/prot_cmc.h"
+#include "bus/neogeo/prot_pvc.h"
+
+
+class neopcb_state : public ngarcade_base_state
+{
+public:
+	neopcb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ngarcade_base_state(mconfig, type, tag)
+		, m_cmc_prot(*this, "cmc50")
+		, m_pcm2_prot(*this, "pcm2")
+		, m_pvc_prot(*this, "pvc")
+	{
+	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
+
+	DECLARE_DRIVER_INIT(ms5pcb);
+	DECLARE_DRIVER_INIT(svcpcb);
+	DECLARE_DRIVER_INIT(kf2k3pcb);
+
+	void neopcb(machine_config &config);
+
+protected:
+	// device overrides
+	virtual void machine_start() override;
+
+	virtual void neogeo_postload() override;
+
+	DECLARE_WRITE16_MEMBER(write_bankpvc);
+
+	void install_common();
+	void install_banked_bios();
+	void neopcb_postload();
+
+	// non-carts
+	void svcpcb_gfx_decrypt();
+	void svcpcb_s1data_decrypt();
+	void kf2k3pcb_gfx_decrypt();
+	void kf2k3pcb_decrypt_s1data();
+	void kf2k3pcb_sp1_decrypt();
+
+private:
+	required_device<cmc_prot_device> m_cmc_prot;
+	required_device<pcm2_prot_device> m_pcm2_prot;
+	required_device<pvc_prot_device> m_pvc_prot;
+};
+
 
 void neopcb_state::machine_start()
 {
-	m_type = NEOGEO_MVS;
-	common_machine_start();
-
-	// enable rtc and serial mode
-	m_upd4990a->cs_w(1);
-	m_upd4990a->oe_w(1);
-	m_upd4990a->c0_w(1);
-	m_upd4990a->c1_w(1);
-	m_upd4990a->c2_w(1);
+	ngarcade_base_state::machine_start();
 
 	m_sprgen->set_screen(m_screen);
 }
 
-void neopcb_state::neopcb_postload()
+void neopcb_state::neogeo_postload()
 {
-	m_bank_audio_main->set_entry(m_use_cart_audio);
+	ngarcade_base_state::neogeo_postload();
+
 	membank("cpu_bank")->set_base(m_region_maincpu->base() + m_bank_base);
-	set_outputs();
 }
 
 MACHINE_CONFIG_START(neopcb_state::neopcb)
 	neogeo_arcade(config);
+	neogeo_mono(config);
+
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "joy", true)
+
 	MCFG_CMC_PROT_ADD("cmc50")
 	MCFG_PCM2_PROT_ADD("pcm2")
 	MCFG_PVC_PROT_ADD("pvc")
@@ -445,7 +490,6 @@ void neopcb_state::install_banked_bios()
 
 DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
 {
-	DRIVER_INIT_CALL(neogeo);
 	install_common();
 	install_banked_bios();
 
@@ -465,7 +509,6 @@ DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
 
 DRIVER_INIT_MEMBER(neopcb_state, svcpcb)
 {
-	DRIVER_INIT_CALL(neogeo);
 	install_common();
 	install_banked_bios();
 
@@ -485,7 +528,6 @@ DRIVER_INIT_MEMBER(neopcb_state, svcpcb)
 
 DRIVER_INIT_MEMBER(neopcb_state, kf2k3pcb)
 {
-	DRIVER_INIT_CALL(neogeo);
 	install_common();
 
 	m_sprgen->m_fixed_layer_bank_type = 2;

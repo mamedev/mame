@@ -21,13 +21,14 @@ class vcs80_state : public driver_device
 {
 public:
 	vcs80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_pio(*this, Z80PIO_TAG),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_bdmem(*this, "bdmem")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_pio(*this, Z80PIO_TAG)
+		, m_y0(*this, "Y0")
+		, m_y1(*this, "Y1")
+		, m_y2(*this, "Y2")
+		, m_bdmem(*this, "bdmem")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -36,6 +37,7 @@ public:
 	required_ioport m_y1;
 	required_ioport m_y2;
 	required_device<address_map_bank_device> m_bdmem;
+	output_finder<9> m_digits;
 
 	virtual void machine_start() override;
 

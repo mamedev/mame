@@ -402,10 +402,10 @@ static const z80_daisy_config xerox820_daisy_chain[] =
 QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	
+
 	if (quickload_size >= 0xfd00)
 		return image_init_result::FAIL;
-	
+
 	bankswitch(0);
 
 	/* Avoid loading a program if CP/M-80 is not in memory */
@@ -414,7 +414,7 @@ QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
 		machine_reset();
 		return image_init_result::FAIL;
 	}
-	
+
 	/* Load image to the TPA (Transient Program Area) */
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
@@ -426,11 +426,11 @@ QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
 
 	/* clear out command tail */
 	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
-	
+
 	/* Roughly set SP basing on the BDOS position */
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);   // start program
-	
+
 	return image_init_result::PASS;
 }
 
@@ -439,7 +439,8 @@ QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
 /* WD1771 Interface */
 
 static SLOT_INTERFACE_START( xerox820_floppies )
-	SLOT_INTERFACE( "sa400", FLOPPY_525_SSSD ) // Shugart SA-400
+	SLOT_INTERFACE( "sa400", FLOPPY_525_SSSD_35T ) // Shugart SA-400, 35 trk drive
+	SLOT_INTERFACE( "sa400l", FLOPPY_525_SSSD ) // Shugart SA-400, 40 trk drive
 	SLOT_INTERFACE( "sa450", FLOPPY_525_DD ) // Shugart SA-450
 	SLOT_INTERFACE( "sa800", FLOPPY_8_SSDD ) // Shugart SA-800
 	SLOT_INTERFACE( "sa850", FLOPPY_8_DSDD ) // Shugart SA-850
@@ -635,8 +636,8 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 	MCFG_FD1771_ADD(FD1771_TAG, XTAL(20'000'000)/20)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(xerox820_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(xerox820_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL(20'000'000)/8)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))

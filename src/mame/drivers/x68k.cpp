@@ -139,8 +139,8 @@
 #include "x68000.lh"
 
 
-static uint32_t adpcm_clock[2] = { 8000000, 4000000 };
-static uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
+static constexpr uint32_t adpcm_clock[2] = { 8000000, 4000000 };
+static constexpr uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
 
 void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -1704,7 +1704,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 	MCFG_OKIM6258_OUT_BITS(OUTPUT_10BITS)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outl", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "adpcm_outr", 0.50)
-	
+
 	MCFG_FILTER_VOLUME_ADD("adpcm_outl", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("adpcm_outr", 0)

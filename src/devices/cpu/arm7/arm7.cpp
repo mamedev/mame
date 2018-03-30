@@ -592,7 +592,7 @@ void arm7_cpu_device::device_start()
 	save_item(NAME(m_decoded_access_control));
 	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	state_add( ARM7_PC,    "PC", m_pc).callexport().formatstr("%08X");
 	state_add(STATE_GENPC, "GENPC", m_pc).callexport().noshow();
@@ -804,7 +804,7 @@ void arm7_cpu_device::execute_run()
 
 		update_insn_prefetch(pc);
 
-		debugger_instruction_hook(this, pc);
+		debugger_instruction_hook(pc);
 
 		/* handle Thumb instructions if active */
 		if (T_IS_SET(m_r[eCPSR]))
@@ -971,9 +971,9 @@ void arm7_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-util::disasm_interface *arm7_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> arm7_cpu_device::create_disassembler()
 {
-	return new arm7_disassembler(this);
+	return std::make_unique<arm7_disassembler>(this);
 }
 
 bool arm7_cpu_device::get_t_flag() const

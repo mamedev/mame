@@ -294,34 +294,34 @@ function cheatfind.startplugin()
 
 		local space_table = cheat.getspaces()
 		for tag, list in pairs(space_table) do
-			if list.program then
+			for name, space in pairs(list) do
 				local ram = {}
-				for num, entry in pairs(list.program.map) do
+				for num, entry in pairs(space.map) do
 					if entry.writetype == "ram" then
 						ram[#ram + 1] = { offset = entry.offset, size = entry.endoff - entry.offset }
-						if list.program.shift > 0 then
-							ram[#ram].size = ram[#ram].size >> list.program.shift
-						elseif list.program.shift < 0 then
-							ram[#ram].size = ram[#ram].size << -list.program.shift
+						if space.shift > 0 then
+							ram[#ram].size = ram[#ram].size >> space.shift
+						elseif space.shift < 0 then
+							ram[#ram].size = ram[#ram].size << -space.shift
 						end
 					end
 				end
 				if next(ram) then
-					if tag == ":maincpu" then
-						table.insert(devtable, 1, { tag = tag, space = list.program, ram = ram })
+					if tag == ":maincpu" and name == "program" then
+						table.insert(devtable, 1, { name = tag .. ", " .. name, tag = tag, sname = name, space = space, ram = ram })
 					else
-						devtable[#devtable + 1] = { tag = tag, space = list.program, ram = ram }
+						devtable[#devtable + 1] = { name = tag .. ", " .. name, tag = tag, sname = name, space = space, ram = ram }
 					end
 				end
 			end
 		end
 		space_table = cheat.getram()
 		for tag, ram in pairs(space_table) do
-			devtable[#devtable + 1] = { tag = tag, space = ram.dev, ram = {{ offset = 0, size = ram.size }} }
+			devtable[#devtable + 1] = { tag = tag, name = "ram", space = ram.dev, ram = {{ offset = 0, size = ram.size }} }
 		end
 		space_table = cheat.getshares()
 		for tag, share in pairs(space_table) do
-			devtable[#devtable + 1] = { tag = tag, space = share, ram = {{ offset = 0, size = share.size }} }
+			devtable[#devtable + 1] = { tag = tag, name = tag, space = share, ram = {{ offset = 0, size = share.size }} }
 		end
 	end
 
@@ -418,7 +418,8 @@ function cheatfind.startplugin()
 						if file then
 							file:write(string.format(cheat_save.json, desc))
 							file:close()
-							if not getmetatable(devtable[devcur].space).__name:match("device_t") then -- no xml or simple for ram_device cheat
+							-- xml or simple are program space only
+							if not getmetatable(devtable[devcur].space).__name:match("device_t") and devtable[devcur].sname == "program" then
 								file = io.open(filename .. ".xml", "w")
 								file:write(string.format(cheat_save.xml, desc))
 								file:close()
@@ -428,7 +429,7 @@ function cheatfind.startplugin()
 								manager:machine():popmessage(string.format(_("Cheat written to %s and added to cheat.simple"), filename))
 							end
 							written = true
-						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") then
+						elseif not getmetatable(devtable[devcur].space).__name:match("device_t") and devtable[devcur].sname == "program" then
 							file = io.open(cheat_save.path .. "/cheat.simple", "a")
 							if file then
 								file:write(string.format(cheat_save.simple, desc))
@@ -452,7 +453,7 @@ function cheatfind.startplugin()
 		end
 
 		menu[#menu + 1] = function()
-			local m = { _("CPU or RAM"), devtable[devsel].tag, 0 }
+			local m = { _("CPU or RAM"), devtable[devsel].name, 0 }
 			menu_lim(devsel, 1, #devtable, m)
 			local function f(event)
 				if (event == "left" or event == "right") and #menu_blocks ~= 0 then
@@ -532,7 +533,7 @@ function cheatfind.startplugin()
 								count = count + #matches[#matches][num]
 							end
 						end
-						manager:machine():popmessage(count .. _(" total matches found"))
+						manager:machine():popmessage(string.format(_("%d total matches found"), count))
 						matches[#matches].count = count
 						matchpg = 0
 						devsel = devcur
@@ -713,7 +714,7 @@ function cheatfind.startplugin()
 						cheat.ram = { ram = dev.tag }
 						cheat.script.run = "ram:write(" .. match.addr .. "," .. match.newval .. ")"
 					else
-						cheat.space = { cpu = { tag = dev.tag, type = "program" } }
+						cheat.space = { cpu = { tag = dev.tag, type = dev.sname } }
 						cheat.script.run = "cpu:write_" .. wid .. "(" .. match.addr .. "," .. match.newval .. ")"
 					end
 					if match.mode == 1 then

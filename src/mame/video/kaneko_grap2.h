@@ -13,7 +13,7 @@ public:
 
 	DECLARE_READ16_MEMBER(regs1_r);
 	DECLARE_WRITE16_MEMBER(regs1_go_w);
-	
+
 	void grap2_map(address_map &map);
 
 	void do_rle(uint32_t address);

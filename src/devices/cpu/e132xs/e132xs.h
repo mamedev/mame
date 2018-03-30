@@ -137,7 +137,7 @@ protected:
 	// compilation boundaries -- how far back/forward does the analysis extend?
 	enum : u32
 	{
-		COMPILE_BACKWARDS_BYTES 	= 128,
+		COMPILE_BACKWARDS_BYTES     = 128,
 		COMPILE_FORWARDS_BYTES      = 512,
 		COMPILE_MAX_INSTRUCTIONS    = (COMPILE_BACKWARDS_BYTES / 4) + (COMPILE_FORWARDS_BYTES / 4),
 		COMPILE_MAX_SEQUENCE        = 64
@@ -292,7 +292,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual u8 get_fp() const override;
 	virtual bool get_h() const override;
 
@@ -456,6 +456,9 @@ private:
 	/* internal compiler state */
 	struct compiler_state
 	{
+		compiler_state(compiler_state const &) = delete;
+		compiler_state &operator=(compiler_state const &) = delete;
+
 		uint32_t m_cycles;          /* accumulated cycles */
 		uint8_t m_checkints;        /* need to check interrupts before next instruction */
 		uml::code_label m_labelnum; /* index for local labels */
@@ -465,117 +468,117 @@ private:
 	void flush_drc_cache();
 	void code_flush_cache();
 	void code_compile_block(offs_t pc);
-	//void load_fast_iregs(drcuml_block *block);
-	//void save_fast_iregs(drcuml_block *block);
+	//void load_fast_iregs(drcuml_block &block);
+	//void save_fast_iregs(drcuml_block &block);
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
 	void static_generate_exception(uint32_t exception, const char *name);
 	void static_generate_memory_accessor(int size, int iswrite, bool isio, const char *name, uml::code_handle *&handleptr);
 	void static_generate_interrupt_checks();
-	void generate_interrupt_checks_no_timer(drcuml_block *block, uml::code_label &labelnum);
-	void generate_interrupt_checks_with_timer(drcuml_block *block, uml::code_label &labelnum);
-	void generate_branch(drcuml_block *block, uml::parameter targetpc, bool update_cycles = true);
-	void generate_update_cycles(drcuml_block *block, bool check_interrupts = true);
-	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
-	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
-	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_interrupt_checks_no_timer(drcuml_block &block, uml::code_label &labelnum);
+	void generate_interrupt_checks_with_timer(drcuml_block &block, uml::code_label &labelnum);
+	void generate_branch(drcuml_block &block, uml::parameter targetpc, bool update_cycles = true);
+	void generate_update_cycles(drcuml_block &block, bool check_interrupts = true);
+	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
+	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	void generate_get_trap_addr(drcuml_block *block, uml::code_label &label, uint32_t trapno);
-	void generate_check_delay_pc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_decode_const(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_decode_immediate_s(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_ignore_immediate_s(drcuml_block *block, const opcode_desc *desc);
-	void generate_decode_pcrel(drcuml_block *block, const opcode_desc *desc);
-	void generate_ignore_pcrel(drcuml_block *block, const opcode_desc *desc);
+	void generate_get_trap_addr(drcuml_block &block, uml::code_label &label, uint32_t trapno);
+	void generate_check_delay_pc(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_decode_const(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_decode_immediate_s(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_ignore_immediate_s(drcuml_block &block, const opcode_desc *desc);
+	void generate_decode_pcrel(drcuml_block &block, const opcode_desc *desc);
+	void generate_ignore_pcrel(drcuml_block &block, const opcode_desc *desc);
 
-	void generate_get_global_register(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_set_global_register(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_get_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_set_global_register(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	template <trap_exception_or_int TYPE> void generate_trap_exception_or_int(drcuml_block *block);
-	void generate_int(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t addr);
-	void generate_exception(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t addr);
-	void generate_software(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <trap_exception_or_int TYPE> void generate_trap_exception_or_int(drcuml_block &block);
+	void generate_int(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr);
+	void generate_exception(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t addr);
+	void generate_software(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_chk(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_movd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void generate_divsu(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_xm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_mask(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_sum(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_sums(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_cmp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_mov(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_add(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_adds(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_cmpb(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_subc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_sub(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_subs(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_addc(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_neg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_negs(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_and(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_andn(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_or(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_xor(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_not(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_cmpi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_movi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_addi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_addsi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_cmpbi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_andni(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_ori(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_xori(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <shift_type HI_N> void generate_shrdi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_shrd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_shr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_shri(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <shift_type HI_N> void generate_sardi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_sard(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_sar(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_sari(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <shift_type HI_N> void generate_shldi(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_shld(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_shl(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_shli(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_testlz(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_rol(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_ldxx1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_ldxx2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_stxx1(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_stxx2(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_chk(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_movd(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void generate_divsu(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_xm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_mask(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_sum(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_sums(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_cmp(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_mov(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_add(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_adds(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_cmpb(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_subc(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_sub(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_subs(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_addc(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_neg(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_negs(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_and(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_andn(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_or(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_xor(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_not(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_cmpi(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_movi(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_addi(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_addsi(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_cmpbi(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_andni(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_ori(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, imm_size IMM_LONG> void generate_xori(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <shift_type HI_N> void generate_shrdi(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_shrd(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_shr(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_shri(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <shift_type HI_N> void generate_sardi(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_sard(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_sar(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_sari(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <shift_type HI_N> void generate_shldi(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_shld(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_shl(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_shli(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_testlz(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_rol(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_ldxx1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_ldxx2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_stxx1(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_stxx2(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void generate_mulsu(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_mul(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL, sign_mode SIGNED> void generate_mulsu(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank DST_GLOBAL, reg_bank SRC_GLOBAL> void generate_mul(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_set(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <shift_type HI_N, reg_bank DST_GLOBAL> void generate_set(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	template <reg_bank SRC_GLOBAL> void generate_ldwr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank SRC_GLOBAL> void generate_lddr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank SRC_GLOBAL> void generate_ldwp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank SRC_GLOBAL> void generate_lddp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_ldwr(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_lddr(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_ldwp(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_lddp(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	template <reg_bank SRC_GLOBAL> void generate_stwr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank SRC_GLOBAL> void generate_stdr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank SRC_GLOBAL> void generate_stwp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <reg_bank SRC_GLOBAL> void generate_stdp(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_stwr(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_stdr(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_stwp(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <reg_bank SRC_GLOBAL> void generate_stdp(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	template <branch_condition CONDITION, condition_set COND_SET> void generate_b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_br(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <branch_condition CONDITION, condition_set COND_SET> void generate_db(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_dbr(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	template <branch_condition CONDITION, condition_set COND_SET> void generate_b(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_br(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <branch_condition CONDITION, condition_set COND_SET> void generate_db(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_dbr(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	void generate_frame(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	template <hyperstone_device::reg_bank SRC_GLOBAL> void generate_call(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_frame(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	template <hyperstone_device::reg_bank SRC_GLOBAL> void generate_call(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	void generate_trap_op(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_extend(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_trap_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_extend(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
-	void generate_reserved(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_do(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_reserved(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_do(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 };
 
 // device type definition

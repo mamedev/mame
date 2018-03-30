@@ -92,14 +92,14 @@
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3.125" />
 		</screen>
-		
+
 		<bezel element="radio" inputtag="IN1" inputmask="0x02">
 			<bounds x="3.250" y="3.150" width="0.35" height="0.35" />
 		</bezel>
 		<bezel name="lamp0" element="start" inputtag="IN0" inputmask="0x04">
 			<bounds x="3.625" y="3.150" width="0.35" height="0.35" />
 		</bezel>
-		
+
 		<bezel name="lamp1" element="view1" inputtag="IN1" inputmask="0x10">
 			<bounds x="0.025" y="3.150" width="0.5" height="0.1" />
 		</bezel>

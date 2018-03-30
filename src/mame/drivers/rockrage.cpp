@@ -61,10 +61,10 @@ Notes:
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(rockrage_state::rockrage_interrupt)
+WRITE_LINE_MEMBER(rockrage_state::vblank_irq)
 {
-	if (m_k007342->is_int_enabled())
-		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	if (state && m_k007342->is_int_enabled())
+		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
@@ -253,7 +253,6 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(rockrage_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rockrage_state,  rockrage_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(24'000'000) / 16)
 	MCFG_CPU_PROGRAM_MAP(rockrage_sound_map)
@@ -268,6 +267,7 @@ MACHINE_CONFIG_START(rockrage_state::rockrage)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rockrage_state, screen_update_rockrage)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rockrage_state, vblank_irq))
 
 	MCFG_K007342_ADD("k007342")
 	MCFG_K007342_GFXNUM(0)

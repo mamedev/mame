@@ -55,9 +55,9 @@ device_memory_interface::space_config_vector v810_device::memory_space_config() 
 }
 
 
-util::disasm_interface *v810_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 {
-	return new v810_disassembler;
+	return std::make_unique<v810_disassembler>();
 }
 
 
@@ -1319,7 +1319,7 @@ void v810_device::device_start()
 	state_add(STATE_GENSP, "GENSP", SP).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", PSW).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void v810_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -1383,7 +1383,7 @@ void v810_device::execute_run()
 		uint32_t op;
 
 		m_PPC=PC;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		op=R_OP(PC);
 		PC+=2;
 		int cnt;

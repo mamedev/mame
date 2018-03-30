@@ -9,46 +9,46 @@
     Hardware and protection reverse-engineering and general assistance by ElSemi.
     MAME driver by R. Belmont, Olivier Galibert, ElSemi and Angelo Salese.
 
-	TODO:
-	- z-sort, focal distance, color gamma and Mip Mapping still needs to be properly sorted in the renderer;
-	- FIFO needs to be properly emulated in the various CPU cores (we currently rely on some workarounds);
-	- sound comms still needs some work (sometimes m68k doesn't get some commands or play them with a delay);
-	- 2C games needs TGPx4 emulation;
-	- outputs and artwork (for gearbox indicators);
-	- clean-ups;
+    TODO:
+    - z-sort, focal distance, color gamma and Mip Mapping still needs to be properly sorted in the renderer;
+    - FIFO needs to be properly emulated in the various CPU cores (we currently rely on some workarounds);
+    - sound comms still needs some work (sometimes m68k doesn't get some commands or play them with a delay);
+    - 2C games needs TGPx4 emulation;
+    - outputs and artwork (for gearbox indicators);
+    - clean-ups;
 
-	TODO (per-game issues)
-	- daytona: crashes when coining it up with master network active
-	           culprit is a wrong command parameter in geo_parse texture data opcode;
-	- daytona: car glasses doesn't get loaded during gameplay;
-	- doa, doaa: corrupted sound, eventually becomes silent;
-	- doa, doaa: Kasumi model has many culled polygons;
-	- dynamcopc: corrupts palette for 2d (most likely unrelated with the lack of DSP);
-	- fvipers, schamp: rasterizer has issues displaying some characters @see video/model2.cpp
+    TODO (per-game issues)
+    - daytona: crashes when coining it up with master network active
+               culprit is a wrong command parameter in geo_parse texture data opcode;
+    - daytona: car glasses doesn't get loaded during gameplay;
+    - doa, doaa: corrupted sound, eventually becomes silent;
+    - doa, doaa: Kasumi model has many culled polygons;
+    - dynamcopc: corrupts palette for 2d (most likely unrelated with the lack of DSP);
+    - fvipers, schamp: rasterizer has issues displaying some characters @see video/model2.cpp
     - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
-	- lastbrnx: has wrong graphics, uses several SHARC opcodes that needs to be double checked 
-	            (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
-	- manxtt: no escape from "active motion slider" tutorial (needs analog inputs), 
-	          bypass it by entering then exiting service mode;
+    - lastbrnx: has wrong graphics, uses several SHARC opcodes that needs to be double checked
+                (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
+    - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
+              bypass it by entering then exiting service mode;
     - manxtt: no bikes are visible (not a z-sort issue!);
-	- manxtt: course select island map doesn't rotate properly:
-		      timing issue, i960 sends read/write geo addresses to bufferram 0x918000/4 which TGP never reads in time.
-	- sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
-	- skytargt: really slow during gameplay (fixed?);
-	- skytargt: short draw distance (might be down to z-sort);
+    - manxtt: course select island map doesn't rotate properly:
+              timing issue, i960 sends read/write geo addresses to bufferram 0x918000/4 which TGP never reads in time.
+    - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
+    - skytargt: really slow during gameplay (fixed?);
+    - skytargt: short draw distance (might be down to z-sort);
     - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
     - vcop: lightgun input is offsetted (needs to be calibrated in service mode);
-	- vcop: missing 3d at stage select screen (priority?);
-	- vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
+    - vcop: missing 3d at stage select screen (priority?);
+    - vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
-	Notes:
-	- some analog games can be calibrated in service mode via volume control item ...
-    - ... while in manxtt (maybe others) you calibrate by entering input test, press service 
-	  (a blinking > will appear near the item to be calibrated) then keep pressed shift down while 
-	  calibrating the analog input (a blinking "setting" will appear). 
-	
+    Notes:
+    - some analog games can be calibrated in service mode via volume control item ...
+    - ... while in manxtt (maybe others) you calibrate by entering input test, press service
+      (a blinking > will appear near the item to be calibrated) then keep pressed shift down while
+      calibrating the analog input (a blinking "setting" will appear).
+
 ======================================================================================================================================
 
     Sega Model 2 Feedback Driver Board
@@ -367,10 +367,10 @@ MACHINE_START_MEMBER(model2_state,model2)
 	m_port_1c00010 = 0;
 	m_port_1c00012 = 1;
 	m_port_1c00014 = 2;
-	
+
 	// initialize custom debugger pool, @see machine/model2.cpp
 	debug_init();
-	
+
 	save_item(NAME(m_intreq));
 	save_item(NAME(m_intena));
 	save_item(NAME(m_coproctl));
@@ -565,7 +565,7 @@ READ32_MEMBER(model2_state::fifo_control_2a_r)
 	// #### 1 if fifo empty, zerogun needs | 0x04 set
 	// TODO: 0x04 is probably fifo full, zeroguna stalls with a fresh nvram with that enabled?
 	return r;
-//	return r | 0x04;
+//  return r | 0x04;
 }
 
 READ32_MEMBER(model2_state::videoctl_r)
@@ -825,7 +825,7 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 		{
 			logerror("Start copro upload\n");
 			m_coprocnt = 0;
-			
+
 			if(m_dsp_type == DSP_TYPE_TGP)
 				m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		}
@@ -875,8 +875,8 @@ WRITE32_MEMBER(model2_state::copro_function_port_w)
 			/* spin the main cpu and let the TGP catch up */
 			m_maincpu->spin_until_time(attotime::from_usec(1));
 			return;
-		}		
-		
+		}
+
 		m_tgpx4->fifoin_w(d);
 	}
 }
@@ -898,7 +898,7 @@ READ32_MEMBER(model2_state::copro_fifo_r)
 			downcast<i960_cpu_device &>(*m_maincpu).i960_stall();
 			/* spin the main cpu and let the TGP catch up */
 			m_maincpu->spin_until_time(attotime::from_usec(1));
-			
+
 			return 0x00884000+offset*4;
 		}
 		else
@@ -1772,7 +1772,7 @@ static INPUT_PORTS_START( model2 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -1869,7 +1869,7 @@ static INPUT_PORTS_START( vcop )
 
 	PORT_START("IN4")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("P1_X")
 	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
 
@@ -1894,7 +1894,7 @@ static INPUT_PORTS_START( gunblade )
 
 	PORT_MODIFY("P2_X")
 	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("P2_Y")
 	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2039,17 +2039,17 @@ static INPUT_PORTS_START( sgt24h )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Up")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Shift Down")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_MODIFY("IN3")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("GEARS")
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( overrev )
 	PORT_INCLUDE( sgt24h )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View 1 Button")
 	// optional, enableable when hardware type isn't in "normal (2in1)" mode (overrev)
@@ -2067,7 +2067,7 @@ static INPUT_PORTS_START( bel )
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Missile")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Missile")
-//	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+//  PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rchase2 )
@@ -2104,7 +2104,7 @@ static INPUT_PORTS_START( skytargt )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Machine Gun")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Missile")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -2161,21 +2161,21 @@ static INPUT_PORTS_START( von )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_PLAYER(1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_PLAYER(1)
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Right Shot")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Right Dash")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(1) 
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_PLAYER(1) 
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_PLAYER(1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skisuprg )
 	PORT_INCLUDE( model2 )
-	
+
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select 3 Button")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Zoom In Button")
@@ -2190,11 +2190,11 @@ static INPUT_PORTS_START( skisuprg )
 	// TODO: what are these exactly? Enables/disables when all four bits are on
 	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Foot Sensor (R)")
 	PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Foot Sensor (L)")
-	
+
 	PORT_START("ANA0")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 
-	PORT_START("ANA1")	
+	PORT_START("ANA1")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -2208,7 +2208,7 @@ static INPUT_PORTS_START( stcc )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Shift Up")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Shift Down")
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -2230,7 +2230,7 @@ static INPUT_PORTS_START( waverunr )
 	// TODO: safety sensor
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT(0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	// TODO: requires LEFT/RIGHT_AD_STICK in framework
 	PORT_START("ANA0")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Handle Bar")
@@ -2247,13 +2247,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( segawski )
 	PORT_INCLUDE( model2 )
-	
+
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Select (Down) Button")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Set Button")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select (Up) Button")
@@ -2263,7 +2263,7 @@ static INPUT_PORTS_START( segawski )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("ANA0")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Slide")
 INPUT_PORTS_END
@@ -2281,10 +2281,10 @@ static INPUT_PORTS_START( topskatr )
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Jump Tail")
 	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	// TODO: requires LEFT/RIGHT_AD_STICK in framework
 	PORT_START("ANA0")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_NAME("Curving")
@@ -2442,7 +2442,7 @@ ADDRESS_MAP_START(model2_state::copro_sharc_map)
 	AM_RANGE(0x0c00000, 0x13fffff) AM_WRITE(copro_sharc_output_fifo_w)
 	AM_RANGE(0x1400000, 0x1bfffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w)
 	AM_RANGE(0x1c00000, 0x1dfffff) AM_ROM AM_REGION("copro_data", 0)
-//	AM_RANGE(0xffff8000, 0xffffffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w) // last bronx, cpu core bug?
+//  AM_RANGE(0xffff8000, 0xffffffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w) // last bronx, cpu core bug?
 ADDRESS_MAP_END
 
 #if 0
@@ -2490,7 +2490,7 @@ MACHINE_CONFIG_START(model2_state::model2_screen)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
 	MCFG_S24TILE_XHOUT_CALLBACK(WRITE16(model2_state, horizontal_sync_w))
 	MCFG_S24TILE_XVOUT_CALLBACK(WRITE16(model2_state, vertical_sync_w))
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 	// TODO: from System 24, might not be accurate for Model 2
@@ -2512,8 +2512,8 @@ MACHINE_CONFIG_START(model2_state::model2_scsp)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-//	MCFG_I8251_RXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
-//	MCFG_I8251_TXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
+//  MCFG_I8251_RXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
+//  MCFG_I8251_TXRDY_HANDLER(WRITELINE(model2_state, sound_ready_w))
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
@@ -2671,7 +2671,7 @@ uint16_t model2_state::crypt_read_callback(uint32_t addr)
 
 MACHINE_CONFIG_START(model2a_state::model2a_5881)
 	model2a(config);
-	
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(model2a_5881_mem)
 
@@ -2723,7 +2723,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2b_state::model2b_5881)
 	model2b(config);
-	
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(model2b_5881_mem)
 
@@ -2815,7 +2815,7 @@ MACHINE_CONFIG_START(model2c_state::model2c_5881)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(model2c_5881_mem)
-	
+
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model2_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -6206,7 +6206,7 @@ ROM_START( daytonam ) /* Daytona USA (Japan, To The MAXX) */
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
-	
+
 	ROM_REGION( 0x10000, "pic", 0)
 	ROM_LOAD("pic.bin", 0x00000, 0x10000, NO_DUMP )
 ROM_END

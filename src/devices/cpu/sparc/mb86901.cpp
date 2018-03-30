@@ -360,7 +360,7 @@ void mb86901_device::device_start()
 	save_item(NAME(m_hold_bus));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -523,11 +523,11 @@ void mb86901_device::state_string_export(const device_state_entry &entry, std::s
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *mb86901_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mb86901_device::create_disassembler()
 {
-	auto dasm = new sparc_disassembler(this, 7);
-	m_asi_desc_adder(dasm);
-	return dasm;
+	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), 7);
+	m_asi_desc_adder(dasm.get());
+	return std::move(dasm);
 }
 
 
@@ -2953,7 +2953,7 @@ void mb86901_device::execute_step()
 	{
 		execute_trap();
 		BREAK_PSR;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 	}
 
 	if (m_execute_mode)
@@ -3076,7 +3076,7 @@ void mb86901_device::execute_run()
 		}
 
 		BREAK_PSR;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		if (m_reset_mode)
 		{

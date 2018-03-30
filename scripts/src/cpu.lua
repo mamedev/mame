@@ -1127,7 +1127,7 @@ if (CPUS["SSEM"]~=null or _OPTIONS["with-tools"]) then
 end
 
 ------------------------------------------
--- Diablo Systems printer CPU 
+-- Diablo Systems printer CPU
 --@src/devices/cpu/diablo/diablo1300.h,CPUS["DIABLO"] = true
 --------------------------------------------------
 

@@ -219,7 +219,7 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_cond));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 }
 
@@ -380,9 +380,9 @@ void m6809_base_device::state_string_export(const device_state_entry &entry, std
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *m6809_base_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6809_base_device::create_disassembler()
 {
-	return new m6809_disassembler;
+	return std::make_unique<m6809_disassembler>();
 }
 
 

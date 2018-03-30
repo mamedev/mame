@@ -343,14 +343,14 @@ WRITE8_MEMBER( qx10_state::cmos_sel_w )
 QUICKLOAD_LOAD_MEMBER( qx10_state, qx10 )
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	
+
 	if (quickload_size >= 0xfd00)
 		return image_init_result::FAIL;
-	
+
 	/* The right RAM bank must be active */
 	m_membank = 0;
 	update_memory_mapping();
-	
+
 	/* Avoid loading a program if CP/M-80 is not in memory */
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
@@ -369,11 +369,11 @@ QUICKLOAD_LOAD_MEMBER( qx10_state, qx10 )
 
 	/* clear out command tail */
 	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
-	
+
 	/* Roughly set SP basing on the BDOS position */
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);       // start program
-	
+
 	return image_init_result::PASS;
 }
 
@@ -831,7 +831,7 @@ MACHINE_CONFIG_START(qx10_state::qx10)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "qx10_flop")
-	
+
 	MCFG_QUICKLOAD_ADD("quickload", qx10_state, qx10, "com,cpm", 3)
 
 MACHINE_CONFIG_END

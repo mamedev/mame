@@ -82,7 +82,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(penta);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void jrpacmbl(machine_config &config);
@@ -369,10 +369,10 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pengo_state::vblank_irq)
+WRITE_LINE_MEMBER(pengo_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -382,7 +382,6 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // U27
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pengo_state, irq_mask_w))
@@ -406,6 +405,7 @@ MACHINE_CONFIG_START(pengo_state::pengo)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(pengo_state, screen_update_pacman)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pengo_state, vblank_irq))
 
 	MCFG_VIDEO_START_OVERRIDE(pengo_state,pengo)
 
@@ -429,7 +429,6 @@ MACHINE_CONFIG_START(pengo_state::pengoe)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5010, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pengo_state,  vblank_irq)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 

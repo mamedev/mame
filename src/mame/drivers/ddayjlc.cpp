@@ -6,13 +6,13 @@
 
     driver by Pierpaolo Prazzoli, Tomasz Slanina and Angelo Salese
 
-	TODO:
-	- text colors most likely are hardwired but iirc hi score text has a different color? Needs a reference shot;
-	- unused upper sprite color bank;
-	- improve sound comms, sometimes BGM becomes silent;
-	- hookup proper i8257 device;
-	- identify & dump MCU;
-	
+    TODO:
+    - text colors most likely are hardwired but iirc hi score text has a different color? Needs a reference shot;
+    - unused upper sprite color bank;
+    - improve sound comms, sometimes BGM becomes silent;
+    - hookup proper i8257 device;
+    - identify & dump MCU;
+
 -------------------------------------------------------
 Is it 1984 or 1987 game ?
 There's text inside rom "1987.07    BY  ELS"
@@ -102,8 +102,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	DECLARE_PALETTE_INIT(ddayjlc);
 	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
-	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void ddayjlc(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -112,7 +111,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_mainram;
@@ -127,8 +126,8 @@ private:
 	int32_t    m_bgadr;
 
 	/* misc */
-	int32_t    m_sound_nmi_enable;
-	int32_t    m_main_nmi_enable;
+	bool       m_sound_nmi_enable;
+	bool       m_main_nmi_enable;
 	int32_t    m_e00x_l[4];
 	int32_t    m_e00x_d[4][2];
 	uint8_t    m_prot_addr;
@@ -139,7 +138,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	
+
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -174,7 +173,7 @@ void ddayjlc_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ddayjlc_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ddayjlc_state::get_tile_info_fg),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_bg_tilemap->set_transparent_pen(0);	
+	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
@@ -184,7 +183,7 @@ void ddayjlc_state::video_start()
      -xxx xxxx code lower offset
  [2] x--- ---- X flip
      --xx ---- code upper offset
-	 ---- xxxx color offset
+     ---- xxxx color offset
  [3] xxxx xxxx X offset
  ***************************/
 void ddayjlc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -200,13 +199,13 @@ void ddayjlc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		uint8_t  color = flags & 0xf;
 
 		code = (code & 0x7f) | ((flags & 0x30) << 3);
-		
+
 		if (flip_screen())
 		{
 			x = 256 - 16 - x;
 			xflip ^= 1;
 		}
-		
+
 		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect, code, color, xflip, yflip, x, y, 0);
 	}
 }
@@ -214,10 +213,10 @@ void ddayjlc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 void ddayjlc_state::draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	
+
 	rectangle opaque_rect(cliprect.min_x, cliprect.min_x + 16, cliprect.min_y, cliprect.max_y);
 	m_fg_tilemap->draw(screen, bitmap, opaque_rect, TILEMAP_DRAW_OPAQUE, 0);
-	
+
 	opaque_rect.min_x = cliprect.max_x - 16;
 	opaque_rect.max_x = cliprect.max_x;
 	m_fg_tilemap->draw(screen, bitmap, opaque_rect, TILEMAP_DRAW_OPAQUE, 0);
@@ -313,12 +312,16 @@ WRITE8_MEMBER(ddayjlc_state::vram_w)
 
 WRITE8_MEMBER(ddayjlc_state::sound_nmi_w)
 {
-	m_sound_nmi_enable = data;
+	m_sound_nmi_enable = BIT(data, 0);
+	if (!m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(ddayjlc_state::main_nmi_w)
 {
-	m_main_nmi_enable = data;
+	m_main_nmi_enable = BIT(data, 0);
+	if (!m_main_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(ddayjlc_state::bg0_w)
@@ -365,7 +368,7 @@ WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
 		int32_t dst = m_e00x_d[2][1] * 256 + m_e00x_d[2][0];
 		int32_t size = (m_e00x_d[1][1] * 256 + m_e00x_d[1][0]) & 0x3ff;
 		int32_t i;
-		
+
 		size++; //??
 
 		for(i = 0; i < size; i++)
@@ -439,7 +442,7 @@ static INPUT_PORTS_START( ddayjlc )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -517,16 +520,13 @@ static GFXDECODE_START( ddayjlc )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_interrupt)
+WRITE_LINE_MEMBER(ddayjlc_state::vblank_irq)
 {
-	if(m_main_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
+	if (state && m_main_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_snd_interrupt)
-{
-	if(m_sound_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -551,8 +551,8 @@ void ddayjlc_state::machine_reset()
 
 	m_char_bank = 0;
 	m_bgadr = 0;
-	m_sound_nmi_enable = 0;
-	m_main_nmi_enable = 0;
+	m_sound_nmi_enable = false;
+	m_main_nmi_enable = false;
 	m_prot_addr = 0;
 
 	for (i = 0; i < 4; i++)
@@ -588,7 +588,7 @@ PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
-	
+
 	// text colors, almost likely hardwired
 	palette.set_pen_color(0x200, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(0x201, rgb_t(0xff, 0x00, 0x00));
@@ -601,11 +601,9 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddayjlc_state,  ddayjlc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddayjlc_state,  ddayjlc_snd_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -617,6 +615,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddayjlc_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddayjlc)
 	MCFG_PALETTE_ADD("palette", 0x200+4)

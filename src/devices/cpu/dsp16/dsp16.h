@@ -146,7 +146,7 @@ protected:
 	virtual void state_string_export(device_state_entry const &entry, std::string &str) const override;
 
 	// device_disasm_interface implementation
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// dsp16_disassembler::cpu implementation
 	virtual predicate check_con(offs_t pc, u16 op) const override;
@@ -234,13 +234,17 @@ private:
 	void program_map(address_map &map);
 
 	// instruction execution
-	void execute_one_rom();
-	void execute_one_cache();
+	template <bool Debugger, bool Caching> void execute_some_rom();
+	template <bool Debugger> void execute_some_cache();
 	void overlap_rom_data_read();
 	void yaau_short_immediate_load(u16 op);
-	s16 yaau_read(u16 op);
-	void yaau_write(u16 op, s16 value);
-	void yaau_write_z(u16 op);
+	template <bool Debugger> s16 yaau_read(u16 op);
+	template <bool Debugger> void yaau_write(u16 op, s16 value);
+	template <bool Debugger> void yaau_write_z(u16 op);
+
+	// built-in peripherals
+	void sio_step();
+	void pio_step();
 
 	// inline helpers
 	static bool op_interruptible(u16 op);
@@ -319,8 +323,10 @@ private:
 	u8 const                    m_yaau_bits;
 
 	// memory system access
+	required_shared_ptr<u16>    m_workram;
 	address_space               *m_spaces[3];
 	direct_read_data<-1>        *m_direct;
+	u16                         m_workram_mask;
 
 	// recompiler stuff
 	drc_cache                   m_drc_cache;

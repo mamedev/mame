@@ -50,6 +50,7 @@ public:
 	minicom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(i87c52_p0_w);
@@ -67,10 +68,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	output_finder<20> m_digits;
 };
 
 void minicom_state::machine_start()
 {
+	m_digits.resolve();
 	// zerofill
 	memset(m_p, 0, 4);
 	m_digit_index = 0;
@@ -88,7 +91,7 @@ void minicom_state::machine_reset()
 	m_display_data = 0;
 
 	for (int i=0; i<20; i++)
-		output().set_digit_value(i, 0);
+		m_digits[i] = 0;
 }
 
 READ8_MEMBER(minicom_state::i87c52_p1_r)
@@ -203,7 +206,7 @@ WRITE8_MEMBER(minicom_state::i87c52_p3_w)
 
 		if (BIT(changed,4) || BIT(changed,5))
 		{
-			output().set_digit_value(m_digit_index, bitswap<16>(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
+			m_digits[m_digit_index] = bitswap<16>(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF;
 		}
 		m_p[3] = data;
 	}

@@ -26,10 +26,10 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(_88games_state::k88games_interrupt)
+WRITE_LINE_MEMBER(_88games_state::vblank_irq)
 {
-	if (m_k052109->is_irq_enabled())
-		irq0_line_hold(device);
+	if (state && m_k052109->is_irq_enabled())
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(_88games_state::bankedram_r)
@@ -309,7 +309,6 @@ MACHINE_CONFIG_START(_88games_state::_88games)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _88games_state,  k88games_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(_88games_state, banking_callback))
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
@@ -327,6 +326,7 @@ MACHINE_CONFIG_START(_88games_state::_88games)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(_88games_state, screen_update_88games)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(_88games_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_ENABLE_SHADOWS()

@@ -38,10 +38,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
 private:
+	void output_digits();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
+	DECLARE_WRITE8_MEMBER(led_strobe_w);
 	DECLARE_READ8_MEMBER(lcd_latch_r);
 	DECLARE_WRITE8_MEMBER(lcd_latch_w);
 	DECLARE_WRITE8_MEMBER(lcd_control_w);
@@ -52,7 +54,6 @@ private:
 	required_device<ticket_dispenser_device> m_ticket;
 	output_finder<4> m_digits;
 	uint8_t   m_ctrl;
-	uint8_t   m_digit_idx;
 	uint8_t   m_lcd_latch;
 	uint32_t  m_digit_latch;
 	void piggypas_io(address_map &map);
@@ -61,11 +62,19 @@ private:
 };
 
 
+void piggypas_state::output_digits()
+{
+	// Serial output driver is UCN5833A
+	m_digits[0] = bitswap<8>(m_digit_latch & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+	m_digits[1] = bitswap<8>((m_digit_latch >> 8) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+	m_digits[2] = bitswap<8>((m_digit_latch >> 16) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+	m_digits[3] = bitswap<8>((m_digit_latch >> 24) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+}
 
 WRITE8_MEMBER(piggypas_state::ctrl_w)
 {
-	if ((m_ctrl ^ data) & m_ctrl & 0x04)
-		m_digit_idx = 0;
+	if (!BIT(data, 2) && BIT(m_ctrl, 2))
+		output_digits();
 
 	m_ticket->motor_w(BIT(data, 6));
 
@@ -74,9 +83,13 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 
 WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
 {
-	// Serial output driver is UCN5833A
-	if (m_digit_idx < 4)
-		m_digits[m_digit_idx++] = bitswap<8>(data,7,6,4,3,2,1,0,5) & 0x7f;
+	m_digit_latch = (m_digit_latch >> 8) | (u32(data) << 24);
+}
+
+WRITE8_MEMBER(piggypas_state::led_strobe_w)
+{
+	if (!BIT(data, 0))
+		m_digit_latch = 0;
 }
 
 READ8_MEMBER(piggypas_state::lcd_latch_r)
@@ -106,14 +119,9 @@ WRITE8_MEMBER(piggypas_state::lcd_control_w)
 	// T0 (P3.4) = output shift clock (serial data present at P1.0)
 	// T1 (P3.5) = output latch enable
 	if (BIT(data, 4))
-		m_digit_latch = (m_digit_latch << 1) | BIT(m_lcd_latch, 0);
+		m_digit_latch = (m_digit_latch >> 1) | (BIT(m_lcd_latch, 0) << 31);
 	if (BIT(data, 5) && !BIT(data, 4))
-	{
-		m_digits[0] = bitswap<8>(m_digit_latch & 0xff, 0,1,3,4,5,6,7,2) & 0x7f;
-		m_digits[1] = bitswap<8>((m_digit_latch >> 8) & 0xff, 0,1,3,4,5,6,7,2) & 0x7f;
-		m_digits[2] = bitswap<8>((m_digit_latch >> 16) & 0xff, 0,1,3,4,5,6,7,2) & 0x7f;
-		m_digits[3] = bitswap<8>((m_digit_latch >> 24) & 0xff, 0,1,3,4,5,6,7,2) & 0x7f;
-	}
+		output_digits();
 }
 
 void piggypas_state::piggypas_map(address_map &map)
@@ -184,7 +192,6 @@ void piggypas_state::machine_start()
 
 void piggypas_state::machine_reset()
 {
-	m_digit_idx = 0;
 }
 
 HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
@@ -199,6 +206,7 @@ MACHINE_CONFIG_START(piggypas_state::piggypas)
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL(8'448'000)) // OKI M80C31F or M80C154S
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
 	MCFG_CPU_IO_MAP(piggypas_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(piggypas_state, led_strobe_w))
 	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("IN2"))
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(piggypas_state, mcs51_tx_callback))
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)

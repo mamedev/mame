@@ -74,7 +74,7 @@ public:
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(imago_get_tile_info_web);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
 	virtual void machine_start() override;

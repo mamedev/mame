@@ -636,7 +636,7 @@ void mips3_device::device_start()
 	state_add( STATE_GENSP, "CURSP", m_core->r[31]).noshow();
 	state_add( STATE_GENFLAGS, "CURFLAGS", m_debugger_temp).formatstr("%1s").noshow();
 
-	m_icountptr = &m_core->icount;
+	set_icountptr(m_core->icount);
 }
 
 
@@ -976,9 +976,9 @@ bool mips3_device::memory_translate(int spacenum, int intention, offs_t &address
 }
 
 
-util::disasm_interface *mips3_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mips3_device::create_disassembler()
 {
-	return new mips3_disassembler;
+	return std::make_unique<mips3_disassembler>();
 }
 
 
@@ -2770,7 +2770,7 @@ void mips3_device::execute_run()
 
 		/* debugging */
 		m_ppc = m_core->pc;
-		debugger_instruction_hook(this, m_core->pc);
+		debugger_instruction_hook(m_core->pc);
 
 		/* instruction fetch */
 		if(!RWORD(m_core->pc, &op))

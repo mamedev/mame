@@ -266,7 +266,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	/* exception types */
 	enum
@@ -634,10 +634,10 @@ protected:
 	void ppc4xx_spu_rx_data(uint8_t data);
 	void ppc4xx_spu_timer_reset();
 	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
-	void load_fast_iregs(drcuml_block *block);
-	void save_fast_iregs(drcuml_block *block);
-	void load_fast_fregs(drcuml_block *block);
-	void save_fast_fregs(drcuml_block *block);
+	void load_fast_iregs(drcuml_block &block);
+	void save_fast_iregs(drcuml_block &block);
+	void load_fast_fregs(drcuml_block &block);
+	void save_fast_fregs(drcuml_block &block);
 	uint32_t compute_rlw_mask(uint8_t mb, uint8_t me);
 	uint32_t compute_crf_mask(uint8_t crm);
 	uint32_t compute_spr(uint32_t spr);
@@ -652,24 +652,24 @@ protected:
 	void static_generate_swap_tgpr();
 	void static_generate_lsw_entries(int mode);
 	void static_generate_stsw_entries(int mode);
-	void generate_update_mode(drcuml_block *block);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
-	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
-	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_compute_flags(drcuml_block *block, const opcode_desc *desc, int updatecr, uint32_t xermask, int invertcarry);
-	void generate_shift_flags(drcuml_block *block, const opcode_desc *desc, uint32_t op);
-	void generate_fp_flags(drcuml_block *block, const opcode_desc *desc, int updatefprf);
-	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int source, uint8_t link);
-	void generate_branch_bo(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t bo, uint32_t bi, int source, int link);
-	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_instruction_13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_instruction_1f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_instruction_3b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	bool generate_instruction_3f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
+	void generate_update_mode(drcuml_block &block);
+	void generate_update_cycles(drcuml_block &block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+	void generate_checksum_block(drcuml_block &block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+	void generate_sequence_instruction(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_compute_flags(drcuml_block &block, const opcode_desc *desc, int updatecr, uint32_t xermask, int invertcarry);
+	void generate_shift_flags(drcuml_block &block, const opcode_desc *desc, uint32_t op);
+	void generate_fp_flags(drcuml_block &block, const opcode_desc *desc, int updatefprf);
+	void generate_branch(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc, int source, uint8_t link);
+	void generate_branch_bo(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc, uint32_t bo, uint32_t bi, int source, int link);
+	bool generate_opcode(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_instruction_13(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_instruction_1f(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_instruction_3b(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_instruction_3f(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
+	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
 	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
-	void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent);
+	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
+	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
 };
 

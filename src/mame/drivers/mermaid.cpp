@@ -153,6 +153,8 @@ WRITE_LINE_MEMBER(mermaid_state::ay2_enable_w)
 WRITE_LINE_MEMBER(mermaid_state::nmi_mask_w)
 {
 	m_nmi_mask = state;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /* Memory Map */
@@ -420,8 +422,6 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 
 INTERRUPT_GEN_MEMBER(mermaid_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 MACHINE_CONFIG_START(mermaid_state::mermaid)

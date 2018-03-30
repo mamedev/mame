@@ -992,7 +992,7 @@ void alto2_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_mpc).noshow();
 	state_add(STATE_GENFLAGS, "CURFLAGS", m_aluc0).formatstr("%5s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -2318,7 +2318,7 @@ void alto2_cpu_device::execute_run()
 
 		m_rsel = rsel();
 
-		debugger_instruction_hook(this, m_mpc);
+		debugger_instruction_hook(m_mpc);
 		m_cycle++;
 
 		if (f1() == f1_load_mar && check_mem_load_mar_stall(m_rsel)) {
@@ -2982,7 +2982,7 @@ void alto2_cpu_device::soft_reset()
 	m_bitclk_time = 0;              // reset the bitclk timing accu
 }
 
-util::disasm_interface *alto2_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> alto2_cpu_device::create_disassembler()
 {
-	return new alto2_disassembler;
+	return std::make_unique<alto2_disassembler>();
 }

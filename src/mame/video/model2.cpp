@@ -109,7 +109,7 @@
 
 struct raster_state
 {
-//	uint32_t mode;                      /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
+//  uint32_t mode;                      /* bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation */
 	uint16_t *texture_rom;              /* Texture ROM pointer */
 	uint32_t texture_rom_mask;          /* Texture ROM mask */
 	int16_t viewport[4];                /* View port (startx,starty,endx,endy) */
@@ -258,7 +258,7 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *v
 	float   curdot, nextdot, scale;
 	int32_t   i, curin, nextin, nextvert, outcount;
 	plane clip_plane;
-	
+
 	clip_plane.normal.x = 0.0f;
 	clip_plane.normal.y = 0.0f;
 	clip_plane.normal.pz = 1.0f;
@@ -283,7 +283,7 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *v
 		nextin = (nextdot >= clip_plane.distance) ? 1 : 0;
 
 		/* Add a clipped vertex if one end of the current edge is inside the plane and the other is outside */
-		// TODO: displaying Honey in Fighting Vipers and Bean in Sonic the Fighters somehow causes a NaN dot product here, 
+		// TODO: displaying Honey in Fighting Vipers and Bean in Sonic the Fighters somehow causes a NaN dot product here,
 		//       causing MAME to hardlock in the renderer routine. They are also causing lots of invalid polygon renders
 		//       which might be related.
 		if ( curin != nextin && std::isnan(curdot) == false && std::isnan(nextdot) == false )
@@ -327,7 +327,7 @@ inline bool model2_state::check_culling( raster_state *raster, uint32_t attr, fl
 	/* if the maximum z value is < 0 then we can safely clip the entire polygon */
 	if ( max_z < 0 )
 		return true;
-	
+
 	return false;
 }
 
@@ -348,7 +348,7 @@ void model2_state::raster_init( memory_region *texture_rom )
 
 	save_item(NAME(m_raster->min_z));
 	save_item(NAME(m_raster->max_z));
-//	save_item(NAME(m_raster->tri_list));
+//  save_item(NAME(m_raster->tri_list));
 	save_item(NAME(m_raster->tri_list_index));
 	save_item(NAME(m_raster->command_buffer));
 	save_item(NAME(m_raster->command_index));
@@ -360,7 +360,7 @@ void model2_state::raster_init( memory_region *texture_rom )
 	save_item(NAME(m_raster->viewport));
 	save_item(NAME(m_raster->center));
 	save_item(NAME(m_raster->center_sel));
-	save_item(NAME(m_raster->texture_ram));	
+	save_item(NAME(m_raster->texture_ram));
 	save_item(NAME(m_raster->log_ram));
 }
 
@@ -388,7 +388,7 @@ READ32_MEMBER(model2_state::polygon_count_r)
  *  Hardware 3D Rasterizer Processing
  *
  *******************************************/
- 
+
 void model2_state::model2_3d_process_quad( raster_state *raster, uint32_t attr )
 {
 	quad_m2 object;
@@ -709,7 +709,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, uint32_t at
 	}
 
 	raster->triangle_z = zvalue;
-	
+
 	/* if we're not culling, do z-clip and add to out triangle list */
 	if ( cull == false )
 	{
@@ -915,14 +915,14 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 WRITE16_MEMBER(model2_state::horizontal_sync_w)
 {
 	m_crtc_xoffset = 84 + (int16_t)data;
-//	printf("H %04x %d %d\n",data,(int16_t)data,m_crtc_xoffset);	
+//  printf("H %04x %d %d\n",data,(int16_t)data,m_crtc_xoffset);
 	m_poly->set_xoffset(m_crtc_xoffset);
 }
 
 WRITE16_MEMBER(model2_state::vertical_sync_w)
 {
 	m_crtc_yoffset = 130 + (int16_t)data;
-//	printf("V %04x %d %d\n",data,(int16_t)data,m_crtc_yoffset);
+//  printf("V %04x %d %d\n",data,(int16_t)data,m_crtc_yoffset);
 	m_poly->set_yoffset(m_crtc_yoffset);
 }
 
@@ -1199,7 +1199,7 @@ void model2_state::model2_3d_push( raster_state *raster, uint32_t input )
 			raster->center_sel = ( input >> 6 ) & 3;
 
 			/* reset the triangle z value */
-			// Zero Gunner sets backgrounds with "previous z value" mode at the start of the display list, 
+			// Zero Gunner sets backgrounds with "previous z value" mode at the start of the display list,
 			// needs this to be this big in order to work properly
 			raster->triangle_z = 1e10;
 		}
@@ -1222,7 +1222,7 @@ void model2_state::geo_init(memory_region *polygon_rom)
 	m_geo->raster = m_raster;
 	m_geo->polygon_rom = (uint32_t *)polygon_rom->base();
 	m_geo->polygon_rom_mask = (polygon_rom->bytes() / 4) - 1;
-	
+
 	save_item(NAME(m_geo->mode));
 	save_item(NAME(m_geo->matrix));
 	save_item(NAME(m_geo->lod));
@@ -1254,7 +1254,7 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 
 	/* apply focus */
 	apply_focus( geo, &point );
-	
+
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1270,7 +1270,7 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 
 	/* apply focus */
 	apply_focus( geo, &point );
-	
+
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1316,7 +1316,7 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 
 			/* apply focus */
 			apply_focus( geo, &point );
-			
+
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1363,7 +1363,7 @@ void model2_state::geo_parse_np_ns( geo_state *geo, uint32_t *input, uint32_t co
 
 				/* apply focus */
 				apply_focus( geo, &point );
-				
+
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
 				model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1402,7 +1402,7 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 
 	/* apply focus */
 	apply_focus( geo, &point );
-	
+
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1418,7 +1418,7 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 
 	/* apply focus */
 	apply_focus( geo, &point );
-	
+
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1464,7 +1464,7 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 
 			/* apply focus */
 			apply_focus( geo, &point );
-			
+
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1520,7 +1520,7 @@ void model2_state::geo_parse_np_s( geo_state *geo, uint32_t *input, uint32_t cou
 
 				/* apply focus */
 				apply_focus( geo, &point );
-				
+
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
 				model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1562,7 +1562,7 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 
 	/* apply focus */
 	apply_focus( geo, &point );
-	
+
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1581,7 +1581,7 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 
 	/* apply focus */
 	apply_focus( geo, &point );
-	
+
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1605,7 +1605,7 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 
 			/* Skip normal */
 			input += 3;
-			
+
 			/* read in the next point */
 			point.x = u2f( *input++ );
 			point.y = u2f( *input++ );
@@ -1631,7 +1631,7 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 
 			/* apply focus */
 			apply_focus( geo, &point );
-			
+
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -1681,7 +1681,7 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, uint32_t *input, uint32_t co
 
 				/* apply focus */
 				apply_focus( geo, &point );
-				
+
 				/* push to the 3d rasterizer */
 				model2_3d_push( raster, f2u(point.x) >> 8 );
 				model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1753,7 +1753,7 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 
 	/* apply focus */
 	apply_focus( geo, &point );
-	
+
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1772,7 +1772,7 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 
 	/* apply focus */
 	apply_focus( geo, &point );
-	
+
 	/* push it to the 3d rasterizer */
 	model2_3d_push( raster, f2u(point.x) >> 8 );
 	model2_3d_push( raster, f2u(point.y) >> 8 );
@@ -1796,7 +1796,7 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 
 			/* Skip normal */
 			input += 3;
-			
+
 			/* read in the next point */
 			point.x = u2f( *input++ );
 			point.y = u2f( *input++ );
@@ -1822,7 +1822,7 @@ void model2_state::geo_parse_nn_s( geo_state *geo, uint32_t *input, uint32_t cou
 
 			/* apply focus */
 			apply_focus( geo, &point );
-	
+
 			/* determine whether this is the front or the back of the polygon */
 			face = 0x100; /* rear */
 			if ( dotp >= 0 ) face = 0; /* front */
@@ -2587,7 +2587,7 @@ void model2_state::geo_parse( void )
 			//       bad timings for geo_parse?
 			if(opcode & 0x078000000 )
 				return;
-			
+
 			/* get the address */
 			address = (opcode & 0x1FFFF) / 4;
 
@@ -2628,7 +2628,7 @@ void model2_state::video_start()
 	m_lumaram = make_unique_clear<uint16_t[]>(0x10000/2);
 	m_fbvramA = make_unique_clear<uint16_t[]>(0x80000/2);
 	m_fbvramB = make_unique_clear<uint16_t[]>(0x80000/2);
-	
+
 	// convert (supposedly) 3d sRGB color space into linear
 	// TODO: might be slightly different algorithm (Daytona USA road/cars, VF2 character skins)
 	for(int i=0;i<256;i++)
@@ -2638,7 +2638,7 @@ void model2_state::video_start()
 		m_gamma_table[i] = (uint8_t)raw_value;
 //      printf("%02x: %02x %lf\n",i,m_gamma_table[i],raw_value);
 	}
-	
+
 	save_item(NAME(m_render_test_mode));
 	save_item(NAME(m_render_unk));
 	save_item(NAME(m_render_mode));
@@ -2670,7 +2670,7 @@ uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 
 	{
 		model2_3d_frame_start();
 
-		/* let the geometry engine do it's thing */ 
+		/* let the geometry engine do it's thing */
 		// TODO: move it from here
 		geo_parse();
 

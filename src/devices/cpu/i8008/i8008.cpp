@@ -42,7 +42,7 @@ i8008_device::i8008_device(const machine_config &mconfig, const char *tag, devic
 	, m_direct(nullptr)
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 //-------------------------------------------------
@@ -208,9 +208,9 @@ void i8008_device::state_string_export(const device_state_entry &entry, std::str
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *i8008_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8008_device::create_disassembler()
 {
-	return new i8008_disassembler;
+	return std::make_unique<i8008_disassembler>();
 }
 
 //**************************************************************************
@@ -257,7 +257,7 @@ void i8008_device::execute_run()
 		if (m_irq_state != CLEAR_LINE) {
 			take_interrupt();
 		}
-		debugger_instruction_hook(this, m_PC.d);
+		debugger_instruction_hook(m_PC.d);
 		execute_one(rop());
 	} while (m_icount > 0);
 }

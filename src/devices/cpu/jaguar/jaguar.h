@@ -245,7 +245,7 @@ public:
 
 protected:
 	virtual void execute_run() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -262,7 +262,7 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 6; }
 	virtual void execute_run() override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 

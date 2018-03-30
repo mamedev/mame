@@ -89,7 +89,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	inline void cycles_passed(uint8_t cycles);
 	inline uint8_t mem_read_byte(uint16_t addr);

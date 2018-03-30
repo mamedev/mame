@@ -187,7 +187,7 @@ private:
 	devcb_write_line   m_write_srq;
 	devcb_write_line   m_write_atn;
 	devcb_write_line   m_write_ren;
-	devcb_write8	   m_write_dio;
+	devcb_write8       m_write_dio;
 
 	void set_signal(device_t *device, int signal, int state);
 	int get_signal(int signal);

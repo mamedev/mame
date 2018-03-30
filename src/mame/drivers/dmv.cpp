@@ -403,10 +403,10 @@ QUICKLOAD_LOAD_MEMBER( dmv_state, dmv )
 		m_ram->base()[i+0x100] = data;
 	}
 
-	m_ram->base()[0x80] = m_ram->base()[0x81] = 0;	// clear out command tail	
-	
+	m_ram->base()[0x80] = m_ram->base()[0x81] = 0;  // clear out command tail
+
 	m_maincpu->set_pc(0x100);                // start program
-	m_maincpu->set_state_int(Z80_SP, 256 * m_ram->base()[7] - 300);	// put the stack a bit before BDOS
+	m_maincpu->set_state_int(Z80_SP, 256 * m_ram->base()[7] - 300); // put the stack a bit before BDOS
 
 	return image_init_result::PASS;
 }
@@ -865,7 +865,7 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, irq7a_w))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "dmv")
-	
+
 	MCFG_QUICKLOAD_ADD("quickload", dmv_state, dmv, "com,cpm", 3)
 
 MACHINE_CONFIG_END

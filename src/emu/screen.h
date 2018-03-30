@@ -352,7 +352,7 @@ private:
 	u64                 m_frame_number;             // the current frame number
 	u32                 m_partial_updates_this_frame;// partial update counter this frame
 
-	bool				m_is_primary_screen;
+	bool                m_is_primary_screen;
 
 	// VBLANK callbacks
 	class callback_item

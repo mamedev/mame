@@ -19,9 +19,9 @@ i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-util::disasm_interface *i8x9x_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8x9x_device::create_disassembler()
 {
-	return new i8x9x_disassembler;
+	return std::make_unique<i8x9x_disassembler>();
 }
 
 device_memory_interface::space_config_vector i8x9x_device::memory_space_config() const

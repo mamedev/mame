@@ -111,7 +111,7 @@ public:
 	DECLARE_READ8_MEMBER(controls_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 	required_device<cpu_device> m_maincpu;
 	void pachifev(machine_config &config);
 	void pachifev_cru(address_map &map);
@@ -306,15 +306,16 @@ void pachifev_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(pachifev_state::pachifev_vblank_irq)
+WRITE_LINE_MEMBER(pachifev_state::vblank_w)
 {
+	if (state)
 	{
 		static const char *const inname[2] = { "PLUNGER_P1", "PLUNGER_P2" };
 
 		/* I wish I had found a better way to handle cocktail inputs, but I can't find a way to access internal RAM */
 		/* (bit 5 of 0xf0aa : 0 = player 1 and 1 = player 2 - bit 6 of 0xf0aa : 0 = upright and 1 = cocktail). */
 		/* All I found is that in main RAM, 0xe00f.b determines the player : 0x00 = player 1 and 0x01 = player 2. */
-		address_space &ramspace = device.memory().space(AS_PROGRAM);
+		address_space &ramspace = m_maincpu->space(AS_PROGRAM);
 		uint8_t player = 0;
 
 		if ((ramspace.read_byte(0xe00f) == 0x01) && ((ioport("DSW1")->read() & 0x08) == 0x00))
@@ -350,13 +351,13 @@ MACHINE_CONFIG_START(pachifev_state::pachifev)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), pachifev_map, pachifev_cru)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pachifev_state, pachifev_vblank_irq)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pachifev_state, vblank_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

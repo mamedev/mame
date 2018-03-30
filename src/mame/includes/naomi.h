@@ -129,7 +129,7 @@ public:
 	DECLARE_WRITE64_MEMBER( aw_flash_w );
 	DECLARE_READ64_MEMBER( aw_modem_r );
 	DECLARE_WRITE64_MEMBER( aw_modem_w );
-	
+
 	DECLARE_DRIVER_INIT(atomiswave);
 	DECLARE_DRIVER_INIT(xtrmhnt2);
 

@@ -4297,7 +4297,6 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goldnpkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldnpkr_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4322,6 +4321,7 @@ MACHINE_CONFIG_START(goldnpkr_state::goldnpkr_base)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK) /* 68B45 or 6845s @ CPU clock */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -4704,7 +4704,6 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(megadpkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(megadpkr_banked_map)
@@ -4739,6 +4738,7 @@ MACHINE_CONFIG_START(blitz_state::megadpkr)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CPU_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldnpkr)
 	MCFG_PALETTE_ADD("palette", 256)

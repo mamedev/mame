@@ -36,9 +36,9 @@ uint8_t deco_cpu6_device::mi_decrypt::read_sync(uint16_t adr)
 		return direct->read_byte(adr);
 }
 
-util::disasm_interface *deco_cpu6_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> deco_cpu6_device::create_disassembler()
 {
-	return new disassembler;
+	return std::make_unique<disassembler>();
 }
 
 u32 deco_cpu6_device::disassembler::interface_flags() const

@@ -41,7 +41,7 @@ WRITE_LINE_MEMBER(rocnrope_state::irq_mask_w)
 {
 	m_irq_mask = state;
 	if (!m_irq_mask)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(rocnrope_state::coin_counter_1_w)
@@ -200,10 +200,10 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(rocnrope_state::vblank_irq)
+WRITE_LINE_MEMBER(rocnrope_state::vblank_irq)
 {
-	if (m_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(rocnrope_state::rocnrope)
@@ -211,7 +211,6 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(rocnrope_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rocnrope_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(rocnrope_state, flip_screen_w))
@@ -231,6 +230,7 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(rocnrope_state, screen_update_rocnrope)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rocnrope_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rocnrope)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)

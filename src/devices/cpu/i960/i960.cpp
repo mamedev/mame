@@ -2096,7 +2096,7 @@ void i960_cpu_device::execute_run()
 
 	while(m_icount > 0) {
 		m_PIP = m_IP;
-		debugger_instruction_hook(this, m_IP);
+		debugger_instruction_hook(m_IP);
 
 		m_bursting = 0;
 
@@ -2259,7 +2259,7 @@ void i960_cpu_device::device_start()
 	memset(m_fp, 0, sizeof(m_fp));
 	m_PIP = 0;
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void i960_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -2296,7 +2296,7 @@ void i960_cpu_device::device_reset()
 	m_rcache_pos = 0;
 }
 
-util::disasm_interface *i960_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i960_cpu_device::create_disassembler()
 {
-	return new i960_disassembler;
+	return std::make_unique<i960_disassembler>();
 }

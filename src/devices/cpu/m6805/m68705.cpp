@@ -698,9 +698,9 @@ void m68705p_device::device_start()
 	state_add(M68705_MOR, "MOR", get_user_rom()[0x0784]).mask(0xff);
 }
 
-util::disasm_interface *m68705p_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68705p_device::create_disassembler()
 {
-	return new m6805_disassembler(m68705p_syms);
+	return std::make_unique<m6805_disassembler>(m68705p_syms);
 }
 
 
@@ -772,9 +772,9 @@ void m68705u_device::device_start()
 	// TODO: MISC register
 }
 
-util::disasm_interface *m68705u_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68705u_device::create_disassembler()
 {
-	return new m6805_disassembler(m68705u_syms);
+	return std::make_unique<m6805_disassembler>(m68705u_syms);
 }
 
 
@@ -825,9 +825,9 @@ void m68705r_device::device_start()
 	// TODO: ADC
 }
 
-util::disasm_interface *m68705r_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68705r_device::create_disassembler()
 {
-	return new m6805_disassembler(m68705r_syms);
+	return std::make_unique<m6805_disassembler>(m68705r_syms);
 }
 
 /****************************************************************************

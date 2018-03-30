@@ -120,7 +120,7 @@ public:
 	required_device<scn2681_device> m_duart;
 	required_device<esqpanel2x16_sq1_device> m_sq1panel;
 	required_device<midi_port_device> m_mdout;
-	
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -242,7 +242,7 @@ MACHINE_CONFIG_START(esqkt_state::kt)
 	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(16'000'000) / (16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
+
 	MCFG_SOUND_ADD("ensoniq1", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */

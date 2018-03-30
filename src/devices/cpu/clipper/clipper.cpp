@@ -122,7 +122,7 @@ void clipper_device::device_start()
 	get_dcammu().set_spaces(spaces);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_psw));
@@ -225,7 +225,7 @@ void clipper_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, m_ip);
+		debugger_instruction_hook(m_ip);
 
 		// fetch and decode an instruction
 		if (decode_instruction())
@@ -1921,7 +1921,7 @@ void clipper_c400_device::execute_instruction()
 	}
 }
 
-util::disasm_interface *clipper_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> clipper_device::create_disassembler()
 {
-	return new clipper_disassembler;
+	return std::make_unique<clipper_disassembler>();
 }

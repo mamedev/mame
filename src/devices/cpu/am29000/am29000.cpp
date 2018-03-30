@@ -409,7 +409,7 @@ void am29000_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callimport().noshow();
 	state_add(STATE_GENFLAGS, "CURFLAGS", m_alu).formatstr("%13s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -673,7 +673,7 @@ void am29000_cpu_device::execute_run()
 		}
 
 		if (call_debugger)
-			debugger_instruction_hook(this, m_pc);
+			debugger_instruction_hook(m_pc);
 
 		fetch_decode();
 
@@ -703,7 +703,7 @@ void am29000_cpu_device::execute_set_input(int inputnum, int state)
 	// TODO : CHECK IRQs
 }
 
-util::disasm_interface *am29000_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> am29000_cpu_device::create_disassembler()
 {
-	return new am29000_disassembler;
+	return std::make_unique<am29000_disassembler>();
 }

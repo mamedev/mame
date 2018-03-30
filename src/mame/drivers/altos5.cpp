@@ -323,10 +323,10 @@ WRITE8_MEMBER( altos5_state::port09_w )
 QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	
+
 	if (quickload_size >= 0xfd00)
 		return image_init_result::FAIL;
-	
+
 	setup_banks(2);
 
 	/* Avoid loading a program if CP/M-80 is not in memory */
@@ -335,12 +335,12 @@ QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
 		machine_reset();
 		return image_init_result::FAIL;
 	}
-	
+
 	/* Load image to the TPA (Transient Program Area) */
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
-		
+
 		if (image.fread( &data, 1) != 1)
 			return image_init_result::FAIL;
 		prog_space.write_byte(i+0x100, data);
@@ -348,11 +348,11 @@ QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
 
 	/* clear out command tail */
 	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
-	
+
 	/* Roughly set SP basing on the BDOS position */
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);       // start program
-	
+
 	return image_init_result::PASS;
 }
 

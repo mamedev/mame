@@ -82,10 +82,10 @@ bool poly_cpm_format::load(io_generic *io, uint32_t form_factor, floppy_image *i
 		head_num = 2;
 		break;
 	}
-	
+
 	int cell_count = (form_factor == floppy_image::FF_525) ? 50000 : 100000;
 	int offset = 0;
-	
+
 	for (int track = 0; track < total_tracks; track++)
 		for (int head = 0; head < head_num; head++)
 		{

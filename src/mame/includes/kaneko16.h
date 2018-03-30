@@ -53,14 +53,14 @@ public:
 
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_mainram;
-	
+
 	optional_memory_region_array<2> m_okiregion;
 	optional_memory_bank_array<2> m_okibank;
 
 	uint16_t m_disp_enable;
 
 	int m_VIEW2_2_pri;
-	
+
 	void kaneko16_common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize);
 	DECLARE_WRITE16_MEMBER(kaneko16_coin_lockout_w);
 	DECLARE_WRITE16_MEMBER(kaneko16_eeprom_w);
@@ -74,7 +74,7 @@ public:
 
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
-	
+
 	DECLARE_DRIVER_INIT(kaneko16);
 	DECLARE_DRIVER_INIT(bakubrkr);
 

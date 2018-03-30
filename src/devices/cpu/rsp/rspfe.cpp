@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "rspfe.h"
 
-#include "rsp.h"
 #include "rspdefs.h"
 
 
@@ -20,12 +19,11 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  rsp_frontend - constructor
+//  rsp_device::frontend - constructor
 //-------------------------------------------------
 
-rsp_frontend::rsp_frontend(rsp_device &rsp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
-	: drc_frontend(rsp, window_start, window_end, max_sequence),
-		m_rsp(rsp)
+rsp_device::frontend::frontend(rsp_device &rsp, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
+	: drc_frontend(rsp, window_start, window_end, max_sequence), m_rsp(rsp)
 {
 }
 
@@ -35,7 +33,7 @@ rsp_frontend::rsp_frontend(rsp_device &rsp, uint32_t window_start, uint32_t wind
 //  instruction
 //-------------------------------------------------
 
-bool rsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
+bool rsp_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
 	uint32_t op, opswitch;
 
@@ -160,7 +158,7 @@ bool rsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 //  single instruction in the 'special' group
 //-------------------------------------------------
 
-bool rsp_frontend::describe_special(uint32_t op, opcode_desc &desc)
+bool rsp_device::frontend::describe_special(uint32_t op, opcode_desc &desc)
 {
 	switch (op & 63)
 	{
@@ -222,7 +220,7 @@ bool rsp_frontend::describe_special(uint32_t op, opcode_desc &desc)
 //  single instruction in the 'regimm' group
 //-------------------------------------------------
 
-bool rsp_frontend::describe_regimm(uint32_t op, opcode_desc &desc)
+bool rsp_device::frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 {
 	switch (RTREG)
 	{
@@ -265,7 +263,7 @@ bool rsp_frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 //  single instruction in the COP0 group
 //-------------------------------------------------
 
-bool rsp_frontend::describe_cop0(uint32_t op, opcode_desc &desc)
+bool rsp_device::frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 {
 	switch (RSREG)
 	{
@@ -290,7 +288,7 @@ bool rsp_frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 //  single instruction in the COP2 group
 //-------------------------------------------------
 
-bool rsp_frontend::describe_cop2(uint32_t op, opcode_desc &desc)
+bool rsp_device::frontend::describe_cop2(uint32_t op, opcode_desc &desc)
 {
 	switch (RSREG)
 	{

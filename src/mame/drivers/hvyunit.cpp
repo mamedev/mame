@@ -5,7 +5,7 @@
 Heavy Unit
 Kaneko/Taito 1988
 
-Driver based on djboy.c / airbustr.c
+Driver based on djboy.cpp / airbustr.cpp
 
 This game runs on Kaneko hardware. The game is similar to R-Type.
 
@@ -81,20 +81,24 @@ class hvyunit_state : public driver_device
 {
 public:
 	hvyunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_mastercpu(*this, "master"),
-		m_slavecpu(*this, "slave"),
-		m_mermaid(*this, "mermaid"),
-		m_soundcpu(*this, "soundcpu"),
-		m_pandora(*this, "pandora"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_mermaidlatch(*this, "mermaidlatch"),
-		m_slavelatch(*this, "slavelatch"),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_mastercpu(*this, "master")
+		, m_slavecpu(*this, "slave")
+		, m_mermaid(*this, "mermaid")
+		, m_soundcpu(*this, "soundcpu")
+		, m_pandora(*this, "pandora")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_mermaidlatch(*this, "mermaidlatch")
+		, m_slavelatch(*this, "slavelatch")
+		, m_masterbank(*this, "master_bank")
+		, m_slavebank(*this, "slave_bank")
+		, m_soundbank(*this, "sound_bank")
+		, m_videoram(*this, "videoram")
+		, m_colorram(*this, "colorram")
+	{
+	}
 
 	/* Devices */
 	required_device<cpu_device> m_mastercpu;
@@ -107,6 +111,10 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mermaidlatch;
 	required_device<generic_latch_8_device> m_slavelatch;
+	
+	required_memory_bank m_masterbank;
+	required_memory_bank m_slavebank;
+	required_memory_bank m_soundbank;
 
 	/* Video */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -122,12 +130,11 @@ public:
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
 	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
 	DECLARE_READ8_MEMBER(mermaid_status_r);
-	DECLARE_WRITE8_MEMBER(trigger_nmi_on_sound_cpu2);
-	DECLARE_WRITE8_MEMBER(hu_videoram_w);
-	DECLARE_WRITE8_MEMBER(hu_colorram_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
 	DECLARE_WRITE8_MEMBER(slave_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(hu_scrollx_w);
-	DECLARE_WRITE8_MEMBER(hu_scrolly_w);
+	DECLARE_WRITE8_MEMBER(scrollx_w);
+	DECLARE_WRITE8_MEMBER(scrolly_w);
 	DECLARE_WRITE8_MEMBER(coin_count_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_READ8_MEMBER(mermaid_p0_r);
@@ -167,9 +174,9 @@ public:
 
 void hvyunit_state::machine_start()
 {
-	membank("master_bank")->configure_entries(0, 8, memregion("master")->base(), 0x4000);
-	membank("slave_bank")->configure_entries(0, 4, memregion("slave")->base(), 0x4000);
-	membank("sound_bank")->configure_entries(0, 4, memregion("soundcpu")->base(), 0x4000);
+	m_masterbank->configure_entries(0, 8, memregion("master")->base(), 0x4000);
+	m_slavebank->configure_entries(0, 4, memregion("slave")->base(), 0x4000);
+	m_soundbank->configure_entries(0, 4, memregion("soundcpu")->base(), 0x4000);
 
 	save_item(NAME(m_mermaid_p));
 }
@@ -240,7 +247,7 @@ WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_slave_cpu)
 
 WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
 {
-	membank("master_bank")->set_entry(data & 7);
+	m_masterbank->set_entry(data & 7);
 }
 
 READ8_MEMBER(hvyunit_state::mermaid_status_r)
@@ -255,19 +262,13 @@ READ8_MEMBER(hvyunit_state::mermaid_status_r)
  *
  *************************************/
 
-WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_sound_cpu2)
-{
-	m_soundlatch->write(space, 0, data);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-WRITE8_MEMBER(hvyunit_state::hu_videoram_w)
+WRITE8_MEMBER(hvyunit_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(hvyunit_state::hu_colorram_w)
+WRITE8_MEMBER(hvyunit_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -276,15 +277,15 @@ WRITE8_MEMBER(hvyunit_state::hu_colorram_w)
 WRITE8_MEMBER(hvyunit_state::slave_bankswitch_w)
 {
 	m_port0_data = data;
-	membank("slave_bank")->set_entry(data & 3);
+	m_slavebank->set_entry(data & 3);
 }
 
-WRITE8_MEMBER(hvyunit_state::hu_scrollx_w)
+WRITE8_MEMBER(hvyunit_state::scrollx_w)
 {
 	m_scrollx = data;
 }
 
-WRITE8_MEMBER(hvyunit_state::hu_scrolly_w)
+WRITE8_MEMBER(hvyunit_state::scrolly_w)
 {
 	m_scrolly = data;
 }
@@ -304,7 +305,7 @@ WRITE8_MEMBER(hvyunit_state::coin_count_w)
 
 WRITE8_MEMBER(hvyunit_state::sound_bankswitch_w)
 {
-	membank("sound_bank")->set_entry(data & 3);
+	m_soundbank->set_entry(data & 3);
 }
 
 
@@ -409,8 +410,8 @@ void hvyunit_state::slave_memory(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("slave_bank");
-	map(0xc000, 0xc3ff).ram().w(this, FUNC(hvyunit_state::hu_videoram_w)).share("videoram");
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(hvyunit_state::hu_colorram_w)).share("colorram");
+	map(0xc000, 0xc3ff).ram().w(this, FUNC(hvyunit_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).ram().w(this, FUNC(hvyunit_state::colorram_w)).share("colorram");
 	map(0xd000, 0xdfff).ram();
 	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xd800, 0xd9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -421,11 +422,11 @@ void hvyunit_state::slave_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(this, FUNC(hvyunit_state::slave_bankswitch_w));
-	map(0x02, 0x02).w(this, FUNC(hvyunit_state::trigger_nmi_on_sound_cpu2));
+	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x04, 0x04).r(m_slavelatch, FUNC(generic_latch_8_device::read));
 	map(0x04, 0x04).w(m_mermaidlatch, FUNC(generic_latch_8_device::write));
-	map(0x06, 0x06).w(this, FUNC(hvyunit_state::hu_scrolly_w));
-	map(0x08, 0x08).w(this, FUNC(hvyunit_state::hu_scrollx_w));
+	map(0x06, 0x06).w(this, FUNC(hvyunit_state::scrolly_w));
+	map(0x08, 0x08).w(this, FUNC(hvyunit_state::scrollx_w));
 	map(0x0c, 0x0c).r(this, FUNC(hvyunit_state::mermaid_status_r));
 	map(0x0e, 0x0e).w(this, FUNC(hvyunit_state::coin_count_w));
 
@@ -668,6 +669,7 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(DM9368, dm9368_device, "dm9368", "Fairchild DM9368 7-Segment 
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-const uint8_t dm9368_device::s_segment_data[16] =
+const u8 dm9368_device::s_segment_data[16] =
 {
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71
 };
@@ -36,61 +36,44 @@ const uint8_t dm9368_device::s_segment_data[16] =
 //  LIVE DEVICE
 //**************************************************************************
 
-//-------------------------------------------------
-//  dm9368_device - constructor
-//-------------------------------------------------
-
-dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DM9368, tag, owner, clock),
-	device_output_interface(mconfig, *this),
-	m_write_rbo(*this),
+	m_update_cb(*this),
+	m_rbo_cb(*this),
 	m_rbi(1),
 	m_rbo(1)
 {
 }
 
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void dm9368_device::device_start()
+void dm9368_device::a_w(u8 data)
 {
-	// resolve callbacks
-	m_write_rbo.resolve_safe();
+	int const a(data & 0x0f);
+	int const rbo((m_rbi || a) ? 1 : 0);
+	u8 const value(rbo ? s_segment_data[a] : 0);
 
-	// state saving
-	save_item(NAME(m_rbi));
-	save_item(NAME(m_rbo));
+	if (!rbo)
+		LOG("DM9368 Blanked Rippling Zero\n");
+	else
+		LOG("DM9368 Output Data: %u = %02x\n", a, value);
+
+	m_update_cb(0, value, 0x7f);
+	if (rbo != m_rbo)
+		m_rbo_cb(m_rbo = rbo);
 }
 
 
-//-------------------------------------------------
-//  a_w -
-//-------------------------------------------------
-
-void dm9368_device::a_w(uint8_t data)
+void dm9368_device::device_resolve_objects()
 {
-	int const a = data & 0x0f;
-	uint8_t value = 0;
+	// resolve callbacks
+	m_update_cb.resolve_safe();
+	m_rbo_cb.resolve_safe();
+}
 
-	if (!m_rbi && !a)
-	{
-		LOG("DM9368 Blanked Rippling Zero\n");
 
-		// blank rippling 0
-		m_rbo = 0;
-	}
-	else
-	{
-		LOG("DM9368 Output Data: %u = %02x\n", a, s_segment_data[a]);
-
-		value = s_segment_data[a];
-
-		m_rbo = 1;
-	}
-
-	set_digit_value(value);
-
-	m_write_rbo(m_rbo);
+void dm9368_device::device_start()
+{
+	// state saving
+	save_item(NAME(m_rbi));
+	save_item(NAME(m_rbo));
 }

@@ -788,9 +788,9 @@ void g65816_device::execute_set_input(int line, int state)
 	(this->*FTABLE_SET_LINE)(line, state);
 }
 
-util::disasm_interface *g65816_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> g65816_device::create_disassembler()
 {
-	return new g65816_disassembler(this);
+	return std::make_unique<g65816_disassembler>(this);
 }
 
 bool g65816_device::get_m_flag() const
@@ -909,7 +909,7 @@ void g65816_device::device_start()
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
 
-	m_icountptr = &m_ICount;
+	set_icountptr(m_ICount);
 }
 
 void g65816_device::state_import(const device_state_entry &entry)

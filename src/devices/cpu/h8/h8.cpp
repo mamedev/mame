@@ -100,7 +100,7 @@ void h8_device::device_start()
 	save_item(NAME(taken_irq_level));
 	save_item(NAME(irq_nmi));
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	PC = 0;
 	PPC = 0;
@@ -208,7 +208,7 @@ void h8_device::execute_run()
 			if(inst_state < 0x10000) {
 				PPC = NPC;
 				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-					debugger_instruction_hook(this, NPC);
+					debugger_instruction_hook(NPC);
 			}
 			do_exec_full();
 		}
@@ -1343,9 +1343,9 @@ void h8_device::set_nz32(uint32_t v)
 		CCR |= F_N;
 }
 
-util::disasm_interface *h8_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> h8_device::create_disassembler()
 {
-	return new h8_disassembler;
+	return std::make_unique<h8_disassembler>();
 }
 
 #include "cpu/h8/h8.hxx"

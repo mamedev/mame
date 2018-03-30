@@ -434,7 +434,7 @@ void seattle_state::machine_start()
 	save_item(NAME(m_output_mode));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
-	
+
 	m_lamps.resolve();
 	m_leds.resolve();
 }
@@ -839,11 +839,11 @@ READ32_MEMBER(seattle_state::output_r)
 WRITE32_MEMBER(seattle_state::output_w)
 {
 	uint8_t arg = data & 0xFF;
-	
+
 	if (!BIT(m_output_last, 11) && BIT(data, 11))
 		m_output_mode = arg;
 	m_output_last = data;
-	
+
 	if (!BIT(data, 10))
 	{
 		switch (m_output_mode)

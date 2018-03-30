@@ -38,7 +38,7 @@ public:
 	s16 &yaau_set_k(s16 value) { return yaau_k = yaau_extend(value); }
 	u16 &yaau_set_rb(s16 value) { return yaau_rb = value & yaau_mask; }
 	u16 &yaau_set_re(s16 value) { return yaau_re = value & yaau_mask; }
-	constexpr s16 yaau_extend(s16 value) { return (value & yaau_mask) | ((value & yaau_sign) ? ~yaau_mask : 0); }
+	constexpr s16 yaau_extend(s16 value) const { return (value & yaau_mask) | ((value & yaau_sign) ? ~yaau_mask : 0); }
 	s16 &yaau_extend_j() { return yaau_j = yaau_extend(yaau_j); }
 	s16 &yaau_extend_k() { return yaau_k = yaau_extend(yaau_k); }
 

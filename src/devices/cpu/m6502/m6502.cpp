@@ -85,7 +85,7 @@ void m6502_device::init()
 	save_item(NAME(irq_taken));
 	save_item(NAME(inhibit_interrupts));
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	PC = 0x0000;
 	NPC = 0x0000;
@@ -390,7 +390,7 @@ void m6502_device::execute_run()
 			PPC = NPC;
 			inst_state = IR | inst_state_base;
 			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debugger_instruction_hook(this, pc_to_external(NPC));
+				debugger_instruction_hook(pc_to_external(NPC));
 		}
 		do_exec_full();
 	}
@@ -502,9 +502,9 @@ void m6502_device::set_nz(uint8_t v)
 		P |= F_Z;
 }
 
-util::disasm_interface *m6502_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6502_device::create_disassembler()
 {
-	return new m6502_disassembler;
+	return std::make_unique<m6502_disassembler>();
 }
 
 uint8_t m6502_device::memory_interface::read_9(uint16_t adr)

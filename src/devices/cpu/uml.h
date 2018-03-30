@@ -230,15 +230,11 @@ namespace uml
 	// class describing a global code handle
 	class code_handle
 	{
-		friend class ::drcuml_state;
-		friend class ::simple_list<code_handle>;
-
+	public:
 		// construction/destruction
 		code_handle(drcuml_state &drcuml, const char *name);
 
-	public:
 		// getters
-		code_handle *next() const { return m_next; }
 		drccodeptr codeptr() const { return *m_code; }
 		drccodeptr *codeptr_addr() { return m_code; }
 		char const *string() const { return m_string.c_str(); }
@@ -250,7 +246,6 @@ namespace uml
 		// internal state
 		drccodeptr *            m_code;             // pointer in the cache to the associated code
 		std::string             m_string;           // pointer to string attached to handle
-		code_handle *           m_next;             // link to next handle in the list
 		drcuml_state &          m_drcuml;           // pointer to owning object
 	};
 
@@ -397,7 +392,7 @@ namespace uml
 	{
 	public:
 		// construction/destruction
-		constexpr instruction() { }
+		constexpr instruction() : m_param{ } { }
 
 		// getters
 		constexpr opcode_t opcode() const { return m_opcode; }

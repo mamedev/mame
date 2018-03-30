@@ -305,8 +305,8 @@ PFSB Flash ROM board
 |-------------------------------------------------------------|
 Notes:
       OSC1  - oscillator 28.000MHz
-	  JP1   - JUMPER ROM0 (IC22) size: 1-2 = 32M, 2-3 = 16M
-	  JP2   - JUMPER ROM0 write: 1-2 = Enabled, 2-3 = Disabled
+      JP1   - JUMPER ROM0 (IC22) size: 1-2 = 32M, 2-3 = 16M
+      JP2   - JUMPER ROM0 write: 1-2 = Enabled, 2-3 = Disabled
       JP3,4 - JUMPERS Bank select: 1-2 1-2 = Master, 2-3 2-3 = Slave (slave data accessed at +0x10000000 at cart address space)
  IC1S-IC21S - FlashROM (SOP56), either 32Mb or 64Mb. Not all positions are populated
       IC22  - EPROM (DIP42), either 27C160 or 27C322
@@ -467,10 +467,10 @@ NRS Flash ROM board
 Notes:
       OSC1  - oscillator 20.000MHz
       JP1   - JUMPER ROM0 (IC16) size: 1-2 = 32M, 2-3 = 16M
-	  JP2   - JUMPER ROM0 write: 1-2 = Enabled, 2-3 = Disabled
-	  JP3   - JUMPER ROM board Bank: 1-2 = Slave, 2-3 = Master
-	JP4,5,7 - JUMPERS SCSI function: 1-2 2-3 1-2 = Enabled, 2-3 1-2 2-3 = Disabled
-	  JP6   - JUMPER Unknown function (1-2)
+      JP2   - JUMPER ROM0 write: 1-2 = Enabled, 2-3 = Disabled
+      JP3   - JUMPER ROM board Bank: 1-2 = Slave, 2-3 = Master
+    JP4,5,7 - JUMPERS SCSI function: 1-2 2-3 1-2 = Enabled, 2-3 1-2 2-3 = Disabled
+      JP6   - JUMPER Unknown function (1-2)
        SW1  - PUSHBUTTON
        SW2  - 8X2 DIPswitch
  SCSI-CTRL  - SCSI-II controller MB86604A
@@ -1940,7 +1940,7 @@ void atomiswave_state::aw_map(address_map &map)
 	map(0x00700000, 0x00707fff).rw(this, FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
 	map(0x00800000, 0x00ffffff).rw(this, FUNC(atomiswave_state::sh4_soundram_r), FUNC(atomiswave_state::sh4_soundram_w));           // sound RAM (8 MB)
-	
+
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
 	map(0x04000000, 0x047fffff).ram().mirror(0x00800000).share("dc_texture_ram");      // texture memory 64 bit access
 	map(0x05000000, 0x057fffff).ram().mirror(0x00800000).share("frameram"); // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
@@ -1999,11 +1999,6 @@ INPUT_PORTS_START( naomi_debug )
 	PORT_CONFNAME( 0x02, 0x00, "Disable Render Calls" )
 	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_CONFNAME( 0x0c, 0x00, "Master CPU Clock Rate (Cheat)") PORT_CHANGED_MEMBER(DEVICE_SELF, dc_state, mastercpu_cheat_r, nullptr)
-	PORT_CONFSETTING(    0x00, "100%" )
-	PORT_CONFSETTING(    0x04, "50%" )
-	PORT_CONFSETTING(    0x08, "25%" )
-	PORT_CONFSETTING(    0x0c, "12.5%" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( naomi_mie )
@@ -3072,7 +3067,7 @@ OFF  OFF  ON   Australia
  PC BD SET4-25 64M NEC / 171-7598B / 837-19104-01 (c) Sega 1997
  EEPROM is 27C4096, it contains monitor-debugger which communicates with host PC via SCSI, may upload code/data to onboard RAM and run it.
  This boot ROM is not designed to run cartridges or other media.
- 
+
 
  zukinver0930.ipl comes from 837-13502-01 / 837-13663 "Development ROM Board" which contains:
   22 empty sockets ROM0 - ROM21
@@ -9535,9 +9530,7 @@ DRIVER_INIT_MEMBER(atomiswave_state,atomiswave)
 
 	aw_ctrl_type = 0;
 
-	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, true, ROM);
-	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
 }
 
 READ64_MEMBER(atomiswave_state::xtrmhnt2_hack_r)
