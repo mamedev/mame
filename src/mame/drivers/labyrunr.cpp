@@ -21,10 +21,10 @@
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_vblank_interrupt)
+WRITE_LINE_MEMBER(labyrunr_state::vblank_irq)
 {
-	if (m_k007121->ctrlram_r(7) & 0x02)
-		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+	if (state && (m_k007121->ctrlram_r(7) & 0x02))
+		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
@@ -169,7 +169,6 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
 	MCFG_CPU_PROGRAM_MAP(labyrunr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", labyrunr_state,  labyrunr_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -182,6 +181,7 @@ MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(labyrunr_state, screen_update_labyrunr)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(labyrunr_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", labyrunr)
 	MCFG_PALETTE_ADD("palette", 2*8*16*16)

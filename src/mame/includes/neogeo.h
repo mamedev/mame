@@ -217,6 +217,7 @@ protected:
 	}
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	virtual DECLARE_WRITE8_MEMBER(io_control_w) override;
 	DECLARE_WRITE_LINE_MEMBER(set_save_ram_unlock);

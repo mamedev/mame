@@ -14834,8 +14834,11 @@ tgaiden                         // Tiger
 tgaunt                          // Tiger
 tgoldeye                        // Tiger
 tgoldnaxe                       // Tiger
+thalone                         // Tiger
+thalone2                        // Tiger
 thook                           // Tiger
 tigarden                        // Tronica
+tinday                          // Tiger
 tjdredd                         // Tiger
 tjpark                          // Tiger
 tkarnov                         // Tiger
@@ -14857,6 +14860,7 @@ tsonic2                         // Tiger
 tspidman                        // Tiger
 tstrider                        // Tiger
 tswampt                         // Tiger
+ttransf2                        // Tiger
 tvindictr                       // Tiger
 txmenpx                         // Tiger
 
@@ -15590,6 +15594,7 @@ shufshot137                     // (c) Strata/Incredible Technologies
 shufshot139                     // (c) Strata/Incredible Technologies
 timekill                        // (c) 1992 Strata/Incredible Technologies
 timekill121                     // (c) 1992 Strata/Incredible Technologies
+timekill121a                    // (c) 1992 Strata/Incredible Technologies
 timekill131                     // (c) 1992 Strata/Incredible Technologies
 timekill132i                    // (c) 1992 Strata/Incredible Technologies
 wcbowl                          // (c) 1995 Incredible Technologies
@@ -33714,8 +33719,9 @@ zektor                          // (c) 1982
 @source:segahang.cpp
 endurob2                        // (c) 1985 (Beta bootleg)
 endurobl                        // (c) 1985 (Herb bootleg)
-enduror                         // (c) 1985 (FD1089B)
-enduror1                        // (c) 1985 (FD1089B)
+enduror                         // (c) 1985 (YM2151, FD1089B)
+enduror1                        // (c) 1985 (YM2203, FD1089B)
+endurora                        // (c) 1985 (YM2151, Mask ROM sprites, FD1089B)
 enduror1d                       // bootleg
 endurord                        // bootleg
 hangon                          // (c) 1985 (Rev A)

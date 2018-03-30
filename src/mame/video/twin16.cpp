@@ -564,5 +564,11 @@ WRITE_LINE_MEMBER(twin16_state::screen_vblank_twin16)
 		else {
 			m_spriteram->copy();
 		}
+
+		// IRQ generation
+		if (m_CPUA_register & 0x20)
+			m_maincpu->set_input_line(5, HOLD_LINE);
+		if (m_subcpu.found() && (m_CPUB_register & 0x02))
+			m_subcpu->set_input_line(5, HOLD_LINE);
 	}
 }
