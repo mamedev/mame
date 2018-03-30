@@ -4172,8 +4172,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Cave Story (World)</description>
 		<year>2013</year>
 		<publisher>histat</publisher>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="cave story (world)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -7875,8 +7875,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Tales Translations</publisher>
 		<info name="release" value="20081022" />
 		<info name="alt_title" value="ディヴァイデッド" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="divi-dead (world)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -9429,8 +9429,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>J-Data</publisher>
 		<info name="serial" value="T-43601M"/>
 		<info name="alt_title" value="J・コード パスポート" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="j-code passport (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -13780,8 +13780,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<description>Gauntlet Legends - Demo CD (USA)</description>
 		<year>2000</year>
 		<publisher>Midway</publisher>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="gauntlet legends - demo cd (usa)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16231,8 +16231,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-5703M"/>
 		<info name="release" value="19990923" />
 		<info name="alt_title" value="アイドル雀士をつくっちゃおう♡" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="idol janshi wo tsukucchaou (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16248,15 +16248,15 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-5702M"/>
 		<info name="release" value="19990923" />
 		<info name="alt_title" value="アイドル雀士をつくっちゃおう♡ 初回限定版" />
-		<part interface="dc_gdrom" name="gdrom1">
+		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Idol Janshi wo Tsukucchaou"/>
-			<diskarea name="gdrom">
+			<diskarea name="cdrom">
 				<disk name="idol janshi wo tsukucchaou - shokai genteiban (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
-		<part interface="dc_gdrom" name="gdrom2">
+		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Suchie-Pai Radio Station Dream"/>
-			<diskarea name="gdrom">
+			<diskarea name="cdrom">
 				<disk name="idol janshi wo tsukucchaou - shokai genteiban (jpn) (suchie-pai radio station dream)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16276,8 +16276,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-38706M"/>
 		<info name="release" value="20020905" />
 		<info name="alt_title" value="斑鳩" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="ikaruga (jpn)" sha1="17ac50da3abe8427c8a9537380d8f0b5c04871c0"/>
 			</diskarea>
 		</part>
@@ -16295,8 +16295,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>AIA</publisher>
 		<info name="serial" value="T-46001N"/>
 		<info name="release" value="20010416" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="illbleed (usa)" sha1="1f69f735f5414c1f335b5468649a47a4c50d33c1"/>
 			</diskarea>
 		</part>
@@ -16310,8 +16310,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-45601M"/>
 		<info name="release" value="20010329" />
 		<info name="alt_title" value="イルブリード" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="illbleed (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16325,8 +16325,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Mr.Game</publisher>
 		<info name="serial" value="T-45601"/>
 		<info name="alt_title" value="勇闖鬼界" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="illbleed (twn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16342,8 +16342,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="610-7993"/>
 		<info name="release" value="20010316" />
 		<info name="alt_title" value="いまこそ!! Dreamcast with SPECIAL GD!!" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="imakoso dreamcast with special gd (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16373,8 +16373,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Interplay</publisher>
 		<info name="serial" value="T-12503N"/>
 		<info name="release" value="19991130" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="incoming (usa)" sha1="14cd290814bd8e9aeabcb63d802f354e6355003a"/>
 			</diskarea>
 		</part>
@@ -16403,8 +16403,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Rage Software</publisher>
 		<info name="serial" value="T-40701D-50"/>
 		<info name="release" value="19991014" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="incoming (euro)" sha1="daf5d3254dc5f84387a6c89e9885c8be71831273"/>
 			</diskarea>
 		</part>
@@ -16434,8 +16434,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-15001M"/>
 		<info name="release" value="19981217" />
 		<info name="alt_title" value="インカミング 人類最終決戦" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="incoming jinrui saisyuu kessen (jpn)" sha1="5d8406941a6d90a00dfabf0fe632458b6d205aab"/>
 			</diskarea>
 		</part>
@@ -16464,8 +16464,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>1999</year>
 		<publisher>Rage Software</publisher>
 		<info name="release" value="19990906" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="incoming (euro, prototype 19990906)" sha1="4d4def1b1f2e632fcd4dff850e3d2a1beb4e9893" status="baddump"/>
 			</diskarea>
 		</part>
@@ -16483,8 +16483,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>UFO</publisher>
 		<info name="serial" value="T-41302N"/>
 		<info name="release" value="20000601" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="industrial spy operation espionage (usa)" sha1="98dcb9d4f2e1d2497cf5a1f4916b543ce3569316"/>
 			</diskarea>
 		</part>
@@ -16503,8 +16503,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-38804M"/>
 		<info name="release" value="19990923" />
 		<info name="alt_title" value="エスピオネージェンツ" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="espion-age-nts industrial agents for active espionage (jpn)" sha1="89ca11774d3a94673e6b02d31a4cdd373b7e7785"/>
 			</diskarea>
 		</part>
@@ -16517,8 +16517,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>NEC Home Electronics</publisher>
 		<info name="serial" value="610-7185"/>
 		<info name="alt_title" value="エスピオネージェンツ 店頭用デモンストレーションムービー" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="espion-age-nts industrial agents for active espionage - tentouyou demonstration movie (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16531,8 +16531,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2005</year>
 		<publisher>GOAT Store Publishing</publisher>
 		<info name="release" value="20050119" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="inhabitants (world)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16547,8 +16547,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-19506M"/>
 		<info name="release" value="20011108" />
 		<info name="alt_title" value="井上涼子 〜ラストシーン〜" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="inoue ryouko last scene (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16564,8 +16564,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-19505M"/>
 		<info name="release" value="20010705" />
 		<info name="alt_title" value="井上涼子 〜ルームメイト〜" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="inoue ryouko roommate (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16581,8 +16581,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-20127M"/>
 		<info name="release" value="20030424" />
 		<info name="alt_title" value="インタールード" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="interlude (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16598,15 +16598,15 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-20117M"/>
 		<info name="release" value="20030313" />
 		<info name="alt_title" value="インタールード 初回限定版" />
-		<part interface="dc_gdrom" name="gdrom1">
+		<part interface="cdrom" name="cdrom1">
 			<feature name="part_id" value="Interlude"/>
-			<diskarea name="gdrom">
+			<diskarea name="cdrom">
 				<disk name="interlude - shokai genteiban (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
-		<part interface="dc_gdrom" name="gdrom2">
+		<part interface="cdrom" name="cdrom2">
 			<feature name="part_id" value="Sound Track"/>
-			<diskarea name="gdrom">
+			<diskarea name="cdrom">
 				<disk name="interlude - shokai genteiban (jpn) (sound track)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16619,8 +16619,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2009</year>
 		<publisher>GOAT Store Publishing</publisher>
 		<info name="release" value="20091212" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="irides master of blocks (world)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16634,8 +16634,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2009</year>
 		<publisher>GOAT Store Publishing</publisher>
 		<info name="release" value="20091212" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="irides master of blocks - limited edition (world)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16650,8 +16650,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-19722M"/>
 		<info name="release" value="20030807" />
 		<info name="alt_title" value="イリス" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="iris (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16667,8 +16667,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-19721M"/>
 		<info name="release" value="20030807" />
 		<info name="alt_title" value="イリス 初回限定版" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="iris - shokai genteiban (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16687,8 +16687,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="T-15129N"/>
 		<info name="release" value="20010206" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="iron aces (usa)" sha1="663990fd2605bd5168150664003624fd8b72d6de"/>
 			</diskarea>
 		</part>
@@ -16707,8 +16707,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Xicat Interactive</publisher>
 		<info name="serial" value="T-44904D-50"/>
 		<info name="release" value="20010629" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="iron aces (euro)" sha1="82c0f92af18786291f9c6bfb997bed2d93f4fd87"/>
 			</diskarea>
 		</part>
@@ -16727,8 +16727,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-43501M"/>
 		<info name="release" value="20000629" />
 		<info name="alt_title" value="インペリアルの鷹 FIGHTER OF ZERO" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="imperial no taka fighter of zero (jpn)" sha1="0aded497b63ff43e7d1f7f062ff5558605708a2e"/>
 			</diskarea>
 		</part>
@@ -16747,8 +16747,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-46902M"/>
 		<info name="release" value="20040129" />
 		<info name="alt_title" value="イズモ" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="izumo (jpn)" sha1="34bf4be6da64b77e64f69b46fa88b60c21b1a8f6"/>
 			</diskarea>
 		</part>
@@ -16762,8 +16762,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="HDR-0028"/>
 		<info name="release" value="19990930" />
 		<info name="alt_title" value="J.LEAGUE プロサッカークラブをつくろう!" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="j.league pro soccer club o tsukurou (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16778,8 +16778,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-43401M"/>
 		<info name="release" value="20000831" />
 		<info name="alt_title" value="ジャーマン" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jahmong (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16801,8 +16801,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-8104N"/>
 		<info name="release" value="20000808" />
 		<info name="ring_code" value="1S T-8104N"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jeremy mcgrath supercross 2000 (usa)" sha1="b2ae0a2cf429d9f1752cb61af59e99342cf7778e"/>
 			</diskarea>
 		</part>
@@ -16828,8 +16828,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-8114D-05, T-8114D-18, T-8114D-50, T-8114D-56, T-8114D-60"/>
 		<info name="release" value="20000908" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jeremy mcgrath supercross 2000 (euro)" sha1="32b8cbb5b523b0c885c97f6a46f9bdfa1c447b0f"/>
 			</diskarea>
 		</part>
@@ -16847,8 +16847,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="release" value="20000515" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jeremy mcgrath supercross 2000 (world, prototype 20000515)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16863,8 +16863,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-41201M"/>
 		<info name="release" value="20001102" />
 		<info name="alt_title" value="ジェットコースタードリーム2" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jet coaster dream 2 (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16884,8 +16884,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Sega</publisher>
 		<info name="serial" value="51058, 51084"/>
 		<info name="release" value="20001101" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jet grind radio (usa)" sha1="bcdbe0779a59b37a0f74c4f6d52e3c1d74fa26f5"/>
 			</diskarea>
 		</part>
@@ -16904,8 +16904,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK-51058-50, 952-0101-50"/>
 		<info name="release" value="20001124" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jet set radio (euro)" sha1="595b3c4c517220eed0f0fa86241ada67691c20e9"/>
 			</diskarea>
 		</part>
@@ -16919,8 +16919,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="HDR-0078"/>
 		<info name="release" value="20000629" />
 		<info name="alt_title" value="ジェット セット ラジオ" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jet set radio (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16941,8 +16941,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="HDR-0186"/>
 		<info name="release" value="20011018" />
 		<info name="alt_title" value="デ・ラ・ジェット セット ラジオ" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="de la jet set radio (jpn)" sha1="4ee7c06c2be198cd2791838cb14e3ea621a7c40d"/>
 			</diskarea>
 		</part>
@@ -16957,8 +16957,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="HDR-0128"/>
 		<info name="release" value="20010101" />
 		<info name="alt_title" value="デ・ラ・ジェット セット ラジオ" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jet set radio (jpn, sega direct)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16971,8 +16971,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>200?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="197093"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jet grind radio (bra)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -16986,8 +16986,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Sega</publisher>
 		<info name="serial" value="610-7888"/>
 		<info name="alt_title" value="ジェット セット ラジオ 体験版" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jet set radio - taikenban (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -17005,8 +17005,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20001002" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jet grind radio (usa, prototype 20001002)" sha1="1088557a8038e7314dda86ac509fd7a3f87f79da"/>
 			</diskarea>
 		</part>
@@ -17024,8 +17024,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="release" value="20001003" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jet set radio (euro, prototype 20001003)" sha1="6f6056be0737b6caeba5d9545fd4704da4e30d85" status="baddump"/>
 			</diskarea>
 		</part>
@@ -17044,8 +17044,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-9507M"/>
 		<info name="release" value="20000330" />
 		<info name="alt_title" value="実況パワフルプロ野球 Dreamcast Edition" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jikkyou powerful pro yakyuu - dreamcast edition (jpn)" sha1="07e2e64eaa62690b431998750e7d3976d36db6a0"/>
 			</diskarea>
 		</part>
@@ -17063,8 +17063,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7001D-50"/>
 		<info name="release" value="199911xx" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jimmy white's 2 cueball (euro)" sha1="51995d91c6667cc4d28247921e4005e5c74a4bfd"/>
 			</diskarea>
 		</part>
@@ -17084,8 +17084,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="release" value="20000622" />
 		<info name="alt_title" value="人生ゲーム for Dreamcast" />
 		<info name="ring_code" value="T-10301M-0381 2MM1"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jinsei game for dreamcast (jpn)" sha1="1078883bc371e99373019ca80c40dcba9f1becf4"/>
 			</diskarea>
 		</part>
@@ -17105,8 +17105,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-18801M"/>
 		<info name="release" value="20000928" />
 		<info name="alt_title" value="実戦パチスロ必勝法!@VP@CHI 〜コングダム〜" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jissen pachislot hisshouhou at vpachi kongdom - shokai genteiban (jpn)" sha1="11deb121971dba2df3b6a895953f437ef3db0ca2"/>
 			</diskarea>
 		</part>
@@ -17124,8 +17124,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Capcom</publisher>
 		<info name="serial" value="T-1206N"/>
 		<info name="release" value="19991031" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jojo's bizarre adventure (usa)" sha1="40cccac2746f3175833f8c99fbf4f93dc732b4c4"/>
 			</diskarea>
 		</part>
@@ -17142,8 +17142,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2000</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-7007D-50"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jojo's bizarre adventure (euro)" sha1="263b09bac283d77c5805f119902434c5086a65bb"/>
 			</diskarea>
 		</part>
@@ -17162,8 +17162,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-1205M"/>
 		<info name="release" value="19991125" />
 		<info name="alt_title" value="ジョジョの奇妙な冒険 未来への遺産" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jojo no kimyou na bouken mirai e no isan (jpn)" sha1="14dd7b84d0196bacc664ea9914939ab18315348c"/>
 			</diskarea>
 		</part>
@@ -17182,8 +17182,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-1231M"/>
 		<info name="release" value="20001026" />
 		<info name="alt_title" value="ジョジョの奇妙な冒険 未来への遺産 for Matching Service" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jojo no kimyou na bouken mirai e no isan for matching service (jpn)" sha1="a4010dcad32d47bcf9dd5ac3168ca5640f306007"/>
 			</diskarea>
 		</part>
@@ -17196,8 +17196,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<publisher>Capcom</publisher>
 		<info name="serial" value="610-7357"/>
 		<info name="alt_title" value="ジョジョの奇妙な冒険 未来への遺産 店頭用体験版" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jojo no kimyou na bouken mirai e no isan - tentou-you taikenban (jpn)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -17210,8 +17210,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="T-42501M"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jra pat for dreamcast (jpn, v40l10)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -17224,8 +17224,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="T-42501M"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jra pat for dreamcast (jpn, v40l11)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -17238,8 +17238,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="T-42501M"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jra pat for dreamcast (jpn, v40l12)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -17252,8 +17252,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2000</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HDR-0204"/>
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jra pat for dreamcast (jpn, v50l10)" status="nodump"/>
 			</diskarea>
 		</part>
@@ -17273,8 +17273,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-35401M"/>
 		<info name="release" value="19981127" />
 		<info name="alt_title" value="ジュライ" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="july (jpn)" sha1="00e326a2e8076c0caecbb53aa48be541fb69a8f2"/>
 			</diskarea>
 		</part>
@@ -17293,8 +17293,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<info name="serial" value="T-35401M"/>
 		<info name="release" value="19981127" />
 		<info name="alt_title" value="ジュライ" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="july (jpn, rev. 1)" sha1="4265f137c03c4d98ad3d28aeee8c3ca4c306a578"/>
 			</diskarea>
 		</part>
@@ -17313,8 +17313,8 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		<year>2011</year>
 		<publisher>2D-Retroperspectives</publisher>
 		<info name="release" value="20110104" />
-		<part interface="dc_gdrom" name="gdrom">
-			<diskarea name="gdrom">
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
 				<disk name="jump'n blob (world)" status="nodump"/>
 			</diskarea>
 		</part>
