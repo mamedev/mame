@@ -211,9 +211,13 @@ public:
 void _4roses_state::_4roses_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
-	map(0x6000, 0x6fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
-	map(0x8000, 0xffff).rom();
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x4fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0xffff).rom().region("maincpu", 0x6000);
 }
 
 /*
@@ -360,7 +364,6 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(_4roses_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _4roses_state,  nmi_line_pulse)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -380,7 +383,10 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	MCFG_PALETTE_INIT_OWNER(_4roses_state,funworld)
 	MCFG_VIDEO_START_OVERRIDE(_4roses_state,funworld)
 
-//  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8) /* 2MHz, guess */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8) /* 2MHz, guess */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+	//MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -461,6 +467,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(_4roses_state,4roses)
 {
+	uint8_t *rom = memregion("maincpu")->base();
+	for (offs_t addr = 0x8000; addr < 0x10000; addr++)
+		rom[addr] = bitswap<8>(rom[addr] ^ 0xca, 6, 5, 4, 3, 2, 1, 0, 7);
 }
 
 
