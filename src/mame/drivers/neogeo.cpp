@@ -1666,13 +1666,13 @@ READ16_MEMBER(neogeo_base_state::banked_vectors_r)
 void neogeo_base_state::base_main_map(address_map &map)
 {
 	map(0x320000, 0x320000).mirror(0x01fffe).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x360000, 0x37ffff).r(this, FUNC(aes_base_state::unmapped_r));
+	map(0x360000, 0x37ffff).r(this, FUNC(neogeo_base_state::unmapped_r));
 	map(0x380000, 0x3800ff).mirror(0x01ff00).w(this, FUNC(neogeo_base_state::io_control_w)).umask16(0x00ff);
 	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).r(this, FUNC(neogeo_base_state::unmapped_r));
 	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w("systemlatch", FUNC(hc259_device::write_a3)).umask16(0x00ff); // BITW1 (system control registers)
 	map(0x3c0000, 0x3c0007).mirror(0x01fff8).r(this, FUNC(neogeo_base_state::video_register_r));
 	map(0x3c0000, 0x3c000f).mirror(0x01fff0).w(this, FUNC(neogeo_base_state::video_register_w));
-	map(0x3e0000, 0x3fffff).r(this, FUNC(ngarcade_base_state::unmapped_r));
+	map(0x3e0000, 0x3fffff).r(this, FUNC(neogeo_base_state::unmapped_r));
 	map(0x400000, 0x401fff).mirror(0x3fe000).rw(this, FUNC(neogeo_base_state::paletteram_r), FUNC(neogeo_base_state::paletteram_w));
 }
 
@@ -1858,7 +1858,7 @@ INPUT_PORTS_START( aes )
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_base_state, get_audio_result, nullptr)
 
 	PORT_START("JP") // JP1 and JP2 are jumpers or solderpads depending on AES board revision, intended for use on the Development BIOS
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short JP1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, aes_state, aes_jp1, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Short JP1 (Debug Monitor)") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, aes_base_state, aes_jp1, 0)
 //  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) // what is JP2 for? somehow related to system reset, disable watchdog?
 INPUT_PORTS_END
 
