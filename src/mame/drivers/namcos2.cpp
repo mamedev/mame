@@ -44,6 +44,9 @@ known issues:
     Bubble Trouble (Golly Ghost II)
     - no artwork
 
+	Metal Hawk
+	- roz wraparound and tilemap issues
+
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
 complete system consists of two boards: CPU + GRAPHICS. It contains a large
 number of custom ASICs to perform graphics operations, there is no
@@ -5723,8 +5726,8 @@ GAME( 1988, assault,    0,        base2,    assault,  namcos2_state, assault,   
 GAME( 1988, assaultj,   assault,  base2,    assault,  namcos2_state, assaultj,      ROT90, "Namco", "Assault (Japan)", 0 )
 GAME( 1988, assaultp,   assault,  assaultp, assault,  namcos2_state, assaultp_hack, ROT90, "Namco", "Assault Plus (Japan)", 0)
 
-GAME( 1988, metlhawk,   0,        metlhawk, metlhawk, namcos2_state, metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", 0)
-GAME( 1988, metlhawkj,  metlhawk, metlhawk, metlhawk, namcos2_state, metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", 0)
+GAME( 1988, metlhawk,   0,        metlhawk, metlhawk, namcos2_state, metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, metlhawkj,  metlhawk, metlhawk, metlhawk, namcos2_state, metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1988, ordyne,     0,        base,     base,     namcos2_state, ordyne,   ROT180, "Namco", "Ordyne (World)", 0 )
 GAME( 1988, ordyneje,   ordyne,   base,     base,     namcos2_state, ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", 0 )
