@@ -193,8 +193,11 @@ public:
 		: funworld_state(mconfig, type, tag) { }
 
 	DECLARE_DRIVER_INIT(4roses);
+	DECLARE_DRIVER_INIT(rugby);
 	void _4roses(machine_config &config);
+	void rugby(machine_config &config);
 	void _4roses_map(address_map &map);
+	void rugby_map(address_map &map);
 };
 
 
@@ -218,6 +221,18 @@ void _4roses_state::_4roses_map(address_map &map)
 	map(0x4000, 0x4fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
 	map(0x5000, 0x5fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
 	map(0x6000, 0xffff).rom().region("maincpu", 0x6000);
+}
+
+void _4roses_state::rugby_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0xffff).rom().region("maincpu", 0x4000);
 }
 
 /*
@@ -395,6 +410,12 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(_4roses_state::rugby)
+	_4roses(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rugby_map)
+MACHINE_CONFIG_END
+
 
 /*************************
 *        Rom Load        *
@@ -472,6 +493,13 @@ DRIVER_INIT_MEMBER(_4roses_state,4roses)
 		rom[addr] = bitswap<8>(rom[addr] ^ 0xca, 6, 5, 4, 3, 2, 1, 0, 7);
 }
 
+DRIVER_INIT_MEMBER(_4roses_state,rugby)
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	for (offs_t addr = 0x8000; addr < 0x10000; addr++)
+		rom[addr] = bitswap<8>(rom[addr], 6, 7, 4, 5, 2, 3, 0, 1);
+}
+
 
 /*************************
 *      Game Drivers      *
@@ -480,4 +508,4 @@ DRIVER_INIT_MEMBER(_4roses_state,4roses)
 /*    YEAR  NAME     PARENT  MACHINE  INPUT   STATE          INIT    ROT   COMPANY      FULLNAME                         FLAGS  */
 GAME( 1999, 4roses,  0,      _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, 4rosesa, 4roses, _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, rugby,   0,      _4roses, 4roses, _4roses_state, 4roses, ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, rugby,   0,      rugby,   4roses, _4roses_state, rugby,  ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
