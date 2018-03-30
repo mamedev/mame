@@ -190,14 +190,23 @@ class _4roses_state : public funworld_state
 {
 public:
 	_4roses_state(const machine_config &mconfig, device_type type, const char *tag)
-		: funworld_state(mconfig, type, tag) { }
+		: funworld_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_DRIVER_INIT(4roses);
 	DECLARE_DRIVER_INIT(rugby);
 	void _4roses(machine_config &config);
 	void rugby(machine_config &config);
+private:
+	DECLARE_READ8_MEMBER(rugby_opcode_r);
+
 	void _4roses_map(address_map &map);
 	void rugby_map(address_map &map);
+	void rugby_opcodes_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -233,6 +242,20 @@ void _4roses_state::rugby_map(address_map &map)
 	map(0x2000, 0x2fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
 	map(0x3000, 0x3fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
 	map(0x4000, 0xffff).rom().region("maincpu", 0x4000);
+}
+
+READ8_MEMBER(_4roses_state::rugby_opcode_r)
+{
+	uint8_t data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	if ((offset >> 12) == 4)
+		data = bitswap<8>(data ^ 0xae, 2, 3, 0, 5, 6, 4, 7, 1);
+	return data;
+}
+
+void _4roses_state::rugby_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r(this, FUNC(_4roses_state::rugby_opcode_r));
+	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
 /*
@@ -414,6 +437,7 @@ MACHINE_CONFIG_START(_4roses_state::rugby)
 	_4roses(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rugby_map)
+	MCFG_CPU_OPCODES_MAP(rugby_opcodes_map)
 MACHINE_CONFIG_END
 
 
