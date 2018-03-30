@@ -32586,6 +32586,7 @@ rabbitjt                        // (c) 1996 Electronic Arts
 
 @source:rad_eu3a14.cpp
 rad_gtg
+rad_foot
 
 @source:rad_eu3a05.cpp
 rad_sinv
@@ -37970,6 +37971,7 @@ zone40                          // Zone 40
 zone60                          // Zone 60
 rad_skat                        //
 rad_skatp                       //
+rad_crik                        //
 
 @source:vsmilepro.cpp
 vsmilpro
