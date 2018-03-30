@@ -341,8 +341,8 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynduke_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(dynduke_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynduke_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynduke)
 
