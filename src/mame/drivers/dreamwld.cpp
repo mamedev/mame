@@ -242,8 +242,8 @@ template<int Layer>
 WRITE32_MEMBER(dreamwld_state::vram_w)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
-	m_tilemap[Layer]->mark_tile_dirty(offset * 2);
-	m_tilemap[Layer]->mark_tile_dirty(offset * 2 + 1);
+	m_tilemap[Layer][offset]->mark_tile_dirty(offset * 2);
+	m_tilemap[Layer][offset]->mark_tile_dirty(offset * 2 + 1);
 }
 
 template<int Layer>
@@ -263,7 +263,7 @@ void dreamwld_state::video_start()
 	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
 	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS, 16, 16, 128,32);
 	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS, 16, 16, 128,32);
-	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[1][1]->set_transparent_pen(0);
 	
 	for (int layer = 0; layer < 2; layer++)
 	{
@@ -299,9 +299,9 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 {
 	tilemap_t *tmptilemap[2];
 
-	int scrolly[2]{ m_vregs[(0x000 / 4)]+32, m_vregs[(0x008 / 4)]+32 };
+	uint32_t scrolly[2]{ m_vregs[(0x000 / 4)]+32, m_vregs[(0x008 / 4)]+32 };
 
-	int scrollx[2]{ m_vregs[(0x004 / 4)] + 0, m_vregs[(0x00c / 4)] + 2 };
+	uint32_t scrollx[2]{ m_vregs[(0x004 / 4)] + 0, m_vregs[(0x00c / 4)] + 2 };
 
 	uint32_t layer_ctrl[2]{ m_vregs[0x010 / 4], m_vregs[0x014 / 4] };
 
@@ -334,22 +334,20 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 			uint16_t* linebase = &m_lineram16[(layer * 0x200) / 2];
 			for (int i = 0; i < (256 >> tile_rowscroll); i++)   /* 256 screen lines */
 			{
-				int x0 = 0;
-
 				/* per-line rowscroll */
 				int x0 = linebase[(i+32)&0xff];
 
 				tmptilemap[layer]->set_scrollx(
-				(i + scrolly[layer]) & (row_mask >> tile_rowscroll),
-				scrollx[layer] + x0 );
+						(i + scrolly[layer]) & (row_mask >> tile_rowscroll),
+						scrollx[layer] + x0 );
 			}
 		}
 		else
 		{
-			if (m_old_linescroll != (layer_ctrl[layer] & 0x0300))
+			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
 				tmptilemap[layer]->set_scroll_rows(1);
-				m_old_linescroll = (layer_ctrl[layer] & 0x0300);
+				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 
 			tmptilemap[layer]->set_scrollx(0, scrollx[layer]);
