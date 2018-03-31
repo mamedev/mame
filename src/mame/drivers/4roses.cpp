@@ -237,10 +237,26 @@ void _4roses_state::_4roses_map(address_map &map)
 READ8_MEMBER(_4roses_state::_4roses_opcode_r)
 {
 	uint8_t data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
-	if ((offset & 0x7c00) == 0x6400)
-		data = bitswap<8>(data ^ 0x3f, 3, 4, 2, 5, 1, 6, 0, 7);
-	else if ((offset & 0x7c00) == 0x6000)
+
+	switch (offset & 0x7c00)
+	{
+	case 0x6000:
 		data = bitswap<8>(data ^ 0x68, 4, 3, 2, 1, 0, 7, 6, 5);
+		break;
+
+	case 0x6400:
+		data = bitswap<8>(data ^ 0x3f, 3, 4, 2, 5, 1, 6, 0, 7);
+		break;
+
+	case 0x6800:
+		data = bitswap<8>(data ^ 0x6a, 7, 0, 2, 1, 4, 3, 6, 5);
+		break;
+
+	case 0x6c00:
+		data = bitswap<8>(data ^ 0x5e, 6, 1, 4, 5, 2, 3, 0, 7);
+		break;
+	}
+
 	return data;
 }
 
