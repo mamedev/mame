@@ -476,7 +476,7 @@ uint32_t psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 
 		case 0: tmsize[layer] = 1;    break;
 		case 1: tmsize[layer] = 2;    break;
 		case 2: tmsize[layer] = 3;    break;
-		default:    tmsize[layer] = 0;    break;
+		default:tmsize[layer] = 0;    break;
 		}
 
 		tmptilemap[layer] = m_tilemap[layer][tmsize[layer]];
@@ -490,7 +490,7 @@ uint32_t psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 
 			int tile_rowscroll = (layer_ctrl[layer] & 0x0200) >> 5; /* per-tile rowscroll */
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				m_tilemap[layer][size]->set_scroll_rows(tilemap_width(tmsize[layer]) >> tile_rowscroll);
+				tmptilemap[layer]->set_scroll_rows(tilemap_width(tmsize[layer]) >> tile_rowscroll);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 			for (i = 0; i < (256 >> tile_rowscroll); i++)   /* 256 screen lines */
@@ -505,7 +505,7 @@ uint32_t psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 
 		{
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				m_tilemap[layer][size]->set_scroll_rows(1);
+				tmptilemap[layer]->set_scroll_rows(1);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 			tmptilemap[layer]->set_scrollx(0, scrollx[layer]);
@@ -617,7 +617,7 @@ uint32_t psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitma
 			int tile_rowscroll = (layer_ctrl[layer] & 0x0200) >> 5; /* per-tile rowscroll */
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				m_tilemap[layer][size]->set_scroll_rows(tilemap_width(tmsize[layer]) >> tile_rowscroll);
+				tmptilemap[layer]->set_scroll_rows(tilemap_width(tmsize[layer]) >> tile_rowscroll);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 			for (i = 0; i < (256 >> tile_rowscroll); i++)   /* 256 screen lines */
@@ -632,7 +632,7 @@ uint32_t psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitma
 		{
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				m_tilemap[layer][size]->set_scroll_rows(1);
+				tmptilemap[layer]->set_scroll_rows(1);
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 			tmptilemap[layer]->set_scrollx(0, scrollx[layer]);
