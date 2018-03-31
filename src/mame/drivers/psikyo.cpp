@@ -1608,8 +1608,8 @@ ROM_START( s1945 )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 
-	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU? */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
+	ROM_REGION( 0x000800, "mcu", 0 )       /* MCU? */
+	ROM_LOAD( "4-u59.bin", 0x00000, 0x00800, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD16_WORD_SWAP( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
@@ -1636,8 +1636,8 @@ ROM_START( s1945a )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 
-	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU? */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
+	ROM_REGION( 0x000800, "mcu", 0 )       /* MCU? */
+	ROM_LOAD( "4-u59.bin", 0x00000, 0x00800, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD16_WORD_SWAP( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
@@ -1664,8 +1664,8 @@ ROM_START( s1945j )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 
-	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
+	ROM_REGION( 0x000800, "mcu", 0 )       /* MCU */
+	ROM_LOAD( "4-u59.bin", 0x00000, 0x00800, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD16_WORD_SWAP( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
@@ -1692,8 +1692,8 @@ ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no eff
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 
-	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
+	ROM_REGION( 0x000800, "mcu", 0 )       /* MCU */
+	ROM_LOAD( "4-u59.bin", 0x00000, 0x00800, NO_DUMP )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD16_WORD_SWAP( "u20.bin",  0x000000, 0x200000, CRC(28a27fee) SHA1(913f3bc4d0c6fb6b776a020c8099bf96f16fd06f) )
@@ -1742,8 +1742,8 @@ ROM_START( tengai )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
-	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
+	ROM_REGION( 0x000800, "mcu", 0 )       /* MCU */
+	ROM_LOAD( "4-u59.bin", 0x00000, 0x00800, NO_DUMP )
 
 	ROM_REGION( 0x600000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
@@ -1770,8 +1770,8 @@ ROM_START( tengaij )
 	ROM_REGION( 0x020000, "audiocpu", 0 )       /* Sound CPU Code */
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 
-	ROM_REGION( 0x000100, "mcu", 0 )       /* MCU */
-	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
+	ROM_REGION( 0x000800, "mcu", 0 )       /* MCU */
+	ROM_LOAD( "4-u59.bin", 0x00000, 0x00800, NO_DUMP )
 
 	ROM_REGION( 0x600000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
