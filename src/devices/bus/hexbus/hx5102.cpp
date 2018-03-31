@@ -476,6 +476,7 @@ WRITE8_MEMBER(hx5102_device::cruwrite)
 	switch (offset)
 	{
 	case 0:
+		// unused right now
 		LOGMASKED(LOG_CRU, "Set precompensation = %d\n", data);
 		break;
 	case 1:
@@ -522,17 +523,22 @@ WRITE8_MEMBER(hx5102_device::cruwrite)
 		break;
 	case 8:
 		LOGMASKED(LOG_CRU, "Set drive select 0 to %d\n", data);
+		m_floppy_ctrl->set_floppy((data==1)? m_floppy : nullptr);
 		break;
 	case 9:
+		// External drive; not implemented
 		LOGMASKED(LOG_CRU, "Set drive select 1 to %d\n", data);
 		break;
 	case 10:
+		// External drive; not implemented
 		LOGMASKED(LOG_CRU, "Set drive select 2 to %d\n", data);
 		break;
 	case 11:
+		// External drive; not implemented
 		LOGMASKED(LOG_CRU, "Set drive select 3 to %d\n", data);
 		break;
 	case 12:
+		// External drive; not implemented
 		LOGMASKED(LOG_CRU, "Set auxiliary motor line to %d\n", data);
 		break;
 	case 13:
@@ -567,9 +573,6 @@ void hx5102_device::device_reset()
 {
 	board_reset(ASSERT_LINE);
 	board_ready(ASSERT_LINE);
-	// set_floppy must be here, because upd765_family_device::device_start
-	// resets the device links to null
-	m_floppy_ctrl->set_floppy(m_floppy);
 }
 
 /*
@@ -598,6 +601,7 @@ WRITE_LINE_MEMBER( hx5102_device::fdc_drq_w )
 
 /*
     Define the floppy formats.
+    TODO: Define another DSDD format with 16 sectors.
 */
 FLOPPY_FORMATS_MEMBER(hx5102_device::floppy_formats)
 	FLOPPY_TI99_SDF_FORMAT,
