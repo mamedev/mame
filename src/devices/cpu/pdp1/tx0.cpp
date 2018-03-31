@@ -41,8 +41,8 @@
 #define INCREMENT_PC_8KW    (PC = (PC+1) & ADDRESS_MASK_8KW)
 
 
-DEFINE_DEVICE_TYPE(TX0_8KW,  tx0_8kw_device,  "tx0_8kw_cpu",  "TX-0 8KW")
-DEFINE_DEVICE_TYPE(TX0_64KW, tx0_64kw_device, "tx0_64kw_cpu", "TX-0 64KW")
+DEFINE_DEVICE_TYPE(TX0_8KW,  tx0_8kw_device,  "tx0_8kw_cpu",  "MIT Lincoln Laboratory TX-0 8KW")
+DEFINE_DEVICE_TYPE(TX0_64KW, tx0_64kw_device, "tx0_64kw_cpu", "MIT Lincoln Laboratory TX-0 64KW")
 
 
 tx0_device::tx0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addr_bits, int address_mask, int ir_mask)
@@ -1076,12 +1076,12 @@ void tx0_device::io_complete()
 }
 
 
-util::disasm_interface *tx0_8kw_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tx0_8kw_device::create_disassembler()
 {
-	return new tx0_8kw_disassembler;
+	return std::make_unique<tx0_8kw_disassembler>();
 }
 
-util::disasm_interface *tx0_64kw_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tx0_64kw_device::create_disassembler()
 {
-	return new tx0_64kw_disassembler;
+	return std::make_unique<tx0_64kw_disassembler>();
 }

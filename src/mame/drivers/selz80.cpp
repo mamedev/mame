@@ -69,27 +69,30 @@ private:
 	required_device<clock_device> m_clock;
 };
 
-ADDRESS_MAP_START(selz80_state::dagz80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void selz80_state::dagz80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).ram().share("ram");
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(selz80_state::selz80_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x27ff) AM_RAM // all 3 RAM sockets filled
+void selz80_state::selz80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x27ff).ram(); // all 3 RAM sockets filled
 	// AM_RANGE(0x3000, 0x37ff) AM_ROM  // empty socket for ROM
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xa000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(selz80_state::selz80_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("i8279", i8279_device, read, write)
-	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void selz80_state::selz80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x18, 0x18).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x19, 0x19).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( selz80 )

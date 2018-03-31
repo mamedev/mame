@@ -117,41 +117,45 @@ READ8_MEMBER(mosaic_state::gfire2_protection_r)
 
 
 
-ADDRESS_MAP_START(mosaic_state::mosaic_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_ROM
-	AM_RANGE(0x20000, 0x21fff) AM_RAM
-	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x24000, 0x241ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void mosaic_state::mosaic_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom();
+	map(0x20000, 0x21fff).ram();
+	map(0x22000, 0x22fff).ram().w(this, FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
+	map(0x23000, 0x23fff).ram().w(this, FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
+	map(0x24000, 0x241ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(mosaic_state::gfire2_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_ROM
-	AM_RANGE(0x10000, 0x17fff) AM_RAM
-	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x24000, 0x241ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void mosaic_state::gfire2_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom();
+	map(0x10000, 0x17fff).ram();
+	map(0x22000, 0x22fff).ram().w(this, FUNC(mosaic_state::bgvideoram_w)).share("bgvideoram");
+	map(0x23000, 0x23fff).ram().w(this, FUNC(mosaic_state::fgvideoram_w)).share("fgvideoram");
+	map(0x24000, 0x241ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(mosaic_state::mosaic_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_WRITENOP    /* Z180 internal registers */
-	AM_RANGE(0x30, 0x30) AM_READNOP /* Z180 internal registers */
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x72, 0x72) AM_READWRITE(protection_r, protection_w)
-	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
-	AM_RANGE(0x76, 0x76) AM_READ_PORT("P2")
-ADDRESS_MAP_END
+void mosaic_state::mosaic_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x3f).nopw();    /* Z180 internal registers */
+	map(0x30, 0x30).nopr(); /* Z180 internal registers */
+	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x72, 0x72).rw(this, FUNC(mosaic_state::protection_r), FUNC(mosaic_state::protection_w));
+	map(0x74, 0x74).portr("P1");
+	map(0x76, 0x76).portr("P2");
+}
 
-ADDRESS_MAP_START(mosaic_state::gfire2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_WRITENOP    /* Z180 internal registers */
-	AM_RANGE(0x30, 0x30) AM_READNOP /* Z180 internal registers */
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x72, 0x72) AM_READWRITE(gfire2_protection_r, gfire2_protection_w)
-	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
-	AM_RANGE(0x76, 0x76) AM_READ_PORT("P2")
-ADDRESS_MAP_END
+void mosaic_state::gfire2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x3f).nopw();    /* Z180 internal registers */
+	map(0x30, 0x30).nopr(); /* Z180 internal registers */
+	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x72, 0x72).rw(this, FUNC(mosaic_state::gfire2_protection_r), FUNC(mosaic_state::gfire2_protection_w));
+	map(0x74, 0x74).portr("P1");
+	map(0x76, 0x76).portr("P2");
+}
 
 
 static INPUT_PORTS_START( mosaic )

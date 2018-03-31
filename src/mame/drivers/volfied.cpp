@@ -66,31 +66,32 @@ Stephh's notes (based on the game M68000 code and some tests) :
                 MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(volfied_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM     /* program */
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM     /* tiles   */
-	AM_RANGE(0x100000, 0x103fff) AM_RAM     /* main    */
-	AM_RANGE(0x200000, 0x203fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)
-	AM_RANGE(0x400000, 0x47ffff) AM_READWRITE(video_ram_r, video_ram_w)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(video_mask_w)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(sprite_ctrl_w)
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(video_ctrl_r, video_ctrl_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xf00000, 0xf007ff) AM_READWRITE(cchip_ram_r, cchip_ram_w)
-	AM_RANGE(0xf00802, 0xf00803) AM_READWRITE(cchip_ctrl_r, cchip_ctrl_w)
-	AM_RANGE(0xf00c00, 0xf00c01) AM_WRITE(cchip_bank_w)
-ADDRESS_MAP_END
+void volfied_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();     /* program */
+	map(0x080000, 0x0fffff).rom();     /* tiles   */
+	map(0x100000, 0x103fff).ram();     /* main    */
+	map(0x200000, 0x203fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));
+	map(0x400000, 0x47ffff).rw(this, FUNC(volfied_state::video_ram_r), FUNC(volfied_state::video_ram_w));
+	map(0x500000, 0x503fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x600000, 0x600001).w(this, FUNC(volfied_state::video_mask_w));
+	map(0x700000, 0x700001).w(this, FUNC(volfied_state::sprite_ctrl_w));
+	map(0xd00000, 0xd00001).rw(this, FUNC(volfied_state::video_ctrl_r), FUNC(volfied_state::video_ctrl_w));
+	map(0xe00001, 0xe00001).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0xe00003, 0xe00003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0xf00000, 0xf007ff).rw(m_cchip, FUNC(taito_cchip_device::mem68_r), FUNC(taito_cchip_device::mem68_w)).umask16(0x00ff);
+	map(0xf00800, 0xf00fff).rw(m_cchip, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic68_w)).umask16(0x00ff);
+}
 
-ADDRESS_MAP_START(volfied_state::z80_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0x8801, 0x8801) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x9800, 0x9800) AM_WRITENOP    /* ? */
-ADDRESS_MAP_END
+void volfied_state::z80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8800).w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0x8801, 0x8801).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+	map(0x9000, 0x9001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x9800, 0x9800).nopw();    /* ? */
+}
 
 
 /***********************************************************
@@ -161,11 +162,11 @@ static INPUT_PORTS_START( volfied )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL // TODO: probably correct based on initial analysis, but why is this on bit 0x80 when read through the c-chip when it was 0x08 in the simulation and for P1, is it just a Taito workaround for reading through ADC?
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( volfiedu )
@@ -211,28 +212,53 @@ GFXDECODE_END
 
 void volfied_state::machine_start()
 {
-	cchip_init();
 }
 
 void volfied_state::machine_reset()
 {
-	cchip_reset();
 }
+
+WRITE8_MEMBER(volfied_state::counters_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+}
+
+INTERRUPT_GEN_MEMBER(volfied_state::interrupt)
+{
+	m_maincpu->set_input_line(4, HOLD_LINE);
+	m_cchip->ext_interrupt(ASSERT_LINE);
+	m_cchip_irq_clear->adjust(attotime::zero);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::cchip_irq_clear_cb)
+{
+	m_cchip->ext_interrupt(CLEAR_LINE);
+}
+
 
 MACHINE_CONFIG_START(volfied_state::volfied)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", volfied_state,  irq4_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", volfied_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(20'000'000)/2) /* 20MHz OSC next to C-Chip */
+	MCFG_CCHIP_IN_PORTA_CB(IOPORT("F00007"))
+	MCFG_CCHIP_IN_PORTB_CB(IOPORT("F00009"))
+	MCFG_CCHIP_IN_PORTC_CB(IOPORT("F0000B"))
+	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("F0000D"))
+	MCFG_CCHIP_OUT_PORTB_CB(WRITE8(volfied_state, counters_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
+	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", volfied_state, cchip_irq_clear_cb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -285,7 +311,7 @@ ROM_START( volfied )
 	ROM_LOAD16_BYTE( "c04-21.8",    0xc0001, 0x20000, CRC(8598d38e) SHA1(4ec1b819586b50e2f6aff2aaa5e3b06704b9bec2) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_c04-23",            0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",   0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
@@ -317,7 +343,7 @@ ROM_START( volfiedo )
 	ROM_LOAD16_BYTE( "c04-21.8",  0xc0001, 0x20000, CRC(8598d38e) SHA1(4ec1b819586b50e2f6aff2aaa5e3b06704b9bec2) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_c04-23",            0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",  0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
@@ -349,7 +375,7 @@ ROM_START( volfiedu )
 	ROM_LOAD16_BYTE( "c04-21.8",    0xc0001, 0x20000, CRC(8598d38e) SHA1(4ec1b819586b50e2f6aff2aaa5e3b06704b9bec2) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_c04-23",            0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",   0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
@@ -381,7 +407,7 @@ ROM_START( volfieduo )
 	ROM_LOAD16_BYTE( "c04-21.8",  0xc0001, 0x20000, CRC(8598d38e) SHA1(4ec1b819586b50e2f6aff2aaa5e3b06704b9bec2) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_c04-23",            0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",  0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
@@ -413,7 +439,7 @@ ROM_START( volfiedj )
 	ROM_LOAD16_BYTE( "c04-21.8",    0xc0001, 0x20000, CRC(8598d38e) SHA1(4ec1b819586b50e2f6aff2aaa5e3b06704b9bec2) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_c04-23",            0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",   0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
@@ -445,7 +471,7 @@ ROM_START( volfiedjo )
 	ROM_LOAD16_BYTE( "c04-21.8",  0xc0001, 0x20000, CRC(8598d38e) SHA1(4ec1b819586b50e2f6aff2aaa5e3b06704b9bec2) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_c04-23",            0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",  0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )

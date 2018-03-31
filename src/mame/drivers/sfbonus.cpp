@@ -1212,10 +1212,11 @@ uint32_t sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind1
 
 
 
-ADDRESS_MAP_START(sfbonus_state::sfbonus_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void sfbonus_state::sfbonus_map(address_map &map)
+{
+	map(0x0000, 0xefff).bankr("bank1").w(this, FUNC(sfbonus_state::sfbonus_videoram_w));
+	map(0xf000, 0xffff).ram().share("nvram");
+}
 
 WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
 {
@@ -1282,39 +1283,40 @@ WRITE8_MEMBER(sfbonus_state::sfbonus_2c01_w)
 }
 
 
-ADDRESS_MAP_START(sfbonus_state::sfbonus_io)
-	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("KEY1")
-	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("KEY2")
-	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("KEY3")
+void sfbonus_state::sfbonus_io(address_map &map)
+{
+	map(0x0400, 0x0400).portr("KEY1");
+	map(0x0408, 0x0408).portr("KEY2");
+	map(0x0410, 0x0410).portr("KEY3");
 
-	AM_RANGE(0x0418, 0x0418) AM_READ_PORT("SWITCH1")
-	AM_RANGE(0x0420, 0x0420) AM_READ_PORT("SWITCH2")
-	AM_RANGE(0x0428, 0x0428) AM_READ_PORT("SWITCH3")
-	AM_RANGE(0x0430, 0x0430) AM_READ_PORT("SWITCH4")
-	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("SWITCH5")
+	map(0x0418, 0x0418).portr("SWITCH1");
+	map(0x0420, 0x0420).portr("SWITCH2");
+	map(0x0428, 0x0428).portr("SWITCH3");
+	map(0x0430, 0x0430).portr("SWITCH4");
+	map(0x0438, 0x0438).portr("SWITCH5");
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	map(0x0800, 0x0800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE("ramdac", ramdac_device, index_w)
-	AM_RANGE(0x0c01, 0x0c01) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0x0c02, 0x0c02) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
+	map(0x0c00, 0x0c00).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x0c01, 0x0c01).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x0c02, 0x0c02).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_SHARE("1800_regs") // lamps and coin counters
+	map(0x1800, 0x1807).w(this, FUNC(sfbonus_state::sfbonus_1800_w)).share("1800_regs"); // lamps and coin counters
 
-	AM_RANGE(0x2400, 0x241f) AM_RAM AM_SHARE("vregs")
+	map(0x2400, 0x241f).ram().share("vregs");
 
-	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_2800_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_SHARE("2801_regs")
+	map(0x2800, 0x2800).r(this, FUNC(sfbonus_state::sfbonus_2800_r));
+	map(0x2801, 0x2801).r(this, FUNC(sfbonus_state::sfbonus_2801_r)).w(this, FUNC(sfbonus_state::sfbonus_2801_w)).share("2801_regs");
 
-	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_2c00_r)
-	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_SHARE("2c01_regs")
+	map(0x2c00, 0x2c00).r(this, FUNC(sfbonus_state::sfbonus_2c00_r));
+	map(0x2c01, 0x2c01).r(this, FUNC(sfbonus_state::sfbonus_2c01_r)).w(this, FUNC(sfbonus_state::sfbonus_2c01_w)).share("2c01_regs");
 
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_SHARE("3000_regs")
-	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
-	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_3800_r)
+	map(0x3000, 0x3000).w(this, FUNC(sfbonus_state::sfbonus_3000_w)).share("3000_regs");
+	map(0x3400, 0x3400).w(this, FUNC(sfbonus_state::sfbonus_bank_w));
+	map(0x3800, 0x3800).r(this, FUNC(sfbonus_state::sfbonus_3800_r));
 
-	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_SHARE("3800_regs")
-ADDRESS_MAP_END
+	map(0x3800, 0x3807).w(this, FUNC(sfbonus_state::sfbonus_3800_w)).share("3800_regs");
+}
 
 
 static const gfx_layout sfbonus_layout =
@@ -1359,9 +1361,10 @@ void sfbonus_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(sfbonus_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void sfbonus_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 
 MACHINE_CONFIG_START(sfbonus_state::sfbonus)

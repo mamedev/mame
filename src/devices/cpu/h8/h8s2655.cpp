@@ -3,8 +3,8 @@
 #include "emu.h"
 #include "h8s2655.h"
 
-DEFINE_DEVICE_TYPE(H8S2655, h8s2655_device, "h8s2655", "H8S/2655")
-DEFINE_DEVICE_TYPE(H8S2653, h8s2653_device, "h8s2653", "H8S/2653")
+DEFINE_DEVICE_TYPE(H8S2655, h8s2655_device, "h8s2655", "Hitachi H8S/2655")
+DEFINE_DEVICE_TYPE(H8S2653, h8s2653_device, "h8s2653", "Hitachi H8S/2653")
 
 h8s2655_device::h8s2655_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2600_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(h8s2655_device::map), this)),

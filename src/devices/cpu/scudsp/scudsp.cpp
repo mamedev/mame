@@ -1051,7 +1051,7 @@ void scudsp_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-util::disasm_interface *scudsp_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> scudsp_cpu_device::create_disassembler()
 {
-	return new scudsp_disassembler;
+	return std::make_unique<scudsp_disassembler>();
 }

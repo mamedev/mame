@@ -332,13 +332,15 @@ void ssv_state::machine_reset()
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(ssv_state::dsp_prg_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("dspprg", 0)
-ADDRESS_MAP_END
+void ssv_state::dsp_prg_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("dspprg", 0);
+}
 
-ADDRESS_MAP_START(ssv_state::dsp_data_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspdata", 0)
-ADDRESS_MAP_END
+void ssv_state::dsp_data_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().region("dspdata", 0);
+}
 
 READ16_MEMBER(ssv_state::dsp_dr_r)
 {
@@ -397,26 +399,28 @@ WRITE16_MEMBER(ssv_state::dsp_w)
 READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 #endif
 
-#define SSV_MAP( _ROM  )                                                                                            \
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("mainram")                                     /*  RAM     */  \
-	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("spriteram")                                       /*  Sprites */  \
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette */\
-	AM_RANGE(0x160000, 0x17ffff) AM_RAM                                                             /*          */  \
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(vblank_r           )                                   /*  Vblank? */  \
-/**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY                                    /*  Scroll  */  \
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(scroll_w) AM_SHARE("scroll")                  /*  Scroll  */  \
-	AM_RANGE(0x210002, 0x210003) AM_READ_PORT("DSW1")                                                               \
-	AM_RANGE(0x210004, 0x210005) AM_READ_PORT("DSW2")                                                               \
-	AM_RANGE(0x210008, 0x210009) AM_READ_PORT("P1")                                                                 \
-	AM_RANGE(0x21000a, 0x21000b) AM_READ_PORT("P2")                                                                 \
-	AM_RANGE(0x21000c, 0x21000d) AM_READ_PORT("SYSTEM")                                                             \
-	AM_RANGE(0x21000e, 0x21000f) AM_READNOP AM_WRITE(lockout_w)                             /*  Lockout */  \
-	AM_RANGE(0x210010, 0x210011) AM_WRITENOP                                                                        \
-	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_SHARE("irq_vectors")                       /*  IRQ Vec */  \
-	AM_RANGE(0x240000, 0x240071) AM_WRITE(irq_ack_w )                                           /*  IRQ Ack */  \
-	AM_RANGE(0x260000, 0x260001) AM_WRITE(irq_enable_w)                                         /*  IRQ En  */  \
-	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0x00ff)    /*  Sound   */  \
-	AM_RANGE(_ROM, 0xffffff) AM_ROM AM_REGION("maincpu", 0)                                         /*  ROM     */
+void ssv_state::ssv_map(address_map &map, u32 rom)
+{
+	map(0x000000, 0x00ffff).ram().share("mainram");                                                                  /*  RAM     */
+	map(0x100000, 0x13ffff).ram().share("spriteram");                                                                /*  Sprites */
+	map(0x140000, 0x15ffff).ram().w("palette", FUNC(palette_device::write16)).share("palette");                      /*  Palette */
+	map(0x160000, 0x17ffff).ram();                                                                                   /*          */
+	map(0x1c0000, 0x1c0001).r(this, FUNC(ssv_state::vblank_r));                                                      /*  Vblank? */
+/**/map(0x1c0002, 0x1c007f).readonly();                                                                              /*  Scroll  */
+	map(0x1c0000, 0x1c007f).w(this, FUNC(ssv_state::scroll_w)).share("scroll");                                      /*  Scroll  */
+	map(0x210002, 0x210003).portr("DSW1");
+	map(0x210004, 0x210005).portr("DSW2");
+	map(0x210008, 0x210009).portr("P1");
+	map(0x21000a, 0x21000b).portr("P2");
+	map(0x21000c, 0x21000d).portr("SYSTEM");
+	map(0x21000e, 0x21000f).nopr().w(this, FUNC(ssv_state::lockout_w));                                              /*  Lockout */
+	map(0x210010, 0x210011).nopw();
+	map(0x230000, 0x230071).writeonly().share("irq_vectors");                                                        /*  IRQ Vec */
+	map(0x240000, 0x240071).w(this, FUNC(ssv_state::irq_ack_w));                                                     /*  IRQ Ack */
+	map(0x260000, 0x260001).w(this, FUNC(ssv_state::irq_enable_w));                                                  /*  IRQ En  */
+	map(0x300000, 0x30007f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write)).umask16(0x00ff);    /*  Sound   */
+	map(rom, 0xffffff).rom().region("maincpu", 0);                                                                   /*  ROM     */
+}
 
 /***************************************************************************
                                 Drift Out '94
@@ -427,18 +431,19 @@ READ16_MEMBER(ssv_state::drifto94_unknown_r)
 	return machine().rand() & 0xffff;
 }
 
-ADDRESS_MAP_START(ssv_state::drifto94_map)
-	SSV_MAP( 0xc00000 )
+void ssv_state::drifto94_map(address_map &map)
+{
+	ssv_map(map, 0xc00000);
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
-	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY                                       // ?
-	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
-	AM_RANGE(0x482000, 0x482fff) AM_READWRITE(dsp_r, dsp_w)
-	AM_RANGE(0x483000, 0x485fff) AM_WRITENOP                                        // ?
-	AM_RANGE(0x500000, 0x500001) AM_WRITENOP                                        // ??
-	AM_RANGE(0x510000, 0x510001) AM_READ(drifto94_unknown_r)                       // ??
-	AM_RANGE(0x520000, 0x520001) AM_READ(drifto94_unknown_r)                       // ??
-	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_SHARE("nvram")   // NVRAM
-ADDRESS_MAP_END
+	map(0x400000, 0x47ffff).writeonly();                                       // ?
+	map(0x480000, 0x480001).rw(this, FUNC(ssv_state::dsp_dr_r), FUNC(ssv_state::dsp_dr_w));
+	map(0x482000, 0x482fff).rw(this, FUNC(ssv_state::dsp_r), FUNC(ssv_state::dsp_w));
+	map(0x483000, 0x485fff).nopw();                                        // ?
+	map(0x500000, 0x500001).nopw();                                        // ??
+	map(0x510000, 0x510001).r(this, FUNC(ssv_state::drifto94_unknown_r));                       // ??
+	map(0x520000, 0x520001).r(this, FUNC(ssv_state::drifto94_unknown_r));                       // ??
+	map(0x580000, 0x5807ff).ram().share("nvram");   // NVRAM
+}
 
 
 /***************************************************************************
@@ -477,18 +482,19 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 }
 
 
-ADDRESS_MAP_START(ssv_state::gdfs_map)
-	SSV_MAP( 0xc00000 )
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_SHARE("gdfs_tmapram")
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM
-	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_SHARE("gdfs_tmapscroll")
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gdfs_eeprom_w)
-	AM_RANGE(0x540000, 0x540001) AM_READ(gdfs_eeprom_r)
-	AM_RANGE(0x600000, 0x600fff) AM_RAM
-	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, sprram_r, sprram_w );
-	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE( "st0020_spr", st0020_device, regs_r,   regs_w   );
-	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, gfxram_r, gfxram_w );
-ADDRESS_MAP_END
+void ssv_state::gdfs_map(address_map &map)
+{
+	ssv_map(map, 0xc00000);
+	map(0x400000, 0x41ffff).ram().w(this, FUNC(ssv_state::gdfs_tmapram_w)).share("gdfs_tmapram");
+	map(0x420000, 0x43ffff).ram();
+	map(0x440000, 0x44003f).ram().share("gdfs_tmapscroll");
+	map(0x500000, 0x500001).w(this, FUNC(ssv_state::gdfs_eeprom_w));
+	map(0x540000, 0x540001).r(this, FUNC(ssv_state::gdfs_eeprom_r));
+	map(0x600000, 0x600fff).ram();
+	map(0x800000, 0x87ffff).rw(m_gdfs_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
+	map(0x8c0000, 0x8c00ff).rw(m_gdfs_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
+	map(0x900000, 0x9fffff).rw(m_gdfs_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
+}
 
 
 /***************************************************************************
@@ -515,33 +521,35 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 	return 0xffff;
 }
 
-ADDRESS_MAP_START(ssv_state::hypreact_map)
-	SSV_MAP( 0xf00000 )
-	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
+void ssv_state::hypreact_map(address_map &map)
+{
+	ssv_map(map, 0xf00000);
+	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                      // ? 5 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)            // Inverted lockout lines
+	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));            // Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                       // ? read at the start, value not used
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(hypreact_input_r)              // Inputs
-	AM_RANGE(0xc00006, 0xc00007) AM_RAM AM_SHARE("input_sel")           //
-	AM_RANGE(0xc00008, 0xc00009) AM_NOP                                 //
-ADDRESS_MAP_END
+	map(0xc00000, 0xc00001).r(this, FUNC(ssv_state::hypreact_input_r));              // Inputs
+	map(0xc00006, 0xc00007).ram().share("input_sel");           //
+	map(0xc00008, 0xc00009).noprw();                                 //
+}
 
 
 /***************************************************************************
                                 Hyper Reaction 2
 ***************************************************************************/
 
-ADDRESS_MAP_START(ssv_state::hypreac2_map)
-	SSV_MAP( 0xe00000 )
-	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
+void ssv_state::hypreac2_map(address_map &map)
+{
+	ssv_map(map, 0xe00000);
+	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 5 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                // Inverted lockout lines
+	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));                // Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                           // ? read at the start, value not used
-	AM_RANGE(0x500000, 0x500001) AM_READ(hypreact_input_r)                  // Inputs
-	AM_RANGE(0x500002, 0x500003) AM_READ(hypreact_input_r)                  // (again?)
-	AM_RANGE(0x520000, 0x520001) AM_WRITEONLY AM_SHARE("input_sel") // Inputs
+	map(0x500000, 0x500001).r(this, FUNC(ssv_state::hypreact_input_r));                  // Inputs
+	map(0x500002, 0x500003).r(this, FUNC(ssv_state::hypreact_input_r));                  // (again?)
+	map(0x520000, 0x520001).writeonly().share("input_sel"); // Inputs
 //  0x540000, 0x540003  communication with other units
-ADDRESS_MAP_END
+}
 
 
 /***************************************************************************
@@ -550,41 +558,44 @@ ADDRESS_MAP_END
 
 
 
-ADDRESS_MAP_START(ssv_state::janjans1_map)
-	SSV_MAP( 0xc00000 )
-	AM_RANGE(0x210000, 0x210001) AM_WRITENOP                            // koikois2 but not janjans1
+void ssv_state::janjans1_map(address_map &map)
+{
+	ssv_map(map, 0xc00000);
+	map(0x210000, 0x210001).nopw();                            // koikois2 but not janjans1
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
-	AM_RANGE(0x210006, 0x210007) AM_READNOP
-	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_SHARE("input_sel") // Inputs
-	AM_RANGE(0x800002, 0x800003) AM_READ(srmp4_input_r)                     // Inputs
-ADDRESS_MAP_END
+	map(0x210006, 0x210007).nopr();
+	map(0x800000, 0x800001).writeonly().share("input_sel"); // Inputs
+	map(0x800002, 0x800003).r(this, FUNC(ssv_state::srmp4_input_r));                     // Inputs
+}
 
 
 /***************************************************************************
                                 Keith & Lucy
 ***************************************************************************/
 
-ADDRESS_MAP_START(ssv_state::keithlcy_map)
-	SSV_MAP( 0xe00000 )
+void ssv_state::keithlcy_map(address_map &map)
+{
+	ssv_map(map, 0xe00000);
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP  // ? 1 at the start
-	AM_RANGE(0x210010, 0x210011) AM_WRITENOP    //
-	AM_RANGE(0x21000e, 0x21000f) AM_READNOP //
-	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY   // ?
-ADDRESS_MAP_END
+	map(0x210010, 0x210011).nopw();    //
+	map(0x21000e, 0x21000f).nopr(); //
+	map(0x400000, 0x47ffff).writeonly();   // ?
+}
 
 
 /***************************************************************************
                                 Meosis Magic
 ***************************************************************************/
 
-ADDRESS_MAP_START(ssv_state::meosism_map)
-	SSV_MAP( 0xf00000 )
-	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
+void ssv_state::meosism_map(address_map &map)
+{
+	ssv_map(map, 0xf00000);
+	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 5 at the start
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                                       // ? read once, value not used
 //  AM_RANGE(0x500004, 0x500005) AM_WRITENOP                                      // ? 0,58,18
-	AM_RANGE(0x580000, 0x58ffff) AM_RAM AM_SHARE("nvram")   // NVRAM
-ADDRESS_MAP_END
+	map(0x580000, 0x58ffff).ram().share("nvram");   // NVRAM
+}
 
 /***************************************************************************
                                 Monster Slider
@@ -602,24 +613,26 @@ WRITE16_MEMBER(ssv_state::mainram_w)
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
-ADDRESS_MAP_START(ssv_state::mslider_map)
-	SSV_MAP( 0xf00000 )
-	AM_RANGE(0x010000, 0x01ffff) AM_READWRITE(mainram_r, mainram_w) // RAM Mirror
+void ssv_state::mslider_map(address_map &map)
+{
+	ssv_map(map, 0xf00000);
+	map(0x010000, 0x01ffff).rw(this, FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w)); // RAM Mirror
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
-	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY                           // ?
+	map(0x400000, 0x47ffff).writeonly();                           // ?
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP                          // ? ff at the start
-ADDRESS_MAP_END
+}
 
 
 /***************************************************************************
                     Gourmet Battle Quiz Ryohrioh CooKing
 ***************************************************************************/
 
-ADDRESS_MAP_START(ssv_state::ryorioh_map)
-	SSV_MAP( 0xc00000 )
-	AM_RANGE(0x210000, 0x210001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+void ssv_state::ryorioh_map(address_map &map)
+{
+	ssv_map(map, 0xc00000);
+	map(0x210000, 0x210001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 1 at the start
-ADDRESS_MAP_END
+}
 
 
 /***************************************************************************
@@ -638,14 +651,15 @@ READ16_MEMBER(ssv_state::srmp4_input_r)
 	return 0xffff;
 }
 
-ADDRESS_MAP_START(ssv_state::srmp4_map)
-	SSV_MAP( 0xf00000 )
-	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
+void ssv_state::srmp4_map(address_map &map)
+{
+	ssv_map(map, 0xf00000);
+	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1,5 at the start
-	AM_RANGE(0xc0000a, 0xc0000b) AM_READ(srmp4_input_r)                     // Inputs
-	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITEONLY AM_SHARE("input_sel") // Inputs
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITENOP                            //
-ADDRESS_MAP_END
+	map(0xc0000a, 0xc0000b).r(this, FUNC(ssv_state::srmp4_input_r));                     // Inputs
+	map(0xc0000e, 0xc0000f).writeonly().share("input_sel"); // Inputs
+	map(0xc00010, 0xc00011).nopw();                            //
+}
 
 
 /***************************************************************************
@@ -685,35 +699,37 @@ READ16_MEMBER(ssv_state::srmp7_input_r)
 	return 0xffff;
 }
 
-ADDRESS_MAP_START(ssv_state::srmp7_map)
-	SSV_MAP( 0xc00000 )
-	AM_RANGE(0x010000, 0x050faf) AM_RAM                                     // More RAM
-	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
+void ssv_state::srmp7_map(address_map &map)
+{
+	ssv_map(map, 0xc00000);
+	map(0x010000, 0x050faf).ram();                                     // More RAM
+	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 0,4 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                // Coin Counters / Lockouts
-	AM_RANGE(0x300076, 0x300077) AM_READ(srmp7_irqv_r)                      // Sound
+	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));                // Coin Counters / Lockouts
+	map(0x300076, 0x300077).r(this, FUNC(ssv_state::srmp7_irqv_r));                      // Sound
 //  0x540000, 0x540003, related to lev 5 irq?
-	AM_RANGE(0x580000, 0x580001) AM_WRITE(srmp7_sound_bank_w)               // Sound Bank
-	AM_RANGE(0x600000, 0x600001) AM_READ(srmp7_input_r)                     // Inputs
-	AM_RANGE(0x680000, 0x680001) AM_WRITEONLY AM_SHARE("input_sel") // Inputs
-ADDRESS_MAP_END
+	map(0x580000, 0x580001).w(this, FUNC(ssv_state::srmp7_sound_bank_w));               // Sound Bank
+	map(0x600000, 0x600001).r(this, FUNC(ssv_state::srmp7_input_r));                     // Inputs
+	map(0x680000, 0x680001).writeonly().share("input_sel"); // Inputs
+}
 
 
 /***************************************************************************
                                 Survival Arts
 ***************************************************************************/
 
-ADDRESS_MAP_START(ssv_state::survarts_map)
-	SSV_MAP( 0xf00000 )
-	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
+void ssv_state::survarts_map(address_map &map)
+{
+	ssv_map(map, 0xf00000);
+	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 0,4 at the start
 //  AM_RANGE(0x290000, 0x290001) AM_READNOP               // ?
 //  AM_RANGE(0x2a0000, 0x2a0001) AM_READNOP               // ?
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM                         // dyna
+	map(0x400000, 0x43ffff).ram();                         // dyna
 
-	AM_RANGE(0x500008, 0x500009) AM_READ_PORT("ADD_BUTTONS")    // Extra Buttons
-ADDRESS_MAP_END
+	map(0x500008, 0x500009).portr("ADD_BUTTONS");    // Extra Buttons
+}
 
 
 /***************************************************************************
@@ -751,17 +767,18 @@ WRITE16_MEMBER(ssv_state::sxyreact_motor_w)
 //  popmessage("%04X",data);   // 8 = motor on; 0 = motor off
 }
 
-ADDRESS_MAP_START(ssv_state::sxyreact_map)
-	SSV_MAP( 0xe00000 )
+void ssv_state::sxyreact_map(address_map &map)
+{
+	ssv_map(map, 0xe00000);
 //  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(mainram_r, mainram_w)             // sxyreac2 reads / writes here, why?
-	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
+	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                            // Inverted lockout lines
-	AM_RANGE(0x500002, 0x500003) AM_READ(sxyreact_ballswitch_r)                         // ?
-	AM_RANGE(0x500004, 0x500005) AM_READWRITE(sxyreact_dial_r, sxyreact_motor_w)        // Dial Value (serial)
-	AM_RANGE(0x520000, 0x520001) AM_WRITE(sxyreact_dial_w)                              // Dial Value (advance 1 bit)
-	AM_RANGE(0x580000, 0x58ffff) AM_RAM AM_SHARE("nvram")   // NVRAM
-ADDRESS_MAP_END
+	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
+	map(0x500002, 0x500003).r(this, FUNC(ssv_state::sxyreact_ballswitch_r));                         // ?
+	map(0x500004, 0x500005).rw(this, FUNC(ssv_state::sxyreact_dial_r), FUNC(ssv_state::sxyreact_motor_w));        // Dial Value (serial)
+	map(0x520000, 0x520001).w(this, FUNC(ssv_state::sxyreact_dial_w));                              // Dial Value (advance 1 bit)
+	map(0x580000, 0x58ffff).ram().share("nvram");   // NVRAM
+}
 
 
 /***************************************************************************
@@ -770,13 +787,14 @@ ADDRESS_MAP_END
 
 /* comes as either a standalone board or a standard SSV rom board (verified) */
 
-ADDRESS_MAP_START(ssv_state::twineag2_map)
-	SSV_MAP( 0xe00000 )
-	AM_RANGE(0x010000, 0x03ffff) AM_RAM                         // More RAM
-	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) // Watchdog (also value is cmp.b with mem 8)
-	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
-	AM_RANGE(0x482000, 0x482fff) AM_READWRITE(dsp_r, dsp_w)
-ADDRESS_MAP_END
+void ssv_state::twineag2_map(address_map &map)
+{
+	ssv_map(map, 0xe00000);
+	map(0x010000, 0x03ffff).ram();                         // More RAM
+	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog (also value is cmp.b with mem 8)
+	map(0x480000, 0x480001).rw(this, FUNC(ssv_state::dsp_dr_r), FUNC(ssv_state::dsp_dr_w));
+	map(0x482000, 0x482fff).rw(this, FUNC(ssv_state::dsp_r), FUNC(ssv_state::dsp_w));
+}
 
 
 /***************************************************************************
@@ -785,12 +803,13 @@ ADDRESS_MAP_END
 
 /* standalone board based on SSV hardware */
 
-ADDRESS_MAP_START(ssv_state::ultrax_map)
-	SSV_MAP( 0xe00000 )
-	AM_RANGE(0x010000, 0x03ffff) AM_RAM                         // More RAM
-	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) // Watchdog (also value is cmp.b with memory address 8)
+void ssv_state::ultrax_map(address_map &map)
+{
+	ssv_map(map, 0xe00000);
+	map(0x010000, 0x03ffff).ram();                         // More RAM
+	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog (also value is cmp.b with memory address 8)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 2,6 at the start
-ADDRESS_MAP_END
+}
 
 /***************************************************************************
             Joryuu Syougi Kyoushitsu
@@ -828,22 +847,24 @@ WRITE16_MEMBER(ssv_state::latch16_w)
 	machine().scheduler().synchronize();
 }
 
-ADDRESS_MAP_START(ssv_state::jsk_map)
-	SSV_MAP( 0xf00000 )
-	AM_RANGE(0x050000, 0x05ffff) AM_READWRITE(mainram_r, mainram_w) // RAM Mirror?
-	AM_RANGE(0x210000, 0x210001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM                                     // RAM?
-	AM_RANGE(0x900000, 0x900007) AM_READWRITE(latch16_r, latch16_w)
-ADDRESS_MAP_END
+void ssv_state::jsk_map(address_map &map)
+{
+	ssv_map(map, 0xf00000);
+	map(0x050000, 0x05ffff).rw(this, FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w)); // RAM Mirror?
+	map(0x210000, 0x210001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x400000, 0x47ffff).ram();                                     // RAM?
+	map(0x900000, 0x900007).rw(this, FUNC(ssv_state::latch16_r), FUNC(ssv_state::latch16_w));
+}
 
 
-ADDRESS_MAP_START(ssv_state::jsk_v810_mem)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM
-	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
-	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE(latch32_r, latch32_w)
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("sub", 0)
-ADDRESS_MAP_END
+void ssv_state::jsk_v810_mem(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).ram();
+	map(0x80000000, 0x8001ffff).ram();
+	map(0xc0000000, 0xc001ffff).ram();
+	map(0x40000000, 0x4000000f).rw(this, FUNC(ssv_state::latch32_r), FUNC(ssv_state::latch32_w));
+	map(0xfff80000, 0xffffffff).rom().region("sub", 0);
+}
 
 
 /***************************************************************************
@@ -881,18 +902,19 @@ WRITE16_MEMBER(ssv_state::eaglshot_gfxram_w)
 }
 
 
-ADDRESS_MAP_START(ssv_state::eaglshot_map)
-	SSV_MAP( 0xf00000 )
-	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(eaglshot_gfxram_r, eaglshot_gfxram_w)
-	AM_RANGE(0x210000, 0x210001) AM_READNOP /*AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)*/                 // Watchdog
+void ssv_state::eaglshot_map(address_map &map)
+{
+	ssv_map(map, 0xf00000);
+	map(0x180000, 0x1bffff).rw(this, FUNC(ssv_state::eaglshot_gfxram_r), FUNC(ssv_state::eaglshot_gfxram_w));
+	map(0x210000, 0x210001).nopr(); /*AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)*/                 // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
-	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                            // Inverted lockout lines
-	AM_RANGE(0x800000, 0x800001) AM_WRITE8(eaglshot_gfxrom_bank_w, 0x00ff)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(eaglshot_trackball_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xbfffff) AM_ROMBANK("gfxrom")
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("nvram")   // NVRAM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8("upd4701", upd4701_device, d_r, 0x00ff)
-ADDRESS_MAP_END
+	map(0x21000e, 0x21000f).w(this, FUNC(ssv_state::lockout_inv_w));                            // Inverted lockout lines
+	map(0x800000, 0x800000).w(this, FUNC(ssv_state::eaglshot_gfxrom_bank_w));
+	map(0x900000, 0x900000).w(this, FUNC(ssv_state::eaglshot_trackball_w));
+	map(0xa00000, 0xbfffff).bankr("gfxrom");
+	map(0xc00000, 0xc007ff).ram().share("nvram");   // NVRAM
+	map(0xd00000, 0xd00000).r(m_upd4701, FUNC(upd4701_device::d_r));
+}
 
 
 

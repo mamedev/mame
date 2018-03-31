@@ -1384,52 +1384,58 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 	}
 }
 
-READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
+READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port1_r)
+{
+	int pc=m_iocpu->pc();
+	uint8_t   result = (m_eeprom_bits & ~4) | (m_eeprom->do_read() << 2);
+
+	if(LOG_PC8031_PORT)
+		logerror("8031: PCPORTR %04X read of P1 returns %02X\n",pc,result);
+
+	return result;
+}
+
+READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port3_r)
 {
 	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
 
 	if(LOG_PC8031_PORT)
-		logerror("8031: PCPORTR %04X read of %04X returns %02X\n",pc,offset,result);
-
-	switch(offset)
-	{
-		case 0x01:
-			result = (m_eeprom_bits & ~4) | (m_eeprom->do_read() << 2);
-			break;
-	}
+		logerror("8031: PCPORTR %04X read of P3 returns %02X\n",pc,result);
 
 	return result;
 }
 
-WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
+WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port1_w)
 {
 	int pc=m_iocpu->pc();
 
-	switch (offset)
-	{
-		case 0x01:
-			m_eeprom->cs_write((data & 8) ? 1 : 0);
+	m_eeprom->cs_write((data & 8) ? 1 : 0);
 
-			if(!(data & 8))
-				m_eeprom_state = 0;
-			else if(!(data & 2) || (m_eeprom_state == 2))
-				m_eeprom_state = 2;
-			else if((data & 8) && (!(m_eeprom_bits & 8)))
-				m_eeprom_state = 1;
-			else if((!(data & 1)) && (m_eeprom_bits & 1) && (m_eeprom_state == 1))
-				m_eeprom_state = 2; //wait until 1 clk after cs rises to set di else it's seen as a start bit
+	if(!(data & 8))
+		m_eeprom_state = 0;
+	else if(!(data & 2) || (m_eeprom_state == 2))
+		m_eeprom_state = 2;
+	else if((data & 8) && (!(m_eeprom_bits & 8)))
+		m_eeprom_state = 1;
+	else if((!(data & 1)) && (m_eeprom_bits & 1) && (m_eeprom_state == 1))
+		m_eeprom_state = 2; //wait until 1 clk after cs rises to set di else it's seen as a start bit
 
-			m_eeprom->di_write(((data & 2) && (m_eeprom_state == 2)) ? 1 : 0);
-			m_eeprom->clk_write((data & 1) ? 1 : 0);
-			m_eeprom_bits = data;
-			break;
-	}
+	m_eeprom->di_write(((data & 2) && (m_eeprom_state == 2)) ? 1 : 0);
+	m_eeprom->clk_write((data & 1) ? 1 : 0);
+	m_eeprom_bits = data;
 
 	if(LOG_PC8031_PORT)
-		logerror("8031 PCPORTW %04X write of %02X to %04X\n",pc,data,offset);
+		logerror("8031 PCPORTW %04X write of %02X to P1\n",pc,data);
 }
 
+WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port3_w)
+{
+	int pc=m_iocpu->pc();
+
+	if(LOG_PC8031_PORT)
+		logerror("8031 PCPORTW %04X write of %02X to P3\n",pc,data);
+}
 
 
 /* IO Unit */

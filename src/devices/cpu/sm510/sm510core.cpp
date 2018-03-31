@@ -16,7 +16,7 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM510, sm510_device, "sm510", "SM510") // 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
+DEFINE_DEVICE_TYPE(SM510, sm510_device, "sm510", "Sharp SM510") // 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
 
 
 // internal memory maps
@@ -42,9 +42,9 @@ sm510_device::sm510_device(const machine_config &mconfig, const char *tag, devic
 
 
 // disasm
-util::disasm_interface *sm510_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm510_device::create_disassembler()
 {
-	return new sm510_disassembler;
+	return std::make_unique<sm510_disassembler>();
 }
 
 

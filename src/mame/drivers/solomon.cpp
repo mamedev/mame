@@ -49,41 +49,44 @@ WRITE8_MEMBER(solomon_state::nmi_mask_w)
 	m_nmi_mask = data & 1;
 }
 
-ADDRESS_MAP_START(solomon_state::main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(solomon_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(solomon_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(solomon_colorram2_w) AM_SHARE("colorram2")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(solomon_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1")
-	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
-	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe603, 0xe603) AM_READ(solomon_0xe603_r)
-	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe605, 0xe605) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe606, 0xe606) AM_READNOP /* watchdog? */
-	AM_RANGE(0xe600, 0xe600) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xe604, 0xe604) AM_WRITE(solomon_flipscreen_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(solomon_sh_command_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void solomon_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(solomon_state::solomon_colorram_w)).share("colorram");
+	map(0xd400, 0xd7ff).ram().w(this, FUNC(solomon_state::solomon_videoram_w)).share("videoram");
+	map(0xd800, 0xdbff).ram().w(this, FUNC(solomon_state::solomon_colorram2_w)).share("colorram2");
+	map(0xdc00, 0xdfff).ram().w(this, FUNC(solomon_state::solomon_videoram2_w)).share("videoram2");
+	map(0xe000, 0xe07f).ram().share("spriteram");
+	map(0xe400, 0xe5ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe600, 0xe600).portr("P1");
+	map(0xe601, 0xe601).portr("P2");
+	map(0xe602, 0xe602).portr("SYSTEM");
+	map(0xe603, 0xe603).r(this, FUNC(solomon_state::solomon_0xe603_r));
+	map(0xe604, 0xe604).portr("DSW1");
+	map(0xe605, 0xe605).portr("DSW2");
+	map(0xe606, 0xe606).nopr(); /* watchdog? */
+	map(0xe600, 0xe600).w(this, FUNC(solomon_state::nmi_mask_w));
+	map(0xe604, 0xe604).w(this, FUNC(solomon_state::solomon_flipscreen_w));
+	map(0xe800, 0xe800).w(this, FUNC(solomon_state::solomon_sh_command_w));
+	map(0xf000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(solomon_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xffff, 0xffff) AM_WRITENOP    /* watchdog? */
-ADDRESS_MAP_END
+void solomon_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xffff, 0xffff).nopw();    /* watchdog? */
+}
 
-ADDRESS_MAP_START(solomon_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void solomon_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x11).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x20, 0x21).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x30, 0x31).w("ay3", FUNC(ay8910_device::address_data_w));
+}
 
 
 

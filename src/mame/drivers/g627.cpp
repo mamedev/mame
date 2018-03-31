@@ -81,19 +81,21 @@ private:
 };
 
 
-ADDRESS_MAP_START(g627_state::mem_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("i8156", i8155_device, memory_r, memory_w)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("nvram") // battery backed
-ADDRESS_MAP_END
+void g627_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0xc000, 0xc0ff).rw("i8156", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0xe000, 0xe0ff).ram().share("nvram"); // battery backed
+}
 
-ADDRESS_MAP_START(g627_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x02) AM_WRITE(disp_w)
-	AM_RANGE(0x03, 0x07) AM_WRITE(lamp_w)
-	AM_RANGE(0x10, 0x17) AM_DEVWRITE("astrocade", astrocade_device, astrocade_sound_w)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("i8156", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+void g627_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x02).w(this, FUNC(g627_state::disp_w));
+	map(0x03, 0x07).w(this, FUNC(g627_state::lamp_w));
+	map(0x10, 0x17).w("astrocade", FUNC(astrocade_device::astrocade_sound_w));
+	map(0x20, 0x27).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 static INPUT_PORTS_START( g627 )
 	PORT_START("SWITCH.0")

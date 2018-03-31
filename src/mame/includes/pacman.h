@@ -58,7 +58,7 @@ public:
 	void vanvan_portmap(address_map &map);
 	void woodpek_map(address_map &map);
 	void writeport(address_map &map);
-private:
+protected:
 	optional_device<namco_device> m_namco_sound;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<uint8_t> m_spriteram;

@@ -241,15 +241,16 @@ READ8_MEMBER(beaminv_state::controller_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(beaminv_state::main_map)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW")
-	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(controller_r)
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ(v128_r)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void beaminv_state::main_map(address_map &map)
+{
+	map(0x0000, 0x17ff).rom();
+	map(0x1800, 0x1fff).ram();
+	map(0x2400, 0x2400).mirror(0x03ff).portr("DSW");
+	map(0x2800, 0x2800).mirror(0x03ff).portr("INPUTS");
+	map(0x3400, 0x3400).mirror(0x03ff).r(this, FUNC(beaminv_state::controller_r));
+	map(0x3800, 0x3800).mirror(0x03ff).r(this, FUNC(beaminv_state::v128_r));
+	map(0x4000, 0x5fff).ram().share("videoram");
+}
 
 
 
@@ -259,10 +260,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(beaminv_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(controller_select_w) /* to be confirmed */
-ADDRESS_MAP_END
+void beaminv_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(beaminv_state::controller_select_w)); /* to be confirmed */
+}
 
 
 

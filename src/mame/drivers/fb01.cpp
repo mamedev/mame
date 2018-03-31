@@ -64,30 +64,32 @@ private:
 };
 
 
-ADDRESS_MAP_START(fb01_state::fb01_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("nvram")  // 2 * 8KB S-RAM
-ADDRESS_MAP_END
+void fb01_state::fb01_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).ram().share("nvram");  // 2 * 8KB S-RAM
+}
 
 
-ADDRESS_MAP_START(fb01_state::fb01_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void fb01_state::fb01_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 	// 00-01  YM2164
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ym2164", ym2151_device, register_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("ym2164", ym2151_device, status_r, data_w)
+	map(0x00, 0x00).w("ym2164", FUNC(ym2151_device::register_w));
+	map(0x01, 0x01).rw("ym2164", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 
 	// 10-11  USART uPD71051C  4MHz & 4MHz / 8
-	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("upd71051", i8251_device, data_r, data_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("upd71051", i8251_device, status_r, control_w)
+	map(0x10, 0x10).rw(m_upd71051, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x11, 0x11).rw(m_upd71051, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
 	// 20     PANEL SWITCH
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("PANEL")
+	map(0x20, 0x20).portr("PANEL");
 
 	// 30-31  HD44780A
-	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
-	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
-ADDRESS_MAP_END
+	map(0x30, 0x30).rw("hd44780", FUNC(hd44780_device::control_read), FUNC(hd44780_device::control_write));
+	map(0x31, 0x31).rw("hd44780", FUNC(hd44780_device::data_read), FUNC(hd44780_device::data_write));
+}
 
 
 static INPUT_PORTS_START( fb01 )

@@ -102,9 +102,10 @@ const tiny_rom_entry *c64_multiscreen_cartridge_device::device_rom_region() cons
 }
 
 
-ADDRESS_MAP_START(c64_multiscreen_cartridge_device::multiscreen_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(MC6802P_TAG, 0)
-ADDRESS_MAP_END
+void c64_multiscreen_cartridge_device::multiscreen_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region(MC6802P_TAG, 0);
+}
 
 
 //-------------------------------------------------

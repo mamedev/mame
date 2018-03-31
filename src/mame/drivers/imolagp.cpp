@@ -329,39 +329,43 @@ READ8_MEMBER(imolagp_state::imola_draw_mode_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(imolagp_state::imolagp_master_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(vreg_control_w)
-	AM_RANGE(0x37f0, 0x37f0) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+void imolagp_state::imolagp_master_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x2800, 0x2803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x3000, 0x3000).w(this, FUNC(imolagp_state::vreg_control_w));
+	map(0x37f0, 0x37f0).w("aysnd", FUNC(ay8910_device::address_w));
 //  AM_RANGE(0x37f7, 0x37f7) AM_NOP
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE(vreg_data_r, vreg_data_w)
-	AM_RANGE(0x3810, 0x3810) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSWA")
-	AM_RANGE(0x47ff, 0x4800) AM_WRITE(transmit_data_w)
-	AM_RANGE(0x5000, 0x50ff) AM_WRITE(imola_led_board_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("DSWA") // assume mirror
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSWB")
-ADDRESS_MAP_END
+	map(0x3800, 0x3800).rw(this, FUNC(imolagp_state::vreg_data_r), FUNC(imolagp_state::vreg_data_w));
+	map(0x3810, 0x3810).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x4000, 0x4000).portr("DSWA");
+	map(0x47ff, 0x4800).w(this, FUNC(imolagp_state::transmit_data_w));
+	map(0x5000, 0x50ff).w(this, FUNC(imolagp_state::imola_led_board_w));
+	map(0x5800, 0x5800).portr("DSWA"); // assume mirror
+	map(0x6000, 0x6000).portr("DSWB");
+}
 
-ADDRESS_MAP_START(imolagp_state::imolagp_master_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(trigger_slave_nmi_r)
-ADDRESS_MAP_END
+void imolagp_state::imolagp_master_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(imolagp_state::trigger_slave_nmi_r));
+}
 
 
-ADDRESS_MAP_START(imolagp_state::imolagp_slave_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x9fff, 0xa000) AM_READ(receive_data_r)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(screenram_w)
-ADDRESS_MAP_END
+void imolagp_state::imolagp_slave_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x9fff, 0xa000).r(this, FUNC(imolagp_state::receive_data_r));
+	map(0xc000, 0xffff).w(this, FUNC(imolagp_state::screenram_w));
+}
 
-ADDRESS_MAP_START(imolagp_state::imolagp_slave_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0xff) AM_READ(imola_draw_mode_r)
-ADDRESS_MAP_END
+void imolagp_state::imolagp_slave_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).r(this, FUNC(imolagp_state::imola_draw_mode_r));
+}
 
 
 

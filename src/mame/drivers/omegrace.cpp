@@ -360,30 +360,32 @@ WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(omegrace_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4bff) AM_RAM
-	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_SHARE("nvram") /* NVRAM */
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("vectorram") AM_REGION("maincpu", 0x8000) /* vector ram */
-	AM_RANGE(0x9000, 0x9fff) AM_ROM /* vector rom */
-ADDRESS_MAP_END
+void omegrace_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4bff).ram();
+	map(0x5c00, 0x5cff).ram().share("nvram"); /* NVRAM */
+	map(0x8000, 0x8fff).ram().share("vectorram").region("maincpu", 0x8000); /* vector ram */
+	map(0x9000, 0x9fff).rom(); /* vector rom */
+}
 
 
-ADDRESS_MAP_START(omegrace_state::port_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
-	AM_RANGE(0x09, 0x09) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("dvg", dvg_device, reset_w)
-	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")             /* vg_halt */
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")               /* DIP SW C4 */
-	AM_RANGE(0x17, 0x17) AM_READ_PORT("DSW2")               /* DIP SW C6 */
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")                /* Player 1 input */
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")                /* Player 2 input */
-	AM_RANGE(0x13, 0x13) AM_WRITE(omegrace_leds_w)          /* coin counters, leds, flip screen */
-	AM_RANGE(0x14, 0x14) AM_WRITE(omegrace_soundlatch_w)    /* Sound command */
-	AM_RANGE(0x15, 0x15) AM_READ(omegrace_spinner1_r)       /* 1st controller */
-	AM_RANGE(0x16, 0x16) AM_READ_PORT("SPIN1")              /* 2nd controller (cocktail) */
-ADDRESS_MAP_END
+void omegrace_state::port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x08).r(this, FUNC(omegrace_state::omegrace_vg_go_r));
+	map(0x09, 0x09).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x0a, 0x0a).w(m_dvg, FUNC(dvg_device::reset_w));
+	map(0x0b, 0x0b).portr("AVGDVG");             /* vg_halt */
+	map(0x10, 0x10).portr("DSW1");               /* DIP SW C4 */
+	map(0x17, 0x17).portr("DSW2");               /* DIP SW C6 */
+	map(0x11, 0x11).portr("IN0");                /* Player 1 input */
+	map(0x12, 0x12).portr("IN1");                /* Player 2 input */
+	map(0x13, 0x13).w(this, FUNC(omegrace_state::omegrace_leds_w));          /* coin counters, leds, flip screen */
+	map(0x14, 0x14).w(this, FUNC(omegrace_state::omegrace_soundlatch_w));    /* Sound command */
+	map(0x15, 0x15).r(this, FUNC(omegrace_state::omegrace_spinner1_r));       /* 1st controller */
+	map(0x16, 0x16).portr("SPIN1");              /* 2nd controller (cocktail) */
+}
 
 
 /*************************************
@@ -392,18 +394,20 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(omegrace_state::sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_MIRROR(0x800)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void omegrace_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().mirror(0x800);
+	map(0x1000, 0x13ff).ram();
+}
 
 
-ADDRESS_MAP_START(omegrace_state::sound_port)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // the game reads from ay1 port b, but ay8912 only has port a
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
-ADDRESS_MAP_END
+void omegrace_state::sound_port(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read)); // the game reads from ay1 port b, but ay8912 only has port a
+	map(0x00, 0x01).w("ay1", FUNC(ay8912_device::address_data_w));
+	map(0x02, 0x03).w("ay2", FUNC(ay8912_device::address_data_w));
+}
 
 
 

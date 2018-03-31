@@ -397,22 +397,15 @@ READ8_MEMBER(m72_state::mcu_snd_r)
 	return m_mcu_snd_cmd_latch;
 }
 
-READ8_MEMBER(m72_state::mcu_port_r)
+WRITE8_MEMBER(m72_state::mcu_port1_w)
 {
-	logerror("port read: %02x\n", offset);
-	return 0;
+	m_mcu_sample_latch = data;
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(m72_state::mcu_port_w)
+WRITE8_MEMBER(m72_state::mcu_port3_w)
 {
-	if (offset == 1)
-	{
-		m_mcu_sample_latch = data;
-		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-	else
-		logerror("port: %02x %02x\n", offset, data);
-
+	logerror("port3: %02x\n", data);
 }
 
 WRITE8_MEMBER(m72_state::mcu_low_w)
@@ -865,266 +858,290 @@ WRITE16_MEMBER(m72_state::soundram_w)
 		m_soundram[offset * 2 + 1] = data >> 8;
 }
 
-ADDRESS_MAP_START(m72_state::m72_cpu1_common_map)
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m72_state::m72_cpu1_common_map(address_map &map)
+{
+	map(0xc0000, 0xc03ff).ram().share("spriteram");
+	map(0xc8000, 0xc8bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xcc000, 0xccbff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xd0000, 0xd3fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd8000, 0xdbfff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xe0000, 0xeffff).rw(this, FUNC(m72_state::soundram_r), FUNC(m72_state::soundram_w));
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(m72_state::m72_map)
-	AM_IMPORT_FROM( m72_cpu1_common_map )
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::m72_map(address_map &map)
+{
+	m72_cpu1_common_map(map);
+	map(0x00000, 0x7ffff).rom();
+	map(0xa0000, 0xa3fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::rtype_map)
-	AM_IMPORT_FROM( m72_cpu1_common_map )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x40000, 0x43fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::rtype_map(address_map &map)
+{
+	m72_cpu1_common_map(map);
+	map(0x00000, 0x3ffff).rom();
+	map(0x40000, 0x43fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::xmultiplm72_map)
-	AM_IMPORT_FROM( m72_cpu1_common_map )
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x83fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::xmultiplm72_map(address_map &map)
+{
+	m72_cpu1_common_map(map);
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0x83fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::dbreedm72_map)
-	AM_IMPORT_FROM( m72_cpu1_common_map )
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x90000, 0x93fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::dbreedm72_map(address_map &map)
+{
+	m72_cpu1_common_map(map);
+	map(0x00000, 0x7ffff).rom();
+	map(0x90000, 0x93fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::m81_cpu1_common_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m72_state::m81_cpu1_common_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
+	map(0xc0000, 0xc03ff).ram().share("spriteram");
+	map(0xc8000, 0xc8bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xcc000, 0xccbff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xd0000, 0xd3fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd8000, 0xdbfff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(m72_state::xmultipl_map)
-	AM_IMPORT_FROM( m81_cpu1_common_map )
-	AM_RANGE(0x9c000, 0x9ffff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::xmultipl_map(address_map &map)
+{
+	m81_cpu1_common_map(map);
+	map(0x9c000, 0x9ffff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::dbreed_map)
-	AM_IMPORT_FROM( m81_cpu1_common_map )
-	AM_RANGE(0x88000, 0x8bfff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::dbreed_map(address_map &map)
+{
+	m81_cpu1_common_map(map);
+	map(0x88000, 0x8bfff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::hharry_map)
-	AM_IMPORT_FROM( m81_cpu1_common_map )
-	AM_RANGE(0xa0000, 0xa3fff) AM_RAM    /* work RAM */
-ADDRESS_MAP_END
+void m72_state::hharry_map(address_map &map)
+{
+	m81_cpu1_common_map(map);
+	map(0xa0000, 0xa3fff).ram();    /* work RAM */
+}
 
-ADDRESS_MAP_START(m72_state::m84_cpu1_common_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(irq_line_w)
-	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP  /* ??? */
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(dmaon_w)
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m72_state::m84_cpu1_common_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0xb0000, 0xb0001).w(this, FUNC(m72_state::irq_line_w));
+	map(0xb4000, 0xb4001).nopw();  /* ??? */
+	map(0xbc000, 0xbc001).w(this, FUNC(m72_state::dmaon_w));
+	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
+	map(0xc0000, 0xc03ff).ram().share("spriteram");
+	map(0xe0000, 0xe3fff).ram();   /* work RAM */
+	map(0xffff0, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(m72_state::rtype2_map)
-	AM_IMPORT_FROM( m84_cpu1_common_map )
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-ADDRESS_MAP_END
+void m72_state::rtype2_map(address_map &map)
+{
+	m84_cpu1_common_map(map);
+	map(0xd0000, 0xd3fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd4000, 0xd7fff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xc8000, 0xc8bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xd8000, 0xd8bff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+}
 
-ADDRESS_MAP_START(m72_state::hharryu_map)
-	AM_IMPORT_FROM( m84_cpu1_common_map )
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-ADDRESS_MAP_END
+void m72_state::hharryu_map(address_map &map)
+{
+	m84_cpu1_common_map(map);
+	map(0xd0000, 0xd3fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd4000, 0xd7fff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xa0000, 0xa0bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xa8000, 0xa8bff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+}
 
-ADDRESS_MAP_START(m72_state::kengo_map)
-	AM_IMPORT_FROM( m84_cpu1_common_map )
-	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(m72_state::m82_map)
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_SHARE("majtitle_rowscr")
-	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")  /* larger than the other games */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM   /* work RAM */
-	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(irq_line_w)
-	AM_RANGE(0xe4000, 0xe4001) AM_WRITEONLY /* playfield enable? 1 during screen transitions, 0 otherwise */
-	AM_RANGE(0xec000, 0xec001) AM_WRITE(dmaon_w)
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void m72_state::kengo_map(address_map &map)
+{
+	m84_cpu1_common_map(map);
+	map(0x80000, 0x83fff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0x84000, 0x87fff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xa0000, 0xa0bff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xa8000, 0xa8bff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+}
 
 
+void m72_state::m82_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0xa0000, 0xa03ff).ram().share("majtitle_rowscr");
+	map(0xa4000, 0xa4bff).rw(this, FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xac000, 0xaffff).ram().w(this, FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xb0000, 0xbffff).ram().w(this, FUNC(m72_state::videoram2_w)).share("videoram2");  /* larger than the other games */
+	map(0xc0000, 0xc03ff).ram().share("spriteram");
+	map(0xc8000, 0xc83ff).ram().share("spriteram2");
+	map(0xcc000, 0xccbff).rw(this, FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xd0000, 0xd3fff).ram();   /* work RAM */
+	map(0xe0000, 0xe0001).w(this, FUNC(m72_state::irq_line_w));
+	map(0xe4000, 0xe4001).writeonly(); /* playfield enable? 1 during screen transitions, 0 otherwise */
+	map(0xec000, 0xec001).w(this, FUNC(m72_state::dmaon_w));
+	map(0xffff0, 0xfffff).rom();
+}
 
 
-ADDRESS_MAP_START(m72_state::m72_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(port02_w, 0x00ff) /* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
+
+
+void m72_state::m72_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::port02_w)); /* coin counters, reset sound cpu, other stuff? */
+	map(0x04, 0x05).w(this, FUNC(m72_state::dmaon_w));
+	map(0x06, 0x07).w(this, FUNC(m72_state::irq_line_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(m72_state::m84_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
-ADDRESS_MAP_END
+void m72_state::m84_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::rtype2_port02_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
+}
 
-ADDRESS_MAP_START(m72_state::m84_v33_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
+void m72_state::m84_v33_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::rtype2_port02_w));
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
 //  AM_RANGE(0x8c, 0x8f) AM_WRITENOP    /* ??? */
-ADDRESS_MAP_END
+}
 
 
-ADDRESS_MAP_START(m72_state::poundfor_portmap)
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701l", upd4701_device, read_xy, 0x00ff)
-	AM_RANGE(0x08, 0x0f) AM_DEVREAD8("upd4701h", upd4701_device, read_xy, 0xff00)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(poundfor_port02_w, 0x00ff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
-ADDRESS_MAP_END
+void m72_state::poundfor_portmap(address_map &map)
+{
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x08, 0x0f).r("upd4701l", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0x08, 0x0f).r("upd4701h", FUNC(upd4701_device::read_xy)).umask16(0xff00);
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::poundfor_port02_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
+}
 
-ADDRESS_MAP_START(m72_state::m82_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
+void m72_state::m82_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::rtype2_port02_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
 
 	// these ports control the tilemap sizes, rowscroll etc. that m82 has, exact bit usage not known (maybe one for each layer?)
-	AM_RANGE(0x8c, 0x8d) AM_WRITE(m82_tm_ctrl_w)
-	AM_RANGE(0x8e, 0x8f) AM_WRITE(m82_gfx_ctrl_w)
-ADDRESS_MAP_END
+	map(0x8c, 0x8d).w(this, FUNC(m72_state::m82_tm_ctrl_w));
+	map(0x8e, 0x8f).w(this, FUNC(m72_state::m82_gfx_ctrl_w));
+}
 
-ADDRESS_MAP_START(m72_state::m81_portmap)
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_WRITE8(rtype2_port02_w, 0x00ff)  /* coin counters, reset sound cpu, other stuff? */
-	AM_RANGE(0x04, 0x05) AM_WRITE(dmaon_w)
-	AM_RANGE(0x06, 0x07) AM_WRITE(irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd71059c", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(scrolly1_w)
-	AM_RANGE(0x82, 0x83) AM_WRITE(scrollx1_w)
-	AM_RANGE(0x84, 0x85) AM_WRITE(scrolly2_w)
-	AM_RANGE(0x86, 0x87) AM_WRITE(scrollx2_w)
-ADDRESS_MAP_END
+void m72_state::m81_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("IN0");
+	map(0x02, 0x03).portr("IN1");
+	map(0x04, 0x05).portr("DSW");
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(m72_state::rtype2_port02_w));  /* coin counters, reset sound cpu, other stuff? */
+	map(0x04, 0x05).w(this, FUNC(m72_state::dmaon_w));
+	map(0x06, 0x07).w(this, FUNC(m72_state::irq_line_w));
+	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x80, 0x81).w(this, FUNC(m72_state::scrolly1_w));
+	map(0x82, 0x83).w(this, FUNC(m72_state::scrollx1_w));
+	map(0x84, 0x85).w(this, FUNC(m72_state::scrolly2_w));
+	map(0x86, 0x87).w(this, FUNC(m72_state::scrollx2_w));
+}
 
 
 
-ADDRESS_MAP_START(m72_state::sound_ram_map)
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("soundram")
-ADDRESS_MAP_END
+void m72_state::sound_ram_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram().share("soundram");
+}
 
-ADDRESS_MAP_START(m72_state::sound_rom_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void m72_state::sound_rom_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(m72_state::rtype_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-ADDRESS_MAP_END
+void m72_state::rtype_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x02, 0x02).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+}
 
-ADDRESS_MAP_START(m72_state::sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
-ADDRESS_MAP_END
+void m72_state::sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x02, 0x02).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
+}
 
-ADDRESS_MAP_START(m72_state::rtype2_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, rtype2_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_audio_device, sample_r)
+void m72_state::rtype2_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x80, 0x80).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x80, 0x81).w(m_audio, FUNC(m72_audio_device::rtype2_sample_addr_w));
+	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
+	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(m72_state::poundfor_sound_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x42, 0x42) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-ADDRESS_MAP_END
+void m72_state::poundfor_sound_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x13).w(m_audio, FUNC(m72_audio_device::poundfor_sample_addr_w));
+	map(0x40, 0x41).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x42, 0x42).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+}
 
-ADDRESS_MAP_START(m72_state::mcu_io_map)
+void m72_state::mcu_io_map(address_map &map)
+{
 	/* External access */
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mcu_sample_r, mcu_low_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(mcu_high_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(mcu_snd_r, mcu_ack_w)
+	map(0x0000, 0x0000).rw(this, FUNC(m72_state::mcu_sample_r), FUNC(m72_state::mcu_low_w));
+	map(0x0001, 0x0001).w(this, FUNC(m72_state::mcu_high_w));
+	map(0x0002, 0x0002).rw(this, FUNC(m72_state::mcu_snd_r), FUNC(m72_state::mcu_ack_w));
 	/* shared at b0000 - b0fff on the main cpu */
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(mcu_data_r,mcu_data_w )
-
-	/* Ports */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(mcu_port_r, mcu_port_w)
-ADDRESS_MAP_END
+	map(0xc000, 0xcfff).rw(this, FUNC(m72_state::mcu_data_r), FUNC(m72_state::mcu_data_w));
+}
 
 #define COIN_MODE_1 \
 	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0400, NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6,7,8") \
@@ -1904,6 +1921,8 @@ MACHINE_CONFIG_START(m72_state::m72_8751)
 
 	MCFG_CPU_ADD("mcu",I8751, XTAL(8'000'000)) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(m72_state, mcu_port1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(m72_state, mcu_port3_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
 MACHINE_CONFIG_END
 
@@ -3293,27 +3312,27 @@ ROM_END
 
 ROM_START( airduel )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "AD_(M82)_A-H0-D.IC52", 0x00001, 0x20000, CRC(dbecc726) SHA1(526e9fdf0ca3af3eae462524df71af8e6bfa85d0) )
-	ROM_LOAD16_BYTE( "AD_(M82)_A-L0-D.IC60", 0x00000, 0x20000, CRC(6a9fcf59) SHA1(a2ae64d290137036c350f84c38054cf6681473a5) )
-	ROM_LOAD16_BYTE( "AD_(M82)_A-H1-D.IC51", 0x40001, 0x20000, CRC(bafc152a) SHA1(e20fa8b832ebfb7a4407fc162f28388858686d61) )
-	ROM_RELOAD(                      0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "AD_(M82)_A-L1-D.IC59", 0x40000, 0x20000, CRC(9e2b1ae7) SHA1(838ccffb760b464d7d7e108e033a09e6295e5fc8) )
-	ROM_RELOAD(                      0xc0000, 0x20000 )
+	ROM_LOAD16_BYTE( "ad_=m82=_a-h0-d.ic52", 0x00001, 0x20000, CRC(dbecc726) SHA1(526e9fdf0ca3af3eae462524df71af8e6bfa85d0) )
+	ROM_LOAD16_BYTE( "ad_=m82=_a-l0-d.ic60", 0x00000, 0x20000, CRC(6a9fcf59) SHA1(a2ae64d290137036c350f84c38054cf6681473a5) )
+	ROM_LOAD16_BYTE( "ad_=m82=_a-h1-d.ic51", 0x40001, 0x20000, CRC(bafc152a) SHA1(e20fa8b832ebfb7a4407fc162f28388858686d61) )
+	ROM_RELOAD(                              0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "ad_=m82=_a-l1-d.ic59", 0x40000, 0x20000, CRC(9e2b1ae7) SHA1(838ccffb760b464d7d7e108e033a09e6295e5fc8) )
+	ROM_RELOAD(                              0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "AD_(M82)_A-SP-D.IC15", 0x00000, 0x10000, CRC(16a858a3) SHA1(51dbac5b37ecb30b46072f5a300a29dc7f7b8542) )
+	ROM_LOAD( "ad_=m82=_a-sp-d.ic15", 0x00000, 0x10000, CRC(16a858a3) SHA1(51dbac5b37ecb30b46072f5a300a29dc7f7b8542) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "AD_(M82)_B-N0-D.IC44",    0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )  /* sprites */
-	ROM_LOAD( "AD_(M82)_B-N1-D.IC45",    0x20000, 0x20000, CRC(9865856b) SHA1(b18a06899ae29d45e2351594df544220f3f4485a) )
-	ROM_LOAD( "AD_(M82)_B-N2-D.IC46",    0x40000, 0x20000, CRC(d392aef2) SHA1(0f639a07066cadddc3884eb490885a8745571567) )
-	ROM_LOAD( "AD_(M82)_B-N3-D.IC36",    0x60000, 0x20000, CRC(923240c3) SHA1(f587a83329087a715a3e42110f74f104e8c8ef1f) )
+	ROM_LOAD( "ad_=m82=_b-n0-d.ic44",    0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )  /* sprites */
+	ROM_LOAD( "ad_=m82=_b-n1-d.ic45",    0x20000, 0x20000, CRC(9865856b) SHA1(b18a06899ae29d45e2351594df544220f3f4485a) )
+	ROM_LOAD( "ad_=m82=_b-n2-d.ic46",    0x40000, 0x20000, CRC(d392aef2) SHA1(0f639a07066cadddc3884eb490885a8745571567) )
+	ROM_LOAD( "ad_=m82=_b-n3-d.ic36",    0x60000, 0x20000, CRC(923240c3) SHA1(f587a83329087a715a3e42110f74f104e8c8ef1f) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
-	ROM_LOAD( "AD_(M82)_A-C0-D.IC49",    0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  /* tiles */
-	ROM_LOAD( "AD_(M82)_A-C1-D.IC48",    0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
-	ROM_LOAD( "AD_(M82)_A-C2-D.IC57",    0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
-	ROM_LOAD( "AD_(M82)_A-C3-D.IC56",    0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
+	ROM_LOAD( "ad_=m82=_a-c0-d.ic49",    0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  /* tiles */
+	ROM_LOAD( "ad_=m82=_a-c1-d.ic48",    0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
+	ROM_LOAD( "ad_=m82=_a-c2-d.ic57",    0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
+	ROM_LOAD( "ad_=m82=_a-c3-d.ic56",    0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
 
 	ROM_REGION( 0x080000, "sprites2", 0 ) // still had these leftover from Major Title, probably needed to avoid displaying garbage?
 	ROM_LOAD( "mt_f0.bin",    0x00000, 0x20000, CRC(2d5e05d5) SHA1(18bdc9c561dbf0f91642161ca985d2154bd58b5d) )  /* sprites #2 */
@@ -3322,7 +3341,7 @@ ROM_START( airduel )
 	ROM_LOAD( "mt_f3.bin",    0x60000, 0x20000, CRC(179f7562) SHA1(6d28b199daffc62e8fa9009878ac0bb976ccbb2a) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
-	ROM_LOAD( "AD_(M82)_A-V0-D.IC12",    0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
+	ROM_LOAD( "ad_=m82=_a-v0-d.ic12",    0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
 ROM_END
 
 
@@ -3396,27 +3415,27 @@ ROM_END
 
 ROM_START( dkgensanm82 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "gen_(m84)_a-h0-d.ic52",   0x00001, 0x20000, CRC(a1ca8855) SHA1(19b0ec1a03af114aa4f02630ace67c277ebce60f) )
-	ROM_LOAD16_BYTE( "gen_(m84)_a-l0-d.ic60",   0x00000, 0x20000, CRC(247117b0) SHA1(e7674b9d0ae80afb52b47094f95ed5c250c7e303) )
-	ROM_LOAD16_BYTE( "gen_(m84)_a-h1-d.ic51",   0x60001, 0x10000, CRC(54e5b73c) SHA1(5664f6e0a931b1c139e82dc98fcc9e38acd14616) )
+	ROM_LOAD16_BYTE( "gen_=m84=_a-h0-d.ic52",   0x00001, 0x20000, CRC(a1ca8855) SHA1(19b0ec1a03af114aa4f02630ace67c277ebce60f) )
+	ROM_LOAD16_BYTE( "gen_=m84=_a-l0-d.ic60",   0x00000, 0x20000, CRC(247117b0) SHA1(e7674b9d0ae80afb52b47094f95ed5c250c7e303) )
+	ROM_LOAD16_BYTE( "gen_=m84=_a-h1-d.ic51",   0x60001, 0x10000, CRC(54e5b73c) SHA1(5664f6e0a931b1c139e82dc98fcc9e38acd14616) )
 	ROM_RELOAD(                                 0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "gen_(m84)_a-l1-d.ic59",   0x60000, 0x10000, CRC(894f8a9f) SHA1(57a0885c52a094def03b129a450cc891e6c075c6) )
+	ROM_LOAD16_BYTE( "gen_=m84=_a-l1-d.ic59",   0x60000, 0x10000, CRC(894f8a9f) SHA1(57a0885c52a094def03b129a450cc891e6c075c6) )
 	ROM_RELOAD(                                 0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "gen_(m84)_a-sp-d.ic15",    0x00000, 0x10000, CRC(e83cfc2c) SHA1(3193bdd06a9712fc499e6fc90a33140463ef59fe) )
+	ROM_LOAD( "gen_=m84=_a-sp-d.ic15",    0x00000, 0x10000, CRC(e83cfc2c) SHA1(3193bdd06a9712fc499e6fc90a33140463ef59fe) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "gen_(m72)_c-l0-b.ic44",    0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )  /* sprites */
-	ROM_LOAD( "gen_(m72)_c-l3-b.ic45",    0x20000, 0x20000, CRC(def65294) SHA1(23f5d99fa9f604fde37cb52113bff233d9be1d25) )
-	ROM_LOAD( "gen_(m72)_c-h0-b.ic46",    0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
-	ROM_LOAD( "gen_(m72)_c-h3-b.ic36",    0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
+	ROM_LOAD( "gen_=m72=_c-l0-b.ic44",    0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )  /* sprites */
+	ROM_LOAD( "gen_=m72=_c-l3-b.ic45",    0x20000, 0x20000, CRC(def65294) SHA1(23f5d99fa9f604fde37cb52113bff233d9be1d25) )
+	ROM_LOAD( "gen_=m72=_c-h0-b.ic46",    0x40000, 0x20000, CRC(bb0d6ad4) SHA1(4ab617fadfc32efad90ed7f0555513f167b0c43a) )
+	ROM_LOAD( "gen_=m72=_c-h3-b.ic36",    0x60000, 0x20000, CRC(4351044e) SHA1(0d3ce3f4f1473fd997e70de91e7b5b5a5ec60ad4) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
-	ROM_LOAD( "gen_(m81)_a-l0-a.ic49",    0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  /* tiles */
-	ROM_LOAD( "gen_(m81)_a-l1-a.ic48",    0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
-	ROM_LOAD( "gen_(m81)_a-h0-a.ic57",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
-	ROM_LOAD( "gen_(m81)_a-h1-a.ic56",    0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
+	ROM_LOAD( "gen_=m81=_a-l0-a.ic49",    0x00000, 0x20000, CRC(c577ba5f) SHA1(c882e58cf64deca8eee6f14f3df43ecc932488fc) )  /* tiles */
+	ROM_LOAD( "gen_=m81=_a-l1-a.ic48",    0x20000, 0x20000, CRC(429d12ab) SHA1(ccba25eab981fc4e664f76e06a2964066f2ae2e8) )
+	ROM_LOAD( "gen_=m81=_a-h0-a.ic57",    0x40000, 0x20000, CRC(b5b163b0) SHA1(82a708fea4953a7c4dcd1d4a1b07f302221ba30b) )
+	ROM_LOAD( "gen_=m81=_a-h1-a.ic56",    0x60000, 0x20000, CRC(8ef566a1) SHA1(3afb020a7317efe89c18b2a7773894ce28499d49) )
 
 	ROM_REGION( 0x080000, "sprites2", 0 ) // leftover from Major Title
 	ROM_LOAD( "mt_f0.ic38",    0x00000, 0x20000, CRC(2d5e05d5) SHA1(18bdc9c561dbf0f91642161ca985d2154bd58b5d) )  /* sprites #2 */
@@ -3425,7 +3444,7 @@ ROM_START( dkgensanm82 )
 	ROM_LOAD( "mt_f3.ic41",    0x60000, 0x20000, CRC(179f7562) SHA1(6d28b199daffc62e8fa9009878ac0bb976ccbb2a) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
-	ROM_LOAD( "gen_(m84)_a-v0-d.ic12",   0x00000, 0x20000, CRC(d8595c66) SHA1(97920c9947fbac609fb901415e5471c6e4ca066c) )
+	ROM_LOAD( "gen_=m84=_a-v0-d.ic12",   0x00000, 0x20000, CRC(d8595c66) SHA1(97920c9947fbac609fb901415e5471c6e4ca066c) )
 ROM_END
 
 
@@ -3676,9 +3695,9 @@ ROM_END
 
 ROM_START( kengoa )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "KEN-D-H0-.IC55", 0x00001, 0x20000, CRC(ed3da88c) SHA1(536824eb3347eade2d3aad927e83eae51ee852b3) )
+	ROM_LOAD16_BYTE( "ken-d-h0-.ic55", 0x00001, 0x20000, CRC(ed3da88c) SHA1(536824eb3347eade2d3aad927e83eae51ee852b3) )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "KEN-D-L0-.IC61", 0x00000, 0x20000, CRC(92c57d8e) SHA1(eb078a7b261e13cfb0a920b5115beee917b8d89c))
+	ROM_LOAD16_BYTE( "ken-d-l0-.ic61", 0x00000, 0x20000, CRC(92c57d8e) SHA1(eb078a7b261e13cfb0a920b5115beee917b8d89c))
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -3700,8 +3719,8 @@ ROM_START( kengoa )
 	ROM_LOAD( "ken_m14.rom",  0x00000, 0x20000, CRC(6651e9b7) SHA1(c42009f986c9a9f35732d5cd717d548536469b1c) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* located on M84-B-B */
-	ROM_LOAD( "KEN_B-4N-.IC23", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
-	ROM_LOAD( "KEN_B-4P-.IC24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // differs from rtype 2 / ninja spirit
+	ROM_LOAD( "ken_b-4n-.ic23", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
+	ROM_LOAD( "ken_b-4p-.ic24", 0x0100, 0x0100, CRC(526f10ca) SHA1(e0ecd4db0720a4a37489e4d725843a2fbf266ebf) ) // differs from rtype 2 / ninja spirit
 ROM_END
 
 

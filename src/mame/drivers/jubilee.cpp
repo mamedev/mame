@@ -296,30 +296,31 @@ INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
 * Memory Map Information *
 *************************/
 
-ADDRESS_MAP_START(jubilee_state::jubileep_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
+void jubilee_state::jubileep_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x2fff).rom();
 
 /*  Video RAM =   3000-33FF
     Working RAM = 3400-37FF
     Color RAM =   3800-3BFF (lower 4-bits)
 */
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_WRITE(jubileep_videoram_w) AM_SHARE("videoworkram")  /* TC5517AP battery backed RAM */
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_WRITE(jubileep_colorram_w) AM_SHARE("colorram")      /* Whole 2114 RAM */
+	map(0x3000, 0x37ff).ram().w(this, FUNC(jubilee_state::jubileep_videoram_w)).share("videoworkram");  /* TC5517AP battery backed RAM */
+	map(0x3800, 0x3bff).ram().w(this, FUNC(jubilee_state::jubileep_colorram_w)).share("colorram");      /* Whole 2114 RAM */
 
 /*  CRTC *is* mapped here. Read 00-01 and then write on them.
     Then does the same for 02-03. Initialization seems incomplete since
     set till register 0x0D. Maybe the last registers are unused.
 */
-	AM_RANGE(0x3e00, 0x3e01) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x3e02, 0x3e03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map(0x3e00, 0x3e01).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x3e02, 0x3e03).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
 /*  CRTC address: $3E01; register: $3E03
     CRTC registers: 2f 20 25 64 26 00 20 23 00 07 00 00 00
     screen total: (0x2f+1)*8 (0x26+1)*(0x07+1) ---> 384 x 312
     visible area: 0x20 0x20  ---------------------> 256 x 256
 */
-ADDRESS_MAP_END
+}
 
 
 WRITE8_MEMBER(jubilee_state::unk_w)
@@ -568,10 +569,11 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 }
 
 
-ADDRESS_MAP_START(jubilee_state::jubileep_cru_map)
-	AM_RANGE(0x00c8, 0x00c8) AM_READ(mux_port_r)    /* multiplexed input port */
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(unk_w)
-ADDRESS_MAP_END
+void jubilee_state::jubileep_cru_map(address_map &map)
+{
+	map(0x00c8, 0x00c8).r(this, FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
+	map(0x0000, 0x07ff).w(this, FUNC(jubilee_state::unk_w));
+}
 
 /* I/O byte R/W
 

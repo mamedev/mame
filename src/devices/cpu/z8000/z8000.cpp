@@ -647,9 +647,9 @@ void z8002_device::init_tables()
 			z8000_exec[val] = opc - table;
 }
 
-util::disasm_interface *z8002_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> z8002_device::create_disassembler()
 {
-	return new z8000_disassembler(this);
+	return std::make_unique<z8000_disassembler>(this);
 }
 
 void z8001_device::device_start()

@@ -18,7 +18,7 @@
 class upd775x_device : public device_t, public device_sound_interface
 {
 public:
-	template <class Object> static devcb_base &set_drq_callback(device_t &device, Object &&cb) { return downcast<upd775x_device &>(device).m_drqcallback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drqcallback.set_callback(std::forward<Object>(cb)); }
 
 	void set_bank_base(offs_t base);
 
@@ -144,9 +144,9 @@ DECLARE_DEVICE_TYPE(UPD7759, upd7759_device)
 DECLARE_DEVICE_TYPE(UPD7756, upd7756_device)
 
 #define MCFG_UPD7759_DRQ_CALLBACK(_write) \
-	devcb = &upd7759_device::set_drq_callback(*device, DEVCB_##_write);
+	devcb = &downcast<upd7759_device &>(*device).set_drq_callback(DEVCB_##_write);
 
 #define MCFG_UPD7756_DRQ_CALLBACK(_write) \
-	devcb = &upd7756_device::set_drq_callback(*device, DEVCB_##_write);
+	devcb = &downcast<upd7756_device &>(*device).set_drq_callback(DEVCB_##_write);
 
 #endif // MAME_SOUND_UPD7759_H

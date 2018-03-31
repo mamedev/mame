@@ -43,9 +43,10 @@ uint32_t bntyhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-ADDRESS_MAP_START(bntyhunt_state::bntyhunt_map)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
-ADDRESS_MAP_END
+void bntyhunt_state::bntyhunt_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
+}
 
 static INPUT_PORTS_START( bntyhunt )
 INPUT_PORTS_END

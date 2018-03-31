@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 #include "machine/74157.h"
+#include "cpu/h6280/h6280.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "video/decbac06.h"
@@ -38,7 +39,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_subcpu;
+	optional_device<h6280_device> m_subcpu;
 	optional_device<cpu_device> m_mcu;
 	required_device<palette_device> m_palette;
 	optional_device<deco_bac06_device> m_tilegen1;
@@ -76,8 +77,11 @@ public:
 	DECLARE_READ16_MEMBER(midres_controls_r);
 	DECLARE_READ8_MEMBER(hippodrm_prot_r);
 	DECLARE_WRITE8_MEMBER(hippodrm_prot_w);
-	DECLARE_READ8_MEMBER(dec0_mcu_port_r);
-	DECLARE_WRITE8_MEMBER(dec0_mcu_port_w);
+	DECLARE_READ8_MEMBER(dec0_mcu_port0_r);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port0_w);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port1_w);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port2_w);
+	DECLARE_WRITE8_MEMBER(dec0_mcu_port3_w);
 	DECLARE_READ16_MEMBER(hippodrm_68000_share_r);
 	DECLARE_WRITE16_MEMBER(hippodrm_68000_share_w);
 	DECLARE_WRITE16_MEMBER(sprite_mirror_w);
@@ -135,7 +139,6 @@ public:
 	void dec0_map(address_map &map);
 	void dec0_s_map(address_map &map);
 	void hippodrm_sub_map(address_map &map);
-	void mcu_io_map(address_map &map);
 	void midres_map(address_map &map);
 	void midres_s_map(address_map &map);
 	void midresb_map(address_map &map);

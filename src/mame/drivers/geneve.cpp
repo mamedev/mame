@@ -294,9 +294,10 @@ public:
     Memory map
 */
 
-ADDRESS_MAP_START(geneve_state::memmap)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, readm, writem) AM_DEVSETOFFSET(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, setoffset)
-ADDRESS_MAP_END
+void geneve_state::memmap(address_map &map)
+{
+	map(0x0000, 0xffff).rw(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::readm), FUNC(bus::ti99::internal::geneve_mapper_device::writem)).setoffset(GENEVE_MAPPER_TAG, FUNC(bus::ti99::internal::geneve_mapper_device::setoffset));
+}
 
 /*
     CRU map
@@ -306,13 +307,14 @@ ADDRESS_MAP_END
     TODO: Check whether A0-A2 are available for CRU addressing since those
     bits are usually routed through the mapper first.
 */
-ADDRESS_MAP_START(geneve_state::crumap)
-	AM_RANGE(0x0000, 0x0fff) AM_READ( cruread )
-	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
+void geneve_state::crumap(address_map &map)
+{
+	map(0x0000, 0x0fff).r(this, FUNC(geneve_state::cruread));
+	map(0x0000, 0x0003).r(m_tms9901, FUNC(tms9901_device::read));
 
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE( cruwrite )
-	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
-ADDRESS_MAP_END
+	map(0x0000, 0x7fff).w(this, FUNC(geneve_state::cruwrite));
+	map(0x0000, 0x001f).w(m_tms9901, FUNC(tms9901_device::write));
+}
 
 /* TI joysticks. The keyboard is implemented in genboard.c. */
 static INPUT_PORTS_START(geneve)

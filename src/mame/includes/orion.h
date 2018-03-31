@@ -25,6 +25,7 @@
 #include "sound/spkrdev.h"
 #include "sound/wave.h"
 
+#include "screen.h"
 
 class orion_state : public radio86_state
 {
@@ -47,6 +48,7 @@ public:
 		, m_bank6(*this, "bank6")
 		, m_bank7(*this, "bank7")
 		, m_bank8(*this, "bank8")
+		, m_screen(*this, "screen")
 	{ }
 
 	DECLARE_READ8_MEMBER(orion128_system_r);
@@ -132,6 +134,7 @@ protected:
 	optional_memory_bank m_bank6;
 	optional_memory_bank m_bank7;
 	optional_memory_bank m_bank8;
+	required_device<screen_device> m_screen;
 
 	void orionz80_switch_bank();
 	void orion_set_video_mode(int width);

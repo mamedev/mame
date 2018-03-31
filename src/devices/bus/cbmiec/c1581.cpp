@@ -89,12 +89,13 @@ const tiny_rom_entry *c1563_device::device_rom_region() const
 //  ADDRESS_MAP( c1581_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c1581_device::c1581_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, mos8520_device, read, write)
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1772_TAG, wd1772_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
-ADDRESS_MAP_END
+void c1581_device::c1581_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x2000).ram();
+	map(0x4000, 0x400f).mirror(0x1ff0).rw(M8520_TAG, FUNC(mos8520_device::read), FUNC(mos8520_device::write));
+	map(0x6000, 0x6003).mirror(0x1ffc).rw(WD1772_TAG, FUNC(wd1772_device::read), FUNC(wd1772_device::write));
+	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
+}
 
 
 //-------------------------------------------------

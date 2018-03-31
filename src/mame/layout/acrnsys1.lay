@@ -26,31 +26,31 @@
 		</backdrop>
 
 		<!-- LEDs -->
-		<bezel name="digit256" element="digit">
+		<bezel name="digit8" element="digit">
 			<bounds left="10" top="10" right="44" bottom="59" />
 		</bezel>
-		<bezel name="digit2" element="digit">
+		<bezel name="digit1" element="digit">
 			<bounds left="54" top="10" right="88" bottom="59" />
 		</bezel>
-		<bezel name="digit4" element="digit">
+		<bezel name="digit2" element="digit">
 			<bounds left="98" top="10" right="132" bottom="59" />
 		</bezel>
-		<bezel name="digit8" element="digit">
+		<bezel name="digit3" element="digit">
 			<bounds left="142" top="10" right="176" bottom="59" />
 		</bezel>
-		<bezel name="digit16" element="digit">
+		<bezel name="digit4" element="digit">
 			<bounds left="186" top="10" right="220" bottom="59" />
 		</bezel>
-		<bezel name="digit32" element="digit">
+		<bezel name="digit5" element="digit">
 			<bounds left="230" top="10" right="264" bottom="59" />
 		</bezel>
-		<bezel name="digit64" element="digit">
+		<bezel name="digit6" element="digit">
 			<bounds left="274" top="10" right="308" bottom="59" />
 		</bezel>
-		<bezel name="digit128" element="digit">
+		<bezel name="digit7" element="digit">
 			<bounds left="318" top="10" right="352" bottom="59" />
 		</bezel>
-		<bezel name="digit1" element="digit">
+		<bezel name="digit0" element="digit">
 			<bounds left="362" top="10" right="396" bottom="59" />
 		</bezel>
 

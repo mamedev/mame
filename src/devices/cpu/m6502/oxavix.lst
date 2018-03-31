@@ -34,6 +34,11 @@ retf_imp
 		TMP2 = read(SP);
 		m_farbank = TMP2;
 	}
+	else
+	{
+		// namcons2: because apparently 0x0300ea isn't correctly mirroring 0x0000ea despite logic in xavix.cpp looking correct?
+		m_farbank = 0;
+	}
 	read_pc();
 	prefetch();
 

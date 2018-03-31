@@ -36,16 +36,16 @@
 //**************************************************************************
 
 #define MCFG_Z80CTC_INTR_CB(_devcb) \
-	devcb = &z80ctc_device::set_intr_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80ctc_device &>(*device).set_intr_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80CTC_ZC0_CB(_devcb) \
-	devcb = &z80ctc_device::set_zc0_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80ctc_device &>(*device).set_zc0_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80CTC_ZC1_CB(_devcb) \
-	devcb = &z80ctc_device::set_zc1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80ctc_device &>(*device).set_zc1_callback(DEVCB_##_devcb);
 
 #define MCFG_Z80CTC_ZC2_CB(_devcb) \
-	devcb = &z80ctc_device::set_zc2_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<z80ctc_device &>(*device).set_zc2_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -62,10 +62,10 @@ public:
 	// construction/destruction
 	z80ctc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_intr_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_intr_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_zc0_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_zc0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_zc1_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_zc1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_zc2_callback(device_t &device, Object &&cb) { return downcast<z80ctc_device &>(device).m_zc2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intr_callback(Object &&cb) { return m_intr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_zc0_callback(Object &&cb) { return m_zc0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_zc1_callback(Object &&cb) { return m_zc1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_zc2_callback(Object &&cb) { return m_zc2_cb.set_callback(std::forward<Object>(cb)); }
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( read );

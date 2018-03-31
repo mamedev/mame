@@ -189,33 +189,37 @@ PALETTE_INIT_MEMBER(rt1715_state, rt1715)
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(rt1715_state::rt1715_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
-	AM_RANGE(0x0800, 0xffff) AM_RAMBANK("bank2")
-ADDRESS_MAP_END
+void rt1715_state::rt1715_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).bankr("bank1").bankw("bank3");
+	map(0x0800, 0xffff).bankrw("bank2");
+}
 
-ADDRESS_MAP_START(rt1715_state::rt1715_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("a71", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("a72", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("a30", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE("a26", i8275_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_WRITE(rt1715_floppy_enable)
-	AM_RANGE(0x28, 0x28) AM_WRITE(rt1715_rom_disable)
-ADDRESS_MAP_END
+void rt1715_state::rt1715_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("a71", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x04, 0x07).rw("a72", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x08, 0x0b).rw("a30", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0c, 0x0f).rw("a29", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x18, 0x19).rw("a26", FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x20, 0x20).w(this, FUNC(rt1715_state::rt1715_floppy_enable));
+	map(0x28, 0x28).w(this, FUNC(rt1715_state::rt1715_rom_disable));
+}
 
-ADDRESS_MAP_START(rt1715_state::k7658_mem)
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(k7658_data_w)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xf800) AM_ROM
-ADDRESS_MAP_END
+void rt1715_state::k7658_mem(address_map &map)
+{
+	map(0x0000, 0xffff).w(this, FUNC(rt1715_state::k7658_data_w));
+	map(0x0000, 0x07ff).mirror(0xf800).rom();
+}
 
-ADDRESS_MAP_START(rt1715_state::k7658_io)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x8000) AM_READ(k7658_led1_r)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x8000) AM_READ(k7658_led2_r)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(k7658_data_r)
-ADDRESS_MAP_END
+void rt1715_state::k7658_io(address_map &map)
+{
+	map(0x2000, 0x2000).mirror(0x8000).r(this, FUNC(rt1715_state::k7658_led1_r));
+	map(0x4000, 0x4000).mirror(0x8000).r(this, FUNC(rt1715_state::k7658_led2_r));
+	map(0x8000, 0x9fff).r(this, FUNC(rt1715_state::k7658_data_r));
+}
 
 
 /***************************************************************************

@@ -60,24 +60,25 @@ private:
 };
 
 
-ADDRESS_MAP_START(basic52_state::basic52_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x7fff) AM_RAM
+void basic52_state::basic52_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).ram();
 	//AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(basic52_state::basic52_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)  // PPI-8255
+void basic52_state::basic52_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0x9fff).rom(); // EPROM
+	map(0xa000, 0xa003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));  // PPI-8255
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
-	AM_RANGE(0x20003, 0x20003) AM_READ(unk_r);
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( basic52 )
@@ -107,6 +108,7 @@ MACHINE_CONFIG_START(basic52_state::basic31)
 	MCFG_CPU_ADD("maincpu", I8031, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(basic52_state, unk_r))
 	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 
@@ -123,6 +125,7 @@ MACHINE_CONFIG_START(basic52_state::basic52)
 	MCFG_CPU_REPLACE("maincpu", I8052, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(basic52_state, unk_r))
 	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(basic52_state, from_term))
 MACHINE_CONFIG_END

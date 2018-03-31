@@ -159,40 +159,44 @@ WRITE8_MEMBER(lgp_state::ldp_write)
 
 
 /* PROGRAM MAPS */
-ADDRESS_MAP_START(lgp_state::main_program_map)
-	AM_RANGE(0x0000,0x7fff) AM_ROM
-	AM_RANGE(0xe000,0xe3ff) AM_RAM AM_SHARE("tile_ram")
-	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_SHARE("tile_ctrl_ram")
+void lgp_state::main_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xe3ff).ram().share("tile_ram");
+	map(0xe400, 0xe7ff).ram().share("tile_ctrl_ram");
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
-	AM_RANGE(0xef80,0xef80) AM_READWRITE(ldp_read,ldp_write)
-	AM_RANGE(0xefb8,0xefb8) AM_READNOP // watchdog
-	AM_RANGE(0xefc0,0xefc0) AM_READ_PORT("DSWA")    /* Not tested */
-	AM_RANGE(0xefc8,0xefc8) AM_READ_PORT("DSWB")
-	AM_RANGE(0xefd0,0xefd0) AM_READ_PORT("DSWC")
-	AM_RANGE(0xefd8,0xefd8) AM_READ_PORT("IN0")
-	AM_RANGE(0xefe0,0xefe0) AM_READ_PORT("IN1")
-	AM_RANGE(0xf000,0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xef80, 0xef80).rw(this, FUNC(lgp_state::ldp_read), FUNC(lgp_state::ldp_write));
+	map(0xefb8, 0xefb8).nopr(); // watchdog
+	map(0xefc0, 0xefc0).portr("DSWA");    /* Not tested */
+	map(0xefc8, 0xefc8).portr("DSWB");
+	map(0xefd0, 0xefd0).portr("DSWC");
+	map(0xefd8, 0xefd8).portr("IN0");
+	map(0xefe0, 0xefe0).portr("IN1");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(lgp_state::sound_program_map)
-	AM_RANGE(0x0000,0x3fff) AM_ROM
-	AM_RANGE(0x8000,0x83ff) AM_RAM
-	AM_RANGE(0x8400,0x8407) AM_RAM      /* Needs handler!  Communications? */
-	AM_RANGE(0x8800,0x8803) AM_RAM      /* Needs handler!  Communications? */
-ADDRESS_MAP_END
+void lgp_state::sound_program_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x83ff).ram();
+	map(0x8400, 0x8407).ram();      /* Needs handler!  Communications? */
+	map(0x8800, 0x8803).ram();      /* Needs handler!  Communications? */
+}
 
 
 /* IO MAPS */
-ADDRESS_MAP_START(lgp_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void lgp_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0xfd,0xfd) AM_READ_PORT("IN_TEST")
 //  AM_RANGE(0xfe,0xfe) AM_READ_PORT("IN_TEST")
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(lgp_state::sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void lgp_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 
 /* PORTS */

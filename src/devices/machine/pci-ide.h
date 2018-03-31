@@ -27,7 +27,7 @@ TODO:
 	downcast<ide_pci_device *>(device)->set_irq_info(_cpu_tag, _irq_num);
 
 #define MCFG_IDE_PCI_IRQ_HANDLER(_devcb) \
-	devcb = &ide_pci_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ide_pci_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 // This will set the top 12 bits for address decoding in legacy mode. Needed for seattle driver.
 #define MCFG_IDE_PCI_SET_LEGACY_TOP(_val) \
@@ -42,7 +42,7 @@ public:
 	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_irq_info(const char *tag, const int irq_num);
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ide_pci_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	void set_legacy_top(int val) { m_legacy_top = val & 0xfff; };
 	void set_pif(int val) { m_pif = val & 0xff; };
 

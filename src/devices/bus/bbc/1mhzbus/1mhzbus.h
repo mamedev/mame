@@ -100,10 +100,10 @@
 	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_1mhzbus_slot_device, nmi_w))
 
 #define MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(_devcb) \
-	devcb = &bbc_1mhzbus_slot_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<bbc_1mhzbus_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &bbc_1mhzbus_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<bbc_1mhzbus_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -122,11 +122,8 @@ public:
 	virtual ~bbc_1mhzbus_slot_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<bbc_1mhzbus_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<bbc_1mhzbus_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( rst_w );
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }

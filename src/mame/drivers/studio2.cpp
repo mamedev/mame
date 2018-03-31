@@ -334,43 +334,49 @@ WRITE8_MEMBER( studio2_state::dispon_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(studio2_state::studio2_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x09ff) AM_MIRROR(0xf400) AM_RAM
-ADDRESS_MAP_END
+void studio2_state::studio2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x09ff).mirror(0xf400).ram();
+}
 
-ADDRESS_MAP_START(studio2_state::studio2_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_READ(dispon_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-ADDRESS_MAP_END
+void studio2_state::studio2_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x01, 0x01).r(this, FUNC(studio2_state::dispon_r));
+	map(0x02, 0x02).w(this, FUNC(studio2_state::keylatch_w));
+}
 
-ADDRESS_MAP_START(visicom_state::visicom_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("cartslot", generic_slot_device, read_rom)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM
-	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_SHARE("color0_ram")
-	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_SHARE("color1_ram")
-ADDRESS_MAP_END
+void visicom_state::visicom_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x0fff).r(m_cart, FUNC(generic_slot_device::read_rom));
+	map(0x1000, 0x10ff).ram();
+	map(0x1100, 0x11ff).ram().share("color0_ram");
+	map(0x1300, 0x13ff).ram().share("color1_ram");
+}
 
-ADDRESS_MAP_START(visicom_state::visicom_io_map)
-	AM_RANGE(0x01, 0x01) AM_WRITE(dispon_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-ADDRESS_MAP_END
+void visicom_state::visicom_io_map(address_map &map)
+{
+	map(0x01, 0x01).w(this, FUNC(visicom_state::dispon_w));
+	map(0x02, 0x02).w(this, FUNC(visicom_state::keylatch_w));
+}
 
-ADDRESS_MAP_START(mpt02_state::mpt02_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x09ff) AM_RAM
-	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_SHARE("color_ram")
-	AM_RANGE(0x0c00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void mpt02_state::mpt02_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x09ff).ram();
+	map(0x0b00, 0x0b3f).ram().share("color_ram");
+	map(0x0c00, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(mpt02_state::mpt02_io_map)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispoff_r, tone_latch_w)
-ADDRESS_MAP_END
+void mpt02_state::mpt02_io_map(address_map &map)
+{
+	map(0x01, 0x01).rw(m_cti, FUNC(cdp1864_device::dispon_r), FUNC(cdp1864_device::step_bgcolor_w));
+	map(0x02, 0x02).w(this, FUNC(mpt02_state::keylatch_w));
+	map(0x04, 0x04).rw(m_cti, FUNC(cdp1864_device::dispoff_r), FUNC(cdp1864_device::tone_latch_w));
+}
 
 /* Input Ports */
 

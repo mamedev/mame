@@ -93,7 +93,7 @@ public:
 	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~z88cart_slot_device();
 
-	template <class Object> static devcb_base &set_out_flp_callback(device_t &device, Object &&cb) { return downcast<z88cart_slot_device &>(device).m_out_flp_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_flp_callback(Object &&cb) { return m_out_flp_cb.set_callback(std::forward<Object>(cb)); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -140,6 +140,6 @@ DECLARE_DEVICE_TYPE(Z88CART_SLOT, z88cart_slot_device)
 ***************************************************************************/
 
 #define MCFG_Z88CART_SLOT_OUT_FLP_CB(_devcb) \
-		devcb = &z88cart_slot_device::set_out_flp_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<z88cart_slot_device &>(*device).set_out_flp_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_Z88_Z88_H

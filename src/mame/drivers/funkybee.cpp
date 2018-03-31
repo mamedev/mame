@@ -99,24 +99,26 @@ WRITE_LINE_MEMBER(funkybee_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-ADDRESS_MAP_START(funkybee_state::funkybee_map)
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(funkybee_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(funkybee_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(funkybee_scroll_w)
-	AM_RANGE(0xe800, 0xe807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xf000, 0xf000) AM_READNOP /* IRQ Ack */
-	AM_RANGE(0xf800, 0xf800) AM_READ(funkybee_input_port_0_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+void funkybee_state::funkybee_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xbfff).ram().w(this, FUNC(funkybee_state::funkybee_videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).ram().w(this, FUNC(funkybee_state::funkybee_colorram_w)).share("colorram");
+	map(0xe000, 0xe000).w(this, FUNC(funkybee_state::funkybee_scroll_w));
+	map(0xe800, 0xe807).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf000).nopr(); /* IRQ Ack */
+	map(0xf800, 0xf800).r(this, FUNC(funkybee_state::funkybee_input_port_0_r)).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0xf801, 0xf801).portr("IN1");
+	map(0xf802, 0xf802).portr("IN2");
+}
 
-ADDRESS_MAP_START(funkybee_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void funkybee_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 static INPUT_PORTS_START( funkybee )

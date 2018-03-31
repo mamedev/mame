@@ -307,45 +307,49 @@ WRITE8_MEMBER( tandy2k_state::addr_ctrl_w )
 
 // Memory Maps
 
-ADDRESS_MAP_START(tandy2k_state::tandy2k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
+void tandy2k_state::tandy2k_mem(address_map &map)
+{
+	map.unmap_value_high();
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
-	AM_RANGE(0xe0000, 0xf7fff) AM_RAM AM_SHARE("hires_ram")
-	AM_RANGE(0xf8000, 0xfbfff) AM_READWRITE8(char_ram_r, char_ram_w, 0x00ff)
-	AM_RANGE(0xfc000, 0xfdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION(I80186_TAG, 0)
-ADDRESS_MAP_END
+	map(0xe0000, 0xf7fff).ram().share("hires_ram");
+	map(0xf8000, 0xfbfff).rw(this, FUNC(tandy2k_state::char_ram_r), FUNC(tandy2k_state::char_ram_w)).umask16(0x00ff);
+	map(0xfc000, 0xfdfff).mirror(0x2000).rom().region(I80186_TAG, 0);
+}
 
-ADDRESS_MAP_START(tandy2k_state::tandy2k_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x00001) AM_MIRROR(0x8) AM_READWRITE8(enable_r, enable_w, 0x00ff)
-	AM_RANGE(0x00002, 0x00003) AM_MIRROR(0x8) AM_WRITE8(dma_mux_w, 0x00ff)
-	AM_RANGE(0x00004, 0x00005) AM_MIRROR(0x8) AM_READWRITE8(fldtc_r, fldtc_w, 0x00ff)
-	AM_RANGE(0x00010, 0x00013) AM_MIRROR(0xc) AM_DEVREADWRITE8(I8251A_TAG, i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x00030, 0x00033) AM_MIRROR(0xc) AM_DEVICE8(I8272A_TAG, i8272a_device, map, 0x00ff)
-	AM_RANGE(0x00040, 0x00047) AM_MIRROR(0x8) AM_DEVREADWRITE8(I8253_TAG, pit8253_device, read, write, 0x00ff)
-	AM_RANGE(0x00050, 0x00057) AM_MIRROR(0x8) AM_DEVREADWRITE8(I8255A_TAG, i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x00052, 0x00053) AM_MIRROR(0x8) AM_READ8(kbint_clr_r, 0x00ff)
-	AM_RANGE(0x00060, 0x00063) AM_MIRROR(0xc) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00070, 0x00073) AM_MIRROR(0xc) AM_DEVREADWRITE8(I8259A_1_TAG, pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x00080, 0x00081) AM_MIRROR(0xe) AM_DEVREADWRITE8(I8272A_TAG, i8272a_device, mdma_r, mdma_w, 0x00ff)
+void tandy2k_state::tandy2k_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x00000).mirror(0x8).rw(this, FUNC(tandy2k_state::enable_r), FUNC(tandy2k_state::enable_w));
+	map(0x00002, 0x00002).mirror(0x8).w(this, FUNC(tandy2k_state::dma_mux_w));
+	map(0x00004, 0x00004).mirror(0x8).rw(this, FUNC(tandy2k_state::fldtc_r), FUNC(tandy2k_state::fldtc_w));
+	map(0x00010, 0x00013).mirror(0xc).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0x00ff);
+	map(0x00030, 0x00033).mirror(0xc).m(m_fdc, FUNC(i8272a_device::map)).umask16(0x00ff);
+	map(0x00040, 0x00047).mirror(0x8).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
+	map(0x00050, 0x00057).mirror(0x8).rw(m_i8255a, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x00052, 0x00052).mirror(0x8).r(this, FUNC(tandy2k_state::kbint_clr_r));
+	map(0x00060, 0x00063).mirror(0xc).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00070, 0x00073).mirror(0xc).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x00080, 0x00080).mirror(0xe).rw(m_fdc, FUNC(i8272a_device::mdma_r), FUNC(i8272a_device::mdma_w));
 //  AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_t, read, write, 0x00ff) AM_WRITE8(addr_ctrl_w, 0xff00)
-	AM_RANGE(0x00100, 0x0017f) AM_READWRITE(vpac_r, vpac_w)
+	map(0x00100, 0x0017f).rw(this, FUNC(tandy2k_state::vpac_r), FUNC(tandy2k_state::vpac_w));
 //  AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
 //  AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
 //  AM_RANGE(0x001a0, 0x001a0) AM_READ8(hires_plane_w, 0x00ff)
 //  AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(i186_internal_port_r, i186_internal_port_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(tandy2k_state::tandy2k_hd_io)
-	AM_IMPORT_FROM(tandy2k_io)
+void tandy2k_state::tandy2k_hd_io(address_map &map)
+{
+	tandy2k_io(map);
 //  AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0x00ff)
 //  AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, hdc_reset_r, hdc_reset_w, 0x00ff)
 //  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, wd1010_r, wd1010_w, 0x00ff)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(tandy2k_state::vpac_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(videoram_r)
-ADDRESS_MAP_END
+void tandy2k_state::vpac_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).r(this, FUNC(tandy2k_state::videoram_r));
+}
 
 // Input Ports
 

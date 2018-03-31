@@ -11,7 +11,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_MIDI_RX_HANDLER(_devcb) \
-	devcb = &midi_port_device::set_rx_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<midi_port_device &>(*device).set_rx_handler(DEVCB_##_devcb);
 
 class device_midi_port_interface;
 
@@ -25,7 +25,7 @@ public:
 	virtual ~midi_port_device();
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_rx_handler(device_t &device, Object &&cb) { return downcast<midi_port_device &>(device).m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rx_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
 

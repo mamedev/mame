@@ -224,6 +224,7 @@ DEFINE_DEVICE_TYPE(S3C44B0, s3c44b0_device, "s3c44b0", "Samsung S3C44B0 SoC")
 
 s3c44b0_device::s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, S3C44B0, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 	, m_cpu(nullptr)
 	, m_port_r_cb(*this)
 	, m_port_w_cb(*this)
@@ -747,7 +748,6 @@ READ32_MEMBER( s3c44b0_device::lcd_r )
 
 void s3c44b0_device::lcd_configure()
 {
-	screen_device *screen = machine().first_screen();
 	int dismode, clkval, lineval, wdly, hozval, lineblank, wlh, mclk;
 	double vclk, framerate;
 	int width, height;
@@ -776,7 +776,7 @@ void s3c44b0_device::lcd_configure()
 	height = lineval + 1;
 	m_lcd.framerate = framerate;
 	verboselog( *this, 3, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
-	screen->configure(screen->width(), screen->height(), screen->visible_area(), HZ_TO_ATTOSECONDS(m_lcd.framerate));
+	screen().configure(screen().width(), screen().height(), screen().visible_area(), HZ_TO_ATTOSECONDS(m_lcd.framerate));
 	m_lcd.hpos_min = 25;
 	m_lcd.hpos_max = 25 + width - 1;
 	m_lcd.hpos_end = 25 + width - 1 + 25;
@@ -800,13 +800,12 @@ void s3c44b0_device::lcd_configure()
 
 void s3c44b0_device::lcd_start()
 {
-	screen_device *screen = machine().first_screen();
 	verboselog( *this, 1, "LCD start\n");
 	lcd_configure();
 	lcd_dma_init();
 	m_lcd.vpos = m_lcd.vpos_min;
 	m_lcd.hpos = m_lcd.hpos_min;
-	m_lcd.frame_time = screen->time_until_pos( 0, 0);
+	m_lcd.frame_time = screen().time_until_pos( 0, 0);
 	m_lcd.timer->adjust(m_lcd.frame_time, 0);
 	m_lcd.frame_time = machine().time() + m_lcd.frame_time;
 }

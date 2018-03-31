@@ -404,50 +404,57 @@ public:
 	void zenith_map(address_map &map);
 };
 
-ADDRESS_MAP_START(pc_state::pc8_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pc_state::pc8_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(pc_state::zenith_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xf7fff) AM_RAM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0x8000)
-ADDRESS_MAP_END
+void pc_state::zenith_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xf7fff).ram();
+	map(0xf8000, 0xfffff).rom().region("bios", 0x8000);
+}
 
-ADDRESS_MAP_START(pc_state::pc16_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pc_state::pc16_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(pc_state::pc8_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-ADDRESS_MAP_END
+void pc_state::pc8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+}
 
-ADDRESS_MAP_START(pc_state::pc16_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
-	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
-ADDRESS_MAP_END
+void pc_state::pc16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x0070, 0x007f).ram(); // needed for Poisk-2
+}
 
 READ8_MEMBER(pc_state::unk_r)
 {
 	return 0;
 }
 
-ADDRESS_MAP_START(pc_state::ibm5550_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
-	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
-ADDRESS_MAP_END
+void pc_state::ibm5550_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x00a0, 0x00a0).r(this, FUNC(pc_state::unk_r));
+}
 
-ADDRESS_MAP_START(pc_state::epc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-	AM_RANGE(0x0070, 0x0070) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
-	AM_RANGE(0x0071, 0x0071) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void pc_state::epc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x0070, 0x0070).rw("i8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0071, 0x0071).rw("i8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
 {
@@ -536,22 +543,22 @@ MACHINE_CONFIG_END
 
 void pc_state::cfg_dual_720K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("35dd");
 }
 
 void pc_state::cfg_single_360K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "525dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 void pc_state::cfg_single_720K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 //Data General One
@@ -949,9 +956,9 @@ ROM_END
 
 ROM_START( mc1702 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
-	ROM_LOAD16_BYTE( "2764_2_(573rf4).rom", 0xc000,  0x2000, CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
-	ROM_LOAD16_BYTE( "2764_3_(573rf4).rom", 0xc001, 0x2000, CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
-	ROM_LOAD( "ba1m_(573rf5).rom", 0x0000, 0x0800, CRC(08d938e8) SHA1(957b6c691dbef75c1c735e8e4e81669d056971e4))
+	ROM_LOAD16_BYTE( "2764_2,573rf4.rom", 0xc000,  0x2000, CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
+	ROM_LOAD16_BYTE( "2764_3,573rf4.rom", 0xc001, 0x2000, CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
+	ROM_LOAD( "ba1m,573rf5.rom", 0x0000, 0x0800, CRC(08d938e8) SHA1(957b6c691dbef75c1c735e8e4e81669d056971e4))
 ROM_END
 
 ROM_START( zdsupers )

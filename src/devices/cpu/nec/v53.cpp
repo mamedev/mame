@@ -16,8 +16,8 @@
 
 
 
-DEFINE_DEVICE_TYPE(V53,  v53_device,  "v53",  "V53")
-DEFINE_DEVICE_TYPE(V53A, v53a_device, "v53a", "V53A")
+DEFINE_DEVICE_TYPE(V53,  v53_device,  "v53",  "NEC V53")
+DEFINE_DEVICE_TYPE(V53A, v53a_device, "v53a", "NEC V53A")
 
 WRITE8_MEMBER(v53_base_device::BSEL_w)
 {
@@ -228,7 +228,7 @@ void v53_base_device::device_start()
 	m_out_dack_2_cb.resolve_safe();
 	m_out_dack_3_cb.resolve_safe();
 
-	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(pic8259_device::inta_cb), (pic8259_device*)m_v53icu));
+	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pic8259_device::inta_cb), (pic8259_device*)m_v53icu));
 }
 
 void v53_base_device::install_peripheral_io()

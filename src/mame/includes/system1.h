@@ -16,8 +16,6 @@ public:
 		m_ppi8255(*this, "ppi8255"),
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
-		m_nob_mcu_latch(*this, "nob_mcu_latch"),
-		m_nob_mcu_status(*this, "nob_mcu_status"),
 		m_paletteram(*this, "palette"),
 		m_videomode_custom(nullptr),
 		m_maincpu(*this, "maincpu"),
@@ -39,8 +37,6 @@ public:
 	optional_device<i8255_device>  m_ppi8255;
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	optional_shared_ptr<uint8_t> m_nob_mcu_latch;
-	optional_shared_ptr<uint8_t> m_nob_mcu_status;
 	required_shared_ptr<uint8_t> m_paletteram;
 
 	std::unique_ptr<uint8_t[]> m_videoram;
@@ -50,6 +46,8 @@ public:
 	uint8_t m_videomode_prev;
 	uint8_t m_mcu_control;
 	uint8_t m_nob_maincpu_latch;
+	uint8_t m_nob_mcu_latch;
+	uint8_t m_nob_mcu_status;
 	int m_nobb_inport23_step;
 	std::unique_ptr<uint8_t[]> m_mix_collide;
 	uint8_t m_mix_collide_summary;
@@ -65,8 +63,11 @@ public:
 	DECLARE_READ8_MEMBER(sound_data_r);
 	DECLARE_WRITE8_MEMBER(soundport_w);
 	DECLARE_WRITE8_MEMBER(mcu_control_w);
-	DECLARE_WRITE8_MEMBER(mcu_io_w);
 	DECLARE_READ8_MEMBER(mcu_io_r);
+	DECLARE_WRITE8_MEMBER(mcu_io_w);
+	DECLARE_READ8_MEMBER(nob_mcu_latch_r);
+	DECLARE_WRITE8_MEMBER(nob_mcu_latch_w);
+	DECLARE_WRITE8_MEMBER(nob_mcu_status_w);
 	DECLARE_WRITE8_MEMBER(nob_mcu_control_p2_w);
 	DECLARE_READ8_MEMBER(nob_maincpu_latch_r);
 	DECLARE_WRITE8_MEMBER(nob_maincpu_latch_w);
@@ -192,7 +193,6 @@ public:
 	void banked_decrypted_opcodes_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void mcu_io_map(address_map &map);
-	void nob_mcu_io_map(address_map &map);
 	void nobo_map(address_map &map);
 	void sound_map(address_map &map);
 	void system1_map(address_map &map);

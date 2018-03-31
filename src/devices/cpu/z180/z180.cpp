@@ -78,7 +78,7 @@ Hitachi HD647180 series:
 /* register is calculated as follows: refresh=(Regs.R&127)|(Regs.R2&128)    */
 /****************************************************************************/
 
-DEFINE_DEVICE_TYPE(Z180, z180_device, "z180", "Z180")
+DEFINE_DEVICE_TYPE(Z180, z180_device, "z180", "Zilog Z180")
 
 
 z180_device::z180_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -90,9 +90,9 @@ z180_device::z180_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-util::disasm_interface *z180_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> z180_device::create_disassembler()
 {
-	return new z180_disassembler;
+	return std::make_unique<z180_disassembler>();
 }
 
 #define CF  0x01

@@ -21,16 +21,16 @@
 	MCFG_DEVICE_ADD(_tag, TUBE, 0);
 
 #define MCFG_TUBE_HIRQ_HANDLER(_devcb) \
-	devcb = &tube_device::set_hirq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<tube_device &>(*device).set_hirq_handler(DEVCB_##_devcb);
 
 #define MCFG_TUBE_PNMI_HANDLER(_devcb) \
-	devcb = &tube_device::set_pnmi_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<tube_device &>(*device).set_pnmi_handler(DEVCB_##_devcb);
 
 #define MCFG_TUBE_PIRQ_HANDLER(_devcb) \
-	devcb = &tube_device::set_pirq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<tube_device &>(*device).set_pirq_handler(DEVCB_##_devcb);
 
 #define MCFG_TUBE_DRQ_HANDLER(_devcb) \
-	devcb = &tube_device::set_drq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<tube_device &>(*device).set_drq_handler(DEVCB_##_devcb);
 
 
 
@@ -48,10 +48,10 @@ public:
 	tube_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> static devcb_base &set_hirq_handler(device_t &device, Object &&cb) { return downcast<tube_device &>(device).m_hirq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pnmi_handler(device_t &device, Object &&cb) { return downcast<tube_device &>(device).m_pnmi_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pirq_handler(device_t &device, Object &&cb) { return downcast<tube_device &>(device).m_pirq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<tube_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_hirq_handler(Object &&cb) { return m_hirq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pnmi_handler(Object &&cb) { return m_pnmi_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pirq_handler(Object &&cb) { return m_pirq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(host_r);
 	DECLARE_WRITE8_MEMBER(host_w);

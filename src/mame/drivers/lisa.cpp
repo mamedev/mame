@@ -23,26 +23,29 @@
     ADDRESS MAP
 ***************************************************************************/
 
-ADDRESS_MAP_START(lisa_state::lisa_map)
-	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(lisa_r, lisa_w)           /* no fixed map, we use an MMU */
-ADDRESS_MAP_END
+void lisa_state::lisa_map(address_map &map)
+{
+	map(0x000000, 0xffffff).rw(this, FUNC(lisa_state::lisa_r), FUNC(lisa_state::lisa_w));           /* no fixed map, we use an MMU */
+}
 
-ADDRESS_MAP_START(lisa_state::lisa_fdc_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff) // only 8k of address space
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fdc_ram")             /* RAM (shared with 68000) */
-	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
-	AM_RANGE(0x0800, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")     /* ROM */
-ADDRESS_MAP_END
+void lisa_state::lisa_fdc_map(address_map &map)
+{
+	map.global_mask(0x1fff); // only 8k of address space
+	map(0x0000, 0x03ff).ram().share("fdc_ram");             /* RAM (shared with 68000) */
+	map(0x0400, 0x07ff).rw(this, FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
+	map(0x0800, 0x0fff).noprw();
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");     /* ROM */
+}
 
-ADDRESS_MAP_START(lisa_state::lisa210_fdc_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff) // only 8k of address space
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("fdc_ram")             /* RAM (shared with 68000) */
-	AM_RANGE(0x0400, 0x07ff) AM_NOP                                     /* nothing, or RAM wrap-around ??? */
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
-	AM_RANGE(0x0c00, 0x0fff) AM_NOP                                     /* nothing, or IO port wrap-around ??? */
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")         /* ROM */
-ADDRESS_MAP_END
+void lisa_state::lisa210_fdc_map(address_map &map)
+{
+	map.global_mask(0x1fff); // only 8k of address space
+	map(0x0000, 0x03ff).ram().share("fdc_ram");             /* RAM (shared with 68000) */
+	map(0x0400, 0x07ff).noprw();                                     /* nothing, or RAM wrap-around ??? */
+	map(0x0800, 0x0bff).rw(this, FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
+	map(0x0c00, 0x0fff).noprw();                                     /* nothing, or IO port wrap-around ??? */
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");         /* ROM */
+}
 
 
 
@@ -99,7 +102,7 @@ MACHINE_CONFIG_START(lisa_state::lisa)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
 	MCFG_CPU_PROGRAM_MAP(lisa_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lisa_state,  lisa_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, lisa_state,  lisa_interrupt)
 
 	MCFG_CPU_ADD(COP421_TAG, COP421, 3900000)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
@@ -122,7 +125,7 @@ MACHINE_CONFIG_START(lisa_state::lisa)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(lisa_state, vtmsk_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(lisa_state, hdmsk_w))
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -181,7 +184,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lisa_state::macxl)
 	lisa210(config);
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_SIZE(   768/* ???? */, 447/* ???? */)
 	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)
 MACHINE_CONFIG_END

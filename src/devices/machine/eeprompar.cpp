@@ -110,18 +110,6 @@ eeprom_parallel_28xx_device::eeprom_parallel_28xx_device(const machine_config &m
 
 
 //-------------------------------------------------
-//  static_set_lock_after_write - configuration
-//  helper to enable simulation of external
-//  flip-flop hooked to lock EEPROM after writes
-//-------------------------------------------------
-
-void eeprom_parallel_28xx_device::static_set_lock_after_write(device_t &device, bool lock)
-{
-	downcast<eeprom_parallel_28xx_device &>(device).m_lock_after_write = lock;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -218,7 +206,7 @@ WRITE32_MEMBER(eeprom_parallel_28xx_device::unlock_write32) { oe_w(1); }
 eeprom_parallel_##_lowercase##_device::eeprom_parallel_##_lowercase##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) \
 	: eeprom_parallel_##_baseclass##_device(mconfig, EEPROM_PARALLEL_##_uppercase, tag, owner) \
 { \
-	static_set_size(*this, _cells, _bits); \
+	set_size(_cells, _bits); \
 } \
 DEFINE_DEVICE_TYPE(EEPROM_PARALLEL_##_uppercase, eeprom_parallel_##_lowercase##_device, #_lowercase, "Parallel EEPROM " #_uppercase " (" #_cells "x" #_bits ")")
 

@@ -88,8 +88,8 @@ const int GIEFLAG   = 0x2000;
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(TMS32031, tms32031_device, "tms32031", "TMS32031")
-DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "TMS32032")
+DEFINE_DEVICE_TYPE(TMS32031, tms32031_device, "tms32031", "Texas Instruments TMS32031")
+DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "Texas Instruments TMS32032")
 
 
 // internal memory maps
@@ -558,9 +558,9 @@ void tms3203x_device::state_string_export(const device_state_entry &entry, std::
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *tms3203x_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms3203x_device::create_disassembler()
 {
-	return new tms32031_disassembler;
+	return std::make_unique<tms32031_disassembler>();
 }
 
 

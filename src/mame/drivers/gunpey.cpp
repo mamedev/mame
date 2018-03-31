@@ -5,8 +5,14 @@
     Gunpey (c) 2000 Banpresto
 
     TODO:
-    - compression scheme used by the Axell video chip, game is playable but several gfxs are
-      still broken.
+    - Implement correct Axell video chip decompression scheme, currently using decompressed
+      data extracted from the PCB (for reference)
+    - Framebuffer is actually in the same DRAM as the blitter data gets copied to, not a
+      separate RAM.  It (and the double buffered copy) appear near the top right of the
+      framebuffer, so there are likely registers to control this that need finding.
+    - Other sprite modes supported by the video chip (not used here?)
+    - Check zooming precision against hardware
+    - Cleanup (still a lot of debug code in here)
 
 =============================================================================================
 ASM code study:
@@ -205,17 +211,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_wram(*this, "wram"),
-		m_palette(*this, "palette")
-		{ }
+		m_palette(*this, "palette"),
+		m_pre_index(*this, "pre_index"),
+		m_pre_data(*this, "pre_data")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki;
-	required_shared_ptr<uint16_t> m_wram;
-	required_device<palette_device> m_palette;
-
-	std::unique_ptr<uint16_t[]> m_blit_buffer;
-	uint16_t m_blit_ram[0x10];
-	uint8_t m_irq_cause, m_irq_mask;
 	DECLARE_WRITE8_MEMBER(status_w);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(inputs_r);
@@ -230,8 +230,14 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);
+
+	void gunpey(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+private:
+
 	void irq_check(uint8_t irq_type);
-	uint8_t draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient);
+	uint8_t draw_gfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int count, uint8_t scene_gradient);
 	uint16_t m_vram_bank;
 	uint16_t m_vreg_addr;
 
@@ -267,10 +273,22 @@ public:
 	uint32_t get_stream_bits(int bits);
 
 	int write_dest_byte(uint8_t usedata);
-	void gunpey(machine_config &config);
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
 	//uint16_t main_m_vram[0x800][0x800];
+
+	uint16_t m_blit_ram[0x10];
+	uint8_t m_irq_cause, m_irq_mask;
+	std::unique_ptr<uint16_t[]> m_blit_buffer;
+
+
+	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
+	required_shared_ptr<uint16_t> m_wram;
+	required_device<palette_device> m_palette;
+
+	// compression workaround
+	void replace_decompressed_sprite(void);
+	required_region_ptr<uint8_t> m_pre_index;
+	required_region_ptr<uint8_t> m_pre_data;
 };
 
 
@@ -286,7 +304,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 	int x,y;
 	int bpp_sel;
 	int color;
-
+	const int ZOOM_SHIFT = 15;
 	// there doesn't seem to be a specific bit to mark compressed sprites (we currently have a hack to look at the first byte of the data)
 	// do they get decompressed at blit time instead? of are there other registers we need to look at
 
@@ -316,21 +334,26 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 	{
 		x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
 		y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
-		uint8_t zoomheight = (m_wram[count+5] >> 8);
-		uint8_t zoomwidth = (m_wram[count+5] & 0xff);
+		uint32_t zoomheight = (m_wram[count+5] >> 8);
+		uint32_t zoomwidth = (m_wram[count+5] & 0xff);
 		bpp_sel = (m_wram[count+0] & 0x18);
 		color = (m_wram[count+0] >> 8);
 
 		x-=0x160;
 		y-=0x188;
 
-		uint8_t sourcewidth  = (m_wram[count+6] & 0xff);
-		uint8_t sourceheight = (m_wram[count+7] >> 8);
+		uint32_t sourcewidth  = (m_wram[count+6] & 0xff)<<ZOOM_SHIFT;
+		uint32_t sourceheight = (m_wram[count+7] >> 8)<<ZOOM_SHIFT;
 		int xsource = ((m_wram[count+2] & 0x003f) << 5) | ((m_wram[count+1] & 0xf800) >> 11);
 		int ysource = ((m_wram[count+3] & 0x001f) << 6) | ((m_wram[count+2] & 0xfc00) >> 10);
 
 		int alpha =  m_wram[count+1] & 0x1f;
 
+		uint32_t widthstep = 1<<ZOOM_SHIFT;
+		uint32_t heightstep = 1<<ZOOM_SHIFT;
+
+		if (zoomwidth) widthstep = sourcewidth / zoomwidth;
+		if (zoomheight) heightstep = sourceheight / zoomheight;
 
 		uint16_t unused;
 		if (debug) printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
@@ -344,26 +367,41 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 		unused = m_wram[count+6]&~0x00ff; if (unused) printf("unused bits set in word 6 - %04x\n", unused);
 		unused = m_wram[count+7]&~0xff00; if (unused) printf("unused bits set in word 7 - %04x\n", unused);
 
-		if ((zoomwidth != sourcewidth) || (zoomheight != sourceheight))
+		if (((zoomwidth<<ZOOM_SHIFT) != sourcewidth) || ((zoomheight<<ZOOM_SHIFT) != sourceheight))
 		{
-			//printf("zoomed widths %02x %02x heights %02x %02x\n", sourcewidth, zoomwidth, sourceheight, zoomheight);
+		//  printf("sw %08x zw %08x sh %08x zh %08x heightstep %08x widthstep %08x \n", sourcewidth, zoomwidth<<ZOOM_SHIFT, sourceheight, zoomheight<<ZOOM_SHIFT, heightstep, widthstep );
 		}
 
 		if(bpp_sel == 0x00)  // 4bpp
 		{
-			for(int yi=0;yi<sourceheight;yi++)
+			int ysourceoff = 0;
+			for(int yi=0;yi<zoomheight;yi++)
 			{
-				for(int xi=0;xi<sourcewidth/2;xi++)
+				int yi2 = ysourceoff>>ZOOM_SHIFT;
+				int xsourceoff = 0;
+
+				for(int xi=0;xi<zoomwidth;xi++)
 				{
-					uint8_t data = m_vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					int xi2 = xsourceoff>>ZOOM_SHIFT;
+					uint8_t data = m_vram[((((ysource + yi2) & 0x7ff) * 0x800) + ((xsource + (xi2/2)) & 0x7ff))];
 					uint8_t pix;
 					uint32_t col_offs;
 					uint16_t color_data;
 
-					pix = (data & 0x0f);
-					col_offs = ((pix + color*0x10) & 0xff) << 1;
-					col_offs+= ((pix + color*0x10) >> 8)*0x800;
-					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
+					if (xi2 & 1)
+					{
+						pix = (data & 0xf0)>>4;
+						col_offs = ((pix + color*0x10) & 0xff) << 1;
+						col_offs+= ((pix + color*0x10) >> 8)*0x800;
+						color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
+					}
+					else
+					{
+						pix = (data & 0x0f);
+						col_offs = ((pix + color*0x10) & 0xff) << 1;
+						col_offs+= ((pix + color*0x10) >> 8)*0x800;
+						color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
+					}
 
 					if(!(color_data & 0x8000))
 					{
@@ -384,15 +422,15 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
 						}
 
-						if(cliprect.contains(x+(xi*2), y+yi))
+						if(cliprect.contains(x+xi, y+yi))
 						{
 							if (alpha==0x00) // a value of 0x00 is solid
 							{
-								bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
 							}
 							else
 							{
-								uint16_t basecolor = bitmap.pix16(y+yi, x+(xi*2));
+								uint16_t basecolor = bitmap.pix16(y+yi, x+xi);
 								int base_r = ((basecolor >> 10)&0x1f)*alpha;
 								int base_g = ((basecolor >> 5)&0x1f)*alpha;
 								int base_b = ((basecolor >> 0)&0x1f)*alpha;
@@ -403,90 +441,33 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 								g = (base_g+g)/0x1f;
 								b = (base_b+b)/0x1f;
 								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-								bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
 							}
 						}
 					}
-
-					pix = (data & 0xf0)>>4;
-					col_offs = ((pix + color*0x10) & 0xff) << 1;
-					col_offs+= ((pix + color*0x10) >> 8)*0x800;
-					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
-
-					if(!(color_data & 0x8000))
-					{
-						if(scene_gradient & 0x40)
-						{
-							int r,g,b;
-
-							r = (color_data & 0x7c00) >> 10;
-							g = (color_data & 0x03e0) >> 5;
-							b = (color_data & 0x001f) >> 0;
-							r-= (scene_gradient & 0x1f);
-							g-= (scene_gradient & 0x1f);
-							b-= (scene_gradient & 0x1f);
-							if(r < 0) r = 0;
-							if(g < 0) g = 0;
-							if(b < 0) b = 0;
-
-							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-						}
-
-						if(cliprect.contains(x+1+(xi*2),y+yi))
-						{
-							if (alpha==0x00) // a value of 0x00 is solid
-							{
-								bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
-							}
-							else
-							{
-								uint16_t basecolor = bitmap.pix16(y+yi, x+1+(xi*2));
-								int base_r = ((basecolor >> 10)&0x1f)*alpha;
-								int base_g = ((basecolor >> 5)&0x1f)*alpha;
-								int base_b = ((basecolor >> 0)&0x1f)*alpha;
-								int r = ((color_data & 0x7c00) >> 10)*(0x1f-alpha);
-								int g = ((color_data & 0x03e0) >> 5)*(0x1f-alpha);
-								int b = ((color_data & 0x001f) >> 0)*(0x1f-alpha);
-								r = (base_r+r)/0x1f;
-								g = (base_g+g)/0x1f;
-								b = (base_b+b)/0x1f;
-								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
-								bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
-							}
-
-						}
-
-					}
+					xsourceoff += widthstep;
 				}
+				ysourceoff += heightstep;
 			}
 		}
 		else if(bpp_sel == 0x08) // 6bpp
 		{
+			// not used by Gunpey?
 			printf("6bpp\n");
-			#if 0
-			for(int yi=0;yi<sourceheight;yi++)
-			{
-				for(int xi=0;xi<sourcewidth;xi++)
-				{
-					uint8_t data = m_vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
-					uint8_t pix;
-					uint32_t col_offs;
-					uint16_t color_data;
-
-					pix = (data & 0x3f);
-					if(cliprect.contains(x+xi, y+yi))
-						bitmap.pix16(y+yi, x+xi) = pix + color*64;
-				}
-			}
-			#endif
 		}
 		else if(bpp_sel == 0x10) // 8bpp
 		{
-			for(int yi=0;yi<sourceheight;yi++)
+			int ysourceoff = 0;
+			for(int yi=0;yi<zoomheight;yi++)
 			{
-				for(int xi=0;xi<sourcewidth;xi++)
+				int yi2 = ysourceoff>>ZOOM_SHIFT;
+				int xsourceoff = 0;
+
+				for(int xi=0;xi<zoomwidth;xi++)
 				{
-					uint8_t data = m_vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					int xi2 = xsourceoff>>ZOOM_SHIFT;
+
+					uint8_t data = m_vram[((((ysource+yi2)&0x7ff)*0x800) + ((xsource+xi2)&0x7ff))];
 					uint8_t pix;
 					uint32_t col_offs;
 					uint16_t color_data;
@@ -515,8 +496,6 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
 						}
 
-
-
 						if(cliprect.contains(x+xi,y+yi))
 						{
 							if (alpha==0x00) // a value of 0x00 is solid
@@ -538,15 +517,16 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
 								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
 							}
-
 						}
-
 					}
+					xsourceoff += widthstep;
 				}
+				ysourceoff += heightstep;
 			}
 		}
 		else if(bpp_sel == 0x18) // RGB32k
 		{
+			// not used by Gunpey?
 			printf("32k\n");
 			// ...
 		}
@@ -1082,7 +1062,76 @@ ooutcount was 51
 
 //#define SHOW_COMPRESSED_DATA_DEBUG
 
+void gunpey_state::replace_decompressed_sprite(void)
+{
+	m_srcx = m_blit_ram[0x04] + (m_blit_ram[0x05] << 8);
+	m_srcy = m_blit_ram[0x06] + (m_blit_ram[0x07] << 8);
+	m_dstx = m_blit_ram[0x08] + (m_blit_ram[0x09] << 8);
+	m_dsty = m_blit_ram[0x0a] + (m_blit_ram[0x0b] << 8);
+	m_xsize = m_blit_ram[0x0c] + 1;
+	m_ysize = m_blit_ram[0x0e] + 1;
 
+	m_dstx <<= 1;
+	m_xsize <<= 1;
+
+	int i = 0;
+
+	for (;;)
+	{
+		uint16_t lookupx, lookupy;
+		uint32_t lookupoffset;
+
+		lookupx = (m_pre_index[i + 0] << 8) | (m_pre_index[i + 1] << 0);
+		lookupy = (m_pre_index[i + 2] << 8) | (m_pre_index[i + 3] << 0);
+		lookupoffset = (m_pre_index[i + 4] << 24) | (m_pre_index[i + 5] << 16) | (m_pre_index[i + 6] << 8) | (m_pre_index[i + 7] << 0);
+
+		// reached end up list without finding anything (shouldn't happen)
+		if ((lookupx == 0xffff) && (lookupy == 0xffff) && (lookupoffset == 0xffffffff))
+		{
+			//fatalerror("sprite replacement not found");
+			break;
+		}
+
+		if ((lookupx == m_srcx) && (lookupy == m_srcy))
+		{
+			m_dstxbase = m_dstx;
+			m_dstxcount = 0;
+			m_dstycount = 0;
+			m_srcxbase = m_srcx;
+			m_scrxcount = 0;
+			m_srcycount = 0;
+
+			for (;;)
+			{
+				uint8_t usedata = 0;
+
+				if (lookupoffset < 0x4c110a)
+				{
+					usedata = m_pre_data[lookupoffset++];
+				}
+				else
+				{
+					//fatalerror("out of data\n");
+				}
+
+				m_srcx++; m_scrxcount++;
+				if (m_scrxcount == m_xsize)
+				{
+					m_scrxcount = 0;
+					m_srcx = m_srcxbase;
+					m_srcy++; m_srcycount++;
+				}
+
+				if ((write_dest_byte(usedata)) == -1)
+					break;
+			}
+
+			break;
+		}
+
+		i += 8;
+	}
+}
 
 WRITE8_MEMBER(gunpey_state::blitter_w)
 {
@@ -1100,14 +1149,14 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 		m_dsty = blit_ram[0x0a]+(blit_ram[0x0b]<<8);
 		m_xsize = blit_ram[0x0c]+1;
 		m_ysize = blit_ram[0x0e]+1;
-		int rle = blit_ram[0x01];
+		int compression = blit_ram[0x01];
 
 		m_dstx<<=1;
 		m_xsize<<=1;
 
-		if(rle)
+		if(compression)
 		{
-			if(rle == 8)
+			if(compression == 8)
 			{
 				// compressed stream format:
 				//
@@ -1223,9 +1272,11 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 				printf("\n");
 #endif
 
+				replace_decompressed_sprite();
+
 			}
 			else
-				printf("unknown RLE mode %02x\n",rle);
+				printf("unknown compression mode %02x\n",compression);
 		}
 		else
 		{
@@ -1295,31 +1346,33 @@ WRITE16_MEMBER(gunpey_state::vregs_addr_w)
 
 /***************************************************************************************/
 
-ADDRESS_MAP_START(gunpey_state::mem_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("wram")
+void gunpey_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram().share("wram");
 //  AM_RANGE(0x50000, 0x500ff) AM_RAM
 //  AM_RANGE(0x50100, 0x502ff) AM_NOP
-	AM_RANGE(0x80000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x80000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(gunpey_state::io_map)
-	AM_RANGE(0x7f40, 0x7f45) AM_READ8(inputs_r,0xffff)
+void gunpey_state::io_map(address_map &map)
+{
+	map(0x7f40, 0x7f45).r(this, FUNC(gunpey_state::inputs_r));
 
-	AM_RANGE(0x7f48, 0x7f49) AM_WRITE8(output_w,0x00ff)
-	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff)
+	map(0x7f48, 0x7f48).w(this, FUNC(gunpey_state::output_w));
+	map(0x7f80, 0x7f81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 
-	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x7f88, 0x7f88).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(status_r, status_w, 0xffff )
-	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(blitter_w, 0xffff )
-	AM_RANGE(0x7fe0, 0x7fe5) AM_WRITE8(blitter_upper_w, 0xffff )
-	AM_RANGE(0x7ff0, 0x7ff5) AM_WRITE8(blitter_upper2_w, 0xffff )
+	map(0x7fc8, 0x7fc9).rw(this, FUNC(gunpey_state::status_r), FUNC(gunpey_state::status_w));
+	map(0x7fd0, 0x7fdf).w(this, FUNC(gunpey_state::blitter_w));
+	map(0x7fe0, 0x7fe5).w(this, FUNC(gunpey_state::blitter_upper_w));
+	map(0x7ff0, 0x7ff5).w(this, FUNC(gunpey_state::blitter_upper2_w));
 
 	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
-	AM_RANGE(0x7fec, 0x7fed) AM_WRITE(vregs_addr_w)
-	AM_RANGE(0x7fee, 0x7fef) AM_WRITE(vram_bank_w)
+	map(0x7fec, 0x7fed).w(this, FUNC(gunpey_state::vregs_addr_w));
+	map(0x7fee, 0x7fef).w(this, FUNC(gunpey_state::vram_bank_w));
 
-ADDRESS_MAP_END
+}
 
 
 /***************************************************************************************/
@@ -1491,8 +1544,14 @@ ROM_START( gunpey )
 
 	ROM_REGION( 0x400000, "oki", 0 )
 	ROM_LOAD( "gp_rom5.622",  0x000000, 0x400000,  CRC(f79903e0) SHA1(4fd50b4138e64a48ec1504eb8cd172a229e0e965)) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
-ROM_END
 
+
+	ROM_REGION( 0x3088, "pre_index", 0 )
+	ROM_LOAD( "tableoutput.bin",  0x000000, 0x3088, CRC(39c6dd4f) SHA1(61697ad9167e75f321d0cbd1cc98a3aeefb8370f) )
+
+	ROM_REGION( 0x4c110a, "pre_data", 0 )
+	ROM_LOAD( "dataoutput.bin",  0x000000, 0x4c110a, CRC(eaff7bb8) SHA1(83afdcabb59d202398b1793f1f60052556dd1811) )
+ROM_END
 
 
 DRIVER_INIT_MEMBER(gunpey_state,gunpey)
@@ -1504,4 +1563,4 @@ DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 	// ...
 }
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Banpresto", "Gunpey (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Bandai / Banpresto", "Gunpey (Japan)", 0 )

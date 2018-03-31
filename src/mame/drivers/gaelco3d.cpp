@@ -668,64 +668,81 @@ WRITE_LINE_MEMBER(gaelco3d_state::unknown_13a_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(gaelco3d_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x51000c, 0x51000d) AM_READ_PORT("IN0")
-	AM_RANGE(0x51001c, 0x51001d) AM_READ_PORT("IN1")
-	AM_RANGE(0x51002c, 0x51002d) AM_READ_PORT("IN2")
-	AM_RANGE(0x51003c, 0x51003d) AM_READ_PORT("IN3")
-	AM_RANGE(0x510040, 0x510041) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x510042, 0x510043) AM_READ(sound_status_r)
-	AM_RANGE(0x510100, 0x510101) AM_READWRITE(eeprom_data_r, irq_ack_w)
-	AM_RANGE(0x510102, 0x510103) AM_DEVREAD8("serial", gaelco_serial_device, data_r, 0x00ff)
-	;map(0x510102, 0x510103).select(0x000038).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_d0(space, offset >> 2, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0x510104, 0x510105) AM_DEVWRITE8("serial", gaelco_serial_device, data_w, 0x00ff)
-	;map(0x510106, 0x510107).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 3, data, mem_mask); }).umask16(0x00ff);
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
-	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_SHARE("tms_comm_base")
-ADDRESS_MAP_END
+void gaelco3d_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).rom();
+	map(0x400000, 0x40ffff).ram().w(this, FUNC(gaelco3d_state::gaelco3d_paletteram_w)).share("paletteram");
+	map(0x51000c, 0x51000d).portr("IN0");
+	map(0x51001c, 0x51001d).portr("IN1");
+	map(0x51002c, 0x51002d).portr("IN2");
+	map(0x51003c, 0x51003d).portr("IN3");
+	map(0x510041, 0x510041).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x510042, 0x510043).r(this, FUNC(gaelco3d_state::sound_status_r));
+	map(0x510100, 0x510101).rw(this, FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
+	map(0x510103, 0x510103).r(m_serial, FUNC(gaelco_serial_device::data_r));
+	map(0x510103, 0x510103).select(0x000038).lw8("mainlatch_w",
+												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+													 m_mainlatch->write_d0(space, offset >> 2, data, mem_mask);
+												 });
+	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
+	map(0x510107, 0x510107).select(0x000070).lw8("outlatch_w",
+												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
+												 });
+	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
+	map(0xfe7f80, 0xfe7fff).w(this, FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
+}
 
 
-ADDRESS_MAP_START(gaelco3d_state::main020_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_020_w) AM_SHARE("paletteram")
-	AM_RANGE(0x51000c, 0x51000f) AM_READ_PORT("IN0")
-	AM_RANGE(0x51001c, 0x51001f) AM_READ_PORT("IN1")
-	AM_RANGE(0x51002c, 0x51002f) AM_READ_PORT("IN2")
-	AM_RANGE(0x51003c, 0x51003f) AM_READ_PORT("IN3")
-	AM_RANGE(0x510041, 0x510041) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x510042, 0x510043) AM_READ(sound_status_r)
-	AM_RANGE(0x510100, 0x510101) AM_READWRITE(eeprom_data_r, irq_ack_w)
-	AM_RANGE(0x510103, 0x510103) AM_DEVREAD("serial", gaelco_serial_device, data_r)
-	;map(0x510103, 0x510103).select(0x000038).lw8("mainlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_mainlatch->write_d0(space, offset >> 1, data, mem_mask); });
-	AM_RANGE(0x510105, 0x510105) AM_DEVWRITE("serial", gaelco_serial_device, data_w)
-	;map(0x510107, 0x510107).select(0x000070).lw8("outlatch_w", [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){ m_outlatch->write_d0(space, offset >> 2, data, mem_mask); });
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
-	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_SHARE("tms_comm_base")
-ADDRESS_MAP_END
+void gaelco3d_state::main020_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x400000, 0x40ffff).ram().w(this, FUNC(gaelco3d_state::gaelco3d_paletteram_020_w)).share("paletteram");
+	map(0x51000c, 0x51000f).portr("IN0");
+	map(0x51001c, 0x51001f).portr("IN1");
+	map(0x51002c, 0x51002f).portr("IN2");
+	map(0x51003c, 0x51003f).portr("IN3");
+	map(0x510041, 0x510041).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x510042, 0x510043).r(this, FUNC(gaelco3d_state::sound_status_r));
+	map(0x510100, 0x510101).rw(this, FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
+	map(0x510103, 0x510103).r(m_serial, FUNC(gaelco_serial_device::data_r));
+	map(0x510103, 0x510103).select(0x000038).lw8("mainlatch_w",
+												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+													 m_mainlatch->write_d0(space, offset >> 1, data, mem_mask);
+												 });
+	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
+	map(0x510107, 0x510107).select(0x000070).lw8("outlatch_w",
+												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+													 m_outlatch->write_d0(space, offset >> 2, data, mem_mask);
+												 });
+	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
+	map(0xfe7f80, 0xfe7fff).w(this, FUNC(gaelco3d_state::tms_comm_w)).share("tms_comm_base");
+}
 
-ADDRESS_MAP_START(gaelco3d_state::tms_map)
-	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(tms_m68k_ram_r, tms_m68k_ram_w)
-	AM_RANGE(0x400000, 0x7fffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(gaelco3d_render_w)
-ADDRESS_MAP_END
+void gaelco3d_state::tms_map(address_map &map)
+{
+	map(0x000000, 0x007fff).rw(this, FUNC(gaelco3d_state::tms_m68k_ram_r), FUNC(gaelco3d_state::tms_m68k_ram_w));
+	map(0x400000, 0x7fffff).rom().region("user2", 0);
+	map(0xc00000, 0xc00007).w(this, FUNC(gaelco3d_state::gaelco3d_render_w));
+}
 
 
-ADDRESS_MAP_START(gaelco3d_state::adsp_program_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("adsp_ram_base")       /* 1k words internal RAM */
-	AM_RANGE(0x37ff, 0x37ff) AM_READNOP                         /* speedup hammers this for no apparent reason */
-ADDRESS_MAP_END
+void gaelco3d_state::adsp_program_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("adsp_ram_base");       /* 1k words internal RAM */
+	map(0x37ff, 0x37ff).nopr();                         /* speedup hammers this for no apparent reason */
+}
 
-ADDRESS_MAP_START(gaelco3d_state::adsp_data_map)
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(adsp_rombank_w)
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x2000, 0x2000) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(sound_status_w)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("adsp_fastram")    /* 512 words internal RAM */
-	AM_RANGE(0x3fe0, 0x3fff) AM_WRITE(adsp_control_w) AM_SHARE("adsp_regs")
-ADDRESS_MAP_END
+void gaelco3d_state::adsp_data_map(address_map &map)
+{
+	map(0x0000, 0x0001).w(this, FUNC(gaelco3d_state::adsp_rombank_w));
+	map(0x0000, 0x1fff).bankr("bank1");
+	map(0x2000, 0x2000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).umask16(0x00ff);
+	map(0x2000, 0x2000).w(this, FUNC(gaelco3d_state::sound_status_w));
+	map(0x3800, 0x39ff).ram().share("adsp_fastram");    /* 512 words internal RAM */
+	map(0x3fe0, 0x3fff).w(this, FUNC(gaelco3d_state::adsp_control_w)).share("adsp_regs");
+}
 
 
 

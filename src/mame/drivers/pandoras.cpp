@@ -117,57 +117,62 @@ WRITE_LINE_MEMBER(pandoras_state::coin_counter_2_w)
 }
 
 
-ADDRESS_MAP_START(pandoras_state::pandoras_master_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("spriteram")               /* Work RAM (Shared with CPU B) */
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("colorram") /* Color RAM (shared with CPU B) */
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("videoram") /* Video RAM (shared with CPU B) */
-	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)               /* INT control */
-	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(pandoras_scrolly_w)                                   /* bg scroll */
-	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)                            /* cause INT on the Z80 */
-	AM_RANGE(0x1e00, 0x1e00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)                                            /* sound command to the Z80 */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(pandoras_cpub_irqtrigger_w)                           /* cause FIRQ on CPU B */
-	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)        /* watchdog reset */
-	AM_RANGE(0x4000, 0x5fff) AM_ROM                                                         /* space for diagnostic ROM */
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("share4")                                      /* Shared RAM with CPU B */
-	AM_RANGE(0x8000, 0xffff) AM_ROM                                                         /* ROM */
-ADDRESS_MAP_END
+void pandoras_state::pandoras_master_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("spriteram");               /* Work RAM (Shared with CPU B) */
+	map(0x1000, 0x13ff).ram().w(this, FUNC(pandoras_state::pandoras_cram_w)).share("colorram"); /* Color RAM (shared with CPU B) */
+	map(0x1400, 0x17ff).ram().w(this, FUNC(pandoras_state::pandoras_vram_w)).share("videoram"); /* Video RAM (shared with CPU B) */
+	map(0x1800, 0x1807).w("mainlatch", FUNC(ls259_device::write_d0));               /* INT control */
+	map(0x1a00, 0x1a00).w(this, FUNC(pandoras_state::pandoras_scrolly_w));                                   /* bg scroll */
+	map(0x1c00, 0x1c00).w(this, FUNC(pandoras_state::pandoras_z80_irqtrigger_w));                            /* cause INT on the Z80 */
+	map(0x1e00, 0x1e00).w("soundlatch", FUNC(generic_latch_8_device::write));                                            /* sound command to the Z80 */
+	map(0x2000, 0x2000).w(this, FUNC(pandoras_state::pandoras_cpub_irqtrigger_w));                           /* cause FIRQ on CPU B */
+	map(0x2001, 0x2001).w("watchdog", FUNC(watchdog_timer_device::reset_w));        /* watchdog reset */
+	map(0x4000, 0x5fff).rom();                                                         /* space for diagnostic ROM */
+	map(0x6000, 0x67ff).ram().share("share4");                                      /* Shared RAM with CPU B */
+	map(0x8000, 0xffff).rom();                                                         /* ROM */
+}
 
-ADDRESS_MAP_START(pandoras_state::pandoras_slave_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("spriteram")                                       /* Work RAM (Shared with CPU A) */
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("colorram")             /* Color RAM (shared with CPU A) */
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("videoram")             /* Video RAM (shared with CPU A) */
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE("mainlatch", ls259_device, write_d0)               /* INT control */
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1a01, 0x1a01) AM_READ_PORT("P1")
-	AM_RANGE(0x1a02, 0x1a02) AM_READ_PORT("P2")
-	AM_RANGE(0x1a03, 0x1a03) AM_READ_PORT("DSW3")
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2")
+void pandoras_state::pandoras_slave_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("spriteram");                                       /* Work RAM (Shared with CPU A) */
+	map(0x1000, 0x13ff).ram().w(this, FUNC(pandoras_state::pandoras_cram_w)).share("colorram");             /* Color RAM (shared with CPU A) */
+	map(0x1400, 0x17ff).ram().w(this, FUNC(pandoras_state::pandoras_vram_w)).share("videoram");             /* Video RAM (shared with CPU A) */
+	map(0x1800, 0x1800).portr("DSW1");
+	map(0x1800, 0x1807).w("mainlatch", FUNC(ls259_device::write_d0));               /* INT control */
+	map(0x1a00, 0x1a00).portr("SYSTEM");
+	map(0x1a01, 0x1a01).portr("P1");
+	map(0x1a02, 0x1a02).portr("P2");
+	map(0x1a03, 0x1a03).portr("DSW3");
+	map(0x1c00, 0x1c00).portr("DSW2");
 //  AM_RANGE(0x1e00, 0x1e00) AM_READNOP                                                     /* ??? seems to be important */
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)        /* watchdog reset */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(pandoras_cpua_irqtrigger_w)                           /* cause FIRQ on CPU A */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share4")                                      /* Shared RAM with the CPU A */
-	AM_RANGE(0xe000, 0xffff) AM_ROM                                                         /* ROM */
-ADDRESS_MAP_END
+	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));        /* watchdog reset */
+	map(0xa000, 0xa000).w(this, FUNC(pandoras_state::pandoras_cpua_irqtrigger_w));                           /* cause FIRQ on CPU A */
+	map(0xc000, 0xc7ff).ram().share("share4");                                      /* Shared RAM with the CPU A */
+	map(0xe000, 0xffff).rom();                                                         /* ROM */
+}
 
-ADDRESS_MAP_START(pandoras_state::pandoras_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM                                                         /* ROM */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM                                                         /* RAM */
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_device, address_w)                          /* AY-8910 */
-	AM_RANGE(0x6001, 0x6001) AM_DEVREAD("aysnd", ay8910_device, data_r)                                   /* AY-8910 */
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("aysnd", ay8910_device, data_w)                         /* AY-8910 */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(pandoras_i8039_irqtrigger_w)                          /* cause INT on the 8039 */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)      /* sound command to the 8039 */
-ADDRESS_MAP_END
+void pandoras_state::pandoras_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();                                                         /* ROM */
+	map(0x2000, 0x23ff).ram();                                                         /* RAM */
+	map(0x4000, 0x4000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x6000, 0x6000).w("aysnd", FUNC(ay8910_device::address_w));                          /* AY-8910 */
+	map(0x6001, 0x6001).r("aysnd", FUNC(ay8910_device::data_r));                                   /* AY-8910 */
+	map(0x6002, 0x6002).w("aysnd", FUNC(ay8910_device::data_w));                         /* AY-8910 */
+	map(0x8000, 0x8000).w(this, FUNC(pandoras_state::pandoras_i8039_irqtrigger_w));                          /* cause INT on the 8039 */
+	map(0xa000, 0xa000).w("soundlatch2", FUNC(generic_latch_8_device::write));      /* sound command to the 8039 */
+}
 
-ADDRESS_MAP_START(pandoras_state::pandoras_i8039_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void pandoras_state::pandoras_i8039_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(pandoras_state::pandoras_i8039_io_map)
-	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void pandoras_state::pandoras_i8039_io_map(address_map &map)
+{
+	map(0x00, 0xff).r("soundlatch2", FUNC(generic_latch_8_device::read));
+}
 
 
 /***************************************************************************

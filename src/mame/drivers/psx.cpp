@@ -503,13 +503,15 @@ void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
 
-ADDRESS_MAP_START(psx1_state::psx_map)
-	AM_RANGE(0x1f000000, 0x1f07ffff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
-ADDRESS_MAP_END
+void psx1_state::psx_map(address_map &map)
+{
+	map(0x1f000000, 0x1f07ffff).rw(this, FUNC(psx1_state::parallel_r), FUNC(psx1_state::parallel_w));
+}
 
-ADDRESS_MAP_START(psx1_state::subcpu_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void psx1_state::subcpu_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
 MACHINE_CONFIG_START(psx1_state::psj)
 	/* basic machine hardware */
@@ -632,7 +634,7 @@ ROM_START( psj )
 	ROMX_LOAD( "ps-40j.bin",    0x000000, 0x080000, CRC(ec541cd0) SHA1(77b10118d21ac7ffa9b35f9c4fd814da240eb3e9), ROM_BIOS(7) )
 
 	ROM_SYSTEM_BIOS( 7, "4.1a", "SCPH-7000W (Version 4.1 11/14/97 A)" ) // 04121995
-	ROMX_LOAD( "ps-41a(w).bin", 0x000000, 0x080000, CRC(b7c43dad) SHA1(1b0dbdb23da9dc0776aac58d0755dc80fea20975), ROM_BIOS(8) )
+	ROMX_LOAD( "ps-41a,w.bin", 0x000000, 0x080000, CRC(b7c43dad) SHA1(1b0dbdb23da9dc0776aac58d0755dc80fea20975), ROM_BIOS(8) )
 
 	ROM_SYSTEM_BIOS( 8, "4.3j", "SCPH-100 (Version 4.3 03/11/00 J)" ) // 04121995
 	ROMX_LOAD( "psone-43j.bin", 0x000000, 0x080000, CRC(f2af798b) SHA1(339a48f4fcf63e10b5b867b8c93cfd40945faf6c), ROM_BIOS(9) )

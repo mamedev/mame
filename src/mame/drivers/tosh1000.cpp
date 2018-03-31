@@ -216,37 +216,40 @@ READ8_MEMBER(tosh1000_state::bram_r)
 }
 
 
-ADDRESS_MAP_START(tosh1000_state::tosh1000_romdos)
-	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("romdos", 0)
-	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("romdos", 0x10000)
-	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("romdos", 0x20000)
-	AM_RANGE(0x30000, 0x3ffff) AM_ROM AM_REGION("romdos", 0x30000)
-	AM_RANGE(0x40000, 0x4ffff) AM_ROM AM_REGION("romdos", 0x40000)
-	AM_RANGE(0x50000, 0x5ffff) AM_ROM AM_REGION("romdos", 0x50000)
-	AM_RANGE(0x60000, 0x6ffff) AM_ROM AM_REGION("romdos", 0x60000)
-	AM_RANGE(0x70000, 0x7ffff) AM_ROM AM_REGION("romdos", 0x70000)
-ADDRESS_MAP_END
+void tosh1000_state::tosh1000_romdos(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("romdos", 0);
+	map(0x10000, 0x1ffff).rom().region("romdos", 0x10000);
+	map(0x20000, 0x2ffff).rom().region("romdos", 0x20000);
+	map(0x30000, 0x3ffff).rom().region("romdos", 0x30000);
+	map(0x40000, 0x4ffff).rom().region("romdos", 0x40000);
+	map(0x50000, 0x5ffff).rom().region("romdos", 0x50000);
+	map(0x60000, 0x6ffff).rom().region("romdos", 0x60000);
+	map(0x70000, 0x7ffff).rom().region("romdos", 0x70000);
+}
 
-ADDRESS_MAP_START(tosh1000_state::tosh1000_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xa0000, 0xaffff) AM_DEVREADWRITE("bankdev", address_map_bank_device, read8, write8)
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void tosh1000_state::tosh1000_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xa0000, 0xaffff).rw(m_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0xf8000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(tosh1000_state::tosh1000_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-	AM_RANGE(0x00c0, 0x00c3) AM_READWRITE(bram_r, bram_w)
-	AM_RANGE(0x00c8, 0x00c8) AM_WRITE(romdos_bank_w)    // ROM-DOS page select [p. B-15]
-	AM_RANGE(0x02c0, 0x02df) AM_DEVREADWRITE("rtc", tc8521_device, read, write)
-ADDRESS_MAP_END
+void tosh1000_state::tosh1000_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x00c0, 0x00c3).rw(this, FUNC(tosh1000_state::bram_r), FUNC(tosh1000_state::bram_w));
+	map(0x00c8, 0x00c8).w(this, FUNC(tosh1000_state::romdos_bank_w));    // ROM-DOS page select [p. B-15]
+	map(0x02c0, 0x02df).rw("rtc", FUNC(tc8521_device::read), FUNC(tc8521_device::write));
+}
 
 
 void tosh1000_state::cfg_fdc_35(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 MACHINE_CONFIG_START(tosh1000_state::tosh1000)
@@ -291,10 +294,10 @@ MACHINE_CONFIG_END
 ROM_START( tosh1000 )
 	ROM_REGION16_LE(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v410", "V4.10")
-	ROMX_LOAD( "026F.27C256.IC25.bin", 0x0000, 0x8000, CRC(a854939f) SHA1(0ff532f295a40716f53949a2fd64d02bf76d575a), ROM_BIOS(1))
+	ROMX_LOAD( "026f.27c256.ic25", 0x0000, 0x8000, CRC(a854939f) SHA1(0ff532f295a40716f53949a2fd64d02bf76d575a), ROM_BIOS(1))
 
 	ROM_REGION16_LE(0x80000, "romdos", 0)
-	ROM_LOAD("tc534000p__B004.dos.ic26", 0x0000, 0x80000, CRC(716027f6) SHA1(563e3a7e1961d4cda216169bd1ecc66925a101aa))
+	ROM_LOAD("tc534000p__b004.dos.ic26", 0x0000, 0x80000, CRC(716027f6) SHA1(563e3a7e1961d4cda216169bd1ecc66925a101aa))
 
 	/* XXX IBM 1501981(CGA) and 1501985(MDA) Character rom */
 	ROM_REGION(0x2000, "gfx1", 0)

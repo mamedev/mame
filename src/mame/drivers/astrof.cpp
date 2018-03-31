@@ -539,62 +539,65 @@ MACHINE_RESET_MEMBER(astrof_state,abattle)
  *
  *************************************/
 
-ADDRESS_MAP_START(astrof_state::astrof_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_SHARE("astrof_color")
-	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(video_control_1_w)
-	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(astrof_video_control_2_w)
-	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(astrof_audio_1_w)
-	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(astrof_audio_2_w)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITENOP
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READ(irq_clear_r) AM_WRITENOP
-	AM_RANGE(0xa003, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void astrof_state::astrof_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x1c00).ram();
+	map(0x2000, 0x3fff).noprw();
+	map(0x4000, 0x5fff).ram().w(this, FUNC(astrof_state::astrof_videoram_w)).share("videoram");
+	map(0x6000, 0x7fff).noprw();
+	map(0x8000, 0x8002).mirror(0x1ff8).noprw();
+	map(0x8003, 0x8003).mirror(0x1ff8).nopr().writeonly().share("astrof_color");
+	map(0x8004, 0x8004).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::video_control_1_w));
+	map(0x8005, 0x8005).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::astrof_video_control_2_w));
+	map(0x8006, 0x8006).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::astrof_audio_1_w));
+	map(0x8007, 0x8007).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::astrof_audio_2_w));
+	map(0xa000, 0xa000).mirror(0x1ff8).portr("IN").nopw();
+	map(0xa001, 0xa001).mirror(0x1ff8).portr("DSW").nopw();
+	map(0xa002, 0xa002).mirror(0x1ff8).r(this, FUNC(astrof_state::irq_clear_r)).nopw();
+	map(0xa003, 0xa007).mirror(0x1ff8).noprw();
+	map(0xc000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(astrof_state::spfghmk2_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(astrof_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_SHARE("astrof_color")
-	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(video_control_1_w)
-	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(spfghmk2_video_control_2_w)
-	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(spfghmk2_audio_w)
-	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITENOP
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READ(irq_clear_r) AM_WRITENOP
-	AM_RANGE(0xa003, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void astrof_state::spfghmk2_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x1c00).ram();
+	map(0x2000, 0x3fff).noprw();
+	map(0x4000, 0x5fff).ram().w(this, FUNC(astrof_state::astrof_videoram_w)).share("videoram");
+	map(0x6000, 0x7fff).noprw();
+	map(0x8000, 0x8002).mirror(0x1ff8).noprw();
+	map(0x8003, 0x8003).mirror(0x1ff8).nopr().writeonly().share("astrof_color");
+	map(0x8004, 0x8004).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::video_control_1_w));
+	map(0x8005, 0x8005).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::spfghmk2_video_control_2_w));
+	map(0x8006, 0x8006).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::spfghmk2_audio_w));
+	map(0x8007, 0x8007).mirror(0x1ff8).noprw();
+	map(0xa000, 0xa000).mirror(0x1ff8).portr("IN").nopw();
+	map(0xa001, 0xa001).mirror(0x1ff8).portr("DSW").nopw();
+	map(0xa002, 0xa002).mirror(0x1ff8).r(this, FUNC(astrof_state::irq_clear_r)).nopw();
+	map(0xa003, 0xa007).mirror(0x1ff8).noprw();
+	map(0xc000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(astrof_state::tomahawk_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_NOP
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(tomahawk_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x8002) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0x8003, 0x8003) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_SHARE("astrof_color")
-	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(video_control_1_w)
-	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(tomahawk_video_control_2_w)
-	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITE(tomahawk_audio_w)
-	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READNOP AM_WRITEONLY AM_SHARE("tomahawk_prot")
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITENOP
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READ(irq_clear_r) AM_WRITENOP
-	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ff8) AM_READ(tomahawk_protection_r) AM_WRITENOP
-	AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void astrof_state::tomahawk_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x1c00).ram();
+	map(0x2000, 0x3fff).noprw();
+	map(0x4000, 0x5fff).ram().w(this, FUNC(astrof_state::tomahawk_videoram_w)).share("videoram");
+	map(0x6000, 0x7fff).noprw();
+	map(0x8000, 0x8002).mirror(0x1ff8).noprw();
+	map(0x8003, 0x8003).mirror(0x1ff8).nopr().writeonly().share("astrof_color");
+	map(0x8004, 0x8004).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::video_control_1_w));
+	map(0x8005, 0x8005).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::tomahawk_video_control_2_w));
+	map(0x8006, 0x8006).mirror(0x1ff8).nopr().w(this, FUNC(astrof_state::tomahawk_audio_w));
+	map(0x8007, 0x8007).mirror(0x1ff8).nopr().writeonly().share("tomahawk_prot");
+	map(0xa000, 0xa000).mirror(0x1ff8).portr("IN").nopw();
+	map(0xa001, 0xa001).mirror(0x1ff8).portr("DSW").nopw();
+	map(0xa002, 0xa002).mirror(0x1ff8).r(this, FUNC(astrof_state::irq_clear_r)).nopw();
+	map(0xa003, 0xa003).mirror(0x1ff8).r(this, FUNC(astrof_state::tomahawk_protection_r)).nopw();
+	map(0xa004, 0xa007).mirror(0x1ff8).noprw();
+	map(0xc000, 0xffff).rom();
+}
 
 
 

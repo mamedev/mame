@@ -102,25 +102,26 @@ WRITE8_MEMBER(alinvade_state::irqmask_w)
 	m_irqff = data;
 }
 
-ADDRESS_MAP_START(alinvade_state::alinvade_map)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0400, 0x0bff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0dff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(sound_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("COIN")
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW")
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
-	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
-	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN4")
-	AM_RANGE(0xa000, 0xa000) AM_WRITENOP //??
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0xff0) AM_ROM AM_REGION("proms",0)
-	AM_RANGE(0xe000, 0xe3ff) AM_ROM
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(sounden_w)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(irqmask_r,irqmask_w) //??
-	AM_RANGE(0xec00, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void alinvade_state::alinvade_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x0400, 0x0bff).ram().share("videoram");
+	map(0x0c00, 0x0dff).ram();
+	map(0x2000, 0x2000).w(this, FUNC(alinvade_state::sound_w));
+	map(0x4000, 0x4000).portr("COIN");
+	map(0x6000, 0x6000).portr("DSW");
+	map(0x8000, 0x8000).portr("IN0");
+	map(0x8001, 0x8001).portr("IN1");
+	map(0x8002, 0x8002).portr("IN2");
+	map(0x8003, 0x8003).portr("IN3");
+	map(0x8004, 0x8004).portr("IN4");
+	map(0xa000, 0xa000).nopw(); //??
+	map(0xc000, 0xc00f).mirror(0xff0).rom().region("proms", 0);
+	map(0xe000, 0xe3ff).rom();
+	map(0xe400, 0xe400).w(this, FUNC(alinvade_state::sounden_w));
+	map(0xe800, 0xe800).rw(this, FUNC(alinvade_state::irqmask_r), FUNC(alinvade_state::irqmask_w)); //??
+	map(0xec00, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( alinvade )

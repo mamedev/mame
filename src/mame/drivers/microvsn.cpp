@@ -94,7 +94,7 @@ public:
 protected:
 	required_device<dac_byte_interface> m_dac;
 	required_device<cpu_device> m_i8021;
-	required_device<cpu_device> m_tms1100;
+	required_device<tms1100_cpu_device> m_tms1100;
 	required_device<generic_slot_device> m_cart;
 
 	// Timers
@@ -165,14 +165,14 @@ MACHINE_START_MEMBER(microvision_state, microvision)
 
 MACHINE_RESET_MEMBER(microvision_state, microvision)
 {
-	for(auto & elem : m_lcd_latch)
+	for (auto & elem : m_lcd_latch)
 	{
 		elem = 0;
 	}
 
-	for(auto & elem : m_lcd)
+	for (auto & elem : m_lcd)
 	{
-		for ( int j = 0; j < 16; j++ )
+		for (int j = 0; j < 16; j++)
 		{
 			elem[j] = 0;
 		}
@@ -184,32 +184,32 @@ MACHINE_RESET_MEMBER(microvision_state, microvision)
 	m_p2 = 0;
 	m_t1 = 0;
 
-	m_paddle_timer->adjust( attotime::never );
+	m_paddle_timer->adjust(attotime::never);
 
-	switch ( m_cpu_type )
+	switch (m_cpu_type)
 	{
 		case CPU_TYPE_I8021:
-			m_i8021->resume( SUSPEND_REASON_DISABLE );
-			m_tms1100->suspend( SUSPEND_REASON_DISABLE, 0 );
+			m_i8021->resume(SUSPEND_REASON_DISABLE);
+			m_tms1100->suspend(SUSPEND_REASON_DISABLE, 0);
 			break;
 
 		case CPU_TYPE_TMS1100:
-			m_i8021->suspend( SUSPEND_REASON_DISABLE, 0 );
-			m_tms1100->resume( SUSPEND_REASON_DISABLE );
+			m_i8021->suspend(SUSPEND_REASON_DISABLE, 0);
+			m_tms1100->resume(SUSPEND_REASON_DISABLE);
 
-			switch ( m_rc_type )
+			switch (m_rc_type)
 			{
 				case RC_TYPE_100PF_21_0K:
-					static_set_clock( *m_tms1100, 550000 );
+					m_tms1100->set_clock(550000);
 					break;
 
 				case RC_TYPE_100PF_23_2K:
 				case RC_TYPE_UNKNOWN:   // Default to most occurring setting
-					static_set_clock( *m_tms1100, 500000 );
+					m_tms1100->set_clock(500000);
 					break;
 
 				case RC_TYPE_100PF_39_4K:
-					static_set_clock( *m_tms1100, 300000 );
+					m_tms1100->set_clock(300000);
 					break;
 			}
 			break;
@@ -538,7 +538,7 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
 		if (pla)
 			m_pla = 1;
 
-		tms1100_cpu_device::set_output_pla(*m_tms1100, m_pla ? microvision_output_pla_1 : microvision_output_pla_0);
+		m_tms1100->set_output_pla(m_pla ? microvision_output_pla_1 : microvision_output_pla_0);
 
 		// Set default setting for PCB type and RC type
 		m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;

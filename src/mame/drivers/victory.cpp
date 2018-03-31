@@ -126,29 +126,31 @@ WRITE8_MEMBER(victory_state::lamp_control_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(victory_state::main_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_READ(video_control_r)
-	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(video_control_w)
-	AM_RANGE(0xc200, 0xc3ff) AM_WRITE(paletteram_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_SHARE("charram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fc) AM_DEVREADWRITE("custom", victory_sound_device, response_r, command_w)
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fc) AM_DEVREAD("custom", victory_sound_device, status_r)
-ADDRESS_MAP_END
+void victory_state::main_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc0ff).r(this, FUNC(victory_state::video_control_r));
+	map(0xc100, 0xc1ff).w(this, FUNC(victory_state::video_control_w));
+	map(0xc200, 0xc3ff).w(this, FUNC(victory_state::paletteram_w));
+	map(0xc400, 0xc7ff).ram().share("videoram");
+	map(0xc800, 0xdfff).ram().share("charram");
+	map(0xe000, 0xefff).ram();
+	map(0xf000, 0xf7ff).ram().share("nvram");
+	map(0xf800, 0xf800).mirror(0x07fc).rw("custom", FUNC(victory_sound_device::response_r), FUNC(victory_sound_device::command_w));
+	map(0xf801, 0xf801).mirror(0x07fc).r("custom", FUNC(victory_sound_device::status_r));
+}
 
 
-ADDRESS_MAP_START(victory_state::main_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("SW2")
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("SW1")
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("pio1", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pio2", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_WRITE(lamp_control_w)
-	AM_RANGE(0x14, 0xff) AM_NOP
-ADDRESS_MAP_END
+void victory_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x03).portr("SW2");
+	map(0x04, 0x04).mirror(0x03).portr("SW1");
+	map(0x08, 0x0b).rw("pio1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0c, 0x0f).rw("pio2", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x10, 0x10).mirror(0x03).w(this, FUNC(victory_state::lamp_control_w));
+	map(0x14, 0xff).noprw();
+}
 
 
 

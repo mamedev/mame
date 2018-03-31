@@ -173,204 +173,223 @@ WRITE8_MEMBER(m62_state::youjyudn_bankswitch_w)
 }
 
 
-ADDRESS_MAP_START(m62_state::kungfum_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(m62_hscroll_low_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(m62_hscroll_high_w)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
+void m62_state::kungfum_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xa000).w(this, FUNC(m62_state::m62_hscroll_low_w));
+	map(0xb000, 0xb000).w(this, FUNC(m62_state::m62_hscroll_high_w));
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
 	/* Kung Fu Master is the only game in this driver to have separated (but */
 	/* contiguous) videoram and colorram. They are interleaved in all the others. */
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(kungfum_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::kungfum_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::kungfum_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void m62_state::kungfum_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
+	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x02, 0x02).portr("P2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+}
 
-ADDRESS_MAP_START(m62_state::battroad_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_SHARE("m62_textram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::battroad_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::battroad_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x80, 0x80) AM_WRITE(m62_vscroll_low_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(m62_hscroll_high_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(m62_hscroll_low_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(battroad_bankswitch_w)
-ADDRESS_MAP_END
+void m62_state::battroad_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
+	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x02, 0x02).portr("P2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x80, 0x80).w(this, FUNC(m62_state::m62_vscroll_low_w));
+	map(0x81, 0x81).w(this, FUNC(m62_state::m62_hscroll_high_w));
+	map(0x82, 0x82).w(this, FUNC(m62_state::m62_hscroll_low_w));
+	map(0x83, 0x83).w(this, FUNC(m62_state::battroad_bankswitch_w));
+}
 
-ADDRESS_MAP_START(m62_state::ldrun_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::ldrun_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::ldrun2_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::ldrun2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::ldrun2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x80, 0x80) AM_READ(ldrun2_bankswitch_r)
-	AM_RANGE(0x80, 0x81) AM_WRITE(ldrun2_bankswitch_w)
-ADDRESS_MAP_END
+void m62_state::ldrun2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
+	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x02, 0x02).portr("P2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x80, 0x80).r(this, FUNC(m62_state::ldrun2_bankswitch_r));
+	map(0x80, 0x81).w(this, FUNC(m62_state::ldrun2_bankswitch_w));
+}
 
-ADDRESS_MAP_START(m62_state::ldrun3_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc800, 0xc800) AM_READ(ldrun3_prot_5_r)
-	AM_RANGE(0xcc00, 0xcc00) AM_READ(ldrun3_prot_7_r)
-	AM_RANGE(0xcfff, 0xcfff) AM_READ(ldrun3_prot_7_r)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xefff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-ADDRESS_MAP_END
+void m62_state::ldrun3_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc800, 0xc800).r(this, FUNC(m62_state::ldrun3_prot_5_r));
+	map(0xcc00, 0xcc00).r(this, FUNC(m62_state::ldrun3_prot_7_r));
+	map(0xcfff, 0xcfff).r(this, FUNC(m62_state::ldrun3_prot_7_r));
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xd000, 0xefff).ram();
+	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+}
 
-ADDRESS_MAP_START(m62_state::ldrun3_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x80, 0x80) AM_WRITE(m62_vscroll_low_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(ldrun3_topbottom_mask_w)
-ADDRESS_MAP_END
+void m62_state::ldrun3_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
+	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x02, 0x02).portr("P2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x80, 0x80).w(this, FUNC(m62_state::m62_vscroll_low_w));
+	map(0x81, 0x81).w(this, FUNC(m62_state::ldrun3_topbottom_mask_w));
+}
 
-ADDRESS_MAP_START(m62_state::ldrun4_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(ldrun4_bankswitch_w)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::ldrun4_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xc800, 0xc800).w(this, FUNC(m62_state::ldrun4_bankswitch_w));
+	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::ldrun4_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x82, 0x82) AM_WRITE(m62_hscroll_high_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(m62_hscroll_low_w)
-ADDRESS_MAP_END
+void m62_state::ldrun4_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
+	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x02, 0x02).portr("P2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x82, 0x82).w(this, FUNC(m62_state::m62_hscroll_high_w));
+	map(0x83, 0x83).w(this, FUNC(m62_state::m62_hscroll_low_w));
+}
 
-ADDRESS_MAP_START(m62_state::lotlot_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(m62_textram_w) AM_SHARE("m62_textram")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::lotlot_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xafff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::kidniki_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_textram_w) AM_SHARE("m62_textram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::kidniki_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xafff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::kidniki_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x80, 0x80) AM_WRITE(m62_hscroll_low_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(m62_hscroll_high_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(kidniki_text_vscroll_low_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(kidniki_text_vscroll_high_w)
-	AM_RANGE(0x84, 0x84) AM_WRITE(kidniki_background_bank_w)
-	AM_RANGE(0x85, 0x85) AM_WRITE(kidniki_bankswitch_w)
-ADDRESS_MAP_END
+void m62_state::kidniki_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
+	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x02, 0x02).portr("P2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x80, 0x80).w(this, FUNC(m62_state::m62_hscroll_low_w));
+	map(0x81, 0x81).w(this, FUNC(m62_state::m62_hscroll_high_w));
+	map(0x82, 0x82).w(this, FUNC(m62_state::kidniki_text_vscroll_low_w));
+	map(0x83, 0x83).w(this, FUNC(m62_state::kidniki_text_vscroll_high_w));
+	map(0x84, 0x84).w(this, FUNC(m62_state::kidniki_background_bank_w));
+	map(0x85, 0x85).w(this, FUNC(m62_state::kidniki_bankswitch_w));
+}
 
-ADDRESS_MAP_START(m62_state::spelunkr_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_SHARE("m62_textram")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(m62_vscroll_low_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(m62_vscroll_high_w)
-	AM_RANGE(0xd002, 0xd002) AM_WRITE(m62_hscroll_low_w)
-	AM_RANGE(0xd003, 0xd003) AM_WRITE(m62_hscroll_high_w)
-	AM_RANGE(0xd004, 0xd004) AM_WRITE(spelunkr_bankswitch_w)
-	AM_RANGE(0xd005, 0xd005) AM_WRITE(spelunkr_palbank_w)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::spelunkr_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xbfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xd000, 0xd000).w(this, FUNC(m62_state::m62_vscroll_low_w));
+	map(0xd001, 0xd001).w(this, FUNC(m62_state::m62_vscroll_high_w));
+	map(0xd002, 0xd002).w(this, FUNC(m62_state::m62_hscroll_low_w));
+	map(0xd003, 0xd003).w(this, FUNC(m62_state::m62_hscroll_high_w));
+	map(0xd004, 0xd004).w(this, FUNC(m62_state::spelunkr_bankswitch_w));
+	map(0xd005, 0xd005).w(this, FUNC(m62_state::spelunkr_palbank_w));
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::spelunk2_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_SHARE("m62_textram")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(m62_vscroll_low_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(m62_hscroll_low_w)
-	AM_RANGE(0xd002, 0xd002) AM_WRITE(spelunk2_gfxport_w)
-	AM_RANGE(0xd003, 0xd003) AM_WRITE(spelunk2_bankswitch_w)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::spelunk2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).bankr("bank1");
+	map(0x9000, 0x9fff).bankr("bank2");
+	map(0xa000, 0xbfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xd000, 0xd000).w(this, FUNC(m62_state::m62_vscroll_low_w));
+	map(0xd001, 0xd001).w(this, FUNC(m62_state::m62_hscroll_low_w));
+	map(0xd002, 0xd002).w(this, FUNC(m62_state::spelunk2_gfxport_w));
+	map(0xd003, 0xd003).w(this, FUNC(m62_state::spelunk2_bankswitch_w));
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::youjyudn_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(m62_textram_w) AM_SHARE("m62_textram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::youjyudn_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc0ff).writeonly().share("spriteram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(m62_state::m62_textram_w)).share("m62_textram");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(m62_state::youjyudn_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(m62_flipscreen_w)  /* + coin counters */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x80, 0x80) AM_WRITE(m62_hscroll_high_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(m62_hscroll_low_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(youjyudn_bankswitch_w)
-ADDRESS_MAP_END
+void m62_state::youjyudn_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("SYSTEM").w(m_audio, FUNC(irem_audio_device::cmd_w));
+	map(0x01, 0x01).portr("P1").w(this, FUNC(m62_state::m62_flipscreen_w));  /* + coin counters */
+	map(0x02, 0x02).portr("P2");
+	map(0x03, 0x03).portr("DSW1");
+	map(0x04, 0x04).portr("DSW2");
+	map(0x80, 0x80).w(this, FUNC(m62_state::m62_hscroll_high_w));
+	map(0x81, 0x81).w(this, FUNC(m62_state::m62_hscroll_low_w));
+	map(0x83, 0x83).w(this, FUNC(m62_state::youjyudn_bankswitch_w));
+}
 
-ADDRESS_MAP_START(m62_state::horizon_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xc800, 0xc83f) AM_RAM_WRITE(horizon_scrollram_w) AM_SHARE("scrollram")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(m62_tileram_w) AM_SHARE("m62_tileram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m62_state::horizon_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc1ff).ram().share("spriteram");
+	map(0xc800, 0xc83f).ram().w(this, FUNC(m62_state::horizon_scrollram_w)).share("scrollram");
+	map(0xd000, 0xdfff).ram().w(this, FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
+}
 
 
 static INPUT_PORTS_START( common )

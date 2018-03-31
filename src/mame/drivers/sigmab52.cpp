@@ -136,17 +136,24 @@
 class sigmab52_state : public driver_device
 {
 public:
-	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_6840ptm_2(*this, "6840ptm_2"),
 		m_palette(*this, "palette"),
 		m_bank1(*this, "bank1"),
 		m_prom(*this, "proms"),
-		m_in0(*this, "IN0")
+		m_in0(*this, "IN0"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	DECLARE_DRIVER_INIT(jwildb52);
+	void jwildb52(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(unk_f700_r);
 	DECLARE_READ8_MEMBER(unk_f760_r);
 	DECLARE_READ8_MEMBER(in0_r);
@@ -159,28 +166,30 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(tower_lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_enable_w);
-	DECLARE_DRIVER_INIT(jwildb52);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
 	void audiocpu_irq_update();
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<ptm6840_device> m_6840ptm_2;
-	required_device<palette_device> m_palette;
-	required_memory_bank m_bank1;
-	required_region_ptr<uint8_t> m_prom;
-	required_ioport m_in0;
-
-	uint64_t      m_coin_start_cycles;
-	uint64_t      m_hopper_start_cycles;
-	int         m_audiocpu_cmd_irq;
-	void jwildb52(machine_config &config);
 	void jwildb52_hd63484_map(address_map &map);
 	void jwildb52_map(address_map &map);
 	void sound_prog_map(address_map &map);
+
+private:
+	required_device<cpu_device>     m_maincpu;
+	required_device<cpu_device>     m_audiocpu;
+	required_device<ptm6840_device> m_6840ptm_2;
+	required_device<palette_device> m_palette;
+	required_memory_bank            m_bank1;
+	required_region_ptr<uint8_t>    m_prom;
+	required_ioport                 m_in0;
+	output_finder<10>               m_lamps;
+	output_finder<2>                m_towerlamps;
+
+	uint64_t    m_coin_start_cycles;
+	uint64_t    m_hopper_start_cycles;
+	int         m_audiocpu_cmd_irq;
 };
 
 
@@ -261,17 +270,17 @@ WRITE8_MEMBER(sigmab52_state::hopper_w)
 
 WRITE8_MEMBER(sigmab52_state::lamps1_w)
 {
-	output().set_lamp_value(offset, data & 1);
+	m_lamps[offset] = data & 1;
 }
 
 WRITE8_MEMBER(sigmab52_state::lamps2_w)
 {
-	output().set_lamp_value(6 + offset, data & 1);
+	m_lamps[6 + offset] = data & 1;
 }
 
 WRITE8_MEMBER(sigmab52_state::tower_lamps_w)
 {
-	output().set_indexed_value("towerlamp", offset, data & 1);
+	m_towerlamps[offset] = data & 1;
 }
 
 WRITE8_MEMBER(sigmab52_state::coin_enable_w)
@@ -309,44 +318,45 @@ WRITE8_MEMBER(sigmab52_state::palette_bank_w)
 *      Memory Maps       *
 *************************/
 
-ADDRESS_MAP_START(sigmab52_state::jwildb52_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+void sigmab52_state::jwildb52_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("nvram");
+	map(0x4000, 0x7fff).bankr("bank1");
 
-	AM_RANGE(0x8000, 0xf6ff) AM_ROM
+	map(0x8000, 0xf6ff).rom();
 
-	AM_RANGE(0xf700, 0xf700) AM_READ(unk_f700_r)    // ACIA ???
-	AM_RANGE(0xf710, 0xf710) AM_WRITE(bank1_w)
+	map(0xf700, 0xf700).r(this, FUNC(sigmab52_state::unk_f700_r));    // ACIA ???
+	map(0xf710, 0xf710).w(this, FUNC(sigmab52_state::bank1_w));
 
-	AM_RANGE(0xf720, 0xf727) AM_DEVREADWRITE("6840ptm_1", ptm6840_device, read, write)
+	map(0xf720, 0xf727).rw("6840ptm_1", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 
-	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", hd63484_device, status8_r, address8_w)
-	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", hd63484_device, data8_r, data8_w)
+	map(0xf730, 0xf730).rw("hd63484", FUNC(hd63484_device::status8_r), FUNC(hd63484_device::address8_w));
+	map(0xf731, 0xf731).rw("hd63484", FUNC(hd63484_device::data8_r), FUNC(hd63484_device::data8_w));
 
-	AM_RANGE(0xf740, 0xf740) AM_READ(in0_r)
-	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")
-	AM_RANGE(0xf742, 0xf742) AM_READ_PORT("IN2")
-	AM_RANGE(0xf743, 0xf743) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf744, 0xf744) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf745, 0xf745) AM_READ_PORT("DSW3")
-	AM_RANGE(0xf746, 0xf746) AM_READ_PORT("DSW4")
-	AM_RANGE(0xf747, 0xf747) AM_READ_PORT("IN3")
-	AM_RANGE(0xf750, 0xf750) AM_WRITE(palette_bank_w)
+	map(0xf740, 0xf740).r(this, FUNC(sigmab52_state::in0_r));
+	map(0xf741, 0xf741).portr("IN1");
+	map(0xf742, 0xf742).portr("IN2");
+	map(0xf743, 0xf743).portr("DSW1");
+	map(0xf744, 0xf744).portr("DSW2");
+	map(0xf745, 0xf745).portr("DSW3");
+	map(0xf746, 0xf746).portr("DSW4");
+	map(0xf747, 0xf747).portr("IN3");
+	map(0xf750, 0xf750).w(this, FUNC(sigmab52_state::palette_bank_w));
 
-	AM_RANGE(0xf760, 0xf760) AM_READ(unk_f760_r)
+	map(0xf760, 0xf760).r(this, FUNC(sigmab52_state::unk_f760_r));
 
 //  AM_RANGE(0xf770, 0xf77f)  Bill validator
 
-	AM_RANGE(0xf780, 0xf780) AM_WRITE(audiocpu_cmd_irq_w)
-	AM_RANGE(0xf790, 0xf790) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	map(0xf780, 0xf780).w(this, FUNC(sigmab52_state::audiocpu_cmd_irq_w));
+	map(0xf790, 0xf790).w("soundlatch", FUNC(generic_latch_8_device::write));
 
-	AM_RANGE(0xf7b0, 0xf7b0) AM_WRITE(coin_enable_w)
-	AM_RANGE(0xf7d5, 0xf7d5) AM_WRITE(hopper_w)
-	AM_RANGE(0xf7b2, 0xf7b7) AM_WRITE(lamps1_w)
-	AM_RANGE(0xf7c0, 0xf7c3) AM_WRITE(lamps2_w)
-	AM_RANGE(0xf7d6, 0xf7d7) AM_WRITE(tower_lamps_w)
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xf7b0, 0xf7b0).w(this, FUNC(sigmab52_state::coin_enable_w));
+	map(0xf7d5, 0xf7d5).w(this, FUNC(sigmab52_state::hopper_w));
+	map(0xf7b2, 0xf7b7).w(this, FUNC(sigmab52_state::lamps1_w));
+	map(0xf7c0, 0xf7c3).w(this, FUNC(sigmab52_state::lamps2_w));
+	map(0xf7d6, 0xf7d7).w(this, FUNC(sigmab52_state::tower_lamps_w));
+	map(0xf800, 0xffff).rom();
+}
 
 /* Unknown R/W:
 
@@ -360,24 +370,26 @@ ADDRESS_MAP_END
 
 */
 
-ADDRESS_MAP_START(sigmab52_state::sound_prog_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x6020, 0x6027) AM_DEVREADWRITE("6840ptm_2", ptm6840_device, read, write)
-	AM_RANGE(0x6030, 0x6030) AM_WRITE(audiocpu_irq_ack_w)
-	AM_RANGE(0x6050, 0x6050) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x6060, 0x6061) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
-ADDRESS_MAP_END
+void sigmab52_state::sound_prog_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x6020, 0x6027).rw(m_6840ptm_2, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x6030, 0x6030).w(this, FUNC(sigmab52_state::audiocpu_irq_ack_w));
+	map(0x6050, 0x6050).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x6060, 0x6061).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0x8000, 0xffff).rom().region("audiocpu", 0);
+}
 
 /* Unknown R/W:
 
 
 */
 
-ADDRESS_MAP_START(sigmab52_state::jwildb52_hd63484_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("gfx1", 0)
-ADDRESS_MAP_END
+void sigmab52_state::jwildb52_hd63484_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).ram();
+	map(0x20000, 0x3ffff).rom().region("gfx1", 0);
+}
 
 INPUT_CHANGED_MEMBER( sigmab52_state::coin_drop_start )
 {
@@ -562,6 +574,8 @@ INPUT_PORTS_END
 void sigmab52_state::machine_start()
 {
 	m_bank1->configure_entries(0, 2, memregion("maincpu")->base(), 0x4000);
+	m_lamps.resolve();
+	m_towerlamps.resolve();
 }
 
 void sigmab52_state::machine_reset()

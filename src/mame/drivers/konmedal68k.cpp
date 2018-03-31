@@ -188,24 +188,25 @@ uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bit
 	return 0;
 }
 
-ADDRESS_MAP_START(konmedal68k_state::kzaurus_main)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x400000, 0x403fff) AM_RAM
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(control_w)
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW")
-	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("IN1")
-	AM_RANGE(0x800008, 0x800009) AM_READ_PORT("IN0")
-	AM_RANGE(0x810000, 0x810001) AM_WRITE(control2_w)
-	AM_RANGE(0x830000, 0x83003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
-	AM_RANGE(0x840000, 0x84000f) AM_DEVWRITE("k056832", k056832_device, b_word_w)
-	AM_RANGE(0x85001c, 0x85001f) AM_WRITENOP
-	AM_RANGE(0x870000, 0x87005f) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
-	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
-	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0xa02000, 0xa03fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
-	AM_RANGE(0xb00000, 0xb01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xc00000, 0xc01fff) AM_READ(vrom_r)
-ADDRESS_MAP_END
+void konmedal68k_state::kzaurus_main(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x400000, 0x403fff).ram();
+	map(0x800000, 0x800001).w(this, FUNC(konmedal68k_state::control_w));
+	map(0x800004, 0x800005).portr("DSW");
+	map(0x800006, 0x800007).portr("IN1");
+	map(0x800008, 0x800009).portr("IN0");
+	map(0x810000, 0x810001).w(this, FUNC(konmedal68k_state::control2_w));
+	map(0x830000, 0x83003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
+	map(0x840000, 0x84000f).w(m_k056832, FUNC(k056832_device::b_word_w));
+	map(0x85001c, 0x85001f).nopw();
+	map(0x870000, 0x87005f).w(m_k055555, FUNC(k055555_device::K055555_word_w));
+	map(0x880000, 0x880003).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
+	map(0xa00000, 0xa01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xa02000, 0xa03fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xb00000, 0xb01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc01fff).r(this, FUNC(konmedal68k_state::vrom_r));
+}
 
 static INPUT_PORTS_START( kzaurus )
 	PORT_START("IN0")

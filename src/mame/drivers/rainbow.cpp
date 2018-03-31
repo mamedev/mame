@@ -360,9 +360,9 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "bus/rs232/ser_mouse.h"
 
 #include "machine/i8251.h"
-#include "machine/clock.h"
 #include "machine/dec_lk201.h"
 #include "machine/nvram.h"
+#include "machine/ripple_counter.h"
 #include "machine/timer.h"
 
 #include "machine/ds1315.h"
@@ -509,9 +509,9 @@ public:
 		m_hdc(*this, "hdc"),
 		m_corvus_hdc(*this, "corvus"),
 
-		m_mpsc(*this, "upd7201"),
-		m_dbrg_A(*this, "com8116_a"),
-		m_dbrg_B(*this, "com8116_b"),
+		m_mpsc(*this, "mpsc"),
+		m_dbrg(*this, "dbrg"),
+		m_comm_port(*this, "comm"),
 
 		m_kbd8251(*this, "kbdser"),
 		m_lk201(*this, LK201_TAG),
@@ -600,10 +600,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
 	DECLARE_WRITE8_MEMBER(comm_bitrate_w);
 	DECLARE_WRITE8_MEMBER(printer_bitrate_w);
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_ft_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_ft_w );
+	DECLARE_WRITE8_MEMBER(bitrate_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(dbrg_fr_w);
+	DECLARE_WRITE_LINE_MEMBER(dbrg_ft_w);
 
 	DECLARE_WRITE8_MEMBER(GDC_EXTRA_REGISTER_w);
 	DECLARE_READ8_MEMBER(GDC_EXTRA_REGISTER_r);
@@ -611,7 +610,6 @@ public:
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	TIMER_DEVICE_CALLBACK_MEMBER(hd_motor_tick);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -670,8 +668,8 @@ private:
 	required_device<corvus_hdc_device> m_corvus_hdc;
 
 	required_device<upd7201_new_device> m_mpsc;
-	required_device<com8116_device> m_dbrg_A;
-	required_device<com8116_device> m_dbrg_B;
+	required_device<com8116_003_device> m_dbrg;
+	required_device<rs232_port_device> m_comm_port;
 
 	required_device<i8251_device> m_kbd8251;
 	required_device<lk201_device> m_lk201;
@@ -721,6 +719,8 @@ private:
 	bool m_zflip;                   // Z80 alternate memory map with A15 inverted
 	bool m_z80_halted;
 	int  m_z80_diskcontrol;         // retains values needed for status register
+
+	uint8_t m_printer_bitrate;
 
 	bool m_kbd_tx_ready, m_kbd_rx_ready;
 	int m_KBD;
@@ -876,13 +876,15 @@ void rainbow_state::machine_start()
 
 	m_SCREEN_BLANK = false;
 
-	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	device_execute_interface::static_set_irq_acknowledge_callback(*maincpu, device_irq_acknowledge_delegate(FUNC(rainbow_state::irq_callback), this));
+	auto *printer_port = subdevice<rs232_port_device>("printer");
+	printer_port->write_dtr(0);
+	printer_port->write_rts(0);
 
 	save_item(NAME(m_z80_private));
 	save_item(NAME(m_z80_mailbox));
 	save_item(NAME(m_8088_mailbox));
 	save_item(NAME(m_zflip));
+	save_item(NAME(m_printer_bitrate));
 	save_item(NAME(m_kbd_tx_ready));
 	save_item(NAME(m_kbd_rx_ready));
 	save_item(NAME(m_irq_high));
@@ -904,10 +906,11 @@ void rainbow_state::machine_start()
 #endif
 }
 
-ADDRESS_MAP_START(rainbow_state::rainbow8088_map)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
-AM_RANGE(0x10000, END_OF_RAM) AM_RAM AM_SHARE("ext_ram") AM_WRITE(ext_ram_w)
+void rainbow_state::rainbow8088_map(address_map &map)
+{
+map.unmap_value_high();
+map(0x00000, 0x0ffff).ram().share("sh_ram");
+map(0x10000, END_OF_RAM).ram().share("ext_ram").w(this, FUNC(rainbow_state::ext_ram_w));
 
 // There is a 2212 (256 x 4 bit) NVRAM from 0xed000 to 0xed0ff (*)
 // shadowed at $ec000 - $ecfff and from $ed100 - $edfff.
@@ -919,30 +922,31 @@ AM_RANGE(0x10000, END_OF_RAM) AM_RAM AM_SHARE("ext_ram") AM_WRITE(ext_ram_w)
 //    'diagnostic_w' handler (similar to real hardware).
 
 //  - Address bits 8-12 are ignored (-> AM_MIRROR).
-AM_RANGE(0xed000, 0xed0ff) AM_RAM AM_SHARE("vol_ram") //AM_MIRROR(0x1f00)
-AM_RANGE(0xed100, 0xed1ff) AM_RAM AM_SHARE("nvram")
+map(0xed000, 0xed0ff).ram().share("vol_ram"); //AM_MIRROR(0x1f00)
+map(0xed100, 0xed1ff).ram().share("nvram");
 
-AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
-AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+map(0xee000, 0xeffff).ram().share("p_ram");
+map(0xf0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(rainbow_state::rainbow8088_io)
-ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_GLOBAL_MASK(0x1ff)
-AM_RANGE(0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
-AM_RANGE(0x02, 0x02) AM_READWRITE(comm_control_r, comm_control_w) // Communication status / control register (8088)
-AM_RANGE(0x04, 0x04) AM_DEVWRITE("vt100_video", rainbow_video_device, dc011_w)
+void rainbow_state::rainbow8088_io(address_map &map)
+{
+map.unmap_value_high();
+map.global_mask(0x1ff);
+map(0x00, 0x00).rw(this, FUNC(rainbow_state::i8088_latch_r), FUNC(rainbow_state::i8088_latch_w));
+map(0x02, 0x02).rw(this, FUNC(rainbow_state::comm_control_r), FUNC(rainbow_state::comm_control_w)); // Communication status / control register (8088)
+map(0x04, 0x04).w(m_crtc, FUNC(rainbow_video_device::dc011_w));
 
-AM_RANGE(0x06, 0x06) AM_WRITE(comm_bitrate_w)
+map(0x06, 0x06).w(this, FUNC(rainbow_state::comm_bitrate_w));
 
-AM_RANGE(0x08, 0x08) AM_READ(system_parameter_r)
-AM_RANGE(0x0a, 0x0a) AM_READWRITE(diagnostic_r, diagnostic_w)
-AM_RANGE(0x0c, 0x0c) AM_SELECT(0x100) AM_DEVWRITE("vt100_video", rainbow_video_device, dc012_w)
+map(0x08, 0x08).r(this, FUNC(rainbow_state::system_parameter_r));
+map(0x0a, 0x0a).rw(this, FUNC(rainbow_state::diagnostic_r), FUNC(rainbow_state::diagnostic_w));
+map(0x0c, 0x0c).select(0x100).w(m_crtc, FUNC(rainbow_video_device::dc012_w));
 
-AM_RANGE(0x0e, 0x0e) AM_WRITE(printer_bitrate_w)
+map(0x0e, 0x0e).w(this, FUNC(rainbow_state::printer_bitrate_w));
 
-AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("kbdser", i8251_device, data_r, data_w)
-AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w)
+map(0x10, 0x10).rw(m_kbd8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+map(0x11, 0x11).rw(m_kbd8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
 // ===========================================================
 // There are 4 select lines for Option Select 1 to 4
@@ -955,8 +959,8 @@ AM_RANGE(0x11, 0x11) AM_DEVREADWRITE("kbdser", i8251_device, status_r, control_w
 // See boot rom @1EA6: 0x27 (<- RESET EXTENDED COMM OPTION  )
 
 // Corvus B/H harddisk controller (incompatible with EXT.COMM OPTION):
-AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("corvus", corvus_hdc_device, read, write)
-AM_RANGE(0x21, 0x21) AM_READ(corvus_status_r)
+map(0x20, 0x20).rw(m_corvus_hdc, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
+map(0x21, 0x21).r(this, FUNC(rainbow_state::corvus_status_r));
 
 // ===========================================================
 // 0x30 -> 0x3f ***** Option Select 3
@@ -971,16 +975,16 @@ AM_RANGE(0x21, 0x21) AM_READ(corvus_status_r)
 // * Color graphics option (NEC upd7220 GDC plus external hw.). See Programmer's Reference AA-AE36A-TV.
 // Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 x 64 K video RAM.
 // (Write Buffer, Pattern Register/Multiplier, ALU/PS, Color Map, readback and offset/scroll hardware):
-AM_RANGE(0x50, 0x55) AM_READWRITE(GDC_EXTRA_REGISTER_r, GDC_EXTRA_REGISTER_w)
-AM_RANGE(0x56, 0x57) AM_DEVREADWRITE("upd7220", upd7220_device, read, write) // 56 param, 57 command
+map(0x50, 0x55).rw(this, FUNC(rainbow_state::GDC_EXTRA_REGISTER_r), FUNC(rainbow_state::GDC_EXTRA_REGISTER_w));
+map(0x56, 0x57).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)); // 56 param, 57 command
 
 // ===========================================================
 // 0x60 -> 0x6f ***** EXTENDED COMM. OPTION / Option Select 2.
 // ===========================================================
 // 0x60 -> 0x6f ***** RD51 HD. CONTROLLER   / Option Select 2.
-AM_RANGE(0x60, 0x67) AM_DEVREADWRITE("hdc", wd2010_device, read, write) AM_MIRROR(0x100)
-AM_RANGE(0x68, 0x68) AM_READWRITE(hd_status_68_r, hd_status_68_w)
-AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
+map(0x60, 0x67).rw(m_hdc, FUNC(wd2010_device::read), FUNC(wd2010_device::write)).mirror(0x100);
+map(0x68, 0x68).rw(this, FUNC(rainbow_state::hd_status_68_r), FUNC(rainbow_state::hd_status_68_w));
+map(0x69, 0x69).r(this, FUNC(rainbow_state::hd_status_69_r));
 // ===========================================================
 // THE RD51 CONTROLLER: WD1010AL - 00 (WDC '83)
 // + 2 K x 8 SRAM (SY2128-4 or Japan 8328) 21-17872-01
@@ -1016,29 +1020,31 @@ AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
 // 0x70 -> 0x7f ***** Option Select 4
 // ===========================================================
 // 0x10c -> (MHFU disable register handled by 0x0c + AM_SELECT)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(rainbow_state::rainbowz80_mem)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE(0x0000, 0xffff) AM_READWRITE(share_z80_r, share_z80_w)
-ADDRESS_MAP_END
+void rainbow_state::rainbowz80_mem(address_map &map)
+{
+map.unmap_value_high();
+map(0x0000, 0xffff).rw(this, FUNC(rainbow_state::share_z80_r), FUNC(rainbow_state::share_z80_w));
+}
 
-ADDRESS_MAP_START(rainbow_state::rainbowz80_io)
-ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_GLOBAL_MASK(0xff)
-AM_RANGE(0x00, 0x00) AM_READWRITE(z80_latch_r, z80_latch_w)
-AM_RANGE(0x20, 0x20) AM_READWRITE(z80_generalstat_r, z80_diskdiag_read_w) // read to port 0x20 used by MS-DOS 2.x diskette loader.
-AM_RANGE(0x21, 0x21) AM_READWRITE(z80_generalstat_r, z80_diskdiag_write_w)
-AM_RANGE(0x40, 0x40) AM_READWRITE(z80_diskstatus_r, z80_diskcontrol_w)
-AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(FD1793_TAG, fd1793_device, read, write)
+void rainbow_state::rainbowz80_io(address_map &map)
+{
+map.unmap_value_high();
+map.global_mask(0xff);
+map(0x00, 0x00).rw(this, FUNC(rainbow_state::z80_latch_r), FUNC(rainbow_state::z80_latch_w));
+map(0x20, 0x20).rw(this, FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
+map(0x21, 0x21).rw(this, FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_write_w));
+map(0x40, 0x40).rw(this, FUNC(rainbow_state::z80_diskstatus_r), FUNC(rainbow_state::z80_diskcontrol_w));
+map(0x60, 0x63).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 
 // Z80 I/O shadow area > $80
-AM_RANGE(0x80, 0x80) AM_READWRITE(z80_latch_r, z80_latch_w)
-AM_RANGE(0xA0, 0xA0) AM_READWRITE(z80_generalstat_r, z80_diskdiag_read_w) // read to port 0x20 used by MS-DOS 2.x diskette loader.
-AM_RANGE(0xA1, 0xA1) AM_READWRITE(z80_generalstat_r, z80_diskdiag_write_w)
-AM_RANGE(0xC0, 0xC0) AM_READWRITE(z80_diskstatus_r, z80_diskcontrol_w)
-AM_RANGE(0xE0, 0xE3) AM_DEVREADWRITE(FD1793_TAG, fd1793_device, read, write)
-ADDRESS_MAP_END
+map(0x80, 0x80).rw(this, FUNC(rainbow_state::z80_latch_r), FUNC(rainbow_state::z80_latch_w));
+map(0xA0, 0xA0).rw(this, FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
+map(0xA1, 0xA1).rw(this, FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_write_w));
+map(0xC0, 0xC0).rw(this, FUNC(rainbow_state::z80_diskstatus_r), FUNC(rainbow_state::z80_diskcontrol_w));
+map(0xE0, 0xE3).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+}
 
 /* Input ports */
 
@@ -1136,7 +1142,7 @@ void rainbow_state::machine_reset()
 	popmessage("Reset");
 
 	// Configure RAM
-	address_space &program = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &program = m_i8088->space(AS_PROGRAM);
 	uint32_t unmap_start = m_inp8->read();
 
 	// Verify RAM size matches hardware (DIP switches)
@@ -1193,7 +1199,7 @@ void rainbow_state::machine_reset()
 	m_rtc->chip_reset();     // * Reset RTC to a defined state *
 
 	//  *********** HARD DISK CONTROLLERS...
-	address_space &io = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	address_space &io = m_i8088->space(AS_IO);
 	if (m_inp5->read() == 0x01) // ...PRESENT?
 	{
 		// Install 8088 read / write handler
@@ -1261,6 +1267,7 @@ void rainbow_state::machine_reset()
 	// *********** SERIAL COMM. (7201)
 	m_mpsc->reset();
 	m_mpsc_irq = 0;
+	m_printer_bitrate = 0;
 
 	// *********** KEYBOARD + IRQ
 	m_kbd_tx_ready = m_kbd_rx_ready = false;
@@ -1410,42 +1417,52 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
-	m_dbrg_A->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
+	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
 
-	m_dbrg_A->stt_w( ((data & 0xf0) >> 4) );
+	m_dbrg->stt_w( ((data & 0xf0) >> 4) );
 	logerror("(COMM.) transmit bitrate = %d ($%02x)\n", comm_rates[((data & 0xf0) >> 4)] ,(data & 0xf0) >> 4);
 }
 
 // PORT 0x0e : Printer bit rates
 WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
 {
-	m_dbrg_B->str_w(data & 7); // bits 0 - 2
-	m_dbrg_B->stt_w(data & 7); // TX and RX rate cannot be programmed independently.
+	m_printer_bitrate = data & 7;
+	// bits 0 - 2 = 0: nominally 75 bps, actually 75.35 bps
+	// bits 0 - 2 = 1: nominally 150 bps, actually 150.7 bps
+	// bits 0 - 2 = 2: nominally 300 bps, actually 301.4 bps
+	// bits 0 - 2 = 3: nominally 600 bps, actually 602.8 bps
+	// bits 0 - 2 = 4: nominally 1200 bps, actually 1205.6 bps
+	// bits 0 - 2 = 5: nominally 2400 bps, actually 2411.2 bps
+	// bits 0 - 2 = 6: nominally 4800 bps, actually 4822.4 bps (keyboard is tied to this rate)
+	// bits 0 - 2 = 7: nominally 9600 bps, actually 9644.8 bps
+	// TX and RX rate cannot be programmed independently.
 	logerror("\n(PRINTER) receive = transmit bitrate: %d ($%02x)", 9600 / ( 1 << (7 - (data & 7))) , data & 7);
 
 	// "bit 3 controls the communications port clock (RxC,TxC). External clock when 1, internal when 0"
 	logerror(" - CLOCK (0 = internal): %02x", data & 8);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_a_fr_w)
+WRITE_LINE_MEMBER(rainbow_state::dbrg_fr_w)
 {
 	m_mpsc->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_a_ft_w)
+WRITE_LINE_MEMBER(rainbow_state::dbrg_ft_w)
 {
 	m_mpsc->txca_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_b_fr_w)
+WRITE8_MEMBER(rainbow_state::bitrate_counter_w)
 {
-	m_mpsc->rxcb_w(state);
-}
+	bool prt_rxtxc = BIT(data, 7 - m_printer_bitrate);
+	bool kbd_rxtxc = BIT(data, 1);
 
-WRITE_LINE_MEMBER(rainbow_state::com8116_b_ft_w)
-{
-	m_mpsc->txcb_w(state);
+	m_mpsc->rxcb_w(prt_rxtxc);
+	m_mpsc->txcb_w(prt_rxtxc);
+
+	m_kbd8251->write_rxc(kbd_rxtxc);
+	m_kbd8251->write_txc(kbd_rxtxc);
 }
 
 // Only Z80 * private SRAM * is wait state free
@@ -1666,7 +1683,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 		return nullptr;
 
 	harddisk_image_device *img = nullptr;
-	img = dynamic_cast<harddisk_image_device *>(machine().device(subtag("decharddisk1").c_str()));
+	img = dynamic_cast<harddisk_image_device *>(subdevice("decharddisk1"));
 
 	if (!img)
 		return nullptr;
@@ -2172,13 +2189,12 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 //  [02] COMMUNICATIONS STATUS REGISTER - PAGE 154 (**** READ **** )
 //  Used to read status of SERIAL port, IRQ line of each CPU, and MHFU logic enable signal.
 
-// ******* TODO: 5 status bits * MISSING * ********************************************************
 // 0 COMM RI   (reflects status of RI line at COMM port)
 // 1 COMM SI / SCF(reflects status of speed indicator line or
 //                 the secondary receive line signal detect at COMM port)
 // 2 COMM DSR  (reflects status of DSR at COMM)
 // 3 COMM CTS  (reflects status of CTS at COMM)
-// 4 COMM RLSD (receive line signal detect at COMM)
+// 4 COMM RLSD (receive line signal detect at COMM; also connected to DCDA on MPSC)
 READ8_MEMBER(rainbow_state::comm_control_r)
 {
 	bool is_mhfu_enabled = false;
@@ -2186,6 +2202,11 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 		is_mhfu_enabled = m_crtc->MHFU(MHFU_IS_ENABLED);
 
 	return          (
+			(m_comm_port->ri_r() ? 0x01 : 0x00) |
+			(m_comm_port->si_r() ? 0x02 : 0x00) |
+			(m_comm_port->dsr_r() ? 0x04 : 0x00) |
+			(m_comm_port->cts_r() ? 0x08 : 0x00) |
+			(m_comm_port->dcd_r() ? 0x10 : 0x00) |
 			(is_mhfu_enabled ? 0x00 : 0x20) |   // (L) status of MHFU flag => bit pos.5
 			((INT88) ? 0x00 : 0x40) |           // (L)
 			((INTZ80) ? 0x00 : 0x80)            // (L)
@@ -2193,7 +2214,6 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 
 }
 
-// ******* TODO: 4 control bits * MISSING * ********************************************************
 //  Communication control register of -COMM- port (when written):
 // (these 4 bits talk DIRECTLY to the COMM port according to schematics):
 // 0 COMM SPD SEL H (controls speed select line of COMM port)
@@ -2203,6 +2223,11 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 WRITE8_MEMBER(rainbow_state::comm_control_w)
 {
 	logerror("%02x to COMM.CONTROL REGISTER ", data);
+
+	m_comm_port->write_spds(BIT(data, 0));
+	// SRTS not currently emulated
+	m_comm_port->write_dtr(BIT(data, 2));
+	m_comm_port->write_rts(BIT(data, 3));
 
 	/* 8088 LEDs:
 	5  7  6  4    <- BIT POSITION
@@ -2416,7 +2441,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 
 	floppy_connector *con = nullptr;
 	if (drive < MAX_FLOPPIES)
-		con = machine().device<floppy_connector>(names[drive]);
+		con = subdevice<floppy_connector>(names[drive]);
 
 	if (con)
 	{
@@ -2475,7 +2500,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		// Assume the other one is switched off -
 		for (int f_num = 0; f_num < MAX_FLOPPIES; f_num++)
 		{
-		floppy_connector *con = machine().device<floppy_connector>(names[f_num]);
+		floppy_connector *con = subdevice<floppy_connector>(names[f_num]);
 		floppy_image_device *tmp_floppy = con->get_device();
 
 		tmp_floppy->mon_w(ASSERT_LINE);
@@ -2740,7 +2765,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 		printf("\nWARNING: UNEMULATED DIAG LOOPBACK (directs RX50 and DC12 output to printer port) **** ");
 	}
 
-	address_space &io = machine().device<cpu_device>("maincpu")->space(AS_IO);
+	address_space &io = m_i8088->space(AS_IO);
 	if (data & 32)
 	{
 		/* BIT 5: PORT LOOPBACK (1 enables loopback for COMM, PRINTER, KEYBOARD ports)
@@ -2798,12 +2823,6 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 {
 	m_kbd_tx_ready = (state == 1) ? true : false;
 	update_kbd_irq();
-}
-
-WRITE_LINE_MEMBER(rainbow_state::write_keyboard_clock)
-{
-	m_kbd8251->write_txc(state);
-	m_kbd8251->write_rxc(state);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::hd_motor_tick)
@@ -2971,7 +2990,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			if(last_message != 1)
 			{
 				popmessage("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN REBOOT.\n");
-				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , machine().device("maincpu")->safe_pc());
+				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , m_i8088->pc());
 				last_message = 1;
 			}
 			return;
@@ -3179,17 +3198,19 @@ GFXDECODE_ENTRY("chargen", 0x0000, rainbow_charlayout, 0, 1)
 GFXDECODE_END
 
 // Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC-NEW):
-ADDRESS_MAP_START(rainbow_state::upd7220_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
-ADDRESS_MAP_END
+void rainbow_state::upd7220_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rw(this, FUNC(rainbow_state::vram_r), FUNC(rainbow_state::vram_w)).share("vram");
+}
 
 MACHINE_CONFIG_START(rainbow_state::rainbow)
 MCFG_DEFAULT_LAYOUT(layout_rainbow)
 
 /* basic machine hardware */
-MCFG_CPU_ADD("maincpu", I8088, XTAL(24'073'400) / 5)
+MCFG_CPU_ADD("maincpu", I8088, XTAL(24'073'400) / 5) // approximately 4.815 MHz
 MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
 MCFG_CPU_IO_MAP(rainbow8088_io)
+MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(rainbow_state, irq_callback)
 
 MCFG_CPU_ADD("subcpu", Z80, XTAL(24'073'400) / 6)
 MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
@@ -3277,44 +3298,34 @@ MCFG_HARDDISK_INTERFACE("corvus_hdd")
 
 MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-MCFG_DEVICE_ADD("com8116_a", COM8116, XTAL(5'068'800))     // Baud rate generator A
-MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_a_fr_w))
-MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_a_ft_w))
+MCFG_DEVICE_ADD("dbrg", COM8116_003, XTAL(24'073'400) / 4) // 6.01835 MHz (nominally 6 MHz)
+MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, dbrg_fr_w))
+MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, dbrg_ft_w))
 
-MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL(5'068'800)) // Baud rate generator B
-MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_b_fr_w))
-MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_b_ft_w))
-
-MCFG_DEVICE_ADD("upd7201", UPD7201_NEW, XTAL(2'500'000))    // 2.5 Mhz from schematics
+MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(24'073'400) / 5 / 2) // 2.4073 MHz (nominally 2.5 MHz)
 MCFG_Z80SIO_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
+MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("comm", rs232_port_device, write_txd))
+MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("printer", rs232_port_device, write_txd))
+// RTS and DTR outputs are not connected
 
-MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
-MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
-MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_rts))
+MCFG_RS232_PORT_ADD("comm", default_rs232_devices, nullptr)
+MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxa_w))
+MCFG_RS232_CTS_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, ctsa_w))
+MCFG_RS232_DCD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, dcda_w))
 
-MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
-MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_dtr))
-MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_rts))
+MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
+MCFG_RS232_RXD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, rxb_w))
+MCFG_RS232_DCD_HANDLER(DEVWRITELINE("mpsc", upd7201_new_device, ctsb_w)) // actually DTR
 
-MCFG_RS232_PORT_ADD("rs232_a", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxa_w))
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsa_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, dcda_w))
-
-MCFG_RS232_PORT_ADD("rs232_b", default_rs232_devices, nullptr)
-MCFG_RS232_RXD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, rxb_w))
-MCFG_RS232_CTS_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, ctsb_w))
-MCFG_RS232_DCD_HANDLER(DEVWRITELINE("upd7201", upd7201_new_device, dcdb_w))
-
-MCFG_DEVICE_MODIFY("rs232_a")
+MCFG_DEVICE_MODIFY("comm")
 MCFG_SLOT_OPTION_ADD("microsoft_mouse", MSFT_SERIAL_MOUSE)
 MCFG_SLOT_OPTION_ADD("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
 MCFG_SLOT_DEFAULT_OPTION("microsoft_mouse")
 
-MCFG_DEVICE_MODIFY("rs232_b")
+MCFG_DEVICE_MODIFY("printer")
 MCFG_SLOT_DEFAULT_OPTION("printer")
 
-MCFG_DEVICE_ADD("kbdser", I8251, 0)
+MCFG_DEVICE_ADD("kbdser", I8251, XTAL(24'073'400) / 5 / 2)
 MCFG_I8251_TXD_HANDLER(WRITELINE(rainbow_state, kbd_tx))
 MCFG_I8251_DTR_HANDLER(WRITELINE(rainbow_state, irq_hi_w))
 MCFG_I8251_RXRDY_HANDLER(WRITELINE(rainbow_state, kbd_rxready_w))
@@ -3322,8 +3333,11 @@ MCFG_I8251_TXRDY_HANDLER(WRITELINE(rainbow_state, kbd_txready_w))
 
 MCFG_DEVICE_ADD(LK201_TAG, LK201, 0)
 MCFG_LK201_TX_HANDLER(DEVWRITELINE("kbdser", i8251_device, write_rxd))
-MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800 * 16) // 8251 is set to /16 on the clock input
-MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(rainbow_state, write_keyboard_clock))
+
+MCFG_DEVICE_ADD("prtbrg", RIPPLE_COUNTER, XTAL(24'073'400) / 6 / 13) // 74LS393 at E17 (both halves)
+// divided clock should ideally be 307.2 kHz, but is actually approximately 308.6333 kHz
+MCFG_RIPPLE_COUNTER_STAGES(8)
+MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(rainbow_state, bitrate_counter_w))
 
 MCFG_TIMER_DRIVER_ADD_PERIODIC("motor", rainbow_state, hd_motor_tick, attotime::from_hz(60))
 

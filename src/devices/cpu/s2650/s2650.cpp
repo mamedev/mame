@@ -25,7 +25,7 @@
 #define INLINE_EA   1
 
 
-DEFINE_DEVICE_TYPE(S2650, s2650_device, "s2650", "S2650")
+DEFINE_DEVICE_TYPE(S2650, s2650_device, "s2650", "Signetics S2650")
 
 
 s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -48,9 +48,9 @@ bool s2650_device::get_z80_mnemonics_mode() const
 	return false;
 }
 
-util::disasm_interface *s2650_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> s2650_device::create_disassembler()
 {
-	return new s2650_disassembler(this);
+	return std::make_unique<s2650_disassembler>(this);
 }
 
 device_memory_interface::space_config_vector s2650_device::memory_space_config() const

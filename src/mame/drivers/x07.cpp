@@ -1220,21 +1220,23 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 	}
 }
 
-ADDRESS_MAP_START(x07_state::x07_mem)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x1fff) AM_NOP     //RAM installed at runtime
-	AM_RANGE(0x2000, 0x7fff) AM_NOP     //Memory Card RAM/ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM     //TV VRAM
-	AM_RANGE(0x9800, 0x9fff) AM_UNMAP   //unused/unknown
-	AM_RANGE(0xa000, 0xafff) AM_ROM     AM_REGION("x720", 0)        //TV ROM
-	AM_RANGE(0xb000, 0xffff) AM_ROM     AM_REGION("basic", 0)       //BASIC ROM
-ADDRESS_MAP_END
+void x07_state::x07_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x1fff).noprw();     //RAM installed at runtime
+	map(0x2000, 0x7fff).noprw();     //Memory Card RAM/ROM
+	map(0x8000, 0x97ff).ram();     //TV VRAM
+	map(0x9800, 0x9fff).unmaprw();   //unused/unknown
+	map(0xa000, 0xafff).rom().region("x720", 0);        //TV ROM
+	map(0xb000, 0xffff).rom().region("basic", 0);       //BASIC ROM
+}
 
-ADDRESS_MAP_START(x07_state::x07_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK (0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(x07_io_r, x07_io_w)
-ADDRESS_MAP_END
+void x07_state::x07_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(x07_state::x07_io_r), FUNC(x07_state::x07_io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( x07 )

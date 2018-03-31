@@ -45,38 +45,46 @@ class segajw_state : public driver_device
 {
 public:
 	segajw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_soundlatch(*this, "soundlatch")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_soundlatch(*this, "soundlatch")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_towerlamps(*this, "towerlamp%u", 0U)
 	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+
+	void segajw(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(coin_counter_r);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(hopper_w);
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(coinlockout_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
 
-	void segajw(machine_config &config);
+	// driver_device overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void ramdac_map(address_map &map);
 	void segajw_audiocpu_io_map(address_map &map);
 	void segajw_audiocpu_map(address_map &map);
 	void segajw_hd63484_map(address_map &map);
 	void segajw_map(address_map &map);
-protected:
 
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
+	output_finder<16> m_lamps;
+	output_finder<3> m_towerlamps;
 
-	// driver_device overrides
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint64_t      m_coin_start_cycles;
 	uint64_t      m_hopper_start_cycles;
 	uint8_t       m_coin_counter;
@@ -101,21 +109,21 @@ WRITE8_MEMBER(segajw_state::hopper_w)
 WRITE8_MEMBER(segajw_state::lamps1_w)
 {
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, BIT(data, i));
+		m_lamps[i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segajw_state::lamps2_w)
 {
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(8 + i, BIT(data, i));
+		m_lamps[8 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(segajw_state::coinlockout_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 
-	for(int i=0; i<3; i++)
-		output().set_indexed_value("towerlamp", i, BIT(data, 3 + i));
+	for (int i = 0; i < 3; i++)
+		m_towerlamps[i] = BIT(data, 3 + i);
 }
 
 INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
@@ -166,44 +174,48 @@ CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
 	return data;
 }
 
-ADDRESS_MAP_START(segajw_state::segajw_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void segajw_state::segajw_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE(0x080000, 0x080001) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x080002, 0x080003) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
+	map(0x080000, 0x080001).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x080002, 0x080003).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
 
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW0")
-	AM_RANGE(0x180004, 0x180005) AM_DEVREAD8("soundlatch2", generic_latch_8_device, read, 0x00ff) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("DSW3")
-	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("DSW2")
+	map(0x180000, 0x180001).portr("DSW0");
+	map(0x180005, 0x180005).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0x180008, 0x180009).portr("DSW1");
+	map(0x18000a, 0x18000b).portr("DSW3");
+	map(0x18000c, 0x18000d).portr("DSW2");
 
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE8("io1a", sega_315_5296_device, read, write, 0x00ff)
+	map(0x1a0000, 0x1a001f).rw("io1a", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE8("io1c", sega_315_5296_device, read, write, 0x00ff)
+	map(0x1c0000, 0x1c001f).rw("io1c", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x280000, 0x280001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x280002, 0x280003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x280004, 0x280005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
+	map(0x280001, 0x280001).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x280003, 0x280003).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x280005, 0x280005).w("ramdac", FUNC(ramdac_device::mask_w));
 
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(segajw_state::segajw_audiocpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segajw_state::segajw_audiocpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segajw_state::segajw_audiocpu_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void segajw_state::segajw_audiocpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xc0, 0xc0).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
-ADDRESS_MAP_START(segajw_state::segajw_hd63484_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0x80000, 0xbffff) AM_ROM AM_REGION("gfx1", 0)
-ADDRESS_MAP_END
+void segajw_state::segajw_hd63484_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+	map(0x80000, 0xbffff).rom().region("gfx1", 0);
+}
 
 
 static INPUT_PORTS_START( segajw )
@@ -338,6 +350,9 @@ INPUT_PORTS_END
 
 void segajw_state::machine_start()
 {
+	m_lamps.resolve();
+	m_towerlamps.resolve();
+
 	save_item(NAME(m_coin_start_cycles));
 	save_item(NAME(m_hopper_start_cycles));
 	save_item(NAME(m_coin_counter));
@@ -351,9 +366,10 @@ void segajw_state::machine_reset()
 	m_coin_counter = 0xff;
 }
 
-ADDRESS_MAP_START(segajw_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
+void segajw_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 MACHINE_CONFIG_START(segajw_state::segajw)
 	/* basic machine hardware */

@@ -41,9 +41,10 @@ WRITE8_MEMBER( comx35_state::cdp1869_w )
 
 /* CDP1869 */
 
-ADDRESS_MAP_START(comx35_state::cdp1869_page_ram)
-	AM_RANGE(0x000, 0x7ff) AM_RAM
-ADDRESS_MAP_END
+void comx35_state::cdp1869_page_ram(address_map &map)
+{
+	map(0x000, 0x7ff).ram();
+}
 
 CDP1869_CHAR_RAM_READ_MEMBER( comx35_state::comx35_charram_r )
 {

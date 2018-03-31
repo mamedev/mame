@@ -59,16 +59,16 @@
 
 
 #define MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK(_write) \
-	devcb = &ql_expansion_slot_device::set_ipl0l_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<ql_expansion_slot_device &>(*device).set_ipl0l_wr_callback(DEVCB_##_write);
 
 #define MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK(_write) \
-	devcb = &ql_expansion_slot_device::set_ipl1l_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<ql_expansion_slot_device &>(*device).set_ipl1l_wr_callback(DEVCB_##_write);
 
 #define MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK(_write) \
-	devcb = &ql_expansion_slot_device::set_berrl_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<ql_expansion_slot_device &>(*device).set_berrl_wr_callback(DEVCB_##_write);
 
 #define MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(_write) \
-	devcb = &ql_expansion_slot_device::set_extintl_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<ql_expansion_slot_device &>(*device).set_extintl_wr_callback(DEVCB_##_write);
 
 
 
@@ -107,10 +107,10 @@ public:
 	// construction/destruction
 	ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_ipl0l_wr_callback(device_t &device, Object &&cb) { return downcast<ql_expansion_slot_device &>(device).m_write_ipl0l.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ipl1l_wr_callback(device_t &device, Object &&cb) { return downcast<ql_expansion_slot_device &>(device).m_write_ipl1l.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_berrl_wr_callback(device_t &device, Object &&cb) { return downcast<ql_expansion_slot_device &>(device).m_write_berrl.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_extintl_wr_callback(device_t &device, Object &&cb) { return downcast<ql_expansion_slot_device &>(device).m_write_extintl.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ipl0l_wr_callback(Object &&cb) { return m_write_ipl0l.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ipl1l_wr_callback(Object &&cb) { return m_write_ipl1l.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_berrl_wr_callback(Object &&cb) { return m_write_berrl.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_extintl_wr_callback(Object &&cb) { return m_write_extintl.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }

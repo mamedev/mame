@@ -199,30 +199,32 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 }
 
 
-ADDRESS_MAP_START(chance32_state::chance32_map)
-	AM_RANGE(0x0000, 0xcfff) AM_ROM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(chance32_fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(chance32_bgram_w) AM_SHARE("bgram")
-ADDRESS_MAP_END
+void chance32_state::chance32_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom();
+	map(0xd800, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(chance32_state::chance32_fgram_w)).share("fgram");
+	map(0xf800, 0xffff).ram().w(this, FUNC(chance32_state::chance32_bgram_w)).share("bgram");
+}
 
-ADDRESS_MAP_START(chance32_state::chance32_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITENOP        // writing bit3 constantly... watchdog?
-	AM_RANGE(0x13, 0x13) AM_WRITE(mux_w)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("DSW1")
-	AM_RANGE(0x22, 0x22) AM_READ_PORT("DSW2")
-	AM_RANGE(0x23, 0x23) AM_READ_PORT("DSW3")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("DSW4")
-	AM_RANGE(0x25, 0x25) AM_READ(mux_r)
-	AM_RANGE(0x26, 0x26) AM_READ_PORT("UNK") // vblank (other bits are checked for different reasons)
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x31, 0x31) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(muxout_w)
-ADDRESS_MAP_END
+void chance32_state::chance32_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).nopw();        // writing bit3 constantly... watchdog?
+	map(0x13, 0x13).w(this, FUNC(chance32_state::mux_w));
+	map(0x20, 0x20).portr("DSW0");
+	map(0x21, 0x21).portr("DSW1");
+	map(0x22, 0x22).portr("DSW2");
+	map(0x23, 0x23).portr("DSW3");
+	map(0x24, 0x24).portr("DSW4");
+	map(0x25, 0x25).r(this, FUNC(chance32_state::mux_r));
+	map(0x26, 0x26).portr("UNK"); // vblank (other bits are checked for different reasons)
+	map(0x30, 0x30).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x31, 0x31).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x50, 0x50).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x60, 0x60).w(this, FUNC(chance32_state::muxout_w));
+}
 
 
 static INPUT_PORTS_START( chance32 )

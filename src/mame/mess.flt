@@ -9,6 +9,7 @@ a6809.cpp
 a7150.cpp
 a7800.cpp
 aa310.cpp
+aaa.cpp
 abc1600.cpp
 abc80.cpp
 abc80x.cpp
@@ -127,6 +128,7 @@ channelf.cpp
 chaos.cpp
 chessmst.cpp
 chesstrv.cpp
+cit101.cpp
 cit220.cpp
 ckz80.cpp
 clcd.cpp
@@ -153,6 +155,7 @@ cvicny.cpp
 cxgz80.cpp
 cxhumax.cpp
 cybiko.cpp
+cz101.cpp
 czk80.cpp
 d400.cpp
 d6800.cpp
@@ -166,6 +169,7 @@ dct11em.cpp
 dectalk.cpp
 decwritr.cpp
 dgn_beta.cpp
+diablo1300.cpp
 didact.cpp
 digel804.cpp
 digijet.cpp
@@ -283,6 +287,7 @@ hp9k_3xx.cpp
 hprot1.cpp
 hpz80unk.cpp
 hp80.cpp
+ht6000.cpp
 ht68k.cpp
 huebler.cpp
 hunter2.cpp
@@ -396,6 +401,7 @@ mikro80.cpp
 mikromik.cpp
 mikrosha.cpp
 mightyframe.cpp
+milton6805.cpp
 milwaukee.cpp
 mini2440.cpp
 minicom.cpp
@@ -548,6 +554,7 @@ prodigy.cpp
 prof180x.cpp
 prof80.cpp
 prophet600.cpp
+proteus.cpp
 proteus3.cpp
 ps2.cpp
 ps2sony.cpp
@@ -566,6 +573,7 @@ px8.cpp
 pyl601.cpp
 ql.cpp
 qtsbc.cpp
+qvt70.cpp
 qvt103.cpp
 qvt201.cpp
 qvt6800.cpp
@@ -592,6 +600,7 @@ rsc55.cpp
 rt1715.cpp
 rvoice.cpp
 rx78.cpp
+rz1.cpp
 rzone.cpp
 sacstate.cpp
 sage2.cpp
@@ -678,7 +687,6 @@ tek440x.cpp
 tekxp33x.cpp
 terak.cpp
 terco.cpp
-terminals.cpp
 test_t400.cpp
 testconsole.cpp
 tg100.cpp
@@ -725,6 +733,8 @@ tutor.cpp
 tv910.cpp
 tv912.cpp
 tv950.cpp
+tv955.cpp
+tv965.cpp
 tv990.cpp
 tvboy.cpp
 tvc.cpp

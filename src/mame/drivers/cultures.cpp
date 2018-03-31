@@ -188,54 +188,58 @@ WRITE8_MEMBER(cultures_state::bg_bank_w)
 }
 
 
-ADDRESS_MAP_START(cultures_state::oki_map)
-	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
-ADDRESS_MAP_END
+void cultures_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).rom();
+	map(0x20000, 0x3ffff).bankr("okibank");
+}
 
-ADDRESS_MAP_START(cultures_state::vrambank_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram")
-	AM_RANGE(0x4000, 0x6fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-ADDRESS_MAP_END
+void cultures_state::vrambank_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().w(this, FUNC(cultures_state::bg0_videoram_w)).share("bg0_videoram");
+	map(0x4000, 0x6fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+}
 
-ADDRESS_MAP_START(cultures_state::cultures_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("prgbank")
-	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("vrambank", address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void cultures_state::cultures_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("prgbank");
+	map(0x8000, 0xbfff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xdfff).ram();
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(cultures_state::cultures_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_RAM
-	AM_RANGE(0x10, 0x13) AM_RAM
-	AM_RANGE(0x20, 0x23) AM_RAM AM_SHARE("bg0_regs_x")
-	AM_RANGE(0x30, 0x33) AM_RAM AM_SHARE("bg0_regs_y")
-	AM_RANGE(0x40, 0x43) AM_RAM AM_SHARE("bg1_regs_x")
-	AM_RANGE(0x50, 0x53) AM_RAM AM_SHARE("bg1_regs_y")
-	AM_RANGE(0x60, 0x63) AM_RAM AM_SHARE("bg2_regs_x")
-	AM_RANGE(0x70, 0x73) AM_RAM AM_SHARE("bg2_regs_y")
-	AM_RANGE(0x80, 0x80) AM_WRITE(cpu_bankswitch_w)
-	AM_RANGE(0x90, 0x90) AM_WRITE(misc_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(bg_bank_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("SW1_A")
-	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("SW1_B")
-	AM_RANGE(0xd2, 0xd2) AM_READ_PORT("SW2_A")
-	AM_RANGE(0xd3, 0xd3) AM_READ_PORT("SW2_B")
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("KEY0")
-	AM_RANGE(0xe1, 0xe1) AM_READ_PORT("KEY1")
-	AM_RANGE(0xe2, 0xe2) AM_READ_PORT("KEY2")
-	AM_RANGE(0xe3, 0xe3) AM_READ_PORT("KEY3")
-	AM_RANGE(0xe4, 0xe4) AM_READ_PORT("KEY4")
-	AM_RANGE(0xe5, 0xe5) AM_READ_PORT("START")
-	AM_RANGE(0xf0, 0xf0) AM_READ_PORT("UNUSED1")
-	AM_RANGE(0xf1, 0xf1) AM_READ_PORT("UNUSED2")
-	AM_RANGE(0xf2, 0xf2) AM_READ_PORT("UNUSED3")
-	AM_RANGE(0xf3, 0xf3) AM_READ_PORT("UNUSED4")
-	AM_RANGE(0xf7, 0xf7) AM_READ_PORT("COINS")
-ADDRESS_MAP_END
+void cultures_state::cultures_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).ram();
+	map(0x10, 0x13).ram();
+	map(0x20, 0x23).ram().share("bg0_regs_x");
+	map(0x30, 0x33).ram().share("bg0_regs_y");
+	map(0x40, 0x43).ram().share("bg1_regs_x");
+	map(0x50, 0x53).ram().share("bg1_regs_y");
+	map(0x60, 0x63).ram().share("bg2_regs_x");
+	map(0x70, 0x73).ram().share("bg2_regs_y");
+	map(0x80, 0x80).w(this, FUNC(cultures_state::cpu_bankswitch_w));
+	map(0x90, 0x90).w(this, FUNC(cultures_state::misc_w));
+	map(0xa0, 0xa0).w(this, FUNC(cultures_state::bg_bank_w));
+	map(0xc0, 0xc0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xd0, 0xd0).portr("SW1_A");
+	map(0xd1, 0xd1).portr("SW1_B");
+	map(0xd2, 0xd2).portr("SW2_A");
+	map(0xd3, 0xd3).portr("SW2_B");
+	map(0xe0, 0xe0).portr("KEY0");
+	map(0xe1, 0xe1).portr("KEY1");
+	map(0xe2, 0xe2).portr("KEY2");
+	map(0xe3, 0xe3).portr("KEY3");
+	map(0xe4, 0xe4).portr("KEY4");
+	map(0xe5, 0xe5).portr("START");
+	map(0xf0, 0xf0).portr("UNUSED1");
+	map(0xf1, 0xf1).portr("UNUSED2");
+	map(0xf2, 0xf2).portr("UNUSED3");
+	map(0xf3, 0xf3).portr("UNUSED4");
+	map(0xf7, 0xf7).portr("COINS");
+}
 
 
 static INPUT_PORTS_START( cultures )

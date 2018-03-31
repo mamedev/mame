@@ -28,13 +28,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(amiga_keyboard_devices, _def_slot, false)
 
 #define MCFG_AMIGA_KEYBOARD_KCLK_HANDLER(_devcb) \
-	devcb = &amiga_keyboard_bus_device::set_kclk_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_keyboard_bus_device &>(*device).set_kclk_handler(DEVCB_##_devcb);
 
 #define MCFG_AMIGA_KEYBOARD_KDAT_HANDLER(_devcb) \
-	devcb = &amiga_keyboard_bus_device::set_kdat_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_keyboard_bus_device &>(*device).set_kdat_handler(DEVCB_##_devcb);
 
 #define MCFG_AMIGA_KEYBOARD_KRST_HANDLER(_devcb) \
-	devcb = &amiga_keyboard_bus_device::set_krst_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_keyboard_bus_device &>(*device).set_krst_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -53,14 +53,9 @@ public:
 	virtual ~amiga_keyboard_bus_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_kclk_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_keyboard_bus_device &>(device).m_kclk_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_kdat_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_keyboard_bus_device &>(device).m_kdat_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_krst_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_keyboard_bus_device &>(device).m_krst_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_kclk_handler(Object &&cb) { return m_kclk_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_kdat_handler(Object &&cb) { return m_kdat_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_krst_handler(Object &&cb) { return m_krst_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from keyboard
 	DECLARE_WRITE_LINE_MEMBER(kclk_w) { m_kclk_handler(state); }

@@ -275,26 +275,27 @@ WRITE8_MEMBER(sandscrp_state::soundlatch_w)
 	m_soundlatch[Latch]->write(space,0,data);
 }
 
-ADDRESS_MAP_START(sandscrp_state::sandscrp)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM     // ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(irq_cause_w) // IRQ Ack
+void sandscrp_state::sandscrp(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();     // ROM
+	map(0x100000, 0x100001).w(this, FUNC(sandscrp_state::irq_cause_w)); // IRQ Ack
 
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM     // RAM
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
-	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
-	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("view2", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w ) // sprites
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(coincounter_w)  // Coin Counters (Lockout unused)
-	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
-	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
-	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
-	AM_RANGE(0xec0000, 0xec0001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0x800000, 0x800001) AM_READ(irq_cause_r)  // IRQ Cause
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE8(soundlatch_r<1>, soundlatch_w<0>, 0x00ff)   // From/To Sound CPU
-	AM_RANGE(0xe40000, 0xe40001) AM_READWRITE(latchstatus_word_r, latchstatus_word_w) //
-ADDRESS_MAP_END
+	map(0x700000, 0x70ffff).ram();     // RAM
+	map(0x200000, 0x20001f).rw("calc1_mcu", FUNC(kaneko_hit_device::kaneko_hit_r), FUNC(kaneko_hit_device::kaneko_hit_w));
+	map(0x300000, 0x30001f).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_regs_w));
+	map(0x400000, 0x403fff).rw(m_view2, FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_r), FUNC(kaneko_view2_tilemap_device::kaneko_tmap_vram_w));
+	map(0x500000, 0x501fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w)); // sprites
+	map(0x600000, 0x600fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");    // Palette
+	map(0xa00000, 0xa00001).w(this, FUNC(sandscrp_state::coincounter_w));  // Coin Counters (Lockout unused)
+	map(0xb00000, 0xb00001).portr("P1");
+	map(0xb00002, 0xb00003).portr("P2");
+	map(0xb00004, 0xb00005).portr("SYSTEM");
+	map(0xb00006, 0xb00007).portr("UNK");
+	map(0xec0000, 0xec0001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0x800000, 0x800001).r(this, FUNC(sandscrp_state::irq_cause_r));  // IRQ Cause
+	map(0xe00001, 0xe00001).rw(this, FUNC(sandscrp_state::soundlatch_r<1>), FUNC(sandscrp_state::soundlatch_w<0>));   // From/To Sound CPU
+	map(0xe40000, 0xe40001).rw(this, FUNC(sandscrp_state::latchstatus_word_r), FUNC(sandscrp_state::latchstatus_word_w)); //
+}
 
 
 
@@ -313,21 +314,23 @@ READ8_MEMBER(sandscrp_state::latchstatus_r)
 			(m_latch_full[0] ? 0x40 : 0) ;
 }
 
-ADDRESS_MAP_START(sandscrp_state::sandscrp_soundmem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM     // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audiobank")    // Banked ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM     // RAM
-ADDRESS_MAP_END
+void sandscrp_state::sandscrp_soundmem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();     // ROM
+	map(0x8000, 0xbfff).bankr("audiobank");    // Banked ROM
+	map(0xc000, 0xdfff).ram();     // RAM
+}
 
-ADDRESS_MAP_START(sandscrp_state::sandscrp_soundport)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(bankswitch_w)    // ROM Bank
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)        // PORTA/B read
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", okim6295_device, write)     // OKIM6295
-	AM_RANGE(0x06, 0x06) AM_WRITE(soundlatch_w<1>)    //
-	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r<0>)     //
-	AM_RANGE(0x08, 0x08) AM_READ(latchstatus_r)    //
-ADDRESS_MAP_END
+void sandscrp_state::sandscrp_soundport(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(sandscrp_state::bankswitch_w));    // ROM Bank
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));        // PORTA/B read
+	map(0x04, 0x04).w("oki", FUNC(okim6295_device::write));     // OKIM6295
+	map(0x06, 0x06).w(this, FUNC(sandscrp_state::soundlatch_w<1>));    //
+	map(0x07, 0x07).r(this, FUNC(sandscrp_state::soundlatch_r<0>));     //
+	map(0x08, 0x08).r(this, FUNC(sandscrp_state::latchstatus_r));    //
+}
 
 
 /***************************************************************************

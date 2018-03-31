@@ -92,19 +92,20 @@ private:
 	int m_row;
 };
 
-ADDRESS_MAP_START(tv950_state::tv950_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("vram") // VRAM
-	AM_RANGE(0x8100, 0x8100) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, status_r, address_w)
-	AM_RANGE(0x8101, 0x8101) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, register_r, register_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(row_addr_w)
-	AM_RANGE(0x9300, 0x9303) AM_DEVREADWRITE(ACIA1_TAG, mos6551_device, read, write)
-	AM_RANGE(0x9500, 0x9503) AM_DEVREADWRITE(ACIA2_TAG, mos6551_device, read, write)
-	AM_RANGE(0x9900, 0x9903) AM_DEVREADWRITE(ACIA3_TAG, mos6551_device, read, write)
-	AM_RANGE(0xb100, 0xb10f) AM_DEVREADWRITE(VIA_TAG, via6522_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void tv950_state::tv950_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x3fff).ram().share("vram"); // VRAM
+	map(0x8100, 0x8100).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
+	map(0x8101, 0x8101).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
+	map(0x9000, 0x9000).w(this, FUNC(tv950_state::row_addr_w));
+	map(0x9300, 0x9303).rw(ACIA1_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x9500, 0x9503).rw(ACIA2_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x9900, 0x9903).rw(ACIA3_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xb100, 0xb10f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe000, 0xffff).rom().region("maincpu", 0);
+}
 
 
 /* Input ports */

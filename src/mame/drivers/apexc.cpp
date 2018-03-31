@@ -844,10 +844,11 @@ static GFXDECODE_START( apexc )
 GFXDECODE_END
 
 
-ADDRESS_MAP_START(apexc_state::apexc_mem_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("maincpu")
-	AM_RANGE(0x1000, 0x7fff) AM_NOP
-ADDRESS_MAP_END
+void apexc_state::apexc_mem_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("maincpu");
+	map(0x1000, 0x7fff).noprw();
+}
 
 
 MACHINE_CONFIG_START(apexc_state::apexc)

@@ -79,34 +79,37 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(blockhl_state::main_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x1f8c, 0x1f8c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW3")
-	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("P1")
-	AM_RANGE(0x1f96, 0x1f96) AM_READ_PORT("P2")
-	AM_RANGE(0x1f97, 0x1f97) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1f98, 0x1f98) AM_READ_PORT("DSW2")
-	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_DEVICE("bank5800", address_map_bank_device, amap8)
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
-ADDRESS_MAP_END
+void blockhl_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rw(this, FUNC(blockhl_state::k052109_051960_r), FUNC(blockhl_state::k052109_051960_w));
+	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x1f88, 0x1f88).w(this, FUNC(blockhl_state::sound_irq_w));
+	map(0x1f8c, 0x1f8c).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1f94, 0x1f94).portr("DSW3");
+	map(0x1f95, 0x1f95).portr("P1");
+	map(0x1f96, 0x1f96).portr("P2");
+	map(0x1f97, 0x1f97).portr("DSW1");
+	map(0x1f98, 0x1f98).portr("DSW2");
+	map(0x4000, 0x57ff).ram();
+	map(0x5800, 0x5fff).m(m_bank5800, FUNC(address_map_bank_device::amap8));
+	map(0x6000, 0x7fff).bankr("rombank");
+	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
+}
 
-ADDRESS_MAP_START(blockhl_state::bank5800_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM
-ADDRESS_MAP_END
+void blockhl_state::bank5800_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0x0800, 0x0fff).ram();
+}
 
-ADDRESS_MAP_START(blockhl_state::audio_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xe00c, 0xe00d) AM_WRITENOP // leftover from missing 007232?
-ADDRESS_MAP_END
+void blockhl_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe00c, 0xe00d).nopw(); // leftover from missing 007232?
+}
 
 
 //**************************************************************************

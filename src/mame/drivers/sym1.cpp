@@ -300,19 +300,20 @@ void sym1_state::machine_reset()
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(sym1_state::sym1_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM // U12/U13 RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAMBANK("bank2") AM_SHARE("ram_1k")
-	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK("bank3") AM_SHARE("ram_2k")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK("bank4") AM_SHARE("ram_3k")
-	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_SHARE("monitor") // U20 Monitor ROM
-	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("via1", via6522_device, read, write)  // U25 VIA #1
-	AM_RANGE(0xa400, 0xa41f) AM_DEVICE("riot", mos6532_new_device, io_map)  // U27 RIOT
-	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_SHARE("riot_ram")   // U27 RIOT RAM
-	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via2", via6522_device, read, write)  // U28 VIA #2
-	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via3", via6522_device, read, write)  // U29 VIA #3
-	AM_RANGE(0xb000, 0xefff) AM_ROM
-ADDRESS_MAP_END
+void sym1_state::sym1_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram(); // U12/U13 RAM
+	map(0x0400, 0x07ff).bankrw("bank2").share("ram_1k");
+	map(0x0800, 0x0bff).bankrw("bank3").share("ram_2k");
+	map(0x0c00, 0x0fff).bankrw("bank4").share("ram_3k");
+	map(0x8000, 0x8fff).rom().share("monitor"); // U20 Monitor ROM
+	map(0xa000, 0xa00f).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U25 VIA #1
+	map(0xa400, 0xa41f).m("riot", FUNC(mos6532_new_device::io_map));  // U27 RIOT
+	map(0xa600, 0xa67f).bankrw("bank5").share("riot_ram");   // U27 RIOT RAM
+	map(0xa800, 0xa80f).rw("via2", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U28 VIA #2
+	map(0xac00, 0xac0f).rw("via3", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U29 VIA #3
+	map(0xb000, 0xefff).rom();
+}
 
 
 //**************************************************************************

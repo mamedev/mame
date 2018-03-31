@@ -32,7 +32,7 @@ public:
 
 	adc12138_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_ipt_convert_callback(device_t &device, ipt_convert_delegate &&cb) { downcast<adc12138_device &>(device).m_ipt_read_cb = std::move(cb); }
+	template <typename Object> void set_ipt_convert_callback(Object &&cb) { m_ipt_read_cb = std::forward<Object>(cb); }
 
 	DECLARE_WRITE8_MEMBER( di_w );
 	DECLARE_WRITE8_MEMBER( cs_w );
@@ -88,6 +88,6 @@ DECLARE_DEVICE_TYPE(ADC12132, adc12132_device)
 
 
 #define MCFG_ADC1213X_IPT_CONVERT_CB(_class, _method) \
-	adc12138_device::set_ipt_convert_callback(*device, adc12138_device::ipt_convert_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc12138_device &>(*device).set_ipt_convert_callback(adc12138_device::ipt_convert_delegate(&_class::_method, #_class "::" #_method, this));
 
 #endif // MAME_MACHINE_ADC1213X_H

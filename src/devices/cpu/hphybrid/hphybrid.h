@@ -41,11 +41,11 @@
 
 // Set boot mode of 5061-3001: either normal (false) or as in HP9845 system (true)
 #define MCFG_HPHYBRID_SET_9845_BOOT(_mode) \
-	hp_5061_3001_cpu_device::set_boot_mode_static(*device, _mode);
+	downcast<hp_5061_3001_cpu_device &>(*device).set_boot_mode(_mode);
 
 // PA changed callback
 #define MCFG_HPHYBRID_PA_CHANGED(_devcb) \
-	devcb = &hp_hybrid_cpu_device::set_pa_changed_func(*device , DEVCB_##_devcb);
+	devcb = &downcast<hp_hybrid_cpu_device &>(*device).set_pa_changed_func(DEVCB_##_devcb);
 
 class hp_hybrid_cpu_device : public cpu_device
 {
@@ -57,7 +57,7 @@ public:
 
 	uint8_t pa_r() const;
 
-	template <class Object> static devcb_base &set_pa_changed_func(device_t &device, Object &&cb) { return downcast<hp_hybrid_cpu_device &>(device).m_pa_changed_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pa_changed_func(Object &&cb) { return m_pa_changed_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	hp_hybrid_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t addrwidth);
@@ -85,7 +85,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// Different cases of memory access
 	// See patent @ pg 361
@@ -161,7 +161,7 @@ class hp_5061_3001_cpu_device : public hp_hybrid_cpu_device
 public:
 	hp_5061_3001_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_boot_mode_static(device_t &device, bool mode) { downcast<hp_5061_3001_cpu_device &>(device).m_boot_mode = mode; }
+	void set_boot_mode(bool mode) { m_boot_mode = mode; }
 
 protected:
 	virtual void device_start() override;
@@ -179,7 +179,7 @@ protected:
 	void do_mpy();
 
 	virtual uint16_t execute_no_bpc_ioc(uint16_t opcode) override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual uint32_t add_mae(aec_cases_t aec_case, uint16_t addr) override;
 	virtual uint16_t read_non_common_reg(uint16_t addr) override;
 	virtual void write_non_common_reg(uint16_t addr , uint16_t v) override;

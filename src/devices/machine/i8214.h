@@ -33,10 +33,10 @@
 ///*************************************************************************
 
 #define MCFG_I8214_INT_CALLBACK(_write) \
-	devcb = &i8214_device::set_int_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<i8214_device &>(*device).set_int_wr_callback(DEVCB_##_write);
 
 #define MCFG_I8214_ENLG_CALLBACK(_write) \
-	devcb = &i8214_device::set_enlg_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<i8214_device &>(*device).set_enlg_wr_callback(DEVCB_##_write);
 
 
 
@@ -52,8 +52,8 @@ public:
 	// construction/destruction
 	i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_int_wr_callback(device_t &device, Object &&cb) { return downcast<i8214_device &>(device).m_write_int.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_enlg_wr_callback(device_t &device, Object &&cb) { return downcast<i8214_device &>(device).m_write_enlg.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_enlg_wr_callback(Object &&cb) { return m_write_enlg.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( sgs_w );
 	DECLARE_WRITE_LINE_MEMBER( etlg_w );

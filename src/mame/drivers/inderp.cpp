@@ -45,16 +45,17 @@ private:
 	u8 m_irqcnt;
 };
 
-ADDRESS_MAP_START(inderp_state::maincpu_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x500) AM_RAM // 2x 5101/2101, battery-backed
-	AM_RANGE(0x0200, 0x02ff) AM_MIRROR(0x400) // outputs CI-110 (displays)
-	AM_RANGE(0x0300, 0x030f) AM_MIRROR(0x4c0) AM_READWRITE(inputs_r,inputs_w) // outputs, one per address CI-118; inputs: whole range CI-159
-	AM_RANGE(0x0310, 0x0310) AM_MIRROR(0x4cf) // outputs, D0-D2, BOB0-7 (solenoids) CI-121
-	AM_RANGE(0x0320, 0x0320) AM_MIRROR(0x4cf) // outputs, D0-D3, (sound) CI-122
-	AM_RANGE(0x0330, 0x0337) AM_MIRROR(0x4c8) // outputs, D0-D7, one per address to 16 sets of 4-bit outputs (lamps)
-	AM_RANGE(0x0800, 0x1fff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void inderp_state::maincpu_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).mirror(0x500).ram(); // 2x 5101/2101, battery-backed
+	map(0x0200, 0x02ff).mirror(0x400); // outputs CI-110 (displays)
+	map(0x0300, 0x030f).mirror(0x4c0).rw(this, FUNC(inderp_state::inputs_r), FUNC(inderp_state::inputs_w)); // outputs, one per address CI-118; inputs: whole range CI-159
+	map(0x0310, 0x0310).mirror(0x4cf); // outputs, D0-D2, BOB0-7 (solenoids) CI-121
+	map(0x0320, 0x0320).mirror(0x4cf); // outputs, D0-D3, (sound) CI-122
+	map(0x0330, 0x0337).mirror(0x4c8); // outputs, D0-D7, one per address to 16 sets of 4-bit outputs (lamps)
+	map(0x0800, 0x1fff).rom().region("roms", 0);
+}
 
 // dsw: don't know bit order yet
 static INPUT_PORTS_START( inderp )

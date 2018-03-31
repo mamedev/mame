@@ -285,11 +285,6 @@ void vrc4373_device::reset_all_mappings()
 	pci_device::reset_all_mappings();
 }
 
-void vrc4373_device::set_cpu_tag(const char *_cpu_tag)
-{
-	LOGNILE("set_cpu_tag\n");
-	cpu_tag = _cpu_tag;
-}
 // PCI bus control
 READ32_MEMBER (vrc4373_device::pcictrl_r)
 {

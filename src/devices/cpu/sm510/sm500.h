@@ -18,7 +18,7 @@
 
 // LCD segment outputs: H1/2 as a0, O group as a1-a4, O data as d0-d3
 #define MCFG_SM500_WRITE_O_CB(_devcb) \
-	devcb = &sm500_device::set_write_o_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sm500_device &>(*device).set_write_o_callback(DEVCB_##_devcb);
 
 // see sm510.h for ACL, K, R, alpha, beta
 
@@ -79,8 +79,8 @@ class sm500_device : public sm510_base_device
 public:
 	sm500_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_write_o_callback(device_t &device, Object &&cb) { return downcast<sm500_device &>(device).m_write_o.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_write_o_callback(Object &&cb) { return m_write_o.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	sm500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int stack_levels, int o_pins, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
@@ -90,7 +90,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 	virtual void clock_melody() override;
@@ -161,7 +161,7 @@ protected:
 	void program_1_8k(address_map &map);
 	void data_5x13x4(address_map &map);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;
 	virtual int get_trs_field() override { return 1; }
 };

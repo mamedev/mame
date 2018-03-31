@@ -21,9 +21,185 @@
     SSD COMPANY LIMITED is already working on their next chip called "XaviX II" that is said to be a 32-bit RISC processor
     with 3D capabilities.
 
-    Important addresses
+    Notes:
 
-    0x18340 in Monster Truck is the self-test mode, shows me which registers need to retain their values etc.
+    To access service mode in Monster Truck hold Horn and Nitro on startup
+
+    There are multiple revisions of the CPU hardware, the SSD 2000 / SSD 2002 chips definitely add more opcodes
+    (thanks to Sean Riddle for this table)
+
+    preliminary list of XaviX software based on various sources (some likely still missing)
+
+     year       name                                                                                            PCB ID      ROM width       TSOP pads   ROM size        SEEPROM             die markings            extra components / notes
+
+    2011        anpan-man kazoku de ikunou mat DX/JoyPalette/Japan                                              -           -               -           -               -                   -                       -
+    2009        anpan-man pyon-pyon ikunou mat/JoyPalette/Japan                                                 -           -               -           -               -                   -                       -
+    2008        kyuukyoku! kinniku grand slam! SASUKE kanzen seiha/EPOCH/Japan                                  -           -               -           -               -                   -                       -
+    2007        Tokyo Friend park? perfect! mezase! grand slam!/EPOCH/Japan                                     -           -               -           -               -                   -                       -
+    2006    1   Let's TV Play series "Kamen Rider Kabuto" /EPOCH/Japan                                          -           -               -           -               -                   -                       -
+            2   Let's TV Play series "Bo-kenger" /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
+            3   Challenge Ai-chan! Exciting Ping-pong /TAKARATOMY/Japan                                         -           -               -           -               -                   -                       -
+            4   Sasuke & Sportsman Tournament /BANDAI/Japan                                                     -           -               -           -               -                   -                       -
+            5   Hyper resque, I am a resque team /BANDAI/Japan                                                  -           -               -           -               -                   -                       -
+            6   Let's TV Play series "Ultraman" /BANDAI/Japan                                                   -           -               -           -               -                   -                       -
+            7   Let's TV Play Classic series "Namco Nostalgia 1" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04                                      dumped non destructively
+            8   Let's TV Play Classic series "Namco Nostalgia 2" /BANDAI/Japan                                  CGSJ        x8              48          1M              24LC04              SSD 98 PL7351-181       dumped
+            9   Let's TV Play Classic series "Taito Nostalgia 1" /BANDAI/Japan                                  CGSJ        x8              48          2M              24LC04                                      flash, dumped non destructively
+            10  Let's TV Play Classic series "Taito Nostalgia 2" /BANDAI/Japan                                  CGSJ        x8              48          2M              24LC04                                      flash, dumped non destructively
+            11  Let's play and study! Doraemon Hiragana book /BANDAI/Japan                                      -           -               -           -               -                   -                       -
+            12  Scan card! Exciting Stage Soccer. /EPOCH/Japan                                                  -           -               -           -               -                   -                       -
+            13  Hello Kitty Super TV computer /EPOCH/Japan                                                      -           -               -           -               -                   -                       -
+            14  Doraemon Super TV computer /EPOCH/Japan                                                         -           -               -           -               -                   -                       -
+    2005    1   Let's TV Play series "Dragon Ball Z" /BANDAI/Japan                                              -           -               -           -               -                   -                       -
+            2   Let's TV Play series "Purikyua" /BANDAI/Japan                                                   -           -               -           -               -                   -                       -
+            3   Idaten Jump /TOMY/Japan                                                                         -           -               -           -               -                   -                       -
+            4   Tokyo Friend Park 2 Special /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
+            5   Masked Rider HIBIKI /BANDAI/Japan                                                               -           -               -           -               -                   -                       -
+            6   Magic Ranger Battle /BANDAI/Japan                                                               -           -               -           -               -                   -                       -
+            7   Accessory cartridge for Super TV computer "ECC Junior"/EPOCH/Japan                              -           -               -           -               -                   -                       -
+            8   Wild Adventure Mini Golf Game /Hasbro/USA                                                       MGFA        x8              48          4M              24C04               SSD 98 PL7351-181       dumped
+            9   MX DIRT REBEL Game /Hasbro/USA                                                                  MTXA        x8              48          8M              24C04               SSD 2000 NEC 85605-621  dumped
+            10  Dokodemo Doraemon Japan Travel Game DX /EPOCH/Japan                                             -           -               -           -               -                   -                       -
+            11  Tomas Plarail /TOMY/Japan                                                                       -           -               -           -               -                   -                       -
+            12  Thomas TV Personal Computer /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
+            13  STAR WARS Light Saber Battle /TOMY/Japan                                                        -           -               -           -               -                   -                       -
+            14  Jala Jaland /atlus/Japan                                                                        -           -               -           -               -                   -                       -
+            15  Star Wars Lightsaber Battle Game /Hasbro/USA                                                    SWSA        x8              48          8M              24C02               SSD 2000 NEC 85605-621  dumped
+            16  Gururin World /EPOCH/Japan                                                                      -           -               -           -               -                   -                       -
+            17  Toinohgi Onmyo-daisenki /BANDAI/Japan                                                           -           -               -           -               -                   -                       -
+    2004    1   Accessory cartridge for Super TV computer "Double mouse party"/EPOCH/Japan                      -           -               -           -               -                   -                       -
+            2   Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+            3   Virtual punching battle of "One Piece" /BANDAI/Japan                                            -           -               -           -               -                   -                       -
+            4   Accessory cartridge for Super TV computer "Doraemon"/EPOCH/Japan                                -           -               -           -               -                   -                       -
+            5   Accessory cartridge for Super TV computer "Hamutaro"/EPOCH/Japan                                -           -               -           -               -                   -                       -
+            6   Super TV computer /EPOCH/Japan                                                                  -           -               -           -               -                   -                       -
+            7   Super Dash ball /EPOCH/Japan                                                                    -           -               -           -               -                   -                       -
+            8   Exciting sports Tennis X Fitness /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
+            9   Accessory memory mascot for TV mail Pc mail cot 2 characters (Putchi, Petchi) /EPOCH/Japan      -           -               -           -               -                   -                       -
+            10  Accessory memory mascot for TV mail Pc mail cot 2 characters (Charuru, Kurau) /EPOCH/Japan      -           -               -           -               -                   -                       -
+            11  The Lord of the Rings Warrior of Middle Earth /Hasbro/USA                                       LORA        x8              48          8M              24C02               SSD 2000 NEC 85605-621  dumped
+            12  Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       -
+            13  All star Festival Quize /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+            14  e-kara mix /TAKARA/Japan                                                                        -           -               -           -               -                   -                       -
+            15  Jumping Popira /TAKARA/Japan                                                                    -           -               -           -               -                   -                       -
+            16  Tour around Japan. I'm a Prarail motorman /TOMY/Japan                                           -           -               -           -               -                   -                       -
+            17  TV mail PC "Mercot /EPOCH/Japan                                                                 -           -               -           -               -                   -                       -
+            18  Play TV Monster Truck /RADICA/USA                                                               74026       x8              48          4M              none                SSD 98 PL7351-181       dumped
+            19  Play TV Madden Football /RADICA/USA                                                             74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
+            20  Play TV SSX Snowboarder (and Snowboarder white?) /RADICA/USA                                    74023                       none                                                                    have
+            21  Disney Princess "Kira-Kira magical lesson" /TOMY/Japan                                          -           -               -           -               -                   -                       -
+            22  Mermaid Melody "pichi-pichi Pitch" e-pitch microcomputer pure starter set /TAKARA/Japan         -           -               -           -               -                   -                       -
+            23  Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+            24  Gan-Gan Revoultion /TAKARA/Japan                                                                -           -               -           -               -                   -                       -
+    2003    1   Tokyo Friend Park II /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
+            2   TV mah-jongg /EPOCH/Japan                                                                       -           -               -           -               -                   -                       -
+            3   e-kara Web /TAKARA/Japan                                                                        -           -               -           -               -                   -                       -
+            4   Doraemon TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
+            5   Exciting stadium DX, Hansin Tigers version /EPOCH/Japan                                         -           -               -           -               -                   -                       -
+            6   Dragon Quest /SQUARE ENIX/Japan                                                                 -           -               -           -               -                   -                       -
+            7   Croquette! Win a medal! /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+            8   Taiko Popira /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -
+            9   Together Minimoni, Dancing' Stage! plus /EPOCH/Japan                                            -           -               -           -               -                   -                       -
+            10  Evio /TOMY/Japan                                                                                -           -               -           -               -                   -                       -
+            11  Together Minimoni,Jumping Party! /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
+            12  Hamutaro TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
+            13  Jara-Ja Land /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -
+            14  Tomika, Draiving by Car navigation system /TOMY/Japan                                           -           -               -           -               -                   -                       -
+            15  PLAY TV Rescue Heroes /RADICA/USA                                                               73036       x8              48          2M              none                SSD 98 PL7351-181       dumped
+            16  PLAY TV Huntin' 2 /RADICA/USA                                                                   73030       x8              none                        none                SSD 98 PL7351-181       have
+            17  Let's play Ping-pong. Exciting pingpong2 /EPOCH/Japan                                           -           -               -           -               -                   -                       -
+            18  Cartridge for Slot machine TV "King of wild animal" /TAKARA/Japan                               -           -               -           -               -                   -                       -
+            19  ChyoroQ "Burning up Racer /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+            20  Super shot! Exciting golf /EPOCH/Japan                                                          -           -               -           -               -                   -                       -
+            21  PichiPichi Pitchi /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
+            22  Dual Station /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -
+            23  Gei-Geki GoGo! Shooting /TAKARA/Japan                                                           -           -               -           -               -                   -                       -
+            24  Let's fish a big one. Exciting fishing! /EPOCH/Japan                                            -           -               -           -               -                   -                       -
+            25  Champion Pinball /TOMY/Japan                                                                    -           -               -           -               -                   -                       -
+            26  Excite Fishing DX                                                                               EF2J        x8              48          4M              24C08               SSD 98 PL7351-181       dumped
+    2002    1   Accessory cartridge for Slot machine "Gin-gin maru TV" /TAKARA/Japan                            -           -               -           -               -                   -                       -
+            2   Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
+            3   Hamutaro's circus /EPOCH/Japan                                                                  -           -               -           -               -                   -                       -
+            4   Doraemon ,computer megaphone /EPOCH/Japan                                                       -           -               -           -               -                   -                       -
+            5   Strike! Exciting bowling /EPOCH/Japan                                                           -           -               -           -               -                   -                       -
+            6   e-kara /Hasbro/Spain                                                                            -           -               -           -               -                   -                       -
+            7   Starter set for e-kara H.S," Morning sisters" /TAKARA/Japan                                     -           -               -           -               -                   -                       -
+            8   e-kara H.S.(headphones set) /TAKARA/Japan                                                       -           -               -           -               -                   -                       -
+            9   Accessory cartridge for Slot machine TV," Aladdin TV" /TAKARA/Japan                             -           -               -           -               -                   -                       -
+            10  Accessory cartridge for Slot machine TV "Businessman Kintaro/TAKARA/Japan                       -           -               -           -               -                   -                       -
+            11  Poko-poko Hammers /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
+            12  e-kara N Angel blue special set /TAKARA/Japan                                                   -           -               -           -               -                   -                       -
+            13  Together Minimoni,Dancing Stage! /EPOCH/Japan                                                   -           -               -           -               -                   -                       -
+            14  King of shooting /TOMY/Japan                                                                    -           -               -           -               -                   -                       -
+            15  Knock them out! Exciting boxing /EPOCH/Japan                                                    -           -               -           -               -                   -                       -
+            16  Popira2 /TAKARA/Japan                                                                           -           -               -           -               -                   -                       -
+            17  Zuba-Zuba Blade /TAKARA/Japan                                                                   -           -               -           -               -                   -                       -
+            18  Starter set for e-kara N "Morning sisters" /TAKARA/Japan                                        -           -               -           -               -                   -                       -
+            19  e-kara /Hasbro/England                                                                          -           -               -           -               -                   -                       -
+            20  e-kara /Takara USA/USA                                                                          -           -               -           -               -                   -                       -
+            21  e-kara PLAY TV Soccer /RADICA/USA                                                               76088500    x8              none                        none                SSD 98 PA7351-107       (aka Radica PlayTV Soccer? if so, have)
+            22  PLAY TV Jr. Construction /RADICA/USA                                                            -           -               -           -               -                   -                       -
+            23  PLAY TV Boxing /RADICA/Japan                                                                    72039       x8              48          2M              none                SSD 98 PA7351-107       dumped
+            24  PLAY TV Baseball 2 /RADICA/USA                                                                  72042       x8              48          2M              none                SSD 98 PL7351-181       dumped
+            25  Barbie Dance Party /RADICA/USA,EU                                                               -           -               -           -               -                   -                       -
+            26  Compete! Exciting stadium DX /EPOCH/Japan                                                       -           -               -           -               -                   -                       -
+            27  e-kara N /EPOCH/Japan                                                                           -           -               -           -               -                   -                       -
+            28  Who's the ace? Excite Tennis /EPOCH/Japan                                                       -           -               -           -               -                   -                       -
+            29  Wildest computer robot, "Daigander" /TAKARA/Japan                                               -           -               -           -               -                   -                       -
+            30  Cartridge for Slot machine TV "King of wild animal Jr." /TAKARA/Japan                           -           -               -           -               -                   -                       -
+            31  Gachinko Contest! Slot machine TV /DCT/Japan                                                    -           -               -           -               -                   -                       -
+            32  Beyblade Ultimate shooter /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+    2001    1   Ping-pong(Chinese version) /Tenpon/China                                                        -           -               -           -               -                   -                       -
+            2   TV hockey /TOMY/Japan                                                                           -           -               -           -               -                   -                       -
+            3   e-kara Morning sisters /TAKARA/Japan                                                            -           -               -           -               -                   -                       -
+            4   e-kara Duet microphone plus /TAKARA/Japan                                                       -           -               -           -               -                   -                       -
+            5   e-kara plus /TAKARA/Japan                                                                       -           -               -           -               -                   -                       -
+            6   Hamutaro, Dancing', Running /EPOCH/Japan                                                        -           -               -           -               -                   -                       -
+            7   Gin-gin Snowboarders /TAKARA/Japan                                                              -           -               -           -               -                   -                       -
+            8   Shoot! Exciting striker /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
+            9   e-kara US version /TAKARA USA, Hasbro/USA,EU                                                    71076       x8              none        1M                                  SSD 98 PA7351-107       this one or #20 above?  dumped
+            10  Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
+            11  I singer: e-kara Korean version /SONOKONG/Korea                                                 -           -               -           -               -                   -                       -
+            12  Ms.Comett, Lovely baton /TAKARA/Japan<                                                          -           -               -           -               -                   -                       -
+            13  Dance Dance revolution family mat /KONAMI,KONAMI Sports/Japan                                   -           -               -           -               -                   -                       -
+            14  PLAY TV Card Night /RADICA/USA                                                                  71063       x8              40          1M              none                SSD 98 PA7351-107       dumped
+            15  PLAY TV Bass Fishin' /RADICA/USA                                                                71008       x8              40          1M              none                SSD 98 PA7351-107       dumped
+            16  PLAY TV Snowboarder (blue) /RADICA/USA                                                          71023       x8              40          1M              none                SSD 98 PL7351-181       dumped
+            17  Bistro Kids /SEGA Toys/Japan                                                                    -           -               -           -               -                   -                       -
+            18  Let's construct the town! /TAKARA/Japan                                                         -           -               -           -               -                   -                       -
+            19  Let's fish black bass! Exciting Fishing /EPOCH/Japan                                            -           -               -           -               -                   -                       -
+            20  Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
+            21  Ping-pong Korean version /SONOKONG/Korea                                                        -           -               -           -               -                   -                       -
+            22  e-kara Hello Kitty /TAKARA/Japan                                                                -           -               -           -               -                   -                       -
+            23  Special box "Morning sisters" /TAKARA/Japan                                                     -           -               -           -               -                   -                       -
+            24  Gan-Gan Adventure /TAKARA/Japan                                                                 -           -               -           -               -                   -                       -
+            25  e-kara wireless unit /TAKARA/Japan                                                              -           -               -           -               -                   -                       -
+            26  Webdiver Gradion /TAKARA/Japan                                                                  -           -               -           -               -                   -                       -
+            27  black bass tsurouze! Excite Fishing/EPOCH/Japan                                                 -           -               -           -               -                   -                       -
+            28  Hamu-chan's Daishuugou dance surunoda! hasirunoda!/EPOCH/Japan                                  -           -               -           -               -                   -                       -
+    2000    1   Popira /TAKARA/Japan                                                                            -           -               -           -               -                   -                       -
+            2   e-kara Duet microphone /TAKARA/Japan                                                            -           -               -           -               -                   -                       -
+            3   e-kara /TAKARA/Japan                                                                            -           -               -           -               -                   -                       -
+            4   Let's play ping-pong. Exciting ping-pong /EPOCH/Japan                                           -           -               -           -               -                   -                       -
+            5   PLAY TV Huntin' Buckmasters /RADICA/USA                                                         8074        x8              none                        none                SSD 98 PA7351-107       have
+            6   PLAY TV Ping Pong /RADICA/USA,HK,EU                                                             8028        x8              48          1M              none                SSD 97 PA7270-107       dumped
+            7   PLAY TV OPUS /RADICA/USA,EU                                                                     -           -               -           -               -                   -                       -
+            8   PLAY TV Baseball 2 /EPOCH/Japan, HK                                                             -           -               -           -               -                   -                       -
+            9   Let's hit a homerun! Exciting baseball /RADICA/USA,EU                                           8017        x8              none                        none                SSD 98 PA7351-107       (aka Radica PlayTV Baseball, if so, have)
+    1999    1   ABC Jungle Fun Hippo /Vteck/HK, USA, France                                                     -           -               -           -               -                   -                       -
+    Unknown 1   PLAY TV Football /RADICA/USA                                                                    74021       x8              48          4M              none                SSD 98 PL7351-181       dumped
+                XaviXTennis                                                                                     SGM6446     x16             48          8M              24C08               SSD 2002 NEC 85054-611  dumped
+                XaviXBowling                                                                                    SGM644C     x16             48                                                                      not dumped
+
+
+    TODO: put into above table (XaviXPORT cartridges)
+
+    XaviX Tennis and XaviX Baseball are the simplest: just the CPU, x16 ROM and 24C08 SEEPROM.  Bowling and Boxing also have 4 IR LEDs and a 32x32 sensor.
+    XaviX Fishing has ROM, 24C08 and a 24-pin daughterboard with a Nordic nRF24E1 2.4GHz 8051-based SoC.
+    All the rest of the carts include an S35390 I2C clock chip with crystal and battery backup, and have two x16 ROM chips, using a 5-pin single-gate inverter to create complementary /OE signals.
+    J-MAT, Fitness Exercise, Fitness Challenge and Bike Concept have a 24CS64 SEEPROM.  Bike Concept also has two 74HC14s.
+    Fitness Dance has an Atmel H93864C (maybe SEEPROM?) a Microchip DSPIC 33FJ12GP202 and two JRC 2740 dual op amps.
+    Music and Circuit has a 24CS64, two UTC324 quad op amps, a 74HC14, a 74HCT04, and an 8-pin SOIC labeled 61545, which is likely an M61545 dual electronic volume control.
 
 ***************************************************************************/
 
@@ -34,7 +210,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-
+// not confirmed for all games
 #define MAIN_CLOCK XTAL(21'477'272)
 
 class xavix_state : public driver_device
@@ -59,8 +235,7 @@ public:
 		m_in1(*this, "IN1"),
 		m_region(*this, "REGION"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_alt_addressing(0),
-		m_alt_addressing_base(0)
+		m_alt_addressing(0)
 	{ }
 
 	// devices
@@ -97,6 +272,9 @@ public:
 	DECLARE_WRITE8_MEMBER(irq_vector0_hi_w);
 	DECLARE_WRITE8_MEMBER(irq_vector1_lo_w);
 	DECLARE_WRITE8_MEMBER(irq_vector1_hi_w);
+
+	DECLARE_READ8_MEMBER(irq_source_r);
+	DECLARE_WRITE8_MEMBER(irq_source_w);
 
 	DECLARE_READ8_MEMBER(xavix_6ff0_r);
 	DECLARE_WRITE8_MEMBER(xavix_6ff0_w);
@@ -154,7 +332,6 @@ public:
 	DECLARE_DRIVER_INIT(xavix);
 	DECLARE_DRIVER_INIT(taitons1);
 	DECLARE_DRIVER_INIT(rad_box);
-	DECLARE_DRIVER_INIT(rad_crdn);
 
 	void xavix_map(address_map &map);
 protected:
@@ -248,7 +425,6 @@ private:
 	int get_current_address_byte();
 
 	int m_alt_addressing;
-	int m_alt_addressing_base;
 };
 
 void xavix_state::set_data_address(int address, int bit)
@@ -381,8 +557,6 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 		opaque = 0;
 	}
 
-	//printf("draw tilemap %d, regs base0 %02x base1 %02x base2 %02x tilesize,bpp %02x scrollx %02x scrolly %02x pal %02x mode %02x\n", which, tileregs[0x0], tileregs[0x1], tileregs[0x2], tileregs[0x3], tileregs[0x4], tileregs[0x5], tileregs[0x6], tileregs[0x7]);
-
 	switch (tileregs[0x3] & 0x30)
 	{
 	case 0x00:
@@ -440,6 +614,8 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 	if (tileregs[0x7] & 0x80)
 	{
+		//printf("draw tilemap %d, regs base0 %02x base1 %02x base2 %02x tilesize,bpp %02x scrollx %02x scrolly %02x pal %02x mode %02x\n", which, tileregs[0x0], tileregs[0x1], tileregs[0x2], tileregs[0x3], tileregs[0x4], tileregs[0x5], tileregs[0x6], tileregs[0x7]);
+
 		// there's a tilemap register to specify base in main ram, although in the monster truck test mode it points to an unmapped region
 		// and expected a fixed layout, we handle that in the memory map at the moment
 		int count;
@@ -451,6 +627,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 			{
 				int bpp, pal, scrolly, scrollx;
 				int tile = 0;
+				int extraattr = 0;
 
 				// the register being 0 probably isn't the condition here
 				if (tileregs[0x0] != 0x00) tile |= mainspace.read_byte((tileregs[0x0] << 8) + count);
@@ -458,7 +635,7 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 				// at the very least boxing leaves unwanted bits set in ram after changing between mode 0x8a and 0x82, expecting them to not be used
 				if (tileregs[0x7] & 0x08)
-					tile |= mainspace.read_byte((tileregs[0x2] << 8) + count) << 16;
+					extraattr = mainspace.read_byte((tileregs[0x2] << 8) + count);
 
 				count++;
 
@@ -494,37 +671,17 @@ void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, cons
 					}
 					else
 					{
+						tile = tile * 8;
+						basereg = (tile & 0x70000) >> 16;
+						tile &= 0xffff;
+						gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
+						tile += gfxbase;
+
 						if (tileregs[0x7] & 0x08)
 						{
-							// seems to be an alt mode where there more tile data comes from an additional attribute table including palette and the banking indirection is changed
-							tile = tile * 8; // << 3
-
-							// boxing suggests this check happens here
-							if ((tile & 0xffff) == 0)
-								continue;
-
-							tile &= 0x0ffff;
-
-							// how we use the banking bits is not clear..
-							tile += hackx * 0x10000;
-
-							/* 0x03 = bass fishing company logo, 0x01 = xavix logo, title, 0x04 = menu background
-
-							   0x05 = card night title (ntsc) 0x01 = xavix logo, menu background, 0x08 = card night title (pal)  (potentially buggy, code flow seems wrong)
-
-							   0x0e = boxing (instruction stuff) also needs palette settings.. also some bits on same layer using different bank? (0xd) or just disabled?
-
-							*/
-
-						}
-						else
-						{
-							// fixed multiplier? or just different? only seen this in 16x8 tile mode at the moment.
-							tile = tile * 8;
-							basereg = (tile & 0xf0000) >> 16;
-							tile &= 0xffff;
-							gfxbase = (m_spr_attra[(basereg * 2) + 1] << 16) | (m_spr_attra[(basereg * 2)] << 8);
-							tile += gfxbase;
+							// make use of the extraattr stuff?
+							pal = (extraattr & 0xf0)>>4;
+							// low bits are priority?
 						}
 					}
 				}
@@ -700,9 +857,7 @@ void xavix_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, cons
 				tile = tile * 8;
 		}
 
-		if (m_alt_addressing==1)
-			tile += m_alt_addressing_base;
-		else if (m_alt_addressing == 2)
+		if (m_alt_addressing != 0)
 		{
 			int basereg = (tile & 0xf0000) >> 16;
 			tile &= 0xffff;
@@ -814,21 +969,28 @@ uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE8_MEMBER(xavix_state::dma_trigger_w)
 {
-	logerror("%s: dma_trigger_w %02x\n", machine().describe_context(), data);
-
-	uint32_t source = (m_rom_dmasrc_hi_data << 16) | (m_rom_dmasrc_md_data<<8) | m_rom_dmasrc_lo_data;
-	uint16_t dest = (m_rom_dmadst_hi_data<<8) | m_rom_dmadst_lo_data;
-	uint16_t len = (m_rom_dmalen_hi_data<<8) | m_rom_dmalen_lo_data;
-
-	source &= m_rgnlen-1;
-	logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
-
-	address_space& destspace = m_maincpu->space(AS_PROGRAM);
-
-	for (int i = 0; i < len; i++)
+	if (data & 0x01) // namcons2 writes 0x81, most of the time things write 0x01
 	{
-		uint8_t dat = m_rgn[(source + i) & (m_rgnlen-1)];
-		destspace.write_byte(dest + i, dat);
+		logerror("%s: dma_trigger_w (do DMA?) %02x\n", machine().describe_context(), data);
+
+		uint32_t source = (m_rom_dmasrc_hi_data << 16) | (m_rom_dmasrc_md_data << 8) | m_rom_dmasrc_lo_data;
+		uint16_t dest = (m_rom_dmadst_hi_data << 8) | m_rom_dmadst_lo_data;
+		uint16_t len = (m_rom_dmalen_hi_data << 8) | m_rom_dmalen_lo_data;
+
+		source &= m_rgnlen - 1;
+		logerror("  (possible DMA op SRC %08x DST %04x LEN %04x)\n", source, dest, len);
+
+		address_space& destspace = m_maincpu->space(AS_PROGRAM);
+
+		for (int i = 0; i < len; i++)
+		{
+			uint8_t dat = m_rgn[(source + i) & (m_rgnlen - 1)];
+			destspace.write_byte(dest + i, dat);
+		}
+	}
+	else // the interrupt routine writes 0x80 to the trigger, maybe 'clear IRQ?'
+	{
+		logerror("%s: dma_trigger_w (unknown) %02x\n", machine().describe_context(), data);
 	}
 }
 
@@ -1307,9 +1469,9 @@ WRITE8_MEMBER(xavix_state::xavix_6fd8_w) // also related to tilemap 2?
 {
 	// possibly just a mirror of tmap2_regs_w, at least it writes 0x04 here which would be the correct
 	// base address to otherwise write at tmap2_regs_w offset 0
-	tmap2_regs_w(space,offset,data);
+//  tmap2_regs_w(space,offset,data);
 
-	//logerror("%s: xavix_6fd8_w data %02x\n", machine().describe_context(), data);
+	logerror("%s: xavix_6fd8_w data %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(xavix_state::tmap2_regs_w)
@@ -1343,77 +1505,101 @@ READ8_MEMBER(xavix_state::xavix_4000_r)
 	}
 }
 
+READ8_MEMBER(xavix_state::irq_source_r)
+{
+	/* the 2nd IRQ routine (regular IRQ, not NMI?) reads here before deciding what to do
+
+	 the following bits have been seen to be checked (active low?)
+
+	  0x40 - Monster Truck - stuff with 6ffb 6fd6 and 6ff8
+	  0x20 - most games (but not Monster Truck) - DMA related?
+	  0x10 - card night + monster truck - 7c00 related? (increases 16-bit counter in ram stores 0xc1 at 7c00)
+	  0x08 - several games - Input related (ADC? - used for analog control on Monster Truck) (uses 7a80 top bit to determine direction, and 7a81 0x08 as an output, presumably to clock)
+	  0x04 - Monster Truck - loads/stores 7b81
+	*/
+	logerror("%s: irq_source_r\n", machine().describe_context());
+	return 0xff;
+}
+
+WRITE8_MEMBER(xavix_state::irq_source_w)
+{
+	logerror("%s: irq_source_w %02x\n", machine().describe_context(), data);
+	// cleared on startup in monster truck, no purpose?
+}
+
+
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
-ADDRESS_MAP_START(xavix_state::xavix_map)
-	AM_RANGE(0x000000, 0x0001ff) AM_RAM
-	AM_RANGE(0x000200, 0x003fff) AM_RAM AM_SHARE("mainram")
+void xavix_state::xavix_map(address_map &map)
+{
+	map(0x000000, 0x0001ff).ram();
+	map(0x000200, 0x003fff).ram().share("mainram");
 
 	// this might not be a real area, the tilemap base register gets set to 0x40 in monster truck service mode, and expects a fixed layout.
 	// As that would point at this address maybe said layout is being read from here, or maybe it's just a magic tilemap register value that doesn't read address space at all.
-	AM_RANGE(0x004000, 0x0041ff) AM_READ(xavix_4000_r)
+	map(0x004000, 0x0041ff).r(this, FUNC(xavix_state::xavix_4000_r));
 
 	// 6xxx ranges are the video hardware
 	// appears to be 256 sprites (shares will be renamed once their purpose is known)
-	AM_RANGE(0x006000, 0x0060ff) AM_RAM AM_SHARE("spr_attr0")
-	AM_RANGE(0x006100, 0x0061ff) AM_RAM AM_SHARE("spr_attr1")
-	AM_RANGE(0x006200, 0x0062ff) AM_RAM AM_SHARE("spr_ypos") // cleared to 0x80 by both games, maybe enable registers?
-	AM_RANGE(0x006300, 0x0063ff) AM_RAM AM_SHARE("spr_xpos")
-	AM_RANGE(0x006400, 0x0064ff) AM_RAM // 6400 range gets populated in some cases, but it seems to be more like work ram, data doesn't matter and must be ignored?
-	AM_RANGE(0x006500, 0x0065ff) AM_RAM AM_SHARE("spr_addr_lo")
-	AM_RANGE(0x006600, 0x0066ff) AM_RAM AM_SHARE("spr_addr_md")
-	AM_RANGE(0x006700, 0x0067ff) AM_RAM AM_SHARE("spr_addr_hi")
-	AM_RANGE(0x006800, 0x0068ff) AM_RAM AM_SHARE("palram1") // written with 6900
-	AM_RANGE(0x006900, 0x0069ff) AM_RAM AM_SHARE("palram2") // startup (taitons1)
-	AM_RANGE(0x006a00, 0x006a1f) AM_RAM AM_SHARE("spr_attra") // test mode, pass flag 0x20
+	map(0x006000, 0x0060ff).ram().share("spr_attr0");
+	map(0x006100, 0x0061ff).ram().share("spr_attr1");
+	map(0x006200, 0x0062ff).ram().share("spr_ypos"); // cleared to 0x80 by both games, maybe enable registers?
+	map(0x006300, 0x0063ff).ram().share("spr_xpos");
+	map(0x006400, 0x0064ff).ram(); // 6400 range gets populated in some cases, but it seems to be more like work ram, data doesn't matter and must be ignored?
+	map(0x006500, 0x0065ff).ram().share("spr_addr_lo");
+	map(0x006600, 0x0066ff).ram().share("spr_addr_md");
+	map(0x006700, 0x0067ff).ram().share("spr_addr_hi");
+	map(0x006800, 0x0068ff).ram().share("palram1"); // written with 6900
+	map(0x006900, 0x0069ff).ram().share("palram2"); // startup (taitons1)
+	map(0x006a00, 0x006a1f).ram().share("spr_attra"); // test mode, pass flag 0x20
 
 
-	AM_RANGE(0x006fc0, 0x006fc0) AM_WRITE(xavix_6fc0_w) // startup (maybe this is a mirror of tmap1_regs_w)
+	map(0x006fc0, 0x006fc0).w(this, FUNC(xavix_state::xavix_6fc0_w)); // startup (maybe this is a mirror of tmap1_regs_w)
 
-	AM_RANGE(0x006fc8, 0x006fcf) AM_WRITE(tmap1_regs_w) // video registers
+	map(0x006fc8, 0x006fcf).w(this, FUNC(xavix_state::tmap1_regs_w)); // video registers
 
-	AM_RANGE(0x006fd0, 0x006fd7) AM_READWRITE(tmap2_regs_r, tmap2_regs_w)
-	AM_RANGE(0x006fd8, 0x006fd8) AM_WRITE(xavix_6fd8_w) // startup (mirror of tmap2_regs_w?)
+	map(0x006fd0, 0x006fd7).rw(this, FUNC(xavix_state::tmap2_regs_r), FUNC(xavix_state::tmap2_regs_w));
+	map(0x006fd8, 0x006fd8).w(this, FUNC(xavix_state::xavix_6fd8_w)); // startup (mirror of tmap2_regs_w?)
 
-	AM_RANGE(0x006fe0, 0x006fe0) AM_READWRITE(vid_dma_trigger_r, vid_dma_trigger_w) // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
-	AM_RANGE(0x006fe1, 0x006fe2) AM_WRITE(vid_dma_params_1_w)
-	AM_RANGE(0x006fe5, 0x006fe6) AM_WRITE(vid_dma_params_2_w)
+	map(0x006fe0, 0x006fe0).rw(this, FUNC(xavix_state::vid_dma_trigger_r), FUNC(xavix_state::vid_dma_trigger_w)); // after writing to 6fe1/6fe2 and 6fe5/6fe6 rad_mtrk writes 0x43/0x44 here then polls on 0x40   (see function call at c273) write values are hardcoded, similar code at 18401
+	map(0x006fe1, 0x006fe2).w(this, FUNC(xavix_state::vid_dma_params_1_w));
+	map(0x006fe5, 0x006fe6).w(this, FUNC(xavix_state::vid_dma_params_2_w));
 
 	// function in rad_mtrk at 0184b7 uses this
-	AM_RANGE(0x006fe8, 0x006fe8) AM_RAM // r/w tested
-	AM_RANGE(0x006fe9, 0x006fe9) AM_RAM // r/w tested
+	map(0x006fe8, 0x006fe8).ram(); // r/w tested
+	map(0x006fe9, 0x006fe9).ram(); // r/w tested
 	//AM_RANGE(0x006fea, 0x006fea) AM_WRITENOP
 
-	AM_RANGE(0x006ff0, 0x006ff0) AM_READWRITE(xavix_6ff0_r, xavix_6ff0_w) // r/w tested
+	map(0x006ff0, 0x006ff0).rw(this, FUNC(xavix_state::xavix_6ff0_r), FUNC(xavix_state::xavix_6ff0_w)); // r/w tested
 	//AM_RANGE(0x006ff1, 0x006ff1) AM_WRITENOP // startup - cleared in interrupt 0
 	//AM_RANGE(0x006ff2, 0x006ff2) AM_WRITENOP // set to 07 after clearing above things in interrupt 0
 
-	AM_RANGE(0x006ff8, 0x006ff8) AM_READWRITE(xavix_6ff8_r, xavix_6ff8_w) // always seems to be a read/store or read/modify/store
-	AM_RANGE(0x006ff9, 0x006ff9) AM_READ(pal_ntsc_r)
+	map(0x006ff8, 0x006ff8).rw(this, FUNC(xavix_state::xavix_6ff8_r), FUNC(xavix_state::xavix_6ff8_w)); // always seems to be a read/store or read/modify/store
+	map(0x006ff9, 0x006ff9).r(this, FUNC(xavix_state::pal_ntsc_r));
 
 	// 7xxx ranges system controller?
 
-	AM_RANGE(0x0075f0, 0x0075f0) AM_READWRITE(xavix_75f0_r, xavix_75f0_w) // r/w tested read/written 8 times in a row
-	AM_RANGE(0x0075f1, 0x0075f1) AM_READWRITE(xavix_75f1_r, xavix_75f1_w) // r/w tested read/written 8 times in a row
-	AM_RANGE(0x0075f3, 0x0075f3) AM_RAM
-	AM_RANGE(0x0075f4, 0x0075f4) AM_READ(xavix_75f4_r) // related to 75f0 (read after writing there - rad_mtrk)
-	AM_RANGE(0x0075f5, 0x0075f5) AM_READ(xavix_75f5_r) // related to 75f1 (read after writing there - rad_mtrk)
+	map(0x0075f0, 0x0075f0).rw(this, FUNC(xavix_state::xavix_75f0_r), FUNC(xavix_state::xavix_75f0_w)); // r/w tested read/written 8 times in a row
+	map(0x0075f1, 0x0075f1).rw(this, FUNC(xavix_state::xavix_75f1_r), FUNC(xavix_state::xavix_75f1_w)); // r/w tested read/written 8 times in a row
+	map(0x0075f3, 0x0075f3).ram();
+	map(0x0075f4, 0x0075f4).r(this, FUNC(xavix_state::xavix_75f4_r)); // related to 75f0 (read after writing there - rad_mtrk)
+	map(0x0075f5, 0x0075f5).r(this, FUNC(xavix_state::xavix_75f5_r)); // related to 75f1 (read after writing there - rad_mtrk)
 
 	// taitons1 after 75f7/75f8
-	AM_RANGE(0x0075f6, 0x0075f6) AM_READWRITE(xavix_75f6_r, xavix_75f6_w) // r/w tested
+	map(0x0075f6, 0x0075f6).rw(this, FUNC(xavix_state::xavix_75f6_r), FUNC(xavix_state::xavix_75f6_w)); // r/w tested
 	// taitons1 written as a pair
-	AM_RANGE(0x0075f7, 0x0075f7) AM_WRITE(xavix_75f7_w)
-	AM_RANGE(0x0075f8, 0x0075f8) AM_READWRITE(xavix_75f8_r, xavix_75f8_w) // r/w tested
+	map(0x0075f7, 0x0075f7).w(this, FUNC(xavix_state::xavix_75f7_w));
+	map(0x0075f8, 0x0075f8).rw(this, FUNC(xavix_state::xavix_75f8_r), FUNC(xavix_state::xavix_75f8_w)); // r/w tested
 	// taitons1 written after 75f6, then read
-	AM_RANGE(0x0075f9, 0x0075f9) AM_READWRITE(xavix_75f9_r, xavix_75f9_w)
+	map(0x0075f9, 0x0075f9).rw(this, FUNC(xavix_state::xavix_75f9_r), FUNC(xavix_state::xavix_75f9_w));
 	// at another time
-	AM_RANGE(0x0075fa, 0x0075fa) AM_READWRITE(xavix_75fa_r, xavix_75fa_w) // r/w tested
-	AM_RANGE(0x0075fb, 0x0075fb) AM_READWRITE(xavix_75fb_r, xavix_75fb_w) // r/w tested
-	AM_RANGE(0x0075fc, 0x0075fc) AM_READWRITE(xavix_75fc_r, xavix_75fc_w) // r/w tested
-	AM_RANGE(0x0075fd, 0x0075fd) AM_READWRITE(xavix_75fd_r, xavix_75fd_w) // r/w tested
-	AM_RANGE(0x0075fe, 0x0075fe) AM_WRITE(xavix_75fe_w)
+	map(0x0075fa, 0x0075fa).rw(this, FUNC(xavix_state::xavix_75fa_r), FUNC(xavix_state::xavix_75fa_w)); // r/w tested
+	map(0x0075fb, 0x0075fb).rw(this, FUNC(xavix_state::xavix_75fb_r), FUNC(xavix_state::xavix_75fb_w)); // r/w tested
+	map(0x0075fc, 0x0075fc).rw(this, FUNC(xavix_state::xavix_75fc_r), FUNC(xavix_state::xavix_75fc_w)); // r/w tested
+	map(0x0075fd, 0x0075fd).rw(this, FUNC(xavix_state::xavix_75fd_r), FUNC(xavix_state::xavix_75fd_w)); // r/w tested
+	map(0x0075fe, 0x0075fe).w(this, FUNC(xavix_state::xavix_75fe_w));
 	// taitons1 written other 75xx operations
-	AM_RANGE(0x0075ff, 0x0075ff) AM_WRITE(xavix_75ff_w)
+	map(0x0075ff, 0x0075ff).w(this, FUNC(xavix_state::xavix_75ff_w));
 
 	//AM_RANGE(0x007810, 0x007810) AM_WRITENOP // startup
 
@@ -1421,21 +1607,21 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	//AM_RANGE(0x007902, 0x007902) AM_WRITENOP // startup
 
 	// DMA trigger for below (written after the others) waits on status of bit 1 in a loop
-	AM_RANGE(0x007980, 0x007980) AM_READWRITE(dma_trigger_r, dma_trigger_w)
+	map(0x007980, 0x007980).rw(this, FUNC(xavix_state::dma_trigger_r), FUNC(xavix_state::dma_trigger_w));
 	// DMA source
-	AM_RANGE(0x007981, 0x007981) AM_WRITE(rom_dmasrc_lo_w)
-	AM_RANGE(0x007982, 0x007982) AM_WRITE(rom_dmasrc_md_w)
-	AM_RANGE(0x007983, 0x007983) AM_WRITE(rom_dmasrc_hi_w)
+	map(0x007981, 0x007981).w(this, FUNC(xavix_state::rom_dmasrc_lo_w));
+	map(0x007982, 0x007982).w(this, FUNC(xavix_state::rom_dmasrc_md_w));
+	map(0x007983, 0x007983).w(this, FUNC(xavix_state::rom_dmasrc_hi_w));
 	// DMA dest
-	AM_RANGE(0x007984, 0x007984) AM_WRITE(rom_dmadst_lo_w)
-	AM_RANGE(0x007985, 0x007985) AM_WRITE(rom_dmadst_hi_w)
+	map(0x007984, 0x007984).w(this, FUNC(xavix_state::rom_dmadst_lo_w));
+	map(0x007985, 0x007985).w(this, FUNC(xavix_state::rom_dmadst_hi_w));
 	// DMA length
-	AM_RANGE(0x007986, 0x007986) AM_WRITE(rom_dmalen_lo_w)
-	AM_RANGE(0x007987, 0x007987) AM_WRITE(rom_dmalen_hi_w)
+	map(0x007986, 0x007986).w(this, FUNC(xavix_state::rom_dmalen_lo_w));
+	map(0x007987, 0x007987).w(this, FUNC(xavix_state::rom_dmalen_hi_w));
 
 	// GPIO stuff
-	AM_RANGE(0x007a00, 0x007a00) AM_READ(xavix_io_0_r)
-	AM_RANGE(0x007a01, 0x007a01) AM_READ(xavix_io_1_r) //AM_WRITENOP // startup (taitons1)
+	map(0x007a00, 0x007a00).r(this, FUNC(xavix_state::xavix_io_0_r));
+	map(0x007a01, 0x007a01).r(this, FUNC(xavix_state::xavix_io_1_r)); //AM_WRITENOP // startup (taitons1)
 	//AM_RANGE(0x007a02, 0x007a02) AM_WRITENOP // startup, gets set to 20, 7a00 is then also written with 20
 	//AM_RANGE(0x007a03, 0x007a03) AM_READNOP AM_WRITENOP // startup (gets set to 84 which is the same as the bits checked on 7a01, possible port direction register?)
 
@@ -1449,21 +1635,24 @@ ADDRESS_MAP_START(xavix_state::xavix_map)
 	//AM_RANGE(0x007c02, 0x007c02) AM_WRITENOP // once
 
 	// this is a multiplication chip
-	AM_RANGE(0x007ff2, 0x007ff4) AM_WRITE(mult_param_w)
-	AM_RANGE(0x007ff5, 0x007ff6) AM_READ(mult_r)
+	map(0x007ff2, 0x007ff4).w(this, FUNC(xavix_state::mult_param_w));
+	map(0x007ff5, 0x007ff6).r(this, FUNC(xavix_state::mult_r));
 
 	// maybe irq enable, written after below
-	AM_RANGE(0x007ff9, 0x007ff9) AM_WRITE(irq_enable_w)
+	map(0x007ff9, 0x007ff9).w(this, FUNC(xavix_state::irq_enable_w)); // interrupt related, but probalby not a simple 'enable' otherwise interrupts happen before we're ready for them.
 	// an IRQ vector (nmi?)
-	AM_RANGE(0x007ffa, 0x007ffa) AM_WRITE(irq_vector0_lo_w)
-	AM_RANGE(0x007ffb, 0x007ffb) AM_WRITE(irq_vector0_hi_w)
+	map(0x007ffa, 0x007ffa).w(this, FUNC(xavix_state::irq_vector0_lo_w));
+	map(0x007ffb, 0x007ffb).w(this, FUNC(xavix_state::irq_vector0_hi_w));
+
+	map(0x007ffc, 0x007ffc).rw(this, FUNC(xavix_state::irq_source_r), FUNC(xavix_state::irq_source_w));
+
 	// an IRQ vector (irq?)
-	AM_RANGE(0x007ffe, 0x007ffe) AM_WRITE(irq_vector1_lo_w)
-	AM_RANGE(0x007fff, 0x007fff) AM_WRITE(irq_vector1_hi_w)
+	map(0x007ffe, 0x007ffe).w(this, FUNC(xavix_state::irq_vector1_lo_w));
+	map(0x007fff, 0x007fff).w(this, FUNC(xavix_state::irq_vector1_hi_w));
 
 //  rom is installed in init due to different rom sizes and mirroring required
 //  AM_RANGE(0x008000, 0x7fffff) AM_ROM AM_REGION("bios", 0x008000) AM_MIRROR(0x800000) // rad_mtrk relies on rom mirroring
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( xavix )
 	PORT_START("IN0")
@@ -1605,6 +1794,34 @@ static INPUT_PORTS_START( rad_boxp )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( rad_snow )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Go") // is this a button, or 'up' ?
+
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_snowp )
+	PORT_INCLUDE(rad_snow)
+
+	PORT_MODIFY("REGION") // PAL/NTSC flag
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( namcons2 )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+INPUT_PORTS_END
+
 /* correct, 4bpp gfxs */
 static const gfx_layout charlayout =
 {
@@ -1741,6 +1958,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",XAVIX,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(xavix_map)
+	MCFG_M6502_DISABLE_DIRECT()
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
@@ -1787,16 +2005,9 @@ DRIVER_INIT_MEMBER(xavix_state, taitons1)
 {
 	DRIVER_INIT_CALL(xavix);
 	m_alt_addressing = 1;
-	m_alt_addressing_base = 0xd8000;
 }
 
 DRIVER_INIT_MEMBER(xavix_state, rad_box)
-{
-	DRIVER_INIT_CALL(xavix);
-	m_alt_addressing = 2;
-}
-
-DRIVER_INIT_MEMBER(xavix_state, rad_crdn)
 {
 	DRIVER_INIT_CALL(xavix);
 	m_alt_addressing = 2;
@@ -1811,6 +2022,21 @@ DRIVER_INIT_MEMBER(xavix_state, rad_crdn)
 ROM_START( taitons1 )
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "taitonostalgia1.u3", 0x000000, 0x200000, CRC(25bd8c67) SHA1(a109cd2da6aa4596e3ca3abd1afce2d0001a473f) )
+ROM_END
+
+ROM_START( taitons2 )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "taitonostalgia2.bin", 0x000000, 0x200000, CRC(d7dbd93d) SHA1(ad96f80d317e7fd64682a1fe406c5ee9dd5eabf9) )
+ROM_END
+
+ROM_START( namcons1 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "namconostalgia1.bin", 0x000000, 0x100000, CRC(9bcccccd) SHA1(cf8fe6de76fbd23974f999299db6f558f79c8f22) )
+ROM_END
+
+ROM_START( namcons2 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "nostalgia.bin", 0x000000, 0x100000, CRC(03f7f755) SHA1(bdf1b10ab0104ed580951b0c428c4e93e7373afe) )
 ROM_END
 
 ROM_START( rad_box )
@@ -1832,6 +2058,17 @@ ROM_START( rad_bassp )
 	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bassfishin.bin", 0x000000, 0x100000, CRC(b54eb1c5) SHA1(084faa9349369f2b8846950765f9c8f758db3e9e) )
 ROM_END
+
+ROM_START( rad_snow )
+	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("snoblu.bin", 0x000000, 0x100000, CRC(593e40b3) SHA1(03483ac39eddd7746470fb60018e704382b0da59) )
+ROM_END
+
+ROM_START( rad_snowp )
+	ROM_REGION(0x100000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("snoblu.bin", 0x000000, 0x100000, CRC(593e40b3) SHA1(03483ac39eddd7746470fb60018e704382b0da59) )
+ROM_END
+
 
 ROM_START( rad_ping )
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
@@ -1863,14 +2100,69 @@ ROM_START( rad_mtrkp ) // rom was dumped from NTSC unit, assuming to be the same
 	ROM_LOAD( "monstertruck.bin", 0x000000, 0x400000, CRC(dccda0a7) SHA1(7953cf29643672f8367639555b797c20bb533eab) )
 ROM_END
 
+
+ROM_START( rad_madf )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("madden.bin", 0x000000, 0x400000, CRC(e972fdcf) SHA1(52001316254880755da959c3441d232fd2c72c7a) )
+ROM_END
+
+ROM_START( rad_fb )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("rfootball.bin", 0x000000, 0x400000, CRC(025e0cb4) SHA1(60ce363de236d5119d078e346ad5d2ae50dbc7e1) )
+ROM_END
+
+ROM_START( epo_efdx )
+	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("excitefishing.bin", 0x000000, 0x400000, CRC(9c85b261) SHA1(6a363faed2ec89c5176e46554a98ca1e20132579) )
+ROM_END
+
+ROM_START( rad_rh )
+	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("rescueheroes.bin", 0x000000, 0x200000, CRC(38c391a7) SHA1(120334d4ce89d98438c2a35bf7e53af5096cc878) )
+ROM_END
+
+/*
+    There's more code in here than in the 'eka_strt' set, but all it seems to do is display an 'insert cartridge' message,
+    however eka_strt also seems a complete program in it's own right, it's unclear if it can see any of the data from this
+    ROM.
+
+    (TODO: turn the cartridges into a software list once the mapping is properly understood)
+*/
+
+ROM_START( eka_base )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekara.bin", 0x000000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
+ROM_END
+
 ROM_START( eka_strt )
 	ROM_REGION( 0x080000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekarastartcart.bin", 0x000000, 0x080000, CRC(8c12c0c2) SHA1(8cc1b098894af25a4bfccada884125b66f5fe8b2) )
 ROM_END
 
+ROM_START( eka_vol1 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekaravol1.bin", 0x000000, 0x100000, CRC(29df4aea) SHA1(b95835aaf8630b61b47e5da0968cd4a1dd3bc517) )
+ROM_END
+
+ROM_START( eka_vol2 )
+	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "ekaravol2.bin", 0x000000, 0x100000, CRC(6c66772e) SHA1(e1e719df1e51caaafd9b3af187059334f7abbba3) )
+ROM_END
+
+ROM_START( has_wamg )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "minigolf.bin", 0x000000, 0x400000, CRC(35cee2ad) SHA1(c7344e8ba336bc329638485ea571cd731ebf7649) )
+ROM_END
+
 /* Standalone TV Games */
 
 CONS( 2006, taitons1,  0,          0,  xavix,  xavix,    xavix_state, taitons1, "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 1", MACHINE_IS_SKELETON )
+
+CONS( 2006, taitons2,  0,          0,  xavix,  namcons2, xavix_state, xavix,    "Bandai / SSD Company LTD / Taito", "Let's! TV Play Classic - Taito Nostalgia 2", MACHINE_IS_SKELETON )
+
+CONS( 2006, namcons1,  0,          0,  xavix,  namcons2, xavix_state, taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 1", MACHINE_IS_SKELETON )
+
+CONS( 2006, namcons2,  0,          0,  xavix,  namcons2, xavix_state, taitons1, "Bandai / SSD Company LTD / Namco", "Let's! TV Play Classic - Namco Nostalgia 2", MACHINE_IS_SKELETON )
 
 CONS( 2000, rad_ping,  0,          0,  xavix,  xavix,    xavix_state, xavix,    "Radica / SSD Company LTD / Simmer Technology", "Play TV Ping Pong", MACHINE_IS_SKELETON ) // "Simmer Technology" is also known as "Hummer Technology Co., Ltd"
 
@@ -1880,36 +2172,38 @@ CONS( 2003, rad_mtrkp, rad_mtrk,   0,  xavixp, rad_mtrkp,xavix_state, xavix,    
 CONS( 200?, rad_box,   0,          0,  xavix,  rad_box,  xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Boxing (NTSC)", MACHINE_IS_SKELETON)
 CONS( 200?, rad_boxp,  rad_box,    0,  xavixp, rad_boxp, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Boxing (PAL)", MACHINE_IS_SKELETON)
 
-CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, rad_crdn, "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IS_SKELETON)
-CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, rad_crdn, "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdn,  0,          0,  xavix,  rad_crdn, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Card Night (NTSC)", MACHINE_IS_SKELETON)
+CONS( 200?, rad_crdnp, rad_crdn,   0,  xavixp, rad_crdnp,xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Card Night (PAL)", MACHINE_IS_SKELETON)
 
 CONS( 2002, rad_bb2,   0,          0,  xavix,  xavix,    xavix_state, xavix,    "Radica / SSD Company LTD",                     "Play TV Baseball 2", MACHINE_IS_SKELETON ) // contains string "Radica RBB2 V1.0"
 
-CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Bass Fishin'", MACHINE_IS_SKELETON)
-CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin'", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bass,  0,          0,  xavix,  xavix,    xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Bass Fishin' (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_bassp, rad_bass,   0,  xavixp, xavixp,   xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Bass Fishin' (PAL)", MACHINE_IS_SKELETON)
 
-CONS (200?, eka_strt,  0,          0,  xavix,  xavix,    xavix_state, xavix, "Takara / SSD Company LTD",                     "e-kara Starter", MACHINE_IS_SKELETON)
+// there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
+CONS( 2001, rad_snow,  0,          0,  xavix,  rad_snow, xavix_state, rad_box,  "Radica / SSD Company LTD",                     "Play TV Snowboarder (Blue) (NTSC)", MACHINE_IS_SKELETON)
+CONS( 2001, rad_snowp, rad_snow,   0,  xavixp, rad_snowp,xavix_state, rad_box,  "Radica / SSD Company LTD",                     "ConnecTV Snowboarder (Blue) (PAL)", MACHINE_IS_SKELETON)
+
+CONS( 2003, rad_madf,  0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "EA Sports Madden Football (NTSC)", MACHINE_IS_SKELETON) // no Play TV branding, USA only release?
+
+CONS( 200?, rad_fb,    0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radica / SSD Company LTD",                     "Play TV Football (NTSC)", MACHINE_IS_SKELETON) // USA only release? doesn't change logo for PAL
+
+CONS( 200?, rad_rh,    0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Radioa / Fisher-Price / SSD Company LTD",      "Play TV Rescue Heroes", MACHINE_IS_SKELETON)
+
+CONS( 200?, epo_efdx,  0,          0,  xavix,  xavix,  xavix_state, taitons1,  "Epoch / SSD Company LTD",                      "Excite Fishing DX (Japan)", MACHINE_IS_SKELETON)
+
+CONS( 200?, has_wamg,  0,          0,  xavix,  xavix,  xavix_state, rad_box,   "Hasbro / Milton Bradley / SSD Company LTD",    "TV Wild Adventure Mini Golf", MACHINE_IS_SKELETON)
+
+CONS (200?, eka_base,  0,          0,  xavix,  xavix,  xavix_state, xavix,     "Takara / Hasbro / SSD Company LTD",                     "e-kara (US?)", MACHINE_IS_SKELETON)
+
+CONS (200?, eka_strt,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Starter (US?)", MACHINE_IS_SKELETON)
+
+CONS (200?, eka_vol1,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 1 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 1'
+
+CONS (200?, eka_vol2,  0,          0,   xavix,  xavix,  xavix_state, xavix,    "Takara / Hasbro / SSD Company LTD",                     "e-kara Volume 2 (US?)", MACHINE_IS_SKELETON) // insert calls it 'HIT MIX Vol 2'
 
 /* The 'XaviXPORT' isn't a real console, more of a TV adapter, all the actual hardware (CPU including video hw, sound hw) is in the cartridges and controllers
    and can vary between games, see notes at top of driver.
-
-   According to sources XaviX Tennis should be a standard XaviX CPU, but at the very least makes significantly more use of custom opcodes than the above titles
-   which only appears to use the call far / return far for extended memory space.
-
-   Furthermore it also seems to require some regular 6502 opcodes to be replaced with custom ones, yet the other games expect these to act normally.  This
-   leads me to believe that XaviX Tennis is almost certainly a Super XaviX title.
-
-   The CPU die on XaviX Tennis is internally marked as NEC 85054-611 and is very different to the two below
-
-   Radica Monster truck die is marked SSD PL7351 with SSD98 also printed on the die
-   Radia Ping Pong      die is marked SSD PA7270 with SSD97 also printed on the die (otherwise looks identical to Monster Truck)
-
-   Boxing, Baseball 2 and Card Night all have the SSD98 logo
-   Boxing, Bass Fishin' and Card Night are all PA7351-107.  Baseball 2 looks like PL7351-181.
-
-   Star Wars Saga Edition also seems to be making use of additional opcodes, meaning it could also be Super Xavix, or something in-between (unless they're
-   caused by the bad dump, but it looks intentional)
-
 */
 
 ROM_START( xavtenni )
@@ -1917,14 +2211,27 @@ ROM_START( xavtenni )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
 ROM_END
 
+/* Tiger games have extended opcodes too */
+
 
 ROM_START( ttv_sw )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "jedi.bin", 0x000000, 0x800000, CRC(51cae5fd) SHA1(1ed8d556f31b4182259ca8c766d60c824d8d9744) )
 ROM_END
 
+ROM_START( ttv_lotr )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "lotr.bin", 0x000000, 0x800000, CRC(a034ecd5) SHA1(264a9d4327af0a075841ad6129db67d82cf741f1) )
+ROM_END
+
+ROM_START( ttv_mx )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "mxdirtrebel.bin", 0x000000, 0x800000, CRC(e64bf1a1) SHA1(137f97d7d857697a13e0c8984509994dc7bc5fc5) )
+ROM_END
+
 
 CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
+
 CONS( 2005, ttv_sw,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
-
-
+CONS( 2005, ttv_lotr,  0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_mx,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )

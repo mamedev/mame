@@ -36,6 +36,7 @@
 #include "speaker.h"
 
 #include "formats/dmv_dsk.h"
+#include "imagedev/snapquik.h"
 
 #include "dmv.lh"
 
@@ -45,6 +46,7 @@ public:
 	dmv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
+			m_screen(*this, "screen"),
 			m_hgdc(*this, "upd7220"),
 			m_dmac(*this, "dma8237"),
 			m_pit(*this, "pit8253"),
@@ -70,6 +72,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<upd7220_device> m_hgdc;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit;
@@ -144,6 +147,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq7a_w)      { update_irqs(7, state); }
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(dmv);
 
 	uint8_t program_read(address_space &space, int cas, offs_t offset);
 	void program_write(address_space &space, int cas, offs_t offset, uint8_t data);
@@ -359,7 +363,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y + yi;
 
-				if(!machine().first_screen()->visible_area().contains(res_x, res_y))
+				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(yi >= 16) { pen = 0; }
@@ -368,6 +372,43 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 			}
 		}
 	}
+}
+
+/***********************************************************
+
+    Quickload
+
+    This loads a .COM file to address 0x100 then jumps
+    there. Sometimes .COM has been renamed to .CPM to
+    prevent windows going ballistic. These can be loaded
+    as well.
+
+************************************************************/
+
+QUICKLOAD_LOAD_MEMBER( dmv_state, dmv )
+{
+	/* Avoid loading a program if CP/M-80 is not in memory */
+	if ((m_ram->base()[0] != 0xc3) || (m_ram->base()[5] != 0xc3))
+		return image_init_result::FAIL;
+
+	if (quickload_size >= 0xfd00)
+		return image_init_result::FAIL;
+
+	/* Load image to the TPA (Transient Program Area) */
+	for (uint16_t i = 0; i < quickload_size; i++)
+	{
+		uint8_t data;
+		if (image.fread( &data, 1) != 1)
+			return image_init_result::FAIL;
+		m_ram->base()[i+0x100] = data;
+	}
+
+	m_ram->base()[0x80] = m_ram->base()[0x81] = 0;  // clear out command tail
+
+	m_maincpu->set_pc(0x100);                // start program
+	m_maincpu->set_state_int(Z80_SP, 256 * m_ram->base()[7] - 300); // put the stack a bit before BDOS
+
+	return image_init_result::PASS;
 }
 
 static SLOT_INTERFACE_START( dmv_floppies )
@@ -511,34 +552,36 @@ uint8_t dmv_state::program_read(address_space &space, int cas, offs_t offset)
 	return data;
 }
 
-ADDRESS_MAP_START(dmv_state::dmv_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(program_r, program_w)
-ADDRESS_MAP_END
+void dmv_state::dmv_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(dmv_state::program_r), FUNC(dmv_state::program_w));
+}
 
-ADDRESS_MAP_START(dmv_state::dmv_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(leds_w)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(ramsel_r, ramsel_w)
-	AM_RANGE(0x11, 0x11) AM_READWRITE(romsel_r, romsel_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(tc_set_w)
-	AM_RANGE(0x13, 0x13) AM_READ(sys_status_r)
-	AM_RANGE(0x14, 0x14) AM_WRITE(fdd_motor_w)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("kb_ctrl_mcu", upi41_cpu_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x50, 0x51) AM_DEVICE("i8272", i8272a_device, map)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
-	AM_RANGE(0xd0, 0xd7) AM_WRITE(switch16_w)
-	AM_RANGE(0xe0, 0xe7) AM_WRITE(rambank_w)
+void dmv_state::dmv_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(dmv_state::leds_w));
+	map(0x10, 0x10).rw(this, FUNC(dmv_state::ramsel_r), FUNC(dmv_state::ramsel_w));
+	map(0x11, 0x11).rw(this, FUNC(dmv_state::romsel_r), FUNC(dmv_state::romsel_w));
+	map(0x12, 0x12).w(this, FUNC(dmv_state::tc_set_w));
+	map(0x13, 0x13).r(this, FUNC(dmv_state::sys_status_r));
+	map(0x14, 0x14).w(this, FUNC(dmv_state::fdd_motor_w));
+	map(0x20, 0x2f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x40, 0x41).rw("kb_ctrl_mcu", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
+	map(0x50, 0x51).m(m_fdc, FUNC(i8272a_device::map));
+	map(0x80, 0x83).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xa0, 0xa1).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
+	map(0xd0, 0xd7).w(this, FUNC(dmv_state::switch16_w));
+	map(0xe0, 0xe7).w(this, FUNC(dmv_state::rambank_w));
 
-	AM_RANGE(0x60, 0x6f) AM_READWRITE(ifsel0_r, ifsel0_w)
-	AM_RANGE(0x70, 0x7f) AM_READWRITE(ifsel1_r, ifsel1_w)
-	AM_RANGE(0x30, 0x3f) AM_READWRITE(ifsel2_r, ifsel2_w)
-	AM_RANGE(0xb0, 0xbf) AM_READWRITE(ifsel3_r, ifsel3_w)
-	AM_RANGE(0xc0, 0xcf) AM_READWRITE(ifsel4_r, ifsel4_w)
-ADDRESS_MAP_END
+	map(0x60, 0x6f).rw(this, FUNC(dmv_state::ifsel0_r), FUNC(dmv_state::ifsel0_w));
+	map(0x70, 0x7f).rw(this, FUNC(dmv_state::ifsel1_r), FUNC(dmv_state::ifsel1_w));
+	map(0x30, 0x3f).rw(this, FUNC(dmv_state::ifsel2_r), FUNC(dmv_state::ifsel2_w));
+	map(0xb0, 0xbf).rw(this, FUNC(dmv_state::ifsel3_r), FUNC(dmv_state::ifsel3_w));
+	map(0xc0, 0xcf).rw(this, FUNC(dmv_state::ifsel4_r), FUNC(dmv_state::ifsel4_w));
+}
 
 READ8_MEMBER(dmv_state::kb_mcu_port1_r)
 {
@@ -558,10 +601,11 @@ WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
 	m_slot7->keyint_w(BIT(data, 4));
 }
 
-ADDRESS_MAP_START(dmv_state::upd7220_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM  AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void dmv_state::upd7220_map(address_map &map)
+{
+	map.global_mask(0x1ffff);
+	map(0x00000, 0x1ffff).ram().share("video_ram");
+}
 
 /* Input ports */
 INPUT_PORTS_START( dmv )
@@ -821,6 +865,8 @@ MACHINE_CONFIG_START(dmv_state::dmv)
 	MCFG_DMVCART_SLOT_OUT_IRQ_CB(WRITELINE(dmv_state, irq7a_w))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "dmv")
+
+	MCFG_QUICKLOAD_ADD("quickload", dmv_state, dmv, "com,cpm", 3)
 
 MACHINE_CONFIG_END
 

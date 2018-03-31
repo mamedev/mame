@@ -299,28 +299,30 @@ READ64_MEMBER(aristmk6_state::hwver_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(aristmk6_state::aristmk6_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x04000000, 0x05ffffff) AM_RAM AM_SHARE("vram") // VRAM 32MB
-	AM_RANGE(0x08000000, 0x0bffffff) AM_ROM AM_REGION("game_rom", 0)
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM // Main RAM 16MB
-	AM_RANGE(0x10800000, 0x1087ffff) AM_RAM // SRAM0 512KB
-	AM_RANGE(0x11000000, 0x1107ffff) AM_RAM // SRAM1 512KB
-	AM_RANGE(0x11800000, 0x1187ffff) AM_RAM // SRAM2 512KB
+void aristmk6_state::aristmk6_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rom().region("maincpu", 0);
+	map(0x04000000, 0x05ffffff).ram().share("vram"); // VRAM 32MB
+	map(0x08000000, 0x0bffffff).rom().region("game_rom", 0);
+	map(0x0c000000, 0x0cffffff).ram(); // Main RAM 16MB
+	map(0x10800000, 0x1087ffff).ram(); // SRAM0 512KB
+	map(0x11000000, 0x1107ffff).ram(); // SRAM1 512KB
+	map(0x11800000, 0x1187ffff).ram(); // SRAM2 512KB
 // 12000xxx main control registers area
-	AM_RANGE(0x12000010, 0x12000017) AM_WRITE(eeprom_w)
-	AM_RANGE(0x12000078, 0x1200007f) AM_WRITENOP // watchdog ??
-	AM_RANGE(0x12000080, 0x12000087) AM_WRITENOP // 0-1-2 written here repeatedly, diag LED or smth ?
-	AM_RANGE(0x120000E0, 0x120000E7) AM_READ(hwver_r)
-	AM_RANGE(0x120000E8, 0x12000107) AM_READ8(irqpend_r, 0xffffffffffffffffU)
-	AM_RANGE(0x12000108, 0x12000127) AM_WRITE8(irqen_w, 0xffffffffffffffffU)
-	AM_RANGE(0x12400010, 0x12400017) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU)
-	AM_RANGE(0x12400018, 0x1240001f) AM_DEVREADWRITE8("uart0", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU)
-	AM_RANGE(0x13800000, 0x13800007) AM_READ8(test_r, 0xffffffffffffffffU)
-ADDRESS_MAP_END
+	map(0x12000010, 0x12000017).w(this, FUNC(aristmk6_state::eeprom_w));
+	map(0x12000078, 0x1200007f).nopw(); // watchdog ??
+	map(0x12000080, 0x12000087).nopw(); // 0-1-2 written here repeatedly, diag LED or smth ?
+	map(0x120000E0, 0x120000E7).r(this, FUNC(aristmk6_state::hwver_r));
+	map(0x120000E8, 0x12000107).r(this, FUNC(aristmk6_state::irqpend_r));
+	map(0x12000108, 0x12000127).w(this, FUNC(aristmk6_state::irqen_w));
+	map(0x12400010, 0x12400017).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x12400018, 0x1240001f).rw(m_uart0, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
+	map(0x13800000, 0x13800007).r(this, FUNC(aristmk6_state::test_r));
+}
 
-ADDRESS_MAP_START(aristmk6_state::aristmk6_port)
-ADDRESS_MAP_END
+void aristmk6_state::aristmk6_port(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( aristmk6 )
 INPUT_PORTS_END

@@ -94,6 +94,8 @@ private:
 
 	tilemap_t *m_bg_tilemap;
 
+	bool m_bookkeeping_mode;
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info_unkitpkr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -221,8 +223,8 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_unkitpkr)
 {
 	int code = m_videoram[tile_index];
 
-	// hack to display cards (TODO: what determines tile banking?)
-	if ((tile_index & 0x1f) < 0x08 || (tile_index & 0x1f) >= 0x10)
+	// hack to display "card" graphics in middle of screen outside of bookkeeping mode
+	if (m_bookkeeping_mode || (tile_index & 0x1f) < 0x08 || (tile_index & 0x1f) >= 0x10)
 		code |= 0x100;
 
 	SET_TILE_INFO_MEMBER(0, code, 1, 0);
@@ -262,42 +264,49 @@ WRITE8_MEMBER(wallc_state::unkitpkr_out1_w)
 
 WRITE8_MEMBER(wallc_state::unkitpkr_out2_w)
 {
+	if (m_bookkeeping_mode != BIT(data, 0))
+	{
+		m_bookkeeping_mode = BIT(data, 0);
+		m_bg_tilemap->mark_all_dirty();
+	}
 }
 
-ADDRESS_MAP_START(wallc_state::wallc_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")   /* 2114, 2114 */
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM     /* 2114, 2114 */
+void wallc_state::wallc_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram().w(this, FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
+	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
 
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xb200, 0xb200) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb400, 0xb400) AM_READ_PORT("DIAL")
-	AM_RANGE(0xb600, 0xb600) AM_READ_PORT("DSW2")
+	map(0xb000, 0xb000).portr("DSW1");
+	map(0xb200, 0xb200).portr("SYSTEM");
+	map(0xb400, 0xb400).portr("DIAL");
+	map(0xb600, 0xb600).portr("DSW2");
 
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP
-	AM_RANGE(0xb100, 0xb100) AM_WRITE(wallc_coin_counter_w)
-	AM_RANGE(0xb200, 0xb200) AM_WRITENOP
-	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE("aysnd", ay8912_device, address_w)
-	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8912_device, data_w)
-ADDRESS_MAP_END
+	map(0xb000, 0xb000).nopw();
+	map(0xb100, 0xb100).w(this, FUNC(wallc_state::wallc_coin_counter_w));
+	map(0xb200, 0xb200).nopw();
+	map(0xb500, 0xb500).w("aysnd", FUNC(ay8912_device::address_w));
+	map(0xb600, 0xb600).w("aysnd", FUNC(ay8912_device::data_w));
+}
 
-ADDRESS_MAP_START(wallc_state::unkitpkr_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")   /* 2114, 2114 */
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM     /* 2114, 2114 */
+void wallc_state::unkitpkr_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram().w(this, FUNC(wallc_state::videoram_w)).mirror(0xc00).share("videoram");   /* 2114, 2114 */
+	map(0xa000, 0xa3ff).ram();     /* 2114, 2114 */
 
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN0")
-	AM_RANGE(0xb100, 0xb100) AM_READ_PORT("IN1")
-	AM_RANGE(0xb200, 0xb200) AM_READ_PORT("IN2")
-	AM_RANGE(0xb300, 0xb300) AM_READ_PORT("IN3")
-	AM_RANGE(0xb500, 0xb5ff) AM_READNOP // read by memory test routine. left over from some other game
+	map(0xb000, 0xb000).portr("IN0");
+	map(0xb100, 0xb100).portr("IN1");
+	map(0xb200, 0xb200).portr("IN2");
+	map(0xb300, 0xb300).portr("IN3");
+	map(0xb500, 0xb5ff).nopr(); // read by memory test routine. left over from some other game
 
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(unkitpkr_out0_w)
-	AM_RANGE(0xb100, 0xb100) AM_WRITE(unkitpkr_out1_w)
-	AM_RANGE(0xb200, 0xb200) AM_WRITE(unkitpkr_out2_w)
-	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE("aysnd", ay8912_device, address_w)
-	AM_RANGE(0xb600, 0xb600) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)  // Port A = DSW
-ADDRESS_MAP_END
+	map(0xb000, 0xb000).w(this, FUNC(wallc_state::unkitpkr_out0_w));
+	map(0xb100, 0xb100).w(this, FUNC(wallc_state::unkitpkr_out1_w));
+	map(0xb200, 0xb200).w(this, FUNC(wallc_state::unkitpkr_out2_w));
+	map(0xb500, 0xb500).w("aysnd", FUNC(ay8912_device::address_w));
+	map(0xb600, 0xb600).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));  // Port A = DSW
+}
 
 
 static INPUT_PORTS_START( wallc )
@@ -745,6 +754,9 @@ DRIVER_INIT_MEMBER(wallc_state, unkitpkr)
 			buffer[a] = gfxrom[(a & 0x03f) | (a & 0x280) >> 1 | (a & 0x140) << 1];
 		memcpy(gfxrom, &buffer[0], 0x400);
 	}
+
+	m_bookkeeping_mode = false;
+	save_item(NAME(m_bookkeeping_mode));
 }
 
 
@@ -754,4 +766,4 @@ GAME( 1984, wallca,   wallc,  wallca,   wallc,    wallc_state, wallca,   ROT0,  
 GAME( 1984, brkblast, wallc,  wallc,    wallc,    wallc_state, wallca,   ROT0,   "bootleg (Fadesa)", "Brick Blast (bootleg of Wall Crash)", MACHINE_SUPPORTS_SAVE ) // Spanish bootleg board, Fadesa stickers / text on various components
 
 GAME( 1984, sidampkr, 0,      wallc,    wallc,    wallc_state, sidam,    ROT270, "Sidam",            "unknown Sidam Poker",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, unkitpkr, 0,      unkitpkr, unkitpkr, wallc_state, unkitpkr, ROT0,   "<unknown>",        "unknown Italian poker game",          MACHINE_SUPPORTS_SAVE )

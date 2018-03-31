@@ -119,8 +119,8 @@ public:
 	DECLARE_READ8_MEMBER(mcu_sample_r);
 	DECLARE_WRITE8_MEMBER(mcu_ack_w);
 	DECLARE_READ8_MEMBER(mcu_snd_r);
-	DECLARE_READ8_MEMBER(mcu_port_r);
-	DECLARE_WRITE8_MEMBER(mcu_port_w);
+	DECLARE_WRITE8_MEMBER(mcu_port1_w);
+	DECLARE_WRITE8_MEMBER(mcu_port3_w);
 	DECLARE_WRITE8_MEMBER(mcu_low_w);
 	DECLARE_WRITE8_MEMBER(mcu_high_w);
 	DECLARE_READ8_MEMBER(snd_cpu_sample_r);

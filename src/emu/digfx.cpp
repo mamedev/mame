@@ -42,37 +42,6 @@ device_gfx_interface::~device_gfx_interface()
 
 
 //-------------------------------------------------
-//  static_set_info: configuration helper to set
-//  the gfxdecode info used by the device
-//-------------------------------------------------
-
-void device_gfx_interface::static_set_info(device_t &device, const gfx_decode_entry *gfxinfo)
-{
-	device_gfx_interface *gfx;
-	if (!device.interface(gfx))
-		throw emu_fatalerror("MCFG_GFX_INFO called on device '%s' with no gfx interface\n", device.tag());
-
-	gfx->m_gfxdecodeinfo = gfxinfo;
-}
-
-
-//-------------------------------------------------
-//  static_set_palette: configuration helper to
-//  set the palette used by the device
-//-------------------------------------------------
-
-void device_gfx_interface::static_set_palette(device_t &device, const char *tag)
-{
-	device_gfx_interface *gfx;
-	if (!device.interface(gfx))
-		throw emu_fatalerror("MCFG_GFX_PALETTE called on device '%s' with no gfx interface\n", device.tag());
-
-	gfx->m_palette_tag = tag;
-	gfx->m_palette_is_sibling = true;
-}
-
-
-//-------------------------------------------------
 //  set_palette_disable: configuration helper to
 //  disable the use of a palette by the device
 //-------------------------------------------------

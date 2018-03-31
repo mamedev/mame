@@ -73,7 +73,7 @@
 
 
 
-DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "TMP87PH40AN")
+DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "Toshiba TMP87PH40AN")
 
 ADDRESS_MAP_START(tlcs870_device::tmp87ph40an_mem)
 #if 0
@@ -3164,7 +3164,7 @@ void tlcs870_device::state_string_export(const device_state_entry &entry, std::s
 
 }
 
-util::disasm_interface *tlcs870_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tlcs870_device::create_disassembler()
 {
-	return new tlcs870_disassembler;
+	return std::make_unique<tlcs870_disassembler>();
 }

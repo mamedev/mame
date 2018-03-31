@@ -12,7 +12,7 @@
 #include "m6510.h"
 #include "m6510d.h"
 
-DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "M6510")
+DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "MOS Technology M6510")
 
 m6510_device::m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6510_device(mconfig, M6510, tag, owner, clock)
@@ -34,9 +34,9 @@ void m6510_device::set_pulls(uint8_t _pullup, uint8_t _floating)
 	floating = _floating;
 }
 
-util::disasm_interface *m6510_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6510_device::create_disassembler()
 {
-	return new m6510_disassembler;
+	return std::make_unique<m6510_disassembler>();
 }
 
 void m6510_device::device_start()

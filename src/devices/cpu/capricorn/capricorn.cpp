@@ -238,9 +238,9 @@ void capricorn_cpu_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
-util::disasm_interface *capricorn_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> capricorn_cpu_device::create_disassembler()
 {
-	return new capricorn_disassembler;
+	return std::make_unique<capricorn_disassembler>();
 }
 
 void capricorn_cpu_device::start_mem_burst(ea_addr_t addr)

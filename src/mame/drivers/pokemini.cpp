@@ -54,13 +54,14 @@ class pokemini_state : public driver_device
 {
 public:
 	pokemini_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_p_ram(*this, "p_ram"),
-		m_speaker(*this, "speaker"),
-		m_i2cmem(*this, "i2cmem"),
-		m_cart(*this, "cartslot"),
-		m_inputs(*this, "INPUTS")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_p_ram(*this, "p_ram")
+		, m_speaker(*this, "speaker")
+		, m_i2cmem(*this, "i2cmem")
+		, m_cart(*this, "cartslot")
+		, m_inputs(*this, "INPUTS")
 	{ }
 
 	uint8_t m_pm_reg[0x100];
@@ -96,6 +97,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<i2cmem_device> m_i2cmem;
@@ -123,12 +125,13 @@ READ8_MEMBER( pokemini_state::rom_r )
 	return m_cart->read_rom(space, offset & 0x1fffff);
 }
 
-ADDRESS_MAP_START(pokemini_state::pokemini_mem_map)
-	AM_RANGE( 0x000000, 0x000fff )  AM_ROM                            /* bios */
-	AM_RANGE( 0x001000, 0x001fff )  AM_RAM AM_SHARE("p_ram")          /* VRAM/RAM */
-	AM_RANGE( 0x002000, 0x0020ff )  AM_READWRITE(hwreg_r, hwreg_w)    /* hardware registers */
-	AM_RANGE( 0x002100, 0x1fffff )  AM_READ(rom_r)                    /* cartridge area */
-ADDRESS_MAP_END
+void pokemini_state::pokemini_mem_map(address_map &map)
+{
+	map(0x000000, 0x000fff).rom();                            /* bios */
+	map(0x001000, 0x001fff).ram().share("p_ram");          /* VRAM/RAM */
+	map(0x002000, 0x0020ff).rw(this, FUNC(pokemini_state::hwreg_r), FUNC(pokemini_state::hwreg_w));    /* hardware registers */
+	map(0x002100, 0x1fffff).r(this, FUNC(pokemini_state::rom_r));                    /* cartridge area */
+}
 
 
 static INPUT_PORTS_START( pokemini )
@@ -1744,7 +1747,7 @@ static const int16_t speaker_levels[] = {-32768, 0, 32767};
 
 void pokemini_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 

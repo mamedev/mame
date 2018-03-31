@@ -186,17 +186,19 @@ READ8_MEMBER( prof180x_state::status_r )
 
 /* Address Maps */
 
-ADDRESS_MAP_START(prof180x_state::prof180x_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void prof180x_state::prof180x_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(prof180x_state::read), FUNC(prof180x_state::write));
+}
 
-ADDRESS_MAP_START(prof180x_state::prof180x_io)
-	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(flr_w)
-	AM_RANGE(0x09, 0x09) AM_SELECT(0xff00) AM_READ(status_r)
-	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_DEVREADWRITE(FDC9268_TAG, upd765a_device, mdma_r, mdma_w)
-	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xff00) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x0c, 0x0d) AM_MIRROR(0xff00) AM_DEVICE(FDC9268_TAG, upd765a_device, map)
-ADDRESS_MAP_END
+void prof180x_state::prof180x_io(address_map &map)
+{
+	map(0x08, 0x08).mirror(0xff00).w(this, FUNC(prof180x_state::flr_w));
+	map(0x09, 0x09).select(0xff00).r(this, FUNC(prof180x_state::status_r));
+	map(0x0a, 0x0a).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
+	map(0x0b, 0x0b).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x0c, 0x0d).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
+}
 
 /* Input ports */
 

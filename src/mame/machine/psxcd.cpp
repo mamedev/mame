@@ -89,7 +89,7 @@ psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, devic
 	cdrom_image_device(mconfig, PSXCD, tag, owner, clock),
 	m_irq_handler(*this)
 {
-	static_set_interface(*this, "psx_cdrom");
+	set_interface("psx_cdrom");
 }
 
 

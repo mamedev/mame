@@ -184,44 +184,46 @@ WRITE16_MEMBER(taito_f3_state::f3_unk_w)
 
 /******************************************************************************/
 
-ADDRESS_MAP_START(taito_f3_state::f3_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
-	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_SHARE("paletteram")
-	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
-	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_SHARE("spriteram")
-	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff)       //AM_SHARE("f3_pf_data")
-	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)     //AM_SHARE("videoram")
-	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff)             //AM_SHARE("f3_vram")
-	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)       //AM_SHARE("f3_line_ram")
-	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)           //AM_SHARE("f3_pivot_ram")
-	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
-	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
-	AM_RANGE(0xc00000, 0xc007ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff)
-	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
-	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
-ADDRESS_MAP_END
+void taito_f3_state::f3_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x300000, 0x30007f).w(this, FUNC(taito_f3_state::f3_sound_bankswitch_w));
+	map(0x400000, 0x41ffff).mirror(0x20000).ram().share("f3_ram");
+	map(0x440000, 0x447fff).ram().w(this, FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
+	map(0x4a0000, 0x4a001f).rw(this, FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
+	map(0x4c0000, 0x4c0003).w(this, FUNC(taito_f3_state::f3_unk_w));
+	map(0x600000, 0x60ffff).rw(this, FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
+	map(0x610000, 0x61bfff).rw(this, FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
+	map(0x61c000, 0x61dfff).rw(this, FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
+	map(0x61e000, 0x61ffff).rw(this, FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
+	map(0x620000, 0x62ffff).rw(this, FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
+	map(0x630000, 0x63ffff).rw(this, FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
+	map(0x660000, 0x66000f).w(this, FUNC(taito_f3_state::f3_control_0_w));
+	map(0x660010, 0x66001f).w(this, FUNC(taito_f3_state::f3_control_1_w));
+	map(0xc00000, 0xc007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0xc80000, 0xc80003).w(this, FUNC(taito_f3_state::f3_sound_reset_0_w));
+	map(0xc80100, 0xc80103).w(this, FUNC(taito_f3_state::f3_sound_reset_1_w));
+}
 
-ADDRESS_MAP_START(taito_f3_state::bubsympb_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_SHARE("f3_ram")
-	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_SHARE("paletteram")
-	AM_RANGE(0x4a0000, 0x4a001b) AM_READWRITE(f3_control_r,  f3_control_w)
-	AM_RANGE(0x4a001c, 0x4a001f) AM_READWRITE(bubsympb_oki_r, bubsympb_oki_w)
-	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_SHARE("spriteram")
-	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16(f3_pf_data_r,f3_pf_data_w,0xffffffff)       //AM_SHARE("f3_pf_data")
-	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16(f3_videoram_r,f3_videoram_w,0xffffffff)     //AM_SHARE("videoram")
-	AM_RANGE(0x61e000, 0x61ffff) AM_READWRITE16(f3_vram_r,f3_vram_w,0xffffffff)             //AM_SHARE("f3_vram")
-	AM_RANGE(0x620000, 0x62ffff) AM_READWRITE16(f3_lineram_r,f3_lineram_w,0xffffffff)       //AM_SHARE("f3_line_ram")
-	AM_RANGE(0x630000, 0x63ffff) AM_READWRITE16(f3_pivot_r,f3_pivot_w,0xffffffff)           //AM_SHARE("f3_pivot_ram")
-	AM_RANGE(0x660000, 0x66000f) AM_WRITE16(f3_control_0_w,0xffffffff)
-	AM_RANGE(0x660010, 0x66001f) AM_WRITE16(f3_control_1_w,0xffffffff)
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM
-ADDRESS_MAP_END
+void taito_f3_state::bubsympb_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x300000, 0x30007f).w(this, FUNC(taito_f3_state::f3_sound_bankswitch_w));
+	map(0x400000, 0x41ffff).mirror(0x20000).ram().share("f3_ram");
+	map(0x440000, 0x447fff).ram().w(this, FUNC(taito_f3_state::f3_palette_24bit_w)).share("paletteram");
+	map(0x4a0000, 0x4a001b).rw(this, FUNC(taito_f3_state::f3_control_r), FUNC(taito_f3_state::f3_control_w));
+	map(0x4a001c, 0x4a001f).rw(this, FUNC(taito_f3_state::bubsympb_oki_r), FUNC(taito_f3_state::bubsympb_oki_w));
+	map(0x4c0000, 0x4c0003).w(this, FUNC(taito_f3_state::f3_unk_w));
+	map(0x600000, 0x60ffff).rw(this, FUNC(taito_f3_state::f3_spriteram_r), FUNC(taito_f3_state::f3_spriteram_w)); //AM_SHARE("spriteram")
+	map(0x610000, 0x61bfff).rw(this, FUNC(taito_f3_state::f3_pf_data_r), FUNC(taito_f3_state::f3_pf_data_w));       //AM_SHARE("f3_pf_data")
+	map(0x61c000, 0x61dfff).rw(this, FUNC(taito_f3_state::f3_videoram_r), FUNC(taito_f3_state::f3_videoram_w));     //AM_SHARE("videoram")
+	map(0x61e000, 0x61ffff).rw(this, FUNC(taito_f3_state::f3_vram_r), FUNC(taito_f3_state::f3_vram_w));             //AM_SHARE("f3_vram")
+	map(0x620000, 0x62ffff).rw(this, FUNC(taito_f3_state::f3_lineram_r), FUNC(taito_f3_state::f3_lineram_w));       //AM_SHARE("f3_line_ram")
+	map(0x630000, 0x63ffff).rw(this, FUNC(taito_f3_state::f3_pivot_r), FUNC(taito_f3_state::f3_pivot_w));           //AM_SHARE("f3_pivot_ram")
+	map(0x660000, 0x66000f).w(this, FUNC(taito_f3_state::f3_control_0_w));
+	map(0x660010, 0x66001f).w(this, FUNC(taito_f3_state::f3_control_1_w));
+	map(0xc00000, 0xc007ff).ram();
+}
 
 
 
@@ -705,14 +707,14 @@ ROM_START( arabianm )
 	ROM_LOAD16_BYTE("d29-02.ic18", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) )   // -std-
 
 	ROM_REGION( 0x1200, "plds", 0 )
-	ROM_LOAD( "D29-11.IC15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
+	ROM_LOAD( "d29-11.ic15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
 	ROM_LOAD( "pal20l8b.2",      0x0200, 0x0144, CRC(c91437e2) SHA1(5bd6fb57fd7e0ff957a6ef9509b8f2e35a8ca29a) ) /* D29-12 */
-	ROM_LOAD( "D29-13.IC14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
+	ROM_LOAD( "d29-13.ic14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
 	ROM_LOAD( "palce16v8h.11",   0x0600, 0x0117, CRC(51088324) SHA1(b985835b92c9d1e1dae6ae7cba9fa83c4db58bbb) ) /* D29-16 */
 	ROM_LOAD( "pal16l8b.22",     0x0800, 0x0104, CRC(3e01e854) SHA1(72f48982673ac8337dac3358b7a79e45c60b9601) ) /* D29-09 */
 	ROM_LOAD( "palce16v8h.31",   0x0a00, 0x0117, CRC(e0789727) SHA1(74add02cd194741de5ca6e36a99f9dd3e756fbdf) ) /* D29-17 */
 	ROM_LOAD( "pal16l8b.62",     0x0c00, 0x0104, CRC(7093e2f3) SHA1(62bb0085ed93cc8a5fb3a1b08ce9c8071ebda657) ) /* D29-10 */
-	ROM_LOAD( "D29-14.IC28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
+	ROM_LOAD( "d29-14.ic28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
 	ROM_LOAD( "pal20l8b.70",     0x1000, 0x0144, CRC(92b5b97c) SHA1(653ab0467f71d93eceb8143b124cdedaf1ede750) ) /* D29-15 */
 ROM_END
 
@@ -745,14 +747,14 @@ ROM_START( arabianmj )
 	ROM_LOAD16_BYTE("d29-02.ic18", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) )   // -std-
 
 	ROM_REGION( 0x1200, "plds", 0 )
-	ROM_LOAD( "D29-11.IC15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
+	ROM_LOAD( "d29-11.ic15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
 	ROM_LOAD( "pal20l8b.2",      0x0200, 0x0144, CRC(c91437e2) SHA1(5bd6fb57fd7e0ff957a6ef9509b8f2e35a8ca29a) ) /* D29-12 */
-	ROM_LOAD( "D29-13.IC14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
+	ROM_LOAD( "d29-13.ic14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
 	ROM_LOAD( "palce16v8h.11",   0x0600, 0x0117, CRC(51088324) SHA1(b985835b92c9d1e1dae6ae7cba9fa83c4db58bbb) ) /* D29-16 */
 	ROM_LOAD( "pal16l8b.22",     0x0800, 0x0104, CRC(3e01e854) SHA1(72f48982673ac8337dac3358b7a79e45c60b9601) ) /* D29-09 */
 	ROM_LOAD( "palce16v8h.31",   0x0a00, 0x0117, CRC(e0789727) SHA1(74add02cd194741de5ca6e36a99f9dd3e756fbdf) ) /* D29-17 */
 	ROM_LOAD( "pal16l8b.62",     0x0c00, 0x0104, CRC(7093e2f3) SHA1(62bb0085ed93cc8a5fb3a1b08ce9c8071ebda657) ) /* D29-10 */
-	ROM_LOAD( "D29-14.IC28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
+	ROM_LOAD( "d29-14.ic28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
 	ROM_LOAD( "pal20l8b.70",     0x1000, 0x0144, CRC(92b5b97c) SHA1(653ab0467f71d93eceb8143b124cdedaf1ede750) ) /* D29-15 */
 ROM_END
 
@@ -785,14 +787,14 @@ ROM_START( arabianmu )
 	ROM_LOAD16_BYTE("d29-02.ic18", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) )   // -std-
 
 	ROM_REGION( 0x1200, "plds", 0 )
-	ROM_LOAD( "D29-11.IC15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
+	ROM_LOAD( "d29-11.ic15.bin", 0x0000, 0x0157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) ) // palce20v8h.1
 	ROM_LOAD( "pal20l8b.2",      0x0200, 0x0144, CRC(c91437e2) SHA1(5bd6fb57fd7e0ff957a6ef9509b8f2e35a8ca29a) ) /* D29-12 */
-	ROM_LOAD( "D29-13.IC14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
+	ROM_LOAD( "d29-13.ic14.bin", 0x0400, 0x0157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) ) // palce20v8h.3
 	ROM_LOAD( "palce16v8h.11",   0x0600, 0x0117, CRC(51088324) SHA1(b985835b92c9d1e1dae6ae7cba9fa83c4db58bbb) ) /* D29-16 */
 	ROM_LOAD( "pal16l8b.22",     0x0800, 0x0104, CRC(3e01e854) SHA1(72f48982673ac8337dac3358b7a79e45c60b9601) ) /* D29-09 */
 	ROM_LOAD( "palce16v8h.31",   0x0a00, 0x0117, CRC(e0789727) SHA1(74add02cd194741de5ca6e36a99f9dd3e756fbdf) ) /* D29-17 */
 	ROM_LOAD( "pal16l8b.62",     0x0c00, 0x0104, CRC(7093e2f3) SHA1(62bb0085ed93cc8a5fb3a1b08ce9c8071ebda657) ) /* D29-10 */
-	ROM_LOAD( "D29-14.IC28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
+	ROM_LOAD( "d29-14.ic28.bin", 0x0e00, 0x0157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) ) // palce20v8h.69
 	ROM_LOAD( "pal20l8b.70",     0x1000, 0x0144, CRC(92b5b97c) SHA1(653ab0467f71d93eceb8143b124cdedaf1ede750) ) /* D29-15 */
 ROM_END
 
@@ -1097,18 +1099,18 @@ ROM_START( hthero93u )
 	ROM_LOAD16_BYTE("d49-05.41", 0x600000, 0x100000, CRC(ed894fe1) SHA1(5bf2fb6abdcf25bc525a2c3b29dbf7aca0b18fea) ) // -std-
 
 	ROM_REGION(0x800000, "palsgame" , ROMREGION_ERASE00 ) // all unprotected / unlocked (dumped from single PCB version of game)
-	ROM_LOAD ("D49-12.IC60.bin", 0x000, 0x104, CRC(aa4cff37) SHA1(58e67e3807a32c403b1ef145d4bc5f91e1537554) )
-	ROM_LOAD ("D49-21.IC17.bin", 0x000, 0x104, CRC(821775d4) SHA1(f066cf6ee2118dd57c904fcff3bb287d57e16367) )
+	ROM_LOAD ("d49-12.ic60.bin", 0x000, 0x104, CRC(aa4cff37) SHA1(58e67e3807a32c403b1ef145d4bc5f91e1537554) )
+	ROM_LOAD ("d49-21.ic17.bin", 0x000, 0x104, CRC(821775d4) SHA1(f066cf6ee2118dd57c904fcff3bb287d57e16367) )
 
 	ROM_REGION(0x800000, "palsbase" , ROMREGION_ERASE00 ) // all unprotected / unlocked (dumped from single PCB version of game)
 	// these should be the same on this and Arabian Magic, but the dumps don't match in all cases, maybe the AM ones were protected?
-	ROM_LOAD ("D29-11.IC15.bin", 0x000000, 0x157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) )
-	ROM_LOAD ("D29-12.IC12.bin", 0x000000, 0x144, CRC(c872f1fd) SHA1(6bcf766f76d83c18fa1c095716a1298581aa06c2) )
-	ROM_LOAD ("D29-13.IC14.bin", 0x000000, 0x157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) )
-	ROM_LOAD ("D29-14.IC28.bin", 0x000000, 0x157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) )
-	ROM_LOAD ("D29-15.IC29.bin", 0x000000, 0x157, CRC(692eb582) SHA1(db40eb294cecc65d4a0d65e75b6daef75dcc2fb7) )
-	ROM_LOAD ("D29-16.IC7.bin",  0x000000, 0x117, CRC(11875f52) SHA1(2c3a7a15b3184421ca1bc88383eeccf49ee0d22c) )
-	ROM_LOAD ("D29-17.IC16.bin", 0x000000, 0x117, CRC(a0f74b51) SHA1(9d19e9099be965152a3cfbc5593e6abedb7c9d71) )
+	ROM_LOAD ("d29-11.ic15.bin", 0x000000, 0x157, CRC(5dd5c8f9) SHA1(5e6153d9e08985b2326dfd6d73f7b90136a7a4b1) )
+	ROM_LOAD ("d29-12.ic12.bin", 0x000000, 0x144, CRC(c872f1fd) SHA1(6bcf766f76d83c18fa1c095716a1298581aa06c2) )
+	ROM_LOAD ("d29-13.ic14.bin", 0x000000, 0x157, CRC(74d61d36) SHA1(c34d8b2d227f69c167d1516dea53e4bcb76491d1) )
+	ROM_LOAD ("d29-14.ic28.bin", 0x000000, 0x157, CRC(25d205d5) SHA1(8859fd498e4d84a55424899d23db470be217eaba) )
+	ROM_LOAD ("d29-15.ic29.bin", 0x000000, 0x157, CRC(692eb582) SHA1(db40eb294cecc65d4a0d65e75b6daef75dcc2fb7) )
+	ROM_LOAD ("d29-16.ic7.bin",  0x000000, 0x117, CRC(11875f52) SHA1(2c3a7a15b3184421ca1bc88383eeccf49ee0d22c) )
+	ROM_LOAD ("d29-17.ic16.bin", 0x000000, 0x117, CRC(a0f74b51) SHA1(9d19e9099be965152a3cfbc5593e6abedb7c9d71) )
 
 ROM_END
 

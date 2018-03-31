@@ -1181,11 +1181,10 @@ void lua_engine::initialize()
 				}),
 			"screens", sol::property([this](running_machine &r) {
 					sol::table table = sol().create_table();
-					for(device_t *dev = r.first_screen(); dev != nullptr; dev = dev->next())
+					for (screen_device &sc : screen_device_iterator(r.root_device()))
 					{
-						screen_device *sc = dynamic_cast<screen_device *>(dev);
-						if (sc && sc->configured() && sc->started() && sc->type())
-							table[sc->tag()] = sc;
+						if (sc.configured() && sc.started() && sc.type())
+							table[sc.tag()] = &sc;
 					}
 					return table;
 				}),
@@ -1965,9 +1964,9 @@ void lua_engine::initialize()
 
 	sol().registry().new_usertype<output_manager>("output", "new", sol::no_constructor,
 			"set_value", &output_manager::set_value,
-			"set_indexed_value", &output_manager::set_indexed_value,
+			"set_indexed_value", [](output_manager &o, char const *basename, int index, int value) { o.set_value(util::string_format("%s%d", basename, index).c_str(), value); },
 			"get_value", &output_manager::get_value,
-			"get_indexed_value", &output_manager::get_indexed_value,
+			"get_indexed_value", [](output_manager &o, char const *basename, int index) { return o.get_value(util::string_format("%s%d", basename, index).c_str()); },
 			"name_to_id", &output_manager::name_to_id,
 			"id_to_name", &output_manager::id_to_name);
 

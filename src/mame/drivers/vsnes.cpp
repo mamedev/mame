@@ -195,27 +195,29 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 /******************************************************************************/
 
 
-ADDRESS_MAP_START(vsnes_state::vsnes_cpu1_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_r, vsnes_in0_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_r) /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x4020, 0x4020) AM_READWRITE(vsnes_coin_counter_r, vsnes_coin_counter_w)
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("extra1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void vsnes_state::vsnes_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
+	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(this, FUNC(vsnes_state::sprite_dma_0_w));
+	map(0x4016, 0x4016).rw(this, FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
+	map(0x4017, 0x4017).r(this, FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
+	map(0x4020, 0x4020).rw(this, FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x6000, 0x7fff).bankrw("extra1");
+	map(0x8000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(vsnes_state::vsnes_cpu2_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram_1")
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu2", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_1_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_1_r, vsnes_in0_1_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_1_r)  /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x4020, 0x4020) AM_WRITE(vsnes_coin_counter_1_w)
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("extra2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void vsnes_state::vsnes_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram_1");
+	map(0x2000, 0x3fff).rw(m_ppu2, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(this, FUNC(vsnes_state::sprite_dma_1_w));
+	map(0x4016, 0x4016).rw(this, FUNC(vsnes_state::vsnes_in0_1_r), FUNC(vsnes_state::vsnes_in0_1_w));
+	map(0x4017, 0x4017).r(this, FUNC(vsnes_state::vsnes_in1_1_r));  /* IN1 - input port 2 / PSG second control register */
+	map(0x4020, 0x4020).w(this, FUNC(vsnes_state::vsnes_coin_counter_1_w));
+	map(0x6000, 0x7fff).bankrw("extra2");
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -244,38 +246,40 @@ READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_data_r)
 
 
 // the bootleg still makes writes to the PSG addresses, it seems the Z80 should interpret them to play the sounds
-ADDRESS_MAP_START(vsnes_state::vsnes_cpu1_bootleg_map)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
-	AM_RANGE(0x4000, 0x4017) AM_WRITE(bootleg_sound_write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_r, vsnes_in0_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_r) /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x4020, 0x4020) AM_READWRITE(vsnes_coin_counter_r, vsnes_coin_counter_w)
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("extra1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void vsnes_state::vsnes_cpu1_bootleg_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x1800).ram().share("work_ram");
+	map(0x2000, 0x3fff).rw(m_ppu1, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4000, 0x4017).w(this, FUNC(vsnes_state::bootleg_sound_write));
+	map(0x4014, 0x4014).w(this, FUNC(vsnes_state::sprite_dma_0_w));
+	map(0x4016, 0x4016).rw(this, FUNC(vsnes_state::vsnes_in0_r), FUNC(vsnes_state::vsnes_in0_w));
+	map(0x4017, 0x4017).r(this, FUNC(vsnes_state::vsnes_in1_r)); /* IN1 - input port 2 / PSG second control register */
+	map(0x4020, 0x4020).rw(this, FUNC(vsnes_state::vsnes_coin_counter_r), FUNC(vsnes_state::vsnes_coin_counter_w));
+	map(0x6000, 0x7fff).bankrw("extra1");
+	map(0x8000, 0xffff).rom();
+}
 
 READ8_MEMBER( vsnes_state::vsnes_bootleg_z80_latch_r )
 {
 	return 0x00;
 }
 
-ADDRESS_MAP_START(vsnes_state::vsnes_bootleg_z80_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
+void vsnes_state::vsnes_bootleg_z80_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
 
-	AM_RANGE(0x4000, 0x4000) AM_READ( vsnes_bootleg_z80_data_r ) // read in IRQ & NMI
+	map(0x4000, 0x4000).r(this, FUNC(vsnes_state::vsnes_bootleg_z80_data_r)); // read in IRQ & NMI
 
-	AM_RANGE(0x6000, 0x6000) AM_READ( vsnes_bootleg_z80_latch_r ) // read in NMI, not explicitly stored (purpose? maybe clear IRQ ?)
-	AM_RANGE(0x6001, 0x6001) AM_READ( vsnes_bootleg_z80_address_r ) // ^
+	map(0x6000, 0x6000).r(this, FUNC(vsnes_state::vsnes_bootleg_z80_latch_r)); // read in NMI, not explicitly stored (purpose? maybe clear IRQ ?)
+	map(0x6001, 0x6001).r(this, FUNC(vsnes_state::vsnes_bootleg_z80_address_r)); // ^
 
 
-	AM_RANGE(0x60FA, 0x60FA) AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x60F9, 0x60F9) AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x60FF, 0x60FF) AM_DEVWRITE("sn3", sn76489_device, write)
+	map(0x60FA, 0x60FA).w("sn1", FUNC(sn76489_device::write));
+	map(0x60F9, 0x60F9).w("sn2", FUNC(sn76489_device::write));
+	map(0x60FF, 0x60FF).w("sn3", FUNC(sn76489_device::write));
 
-ADDRESS_MAP_END
+}
 
 /******************************************************************************/
 
@@ -1772,10 +1776,10 @@ MACHINE_CONFIG_START(vsnes_state::vsdual)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
-								/* some carts also trigger IRQs */
+
 	MCFG_CPU_ADD("sub", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu2_map)
-								/* some carts also trigger IRQs */
+
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsdual)
 
@@ -1937,7 +1941,7 @@ ROM_END
 ROM_START( suprmrioa ) /* Vs. Super Mario Bros. (Set unknown, possibly operator hack of E rev 4 to make the game harder) */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-sm4-4__1dor6d_e.1d or 6d", 0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
-	ROM_LOAD( "(__suprmrioa).1c or 6c",   0xa000, 0x2000, CRC(0011fc5a) SHA1(5c2c49938a12affc03e64e5bdab307998be20020) ) /* Need to verify correct label */
+	ROM_LOAD( "__suprmrioa,.1c or 6c",   0xa000, 0x2000, CRC(0011fc5a) SHA1(5c2c49938a12affc03e64e5bdab307998be20020) ) /* Need to verify correct label */
 	ROM_LOAD( "mds-sm4-4__1bor6b_e.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
 	ROM_LOAD( "mds-sm4-4__1aor6a_e.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
@@ -2006,8 +2010,8 @@ ROM_START( skatekds )
 	ROM_LOAD( "mds-sm4-4__1aor6a_e.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
 	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
-	ROM_LOAD( "(__skatekds).2b",  0x0000, 0x2000,CRC(f3980303) SHA1(b9a25c906d1861c89e2e40e878a34d318daf6619) )
-	ROM_LOAD( "(__skatekds).2a",  0x2000, 0x2000,CRC(7a0ab7eb) SHA1(b6c32791481fafddc8504adb4eaed30a2fb3a03e) )
+	ROM_LOAD( "__skatekds,.2b",  0x0000, 0x2000,CRC(f3980303) SHA1(b9a25c906d1861c89e2e40e878a34d318daf6619) )
+	ROM_LOAD( "__skatekds,.2a",  0x2000, 0x2000,CRC(7a0ab7eb) SHA1(b6c32791481fafddc8504adb4eaed30a2fb3a03e) )
 
 	PALETTE_2C04_0004
 ROM_END

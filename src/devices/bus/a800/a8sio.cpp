@@ -59,13 +59,6 @@ a8sio_slot_device::a8sio_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void a8sio_slot_device::static_set_a8sio_slot(device_t &device, const char *tag, const char *slottag)
-{
-	a8sio_slot_device &a8sio_ext = dynamic_cast<a8sio_slot_device &>(device);
-	a8sio_ext.m_a8sio_tag = tag;
-	a8sio_ext.m_a8sio_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -76,7 +69,7 @@ void a8sio_slot_device::device_start()
 
 	if (dev)
 	{
-		device_a8sio_card_interface::static_set_a8sio_tag(*dev, m_a8sio_tag, m_a8sio_slottag);
+		dev->set_a8sio_tag(m_a8sio_tag, m_a8sio_slottag);
 	}
 }
 
@@ -189,13 +182,6 @@ device_a8sio_card_interface::device_a8sio_card_interface(const machine_config &m
 
 device_a8sio_card_interface::~device_a8sio_card_interface()
 {
-}
-
-void device_a8sio_card_interface::static_set_a8sio_tag(device_t &device, const char *tag, const char *slottag)
-{
-	device_a8sio_card_interface &a8sio_card = dynamic_cast<device_a8sio_card_interface &>(device);
-	a8sio_card.m_a8sio_tag = tag;
-	a8sio_card.m_a8sio_slottag = slottag;
 }
 
 void device_a8sio_card_interface::set_a8sio_device()

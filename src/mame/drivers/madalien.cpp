@@ -67,42 +67,44 @@ WRITE8_MEMBER(madalien_state::madalien_portB_w)
 }
 
 
-ADDRESS_MAP_START(madalien_state::main_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
+void madalien_state::main_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
 
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(madalien_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x6400, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x7fff) AM_RAM_WRITE(madalien_charram_w) AM_SHARE("charram")
+	map(0x6000, 0x63ff).ram().w(this, FUNC(madalien_state::madalien_videoram_w)).share("videoram");
+	map(0x6400, 0x67ff).ram();
+	map(0x6800, 0x7fff).ram().w(this, FUNC(madalien_state::madalien_charram_w)).share("charram");
 
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITEONLY AM_SHARE("video_control")
-	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x0ff0) AM_WRITE(madalien_output_w)
-	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x8008, 0x8008) AM_MIRROR(0x07f0) AM_RAM_READ(shift_r) AM_SHARE("shift_hi")
-	AM_RANGE(0x8009, 0x8009) AM_MIRROR(0x07f0) AM_RAM_READ(shift_rev_r) AM_SHARE("shift_lo")
-	AM_RANGE(0x800b, 0x800b) AM_MIRROR(0x07f0) AM_WRITEONLY AM_SHARE("video_flags")
-	AM_RANGE(0x800c, 0x800c) AM_MIRROR(0x07f0) AM_WRITEONLY AM_SHARE("headlight_pos")
-	AM_RANGE(0x800d, 0x800d) AM_MIRROR(0x07f0) AM_WRITEONLY AM_SHARE("edge1_pos")
-	AM_RANGE(0x800e, 0x800e) AM_MIRROR(0x07f0) AM_WRITEONLY AM_SHARE("edge2_pos")
-	AM_RANGE(0x800f, 0x800f) AM_MIRROR(0x07f0) AM_WRITEONLY AM_SHARE("scroll")
+	map(0x8000, 0x8000).mirror(0x0ff0).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x8001, 0x8001).mirror(0x0ff0).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x8004, 0x8004).mirror(0x0ff0).writeonly().share("video_control");
+	map(0x8005, 0x8005).mirror(0x0ff0).w(this, FUNC(madalien_state::madalien_output_w));
+	map(0x8006, 0x8006).mirror(0x0ff0).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x8008, 0x8008).mirror(0x07f0).ram().r(this, FUNC(madalien_state::shift_r)).share("shift_hi");
+	map(0x8009, 0x8009).mirror(0x07f0).ram().r(this, FUNC(madalien_state::shift_rev_r)).share("shift_lo");
+	map(0x800b, 0x800b).mirror(0x07f0).writeonly().share("video_flags");
+	map(0x800c, 0x800c).mirror(0x07f0).writeonly().share("headlight_pos");
+	map(0x800d, 0x800d).mirror(0x07f0).writeonly().share("edge1_pos");
+	map(0x800e, 0x800e).mirror(0x07f0).writeonly().share("edge2_pos");
+	map(0x800f, 0x800f).mirror(0x07f0).writeonly().share("scroll");
 
-	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ff0) AM_READ_PORT("PLAYER1")
-	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ff0) AM_READ_PORT("DSW")
-	AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ff0) AM_READ_PORT("PLAYER2")
+	map(0x9000, 0x9000).mirror(0x0ff0).portr("PLAYER1");
+	map(0x9001, 0x9001).mirror(0x0ff0).portr("DSW");
+	map(0x9002, 0x9002).mirror(0x0ff0).portr("PLAYER2");
 
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xa000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(madalien_state::audio_map)
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_RAM /* unknown device in an epoxy block, might be tilt detection */
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8001) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x1ffc) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void madalien_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x1c00).ram();
+	map(0x6000, 0x6003).mirror(0x1ffc).ram(); /* unknown device in an epoxy block, might be tilt detection */
+	map(0x8000, 0x8000).mirror(0x1ffc).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8001).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8002).mirror(0x1ffc).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0xf800, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( madalien )

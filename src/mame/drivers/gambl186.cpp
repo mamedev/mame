@@ -360,30 +360,32 @@ WRITE16_MEMBER(gambl186_state::upd_w)
 //  m_upd7759->start_w(1);
 }
 
-ADDRESS_MAP_START(gambl186_state::gambl186_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_ROMBANK("data_bank")
-	AM_RANGE(0xa0000, 0xbffff) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, mem_r, mem_w, 0xffff)
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("ipl",0)
-ADDRESS_MAP_END
+void gambl186_state::gambl186_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram().share("nvram");
+	map(0x40000, 0x7ffff).bankr("data_bank");
+	map(0xa0000, 0xbffff).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
+	map(0xc0000, 0xfffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(gambl186_state::gambl186_io)
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03b0_r, port_03b0_w, 0xffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03c0_r, port_03c0_w, 0xffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5428_device, port_03d0_r, port_03d0_w, 0xffff)
-	AM_RANGE(0x0400, 0x0401) AM_WRITE(upd_w)      // upd7759 sample index/input
-	AM_RANGE(0x0500, 0x0501) AM_READ_PORT("IN0")
-	AM_RANGE(0x0502, 0x0503) AM_READ_PORT("IN1")
-	AM_RANGE(0x0504, 0x0505) AM_READ_PORT("IN2")  // Seems to writes more upd7759 params in MSB...
+void gambl186_state::gambl186_io(address_map &map)
+{
+	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
+	map(0x0400, 0x0401).w(this, FUNC(gambl186_state::upd_w));      // upd7759 sample index/input
+	map(0x0500, 0x0501).portr("IN0");
+	map(0x0502, 0x0503).portr("IN1");
+	map(0x0504, 0x0505).portr("IN2");  // Seems to writes more upd7759 params in MSB...
 
 	//AM_RANGE(0x0500, 0x050f) AM_READ(unk_r)
-	AM_RANGE(0x0580, 0x0581) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0582, 0x0583) AM_READ_PORT("JOY")
-	AM_RANGE(0x0584, 0x0585) AM_READ_PORT("DSW0") AM_WRITENOP // Watchdog: bit 8
+	map(0x0580, 0x0581).portr("DSW1");
+	map(0x0582, 0x0583).portr("JOY");
+	map(0x0584, 0x0585).portr("DSW0").nopw(); // Watchdog: bit 8
 //  AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
-	AM_RANGE(0x0680, 0x0683) AM_READWRITE(comms_r, comms_w)
-	AM_RANGE(0x0700, 0x0701) AM_WRITE(data_bank_w)
-ADDRESS_MAP_END
+	map(0x0680, 0x0683).rw(this, FUNC(gambl186_state::comms_r), FUNC(gambl186_state::comms_w));
+	map(0x0700, 0x0701).w(this, FUNC(gambl186_state::data_bank_w));
+}
 
 
 
@@ -479,8 +481,8 @@ MACHINE_CONFIG_START(gambl186_state::gambl186)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -520,15 +522,15 @@ ROM_END
 
 ROM_START( gambl186b )
 	ROM_REGION( 0x100000, "data", 0 )
-	ROM_LOAD16_BYTE( "IE3.7.8.bin", 0x00000, 0x80000, CRC(cc27886c) SHA1(cb27af74dffe86c564ba8a0ad711f4232330cf1b) )
-	ROM_LOAD16_BYTE( "IO3.7.8.bin", 0x00001, 0x80000, CRC(c69bf3ad) SHA1(eb612e903a9b184c2dd363e081ee8f650a4f2f90) )
+	ROM_LOAD16_BYTE( "ie3.7.8.bin", 0x00000, 0x80000, CRC(cc27886c) SHA1(cb27af74dffe86c564ba8a0ad711f4232330cf1b) )
+	ROM_LOAD16_BYTE( "io3.7.8.bin", 0x00001, 0x80000, CRC(c69bf3ad) SHA1(eb612e903a9b184c2dd363e081ee8f650a4f2f90) )
 
 	ROM_REGION( 0x40000, "ipl", 0 )
-	ROM_LOAD16_BYTE( "SE3.8.6T.bin", 0x00000, 0x20000,CRC(158bd3a3) SHA1(846f382f145f8c4c36bd75fef12717b41e91c70b))
-	ROM_LOAD16_BYTE( "SO3.8.6T.bin", 0x00001, 0x20000, CRC(4bd275d3) SHA1(6b84f54e723408b06b71e89f7de6a8014fd9ecfd) )
+	ROM_LOAD16_BYTE( "se3.8.6t.bin", 0x00000, 0x20000,CRC(158bd3a3) SHA1(846f382f145f8c4c36bd75fef12717b41e91c70b))
+	ROM_LOAD16_BYTE( "so3.8.6t.bin", 0x00001, 0x20000, CRC(4bd275d3) SHA1(6b84f54e723408b06b71e89f7de6a8014fd9ecfd) )
 
 	ROM_REGION( 0x20000, "upd", 0 ) // upd7759 sound samples
-	ROM_LOAD( "SOUND3.9.8.bin", 0x00000, 0x20000, CRC(1d6d1743) SHA1(df0e8d311ccaf77fb5dfc341124a11051154e79c) )
+	ROM_LOAD( "sound3.9.8.bin", 0x00000, 0x20000, CRC(1d6d1743) SHA1(df0e8d311ccaf77fb5dfc341124a11051154e79c) )
 ROM_END
 
 // version numbering isn't clear, rom labels don't agree with test mode display.

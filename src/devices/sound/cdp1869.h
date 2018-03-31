@@ -87,18 +87,18 @@
 //**************************************************************************
 
 #define MCFG_CDP1869_ADD(_tag, _pixclock, _map) \
-		MCFG_DEVICE_ADD(_tag, CDP1869, _pixclock) \
-		MCFG_DEVICE_ADDRESS_MAP(0, _map)
+	MCFG_DEVICE_ADD(_tag, CDP1869, _pixclock) \
+	MCFG_DEVICE_ADDRESS_MAP(0, _map)
 
 #define MCFG_CDP1869_SCREEN_PAL_ADD(_cdptag, _tag, _clock) \
-		MCFG_SCREEN_ADD(_tag, RASTER) \
-		MCFG_SCREEN_UPDATE_DEVICE(_cdptag, cdp1869_device, screen_update) \
-		MCFG_SCREEN_RAW_PARAMS(_clock, cdp1869_device::SCREEN_WIDTH, cdp1869_device::HBLANK_END, cdp1869_device::HBLANK_START, cdp1869_device::TOTAL_SCANLINES_PAL, cdp1869_device::SCANLINE_VBLANK_END_PAL, cdp1869_device::SCANLINE_VBLANK_START_PAL)
+	MCFG_SCREEN_ADD(_tag, RASTER) \
+	MCFG_SCREEN_UPDATE_DEVICE(_cdptag, cdp1869_device, screen_update) \
+	MCFG_SCREEN_RAW_PARAMS(_clock, cdp1869_device::SCREEN_WIDTH, cdp1869_device::HBLANK_END, cdp1869_device::HBLANK_START, cdp1869_device::TOTAL_SCANLINES_PAL, cdp1869_device::SCANLINE_VBLANK_END_PAL, cdp1869_device::SCANLINE_VBLANK_START_PAL)
 
 #define MCFG_CDP1869_SCREEN_NTSC_ADD(_cdptag, _tag, _clock) \
-		MCFG_SCREEN_ADD(_tag, RASTER) \
-		MCFG_SCREEN_UPDATE_DEVICE(_cdptag, cdp1869_device, screen_update) \
-		MCFG_SCREEN_RAW_PARAMS(_clock, cdp1869_device::SCREEN_WIDTH, cdp1869_device::HBLANK_END, cdp1869_device::HBLANK_START, cdp1869_device::TOTAL_SCANLINES_NTSC, cdp1869_device::SCANLINE_VBLANK_END_NTSC, cdp1869_device::SCANLINE_VBLANK_START_NTSC)
+	MCFG_SCREEN_ADD(_tag, RASTER) \
+	MCFG_SCREEN_UPDATE_DEVICE(_cdptag, cdp1869_device, screen_update) \
+	MCFG_SCREEN_RAW_PARAMS(_clock, cdp1869_device::SCREEN_WIDTH, cdp1869_device::HBLANK_END, cdp1869_device::HBLANK_START, cdp1869_device::TOTAL_SCANLINES_NTSC, cdp1869_device::SCANLINE_VBLANK_END_NTSC, cdp1869_device::SCANLINE_VBLANK_START_NTSC)
 
 #define MCFG_CDP1869_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
@@ -107,22 +107,22 @@
 #define CDP1869_PCB_READ_MEMBER(name) int name(uint16_t pma, uint8_t cma, uint8_t pmd)
 
 #define MCFG_CDP1869_PAL_NTSC_CALLBACK(_read) \
-		devcb = &cdp1869_device::set_pal_ntsc_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<cdp1869_device &>(*device).set_pal_ntsc_rd_callback(DEVCB_##_read);
 
 #define MCFG_CDP1869_PRD_CALLBACK(_write) \
-		devcb = &cdp1869_device::set_prd_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<cdp1869_device &>(*device).set_prd_wr_callback(DEVCB_##_write);
 
 #define MCFG_CDP1869_COLOR_CLOCK(_clk) \
-		cdp1869_device::static_set_color_clock(*device, _clk);
+	downcast<cdp1869_device &>(*device).set_color_clock(_clk);
 
 #define MCFG_CDP1869_CHAR_RAM_READ_OWNER(_class, _method) \
-		cdp1869_device::static_set_char_ram_read(*device, cdp1869_device::char_ram_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<cdp1869_device &>(*device).set_char_ram_read(cdp1869_device::char_ram_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_CDP1869_CHAR_RAM_WRITE_OWNER(_class, _method) \
-		cdp1869_device::static_set_char_ram_write(*device, cdp1869_device::char_ram_write_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<cdp1869_device &>(*device).set_char_ram_write(cdp1869_device::char_ram_write_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_CDP1869_CHAR_PCB_READ_OWNER(_class, _method) \
-		cdp1869_device::static_set_pcb_read(*device, cdp1869_device::pcb_read_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<cdp1869_device &>(*device).set_pcb_read(cdp1869_device::pcb_read_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************
@@ -188,13 +188,13 @@ public:
 	// construction/destruction
 	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_pal_ntsc_rd_callback(device_t &device, Object &&cb) { return downcast<cdp1869_device &>(device).m_read_pal_ntsc.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_prd_wr_callback(device_t &device, Object &&cb) { return downcast<cdp1869_device &>(device).m_write_prd.set_callback(std::forward<Object>(cb)); }
-	static void static_set_char_ram_read(device_t &device, char_ram_read_delegate &&cb) { downcast<cdp1869_device &>(device).m_in_char_ram_func = std::move(cb); }
-	static void static_set_char_ram_write(device_t &device, char_ram_write_delegate &&cb) { downcast<cdp1869_device &>(device).m_out_char_ram_func = std::move(cb); }
-	static void static_set_pcb_read(device_t &device, pcb_read_delegate &&cb) { downcast<cdp1869_device &>(device).m_in_pcb_func = std::move(cb); }
-	static void static_set_color_clock(device_t &device, int color_clock) { downcast<cdp1869_device &>(device).m_color_clock = color_clock; }
-	static void static_set_color_clock(device_t &device, const XTAL &xtal) { xtal.validate("selecting cdp1869 clock"); static_set_color_clock(device, xtal.value()); }
+	template <class Object> devcb_base &set_pal_ntsc_rd_callback(Object &&cb) { return m_read_pal_ntsc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_prd_wr_callback(Object &&cb) { return m_write_prd.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> void set_char_ram_read(Object &&cb) { m_in_char_ram_func = std::forward<Object>(cb); }
+	template <typename Object> void set_char_ram_write(Object &&cb) { m_out_char_ram_func = std::forward<Object>(cb); }
+	template <typename Object> void set_pcb_read(Object &&cb) { m_in_pcb_func = std::forward<Object>(cb); }
+	void set_color_clock(int color_clock) { m_color_clock = color_clock; }
+	void set_color_clock(const XTAL &xtal) { xtal.validate("selecting cdp1869 clock"); set_color_clock(xtal.value()); }
 
 	virtual void io_map(address_map &map);
 	virtual void char_map(address_map &map);

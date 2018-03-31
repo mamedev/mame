@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 			// It switches between on/off at each 2048 C-Sync pulses.
 			if ((m_csync_counter & 0x7ff) == 0)
 			{
-				output().set_led_value(0, !output().get_led_value(0));
+				m_led_pwr = !m_led_pwr;
 			}
 		}
 		else // Rapid Fire disabled
@@ -1025,6 +1025,8 @@ void sms_state::setup_bios()
 
 MACHINE_START_MEMBER(sms_state,sms)
 {
+	m_led_pwr.resolve();
+
 	char str[7];
 
 	m_cartslot = machine().device<sega8_cart_slot_device>("slot");

@@ -42,8 +42,9 @@ public:
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq2_ack_w);
-	DECLARE_READ8_MEMBER(prot_io_r);
-	DECLARE_WRITE8_MEMBER(prot_io_w);
+	DECLARE_WRITE8_MEMBER(prot_p0_w);
+	DECLARE_WRITE8_MEMBER(prot_p1_w);
+	DECLARE_WRITE8_MEMBER(prot_p2_w);
 	DECLARE_READ16_MEMBER(sb3_sound_r);
 	DECLARE_READ16_MEMBER(_4in1_02_read);
 	DECLARE_READ16_MEMBER(_3in1_read);
@@ -93,8 +94,6 @@ public:
 	void honeydol_sound_map(address_map &map);
 	void hyperpac_map(address_map &map);
 	void hyperpac_sound_map(address_map &map);
-	void protection_iomap(address_map &map);
-	void protection_map(address_map &map);
 	void snowbros3_map(address_map &map);
 	void snowbros_map(address_map &map);
 	void sound_io_map(address_map &map);

@@ -95,7 +95,7 @@ enum BREGS {
 
 /***************************************************************************/
 
-DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "V30MZ")
+DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "NEC V30MZ")
 
 
 v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1305,9 +1305,9 @@ void v30mz_cpu_device::execute_set_input( int inptnum, int state )
 }
 
 
-util::disasm_interface *v30mz_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v30mz_cpu_device::create_disassembler()
 {
-	return new nec_disassembler;
+	return std::make_unique<nec_disassembler>();
 }
 
 

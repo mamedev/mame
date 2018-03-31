@@ -222,28 +222,31 @@ WRITE8_MEMBER(pipeline_state::protection_w)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
-ADDRESS_MAP_START(pipeline_state::cpu0_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x97ff) AM_RAM_WRITE(vram1_w) AM_SHARE("vram1")
-	AM_RANGE(0x9800, 0xa7ff) AM_RAM_WRITE(vram2_w) AM_SHARE("vram2")
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0xb830, 0xb830) AM_NOP
-	AM_RANGE(0xb840, 0xb840) AM_NOP
-ADDRESS_MAP_END
+void pipeline_state::cpu0_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x97ff).ram().w(this, FUNC(pipeline_state::vram1_w)).share("vram1");
+	map(0x9800, 0xa7ff).ram().w(this, FUNC(pipeline_state::vram2_w)).share("vram2");
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb830, 0xb830).noprw();
+	map(0xb840, 0xb840).noprw();
+}
 
-ADDRESS_MAP_START(pipeline_state::cpu1_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-ADDRESS_MAP_END
+void pipeline_state::cpu1_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xe000, 0xe003).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-ADDRESS_MAP_START(pipeline_state::sound_port)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x06, 0x07) AM_NOP
-ADDRESS_MAP_END
+void pipeline_state::sound_port(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x06, 0x07).noprw();
+}
 
 WRITE8_MEMBER(pipeline_state::mcu_portA_w)
 {

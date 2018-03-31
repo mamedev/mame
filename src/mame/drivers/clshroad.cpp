@@ -70,25 +70,27 @@ WRITE_LINE_MEMBER(clshroad_state::sound_irq_mask_w)
 }
 
 
-ADDRESS_MAP_START(clshroad_state::clshroad_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x95ff) AM_RAM
-	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x9800, 0x9dff) AM_RAM
-	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0xa100, 0xa107) AM_READ(input_r)
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
-	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_SHARE("vregs") // Scroll
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
-ADDRESS_MAP_END
+void clshroad_state::clshroad_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x95ff).ram();
+	map(0x9600, 0x97ff).ram().share("share1");
+	map(0x9800, 0x9dff).ram();
+	map(0x9e00, 0x9fff).ram().share("spriteram");
+	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xa100, 0xa107).r(this, FUNC(clshroad_state::input_r));
+	map(0xa800, 0xafff).ram().w(this, FUNC(clshroad_state::vram_1_w)).share("vram_1"); // Layer 1
+	map(0xb000, 0xb003).writeonly().share("vregs"); // Scroll
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(clshroad_state::vram_0_w)).share("vram_0"); // Layer 0
+}
 
-ADDRESS_MAP_START(clshroad_state::clshroad_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("custom", wiping_sound_device, sound_w)
-	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void clshroad_state::clshroad_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x7fff).w("custom", FUNC(wiping_sound_device::sound_w));
+	map(0x9600, 0x97ff).ram().share("share1");
+	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
 

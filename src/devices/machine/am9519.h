@@ -33,7 +33,7 @@
 ***************************************************************************/
 
 #define MCFG_AM9519_OUT_INT_CB(_devcb) \
-	devcb = &am9519_device::static_set_out_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<am9519_device &>(*device).static_set_out_int_callback(DEVCB_##_devcb);
 
 
 class am9519_device : public device_t
@@ -41,7 +41,7 @@ class am9519_device : public device_t
 public:
 	am9519_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <class Object> static devcb_base &static_set_out_int_callback(device_t &device, Object &&cb) { return downcast<am9519_device &>(device).m_out_int_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &static_set_out_int_callback(Object &&cb) { return m_out_int_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( stat_r );
 	DECLARE_READ8_MEMBER( data_r );

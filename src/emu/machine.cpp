@@ -107,8 +107,7 @@ osd_interface &running_machine::osd() const
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
-	: primary_screen(nullptr),
-		m_side_effects_disabled(0),
+	: m_side_effects_disabled(0),
 		debug_flags(0),
 		m_config(_config),
 		m_system(_config.gamedrv()),
@@ -142,9 +141,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 	device_iterator iter(root_device());
 	for (device_t &device : iter)
 		device.set_machine(*this);
-
-	// find devices
-	primary_screen = screen_device_iterator(root_device()).first();
 
 	// fetch core options
 	if (options().debug())

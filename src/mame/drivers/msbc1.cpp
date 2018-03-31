@@ -72,11 +72,12 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(msbc1_state::msbc1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM
-	AM_RANGE(0xf80000, 0xf87fff) AM_ROM AM_REGION(MC68000R12_TAG, 0)
-ADDRESS_MAP_END
+void msbc1_state::msbc1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).ram();
+	map(0xf80000, 0xf87fff).rom().region(MC68000R12_TAG, 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( msbc1 )

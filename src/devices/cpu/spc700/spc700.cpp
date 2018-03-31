@@ -218,7 +218,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 
 
 
-DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "SPC700")
+DEFINE_DEVICE_TYPE(SPC700, spc700_device, "spc700", "Sony SPC700")
 
 
 spc700_device::spc700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1353,9 +1353,9 @@ void spc700_device::execute_set_input( int inptnum, int state )
 
 #include "spc700ds.h"
 
-util::disasm_interface *spc700_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> spc700_device::create_disassembler()
 {
-	return new spc700_disassembler;
+	return std::make_unique<spc700_disassembler>();
 }
 
 //int dump_flag = 0;

@@ -63,8 +63,9 @@ public:
 	DECLARE_WRITE16_MEMBER(semicom_soundcmd_w);
 	DECLARE_WRITE8_MEMBER(oki_sound_bank_w);
 	DECLARE_WRITE8_MEMBER(jumpkids_oki_bank_w);
-	DECLARE_READ8_MEMBER(prot_io_r);
-	DECLARE_WRITE8_MEMBER(prot_io_w);
+	DECLARE_WRITE8_MEMBER(prot_p0_w);
+	DECLARE_WRITE8_MEMBER(prot_p1_w);
+	DECLARE_WRITE8_MEMBER(prot_p2_w);
 	DECLARE_READ16_MEMBER(bcstory_1a0_read);
 	DECLARE_WRITE16_MEMBER(bcstory_tilebank_w);
 	DECLARE_WRITE16_MEMBER(chokchok_tilebank_w);
@@ -152,8 +153,6 @@ public:
 	void jumpkids_main_map(address_map &map);
 	void jumpkids_sound_map(address_map &map);
 	void pangpang_main_map(address_map &map);
-	void protection_iomap(address_map &map);
-	void protection_map(address_map &map);
 	void semicom_sound_map(address_map &map);
 	void suprtrio_main_map(address_map &map);
 	void suprtrio_sound_map(address_map &map);

@@ -22,6 +22,7 @@
 #include "machine/z80dart.h"
 #include "sound/spkrdev.h"
 #include "sound/beep.h"
+#include "imagedev/snapquik.h"
 
 #define SCREEN_TAG      "screen"
 
@@ -79,6 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(xerox820);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 

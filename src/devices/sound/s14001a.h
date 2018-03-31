@@ -9,10 +9,10 @@
 #define MAME_SOUND_S14001A_H
 
 #define MCFG_S14001A_BSY_HANDLER(_devcb) \
-	devcb = &s14001a_device::set_bsy_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<s14001a_device &>(*device).set_bsy_handler(DEVCB_##_devcb);
 
 #define MCFG_S14001A_EXT_READ_HANDLER(_devcb) \
-	devcb = &s14001a_device::set_ext_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<s14001a_device &>(*device).set_ext_read_handler(DEVCB_##_devcb);
 
 
 class s14001a_device : public device_t, public device_sound_interface
@@ -20,9 +20,9 @@ class s14001a_device : public device_t, public device_sound_interface
 public:
 	s14001a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_bsy_handler(device_t &device, Object &&cb) { return downcast<s14001a_device &>(device).m_bsy_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ext_read_handler(device_t &device, Object &&cb) { return downcast<s14001a_device &>(device).m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_bsy_handler(Object &&cb) { return m_bsy_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ext_read_handler(Object &&cb) { return m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ_LINE_MEMBER(busy_r);   // /BUSY (pin 40)
 	DECLARE_READ_LINE_MEMBER(romen_r);  // ROM /EN (pin 9)

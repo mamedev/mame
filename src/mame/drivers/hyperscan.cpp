@@ -585,15 +585,16 @@ void hyperscan_state::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-ADDRESS_MAP_START(hyperscan_state::spg290_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffffff)
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_MIRROR(0x07000000)
-	AM_RANGE(0x08000000, 0x09ffffff) AM_READWRITE(spg290_regs_r, spg290_regs_w)
-	AM_RANGE(0x0a000000, 0x0a003fff) AM_RAM                         // internal SRAM
-	AM_RANGE(0x0b000000, 0x0b007fff) AM_ROM AM_REGION("spg290", 0)  // internal ROM
-	AM_RANGE(0x10000000, 0x100fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
-	AM_RANGE(0x11000000, 0x110fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x0e000000)
-ADDRESS_MAP_END
+void hyperscan_state::spg290_mem(address_map &map)
+{
+	map.global_mask(0x1fffffff);
+	map(0x00000000, 0x00ffffff).ram().mirror(0x07000000);
+	map(0x08000000, 0x09ffffff).rw(this, FUNC(hyperscan_state::spg290_regs_r), FUNC(hyperscan_state::spg290_regs_w));
+	map(0x0a000000, 0x0a003fff).ram();                         // internal SRAM
+	map(0x0b000000, 0x0b007fff).rom().region("spg290", 0);  // internal ROM
+	map(0x10000000, 0x100fffff).rom().region("bios", 0).mirror(0x0e000000);
+	map(0x11000000, 0x110fffff).rom().region("bios", 0).mirror(0x0e000000);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( hyperscan )

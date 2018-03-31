@@ -43,8 +43,6 @@ public:
 	DECLARE_READ8_MEMBER(read_5841);
 	DECLARE_WRITE8_MEMBER(write_5841);
 	DECLARE_READ8_MEMBER(read_5842);
-	DECLARE_WRITE8_MEMBER(write_5842);
-	DECLARE_READ8_MEMBER(read_5843);
 	DECLARE_WRITE8_MEMBER(write_5843);
 	DECLARE_READ8_MEMBER(read_5846);
 	DECLARE_READ8_MEMBER(read_5847);
@@ -53,6 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(page_w);
 
 	DECLARE_WRITE_LINE_MEMBER(vsyn_w);
+	DECLARE_WRITE_LINE_MEMBER(so_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
 
 	void ampex(machine_config &config);
@@ -63,6 +62,7 @@ private:
 	u8 m_page;
 	u8 m_attr;
 	bool m_attr_readback;
+	bool m_uart_loopback;
 	std::unique_ptr<u16[]> m_paged_ram;
 
 	required_device<cpu_device> m_maincpu;
@@ -100,8 +100,7 @@ READ8_MEMBER(ampex_state::read_5841)
 
 WRITE8_MEMBER(ampex_state::write_5841)
 {
-	// bit 7 set for UART loopback test
-
+	m_uart_loopback = BIT(data, 7);
 	m_attr_readback = BIT(data, 5);
 }
 
@@ -109,19 +108,6 @@ READ8_MEMBER(ampex_state::read_5842)
 {
 	//logerror("%s: Read from 5842\n", machine().describe_context());
 	return 0;
-}
-
-WRITE8_MEMBER(ampex_state::write_5842)
-{
-	m_uart->set_transmit_data(data);
-}
-
-READ8_MEMBER(ampex_state::read_5843)
-{
-	m_uart->write_rdav(0);
-	u8 data = m_uart->get_received_data();
-	m_uart->write_rdav(1);
-	return data;
 }
 
 WRITE8_MEMBER(ampex_state::write_5843)
@@ -160,25 +146,32 @@ WRITE_LINE_MEMBER(ampex_state::vsyn_w)
 	// should generate RST 6 interrupt
 }
 
+WRITE_LINE_MEMBER(ampex_state::so_w)
+{
+	if (m_uart_loopback)
+		m_uart->write_si(state);
+}
+
 WRITE_LINE_MEMBER(ampex_state::dav_w)
 {
 	// DAV should generate RST 7
 }
 
-ADDRESS_MAP_START(ampex_state::mem_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM // main RAM
-	AM_RANGE(0x4400, 0x57ff) AM_RAM // expansion RAM
-	AM_RANGE(0x5840, 0x5840) AM_READWRITE(read_5840, write_5840)
-	AM_RANGE(0x5841, 0x5841) AM_READWRITE(read_5841, write_5841)
-	AM_RANGE(0x5842, 0x5842) AM_READWRITE(read_5842, write_5842)
-	AM_RANGE(0x5843, 0x5843) AM_READWRITE(read_5843, write_5843)
-	AM_RANGE(0x5846, 0x5846) AM_READ(read_5846)
-	AM_RANGE(0x5847, 0x5847) AM_READ(read_5847)
-	AM_RANGE(0x5c00, 0x5c0f) AM_DEVREADWRITE("vtac", crt5037_device, read, write)
-	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(page_r, page_w)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM // video RAM
-ADDRESS_MAP_END
+void ampex_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom().region("roms", 0);
+	map(0x4000, 0x43ff).ram(); // main RAM
+	map(0x4400, 0x57ff).ram(); // expansion RAM
+	map(0x5840, 0x5840).rw(this, FUNC(ampex_state::read_5840), FUNC(ampex_state::write_5840));
+	map(0x5841, 0x5841).rw(this, FUNC(ampex_state::read_5841), FUNC(ampex_state::write_5841));
+	map(0x5842, 0x5842).r(this, FUNC(ampex_state::read_5842)).w(m_uart, FUNC(ay31015_device::transmit));
+	map(0x5843, 0x5843).r(m_uart, FUNC(ay31015_device::receive)).w(this, FUNC(ampex_state::write_5843));
+	map(0x5846, 0x5846).r(this, FUNC(ampex_state::read_5846));
+	map(0x5847, 0x5847).r(this, FUNC(ampex_state::read_5847));
+	map(0x5c00, 0x5c0f).rw("vtac", FUNC(crt5037_device::read), FUNC(crt5037_device::write));
+	map(0x8000, 0x97ff).rw(this, FUNC(ampex_state::page_r), FUNC(ampex_state::page_w));
+	map(0xc000, 0xcfff).ram(); // video RAM
+}
 
 static INPUT_PORTS_START( ampex )
 INPUT_PORTS_END
@@ -188,13 +181,27 @@ void ampex_state::machine_start()
 	m_page = 0;
 	m_attr = 0;
 	m_attr_readback = false;
+	m_uart_loopback = false;
 	m_paged_ram = std::make_unique<u16[]>(0x1800 * 4);
 
 	m_uart->write_swe(0);
 
+	// Are rates hardwired to DIP switches? They don't seem to be software-controlled...
+	m_dbrg->str_w(0xe);
+	m_dbrg->stt_w(0xe);
+
+	// Make up some settings for the UART (probably also actually controlled by DIP switches)
+	m_uart->write_nb1(1);
+	m_uart->write_nb2(1);
+	m_uart->write_np(1);
+	m_uart->write_eps(1);
+	m_uart->write_tsb(0);
+	m_uart->write_cs(1);
+
 	save_item(NAME(m_page));
 	save_item(NAME(m_attr));
 	save_item(NAME(m_attr_readback));
+	save_item(NAME(m_uart_loopback));
 	save_pointer(NAME(m_paged_ram.get()), 0x1800 * 4);
 }
 
@@ -206,16 +213,19 @@ MACHINE_CONFIG_START(ampex_state::ampex)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000) / 2, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(ampex_state, screen_update)
 
-	// FIXME: dot clock should be divided by char width
-	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2)
+	MCFG_DEVICE_ADD("vtac", CRT5037, XTAL(23'814'000) / 2 / CHAR_WIDTH)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
 	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE(ampex_state, vsyn_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD("uart", AY31015, 0) // COM8017, actually
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(ampex_state, so_w))
 	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ampex_state, dav_w))
+	MCFG_AY31015_AUTO_RDAV(true)
 
 	MCFG_DEVICE_ADD("dbrg", COM5016_5, XTAL(4'915'200))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("uart", ay31015_device, write_rcp))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("uart", ay31015_device, write_tcp))
 MACHINE_CONFIG_END
 
 ROM_START( dialog80 )

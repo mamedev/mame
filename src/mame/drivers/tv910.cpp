@@ -103,23 +103,24 @@ private:
 	uint8_t m_control;
 };
 
-ADDRESS_MAP_START(tv910_state::tv910_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vram") // VRAM
-	AM_RANGE(0x8010, 0x801f) AM_READ(charset_r)
-	AM_RANGE(0x8020, 0x8020) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, status_r, address_w)
-	AM_RANGE(0x8021, 0x8021) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, register_r, register_w)
-	AM_RANGE(0x8030, 0x8033) AM_DEVREADWRITE(ACIA_TAG, mos6551_device, read, write)
-	AM_RANGE(0x8040, 0x804f) AM_WRITE(vbl_ack_w)
-	AM_RANGE(0x8050, 0x805f) AM_WRITE(nmi_ack_w)
-	AM_RANGE(0x8060, 0x806f) AM_READ(kbd_ascii_r)
-	AM_RANGE(0x8070, 0x807f) AM_READ(kbd_flags_r)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(control_w)
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void tv910_state::tv910_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).ram();
+	map(0x4000, 0x47ff).ram().share("vram"); // VRAM
+	map(0x8010, 0x801f).r(this, FUNC(tv910_state::charset_r));
+	map(0x8020, 0x8020).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
+	map(0x8021, 0x8021).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
+	map(0x8030, 0x8033).rw(ACIA_TAG, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0x8040, 0x804f).w(this, FUNC(tv910_state::vbl_ack_w));
+	map(0x8050, 0x805f).w(this, FUNC(tv910_state::nmi_ack_w));
+	map(0x8060, 0x806f).r(this, FUNC(tv910_state::kbd_ascii_r));
+	map(0x8070, 0x807f).r(this, FUNC(tv910_state::kbd_flags_r));
+	map(0x9000, 0x9000).w(this, FUNC(tv910_state::control_w));
+	map(0x9001, 0x9001).portr("DSW1");
+	map(0x9002, 0x9002).portr("DSW2");
+	map(0xf000, 0xffff).rom().region("maincpu", 0);
+}
 
 WRITE8_MEMBER(tv910_state::control_w)
 {

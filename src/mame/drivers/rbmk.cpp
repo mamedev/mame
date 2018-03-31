@@ -166,42 +166,45 @@ WRITE16_MEMBER(rbmk_state::eeprom_w)
 }
 
 
-ADDRESS_MAP_START(rbmk_state::rbmk_mem)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2")
-	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(eeprom_w)
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(dip_mux_r, dip_mux_w)
-	AM_RANGE(0xc08000, 0xc08001) AM_READ_PORT("IN1") AM_WRITE(tilebank_w)
-	AM_RANGE(0xc10000, 0xc10001) AM_READ_PORT("IN2")
-	AM_RANGE(0xc18080, 0xc18081) AM_READ(unk_r)
-	AM_RANGE(0xc20000, 0xc20001) AM_READ_PORT("IN3")
-	AM_RANGE(0xc28000, 0xc28001) AM_WRITE(unk_w)
-ADDRESS_MAP_END
+void rbmk_state::rbmk_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().nopw();
+	map(0x100000, 0x10ffff).ram();
+	map(0x500000, 0x50ffff).ram();
+	map(0x940000, 0x940fff).ram().share("vidram2");
+	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access
+	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x9c0000, 0x9c0fff).ram().share("vidram");
+	map(0xb00000, 0xb00001).w(this, FUNC(rbmk_state::eeprom_w));
+	map(0xc00000, 0xc00001).rw(this, FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
+	map(0xc08000, 0xc08001).portr("IN1").w(this, FUNC(rbmk_state::tilebank_w));
+	map(0xc10000, 0xc10001).portr("IN2");
+	map(0xc18080, 0xc18081).r(this, FUNC(rbmk_state::unk_r));
+	map(0xc20000, 0xc20001).portr("IN3");
+	map(0xc28000, 0xc28001).w(this, FUNC(rbmk_state::unk_w));
+}
 
-ADDRESS_MAP_START(rbmk_state::rbspm_mem)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(eeprom_w) // wrong
-	AM_RANGE(0x300000, 0x300001) AM_READWRITE(dip_mux_r, dip_mux_w)
-	AM_RANGE(0x308000, 0x308001) AM_READ_PORT("IN1") AM_WRITE(tilebank_w) // ok
-	AM_RANGE(0x310000, 0x310001) AM_READ_PORT("IN2")
-	AM_RANGE(0x318080, 0x318081) AM_READ(unk_r)
-	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN3")
-	AM_RANGE(0x328000, 0x328001) AM_WRITE(unk_w)
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // if removed fails gfx test?
-	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2") // if removed fails palette test?
-	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access, u25 and u26 according to test mode
-	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
-ADDRESS_MAP_END
+void rbmk_state::rbspm_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x200000, 0x200001).w(this, FUNC(rbmk_state::eeprom_w)); // wrong
+	map(0x300000, 0x300001).rw(this, FUNC(rbmk_state::dip_mux_r), FUNC(rbmk_state::dip_mux_w));
+	map(0x308000, 0x308001).portr("IN1").w(this, FUNC(rbmk_state::tilebank_w)); // ok
+	map(0x310000, 0x310001).portr("IN2");
+	map(0x318080, 0x318081).r(this, FUNC(rbmk_state::unk_r));
+	map(0x320000, 0x320001).portr("IN3");
+	map(0x328000, 0x328001).w(this, FUNC(rbmk_state::unk_w));
+	map(0x500000, 0x50ffff).ram();
+	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // if removed fails gfx test?
+	map(0x940000, 0x940fff).ram().share("vidram2"); // if removed fails palette test?
+	map(0x980300, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
+	map(0x9c0000, 0x9c0fff).ram().share("vidram");
+}
 
-ADDRESS_MAP_START(rbmk_state::mcu_mem)
+void rbmk_state::mcu_mem(address_map &map)
+{
 //  AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+}
 
 READ8_MEMBER(rbmk_state::mcu_io_r)
 {
@@ -238,11 +241,10 @@ WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
 	m_mux_data = ~data;
 }
 
-ADDRESS_MAP_START(rbmk_state::mcu_io)
-	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(mcu_io_r, mcu_io_w )
-
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(mcu_io_mux_w )
-ADDRESS_MAP_END
+void rbmk_state::mcu_io(address_map &map)
+{
+	map(0x0ff00, 0x0ffff).rw(this, FUNC(rbmk_state::mcu_io_r), FUNC(rbmk_state::mcu_io_w));
+}
 
 static INPUT_PORTS_START( rbmk )
 	PORT_START("IN1")   /* 16bit */
@@ -572,6 +574,7 @@ MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_CPU_ADD("mcu", AT89C4051, 22000000 / 4) // frequency isn't right
 	MCFG_CPU_PROGRAM_MAP(mcu_mem)
 	MCFG_CPU_IO_MAP(mcu_io)
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(rbmk_state, mcu_io_mux_w))
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  mcu_irq)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rbmk)
@@ -645,7 +648,7 @@ http://youtu.be/VGbrR7GfDck
 
 ROM_START( rbspm )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD( "MJ-DFMJ-P1.bin", 0x00000, 0x80000, CRC(8f81f154) SHA1(50a9a373dec96b0265907f053d068d636bdabd61) )
+	ROM_LOAD( "mj-dfmj-p1.bin", 0x00000, 0x80000, CRC(8f81f154) SHA1(50a9a373dec96b0265907f053d068d636bdabd61) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* protected MCU */
 	ROM_LOAD( "89c51.bin", 0x0000, 0x1000, NO_DUMP ) // reads as all 0xff
@@ -655,20 +658,20 @@ ROM_START( rbspm )
 	ROM_LOAD( "c016_pic16f84_data.bin", 0x800, 0x080, CRC(ee882e11) SHA1(aa5852a95a89b17270bb6f315dfa036f9f8155cf) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* ??? mcu data / code */
-	ROM_LOAD( "MJ-DFMJ-2.2-XX.bin", 0x00000, 0x20000,  CRC(58a9eea2) SHA1(1a251e9b049bc8dafbc0728b3d876fdd5a1c8dd9) )
+	ROM_LOAD( "mj-dfmj-2.2-xx.bin", 0x00000, 0x20000,  CRC(58a9eea2) SHA1(1a251e9b049bc8dafbc0728b3d876fdd5a1c8dd9) )
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "MJ-DFMJ-2.2-S1.bin", 0x00000, 0x80000, CRC(2410bb61) SHA1(54e258e4af089841a63e45f25aad70310a28d76b) )  // 1st and 2nd half identical
+	ROM_LOAD( "mj-dfmj-2.2-s1.bin", 0x00000, 0x80000, CRC(2410bb61) SHA1(54e258e4af089841a63e45f25aad70310a28d76b) )  // 1st and 2nd half identical
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* 8x32 tiles, lots of girls etc. */
-	ROM_LOAD( "MJ-DFMJ-4.2-A1.bin", 0x00000, 0x80000,  CRC(b0a3a866) SHA1(cc950532160a066fc6ce427f6df9d58ee4589821) )
+	ROM_LOAD( "mj-dfmj-4.2-a1.bin", 0x00000, 0x80000,  CRC(b0a3a866) SHA1(cc950532160a066fc6ce427f6df9d58ee4589821) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 ) /* 8x8 tiles? cards etc */
-	ROM_LOAD( "MJ-DFMJ-4.8-T1.bin", 0x00000, 0x80000, CRC(2b8b689d) SHA1(65ab643fac1e734af8b3a86caa06b532baafa0fe) )
+	ROM_LOAD( "mj-dfmj-4.8-t1.bin", 0x00000, 0x80000, CRC(2b8b689d) SHA1(65ab643fac1e734af8b3a86caa06b532baafa0fe) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* eeprom */
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
 ROM_END
 
-GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",     MACHINE_NOT_WORKING )
 GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )

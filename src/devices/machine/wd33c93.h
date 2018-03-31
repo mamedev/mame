@@ -13,7 +13,7 @@
 #include "legscsi.h"
 
 #define MCFG_WD33C93_IRQ_CB(cb) \
-		devcb = &wd33c93_device::set_irq_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<wd33c93_device &>(*device).set_irq_callback((DEVCB_##cb));
 
 class wd33c93_device : public legacy_scsi_host_adapter
 {
@@ -21,7 +21,7 @@ public:
 	// construction/destruction
 	wd33c93_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<wd33c93_device &>(device).m_irq_cb.set_callback(object); }
+	template<class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

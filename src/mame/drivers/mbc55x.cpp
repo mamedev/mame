@@ -36,40 +36,42 @@ const unsigned char mbc55x_palette[SCREEN_NO_COLOURS][3] =
 };
 
 
-ADDRESS_MAP_START(mbc55x_state::mbc55x_mem)
-	AM_RANGE( 0x00000, 0x0FFFF ) AM_RAMBANK(RAM_BANK00_TAG)
-	AM_RANGE( 0x10000, 0x1FFFF ) AM_RAMBANK(RAM_BANK01_TAG)
-	AM_RANGE( 0x20000, 0x2FFFF ) AM_RAMBANK(RAM_BANK02_TAG)
-	AM_RANGE( 0x30000, 0x3FFFF ) AM_RAMBANK(RAM_BANK03_TAG)
-	AM_RANGE( 0x40000, 0x4FFFF ) AM_RAMBANK(RAM_BANK04_TAG)
-	AM_RANGE( 0x50000, 0x5FFFF ) AM_RAMBANK(RAM_BANK05_TAG)
-	AM_RANGE( 0x60000, 0x6FFFF ) AM_RAMBANK(RAM_BANK06_TAG)
-	AM_RANGE( 0x70000, 0x7FFFF ) AM_RAMBANK(RAM_BANK07_TAG)
-	AM_RANGE( 0x80000, 0x8FFFF ) AM_RAMBANK(RAM_BANK08_TAG)
-	AM_RANGE( 0x90000, 0x9FFFF ) AM_RAMBANK(RAM_BANK09_TAG)
-	AM_RANGE( 0xA0000, 0xAFFFF ) AM_RAMBANK(RAM_BANK0A_TAG)
-	AM_RANGE( 0xB0000, 0xBFFFF ) AM_RAMBANK(RAM_BANK0B_TAG)
-	AM_RANGE( 0xC0000, 0xCFFFF ) AM_RAMBANK(RAM_BANK0C_TAG)
-	AM_RANGE( 0xD0000, 0xDFFFF ) AM_RAMBANK(RAM_BANK0D_TAG)
-	AM_RANGE( 0xE0000, 0xEFFFF ) AM_RAMBANK(RAM_BANK0E_TAG)
-	AM_RANGE( 0xF0000, 0xF3FFF ) AM_RAMBANK(RED_PLANE_TAG)
-	AM_RANGE( 0xF4000, 0xF7FFF ) AM_RAMBANK(BLUE_PLANE_TAG)
-	AM_RANGE( 0xF8000, 0xFBFFF ) AM_NOP
-	AM_RANGE( 0xFC000, 0xFDFFF ) AM_ROM AM_WRITENOP AM_REGION(MAINCPU_TAG, 0x0000) AM_MIRROR(0x002000)
-ADDRESS_MAP_END
+void mbc55x_state::mbc55x_mem(address_map &map)
+{
+	map(0x00000, 0x0FFFF).bankrw(RAM_BANK00_TAG);
+	map(0x10000, 0x1FFFF).bankrw(RAM_BANK01_TAG);
+	map(0x20000, 0x2FFFF).bankrw(RAM_BANK02_TAG);
+	map(0x30000, 0x3FFFF).bankrw(RAM_BANK03_TAG);
+	map(0x40000, 0x4FFFF).bankrw(RAM_BANK04_TAG);
+	map(0x50000, 0x5FFFF).bankrw(RAM_BANK05_TAG);
+	map(0x60000, 0x6FFFF).bankrw(RAM_BANK06_TAG);
+	map(0x70000, 0x7FFFF).bankrw(RAM_BANK07_TAG);
+	map(0x80000, 0x8FFFF).bankrw(RAM_BANK08_TAG);
+	map(0x90000, 0x9FFFF).bankrw(RAM_BANK09_TAG);
+	map(0xA0000, 0xAFFFF).bankrw(RAM_BANK0A_TAG);
+	map(0xB0000, 0xBFFFF).bankrw(RAM_BANK0B_TAG);
+	map(0xC0000, 0xCFFFF).bankrw(RAM_BANK0C_TAG);
+	map(0xD0000, 0xDFFFF).bankrw(RAM_BANK0D_TAG);
+	map(0xE0000, 0xEFFFF).bankrw(RAM_BANK0E_TAG);
+	map(0xF0000, 0xF3FFF).bankrw(RED_PLANE_TAG);
+	map(0xF4000, 0xF7FFF).bankrw(BLUE_PLANE_TAG);
+	map(0xF8000, 0xFBFFF).noprw();
+	map(0xFC000, 0xFDFFF).rom().nopw().region(MAINCPU_TAG, 0x0000).mirror(0x002000);
+}
 
-ADDRESS_MAP_START(mbc55x_state::mbc55x_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x0000, 0x0003) AM_READWRITE(mbcpic8259_r, mbcpic8259_w)
-	AM_RANGE( 0x0008, 0x000F) AM_READWRITE(mbc55x_disk_r, mbc55x_disk_w)
-	AM_RANGE( 0x0010, 0x0010) AM_READWRITE( vram_page_r, vram_page_w)
-	AM_RANGE( 0x0018, 0x001F) AM_READWRITE( ppi8255_r, ppi8255_w)
-	AM_RANGE( 0x0020, 0x0027) AM_READWRITE(mbcpit8253_r, mbcpit8253_w)
-	AM_RANGE( 0x0028, 0x002B) AM_READWRITE( mbc55x_usart_r, mbc55x_usart_w)
-	AM_RANGE( 0x0030, 0x0031) AM_DEVREADWRITE(VID_MC6845_NAME, mc6845_device, status_r, address_w )
-	AM_RANGE( 0x0032, 0x0033) AM_DEVREADWRITE(VID_MC6845_NAME, mc6845_device, register_r, register_w )
-	AM_RANGE( 0x0038, 0x003B) AM_READWRITE(mbc55x_kb_usart_r, mbc55x_kb_usart_w)
-ADDRESS_MAP_END
+void mbc55x_state::mbc55x_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0003).rw(this, FUNC(mbc55x_state::mbcpic8259_r), FUNC(mbc55x_state::mbcpic8259_w));
+	map(0x0008, 0x000F).rw(this, FUNC(mbc55x_state::mbc55x_disk_r), FUNC(mbc55x_state::mbc55x_disk_w));
+	map(0x0010, 0x0010).rw(this, FUNC(mbc55x_state::vram_page_r), FUNC(mbc55x_state::vram_page_w));
+	map(0x0018, 0x001F).rw(this, FUNC(mbc55x_state::ppi8255_r), FUNC(mbc55x_state::ppi8255_w));
+	map(0x0020, 0x0027).rw(this, FUNC(mbc55x_state::mbcpit8253_r), FUNC(mbc55x_state::mbcpit8253_w));
+	map(0x0028, 0x002B).rw(this, FUNC(mbc55x_state::mbc55x_usart_r), FUNC(mbc55x_state::mbc55x_usart_w));
+	map(0x0030, 0x0031).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x0032, 0x0033).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0038, 0x003B).rw(this, FUNC(mbc55x_state::mbc55x_kb_usart_r), FUNC(mbc55x_state::mbc55x_kb_usart_w));
+}
 
 static INPUT_PORTS_START( mbc55x )
 	PORT_START("KEY0") /* Key row 0 scancodes 00..07 */

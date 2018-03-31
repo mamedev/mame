@@ -21,7 +21,7 @@ class dmg_ppu_device :  public device_t,
 public:
 	dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_lr35902_tag(device_t &device, const char *tag) { downcast<dmg_ppu_device &>(device).m_lr35902.set_tag(tag); }
+	void set_lr35902_tag(const char *tag) { m_lr35902.set_tag(tag); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -295,19 +295,19 @@ DECLARE_DEVICE_TYPE(CGB_PPU, cgb_ppu_device)
 
 #define MCFG_DMG_PPU_ADD(_tag, _cpu_tag ) \
 		MCFG_DEVICE_ADD( _tag, DMG_PPU, 0 ) \
-		dmg_ppu_device::static_set_lr35902_tag(*device, "^" _cpu_tag);
+		downcast<dmg_ppu_device &>(*device).set_lr35902_tag("^" _cpu_tag);
 
 #define MCFG_MGB_PPU_ADD(_tag, _cpu_tag ) \
 		MCFG_DEVICE_ADD( _tag, MGB_PPU, 0 ) \
-		dmg_ppu_device::static_set_lr35902_tag(*device, "^" _cpu_tag);
+		downcast<dmg_ppu_device &>(*device).set_lr35902_tag("^" _cpu_tag);
 
 #define MCFG_SGB_PPU_ADD(_tag, _cpu_tag ) \
 		MCFG_DEVICE_ADD( _tag, SGB_PPU, 0 ) \
-		dmg_ppu_device::static_set_lr35902_tag(*device, "^" _cpu_tag);
+		downcast<dmg_ppu_device &>(*device).set_lr35902_tag("^" _cpu_tag);
 
 #define MCFG_CGB_PPU_ADD(_tag, _cpu_tag ) \
 		MCFG_DEVICE_ADD( _tag, CGB_PPU, 0 ) \
-		dmg_ppu_device::static_set_lr35902_tag(*device, "^" _cpu_tag);
+		downcast<dmg_ppu_device &>(*device).set_lr35902_tag("^" _cpu_tag);
 
 
 #endif // MAME_VIDEO_GB_LCD_H

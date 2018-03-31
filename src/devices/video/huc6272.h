@@ -24,10 +24,10 @@
 		MCFG_DEVICE_ADD((tag), HUC6272, (freq))
 
 #define MCFG_HUC6272_IRQ_CHANGED_CB(cb) \
-		devcb = &huc6272_device::set_irq_changed_callback(*device, (DEVCB_##cb));
+		devcb = &downcast<huc6272_device &>(*device).set_irq_changed_callback((DEVCB_##cb));
 
 #define MCFG_HUC6272_RAINBOW(tag) \
-		huc6272_device::set_rainbow_tag(*device, (tag));
+		downcast<huc6272_device &>(*device).set_rainbow_tag((tag));
 
 
 //**************************************************************************
@@ -43,8 +43,8 @@ public:
 	// construction/destruction
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_changed_callback(device_t &device, Object &&cb) { return downcast<huc6272_device &>(device).m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
-	static void set_rainbow_tag(device_t &device, const char *tag) { downcast<huc6272_device &>(device).m_huc6271_tag = tag; }
+	template <class Object> devcb_base &set_irq_changed_callback(Object &&cb) { return m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
+	void set_rainbow_tag(const char *tag) { m_huc6271_tag = tag; }
 
 	// I/O operations
 	DECLARE_WRITE32_MEMBER( write );

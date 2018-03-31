@@ -14,7 +14,7 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "u'nSP")
+DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "SunPlus u'nSP")
 
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -31,9 +31,9 @@ device_memory_interface::space_config_vector unsp_device::memory_space_config() 
 	};
 }
 
-util::disasm_interface *unsp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> unsp_device::create_disassembler()
 {
-	return new unsp_disassembler;
+	return std::make_unique<unsp_disassembler>();
 }
 
 

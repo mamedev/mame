@@ -117,22 +117,21 @@ vme_slot_device::vme_slot_device(const machine_config &mconfig, device_type type
 }
 
 //-------------------------------------------------
-//  static_update_vme_chains
+//  update_vme_chains
 //-------------------------------------------------
-void vme_slot_device::static_update_vme_chains(device_t &device, uint32_t slot_nbr)
+void vme_slot_device::update_vme_chains(uint32_t slot_nbr)
 {
-	LOG("%s %s - %d\n", FUNCNAME, device.tag(), slot_nbr);
+	LOG("%s %s - %d\n", FUNCNAME, tag(), slot_nbr);
 }
 
 //-------------------------------------------------
-//  static_set_vme_slot
+//  set_vme_slot
 //-------------------------------------------------
-void vme_slot_device::static_set_vme_slot(device_t &device, const char *tag, const char *slottag)
+void vme_slot_device::set_vme_slot(const char *tag, const char *slottag)
 {
 	LOG("%s %s - %s\n", FUNCNAME, tag, slottag);
-	vme_slot_device &vme_card = dynamic_cast<vme_slot_device&>(device);
-	vme_card.m_vme_tag = tag;
-	vme_card.m_vme_slottag = slottag;
+	m_vme_tag = tag;
+	m_vme_slottag = slottag;
 }
 
 //-------------------------------------------------
@@ -144,7 +143,7 @@ void vme_slot_device::device_start()
 	LOG("%s %s - %s:%s\n", tag(), FUNCNAME, m_vme_tag, m_vme_slottag);
 	if (dev)
 	{
-		device_vme_card_interface::static_set_vme_tag(*dev, m_vme_tag, m_vme_slottag);
+		dev->set_vme_tag(m_vme_tag, m_vme_slottag);
 	}
 
 	//  m_card = dynamic_cast<device_vme_card_interface *>(get_card_device());
@@ -212,22 +211,14 @@ device_memory_interface::space_config_vector vme_device::memory_space_config() c
 	};
 }
 
-// static_set_cputag - used to be able to lookup the CPU owning this VME bus
-void vme_device::static_set_cputag(device_t &device, const char *tag)
-{
-	vme_device &vme = downcast<vme_device &>(device);
-	vme.m_cputag = tag;
-}
-
-// static_set_use_owner_spaces - disables use of the memory interface and use the address spaces
+// set_use_owner_spaces - disables use of the memory interface and use the address spaces
 // of the owner instead. This is useful for VME buses where no address modifiers or arbitration is
 // being used and gives some gain in performance.
-void vme_device::static_use_owner_spaces(device_t &device)
+void vme_device::use_owner_spaces()
 {
-	LOG("%s %s\n", device.tag(), FUNCNAME);
-	vme_device &vme = downcast<vme_device &>(device);
+	LOG("%s %s\n", tag(), FUNCNAME);
 
-	vme.m_allocspaces = false;
+	m_allocspaces = false;
 }
 
 vme_device::vme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -418,12 +409,11 @@ device_vme_card_interface::~device_vme_card_interface()
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);
 }
 
-void device_vme_card_interface::static_set_vme_tag(device_t &device, const char *tag, const char *slottag)
+void device_vme_card_interface::set_vme_tag(const char *tag, const char *slottag)
 {
 	LOG("%s %s\n", tag, FUNCNAME);
-	device_vme_card_interface &vme_card = dynamic_cast<device_vme_card_interface &>(device);
-	vme_card.m_vme_tag = tag;
-	vme_card.m_vme_slottag = slottag;
+	m_vme_tag = tag;
+	m_vme_slottag = slottag;
 }
 
 void device_vme_card_interface::set_vme_device()

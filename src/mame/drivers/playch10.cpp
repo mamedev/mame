@@ -350,34 +350,37 @@ WRITE8_MEMBER(playch10_state::time_w)
 /******************************************************************************/
 
 /* BIOS */
-ADDRESS_MAP_START(playch10_state::bios_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM // 8V
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_SHARE("ram_8w")    // 8W
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(pc10_prot_r, pc10_prot_w)
-ADDRESS_MAP_END
+void playch10_state::bios_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x87ff).ram(); // 8V
+	map(0x8800, 0x8fff).rw(this, FUNC(playch10_state::ram_8w_r), FUNC(playch10_state::ram_8w_w)).share("ram_8w");    // 8W
+	map(0x9000, 0x97ff).ram().w(this, FUNC(playch10_state::playch10_videoram_w)).share("videoram");
+	map(0xc000, 0xdfff).rom();
+	map(0xe000, 0xffff).rw(this, FUNC(playch10_state::pc10_prot_r), FUNC(playch10_state::pc10_prot_w));
+}
 
-ADDRESS_MAP_START(playch10_state::bios_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("BIOS")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SW1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SW2")
-	AM_RANGE(0x03, 0x03) AM_READ(pc10_detectclr_r)
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch1", ls259_device, write_d0)
-	AM_RANGE(0x08, 0x0f) AM_DEVWRITE("outlatch2", ls259_device, write_d0)
-	AM_RANGE(0x10, 0x13) AM_WRITE(time_w)
-ADDRESS_MAP_END
+void playch10_state::bios_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("BIOS");
+	map(0x01, 0x01).portr("SW1");
+	map(0x02, 0x02).portr("SW2");
+	map(0x03, 0x03).r(this, FUNC(playch10_state::pc10_detectclr_r));
+	map(0x00, 0x07).w("outlatch1", FUNC(ls259_device::write_d0));
+	map(0x08, 0x0f).w("outlatch2", FUNC(ls259_device::write_d0));
+	map(0x10, 0x13).w(this, FUNC(playch10_state::time_w));
+}
 
-ADDRESS_MAP_START(playch10_state::cart_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("work_ram")
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(pc10_in0_r, pc10_in0_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(pc10_in1_r)  /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void playch10_state::cart_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().mirror(0x1800).share("work_ram");
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(this, FUNC(playch10_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(this, FUNC(playch10_state::pc10_in0_r), FUNC(playch10_state::pc10_in0_w));
+	map(0x4017, 0x4017).r(this, FUNC(playch10_state::pc10_in1_r));  /* IN1 - input port 2 / PSG second control register */
+	map(0x8000, 0xffff).rom();
+}
 
 /******************************************************************************/
 
@@ -1442,15 +1445,15 @@ ROM_END
 // TT-PRG.U5           = nes-ni-0 prg          nes:ttoonadvu Tiny Toon Adventures (USA)
 ROM_START( pc_ttoon )   /* Tiny Toon Adventures */
 	BIOS_CPU
-	ROM_LOAD( "TT-GM2.U3",   0x0c000, 0x2000, CRC(d2764d91) SHA1(393b54148e9250f14d83318aed6686cc04b923e6) ) /* extra bios code for this game */
+	ROM_LOAD( "tt-gm2.u3",   0x0c000, 0x2000, CRC(d2764d91) SHA1(393b54148e9250f14d83318aed6686cc04b923e6) ) /* extra bios code for this game */
 	BIOS_GFX
 
 	ROM_REGION( 0x50000, "cart", 0 )
-	ROM_LOAD( "TT-PRG.U5",    0x10000, 0x20000, CRC(9cb55b96) SHA1(437c326a4575895b9d7e567cab4f70b2f44ed8dd) )   /* banked */
+	ROM_LOAD( "tt-prg.u5",    0x10000, 0x20000, CRC(9cb55b96) SHA1(437c326a4575895b9d7e567cab4f70b2f44ed8dd) )   /* banked */
 	ROM_RELOAD(          0x30000, 0x20000 )
 
 	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
-	ROM_LOAD( "TT-CHR.U1",    0x00000, 0x20000, CRC(a024ae14) SHA1(2e797a173161a61c14ce299e3c5a31c6029f2b50) )
+	ROM_LOAD( "tt-chr.u1",    0x00000, 0x20000, CRC(a024ae14) SHA1(2e797a173161a61c14ce299e3c5a31c6029f2b50) )
 
 	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
 	ROM_LOAD( "security.u6", 0x00, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )

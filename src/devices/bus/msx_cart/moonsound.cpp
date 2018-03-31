@@ -29,10 +29,11 @@ msx_cart_moonsound_device::msx_cart_moonsound_device(const machine_config &mconf
 }
 
 
-ADDRESS_MAP_START(msx_cart_moonsound_device::ymf278b_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x3fffff) AM_RAM  // 2MB sram for testing
-ADDRESS_MAP_END
+void msx_cart_moonsound_device::ymf278b_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x200000, 0x3fffff).ram();  // 2MB sram for testing
+}
 
 
 MACHINE_CONFIG_START(msx_cart_moonsound_device::device_add_mconfig)

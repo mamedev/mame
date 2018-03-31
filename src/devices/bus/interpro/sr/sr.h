@@ -7,13 +7,13 @@
 #pragma once
 
 #define MCFG_SR_OUT_IRQ0_CB(_devcb) \
-	devcb = &sr_device::set_out_irq0_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sr_device &>(*device).set_out_irq0_callback(DEVCB_##_devcb);
 
 #define MCFG_SR_OUT_IRQ1_CB(_devcb) \
-	devcb = &sr_device::set_out_irq1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sr_device &>(*device).set_out_irq1_callback(DEVCB_##_devcb);
 
 #define MCFG_SR_OUT_IRQ2_CB(_devcb) \
-	devcb = &sr_device::set_out_irq2_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sr_device &>(*device).set_out_irq2_callback(DEVCB_##_devcb);
 
 #define MCFG_SR_SLOT_ADD(_srtag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, SR_SLOT, 0) \
@@ -56,9 +56,9 @@ public:
 	sr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// inline configuration
-	template <class Object> static devcb_base &set_out_irq0_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq0_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq1_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq1_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq2_callback(device_t &device, Object &&cb) { return downcast<sr_device &>(device).m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq0_callback(Object &&cb) { return m_out_irq0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq1_callback(Object &&cb) { return m_out_irq1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq2_callback(Object &&cb) { return m_out_irq2_cb.set_callback(std::forward<Object>(cb)); }
 
 	void set_memory(const char *const tag, const int main_spacenum, const int io_spacenum);
 
@@ -121,7 +121,7 @@ public:
 	void irq(int status);
 
 	// inline configuration
-	static void static_set_sr_tag(device_t &device, const char *tag, const char *slot_tag);
+	void set_sr_tag(const char *tag, const char *slot_tag) { m_sr_tag = tag; m_sr_slot_tag = slot_tag; }
 
 protected:
 	device_sr_card_interface(const machine_config &mconfig, device_t &device);

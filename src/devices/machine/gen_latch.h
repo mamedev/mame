@@ -32,10 +32,10 @@ DECLARE_DEVICE_TYPE(GENERIC_LATCH_16, generic_latch_16_device)
 	MCFG_DEVICE_ADD(_tag, GENERIC_LATCH_16, 0)
 
 #define MCFG_GENERIC_LATCH_DATA_PENDING_CB(_devcb) \
-	devcb = &generic_latch_base_device::set_data_pending_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<generic_latch_base_device &>(*device).set_data_pending_callback(DEVCB_##_devcb);
 
 #define MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(_ack) \
-	generic_latch_base_device::set_separate_acknowledge(*device, _ack);
+	downcast<generic_latch_base_device &>(*device).set_separate_acknowledge(_ack);
 
 
 //**************************************************************************
@@ -51,10 +51,9 @@ protected:
 	generic_latch_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 public:
-	// static configuration
-	template <class Object> static devcb_base &set_data_pending_callback(device_t &device, Object &&cb)
-	{ return downcast<generic_latch_base_device &>(device).m_data_pending_cb.set_callback(std::forward<Object>(cb)); }
-	static void set_separate_acknowledge(device_t &device, bool ack) { downcast<generic_latch_base_device &>(device).m_separate_acknowledge = ack; }
+	// configuration
+	template <class Object> devcb_base &set_data_pending_callback(Object &&cb) { return m_data_pending_cb.set_callback(std::forward<Object>(cb)); }
+	void set_separate_acknowledge(bool ack) { m_separate_acknowledge = ack; }
 
 	DECLARE_READ_LINE_MEMBER(pending_r);
 

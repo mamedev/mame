@@ -45,7 +45,7 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(SC61860, sc61860_device, "sc61860", "SC61860")
+DEFINE_DEVICE_TYPE(SC61860, sc61860_device, "sc61860", "Sharp SC61860")
 
 
 sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -69,9 +69,9 @@ device_memory_interface::space_config_vector sc61860_device::memory_space_config
 	};
 }
 
-util::disasm_interface *sc61860_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sc61860_device::create_disassembler()
 {
-	return new sc61860_disassembler;
+	return std::make_unique<sc61860_disassembler>();
 }
 
 

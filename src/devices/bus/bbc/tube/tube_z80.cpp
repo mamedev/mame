@@ -25,25 +25,28 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_Z80, bbc_tube_z80_device, "bbc_tube_z80", "Acorn Z80
 //  ADDRESS_MAP( tube_z80_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_z80_device::tube_z80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void bbc_tube_z80_device::tube_z80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(bbc_tube_z80_device::mem_r), FUNC(bbc_tube_z80_device::mem_w));
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( tube_z80_fetch )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_z80_device::tube_z80_fetch)
-	AM_RANGE(0x000, 0xffff) AM_READ(opcode_r)
-ADDRESS_MAP_END
+void bbc_tube_z80_device::tube_z80_fetch(address_map &map)
+{
+	map(0x000, 0xffff).r(this, FUNC(bbc_tube_z80_device::opcode_r));
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( tube_z80_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_z80_device::tube_z80_io)
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ula", tube_device, parasite_r, parasite_w)
-ADDRESS_MAP_END
+void bbc_tube_z80_device::tube_z80_io(address_map &map)
+{
+	map(0x00, 0x07).mirror(0xff00).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w));
+}
 
 //-------------------------------------------------
 //  ROM( tube_z80 )
@@ -51,7 +54,7 @@ ADDRESS_MAP_END
 
 ROM_START( tube_z80 )
 	ROM_REGION(0x1000, "rom", 0)
-	ROM_LOAD("Z80_120.rom", 0x0000, 0x1000, CRC(315bfc20) SHA1(069077df498599a9c880d4ec9f4bc53fcc602d82))
+	ROM_LOAD("z80_120.rom", 0x0000, 0x1000, CRC(315bfc20) SHA1(069077df498599a9c880d4ec9f4bc53fcc602d82))
 ROM_END
 
 //-------------------------------------------------

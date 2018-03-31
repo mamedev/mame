@@ -13,7 +13,17 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-if (CPUS["E1"]~=null or CPUS["SH"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null) then
+DRC_CPUS = { "E1", "SH", "MIPS", "POWERPC", "RSP", "ARM7", "ADSP21062", "MB86235", "DSP16" }
+CPU_INCLUDE_DRC = false
+for i, v in ipairs(DRC_CPUS) do
+	if (CPUS[v]~=null) then
+		CPU_INCLUDE_DRC = true
+		break
+	end
+end
+
+
+if (CPU_INCLUDE_DRC) then
 	files {
 		MAME_DIR .. "src/devices/cpu/drcbec.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbec.h",
@@ -253,19 +263,25 @@ if (CPUS["APEXC"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- AT&T DSP16A
---@src/devices/cpu/dsp16/dsp16.h,CPUS["DSP16A"] = true
+-- WE|AT&T DSP16
+--@src/devices/cpu/dsp16/dsp16.h,CPUS["DSP16"] = true
 --------------------------------------------------
 
-if (CPUS["DSP16A"]~=null) then
+if (CPUS["DSP16"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.cpp",
 		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.h",
-		MAME_DIR .. "src/devices/cpu/dsp16/dsp16ops.hxx",
+		MAME_DIR .. "src/devices/cpu/dsp16/dsp16core.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp16/dsp16core.h",
+		MAME_DIR .. "src/devices/cpu/dsp16/dsp16core.ipp",
+		MAME_DIR .. "src/devices/cpu/dsp16/dsp16fe.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp16/dsp16fe.h",
+		MAME_DIR .. "src/devices/cpu/dsp16/dsp16rc.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp16/dsp16rc.h",
 	}
 end
 
-if (CPUS["DSP16A"]~=null or _OPTIONS["with-tools"]) then
+if (CPUS["DSP16"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp16/dsp16dis.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp16/dsp16dis.h")
 end
@@ -1019,7 +1035,7 @@ if (CPUS["I86"]~=null) then
 	}
 end
 
-if (CPUS["E1"]~=null or CPUS["SH"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null or CPUS["I86"]~=null or CPUS["I386"]~=null or _OPTIONS["with-tools"]) then
+if (CPUS["I86"]~=null or CPUS["I386"]~=null or CPU_INCLUDE_DRC or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.h")
 end
@@ -1110,6 +1126,23 @@ if (CPUS["SSEM"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ssem/ssemdasm.h")
 end
 
+------------------------------------------
+-- Diablo Systems printer CPU
+--@src/devices/cpu/diablo/diablo1300.h,CPUS["DIABLO"] = true
+--------------------------------------------------
+
+if (CPUS["DIABLO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/diablo/diablo1300.cpp",
+		MAME_DIR .. "src/devices/cpu/diablo/diablo1300.h",
+	}
+end
+
+if (CPUS["DIABLO"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ssem/diablo1300dasm.h")
+end
+
 --------------------------------------------------
 -- Fujitsu MB88xx
 --@src/devices/cpu/mb88xx/mb88xx.h,CPUS["MB88XX"] = true
@@ -1156,6 +1189,7 @@ if (CPUS["MB86235"]~=null) then
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235drc.cpp",
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235fe.cpp",
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235fe.h",
+		MAME_DIR .. "src/devices/cpu/mb86235/mb86235ops.cpp",
 	}
 end
 

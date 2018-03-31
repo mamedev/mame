@@ -343,17 +343,18 @@ READ32_MEMBER( gp2x_state::sdcard_r )
 	return 0xffff<<16;  // at 3e146b0 - indicate timeout & CRC error
 }
 
-ADDRESS_MAP_START(gp2x_state::gp2x_map)
-	AM_RANGE(0x00000000, 0x00007fff) AM_ROM
-	AM_RANGE(0x01000000, 0x04ffffff) AM_RAM AM_SHARE("ram") // 64 MB of RAM
-	AM_RANGE(0x9c000000, 0x9c00001f) AM_READWRITE(nand_r, nand_w)
-	AM_RANGE(0xc0000a00, 0xc0000a03) AM_READ(timer_r)
-	AM_RANGE(0xc0001208, 0xc000120b) AM_READ(tx_status_r)
-	AM_RANGE(0xc0001210, 0xc0001213) AM_WRITE(tx_xmit_w)
-	AM_RANGE(0xc0001508, 0xc000150b) AM_READ(sdcard_r)
-	AM_RANGE(0xc0002800, 0xc00029ff) AM_READWRITE(gp2x_lcdc_r, gp2x_lcdc_w)
-	AM_RANGE(0xc0003a38, 0xc0003a3b) AM_READWRITE(nand_ctrl_r, nand_ctrl_w)
-ADDRESS_MAP_END
+void gp2x_state::gp2x_map(address_map &map)
+{
+	map(0x00000000, 0x00007fff).rom();
+	map(0x01000000, 0x04ffffff).ram().share("ram"); // 64 MB of RAM
+	map(0x9c000000, 0x9c00001f).rw(this, FUNC(gp2x_state::nand_r), FUNC(gp2x_state::nand_w));
+	map(0xc0000a00, 0xc0000a03).r(this, FUNC(gp2x_state::timer_r));
+	map(0xc0001208, 0xc000120b).r(this, FUNC(gp2x_state::tx_status_r));
+	map(0xc0001210, 0xc0001213).w(this, FUNC(gp2x_state::tx_xmit_w));
+	map(0xc0001508, 0xc000150b).r(this, FUNC(gp2x_state::sdcard_r));
+	map(0xc0002800, 0xc00029ff).rw(this, FUNC(gp2x_state::gp2x_lcdc_r), FUNC(gp2x_state::gp2x_lcdc_w));
+	map(0xc0003a38, 0xc0003a3b).rw(this, FUNC(gp2x_state::nand_ctrl_r), FUNC(gp2x_state::nand_ctrl_w));
+}
 
 static INPUT_PORTS_START( gp2x )
 INPUT_PORTS_END

@@ -219,22 +219,23 @@ WRITE_LINE_MEMBER( econet_e01_device::scsi_req_w )
 //  ADDRESS_MAP( e01_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(econet_e01_device::e01_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x00c3) AM_READWRITE(rtc_address_r, rtc_address_w)
-	AM_RANGE(0xfc04, 0xfc04) AM_MIRROR(0x00c3) AM_READWRITE(rtc_data_r, rtc_data_w)
-	AM_RANGE(0xfc08, 0xfc08) AM_MIRROR(0x00c0) AM_READ(ram_select_r) AM_WRITE(floppy_w)
-	AM_RANGE(0xfc0c, 0xfc0f) AM_MIRROR(0x00c0) AM_DEVREADWRITE(WD2793_TAG, wd2793_device, read, write)
-	AM_RANGE(0xfc10, 0xfc1f) AM_MIRROR(0x00c0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0xfc20, 0xfc23) AM_MIRROR(0x00c0) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
-	AM_RANGE(0xfc24, 0xfc24) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_disable_r, network_irq_disable_w)
-	AM_RANGE(0xfc28, 0xfc28) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_enable_r, network_irq_enable_w)
-	AM_RANGE(0xfc2c, 0xfc2c) AM_MIRROR(0x00c3) AM_READ_PORT("FLAP")
-	AM_RANGE(0xfc30, 0xfc30) AM_MIRROR(0x00c0) AM_READWRITE(hdc_data_r, hdc_data_w)
-	AM_RANGE(0xfc31, 0xfc31) AM_MIRROR(0x00c0) AM_DEVREAD("scsi_ctrl_in", input_buffer_device, read)
-	AM_RANGE(0xfc32, 0xfc32) AM_MIRROR(0x00c0) AM_WRITE(hdc_select_w)
-	AM_RANGE(0xfc33, 0xfc33) AM_MIRROR(0x00c0) AM_WRITE(hdc_irq_enable_w)
-ADDRESS_MAP_END
+void econet_e01_device::e01_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(econet_e01_device::read), FUNC(econet_e01_device::write));
+	map(0xfc00, 0xfc00).mirror(0x00c3).rw(this, FUNC(econet_e01_device::rtc_address_r), FUNC(econet_e01_device::rtc_address_w));
+	map(0xfc04, 0xfc04).mirror(0x00c3).rw(this, FUNC(econet_e01_device::rtc_data_r), FUNC(econet_e01_device::rtc_data_w));
+	map(0xfc08, 0xfc08).mirror(0x00c0).r(this, FUNC(econet_e01_device::ram_select_r)).w(this, FUNC(econet_e01_device::floppy_w));
+	map(0xfc0c, 0xfc0f).mirror(0x00c0).rw(WD2793_TAG, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
+	map(0xfc10, 0xfc1f).mirror(0x00c0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xfc20, 0xfc23).mirror(0x00c0).rw(MC6854_TAG, FUNC(mc6854_device::read), FUNC(mc6854_device::write));
+	map(0xfc24, 0xfc24).mirror(0x00c3).rw(this, FUNC(econet_e01_device::network_irq_disable_r), FUNC(econet_e01_device::network_irq_disable_w));
+	map(0xfc28, 0xfc28).mirror(0x00c3).rw(this, FUNC(econet_e01_device::network_irq_enable_r), FUNC(econet_e01_device::network_irq_enable_w));
+	map(0xfc2c, 0xfc2c).mirror(0x00c3).portr("FLAP");
+	map(0xfc30, 0xfc30).mirror(0x00c0).rw(this, FUNC(econet_e01_device::hdc_data_r), FUNC(econet_e01_device::hdc_data_w));
+	map(0xfc31, 0xfc31).mirror(0x00c0).r("scsi_ctrl_in", FUNC(input_buffer_device::read));
+	map(0xfc32, 0xfc32).mirror(0x00c0).w(this, FUNC(econet_e01_device::hdc_select_w));
+	map(0xfc33, 0xfc33).mirror(0x00c0).w(this, FUNC(econet_e01_device::hdc_irq_enable_w));
+}
 
 
 //-------------------------------------------------

@@ -133,6 +133,7 @@ public:
 		m_beeper(*this, "beeper"),
 		m_ym(*this, "ym"),
 		m_psg(*this, "psg"),
+		m_screen(*this, "screen"),
 		m_centronics(*this, "centronics"),
 		m_cent_data_out(*this, "cent_data_out"),
 		m_fdc(*this, "fdc"),
@@ -143,29 +144,14 @@ public:
 		m_rom_ptr(*this, "init"),
 		m_basic_ptr(*this, "fbasic"),
 		m_kanji(*this, "kanji1"),
-		m_kb_ports(*this, {"key1", "key2", "key3"}),
+		m_kb_ports(*this, "key%u", 1),
 		m_keymod(*this, "key_modifiers"),
 		m_joy1(*this, "joy1"),
 		m_joy2(*this, "joy2"),
 		m_dsw(*this, "DSW"),
 		m_palette(*this, "palette"),
 		m_av_palette(*this, "av_palette"),
-		m_avbank1(*this, "av_bank1"),
-		m_avbank2(*this, "av_bank2"),
-		m_avbank3(*this, "av_bank3"),
-		m_avbank4(*this, "av_bank4"),
-		m_avbank5(*this, "av_bank5"),
-		m_avbank6(*this, "av_bank6"),
-		m_avbank7(*this, "av_bank7"),
-		m_avbank8(*this, "av_bank8"),
-		m_avbank9(*this, "av_bank9"),
-		m_avbank10(*this, "av_bank10"),
-		m_avbank11(*this, "av_bank11"),
-		m_avbank12(*this, "av_bank12"),
-		m_avbank13(*this, "av_bank13"),
-		m_avbank14(*this, "av_bank14"),
-		m_avbank15(*this, "av_bank15"),
-		m_avbank16(*this, "av_bank16")
+		m_avbank(*this, "av_bank%u", 1)
 	{
 	}
 	DECLARE_DRIVER_INIT(fm7);
@@ -359,6 +345,7 @@ protected:
 	required_device<beep_device> m_beeper;
 	optional_device<ym2203_device> m_ym;
 	optional_device<ay8910_device> m_psg;
+	required_device<screen_device> m_screen;
 
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
@@ -406,22 +393,7 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<palette_device> m_av_palette;
 
-	optional_device<address_map_bank_device> m_avbank1;
-	optional_device<address_map_bank_device> m_avbank2;
-	optional_device<address_map_bank_device> m_avbank3;
-	optional_device<address_map_bank_device> m_avbank4;
-	optional_device<address_map_bank_device> m_avbank5;
-	optional_device<address_map_bank_device> m_avbank6;
-	optional_device<address_map_bank_device> m_avbank7;
-	optional_device<address_map_bank_device> m_avbank8;
-	optional_device<address_map_bank_device> m_avbank9;
-	optional_device<address_map_bank_device> m_avbank10;
-	optional_device<address_map_bank_device> m_avbank11;
-	optional_device<address_map_bank_device> m_avbank12;
-	optional_device<address_map_bank_device> m_avbank13;
-	optional_device<address_map_bank_device> m_avbank14;
-	optional_device<address_map_bank_device> m_avbank15;
-	optional_device<address_map_bank_device> m_avbank16;
+	optional_device_array<address_map_bank_device, 16> m_avbank;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

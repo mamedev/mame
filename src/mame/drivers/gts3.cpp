@@ -71,13 +71,14 @@ private:
 };
 
 
-ADDRESS_MAP_START(gts3_state::gts3_map)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("u4", via6522_device, read, write)
-	AM_RANGE(0x2010, 0x201f) AM_DEVREADWRITE("u5", via6522_device, read, write)
-	AM_RANGE(0x2020, 0x2023) AM_MIRROR(0x0c) AM_WRITE(segbank_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gts3_state::gts3_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("nvram");
+	map(0x2000, 0x200f).rw(m_u4, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x2010, 0x201f).rw(m_u5, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x2020, 0x2023).mirror(0x0c).w(this, FUNC(gts3_state::segbank_w));
+	map(0x4000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( gts3 )
 	PORT_START("TTS")

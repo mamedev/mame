@@ -792,29 +792,32 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
               |               |               |               |               |
 */
 
-ADDRESS_MAP_START(dectalk_state::m68k_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x740000) AM_ROM /* ROM */
-	AM_RANGE(0x080000, 0x093fff) AM_MIRROR(0x760000) AM_RAM /* RAM */
-	AM_RANGE(0x094000, 0x0943ff) AM_MIRROR(0x763c00) AM_WRITE8(led_write, 0x00ff)  /* LED array */
-	AM_RANGE(0x094000, 0x0941ff) AM_MIRROR(0x763c00) AM_DEVREADWRITE8("x2212", x2212_device, read, write, 0xff00) /* Xicor X2212 NVRAM */
-	AM_RANGE(0x094200, 0x0943ff) AM_MIRROR(0x763c00) AM_READWRITE8(nvram_recall, nvram_store, 0xff00) /* Xicor X2212 NVRAM */
-	AM_RANGE(0x098000, 0x09801f) AM_MIRROR(0x763fe0) AM_DEVREADWRITE8("duart", scn2681_device, read, write, 0x00ff ) /* DUART */
-	AM_RANGE(0x09c000, 0x09c001) AM_MIRROR(0x763ff8) AM_READWRITE(m68k_spcflags_r, m68k_spcflags_w) /* SPC flags reg */
-	AM_RANGE(0x09c002, 0x09c003) AM_MIRROR(0x763ff8) AM_WRITE(m68k_infifo_w) /* SPC fifo reg */
-	AM_RANGE(0x09c004, 0x09c005) AM_MIRROR(0x763ff8) AM_READWRITE(m68k_tlcflags_r, m68k_tlcflags_w) /* telephone status flags */
-	AM_RANGE(0x09c006, 0x09c007) AM_MIRROR(0x763ff8) AM_READ(m68k_tlc_dtmf_r) /* telephone dtmf read */
-ADDRESS_MAP_END
+void dectalk_state::m68k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x03ffff).mirror(0x740000).rom(); /* ROM */
+	map(0x080000, 0x093fff).mirror(0x760000).ram(); /* RAM */
+	map(0x094000, 0x0943ff).mirror(0x763c00).w(this, FUNC(dectalk_state::led_write)).umask16(0x00ff);  /* LED array */
+	map(0x094000, 0x0941ff).mirror(0x763c00).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0xff00); /* Xicor X2212 NVRAM */
+	map(0x094200, 0x0943ff).mirror(0x763c00).rw(this, FUNC(dectalk_state::nvram_recall), FUNC(dectalk_state::nvram_store)).umask16(0xff00); /* Xicor X2212 NVRAM */
+	map(0x098000, 0x09801f).mirror(0x763fe0).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff); /* DUART */
+	map(0x09c000, 0x09c001).mirror(0x763ff8).rw(this, FUNC(dectalk_state::m68k_spcflags_r), FUNC(dectalk_state::m68k_spcflags_w)); /* SPC flags reg */
+	map(0x09c002, 0x09c003).mirror(0x763ff8).w(this, FUNC(dectalk_state::m68k_infifo_w)); /* SPC fifo reg */
+	map(0x09c004, 0x09c005).mirror(0x763ff8).rw(this, FUNC(dectalk_state::m68k_tlcflags_r), FUNC(dectalk_state::m68k_tlcflags_w)); /* telephone status flags */
+	map(0x09c006, 0x09c007).mirror(0x763ff8).r(this, FUNC(dectalk_state::m68k_tlc_dtmf_r)); /* telephone dtmf read */
+}
 
-ADDRESS_MAP_START(dectalk_state::tms32010_mem)
-	AM_RANGE(0x000, 0x7ff) AM_ROM /* ROM */
-ADDRESS_MAP_END
+void dectalk_state::tms32010_mem(address_map &map)
+{
+	map(0x000, 0x7ff).rom(); /* ROM */
+}
 
-ADDRESS_MAP_START(dectalk_state::tms32010_io)
-	AM_RANGE(0, 0) AM_WRITE(spc_latch_outfifo_error_stats) // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
-	AM_RANGE(1, 1) AM_READWRITE(spc_infifo_data_r, spc_outfifo_data_w) //read from input fifo, write to sound fifo
+void dectalk_state::tms32010_io(address_map &map)
+{
+	map(0, 0).w(this, FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
+	map(1, 1).rw(this, FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
 	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
-ADDRESS_MAP_END
+}
 
 /******************************************************************************
  Input Ports

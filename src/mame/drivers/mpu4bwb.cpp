@@ -655,7 +655,7 @@ GAME_CUSTOM( 199?, m4mmm__f,  m4mmm,  "mu_ssjb_.2_0", 0x0000, 0x040000, CRC(5728
 	ROM_END \
 	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
 
-GAME_CUSTOM( 199?, m4orland,       0,          "or 05a v2-1(27c010)",  0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29), "Bwb","Orlando Magic (Bwb) (MPU4) (set 1)" )
+GAME_CUSTOM( 199?, m4orland,       0,          "or 05a v2-1,27c010",   0x0000, 0x020000, CRC(a33c22ee) SHA1(3598a2940f05622405fdef16426f3f5f30dfef29), "Bwb","Orlando Magic (Bwb) (MPU4) (set 1)" )
 GAME_CUSTOM( 199?, m4orland__a,    m4orland,   "or_05a__.1_1",         0x0000, 0x020000, CRC(3e7fe3ac) SHA1(9f4c0d5b7ba10726376b0654c8ddbc62b62c9eed), "Bwb","Orlando Magic (Bwb) (MPU4) (set 2)" )
 GAME_CUSTOM( 199?, m4orland__b,    m4orland,   "or_20a__.7_1",         0x0000, 0x020000, CRC(ae524299) SHA1(3bb2bfe1c0ca0660aca148d6f17b730b7bdc8183), "Bwb","Orlando Magic (Bwb) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4orland__c,    m4orland,   "or_20b__.7_1",         0x0000, 0x020000, CRC(c8a30e2e) SHA1(8abc5437751faf61c12709c963a6819cb0b2b43f), "Bwb","Orlando Magic (Bwb) (MPU4) (set 4)" )

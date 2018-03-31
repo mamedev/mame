@@ -472,28 +472,6 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 }
 
 
-//-------------------------------------------------
-//  mapper_sound_r - callback when the sound I/O
-//  port on the memory mapper is read
-//-------------------------------------------------
-
-READ8_MEMBER(segaorun_state::mapper_sound_r)
-{
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  mapper_sound_w - callback when the sound I/O
-//  port on the memory mapper is written
-//-------------------------------------------------
-
-WRITE8_MEMBER(segaorun_state::mapper_sound_w)
-{
-	synchronize(TID_SOUND_WRITE, data);
-}
-
-
 
 //**************************************************************************
 //  MAIN CPU READ/WRITE HANDLERS
@@ -540,23 +518,6 @@ WRITE16_MEMBER( segaorun_state::nop_w )
 
 
 //**************************************************************************
-//  Z80 SOUND CPU READ/WRITE HANDLERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  sound_data_r - handle sound board reads from
-//  the sound latch
-//-------------------------------------------------
-
-READ8_MEMBER( segaorun_state::sound_data_r )
-{
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
-}
-
-
-
-//**************************************************************************
 //  DRIVER OVERRIDES
 //**************************************************************************
 
@@ -587,11 +548,6 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-		case TID_SOUND_WRITE:
-			m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, param);
-			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-			break;
-
 		case TID_IRQ2_GEN:
 			// set the IRQ2 line
 			m_irq2_state = 1;
@@ -883,35 +839,38 @@ WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
 //  MAIN CPU MEMORY MAP
 //**************************************************************************
 
-ADDRESS_MAP_START(segaorun_state::outrun_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
+void segaorun_state::outrun_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0xffffff).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write)).umask16(0x00ff);
 
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x200000, 0x201fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("tileram")
-	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0x100000, 0x100fff).ram().share("sprites");
+	map(0x200000, 0x201fff).ram().share("paletteram");
+	map(0x300000, 0x30ffff).ram().share("tileram");
+	map(0x400000, 0x400fff).ram().share("textram");
+	map(0x500000, 0x507fff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(segaorun_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segaorun_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 //**************************************************************************
 //  SECOND CPU MEMORY MAP
 //**************************************************************************
 
-ADDRESS_MAP_START(segaorun_state::sub_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM AM_SHARE("cpu1rom")
-	AM_RANGE(0x060000, 0x067fff) AM_MIRROR(0x018000) AM_RAM AM_SHARE("cpu1ram")
-	AM_RANGE(0x080000, 0x080fff) AM_MIRROR(0x00f000) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x090000, 0x09ffff) AM_DEVREADWRITE("segaic16road", segaic16_road_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
-ADDRESS_MAP_END
+void segaorun_state::sub_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xfffff);
+	map(0x000000, 0x05ffff).rom().share("cpu1rom");
+	map(0x060000, 0x067fff).mirror(0x018000).ram().share("cpu1ram");
+	map(0x080000, 0x080fff).mirror(0x00f000).ram().share("roadram");
+	map(0x090000, 0x09ffff).rw(m_segaic16road, FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
+}
 
 
 
@@ -919,19 +878,21 @@ ADDRESS_MAP_END
 //  SOUND CPU MEMORY MAP
 //**************************************************************************
 
-ADDRESS_MAP_START(segaorun_state::sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segaorun_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segaorun_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segaorun_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).r(m_mapper, FUNC(sega_315_5195_mapper_device::pread));
+}
 
 
 
@@ -1208,9 +1169,10 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segaorun_state, memory_mapper)
-	MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(READ8(segaorun_state, mapper_sound_r))
-	MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(WRITE8(segaorun_state, mapper_sound_w))
+	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK/4)
+	MCFG_SEGA_315_5195_CPU("maincpu")
+	MCFG_SEGA_315_5195_MAPPER_HANDLER(segaorun_state, memory_mapper)
+	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	// video hardware
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaorun)
@@ -1227,8 +1189,6 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)

@@ -196,18 +196,6 @@ INPUT_PORTS_END
 
 DEFINE_DEVICE_TYPE(PC_KBD_MICROSOFT_NATURAL, pc_kbd_microsoft_natural_device, "kb_ms_natural", "Microsoft Natural Keyboard")
 
-/*****************************************************************************
-    ADDRESS MAPS
-*****************************************************************************/
-
-ADDRESS_MAP_START(pc_kbd_microsoft_natural_device::microsoft_natural_io)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(p0_read, p0_write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_write)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(p2_write)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_read, p3_write)
-ADDRESS_MAP_END
-
-
 /***************************************************************************
     ROM DEFINITIONS
 ***************************************************************************/
@@ -259,7 +247,12 @@ void pc_kbd_microsoft_natural_device::device_reset()
 
 MACHINE_CONFIG_START(pc_kbd_microsoft_natural_device::device_add_mconfig)
 	MCFG_CPU_ADD("ms_natrl_cpu", I8051, XTAL(6'000'000))
-	MCFG_CPU_IO_MAP(microsoft_natural_io)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(pc_kbd_microsoft_natural_device, p0_read))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(pc_kbd_microsoft_natural_device, p0_write))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(pc_kbd_microsoft_natural_device, p1_write))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(pc_kbd_microsoft_natural_device, p2_write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(pc_kbd_microsoft_natural_device, p3_read))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(pc_kbd_microsoft_natural_device, p3_write))
 MACHINE_CONFIG_END
 
 

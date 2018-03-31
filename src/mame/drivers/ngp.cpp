@@ -551,15 +551,16 @@ WRITE8_MEMBER( ngp_state::flash1_w )
 }
 
 
-ADDRESS_MAP_START(ngp_state::ngp_mem)
-	AM_RANGE( 0x000080, 0x0000bf )  AM_READWRITE(ngp_io_r, ngp_io_w)                        /* ngp/c specific i/o */
-	AM_RANGE( 0x004000, 0x006fff )  AM_RAM AM_SHARE("mainram")                              /* work ram */
-	AM_RANGE( 0x007000, 0x007fff )  AM_RAM AM_SHARE("share1")                               /* shared with sound cpu */
-	AM_RANGE( 0x008000, 0x00bfff )  AM_DEVREADWRITE("k1ge", k1ge_device, read, write)       /* video chip */
-	AM_RANGE( 0x200000, 0x3fffff )  AM_WRITE(flash0_w)   /* cart area #1 */
-	AM_RANGE( 0x800000, 0x9fffff )  AM_WRITE(flash1_w)   /* cart area #2 */
-	AM_RANGE( 0xff0000, 0xffffff )  AM_ROM AM_REGION("maincpu", 0)                          /* system rom */
-ADDRESS_MAP_END
+void ngp_state::ngp_mem(address_map &map)
+{
+	map(0x000080, 0x0000bf).rw(this, FUNC(ngp_state::ngp_io_r), FUNC(ngp_state::ngp_io_w));                        /* ngp/c specific i/o */
+	map(0x004000, 0x006fff).ram().share("mainram");                              /* work ram */
+	map(0x007000, 0x007fff).ram().share("share1");                               /* shared with sound cpu */
+	map(0x008000, 0x00bfff).rw(m_k1ge, FUNC(k1ge_device::read), FUNC(k1ge_device::write));       /* video chip */
+	map(0x200000, 0x3fffff).w(this, FUNC(ngp_state::flash0_w));   /* cart area #1 */
+	map(0x800000, 0x9fffff).w(this, FUNC(ngp_state::flash1_w));   /* cart area #2 */
+	map(0xff0000, 0xffffff).rom().region("maincpu", 0);                          /* system rom */
+}
 
 
 READ8_MEMBER( ngp_state::ngp_z80_comm_r )
@@ -580,12 +581,13 @@ WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 }
 
 
-ADDRESS_MAP_START(ngp_state::z80_mem)
-	AM_RANGE( 0x0000, 0x0fff )  AM_RAM AM_SHARE("share1")                       /* shared with tlcs900 */
-	AM_RANGE( 0x4000, 0x4001 )  AM_DEVWRITE("t6w28", t6w28_device, write )      /* sound chip (right, left) */
-	AM_RANGE( 0x8000, 0x8000 )  AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )  /* main-sound communication */
-	AM_RANGE( 0xc000, 0xc000 )  AM_WRITE( ngp_z80_signal_main_w )               /* signal irq to main cpu */
-ADDRESS_MAP_END
+void ngp_state::z80_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().share("share1");                       /* shared with tlcs900 */
+	map(0x4000, 0x4001).w(m_t6w28, FUNC(t6w28_device::write));      /* sound chip (right, left) */
+	map(0x8000, 0x8000).rw(this, FUNC(ngp_state::ngp_z80_comm_r), FUNC(ngp_state::ngp_z80_comm_w));  /* main-sound communication */
+	map(0xc000, 0xc000).w(this, FUNC(ngp_state::ngp_z80_signal_main_w));               /* signal irq to main cpu */
+}
 
 
 WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
@@ -597,9 +599,10 @@ WRITE8_MEMBER( ngp_state::ngp_z80_clear_irq )
 }
 
 
-ADDRESS_MAP_START(ngp_state::z80_io)
-	AM_RANGE( 0x0000, 0xffff )  AM_WRITE( ngp_z80_clear_irq )
-ADDRESS_MAP_END
+void ngp_state::z80_io(address_map &map)
+{
+	map(0x0000, 0xffff).w(this, FUNC(ngp_state::ngp_z80_clear_irq));
+}
 
 
 INPUT_CHANGED_MEMBER(ngp_state::power_callback)

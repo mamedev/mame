@@ -36,8 +36,6 @@ class kl5c80a12_device : public z80_device
 public:
 	kl5c80a12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-	// static configuration helpers
-
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -186,65 +186,71 @@ WRITE_LINE_MEMBER(gyruss_state::coin_counter_2_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-ADDRESS_MAP_START(gyruss_state::main_cpu1_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW2") AM_WRITENOP   /* watchdog reset */
-	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("SYSTEM") AM_WRITE(gyruss_sh_irqtrigger_w)
-	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("P1")
-	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
-	AM_RANGE(0xc0e0, 0xc0e0) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc180, 0xc187) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void gyruss_state::main_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram().share("colorram");
+	map(0x8400, 0x87ff).ram().share("videoram");
+	map(0x9000, 0x9fff).ram();
+	map(0xa000, 0xa7ff).ram().share("share1");
+	map(0xc000, 0xc000).portr("DSW2").nopw();   /* watchdog reset */
+	map(0xc080, 0xc080).portr("SYSTEM").w(this, FUNC(gyruss_state::gyruss_sh_irqtrigger_w));
+	map(0xc0a0, 0xc0a0).portr("P1");
+	map(0xc0c0, 0xc0c0).portr("P2");
+	map(0xc0e0, 0xc0e0).portr("DSW1");
+	map(0xc100, 0xc100).portr("DSW3").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xc180, 0xc187).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(gyruss_state::main_cpu2_map)
-	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(slave_irq_mask_w) AM_READNOP
-	AM_RANGE(0x4000, 0x403f) AM_RAM
-	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE(gyruss_spriteram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x4100, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void gyruss_state::main_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x0000).r(this, FUNC(gyruss_state::gyruss_scanline_r));
+	map(0x2000, 0x2000).w(this, FUNC(gyruss_state::slave_irq_mask_w)).nopr();
+	map(0x4000, 0x403f).ram();
+	map(0x4040, 0x40ff).ram().w(this, FUNC(gyruss_state::gyruss_spriteram_w)).share("spriteram");
+	map(0x4100, 0x47ff).ram();
+	map(0x6000, 0x67ff).ram().share("share1");
+	map(0xe000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(gyruss_state::audio_cpu1_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void gyruss_state::audio_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).ram();
+	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
-ADDRESS_MAP_START(gyruss_state::audio_cpu1_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay3", ay8910_device, address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREAD("ay3", ay8910_device, data_r)
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay3", ay8910_device, data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("ay4", ay8910_device, address_w)
-	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("ay4", ay8910_device, data_r)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("ay4", ay8910_device, data_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay5", ay8910_device, address_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay5", ay8910_device, data_r)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE("ay5", ay8910_device, data_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(gyruss_i8039_irq_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void gyruss_state::audio_cpu1_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x01, 0x01).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x02, 0x02).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x04, 0x04).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x05, 0x05).r("ay2", FUNC(ay8910_device::data_r));
+	map(0x06, 0x06).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x08, 0x08).w("ay3", FUNC(ay8910_device::address_w));
+	map(0x09, 0x09).r("ay3", FUNC(ay8910_device::data_r));
+	map(0x0a, 0x0a).w("ay3", FUNC(ay8910_device::data_w));
+	map(0x0c, 0x0c).w("ay4", FUNC(ay8910_device::address_w));
+	map(0x0d, 0x0d).r("ay4", FUNC(ay8910_device::data_r));
+	map(0x0e, 0x0e).w("ay4", FUNC(ay8910_device::data_w));
+	map(0x10, 0x10).w("ay5", FUNC(ay8910_device::address_w));
+	map(0x11, 0x11).r("ay5", FUNC(ay8910_device::data_r));
+	map(0x12, 0x12).w("ay5", FUNC(ay8910_device::data_w));
+	map(0x14, 0x14).w(this, FUNC(gyruss_state::gyruss_i8039_irq_w));
+	map(0x18, 0x18).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
 
-ADDRESS_MAP_START(gyruss_state::audio_cpu2_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void gyruss_state::audio_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(gyruss_state::audio_cpu2_io_map)
-	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void gyruss_state::audio_cpu2_io_map(address_map &map)
+{
+	map(0x00, 0xff).r("soundlatch2", FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( gyruss )

@@ -261,15 +261,16 @@ WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
 *                Memory Map                *
 *******************************************/
 
-ADDRESS_MAP_START(truco_state::main_map)
-	AM_RANGE(0x0000, 0x17ff) AM_RAM                                     /* General purpose RAM */
-	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_SHARE("videoram")                /* Video RAM */
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_SHARE("battery_ram")             /* Battery backed RAM */
-	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x8005, 0x8005) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x8008, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void truco_state::main_map(address_map &map)
+{
+	map(0x0000, 0x17ff).ram();                                     /* General purpose RAM */
+	map(0x1800, 0x7bff).ram().share("videoram");                /* Video RAM */
+	map(0x7c00, 0x7fff).ram().share("battery_ram");             /* Battery backed RAM */
+	map(0x8000, 0x8003).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8004, 0x8004).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x8005, 0x8005).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x8008, 0xffff).rom();
+}
 /*
 CRTC:
 

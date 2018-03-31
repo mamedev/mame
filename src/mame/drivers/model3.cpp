@@ -1749,71 +1749,6 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 	}
 }
 
-
-
-READ64_MEMBER(model3_state::model3_5881prot_r)
-{
-	uint64_t retvalue = 0xffffffffffffffffU;
-
-	if (offset == 0x00 / 8)
-	{
-		retvalue = 0;
-	}
-	else if (offset == 0x18 / 8)
-	{
-		if (first_read == 1)
-		{
-			// the RAM based schemes expect a dummy value before the start of the stream
-			// to match the previous simulation I use 0xffff here
-			first_read = 0;
-			retvalue = 0xffff << 16;
-		}
-		else
-		{
-			uint8_t* base;
-			retvalue = m_cryptdevice->do_decrypt(base);
-			//  retvalue = ((retvalue & 0xff00) >> 8) | ((retvalue & 0x00ff) << 8); // don't endian swap the return value on this hardware
-			retvalue <<= 16;
-		}
-
-	//  printf("model3_5881prot_r offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (uint32_t)(retvalue >> 32), (uint32_t)(retvalue & 0xffffffff), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask & 0xffffffff));
-	}
-	else
-	{
-		printf("model3_5881prot_r offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (uint32_t)(retvalue >> 32), (uint32_t)(retvalue & 0xffffffff), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask & 0xffffffff));
-	}
-
-	return retvalue;
-
-
-}
-
-WRITE64_MEMBER(model3_state::model3_5881prot_w)
-{
-	if (offset == 0x10 / 8)
-	{
-		// code is copied to RAM first, so base address is always 0
-		m_cryptdevice->set_addr_low(0);
-		m_cryptdevice->set_addr_high(0);
-
-		if (data != 0)
-			printf("model3_5881prot_w address isn't 0?\n");
-
-		first_read = 1;
-	}
-	else if (offset == 0x18 / 8)
-	{
-		uint16_t subkey = data >> (32 + 16);
-		subkey = ((subkey & 0xff00) >> 8) | ((subkey & 0x00ff) << 8); // endian swap the sub-key for this hardware
-		printf("model3_5881prot_w setting subkey %04x\n", subkey);
-		m_cryptdevice->set_subkey(subkey);
-	}
-	else
-	{
-		printf("model3_5881prot_w offset %08x : %08x%08x (%08x%08x)\n", offset * 8, (uint32_t)(data >> 32), (uint32_t)(data & 0xffffffff), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask & 0xffffffff));
-	}
-}
-
 WRITE64_MEMBER(model3_state::daytona2_rombank_w)
 {
 	if (ACCESSING_BITS_56_63)
@@ -1825,32 +1760,41 @@ WRITE64_MEMBER(model3_state::daytona2_rombank_w)
 	}
 }
 
-ADDRESS_MAP_START(model3_state::model3_10_mem)
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("work_ram")    /* work RAM */
+void model3_state::model3_10_mem(address_map &map)
+{
+	map(0x00000000, 0x007fffff).ram().share("work_ram");    /* work RAM */
 
-	AM_RANGE(0x84000000, 0x8400003f) AM_READ(real3d_status_r )
-	AM_RANGE(0x88000000, 0x88000007) AM_WRITE(real3d_cmd_w )
-	AM_RANGE(0x8e000000, 0x8e0fffff) AM_WRITE(real3d_display_list_w )
-	AM_RANGE(0x98000000, 0x980fffff) AM_WRITE(real3d_polygon_ram_w )
+	map(0x84000000, 0x8400003f).r(this, FUNC(model3_state::real3d_status_r));
+	map(0x88000000, 0x88000007).w(this, FUNC(model3_state::real3d_cmd_w));
+	map(0x8e000000, 0x8e0fffff).w(this, FUNC(model3_state::real3d_display_list_w));
+	map(0x98000000, 0x980fffff).w(this, FUNC(model3_state::real3d_polygon_ram_w));
 
-	AM_RANGE(0xf0040000, 0xf004003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_ctrl_r, model3_ctrl_w )
-	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_READWRITE8(model3_sound_r, model3_sound_w, 0xffffffffffffffffU )
-	AM_RANGE(0xf00c0000, 0xf00dffff) AM_MIRROR(0x0e000000) AM_RAM AM_SHARE("backup")    /* backup SRAM */
-	AM_RANGE(0xf0100000, 0xf010003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_sys_r, model3_sys_w )
-	AM_RANGE(0xf0140000, 0xf014003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_rtc_r, model3_rtc_w )
+	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw(this, FUNC(model3_state::model3_ctrl_r), FUNC(model3_state::model3_ctrl_w));
+	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).rw(this, FUNC(model3_state::model3_sound_r), FUNC(model3_state::model3_sound_w));
+	map(0xf00c0000, 0xf00dffff).mirror(0x0e000000).ram().share("backup");    /* backup SRAM */
+	map(0xf0100000, 0xf010003f).mirror(0x0e000000).rw(this, FUNC(model3_state::model3_sys_r), FUNC(model3_state::model3_sys_w));
+	map(0xf0140000, 0xf014003f).mirror(0x0e000000).rw(this, FUNC(model3_state::model3_rtc_r), FUNC(model3_state::model3_rtc_w));
 
-	AM_RANGE(0xf1000000, 0xf10f7fff) AM_READWRITE(model3_char_r, model3_char_w )    /* character RAM */
-	AM_RANGE(0xf10f8000, 0xf10fffff) AM_READWRITE(model3_tile_r, model3_tile_w )    /* tilemaps */
-	AM_RANGE(0xf1100000, 0xf111ffff) AM_READWRITE(model3_palette_r, model3_palette_w ) AM_SHARE("paletteram64") /* palette */
-	AM_RANGE(0xf1180000, 0xf11800ff) AM_READWRITE(model3_vid_reg_r, model3_vid_reg_w )
+	map(0xf1000000, 0xf10f7fff).rw(this, FUNC(model3_state::model3_char_r), FUNC(model3_state::model3_char_w));    /* character RAM */
+	map(0xf10f8000, 0xf10fffff).rw(this, FUNC(model3_state::model3_tile_r), FUNC(model3_state::model3_tile_w));    /* tilemaps */
+	map(0xf1100000, 0xf111ffff).rw(this, FUNC(model3_state::model3_palette_r), FUNC(model3_state::model3_palette_w)).share("paletteram64"); /* palette */
+	map(0xf1180000, 0xf11800ff).rw(this, FUNC(model3_state::model3_vid_reg_r), FUNC(model3_state::model3_vid_reg_w));
 
-	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+	map(0xff800000, 0xffffffff).rom().region("user1", 0);
+}
 
-ADDRESS_MAP_START(model3_state::model3_mem)
-	AM_IMPORT_FROM( model3_10_mem )
-	AM_RANGE(0xc0000000, 0xc003ffff) AM_DEVICE32("comm_board", m3comm_device, m3_map, 0xffffffffffffffffU )
-ADDRESS_MAP_END
+void model3_state::model3_mem(address_map &map)
+{
+	model3_10_mem(map);
+	map(0xc0000000, 0xc003ffff).m("comm_board", FUNC(m3comm_device::m3_map));
+}
+
+void model3_state::model3_5881_mem(address_map &map)
+{
+	model3_mem(map);
+	map(0xf0180000, 0xf019ffff).mirror(0x0e000000).ram();
+	map(0xf01a0000, 0xf01a003f).mirror(0x0e000000).m(m_cryptdevice, FUNC(sega_315_5881_crypt_device::iomap_64be));
+}
 
 static INPUT_PORTS_START( common )
 	PORT_START("IN0")
@@ -5753,17 +5697,18 @@ WRITE16_MEMBER(model3_state::model3snd_ctrl)
 	}
 }
 
-ADDRESS_MAP_START(model3_state::model3_snd)
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1", 0) AM_SHARE("soundram")
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_device, read, write)
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2", 0)
-	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE("scsp2", scsp_device, read, write)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(model3snd_ctrl)
-	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("samples", 0)
-	AM_RANGE(0xa00000, 0xdfffff) AM_ROMBANK("bank4")
-	AM_RANGE(0xe00000, 0xffffff) AM_ROMBANK("bank5")
-ADDRESS_MAP_END
+void model3_state::model3_snd(address_map &map)
+{
+	map(0x000000, 0x07ffff).ram().region("scsp1", 0).share("soundram");
+	map(0x100000, 0x100fff).rw(m_scsp1, FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x200000, 0x27ffff).ram().region("scsp2", 0);
+	map(0x300000, 0x300fff).rw("scsp2", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x400000, 0x400001).w(this, FUNC(model3_state::model3snd_ctrl));
+	map(0x600000, 0x67ffff).rom().region("audiocpu", 0x80000);
+	map(0x800000, 0x9fffff).rom().region("samples", 0);
+	map(0xa00000, 0xdfffff).bankr("bank4");
+	map(0xe00000, 0xffffff).bankr("bank5");
+}
 
 
 WRITE8_MEMBER(model3_state::scsp_irq)
@@ -5950,8 +5895,26 @@ MACHINE_CONFIG_START(model3_state::model3_20)
 	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
+uint16_t model3_state::crypt_read_callback(uint32_t addr)
+{
+	uint16_t dat = 0;
+	if (addr < 0x8000)
+	{
+		dat = m_maincpu->space().read_word((0xf0180000 + 4 * addr)); // every other word is unused in this RAM, probably 32-bit ram on 64-bit bus?
+	}
+
+//  dat = ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
+//  printf("reading %04x\n", dat);
+
+	return dat;
+}
+
 MACHINE_CONFIG_START(model3_state::model3_20_5881)
 	model3_20(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model3_5881_mem)
+
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -5996,23 +5959,12 @@ MACHINE_CONFIG_START(model3_state::model3_21)
 	MCFG_M3COMM_ADD("comm_board")
 MACHINE_CONFIG_END
 
-
-uint16_t model3_state::crypt_read_callback(uint32_t addr)
-{
-	uint16_t dat = 0;
-	if (addr < 0x8000)
-	{
-		dat = m_maincpu->space().read_word((0xf0180000 + 4 * addr)); // every other word is unused in this RAM, probably 32-bit ram on 64-bit bus?
-	}
-
-//  dat = ((dat & 0xff00) >> 8) | ((dat & 0x00ff) << 8);
-//  printf("reading %04x\n", dat);
-
-	return dat;
-}
-
 MACHINE_CONFIG_START(model3_state::model3_21_5881)
 	model3_21(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model3_5881_mem)
+
 	MCFG_DEVICE_ADD("315_5881", SEGA315_5881_CRYPT, 0)
 	MCFG_SET_READ_CALLBACK(model3_state, crypt_read_callback)
 MACHINE_CONFIG_END
@@ -6048,15 +6000,6 @@ void model3_state::interleave_vroms()
 	}
 }
 
-DRIVER_INIT_MEMBER(model3_state, genprot)
-{
-//  std::string key = parameter(":315_5881:key");
-
-	m_maincpu->space(AS_PROGRAM).install_ram(0xf0180000, 0xf019ffff, 0x0e000000);
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf01a0000, 0xf01a003f, 0, 0x0e000000, 0, read64_delegate(FUNC(model3_state::model3_5881prot_r), this), write64_delegate(FUNC(model3_state::model3_5881prot_w), this) );
-
-}
 
 DRIVER_INIT_MEMBER(model3_state,model3_10)
 {
@@ -6221,16 +6164,11 @@ DRIVER_INIT_MEMBER(model3_state,vs2)
 DRIVER_INIT_MEMBER(model3_state,vs298)
 {
 	DRIVER_INIT_CALL(model3_20);
-	DRIVER_INIT_CALL(genprot);
 }
-
-
-
 
 DRIVER_INIT_MEMBER(model3_state,vs299)
 {
 	DRIVER_INIT_CALL(model3_20);
-	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,harley)
@@ -6243,11 +6181,9 @@ DRIVER_INIT_MEMBER(model3_state,harleya)
 	DRIVER_INIT_CALL(model3_20);
 }
 
-
 DRIVER_INIT_MEMBER(model3_state,srally2)
 {
 	DRIVER_INIT_CALL(model3_20);
-
 
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	rom[(0x7c0c4^4)/4] = 0x60000000;
@@ -6271,17 +6207,12 @@ DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 
 	rom[(0x043dc^4)/4] = 0x48000090;        // skip force feedback setup
 	rom[(0xf6e44^4)/4] = 0x60000000;
-
-
-	DRIVER_INIT_CALL(genprot);
-
 }
 
 DRIVER_INIT_MEMBER(model3_state,swtrilga)
 {
 	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
-	DRIVER_INIT_CALL(genprot);
 
 	//rom[(0xf6dd0^4)/4] = 0x60000000;
 }
@@ -6291,7 +6222,6 @@ DRIVER_INIT_MEMBER(model3_state,von2)
 	m_step20_with_old_real3d = true;
 
 	DRIVER_INIT_CALL(model3_20);
-	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,dirtdvls)
@@ -6299,7 +6229,6 @@ DRIVER_INIT_MEMBER(model3_state,dirtdvls)
 	m_step20_with_old_real3d = true;
 
 	DRIVER_INIT_CALL(model3_20);
-	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,daytona2)
@@ -6314,8 +6243,6 @@ DRIVER_INIT_MEMBER(model3_state,daytona2)
 	//rom[(0x6063c4^4)/4] = 0x60000000;
 	//rom[(0x616434^4)/4] = 0x60000000;
 	//rom[(0x69f4e4^4)/4] = 0x60000000;
-
-	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,dayto2pe)
@@ -6331,8 +6258,6 @@ DRIVER_INIT_MEMBER(model3_state,dayto2pe)
 //  rom[(0x618b28^4)/4] = 0x60000000;       // jump to encrypted code
 
 //  rom[(0x64ca34^4)/4] = 0x60000000;       // dec
-
-	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,spikeout)
@@ -6342,7 +6267,6 @@ DRIVER_INIT_MEMBER(model3_state,spikeout)
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
 	rom[(0x6059ec^4)/4] = 0x60000000;
-	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,spikeofe)
@@ -6352,13 +6276,11 @@ DRIVER_INIT_MEMBER(model3_state,spikeofe)
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
 	rom[(0x6059ec^4)/4] = 0x60000000;
-	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,eca)
 {
 	DRIVER_INIT_CALL(model3_20);
-	DRIVER_INIT_CALL(genprot);
 
 	// base = 0xffc80000
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
@@ -6390,8 +6312,6 @@ DRIVER_INIT_MEMBER(model3_state,oceanhun)
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
-
-	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,magtruck)
@@ -6399,7 +6319,6 @@ DRIVER_INIT_MEMBER(model3_state,magtruck)
 	m_step20_with_old_real3d = true;
 
 	DRIVER_INIT_CALL(model3_20);
-	DRIVER_INIT_CALL(genprot);
 }
 
 DRIVER_INIT_MEMBER(model3_state,lamachin)
@@ -6407,7 +6326,6 @@ DRIVER_INIT_MEMBER(model3_state,lamachin)
 	m_step20_with_old_real3d = true;
 
 	DRIVER_INIT_CALL(model3_20);
-	DRIVER_INIT_CALL(genprot);
 }
 
 

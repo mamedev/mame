@@ -70,24 +70,25 @@ void ax80_state::machine_reset()
 {
 }
 
-ADDRESS_MAP_START(ax80_state::ax80_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0) // internal ROM
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x000c) AM_DEVREADWRITE(PIT0_TAG, pit8253_device, read, write) // IC20
-	AM_RANGE(0x1010, 0x1013) AM_MIRROR(0x000c) AM_DEVREADWRITE(PIT1_TAG, pit8253_device, read, write) // IC21
-	AM_RANGE(0x1020, 0x1023) AM_MIRROR(0x000c) AM_DEVREADWRITE(PIT2_TAG, pit8253_device, read, write) // IC22
-	AM_RANGE(0x1030, 0x1033) AM_MIRROR(0x000c) AM_DEVREADWRITE(PIT3_TAG, pit8253_device, read, write) // IC23
-	AM_RANGE(0x1040, 0x1043) AM_MIRROR(0x000c) AM_DEVREADWRITE(PIT4_TAG, pit8253_device, read, write) // IC24
-	AM_RANGE(0x1050, 0x1053) AM_MIRROR(0x000c) AM_DEVREADWRITE(PIT5_TAG, pit8253_device, read, write) // IC25
-	AM_RANGE(0x1060, 0x1060) AM_MIRROR(0x000e) AM_DEVREADWRITE("kdc", i8279_device, data_r, data_w)   // IC11
-	AM_RANGE(0x1061, 0x1061) AM_MIRROR(0x000e) AM_DEVREADWRITE("kdc", i8279_device, status_r, cmd_w)  // IC11
-	AM_RANGE(0x1070, 0x1073) AM_MIRROR(0x000c) AM_DEVREADWRITE(PPI1_TAG, i8255_device, read, write)   // IC10
+void ax80_state::ax80_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("maincpu", 0); // internal ROM
+	map(0x1000, 0x1003).mirror(0x000c).rw(PIT0_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC20
+	map(0x1010, 0x1013).mirror(0x000c).rw(PIT1_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC21
+	map(0x1020, 0x1023).mirror(0x000c).rw(PIT2_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC22
+	map(0x1030, 0x1033).mirror(0x000c).rw(PIT3_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC23
+	map(0x1040, 0x1043).mirror(0x000c).rw(PIT4_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC24
+	map(0x1050, 0x1053).mirror(0x000c).rw(PIT5_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write)); // IC25
+	map(0x1060, 0x1060).mirror(0x000e).rw("kdc", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));   // IC11
+	map(0x1061, 0x1061).mirror(0x000e).rw("kdc", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));  // IC11
+	map(0x1070, 0x1073).mirror(0x000c).rw(PPI1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC10
 	//AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0dfe) AM_DEVREADWRITE(PPI0_TAG, i8255_device, read, write)   // IC9 - A9 connects to A1-pin
 	//AM_RANGE(0x2200, 0x2201) AM_MIRROR(0x0dfe) AM_DEVREADWRITE(PPI0_TAG, i8255_device, read, write)   // IC9 - A9 connects to A1-pin
 	//AM_RANGE(0x3000, 0x3fff) // steers audio to the various voice channels
-	AM_RANGE(0x4000, 0x5fff) AM_MIRROR(0x2000) AM_ROM AM_REGION("maincpu", 0x1000)    // external program EPROM
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
-ADDRESS_MAP_END
+	map(0x4000, 0x5fff).mirror(0x2000).rom().region("maincpu", 0x1000);    // external program EPROM
+	map(0x8000, 0x87ff).mirror(0x3800).ram();
+	map(0xc000, 0xc7ff).mirror(0x3800).ram();
+}
 
 MACHINE_CONFIG_START(ax80_state::ax80)
 	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(12'000'000))
@@ -122,11 +123,11 @@ ROM_START( ax80 )
 	ROM_LOAD( "akai ax80 main cpu mask rom.ic2", 0x000000, 0x001000, CRC(241c078f) SHA1(7f5d0d718f2d03ec446568ae440beaff0aac6bfd) )
 	// external program EPROM
 	ROM_SYSTEM_BIOS( 0, "k", "REV.K" )
-	ROMX_LOAD( "AX-80K.ic4", 0x001000, 0x002000, CRC(a2f95ccf) SHA1(4e5f2c4c9a08ec1d38146cae786b400261a3dbb7), ROM_BIOS(1) )
+	ROMX_LOAD( "ax-80k.ic4", 0x001000, 0x002000, CRC(a2f95ccf) SHA1(4e5f2c4c9a08ec1d38146cae786b400261a3dbb7), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "l", "REV.L" )
-	ROMX_LOAD( "AX-80L.ic4", 0x001000, 0x002000, CRC(bc3d21bd) SHA1(d6730ec33b28e705a0ff88946b7860fadcc37793), ROM_BIOS(2) )
+	ROMX_LOAD( "ax-80l.ic4", 0x001000, 0x002000, CRC(bc3d21bd) SHA1(d6730ec33b28e705a0ff88946b7860fadcc37793), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "i", "REV.I" )
-	ROMX_LOAD( "AX-80I.ic4", 0x001000, 0x002000, CRC(d616e435) SHA1(84820522e6a96fc29966f82e76254e54df15d7e6), ROM_BIOS(3) )
+	ROMX_LOAD( "ax-80i.ic4", 0x001000, 0x002000, CRC(d616e435) SHA1(84820522e6a96fc29966f82e76254e54df15d7e6), ROM_BIOS(3) )
 ROM_END
 
 CONS( 1984, ax80, 0, 0, ax80, ax80, ax80_state, 0, "Akai", "AX80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -116,29 +116,33 @@ WRITE_LINE_MEMBER(dectalk_isa_device::clock_w)
 	m_dsp->set_input_line(INPUT_LINE_IRQ0, (!(m_ctl & 0x20) || state) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-ADDRESS_MAP_START(dectalk_isa_device::dectalk_cpu_io)
-	AM_RANGE(0x0400, 0x0401) AM_READWRITE(cmd_r, status_w) //PCS0
-	AM_RANGE(0x0480, 0x0481) AM_READWRITE(data_r, data_w) //PCS1
-	AM_RANGE(0x0500, 0x0501) AM_WRITE(dsp_dma_w) //PCS2
-	AM_RANGE(0x0580, 0x0581) AM_READ(host_irq_r) //PCS3
-	AM_RANGE(0x0600, 0x0601) AM_WRITE(output_ctl_w) //PCS4
-	AM_RANGE(0x0680, 0x0681) AM_READWRITE8(dma_r, dma_w, 0xff) //PCS5
-	AM_RANGE(0x0700, 0x0701) AM_WRITE(irq_line_w) //PCS6
-ADDRESS_MAP_END
+void dectalk_isa_device::dectalk_cpu_io(address_map &map)
+{
+	map(0x0400, 0x0401).rw(this, FUNC(dectalk_isa_device::cmd_r), FUNC(dectalk_isa_device::status_w)); //PCS0
+	map(0x0480, 0x0481).rw(this, FUNC(dectalk_isa_device::data_r), FUNC(dectalk_isa_device::data_w)); //PCS1
+	map(0x0500, 0x0501).w(this, FUNC(dectalk_isa_device::dsp_dma_w)); //PCS2
+	map(0x0580, 0x0581).r(this, FUNC(dectalk_isa_device::host_irq_r)); //PCS3
+	map(0x0600, 0x0601).w(this, FUNC(dectalk_isa_device::output_ctl_w)); //PCS4
+	map(0x0680, 0x0680).rw(this, FUNC(dectalk_isa_device::dma_r), FUNC(dectalk_isa_device::dma_w)); //PCS5
+	map(0x0700, 0x0701).w(this, FUNC(dectalk_isa_device::irq_line_w)); //PCS6
+}
 
-ADDRESS_MAP_START(dectalk_isa_device::dectalk_cpu_map)
-	AM_RANGE(0x00000, 0xFBFFF) AM_RAM
-	AM_RANGE(0xFC000, 0xFFFFF) AM_ROM AM_REGION("dectalk_cpu", 0)
-ADDRESS_MAP_END
+void dectalk_isa_device::dectalk_cpu_map(address_map &map)
+{
+	map(0x00000, 0xFBFFF).ram();
+	map(0xFC000, 0xFFFFF).rom().region("dectalk_cpu", 0);
+}
 
-ADDRESS_MAP_START(dectalk_isa_device::dectalk_dsp_io)
-	AM_RANGE(0x0, 0x0) AM_READ(dsp_dma_r)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(dsp_dma_r, dac_w)
-ADDRESS_MAP_END
+void dectalk_isa_device::dectalk_dsp_io(address_map &map)
+{
+	map(0x0, 0x0).r(this, FUNC(dectalk_isa_device::dsp_dma_r));
+	map(0x1, 0x1).rw(this, FUNC(dectalk_isa_device::dsp_dma_r), FUNC(dectalk_isa_device::dac_w));
+}
 
-ADDRESS_MAP_START(dectalk_isa_device::dectalk_dsp_map)
-	AM_RANGE(0x0000, 0x0FFF) AM_ROM AM_REGION("dectalk_dsp", 0)
-ADDRESS_MAP_END
+void dectalk_isa_device::dectalk_dsp_map(address_map &map)
+{
+	map(0x0000, 0x0FFF).rom().region("dectalk_dsp", 0);
+}
 
 ROM_START( dectalk_isa )
 	ROM_REGION( 0x4000, "dectalk_cpu", 0 )

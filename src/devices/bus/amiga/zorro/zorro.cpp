@@ -34,13 +34,6 @@ zorro_slot_device::zorro_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void zorro_slot_device::set_zorro_slot(device_t &device, device_t *owner, const char *zorro_tag)
-{
-	zorro_slot_device &zorro_card = dynamic_cast<zorro_slot_device &>(device);
-	zorro_card.m_owner = owner;
-	zorro_card.m_zorro_tag = zorro_tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -73,16 +66,6 @@ zorro_device::zorro_device(const machine_config &mconfig, device_type type, cons
 	m_int2_handler(*this),
 	m_int6_handler(*this)
 {
-}
-
-//-------------------------------------------------
-//  set_cputag - set cpu we are attached to
-//-------------------------------------------------
-
-void zorro_device::set_cputag(device_t &device, const char *tag)
-{
-	zorro_device &zorro = downcast<zorro_device &>(device);
-	zorro.m_cputag = tag;
 }
 
 //-------------------------------------------------

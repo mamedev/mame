@@ -78,42 +78,47 @@ static INPUT_PORTS_START( paranoia )
 	PCE_STANDARD_INPUT_PORT_P1
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(paranoia_state::pce_mem)
-	AM_RANGE( 0x000000, 0x03FFFF) AM_ROM
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE("c6280", c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(pce_joystick_r, pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
-ADDRESS_MAP_END
+void paranoia_state::pce_mem(address_map &map)
+{
+	map(0x000000, 0x03FFFF).rom();
+	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
+	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
+	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
+	map(0x1FEC00, 0x1FEFFF).rw(m_maincpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w));
+	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(paranoia_state::pce_joystick_r), FUNC(paranoia_state::pce_joystick_w));
+	map(0x1FF400, 0x1FF7FF).rw(m_maincpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
+}
 
-ADDRESS_MAP_START(paranoia_state::pce_io)
-	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
-ADDRESS_MAP_END
+void paranoia_state::pce_io(address_map &map)
+{
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+}
 
 WRITE8_MEMBER(paranoia_state::i8085_d000_w)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
 
-ADDRESS_MAP_START(paranoia_state::paranoia_8085_map)
-	AM_RANGE( 0x0000, 0x7fff) AM_ROM
-	AM_RANGE( 0x8000, 0x80ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE( 0x8100, 0x8107) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
-	AM_RANGE( 0xd000, 0xd000) AM_WRITE(i8085_d000_w )
-	AM_RANGE( 0xe000, 0xe1ff) AM_RAM
-ADDRESS_MAP_END
+void paranoia_state::paranoia_8085_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x80ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x8100, 0x8107).rw("i8155", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0xd000, 0xd000).w(this, FUNC(paranoia_state::i8085_d000_w));
+	map(0xe000, 0xe1ff).ram();
+}
 
-ADDRESS_MAP_START(paranoia_state::paranoia_8085_io_map)
-ADDRESS_MAP_END
+void paranoia_state::paranoia_8085_io_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(paranoia_state::paranoia_z80_map)
-	AM_RANGE( 0x0000, 0x3fff) AM_ROM
-	AM_RANGE( 0x6000, 0x67ff) AM_RAM
-	AM_RANGE( 0x7000, 0x73ff) AM_RAM
-ADDRESS_MAP_END
+void paranoia_state::paranoia_z80_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x6000, 0x67ff).ram();
+	map(0x7000, 0x73ff).ram();
+}
 
 READ8_MEMBER(paranoia_state::z80_io_01_r)
 {
@@ -133,13 +138,14 @@ WRITE8_MEMBER(paranoia_state::z80_io_37_w)
 {
 }
 
-ADDRESS_MAP_START(paranoia_state::paranoia_z80_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ(z80_io_01_r )
-	AM_RANGE( 0x02, 0x02 ) AM_READ(z80_io_02_r )
-	AM_RANGE( 0x17, 0x17 ) AM_WRITE(z80_io_17_w )
-	AM_RANGE( 0x37, 0x37 ) AM_WRITE(z80_io_37_w )
-ADDRESS_MAP_END
+void paranoia_state::paranoia_z80_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r(this, FUNC(paranoia_state::z80_io_01_r));
+	map(0x02, 0x02).r(this, FUNC(paranoia_state::z80_io_02_r));
+	map(0x17, 0x17).w(this, FUNC(paranoia_state::z80_io_17_w));
+	map(0x37, 0x37).w(this, FUNC(paranoia_state::z80_io_37_w));
+}
 
 WRITE8_MEMBER(paranoia_state::i8155_a_w)
 {

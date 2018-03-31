@@ -72,21 +72,23 @@ INPUT_CHANGED_MEMBER(kopunch_state::right_coin_inserted)
 
 ********************************************************/
 
-ADDRESS_MAP_START(kopunch_state::kopunch_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(vram_fg_w) AM_SHARE("vram_fg")
-	AM_RANGE(0x7000, 0x70ff) AM_RAM_WRITE(vram_bg_w) AM_SHARE("vram_bg")
-	AM_RANGE(0x7100, 0x73ff) AM_RAM // unused vram
-	AM_RANGE(0x7400, 0x7bff) AM_RAM // more unused vram? or accidental writes?
-ADDRESS_MAP_END
+void kopunch_state::kopunch_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x6000, 0x63ff).ram().w(this, FUNC(kopunch_state::vram_fg_w)).share("vram_fg");
+	map(0x7000, 0x70ff).ram().w(this, FUNC(kopunch_state::vram_bg_w)).share("vram_bg");
+	map(0x7100, 0x73ff).ram(); // unused vram
+	map(0x7400, 0x7bff).ram(); // more unused vram? or accidental writes?
+}
 
-ADDRESS_MAP_START(kopunch_state::kopunch_io_map)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x34, 0x37) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x38, 0x3b) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x3c, 0x3f) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)
-ADDRESS_MAP_END
+void kopunch_state::kopunch_io_map(address_map &map)
+{
+	map(0x30, 0x33).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x34, 0x37).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x38, 0x3b).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x3c, 0x3f).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
 
 

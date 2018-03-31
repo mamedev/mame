@@ -93,21 +93,21 @@ ROM_START( stereo_fx )
 	ROM_LOAD("ati_stereo_fx.bin", 0x0000, 0x8000, CRC(1bebffa6) SHA1(e66c2619a6c05199554b5702d67877ae3799d415))
 ROM_END
 
-ADDRESS_MAP_START(stereo_fx_device::stereo_fx_io)
-	AM_RANGE(0xFF00, 0xFF00) AM_WRITE(port00_w)
-	AM_RANGE(0xFF10, 0xFF10) AM_DEVWRITE("rdac", dac_byte_interface, write)
-	AM_RANGE(0xFF20, 0xFF20) AM_WRITE(port20_w)
+void stereo_fx_device::stereo_fx_io(address_map &map)
+{
+	map(0xFF00, 0xFF00).w(this, FUNC(stereo_fx_device::port00_w));
+	map(0xFF10, 0xFF10).w("rdac", FUNC(dac_byte_interface::write));
+	map(0xFF20, 0xFF20).w(this, FUNC(stereo_fx_device::port20_w));
 	//AM_RANGE(0xFF30, 0xFF30) AM_WRITE()  //  used only on reset and undocumented cmd 0xc4
-	AM_RANGE(0xFF40, 0xFF40) AM_READWRITE(dev_dsp_data_r, dev_dsp_data_w)
-	AM_RANGE(0xFF50, 0xFF50) AM_WRITE(raise_drq_w)
-	AM_RANGE(0xFF60, 0xFF60) AM_WRITE(dev_host_irq_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(p1_r) AM_DEVWRITE("ldac", dac_byte_interface, write)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
-ADDRESS_MAP_END
+	map(0xFF40, 0xFF40).rw(this, FUNC(stereo_fx_device::dev_dsp_data_r), FUNC(stereo_fx_device::dev_dsp_data_w));
+	map(0xFF50, 0xFF50).w(this, FUNC(stereo_fx_device::raise_drq_w));
+	map(0xFF60, 0xFF60).w(this, FUNC(stereo_fx_device::dev_host_irq_w));
+}
 
-ADDRESS_MAP_START(stereo_fx_device::stereo_fx_rom)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void stereo_fx_device::stereo_fx_rom(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 const tiny_rom_entry *stereo_fx_device::device_rom_region() const
 {
@@ -118,6 +118,10 @@ MACHINE_CONFIG_START(stereo_fx_device::device_add_mconfig)
 	MCFG_CPU_ADD("stereo_fx_cpu", I80C31, XTAL(30'000'000))
 	MCFG_CPU_IO_MAP(stereo_fx_io)
 	MCFG_CPU_PROGRAM_MAP(stereo_fx_rom)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(stereo_fx_device, p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(DEVWRITE8("ldac", dac_byte_interface, write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(stereo_fx_device, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(stereo_fx_device, p3_w))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ym3812", YM3812, XTAL(3'579'545))

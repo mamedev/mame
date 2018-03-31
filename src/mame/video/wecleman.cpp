@@ -62,8 +62,7 @@
 void wecleman_state::get_sprite_info()
 {
 	const pen_t *base_pal = m_palette->pens();
-	uint8_t *base_gfx = memregion("gfx1")->base();
-	int gfx_max     = memregion("gfx1")->bytes();
+	int gfx_max     = m_sprite_region.length();
 
 	uint16_t *source = m_spriteram;
 
@@ -107,14 +106,14 @@ void wecleman_state::get_sprite_info()
 
 		if ((gfx + sprite->tile_width * sprite->tile_height - 1) >= gfx_max) continue;
 
-		sprite->pen_data = base_gfx + gfx;
+		sprite->pen_data = &m_sprite_region[gfx];
 		sprite->line_offset = sprite->tile_width;
 		sprite->total_width = sprite->tile_width - (sprite->tile_width * (zoom & 0xff)) / 0x80;
 		sprite->total_height += 1;
 		sprite->x += m_spr_offsx;
 		sprite->y += m_spr_offsy;
 
-		if (m_gameid == 0)
+		if (m_gameid == WECLEMAN_ID)
 		{
 			m_spr_idx_list[m_spr_count] = m_spr_count;
 			m_spr_pri_list[m_spr_count] = source[0x0e/2] >> 8;
@@ -319,7 +318,7 @@ void wecleman_state::sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect
 {
 	int i;
 
-	if (m_gameid == 0)   // Wec Le Mans
+	if (m_gameid == WECLEMAN_ID)   // Wec Le Mans
 	{
 		sortsprite(m_spr_idx_list, m_spr_pri_list, m_spr_count);
 
@@ -880,7 +879,7 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 	assert(m_screen->format() == BITMAP_FORMAT_RGB32);
 	buffer = auto_alloc_array(machine(), uint8_t, 0x12c00);   // working buffer for sprite operations
 
-	m_gameid = 0;
+	m_gameid = WECLEMAN_ID;
 	m_gfx_bank = bank;
 	m_spr_offsx = -0xbc + BMP_PAD;
 	m_spr_offsy = 1 + BMP_PAD;
@@ -980,7 +979,7 @@ VIDEO_START_MEMBER(wecleman_state,hotchase)
 
 	buffer = auto_alloc_array(machine(), uint8_t, 0x400); // reserve 1k for sprite list
 
-	m_gameid = 1;
+	m_gameid = HOTCHASE_ID;
 	m_gfx_bank = bank;
 	m_spr_offsx = -0xc0;
 	m_spr_offsy = 0;
@@ -1102,7 +1101,7 @@ uint32_t wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_in
 
 	/* Draw the background */
 	if (video_on)
-		m_k051316_1->zoom_draw(screen, bitmap, cliprect, 0, 0);
+		m_k051316[0]->zoom_draw(screen, bitmap, cliprect, 0, 0);
 
 	/* Draw the road */
 	if (video_on)
@@ -1114,6 +1113,6 @@ uint32_t wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_in
 
 	/* Draw the foreground (text) */
 	if (video_on)
-		m_k051316_2->zoom_draw(screen, bitmap, cliprect, 0, 0);
+		m_k051316[1]->zoom_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }

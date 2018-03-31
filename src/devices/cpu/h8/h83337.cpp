@@ -3,9 +3,9 @@
 #include "emu.h"
 #include "h83337.h"
 
-DEFINE_DEVICE_TYPE(H83334, h83334_device, "h83334", "H8/3334")
-DEFINE_DEVICE_TYPE(H83336, h83336_device, "h83336", "H8/3336")
-DEFINE_DEVICE_TYPE(H83337, h83337_device, "h83337", "H8/3337")
+DEFINE_DEVICE_TYPE(H83334, h83334_device, "h83334", "Hitachi H8/3334")
+DEFINE_DEVICE_TYPE(H83336, h83336_device, "h83336", "Hitachi H8/3336")
+DEFINE_DEVICE_TYPE(H83337, h83337_device, "h83337", "Hitachi H8/3337")
 
 
 h83337_device::h83337_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start) :

@@ -50,31 +50,42 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_switch(*this, "SWITCH.%u", 0)
+		, m_led(*this, "led_%u", 1U)
+		, m_dpl(*this, "dpl_%u", 0U)
 	{ }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
+	DECLARE_DRIVER_INIT(peyper);
+	DECLARE_DRIVER_INIT(odin);
+	DECLARE_DRIVER_INIT(wolfman);
+
+	void peyper(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(sw_r);
 	DECLARE_WRITE8_MEMBER(col_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(lamp7_w);
 	DECLARE_WRITE8_MEMBER(sol_w);
-	DECLARE_WRITE8_MEMBER(p1a_w) { }; // more lamps
-	DECLARE_WRITE8_MEMBER(p1b_w) { }; // more lamps
-	DECLARE_WRITE8_MEMBER(p2a_w) { }; // more lamps
-	DECLARE_WRITE8_MEMBER(p2b_w) { }; // more lamps
-	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
-	DECLARE_DRIVER_INIT(peyper);
-	DECLARE_DRIVER_INIT(odin);
-	DECLARE_DRIVER_INIT(wolfman);
-	void peyper(machine_config &config);
+	DECLARE_WRITE8_MEMBER(p1a_w) { } // more lamps
+	DECLARE_WRITE8_MEMBER(p1b_w) { } // more lamps
+	DECLARE_WRITE8_MEMBER(p2a_w) { } // more lamps
+	DECLARE_WRITE8_MEMBER(p2b_w) { } // more lamps
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void peyper_io(address_map &map);
 	void peyper_map(address_map &map);
+
 private:
 	uint8_t m_digit;
 	uint8_t m_disp_layout[36];
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<4> m_switch;
+	output_finder<4> m_led;
+	output_finder<34> m_dpl; // 0 used as black hole
 };
 
 WRITE8_MEMBER( peyper_state::col_w )
@@ -112,31 +123,28 @@ WRITE8_MEMBER( peyper_state::disp_w )
 15 -> DPL31,DPL32
 */
 
-	uint8_t i,q,hex_a,a;
-	uint8_t p = m_digit << 1;
-
-	for (i = 0; i < 2; i++)
+	uint8_t const p = m_digit << 1;
+	for (uint8_t i = 0; i < 2; i++, data >>= 4)
 	{
-		q = m_disp_layout[p++]; // get control code or digit
-		a = data & 15; // get bcd
-		data >>= 4; // rotate for next iteration
-		hex_a = patterns[a]; // get segments
+		uint8_t const q = m_disp_layout[p | i]; // get control code or digit
+		uint8_t const a = data & 15; // get bcd
+		uint8_t const hex_a = patterns[a]; // get segments
 
 		// special codes
 		switch (q)
 		{
 			case 34: // player indicator lights (7-digit only)
-				output().set_indexed_value("led_",1,BIT(a,0)); // PLAYER 1
-				output().set_indexed_value("led_",2,BIT(a,1)); // PLAYER 2
-				output().set_indexed_value("led_",3,BIT(a,2)); // PLAYER 3
-				output().set_indexed_value("led_",4,BIT(a,3)); // PLAYER 4
+				m_led[0] = BIT(a, 0); // PLAYER 1
+				m_led[1] = BIT(a, 1); // PLAYER 2
+				m_led[2] = BIT(a, 2); // PLAYER 3
+				m_led[3] = BIT(a, 3); // PLAYER 4
 				break;
 
 			case 35: // units digits show 0
-				if (!BIT(a,0)) output().set_indexed_value("dpl_",m_disp_layout[32], 0x3f);
-				if (!BIT(a,1)) output().set_indexed_value("dpl_",m_disp_layout[33], 0x3f);
-				if (!BIT(a,2)) output().set_indexed_value("dpl_",m_disp_layout[34], 0x3f);
-				if (!BIT(a,3)) output().set_indexed_value("dpl_",m_disp_layout[35], 0x3f);
+				if (!BIT(a, 0)) m_dpl[m_disp_layout[32]] = 0x3f;
+				if (!BIT(a, 1)) m_dpl[m_disp_layout[33]] = 0x3f;
+				if (!BIT(a, 2)) m_dpl[m_disp_layout[34]] = 0x3f;
+				if (!BIT(a, 3)) m_dpl[m_disp_layout[35]] = 0x3f;
 				break;
 
 			case 36: // game status indicators
@@ -152,13 +160,13 @@ WRITE8_MEMBER( peyper_state::disp_w )
 			case 38: // player 2 indicators (6-digit only)
 			case 39: // player 3 indicators (6-digit only)
 			case 40: // player 4 indicators (6-digit only)
-				output().set_indexed_value("led_",q-36,BIT(a,1)); // player indicator
-				output().set_indexed_value("dpl_",q-7,BIT(a,2) ? 6:0); // million led (we show blank or 1 in millions digit)
+				m_led[q - 37] = BIT(a, 1); // player indicator
+				m_dpl[q - 7] = BIT(a, 2) ? 6 : 0; // million led (we show blank or 1 in millions digit)
 				// bit 3, looks like it turns on all the decimal points, reason unknown
 				break;
 
 			default: // display a digit
-				output().set_indexed_value("dpl_",q,hex_a);
+				m_dpl[q] = hex_a;
 		}
 	}
 }
@@ -197,29 +205,31 @@ CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 }
 
 
-ADDRESS_MAP_START(peyper_state::peyper_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5FFF) AM_ROM
-	AM_RANGE(0x6000, 0x67FF) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void peyper_state::peyper_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x5FFF).rom();
+	map(0x6000, 0x67FF).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(peyper_state::peyper_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("i8279", i8279_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREAD("ay1", ay8910_device, data_r) // only read by Ator?
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREAD("ay2", ay8910_device, data_r) // never actually read?
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(sol_w)
-	AM_RANGE(0x10, 0x18) AM_WRITE(lamp_w)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
-	AM_RANGE(0x24, 0x24) AM_READ_PORT("DSW1")
-	AM_RANGE(0x28, 0x28) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2c, 0x2c) AM_WRITE(lamp7_w)
-ADDRESS_MAP_END
+void peyper_state::peyper_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x04, 0x04).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x05, 0x05).r("ay1", FUNC(ay8910_device::data_r)); // only read by Ator?
+	map(0x06, 0x06).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x08, 0x08).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x09, 0x09).r("ay2", FUNC(ay8910_device::data_r)); // never actually read?
+	map(0x0a, 0x0a).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x0c, 0x0c).w(this, FUNC(peyper_state::sol_w));
+	map(0x10, 0x18).w(this, FUNC(peyper_state::lamp_w));
+	map(0x20, 0x20).portr("DSW0");
+	map(0x24, 0x24).portr("DSW1");
+	map(0x28, 0x28).portr("SYSTEM");
+	map(0x2c, 0x2c).w(this, FUNC(peyper_state::lamp7_w));
+}
 
 static INPUT_PORTS_START( pbsonic_generic )
 	/* SYSTEM : port 0x28 (cpl'ed) */
@@ -577,13 +587,25 @@ static INPUT_PORTS_START( odisea )
 INPUT_PORTS_END
 
 
+void peyper_state::machine_start()
+{
+	genpin_class::machine_start();
+
+	m_led.resolve();
+	m_dpl.resolve();
+
+	save_item(NAME(m_digit));
+}
+
 void peyper_state::machine_reset()
 {
+	genpin_class::machine_reset();
 }
+
 
 MACHINE_CONFIG_START(peyper_state::peyper)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
+	MCFG_CPU_ADD("maincpu", Z80, 2'500'000)
 	MCFG_CPU_PROGRAM_MAP(peyper_map)
 	MCFG_CPU_IO_MAP(peyper_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
@@ -846,7 +868,7 @@ ROM_END
 ROM_START(ator)
 	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("1.bin", 0x0000, 0x2000, NO_DUMP)
-	ROM_LOAD("Ator 2 _0xBA29.BIN", 0x2000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
+	ROM_LOAD("ator 2 _0xba29.bin", 0x2000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
 	// probably no ROM 3 (PCB photo shows location unpopulated)
 ROM_END
 

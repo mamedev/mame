@@ -165,49 +165,55 @@ WRITE8_MEMBER( xerox820ii_state::sync_w )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(xerox820_state::xerox820_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x4000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void xerox820_state::xerox820_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x3000, 0x3fff).ram().share("video_ram");
+	map(0x4000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(xerox820_state::xerox820_io)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, str_w)
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_GP_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, stt_w)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x14, 0x14) AM_MIRROR(0x0003) AM_SELECT(0xff00) AM_WRITE(scroll_w)
-	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_KB_TAG, z80pio_device, read_alt, write_alt)
-ADDRESS_MAP_END
+void xerox820_state::xerox820_io(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::str_w));
+	map(0x04, 0x07).mirror(0xff00).rw(m_sio, FUNC(z80sio0_device::ba_cd_r), FUNC(z80sio0_device::ba_cd_w));
+	map(0x08, 0x0b).mirror(0xff00).rw(Z80PIO_GP_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0c, 0x0c).mirror(0xff03).w(COM8116_TAG, FUNC(com8116_device::stt_w));
+	map(0x10, 0x13).mirror(0xff00).rw(this, FUNC(xerox820_state::fdc_r), FUNC(xerox820_state::fdc_w));
+	map(0x14, 0x14).mirror(0x0003).select(0xff00).w(this, FUNC(xerox820_state::scroll_w));
+	map(0x18, 0x1b).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x1c, 0x1f).mirror(0xff00).rw(m_kbpio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+}
 
-ADDRESS_MAP_START(xerox820ii_state::xerox820ii_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void xerox820ii_state::xerox820ii_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x3000, 0x3fff).ram().share("video_ram");
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(xerox820ii_state::xerox820ii_io)
-	AM_IMPORT_FROM(xerox820_io)
-	AM_RANGE(0x28, 0x29) AM_MIRROR(0xff00) AM_WRITE(bell_w)
-	AM_RANGE(0x30, 0x31) AM_MIRROR(0xff00) AM_WRITE(slden_w)
-	AM_RANGE(0x34, 0x35) AM_MIRROR(0xff00) AM_WRITE(chrom_w)
-	AM_RANGE(0x36, 0x36) AM_MIRROR(0xff00) AM_WRITE(lowlite_w)
-	AM_RANGE(0x68, 0x69) AM_MIRROR(0xff00) AM_WRITE(sync_w)
-ADDRESS_MAP_END
+void xerox820ii_state::xerox820ii_io(address_map &map)
+{
+	xerox820_io(map);
+	map(0x28, 0x29).mirror(0xff00).w(this, FUNC(xerox820ii_state::bell_w));
+	map(0x30, 0x31).mirror(0xff00).w(this, FUNC(xerox820ii_state::slden_w));
+	map(0x34, 0x35).mirror(0xff00).w(this, FUNC(xerox820ii_state::chrom_w));
+	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(xerox820ii_state::lowlite_w));
+	map(0x68, 0x69).mirror(0xff00).w(this, FUNC(xerox820ii_state::sync_w));
+}
 
-ADDRESS_MAP_START(xerox820ii_state::xerox168_mem)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
-ADDRESS_MAP_END
+void xerox820ii_state::xerox168_mem(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+	map(0xff000, 0xfffff).rom().region(I8086_TAG, 0);
+}
 
-ADDRESS_MAP_START(xerox820_state::mk83_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void xerox820_state::mk83_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x3000, 0x6fff).ram();
+	map(0x7000, 0x7fff).ram().share("video_ram");
+	map(0x8000, 0xffff).ram();
+}
 
 
 /* Input Ports */
@@ -380,10 +386,60 @@ static const z80_daisy_config xerox820_daisy_chain[] =
 	{ nullptr }
 };
 
+
+
+/***********************************************************
+
+    Quickload
+
+    This loads a .COM file to address 0x100 then jumps
+    there. Sometimes .COM has been renamed to .CPM to
+    prevent windows going ballistic. These can be loaded
+    as well.
+
+************************************************************/
+
+QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+
+	if (quickload_size >= 0xfd00)
+		return image_init_result::FAIL;
+
+	bankswitch(0);
+
+	/* Avoid loading a program if CP/M-80 is not in memory */
+	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
+	{
+		machine_reset();
+		return image_init_result::FAIL;
+	}
+
+	/* Load image to the TPA (Transient Program Area) */
+	for (uint16_t i = 0; i < quickload_size; i++)
+	{
+		uint8_t data;
+		if (image.fread( &data, 1) != 1)
+			return image_init_result::FAIL;
+		prog_space.write_byte(i+0x100, data);
+	}
+
+	/* clear out command tail */
+	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
+
+	/* Roughly set SP basing on the BDOS position */
+	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
+	m_maincpu->set_pc(0x100);   // start program
+
+	return image_init_result::PASS;
+}
+
+
+
 /* WD1771 Interface */
 
 static SLOT_INTERFACE_START( xerox820_floppies )
-	SLOT_INTERFACE( "sa400", FLOPPY_525_SSSD_35T ) // Shugart SA-400
+	SLOT_INTERFACE( "sa400", FLOPPY_525_SSSD ) // Shugart SA-400
 	SLOT_INTERFACE( "sa450", FLOPPY_525_DD ) // Shugart SA-450
 	SLOT_INTERFACE( "sa800", FLOPPY_8_SSDD ) // Shugart SA-800
 	SLOT_INTERFACE( "sa850", FLOPPY_8_DSDD ) // Shugart SA-850
@@ -610,6 +666,7 @@ MACHINE_CONFIG_START(xerox820_state::xerox820)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820")
+	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bigboard_state::bigboard)
@@ -713,6 +770,7 @@ MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820ii")
+	MCFG_QUICKLOAD_ADD("quickload", xerox820_state, xerox820, "com,cpm", 3)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(xerox820ii_state::xerox168)

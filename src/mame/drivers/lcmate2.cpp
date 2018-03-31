@@ -95,26 +95,28 @@ WRITE8_MEMBER( lcmate2_state::bankswitch_w )
 	membank("rombank")->set_entry(data&0x0f);
 }
 
-ADDRESS_MAP_START(lcmate2_state::lcmate2_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
-	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("rombank")
-	AM_RANGE( 0x8000, 0x9fff ) AM_RAM   AM_MIRROR(0x6000) AM_SHARE("nvram")
-ADDRESS_MAP_END
+void lcmate2_state::lcmate2_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x8000, 0x9fff).ram().mirror(0x6000).share("nvram");
+}
 
-ADDRESS_MAP_START(lcmate2_state::lcmate2_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("rtc", rp5c15_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(speaker_w)
-	AM_RANGE(0x1fff, 0x1fff) AM_WRITE(bankswitch_w)
+void lcmate2_state::lcmate2_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x000f).rw(m_rtc, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write));
+	map(0x1000, 0x1000).w(this, FUNC(lcmate2_state::speaker_w));
+	map(0x1fff, 0x1fff).w(this, FUNC(lcmate2_state::bankswitch_w));
 
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("hd44780", hd44780_device, control_write)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("hd44780", hd44780_device, data_write)
-	AM_RANGE(0x3002, 0x3002) AM_DEVREAD("hd44780", hd44780_device, control_read)
-	AM_RANGE(0x3003, 0x3003) AM_DEVREAD("hd44780", hd44780_device, data_read)
+	map(0x3000, 0x3000).w(m_lcdc, FUNC(hd44780_device::control_write));
+	map(0x3001, 0x3001).w(m_lcdc, FUNC(hd44780_device::data_write));
+	map(0x3002, 0x3002).r(m_lcdc, FUNC(hd44780_device::control_read));
+	map(0x3003, 0x3003).r(m_lcdc, FUNC(hd44780_device::data_read));
 
-	AM_RANGE(0x5000, 0x50ff) AM_READ(key_r)
-ADDRESS_MAP_END
+	map(0x5000, 0x50ff).r(this, FUNC(lcmate2_state::key_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( lcmate2 )

@@ -74,7 +74,7 @@
 
 
 #define MCFG_SHARC_BOOT_MODE(boot_mode) \
-	adsp21062_device::set_boot_mode(*device, adsp21062_device::boot_mode);
+	downcast<adsp21062_device &>(*device).set_boot_mode(adsp21062_device::boot_mode);
 
 class sharc_frontend;
 
@@ -95,8 +95,8 @@ public:
 	// construction/destruction
 	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	// static configuration helpers
-	static void set_boot_mode(device_t &device, const sharc_boot_mode boot_mode) { downcast<adsp21062_device &>(device).m_boot_mode = boot_mode; }
+	// configuration helpers
+	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
 
 	void set_flag_input(int flag_num, int state);
 	void external_iop_write(uint32_t address, uint32_t data);
@@ -222,7 +222,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	struct alignas(16) SHARC_DAG
@@ -589,6 +589,7 @@ private:
 	inline void compute_fmul_float_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fix_scaled(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_avg(int fm, int fxm, int fym, int fa, int fxa, int fya);
+	inline void compute_fmul_abs(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fmax(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fmin(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_dual_fadd_fsub(int fm, int fxm, int fym, int fa, int fs, int fxa, int fya);
@@ -611,7 +612,7 @@ private:
 	void execute_run_drc();
 	void flush_cache();
 	void compile_block(offs_t pc);
-	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
+	void alloc_handle(uml::code_handle *&handleptr, const char *name);
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
@@ -624,27 +625,27 @@ private:
 	void static_generate_push_status();
 	void static_generate_pop_status();
 	void static_generate_mode1_ops();
-	void load_fast_iregs(drcuml_block *block);
-	void save_fast_iregs(drcuml_block *block);
-	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, bool last_delayslot);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
-	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_unimplemented_compute(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_compute(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_if_condition(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int condition, int skip_label);
-	void generate_do_condition(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int condition, int skip_label, ASTAT_DRC &astat);
-	void generate_shift_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int data, int shiftop, int rn, int rx);
-	void generate_call(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, bool delayslot);
-	void generate_jump(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, bool delayslot, bool loopabort, bool clearint);
-	void generate_loop_jump(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	void generate_write_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data);
-	void generate_set_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data);
-	void generate_clear_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data);
-	void generate_toggle_mode1_imm(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t data);
-	void generate_read_ureg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int ureg, bool has_compute);
-	void generate_write_ureg(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int ureg, bool imm, uint32_t data);
-	void generate_update_circular_buffer(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int g, int i);
-	void generate_astat_copy(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void load_fast_iregs(drcuml_block &block);
+	void save_fast_iregs(drcuml_block &block);
+	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, bool last_delayslot);
+	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
+	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_unimplemented_compute(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_compute(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_if_condition(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int condition, int skip_label);
+	void generate_do_condition(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int condition, int skip_label, ASTAT_DRC &astat);
+	void generate_shift_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int data, int shiftop, int rn, int rx);
+	void generate_call(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, bool delayslot);
+	void generate_jump(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, bool delayslot, bool loopabort, bool clearint);
+	void generate_loop_jump(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_write_mode1_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t data);
+	void generate_set_mode1_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t data);
+	void generate_clear_mode1_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t data);
+	void generate_toggle_mode1_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t data);
+	void generate_read_ureg(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int ureg, bool has_compute);
+	void generate_write_ureg(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int ureg, bool imm, uint32_t data);
+	void generate_update_circular_buffer(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int g, int i);
+	void generate_astat_copy(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 
 	bool if_condition_always_true(int condition);
 	uint32_t do_condition_astat_bits(int condition);

@@ -23,25 +23,25 @@
 #define MCFG_DMAC_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, AMIGA_DMAC, _clock)
 #define MCFG_DMAC_CFGOUT_HANDLER(_devcb) \
-	devcb = &amiga_dmac_device::set_cfgout_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_dmac_device &>(*device).set_cfgout_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_INT_HANDLER(_devcb) \
-	devcb = &amiga_dmac_device::set_int_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_dmac_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_XDACK_HANDLER(_devcb) \
-	devcb = &amiga_dmac_device::set_xdack_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_dmac_device &>(*device).set_xdack_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_SCSI_READ_HANDLER(_devcb) \
-	devcb = &amiga_dmac_device::set_scsi_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_dmac_device &>(*device).set_scsi_read_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_SCSI_WRITE_HANDLER(_devcb) \
-	devcb = &amiga_dmac_device::set_scsi_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_dmac_device &>(*device).set_scsi_write_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_IO_READ_HANDLER(_devcb) \
-	devcb = &amiga_dmac_device::set_io_read_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_dmac_device &>(*device).set_io_read_handler(DEVCB_##_devcb);
 
 #define MCFG_DMAC_IO_WRITE_HANDLER(_devcb) \
-	devcb = &amiga_dmac_device::set_io_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<amiga_dmac_device &>(*device).set_io_write_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -57,26 +57,13 @@ public:
 	amiga_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> static devcb_base &set_cfgout_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_dmac_device &>(device).m_cfgout_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_dmac_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_xdack_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_dmac_device &>(device).m_xdack_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_scsi_read_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_dmac_device &>(device).m_scsi_read_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_scsi_write_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_dmac_device &>(device).m_scsi_write_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_io_read_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_dmac_device &>(device).m_io_read_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_io_write_handler(device_t &device, Object &&cb)
-	{ return downcast<amiga_dmac_device &>(device).m_io_write_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cfgout_handler(Object &&cb) { return m_cfgout_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xdack_handler(Object &&cb) { return m_xdack_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_scsi_read_handler(Object &&cb) { return m_scsi_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_scsi_write_handler(Object &&cb) { return m_scsi_write_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_io_read_handler(Object &&cb) { return m_io_read_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_io_write_handler(Object &&cb) { return m_io_write_handler.set_callback(std::forward<Object>(cb)); }
 
 	void set_address_space(address_space *space) { m_space = space; }
 	void set_rom(uint8_t *rom) { m_rom = rom; }

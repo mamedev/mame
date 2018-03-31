@@ -64,6 +64,7 @@ private:
 extern const device_type COCO_FDC;
 extern const device_type COCO_FDC_V11;
 extern const device_type COCO3_HDB1;
+extern const device_type COCO2_HDB1;
 extern const device_type CP450_FDC;
 extern const device_type CD6809_FDC;
 

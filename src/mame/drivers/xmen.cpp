@@ -77,57 +77,60 @@ WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
 }
 
 
-ADDRESS_MAP_START(xmen_state::main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
-	AM_RANGE(0x108040, 0x10805f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
-	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
-	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
-	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
-	AM_RANGE(0x18c000, 0x197fff) AM_DEVREADWRITE("k052109", k052109_device, lsb_r, lsb_w)
-	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
-ADDRESS_MAP_END
+void xmen_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x0fffff).rom();
+	map(0x100000, 0x100fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w));
+	map(0x101000, 0x101fff).ram();
+	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x108000, 0x108001).w(this, FUNC(xmen_state::eeprom_w));
+	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w));
+	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
+	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x10a002, 0x10a003).portr("P1_P3");
+	map(0x10a004, 0x10a005).portr("EEPROM");
+	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r));
+	map(0x110000, 0x113fff).ram();     /* main RAM */
+	map(0x18c000, 0x197fff).rw(m_k052109, FUNC(k052109_device::lsb_r), FUNC(k052109_device::lsb_w));
+	map(0x18fa00, 0x18fa01).w(this, FUNC(xmen_state::xmen_18fa00_w));
+}
 
-ADDRESS_MAP_START(xmen_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xe800, 0xe801) AM_MIRROR(0x0400) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
-ADDRESS_MAP_END
+void xmen_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("z80bank");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe22f).rw(m_k054539, FUNC(k054539_device::read), FUNC(k054539_device::write));
+	map(0xe800, 0xe801).mirror(0x0400).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
+	map(0xf800, 0xf800).w(this, FUNC(xmen_state::sound_bankswitch_w));
+}
 
 
-ADDRESS_MAP_START(xmen_state::_6p_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteramleft")   /* sprites (screen 1) */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_SHARE("spriteramright")  /* sprites (screen 2) */
-	AM_RANGE(0x103000, 0x103fff) AM_RAM     /* 6p - a buffer? */
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x108020, 0x108027) AM_DEVWRITE("k053246", k053247_device, k053246_word_w) /* sprites */
-	AM_RANGE(0x108040, 0x10805f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
-	AM_RANGE(0x108060, 0x10807f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
-	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
-	AM_RANGE(0x10a004, 0x10a005) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x10a006, 0x10a007) AM_READ_PORT("P5_P6")
-	AM_RANGE(0x10a00c, 0x10a00d) AM_DEVREAD("k053246", k053247_device, k053246_word_r) /* sprites */
-	AM_RANGE(0x110000, 0x113fff) AM_RAM     /* main RAM */
+void xmen_state::_6p_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x0fffff).rom();
+	map(0x100000, 0x100fff).ram().share("spriteramleft");   /* sprites (screen 1) */
+	map(0x101000, 0x101fff).ram();
+	map(0x102000, 0x102fff).ram().share("spriteramright");  /* sprites (screen 2) */
+	map(0x103000, 0x103fff).ram();     /* 6p - a buffer? */
+	map(0x104000, 0x104fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x108000, 0x108001).w(this, FUNC(xmen_state::eeprom_w));
+	map(0x108020, 0x108027).w(m_k053246, FUNC(k053247_device::k053246_word_w)); /* sprites */
+	map(0x108040, 0x10805f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
+	map(0x108060, 0x10807f).w(m_k053251, FUNC(k053251_device::lsb_w));
+	map(0x10a000, 0x10a001).portr("P2_P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x10a002, 0x10a003).portr("P1_P3");
+	map(0x10a004, 0x10a005).portr("EEPROM");
+	map(0x10a006, 0x10a007).portr("P5_P6");
+	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r)); /* sprites */
+	map(0x110000, 0x113fff).ram();     /* main RAM */
 /*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_device, lsb_w) AM_SHARE("tilemapleft") */
-	AM_RANGE(0x18c000, 0x197fff) AM_RAM AM_SHARE("tilemapleft") /* left tilemap (p1,p2,p3 counters) */
-	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
+	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
+	map(0x18fa00, 0x18fa01).w(this, FUNC(xmen_state::xmen_18fa00_w));
 /*
     AM_RANGE(0x1ac000, 0x1af7ff) AM_READONLY
     AM_RANGE(0x1ac000, 0x1af7ff) AM_WRITEONLY
@@ -138,7 +141,7 @@ ADDRESS_MAP_START(xmen_state::_6p_main_map)
     AM_RANGE(0x1b4000, 0x1b77ff) AM_READONLY
     AM_RANGE(0x1b4000, 0x1b77ff) AM_WRITEONLY
 */
-	AM_RANGE(0x1ac000, 0x1b7fff) AM_RAM AM_SHARE("tilemapright") /* right tilemap */
+	map(0x1ac000, 0x1b7fff).ram().share("tilemapright"); /* right tilemap */
 
 	/* what are the regions below buffers? (used by hw or software?) */
 /*
@@ -148,7 +151,7 @@ ADDRESS_MAP_START(xmen_state::_6p_main_map)
     AM_RANGE(0x1d0000, 0x1d37ff) AM_READONLY
     AM_RANGE(0x1d0000, 0x1d37ff) AM_WRITEONLY
 */
-	AM_RANGE(0x1cc000, 0x1d7fff) AM_RAM /* tilemap ? */
+	map(0x1cc000, 0x1d7fff).ram(); /* tilemap ? */
 
 	/* whats the stuff below, buffers? */
 /*
@@ -159,8 +162,8 @@ ADDRESS_MAP_START(xmen_state::_6p_main_map)
     AM_RANGE(0x1f4000, 0x1f77ff) AM_READONLY
     AM_RANGE(0x1f4000, 0x1f77ff) AM_WRITEONLY
 */
-	AM_RANGE(0x1ec000, 0x1f7fff) AM_RAM /* tilemap ? */
-ADDRESS_MAP_END
+	map(0x1ec000, 0x1f7fff).ram(); /* tilemap ? */
+}
 
 
 static INPUT_PORTS_START( xmen )

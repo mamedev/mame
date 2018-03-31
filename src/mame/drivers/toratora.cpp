@@ -316,21 +316,22 @@ WRITE_LINE_MEMBER(toratora_state::sn2_ca2_u2_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(toratora_state::main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xf047) AM_NOP
-	AM_RANGE(0xf048, 0xf049) AM_NOP
-	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)   /* the read is mark *LEDEN, but not used */
-	AM_RANGE(0xf04b, 0xf04b) AM_READWRITE(timer_r, clear_timer_w)
-	AM_RANGE(0xf04c, 0xf09f) AM_NOP
-	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE("pia_u1", pia6821_device, read, write)
-	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE("pia_u2", pia6821_device, read, write)
-	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE("pia_u3", pia6821_device, read, write)
-	AM_RANGE(0xf0ac, 0xf7ff) AM_NOP
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void toratora_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x7fff).rom();  /* not fully populated */
+	map(0x8000, 0x9fff).ram().share("videoram");
+	map(0xa000, 0xf047).noprw();
+	map(0xf048, 0xf049).noprw();
+	map(0xf04a, 0xf04a).w(this, FUNC(toratora_state::clear_tv_w));   /* the read is mark *LEDEN, but not used */
+	map(0xf04b, 0xf04b).rw(this, FUNC(toratora_state::timer_r), FUNC(toratora_state::clear_timer_w));
+	map(0xf04c, 0xf09f).noprw();
+	map(0xf0a0, 0xf0a3).rw(m_pia_u1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf0a4, 0xf0a7).rw(m_pia_u2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf0a8, 0xf0ab).rw(m_pia_u3, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf0ac, 0xf7ff).noprw();
+	map(0xf800, 0xffff).rom();
+}
 
 
 

@@ -49,22 +49,24 @@ MACHINE_RESET_MEMBER(mikrosha_state,mikrosha)
 }
 
 /* Address maps */
-ADDRESS_MAP_START(mikrosha_state::mikrosha_mem)
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0x7fff ) AM_RAM // RAM
-	AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x07fc)
-	AM_RANGE( 0xc800, 0xc803 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x07fc)
-	AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x07fe) // video
-	AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE("pit8253", pit8253_device, read, write) AM_MIRROR(0x07fc) // Timer
-	AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
-	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+void mikrosha_state::mikrosha_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0x7fff).ram(); // RAM
+	map(0xc000, 0xc003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x07fc);
+	map(0xc800, 0xc803).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x07fc);
+	map(0xd000, 0xd001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x07fe); // video
+	map(0xd800, 0xd803).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).mirror(0x07fc); // Timer
+	map(0xe000, 0xf7ff).r(this, FUNC(mikrosha_state::radio_cpu_state_r)); // Not connected
+	map(0xf800, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf800, 0xffff).rom();  // System ROM
+}
 
-ADDRESS_MAP_START(mikrosha_state::mikrosha_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(radio_io_r,radio_io_w)
-ADDRESS_MAP_END
+void mikrosha_state::mikrosha_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0xff).rw(this, FUNC(mikrosha_state::radio_io_r), FUNC(mikrosha_state::radio_io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mikrosha )

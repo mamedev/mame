@@ -45,7 +45,7 @@
 // are such accesses simply illegal, be handled in a different way, or simply not be happening in the first place?
 #define ALLOW_UNALIGNED_DWORD_ACCESS 0
 
-DEFINE_DEVICE_TYPE(SE3208, se3208_device, "se3208", "SE3208")
+DEFINE_DEVICE_TYPE(SE3208, se3208_device, "se3208", "ADChips SE3208")
 
 
 se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -1848,7 +1848,7 @@ void se3208_device::execute_set_input( int line, int state )
 		m_IRQ=state;
 }
 
-util::disasm_interface *se3208_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> se3208_device::create_disassembler()
 {
-	return new se3208_disassembler;
+	return std::make_unique<se3208_disassembler>();
 }

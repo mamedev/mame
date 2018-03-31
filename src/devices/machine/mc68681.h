@@ -7,33 +7,33 @@
 
 
 #define MCFG_MC68681_IRQ_CALLBACK(_cb) \
-	devcb = &duart_base_device::set_irq_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<duart_base_device &>(*device).set_irq_cb(DEVCB_##_cb);
 
 #define MCFG_MC68681_A_TX_CALLBACK(_cb) \
-	devcb = &duart_base_device::set_a_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<duart_base_device &>(*device).set_a_tx_cb(DEVCB_##_cb);
 
 #define MCFG_MC68681_B_TX_CALLBACK(_cb) \
-	devcb = &duart_base_device::set_b_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<duart_base_device &>(*device).set_b_tx_cb(DEVCB_##_cb);
 
 // deprecated: use ipX_w() instead
 #define MCFG_MC68681_INPORT_CALLBACK(_cb) \
-	devcb = &duart_base_device::set_inport_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<duart_base_device &>(*device).set_inport_cb(DEVCB_##_cb);
 
 #define MCFG_MC68681_OUTPORT_CALLBACK(_cb) \
-	devcb = &duart_base_device::set_outport_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<duart_base_device &>(*device).set_outport_cb(DEVCB_##_cb);
 
 #define MCFG_MC68681_SET_EXTERNAL_CLOCKS(_a, _b, _c, _d) \
-	duart_base_device::static_set_clocks(*device, _a, _b, _c, _d);
+	downcast<duart_base_device &>(*device).set_clocks(_a, _b, _c, _d);
 
 // SC28C94 specific callbacks
 #define MCFG_SC28C94_ADD(_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, SC28C94, _clock)
 
 #define MCFG_SC28C94_C_TX_CALLBACK(_cb) \
-	devcb = &sc28c94_device::set_c_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<sc28c94_device &>(*device).set_c_tx_cb(DEVCB_##_cb);
 
 #define MCFG_SC28C94_D_TX_CALLBACK(_cb) \
-	devcb = &sc28c94_device::set_d_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<sc28c94_device &>(*device).set_d_tx_cb(DEVCB_##_cb);
 
 // MC68340SERIAL specific callbacks
 #define MCFG_MC68340DUART_ADD(_tag, _clock) \
@@ -120,9 +120,9 @@ public:
 	optional_device<duart_channel> m_chanD;
 
 	// inline configuration helpers
-	static void static_set_clocks(device_t &device, int clk3, int clk4, int clk5, int clk6);
-	static void static_set_clocks(device_t &device, const XTAL &clk3, const XTAL &clk4, const XTAL &clk5, const XTAL &clk6) {
-		static_set_clocks(device, clk3.value(), clk4.value(), clk5.value(), clk6.value());
+	void set_clocks(int clk3, int clk4, int clk5, int clk6);
+	void set_clocks(const XTAL &clk3, const XTAL &clk4, const XTAL &clk5, const XTAL &clk6) {
+		set_clocks(clk3.value(), clk4.value(), clk5.value(), clk6.value());
 	}
 
 	// API
@@ -132,11 +132,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
 
-	template <class Object> static devcb_base &set_irq_cb(device_t &device, Object &&cb) { return downcast<duart_base_device &>(device).write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_a_tx_cb(device_t &device, Object &&cb) { return downcast<duart_base_device &>(device).write_a_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_b_tx_cb(device_t &device, Object &&cb) { return downcast<duart_base_device &>(device).write_b_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_inport_cb(device_t &device, Object &&cb) { return downcast<duart_base_device &>(device).read_inport.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_outport_cb(device_t &device, Object &&cb) { return downcast<duart_base_device &>(device).write_outport.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_cb(Object &&cb) { return write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_a_tx_cb(Object &&cb) { return write_a_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_b_tx_cb(Object &&cb) { return write_b_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_inport_cb(Object &&cb) { return read_inport.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_outport_cb(Object &&cb) { return write_outport.set_callback(std::forward<Object>(cb)); }
 
 	// new-style push handlers for input port bits
 	DECLARE_WRITE_LINE_MEMBER( ip0_w );
@@ -243,8 +243,8 @@ class sc28c94_device : public duart_base_device
 public:
 	sc28c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_c_tx_cb(device_t &device, Object &&cb) { return downcast<sc28c94_device &>(device).write_c_tx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_d_tx_cb(device_t &device, Object &&cb) { return downcast<sc28c94_device &>(device).write_d_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_c_tx_cb(Object &&cb) { return write_c_tx.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_d_tx_cb(Object &&cb) { return write_d_tx.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( rx_c_w ) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_d_w ) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }

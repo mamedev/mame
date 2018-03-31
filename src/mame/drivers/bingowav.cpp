@@ -73,35 +73,39 @@ void bingowav_state::machine_start()
 }
 
 
-ADDRESS_MAP_START(bingowav_state::bingowav_main_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x120000, 0x12001f) AM_DEVREADWRITE8("mainioh", te7750_device, read, write, 0xff00)
-	AM_RANGE(0x120000, 0x12001f) AM_DEVREADWRITE8("mainiol", te7750_device, read, write, 0x00ff)
-	AM_RANGE(0x140000, 0x140001) AM_READNOP
-	AM_RANGE(0x150000, 0x150001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x150002, 0x150003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xfffc00, 0xffffff) AM_DEVREADWRITE("maintmp", tmp68301_device, regs_r, regs_w)
-ADDRESS_MAP_END
+void bingowav_state::bingowav_main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x120000, 0x12001f).rw("mainioh", FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0xff00);
+	map(0x120000, 0x12001f).rw("mainiol", FUNC(te7750_device::read), FUNC(te7750_device::write)).umask16(0x00ff);
+	map(0x140000, 0x140001).nopr();
+	map(0x150001, 0x150001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x150003, 0x150003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0xfffc00, 0xffffff).rw("maintmp", FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
+}
 
-ADDRESS_MAP_START(bingowav_state::bingowav_audio_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xf200, 0xf200) AM_WRITENOP
-ADDRESS_MAP_END
+void bingowav_state::bingowav_audio_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe200, 0xe200).w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
+	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
+	map(0xf200, 0xf200).nopw();
+}
 
-ADDRESS_MAP_START(bingowav_state::bingowav_drive_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-ADDRESS_MAP_END
+void bingowav_state::bingowav_drive_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+}
 
-ADDRESS_MAP_START(bingowav_state::bingowav_control_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP
-ADDRESS_MAP_END
+void bingowav_state::bingowav_control_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xf000, 0xf000).nopw();
+}
 
 
 static INPUT_PORTS_START( bingowav )

@@ -221,102 +221,108 @@ WRITE_LINE_MEMBER(hp16500_state::irq_2)
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR);
 }
 
-ADDRESS_MAP_START(hp16500_state::hp1650_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
+void hp16500_state::hp1650_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("bios", 0);
 
-	AM_RANGE(0x201000, 0x201001) AM_WRITE(maskval_w)
+	map(0x201000, 0x201001).w(this, FUNC(hp16500_state::maskval_w));
 
-	AM_RANGE(0x204000, 0x204001) AM_WRITE8(pal_ctrl_w, 0x00ff)
-	AM_RANGE(0x205000, 0x205001) AM_WRITE8(pal_r_w, 0x00ff)
-	AM_RANGE(0x2050fe, 0x2050ff) AM_NOP
-	AM_RANGE(0x206000, 0x206001) AM_READNOP AM_WRITE8(pal_g_w, 0x00ff)
-	AM_RANGE(0x207000, 0x207001) AM_WRITE8(pal_b_w, 0x00ff)
+	map(0x204001, 0x204001).w(this, FUNC(hp16500_state::pal_ctrl_w));
+	map(0x205001, 0x205001).w(this, FUNC(hp16500_state::pal_r_w));
+	map(0x2050fe, 0x2050ff).noprw();
+	map(0x206000, 0x206001).nopr();
+	map(0x206001, 0x206001).w(this, FUNC(hp16500_state::pal_g_w));
+	map(0x207001, 0x207001).w(this, FUNC(hp16500_state::pal_b_w));
 
-	AM_RANGE(0x20a000, 0x20a007) AM_DEVREADWRITE8("epci", mc2661_device, read, write, 0x00ff)
+	map(0x20a000, 0x20a007).rw("epci", FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
+	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x20e000, 0x20e001) AM_READWRITE(vbl_ack16_r, vbl_ack16_w)
+	map(0x20e000, 0x20e001).rw(this, FUNC(hp16500_state::vbl_ack16_r), FUNC(hp16500_state::vbl_ack16_w));
 
-	AM_RANGE(0x20f000, 0x20f001) AM_NOP
+	map(0x20f000, 0x20f001).noprw();
 
-	AM_RANGE(0x600000, 0x61ffff) AM_WRITE(vram_w)
-	AM_RANGE(0x600000, 0x67ffff) AM_READ8(vram_r, 0x00ff)
+	map(0x600000, 0x61ffff).w(this, FUNC(hp16500_state::vram_w));
+	map(0x600000, 0x67ffff).r(this, FUNC(hp16500_state::vram_r)).umask16(0x00ff);
 
-	AM_RANGE(0x900000, 0x9fffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x900000, 0x9fffff).ram();
+}
 
 // like 1650 but moves main RAM to match 16500a
-ADDRESS_MAP_START(hp16500_state::hp1651_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
+void hp16500_state::hp1651_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("bios", 0);
 
-	AM_RANGE(0x201000, 0x201001) AM_WRITE(maskval_w)
+	map(0x201000, 0x201001).w(this, FUNC(hp16500_state::maskval_w));
 
-	AM_RANGE(0x204000, 0x204001) AM_WRITE8(pal_ctrl_w, 0x00ff)
-	AM_RANGE(0x205000, 0x205001) AM_WRITE8(pal_r_w, 0x00ff)
-	AM_RANGE(0x2050fe, 0x2050ff) AM_NOP
-	AM_RANGE(0x206000, 0x206001) AM_READNOP AM_WRITE8(pal_g_w, 0x00ff)
-	AM_RANGE(0x207000, 0x207001) AM_WRITE8(pal_b_w, 0x00ff)
+	map(0x204001, 0x204001).w(this, FUNC(hp16500_state::pal_ctrl_w));
+	map(0x205001, 0x205001).w(this, FUNC(hp16500_state::pal_r_w));
+	map(0x2050fe, 0x2050ff).noprw();
+	map(0x206000, 0x206001).nopr();
+	map(0x206001, 0x206001).w(this, FUNC(hp16500_state::pal_g_w));
+	map(0x207001, 0x207001).w(this, FUNC(hp16500_state::pal_b_w));
 
-	AM_RANGE(0x20a000, 0x20a007) AM_DEVREADWRITE8("epci", mc2661_device, read, write, 0x00ff)
+	map(0x20a000, 0x20a007).rw("epci", FUNC(mc2661_device::read), FUNC(mc2661_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
+	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x20e000, 0x20e001) AM_READWRITE(vbl_ack16_r, vbl_ack16_w)
+	map(0x20e000, 0x20e001).rw(this, FUNC(hp16500_state::vbl_ack16_r), FUNC(hp16500_state::vbl_ack16_w));
 
-	AM_RANGE(0x20f000, 0x20f001) AM_NOP
+	map(0x20f000, 0x20f001).noprw();
 
-	AM_RANGE(0x600000, 0x61ffff) AM_WRITE(vram_w)
-	AM_RANGE(0x600000, 0x67ffff) AM_READ8(vram_r, 0x00ff)
+	map(0x600000, 0x61ffff).w(this, FUNC(hp16500_state::vram_w));
+	map(0x600000, 0x67ffff).r(this, FUNC(hp16500_state::vram_r)).umask16(0x00ff);
 
-	AM_RANGE(0x980000, 0xa7ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x980000, 0xa7ffff).ram();
+}
 
-ADDRESS_MAP_START(hp16500_state::hp16500a_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_REGION("bios", 0)
+void hp16500_state::hp16500a_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("bios", 0);
 
-	AM_RANGE(0x201000, 0x201001) AM_WRITE(maskval_w)
+	map(0x201000, 0x201001).w(this, FUNC(hp16500_state::maskval_w));
 
-	AM_RANGE(0x204000, 0x204001) AM_WRITE8(pal_ctrl_w, 0x00ff)
-	AM_RANGE(0x205000, 0x205001) AM_WRITE8(pal_r_w, 0x00ff)
-	AM_RANGE(0x206000, 0x206001) AM_WRITE8(pal_g_w, 0x00ff)
-	AM_RANGE(0x207000, 0x207001) AM_WRITE8(pal_b_w, 0x00ff)
+	map(0x204001, 0x204001).w(this, FUNC(hp16500_state::pal_ctrl_w));
+	map(0x205001, 0x205001).w(this, FUNC(hp16500_state::pal_r_w));
+	map(0x206001, 0x206001).w(this, FUNC(hp16500_state::pal_g_w));
+	map(0x207001, 0x207001).w(this, FUNC(hp16500_state::pal_b_w));
 
-	AM_RANGE(0x20c000, 0x20c001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
-	AM_RANGE(0x20c002, 0x20c003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
+	map(0x20c001, 0x20c001).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x20c003, 0x20c003).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x20e000, 0x20e001) AM_READWRITE(vbl_ack16_r, vbl_ack16_w)
+	map(0x20e000, 0x20e001).rw(this, FUNC(hp16500_state::vbl_ack16_r), FUNC(hp16500_state::vbl_ack16_w));
 
-	AM_RANGE(0x600000, 0x61ffff) AM_WRITE(vram_w)
-	AM_RANGE(0x600000, 0x67ffff) AM_READ8(vram_r, 0x00ff)
+	map(0x600000, 0x61ffff).w(this, FUNC(hp16500_state::vram_w));
+	map(0x600000, 0x67ffff).r(this, FUNC(hp16500_state::vram_r)).umask16(0x00ff);
 
-	AM_RANGE(0x980000, 0xa7ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x980000, 0xa7ffff).ram();
+}
 
 uint32_t hp16500_state::screen_update_hp16500a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-ADDRESS_MAP_START(hp16500_state::hp16500_map)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x0020f000, 0x0020f003) AM_WRITE(palette_w)
+void hp16500_state::hp16500_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom().region("bios", 0);
+	map(0x0020f000, 0x0020f003).w(this, FUNC(hp16500_state::palette_w));
 
-	AM_RANGE(0x00202800, 0x00202803) AM_WRITE(vbl_ack_w)
-	AM_RANGE(0x00203000, 0x00203003) AM_WRITE(vbl_ack_w)
-	AM_RANGE(0x00209800, 0x00209803) AM_READ(vbl_state_r)
+	map(0x00202800, 0x00202803).w(this, FUNC(hp16500_state::vbl_ack_w));
+	map(0x00203000, 0x00203003).w(this, FUNC(hp16500_state::vbl_ack_w));
+	map(0x00209800, 0x00209803).r(this, FUNC(hp16500_state::vbl_state_r));
 
-	AM_RANGE(0x0020b800, 0x0020b8ff) AM_RAM // system ram test is really strange.
+	map(0x0020b800, 0x0020b8ff).ram(); // system ram test is really strange.
 
-	AM_RANGE(0x0020f800, 0x0020f80f) AM_DEVREADWRITE8("mlc", hp_hil_mlc_device, read, write, 0xffffffff);
-	AM_RANGE(0x00600000, 0x0061ffff) AM_WRITE16(vram_w, 0xffffffff)
-	AM_RANGE(0x00600000, 0x0067ffff) AM_READ8  (vram_r, 0x00ff00ff)
-	AM_RANGE(0x00700000, 0x00700003) AM_WRITE8 (mask_w, 0xff000000)
-	AM_RANGE(0x00740000, 0x00740003) AM_WRITE8 (val_w,  0xff000000)
-	AM_RANGE(0x00800000, 0x009fffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x0020f800, 0x0020f80f).rw(m_mlc, FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write));
+	map(0x00600000, 0x0061ffff).w(this, FUNC(hp16500_state::vram_w));
+	map(0x00600000, 0x0067ffff).r(this, FUNC(hp16500_state::vram_r)).umask32(0x00ff00ff);
+	map(0x00700000, 0x00700000).w(this, FUNC(hp16500_state::mask_w));
+	map(0x00740000, 0x00740000).w(this, FUNC(hp16500_state::val_w));
+	map(0x00800000, 0x009fffff).ram();
+}
 
 INTERRUPT_GEN_MEMBER(hp16500_state::vblank)
 {

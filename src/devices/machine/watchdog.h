@@ -16,9 +16,9 @@
 #define MCFG_WATCHDOG_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 #define MCFG_WATCHDOG_VBLANK_INIT(_screen, _count) \
-	watchdog_timer_device::static_set_vblank_count(*device, _screen, _count);
+	downcast<watchdog_timer_device &>(*device).set_vblank_count(_screen, _count);
 #define MCFG_WATCHDOG_TIME_INIT(_time) \
-	watchdog_timer_device::static_set_time(*device, _time);
+	downcast<watchdog_timer_device &>(*device).set_time(_time);
 
 
 //**************************************************************************
@@ -34,8 +34,8 @@ public:
 	watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_vblank_count(device_t &device, const char *screen_tag, int32_t count);
-	static void static_set_time(device_t &device, attotime time);
+	void set_vblank_count(const char *screen_tag, int32_t count) { m_screen_tag = screen_tag; m_vblank_count = count; }
+	void set_time(attotime time) { m_time = time; }
 
 	// watchdog control
 	void watchdog_reset();

@@ -78,30 +78,32 @@ WRITE_LINE_MEMBER(sonson_state::coin2_counter_w)
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-ADDRESS_MAP_START(sonson_state::main_map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sonson_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(sonson_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2020, 0x207f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(sonson_scrollx_w)
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
-	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("P2")
-	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3005, 0x3005) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3006, 0x3006) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3008, 0x3008) AM_WRITENOP    // might be Y scroll, but the game always sets it to 0
-	AM_RANGE(0x3010, 0x3010) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x3018, 0x301f) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void sonson_state::main_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x13ff).ram().w(this, FUNC(sonson_state::sonson_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(this, FUNC(sonson_state::sonson_colorram_w)).share("colorram");
+	map(0x2020, 0x207f).ram().share("spriteram");
+	map(0x3000, 0x3000).w(this, FUNC(sonson_state::sonson_scrollx_w));
+	map(0x3002, 0x3002).portr("P1");
+	map(0x3003, 0x3003).portr("P2");
+	map(0x3004, 0x3004).portr("SYSTEM");
+	map(0x3005, 0x3005).portr("DSW1");
+	map(0x3006, 0x3006).portr("DSW2");
+	map(0x3008, 0x3008).nopw();    // might be Y scroll, but the game always sets it to 0
+	map(0x3010, 0x3010).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x3018, 0x301f).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x4000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(sonson_state::sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void sonson_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x4000, 0x4001).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xffff).rom();
+}
 
 
 

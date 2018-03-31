@@ -191,9 +191,10 @@ READ_LINE_MEMBER( vicdual_state::carnival_music_port_t1_r )
 }
 
 
-ADDRESS_MAP_START(vicdual_state::mboard_map)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
+void vicdual_state::mboard_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+}
 
 
 MACHINE_CONFIG_START(vicdual_state::carnival_audio)

@@ -16,16 +16,16 @@
 
 
 #define MCFG_SCSP_ROFFSET(_offs) \
-	scsp_device::set_roffset(*device, _offs);
+	downcast<scsp_device &>(*device).set_roffset(_offs);
 
 #define MCFG_SCSP_IRQ_CB(_devcb) \
-	devcb = &scsp_device::set_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<scsp_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_SCSP_MAIN_IRQ_CB(_devcb) \
-	devcb = &scsp_device::set_main_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<scsp_device &>(*device).set_main_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_SCSP_EXTS_CB(_devcb) \
-	devcb = &scsp_device::set_exts_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<scsp_device &>(*device).set_exts_callback(DEVCB_##_devcb);
 
 
 class scsp_device : public device_t,
@@ -34,10 +34,10 @@ class scsp_device : public device_t,
 public:
 	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_roffset(device_t &device, int roffset) { downcast<scsp_device &>(device).m_roffset = roffset; }
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<scsp_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_main_irq_callback(device_t &device, Object &&cb) { return downcast<scsp_device &>(device).m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_exts_callback(device_t &device, Object &&cb) { return downcast<scsp_device &>(device).m_exts_cb.set_callback(std::forward<Object>(cb)); }
+	void set_roffset(int roffset) { m_roffset = roffset; }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_exts_callback(Object &&cb) { return m_exts_cb.set_callback(std::forward<Object>(cb)); }
 
 	// SCSP register access
 	DECLARE_READ16_MEMBER( read );

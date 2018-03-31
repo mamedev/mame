@@ -113,34 +113,36 @@ READ8_MEMBER(ksayakyu_state::int_ack_r)
 	return 0xff; // value not used
 }
 
-ADDRESS_MAP_START(ksayakyu_state::maincpu_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("P2")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("DSW")
-	AM_RANGE(0xa803, 0xa803) AM_READNOP /* watchdog ? */
-	AM_RANGE(0xa804, 0xa804) AM_WRITE(ksayakyu_videoctrl_w)
-	AM_RANGE(0xa805, 0xa805) AM_WRITE(latch_w)
-	AM_RANGE(0xa806, 0xa806) AM_READ(sound_status_r)
-	AM_RANGE(0xa807, 0xa807) AM_READ(int_ack_r)
-	AM_RANGE(0xa808, 0xa808) AM_WRITE(bank_select_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(ksayakyu_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void ksayakyu_state::maincpu_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xa7ff).ram();
+	map(0xa800, 0xa800).portr("P1");
+	map(0xa801, 0xa801).portr("P2");
+	map(0xa802, 0xa802).portr("DSW");
+	map(0xa803, 0xa803).nopr(); /* watchdog ? */
+	map(0xa804, 0xa804).w(this, FUNC(ksayakyu_state::ksayakyu_videoctrl_w));
+	map(0xa805, 0xa805).w(this, FUNC(ksayakyu_state::latch_w));
+	map(0xa806, 0xa806).r(this, FUNC(ksayakyu_state::sound_status_r));
+	map(0xa807, 0xa807).r(this, FUNC(ksayakyu_state::int_ack_r));
+	map(0xa808, 0xa808).w(this, FUNC(ksayakyu_state::bank_select_w));
+	map(0xb000, 0xb7ff).ram().w(this, FUNC(ksayakyu_state::ksayakyu_videoram_w)).share("videoram");
+	map(0xb800, 0xbfff).ram().share("spriteram");
+}
 
-ADDRESS_MAP_START(ksayakyu_state::soundcpu_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0xa006, 0xa007) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0xa008, 0xa008) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
-	AM_RANGE(0xa010, 0xa010) AM_WRITENOP //a timer of some sort?
-ADDRESS_MAP_END
+void ksayakyu_state::soundcpu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram();
+	map(0xa001, 0xa001).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xa002, 0xa003).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0xa006, 0xa007).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0xa008, 0xa008).w("dac", FUNC(dac_byte_interface::write));
+	map(0xa00c, 0xa00c).w(this, FUNC(ksayakyu_state::tomaincpu_w));
+	map(0xa010, 0xa010).nopw(); //a timer of some sort?
+}
 
 static INPUT_PORTS_START( ksayakyu )
 	PORT_START("P1")

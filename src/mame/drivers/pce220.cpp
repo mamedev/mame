@@ -576,59 +576,62 @@ WRITE8_MEMBER( pcg850v_state::g850v_lcd_data_w )
 }
 
 
-ADDRESS_MAP_START(pce220_state::pce220_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
-ADDRESS_MAP_END
+void pce220_state::pce220_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xffff).bankr("bank4");
+}
 
-ADDRESS_MAP_START(pce220_state::pce220_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ(kb_r)
-	AM_RANGE(0x11, 0x12) AM_WRITE(kb_matrix_w)
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("SHIFT")
-	AM_RANGE(0x14, 0x14) AM_READWRITE(timer_r, timer_w)
-	AM_RANGE(0x15, 0x15) AM_READWRITE(port15_r, port15_w)
-	AM_RANGE(0x16, 0x16) AM_READWRITE(irq_status_r, irq_ack_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
-	AM_RANGE(0x19, 0x19) AM_READWRITE(rom_bank_r, rom_bank_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(boot_bank_w)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(ram_bank_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //peripheral reset
-	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("BATTERY")
-	AM_RANGE(0x1e, 0x1e) AM_WRITENOP //???
-	AM_RANGE(0x1f, 0x1f) AM_READ(port1f_r)
-	AM_RANGE(0x58, 0x58) AM_WRITE(lcd_control_w)
-	AM_RANGE(0x59, 0x59) AM_READ(lcd_status_r)
-	AM_RANGE(0x5a, 0x5a) AM_WRITE(lcd_data_w)
-	AM_RANGE(0x5b, 0x5b) AM_READ(lcd_data_r)
-ADDRESS_MAP_END
+void pce220_state::pce220_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x10, 0x10).r(this, FUNC(pce220_state::kb_r));
+	map(0x11, 0x12).w(this, FUNC(pce220_state::kb_matrix_w));
+	map(0x13, 0x13).portr("SHIFT");
+	map(0x14, 0x14).rw(this, FUNC(pce220_state::timer_r), FUNC(pce220_state::timer_w));
+	map(0x15, 0x15).rw(this, FUNC(pce220_state::port15_r), FUNC(pce220_state::port15_w));
+	map(0x16, 0x16).rw(this, FUNC(pce220_state::irq_status_r), FUNC(pce220_state::irq_ack_w));
+	map(0x17, 0x17).w(this, FUNC(pce220_state::irq_mask_w));
+	map(0x18, 0x18).rw(this, FUNC(pce220_state::port18_r), FUNC(pce220_state::port18_w));
+	map(0x19, 0x19).rw(this, FUNC(pce220_state::rom_bank_r), FUNC(pce220_state::rom_bank_w));
+	map(0x1a, 0x1a).w(this, FUNC(pce220_state::boot_bank_w));
+	map(0x1b, 0x1b).w(this, FUNC(pce220_state::ram_bank_w));
+	map(0x1c, 0x1c).nopw(); //peripheral reset
+	map(0x1d, 0x1d).portr("BATTERY");
+	map(0x1e, 0x1e).nopw(); //???
+	map(0x1f, 0x1f).r(this, FUNC(pce220_state::port1f_r));
+	map(0x58, 0x58).w(this, FUNC(pce220_state::lcd_control_w));
+	map(0x59, 0x59).r(this, FUNC(pce220_state::lcd_status_r));
+	map(0x5a, 0x5a).w(this, FUNC(pce220_state::lcd_data_w));
+	map(0x5b, 0x5b).r(this, FUNC(pce220_state::lcd_data_r));
+}
 
-ADDRESS_MAP_START(pcg850v_state::pcg850v_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ(kb_r)
-	AM_RANGE(0x11, 0x12) AM_WRITE(kb_matrix_w)
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("SHIFT")
-	AM_RANGE(0x14, 0x14) AM_READWRITE(timer_r, timer_w)
-	AM_RANGE(0x15, 0x15) AM_READWRITE(port15_r, port15_w)
-	AM_RANGE(0x16, 0x16) AM_READWRITE(irq_status_r, irq_ack_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x18, 0x18) AM_READWRITE(port18_r, port18_w)
-	AM_RANGE(0x19, 0x19) AM_READWRITE(rom_bank_r, rom_bank_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(boot_bank_w)
-	AM_RANGE(0x1b, 0x1b) AM_WRITE(ram_bank_w)
-	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //peripheral reset
-	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("BATTERY")
-	AM_RANGE(0x1e, 0x1e) AM_WRITENOP //???
-	AM_RANGE(0x1f, 0x1f) AM_READ(port1f_r)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(g850v_lcd_status_r, g850v_lcd_control_w)
-	AM_RANGE(0x41, 0x41) AM_READWRITE(g850v_lcd_data_r, g850v_lcd_data_w)
-	AM_RANGE(0x69, 0x69) AM_READWRITE(g850v_bank_r, g850v_bank_w)
-ADDRESS_MAP_END
+void pcg850v_state::pcg850v_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x10, 0x10).r(this, FUNC(pcg850v_state::kb_r));
+	map(0x11, 0x12).w(this, FUNC(pcg850v_state::kb_matrix_w));
+	map(0x13, 0x13).portr("SHIFT");
+	map(0x14, 0x14).rw(this, FUNC(pcg850v_state::timer_r), FUNC(pcg850v_state::timer_w));
+	map(0x15, 0x15).rw(this, FUNC(pcg850v_state::port15_r), FUNC(pcg850v_state::port15_w));
+	map(0x16, 0x16).rw(this, FUNC(pcg850v_state::irq_status_r), FUNC(pcg850v_state::irq_ack_w));
+	map(0x17, 0x17).w(this, FUNC(pcg850v_state::irq_mask_w));
+	map(0x18, 0x18).rw(this, FUNC(pcg850v_state::port18_r), FUNC(pcg850v_state::port18_w));
+	map(0x19, 0x19).rw(this, FUNC(pcg850v_state::rom_bank_r), FUNC(pcg850v_state::rom_bank_w));
+	map(0x1a, 0x1a).w(this, FUNC(pcg850v_state::boot_bank_w));
+	map(0x1b, 0x1b).w(this, FUNC(pcg850v_state::ram_bank_w));
+	map(0x1c, 0x1c).nopw(); //peripheral reset
+	map(0x1d, 0x1d).portr("BATTERY");
+	map(0x1e, 0x1e).nopw(); //???
+	map(0x1f, 0x1f).r(this, FUNC(pcg850v_state::port1f_r));
+	map(0x40, 0x40).rw(this, FUNC(pcg850v_state::g850v_lcd_status_r), FUNC(pcg850v_state::g850v_lcd_control_w));
+	map(0x41, 0x41).rw(this, FUNC(pcg850v_state::g850v_lcd_data_r), FUNC(pcg850v_state::g850v_lcd_data_w));
+	map(0x69, 0x69).rw(this, FUNC(pcg850v_state::g850v_bank_r), FUNC(pcg850v_state::g850v_bank_w));
+}
 
 INPUT_CHANGED_MEMBER(pce220_state::kb_irq)
 {

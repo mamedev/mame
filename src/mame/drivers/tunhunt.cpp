@@ -129,26 +129,27 @@ READ8_MEMBER(tunhunt_state::dsw2_4r)
  *
  *************************************/
 
-ADDRESS_MAP_START(tunhunt_state::main_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("workram") /* Work RAM */
-	AM_RANGE(0x1080, 0x10ff) AM_WRITEONLY
-	AM_RANGE(0x1200, 0x12ff) AM_WRITEONLY
-	AM_RANGE(0x1400, 0x14ff) AM_WRITEONLY
-	AM_RANGE(0x1600, 0x160f) AM_WRITEONLY AM_SHARE("paletteram")    /* COLRAM (D7-D4 SHADE; D3-D0 COLOR) */
-	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY   /* SHEL0H */
-	AM_RANGE(0x1a00, 0x1a00) AM_WRITEONLY   /* SHEL1H */
-	AM_RANGE(0x1c00, 0x1c00) AM_WRITEONLY   /* MOBJV */
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(videoram_w) AM_SHARE("videoram")  /* ALPHA */
-	AM_RANGE(0x2000, 0x2000) AM_WRITENOP    /* watchdog */
-	AM_RANGE(0x2000, 0x2007) AM_READ(button_r)
-	AM_RANGE(0x2400, 0x2400) AM_WRITENOP    /* INT ACK */
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(control_w)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
-	AM_RANGE(0x5000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void tunhunt_state::main_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x03ff).ram().share("workram"); /* Work RAM */
+	map(0x1080, 0x10ff).writeonly();
+	map(0x1200, 0x12ff).writeonly();
+	map(0x1400, 0x14ff).writeonly();
+	map(0x1600, 0x160f).writeonly().share("paletteram");    /* COLRAM (D7-D4 SHADE; D3-D0 COLOR) */
+	map(0x1800, 0x1800).writeonly();   /* SHEL0H */
+	map(0x1a00, 0x1a00).writeonly();   /* SHEL1H */
+	map(0x1c00, 0x1c00).writeonly();   /* MOBJV */
+	map(0x1e00, 0x1eff).w(this, FUNC(tunhunt_state::videoram_w)).share("videoram");  /* ALPHA */
+	map(0x2000, 0x2000).nopw();    /* watchdog */
+	map(0x2000, 0x2007).r(this, FUNC(tunhunt_state::button_r));
+	map(0x2400, 0x2400).nopw();    /* INT ACK */
+	map(0x2800, 0x2800).w(this, FUNC(tunhunt_state::control_w));
+	map(0x2c00, 0x2fff).writeonly().share("spriteram");
+	map(0x3000, 0x300f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x4000, 0x400f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x5000, 0x7fff).rom();
+}
 
 
 /*************************************

@@ -17,8 +17,7 @@
 
 #include "emu.h"
 #include "includes/spectrum.h"
-#include "screen.h"
-
+#include "includes/spec128.h"
 
 /***************************************************************************
   Start the video hardware emulation.
@@ -31,12 +30,17 @@ VIDEO_START_MEMBER(spectrum_state,spectrum)
 
 	m_previous_border_x = 0;
 	m_previous_border_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_border_bitmap);
+	m_screen->register_screen_bitmap(m_border_bitmap);
 	m_previous_screen_x = 0;
 	m_previous_screen_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_screen_bitmap);
+	m_screen->register_screen_bitmap(m_screen_bitmap);
 
 	m_screen_location = m_video_ram;
+
+	m_CyclesPerLine = SPEC_CYCLES_PER_LINE;
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	timer_set(m_maincpu->cycles_to_attotime(m_CyclesPerLine), TIMER_SCANLINE);
+
 }
 
 VIDEO_START_MEMBER(spectrum_state,spectrum_128)
@@ -47,12 +51,16 @@ VIDEO_START_MEMBER(spectrum_state,spectrum_128)
 
 	m_previous_border_x = 0;
 	m_previous_border_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_border_bitmap);
+	m_screen->register_screen_bitmap(m_border_bitmap);
 	m_previous_screen_x = 0;
 	m_previous_screen_y = 0;
-	machine().first_screen()->register_screen_bitmap(m_screen_bitmap);
+	m_screen->register_screen_bitmap(m_screen_bitmap);
 
 	m_screen_location = m_ram->pointer() + (5 << 14);
+
+	m_CyclesPerLine = SPEC128_CYCLES_PER_LINE;
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	timer_set(m_maincpu->cycles_to_attotime(m_CyclesPerLine), TIMER_SCANLINE);
 }
 
 
@@ -202,8 +210,8 @@ PALETTE_INIT_MEMBER(spectrum_state,spectrum)
 
 void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 {
-	unsigned int x = machine().first_screen()->hpos();
-	unsigned int y = machine().first_screen()->vpos();
+	unsigned int x = m_screen->hpos();
+	unsigned int y = m_screen->vpos();
 	int width = m_screen_bitmap.width();
 	int height = m_screen_bitmap.height();
 
@@ -259,8 +267,8 @@ void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 
 void spectrum_state::spectrum_UpdateBorderBitmap()
 {
-	unsigned int x = machine().first_screen()->hpos();
-	unsigned int y = machine().first_screen()->vpos();
+	unsigned int x = m_screen->hpos();
+	unsigned int y = m_screen->vpos();
 	int width = m_border_bitmap.width();
 	int height = m_border_bitmap.height();
 

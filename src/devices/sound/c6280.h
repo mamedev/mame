@@ -12,7 +12,7 @@ class c6280_device : public device_t, public device_sound_interface
 public:
 	c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_devicecpu_tag(device_t &device, const char *tag) { downcast<c6280_device &>(device).m_cpudevice.set_tag(tag); }
+	void set_devicecpu_tag(const char *tag) { m_cpudevice.set_tag(tag); }
 
 	// read/write
 	DECLARE_READ8_MEMBER( c6280_r );
@@ -57,6 +57,6 @@ private:
 DECLARE_DEVICE_TYPE(C6280, c6280_device)
 
 #define MCFG_C6280_CPU(tag) \
-		c6280_device::set_devicecpu_tag(*device, ("^" tag));
+	downcast<c6280_device &>(*device).set_devicecpu_tag(("^" tag));
 
 #endif // MAME_SOUND_C6280_H

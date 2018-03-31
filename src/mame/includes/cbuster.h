@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "cpu/h6280/h6280.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
@@ -30,7 +31,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<h6280_device> m_audiocpu;
 	required_device_array<deco16ic_device, 2> m_deco_tilegen;
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;

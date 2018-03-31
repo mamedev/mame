@@ -316,27 +316,29 @@ READ8_MEMBER(mjsister_state::keys_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(mjsister_state::mjsister_map)
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(videoram_w)
-ADDRESS_MAP_END
+void mjsister_state::mjsister_map(address_map &map)
+{
+	map(0x0000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram();
+	map(0x8000, 0xffff).bankr("bank1").w(this, FUNC(mjsister_state::videoram_w));
+}
 
-ADDRESS_MAP_START(mjsister_state::mjsister_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITENOP /* HD46505? */
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x20, 0x20) AM_READ(keys_r)
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("mainlatch1", ls259_device, write_nibble_d0)
-	AM_RANGE(0x31, 0x31) AM_DEVWRITE("mainlatch2", ls259_device, write_nibble_d0)
-	AM_RANGE(0x32, 0x32) AM_WRITE(input_sel1_w)
-	AM_RANGE(0x33, 0x33) AM_WRITE(input_sel2_w)
-	AM_RANGE(0x34, 0x34) AM_WRITE(dac_adr_s_w)
-	AM_RANGE(0x35, 0x35) AM_WRITE(dac_adr_e_w)
-ADDRESS_MAP_END
+void mjsister_state::mjsister_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).nopw(); /* HD46505? */
+	map(0x10, 0x10).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x11, 0x11).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x12, 0x12).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x20, 0x20).r(this, FUNC(mjsister_state::keys_r));
+	map(0x21, 0x21).portr("IN0");
+	map(0x30, 0x30).w("mainlatch1", FUNC(ls259_device::write_nibble_d0));
+	map(0x31, 0x31).w("mainlatch2", FUNC(ls259_device::write_nibble_d0));
+	map(0x32, 0x32).w(this, FUNC(mjsister_state::input_sel1_w));
+	map(0x33, 0x33).w(this, FUNC(mjsister_state::input_sel2_w));
+	map(0x34, 0x34).w(this, FUNC(mjsister_state::dac_adr_s_w));
+	map(0x35, 0x35).w(this, FUNC(mjsister_state::dac_adr_e_w));
+}
 
 
 /*************************************

@@ -51,24 +51,25 @@ READ16_MEMBER(goal92_state::goal92_inputs_r)
 	return 0;
 }
 
-ADDRESS_MAP_START(goal92_state::goal92_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(goal92_background_w) AM_SHARE("bg_data")
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_SHARE("fg_data")
-	AM_RANGE(0x101800, 0x101fff) AM_RAM // it has tiles for clouds, but they aren't used
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_SHARE("tx_data")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x104000, 0x13ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140800, 0x140801) AM_WRITENOP
-	AM_RANGE(0x140802, 0x140803) AM_WRITENOP
-	AM_RANGE(0x180000, 0x18000f) AM_READ(goal92_inputs_r)
-	AM_RANGE(0x180008, 0x180009) AM_WRITE(goal92_sound_command_w)
-	AM_RANGE(0x18000a, 0x18000b) AM_WRITENOP
-	AM_RANGE(0x180010, 0x180017) AM_WRITEONLY AM_SHARE("scrollram")
-	AM_RANGE(0x18001c, 0x18001d) AM_READWRITE(goal92_fg_bank_r, goal92_fg_bank_w)
-ADDRESS_MAP_END
+void goal92_state::goal92_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x1007ff).ram();
+	map(0x100800, 0x100fff).ram().w(this, FUNC(goal92_state::goal92_background_w)).share("bg_data");
+	map(0x101000, 0x1017ff).ram().w(this, FUNC(goal92_state::goal92_foreground_w)).share("fg_data");
+	map(0x101800, 0x101fff).ram(); // it has tiles for clouds, but they aren't used
+	map(0x102000, 0x102fff).ram().w(this, FUNC(goal92_state::goal92_text_w)).share("tx_data");
+	map(0x103000, 0x103fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x104000, 0x13ffff).ram();
+	map(0x140000, 0x1407ff).ram().share("spriteram");
+	map(0x140800, 0x140801).nopw();
+	map(0x140802, 0x140803).nopw();
+	map(0x180000, 0x18000f).r(this, FUNC(goal92_state::goal92_inputs_r));
+	map(0x180008, 0x180009).w(this, FUNC(goal92_state::goal92_sound_command_w));
+	map(0x18000a, 0x18000b).nopw();
+	map(0x180010, 0x180017).writeonly().share("scrollram");
+	map(0x18001c, 0x18001d).rw(this, FUNC(goal92_state::goal92_fg_bank_r), FUNC(goal92_state::goal92_fg_bank_w));
+}
 
 /* Sound CPU */
 
@@ -84,16 +85,17 @@ WRITE8_MEMBER(goal92_state::adpcm_data_w)
 	m_msm5205next = data;
 }
 
-ADDRESS_MAP_START(goal92_state::sound_cpu)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_control_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void goal92_state::sound_cpu(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xe000, 0xe000).w(this, FUNC(goal92_state::adpcm_control_w));
+	map(0xe400, 0xe400).w(this, FUNC(goal92_state::adpcm_data_w));
+	map(0xe800, 0xe801).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xec00, 0xec01).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 static INPUT_PORTS_START( goal92 )
 	PORT_START("DSW1")

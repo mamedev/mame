@@ -63,13 +63,13 @@
 
 
 #define MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &vic20_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<vic20_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(_write) \
-	devcb = &vic20_expansion_slot_device::set_nmi_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<vic20_expansion_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 #define MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(_write) \
-	devcb = &vic20_expansion_slot_device::set_res_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<vic20_expansion_slot_device &>(*device).set_res_wr_callback(DEVCB_##_write);
 
 
 
@@ -89,9 +89,9 @@ public:
 	// construction/destruction
 	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<vic20_expansion_slot_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nmi_wr_callback(device_t &device, Object &&cb) { return downcast<vic20_expansion_slot_device &>(device).m_write_nmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_res_wr_callback(device_t &device, Object &&cb) { return downcast<vic20_expansion_slot_device &>(device).m_write_res.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_res_wr_callback(Object &&cb) { return m_write_res.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);

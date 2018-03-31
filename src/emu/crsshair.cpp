@@ -118,7 +118,7 @@ render_crosshair::render_crosshair(running_machine &machine, int player)
 	, m_time(0)
 {
 	// for now, use the main screen
-	m_screen = machine.first_screen();
+	m_screen = screen_device_iterator(machine.root_device()).first();
 }
 
 
@@ -314,8 +314,9 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 		machine.configuration().config_register("crosshairs", config_load_delegate(&crosshair_manager::config_load, this), config_save_delegate(&crosshair_manager::config_save, this));
 
 	/* register the animation callback */
-	if (machine.first_screen() != nullptr)
-		machine.first_screen()->register_vblank_callback(vblank_state_delegate(&crosshair_manager::animate, this));
+	screen_device *first_screen = screen_device_iterator(machine.root_device()).first();
+	if (first_screen != nullptr)
+		first_screen->register_vblank_callback(vblank_state_delegate(&crosshair_manager::animate, this));
 }
 
 /*-------------------------------------------------

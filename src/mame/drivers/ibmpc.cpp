@@ -277,15 +277,17 @@ public:
 	void pc8_map(address_map &map);
 };
 
-ADDRESS_MAP_START(ibmpc_state::pc8_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void ibmpc_state::pc8_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(ibmpc_state::pc8_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-ADDRESS_MAP_END
+void ibmpc_state::pc8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+}
 
 static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
@@ -521,16 +523,16 @@ ROM_START( ibm5160 )
 	           board but is unpopulated. Connector 2 still connects to the Main display board as
 	           before.
 
-	    ** The Main Display Board (with one 48-pin custom, 3 40 pin customs at least one of which is
-	       an MCU, four 2016BP-10 srams, an 8254 and an 8255 on it, two crystals (16.257MHz and
-	       21.676MHz) plus two mask roms ) is stickered "61X6579 // 983623 // 6390 SU" on the front.
+	    ** The Main Display Board (with one 48-pin custom, two 40 pin customs at least one of which
+	           is an MCU, four 2016BP-10 srams, an 8254 and an 8255 on it, a SCN2672 (PVTC), two crystals
+	           (16.257MHz and 21.676MHz) plus two mask roms ) is stickered "61X6579 // 983623 // 6390 SU"
+	           on the front.
 	    *  The pcb is trace-marked "6320987" on both the front and back.
 	    *  The card has a DE-9 connector on it for a monitor.
 	    *  The customs are marked:
 	       "1503192 // TC15G008P-0009 // JAPAN       8549A" (40 pins, at U52)
 	       "1503193 // TC15G008AP-0020 // JAPAN       8610A" (48 pins, at U29)
 	       "(M)1503194 // XE KGA005 // 8616N XM // SC81156P" (40 pins, at U36, likely an MCU)
-	       "S8613 // SCN2672B // C4N40 A // CP3303" (40 pins, at U24, also possibly an MCU)
 
 	    ** The All Points Addressable (Frame buffer?) card (with 2 48-pin customs on it which are
 	       probably gate arrays and not MCUs, an empty socket (28 pins, U46), an Intel Id2147H-3,

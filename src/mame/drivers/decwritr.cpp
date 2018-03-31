@@ -144,7 +144,7 @@ READ8_MEMBER( decwriter_state::la120_NVR_r )
 	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-1);
 
-	return (m_nvm->data_r() << 7) | 0x7e;
+	return (!m_nvm->data_r() << 7) | 0x7f;
 }
 
 WRITE8_MEMBER( decwriter_state::la120_NVR_w )
@@ -154,10 +154,12 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
 		m_maincpu->adjust_icount(-1);
 
 	// ER1400 has negative logic, but 7406 inverters are used
-	m_nvm->clock_w(BIT(offset, 0));
 	m_nvm->c3_w(BIT(offset, 10));
 	m_nvm->c2_w(BIT(offset, 9));
 	m_nvm->c1_w(BIT(offset, 8));
+
+	// FIXME: clock line shouldn't be inverted relative to C1-C3, but accesses only seems to work this way
+	m_nvm->clock_w(!BIT(offset, 0));
 
 	// C2 is used to disable pullup on data line
 	m_nvm->data_w(!BIT(offset, 9) ? 0 : !BIT(data, 7));
@@ -180,6 +182,10 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
  */
 READ8_MEMBER( decwriter_state::la120_DC305_r )
 {
+	// one wait state inserted
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-1);
+
 	uint8_t data = 0x00;
 	if (DC305_VERBOSE)
 		logerror("DC305 Read from offset %01x, returning %02X\n", offset, data);
@@ -197,6 +203,10 @@ READ8_MEMBER( decwriter_state::la120_DC305_r )
  */
 WRITE8_MEMBER( decwriter_state::la120_DC305_w )
 {
+	// one wait state inserted
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-1);
+
 	if (DC305_VERBOSE)
 		logerror("DC305 Write of %02X to offset %01X\n", data, offset);
 }
@@ -215,16 +225,17 @@ WRITE8_MEMBER( decwriter_state::la120_DC305_w )
    0   1   1   1   x   x   x   x   x   x   x   x   x   x   *   *     RW     PTR (DC305 ASIC,e25)
    1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *            Expansion space (open bus)
  */
-ADDRESS_MAP_START(decwriter_state::la120_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x27ff ) AM_ROM
-	AM_RANGE( 0x3000, 0x301f ) AM_READWRITE(la120_KBD_r, la120_LED_w) AM_MIRROR(0xFE0) // keyboard read, write to status and 7seg LEDS
-	AM_RANGE( 0x4000, 0x43ff ) AM_MIRROR(0x0c00) AM_RAM // 1k 'low ram'
-	AM_RANGE( 0x5000, 0x53ff ) AM_MIRROR(0x0c00) AM_RAM // 1k 'high ram'
-	AM_RANGE( 0x6000, 0x67ff ) /*AM_MIRROR(0x08fe)*/AM_MIRROR(0x800) AM_READWRITE(la120_NVR_r, la120_NVR_w) // ER1400 EAROM; a10,9,8 are c3,2,1, a0 is clk, data i/o on d7, d0 always reads as 0 (there may have once been a second er1400 with data i/o on d0, sharing same address controls as the d7 one, not populated on shipping boards), d1-d6 read open bus
-	AM_RANGE( 0x7000, 0x7003 ) AM_MIRROR(0x0ffc) AM_READWRITE(la120_DC305_r, la120_DC305_w) // DC305 printer controller ASIC stuff; since this can generate interrupts (dot interrupt, lf interrupt, 2.5ms interrupt) this needs to be split to its own device.
+void decwriter_state::la120_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x27ff).rom();
+	map(0x3000, 0x301f).rw(this, FUNC(decwriter_state::la120_KBD_r), FUNC(decwriter_state::la120_LED_w)).mirror(0xFE0); // keyboard read, write to status and 7seg LEDS
+	map(0x4000, 0x43ff).mirror(0x0c00).ram(); // 1k 'low ram'
+	map(0x5000, 0x53ff).mirror(0x0c00).ram(); // 1k 'high ram'
+	map(0x6000, 0x67ff) /*.mirror(0x08fe)*/ .mirror(0x800).rw(this, FUNC(decwriter_state::la120_NVR_r), FUNC(decwriter_state::la120_NVR_w)); // ER1400 EAROM; a10,9,8 are c3,2,1, a0 is clk, data i/o on d7, d0 always reads as 0 (there may have once been a second er1400 with data i/o on d0, sharing same address controls as the d7 one, not populated on shipping boards), d1-d6 read open bus
+	map(0x7000, 0x7003).mirror(0x0ffc).rw(this, FUNC(decwriter_state::la120_DC305_r), FUNC(decwriter_state::la120_DC305_w)); // DC305 printer controller ASIC stuff; since this can generate interrupts (dot interrupt, lf interrupt, 2.5ms interrupt) this needs to be split to its own device.
 	// 8000-ffff is reserved for expansion (i.e. unused, open bus)
-ADDRESS_MAP_END
+}
 
 /*
  * 8080 IO address map (x = ignored; * = selects address within this range)
@@ -235,14 +246,15 @@ ADDRESS_MAP_END
    0   x   x   x   x   x   1   x     RW     Flags Read/Write
    1   x   x   x   x   x   x   x     RW     Expansion (Open bus)
  */
-ADDRESS_MAP_START(decwriter_state::la120_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7C) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w) // 8251 Data
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7C) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w) // 8251 Status/Control
-	//AM_RANGE(0x02, 0x02) AM_MIRROR(0x7D) // other io ports, serial loopback etc, see table 4-9 in TM
+void decwriter_state::la120_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).mirror(0x7C).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)); // 8251 Data
+	map(0x01, 0x01).mirror(0x7C).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)); // 8251 Status/Control
+	//map(0x02, 0x02).mirror(0x7D); // other io ports, serial loopback etc, see table 4-9 in TM
 	// 0x80-0xff are reserved for expansion (i.e. unused, open bus)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+	map.global_mask(0xff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( la120 )

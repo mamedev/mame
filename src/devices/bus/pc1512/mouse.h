@@ -37,16 +37,16 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_PC1512_MOUSE_PORT_X_CB(_write) \
-	devcb = &pc1512_mouse_port_device::set_x_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<pc1512_mouse_port_device &>(*device).set_x_wr_callback(DEVCB_##_write);
 
 #define MCFG_PC1512_MOUSE_PORT_Y_CB(_write) \
-	devcb = &pc1512_mouse_port_device::set_y_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<pc1512_mouse_port_device &>(*device).set_y_wr_callback(DEVCB_##_write);
 
 #define MCFG_PC1512_MOUSE_PORT_M1_CB(_write) \
-	devcb = &pc1512_mouse_port_device::set_m1_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<pc1512_mouse_port_device &>(*device).set_m1_wr_callback(DEVCB_##_write);
 
 #define MCFG_PC1512_MOUSE_PORT_M2_CB(_write) \
-	devcb = &pc1512_mouse_port_device::set_m2_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<pc1512_mouse_port_device &>(*device).set_m2_wr_callback(DEVCB_##_write);
 
 
 
@@ -81,10 +81,10 @@ public:
 	pc1512_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_x_wr_callback(device_t &device, Object &&cb) { return downcast<pc1512_mouse_port_device &>(device).m_write_x.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y_wr_callback(device_t &device, Object &&cb) { return downcast<pc1512_mouse_port_device &>(device).m_write_y.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_m1_wr_callback(device_t &device, Object &&cb) { return downcast<pc1512_mouse_port_device &>(device).m_write_m1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_m2_wr_callback(device_t &device, Object &&cb) { return downcast<pc1512_mouse_port_device &>(device).m_write_m2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_x_wr_callback(Object &&cb) { return m_write_x.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_y_wr_callback(Object &&cb) { return m_write_y.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_m1_wr_callback(Object &&cb) { return m_write_m1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_m2_wr_callback(Object &&cb) { return m_write_m2.set_callback(std::forward<Object>(cb)); }
 
 	// peripheral interface
 	void x_w(uint8_t data) { m_write_x(data); }

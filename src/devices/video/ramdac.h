@@ -20,13 +20,13 @@
 #define MCFG_RAMDAC_ADD(_tag, _map, _palette_tag) \
 	MCFG_DEVICE_ADD(_tag, RAMDAC, 0) \
 	MCFG_DEVICE_ADDRESS_MAP(0, _map) \
-	ramdac_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<ramdac_device &>(*device).set_palette_tag("^" _palette_tag);
 
 #define MCFG_RAMDAC_COLOR_BASE(_color_base) \
-	ramdac_device::static_set_color_base(*device, _color_base);
+	downcast<ramdac_device &>(*device).set_color_base(_color_base);
 
 #define MCFG_RAMDAC_SPLIT_READ(_split) \
-	ramdac_device::set_split_read(*device, _split);
+	downcast<ramdac_device &>(*device).set_split_read(_split);
 
 
 //**************************************************************************
@@ -42,10 +42,10 @@ public:
 	// construction/destruction
 	ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void static_set_color_base(device_t &device, uint32_t color_base) { downcast<ramdac_device &>(device).m_color_base = color_base; }
-	static void set_split_read(device_t &device, int split) { downcast<ramdac_device &>(device).m_split_read_reg = split; }
+	// configuration
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	void set_color_base(uint32_t color_base) { m_color_base = color_base; }
+	void set_split_read(int split) { m_split_read_reg = split; }
 
 	// I/O operations
 	DECLARE_READ8_MEMBER( index_r );

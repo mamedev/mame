@@ -39,7 +39,7 @@
 
 
 
-DEFINE_DEVICE_TYPE(SATURN, saturn_device, "saturn_cpu", "HP Saturn")
+DEFINE_DEVICE_TYPE(SATURN, saturn_device, "saturn_cpu", "Hewlett-Packard Saturn")
 
 
 saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -71,9 +71,9 @@ bool saturn_device::get_nonstandard_mnemonics_mode() const
 }
 
 
-util::disasm_interface *saturn_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> saturn_device::create_disassembler()
 {
-	return new saturn_disassembler(this);
+	return std::make_unique<saturn_disassembler>(this);
 }
 
 

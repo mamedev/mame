@@ -11,7 +11,7 @@
 //**************************************************************************
 
 #define MCFG_ST0016_SOUNDRAM_READ_CB(_devcb) \
-	devcb = &st0016_device::set_soundram_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<st0016_device &>(*device).set_soundram_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -24,7 +24,7 @@ class st0016_device : public device_t, public device_sound_interface
 public:
 	st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_soundram_callback(device_t &device, Object &&cb) { return downcast<st0016_device &>(device).m_ram_read_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_soundram_callback(Object &&cb) { return m_ram_read_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( st0016_snd_r );
 	DECLARE_WRITE8_MEMBER( st0016_snd_w );

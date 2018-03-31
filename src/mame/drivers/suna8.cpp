@@ -558,26 +558,28 @@ WRITE8_MEMBER(suna8_state::hardhead_flipscreen_w)
 	machine().bookkeeping().coin_lockout_w(1, data & 0x10);
 }
 
-ADDRESS_MAP_START(suna8_state::hardhead_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
-	AM_RANGE(0xc000, 0xd7ff) AM_RAM                             // RAM
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
-	AM_RANGE(0xda00, 0xda00) AM_RAM_READ(hardhead_ip_r) AM_SHARE("hardhead_ip") // Input Port Select
-	AM_RANGE(0xda80, 0xda80) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(hardhead_bankswitch_w )   // ROM Banking
-	AM_RANGE(0xdb00, 0xdb00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)   // To Sound CPU
-	AM_RANGE(0xdb80, 0xdb80) AM_WRITE(hardhead_flipscreen_w )   // Flip Screen + Coin Lockout
-	AM_RANGE(0xdc00, 0xdc00) AM_NOP                             // <- R (after bank select)
-	AM_RANGE(0xdc80, 0xdc80) AM_NOP                             // <- R (after bank select)
-	AM_RANGE(0xdd00, 0xdd00) AM_NOP                             // <- R (after ip select)
-	AM_RANGE(0xdd80, 0xddff) AM_READWRITE(hardhead_protection_r, hardhead_protection_w  )   // Protection
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_SHARE("spriteram")  // Sprites
-ADDRESS_MAP_END
+void suna8_state::hardhead_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                             // ROM
+	map(0x8000, 0xbfff).bankr("bank1");                        // Banked ROM
+	map(0xc000, 0xd7ff).ram();                             // RAM
+	map(0xd800, 0xd9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // Palette
+	map(0xda00, 0xda00).ram().r(this, FUNC(suna8_state::hardhead_ip_r)).share("hardhead_ip"); // Input Port Select
+	map(0xda80, 0xda80).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(this, FUNC(suna8_state::hardhead_bankswitch_w));   // ROM Banking
+	map(0xdb00, 0xdb00).w(m_soundlatch, FUNC(generic_latch_8_device::write));   // To Sound CPU
+	map(0xdb80, 0xdb80).w(this, FUNC(suna8_state::hardhead_flipscreen_w));   // Flip Screen + Coin Lockout
+	map(0xdc00, 0xdc00).noprw();                             // <- R (after bank select)
+	map(0xdc80, 0xdc80).noprw();                             // <- R (after bank select)
+	map(0xdd00, 0xdd00).noprw();                             // <- R (after ip select)
+	map(0xdd80, 0xddff).rw(this, FUNC(suna8_state::hardhead_protection_r), FUNC(suna8_state::hardhead_protection_w));   // Protection
+	map(0xe000, 0xffff).ram().w(this, FUNC(suna8_state::suna8_spriteram_w)).share("spriteram");  // Sprites
+}
 
-ADDRESS_MAP_START(suna8_state::hardhead_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READNOP // ? IRQ Ack
-ADDRESS_MAP_END
+void suna8_state::hardhead_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopr(); // ? IRQ Ack
+}
 
 /***************************************************************************
                                 Rough Ranger
@@ -625,28 +627,30 @@ WRITE8_MEMBER(suna8_state::sranger_prot_w)
 	m_maincpu->space(AS_PROGRAM).write_byte(0xcd99,0xff);
 }
 
-ADDRESS_MAP_START(suna8_state::rranger_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)  // To Sound CPU
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(rranger_bankswitch_w  )   // ROM Banking
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")                 // P1 (Inputs)
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")                 // P2
-	AM_RANGE(0xc004, 0xc004) AM_READ(rranger_soundstatus_r  )   // Latch Status?
-	AM_RANGE(0xc200, 0xc200) AM_READNOP AM_WRITE(sranger_prot_w)// Protection?
-	AM_RANGE(0xc280, 0xc280) AM_WRITENOP    // ? NMI Ack
-	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
-	AM_RANGE(0xc800, 0xdfff) AM_RAM                                                                     // Work RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_SHARE("spriteram")                      // Sprites
-ADDRESS_MAP_END
+void suna8_state::rranger_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                             // ROM
+	map(0x8000, 0xbfff).bankr("bank1");                        // Banked ROM
+	map(0xc000, 0xc000).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));  // To Sound CPU
+	map(0xc002, 0xc002).w(this, FUNC(suna8_state::rranger_bankswitch_w));   // ROM Banking
+	map(0xc002, 0xc002).portr("P1");                 // P1 (Inputs)
+	map(0xc003, 0xc003).portr("P2");                 // P2
+	map(0xc004, 0xc004).r(this, FUNC(suna8_state::rranger_soundstatus_r));   // Latch Status?
+	map(0xc200, 0xc200).nopr().w(this, FUNC(suna8_state::sranger_prot_w));// Protection?
+	map(0xc280, 0xc280).nopw();    // ? NMI Ack
+	map(0xc280, 0xc280).portr("DSW1");               // DSW 1
+	map(0xc2c0, 0xc2c0).portr("DSW2");               // DSW 2
+	map(0xc600, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // Palette
+	map(0xc800, 0xdfff).ram();                                                                     // Work RAM
+	map(0xe000, 0xffff).ram().w(this, FUNC(suna8_state::suna8_spriteram_w)).share("spriteram");                      // Sprites
+}
 
 
-ADDRESS_MAP_START(suna8_state::rranger_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READNOP // ? IRQ Ack
-ADDRESS_MAP_END
+void suna8_state::rranger_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).nopr(); // ? IRQ Ack
+}
 
 /***************************************************************************
                                 Brick Zone
@@ -732,30 +736,31 @@ WRITE8_MEMBER(suna8_state::brickzn_palbank_w)
 	if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",m_maincpu->pc(),data);
 }
 
-ADDRESS_MAP_START(suna8_state::brickzn11_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                // Banked ROM
+void suna8_state::brickzn11_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                             // ROM
+	map(0x8000, 0xbfff).bankr("bank1");                // Banked ROM
 
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)   // To Sound CPU
-	AM_RANGE(0xc040, 0xc040) AM_WRITE(brickzn_sprbank_w     )   // Sprite RAM Bank + Flip Screen + Protection
-	AM_RANGE(0xc060, 0xc060) AM_WRITE(brickzn_rombank_w     )   // ROM Bank
-	AM_RANGE(0xc080, 0xc080) AM_WRITE(brickzn_leds_w        )   // Leds
-	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(brickzn_palbank_w     )   // Palette RAM Bank
+	map(0xc000, 0xc000).w(m_soundlatch, FUNC(generic_latch_8_device::write));   // To Sound CPU
+	map(0xc040, 0xc040).w(this, FUNC(suna8_state::brickzn_sprbank_w));   // Sprite RAM Bank + Flip Screen + Protection
+	map(0xc060, 0xc060).w(this, FUNC(suna8_state::brickzn_rombank_w));   // ROM Bank
+	map(0xc080, 0xc080).w(this, FUNC(suna8_state::brickzn_leds_w));   // Leds
+	map(0xc0a0, 0xc0a0).w(this, FUNC(suna8_state::brickzn_palbank_w));   // Palette RAM Bank
 //  AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(brickzn_prot2_w       )   // Protection 2
 
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("P1")                 // P1 (Buttons)
-	AM_RANGE(0xc101, 0xc101) AM_READ_PORT("P2")                 // P2 (Buttons)
-	AM_RANGE(0xc102, 0xc102) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0xc103, 0xc103) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0xc108, 0xc108) AM_READ_PORT("SPIN1")              // P1 (Spinner)
-	AM_RANGE(0xc10c, 0xc10c) AM_READ_PORT("SPIN2")              // P2 (Spinner)
+	map(0xc100, 0xc100).portr("P1");                 // P1 (Buttons)
+	map(0xc101, 0xc101).portr("P2");                 // P2 (Buttons)
+	map(0xc102, 0xc102).portr("DSW1");               // DSW 1
+	map(0xc103, 0xc103).portr("DSW2");               // DSW 2
+	map(0xc108, 0xc108).portr("SPIN1");              // P1 (Spinner)
+	map(0xc10c, 0xc10c).portr("SPIN2");              // P2 (Spinner)
 
-	AM_RANGE(0xc140, 0xc140) AM_READ(brickzn_cheats_r)          // Cheats / Debugging Inputs
+	map(0xc140, 0xc140).r(this, FUNC(suna8_state::brickzn_cheats_r));          // Cheats / Debugging Inputs
 
-	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, brickzn_banked_paletteram_w) AM_SHARE("paletteram")      // Palette (Banked)
-	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_SHARE("wram")                                            // Work RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)   // Sprites (Banked)
-ADDRESS_MAP_END
+	map(0xc600, 0xc7ff).rw(this, FUNC(suna8_state::banked_paletteram_r), FUNC(suna8_state::brickzn_banked_paletteram_w)).share("paletteram");      // Palette (Banked)
+	map(0xc800, 0xdfff).ram().share("wram");                                            // Work RAM
+	map(0xe000, 0xffff).rw(this, FUNC(suna8_state::suna8_banked_spriteram_r), FUNC(suna8_state::suna8_banked_spriteram_w));   // Sprites (Banked)
+}
 
 /*
   (newer sets only)
@@ -860,44 +865,47 @@ WRITE8_MEMBER(suna8_state::brickzn_disab_palram_w)
 	m_paletteram_enab = 0;
 }
 
-ADDRESS_MAP_START(suna8_state::brickzn_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                             // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                // Banked ROM
+void suna8_state::brickzn_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                             // ROM
+	map(0x8000, 0xbfff).bankr("bank1");                // Banked ROM
 
 	// c000 writes before reading buttons
 	// c010 writes?
-	AM_RANGE(0xc040, 0xc040) AM_WRITE(brickzn_rombank_w     )   // ROM Bank
-	AM_RANGE(0xc060, 0xc060) AM_WRITE(brickzn_sprbank_w     )   // Sprite RAM Bank + Flip Screen + Protection
+	map(0xc040, 0xc040).w(this, FUNC(suna8_state::brickzn_rombank_w));   // ROM Bank
+	map(0xc060, 0xc060).w(this, FUNC(suna8_state::brickzn_sprbank_w));   // Sprite RAM Bank + Flip Screen + Protection
 	// c080 writes?
 	// c090 writes?
-	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(brickzn_multi_w       )   // Palette RAM Bank / Sound Latch / ...
-	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(brickzn_prot2_w       )   // Protection 2
+	map(0xc0a0, 0xc0a0).w(this, FUNC(suna8_state::brickzn_multi_w));   // Palette RAM Bank / Sound Latch / ...
+	map(0xc0c0, 0xc0c0).w(this, FUNC(suna8_state::brickzn_prot2_w));   // Protection 2
 
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("P1")                 // P1 (Buttons)
-	AM_RANGE(0xc101, 0xc101) AM_READ_PORT("P2")                 // P2 (Buttons)
-	AM_RANGE(0xc102, 0xc102) AM_READ_PORT("DSW1")               // DSW 1
-	AM_RANGE(0xc103, 0xc103) AM_READ_PORT("DSW2")               // DSW 2
-	AM_RANGE(0xc108, 0xc108) AM_READ_PORT("SPIN1")              // P1 (Spinner)
-	AM_RANGE(0xc10c, 0xc10c) AM_READ_PORT("SPIN2")              // P2 (Spinner)
+	map(0xc100, 0xc100).portr("P1");                 // P1 (Buttons)
+	map(0xc101, 0xc101).portr("P2");                 // P2 (Buttons)
+	map(0xc102, 0xc102).portr("DSW1");               // DSW 1
+	map(0xc103, 0xc103).portr("DSW2");               // DSW 2
+	map(0xc108, 0xc108).portr("SPIN1");              // P1 (Spinner)
+	map(0xc10c, 0xc10c).portr("SPIN2");              // P2 (Spinner)
 
-	AM_RANGE(0xc140, 0xc140) AM_READ(brickzn_cheats_r)          // Cheats / Debugging Inputs
+	map(0xc140, 0xc140).r(this, FUNC(suna8_state::brickzn_cheats_r));          // Cheats / Debugging Inputs
 	// c144 reads?
 	// c14a reads?
 
-	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, brickzn_banked_paletteram_w) AM_SHARE("paletteram")      // Palette (Banked)
-	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_SHARE("wram")                                            // Work RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)   // Sprites (Banked)
-ADDRESS_MAP_END
+	map(0xc600, 0xc7ff).rw(this, FUNC(suna8_state::banked_paletteram_r), FUNC(suna8_state::brickzn_banked_paletteram_w)).share("paletteram");      // Palette (Banked)
+	map(0xc800, 0xdfff).ram().share("wram");                                            // Work RAM
+	map(0xe000, 0xffff).rw(this, FUNC(suna8_state::suna8_banked_spriteram_r), FUNC(suna8_state::suna8_banked_spriteram_w));   // Sprites (Banked)
+}
 
-ADDRESS_MAP_START(suna8_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-ADDRESS_MAP_END
+void suna8_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+}
 
-ADDRESS_MAP_START(suna8_state::brickzn_io_map)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(brickzn_disab_palram_w    )   // Disable Palette RAM
-	AM_RANGE(0x00a1, 0x00a1) AM_WRITE(brickzn_enab_palram_w     )   // Enable Palette RAM
-ADDRESS_MAP_END
+void suna8_state::brickzn_io_map(address_map &map)
+{
+	map(0x0000, 0x0000).w(this, FUNC(suna8_state::brickzn_disab_palram_w));   // Disable Palette RAM
+	map(0x00a1, 0x00a1).w(this, FUNC(suna8_state::brickzn_enab_palram_w));   // Enable Palette RAM
+}
 
 /***************************************************************************
                                 Hard Head 2
@@ -974,45 +982,46 @@ WRITE8_MEMBER(suna8_state::hardhea2_rambank_1_w)
 }
 
 
-ADDRESS_MAP_START(suna8_state::hardhea2_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                 // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                            // Banked ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")                     // P1 (Inputs)
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")                     // P2
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("DSW1")                   // DSW 1
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")                   // DSW 2
-	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("BUTTONS")                // vblank?
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(hardhea2_spritebank_w     )   // Sprite RAM Bank
-	AM_RANGE(0xc280, 0xc280) AM_WRITE(hardhea2_rombank_w            )   // ROM Bank (?mirrored up to c2ff?)
+void suna8_state::hardhea2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                                 // ROM
+	map(0x8000, 0xbfff).bankr("bank1");                            // Banked ROM
+	map(0xc000, 0xc000).portr("P1");                     // P1 (Inputs)
+	map(0xc001, 0xc001).portr("P2");                     // P2
+	map(0xc002, 0xc002).portr("DSW1");                   // DSW 1
+	map(0xc003, 0xc003).portr("DSW2");                   // DSW 2
+	map(0xc080, 0xc080).portr("BUTTONS");                // vblank?
+	map(0xc200, 0xc200).w(this, FUNC(suna8_state::hardhea2_spritebank_w));   // Sprite RAM Bank
+	map(0xc280, 0xc280).w(this, FUNC(suna8_state::hardhea2_rombank_w));   // ROM Bank (?mirrored up to c2ff?)
 
 	// *** Protection
-	AM_RANGE(0xc28c, 0xc28c) AM_WRITE(hardhea2_rombank_w        )
+	map(0xc28c, 0xc28c).w(this, FUNC(suna8_state::hardhea2_rombank_w));
 	// Protection ***
 
-	AM_RANGE(0xc300, 0xc300) AM_WRITE(hardhea2_flipscreen_w     )   // Flip Screen
-	AM_RANGE(0xc380, 0xc380) AM_WRITE(hardhea2_nmi_w                )   // ? NMI related ?
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(hardhea2_leds_w               )   // Leds + Coin Counter
-	AM_RANGE(0xc480, 0xc480) AM_WRITENOP    // ~ROM Bank
-	AM_RANGE(0xc500, 0xc500) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)   // To Sound CPU
+	map(0xc300, 0xc300).w(this, FUNC(suna8_state::hardhea2_flipscreen_w));   // Flip Screen
+	map(0xc380, 0xc380).w(this, FUNC(suna8_state::hardhea2_nmi_w));   // ? NMI related ?
+	map(0xc400, 0xc400).w(this, FUNC(suna8_state::hardhea2_leds_w));   // Leds + Coin Counter
+	map(0xc480, 0xc480).nopw();    // ~ROM Bank
+	map(0xc500, 0xc500).w(m_soundlatch, FUNC(generic_latch_8_device::write));   // To Sound CPU
 
 	// *** Protection
-	AM_RANGE(0xc50f, 0xc50f) AM_WRITE(hardhea2_spritebank_1_w )
-	AM_RANGE(0xc508, 0xc508) AM_WRITE(hardhea2_spritebank_0_w )
+	map(0xc50f, 0xc50f).w(this, FUNC(suna8_state::hardhea2_spritebank_1_w));
+	map(0xc508, 0xc508).w(this, FUNC(suna8_state::hardhea2_spritebank_0_w));
 
-	AM_RANGE(0xc507, 0xc507) AM_WRITE(hardhea2_rambank_1_w )
-	AM_RANGE(0xc522, 0xc522) AM_WRITE(hardhea2_rambank_0_w )
+	map(0xc507, 0xc507).w(this, FUNC(suna8_state::hardhea2_rambank_1_w));
+	map(0xc522, 0xc522).w(this, FUNC(suna8_state::hardhea2_rambank_0_w));
 
-	AM_RANGE(0xc556, 0xc556) AM_WRITE(hardhea2_rambank_1_w )
-	AM_RANGE(0xc528, 0xc528) AM_WRITE(hardhea2_rambank_0_w )
+	map(0xc556, 0xc556).w(this, FUNC(suna8_state::hardhea2_rambank_1_w));
+	map(0xc528, 0xc528).w(this, FUNC(suna8_state::hardhea2_rambank_0_w));
 
-	AM_RANGE(0xc560, 0xc560) AM_WRITE(hardhea2_rambank_1_w )
-	AM_RANGE(0xc533, 0xc533) AM_WRITE(hardhea2_rambank_0_w )
+	map(0xc560, 0xc560).w(this, FUNC(suna8_state::hardhea2_rambank_1_w));
+	map(0xc533, 0xc533).w(this, FUNC(suna8_state::hardhea2_rambank_0_w));
 	// Protection ***
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
-	AM_RANGE(0xc800, 0xdfff) AM_RAMBANK("bank2")                                                        // Work RAM (Banked)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)           // Sprites (Banked)
-ADDRESS_MAP_END
+	map(0xc600, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // Palette
+	map(0xc800, 0xdfff).bankrw("bank2");                                                        // Work RAM (Banked)
+	map(0xe000, 0xffff).rw(this, FUNC(suna8_state::suna8_banked_spriteram_r), FUNC(suna8_state::suna8_banked_spriteram_w));           // Sprites (Banked)
+}
 
 
 /***************************************************************************
@@ -1094,29 +1103,30 @@ WRITE8_MEMBER(suna8_state::starfigh_leds_w)
 	logerror("CPU #0 - PC %04X: rom bank = %02X\n",m_maincpu->pc(), m_rombank);
 }
 
-ADDRESS_MAP_START(suna8_state::starfigh_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
+void suna8_state::starfigh_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                                     // ROM
+	map(0x8000, 0xbfff).bankr("bank1");                        // Banked ROM
 
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")                         // P1 (Inputs)
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")                         // P2
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("DSW1")                       // DSW 1
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")                       // DSW 2
-	AM_RANGE(0xc080, 0xc080) AM_READ(starfigh_cheats_r              )   // Cheats?
+	map(0xc000, 0xc000).portr("P1");                         // P1 (Inputs)
+	map(0xc001, 0xc001).portr("P2");                         // P2
+	map(0xc002, 0xc002).portr("DSW1");                       // DSW 1
+	map(0xc003, 0xc003).portr("DSW2");                       // DSW 2
+	map(0xc080, 0xc080).r(this, FUNC(suna8_state::starfigh_cheats_r));   // Cheats?
 
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(starfigh_spritebank_w         )   // Sprite RAM Bank
-	AM_RANGE(0xc280, 0xc2ff) AM_WRITE(starfigh_rombank_latch_w      )   // ROM Bank Latch (?mirrored up to c2ff?)
-	AM_RANGE(0xc300, 0xc300) AM_WRITE(hardhea2_flipscreen_w         )   // Flip Screen
-	AM_RANGE(0xc380, 0xc3ff) AM_WRITE(starfigh_spritebank_latch_w   )   // Sprite RAM Bank Latch
-	AM_RANGE(0xc400, 0xc47f) AM_WRITE(starfigh_leds_w               )   // Leds + Coin Counter + ROM Bank
+	map(0xc200, 0xc200).w(this, FUNC(suna8_state::starfigh_spritebank_w));   // Sprite RAM Bank
+	map(0xc280, 0xc2ff).w(this, FUNC(suna8_state::starfigh_rombank_latch_w));   // ROM Bank Latch (?mirrored up to c2ff?)
+	map(0xc300, 0xc300).w(this, FUNC(suna8_state::hardhea2_flipscreen_w));   // Flip Screen
+	map(0xc380, 0xc3ff).w(this, FUNC(suna8_state::starfigh_spritebank_latch_w));   // Sprite RAM Bank Latch
+	map(0xc400, 0xc47f).w(this, FUNC(suna8_state::starfigh_leds_w));   // Leds + Coin Counter + ROM Bank
 //  c480 write?
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(starfigh_sound_latch_w        )   // To Sound CPU (can be disabled)
+	map(0xc500, 0xc500).w(this, FUNC(suna8_state::starfigh_sound_latch_w));   // To Sound CPU (can be disabled)
 //  (c522 + R & 0x1f) write?
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
-	AM_RANGE(0xc800, 0xdfff) AM_RAM                                                                     // Work RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)           // Sprites (Banked)
-ADDRESS_MAP_END
+	map(0xc600, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // Palette
+	map(0xc800, 0xdfff).ram();                                                                     // Work RAM
+	map(0xe000, 0xffff).rw(this, FUNC(suna8_state::suna8_banked_spriteram_r), FUNC(suna8_state::suna8_banked_spriteram_w));           // Sprites (Banked)
+}
 
 
 /***************************************************************************
@@ -1222,29 +1232,30 @@ READ8_MEMBER(suna8_state::sparkman_c0a3_r)
 	return (m_screen->frame_number() & 1) ? 0x80 : 0;
 }
 
-ADDRESS_MAP_START(suna8_state::sparkman_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     // ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM
+void suna8_state::sparkman_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();                                     // ROM
+	map(0x8000, 0xbfff).bankr("bank1");                        // Banked ROM
 
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")                         // P1 (Inputs)
-	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")                         // P2
-	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("DSW1")                       // DSW 1
-	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")                       // DSW 2
-	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("BUTTONS")                    // Buttons
-	AM_RANGE(0xc0a3, 0xc0a3) AM_READ(sparkman_c0a3_r                )   // ???
+	map(0xc000, 0xc000).portr("P1");                         // P1 (Inputs)
+	map(0xc001, 0xc001).portr("P2");                         // P2
+	map(0xc002, 0xc002).portr("DSW1");                       // DSW 1
+	map(0xc003, 0xc003).portr("DSW2");                       // DSW 2
+	map(0xc080, 0xc080).portr("BUTTONS");                    // Buttons
+	map(0xc0a3, 0xc0a3).r(this, FUNC(suna8_state::sparkman_c0a3_r));   // ???
 
-	AM_RANGE(0xc200, 0xc27f) AM_WRITE(sparkman_spritebank_w         )   // Sprite RAM Bank
-	AM_RANGE(0xc280, 0xc2ff) AM_WRITE(sparkman_rombank_latch_w      )   // ROM Bank Latch
-	AM_RANGE(0xc300, 0xc37f) AM_WRITE(sparkman_spritebank_latch_w   )   // Sprite RAM Bank Latch (Invert) + Flip Screen
-	AM_RANGE(0xc380, 0xc3ff) AM_WRITE(sparkman_write_disable_w      )   // Work RAM Writes Disable + NMI Enable
-	AM_RANGE(0xc400, 0xc47f) AM_WRITE(sparkman_rombank_w            )   // ROM Bank + Leds
-	AM_RANGE(0xc480, 0xc480) AM_WRITE(sparkman_coin_counter_w       )   // Coin Counter
-	AM_RANGE(0xc500, 0xc57f) AM_WRITE(starfigh_sound_latch_w        )   // To Sound CPU (can be disabled)
+	map(0xc200, 0xc27f).w(this, FUNC(suna8_state::sparkman_spritebank_w));   // Sprite RAM Bank
+	map(0xc280, 0xc2ff).w(this, FUNC(suna8_state::sparkman_rombank_latch_w));   // ROM Bank Latch
+	map(0xc300, 0xc37f).w(this, FUNC(suna8_state::sparkman_spritebank_latch_w));   // Sprite RAM Bank Latch (Invert) + Flip Screen
+	map(0xc380, 0xc3ff).w(this, FUNC(suna8_state::sparkman_write_disable_w));   // Work RAM Writes Disable + NMI Enable
+	map(0xc400, 0xc47f).w(this, FUNC(suna8_state::sparkman_rombank_w));   // ROM Bank + Leds
+	map(0xc480, 0xc480).w(this, FUNC(suna8_state::sparkman_coin_counter_w));   // Coin Counter
+	map(0xc500, 0xc57f).w(this, FUNC(suna8_state::starfigh_sound_latch_w));   // To Sound CPU (can be disabled)
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // Palette
-	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_SHARE("wram")                        // RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)   // Sprites (Banked)
-ADDRESS_MAP_END
+	map(0xc600, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // Palette
+	map(0xc800, 0xdfff).ram().w(this, FUNC(suna8_state::suna8_wram_w)).share("wram");                        // RAM
+	map(0xe000, 0xffff).rw(this, FUNC(suna8_state::suna8_banked_spriteram_r), FUNC(suna8_state::suna8_banked_spriteram_w));   // Sprites (Banked)
+}
 
 
 /***************************************************************************
@@ -1259,66 +1270,72 @@ ADDRESS_MAP_END
                                 Hard Head
 ***************************************************************************/
 
-ADDRESS_MAP_START(suna8_state::hardhead_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM // ROM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM // RAM
-	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("ymsnd", ym3812_device, status_port_r)   // ? unsure
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)   //
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)   // From Main CPU
-ADDRESS_MAP_END
+void suna8_state::hardhead_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // ROM
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0xa002, 0xa003).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xc000, 0xc7ff).ram(); // RAM
+	map(0xc800, 0xc800).r("ymsnd", FUNC(ym3812_device::status_port_r));   // ? unsure
+	map(0xd000, 0xd000).w(m_soundlatch2, FUNC(generic_latch_8_device::write));   //
+	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));   // From Main CPU
+}
 
 
-ADDRESS_MAP_START(suna8_state::hardhead_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READNOP // ? IRQ Ack
-ADDRESS_MAP_END
+void suna8_state::hardhead_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).nopr(); // ? IRQ Ack
+}
 
 
 /***************************************************************************
                                 Rough Ranger
 ***************************************************************************/
 
-ADDRESS_MAP_START(suna8_state::rranger_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM // ROM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym1", ym2203_device, write)   // Samples + Music
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ym2", ym2203_device, write)   // Music + FX
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM // RAM
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)   // To Sound CPU
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)   // From Main CPU
-ADDRESS_MAP_END
+void suna8_state::rranger_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // ROM
+	map(0xa000, 0xa001).w("ym1", FUNC(ym2203_device::write));   // Samples + Music
+	map(0xa002, 0xa003).w("ym2", FUNC(ym2203_device::write));   // Music + FX
+	map(0xc000, 0xc7ff).ram(); // RAM
+	map(0xd000, 0xd000).w(m_soundlatch2, FUNC(generic_latch_8_device::write));   // To Sound CPU
+	map(0xd800, 0xd800).r(m_soundlatch, FUNC(generic_latch_8_device::read));   // From Main CPU
+}
 
 
 /***************************************************************************
                                 Brick Zone
 ***************************************************************************/
 
-ADDRESS_MAP_START(suna8_state::brickzn_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM // ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM // RAM
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)   // To PCM CPU
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)   // From Main CPU
-ADDRESS_MAP_END
+void suna8_state::brickzn_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom(); // ROM
+	map(0xc000, 0xc001).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xc002, 0xc003).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xe000, 0xe7ff).ram(); // RAM
+	map(0xf000, 0xf000).w(m_soundlatch2, FUNC(generic_latch_8_device::write));   // To PCM CPU
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));   // From Main CPU
+}
 
 
 /* PCM Z80, 4 DACs (4 bits per sample), NO RAM !! */
 
-ADDRESS_MAP_START(suna8_state::brickzn_pcm_map)
-	AM_RANGE(0x0000, 0xffff) AM_ROM // ROM
-ADDRESS_MAP_END
+void suna8_state::brickzn_pcm_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom(); // ROM
+}
 
 
-ADDRESS_MAP_START(suna8_state::brickzn_pcm_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)   // From Sound CPU
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ldac", dac_byte_interface, write)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("rdac", dac_byte_interface, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("ldac2", dac_byte_interface, write)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("rdac2", dac_byte_interface, write)
-ADDRESS_MAP_END
+void suna8_state::brickzn_pcm_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(m_soundlatch2, FUNC(generic_latch_8_device::read));   // From Sound CPU
+	map(0x00, 0x00).w("ldac", FUNC(dac_byte_interface::write));
+	map(0x01, 0x01).w("rdac", FUNC(dac_byte_interface::write));
+	map(0x02, 0x02).w("ldac2", FUNC(dac_byte_interface::write));
+	map(0x03, 0x03).w("rdac2", FUNC(dac_byte_interface::write));
+}
 
 /***************************************************************************
 
@@ -2845,27 +2862,27 @@ ROM_END
 
 ROM_START( hardhea2b )
 	ROM_REGION( 0x50000, "maincpu", 0 )     /* Main Z80 Code */
-	ROM_LOAD( "9.F5",  0x00000, 0x10000, CRC(3f31ece3) SHA1(224e9bc60a71ede9d194e9c696c2259a55f16e7d) )
-	ROM_LOAD( "10.H5", 0x10000, 0x10000, CRC(98b34813) SHA1(8aa9cab73480e4526d30880f99332e7cb716ce81) )
-	ROM_LOAD( "11.I5", 0x20000, 0x10000, CRC(12af8f8e) SHA1(1b33a060b70900042fdae00f7dec325228d566f5) )
-	ROM_LOAD( "12.F7", 0x30000, 0x10000, CRC(35d13212) SHA1(2fd03077b89ec9e55d2758b7f9cada970f0bdd91) )
-	ROM_LOAD( "13.H7", 0x40000, 0x10000, CRC(044f956f) SHA1(9361d383b14fc0f4f718d46db7fcac56647405a6) )
+	ROM_LOAD( "9.f5",  0x00000, 0x10000, CRC(3f31ece3) SHA1(224e9bc60a71ede9d194e9c696c2259a55f16e7d) )
+	ROM_LOAD( "10.h5", 0x10000, 0x10000, CRC(98b34813) SHA1(8aa9cab73480e4526d30880f99332e7cb716ce81) )
+	ROM_LOAD( "11.i5", 0x20000, 0x10000, CRC(12af8f8e) SHA1(1b33a060b70900042fdae00f7dec325228d566f5) )
+	ROM_LOAD( "12.f7", 0x30000, 0x10000, CRC(35d13212) SHA1(2fd03077b89ec9e55d2758b7f9cada970f0bdd91) )
+	ROM_LOAD( "13.h7", 0x40000, 0x10000, CRC(044f956f) SHA1(9361d383b14fc0f4f718d46db7fcac56647405a6) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Music Z80 Code */
-	ROM_LOAD( "14.C6", 0x00000, 0x08000, CRC(79a3be51) SHA1(30bc67cd3a936615c6931f8e15953425dff59611) )
+	ROM_LOAD( "14.c6", 0x00000, 0x08000, CRC(79a3be51) SHA1(30bc67cd3a936615c6931f8e15953425dff59611) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )     /* PCM Z80 Code */
-	ROM_LOAD( "15.M10", 0x00000, 0x10000, CRC(bcbd88c3) SHA1(79782d598d9d764de70c54fc07ff9bf0f7d13d62) )
+	ROM_LOAD( "15.m10", 0x00000, 0x10000, CRC(bcbd88c3) SHA1(79782d598d9d764de70c54fc07ff9bf0f7d13d62) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* Sprites */
-	ROM_LOAD( "1.N1",  0x00000, 0x10000, CRC(7e7b7a58) SHA1(1a74260dda64aafcb046c8add92a54655bbc74e4) )
-	ROM_LOAD( "2.O1",  0x10000, 0x10000, CRC(303ec802) SHA1(533c29d9bb54415410c5d3c5af234b8b040190de) )
-	ROM_LOAD( "3.Q1",  0x20000, 0x10000, CRC(3353b2c7) SHA1(a3ec0fc2a97e7e0bc72fafd5897cb1dd4cd32197) )
-	ROM_LOAD( "4.N3",  0x30000, 0x10000, CRC(dbc1f9c1) SHA1(720c729d7825635584632d033b4b46eea2fb1291) )
-	ROM_LOAD( "5.N4",  0x40000, 0x10000, CRC(f738c0af) SHA1(7dda657acd1d6fb7064e8dbd5ce386e9eae3d36a) )
-	ROM_LOAD( "6.O4",  0x50000, 0x10000, CRC(bf90d3ca) SHA1(2d0533d93fc5155fe879c1890bc7bc4581308e16) )
-	ROM_LOAD( "7.Q4",  0x60000, 0x10000, CRC(992ce8cb) SHA1(21c0dd227138ec64003c7cb090855ec27d41719e) )
-	ROM_LOAD( "8.N6",  0x70000, 0x10000, CRC(359597a4) SHA1(ae024dd61c5d12813a661abe8ea63ae6112ddc9c) )
+	ROM_LOAD( "1.n1",  0x00000, 0x10000, CRC(7e7b7a58) SHA1(1a74260dda64aafcb046c8add92a54655bbc74e4) )
+	ROM_LOAD( "2.o1",  0x10000, 0x10000, CRC(303ec802) SHA1(533c29d9bb54415410c5d3c5af234b8b040190de) )
+	ROM_LOAD( "3.q1",  0x20000, 0x10000, CRC(3353b2c7) SHA1(a3ec0fc2a97e7e0bc72fafd5897cb1dd4cd32197) )
+	ROM_LOAD( "4.n3",  0x30000, 0x10000, CRC(dbc1f9c1) SHA1(720c729d7825635584632d033b4b46eea2fb1291) )
+	ROM_LOAD( "5.n4",  0x40000, 0x10000, CRC(f738c0af) SHA1(7dda657acd1d6fb7064e8dbd5ce386e9eae3d36a) )
+	ROM_LOAD( "6.o4",  0x50000, 0x10000, CRC(bf90d3ca) SHA1(2d0533d93fc5155fe879c1890bc7bc4581308e16) )
+	ROM_LOAD( "7.q4",  0x60000, 0x10000, CRC(992ce8cb) SHA1(21c0dd227138ec64003c7cb090855ec27d41719e) )
+	ROM_LOAD( "8.n6",  0x70000, 0x10000, CRC(359597a4) SHA1(ae024dd61c5d12813a661abe8ea63ae6112ddc9c) )
 ROM_END
 
 

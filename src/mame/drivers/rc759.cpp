@@ -467,41 +467,43 @@ void rc759_state::machine_reset()
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START(rc759_state::rc759_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0xd0000, 0xd7fff) AM_MIRROR(0x08000) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xe8000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void rc759_state::rc759_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+	map(0xd0000, 0xd7fff).mirror(0x08000).ram().share("vram");
+	map(0xe8000, 0xeffff).mirror(0x10000).rom().region("bios", 0);
+}
 
-ADDRESS_MAP_START(rc759_state::rc759_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x003) AM_MIRROR(0x0c) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x020, 0x021) AM_READ8(keyboard_r, 0x00ff)
-	AM_RANGE(0x056, 0x057) AM_NOP // in reality, access to sound and rtc is a bit more involved
-	AM_RANGE(0x05a, 0x05b) AM_DEVWRITE8("snd", sn76489a_device, write, 0x00ff)
-	AM_RANGE(0x05c, 0x05d) AM_READWRITE8(rtc_r, rtc_w, 0x00ff)
+void rc759_state::rc759_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x003).mirror(0x0c).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x020, 0x020).r(this, FUNC(rc759_state::keyboard_r));
+	map(0x056, 0x057).noprw(); // in reality, access to sound and rtc is a bit more involved
+	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::write));
+	map(0x05c, 0x05c).rw(this, FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
 //  AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
-	AM_RANGE(0x070, 0x077) AM_MIRROR(0x08) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x080, 0x0ff) AM_READWRITE8(nvram_r, nvram_w, 0x00ff)
+	map(0x070, 0x077).mirror(0x08).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x080, 0x0ff).rw(this, FUNC(rc759_state::nvram_r), FUNC(rc759_state::nvram_w)).umask16(0x00ff);
 //  AM_RANGE(0x100, 0x101) net
-	AM_RANGE(0x180, 0x1bf) AM_READWRITE8(palette_r, palette_w, 0x00ff)
-	AM_RANGE(0x230, 0x231) AM_WRITE(txt_irst_w)
-	AM_RANGE(0x240, 0x241) AM_WRITE(txt_ca_w)
-	AM_RANGE(0x250, 0x251) AM_READWRITE8(centronics_data_r, centronics_data_w, 0x00ff)
-	AM_RANGE(0x260, 0x261) AM_READWRITE8(centronics_control_r, centronics_control_w, 0x00ff)
-	AM_RANGE(0x280, 0x287) AM_DEVREADWRITE8("fdc", wd2797_device, read, write, 0x00ff)
-	AM_RANGE(0x288, 0x289) AM_WRITE8(floppy_control_w, 0x00ff)
+	map(0x180, 0x1bf).rw(this, FUNC(rc759_state::palette_r), FUNC(rc759_state::palette_w)).umask16(0x00ff);
+	map(0x230, 0x231).w(this, FUNC(rc759_state::txt_irst_w));
+	map(0x240, 0x241).w(this, FUNC(rc759_state::txt_ca_w));
+	map(0x250, 0x250).rw(this, FUNC(rc759_state::centronics_data_r), FUNC(rc759_state::centronics_data_w));
+	map(0x260, 0x260).rw(this, FUNC(rc759_state::centronics_control_r), FUNC(rc759_state::centronics_control_w));
+	map(0x280, 0x287).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
+	map(0x288, 0x288).w(this, FUNC(rc759_state::floppy_control_w));
 //  AM_RANGE(0x28a, 0x28b) external printer data
 //  AM_RANGE(0x28d, 0x28d) external printer control
-	AM_RANGE(0x28e, 0x28f) AM_READWRITE8(floppy_ack_r, floppy_reserve_w, 0x00ff)
-	AM_RANGE(0x290, 0x291) AM_WRITE8(floppy_release_w, 0x00ff)
+	map(0x28e, 0x28e).rw(this, FUNC(rc759_state::floppy_ack_r), FUNC(rc759_state::floppy_reserve_w));
+	map(0x290, 0x290).w(this, FUNC(rc759_state::floppy_release_w));
 //  AM_RANGE(0x292, 0x293) AM_READWRITE8(printer_ack_r, printer_reserve_w, 0x00ff)
 //  AM_RANGE(0x294, 0x295) AM_WRITE8(printer_release_w, 0x00ff)
-	AM_RANGE(0x300, 0x30f) AM_DEVREADWRITE8("isbx", isbx_slot_device, mcs0_r, mcs0_w, 0x00ff)
-	AM_RANGE(0x310, 0x31f) AM_DEVREADWRITE8("isbx", isbx_slot_device, mcs1_r, mcs1_w, 0x00ff)
+	map(0x300, 0x30f).rw(m_isbx, FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
+	map(0x310, 0x31f).rw(m_isbx, FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
 //  AM_RANGE(0x320, 0x321) isbx dma ack
 //  AM_RANGE(0x330, 0x331) isbx tc
-ADDRESS_MAP_END
+}
 
 
 //**************************************************************************

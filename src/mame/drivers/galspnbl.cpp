@@ -57,38 +57,40 @@ WRITE16_MEMBER(galspnbl_state::soundcommand_w)
 }
 
 
-ADDRESS_MAP_START(galspnbl_state::main_map)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x700000, 0x703fff) AM_RAM     /* galspnbl work RAM */
-	AM_RANGE(0x708000, 0x70ffff) AM_RAM     /* galspnbl work RAM, bitmaps are decompressed here */
-	AM_RANGE(0x800000, 0x803fff) AM_RAM     /* hotpinbl work RAM */
-	AM_RANGE(0x808000, 0x80ffff) AM_RAM     /* hotpinbl work RAM, bitmaps are decompressed here */
-	AM_RANGE(0x880000, 0x880fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x8ff400, 0x8fffff) AM_WRITENOP    /* ??? */
-	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x901000, 0x903fff) AM_WRITENOP    /* ??? */
-	AM_RANGE(0x904000, 0x904fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP    /* ??? */
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bgvideoram")
-	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP    /* more palette ? */
-	AM_RANGE(0xa01000, 0xa017ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP    /* more palette ? */
-	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
-	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
-	AM_RANGE(0xa80020, 0xa80021) AM_READ_PORT("SYSTEM") AM_WRITENOP     /* w - could be watchdog, but causes resets when picture is shown */
-	AM_RANGE(0xa80030, 0xa80031) AM_READ_PORT("DSW1") AM_WRITENOP       /* w - irq ack? */
-	AM_RANGE(0xa80040, 0xa80041) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa80050, 0xa80051) AM_WRITEONLY AM_SHARE("scroll")    /* ??? */
-ADDRESS_MAP_END
+void galspnbl_state::main_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x700000, 0x703fff).ram();     /* galspnbl work RAM */
+	map(0x708000, 0x70ffff).ram();     /* galspnbl work RAM, bitmaps are decompressed here */
+	map(0x800000, 0x803fff).ram();     /* hotpinbl work RAM */
+	map(0x808000, 0x80ffff).ram();     /* hotpinbl work RAM, bitmaps are decompressed here */
+	map(0x880000, 0x880fff).ram().share("spriteram");
+	map(0x8ff400, 0x8fffff).nopw();    /* ??? */
+	map(0x900000, 0x900fff).ram().share("colorram");
+	map(0x901000, 0x903fff).nopw();    /* ??? */
+	map(0x904000, 0x904fff).ram().share("videoram");
+	map(0x905000, 0x907fff).nopw();    /* ??? */
+	map(0x980000, 0x9bffff).ram().share("bgvideoram");
+	map(0xa00000, 0xa00fff).nopw();    /* more palette ? */
+	map(0xa01000, 0xa017ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa01800, 0xa027ff).nopw();    /* more palette ? */
+	map(0xa80000, 0xa80001).portr("IN0");
+	map(0xa80010, 0xa80011).portr("IN1").w(this, FUNC(galspnbl_state::soundcommand_w));
+	map(0xa80020, 0xa80021).portr("SYSTEM").nopw();     /* w - could be watchdog, but causes resets when picture is shown */
+	map(0xa80030, 0xa80031).portr("DSW1").nopw();       /* w - irq ack? */
+	map(0xa80040, 0xa80041).portr("DSW2");
+	map(0xa80050, 0xa80051).writeonly().share("scroll");    /* ??? */
+}
 
-ADDRESS_MAP_START(galspnbl_state::audio_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* irq ack ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void galspnbl_state::audio_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf810, 0xf811).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xfc00, 0xfc00).noprw(); /* irq ack ?? */
+	map(0xfc20, 0xfc20).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 static INPUT_PORTS_START( galspnbl )

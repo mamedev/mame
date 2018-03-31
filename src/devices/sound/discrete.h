@@ -4264,7 +4264,7 @@ public:
 	MCFG_DISCRETE_INTF(_intf)
 
 #define MCFG_DISCRETE_INTF(_intf) \
-	discrete_device::static_set_intf(*device, (const discrete_block *)&(_intf##_discrete_interface));
+	downcast<discrete_device &>(*device).set_intf((const discrete_block *)&(_intf##_discrete_interface));
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -4286,7 +4286,7 @@ protected:
 
 public:
 	// inline configuration helpers
-	static void static_set_intf(device_t &device, const discrete_block *intf);
+	void set_intf(const discrete_block *intf) { m_intf = intf; }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

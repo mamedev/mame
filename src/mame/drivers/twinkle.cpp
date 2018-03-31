@@ -252,18 +252,30 @@ Notes:
 class twinkle_state : public driver_device
 {
 public:
-	twinkle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	twinkle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_am53cf96(*this, "am53cf96"),
 		m_ata(*this, "ata"),
 		m_waveram(*this, "rfsnd"),
+		m_led_displays(*this, "led%u", 0U),
+		m_spotlights(*this, "spotlight%u", 0U),
+		m_main_leds(*this, "main_led%u", 0U),
+		m_key_leds(*this, "key%u-%u", 1U, 1U),
+		m_spu_leds(*this, "spu_led%u", 0U),
 		m_spu_ata_dma(0),
 		m_spu_ata_dmarq(0),
 		m_wave_bank(0)
 	{
 	}
+
+	void twinklex(machine_config &config);
+	void twinklei(machine_config &config);
+	void twinkle(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 	DECLARE_WRITE8_MEMBER(twinkle_io_w);
 	DECLARE_READ8_MEMBER(twinkle_io_r);
@@ -288,18 +300,22 @@ public:
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 
-	void twinklex(machine_config &config);
-	void twinklei(machine_config &config);
-	void twinkle(machine_config &config);
 	void main_map(address_map &map);
 	void rf5c400_map(address_map &map);
 	void sound_map(address_map &map);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<am53cf96_device> m_am53cf96;
 	required_device<ata_interface_device> m_ata;
 	required_shared_ptr<uint16_t> m_waveram;
+
+	output_finder<9> m_led_displays;
+	output_finder<8> m_spotlights;
+	output_finder<9> m_main_leds;
+	output_finder<2, 7> m_key_leds;
+	output_finder<8> m_spu_leds;
 
 	uint16_t m_spu_ctrl;      // SPU board control register
 	uint8_t m_spu_shared[0x400];  // SPU/PSX shared dual-ported RAM
@@ -488,6 +504,35 @@ static const uint16_t asciicharset[]=
 	0, //
 };
 
+void twinkle_state::machine_start()
+{
+	m_led_displays.resolve();
+	m_spotlights.resolve();
+	m_main_leds.resolve();
+	m_key_leds.resolve();
+	m_spu_leds.resolve();
+
+	save_item(NAME(m_spu_ctrl));
+	save_item(NAME(m_spu_shared));
+	save_item(NAME(m_spu_ata_dma));
+	save_item(NAME(m_spu_ata_dmarq));
+	save_item(NAME(m_wave_bank));
+
+	save_item(NAME(m_io_offset));
+	save_item(NAME(m_output_last));
+	save_item(NAME(m_sector_buffer));
+
+	save_item(NAME(m_serial_shift));
+	save_item(NAME(m_serial_bits));
+	save_item(NAME(m_serial_cs));
+	save_item(NAME(m_serial_clock));
+
+	save_item(NAME(m_output_shift));
+	save_item(NAME(m_output_bits));
+	save_item(NAME(m_output_cs));
+	save_item(NAME(m_output_clock));
+}
+
 WRITE8_MEMBER(twinkle_state::twinkle_io_w)
 {
 	switch( offset )
@@ -534,18 +579,18 @@ WRITE8_MEMBER(twinkle_state::twinkle_io_w)
 			case 0x6f:
 			case 0x77:
 			case 0x7f:
-				output().set_indexed_value( "led", ( m_io_offset - 0x3f ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
+				m_led_displays[(m_io_offset - 0x3f) / 8] = asciicharset[(data ^ 0xff) & 0x7f];
 				break;
 
 			case 0x87:
-				output().set_indexed_value( "spotlight", 0, ( ~data >> 3 ) & 1 );
-				output().set_indexed_value( "spotlight", 1, ( ~data >> 2 ) & 1 );
-				output().set_indexed_value( "spotlight", 2, ( ~data >> 1 ) & 1 );
-				output().set_indexed_value( "spotlight", 3, ( ~data >> 0 ) & 1 );
-				output().set_indexed_value( "spotlight", 4, ( ~data >> 4 ) & 1 );
-				output().set_indexed_value( "spotlight", 5, ( ~data >> 5 ) & 1 );
-				output().set_indexed_value( "spotlight", 6, ( ~data >> 6 ) & 1 );
-				output().set_indexed_value( "spotlight", 7, ( ~data >> 7 ) & 1 );
+				m_spotlights[0] = BIT(~data, 3);
+				m_spotlights[1] = BIT(~data, 2);
+				m_spotlights[2] = BIT(~data, 1);
+				m_spotlights[3] = BIT(~data, 0);
+				m_spotlights[4] = BIT(~data, 4);
+				m_spotlights[5] = BIT(~data, 5);
+				m_spotlights[6] = BIT(~data, 6);
+				m_spotlights[7] = BIT(~data, 7);
 				break;
 
 			case 0x8f:
@@ -679,15 +724,15 @@ WRITE16_MEMBER(twinkle_state::twinkle_output_w)
 
 WRITE16_MEMBER(twinkle_state::led_w)
 {
-	output().set_indexed_value("main_led", 0, (~data >> 0) & 1);
-	output().set_indexed_value("main_led", 1, (~data >> 1) & 1);
-	output().set_indexed_value("main_led", 2, (~data >> 2) & 1);
-	output().set_indexed_value("main_led", 3, (~data >> 3) & 1);
-	output().set_indexed_value("main_led", 4, (~data >> 4) & 1);
-	output().set_indexed_value("main_led", 5, (~data >> 5) & 1);
-	output().set_indexed_value("main_led", 6, (~data >> 6) & 1);
-	output().set_indexed_value("main_led", 7, (~data >> 7) & 1);
-	output().set_indexed_value("main_led", 8, (~data >> 8) & 1);
+	m_main_leds[0] = BIT(~data, 0);
+	m_main_leds[1] = BIT(~data, 1);
+	m_main_leds[2] = BIT(~data, 2);
+	m_main_leds[3] = BIT(~data, 3);
+	m_main_leds[4] = BIT(~data, 4);
+	m_main_leds[5] = BIT(~data, 5);
+	m_main_leds[6] = BIT(~data, 6);
+	m_main_leds[7] = BIT(~data, 7);
+	m_main_leds[8] = BIT(~data, 8);
 
 	if ((data & 0xfe00) != 0xfe00)
 	{
@@ -698,20 +743,20 @@ WRITE16_MEMBER(twinkle_state::led_w)
 WRITE16_MEMBER(twinkle_state::key_led_w)
 {
 	// words are written using a byte write
-	output().set_indexed_value("key1-", 1, (data >> 0) & 1);
-	output().set_indexed_value("key1-", 2, (data >> 1) & 1);
-	output().set_indexed_value("key1-", 3, (data >> 2) & 1);
-	output().set_indexed_value("key1-", 4, (data >> 3) & 1);
-	output().set_indexed_value("key1-", 5, (data >> 4) & 1);
-	output().set_indexed_value("key1-", 6, (data >> 5) & 1);
-	output().set_indexed_value("key1-", 7, (data >> 6) & 1);
-	output().set_indexed_value("key2-", 1, (data >> 7) & 1);
-	output().set_indexed_value("key2-", 2, (data >> 8) & 1);
-	output().set_indexed_value("key2-", 3, (data >> 9) & 1);
-	output().set_indexed_value("key2-", 4, (data >> 10) & 1);
-	output().set_indexed_value("key2-", 5, (data >> 11) & 1);
-	output().set_indexed_value("key2-", 6, (data >> 12) & 1);
-	output().set_indexed_value("key2-", 7, (data >> 13) & 1);
+	m_key_leds[0][0] = BIT(data, 0);
+	m_key_leds[0][1] = BIT(data, 1);
+	m_key_leds[0][2] = BIT(data, 2);
+	m_key_leds[0][3] = BIT(data, 3);
+	m_key_leds[0][4] = BIT(data, 4);
+	m_key_leds[0][5] = BIT(data, 5);
+	m_key_leds[0][6] = BIT(data, 6);
+	m_key_leds[1][0] = BIT(data, 7);
+	m_key_leds[1][1] = BIT(data, 8);
+	m_key_leds[1][2] = BIT(data, 9);
+	m_key_leds[1][3] = BIT(data, 10);
+	m_key_leds[1][4] = BIT(data, 11);
+	m_key_leds[1][5] = BIT(data, 12);
+	m_key_leds[1][6] = BIT(data, 13);
 	output().set_value("unknown3", (data >> 14) & 1);
 	output().set_value("unknown4", (data >> 15) & 1);
 }
@@ -769,24 +814,25 @@ READ8_MEMBER(twinkle_state::shared_psx_r)
 	return result;
 }
 
-ADDRESS_MAP_START(twinkle_state::main_map)
-	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE8(shared_psx_r, shared_psx_w, 0x00ff00ff)
-	AM_RANGE(0x1f200000, 0x1f20001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
-	AM_RANGE(0x1f210000, 0x1f2107ff) AM_DEVREADWRITE8("fdc37c665gt", fdc37c665gt_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f218000, 0x1f218003) AM_DEVWRITE8("watchdog", watchdog_timer_device, reset_w, 0x000000ff) /* LTC1232 */
-	AM_RANGE(0x1f220000, 0x1f220003) AM_WRITE8(twinkle_io_w, 0x00ff00ff)
-	AM_RANGE(0x1f220004, 0x1f220007) AM_READ8(twinkle_io_r, 0x00ff00ff)
-	AM_RANGE(0x1f230000, 0x1f230003) AM_WRITE16(led_w, 0x0000ffff)
-	AM_RANGE(0x1f240000, 0x1f240003) AM_READ_PORT("IN6")
-	AM_RANGE(0x1f250000, 0x1f250003) AM_WRITE16(key_led_w, 0x0000ffff)
-	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE16(serial_w, 0x0000ffff)
-	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE_PORT("OUTSEC")
-	AM_RANGE(0x1f280000, 0x1f280003) AM_READ_PORT("INSEC")
-	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0x00ff00ff)
-	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0x00ff00ff)
-	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE16(twinkle_output_w, 0xffffffff)
-ADDRESS_MAP_END
+void twinkle_state::main_map(address_map &map)
+{
+	map(0x1f000000, 0x1f0007ff).rw(this, FUNC(twinkle_state::shared_psx_r), FUNC(twinkle_state::shared_psx_w)).umask32(0x00ff00ff);
+	map(0x1f200000, 0x1f20001f).rw(m_am53cf96, FUNC(am53cf96_device::read), FUNC(am53cf96_device::write)).umask32(0x00ff00ff);
+	map(0x1f20a01c, 0x1f20a01f).nopw(); /* scsi? */
+	map(0x1f210000, 0x1f2107ff).rw("fdc37c665gt", FUNC(fdc37c665gt_device::read), FUNC(fdc37c665gt_device::write)).umask32(0x00ff00ff);
+	map(0x1f218000, 0x1f218000).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* LTC1232 */
+	map(0x1f220000, 0x1f220003).w(this, FUNC(twinkle_state::twinkle_io_w)).umask32(0x00ff00ff);
+	map(0x1f220004, 0x1f220007).r(this, FUNC(twinkle_state::twinkle_io_r)).umask32(0x00ff00ff);
+	map(0x1f230000, 0x1f230001).w(this, FUNC(twinkle_state::led_w));
+	map(0x1f240000, 0x1f240003).portr("IN6");
+	map(0x1f250000, 0x1f250001).w(this, FUNC(twinkle_state::key_led_w));
+	map(0x1f260000, 0x1f260001).w(this, FUNC(twinkle_state::serial_w));
+	map(0x1f270000, 0x1f270003).portw("OUTSEC");
+	map(0x1f280000, 0x1f280003).portr("INSEC");
+	map(0x1f290000, 0x1f29007f).rw("rtc", FUNC(rtc65271_device::rtc_r), FUNC(rtc65271_device::rtc_w)).umask32(0x00ff00ff);
+	map(0x1f2a0000, 0x1f2a007f).rw("rtc", FUNC(rtc65271_device::xram_r), FUNC(rtc65271_device::xram_w)).umask32(0x00ff00ff);
+	map(0x1f2b0000, 0x1f2b00ff).w(this, FUNC(twinkle_state::twinkle_output_w));
+}
 
 /* SPU board */
 
@@ -908,36 +954,38 @@ WRITE16_MEMBER(twinkle_state::shared_68k_w)
 WRITE16_MEMBER(twinkle_state::spu_led_w)
 {
 	// upper 8 bits are occassionally written as all zeros
-	output().set_indexed_value("spu_led", 0, (~data >> 0) & 1);
-	output().set_indexed_value("spu_led", 1, (~data >> 1) & 1);
-	output().set_indexed_value("spu_led", 2, (~data >> 2) & 1);
-	output().set_indexed_value("spu_led", 3, (~data >> 3) & 1);
-	output().set_indexed_value("spu_led", 4, (~data >> 4) & 1);
-	output().set_indexed_value("spu_led", 5, (~data >> 5) & 1);
-	output().set_indexed_value("spu_led", 6, (~data >> 6) & 1);
-	output().set_indexed_value("spu_led", 7, (~data >> 7) & 1);
+	m_spu_leds[0] = BIT(~data, 0);
+	m_spu_leds[1] = BIT(~data, 1);
+	m_spu_leds[2] = BIT(~data, 2);
+	m_spu_leds[3] = BIT(~data, 3);
+	m_spu_leds[4] = BIT(~data, 4);
+	m_spu_leds[5] = BIT(~data, 5);
+	m_spu_leds[6] = BIT(~data, 6);
+	m_spu_leds[7] = BIT(~data, 7);
 }
 
-ADDRESS_MAP_START(twinkle_state::sound_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x13ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("SPU_DSW")
-	AM_RANGE(0x220000, 0x220001) AM_WRITE(spu_led_w)
-	AM_RANGE(0x230000, 0x230003) AM_WRITE(twinkle_spu_ctrl_w)
-	AM_RANGE(0x240000, 0x240003) AM_WRITE(spu_ata_dma_low_w) AM_READNOP
-	AM_RANGE(0x250000, 0x250003) AM_WRITE(spu_ata_dma_high_w) AM_READNOP
-	AM_RANGE(0x260000, 0x260001) AM_WRITE(spu_wavebank_w) AM_READNOP
-	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(shared_68k_r, shared_68k_w)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ata", ata_interface_device, read_cs0, write_cs0)
+void twinkle_state::sound_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x13ffff).ram();
+	map(0x200000, 0x200001).portr("SPU_DSW");
+	map(0x220000, 0x220001).w(this, FUNC(twinkle_state::spu_led_w));
+	map(0x230000, 0x230003).w(this, FUNC(twinkle_state::twinkle_spu_ctrl_w));
+	map(0x240000, 0x240003).w(this, FUNC(twinkle_state::spu_ata_dma_low_w)).nopr();
+	map(0x250000, 0x250003).w(this, FUNC(twinkle_state::spu_ata_dma_high_w)).nopr();
+	map(0x260000, 0x260001).w(this, FUNC(twinkle_state::spu_wavebank_w)).nopr();
+	map(0x280000, 0x280fff).rw(this, FUNC(twinkle_state::shared_68k_r), FUNC(twinkle_state::shared_68k_w));
+	map(0x300000, 0x30000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
 	// 34000E = ???
-	AM_RANGE(0x34000e, 0x34000f) AM_WRITENOP
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w)
-ADDRESS_MAP_END
+	map(0x34000e, 0x34000f).nopw();
+	map(0x400000, 0x400fff).rw("rfsnd", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
+	map(0x800000, 0xffffff).rw(this, FUNC(twinkle_state::twinkle_waveram_r), FUNC(twinkle_state::twinkle_waveram_w));
+}
 
-ADDRESS_MAP_START(twinkle_state::rf5c400_map)
-	AM_RANGE(0x0000000, 0x1ffffff) AM_RAM AM_SHARE("rfsnd")
-ADDRESS_MAP_END
+void twinkle_state::rf5c400_map(address_map &map)
+{
+	map(0x0000000, 0x1ffffff).ram().share("rfsnd");
+}
 
 /* SCSI */
 
@@ -1427,7 +1475,7 @@ ROM_START( bmiidxc2 )
 	ROM_LOAD( "984a02", 0x000000, 0x000224, BAD_DUMP CRC(5b08e1ef) SHA1(d43ad5d958313ccb2420246621d9180230b4782d) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
-	DISK_IMAGE_READONLY( "ge984a01(bm)", 0, SHA1(03b083ba09652dfab6f328000c3c9de2a7a4e618) )
+	DISK_IMAGE_READONLY( "ge984a01,bm", 0, SHA1(03b083ba09652dfab6f328000c3c9de2a7a4e618) )
 
 	DISK_REGION( "cdrom1" ) // video CD
 	DISK_IMAGE_READONLY( "ge984a04", 0, NO_DUMP )

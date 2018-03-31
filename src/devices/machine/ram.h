@@ -33,16 +33,16 @@
 
 #define MCFG_RAM_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)    \
-	ram_device::static_set_extra_options(*device, nullptr);
+	downcast<ram_device &>(*device).set_extra_options(nullptr);
 
 #define MCFG_RAM_DEFAULT_SIZE(_default_size) \
-	ram_device::static_set_default_size(*device, _default_size);
+	downcast<ram_device &>(*device).set_default_size(_default_size);
 
 #define MCFG_RAM_EXTRA_OPTIONS(_extra_options) \
-	ram_device::static_set_extra_options(*device, _extra_options);
+	downcast<ram_device &>(*device).set_extra_options(_extra_options);
 
 #define MCFG_RAM_DEFAULT_VALUE(_default_value) \
-	ram_device::static_set_default_value(*device, _default_value);
+	downcast<ram_device &>(*device).set_default_value(_default_value);
 
 
 /***************************************************************************
@@ -67,9 +67,9 @@ public:
 	void write(offs_t offset, uint8_t data)   { m_pointer[offset % m_size] = data; }
 
 	// inline configuration helpers
-	static void static_set_default_size(device_t &device, const char *default_size)     { downcast<ram_device &>(device).m_default_size = default_size; }
-	static void static_set_extra_options(device_t &device, const char *extra_options)   { downcast<ram_device &>(device).m_extra_options_string = extra_options && extra_options[0] ? extra_options : nullptr; downcast<ram_device &>(device).m_extra_options.clear(); }
-	static void static_set_default_value(device_t &device, uint8_t default_value)       { downcast<ram_device &>(device).m_default_value = default_value; }
+	void set_default_size(const char *default_size)     { m_default_size = default_size; }
+	void set_extra_options(const char *extra_options)   { m_extra_options_string = extra_options && extra_options[0] ? extra_options : nullptr; m_extra_options.clear(); }
+	void set_default_value(uint8_t default_value)       { m_default_value = default_value; }
 
 protected:
 	virtual void device_start() override;

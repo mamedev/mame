@@ -119,30 +119,32 @@ WRITE_LINE_MEMBER( phc25_state::write_centronics_busy )
 
 /* Memory Maps */
 
-ADDRESS_MAP_START(phc25_state::phc25_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x6000, 0x77ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void phc25_state::phc25_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x5fff).rom().region(Z80_TAG, 0);
+	map(0x6000, 0x77ff).ram().share("video_ram");
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(phc25_state::phc25_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(port40_r, port40_w)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("KEY0")
-	AM_RANGE(0x81, 0x81) AM_READ_PORT("KEY1")
-	AM_RANGE(0x82, 0x82) AM_READ_PORT("KEY2")
-	AM_RANGE(0x83, 0x83) AM_READ_PORT("KEY3")
-	AM_RANGE(0x84, 0x84) AM_READ_PORT("KEY4")
-	AM_RANGE(0x85, 0x85) AM_READ_PORT("KEY5")
-	AM_RANGE(0x86, 0x86) AM_READ_PORT("KEY6")
-	AM_RANGE(0x87, 0x87) AM_READ_PORT("KEY7")
-	AM_RANGE(0x88, 0x88) AM_READ_PORT("KEY8")
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE(AY8910_TAG, ay8910_device, data_r, data_w)
-	AM_RANGE(0xc1, 0xc1) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
-ADDRESS_MAP_END
+void phc25_state::phc25_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x40, 0x40).rw(this, FUNC(phc25_state::port40_r), FUNC(phc25_state::port40_w));
+	map(0x80, 0x80).portr("KEY0");
+	map(0x81, 0x81).portr("KEY1");
+	map(0x82, 0x82).portr("KEY2");
+	map(0x83, 0x83).portr("KEY3");
+	map(0x84, 0x84).portr("KEY4");
+	map(0x85, 0x85).portr("KEY5");
+	map(0x86, 0x86).portr("KEY6");
+	map(0x87, 0x87).portr("KEY7");
+	map(0x88, 0x88).portr("KEY8");
+	map(0xc0, 0xc0).rw(AY8910_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xc1, 0xc1).w(AY8910_TAG, FUNC(ay8910_device::address_w));
+}
 
 /* Input Ports */
 

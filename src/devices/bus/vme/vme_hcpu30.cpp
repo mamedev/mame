@@ -53,22 +53,23 @@
 
 DEFINE_DEVICE_TYPE(VME_HCPU30, vme_hcpu30_card_device, "hcpu30", "Besta HCPU30 CPU board")
 
-ADDRESS_MAP_START(vme_hcpu30_card_device::hcpu30_mem)
-	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_WRITE(bootvect_w)   /* After first write we act as RAM */
-	AM_RANGE(0x00000000, 0x00000007) AM_ROM AM_READ(bootvect_r)   /* ROM mirror just during reset */
-	AM_RANGE(0x00000008, 0x001fffff) AM_RAM // local bus DRAM, 4MB
-	AM_RANGE(0x00200000, 0x00201fff) AM_RAM // AM_SHARE("iocpu")
-	AM_RANGE(0xff000000, 0xff007fff) AM_ROM AM_MIRROR(0x8000) AM_REGION("user1", 0)
-	AM_RANGE(0xff020000, 0xff027fff) AM_RAM AM_MIRROR(0x8000) // SRAM 32KB
-	AM_RANGE(0xffff8000, 0xffff8fff) AM_UNMAP // shared memory with iocpu
-	AM_RANGE(0xffff9000, 0xffff9fff) AM_RAM   // SRAM, optional: battery-backed
-	AM_RANGE(0xfffff100, 0xfffff11f) AM_UNMAP // VME bus configuration (accessed after DIP switch read)
-	AM_RANGE(0xfffff120, 0xfffff123) AM_READ_PORT("SA1")
-	AM_RANGE(0xfffff200, 0xfffff2ff) AM_UNMAP
-	AM_RANGE(0xfffff300, 0xfffff3ff) AM_DEVREADWRITE8("duscc", duscc68562_device, read, write, 0xffffffff)
-	AM_RANGE(0xfffff600, 0xfffff6ff) AM_UNMAP
-	AM_RANGE(0xfffff700, 0xfffff7ff) AM_UNMAP
-ADDRESS_MAP_END
+void vme_hcpu30_card_device::hcpu30_mem(address_map &map)
+{
+	map(0x00000000, 0x00000007).ram().w(this, FUNC(vme_hcpu30_card_device::bootvect_w));   /* After first write we act as RAM */
+	map(0x00000000, 0x00000007).rom().r(this, FUNC(vme_hcpu30_card_device::bootvect_r));   /* ROM mirror just during reset */
+	map(0x00000008, 0x001fffff).ram(); // local bus DRAM, 4MB
+	map(0x00200000, 0x00201fff).ram(); // AM_SHARE("iocpu")
+	map(0xff000000, 0xff007fff).rom().mirror(0x8000).region("user1", 0);
+	map(0xff020000, 0xff027fff).ram().mirror(0x8000); // SRAM 32KB
+	map(0xffff8000, 0xffff8fff).unmaprw(); // shared memory with iocpu
+	map(0xffff9000, 0xffff9fff).ram();   // SRAM, optional: battery-backed
+	map(0xfffff100, 0xfffff11f).unmaprw(); // VME bus configuration (accessed after DIP switch read)
+	map(0xfffff120, 0xfffff123).portr("SA1");
+	map(0xfffff200, 0xfffff2ff).unmaprw();
+	map(0xfffff300, 0xfffff3ff).rw("duscc", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write));
+	map(0xfffff600, 0xfffff6ff).unmaprw();
+	map(0xfffff700, 0xfffff7ff).unmaprw();
+}
 
 static INPUT_PORTS_START(hcpu30)
 	PORT_START("SA1")

@@ -183,26 +183,27 @@ uint32_t silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind1
 }
 
 
-ADDRESS_MAP_START(silvmil_state::silvmil_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+void silvmil_state::silvmil_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(silvmil_tilebank1_w)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(silvmil_fg_scrollx_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(silvmil_fg_scrolly_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(silvmil_bg_scrollx_w)
-	AM_RANGE(0x100008, 0x100009) AM_WRITE(silvmil_bg_scrolly_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(silvmil_tilebank_w)
+	map(0x100000, 0x100001).w(this, FUNC(silvmil_state::silvmil_tilebank1_w));
+	map(0x100002, 0x100003).w(this, FUNC(silvmil_state::silvmil_fg_scrollx_w));
+	map(0x100004, 0x100005).w(this, FUNC(silvmil_state::silvmil_fg_scrolly_w));
+	map(0x100006, 0x100007).w(this, FUNC(silvmil_state::silvmil_bg_scrollx_w));
+	map(0x100008, 0x100009).w(this, FUNC(silvmil_state::silvmil_bg_scrolly_w));
+	map(0x10000e, 0x10000f).w(this, FUNC(silvmil_state::silvmil_tilebank_w));
 
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(silvmil_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(silvmil_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x270000, 0x270001) AM_WRITE(silvmil_soundcmd_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
-	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x120000, 0x120fff).ram().w(this, FUNC(silvmil_state::silvmil_fg_videoram_w)).share("fg_videoram");
+	map(0x122000, 0x122fff).ram().w(this, FUNC(silvmil_state::silvmil_bg_videoram_w)).share("bg_videoram");
+	map(0x200000, 0x2005ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x210000, 0x2107ff).ram().share("spriteram");
+	map(0x270000, 0x270001).w(this, FUNC(silvmil_state::silvmil_soundcmd_w));
+	map(0x280000, 0x280001).portr("P1_P2");
+	map(0x280002, 0x280003).portr("COIN");
+	map(0x280004, 0x280005).portr("DSW");
+	map(0x300000, 0x30ffff).ram();
+}
 
 
 static INPUT_PORTS_START( silvmil )
@@ -390,14 +391,15 @@ void silvmil_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(silvmil_state::silvmil_sound_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
-	AM_RANGE(0xc006, 0xc006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ??
-ADDRESS_MAP_END
+void silvmil_state::silvmil_sound_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xd000, 0xd7ff).ram();
+	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc002, 0xc002).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).mirror(1);
+	map(0xc006, 0xc006).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc00f, 0xc00f).nopw(); // ??
+}
 
 
 MACHINE_CONFIG_START(silvmil_state::silvmil)

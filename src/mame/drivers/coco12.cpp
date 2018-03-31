@@ -352,6 +352,7 @@ INPUT_PORTS_END
 SLOT_INTERFACE_START( coco_cart )
 	SLOT_INTERFACE("fdc", COCO_FDC)
 	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
+	SLOT_INTERFACE("cc2hdb1", COCO2_HDB1)
 	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
 	SLOT_INTERFACE("cp450_fdc", CP450_FDC)
 	SLOT_INTERFACE("cd6809_fdc", CD6809_FDC)
@@ -398,9 +399,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG ( coco_floating )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(coco_state::coco_floating_map)
-	AM_RANGE(0x0000, 0xFFFF) AM_READ(floating_bus_read)
-ADDRESS_MAP_END
+void coco_state::coco_floating_map(address_map &map)
+{
+	map(0x0000, 0xFFFF).r(this, FUNC(coco_state::floating_bus_read));
+}
 
 
 MACHINE_CONFIG_START(coco_state::coco_floating)
@@ -604,8 +606,8 @@ ROM_END
 
 ROM_START(t4426)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
-	ROM_LOAD("SOFT4426-U13-1.2.bin", 0x2000, 0x2000, CRC(3c1af94a) SHA1(1dc57b3e4a6ef6a743ca21d8f111a74b1ea9d54e))
-	ROM_LOAD("SOFT4426-U14-1.2.bin", 0x0000, 0x2000, CRC(e031d076) SHA1(7275f1e3f165ff6a4657e4e5e24cb8b817239f54))
+	ROM_LOAD("soft4426-u13-1.2.bin", 0x2000, 0x2000, CRC(3c1af94a) SHA1(1dc57b3e4a6ef6a743ca21d8f111a74b1ea9d54e))
+	ROM_LOAD("soft4426-u14-1.2.bin", 0x0000, 0x2000, CRC(e031d076) SHA1(7275f1e3f165ff6a4657e4e5e24cb8b817239f54))
 ROM_END
 
 ROM_START(lzcolor64)

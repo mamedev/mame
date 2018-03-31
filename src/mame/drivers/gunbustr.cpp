@@ -115,19 +115,20 @@ WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
              MEMORY STRUCTURES
 ***********************************************************/
 
-ADDRESS_MAP_START(gunbustr_state::gunbustr_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("ram")                                     /* main CPUA ram */
-	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_SHARE("spriteram")               /* Sprite ram */
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)                                          /* motor, lamps etc. */
-	AM_RANGE(0x390000, 0x3907ff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xffffffff) /* Sound shared ram */
-	AM_RANGE(0x400000, 0x400007) AM_DEVREADWRITE8("tc0510nio", tc0510nio_device, read, write, 0xffffffff)
-	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)                       /* gun coord read */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, long_r, long_w)
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_long_r, ctrl_long_w)
-	AM_RANGE(0x900000, 0x901fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM                                                             /* network ram ?? */
-ADDRESS_MAP_END
+void gunbustr_state::gunbustr_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x200000, 0x21ffff).ram().share("ram");                                     /* main CPUA ram */
+	map(0x300000, 0x301fff).ram().share("spriteram");               /* Sprite ram */
+	map(0x380000, 0x380003).w(this, FUNC(gunbustr_state::motor_control_w));                                          /* motor, lamps etc. */
+	map(0x390000, 0x3907ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
+	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
+	map(0x500000, 0x500003).rw(this, FUNC(gunbustr_state::gunbustr_gun_r), FUNC(gunbustr_state::gunbustr_gun_w));                       /* gun coord read */
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
+	map(0x900000, 0x901fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xc00000, 0xc03fff).ram();                                                             /* network ram ?? */
+}
 
 /***********************************************************
              INPUT PORTS (dips in eprom)

@@ -478,49 +478,53 @@ READ8_MEMBER(tx1_state::bbjr_analog_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(tx1_state::tx1_main)
-	AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x1000) AM_RAM
-	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM
-	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x06000, 0x06fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
-	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("rcram")
-	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE(dipswitches_r, z80_busreq_w)
-	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(tx1_scolst_w)
-	AM_RANGE(0x0d000, 0x0d003) AM_WRITE(tx1_slincs_w)
-	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(tx1_slock_w)
-	AM_RANGE(0x0f000, 0x0f001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) AM_WRITE(resume_math_w)
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(z80_shared_r, z80_shared_w)
-	AM_RANGE(0x20000, 0x2ffff) AM_MIRROR(0xd0000) AM_ROM
-ADDRESS_MAP_END
+void tx1_state::tx1_main(address_map &map)
+{
+	map(0x00000, 0x00fff).mirror(0x1000).ram();
+	map(0x02000, 0x02fff).mirror(0x1000).ram();
+	map(0x04000, 0x04fff).mirror(0x1000).ram().share("nvram");
+	map(0x06000, 0x06fff).rw(this, FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
+	map(0x08000, 0x09fff).ram().share("vram");
+	map(0x0a000, 0x0afff).ram().share("rcram");
+	map(0x0b000, 0x0b001).rw(this, FUNC(tx1_state::dipswitches_r), FUNC(tx1_state::z80_busreq_w));
+	map(0x0c000, 0x0c001).w(this, FUNC(tx1_state::tx1_scolst_w));
+	map(0x0d000, 0x0d003).w(this, FUNC(tx1_state::tx1_slincs_w));
+	map(0x0e000, 0x0e001).w(this, FUNC(tx1_state::tx1_slock_w));
+	map(0x0f000, 0x0f001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(this, FUNC(tx1_state::resume_math_w));
+	map(0x10000, 0x1ffff).rw(this, FUNC(tx1_state::z80_shared_r), FUNC(tx1_state::z80_shared_w));
+	map(0x20000, 0x2ffff).mirror(0xd0000).rom();
+}
 
-ADDRESS_MAP_START(tx1_state::tx1_math)
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("math_ram")
-	AM_RANGE(0x00800, 0x00fff) AM_READWRITE(tx1_spcs_ram_r, tx1_spcs_ram_w)
-	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE("rcram")
-	AM_RANGE(0x02000, 0x022ff) AM_RAM AM_SHARE("objram")
-	AM_RANGE(0x02400, 0x027ff) AM_WRITE(tx1_bankcs_w)
-	AM_RANGE(0x02800, 0x02bff) AM_WRITE(halt_math_w)
-	AM_RANGE(0x02C00, 0x02fff) AM_WRITE(tx1_flgcs_w)
-	AM_RANGE(0x03000, 0x03fff) AM_READWRITE(tx1_math_r, tx1_math_w)
-	AM_RANGE(0x04000, 0x07fff) AM_MIRROR(0xf8000) AM_ROM
-	AM_RANGE(0x05000, 0x07fff) AM_READ(tx1_spcs_rom_r)
-ADDRESS_MAP_END
+void tx1_state::tx1_math(address_map &map)
+{
+	map(0x00000, 0x007ff).ram().share("math_ram");
+	map(0x00800, 0x00fff).rw(this, FUNC(tx1_state::tx1_spcs_ram_r), FUNC(tx1_state::tx1_spcs_ram_w));
+	map(0x01000, 0x01fff).ram().share("rcram");
+	map(0x02000, 0x022ff).ram().share("objram");
+	map(0x02400, 0x027ff).w(this, FUNC(tx1_state::tx1_bankcs_w));
+	map(0x02800, 0x02bff).w(this, FUNC(tx1_state::halt_math_w));
+	map(0x02C00, 0x02fff).w(this, FUNC(tx1_state::tx1_flgcs_w));
+	map(0x03000, 0x03fff).rw(this, FUNC(tx1_state::tx1_math_r), FUNC(tx1_state::tx1_math_w));
+	map(0x04000, 0x07fff).mirror(0xf8000).rom();
+	map(0x05000, 0x07fff).r(this, FUNC(tx1_state::tx1_spcs_rom_r));
+}
 
-ADDRESS_MAP_START(tx1_state::tx1_sound_prg)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_MIRROR(0x800) AM_SHARE("z80_ram")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(z80_intreq_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("tx1", tx1_sound_device, pit8253_r, pit8253_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(tx1_ppi_latch_w)
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(ts_r, ts_w)
-ADDRESS_MAP_END
+void tx1_state::tx1_sound_prg(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x3000, 0x37ff).ram().mirror(0x800).share("z80_ram");
+	map(0x4000, 0x4000).w(this, FUNC(tx1_state::z80_intreq_w));
+	map(0x5000, 0x5003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6000, 0x6003).rw("tx1", FUNC(tx1_sound_device::pit8253_r), FUNC(tx1_sound_device::pit8253_w));
+	map(0x7000, 0x7fff).w(this, FUNC(tx1_state::tx1_ppi_latch_w));
+	map(0xb000, 0xbfff).rw(this, FUNC(tx1_state::ts_r), FUNC(tx1_state::ts_w));
+}
 
-ADDRESS_MAP_START(tx1_state::tx1_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void tx1_state::tx1_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
 
 /*************************************
@@ -529,76 +533,82 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(tx1_state::buggyboy_main)
-	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
-	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("rcram")
-	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE(dipswitches_r, z80_busreq_w)
-	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(buggyboy_scolst_w)
-	AM_RANGE(0x0d000, 0x0d003) AM_WRITE(tx1_slincs_w)
-	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(buggyboy_sky_w)
-	AM_RANGE(0x0f000, 0x0f003) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) AM_WRITE(resume_math_w)
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(z80_shared_r, z80_shared_w)
-	AM_RANGE(0x20000, 0x2ffff) AM_ROM
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void tx1_state::buggyboy_main(address_map &map)
+{
+	map(0x00000, 0x03fff).ram().share("nvram");
+	map(0x04000, 0x04fff).rw(this, FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
+	map(0x08000, 0x09fff).ram().share("vram");
+	map(0x0a000, 0x0afff).ram().share("rcram");
+	map(0x0b000, 0x0b001).rw(this, FUNC(tx1_state::dipswitches_r), FUNC(tx1_state::z80_busreq_w));
+	map(0x0c000, 0x0c001).w(this, FUNC(tx1_state::buggyboy_scolst_w));
+	map(0x0d000, 0x0d003).w(this, FUNC(tx1_state::tx1_slincs_w));
+	map(0x0e000, 0x0e001).w(this, FUNC(tx1_state::buggyboy_sky_w));
+	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(this, FUNC(tx1_state::resume_math_w));
+	map(0x10000, 0x1ffff).rw(this, FUNC(tx1_state::z80_shared_r), FUNC(tx1_state::z80_shared_w));
+	map(0x20000, 0x2ffff).rom();
+	map(0xf0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(tx1_state::buggybjr_main)
-	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
-	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("rcram")
-	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE(dipswitches_r, z80_busreq_w)
-	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(buggyboy_scolst_w)
-	AM_RANGE(0x0d000, 0x0d003) AM_WRITE(tx1_slincs_w)
-	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(buggyboy_sky_w)
-	AM_RANGE(0x0f000, 0x0f003) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) AM_WRITE(resume_math_w)
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(z80_shared_r, z80_shared_w)
-	AM_RANGE(0x20000, 0x2ffff) AM_ROM
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void tx1_state::buggybjr_main(address_map &map)
+{
+	map(0x00000, 0x03fff).ram().share("nvram");
+	map(0x04000, 0x04fff).rw(this, FUNC(tx1_state::tx1_crtc_r), FUNC(tx1_state::tx1_crtc_w));
+	map(0x08000, 0x08fff).ram().share("vram");
+	map(0x0a000, 0x0afff).ram().share("rcram");
+	map(0x0b000, 0x0b001).rw(this, FUNC(tx1_state::dipswitches_r), FUNC(tx1_state::z80_busreq_w));
+	map(0x0c000, 0x0c001).w(this, FUNC(tx1_state::buggyboy_scolst_w));
+	map(0x0d000, 0x0d003).w(this, FUNC(tx1_state::tx1_slincs_w));
+	map(0x0e000, 0x0e001).w(this, FUNC(tx1_state::buggyboy_sky_w));
+	map(0x0f000, 0x0f003).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).w(this, FUNC(tx1_state::resume_math_w));
+	map(0x10000, 0x1ffff).rw(this, FUNC(tx1_state::z80_shared_r), FUNC(tx1_state::z80_shared_w));
+	map(0x20000, 0x2ffff).rom();
+	map(0xf0000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(tx1_state::buggyboy_math)
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("math_ram")
-	AM_RANGE(0x00800, 0x00fff) AM_READWRITE(buggyboy_spcs_ram_r, buggyboy_spcs_ram_w)
-	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE("rcram")
-	AM_RANGE(0x02000, 0x022ff) AM_RAM AM_SHARE("objram")
-	AM_RANGE(0x02400, 0x024ff) AM_WRITE(buggyboy_gas_w)
-	AM_RANGE(0x03000, 0x03fff) AM_READWRITE(buggyboy_math_r, buggyboy_math_w)
-	AM_RANGE(0x04000, 0x07fff) AM_MIRROR(0xf8000) AM_ROM
-	AM_RANGE(0x05000, 0x07fff) AM_READ(buggyboy_spcs_rom_r)
-ADDRESS_MAP_END
+void tx1_state::buggyboy_math(address_map &map)
+{
+	map(0x00000, 0x007ff).ram().share("math_ram");
+	map(0x00800, 0x00fff).rw(this, FUNC(tx1_state::buggyboy_spcs_ram_r), FUNC(tx1_state::buggyboy_spcs_ram_w));
+	map(0x01000, 0x01fff).ram().share("rcram");
+	map(0x02000, 0x022ff).ram().share("objram");
+	map(0x02400, 0x024ff).w(this, FUNC(tx1_state::buggyboy_gas_w));
+	map(0x03000, 0x03fff).rw(this, FUNC(tx1_state::buggyboy_math_r), FUNC(tx1_state::buggyboy_math_w));
+	map(0x04000, 0x07fff).mirror(0xf8000).rom();
+	map(0x05000, 0x07fff).r(this, FUNC(tx1_state::buggyboy_spcs_rom_r));
+}
 
 /* Buggy Boy Sound PCB TC033A */
-ADDRESS_MAP_START(tx1_state::buggyboy_sound_prg)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("z80_ram")
-	AM_RANGE(0x6000, 0x6001) AM_READ(bb_analog_r)
-	AM_RANGE(0x6800, 0x6803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE("buggyboy", buggyboy_sound_device, pit8253_r, pit8253_w)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(z80_intreq_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(ts_r, ts_w)
-ADDRESS_MAP_END
+void tx1_state::buggyboy_sound_prg(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().share("z80_ram");
+	map(0x6000, 0x6001).r(this, FUNC(tx1_state::bb_analog_r));
+	map(0x6800, 0x6803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7000, 0x7003).rw("buggyboy", FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
+	map(0x7800, 0x7800).w(this, FUNC(tx1_state::z80_intreq_w));
+	map(0xc000, 0xc7ff).rw(this, FUNC(tx1_state::ts_r), FUNC(tx1_state::ts_w));
+}
 
 /* Buggy Boy Jr Sound PCB TC043 */
-ADDRESS_MAP_START(tx1_state::buggybjr_sound_prg)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("z80_ram")
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("buggyboy", buggyboy_sound_device, pit8253_r, pit8253_w)
-	AM_RANGE(0x6000, 0x6001) AM_READ(bbjr_analog_r)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(z80_intreq_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(ts_r, ts_w)
-ADDRESS_MAP_END
+void tx1_state::buggybjr_sound_prg(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().share("z80_ram");
+	map(0x5000, 0x5003).rw("buggyboy", FUNC(buggyboy_sound_device::pit8253_r), FUNC(buggyboy_sound_device::pit8253_w));
+	map(0x6000, 0x6001).r(this, FUNC(tx1_state::bbjr_analog_r));
+	map(0x7000, 0x7000).w(this, FUNC(tx1_state::z80_intreq_w));
+	map(0xc000, 0xc7ff).rw(this, FUNC(tx1_state::ts_r), FUNC(tx1_state::ts_w));
+}
 
 /* Common */
-ADDRESS_MAP_START(tx1_state::buggyboy_sound_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("ym1", ay8910_device, data_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ay8910_device, data_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD("ym2", ay8910_device, data_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void tx1_state::buggyboy_sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x40, 0x40).r("ym1", FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w("ym1", FUNC(ay8910_device::data_address_w));
+	map(0x80, 0x80).r("ym2", FUNC(ay8910_device::data_r));
+	map(0x80, 0x81).w("ym2", FUNC(ay8910_device::data_address_w));
+}
 
 /*************************************
  *

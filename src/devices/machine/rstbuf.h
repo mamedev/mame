@@ -16,7 +16,7 @@
 //**************************************************************************
 
 #define MCFG_RST_BUFFER_INT_CALLBACK(_devcb) \
-	devcb = &rst_buffer_device::set_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<rst_buffer_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -27,12 +27,8 @@
 class rst_buffer_device : public device_t
 {
 public:
-	// static configuration
-	template<class Object>
-	static devcb_base &set_int_callback(device_t &device, Object &&object)
-	{
-		return downcast<rst_buffer_device &>(device).m_int_cb.set_callback(std::forward<Object>(object));
-	}
+	// configuration
+	template<class Object> devcb_base &set_int_callback(Object &&object) { return m_int_cb.set_callback(std::forward<Object>(object)); }
 
 	// getter (required override)
 	virtual u8 get_vector() const = 0;

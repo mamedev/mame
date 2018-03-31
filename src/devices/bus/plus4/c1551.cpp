@@ -313,11 +313,12 @@ WRITE8_MEMBER( c1551_device::tpi1_pc_w )
 //  ADDRESS_MAP( c1551_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c1551_device::c1551_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(tpi0_r, tpi0_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6510T_TAG, 0)
-ADDRESS_MAP_END
+void c1551_device::c1551_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x0800).ram();
+	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(c1551_device::tpi0_r), FUNC(c1551_device::tpi0_w));
+	map(0xc000, 0xffff).rom().region(M6510T_TAG, 0);
+}
 
 
 //-------------------------------------------------

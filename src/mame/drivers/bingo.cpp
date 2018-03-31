@@ -28,11 +28,12 @@ public:
 };
 
 
-ADDRESS_MAP_START(bingo_state::bingo_map)
-	AM_RANGE(0x0000, 0x7fff) AM_NOP
-	AM_RANGE(0x0000, 0x1eff) AM_ROM
-	AM_RANGE(0x1f00, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void bingo_state::bingo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).noprw();
+	map(0x0000, 0x1eff).rom();
+	map(0x1f00, 0x1fff).ram();
+}
 
 static INPUT_PORTS_START( bingo )
 INPUT_PORTS_END
@@ -73,8 +74,9 @@ public:
 };
 
 
-ADDRESS_MAP_START(seeben_state::seeben_map)
-ADDRESS_MAP_END
+void seeben_state::seeben_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( seeben )
 INPUT_PORTS_END
@@ -114,11 +116,12 @@ public:
 	DECLARE_DRIVER_INIT(splin);
 };
 
-ADDRESS_MAP_START(splin_state::splin_map)
-	AM_RANGE(0x00000, 0x0bfff) AM_RAM
-	AM_RANGE(0x0d900, 0x0d9ff) AM_RAM
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void splin_state::splin_map(address_map &map)
+{
+	map(0x00000, 0x0bfff).ram();
+	map(0x0d900, 0x0d9ff).ram();
+	map(0xe0000, 0xfffff).rom();
+}
 
 static INPUT_PORTS_START( splin )
 INPUT_PORTS_END

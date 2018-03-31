@@ -32,8 +32,17 @@ public:
 		m_screen(*this, "screen"),
 		m_k054321(*this, "k054321"),
 		m_sysreg(*this, "sysreg")
-	{ }
+		{ }
 
+	void rng(machine_config &config);
+	void rng_dual(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -96,9 +105,6 @@ public:
 
 	K055673_CB_MEMBER(sprite_callback);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint32_t screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -108,8 +114,7 @@ public:
 	void   sprite_dma_trigger(void);
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
-	void rng(machine_config &config);
-	void rng_dual(machine_config &config);
+
 	void rungun_k054539_map(address_map &map);
 	void rungun_map(address_map &map);
 	void rungun_sound_map(address_map &map);

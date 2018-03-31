@@ -108,17 +108,18 @@ WRITE8_MEMBER( tk80bs_state::ppi_custom_w )
 	}
 }
 
-ADDRESS_MAP_START(tk80bs_state::tk80bs_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
+void tk80bs_state::tk80bs_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
 //  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
-	AM_RANGE(0x7df8, 0x7df9) AM_NOP // i8251 sio
-	AM_RANGE(0x7dfc, 0x7dff) AM_READWRITE(ppi_custom_r,ppi_custom_w)
-	AM_RANGE(0x7e00, 0x7fff) AM_RAM AM_SHARE("videoram") // video ram
-	AM_RANGE(0x8000, 0xcfff) AM_RAM // RAM
-	AM_RANGE(0xd000, 0xefff) AM_ROM // BASIC
-	AM_RANGE(0xf000, 0xffff) AM_ROM // BSMON
-ADDRESS_MAP_END
+	map(0x7df8, 0x7df9).noprw(); // i8251 sio
+	map(0x7dfc, 0x7dff).rw(this, FUNC(tk80bs_state::ppi_custom_r), FUNC(tk80bs_state::ppi_custom_w));
+	map(0x7e00, 0x7fff).ram().share("videoram"); // video ram
+	map(0x8000, 0xcfff).ram(); // RAM
+	map(0xd000, 0xefff).rom(); // BASIC
+	map(0xf000, 0xffff).rom(); // BSMON
+}
 
 
 /* Input ports */

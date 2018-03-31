@@ -108,16 +108,18 @@ WRITE8_MEMBER( mk1_state::mk1_f8_w )
 	if ( ! ( m_f8[1] & 8 ) ) m_led[3] = bitswap<8>( m_f8[0],2,1,3,4,5,6,7,0 );
 }
 
-ADDRESS_MAP_START(mk1_state::mk1_mem)
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
-	AM_RANGE( 0x1800, 0x18ff ) AM_RAM
-ADDRESS_MAP_END
+void mk1_state::mk1_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x1800, 0x18ff).ram();
+}
 
 
-ADDRESS_MAP_START(mk1_state::mk1_io)
-	AM_RANGE( 0x0, 0x1 ) AM_READWRITE( mk1_f8_r, mk1_f8_w )
-	AM_RANGE( 0xc, 0xf ) AM_DEVREADWRITE("f3853", f3853_device, read, write )
-ADDRESS_MAP_END
+void mk1_state::mk1_io(address_map &map)
+{
+	map(0x0, 0x1).rw(this, FUNC(mk1_state::mk1_f8_r), FUNC(mk1_state::mk1_f8_w));
+	map(0xc, 0xf).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
+}
 
 
 static INPUT_PORTS_START( mk1 )

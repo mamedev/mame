@@ -12,7 +12,6 @@
 #define MAME_INCLUDES_APPLE3_H
 
 #include "cpu/m6502/m6502.h"
-#include "includes/apple2.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "bus/a2bus/a2bus.h"
@@ -24,6 +23,7 @@
 #include "machine/wozfdc.h"
 #include "imagedev/floppy.h"
 #include "formats/flopimg.h"
+#include "screen.h"
 
 #define VAR_VM0         0x0001
 #define VAR_VM1         0x0002
@@ -41,8 +41,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
-		m_via_0(*this, "via6522_0"),
-		m_via_1(*this, "via6522_1"),
+		m_via(*this, "via6522_%u", 0),
 		m_acia(*this, "acia"),
 		m_fdc(*this, "fdc"),
 		m_ay3600(*this, "ay3600"),
@@ -52,6 +51,7 @@ public:
 		m_dac(*this, "dac"),
 		m_kbspecial(*this, "keyb_special"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_joy1x(*this, "joy_1_x"),
 		m_joy1y(*this, "joy_1_y"),
 		m_joy2x(*this, "joy_2_x"),
@@ -67,8 +67,7 @@ public:
 
 	required_device<m6502_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<via6522_device> m_via_0;
-	required_device<via6522_device> m_via_1;
+	required_device_array<via6522_device, 2> m_via;
 	required_device<mos6551_device> m_acia;
 	required_device<appleiii_fdc_device> m_fdc;
 	required_device<ay3600_device> m_ay3600;
@@ -78,6 +77,7 @@ public:
 	required_device<dac_byte_interface> m_dac;
 	required_ioport m_kbspecial;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
 	required_device<timer_device> m_pdltimer;
 	required_device<floppy_connector> floppy0;

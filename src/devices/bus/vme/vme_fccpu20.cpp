@@ -226,20 +226,21 @@ DEFINE_DEVICE_TYPE(VME_FCCPU21YB, vme_fccpu21yb_card_device, "fccpu21yb", "Force
 #define CLOCK40 XTAL(40'000'000) /* HCJ */
 #define CLOCK32 XTAL(32'000'000) /* HCJ */
 
-ADDRESS_MAP_START(vme_fccpu20_device::cpu20_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)   /* After first write we act as RAM */
-	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ (bootvect_r)   /* ROM mirror just during reset */
-	AM_RANGE (0x00000008, 0x0007ffff) AM_RAM /* Local SRAM */
-	AM_RANGE (0x00080000, 0x000fffff) AM_RAM /* SRAM-22 installed */
-	AM_RANGE (0xff040000, 0xff04ffff) AM_RAM
-	AM_RANGE (0xff000000, 0xff00ffff) AM_ROM AM_REGION("roms", 0x0000)
-	AM_RANGE (0xff800000, 0xff80001f) AM_DEVREADWRITE8("mpcc", mpcc68561_device, read, write, 0xffffffff)
-	AM_RANGE (0xff800200, 0xff80021f) AM_DEVREADWRITE8("mpcc2", mpcc68561_device, read, write, 0xffffffff)
-	AM_RANGE (0xff800600, 0xff80061f) AM_DEVREADWRITE8("mpcc3", mpcc68561_device, read, write, 0xffffffff)
-	AM_RANGE (0xff800800, 0xff80080f) AM_DEVREADWRITE8("bim", bim68153_device, read, write, 0xff00ff00)
-	AM_RANGE (0xff800c00, 0xff800dff) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0xffffffff)
-ADDRESS_MAP_END
+void vme_fccpu20_device::cpu20_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x00000007).ram().w(this, FUNC(vme_fccpu20_device::bootvect_w));   /* After first write we act as RAM */
+	map(0x00000000, 0x00000007).rom().r(this, FUNC(vme_fccpu20_device::bootvect_r));   /* ROM mirror just during reset */
+	map(0x00000008, 0x0007ffff).ram(); /* Local SRAM */
+	map(0x00080000, 0x000fffff).ram(); /* SRAM-22 installed */
+	map(0xff040000, 0xff04ffff).ram();
+	map(0xff000000, 0xff00ffff).rom().region("roms", 0x0000);
+	map(0xff800000, 0xff80001f).rw("mpcc", FUNC(mpcc68561_device::read), FUNC(mpcc68561_device::write));
+	map(0xff800200, 0xff80021f).rw("mpcc2", FUNC(mpcc68561_device::read), FUNC(mpcc68561_device::write));
+	map(0xff800600, 0xff80061f).rw("mpcc3", FUNC(mpcc68561_device::read), FUNC(mpcc68561_device::write));
+	map(0xff800800, 0xff80080f).rw("bim", FUNC(bim68153_device::read), FUNC(bim68153_device::write)).umask32(0xff00ff00);
+	map(0xff800c00, 0xff800dff).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write));
+}
 
 
 MACHINE_CONFIG_START(vme_fccpu20_device::device_add_mconfig)
@@ -586,10 +587,10 @@ READ8_MEMBER (vme_fccpu20_device::pitc_r)
 /* ROM definitions */
 ROM_START (fccpu20) /* This is an original rom dump */
 	ROM_REGION32_BE(0x10000, "roms", 0)
-	ROM_LOAD32_BYTE("L.BIN",  0x000002, 0x4000, CRC (174ab801) SHA1 (0d7b8ed29d5fdd4bd2073005008120c5f20128dd))
-	ROM_LOAD32_BYTE("LL.BIN", 0x000003, 0x4000, CRC (9fd9e3e4) SHA1 (e5a7c87021e6be412dd5a8166d9f62b681169eda))
-	ROM_LOAD32_BYTE("U.BIN",  0x000001, 0x4000, CRC (d1afe4c0) SHA1 (b5baf9798d73632f7bb843cbc4b306c8c03f4296))
-	ROM_LOAD32_BYTE("UU.BIN", 0x000000, 0x4000, CRC (b54d623b) SHA1 (49b272184a04570b09004de71fae0ed0d1bf5929))
+	ROM_LOAD32_BYTE("l.bin",  0x000002, 0x4000, CRC (174ab801) SHA1 (0d7b8ed29d5fdd4bd2073005008120c5f20128dd))
+	ROM_LOAD32_BYTE("ll.bin", 0x000003, 0x4000, CRC (9fd9e3e4) SHA1 (e5a7c87021e6be412dd5a8166d9f62b681169eda))
+	ROM_LOAD32_BYTE("u.bin",  0x000001, 0x4000, CRC (d1afe4c0) SHA1 (b5baf9798d73632f7bb843cbc4b306c8c03f4296))
+	ROM_LOAD32_BYTE("uu.bin", 0x000000, 0x4000, CRC (b54d623b) SHA1 (49b272184a04570b09004de71fae0ed0d1bf5929))
 ROM_END
 
 /* These cpu-21 boards are supported by the latest cpu-20 rom */

@@ -36,69 +36,6 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 
 
 //**************************************************************************
-//  INITIALIZATION AND CONFIGURATION
-//**************************************************************************
-
-void palette_device::static_set_init(device_t &device, palette_init_delegate init)
-{
-	downcast<palette_device &>(device).m_init = init;
-}
-
-
-void palette_device::static_set_format(device_t &device, raw_to_rgb_converter raw_to_rgb)
-{
-	downcast<palette_device &>(device).m_raw_to_rgb = raw_to_rgb;
-}
-
-
-void palette_device::static_set_membits(device_t &device, int membits)
-{
-	palette_device &palette = downcast<palette_device &>(device);
-	palette.m_membits = membits;
-	palette.m_membits_supplied = true;
-}
-
-
-void palette_device::static_set_endianness(device_t &device, endianness_t endianness)
-{
-	palette_device &palette = downcast<palette_device &>(device);
-	palette.m_endianness = endianness;
-	palette.m_endianness_supplied = true;
-}
-
-
-void palette_device::static_set_entries(device_t &device, u32 entries)
-{
-	downcast<palette_device &>(device).m_entries = entries;
-}
-
-
-void palette_device::static_set_indirect_entries(device_t &device, u32 entries)
-{
-	downcast<palette_device &>(device).m_indirect_entries = entries;
-}
-
-
-void palette_device::static_enable_shadows(device_t &device)
-{
-	downcast<palette_device &>(device).m_enable_shadows = true;
-}
-
-
-void palette_device::static_enable_hilights(device_t &device)
-{
-	downcast<palette_device &>(device).m_enable_hilights = true;
-}
-
-
-void palette_device::static_set_prom_region(device_t &device, const char *region)
-{
-	downcast<palette_device &>(device).m_prom_region.set_tag(region);
-}
-
-
-
-//**************************************************************************
 //  GENERIC WRITE HANDLERS
 //**************************************************************************
 
@@ -462,7 +399,7 @@ void palette_device::palette_init_BBBBBGGGGGRRRRR(palette_device &palette)
 
 
 /*-------------------------------------------------
-    RRRRR_GGGGGG_BBBBB -
+    RRRRR_GGGGGG_BBBBB/BBBBB_GGGGGG_RRRRR -
     standard 5-6-5 palette for games using a
     16-bit color space
 -------------------------------------------------*/
@@ -473,6 +410,14 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 
 	for (i = 0; i < 0x10000; i++)
 		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
+}
+
+void palette_device::palette_init_BBBBBGGGGGGRRRRR(palette_device &palette)
+{
+	int i;
+
+	for (i = 0; i < 0x10000; i++)
+		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 0, 5, 11));
 }
 
 rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(u32 raw)

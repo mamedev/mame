@@ -860,9 +860,9 @@ void i4004_cpu_device::execute_set_input(int inputnum, int state)
     device_disasm_interface implementation
 ***********************************************************************/
 
-util::disasm_interface *i4004_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i4004_cpu_device::create_disassembler()
 {
-	return new i4004_disassembler;
+	return std::make_unique<i4004_disassembler>();
 }
 
 
@@ -1170,9 +1170,9 @@ void i4040_cpu_device::execute_set_input(int inputnum, int state)
     device_disasm_interface implementation
 ***********************************************************************/
 
-util::disasm_interface *i4040_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i4040_cpu_device::create_disassembler()
 {
-	return new i4040_disassembler;
+	return std::make_unique<i4040_disassembler>();
 }
 
 

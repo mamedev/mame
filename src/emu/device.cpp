@@ -108,7 +108,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_tag.assign((owner->owner() == nullptr) ? "" : owner->tag()).append(":").append(tag);
 	else
 		m_tag.assign(":");
-	static_set_clock(*this, clock);
+	set_clock(clock);
 }
 
 
@@ -208,19 +208,19 @@ std::string device_t::parameter(const char *tag) const
 
 
 //-------------------------------------------------
-//  static_set_clock - set/change the clock on
+//  set_clock - set/change the clock on
 //  a device
 //-------------------------------------------------
 
-void device_t::static_set_clock(device_t &device, u32 clock)
+void device_t::set_clock(u32 clock)
 {
-	device.m_configured_clock = clock;
+	m_configured_clock = clock;
 
 	// derive the clock from our owner if requested
 	if ((clock & 0xff000000) == 0xff000000)
-		device.calculate_derived_clock();
+		calculate_derived_clock();
 	else
-		device.set_unscaled_clock(clock);
+		set_unscaled_clock(clock);
 }
 
 

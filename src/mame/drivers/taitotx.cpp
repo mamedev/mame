@@ -151,9 +151,10 @@ uint32_t taito_type_x_state::screen_update_taito_type_x(screen_device &screen, b
 	return 0;
 }
 
-ADDRESS_MAP_START(taito_type_x_state::taito_type_x_map)
-	AM_RANGE(0x00, 0x0f) AM_ROM
-ADDRESS_MAP_END
+void taito_type_x_state::taito_type_x_map(address_map &map)
+{
+	map(0x00, 0x0f).rom();
+}
 
 static INPUT_PORTS_START( taito_type_x )
 INPUT_PORTS_END

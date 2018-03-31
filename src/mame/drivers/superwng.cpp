@@ -320,40 +320,42 @@ WRITE8_MEMBER(superwng_state::superwng_hopper_w)
 {
 }
 
-ADDRESS_MAP_START(superwng_state::superwng_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x6fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(superwng_bg_vram_w) AM_SHARE("videorabg")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(superwng_fg_vram_w) AM_SHARE("videorafg")
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(superwng_bg_cram_w) AM_SHARE("colorrabg")
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(superwng_fg_cram_w) AM_SHARE("colorrafg")
-	AM_RANGE(0x9800, 0x99ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(superwng_hopper_w)
-	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
-	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(superwng_sound_interrupt_w)
-	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa180, 0xa180) AM_WRITENOP // watchdog? int ack?
-	AM_RANGE(0xa181, 0xa181) AM_WRITE(superwng_nmi_enable_w)
-	AM_RANGE(0xa182, 0xa182) AM_WRITE(superwng_tilebank_w)
-	AM_RANGE(0xa183, 0xa183) AM_WRITE(superwng_flip_screen_w)
-	AM_RANGE(0xa184, 0xa184) AM_WRITE(superwng_cointcnt1_w)
-	AM_RANGE(0xa185, 0xa185) AM_WRITE(superwng_unk_a185_w)  // unknown, always(?) 0
-	AM_RANGE(0xa186, 0xa186) AM_WRITE(superwng_cointcnt2_w)
-	AM_RANGE(0xa187, 0xa187) AM_WRITE(superwng_unk_a187_w) // unknown, always(?) 0
-ADDRESS_MAP_END
+void superwng_state::superwng_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x6fff).bankr("bank1");
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0x83ff).ram().w(this, FUNC(superwng_state::superwng_bg_vram_w)).share("videorabg");
+	map(0x8400, 0x87ff).ram().w(this, FUNC(superwng_state::superwng_fg_vram_w)).share("videorafg");
+	map(0x8800, 0x8bff).ram().w(this, FUNC(superwng_state::superwng_bg_cram_w)).share("colorrabg");
+	map(0x8c00, 0x8fff).ram().w(this, FUNC(superwng_state::superwng_fg_cram_w)).share("colorrafg");
+	map(0x9800, 0x99ff).ram();
+	map(0xa000, 0xa000).portr("P1");
+	map(0xa000, 0xa000).w(this, FUNC(superwng_state::superwng_hopper_w));
+	map(0xa080, 0xa080).portr("P2");
+	map(0xa100, 0xa100).portr("DSW1");
+	map(0xa100, 0xa100).w(this, FUNC(superwng_state::superwng_sound_interrupt_w));
+	map(0xa180, 0xa180).portr("DSW2");
+	map(0xa180, 0xa180).nopw(); // watchdog? int ack?
+	map(0xa181, 0xa181).w(this, FUNC(superwng_state::superwng_nmi_enable_w));
+	map(0xa182, 0xa182).w(this, FUNC(superwng_state::superwng_tilebank_w));
+	map(0xa183, 0xa183).w(this, FUNC(superwng_state::superwng_flip_screen_w));
+	map(0xa184, 0xa184).w(this, FUNC(superwng_state::superwng_cointcnt1_w));
+	map(0xa185, 0xa185).w(this, FUNC(superwng_state::superwng_unk_a185_w));  // unknown, always(?) 0
+	map(0xa186, 0xa186).w(this, FUNC(superwng_state::superwng_cointcnt2_w));
+	map(0xa187, 0xa187).w(this, FUNC(superwng_state::superwng_unk_a187_w)); // unknown, always(?) 0
+}
 
-ADDRESS_MAP_START(superwng_state::superwng_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(superwng_sound_nmi_clear_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-ADDRESS_MAP_END
+void superwng_state::superwng_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x3000, 0x3000).w(this, FUNC(superwng_state::superwng_sound_nmi_clear_w));
+	map(0x4000, 0x4000).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x5000, 0x5000).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6000).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x7000, 0x7000).w("ay2", FUNC(ay8910_device::address_w));
+}
 
 static INPUT_PORTS_START( superwng )
 	PORT_START("P1")

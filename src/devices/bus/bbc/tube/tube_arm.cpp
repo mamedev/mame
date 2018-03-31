@@ -23,12 +23,13 @@ DEFINE_DEVICE_TYPE(BBC_TUBE_ARM, bbc_tube_arm_device, "bbc_tube_arm", "ARM Evalu
 //  ADDRESS_MAP( tube_arm_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(bbc_tube_arm_device::tube_arm_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000000, 0x03fffff) AM_READWRITE8(ram_r, ram_w, 0xffffffff)
-	AM_RANGE(0x1000000, 0x100001f) AM_DEVREADWRITE8("ula", tube_device, parasite_r, parasite_w, 0x000000ff)
-	AM_RANGE(0x3000000, 0x3003fff) AM_ROM AM_REGION("bootstrap", 0) AM_MIRROR(0xc000)
-ADDRESS_MAP_END
+void bbc_tube_arm_device::tube_arm_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000000, 0x03fffff).rw(this, FUNC(bbc_tube_arm_device::ram_r), FUNC(bbc_tube_arm_device::ram_w));
+	map(0x1000000, 0x100001f).rw("ula", FUNC(tube_device::parasite_r), FUNC(tube_device::parasite_w)).umask32(0x000000ff);
+	map(0x3000000, 0x3003fff).rom().region("bootstrap", 0).mirror(0xc000);
+}
 
 //-------------------------------------------------
 //  ROM( tube_arm )
@@ -38,11 +39,11 @@ ROM_START( tube_arm )
 	ROM_REGION(0x4000, "bootstrap", 0)
 	ROM_DEFAULT_BIOS("101")
 	ROM_SYSTEM_BIOS(0, "101", "Executive v1.00 (14th August 1986)")
-	ROMX_LOAD("ARMeval_101.rom", 0x0000, 0x4000, CRC(cab85473) SHA1(f86bbc4894e62725b8ef22d44e7f44d37c98ac14), ROM_BIOS(1))
+	ROMX_LOAD("armeval_101.rom", 0x0000, 0x4000, CRC(cab85473) SHA1(f86bbc4894e62725b8ef22d44e7f44d37c98ac14), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "100", "Executive v1.00 (6th June 1986)")
-	ROMX_LOAD("ARMeval_100.rom", 0x0000, 0x4000, CRC(ed80462a) SHA1(ba33eaf1a23cfef6fc1b88aa516ca2b3693e69d9), ROM_BIOS(2))
+	ROMX_LOAD("armeval_100.rom", 0x0000, 0x4000, CRC(ed80462a) SHA1(ba33eaf1a23cfef6fc1b88aa516ca2b3693e69d9), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "005", "Brazil v-.005 (8th August 1986)")
-	ROMX_LOAD("Brazil_005.rom", 0x0000, 0x4000, CRC(7c27c098) SHA1(abcc71cbc43489e89a87aac64e67b17daef5895a), ROM_BIOS(3))
+	ROMX_LOAD("brazil_005.rom", 0x0000, 0x4000, CRC(7c27c098) SHA1(abcc71cbc43489e89a87aac64e67b17daef5895a), ROM_BIOS(3))
 ROM_END
 
 //-------------------------------------------------

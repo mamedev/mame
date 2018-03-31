@@ -21,27 +21,27 @@
 //**************************************************************************
 
 #define MCFG_BML3BUS_CPU(_cputag) \
-	bml3bus_device::static_set_cputag(*device, "^" _cputag);
+	downcast<bml3bus_device &>(*device).set_cputag("^" _cputag);
 
 #define MCFG_BML3BUS_OUT_NMI_CB(_devcb) \
-	devcb = &bml3bus_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<bml3bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_BML3BUS_OUT_IRQ_CB(_devcb) \
-	devcb = &bml3bus_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<bml3bus_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_BML3BUS_OUT_FIRQ_CB(_devcb) \
-	devcb = &bml3bus_device::set_out_firq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<bml3bus_device &>(*device).set_out_firq_callback(DEVCB_##_devcb);
 
 #define MCFG_BML3BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, BML3BUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	bml3bus_slot_device::static_set_bml3bus_slot(*device, _nbtag, _tag);
+	downcast<bml3bus_slot_device &>(*device).set_bml3bus_slot(_nbtag, _tag);
 #define MCFG_BML3BUS_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_BML3BUS_ONBOARD_ADD(_nbtag, _tag, _dev_type) \
 	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	device_bml3bus_card_interface::static_set_bml3bus_tag(*device, _nbtag, _tag);
+	downcast<device_bml3bus_card_interface &>(*device).set_bml3bus_tag(_nbtag, _tag);
 
 
 //**************************************************************************
@@ -61,7 +61,7 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_bml3bus_slot(device_t &device, const char *tag, const char *slottag);
+	void set_bml3bus_slot(const char *tag, const char *slottag) { m_bml3bus_tag = tag; m_bml3bus_slottag = slottag; }
 
 protected:
 	bml3bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -83,10 +83,10 @@ public:
 	bml3bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<bml3bus_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<bml3bus_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_firq_callback(device_t &device, Object &&cb) { return downcast<bml3bus_device &>(device).m_out_firq_cb.set_callback(std::forward<Object>(cb)); }
+	void set_cputag(const char *tag) { m_maincpu.set_tag(tag); }
+	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_firq_callback(Object &&cb) { return m_out_firq_cb.set_callback(std::forward<Object>(cb)); }
 
 	void add_bml3bus_card(int slot, device_bml3bus_card_interface *card);
 	device_bml3bus_card_interface *get_bml3bus_card(int slot);
@@ -145,7 +145,7 @@ public:
 	void lower_slot_firq() { m_bml3bus->set_firq_line(CLEAR_LINE); }
 
 	// inline configuration
-	static void static_set_bml3bus_tag(device_t &device, const char *tag, const char *slottag);
+	void set_bml3bus_tag(const char *tag, const char *slottag) { m_bml3bus_tag = tag; m_bml3bus_slottag = slottag; }
 
 protected:
 	device_bml3bus_card_interface(const machine_config &mconfig, device_t &device);

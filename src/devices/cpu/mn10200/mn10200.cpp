@@ -37,7 +37,7 @@ enum mn10200_flag
 };
 
 
-DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "MN1020012A")
+DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "Panasonic MN1020012A")
 
 // internal memory maps
 ADDRESS_MAP_START(mn10200_device::mn1020012a_internal_map)
@@ -89,9 +89,9 @@ void mn10200_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-util::disasm_interface *mn10200_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mn10200_device::create_disassembler()
 {
-	return new mn10200_disassembler;
+	return std::make_unique<mn10200_disassembler>();
 }
 
 

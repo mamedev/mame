@@ -36,7 +36,7 @@
 #define clkMEM 3
 
 
-DEFINE_DEVICE_TYPE(V810, v810_device, "v810", "V810")
+DEFINE_DEVICE_TYPE(V810, v810_device, "v810", "NEC V810")
 
 
 v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -55,9 +55,9 @@ device_memory_interface::space_config_vector v810_device::memory_space_config() 
 }
 
 
-util::disasm_interface *v810_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 {
-	return new v810_disassembler;
+	return std::make_unique<v810_disassembler>();
 }
 
 

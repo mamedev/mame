@@ -31,8 +31,8 @@ public:
 	// construction/destruction
 	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_set_bits(device_t &device, tlc34076_bits bits);
+	// configuration helpers
+	void set_bits(tlc34076_bits bits) { m_dacbits = bits; }
 
 	// public interface
 	const rgb_t *get_pens();
@@ -62,7 +62,7 @@ private:
 
 #define MCFG_TLC34076_ADD(tag, bits) \
 	MCFG_DEVICE_ADD((tag), TLC34076, 0) \
-	tlc34076_device::static_set_bits(*device, (tlc34076_device::bits));
+	downcast<tlc34076_device &>(*device).set_bits((tlc34076_device::bits));
 
 
 DECLARE_DEVICE_TYPE(TLC34076, tlc34076_device)

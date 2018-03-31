@@ -21,11 +21,11 @@
 #define MCFG_V9938_ADD(_tag, _screen, _vramsize, _clock) \
 	MCFG_DEVICE_ADD(_tag, V9938, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
-	v9938_device::static_set_vram_size(*device, _vramsize);
+	downcast<v99x8_device &>(*device).set_vram_size(_vramsize);
 #define MCFG_V9958_ADD(_tag, _screen, _vramsize, _clock) \
 	MCFG_DEVICE_ADD(_tag, V9958, _clock) \
 	MCFG_VIDEO_SET_SCREEN(_screen) \
-	v9938_device::static_set_vram_size(*device, _vramsize);
+	downcast<v99x8_device &>(*device).set_vram_size(_vramsize);
 
 #define MCFG_V99X8_SCREEN_ADD_NTSC(_screen_tag, _v9938_tag, _clock) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -91,7 +91,7 @@ public:
 	void command_w(uint8_t data);
 	void register_w(uint8_t data);
 
-	static void static_set_vram_size(device_t &device, uint32_t vram_size);
+	void set_vram_size(uint32_t vram_size) { m_vram_size = vram_size; }
 
 	/* RESET pin */
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }

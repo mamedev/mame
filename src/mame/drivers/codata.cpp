@@ -34,18 +34,19 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(codata_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x200000, 0x203fff) AM_ROM AM_REGION("user1", 0);
-	AM_RANGE(0x400000, 0x403fff) AM_ROM AM_REGION("user1", 0x4000);
-	AM_RANGE(0x600000, 0x600007) AM_MIRROR(0x1ffff8) AM_DEVREADWRITE8("uart", upd7201_new_device, ba_cd_r, ba_cd_w, 0xff00)
-	AM_RANGE(0x800000, 0x800003) AM_MIRROR(0x1ffffc) AM_DEVREADWRITE("timer", am9513_device, read16, write16)
-	AM_RANGE(0xe00000, 0xe00001) AM_MIRROR(0x1ffffe) AM_READ_PORT("INPUT")
+void codata_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).ram().share("rambase");
+	map(0x200000, 0x203fff).rom().region("user1", 0);
+	map(0x400000, 0x403fff).rom().region("user1", 0x4000);
+	map(0x600000, 0x600007).mirror(0x1ffff8).rw("uart", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0xff00);
+	map(0x800000, 0x800003).mirror(0x1ffffc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+	map(0xe00000, 0xe00001).mirror(0x1ffffe).portr("INPUT");
 	//AM_RANGE(0xa00000, 0xbfffff) page map (rw)
 	//AM_RANGE(0xc00000, 0xdfffff) segment map (rw), context register (r)
 	//AM_RANGE(0xe00000, 0xffffff) context register (w), 16-bit parallel input port (r)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( codata )

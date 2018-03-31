@@ -57,6 +57,7 @@ public:
 	smc777_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_crtc(*this, "crtc")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
@@ -110,6 +111,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
 	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -232,7 +234,7 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 				case 3: bk_pen = (color ^ 0xf); break; //complementary
 			}
 
-			if(blink && machine().first_screen()->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
+			if(blink && m_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
 
 			for(yi=0;yi<8;yi++)
@@ -266,8 +268,8 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine().first_screen()->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine().first_screen()->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(m_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(m_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
@@ -608,48 +610,50 @@ WRITE8_MEMBER(smc777_state::irq_mask_w)
 	m_irq_mask = data & 1;
 }
 
-ADDRESS_MAP_START(smc777_state::smc777_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(smc777_mem_r, smc777_mem_w)
-ADDRESS_MAP_END
+void smc777_state::smc777_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(smc777_state::smc777_mem_r), FUNC(smc777_state::smc777_mem_w));
+}
 
-ADDRESS_MAP_START(smc777_state::smc777_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x07) AM_SELECT(0xff00) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0x08, 0x0f) AM_SELECT(0xff00) AM_READWRITE(attr_r, attr_w)
-	AM_RANGE(0x10, 0x17) AM_SELECT(0xff00) AM_READWRITE(pcg_r, pcg_w)
-	AM_RANGE(0x18, 0x19) AM_MIRROR(0xff00) AM_WRITE(mc6845_w)
-	AM_RANGE(0x1a, 0x1b) AM_MIRROR(0xff00) AM_READWRITE(key_r, key_w)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff00) AM_READWRITE(system_input_r, system_output_w)
+void smc777_state::smc777_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x07).select(0xff00).rw(this, FUNC(smc777_state::vram_r), FUNC(smc777_state::vram_w));
+	map(0x08, 0x0f).select(0xff00).rw(this, FUNC(smc777_state::attr_r), FUNC(smc777_state::attr_w));
+	map(0x10, 0x17).select(0xff00).rw(this, FUNC(smc777_state::pcg_r), FUNC(smc777_state::pcg_w));
+	map(0x18, 0x19).mirror(0xff00).w(this, FUNC(smc777_state::mc6845_w));
+	map(0x1a, 0x1b).mirror(0xff00).rw(this, FUNC(smc777_state::key_r), FUNC(smc777_state::key_w));
+	map(0x1c, 0x1c).mirror(0xff00).rw(this, FUNC(smc777_state::system_input_r), FUNC(smc777_state::system_output_w));
 //  AM_RANGE(0x1d, 0x1d) system and control read, printer strobe write
 //  AM_RANGE(0x1e, 0x1f) rs232 irq control
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_READWRITE(display_reg_r, display_reg_w)
-	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_READWRITE(irq_mask_r, irq_mask_w)
+	map(0x20, 0x20).mirror(0xff00).rw(this, FUNC(smc777_state::display_reg_r), FUNC(smc777_state::display_reg_w));
+	map(0x21, 0x21).mirror(0xff00).rw(this, FUNC(smc777_state::irq_mask_r), FUNC(smc777_state::irq_mask_w));
 //  AM_RANGE(0x22, 0x22) printer output data
-	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_WRITE(border_col_w)
+	map(0x23, 0x23).mirror(0xff00).w(this, FUNC(smc777_state::border_col_w));
 //  AM_RANGE(0x24, 0x24) rtc write address
 //  AM_RANGE(0x25, 0x25) rtc read
 //  AM_RANGE(0x26, 0x26) rs232 #1
 //  AM_RANGE(0x28, 0x2c) fdc #2
 //  AM_RANGE(0x2d, 0x2f) rs232 #2
-	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff00) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_READWRITE(fdc_request_r, floppy_select_w)
+	map(0x30, 0x33).mirror(0xff00).rw(this, FUNC(smc777_state::fdc_r), FUNC(smc777_state::fdc_w));
+	map(0x34, 0x34).mirror(0xff00).rw(this, FUNC(smc777_state::fdc_request_r), FUNC(smc777_state::floppy_select_w));
 //  AM_RANGE(0x35, 0x37) rs232 #3
 //  AM_RANGE(0x38, 0x3b) cache disk unit
 //  AM_RANGE(0x3c, 0x3d) rgb superimposer
 //  AM_RANGE(0x40, 0x47) ieee-488
 //  AM_RANGE(0x48, 0x4f) hdd (winchester)
-	AM_RANGE(0x51, 0x51) AM_MIRROR(0xff00) AM_READ_PORT("JOY_1P") AM_WRITE(color_mode_w)
-	AM_RANGE(0x52, 0x52) AM_SELECT(0xff00) AM_WRITE(ramdac_w)
-	AM_RANGE(0x53, 0x53) AM_MIRROR(0xff00) AM_DEVWRITE("sn1", sn76489a_device, write)
+	map(0x51, 0x51).mirror(0xff00).portr("JOY_1P").w(this, FUNC(smc777_state::color_mode_w));
+	map(0x52, 0x52).select(0xff00).w(this, FUNC(smc777_state::ramdac_w));
+	map(0x53, 0x53).mirror(0xff00).w("sn1", FUNC(sn76489a_device::write));
 //  AM_RANGE(0x54, 0x59) vrt controller
 //  AM_RANGE(0x5a, 0x5b) ram banking
 //  AM_RANGE(0x70, 0x70) auto-start rom
 //  AM_RANGE(0x74, 0x74) ieee-488 rom
 //  AM_RANGE(0x75, 0x75) vrt controller rom
 //  AM_RANGE(0x7e, 0x7f) kanji rom
-	AM_RANGE(0x80, 0xff) AM_SELECT(0xff00) AM_READWRITE(fbuf_r, fbuf_w)
-ADDRESS_MAP_END
+	map(0x80, 0xff).select(0xff00).rw(this, FUNC(smc777_state::fbuf_r), FUNC(smc777_state::fbuf_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( smc777 )

@@ -128,7 +128,7 @@ void tms9927_device::device_clock_changed()
 void tms9927_device::device_stop()
 {
 	osd_printf_debug("TMS9927: Final params: (%d, %d, %d, %d, %d, %d, %d)\n",
-						clock(),
+						clock() * m_hpixels_per_column,
 						m_total_hpix,
 						0, m_visible_hpix,
 						m_total_vpix,
@@ -351,7 +351,7 @@ void tms9927_device::recompute_parameters(bool postload)
 	rectangle visarea(0, m_overscan_left + m_visible_hpix + m_overscan_right - 1,
 				0, m_overscan_top + m_visible_vpix + m_overscan_bottom - 1);
 
-	attoseconds_t refresh = clocks_to_attotime(m_total_hpix * m_total_vpix).as_attoseconds();
+	attoseconds_t refresh = clocks_to_attotime(HCOUNT * m_total_vpix).as_attoseconds();
 
 	osd_printf_debug("TMS9927: Total = %dx%d, Visible = %dx%d, HSync = %d-%d, VSync = %d-%d, Skew=%d, Upscroll=%d, Period=%f Hz\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, m_hsyn_start, m_hsyn_end, m_vsyn_start, m_vsyn_end, SKEW_BITS, m_start_datarow, ATTOSECONDS_TO_HZ(refresh));
 

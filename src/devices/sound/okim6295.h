@@ -22,15 +22,15 @@
 //**************************************************************************
 
 #define MCFG_OKIM6295_ADD(tag, clock, pin7) \
-		MCFG_DEVICE_ADD((tag), OKIM6295, (clock)) \
-		MCFG_OKIM6295_PIN7(pin7)
+	MCFG_DEVICE_ADD((tag), OKIM6295, (clock)) \
+	MCFG_OKIM6295_PIN7(pin7)
 
 #define MCFG_OKIM6295_REPLACE(tag, clock, pin7) \
-		MCFG_DEVICE_REPLACE((tag), OKIM6295, (clock)) \
-		MCFG_OKIM6295_PIN7(pin7)
+	MCFG_DEVICE_REPLACE((tag), OKIM6295, (clock)) \
+	MCFG_OKIM6295_PIN7(pin7)
 
 #define MCFG_OKIM6295_PIN7(pin7) \
-		okim6295_device::static_set_pin7(*device, (okim6295_device::pin7));
+	downcast<okim6295_device &>(*device).config_pin7((okim6295_device::pin7));
 
 
 //**************************************************************************
@@ -55,7 +55,7 @@ public:
 	okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_pin7(device_t &device, int pin7);
+	void config_pin7(int pin7) { m_pin7_state = pin7; }
 
 	// runtime configuration
 	void set_pin7(int pin7);

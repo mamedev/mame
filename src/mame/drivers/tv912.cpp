@@ -97,8 +97,6 @@ public:
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
 	DECLARE_READ8_MEMBER(uart_status_r);
-	DECLARE_READ8_MEMBER(uart_data_r);
-	DECLARE_WRITE8_MEMBER(uart_data_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(output_40c);
 
@@ -212,19 +210,6 @@ READ8_MEMBER(tv912_state::uart_status_r)
 	status |= m_option->read();
 	m_uart->write_swe(1);
 	return status;
-}
-
-READ8_MEMBER(tv912_state::uart_data_r)
-{
-	m_uart->write_rdav(0);
-	u8 data = m_uart->get_received_data();
-	m_uart->write_rdav(1);
-	return data;
-}
-
-WRITE8_MEMBER(tv912_state::uart_data_w)
-{
-	m_uart->set_transmit_data(data);
 }
 
 WRITE8_MEMBER(tv912_state::output_40c)
@@ -367,24 +352,27 @@ void tv912_state::machine_reset()
 	m_uart->write_cs(1);
 }
 
-ADDRESS_MAP_START(tv912_state::prog_map)
-	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void tv912_state::prog_map(address_map &map)
+{
+	map(0x000, 0xfff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(tv912_state::io_map)
-	AM_RANGE(0x00, 0xff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void tv912_state::io_map(address_map &map)
+{
+	map(0x00, 0xff).m(m_bankdev, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(tv912_state::bank_map)
-	AM_RANGE(0x000, 0x0ff) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x400, 0x403) AM_MIRROR(0x3c0) AM_SELECT(0x030) AM_READWRITE(crtc_r, crtc_w)
-	AM_RANGE(0x404, 0x404) AM_MIRROR(0x3f3) AM_READ(uart_data_r)
-	AM_RANGE(0x408, 0x40b) AM_MIRROR(0x3f0) AM_READ(uart_status_r)
-	AM_RANGE(0x408, 0x408) AM_MIRROR(0x3f3) AM_WRITE(uart_data_w)
-	AM_RANGE(0x40c, 0x40f) AM_MIRROR(0x3f0) AM_READ(keyboard_r)
-	AM_RANGE(0x40c, 0x40c) AM_MIRROR(0x3f3) AM_WRITE(output_40c)
-	AM_RANGE(0x800, 0xfff) AM_RAMBANK("dispram")
-ADDRESS_MAP_END
+void tv912_state::bank_map(address_map &map)
+{
+	map(0x000, 0x0ff).mirror(0x300).ram();
+	map(0x400, 0x403).mirror(0x3c0).select(0x030).rw(this, FUNC(tv912_state::crtc_r), FUNC(tv912_state::crtc_w));
+	map(0x404, 0x404).mirror(0x3f3).r(m_uart, FUNC(ay51013_device::receive));
+	map(0x408, 0x40b).mirror(0x3f0).r(this, FUNC(tv912_state::uart_status_r));
+	map(0x408, 0x408).mirror(0x3f3).w(m_uart, FUNC(ay51013_device::transmit));
+	map(0x40c, 0x40f).mirror(0x3f0).r(this, FUNC(tv912_state::keyboard_r));
+	map(0x40c, 0x40c).mirror(0x3f3).w(this, FUNC(tv912_state::output_40c));
+	map(0x800, 0xfff).bankrw("dispram");
+}
 
 INPUT_CHANGED_MEMBER(tv912_state::uart_settings_changed)
 {
@@ -627,7 +615,7 @@ static INPUT_PORTS_START( tv912b )
 
 	PORT_START("KEY22")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('/') PORT_CHAR('?') PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('`') PORT_CHAR('@') PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('@') PORT_CHAR('`') PORT_CODE(KEYCODE_TILDE)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -903,7 +891,7 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000), 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(tv912_state, screen_update)
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL(23'814'000))
+	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL(23'814'000) / CHAR_WIDTH)
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
 	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", MCS48_INPUT_IRQ))
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -911,6 +899,7 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_DEVICE_ADD("uart", AY51013, 0)
 	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
 	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_AUTO_RDAV(true)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "loopback")
 

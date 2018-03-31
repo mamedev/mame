@@ -227,24 +227,25 @@ WRITE16_MEMBER( dm7000_state::dm7000_enet_w )
  400f 0xxx   IDE Controller
 
 */
-ADDRESS_MAP_START(dm7000_state::dm7000_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM                                     // RAM page 0 - 32MB
-	AM_RANGE(0x20000000, 0x21ffffff) AM_RAM                                     // RAM page 1 - 32MB
+void dm7000_state::dm7000_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x01ffffff).ram();                                     // RAM page 0 - 32MB
+	map(0x20000000, 0x21ffffff).ram();                                     // RAM page 1 - 32MB
 
-	AM_RANGE(0x40030000, 0x4003000f) AM_READWRITE8(dm7000_iic0_r, dm7000_iic0_w, 0xffffffff)
-	AM_RANGE(0x40040000, 0x40040007) AM_READWRITE8(dm7000_scc0_r, dm7000_scc0_w, 0xffffffff)
-	AM_RANGE(0x40060000, 0x40060047) AM_READWRITE8(dm7000_gpio0_r, dm7000_gpio0_w, 0xffffffff)
-	AM_RANGE(0x400b0000, 0x400b000f) AM_READWRITE8(dm7000_iic1_r, dm7000_iic1_w, 0xffffffff)
-	AM_RANGE(0x400c0000, 0x400c0007) AM_READWRITE8(dm7000_scp0_r, dm7000_scp0_w, 0xffffffff)
+	map(0x40030000, 0x4003000f).rw(this, FUNC(dm7000_state::dm7000_iic0_r), FUNC(dm7000_state::dm7000_iic0_w));
+	map(0x40040000, 0x40040007).rw(this, FUNC(dm7000_state::dm7000_scc0_r), FUNC(dm7000_state::dm7000_scc0_w));
+	map(0x40060000, 0x40060047).rw(this, FUNC(dm7000_state::dm7000_gpio0_r), FUNC(dm7000_state::dm7000_gpio0_w));
+	map(0x400b0000, 0x400b000f).rw(this, FUNC(dm7000_state::dm7000_iic1_r), FUNC(dm7000_state::dm7000_iic1_w));
+	map(0x400c0000, 0x400c0007).rw(this, FUNC(dm7000_state::dm7000_scp0_r), FUNC(dm7000_state::dm7000_scp0_w));
 
 	/* ENET - ASIX AX88796 */
-	AM_RANGE(0x72000300, 0x720003ff) AM_READWRITE16(dm7000_enet_r, dm7000_enet_w, 0xffffffff)
+	map(0x72000300, 0x720003ff).rw(this, FUNC(dm7000_state::dm7000_enet_r), FUNC(dm7000_state::dm7000_enet_w));
 
-	AM_RANGE(0x7f800000, 0x7ffdffff) AM_ROM AM_REGION("user2",0)
-	AM_RANGE(0x7ffe0000, 0x7fffffff) AM_ROM AM_REGION("user1",0)
+	map(0x7f800000, 0x7ffdffff).rom().region("user2", 0);
+	map(0x7ffe0000, 0x7fffffff).rom().region("user1", 0);
 	//AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dm7000 )

@@ -745,14 +745,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 
 	if (scanline == 384)
 	{
+		if (m_m1comm != nullptr)
+			m_m1comm->check_vint_irq();
 		irq_raise(1);
 	}
 	else if(scanline == 384/2)
 	{
 		irq_raise(m_sound_irq);
-
-		if (m_m1comm != nullptr)
-			m_m1comm->check_vint_irq();
 	}
 }
 
@@ -863,109 +862,118 @@ WRITE16_MEMBER(model1_state::mr2_w)
 		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), m_maincpu->pc());
 }
 
-ADDRESS_MAP_START(model1_state::model1_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x200000, 0x2fffff) AM_ROM
+void model1_state::model1_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x1fffff).bankr("bank1");
+	map(0x200000, 0x2fffff).rom();
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_SHARE("mr2")
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_SHARE("mr")
+	map(0x400000, 0x40ffff).ram().w(this, FUNC(model1_state::mr2_w)).share("mr2");
+	map(0x500000, 0x53ffff).ram().w(this, FUNC(model1_state::mr_w)).share("mr");
 
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_SHARE("display_list0")
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_SHARE("display_list1")
-	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
+	map(0x600000, 0x60ffff).ram().w(this, FUNC(model1_state::md0_w)).share("display_list0");
+	map(0x610000, 0x61ffff).ram().w(this, FUNC(model1_state::md1_w)).share("display_list1");
+	map(0x680000, 0x680003).rw(this, FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
 
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
-	AM_RANGE(0x720000, 0x720001) AM_WRITENOP        // Unknown, always 0
-	AM_RANGE(0x740000, 0x740001) AM_WRITENOP        // Horizontal synchronization register
-	AM_RANGE(0x760000, 0x760001) AM_WRITENOP        // Vertical synchronization register
-	AM_RANGE(0x770000, 0x770001) AM_WRITENOP        // Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
+	map(0x700000, 0x70ffff).rw(m_tiles, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
+	map(0x720000, 0x720001).nopw();        // Unknown, always 0
+	map(0x740000, 0x740001).nopw();        // Horizontal synchronization register
+	map(0x760000, 0x760001).nopw();        // Vertical synchronization register
+	map(0x770000, 0x770001).nopw();        // Video synchronization switch
+	map(0x780000, 0x7fffff).rw(m_tiles, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("palette")
-	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_SHARE("color_xlat")
+	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
+	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	AM_RANGE(0xb00000, 0xb00fff) AM_DEVREADWRITE8("m1comm", m1comm_device, share_r, share_w, 0xffff)
-	AM_RANGE(0xb01000, 0xb01001) AM_DEVREADWRITE8("m1comm", m1comm_device, cn_r, cn_w, 0x00ff)
-	AM_RANGE(0xb01002, 0xb01003) AM_DEVREADWRITE8("m1comm", m1comm_device, fg_r, fg_w, 0x00ff)
+	map(0xc00000, 0xc0003f).rw(this, FUNC(model1_state::io_r), FUNC(model1_state::io_w));
 
-	AM_RANGE(0xc00000, 0xc0003f) AM_READWRITE(io_r, io_w)
+	map(0xc00040, 0xc00043).rw(this, FUNC(model1_state::network_ctl_r), FUNC(model1_state::network_ctl_w));
 
-	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
+	map(0xc00200, 0xc002ff).ram().share("nvram");
 
-	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
+	map(0xc40000, 0xc40000).rw(m_m1uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc40002, 0xc40002).rw(m_m1uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("m1uart", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xc40002, 0xc40003) AM_DEVREADWRITE8("m1uart", i8251_device, status_r, control_w, 0x00ff)
+	map(0xd00000, 0xd00001).rw(this, FUNC(model1_state::model1_tgp_copro_adr_r), FUNC(model1_state::model1_tgp_copro_adr_w));
+	map(0xd20000, 0xd20003).w(this, FUNC(model1_state::model1_tgp_copro_ram_w));
+	map(0xd80000, 0xd80003).w(this, FUNC(model1_state::model1_tgp_copro_w)).mirror(0x10);
+	map(0xdc0000, 0xdc0003).r(this, FUNC(model1_state::fifoin_status_r));
 
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_copro_adr_r, model1_tgp_copro_adr_w)
-	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_tgp_copro_ram_w )
-	AM_RANGE(0xd80000, 0xd80003) AM_WRITE(model1_tgp_copro_w) AM_MIRROR(0x10)
-	AM_RANGE(0xdc0000, 0xdc0003) AM_READ(fifoin_status_r)
+	map(0xe00000, 0xe00001).nopw();        // Watchdog?  IRQ ack? Always 0x20, usually on irq
+	map(0xe00004, 0xe00005).w(this, FUNC(model1_state::bank_w));
+	map(0xe0000c, 0xe0000f).nopw();
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP        // Watchdog?  IRQ ack? Always 0x20, usually on irq
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(bank_w)
-	AM_RANGE(0xe0000c, 0xe0000f) AM_WRITENOP
+	map(0xf80000, 0xffffff).rom();
+}
 
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
+void model1_state::model1_io(address_map &map)
+{
+	map(0xd20000, 0xd20003).r(this, FUNC(model1_state::model1_tgp_copro_ram_r));
+	map(0xd80000, 0xd80003).r(this, FUNC(model1_state::model1_tgp_copro_r));
+}
 
-ADDRESS_MAP_START(model1_state::model1_io)
-	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_tgp_copro_ram_r)
-	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_tgp_copro_r)
-ADDRESS_MAP_END
+void model1_state::model1_comm_mem(address_map &map)
+{
+	model1_mem(map);
 
-ADDRESS_MAP_START(model1_state::model1_vr_mem)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x200000, 0x2fffff) AM_ROM
+	map(0xb00000, 0xb00fff).rw(m_m1comm, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+	map(0xb01000, 0xb01000).rw(m_m1comm, FUNC(m1comm_device::cn_r), FUNC(m1comm_device::cn_w));
+	map(0xb01002, 0xb01002).rw(m_m1comm, FUNC(m1comm_device::fg_r), FUNC(m1comm_device::fg_w));
+}
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_SHARE("mr2")
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_SHARE("mr")
+void model1_state::model1_vr_mem(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x1fffff).bankr("bank1");
+	map(0x200000, 0x2fffff).rom();
 
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_SHARE("display_list0")
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_SHARE("display_list1")
-	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
+	map(0x400000, 0x40ffff).ram().w(this, FUNC(model1_state::mr2_w)).share("mr2");
+	map(0x500000, 0x53ffff).ram().w(this, FUNC(model1_state::mr_w)).share("mr");
 
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
-	AM_RANGE(0x720000, 0x720001) AM_WRITENOP        // Unknown, always 0
-	AM_RANGE(0x740000, 0x740001) AM_WRITENOP        // Horizontal synchronization register
-	AM_RANGE(0x760000, 0x760001) AM_WRITENOP        // Vertical synchronization register
-	AM_RANGE(0x770000, 0x770001) AM_WRITENOP        // Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
+	map(0x600000, 0x60ffff).ram().w(this, FUNC(model1_state::md0_w)).share("display_list0");
+	map(0x610000, 0x61ffff).ram().w(this, FUNC(model1_state::md1_w)).share("display_list1");
+	map(0x680000, 0x680003).rw(this, FUNC(model1_state::model1_listctl_r), FUNC(model1_state::model1_listctl_w));
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("palette")
-	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_SHARE("color_xlat")
+	map(0x700000, 0x70ffff).rw(m_tiles, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
+	map(0x720000, 0x720001).nopw();        // Unknown, always 0
+	map(0x740000, 0x740001).nopw();        // Horizontal synchronization register
+	map(0x760000, 0x760001).nopw();        // Vertical synchronization register
+	map(0x770000, 0x770001).nopw();        // Video synchronization switch
+	map(0x780000, 0x7fffff).rw(m_tiles, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
 
-	AM_RANGE(0xb00000, 0xb00fff) AM_DEVREADWRITE8("m1comm", m1comm_device, share_r, share_w, 0xffff)
-	AM_RANGE(0xb01000, 0xb01001) AM_DEVREADWRITE8("m1comm", m1comm_device, cn_r, cn_w, 0x00ff)
-	AM_RANGE(0xb01002, 0xb01003) AM_DEVREADWRITE8("m1comm", m1comm_device, fg_r, fg_w, 0x00ff)
+	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
+	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	AM_RANGE(0xc00000, 0xc0003f) AM_READWRITE(io_r, io_w)
+	map(0xb00000, 0xb00fff).rw(m_m1comm, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
+	map(0xb01000, 0xb01000).rw(m_m1comm, FUNC(m1comm_device::cn_r), FUNC(m1comm_device::cn_w));
+	map(0xb01002, 0xb01002).rw(m_m1comm, FUNC(m1comm_device::fg_r), FUNC(m1comm_device::fg_w));
 
-	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
+	map(0xc00000, 0xc0003f).rw(this, FUNC(model1_state::io_r), FUNC(model1_state::io_w));
 
-	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
+	map(0xc00040, 0xc00043).rw(this, FUNC(model1_state::network_ctl_r), FUNC(model1_state::network_ctl_w));
 
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("m1uart", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xc40002, 0xc40003) AM_DEVREADWRITE8("m1uart", i8251_device, status_r, control_w, 0x00ff)
+	map(0xc00200, 0xc002ff).ram().share("nvram");
 
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_vr_adr_r, model1_tgp_vr_adr_w)
-	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_vr_tgp_ram_w )
-	AM_RANGE(0xd80000, 0xd80003) AM_WRITE(model1_vr_tgp_w) AM_MIRROR(0x10)
-	AM_RANGE(0xdc0000, 0xdc0003) AM_READ(fifoin_status_r)
+	map(0xc40000, 0xc40000).rw(m_m1uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc40002, 0xc40002).rw(m_m1uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP        // Watchdog?  IRQ ack? Always 0x20, usually on irq
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(bank_w)
-	AM_RANGE(0xe0000c, 0xe0000f) AM_WRITENOP
+	map(0xd00000, 0xd00001).rw(this, FUNC(model1_state::model1_tgp_vr_adr_r), FUNC(model1_state::model1_tgp_vr_adr_w));
+	map(0xd20000, 0xd20003).w(this, FUNC(model1_state::model1_vr_tgp_ram_w));
+	map(0xd80000, 0xd80003).w(this, FUNC(model1_state::model1_vr_tgp_w)).mirror(0x10);
+	map(0xdc0000, 0xdc0003).r(this, FUNC(model1_state::fifoin_status_r));
 
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xe00000, 0xe00001).nopw();        // Watchdog?  IRQ ack? Always 0x20, usually on irq
+	map(0xe00004, 0xe00005).w(this, FUNC(model1_state::bank_w));
+	map(0xe0000c, 0xe0000f).nopw();
 
-ADDRESS_MAP_START(model1_state::model1_vr_io)
-	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_vr_tgp_ram_r)
-	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_vr_tgp_r)
-ADDRESS_MAP_END
+	map(0xfc0000, 0xffffff).rom();
+}
+
+void model1_state::model1_vr_io(address_map &map)
+{
+	map(0xd20000, 0xd20003).r(this, FUNC(model1_state::model1_vr_tgp_ram_r));
+	map(0xd80000, 0xd80003).r(this, FUNC(model1_state::model1_vr_tgp_r));
+}
 
 static INPUT_PORTS_START( vf )
 	PORT_START("IN.0")
@@ -1283,9 +1291,6 @@ ROM_START( vformula )
 	ROM_LOAD32_BYTE( "mpr-14900.41", 0x000002, 0x80000, CRC(aa7c017d) SHA1(0fa2b59a8bb5f5907b2b2567e69d11c73b398dc1) )
 	ROM_LOAD32_BYTE( "mpr-14901.42", 0x000003, 0x80000, CRC(175b7a9a) SHA1(c86602e771cd49bab425b4ba7926d2f44858bd39) )
 
-	ROM_REGION( 0x20000, "commboard", 0 ) /* Comms Board */
-	ROM_LOAD( "epr-15624.17", 0x00000, 0x20000, CRC(9b3ba315) SHA1(0cd0983cc8b2f2d6b41617d0d0a24cc6c188e62a) )
-
 	ROM_REGION( 0x2000, "tgp", 0 ) /* TGP program rom */
 	// The real internal TGP rom
 	ROM_LOAD("315-5573.bin", 0, 0x2000, CRC(ec913af2) SHA1(a18bf6c9d7b35f8b9e513a7d279f13a30b32a961) )
@@ -1558,9 +1563,6 @@ ROM_START( wingwar360 )
 	ROM_REGION( 0x10000, "ioboard", 0 )
 	ROM_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0) )
 
-	ROM_REGION( 0x20000, "commboard", 0 )
-	ROM_LOAD("epr-15112.17", 0x00000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a) )
-
 	// Dumper's note: Video & Drive is the control board in the attendants' tower, same hardware as G-Loc R360 with the two program roms being the only difference.
 	ROM_REGION( 0x400000, "controlboard", 0 )
 	ROM_LOAD("ic22_18851.bin", 0x00000, 0x20000, CRC(85f75bd7) SHA1(43cc8f8c81631d71b661e55e15f3fe8803a8a7e9) )
@@ -1649,8 +1651,16 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
+MACHINE_CONFIG_END
 
-	MCFG_M1COMM_ADD("m1comm")
+MACHINE_CONFIG_START(model1_state::wingwar)
+	model1(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model1_comm_mem)
+
+	MCFG_M1COMM_ADD(M1COMM_TAG)
+	// use EPR-15112
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::swa)
@@ -1666,11 +1676,12 @@ MACHINE_CONFIG_START(model1_state::swa)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(model1_state::polhemus_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("polhemus", 0)
-ADDRESS_MAP_END
+void model1_state::polhemus_map(address_map &map)
+{
+	map.global_mask(0xfffff);
+	map(0x00000, 0x03fff).ram();
+	map(0xf8000, 0xfffff).rom().region("polhemus", 0);
+}
 
 MACHINE_CONFIG_START(model1_state::netmerc)
 	model1(config);
@@ -1721,8 +1732,20 @@ MACHINE_CONFIG_START(model1_state::model1_vr)
 	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
+MACHINE_CONFIG_END
 
-	MCFG_M1COMM_ADD("m1comm")
+MACHINE_CONFIG_START(model1_state::vr)
+	model1_vr(config);
+
+	MCFG_M1COMM_ADD(M1COMM_TAG)
+	// use EPR-15112
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model1_state::vformula)
+	model1_vr(config);
+
+	MCFG_M1COMM_ADD(M1COMM_TAG)
+	// use EPR-15624
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(model1_state,wingwar360)
@@ -1789,12 +1812,12 @@ WRITE16_MEMBER(model1_state::r360_w)
 	}
 }
 
-GAME( 1993, vf,         0,       model1,    vf,      model1_state,  0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,         0,       model1_vr, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
-GAME( 1993, vformula,   vr,      model1_vr, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,       swa,     model1_state,  0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,    0,       model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj,   wingwar, model1,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwar360, wingwar, model1,    wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       netmerc,   vf,      model1_state,  0,          ROT0, "Sega", "Sega NetMerc", MACHINE_NOT_WORKING )
+GAME( 1993, vf,         0,       model1,   vf,      model1_state,  0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       vr,       vr,      model1_state,  0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAME( 1993, vformula,   vr,      vformula, vr,      model1_state,  0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,      swa,     model1_state,  0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       wingwar,  wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, wingwar,  wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, wingwar,  wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwar360, wingwar, wingwar,  wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,  vf,      model1_state,  0,          ROT0, "Sega", "Sega NetMerc", MACHINE_NOT_WORKING )

@@ -82,49 +82,54 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(leland_state::master_map_program)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(leland_battery_ram_w) AM_SHARE("battery")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(leland_gated_paletteram_r, leland_gated_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_master_video_addr_w)
-ADDRESS_MAP_END
+void leland_state::master_map_program(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xdfff).bankr("bank2").w(this, FUNC(leland_state::leland_battery_ram_w)).share("battery");
+	map(0xe000, 0xefff).ram().share("mainram");
+	map(0xf000, 0xf3ff).rw(this, FUNC(leland_state::leland_gated_paletteram_r), FUNC(leland_state::leland_gated_paletteram_w)).share("palette");
+	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_master_video_addr_w));
+}
 
-ADDRESS_MAP_START(leland_state::master_map_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
-	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
-ADDRESS_MAP_END
+void leland_state::master_map_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(this, FUNC(leland_state::leland_master_alt_bankswitch_w));
+	map(0xfd, 0xff).rw(this, FUNC(leland_state::leland_master_analog_key_r), FUNC(leland_state::leland_master_analog_key_w));
+}
 
-ADDRESS_MAP_START(leland_state::master_redline_map_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("custom", leland_80186_sound_device, leland_80186_response_r, leland_80186_command_lo_w)
-	AM_RANGE(0xf4, 0xf4) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_hi_w)
-	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
-ADDRESS_MAP_END
-
-
-ADDRESS_MAP_START(leland_state::master_map_program_2)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(ataxx_battery_ram_w) AM_SHARE("battery")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(ataxx_paletteram_and_misc_r, ataxx_paletteram_and_misc_w) AM_SHARE("palette")
-ADDRESS_MAP_END
+void leland_state::master_redline_map_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(this, FUNC(leland_state::leland_master_alt_bankswitch_w));
+	map(0xf2, 0xf2).rw(m_sound, FUNC(leland_80186_sound_device::leland_80186_response_r), FUNC(leland_80186_sound_device::leland_80186_command_lo_w));
+	map(0xf4, 0xf4).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_hi_w));
+	map(0xfd, 0xff).rw(this, FUNC(leland_state::leland_master_analog_key_r), FUNC(leland_state::leland_master_analog_key_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::master_map_io_2)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("custom", leland_80186_sound_device, leland_80186_response_r)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_hi_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_lo_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("custom", leland_80186_sound_device, ataxx_80186_control_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(ataxx_eeprom_r, ataxx_eeprom_w)
-	AM_RANGE(0xd0, 0xef) AM_READWRITE(ataxx_mvram_port_r, ataxx_mvram_port_w)
-	AM_RANGE(0xf0, 0xff) AM_READWRITE(ataxx_master_input_r, ataxx_master_output_w)
-ADDRESS_MAP_END
+void leland_state::master_map_program_2(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xdfff).bankr("bank2").w(this, FUNC(leland_state::ataxx_battery_ram_w)).share("battery");
+	map(0xe000, 0xf7ff).ram().share("mainram");
+	map(0xf800, 0xffff).rw(this, FUNC(leland_state::ataxx_paletteram_and_misc_r), FUNC(leland_state::ataxx_paletteram_and_misc_w)).share("palette");
+}
+
+
+void leland_state::master_map_io_2(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x04, 0x04).r(m_sound, FUNC(leland_80186_sound_device::leland_80186_response_r));
+	map(0x05, 0x05).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_hi_w));
+	map(0x06, 0x06).w(m_sound, FUNC(leland_80186_sound_device::leland_80186_command_lo_w));
+	map(0x0c, 0x0c).w(m_sound, FUNC(leland_80186_sound_device::ataxx_80186_control_w));
+	map(0x20, 0x20).rw(this, FUNC(leland_state::ataxx_eeprom_r), FUNC(leland_state::ataxx_eeprom_w));
+	map(0xd0, 0xef).rw(this, FUNC(leland_state::ataxx_mvram_port_r), FUNC(leland_state::ataxx_mvram_port_w));
+	map(0xf0, 0xff).rw(this, FUNC(leland_state::ataxx_master_input_r), FUNC(leland_state::ataxx_master_output_w));
+}
 
 
 
@@ -134,48 +139,53 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(leland_state::slave_small_map_program)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xdfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ(leland_raster_r)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(leland_slave_small_banksw_w)
-ADDRESS_MAP_END
+void leland_state::slave_small_map_program(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0xdfff).bankr("bank3");
+	map(0xe000, 0xefff).ram();
+	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xf802, 0xf802).r(this, FUNC(leland_state::leland_raster_r));
+	map(0xf803, 0xf803).w(this, FUNC(leland_state::leland_slave_small_banksw_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::slave_large_map_program)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(leland_slave_large_banksw_w)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ(leland_raster_r)
-ADDRESS_MAP_END
+void leland_state::slave_large_map_program(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xc000).w(this, FUNC(leland_state::leland_slave_large_banksw_w));
+	map(0xe000, 0xefff).ram();
+	map(0xf800, 0xf801).w(this, FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xf802, 0xf802).r(this, FUNC(leland_state::leland_raster_r));
+}
 
 
-ADDRESS_MAP_START(leland_state::slave_map_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
-	AM_RANGE(0x40, 0x5f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
-ADDRESS_MAP_END
+void leland_state::slave_map_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x1f).rw(this, FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
+	map(0x40, 0x5f).rw(this, FUNC(leland_state::leland_svram_port_r), FUNC(leland_state::leland_svram_port_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::slave_map_program)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank3")
-	AM_RANGE(0xa000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xfffc, 0xfffd) AM_WRITE(leland_slave_video_addr_w)
-	AM_RANGE(0xfffe, 0xfffe) AM_READ(leland_raster_r)
-	AM_RANGE(0xffff, 0xffff) AM_WRITE(ataxx_slave_banksw_w)
-ADDRESS_MAP_END
+void leland_state::slave_map_program(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x9fff).bankr("bank3");
+	map(0xa000, 0xdfff).rom();
+	map(0xe000, 0xefff).ram();
+	map(0xfffc, 0xfffd).w(this, FUNC(leland_state::leland_slave_video_addr_w));
+	map(0xfffe, 0xfffe).r(this, FUNC(leland_state::leland_raster_r));
+	map(0xffff, 0xffff).w(this, FUNC(leland_state::ataxx_slave_banksw_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::slave_map_io_2)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x7f) AM_READWRITE(ataxx_svram_port_r, ataxx_svram_port_w)
-ADDRESS_MAP_END
+void leland_state::slave_map_io_2(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x60, 0x7f).rw(this, FUNC(leland_state::ataxx_svram_port_r), FUNC(leland_state::ataxx_svram_port_w));
+}
 
 /*************************************
  *
@@ -183,22 +193,26 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(leland_state::leland_80186_map_program)
-	AM_RANGE(0x00000, 0x03fff) AM_MIRROR(0x1c000) AM_RAM
-	AM_RANGE(0x20000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void leland_state::leland_80186_map_program(address_map &map)
+{
+	map(0x00000, 0x03fff).mirror(0x1c000).ram();
+	map(0x20000, 0xfffff).rom();
+}
 
-ADDRESS_MAP_START(leland_state::ataxx_80186_map_io)
-ADDRESS_MAP_END
+void leland_state::ataxx_80186_map_io(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(leland_state::redline_80186_map_io)
-	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", redline_80186_sound_device, redline_dac_w)
-ADDRESS_MAP_END
+void leland_state::redline_80186_map_io(address_map &map)
+{
+	map(0x0000, 0xffff).w("custom", FUNC(redline_80186_sound_device::redline_dac_w));
+}
 
 
-ADDRESS_MAP_START(leland_state::leland_80186_map_io)
-	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", leland_80186_sound_device, dac_w)
-ADDRESS_MAP_END
+void leland_state::leland_80186_map_io(address_map &map)
+{
+	map(0x0000, 0xffff).w(m_sound, FUNC(leland_80186_sound_device::dac_w));
+}
 
 
 /************************************************************************
@@ -1574,18 +1588,18 @@ ROM_END
 
 ROM_START( dblplay )
 	ROM_REGION( 0x38000, "master", 0 )
-	ROM_LOAD( "15018-01.u101",   0x00000, 0x02000, CRC(17b6af29) SHA1(00865927d74f735ed9bbe635bb554d408bf7f856) )
-	ROM_LOAD( "15019-01.u102",   0x10000, 0x02000, CRC(9fc8205e) SHA1(2b783c406539a3d06adacd6b15c8edd86b994561) )
+	ROM_LOAD( "15018-01.u101",  0x00000, 0x02000, CRC(17b6af29) SHA1(00865927d74f735ed9bbe635bb554d408bf7f856) )
+	ROM_LOAD( "15019-01.u102",  0x10000, 0x02000, CRC(9fc8205e) SHA1(2b783c406539a3d06adacd6b15c8edd86b994561) )
 	ROM_CONTINUE(               0x1c000, 0x02000 )
-	ROM_LOAD( "15020-01.u103",   0x12000, 0x02000, CRC(4edcc091) SHA1(5db2641fb92eeba22b731074e2818484aaa247a0) )
+	ROM_LOAD( "15020-01.u103",  0x12000, 0x02000, CRC(4edcc091) SHA1(5db2641fb92eeba22b731074e2818484aaa247a0) )
 	ROM_CONTINUE(               0x1e000, 0x02000 )
-	ROM_LOAD( "15021-01.u104",   0x14000, 0x02000, CRC(a0eba1c7) SHA1(5d1afd2e6f694416ab64aec334ce6f7803dac93e) )
+	ROM_LOAD( "15021-01.u104",  0x14000, 0x02000, CRC(a0eba1c7) SHA1(5d1afd2e6f694416ab64aec334ce6f7803dac93e) )
 	ROM_CONTINUE(               0x20000, 0x02000 )
-	ROM_LOAD( "15022-01.u105",   0x16000, 0x02000, CRC(7bbfe0b7) SHA1(551e4d48ffc8f3660d59bb4e59f73d438f4eb20d) )
+	ROM_LOAD( "15022-01.u105",  0x16000, 0x02000, CRC(7bbfe0b7) SHA1(551e4d48ffc8f3660d59bb4e59f73d438f4eb20d) )
 	ROM_CONTINUE(               0x22000, 0x02000 )
-	ROM_LOAD( "15023-01.u106",   0x18000, 0x02000, CRC(bbedae34) SHA1(4c15f63ea6ac822a6c9bc5c3b9f9e5a62e57b88c) )
+	ROM_LOAD( "15023-01.u106",  0x18000, 0x02000, CRC(bbedae34) SHA1(4c15f63ea6ac822a6c9bc5c3b9f9e5a62e57b88c) )
 	ROM_CONTINUE(               0x24000, 0x02000 )
-	ROM_LOAD( "15024-01.u107",   0x1a000, 0x02000, CRC(02afcf52) SHA1(686332740733d92f87fb004de85be4cb9cbaabc0) )
+	ROM_LOAD( "15024-01.u107",  0x1a000, 0x02000, CRC(02afcf52) SHA1(686332740733d92f87fb004de85be4cb9cbaabc0) )
 	ROM_CONTINUE(               0x26000, 0x02000 )
 	/* Extra banks ( referred to as the "top" board) */
 	ROM_LOAD( "15025-01.u2t",   0x28000, 0x02000, CRC(1c959895) SHA1(efd40c1775f8283162602fdb490bfc18ee784a12) )
@@ -1640,18 +1654,18 @@ For Strike Zone, the label format is:
 */
 ROM_START( strkzone )
 	ROM_REGION( 0x38000, "master", 0 )
-	ROM_LOAD( "strkzone.u101",   0x00000, 0x04000, CRC(8d83a611) SHA1(d17114559c8d60e3107895bdcb1886cc843b624c) )
-	ROM_LOAD( "strkzone.u102",   0x10000, 0x02000, CRC(3859e67d) SHA1(0a0d18c16fa5becae2ecc147dfafadc16dee8d2f) )
+	ROM_LOAD( "strkzone.u101",  0x00000, 0x04000, CRC(8d83a611) SHA1(d17114559c8d60e3107895bdcb1886cc843b624c) )
+	ROM_LOAD( "strkzone.u102",  0x10000, 0x02000, CRC(3859e67d) SHA1(0a0d18c16fa5becae2ecc147dfafadc16dee8d2f) )
 	ROM_CONTINUE(               0x1c000, 0x02000 )
-	ROM_LOAD( "strkzone.u103",   0x12000, 0x02000, CRC(cdd83bfb) SHA1(6d5c1e9e951a0bfdd79fd54b06e2e4f1bf8e37b4) )
+	ROM_LOAD( "strkzone.u103",  0x12000, 0x02000, CRC(cdd83bfb) SHA1(6d5c1e9e951a0bfdd79fd54b06e2e4f1bf8e37b4) )
 	ROM_CONTINUE(               0x1e000, 0x02000 )
-	ROM_LOAD( "strkzone.u104",   0x14000, 0x02000, CRC(be280212) SHA1(f48f2edd41bd4f2729ee6c15fb228c758da40ea1) )
+	ROM_LOAD( "strkzone.u104",  0x14000, 0x02000, CRC(be280212) SHA1(f48f2edd41bd4f2729ee6c15fb228c758da40ea1) )
 	ROM_CONTINUE(               0x20000, 0x02000 )
-	ROM_LOAD( "strkzone.u105",   0x16000, 0x02000, CRC(afb63390) SHA1(42df802ca2a247b971ae274bd6f7d1f1e5893fe3) )
+	ROM_LOAD( "strkzone.u105",  0x16000, 0x02000, CRC(afb63390) SHA1(42df802ca2a247b971ae274bd6f7d1f1e5893fe3) )
 	ROM_CONTINUE(               0x22000, 0x02000 )
-	ROM_LOAD( "strkzone.u106",   0x18000, 0x02000, CRC(e853b9f6) SHA1(07cc7bd0053422d68526a6e1b68165db60af6429) )
+	ROM_LOAD( "strkzone.u106",  0x18000, 0x02000, CRC(e853b9f6) SHA1(07cc7bd0053422d68526a6e1b68165db60af6429) )
 	ROM_CONTINUE(               0x24000, 0x02000 )
-	ROM_LOAD( "strkzone.u107",   0x1a000, 0x02000, CRC(1b4b6c2d) SHA1(9cd5e5ce7bc3088f14b6cbbd7c2d5b5e69a7bc11) )
+	ROM_LOAD( "strkzone.u107",  0x1a000, 0x02000, CRC(1b4b6c2d) SHA1(9cd5e5ce7bc3088f14b6cbbd7c2d5b5e69a7bc11) )
 	ROM_CONTINUE(               0x26000, 0x02000 )
 	/* Extra banks ( referred to as the "top" board) */
 	ROM_LOAD( "strkzone.u2t",   0x28000, 0x02000, CRC(8e0af06f) SHA1(ad277433a2c97c388e626a0ce9119466dff85d37) )
@@ -2420,95 +2434,187 @@ ROM_START( offroadt2p )
 ROM_END
 
 
+/*
+Pig Out: Dine Like a Swine!, the label format is:
+------------------------
+|(C)1990 Leland Corp.  | -> Copyright & Manufacturer
+|P/N 03-29020-01       | -> Part number with revision
+|PIGOUT           U58T | -> Game name & ROM PCB location
+------------------------
+*/
 ROM_START( pigout )
 	ROM_REGION( 0x040000, "master", 0 )
-	ROM_LOAD( "poutu58t.bin",  0x00000, 0x10000, CRC(8fe4b683) SHA1(6f98a4e54a558a642b7193af85823b29ade46919) )
-	ROM_LOAD( "poutu59t.bin",  0x10000, 0x10000, CRC(ab907762) SHA1(971c34ae42c17aa27880665966dc15a98387bebb) )
-	ROM_LOAD( "poutu57t.bin",  0x20000, 0x10000, CRC(c22be0ff) SHA1(52b76918358046f40ea4b74e53a38d8984125dbb) )
+	ROM_LOAD( "03-29020.u58t",    0x00000, 0x10000, CRC(8fe4b683) SHA1(6f98a4e54a558a642b7193af85823b29ade46919) ) /* more likely rev 02 than rev 00 */
+	ROM_LOAD( "03-29021.u59t",    0x10000, 0x10000, CRC(ab907762) SHA1(971c34ae42c17aa27880665966dc15a98387bebb) ) /* more likely rev 02 than rev 00 */
+	ROM_LOAD( "03-29019-01.u57t", 0x20000, 0x10000, CRC(c22be0ff) SHA1(52b76918358046f40ea4b74e53a38d8984125dbb) )
 
 	ROM_REGION( 0x080000, "slave", 0 )
-	ROM_LOAD( "poutu3.bin",   0x00000, 0x02000, CRC(af213cb7) SHA1(cf31ee09ee3685274f5ce1df954e7e87199e2e80) )
-	ROM_LOAD( "poutu2t.bin",  0x10000, 0x10000, CRC(b23164c6) SHA1(11edbea7bf54a68cb85df36345f39654d726a7f2) )
-	ROM_LOAD( "poutu3t.bin",  0x20000, 0x10000, CRC(d93f105f) SHA1(9fe469d674e84209eb55704fd2ad317d11e4caac) )
-	ROM_LOAD( "poutu4t.bin",  0x30000, 0x10000, CRC(b7c47bfe) SHA1(42b1ce4401e3754f6fb1453ab4a661dc4237770d) )
-	ROM_LOAD( "poutu5t.bin",  0x40000, 0x10000, CRC(d9b9dfbf) SHA1(a6f663638d9f6e14c1a6a99ca811d1d495664412) )
-	ROM_LOAD( "poutu6t.bin",  0x50000, 0x10000, CRC(728c7c1a) SHA1(cc3211313a6b3998a0458d3865e3d2a0f9eb8a94) )
-	ROM_LOAD( "poutu7t.bin",  0x60000, 0x10000, CRC(393bd990) SHA1(d66d3c5c6d97bb983549d5037bd69c481751b9bf) )
-	ROM_LOAD( "poutu8t.bin",  0x70000, 0x10000, CRC(cb9ffaad) SHA1(f39fb33e5a30619cd3017574739ccace80afbe1f) )
+	ROM_LOAD( "03-29000-01.u3",   0x00000, 0x02000, CRC(af213cb7) SHA1(cf31ee09ee3685274f5ce1df954e7e87199e2e80) )
+	ROM_LOAD( "03-29001-01.u2t",  0x10000, 0x10000, CRC(b23164c6) SHA1(11edbea7bf54a68cb85df36345f39654d726a7f2) )
+	ROM_LOAD( "03-29002-01.u3t",  0x20000, 0x10000, CRC(d93f105f) SHA1(9fe469d674e84209eb55704fd2ad317d11e4caac) )
+	ROM_LOAD( "03-29003-01.u4t",  0x30000, 0x10000, CRC(b7c47bfe) SHA1(42b1ce4401e3754f6fb1453ab4a661dc4237770d) )
+	ROM_LOAD( "03-29004-01.u5t",  0x40000, 0x10000, CRC(d9b9dfbf) SHA1(a6f663638d9f6e14c1a6a99ca811d1d495664412) )
+	ROM_LOAD( "03-29005-01.u6t",  0x50000, 0x10000, CRC(728c7c1a) SHA1(cc3211313a6b3998a0458d3865e3d2a0f9eb8a94) )
+	ROM_LOAD( "03-29006-01.u7t",  0x60000, 0x10000, CRC(393bd990) SHA1(d66d3c5c6d97bb983549d5037bd69c481751b9bf) )
+	ROM_LOAD( "03-29007-01.u8t",  0x70000, 0x10000, CRC(cb9ffaad) SHA1(f39fb33e5a30619cd3017574739ccace80afbe1f) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "poutu25t.bin", 0x040001, 0x10000, CRC(92cd2617) SHA1(88e318f4a41c67fd9e91f013b3c29b6275b69c31) )
-	ROM_LOAD16_BYTE( "poutu13t.bin", 0x040000, 0x10000, CRC(9448c389) SHA1(7bb0bd49044ba4b302048d2922ed300f799a2efb) )
-	ROM_LOAD16_BYTE( "poutu26t.bin", 0x060001, 0x10000, CRC(ab57de8f) SHA1(28a366e7441bc85dfb814f7a7797aa704a0277ba) )
-	ROM_LOAD16_BYTE( "poutu14t.bin", 0x060000, 0x10000, CRC(30678e93) SHA1(6d2c8f5c9de3d016538dc1da99ec0017fefdf35a) )
-	ROM_LOAD16_BYTE( "poutu27t.bin", 0x0e0001, 0x10000, CRC(37a8156e) SHA1(a0b44b1ba6701daaa26576c6c892fd97ec82d5e3) )
-	ROM_LOAD16_BYTE( "poutu15t.bin", 0x0e0000, 0x10000, CRC(1c60d58b) SHA1(93f83a231d06cd958d3539a528e6ee6c2d9904ed) )
+	ROM_LOAD16_BYTE( "03-29025-01.u25t", 0x040001, 0x10000, CRC(92cd2617) SHA1(88e318f4a41c67fd9e91f013b3c29b6275b69c31) )
+	ROM_LOAD16_BYTE( "03-29022-01.u13t", 0x040000, 0x10000, CRC(9448c389) SHA1(7bb0bd49044ba4b302048d2922ed300f799a2efb) )
+	ROM_LOAD16_BYTE( "03-29026-01.u26t", 0x060001, 0x10000, CRC(ab57de8f) SHA1(28a366e7441bc85dfb814f7a7797aa704a0277ba) )
+	ROM_LOAD16_BYTE( "03-29023-01.u14t", 0x060000, 0x10000, CRC(30678e93) SHA1(6d2c8f5c9de3d016538dc1da99ec0017fefdf35a) )
+	ROM_LOAD16_BYTE( "03-29027-01.u27t", 0x0e0001, 0x10000, CRC(37a8156e) SHA1(a0b44b1ba6701daaa26576c6c892fd97ec82d5e3) )
+	ROM_LOAD16_BYTE( "03-29024-01.u15t", 0x0e0000, 0x10000, CRC(1c60d58b) SHA1(93f83a231d06cd958d3539a528e6ee6c2d9904ed) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "poutu93.bin", 0x000000, 0x08000, CRC(f102a04d) SHA1(3ecc0ab34a5d6e760679dc5fd7d32dd439f797d5) )
-	ROM_LOAD( "poutu94.bin", 0x008000, 0x08000, CRC(ec63c015) SHA1(10010a17ffda468dbe2940fae6aae49c56e1ad78) )
-	ROM_LOAD( "poutu95.bin", 0x010000, 0x08000, CRC(ba6e797e) SHA1(135f905b7663026a99fd9aca8e0247a72bf43cdb) )
+	ROM_LOAD( "03-29016-01.u93", 0x000000, 0x08000, CRC(f102a04d) SHA1(3ecc0ab34a5d6e760679dc5fd7d32dd439f797d5) )
+	ROM_LOAD( "03-29017-01.u94", 0x008000, 0x08000, CRC(ec63c015) SHA1(10010a17ffda468dbe2940fae6aae49c56e1ad78) )
+	ROM_LOAD( "03-29018-01.u95", 0x010000, 0x08000, CRC(ba6e797e) SHA1(135f905b7663026a99fd9aca8e0247a72bf43cdb) )
 
 	ROM_REGION( 0x40000, "user1", 0 )   /* Ordering: 70/92/69/91/68/90/67/89 */
-	ROM_LOAD( "poutu70.bin",  0x00000, 0x4000, CRC(7db4eaa1) SHA1(e1ec186a8359b3302071e87577092008065c39de) )
-	ROM_LOAD( "poutu92.bin",  0x04000, 0x4000, CRC(20fa57bb) SHA1(7e94698a25c5459991f0e99a50e5e98f392cda41) )
-	ROM_LOAD( "poutu69.bin",  0x08000, 0x4000, CRC(a16886f3) SHA1(48a0cbbea80cc38cd4d5594d3367282690724c59) )
-	ROM_LOAD( "poutu91.bin",  0x0c000, 0x4000, CRC(482a3581) SHA1(bab1140a5c0a2ff4c3ef076155429e35cbfe2335) )
-	ROM_LOAD( "poutu68.bin",  0x10000, 0x4000, CRC(7b62a3ed) SHA1(fc707626a3fa78d38f5b2cbe3b8786e8c4382563) )
-	ROM_LOAD( "poutu90.bin",  0x14000, 0x4000, CRC(9615d710) SHA1(a9b2d2bf4d6edecdc212f5d96eec8095833bee22) )
-	ROM_LOAD( "poutu67.bin",  0x18000, 0x4000, CRC(af85ce79) SHA1(76e421772dfdf4d27e36aa51993a987883e015b0) )
-	ROM_LOAD( "poutu89.bin",  0x1c000, 0x4000, CRC(6c874a05) SHA1(a931ba5ac41facfaf32c5e940eb011e780ab234a) )
+	ROM_LOAD( "03-29011-01.u70",  0x00000, 0x4000, CRC(7db4eaa1) SHA1(e1ec186a8359b3302071e87577092008065c39de) )
+	ROM_LOAD( "03-29015-01.u92",  0x04000, 0x4000, CRC(20fa57bb) SHA1(7e94698a25c5459991f0e99a50e5e98f392cda41) )
+	ROM_LOAD( "03-29010-01.u69",  0x08000, 0x4000, CRC(a16886f3) SHA1(48a0cbbea80cc38cd4d5594d3367282690724c59) )
+	ROM_LOAD( "03-29014-01.u91",  0x0c000, 0x4000, CRC(482a3581) SHA1(bab1140a5c0a2ff4c3ef076155429e35cbfe2335) )
+	ROM_LOAD( "03-29009-01.u68",  0x10000, 0x4000, CRC(7b62a3ed) SHA1(fc707626a3fa78d38f5b2cbe3b8786e8c4382563) )
+	ROM_LOAD( "03-29013-01.u90",  0x14000, 0x4000, CRC(9615d710) SHA1(a9b2d2bf4d6edecdc212f5d96eec8095833bee22) )
+	ROM_LOAD( "03-29008-01.u67",  0x18000, 0x4000, CRC(af85ce79) SHA1(76e421772dfdf4d27e36aa51993a987883e015b0) )
+	ROM_LOAD( "03-29012-01.u89",  0x1c000, 0x4000, CRC(6c874a05) SHA1(a931ba5ac41facfaf32c5e940eb011e780ab234a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-pigout.bin", 0x0000, 0x0080, CRC(9646fa72) SHA1(80311bd6ba8988afc4ad1aabf3f452266686917f) )
-ROM_END
 
+	ROM_REGION( 0x0e00, "top_board_plds", 0 ) // 80-18002-01 (Top Board), all protected
+	ROM_LOAD( "35-01.u44", 0x0000, 0x0104, NO_DUMP ) // TIBPAL16L8-25CN
+	ROM_LOAD( "36-01.u43", 0x0200, 0x0104, NO_DUMP ) // TIBPAL16R4-25CN
+	ROM_LOAD( "37-01.u42", 0x0400, 0x0104, NO_DUMP ) // MMI PAL16R6ACN
+	ROM_LOAD( "38-01.u9",  0x0600, 0x00cc, NO_DUMP ) // CPL20L10-25NC
+	ROM_LOAD( "39-01.u55", 0x0700, 0x0149, NO_DUMP ) // AMPAL18P8APC
+	ROM_LOAD( "40-01.u68", 0x0900, 0x0149, NO_DUMP ) // AMPAL18P8APC
+	ROM_LOAD( "41-02.u54", 0x0b00, 0x0104, NO_DUMP ) // TIBPAL16L8-25CN
+
+	ROM_REGION( 0x1400, "bottom_board_plds", 0 ) // 80-10000-01 (Bottom Board), all protected
+	ROM_LOAD( "01-01.u96", 0x0000, 0x0104, NO_DUMP ) // MMI PAL16L8ACN
+	ROM_LOAD( "02-29.u85", 0x0200, 0x0104, NO_DUMP ) // MMI PAL16L8ACN
+	ROM_LOAD( "03-01.u16", 0x0400, 0x0104, NO_DUMP ) // TIBPAL16L8-25
+	ROM_LOAD( "04-01.u17", 0x0600, 0x0104, NO_DUMP ) // MMI PAL16L8ACNS
+	ROM_LOAD( "05-01.u21", 0x0800, 0x00cc, NO_DUMP ) // MMI PAL20X10ACNS
+	ROM_LOAD( "06-01.u19", 0x0900, 0x00cc, NO_DUMP ) // MMI PAL20X10ACNS
+	ROM_LOAD( "07-01.u43", 0x0a00, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "08-01.u42", 0x0c00, 0x0104, NO_DUMP ) // TIBPAL16R4-25CN
+	ROM_LOAD( "09-01.u40", 0x0e00, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "10-01.u26", 0x1000, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "11-01.u27", 0x1200, 0x0104, NO_DUMP ) // MMI PAL16R8ACNS
+ROM_END
 
 ROM_START( pigouta )
 	ROM_REGION( 0x040000, "master", 0 )
 	ROM_LOAD( "03-29020-01.u58t", 0x00000, 0x10000, CRC(6c815982) SHA1(0720b22afd16e9bdc5d4a9e9a0071674ea46d038) )
 	ROM_LOAD( "03-29021-01.u59t", 0x10000, 0x10000, CRC(9de7a763) SHA1(9a612730a9d80d84114c1afc4a1887277d1ad5bc) )
-	ROM_LOAD( "poutu57t.bin",     0x20000, 0x10000, CRC(c22be0ff) SHA1(52b76918358046f40ea4b74e53a38d8984125dbb) )
+	ROM_LOAD( "03-29019-01.u57t", 0x20000, 0x10000, CRC(c22be0ff) SHA1(52b76918358046f40ea4b74e53a38d8984125dbb) )
 
 	ROM_REGION( 0x80000, "slave", 0 )
-	ROM_LOAD( "poutu3.bin",   0x00000, 0x02000, CRC(af213cb7) SHA1(cf31ee09ee3685274f5ce1df954e7e87199e2e80) )
-	ROM_LOAD( "poutu2t.bin",  0x10000, 0x10000, CRC(b23164c6) SHA1(11edbea7bf54a68cb85df36345f39654d726a7f2) )
-	ROM_LOAD( "poutu3t.bin",  0x20000, 0x10000, CRC(d93f105f) SHA1(9fe469d674e84209eb55704fd2ad317d11e4caac) )
-	ROM_LOAD( "poutu4t.bin",  0x30000, 0x10000, CRC(b7c47bfe) SHA1(42b1ce4401e3754f6fb1453ab4a661dc4237770d) )
-	ROM_LOAD( "poutu5t.bin",  0x40000, 0x10000, CRC(d9b9dfbf) SHA1(a6f663638d9f6e14c1a6a99ca811d1d495664412) )
-	ROM_LOAD( "poutu6t.bin",  0x50000, 0x10000, CRC(728c7c1a) SHA1(cc3211313a6b3998a0458d3865e3d2a0f9eb8a94) )
-	ROM_LOAD( "poutu7t.bin",  0x60000, 0x10000, CRC(393bd990) SHA1(d66d3c5c6d97bb983549d5037bd69c481751b9bf) )
-	ROM_LOAD( "poutu8t.bin",  0x70000, 0x10000, CRC(cb9ffaad) SHA1(f39fb33e5a30619cd3017574739ccace80afbe1f) )
+	ROM_LOAD( "03-29000-01.u3",   0x00000, 0x02000, CRC(af213cb7) SHA1(cf31ee09ee3685274f5ce1df954e7e87199e2e80) )
+	ROM_LOAD( "03-29001-01.u2t",  0x10000, 0x10000, CRC(b23164c6) SHA1(11edbea7bf54a68cb85df36345f39654d726a7f2) )
+	ROM_LOAD( "03-29002-01.u3t",  0x20000, 0x10000, CRC(d93f105f) SHA1(9fe469d674e84209eb55704fd2ad317d11e4caac) )
+	ROM_LOAD( "03-29003-01.u4t",  0x30000, 0x10000, CRC(b7c47bfe) SHA1(42b1ce4401e3754f6fb1453ab4a661dc4237770d) )
+	ROM_LOAD( "03-29004-01.u5t",  0x40000, 0x10000, CRC(d9b9dfbf) SHA1(a6f663638d9f6e14c1a6a99ca811d1d495664412) )
+	ROM_LOAD( "03-29005-01.u6t",  0x50000, 0x10000, CRC(728c7c1a) SHA1(cc3211313a6b3998a0458d3865e3d2a0f9eb8a94) )
+	ROM_LOAD( "03-29006-01.u7t",  0x60000, 0x10000, CRC(393bd990) SHA1(d66d3c5c6d97bb983549d5037bd69c481751b9bf) )
+	ROM_LOAD( "03-29007-01.u8t",  0x70000, 0x10000, CRC(cb9ffaad) SHA1(f39fb33e5a30619cd3017574739ccace80afbe1f) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "poutu25t.bin", 0x040001, 0x10000, CRC(92cd2617) SHA1(88e318f4a41c67fd9e91f013b3c29b6275b69c31) )
-	ROM_LOAD16_BYTE( "poutu13t.bin", 0x040000, 0x10000, CRC(9448c389) SHA1(7bb0bd49044ba4b302048d2922ed300f799a2efb) )
-	ROM_LOAD16_BYTE( "poutu26t.bin", 0x060001, 0x10000, CRC(ab57de8f) SHA1(28a366e7441bc85dfb814f7a7797aa704a0277ba) )
-	ROM_LOAD16_BYTE( "poutu14t.bin", 0x060000, 0x10000, CRC(30678e93) SHA1(6d2c8f5c9de3d016538dc1da99ec0017fefdf35a) )
-	ROM_LOAD16_BYTE( "poutu27t.bin", 0x0e0001, 0x10000, CRC(37a8156e) SHA1(a0b44b1ba6701daaa26576c6c892fd97ec82d5e3) )
-	ROM_LOAD16_BYTE( "poutu15t.bin", 0x0e0000, 0x10000, CRC(1c60d58b) SHA1(93f83a231d06cd958d3539a528e6ee6c2d9904ed) )
+	ROM_LOAD16_BYTE( "03-29025-01.u25t", 0x040001, 0x10000, CRC(92cd2617) SHA1(88e318f4a41c67fd9e91f013b3c29b6275b69c31) )
+	ROM_LOAD16_BYTE( "03-29022-01.u13t", 0x040000, 0x10000, CRC(9448c389) SHA1(7bb0bd49044ba4b302048d2922ed300f799a2efb) )
+	ROM_LOAD16_BYTE( "03-29026-01.u26t", 0x060001, 0x10000, CRC(ab57de8f) SHA1(28a366e7441bc85dfb814f7a7797aa704a0277ba) )
+	ROM_LOAD16_BYTE( "03-29023-01.u14t", 0x060000, 0x10000, CRC(30678e93) SHA1(6d2c8f5c9de3d016538dc1da99ec0017fefdf35a) )
+	ROM_LOAD16_BYTE( "03-29027-01.u27t", 0x0e0001, 0x10000, CRC(37a8156e) SHA1(a0b44b1ba6701daaa26576c6c892fd97ec82d5e3) )
+	ROM_LOAD16_BYTE( "03-29024-01.u15t", 0x0e0000, 0x10000, CRC(1c60d58b) SHA1(93f83a231d06cd958d3539a528e6ee6c2d9904ed) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "poutu93.bin", 0x000000, 0x08000, CRC(f102a04d) SHA1(3ecc0ab34a5d6e760679dc5fd7d32dd439f797d5) )
-	ROM_LOAD( "poutu94.bin", 0x008000, 0x08000, CRC(ec63c015) SHA1(10010a17ffda468dbe2940fae6aae49c56e1ad78) )
-	ROM_LOAD( "poutu95.bin", 0x010000, 0x08000, CRC(ba6e797e) SHA1(135f905b7663026a99fd9aca8e0247a72bf43cdb) )
+	ROM_LOAD( "03-29016-01.u93", 0x000000, 0x08000, CRC(f102a04d) SHA1(3ecc0ab34a5d6e760679dc5fd7d32dd439f797d5) )
+	ROM_LOAD( "03-29017-01.u94", 0x008000, 0x08000, CRC(ec63c015) SHA1(10010a17ffda468dbe2940fae6aae49c56e1ad78) )
+	ROM_LOAD( "03-29018-01.u95", 0x010000, 0x08000, CRC(ba6e797e) SHA1(135f905b7663026a99fd9aca8e0247a72bf43cdb) )
 
 	ROM_REGION( 0x40000, "user1", 0 )   /* Ordering: 70/92/69/91/68/90/67/89 */
-	ROM_LOAD( "poutu70.bin",  0x00000, 0x4000, CRC(7db4eaa1) SHA1(e1ec186a8359b3302071e87577092008065c39de) )
-	ROM_LOAD( "poutu92.bin",  0x04000, 0x4000, CRC(20fa57bb) SHA1(7e94698a25c5459991f0e99a50e5e98f392cda41) )
-	ROM_LOAD( "poutu69.bin",  0x08000, 0x4000, CRC(a16886f3) SHA1(48a0cbbea80cc38cd4d5594d3367282690724c59) )
-	ROM_LOAD( "poutu91.bin",  0x0c000, 0x4000, CRC(482a3581) SHA1(bab1140a5c0a2ff4c3ef076155429e35cbfe2335) )
-	ROM_LOAD( "poutu68.bin",  0x10000, 0x4000, CRC(7b62a3ed) SHA1(fc707626a3fa78d38f5b2cbe3b8786e8c4382563) )
-	ROM_LOAD( "poutu90.bin",  0x14000, 0x4000, CRC(9615d710) SHA1(a9b2d2bf4d6edecdc212f5d96eec8095833bee22) )
-	ROM_LOAD( "poutu67.bin",  0x18000, 0x4000, CRC(af85ce79) SHA1(76e421772dfdf4d27e36aa51993a987883e015b0) )
-	ROM_LOAD( "poutu89.bin",  0x1c000, 0x4000, CRC(6c874a05) SHA1(a931ba5ac41facfaf32c5e940eb011e780ab234a) )
+	ROM_LOAD( "03-29011-01.u70",  0x00000, 0x4000, CRC(7db4eaa1) SHA1(e1ec186a8359b3302071e87577092008065c39de) )
+	ROM_LOAD( "03-29015-01.u92",  0x04000, 0x4000, CRC(20fa57bb) SHA1(7e94698a25c5459991f0e99a50e5e98f392cda41) )
+	ROM_LOAD( "03-29010-01.u69",  0x08000, 0x4000, CRC(a16886f3) SHA1(48a0cbbea80cc38cd4d5594d3367282690724c59) )
+	ROM_LOAD( "03-29014-01.u91",  0x0c000, 0x4000, CRC(482a3581) SHA1(bab1140a5c0a2ff4c3ef076155429e35cbfe2335) )
+	ROM_LOAD( "03-29009-01.u68",  0x10000, 0x4000, CRC(7b62a3ed) SHA1(fc707626a3fa78d38f5b2cbe3b8786e8c4382563) )
+	ROM_LOAD( "03-29013-01.u90",  0x14000, 0x4000, CRC(9615d710) SHA1(a9b2d2bf4d6edecdc212f5d96eec8095833bee22) )
+	ROM_LOAD( "03-29008-01.u67",  0x18000, 0x4000, CRC(af85ce79) SHA1(76e421772dfdf4d27e36aa51993a987883e015b0) )
+	ROM_LOAD( "03-29012-01.u89",  0x1c000, 0x4000, CRC(6c874a05) SHA1(a931ba5ac41facfaf32c5e940eb011e780ab234a) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-pigout.bin", 0x0000, 0x0080, CRC(9646fa72) SHA1(80311bd6ba8988afc4ad1aabf3f452266686917f) )
+
+	ROM_REGION( 0x0e00, "top_board_plds", 0 ) // 80-18002-01 (Top Board), all protected
+	ROM_LOAD( "35-01.u44", 0x0000, 0x0104, NO_DUMP ) // TIBPAL16L8-25CN
+	ROM_LOAD( "36-01.u43", 0x0200, 0x0104, NO_DUMP ) // TIBPAL16R4-25CN
+	ROM_LOAD( "37-01.u42", 0x0400, 0x0104, NO_DUMP ) // MMI PAL16R6ACN
+	ROM_LOAD( "38-01.u9",  0x0600, 0x00cc, NO_DUMP ) // CPL20L10-25NC
+	ROM_LOAD( "39-01.u55", 0x0700, 0x0149, NO_DUMP ) // AMPAL18P8APC
+	ROM_LOAD( "40-01.u68", 0x0900, 0x0149, NO_DUMP ) // AMPAL18P8APC
+	ROM_LOAD( "41-02.u54", 0x0b00, 0x0104, NO_DUMP ) // TIBPAL16L8-25CN
+
+	ROM_REGION( 0x1400, "bottom_board_plds", 0 ) // 80-10000-01 (Bottom Board), all protected
+	ROM_LOAD( "01-01.u96", 0x0000, 0x0104, NO_DUMP ) // MMI PAL16L8ACN
+	ROM_LOAD( "02-29.u85", 0x0200, 0x0104, NO_DUMP ) // MMI PAL16L8ACN
+	ROM_LOAD( "03-01.u16", 0x0400, 0x0104, NO_DUMP ) // TIBPAL16L8-25
+	ROM_LOAD( "04-01.u17", 0x0600, 0x0104, NO_DUMP ) // MMI PAL16L8ACNS
+	ROM_LOAD( "05-01.u21", 0x0800, 0x00cc, NO_DUMP ) // MMI PAL20X10ACNS
+	ROM_LOAD( "06-01.u19", 0x0900, 0x00cc, NO_DUMP ) // MMI PAL20X10ACNS
+	ROM_LOAD( "07-01.u43", 0x0a00, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "08-01.u42", 0x0c00, 0x0104, NO_DUMP ) // TIBPAL16R4-25CN
+	ROM_LOAD( "09-01.u40", 0x0e00, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "10-01.u26", 0x1000, 0x0104, NO_DUMP ) // MMI PAL16R8ACN
+	ROM_LOAD( "11-01.u27", 0x1200, 0x0104, NO_DUMP ) // MMI PAL16R8ACNS
 ROM_END
 
 
+/*
+For Ataxx, the label format is:
+------------------------
+|(C)1990 Leland Corp.  | -> Copyright & Manufacturer
+|P/N E-302-31005-05    | -> Part number with revision
+|ATAXX            U38  | -> Game name & ROM PCB location
+------------------------
+*/
 ROM_START( ataxx )
+	ROM_REGION( 0x30000, "master", 0 )
+	ROM_LOAD( "e-302-31005-05.u38",   0x00000, 0x20000, CRC(3378937d) SHA1(3c62da7e11b2860c7fe3a35c077cadcf4d0272ca) )
+	ROM_RELOAD(                       0x10000, 0x20000 )
+
+	ROM_REGION( 0x60000, "slave", 0 )
+	ROM_LOAD( "e-302-31012-01.u111",  0x00000, 0x20000, CRC(9a3297cc) SHA1(1dfa0bacd2f2b18d44bfc2d55c40291c1b142f8f) )
+	ROM_LOAD( "e-302-31013-01.u112",  0x20000, 0x20000, CRC(7e7c3e2f) SHA1(a7e31e1f1b09414c40ab9ace5e9bffbdbaee8704) )
+	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "e-302-31003-01.u15", 0x20001, 0x20000, CRC(8bb3233b) SHA1(5131ad78bdf904cde36534e99efa5576fcea25c0) )
+	ROM_LOAD16_BYTE( "e-302-31001-01.u1",  0x20000, 0x20000, CRC(728d75f2) SHA1(d9e8e742cc2d536bd62370c1e474c7036e4392bb) )
+	ROM_LOAD16_BYTE( "e-302-31004-01.u16", 0x60001, 0x20000, CRC(f2bdff48) SHA1(f34eb16ea180effffd81d637acc3d96bffaf81c9) )
+	ROM_RELOAD(                            0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "e-302-31002-01.u2",  0x60000, 0x20000, CRC(ca06a394) SHA1(0858908bd150dd7354536e10b2a386b45f17ac9f) )
+	ROM_RELOAD(                            0xc0000, 0x20000 )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "e-302-31006-01.u98",   0x00000, 0x20000, CRC(59d0f2ae) SHA1(8da5dc006e192af98458227e79421b6a07ac1cdc) )
+	ROM_LOAD( "e-302-31007-01.u99",   0x20000, 0x20000, CRC(6ab7db25) SHA1(25c2fa23b99ac4bab5a9b851c2087de44512a5c2) )
+	ROM_LOAD( "e-302-31008-01.u100",  0x40000, 0x20000, CRC(2352849e) SHA1(f49394b6efb6a87d86516ec0a5ddd582f96f7e5d) )
+	ROM_LOAD( "e-302-31009-01.u101",  0x60000, 0x20000, CRC(4c31e02b) SHA1(2d8dd97a2a737bafb44dced7ce3eef22d7d14cbe) )
+	ROM_LOAD( "e-302-31010-01.u102",  0x80000, 0x20000, CRC(a951228c) SHA1(7ec5cf4d0aa3702be9236d155bea373a06c0be03) )
+	ROM_LOAD( "e-302-31011-01.u103",  0xa0000, 0x20000, CRC(ed326164) SHA1(8706192f525ece200587cee7e7beb4a1975bf63e) )
+
+	ROM_REGION( 0x00001, "user1", ROMREGION_ERASEFF ) /* X-ROM (data used by main processor) */
+	/* Empty / not used */
+
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-ataxx.bin", 0x0000, 0x0100, CRC(989cdb8c) SHA1(13b30a328e71a195960e98e50d1657a8b6860dcf) )
+ROM_END
+
+ROM_START( ataxxa )
 	ROM_REGION( 0x30000, "master", 0 )
 	ROM_LOAD( "e-302-31005-04.u38",   0x00000, 0x20000, CRC(e1cf6236) SHA1(fabf423a006b1db22273c6fffa03edc148d7d957) )
 	ROM_RELOAD(                       0x10000, 0x20000 )
@@ -2541,43 +2647,9 @@ ROM_START( ataxx )
 	ROM_LOAD16_WORD( "eeprom-ataxx.bin", 0x0000, 0x0100, CRC(989cdb8c) SHA1(13b30a328e71a195960e98e50d1657a8b6860dcf) )
 ROM_END
 
-
-ROM_START( ataxxa )
-	ROM_REGION( 0x30000, "master", 0 )
-	ROM_LOAD( "u38.u38",   0x00000, 0x20000, CRC(3378937d) SHA1(3c62da7e11b2860c7fe3a35c077cadcf4d0272ca) )
-	ROM_RELOAD(            0x10000, 0x20000 )
-
-	ROM_REGION( 0x60000, "slave", 0 )
-	ROM_LOAD( "e-302-31012-01.u111",  0x00000, 0x20000, CRC(9a3297cc) SHA1(1dfa0bacd2f2b18d44bfc2d55c40291c1b142f8f) )
-	ROM_LOAD( "e-302-31013-01.u112",  0x20000, 0x20000, CRC(7e7c3e2f) SHA1(a7e31e1f1b09414c40ab9ace5e9bffbdbaee8704) )
-	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
-
-	ROM_REGION( 0x100000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "e-302-31003-01.u15", 0x20001, 0x20000, CRC(8bb3233b) SHA1(5131ad78bdf904cde36534e99efa5576fcea25c0) )
-	ROM_LOAD16_BYTE( "e-302-31001-01.u1",  0x20000, 0x20000, CRC(728d75f2) SHA1(d9e8e742cc2d536bd62370c1e474c7036e4392bb) )
-	ROM_LOAD16_BYTE( "e-302-31004-01.u16", 0x60001, 0x20000, CRC(f2bdff48) SHA1(f34eb16ea180effffd81d637acc3d96bffaf81c9) )
-	ROM_RELOAD(                            0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "e-302-31002-01.u2",  0x60000, 0x20000, CRC(ca06a394) SHA1(0858908bd150dd7354536e10b2a386b45f17ac9f) )
-	ROM_RELOAD(                            0xc0000, 0x20000 )
-
-	ROM_REGION( 0xc0000, "gfx1", 0 )
-	ROM_LOAD( "e-302-31006-01.u98",   0x00000, 0x20000, CRC(59d0f2ae) SHA1(8da5dc006e192af98458227e79421b6a07ac1cdc) )
-	ROM_LOAD( "e-302-31007-01.u99",   0x20000, 0x20000, CRC(6ab7db25) SHA1(25c2fa23b99ac4bab5a9b851c2087de44512a5c2) )
-	ROM_LOAD( "e-302-31008-01.u100",  0x40000, 0x20000, CRC(2352849e) SHA1(f49394b6efb6a87d86516ec0a5ddd582f96f7e5d) )
-	ROM_LOAD( "e-302-31009-01.u101",  0x60000, 0x20000, CRC(4c31e02b) SHA1(2d8dd97a2a737bafb44dced7ce3eef22d7d14cbe) )
-	ROM_LOAD( "e-302-31010-01.u102",  0x80000, 0x20000, CRC(a951228c) SHA1(7ec5cf4d0aa3702be9236d155bea373a06c0be03) )
-	ROM_LOAD( "e-302-31011-01.u103",  0xa0000, 0x20000, CRC(ed326164) SHA1(8706192f525ece200587cee7e7beb4a1975bf63e) )
-
-	ROM_REGION( 0x00001, "user1", ROMREGION_ERASEFF ) /* X-ROM (data used by main processor) */
-	/* Empty / not used */
-
-	ROM_REGION16_BE( 0x100, "eeprom", 0 )
-	ROM_LOAD16_WORD( "eeprom-ataxx.bin", 0x0000, 0x0100, CRC(989cdb8c) SHA1(13b30a328e71a195960e98e50d1657a8b6860dcf) )
-ROM_END
-
 ROM_START( ataxxe )
 	ROM_REGION( 0x30000, "master", 0 )
-	ROM_LOAD( "euro_ataxx_u38_3079.bin", 0x00000, 0x20000, CRC(16aef3b7) SHA1(b2de1e3fd032ab8cc5ed995522f528f0b3283d8a) )
+	ROM_LOAD( "euro_ataxx_u38_3079.u38", 0x00000, 0x20000, CRC(16aef3b7) SHA1(b2de1e3fd032ab8cc5ed995522f528f0b3283d8a) )
 	ROM_RELOAD(                          0x10000, 0x20000 )
 
 	ROM_REGION( 0x60000, "slave", 0 )
@@ -2607,7 +2679,6 @@ ROM_START( ataxxe )
 	ROM_REGION16_BE( 0x100, "eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-ataxxe.bin", 0x0000, 0x0100, CRC(8df1dee1) SHA1(876c5d5d506c31fdf4c3e611a1869b50ceadc6fd) )
 ROM_END
-
 
 ROM_START( ataxxj )
 	ROM_REGION( 0x30000, "master", 0 )
@@ -2728,7 +2799,7 @@ ROM_START( indyheat )
 	ROM_LOAD16_BYTE( "e-302-33024-01.u6",  0x20000, 0x20000, CRC(15a89962) SHA1(52f66e1ccde0ef3fb7959a207cc967237e37833e) )
 	ROM_LOAD16_BYTE( "e-302-33022-01.u4",  0x60001, 0x20000, CRC(fa7bfa04) SHA1(0174f5372117d15bf0ecd48b72c9cca4cf8bb75f) )
 	ROM_RELOAD(                            0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "E-302-33023-01.u5",  0x60000, 0x20000, CRC(198285d4) SHA1(8f6b3cba2bc729f2e0623578b13720ead91333e4) )
+	ROM_LOAD16_BYTE( "e-302-33023-01.u5",  0x60000, 0x20000, CRC(198285d4) SHA1(8f6b3cba2bc729f2e0623578b13720ead91333e4) )
 	ROM_RELOAD(                            0xc0000, 0x20000 )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
@@ -3301,12 +3372,12 @@ GAME( 1989, offroad,    0,       lelandi,  offroad, leland_state,    offroad,  R
 GAME( 1989, offroad3,   offroad, lelandi,  offroad, leland_state,    offroad,  ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road (rev 3)", 0 )
 GAME( 1989, offroadt,   0,       lelandi,  offroad, leland_state,    offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
 GAME( 1989, offroadt2p, offroadt,lelandi,  offroadt2p, leland_state, offroadt, ROT0,   "Leland Corporation", "Ironman Ivan Stewart's Super Off-Road Track-Pak (rev 4, 2 Players)", 0 )
-GAME( 1990, pigout,     0,       lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (set 1)", 0 )
-GAME( 1990, pigouta,    pigout,  lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (set 2)", 0 )
+GAME( 1990, pigout,     0,       lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 2?)", 0 ) /* need to verify revision */
+GAME( 1990, pigouta,    pigout,  lelandi,  pigout, leland_state,     pigout,   ROT0,   "Leland Corporation", "Pig Out: Dine Like a Swine! (rev 1)", 0 )
 
 /* Ataxx-era PCB, 80186 sound */
-GAME( 1990, ataxx,    0,      ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (set 1)", 0 )
-GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (set 2)", 0 )
+GAME( 1990, ataxx,    0,      ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 5)", 0 )
+GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (rev 4)", 0 )
 GAME( 1990, ataxxe,   ataxx,  ataxx,   ataxx,    leland_state, ataxx,    ROT0,   "Leland Corporation", "Ataxx (Europe)", 0 )
 GAME( 1990, ataxxj,   ataxx,  ataxx,   ataxx,    leland_state, ataxxj,   ROT0,   "Leland Corporation (Capcom license)", "Ataxx (Japan)", 0 )
 GAME( 1990, wsf,      0,      wsf,     wsf,      leland_state, wsf,      ROT0,   "Leland Corporation", "World Soccer Finals (rev 3)", 0 )

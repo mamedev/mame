@@ -25,14 +25,15 @@
     and C only. Though it was later reprinted with an addendum for Models
     D, E, and F, this has not been found. The available schematics are
     inapplicable to later models, which have an altogether different memory
-    map. It might even be possible that later models substitute some generic
-    battery-backed CMOS SRAM for the X2212 and/or replace the CRT9007 with
-    a custom video gate array.
+    map and, evidently, use some different IC types: an ER5911 rather than
+    X2212 as non-volatile memory and, in place of the CRT9007, some sort
+    of custom video gate array (which might even be clocked differently).
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+//#include "machine/eepromser.h"
 #include "machine/mc68681.h"
 #include "machine/ram.h"
 //#include "machine/x2212.h"
@@ -62,24 +63,27 @@ public:
 };
 
 
-ADDRESS_MAP_START(vt220_state::vt220_mem)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void vt220_state::vt220_mem(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vt220_state::vt220a_mem)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+void vt220_state::vt220a_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("maincpu", 0);
+}
 
-ADDRESS_MAP_START(vt220_state::vt220_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0xc000) AM_RAM
-	AM_RANGE(0x3800, 0x380f) AM_MIRROR(0xc7f0) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP
-ADDRESS_MAP_END
+void vt220_state::vt220_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x2000, 0x2fff).mirror(0xc000).ram();
+	map(0x3800, 0x380f).mirror(0xc7f0).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+}
 
-ADDRESS_MAP_START(vt220_state::vt220a_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void vt220_state::vt220a_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vt220 )
@@ -105,6 +109,7 @@ MACHINE_CONFIG_START(vt220_state::vt220)
 	MCFG_CPU_ADD("maincpu", I8051, XTAL(11'059'200)) // from schematic for earlier version
 	MCFG_CPU_PROGRAM_MAP(vt220_mem)
 	MCFG_CPU_IO_MAP(vt220_io)
+	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ???
 
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", MCS51_INT1_LINE))

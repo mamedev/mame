@@ -105,19 +105,21 @@ const tiny_rom_entry *abc_cadmouse_device::device_rom_region() const
 //  ADDRESS_MAP( abc_cadmouse_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START( abc_cadmouse_device::abc_cadmouse_mem )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION(Z80_TAG, 0)
-ADDRESS_MAP_END
+void abc_cadmouse_device::abc_cadmouse_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).rom().region(Z80_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc_cadmouse_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START( abc_cadmouse_device::abc_cadmouse_io )
-ADDRESS_MAP_END
+void abc_cadmouse_device::abc_cadmouse_io(address_map &map)
+{
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

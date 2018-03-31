@@ -62,31 +62,33 @@ const tiny_rom_entry *imi5000h_device::device_rom_region() const
 //  ADDRESS_MAP( imi5000h_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(imi5000h_device::imi5000h_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1c00) AM_RAM
-ADDRESS_MAP_END
+void imi5000h_device::imi5000h_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).mirror(0x1000).rom().region(Z80_TAG, 0);
+	map(0x4000, 0x47ff).mirror(0x1800).ram();
+	map(0x6000, 0x63ff).mirror(0x1c00).ram();
+	map(0x8000, 0x83ff).mirror(0x1c00).ram();
+	map(0xa000, 0xa3ff).mirror(0x1c00).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( imi5000h_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(imi5000h_device::imi5000h_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x9f)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80PIO_0_TAG, z80pio_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80PIO_2_TAG, z80pio_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80PIO_3_TAG, z80pio_device, read, write)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) // BEGRDY
-	AM_RANGE(0x14, 0x14) AM_MIRROR(0x03) // HSXCLR
-	AM_RANGE(0x18, 0x18) AM_MIRROR(0x03) // XFERSTB
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-ADDRESS_MAP_END
+void imi5000h_device::imi5000h_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x9f);
+	map(0x00, 0x03).rw(Z80PIO_0_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x08, 0x0b).rw(Z80PIO_2_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x0c, 0x0f).rw(Z80PIO_3_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x10, 0x10).mirror(0x03); // BEGRDY
+	map(0x14, 0x14).mirror(0x03); // HSXCLR
+	map(0x18, 0x18).mirror(0x03); // XFERSTB
+	map(0x1c, 0x1f).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 //-------------------------------------------------

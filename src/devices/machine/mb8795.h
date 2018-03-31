@@ -9,16 +9,16 @@
 	downcast<mb8795_device *>(device)->set_drq_cb(_tx_drq, _rx_drq);
 
 #define MCFG_MB8795_TX_IRQ_CALLBACK(_write) \
-	devcb = &mb8795_device::set_tx_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mb8795_device &>(*device).set_tx_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MB8795_RX_IRQ_CALLBACK(_write) \
-	devcb = &mb8795_device::set_rx_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mb8795_device &>(*device).set_rx_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MB8795_TX_DRQ_CALLBACK(_write) \
-	devcb = &mb8795_device::set_tx_drq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mb8795_device &>(*device).set_tx_drq_wr_callback(DEVCB_##_write);
 
 #define MCFG_MB8795_RX_DRQ_CALLBACK(_write) \
-	devcb = &mb8795_device::set_rx_drq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<mb8795_device &>(*device).set_rx_drq_wr_callback(DEVCB_##_write);
 
 class mb8795_device :   public device_t,
 						public device_network_interface
@@ -26,10 +26,10 @@ class mb8795_device :   public device_t,
 public:
 	mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_tx_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).irq_tx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rx_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).irq_rx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_tx_drq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).drq_tx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rx_drq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).drq_rx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_tx_irq_wr_callback(Object &&cb) { return irq_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rx_irq_wr_callback(Object &&cb) { return irq_rx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_tx_drq_wr_callback(Object &&cb) { return drq_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rx_drq_wr_callback(Object &&cb) { return drq_rx_cb.set_callback(std::forward<Object>(cb)); }
 
 	void tx_dma_w(uint8_t data, bool eof);
 	void rx_dma_r(uint8_t &data, bool &eof);

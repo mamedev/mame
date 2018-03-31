@@ -20,28 +20,28 @@
 //**************************************************************************
 
 #define MCFG_M5074X_PORT0_READ_CALLBACK(_read) \
-	devcb = &m5074x_device::set_p0_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<m5074x_device &>(*device).set_p0_rd_callback(DEVCB_##_read);
 
 #define MCFG_M5074X_PORT1_READ_CALLBACK(_read) \
-	devcb = &m5074x_device::set_p1_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<m5074x_device &>(*device).set_p1_rd_callback(DEVCB_##_read);
 
 #define MCFG_M5074X_PORT2_READ_CALLBACK(_read) \
-	devcb = &m5074x_device::set_p2_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<m5074x_device &>(*device).set_p2_rd_callback(DEVCB_##_read);
 
 #define MCFG_M5074X_PORT3_READ_CALLBACK(_read) \
-	devcb = &m5074x_device::set_p3_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<m5074x_device &>(*device).set_p3_rd_callback(DEVCB_##_read);
 
 #define MCFG_M5074X_PORT0_WRITE_CALLBACK(_write) \
-	devcb = &m5074x_device::set_p0_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<m5074x_device &>(*device).set_p0_wr_callback(DEVCB_##_write);
 
 #define MCFG_M5074X_PORT1_WRITE_CALLBACK(_write) \
-	devcb = &m5074x_device::set_p1_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<m5074x_device &>(*device).set_p1_wr_callback(DEVCB_##_write);
 
 #define MCFG_M5074X_PORT2_WRITE_CALLBACK(_write) \
-	devcb = &m5074x_device::set_p2_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<m5074x_device &>(*device).set_p2_wr_callback(DEVCB_##_write);
 
 #define MCFG_M5074X_PORT3_WRITE_CALLBACK(_write) \
-	devcb = &m5074x_device::set_p3_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<m5074x_device &>(*device).set_p3_wr_callback(DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -73,14 +73,14 @@ class m5074x_device :  public m740_device
 public:
 	const address_space_config m_program_config;
 
-	template<class _Object> static devcb_base &set_p0_rd_callback(device_t &device, _Object object) { return downcast<m5074x_device &>(device).read_p0.set_callback(object); }
-	template<class _Object> static devcb_base &set_p1_rd_callback(device_t &device, _Object object) { return downcast<m5074x_device &>(device).read_p1.set_callback(object); }
-	template<class _Object> static devcb_base &set_p2_rd_callback(device_t &device, _Object object) { return downcast<m5074x_device &>(device).read_p2.set_callback(object); }
-	template<class _Object> static devcb_base &set_p3_rd_callback(device_t &device, _Object object) { return downcast<m5074x_device &>(device).read_p3.set_callback(object); }
-	template<class _Object> static devcb_base &set_p0_wr_callback(device_t &device, _Object object) { return downcast<m5074x_device &>(device).write_p0.set_callback(object); }
-	template<class _Object> static devcb_base &set_p1_wr_callback(device_t &device, _Object object) { return downcast<m5074x_device &>(device).write_p1.set_callback(object); }
-	template<class _Object> static devcb_base &set_p2_wr_callback(device_t &device, _Object object) { return downcast<m5074x_device &>(device).write_p2.set_callback(object); }
-	template<class _Object> static devcb_base &set_p3_wr_callback(device_t &device, _Object object) { return downcast<m5074x_device &>(device).write_p3.set_callback(object); }
+	template<class Object> devcb_base &set_p0_rd_callback(Object &&cb) { return read_p0.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_p1_rd_callback(Object &&cb) { return read_p1.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_p2_rd_callback(Object &&cb) { return read_p2.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_p3_rd_callback(Object &&cb) { return read_p3.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_p0_wr_callback(Object &&cb) { return write_p0.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_p1_wr_callback(Object &&cb) { return write_p1.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_p2_wr_callback(Object &&cb) { return write_p2.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_p3_wr_callback(Object &&cb) { return write_p3.set_callback(std::forward<Object>(cb)); }
 
 	devcb_read8  read_p0, read_p1, read_p2, read_p3;
 	devcb_write8 write_p0, write_p1, write_p2, write_p3;

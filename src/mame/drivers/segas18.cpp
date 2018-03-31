@@ -125,17 +125,6 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
  *
  *************************************/
 
-READ8_MEMBER(segas18_state::mapper_sound_r)
-{
-	return m_mcu_data;
-}
-
-WRITE8_MEMBER(segas18_state::mapper_sound_w)
-{
-	m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void segas18_state::init_generic(segas18_rom_board rom_board)
 {
 	// set the ROM board
@@ -152,7 +141,6 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 	m_vdp->stop_timers(); // 315-5124 timers
 
 	// save state
-	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_lghost_value));
 	save_item(NAME(m_lghost_select));
 }
@@ -618,13 +606,6 @@ WRITE8_MEMBER( segas18_state::soundbank_w )
 }
 
 
-WRITE8_MEMBER( segas18_state::mcu_data_w )
-{
-	m_mcu_data = data;
-	m_mcu->set_input_line(MCS51_INT1_LINE, HOLD_LINE);
-}
-
-
 
 /*************************************
  *
@@ -632,22 +613,24 @@ WRITE8_MEMBER( segas18_state::mcu_data_w )
  *
  *************************************/
 
-ADDRESS_MAP_START(segas18_state::system18_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xffffff) AM_DEVREADWRITE8("mapper", sega_315_5195_mapper_device, read, write, 0x00ff)
+void segas18_state::system18_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0xffffff).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write)).umask16(0x00ff);
 
 	// these get overwritten by the memory mapper above, but we put them here
 	// so they are properly allocated and tracked for saving
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("tileram")
-	AM_RANGE(0x400000, 0x400fff) AM_RAM AM_SHARE("textram")
-	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_SHARE("workram")
-ADDRESS_MAP_END
+	map(0x100000, 0x1007ff).ram().share("sprites");
+	map(0x200000, 0x200fff).ram().share("paletteram");
+	map(0x300000, 0x30ffff).ram().share("tileram");
+	map(0x400000, 0x400fff).ram().share("textram");
+	map(0x500000, 0x503fff).ram().share("workram");
+}
 
-ADDRESS_MAP_START(segas18_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segas18_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 /*************************************
  *
@@ -655,23 +638,25 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(segas18_state::sound_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x10000)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_device, rf5c68_w)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rfsnd", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segas18_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x9fff).rom().region("soundcpu", 0x10000);
+	map(0xa000, 0xbfff).bankr("soundbank");
+	map(0xc000, 0xc00f).mirror(0x0ff0).w("rfsnd", FUNC(rf5c68_device::rf5c68_w));
+	map(0xd000, 0xdfff).rw("rfsnd", FUNC(rf5c68_device::rf5c68_mem_r), FUNC(rf5c68_device::rf5c68_mem_w));
+	map(0xe000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segas18_state::sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(soundbank_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(mcu_data_w)
-ADDRESS_MAP_END
+void segas18_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).mirror(0x0c).rw("ym1", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0x90, 0x93).mirror(0x0c).rw("ym2", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xa0, 0xa0).mirror(0x1f).w(this, FUNC(segas18_state::soundbank_w));
+	map(0xc0, 0xc0).mirror(0x1f).rw(m_mapper, FUNC(sega_315_5195_mapper_device::pread), FUNC(sega_315_5195_mapper_device::pwrite));
+}
 
 
 
@@ -681,11 +666,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(segas18_state::mcu_io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	// port 2 not used for high order address byte
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
-ADDRESS_MAP_END
+void segas18_state::mcu_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff); // port 2 not used for high order address byte
+	map(0x00, 0x1f).rw(m_mapper, FUNC(sega_315_5195_mapper_device::read), FUNC(sega_315_5195_mapper_device::write));
+}
 
 
 
@@ -1313,12 +1299,6 @@ WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(segas18_state::ym3438_irq_handler)
-{
-	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 MACHINE_CONFIG_START(segas18_state::system18)
 
 	// basic machine hardware
@@ -1332,9 +1312,10 @@ MACHINE_CONFIG_START(segas18_state::system18)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_SEGA_315_5195_MAPPER_ADD("mapper", "maincpu", segas18_state, memory_mapper)
-	MCFG_SEGA_315_5195_SOUND_READ_CALLBACK(READ8(segas18_state, mapper_sound_r))
-	MCFG_SEGA_315_5195_SOUND_WRITE_CALLBACK(WRITE8(segas18_state, mapper_sound_w))
+	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, 10000000)
+	MCFG_SEGA_315_5195_CPU("maincpu")
+	MCFG_SEGA_315_5195_MAPPER_HANDLER(segas18_state, memory_mapper)
+	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5296, 16000000)
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
@@ -1377,11 +1358,9 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	MCFG_SOUND_ADD("ym1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas18_state, ym3438_irq_handler))
+	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_IRQ0))
 
 	MCFG_SOUND_ADD("ym2", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
@@ -1454,6 +1433,9 @@ MACHINE_CONFIG_START(segas18_state::system18_i8751)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_REMOVE()
 
+	MCFG_DEVICE_MODIFY("mapper")
+	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
+
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
@@ -1465,6 +1447,9 @@ MACHINE_CONFIG_START(segas18_state::system18_fd1094_i8751)
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_REMOVE()
+
+	MCFG_DEVICE_MODIFY("mapper")
+	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
 
 	MCFG_CPU_ADD("mcu", I8751, 8000000)
 	MCFG_CPU_IO_MAP(mcu_io_map)

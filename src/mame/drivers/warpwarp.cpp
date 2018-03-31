@@ -290,44 +290,48 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 
 
 
-ADDRESS_MAP_START(warpwarp_state::geebee_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x400) AM_RAM_WRITE(geebee_videoram_w) AM_SHARE("geebee_videoram") // mirror used by kaitei due to a bug
-	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("gfx1", 0) // 3000-33ff in geebee
-	AM_RANGE(0x4000, 0x40ff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_READ(geebee_in_r)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(geebee_out6_w)
-	AM_RANGE(0x7000, 0x7007) AM_MIRROR(0x0ff8) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void warpwarp_state::geebee_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).mirror(0x400).ram().w(this, FUNC(warpwarp_state::geebee_videoram_w)).share("geebee_videoram"); // mirror used by kaitei due to a bug
+	map(0x3000, 0x37ff).rom().region("gfx1", 0); // 3000-33ff in geebee
+	map(0x4000, 0x40ff).ram();
+	map(0x5000, 0x53ff).r(this, FUNC(warpwarp_state::geebee_in_r));
+	map(0x6000, 0x6fff).w(this, FUNC(warpwarp_state::geebee_out6_w));
+	map(0x7000, 0x7007).mirror(0x0ff8).w("latch", FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(warpwarp_state::geebee_port_map)
-	AM_RANGE(0x50, 0x53) AM_READ(geebee_in_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(geebee_out6_w)
-	AM_RANGE(0x70, 0x77) AM_MIRROR(0x08) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void warpwarp_state::geebee_port_map(address_map &map)
+{
+	map(0x50, 0x53).r(this, FUNC(warpwarp_state::geebee_in_r));
+	map(0x60, 0x6f).w(this, FUNC(warpwarp_state::geebee_out6_w));
+	map(0x70, 0x77).mirror(0x08).w("latch", FUNC(ls259_device::write_d0));
+}
 
 
-ADDRESS_MAP_START(warpwarp_state::bombbee_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0x6000, 0x600f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
-	AM_RANGE(0x6010, 0x601f) AM_READ(warpwarp_vol_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music1_w)
-	AM_RANGE(0x6020, 0x602f) AM_READ(warpwarp_dsw1_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music2_w)
-	AM_RANGE(0x6030, 0x6037) AM_MIRROR(0x0008) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void warpwarp_state::bombbee_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x47ff).ram().w(this, FUNC(warpwarp_state::warpwarp_videoram_w)).share("videoram");
+	map(0x4800, 0x4fff).rom().region("gfx1", 0);
+	map(0x6000, 0x600f).rw(this, FUNC(warpwarp_state::warpwarp_sw_r), FUNC(warpwarp_state::warpwarp_out0_w));
+	map(0x6010, 0x601f).r(this, FUNC(warpwarp_state::warpwarp_vol_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music1_w));
+	map(0x6020, 0x602f).r(this, FUNC(warpwarp_state::warpwarp_dsw1_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music2_w));
+	map(0x6030, 0x6037).mirror(0x0008).w("latch", FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(warpwarp_state::warpwarp_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
-	AM_RANGE(0xc010, 0xc01f) AM_READ(warpwarp_vol_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music1_w)
-	AM_RANGE(0xc020, 0xc02f) AM_READ(warpwarp_dsw1_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music2_w)
-	AM_RANGE(0xc030, 0xc037) AM_MIRROR(0x0008) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void warpwarp_state::warpwarp_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x83ff).ram();
+	map(0x4000, 0x47ff).ram().w(this, FUNC(warpwarp_state::warpwarp_videoram_w)).share("videoram");
+	map(0x4800, 0x4fff).rom().region("gfx1", 0);
+	map(0xc000, 0xc00f).rw(this, FUNC(warpwarp_state::warpwarp_sw_r), FUNC(warpwarp_state::warpwarp_out0_w));
+	map(0xc010, 0xc01f).r(this, FUNC(warpwarp_state::warpwarp_vol_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music1_w));
+	map(0xc020, 0xc02f).r(this, FUNC(warpwarp_state::warpwarp_dsw1_r)).w(m_warpwarp_sound, FUNC(warpwarp_sound_device::music2_w));
+	map(0xc030, 0xc037).mirror(0x0008).w("latch", FUNC(ls259_device::write_d0));
+}
 
 
 

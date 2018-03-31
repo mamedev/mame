@@ -77,7 +77,7 @@ uint16_t bbc_state::calculate_video_address(uint16_t ma, uint8_t ra)
 	else
 		m = ((ma & 0xff)<<3) | (s<<11) | (ra & 0x7);
 
-	if (m_memorySize == 16) m &= 0x3fff;
+	if (m_ram->size() == 16 * 1024) m &= 0x3fff;
 
 	return m;
 }
@@ -144,13 +144,13 @@ void bbc_state::set_pixel_lookup()
 WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 {
 	// Make sure vpos is never <0
-	int vpos = machine().first_screen()->vpos();
+	int vpos = m_screen->vpos();
 	if (vpos == 0)
-		machine().first_screen()->update_partial(vpos);
+		m_screen->update_partial(vpos);
 	else
-		machine().first_screen()->update_partial(vpos - 1);
+		m_screen->update_partial(vpos - 1);
 
-	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,machine().first_screen()->vpos() );
+	logerror("setting videoULA %.4x to:%.4x   at :%d \n", data, offset, vpos);
 
 	switch (offset & 0x01)
 	{
@@ -281,13 +281,13 @@ WRITE_LINE_MEMBER(bbc_state::bbc_de_changed)
 
 /**** BBC B+/Master Shadow Ram change ****/
 
-void bbc_state::bbc_setvideoshadow(int vdusel)
+void bbc_state::setvideoshadow(int vdusel)
 {
 	// LYNNE lives at 0xb000 in our map, but the offset we use here is 0x8000
 	// as the video circuitry will already be looking at 0x3000 or so above
 	// the offset.
 	if (vdusel)
-		m_video_ram = m_region_maincpu->base()+0x8000;
+		m_video_ram = m_region_maincpu->base() + 0x8000;
 	else
 		m_video_ram = m_region_maincpu->base();
 }
@@ -304,5 +304,4 @@ VIDEO_START_MEMBER(bbc_state, bbc)
 	set_pixel_lookup();
 
 	m_video_ram = m_region_maincpu->base();
-	m_memorySize = m_ram->size() / 1024;
 }

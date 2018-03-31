@@ -217,81 +217,89 @@ WRITE8_MEMBER(route16_state::speakres_out2_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(route16_state::route16_cpu1_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3001) AM_READ(route16_prot_read)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::route16_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x3000, 0x3001).r(this, FUNC(route16_state::route16_prot_read));
+	map(0x4000, 0x43ff).ram().w(this, FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2");
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-ADDRESS_MAP_START(route16_state::routex_cpu1_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
-	AM_RANGE(0x6400, 0x6400) AM_READ(routex_prot_read)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::routex_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().w(this, FUNC(route16_state::route16_sharedram_w<true>)).share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2");
+	map(0x6400, 0x6400).r(this, FUNC(route16_state::routex_prot_read));
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-ADDRESS_MAP_START(route16_state::stratvox_cpu1_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::stratvox_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2");
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-ADDRESS_MAP_START(route16_state::speakres_cpu1_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(speakres_out2_w)
-	AM_RANGE(0x6000, 0x6000) AM_READ(speakres_in3_r)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::speakres_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).portr("P1").w(this, FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).portr("P2").w(this, FUNC(route16_state::speakres_out2_w));
+	map(0x6000, 0x6000).r(this, FUNC(route16_state::speakres_in3_r));
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-ADDRESS_MAP_START(route16_state::ttmahjng_cpu1_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ(ttmahjng_p2_matrix_r) AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READWRITE(ttmahjng_p1_matrix_r, ttmahjng_input_port_matrix_w)
-	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0x6900, 0x6900) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
-ADDRESS_MAP_END
+void route16_state::ttmahjng_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x4800, 0x4800).portr("DSW").w(this, FUNC(route16_state::out0_w));
+	map(0x5000, 0x5000).r(this, FUNC(route16_state::ttmahjng_p2_matrix_r)).w(this, FUNC(route16_state::out1_w));
+	map(0x5800, 0x5800).rw(this, FUNC(route16_state::ttmahjng_p1_matrix_r), FUNC(route16_state::ttmahjng_input_port_matrix_w));
+	map(0x6800, 0x6800).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x6900, 0x6900).w("ay8910", FUNC(ay8910_device::address_w));
+	map(0x8000, 0xbfff).ram().share("videoram1");
+}
 
 
-ADDRESS_MAP_START(route16_state::route16_cpu2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<false>) AM_SHARE("sharedram")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
-ADDRESS_MAP_END
+void route16_state::route16_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram().w(this, FUNC(route16_state::route16_sharedram_w<false>)).share("sharedram");
+	map(0x8000, 0xbfff).ram().share("videoram2");
+}
 
 
-ADDRESS_MAP_START(route16_state::stratvox_cpu2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
-ADDRESS_MAP_END
+void route16_state::stratvox_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2800, 0x2800).w("dac", FUNC(dac_byte_interface::write));
+	map(0x4000, 0x43ff).ram().share("sharedram");
+	map(0x8000, 0xbfff).ram().share("videoram2");
+}
 
 
-ADDRESS_MAP_START(route16_state::cpu1_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x00ff) AM_DEVWRITE("ay8910", ay8910_device, data_w)
-	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x00ff) AM_DEVWRITE("ay8910", ay8910_device, address_w)
-ADDRESS_MAP_END
+void route16_state::cpu1_io_map(address_map &map)
+{
+	map.global_mask(0x1ff);
+	map(0x0000, 0x0000).mirror(0x00ff).w("ay8910", FUNC(ay8910_device::data_w));
+	map(0x0100, 0x0100).mirror(0x00ff).w("ay8910", FUNC(ay8910_device::address_w));
+}
 
 
 

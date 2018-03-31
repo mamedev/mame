@@ -367,11 +367,12 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
 }
 
 
-ADDRESS_MAP_START(pgm_022_025_state::killbld_mem)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("sharedprotram") // Shared with protection device
-ADDRESS_MAP_END
+void pgm_022_025_state::killbld_mem(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x2fffff).bankr("bank1"); /* Game ROM */
+	map(0x300000, 0x303fff).ram().share("sharedprotram"); // Shared with protection device
+}
 
 
 MACHINE_CONFIG_START(pgm_022_025_state::pgm_022_025)

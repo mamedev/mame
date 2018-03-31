@@ -111,21 +111,24 @@ protected:
 };
 
 
-ADDRESS_MAP_START(odyssey2_state::odyssey2_mem)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0400, 0x0bff) AM_DEVREAD("cartslot", o2_cart_slot_device, read_rom04)
-	AM_RANGE(0x0c00, 0x0fff) AM_DEVREAD("cartslot", o2_cart_slot_device, read_rom0c)
-ADDRESS_MAP_END
+void odyssey2_state::odyssey2_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0x0bff).r(m_cart, FUNC(o2_cart_slot_device::read_rom04));
+	map(0x0c00, 0x0fff).r(m_cart, FUNC(o2_cart_slot_device::read_rom0c));
+}
 
 
-ADDRESS_MAP_START(odyssey2_state::odyssey2_io)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(io_read, io_write)
-ADDRESS_MAP_END
+void odyssey2_state::odyssey2_io(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(odyssey2_state::io_read), FUNC(odyssey2_state::io_write));
+}
 
 
-ADDRESS_MAP_START(g7400_state::g7400_io)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(io_read, io_write)
-ADDRESS_MAP_END
+void g7400_state::g7400_io(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(g7400_state::io_read), FUNC(g7400_state::io_write));
+}
 
 
 static INPUT_PORTS_START( odyssey2 )

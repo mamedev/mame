@@ -120,18 +120,19 @@ protected:
 	required_device<screen_device> m_screen;
 };
 
-ADDRESS_MAP_START(kcgd_state::kcgd_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0000000, 0077777) AM_READWRITE(vram_mmap_r, vram_mmap_w)
-	AM_RANGE (0100000, 0157777) AM_ROM
-	AM_RANGE (0160000, 0160001) AM_MIRROR(03774) AM_READWRITE(vram_addr_r, vram_addr_w)
-	AM_RANGE (0160002, 0160003) AM_MIRROR(03774) AM_READWRITE(vram_data_r, vram_data_w)
-	AM_RANGE (0167770, 0167771) AM_READWRITE(status_r, status_w)
-	AM_RANGE (0167772, 0167773) AM_READWRITE8(palette_index_r, palette_index_w, 0x00ff) // reads always return 0
-	AM_RANGE (0167772, 0167773) AM_READWRITE8(palette_data_r, palette_data_w, 0xff00)
-//  AM_RANGE (0176560, 0176567) AM_RAM  // USART2 -- host
-//  AM_RANGE (0177560, 0177567) AM_RAM  // USART3 -- keyboard
-ADDRESS_MAP_END
+void kcgd_state::kcgd_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0000000, 0077777).rw(this, FUNC(kcgd_state::vram_mmap_r), FUNC(kcgd_state::vram_mmap_w));
+	map(0100000, 0157777).rom();
+	map(0160000, 0160001).mirror(03774).rw(this, FUNC(kcgd_state::vram_addr_r), FUNC(kcgd_state::vram_addr_w));
+	map(0160002, 0160003).mirror(03774).rw(this, FUNC(kcgd_state::vram_data_r), FUNC(kcgd_state::vram_data_w));
+	map(0167770, 0167771).rw(this, FUNC(kcgd_state::status_r), FUNC(kcgd_state::status_w));
+	map(0167772, 0167772).rw(this, FUNC(kcgd_state::palette_index_r), FUNC(kcgd_state::palette_index_w)); // reads always return 0
+	map(0167773, 0167773).rw(this, FUNC(kcgd_state::palette_data_r), FUNC(kcgd_state::palette_data_w));
+//  map(0176560, 0176567).ram();  // USART2 -- host
+//  map(0177560, 0177567).ram();  // USART3 -- keyboard
+}
 
 void kcgd_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {

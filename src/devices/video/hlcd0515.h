@@ -43,11 +43,11 @@
 
 // COL/ROW pins (offset for ROW)
 #define MCFG_HLCD0515_WRITE_COLS_CB(_devcb) \
-	devcb = &hlcd0515_device::set_write_cols_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hlcd0515_device &>(*device).set_write_cols_callback(DEVCB_##_devcb);
 
 // DATA OUT pin, don't use on HLCD0569
 #define MCFG_HLCD0515_WRITE_DATA_CB(_devcb) \
-	devcb = &hlcd0515_device::set_write_data_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hlcd0515_device &>(*device).set_write_data_callback(DEVCB_##_devcb);
 
 
 class hlcd0515_device : public device_t
@@ -55,9 +55,9 @@ class hlcd0515_device : public device_t
 public:
 	hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration helpers
-	template <typename Object> static devcb_base &set_write_cols_callback(device_t &device, Object &&cb) { return downcast<hlcd0515_device &>(device).m_write_cols.set_callback(std::forward<Object>(cb)); }
-	template <typename Object> static devcb_base &set_write_data_callback(device_t &device, Object &&cb) { return downcast<hlcd0515_device &>(device).m_write_data.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <typename Object> devcb_base &set_write_cols_callback(Object &&cb) { return m_write_cols.set_callback(std::forward<Object>(cb)); }
+	template <typename Object> devcb_base &set_write_data_callback(Object &&cb) { return m_write_data.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_cs);

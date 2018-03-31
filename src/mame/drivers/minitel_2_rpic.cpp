@@ -98,8 +98,10 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
 
-	DECLARE_WRITE8_MEMBER ( port_w );
-	DECLARE_READ8_MEMBER ( port_r );
+	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_WRITE8_MEMBER(port3_w);
+	DECLARE_READ8_MEMBER(port1_r);
+	DECLARE_READ8_MEMBER(port3_r);
 
 	DECLARE_WRITE8_MEMBER ( dev_crtl_reg_w );
 	DECLARE_READ8_MEMBER ( dev_keyb_ser_r );
@@ -114,12 +116,12 @@ protected:
 	required_ioport_array<16> m_io_kbd;
 	virtual void machine_start() override;
 
-	char port0, port1, port2, port3;
+	uint8_t port1, port3;
 
 	int keyboard_para_ser;
-	unsigned char keyboard_x_row_reg;
+	uint8_t keyboard_x_row_reg;
 
-	unsigned char last_ctrl_reg;
+	uint8_t last_ctrl_reg;
 };
 
 void minitel_state::machine_start()
@@ -134,95 +136,74 @@ void minitel_state::machine_start()
 	m_palette->set_pen_color( 7, 255, 255, 255);
 }
 
-WRITE8_MEMBER(minitel_state::port_w)
+WRITE8_MEMBER(minitel_state::port1_w)
 {
-	LOG("port_w: write %02X to PORT (offset=%02X)\n", data, offset);
+	LOG("port_w: write %02X to PORT1\n", data);
 
-	switch(offset| 0x20000)
+	if( (port1 ^ data) & PORT_1_KBSERIN )
 	{
-		case MCS51_PORT_P0:
-			port0 = data;
-		break;
-		case MCS51_PORT_P1:
-
-			if( (port1 ^ data) & PORT_1_KBSERIN )
-			{
-				LOG("PORT_1_KBSERIN : %d \n", data & PORT_1_KBSERIN );
-			}
-
-			if( (port1 ^ data) & PORT_1_MDM_DCD )
-			{
-				LOG("PORT_1_MDM_DCD : %d \n", data & PORT_1_MDM_DCD );
-			}
-
-			if( (port1 ^ data) & PORT_1_MDM_PRD )
-			{
-				LOG("PORT_1_MDM_PRD : %d \n", data & PORT_1_MDM_PRD );
-			}
-
-			if( (port1 ^ data) & PORT_1_MDM_TXD )
-			{
-				LOG("PORT_1_MDM_TXD : %d \n", data & PORT_1_MDM_TXD );
-			}
-
-			if( (port1 ^ data) & PORT_1_MDM_RTS )
-			{
-				LOG("PORT_1_MDM_RTS : %d \n", data & PORT_1_MDM_RTS );
-			}
-
-			if( (port1 ^ data) & PORT_1_KBLOAD )
-			{
-				LOG("PORT_1_KBLOAD : %d PC:0x%x\n", data & PORT_1_KBLOAD,m_maincpu->pc() );
-
-				if(data & PORT_1_KBLOAD)
-					keyboard_para_ser = 1;
-				else
-					keyboard_para_ser = 0;
-			}
-
-			if( (port1 ^ data) & PORT_1_SCL )
-			{
-				LOG("PORT_1_SCL : %d \n", data & PORT_1_SCL );
-			}
-
-			if( (port1 ^ data) & PORT_1_SDA )
-			{
-				LOG("PORT_1_SDA : %d \n", data & PORT_1_SDA );
-			}
-
-			port1=data;
-		break;
-
-		case MCS51_PORT_P2:
-			port2=data;
-		break;
-
-		case MCS51_PORT_P3:
-			port3=data;
-		break;
+		LOG("PORT_1_KBSERIN : %d \n", data & PORT_1_KBSERIN );
 	}
+
+	if( (port1 ^ data) & PORT_1_MDM_DCD )
+	{
+		LOG("PORT_1_MDM_DCD : %d \n", data & PORT_1_MDM_DCD );
+	}
+
+	if( (port1 ^ data) & PORT_1_MDM_PRD )
+	{
+		LOG("PORT_1_MDM_PRD : %d \n", data & PORT_1_MDM_PRD );
+	}
+
+	if( (port1 ^ data) & PORT_1_MDM_TXD )
+	{
+		LOG("PORT_1_MDM_TXD : %d \n", data & PORT_1_MDM_TXD );
+	}
+
+	if( (port1 ^ data) & PORT_1_MDM_RTS )
+	{
+		LOG("PORT_1_MDM_RTS : %d \n", data & PORT_1_MDM_RTS );
+	}
+
+	if( (port1 ^ data) & PORT_1_KBLOAD )
+	{
+		LOG("PORT_1_KBLOAD : %d PC:0x%x\n", data & PORT_1_KBLOAD,m_maincpu->pc() );
+
+		if(data & PORT_1_KBLOAD)
+			keyboard_para_ser = 1;
+		else
+			keyboard_para_ser = 0;
+	}
+
+	if( (port1 ^ data) & PORT_1_SCL )
+	{
+		LOG("PORT_1_SCL : %d \n", data & PORT_1_SCL );
+	}
+
+	if( (port1 ^ data) & PORT_1_SDA )
+	{
+		LOG("PORT_1_SDA : %d \n", data & PORT_1_SDA );
+	}
+
+	port1 = data;
 }
 
-READ8_MEMBER(minitel_state::port_r)
+WRITE8_MEMBER(minitel_state::port3_w)
 {
-	LOG("port_r: read PORT (offset=%02X) %x\n", offset,m_maincpu->pc());
+	LOG("port_w: write %02X to PORT3\n", data);
+	port3 = data;
+}
 
-	switch(offset | 0x20000)
-	{
-		case MCS51_PORT_P0:
-			LOG("port_r: read %02X from PORT0\n", port0);
-			return port0;
-		case MCS51_PORT_P1:
-			LOG("port_r: read %02X from PORT1 - Keyboard -> %x\n", port1,((keyboard_x_row_reg>>7)&1));
-			return ( (port1&0xFE) | ((keyboard_x_row_reg>>7)&1) ) ;
-		case MCS51_PORT_P2:
-			LOG("port_r: read %02X from PORT2\n", port2);
-			return port2;
-		case MCS51_PORT_P3:
-			LOG("port_r: read %02X from PORT3\n", port3);
-			return port3;
-	}
-	return 0;
+READ8_MEMBER(minitel_state::port1_r)
+{
+	LOG("port_r: read %02X from PORT1 - Keyboard -> %x\n", port1,((keyboard_x_row_reg>>7)&1));
+	return ( (port1&0xFE) | ((keyboard_x_row_reg>>7)&1) ) ;
+}
+
+READ8_MEMBER(minitel_state::port3_r)
+{
+	LOG("port_r: read %02X from PORT3\n", port3);
+	return port3;
 }
 
 WRITE8_MEMBER(minitel_state::dev_crtl_reg_w)
@@ -296,15 +277,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(minitel_state::minitel_scanline)
 	m_ts9347->update_scanline((uint16_t)param);
 }
 
-ADDRESS_MAP_START(minitel_state::mem_prg)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void minitel_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 ADDRESS_MAP_START(minitel_state::mem_io)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dev_keyb_ser_r, dev_crtl_reg_w)
 	/* ts9347 */
 	AM_RANGE(0x4000, 0x5ffF) AM_READWRITE(ts9347_io_r, ts9347_io_w)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(port_r, port_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -419,7 +400,10 @@ MACHINE_CONFIG_START(minitel_state::minitel2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL(14'318'181)) //verified on pcb
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_CPU_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(minitel_state, port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(minitel_state, port1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(minitel_state, port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(minitel_state, port3_w))
 
 	MCFG_DEVICE_ADD("ts9347", TS9347, 0)
 	MCFG_EF9345_PALETTE("palette")
@@ -441,7 +425,7 @@ ROM_START( minitel2 )
 	ROM_DEFAULT_BIOS("ft_bv4")
 
 	ROM_SYSTEM_BIOS(0, "ft_bv4", "Minitel 2 ROM BV4")
-	ROMX_LOAD( "MINITEL2_BV4.BIN",   0x0000, 0x8000, CRC(8844A0A7) SHA1(D3E9079B080DBCEE27AD870EC6C39AC42E7DEACF), ROM_BIOS(1) )
+	ROMX_LOAD( "minitel2_bv4.bin",   0x0000, 0x8000, CRC(8844A0A7) SHA1(D3E9079B080DBCEE27AD870EC6C39AC42E7DEACF), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(1, "demov1", "Minitel 2 Demo")
 	ROMX_LOAD( "demo_minitel.bin",   0x0000, 0x8000, CRC(607F2482) SHA1(7965EDBEF68E45D09DC67A4684DA56003EFF6328), ROM_BIOS(2) )

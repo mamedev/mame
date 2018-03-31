@@ -21,20 +21,25 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
-void ts3000(machine_config &config);
-void io_map(address_map &map);
-void mem_map(address_map &map);
+	void ts3000(machine_config &config);
+
+protected:
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
 private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-ADDRESS_MAP_START(ts3000_state::mem_map)
-	AM_RANGE(0x00000,0x0ffff) AM_RAM
-	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void ts3000_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0xfc000, 0xfffff).rom().region("roms", 0);
+}
 
-ADDRESS_MAP_START(ts3000_state::io_map)
-ADDRESS_MAP_END
+void ts3000_state::io_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( ts3000 )
 INPUT_PORTS_END
@@ -47,7 +52,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ts3000 )
 	ROM_REGION( 0x4000, "roms", 0 )
-	ROM_LOAD( "U25 VER 2.03 BIOS D.u25", 0x0000, 0x4000, CRC(abaff64c) SHA1(b2f0e73d2a25a03d5bac558580919bd0400f4fcf) ) // The D at the end is handwritten
+	ROM_LOAD( "u25 ver 2.03 bios d.u25", 0x0000, 0x4000, CRC(abaff64c) SHA1(b2f0e73d2a25a03d5bac558580919bd0400f4fcf) ) // The D at the end is handwritten
 ROM_END
 
 COMP( 198?, ts3000, 0, 0, ts3000, ts3000, ts3000_state, 0, "Televideo", "TS-3000", MACHINE_IS_SKELETON )

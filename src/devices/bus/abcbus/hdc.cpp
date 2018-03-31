@@ -54,17 +54,19 @@ const tiny_rom_entry *abc_hdc_device::device_rom_region() const
 //  ADDRESS_MAP( abc_hdc_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc_hdc_device::abc_hdc_mem)
-	AM_RANGE(0x0000, 0x0ff) AM_ROM AM_REGION(Z80_TAG, 0)
-ADDRESS_MAP_END
+void abc_hdc_device::abc_hdc_mem(address_map &map)
+{
+	map(0x0000, 0x0ff).rom().region(Z80_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc_hdc_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc_hdc_device::abc_hdc_io)
-ADDRESS_MAP_END
+void abc_hdc_device::abc_hdc_io(address_map &map)
+{
+}
 
 
 //-------------------------------------------------

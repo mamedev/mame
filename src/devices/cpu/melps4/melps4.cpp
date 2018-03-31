@@ -473,7 +473,7 @@ void melps4_cpu_device::execute_run()
 	}
 }
 
-util::disasm_interface *melps4_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> melps4_cpu_device::create_disassembler()
 {
-	return new melps4_disassembler;
+	return std::make_unique<melps4_disassembler>();
 }

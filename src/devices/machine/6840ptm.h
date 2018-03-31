@@ -20,19 +20,19 @@
 //**************************************************************************
 
 #define MCFG_PTM6840_EXTERNAL_CLOCKS(_clk0, _clk1, _clk2) \
-	ptm6840_device::set_external_clocks(*device, _clk0, _clk1, _clk2);
+	downcast<ptm6840_device &>(*device).set_external_clocks(_clk0, _clk1, _clk2);
 
 #define MCFG_PTM6840_O1_CB(_devcb) \
-	devcb = &ptm6840_device::set_out_callback(*device, 0, DEVCB_##_devcb);
+	devcb = &downcast<ptm6840_device &>(*device).set_out_callback(0, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_O2_CB(_devcb) \
-	devcb = &ptm6840_device::set_out_callback(*device, 1, DEVCB_##_devcb);
+	devcb = &downcast<ptm6840_device &>(*device).set_out_callback(1, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_O3_CB(_devcb) \
-	devcb = &ptm6840_device::set_out_callback(*device, 2, DEVCB_##_devcb);
+	devcb = &downcast<ptm6840_device &>(*device).set_out_callback(2, DEVCB_##_devcb);
 
 #define MCFG_PTM6840_IRQ_CB(_devcb) \
-	devcb = &ptm6840_device::set_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ptm6840_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -46,10 +46,10 @@ public:
 	// construction/destruction
 	ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_external_clocks(device_t &device, double clock0, double clock1, double clock2) { downcast<ptm6840_device &>(device).m_external_clock[0] = clock0; downcast<ptm6840_device &>(device).m_external_clock[1] = clock1; downcast<ptm6840_device &>(device).m_external_clock[2] = clock2; }
-	static void set_external_clocks(device_t &device, const XTAL &clock0, const XTAL &clock1, const XTAL &clock2) { set_external_clocks(device, clock0.dvalue(), clock1.dvalue(), clock2.dvalue()); }
-	template <class Object> static devcb_base &set_out_callback(device_t &device, int index, Object &&cb) { return downcast<ptm6840_device &>(device).m_out_cb[index].set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<ptm6840_device &>(device).m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	void set_external_clocks(double clock0, double clock1, double clock2) { m_external_clock[0] = clock0; m_external_clock[1] = clock1; m_external_clock[2] = clock2; }
+	void set_external_clocks(const XTAL &clock0, const XTAL &clock1, const XTAL &clock2) { set_external_clocks(clock0.dvalue(), clock1.dvalue(), clock2.dvalue()); }
+	template <class Object> devcb_base &set_out_callback(int index, Object &&cb) { return m_out_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 
 	int status(int clock) const { return m_enabled[clock]; } // get whether timer is enabled
 	int irq_state() const { return m_irq; }                 // get IRQ state

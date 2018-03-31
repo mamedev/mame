@@ -34,13 +34,6 @@ nasbus_slot_device::nasbus_slot_device(const machine_config &mconfig, device_typ
 {
 }
 
-void nasbus_slot_device::set_nasbus_slot(device_t &device, device_t *owner, const char *nasbus_tag)
-{
-	nasbus_slot_device &nasbus_card = dynamic_cast<nasbus_slot_device &>(device);
-	nasbus_card.m_owner = owner;
-	nasbus_card.m_nasbus_tag = nasbus_tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

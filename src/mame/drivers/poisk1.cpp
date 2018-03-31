@@ -74,7 +74,9 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
+		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -86,7 +88,10 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+
+	required_ioport_array<8> m_kbdio;
 
 	DECLARE_DRIVER_INIT(poisk1);
 	DECLARE_MACHINE_START(poisk1);
@@ -241,9 +246,9 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 	if (BIT((data ^ m_video.color_select_68), 7))
 	{
 		if (BIT(data, 7))
-			machine().first_screen()->set_visible_area(0, 640 - 1, 0, 200 - 1);
+			m_screen->set_visible_area(0, 640 - 1, 0, 200 - 1);
 		else
-			machine().first_screen()->set_visible_area(0, 320 - 1, 0, 200 - 1);
+			m_screen->set_visible_area(0, 320 - 1, 0, 200 - 1);
 	}
 	m_video.color_select_68 = data;
 	set_palette_luts();
@@ -489,14 +494,14 @@ READ8_MEMBER(p1_state::p1_ppi_portb_r)
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
 
-	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
-	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }
-	if (m_kbpoll_mask & 0x04) { key &= ioport("Y3")->read(); }
-	if (m_kbpoll_mask & 0x08) { key &= ioport("Y4")->read(); }
-	if (m_kbpoll_mask & 0x10) { key &= ioport("Y5")->read(); }
-	if (m_kbpoll_mask & 0x20) { key &= ioport("Y6")->read(); }
-	if (m_kbpoll_mask & 0x40) { key &= ioport("Y7")->read(); }
-	if (m_kbpoll_mask & 0x80) { key &= ioport("Y8")->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_kbpoll_mask, i))
+		{
+			key &= m_kbdio[i]->read();
+		}
+	}
+
 	ret = key & 0xff;
 //  DBG_LOG(1,"p1_ppi_portb_r",("= %02X\n", ret));
 	return ret;
@@ -507,14 +512,14 @@ READ8_MEMBER(p1_state::p1_ppi_portc_r)
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
 
-	if (m_kbpoll_mask & 0x01) { key &= ioport("Y1")->read(); }
-	if (m_kbpoll_mask & 0x02) { key &= ioport("Y2")->read(); }
-	if (m_kbpoll_mask & 0x04) { key &= ioport("Y3")->read(); }
-	if (m_kbpoll_mask & 0x08) { key &= ioport("Y4")->read(); }
-	if (m_kbpoll_mask & 0x10) { key &= ioport("Y5")->read(); }
-	if (m_kbpoll_mask & 0x20) { key &= ioport("Y6")->read(); }
-	if (m_kbpoll_mask & 0x40) { key &= ioport("Y7")->read(); }
-	if (m_kbpoll_mask & 0x80) { key &= ioport("Y8")->read(); }
+	for (int i = 0; i < 8; i++)
+	{
+		if (BIT(m_kbpoll_mask, i))
+		{
+			key &= m_kbdio[i]->read();
+		}
+	}
+
 	ret = (key >> 8) & 0xff;
 	DBG_LOG(2,"p1_ppi_portc_r",("= %02X\n", ret));
 	return ret;
@@ -615,20 +620,22 @@ MACHINE_RESET_MEMBER(p1_state, poisk1)
  * macros
  */
 
-ADDRESS_MAP_START(p1_state::poisk1_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION("bios", 0xc000)
-ADDRESS_MAP_END
+void p1_state::poisk1_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xfc000, 0xfffff).rom().region("bios", 0xc000);
+}
 
-ADDRESS_MAP_START(p1_state::poisk1_io)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0028, 0x002B) AM_READWRITE(p1_trap_r, p1_trap_w)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+void p1_state::poisk1_io(address_map &map)
+{
+	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0028, 0x002B).rw(this, FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
+	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	// can't use regular AM_DEVREADWRITE, because THIS IS SPARTA!
 	// 1st PPI occupies ports 60, 69, 6A and 6B; 2nd PPI -- 68, 61, 62 and 63.
-	AM_RANGE(0x0060, 0x006F) AM_READWRITE(p1_ppi_r, p1_ppi_w)
-	AM_RANGE(0x03D0, 0x03DF) AM_READWRITE(p1_cga_r, p1_cga_w)
-ADDRESS_MAP_END
+	map(0x0060, 0x006F).rw(this, FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
+	map(0x03D0, 0x03DF).rw(this, FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
+}
 
 static INPUT_PORTS_START( poisk1 )
 	PORT_INCLUDE( poisk1_keyboard_v91 )
@@ -707,7 +714,7 @@ ROM_START( poisk1 )
 
 	ROM_DEFAULT_BIOS("v91")
 	ROM_SYSTEM_BIOS(0, "v89r0", "1989r0")
-	ROMX_LOAD( "BIOS.RF6", 0xe000, 0x2000, CRC(c0f333e3) SHA1(a44f355b7deae3693e1462d57543a42944fd0969), ROM_BIOS(1))
+	ROMX_LOAD( "bios.rf6", 0xe000, 0x2000, CRC(c0f333e3) SHA1(a44f355b7deae3693e1462d57543a42944fd0969), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "v89", "1989")
 	ROMX_LOAD( "biosp1s.rf4", 0xe000, 0x2000, CRC(1a85f671) SHA1(f0e59b2c4d92164abca55a96a58071ce869ff988), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v91", "1991")
@@ -716,15 +723,15 @@ ROM_START( poisk1 )
 	ROMX_LOAD( "p_bios_nm.bin", 0xe000, 0x2000, CRC(84430b4f) SHA1(3e477962be3cea09662cb2e3ad9966ad01c7455d), ROM_BIOS(4))
 
 	ROM_SYSTEM_BIOS(4, "test1", "Test 1")
-	ROMX_LOAD( "TEST1.RF6", 0x00000, 0x2000, CRC(a5f05dff) SHA1(21dd0cea605bd7be22e94f8355d86b2478d9527e), ROM_BIOS(5))
+	ROMX_LOAD( "test1.rf6", 0x00000, 0x2000, CRC(a5f05dff) SHA1(21dd0cea605bd7be22e94f8355d86b2478d9527e), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS(5, "test2", "Test 2")
-	ROMX_LOAD( "TEST2.RF6", 0x00000, 0x2000, CRC(eff730e4) SHA1(fcbc08de9b8592c974eaea837839f1a9caf36a75), ROM_BIOS(6))
+	ROMX_LOAD( "test2.rf6", 0x00000, 0x2000, CRC(eff730e4) SHA1(fcbc08de9b8592c974eaea837839f1a9caf36a75), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS(6, "test3", "Test 3")
-	ROMX_LOAD( "TEST3.RF6", 0x00000, 0x2000, CRC(23025dc9) SHA1(dca4cb580162bb28f6e49ff625b677001d40d573), ROM_BIOS(7))
+	ROMX_LOAD( "test3.rf6", 0x00000, 0x2000, CRC(23025dc9) SHA1(dca4cb580162bb28f6e49ff625b677001d40d573), ROM_BIOS(7))
 	ROM_SYSTEM_BIOS(7, "test4", "Test 4")
-	ROMX_LOAD( "TEST4.RF6", 0x00000, 0x2000, CRC(aac8fc5e) SHA1(622abb5ac66d38a474ee54fe016aff0ba0b5794f), ROM_BIOS(8))
+	ROMX_LOAD( "test4.rf6", 0x00000, 0x2000, CRC(aac8fc5e) SHA1(622abb5ac66d38a474ee54fe016aff0ba0b5794f), ROM_BIOS(8))
 	ROM_SYSTEM_BIOS(8, "test5", "Test 5")
-	ROMX_LOAD( "TEST5.RF6", 0x00000, 0x2000, CRC(f308e679) SHA1(37bd35f62015d338b3347fd4e3ec455eab048b66), ROM_BIOS(9))
+	ROMX_LOAD( "test5.rf6", 0x00000, 0x2000, CRC(f308e679) SHA1(37bd35f62015d338b3347fd4e3ec455eab048b66), ROM_BIOS(9))
 
 	// 0xc0000, sets 80x25 text and loops asking for 'Boot from hard disk (Y or N)?'
 	ROM_LOAD( "boot_net.rf4", 0x00000, 0x2000, CRC(316c2030) SHA1(d043325596455772252e465b85321f1b5c529d0b)) // NET BIOS

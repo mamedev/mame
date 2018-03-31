@@ -36,18 +36,6 @@ ecbbus_slot_device::ecbbus_slot_device(const machine_config &mconfig, const char
 
 
 //-------------------------------------------------
-//  static_set_ecbbus_slot -
-//-------------------------------------------------
-
-void ecbbus_slot_device::static_set_ecbbus_slot(device_t &device, const char *tag, int num)
-{
-	ecbbus_slot_device &ecbbus_card = dynamic_cast<ecbbus_slot_device &>(device);
-	ecbbus_card.m_bus_tag = tag;
-	ecbbus_card.m_bus_num = num;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

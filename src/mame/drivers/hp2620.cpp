@@ -75,21 +75,23 @@ WRITE8_MEMBER(hp2620_state::modem_w)
 {
 }
 
-ADDRESS_MAP_START(hp2620_state::mem_map)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void hp2620_state::mem_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().region("maincpu", 0);
+	map(0xc000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(hp2620_state::io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_READWRITE(nvram_r, nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x80, 0x80) AM_READ(keystat_r)
-	AM_RANGE(0x90, 0x90) AM_READ(sysstat_r)
-	AM_RANGE(0xa0, 0xa3) AM_DEVWRITE("acia", mos6551_device, write)
-	AM_RANGE(0xa4, 0xa7) AM_DEVREAD("acia", mos6551_device, read)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(modem_w)
-	AM_RANGE(0xb8, 0xb8) AM_WRITE(keydisp_w)
-ADDRESS_MAP_END
+void hp2620_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x7f).rw(this, FUNC(hp2620_state::nvram_r), FUNC(hp2620_state::nvram_w)).share("nvram");
+	map(0x80, 0x80).r(this, FUNC(hp2620_state::keystat_r));
+	map(0x90, 0x90).r(this, FUNC(hp2620_state::sysstat_r));
+	map(0xa0, 0xa3).w("acia", FUNC(mos6551_device::write));
+	map(0xa4, 0xa7).r("acia", FUNC(mos6551_device::read));
+	map(0xa8, 0xa8).w(this, FUNC(hp2620_state::modem_w));
+	map(0xb8, 0xb8).w(this, FUNC(hp2620_state::keydisp_w));
+}
 
 static INPUT_PORTS_START( hp2622 )
 INPUT_PORTS_END

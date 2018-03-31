@@ -71,9 +71,10 @@ To load and play a game:
  */
 
 
-ADDRESS_MAP_START(pdp1_state::pdp1_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+void pdp1_state::pdp1_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
 
 static INPUT_PORTS_START( pdp1 )
 	PORT_START("SPACEWAR")      /* 0: spacewar controllers */

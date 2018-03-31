@@ -251,29 +251,31 @@ void f1_state::machine_start()
 //  ADDRESS_MAP( act_f1_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(f1_state::act_f1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x01dff) AM_RAM
-	AM_RANGE(0x01e00, 0x01fff) AM_RAM AM_SHARE("p_scrollram")
-	AM_RANGE(0x02000, 0x3ffff) AM_RAM
-	AM_RANGE(0xe0000, 0xe001f) AM_READWRITE(palette_r, palette_w) AM_SHARE("p_paletteram")
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
-ADDRESS_MAP_END
+void f1_state::act_f1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x01dff).ram();
+	map(0x01e00, 0x01fff).ram().share("p_scrollram");
+	map(0x02000, 0x3ffff).ram();
+	map(0xe0000, 0xe001f).rw(this, FUNC(f1_state::palette_r), FUNC(f1_state::palette_w)).share("p_paletteram");
+	map(0xf8000, 0xfffff).rom().region(I8086_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( act_f1_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(f1_state::act_f1_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x000f) AM_WRITE8(system_w, 0xffff)
-	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8(Z80CTC_TAG, z80ctc_device, read, write, 0x00ff)
-	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8(Z80SIO2_TAG, z80sio_device, ba_cd_r, ba_cd_w, 0x00ff)
+void f1_state::act_f1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x000f).w(this, FUNC(f1_state::system_w));
+	map(0x0010, 0x0017).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
+	map(0x0020, 0x0027).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
 //  AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w, 0x00ff)
-	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8(WD2797_TAG, wd2797_device, read, write, 0x00ff)
+	map(0x0040, 0x0047).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x01e0, 0x01ff) winchester
-ADDRESS_MAP_END
+}
 
 
 //**************************************************************************

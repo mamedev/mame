@@ -8,29 +8,29 @@
 #include "imagedev/floppy.h"
 
 #define MCFG_AMIGA_FDC_INDEX_CALLBACK(_write) \
-	devcb = &amiga_fdc_device::set_index_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<amiga_fdc_device &>(*device).set_index_wr_callback(DEVCB_##_write);
 
 #define MCFG_AMIGA_FDC_READ_DMA_CALLBACK(_read) \
-	devcb = &amiga_fdc_device::set_dma_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<amiga_fdc_device &>(*device).set_dma_rd_callback(DEVCB_##_read);
 
 #define MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(_write) \
-	devcb = &amiga_fdc_device::set_dma_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<amiga_fdc_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
 
 #define MCFG_AMIGA_FDC_DSKBLK_CALLBACK(_write) \
-	devcb = &amiga_fdc_device::set_dskblk_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<amiga_fdc_device &>(*device).set_dskblk_wr_callback(DEVCB_##_write);
 
 #define MCFG_AMIGA_FDC_DSKSYN_CALLBACK(_write) \
-	devcb = &amiga_fdc_device::set_dsksyn_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<amiga_fdc_device &>(*device).set_dsksyn_wr_callback(DEVCB_##_write);
 
 class amiga_fdc_device : public device_t {
 public:
 	amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_index_wr_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_write_index.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_rd_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_read_dma.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dma_wr_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_write_dma.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dskblk_wr_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_write_dskblk.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_dsksyn_wr_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_write_dsksyn.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_index_wr_callback(Object &&cb) { return m_write_index.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_rd_callback(Object &&cb) { return m_read_dma.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dskblk_wr_callback(Object &&cb) { return m_write_dskblk.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dsksyn_wr_callback(Object &&cb) { return m_write_dsksyn.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(ciaaprb_w);
 

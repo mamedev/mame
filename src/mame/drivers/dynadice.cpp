@@ -113,33 +113,37 @@ WRITE8_MEMBER(dynadice_state::sound_control_w)
 }
 
 
-ADDRESS_MAP_START(dynadice_state::dynadice_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void dynadice_state::dynadice_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram().w(this, FUNC(dynadice_state::dynadice_videoram_w)).share("videoram");
+	map(0x4000, 0x40ff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(dynadice_state::dynadice_io_map)
-	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN0")
-	AM_RANGE(0x51, 0x51) AM_READ_PORT("IN1")
-	AM_RANGE(0x52, 0x52) AM_READ_PORT("DSW")
-	AM_RANGE(0x62, 0x62) AM_WRITENOP
-	AM_RANGE(0x63, 0x63) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x70, 0x77) AM_WRITENOP
-ADDRESS_MAP_END
+void dynadice_state::dynadice_io_map(address_map &map)
+{
+	map(0x50, 0x50).portr("IN0");
+	map(0x51, 0x51).portr("IN1");
+	map(0x52, 0x52).portr("DSW");
+	map(0x62, 0x62).nopw();
+	map(0x63, 0x63).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x70, 0x77).nopw();
+}
 
-ADDRESS_MAP_START(dynadice_state::dynadice_sound_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void dynadice_state::dynadice_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-ADDRESS_MAP_START(dynadice_state::dynadice_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sound_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(sound_control_w)
-ADDRESS_MAP_END
+void dynadice_state::dynadice_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x01, 0x01).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).w(this, FUNC(dynadice_state::sound_data_w));
+	map(0x03, 0x03).w(this, FUNC(dynadice_state::sound_control_w));
+}
 
 static INPUT_PORTS_START( dynadice )
 	PORT_START("IN0")

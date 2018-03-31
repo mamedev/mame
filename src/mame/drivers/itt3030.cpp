@@ -214,6 +214,7 @@ public:
 	itt3030_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_kbdmcu(*this, "kbdmcu")
 		, m_ram(*this, "mainram")
 		, m_crtc(*this, "crt5027")
@@ -261,6 +262,7 @@ protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<i8741_device> m_kbdmcu;
 	required_device<ram_device> m_ram;
 	required_device<crt5027_device> m_crtc;
@@ -290,27 +292,30 @@ private:
 // The upper 16K is always the top 16K of the first bank, F5 can set this to 32K
 // Port F6 bits 7-5 select banks 0-7, bit 4 enables bank 8
 
-ADDRESS_MAP_START(itt3030_state::itt3030_map)
-	AM_RANGE(0x0000, 0xbfff) AM_DEVICE("lowerbank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void itt3030_state::itt3030_map(address_map &map)
+{
+	map(0x0000, 0xbfff).m(m_48kbank, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(itt3030_state::lower48_map)
-	AM_RANGE(0x60000, 0x607ff) AM_ROM AM_REGION("maincpu", 0)   // begin "page 8"
-	AM_RANGE(0x60800, 0x60fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x61000, 0x610ff) AM_RAM AM_MIRROR(0x100)  // only 256 bytes, but ROM also clears 11xx?
-	AM_RANGE(0x63000, 0x63fff) AM_RAM AM_SHARE("vram")
-ADDRESS_MAP_END
+void itt3030_state::lower48_map(address_map &map)
+{
+	map(0x60000, 0x607ff).rom().region("maincpu", 0);   // begin "page 8"
+	map(0x60800, 0x60fff).rom().region("maincpu", 0);
+	map(0x61000, 0x610ff).ram().mirror(0x100);  // only 256 bytes, but ROM also clears 11xx?
+	map(0x63000, 0x63fff).ram().share("vram");
+}
 
-ADDRESS_MAP_START(itt3030_state::itt3030_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("crt5027", crt5027_device, read, write)
-	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("kbdmcu", i8741_device, upi41_master_r, upi41_master_w)
-	AM_RANGE(0x32, 0x32) AM_WRITE(beep_w)
-	AM_RANGE(0x35, 0x35) AM_READ(vsync_r)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
-ADDRESS_MAP_END
+void itt3030_state::itt3030_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x20, 0x2f).rw(m_crtc, FUNC(crt5027_device::read), FUNC(crt5027_device::write));
+	map(0x30, 0x31).rw(m_kbdmcu, FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
+	map(0x32, 0x32).w(this, FUNC(itt3030_state::beep_w));
+	map(0x35, 0x35).r(this, FUNC(itt3030_state::vsync_r));
+	map(0x50, 0x53).rw(this, FUNC(itt3030_state::fdc_r), FUNC(itt3030_state::fdc_w));
+	map(0x54, 0x54).rw(this, FUNC(itt3030_state::fdc_stat_r), FUNC(itt3030_state::fdc_cmd_w));
+	map(0xf6, 0xf6).w(this, FUNC(itt3030_state::bank_w));
+}
 
 
 //**************************************************************************
@@ -463,12 +468,12 @@ READ8_MEMBER(itt3030_state::vsync_r)
 {
 	uint8_t ret = 0;
 
-	if (machine().first_screen()->vblank())
+	if (m_screen->vblank())
 	{
 		ret |= 0xc0;    // set both bits 6 and 7 if vblank
 	}
 
-	if (machine().first_screen()->hblank())
+	if (m_screen->hblank())
 	{
 		ret |= 0x80;    // set only bit 7 if hblank
 	}
@@ -722,7 +727,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0xc000)
 
-	MCFG_DEVICE_ADD("crt5027", CRT5027, XTAL(6'000'000))
+	MCFG_DEVICE_ADD("crt5027", CRT5027, XTAL(6'000'000) / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_FD1791_ADD("fdc", XTAL(20'000'000) / 20)

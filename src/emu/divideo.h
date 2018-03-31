@@ -23,7 +23,7 @@
 //**************************************************************************
 
 #define MCFG_VIDEO_SET_SCREEN(_tag) \
-	device_video_interface::static_set_screen(*device, _tag);
+	dynamic_cast<device_video_interface &>(*device).set_screen(_tag);
 
 
 
@@ -42,8 +42,8 @@ public:
 	device_video_interface(const machine_config &mconfig, device_t &device, bool screen_required = true);
 	virtual ~device_video_interface();
 
-	// static configuration
-	static void static_set_screen(device_t &device, const char *tag);
+	// configuration
+	void set_screen(const char *tag) { m_screen_tag = tag; }
 
 	// getters
 	screen_device &screen() const { return *m_screen; }

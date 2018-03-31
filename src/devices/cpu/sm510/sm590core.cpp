@@ -18,36 +18,19 @@
 
 
 // MCU types
-DEFINE_DEVICE_TYPE(SM590, sm590_device, "sm590", "SM590") // 512x8 ROM, 32x4 RAM
-//DEFINE_DEVICE_TYPE(SM591, sm591_device, "sm591", "SM591") // 1kx8 ROM, 56x4 RAM
-//DEFINE_DEVICE_TYPE(SM595, sm595_device, "sm595", "SM595") // 768x8 ROM, 32x4 RAM
+DEFINE_DEVICE_TYPE(SM590, sm590_device, "sm590", "Sharp SM590") // 512x8 ROM, 32x4 RAM
+//DEFINE_DEVICE_TYPE(SM591, sm591_device, "sm591", "Sharp SM591") // 1kx8 ROM, 56x4 RAM
+//DEFINE_DEVICE_TYPE(SM595, sm595_device, "sm595", "Sharp SM595") // 768x8 ROM, 32x4 RAM
 
 // internal memory maps
 ADDRESS_MAP_START(sm590_device::program_1x128x4)
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
-/*static ADDRESS_MAP_START(program_2x128x4, AS_PROGRAM, 8, sm510_base_device)
-    AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(program_1x128x4_1x128x2, AS_PROGRAM, 8, sm510_base_device)
-    AM_RANGE(0x000, 0x2ff) AM_ROM
-ADDRESS_MAP_END*/
-
 ADDRESS_MAP_START(sm590_device::data_16x2x4)
 	AM_RANGE(0x00, 0x0f) AM_RAM
 	AM_RANGE(0x10, 0x1f) AM_RAM
 ADDRESS_MAP_END
-
-/*
-static ADDRESS_MAP_START(data_16x3.5x4, AS_DATA, 8, sm510_base_device)
-    AM_RANGE(0x00, 0x0f) AM_RAM
-    AM_RANGE(0x10, 0x1f) AM_RAM
-    AM_RANGE(0x20, 0x2f) AM_RAM
-    AM_RANGE(0x30, 0x37) AM_RAM
-ADDRESS_MAP_END
-*/
 
 // device definitions
 sm590_device::sm590_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -71,9 +54,9 @@ sm590_device::sm590_device(const machine_config &mconfig, device_type type, cons
 }
 
 
-util::disasm_interface *sm590_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm590_device::create_disassembler()
 {
-	return new sm590_disassembler;
+	return std::make_unique<sm590_disassembler>();
 }
 
 

@@ -144,11 +144,6 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_reset)
 	membank("boot")->set_entry(0);
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fc_w)
-{
-	m_uart->set_transmit_data(data);
-}
-
 
 WRITE8_MEMBER(sorcerer_state::sorcerer_fd_w)
 {
@@ -243,14 +238,6 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 		m_centronics->write_strobe(1);
 		break;
 	}
-}
-
-READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
-{
-	uint8_t data = m_uart->get_received_data();
-	m_uart->write_rdav(0);
-	m_uart->write_rdav(1);
-	return data;
 }
 
 READ8_MEMBER(sorcerer_state::sorcerer_fd_r)

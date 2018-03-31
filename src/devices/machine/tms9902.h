@@ -50,10 +50,10 @@ public:
 
 	tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_int_callback(device_t &device, Object &&cb) { return downcast<tms9902_device &>(device).m_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_rcv_callback(device_t &device, Object &&cb) { return downcast<tms9902_device &>(device).m_rcv_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_xmit_callback(device_t &device, Object &&cb) { return downcast<tms9902_device &>(device).m_xmit_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ctrl_callback(device_t &device, Object &&cb) { return downcast<tms9902_device &>(device).m_ctrl_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rcv_callback(Object &&cb) { return m_rcv_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_xmit_callback(Object &&cb) { return m_xmit_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ctrl_callback(Object &&cb) { return m_ctrl_cb.set_callback(std::forward<Object>(cb)); }
 
 	void    set_clock(bool state);
 
@@ -190,15 +190,15 @@ private:
 ***************************************************************************/
 
 #define MCFG_TMS9902_INT_CB(cb) \
-		devcb = &tms9902_device::set_int_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<tms9902_device &>(*device).set_int_callback((DEVCB_##cb));
 
 #define MCFG_TMS9902_RCV_CB(cb) \
-		devcb = &tms9902_device::set_rcv_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<tms9902_device &>(*device).set_rcv_callback((DEVCB_##cb));
 
 #define MCFG_TMS9902_XMIT_CB(cb) \
-		devcb = &tms9902_device::set_xmit_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<tms9902_device &>(*device).set_xmit_callback((DEVCB_##cb));
 
 #define MCFG_TMS9902_CTRL_CB(cb) \
-		devcb = &tms9902_device::set_ctrl_callback(*device, (DEVCB_##cb));
+	devcb = &downcast<tms9902_device &>(*device).set_ctrl_callback((DEVCB_##cb));
 
 #endif // MAME_MACHINE_TMS9902_H

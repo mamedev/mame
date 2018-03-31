@@ -385,60 +385,62 @@ WRITE8_MEMBER(wyvernf0_state::nmi_enable_w)
 	}
 }
 
-ADDRESS_MAP_START(wyvernf0_state::wyvernf0_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
+void wyvernf0_state::wyvernf0_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
 
-	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("rambank")
+	map(0x9000, 0x9fff).bankrw("rambank");
 
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("rombank")
+	map(0xa000, 0xbfff).bankr("rombank");
 
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
+	map(0xc000, 0xc7ff).ram().w(this, FUNC(wyvernf0_state::fgram_w)).share("fgram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(wyvernf0_state::bgram_w)).share("bgram");
 
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // d000 write (02)
-	AM_RANGE(0xd100, 0xd100) AM_WRITE(rambank_w)
-	AM_RANGE(0xd200, 0xd200) AM_WRITE(rombank_w)
+	map(0xd000, 0xd000).nopw(); // d000 write (02)
+	map(0xd100, 0xd100).w(this, FUNC(wyvernf0_state::rambank_w));
+	map(0xd200, 0xd200).w(this, FUNC(wyvernf0_state::rombank_w));
 
-	AM_RANGE(0xd300, 0xd303) AM_RAM AM_SHARE("scrollram")
+	map(0xd300, 0xd303).ram().share("scrollram");
 
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(fake_mcu_r, fake_mcu_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(fake_status_r)
+	map(0xd400, 0xd400).rw(this, FUNC(wyvernf0_state::fake_mcu_r), FUNC(wyvernf0_state::fake_mcu_w));
+	map(0xd401, 0xd401).r(this, FUNC(wyvernf0_state::fake_status_r));
 
-	AM_RANGE(0xd500, 0xd5ff) AM_RAM AM_SHARE("spriteram")
+	map(0xd500, 0xd5ff).ram().share("spriteram");
 
-	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("DSW3")
-	AM_RANGE(0xd603, 0xd603) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd604, 0xd604) AM_READ_PORT("JOY1")
-	AM_RANGE(0xd605, 0xd605) AM_READ_PORT("FIRE1")
-	AM_RANGE(0xd606, 0xd606) AM_READ_PORT("JOY2")
-	AM_RANGE(0xd607, 0xd607) AM_READ_PORT("FIRE2")
+	map(0xd600, 0xd600).portr("DSW1");
+	map(0xd601, 0xd601).portr("DSW2");
+	map(0xd602, 0xd602).portr("DSW3");
+	map(0xd603, 0xd603).portr("SYSTEM");
+	map(0xd604, 0xd604).portr("JOY1");
+	map(0xd605, 0xd605).portr("FIRE1");
+	map(0xd606, 0xd606).portr("JOY2");
+	map(0xd607, 0xd607).portr("FIRE2");
 
-	AM_RANGE(0xd610, 0xd610) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_command_w)
+	map(0xd610, 0xd610).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(wyvernf0_state::sound_command_w));
 	// d613 write (FF -> 00 at boot)
 
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0xd800, 0xdbff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITENOP    // irq ack?
-ADDRESS_MAP_END
+	map(0xdc00, 0xdc00).nopw();    // irq ack?
+}
 
-ADDRESS_MAP_START(wyvernf0_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay1", ym2149_device, address_data_w)
-	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("ay2", ym2149_device, address_data_w)
-	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE("msm", msm5232_device, write)
+void wyvernf0_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xc801).w("ay1", FUNC(ym2149_device::address_data_w));
+	map(0xc802, 0xc803).w("ay2", FUNC(ym2149_device::address_data_w));
+	map(0xc900, 0xc90d).w("msm", FUNC(msm5232_device::write));
 	// ca00 write
 	// cb00 write
 	// cc00 write
-	AM_RANGE(0xd000, 0xd000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
-	AM_RANGE(0xd200, 0xd200) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xd600, 0xd600) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostics ROM
-ADDRESS_MAP_END
+	map(0xd000, 0xd000).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::write));
+	map(0xd200, 0xd200).w(this, FUNC(wyvernf0_state::nmi_enable_w));
+	map(0xd400, 0xd400).w(this, FUNC(wyvernf0_state::nmi_disable_w));
+	map(0xd600, 0xd600).w("dac", FUNC(dac_byte_interface::write));
+	map(0xe000, 0xefff).rom(); // space for diagnostics ROM
+}
 
 
 /***************************************************************************

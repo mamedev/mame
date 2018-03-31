@@ -247,17 +247,17 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 	if(address > pc)
 		address = 0;
 
-	util::disasm_interface *intf = dynamic_cast<device_disasm_interface &>(*source.device()).get_disassembler();
-	if(intf->interface_flags() & util::disasm_interface::NONLINEAR_PC) {
-		offs_t lpc = intf->pc_real_to_linear(pc);
-		while(intf->pc_real_to_linear(address) < lpc) {
+	util::disasm_interface &intf(dynamic_cast<device_disasm_interface &>(*source.device()).get_disassembler());
+	if(intf.interface_flags() & util::disasm_interface::NONLINEAR_PC) {
+		offs_t lpc = intf.pc_real_to_linear(pc);
+		while(intf.pc_real_to_linear(address) < lpc) {
 			std::string dasm;
 			offs_t size;
 			offs_t next_address;
 			u32 info;
 			buffer.disassemble(address, dasm, next_address, size, info);
 			m_dasm.emplace_back(address, size, dasm);
-			if(intf->pc_real_to_linear(address) > intf->pc_real_to_linear(next_address))
+			if(intf.pc_real_to_linear(address) > intf.pc_real_to_linear(next_address))
 				return false;
 			address = next_address;
 		}

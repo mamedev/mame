@@ -111,8 +111,6 @@ In other words,the first three types uses the offset and not the color allocated
 #include "emu.h"
 #include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
 
-#include "screen.h"
-
 
 #define DEBUG_MODE 0
 #define TEST_FUNCTIONS 0
@@ -6037,8 +6035,8 @@ int saturn_state::get_pixel_clock( void )
 /* TODO: hblank position and hblank firing doesn't really match HW behaviour. */
 uint8_t saturn_state::get_hblank( void )
 {
-	const rectangle &visarea = machine().first_screen()->visible_area();
-	int cur_h = machine().first_screen()->hpos();
+	const rectangle &visarea = m_screen->visible_area();
+	int cur_h = m_screen->hpos();
 
 	if (cur_h > visarea.max_x) //TODO
 		return 1;
@@ -6049,7 +6047,7 @@ uint8_t saturn_state::get_hblank( void )
 uint8_t saturn_state::get_vblank( void )
 {
 	int cur_v,vblank;
-	cur_v = machine().first_screen()->vpos();
+	cur_v = m_screen->vpos();
 
 	vblank = get_vblank_start_position() * get_ystep_count();
 
@@ -6068,7 +6066,7 @@ uint8_t saturn_state::get_odd_bit( void )
 //       But the documentation claims that "non-interlaced" mode is always 1.
 //       grdforce tests this bit to be 1 from title screen to gameplay, ditto for finlarch/sasissu/magzun.
 //       Assume documentation is wrong and actually always flip this bit.
-	return m_vdp2.odd;//machine().first_screen()->frame_number() & 1;
+	return m_vdp2.odd;//m_screen->frame_number() & 1;
 }
 
 int saturn_state::get_vblank_start_position( void )
@@ -6088,7 +6086,7 @@ int saturn_state::get_vblank_start_position( void )
 
 int saturn_state::get_ystep_count( void )
 {
-	int max_y = machine().first_screen()->height();
+	int max_y = m_screen->height();
 	int y_step;
 
 	y_step = 2;
@@ -6104,7 +6102,7 @@ int saturn_state::get_hcounter( void )
 {
 	int hcount;
 
-	hcount = machine().first_screen()->hpos();
+	hcount = m_screen->hpos();
 
 	switch(STV_VDP2_HRES & 6)
 	{
@@ -6135,7 +6133,7 @@ int saturn_state::get_vcounter( void )
 {
 	int vcount;
 
-	vcount = machine().first_screen()->vpos();
+	vcount = m_screen->vpos();
 
 	/* Exclusive Monitor */
 	if(STV_VDP2_HRES & 4)
@@ -6143,7 +6141,7 @@ int saturn_state::get_vcounter( void )
 
 	/* Double Density Interlace */
 	if((STV_VDP2_LSMD & 3) == 3)
-		return (vcount & ~1) | (machine().first_screen()->frame_number() & 1);
+		return (vcount & ~1) | (m_screen->frame_number() & 1);
 
 	/* docs says << 1, but according to HW tests it's a typo. */
 	assert((vcount & 0x1ff) < ARRAY_LENGTH(true_vcount));
@@ -6220,7 +6218,7 @@ int saturn_state::stv_vdp2_start ( void )
 VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 {
 	int i;
-	machine().first_screen()->register_screen_bitmap(m_tmpbitmap);
+	m_screen->register_screen_bitmap(m_tmpbitmap);
 	stv_vdp2_start();
 	stv_vdp1_start();
 	m_vdpdebug_roz = 0;
@@ -6287,9 +6285,9 @@ void saturn_state::stv_vdp2_dynamic_res_change( void )
 		refresh  = HZ_TO_ATTOSECONDS(get_pixel_clock()) * (hblank_period) * vblank_period;
 		//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
 
-		machine().first_screen()->configure(hblank_period, vblank_period, visarea, refresh );
+		m_screen->configure(hblank_period, vblank_period, visarea, refresh );
 	}
-//  machine().first_screen()->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
+//  m_screen->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
 }
 
 /*This is for calculating the rgb brightness*/

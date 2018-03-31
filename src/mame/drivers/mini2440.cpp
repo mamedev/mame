@@ -207,10 +207,11 @@ void mini2440_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(mini2440_state::mini2440_map)
+void mini2440_state::mini2440_map(address_map &map)
+{
 //  AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x30000000, 0x37ffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x30000000, 0x37ffffff).ram();
+}
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -245,6 +246,7 @@ MACHINE_CONFIG_START(mini2440_state::mini2440)
 
 	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
 	MCFG_S3C2440_PALETTE("palette")
+	MCFG_S3C2440_SCREEN("screen")
 	MCFG_S3C2440_CORE_PIN_R_CB(READ32(mini2440_state, s3c2440_core_pin_r))
 	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(mini2440_state, s3c2440_gpio_port_r))
 	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(mini2440_state, s3c2440_gpio_port_w))

@@ -320,31 +320,32 @@ WRITE16_MEMBER(atarig42_0x400_state::guardians_sloop_data_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(atarig42_state::main_map)
-	AM_RANGE(0x000000, 0x080001) AM_ROM
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
-	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("IN1")
-	AM_RANGE(0xe00010, 0xe00011) AM_READ(special_port2_r)
-	AM_RANGE(0xe00012, 0xe00013) AM_READ_PORT("jsa:JSAIII")
-	AM_RANGE(0xe00020, 0xe00027) AM_READWRITE(a2d_data_r, a2d_select_w)
-	AM_RANGE(0xe00030, 0xe00031) AM_DEVREAD8("jsa", atari_jsa_iii_device, main_response_r, 0x00ff)
-	AM_RANGE(0xe00040, 0xe00041) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
-	AM_RANGE(0xe00050, 0xe00051) AM_WRITE(io_latch_w)
-	AM_RANGE(0xe00060, 0xe00061) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
-	AM_RANGE(0xe03000, 0xe03001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0xe03800, 0xe03801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
-	AM_RANGE(0xf40000, 0xf40001) AM_DEVREAD("asic65", asic65_device, io_r)
-	AM_RANGE(0xf60000, 0xf60001) AM_DEVREAD("asic65", asic65_device, read)
-	AM_RANGE(0xf80000, 0xf80003) AM_DEVWRITE("asic65", asic65_device, data_w)
-	AM_RANGE(0xfa0000, 0xfa0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
-	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
-	AM_RANGE(0xff2000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
-	AM_RANGE(0xff7000, 0xff7001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-ADDRESS_MAP_END
+void atarig42_state::main_map(address_map &map)
+{
+	map(0x000000, 0x080001).rom();
+	map(0xe00000, 0xe00001).portr("IN0");
+	map(0xe00002, 0xe00003).portr("IN1");
+	map(0xe00010, 0xe00011).r(this, FUNC(atarig42_state::special_port2_r));
+	map(0xe00012, 0xe00013).portr("jsa:JSAIII");
+	map(0xe00020, 0xe00027).rw(this, FUNC(atarig42_state::a2d_data_r), FUNC(atarig42_state::a2d_select_w));
+	map(0xe00031, 0xe00031).r(m_jsa, FUNC(atari_jsa_iii_device::main_response_r));
+	map(0xe00041, 0xe00041).w(m_jsa, FUNC(atari_jsa_iii_device::main_command_w));
+	map(0xe00050, 0xe00051).w(this, FUNC(atarig42_state::io_latch_w));
+	map(0xe00060, 0xe00061).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
+	map(0xe03000, 0xe03001).w(this, FUNC(atarig42_state::video_int_ack_w));
+	map(0xe03800, 0xe03801).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0xe80000, 0xe80fff).ram();
+	map(0xf40000, 0xf40001).r(m_asic65, FUNC(asic65_device::io_r));
+	map(0xf60000, 0xf60001).r(m_asic65, FUNC(asic65_device::read));
+	map(0xf80000, 0xf80003).w(m_asic65, FUNC(asic65_device::data_w));
+	map(0xfa0000, 0xfa0fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xfc0000, 0xfc0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xff0000, 0xffffff).ram();
+	map(0xff0000, 0xff0fff).ram().share("rle");
+	map(0xff2000, 0xff5fff).w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0xff6000, 0xff6fff).w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0xff7000, 0xff7001).w(this, FUNC(atarig42_state::mo_command_w)).share("mo_command");
+}
 
 
 

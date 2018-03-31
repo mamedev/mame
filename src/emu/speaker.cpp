@@ -70,20 +70,6 @@ speaker_device::~speaker_device()
 
 
 //-------------------------------------------------
-//  static_set_position - configuration helper to
-//  set the speaker position
-//-------------------------------------------------
-
-void speaker_device::static_set_position(device_t &device, double x, double y, double z)
-{
-	speaker_device &speaker = downcast<speaker_device &>(device);
-	speaker.m_x = x;
-	speaker.m_y = y;
-	speaker.m_z = z;
-}
-
-
-//-------------------------------------------------
 //  mix - mix in samples from the speaker's stream
 //-------------------------------------------------
 

@@ -54,6 +54,12 @@ Similar Systems: ( from http://en.wkikpedia.org/wiki/V.Smile )
 - V.Smile Baby Infant Development System
 - V.Flash
 
+also on this hardware
+
+    name                        PCB ID      ROM width   TSOP pads   ROM size        SEEPROM         die markings
+    Radica Play TV Football 2   L7278       x16         48          not dumped      no              Sunplus
+    Dream Life                  ?           x16         48          no tdumped      no              Sunplus
+
 Detailed list of bugs:
 - When loading a cart from file manager, sometimes it will crash
 - On 'vii_vc1' & 'vii_vc2' cart, the left-right keys are transposed with the up-down keys
@@ -1004,17 +1010,18 @@ WRITE16_MEMBER( spg2xx_game_state::spriteram_w )
 }
 */
 
-ADDRESS_MAP_START(spg2xx_game_state::vii_mem)
-	AM_RANGE( 0x000000, 0x3fffff ) AM_ROMBANK("cart")
+void spg2xx_game_state::vii_mem(address_map &map)
+{
+	map(0x000000, 0x3fffff).bankr("cart");
 
-	AM_RANGE( 0x000000, 0x0027ff ) AM_RAM AM_SHARE("p_ram")
-	AM_RANGE( 0x002800, 0x0028ff ) AM_READWRITE(video_r, video_w)
-	AM_RANGE( 0x002900, 0x002aff ) AM_RAM AM_SHARE("p_rowscroll")
-	AM_RANGE( 0x002b00, 0x002bff ) AM_RAM AM_SHARE("p_palette")
-	AM_RANGE( 0x002c00, 0x002fff ) AM_RAM AM_SHARE("p_spriteram")
-	AM_RANGE( 0x003000, 0x0037ff ) AM_READWRITE(audio_r, audio_w)
-	AM_RANGE( 0x003d00, 0x003eff ) AM_READWRITE(io_r,    io_w)
-ADDRESS_MAP_END
+	map(0x000000, 0x0027ff).ram().share("p_ram");
+	map(0x002800, 0x0028ff).rw(this, FUNC(spg2xx_game_state::video_r), FUNC(spg2xx_game_state::video_w));
+	map(0x002900, 0x002aff).ram().share("p_rowscroll");
+	map(0x002b00, 0x002bff).ram().share("p_palette");
+	map(0x002c00, 0x002fff).ram().share("p_spriteram");
+	map(0x003000, 0x0037ff).rw(this, FUNC(spg2xx_game_state::audio_r), FUNC(spg2xx_game_state::audio_w));
+	map(0x003d00, 0x003eff).rw(this, FUNC(spg2xx_game_state::io_r), FUNC(spg2xx_game_state::io_w));
+}
 
 static INPUT_PORTS_START( vii )
 	PORT_START("P1")
@@ -1532,13 +1539,13 @@ which is also found in the Wireless Air 60 ROM.
 
 ROM_START( wireless )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "wireless.nand", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
+	ROM_LOAD16_WORD_SWAP( "wireless.bin", 0x0000, 0x8000000, CRC(a6ecc20e) SHA1(3645f23ba2bb218e92d4560a8ae29dddbaabf796) )
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE              INIT      COMPANY                                              FULLNAME             FLAGS
 
 // VTech systems
-CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (US)",      MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 CONS( 2005, vsmileg,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 CONS( 2005, vsmilef,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 CONS( 2005, vsmileb,  0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
@@ -1558,7 +1565,7 @@ CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_sta
 CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, rad_skat, "Radica",                                            "Connectv Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
-CONS( 200?, zone40,    0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Zone 40", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, zone40,    0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // might not fit here, NAND dump, has internal bootstrap at least, see above.
-CONS( 200?, wlsair60,  0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Wireless Air 60", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2011, wireless,  0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Wireless", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2010, wlsair60,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, wireless,  0,       0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Hamy / Kids Station Toys Inc",                      "Wireless",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

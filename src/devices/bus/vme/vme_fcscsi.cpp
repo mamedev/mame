@@ -185,19 +185,20 @@ DEFINE_DEVICE_TYPE(VME_FCSCSI1, vme_fcscsi1_card_device, "fcscsi1", "Force Compu
 #define CPU_CRYSTAL XTAL(20'000'000) /* Jauch */
 #define PIT_CRYSTAL XTAL(16'000'000) /* Jauch */
 
-ADDRESS_MAP_START(vme_fcscsi1_card_device::fcscsi1_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */
-	AM_RANGE (0x000008, 0x001fff) AM_RAM /* SRAM */
-	AM_RANGE (0x002000, 0x01ffff) AM_RAM /* Dual Ported RAM */
-	AM_RANGE (0xe00000, 0xe7ffff) AM_ROM /* System EPROM Area 32Kb DEBUGGER supplied */
-	AM_RANGE (0xd00000, 0xd0003f) AM_DEVREADWRITE8 ("pit", pit68230_device, read, write, 0x00ff)
+void vme_fcscsi1_card_device::fcscsi1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x000007).rom().r(this, FUNC(vme_fcscsi1_card_device::bootvect_r));       /* Vectors mapped from System EPROM */
+	map(0x000008, 0x001fff).ram(); /* SRAM */
+	map(0x002000, 0x01ffff).ram(); /* Dual Ported RAM */
+	map(0xe00000, 0xe7ffff).rom(); /* System EPROM Area 32Kb DEBUGGER supplied */
+	map(0xd00000, 0xd0003f).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 //  AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
-	AM_RANGE (0xc40000, 0xc4001f) AM_READWRITE8 (scsi_r, scsi_w, 0x00ff)
-	AM_RANGE (0xc80000, 0xc800ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)  /* DMA Controller interface */
-	AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_device, read, write, 0x00ff)      /* Floppy Controller interface */
-	AM_RANGE (0xcc0008, 0xcc0009) AM_READWRITE8 (tcr_r, tcr_w, 0x00ff) /* The Control Register, SCSI ID and FD drive select bits */
-ADDRESS_MAP_END
+	map(0xc40000, 0xc4001f).rw(this, FUNC(vme_fcscsi1_card_device::scsi_r), FUNC(vme_fcscsi1_card_device::scsi_w)).umask16(0x00ff);
+	map(0xc80000, 0xc800ff).rw("mc68450", FUNC(hd63450_device::read), FUNC(hd63450_device::write));  /* DMA Controller interface */
+	map(0xcc0000, 0xcc0007).rw("fdc", FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);      /* Floppy Controller interface */
+	map(0xcc0009, 0xcc0009).rw(this, FUNC(vme_fcscsi1_card_device::tcr_r), FUNC(vme_fcscsi1_card_device::tcr_w)); /* The Control Register, SCSI ID and FD drive select bits */
+}
 
 
 FLOPPY_FORMATS_MEMBER( vme_fcscsi1_card_device::floppy_formats )
@@ -215,13 +216,13 @@ ROM_START (fcscsi1)
 
 	/* Besta ROM:s - apparantly patched Force ROM:s */
 	ROM_SYSTEM_BIOS(0, "besta88", "Besta 88")
-	ROMX_LOAD ("besta88_scsi_lower.ROM", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD ("besta88_scsi_upper.ROM", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("besta88_scsi_lower.rom", 0xe00001, 0x4000, CRC (fb3ab364) SHA1 (d79112100f1c4beaf358e006efd4dde5e300b0ba), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD ("besta88_scsi_upper.rom", 0xe00000, 0x4000, CRC (41f9cdf4) SHA1 (66b998bbf9459f0a613718260e05e97749532073), ROM_SKIP(1) | ROM_BIOS(1))
 
 	/* Force ROM:s  */
 	ROM_SYSTEM_BIOS(1, "iscsi-1_v3.7", "Force Computer SYS68K/ISCSI-1 firmware v3.7")
-	ROMX_LOAD ("ISCSI-1_V3.7_L.BIN", 0xe00001, 0x4000, CRC (83d95ab7) SHA1 (bf249910bcb6cb0b04dda2a95a38a0f90b553352), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD ("ISCSI-1_V3.7_U.BIN", 0xe00000, 0x4000, CRC (58815831) SHA1 (074085ef96e1fe2a551938bdeee6a9cab40ff09c), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD ("iscsi-1_v3.7_l.bin", 0xe00001, 0x4000, CRC (83d95ab7) SHA1 (bf249910bcb6cb0b04dda2a95a38a0f90b553352), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD ("iscsi-1_v3.7_u.bin", 0xe00000, 0x4000, CRC (58815831) SHA1 (074085ef96e1fe2a551938bdeee6a9cab40ff09c), ROM_SKIP(1) | ROM_BIOS(2))
 
 ROM_END
 

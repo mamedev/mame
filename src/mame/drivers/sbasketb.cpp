@@ -79,39 +79,41 @@ WRITE_LINE_MEMBER(sbasketb_state::irq_mask_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-ADDRESS_MAP_START(sbasketb_state::sbasketb_map)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3a00, 0x3bff) AM_RAM           /* Probably unused, but initialized */
-	AM_RANGE(0x3c00, 0x3c00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x3c10, 0x3c10) AM_READNOP    /* ???? */
-	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_SHARE("palettebank")
-	AM_RANGE(0x3c80, 0x3c87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x3d00, 0x3d00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(sbasketb_sh_irqtrigger_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3e01, 0x3e01) AM_READ_PORT("P1")
-	AM_RANGE(0x3e02, 0x3e02) AM_READ_PORT("P2")
-	AM_RANGE(0x3e03, 0x3e03) AM_READNOP
-	AM_RANGE(0x3e80, 0x3e80) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITEONLY AM_SHARE("scroll")
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void sbasketb_state::sbasketb_map(address_map &map)
+{
+	map(0x2000, 0x2fff).ram();
+	map(0x3000, 0x33ff).ram().w(this, FUNC(sbasketb_state::sbasketb_colorram_w)).share("colorram");
+	map(0x3400, 0x37ff).ram().w(this, FUNC(sbasketb_state::sbasketb_videoram_w)).share("videoram");
+	map(0x3800, 0x39ff).ram().share("spriteram");
+	map(0x3a00, 0x3bff).ram();           /* Probably unused, but initialized */
+	map(0x3c00, 0x3c00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x3c10, 0x3c10).nopr();    /* ???? */
+	map(0x3c20, 0x3c20).writeonly().share("palettebank");
+	map(0x3c80, 0x3c87).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x3d00, 0x3d00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x3d80, 0x3d80).w(this, FUNC(sbasketb_state::sbasketb_sh_irqtrigger_w));
+	map(0x3e00, 0x3e00).portr("SYSTEM");
+	map(0x3e01, 0x3e01).portr("P1");
+	map(0x3e02, 0x3e02).portr("P2");
+	map(0x3e03, 0x3e03).nopr();
+	map(0x3e80, 0x3e80).portr("DSW2");
+	map(0x3f00, 0x3f00).portr("DSW1");
+	map(0x3f80, 0x3f80).writeonly().share("scroll");
+	map(0x6000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(sbasketb_state::sbasketb_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, hyperspt_sound_w)     /* speech and output control */
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)      /* This address triggers the SN chip to read the data port. */
-ADDRESS_MAP_END
+void sbasketb_state::sbasketb_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8000).r("trackfld_audio", FUNC(trackfld_audio_device::hyperspt_sh_timer_r));
+	map(0xa000, 0xa000).w(m_vlm, FUNC(vlm5030_device::data_w)); /* speech data */
+	map(0xc000, 0xdfff).w("trackfld_audio", FUNC(trackfld_audio_device::hyperspt_sound_w));     /* speech and output control */
+	map(0xe000, 0xe000).w("dac", FUNC(dac_byte_interface::write));
+	map(0xe001, 0xe001).w(this, FUNC(sbasketb_state::konami_SN76496_latch_w));  /* Loads the snd command into the snd latch */
+	map(0xe002, 0xe002).w(this, FUNC(sbasketb_state::konami_SN76496_w));      /* This address triggers the SN chip to read the data port. */
+}
 
 
 static INPUT_PORTS_START( sbasketb )

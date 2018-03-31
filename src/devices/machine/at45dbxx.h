@@ -32,7 +32,7 @@
 	MCFG_DEVICE_ADD(_tag, AT45DB161, 0)
 
 #define MCFG_AT45DBXXX_SO_CALLBACK(_cb) \
-	devcb = &at45db041_device::set_so_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<at45db041_device &>(*device).set_so_cb(DEVCB_##_cb);
 
 
 // ======================> at45db041_device
@@ -50,7 +50,7 @@ public:
 
 	uint8_t *get_ptr() {  return &m_data[0];  }
 
-	template <class Object> static devcb_base &set_so_cb(device_t &device, Object &&cb) { return downcast<at45db041_device &>(device).write_so.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_so_cb(Object &&cb) { return write_so.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	at45db041_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

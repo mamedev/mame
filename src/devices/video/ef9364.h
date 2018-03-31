@@ -14,13 +14,13 @@
 #pragma once
 
 #define MCFG_EF9364_PALETTE(_palette_tag) \
-	ef9364_device::static_set_palette_tag(*device, "^" _palette_tag);
+	downcast<ef9364_device &>(*device).set_palette_tag("^" _palette_tag);
 
 #define MCFG_EF9364_PAGES_CNT(_pages_number) \
-	ef9364_device::static_set_nb_of_pages(*device,_pages_number);
+	downcast<ef9364_device &>(*device).set_nb_of_pages(_pages_number);
 
 #define MCFG_EF9364_IRQ_HANDLER(_devcb) \
-	devcb = &ef9364_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ef9364_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -42,9 +42,14 @@ public:
 	// construction/destruction
 	ef9364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_palette_tag(device_t &device, const char *tag);
-	static void static_set_nb_of_pages(device_t &device, int nb_bitplanes );
+	// configuration
+	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
+	void set_nb_of_pages(int nb_bitplanes) {
+		if (nb_bitplanes > 0 && nb_bitplanes <= 8)
+		{
+			nb_of_pages = nb_bitplanes;
+		}
+	}
 
 	// device interface
 	void update_scanline(uint16_t scanline);

@@ -27,7 +27,7 @@
 
 
 #define MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(_write) \
-	devcb = &vcs_control_port_device::set_trigger_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<vcs_control_port_device &>(*device).set_trigger_wr_callback(DEVCB_##_write);
 
 
 
@@ -70,7 +70,7 @@ public:
 	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_trigger_wr_callback(device_t &device, Object &&cb) { return downcast<vcs_control_port_device &>(device).m_write_trigger.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_trigger_wr_callback(Object &&cb) { return m_write_trigger.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 

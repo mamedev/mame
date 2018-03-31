@@ -125,16 +125,6 @@ ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void ef9345_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<ef9345_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

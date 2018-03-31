@@ -155,26 +155,27 @@ WRITE_LINE_MEMBER(starshp1_state::led_w)
 }
 
 
-ADDRESS_MAP_START(starshp1_state::starshp1_map)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
-	AM_RANGE(0x2c00, 0x3fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("VBLANK")
-	AM_RANGE(0xc300, 0xc3ff) AM_WRITE(starshp1_sspic_w) /* spaceship picture */
-	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("COINAGE")
-	AM_RANGE(0xc400, 0xc4ff) AM_WRITE(starshp1_ssadd_w) /* spaceship address */
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(starshp1_playfield_w) AM_SHARE("playfield_ram")
-	AM_RANGE(0xcc00, 0xcc0f) AM_WRITEONLY AM_SHARE("hpos_ram")
-	AM_RANGE(0xd000, 0xd00f) AM_WRITEONLY AM_SHARE("vpos_ram")
-	AM_RANGE(0xd400, 0xd40f) AM_WRITEONLY AM_SHARE("obj_ram")
-	AM_RANGE(0xd800, 0xd800) AM_READ(starshp1_rng_r)
-	AM_RANGE(0xd800, 0xd80f) AM_WRITE(starshp1_collision_reset_w)
-	AM_RANGE(0xdc00, 0xdc07) AM_MIRROR(0x0008) AM_DEVWRITE("misclatch", f9334_device, write_d0)
-	AM_RANGE(0xdd00, 0xdd0f) AM_WRITE(starshp1_analog_in_w)
-	AM_RANGE(0xde00, 0xde07) AM_MIRROR(0x0008) AM_DEVWRITE("audiolatch", f9334_device, write_d0)
-	AM_RANGE(0xdf00, 0xdf0f) AM_WRITE(starshp1_analog_out_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void starshp1_state::starshp1_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().mirror(0x100);
+	map(0x2c00, 0x3fff).rom();
+	map(0xa000, 0xa000).portr("SYSTEM");
+	map(0xb000, 0xb000).portr("VBLANK");
+	map(0xc300, 0xc3ff).w(this, FUNC(starshp1_state::starshp1_sspic_w)); /* spaceship picture */
+	map(0xc400, 0xc400).portr("COINAGE");
+	map(0xc400, 0xc4ff).w(this, FUNC(starshp1_state::starshp1_ssadd_w)); /* spaceship address */
+	map(0xc800, 0xc9ff).ram().w(this, FUNC(starshp1_state::starshp1_playfield_w)).share("playfield_ram");
+	map(0xcc00, 0xcc0f).writeonly().share("hpos_ram");
+	map(0xd000, 0xd00f).writeonly().share("vpos_ram");
+	map(0xd400, 0xd40f).writeonly().share("obj_ram");
+	map(0xd800, 0xd800).r(this, FUNC(starshp1_state::starshp1_rng_r));
+	map(0xd800, 0xd80f).w(this, FUNC(starshp1_state::starshp1_collision_reset_w));
+	map(0xdc00, 0xdc07).mirror(0x0008).w("misclatch", FUNC(f9334_device::write_d0));
+	map(0xdd00, 0xdd0f).w(this, FUNC(starshp1_state::starshp1_analog_in_w));
+	map(0xde00, 0xde07).mirror(0x0008).w("audiolatch", FUNC(f9334_device::write_d0));
+	map(0xdf00, 0xdf0f).w(this, FUNC(starshp1_state::starshp1_analog_out_w));
+	map(0xf000, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( starshp1 )

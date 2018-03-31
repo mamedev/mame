@@ -54,7 +54,7 @@ enum
 	SHARC_B12,      SHARC_B13,      SHARC_B14,      SHARC_B15
 };
 
-DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "ADSP21062")
+DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "Analog Devices ADSP21062 \"SHARC\"")
 
 ADDRESS_MAP_START(adsp21062_device::internal_pgm)
 	AM_RANGE(0x20000, 0x24fff) AM_READWRITE(pm0_r, pm0_w)
@@ -97,9 +97,9 @@ device_memory_interface::space_config_vector adsp21062_device::memory_space_conf
 	};
 }
 
-util::disasm_interface *adsp21062_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> adsp21062_device::create_disassembler()
 {
-	return new sharc_disassembler;
+	return std::make_unique<sharc_disassembler>();
 }
 
 void adsp21062_device::enable_recompiler()

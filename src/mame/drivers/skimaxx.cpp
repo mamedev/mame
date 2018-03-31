@@ -309,31 +309,32 @@ READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
  *
  *************************************/
 
-ADDRESS_MAP_START(skimaxx_state::m68030_1_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x10000000, 0x10000003) AM_WRITE(skimaxx_sub_ctrl_w )
-	AM_RANGE(0x10100000, 0x1010000f) AM_DEVREADWRITE16("tms", tms34010_device, host_r, host_w, 0x0000ffff)
+void skimaxx_state::m68030_1_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).rom();
+	map(0x10000000, 0x10000003).w(this, FUNC(skimaxx_state::skimaxx_sub_ctrl_w));
+	map(0x10100000, 0x1010000f).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w)).umask32(0x0000ffff);
 //  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE("share1")  // above 10188000 accessed at level end (game bug?)
-	AM_RANGE(0x20000000, 0x20000003) AM_READNOP // watchdog_r?
+	map(0x10180000, 0x1018ffff).ram().share("share1");  // above 10188000 accessed at level end (game bug?)
+	map(0x20000000, 0x20000003).nopr(); // watchdog_r?
 
-	AM_RANGE(0x20000010, 0x20000013) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff) // left
-	AM_RANGE(0x20000014, 0x20000017) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff) // left
-	AM_RANGE(0x20000018, 0x2000001b) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x00ff) // right
-	AM_RANGE(0x2000001c, 0x2000001f) AM_DEVREADWRITE8("oki4", okim6295_device, read, write, 0x00ff) // right
+	map(0x20000013, 0x20000013).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // left
+	map(0x20000017, 0x20000017).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // left
+	map(0x2000001b, 0x2000001b).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // right
+	map(0x2000001f, 0x2000001f).rw("oki4", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // right
 
-	AM_RANGE(0x20000020, 0x20000023) AM_READ(skimaxx_unk1_r )   // units linking?
-	AM_RANGE(0x20000024, 0x20000027) AM_WRITE(skimaxx_unk1_w )  // ""
+	map(0x20000020, 0x20000023).r(this, FUNC(skimaxx_state::skimaxx_unk1_r));   // units linking?
+	map(0x20000024, 0x20000027).w(this, FUNC(skimaxx_state::skimaxx_unk1_w));  // ""
 
-	AM_RANGE(0x20000040, 0x20000043) AM_RAM // write
-	AM_RANGE(0x20000044, 0x20000047) AM_READ_PORT( "DSW" )
-	AM_RANGE(0x20000048, 0x2000004b) AM_READ_PORT( "COIN" )
-	AM_RANGE(0x2000004c, 0x2000004f) AM_READ(unk_r) // bit 7, bit 0
+	map(0x20000040, 0x20000043).ram(); // write
+	map(0x20000044, 0x20000047).portr("DSW");
+	map(0x20000048, 0x2000004b).portr("COIN");
+	map(0x2000004c, 0x2000004f).r(this, FUNC(skimaxx_state::unk_r)); // bit 7, bit 0
 
-	AM_RANGE(0x20000050, 0x20000057) AM_READ(skimaxx_analog_r ) AM_WRITENOP // read (0-1f), write motor?
+	map(0x20000050, 0x20000057).r(this, FUNC(skimaxx_state::skimaxx_analog_r)).nopw(); // read (0-1f), write motor?
 
-	AM_RANGE(0xfffc0000, 0xfffdffff) AM_RAM AM_MIRROR(0x00020000)
-ADDRESS_MAP_END
+	map(0xfffc0000, 0xfffdffff).ram().mirror(0x00020000);
+}
 
 
 /*************************************
@@ -342,22 +343,23 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(skimaxx_state::m68030_2_map)
-	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
+void skimaxx_state::m68030_2_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rom();
 
-	AM_RANGE(0x20000000, 0x2007ffff) AM_READ(skimaxx_blitter_r )    // do blit
-	AM_RANGE(0x30000000, 0x3000000f) AM_WRITE(skimaxx_blitter_w ) AM_SHARE("blitter_regs")
+	map(0x20000000, 0x2007ffff).r(this, FUNC(skimaxx_state::skimaxx_blitter_r));    // do blit
+	map(0x30000000, 0x3000000f).w(this, FUNC(skimaxx_state::skimaxx_blitter_w)).share("blitter_regs");
 
-	AM_RANGE(0x40000000, 0x40000003) AM_WRITE(skimaxx_fpga_ctrl_w ) AM_SHARE("fpga_ctrl")
+	map(0x40000000, 0x40000003).w(this, FUNC(skimaxx_state::skimaxx_fpga_ctrl_w)).share("fpga_ctrl");
 
-	AM_RANGE(0x50000000, 0x5007ffff) AM_RAMBANK("bank1")    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
+	map(0x50000000, 0x5007ffff).bankrw("bank1");    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfffc0000, 0xfffcffff) AM_RAM AM_SHARE("share1")
+	map(0xfffc0000, 0xfffcffff).ram().share("share1");
 //  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
-	AM_RANGE(0xfffe0000, 0xfffeffff) AM_RAM AM_SHARE("share1")  // HACK
-	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM             // HACK
-	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xfffe0000, 0xfffeffff).ram().share("share1");  // HACK
+	map(0xfffe0010, 0xfffeffff).ram();             // HACK
+	map(0xffff0000, 0xffffffff).ram();
+}
 
 
 /*************************************
@@ -366,16 +368,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(skimaxx_state::tms_program_map)
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM
-	AM_RANGE(0x00050000, 0x0005ffff) AM_RAM
-	AM_RANGE(0x00220000, 0x003fffff) AM_RAM AM_SHARE("fg_buffer")
-	AM_RANGE(0x02000000, 0x0200000f) AM_RAM
-	AM_RANGE(0x02100000, 0x0210000f) AM_RAM
-	AM_RANGE(0x04000000, 0x047fffff) AM_ROM AM_REGION("tmsgfx", 0)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("tms", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("tms", 0)
-ADDRESS_MAP_END
+void skimaxx_state::tms_program_map(address_map &map)
+{
+	map(0x00000000, 0x0003ffff).ram();
+	map(0x00050000, 0x0005ffff).ram();
+	map(0x00220000, 0x003fffff).ram().share("fg_buffer");
+	map(0x02000000, 0x0200000f).ram();
+	map(0x02100000, 0x0210000f).ram();
+	map(0x04000000, 0x047fffff).rom().region("tmsgfx", 0);
+	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xff800000, 0xffffffff).rom().region("tms", 0);
+}
 
 
 /*************************************

@@ -558,91 +558,98 @@ WRITE8_MEMBER(a400_state::xegs_low_w)
  **************************************************************/
 
 
-ADDRESS_MAP_START(a400_state::a400_mem)
-	AM_RANGE(0x0000, 0xbfff) AM_NOP // RAM installed at runtime
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
-	AM_RANGE(0xd500, 0xd7ff) AM_NOP
-	AM_RANGE(0xd800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void a400_state::a400_mem(address_map &map)
+{
+	map(0x0000, 0xbfff).noprw(); // RAM installed at runtime
+	map(0xc000, 0xcfff).rom();
+	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd100, 0xd1ff).noprw();
+	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xd500, 0xd7ff).noprw();
+	map(0xd800, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(a400_state::a600xl_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x5000, 0x57ff) AM_READ(a600xl_low_r)    // self test or NOP
-	AM_RANGE(0xa000, 0xbfff) AM_ROM // BASIC
-	AM_RANGE(0xc000, 0xcfff) AM_ROM // OS
-	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
-	AM_RANGE(0xd500, 0xd7ff) AM_NOP
-	AM_RANGE(0xd800, 0xffff) AM_ROM // OS
-ADDRESS_MAP_END
+void a400_state::a600xl_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x5000, 0x57ff).r(this, FUNC(a400_state::a600xl_low_r));    // self test or NOP
+	map(0xa000, 0xbfff).rom(); // BASIC
+	map(0xc000, 0xcfff).rom(); // OS
+	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd100, 0xd1ff).noprw();
+	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xd500, 0xd7ff).noprw();
+	map(0xd800, 0xffff).rom(); // OS
+}
 
 
-ADDRESS_MAP_START(a400_state::a1200xl_mem)
-	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a1200xl_low_r, xegs_low_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
-	AM_RANGE(0xd500, 0xd7ff) AM_NOP
-	AM_RANGE(0xd800, 0xffff) AM_READWRITE(a800xl_high_r, a800xl_high_w)
-ADDRESS_MAP_END
+void a400_state::a1200xl_mem(address_map &map)
+{
+	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::a1200xl_low_r), FUNC(a400_state::xegs_low_w));
+	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd100, 0xd1ff).noprw();
+	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xd500, 0xd7ff).noprw();
+	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+}
 
 
-ADDRESS_MAP_START(a400_state::a800xl_mem)
-	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a800xl_low_r, a800xl_low_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
-	AM_RANGE(0xd500, 0xd7ff) AM_NOP
-	AM_RANGE(0xd800, 0xffff) AM_READWRITE(a800xl_high_r, a800xl_high_w)
-ADDRESS_MAP_END
+void a400_state::a800xl_mem(address_map &map)
+{
+	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::a800xl_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd100, 0xd1ff).noprw();
+	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xd500, 0xd7ff).noprw();
+	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+}
 
 
-ADDRESS_MAP_START(a400_state::a130xe_mem)
-	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a130xe_low_r, a800xl_low_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
-	AM_RANGE(0xd500, 0xd7ff) AM_NOP
-	AM_RANGE(0xd800, 0xffff) AM_READWRITE(a800xl_high_r, a800xl_high_w)
-ADDRESS_MAP_END
+void a400_state::a130xe_mem(address_map &map)
+{
+	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::a130xe_low_r), FUNC(a400_state::a800xl_low_w));
+	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd100, 0xd1ff).noprw();
+	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xd500, 0xd7ff).noprw();
+	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+}
 
 
-ADDRESS_MAP_START(a400_state::xegs_mem)
-	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(xegs_low_r, xegs_low_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("antic", antic_device, read, write)
-	AM_RANGE(0xd500, 0xd7ff) AM_NOP
-	AM_RANGE(0xd800, 0xffff) AM_READWRITE(a800xl_high_r, a800xl_high_w)
-ADDRESS_MAP_END
+void a400_state::xegs_mem(address_map &map)
+{
+	map(0x0000, 0xcfff).rw(this, FUNC(a400_state::xegs_low_r), FUNC(a400_state::xegs_low_w));
+	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd100, 0xd1ff).noprw();
+	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd300, 0xd3ff).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
+	map(0xd500, 0xd7ff).noprw();
+	map(0xd800, 0xffff).rw(this, FUNC(a400_state::a800xl_high_r), FUNC(a400_state::a800xl_high_w));
+}
 
 
-ADDRESS_MAP_START(a400_state::a5200_mem)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xbfff) AM_NOP // ROM installed at machine start
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
-	AM_RANGE(0xd400, 0xdfff) AM_DEVREADWRITE("antic", antic_device, read, write)
+void a400_state::a5200_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0xbfff).noprw(); // ROM installed at machine start
+	map(0xc000, 0xcfff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
+	map(0xd400, 0xdfff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	// 0xe000-0xe7ff - Expansion?
-	AM_RANGE(0xe800, 0xefff) AM_DEVREADWRITE("pokey", pokey_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xe800, 0xefff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xf000, 0xffff).rom();
+}
 
 
 
@@ -2137,8 +2144,8 @@ MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	MCFG_POKEY_POT7_R_CB(IOPORT("analog_7"))
 	MCFG_POKEY_SERIN_R_CB(DEVREAD8("fdc", atari_fdc_device, serin_r))
 	MCFG_POKEY_SEROUT_W_CB(DEVWRITE8("fdc", atari_fdc_device, serout_w))
-	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a800_keyboard)
-	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
+	MCFG_POKEY_KEYBOARD_CB(a400_state, a800_keyboard)
+	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -2185,6 +2192,9 @@ MACHINE_CONFIG_START(a400_state::a400)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
 	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+
+	MCFG_DEVICE_MODIFY("gtia")
+	MCFG_GTIA_REGION(GTIA_NTSC)
 MACHINE_CONFIG_END
 
 
@@ -2201,6 +2211,9 @@ MACHINE_CONFIG_START(a400_state::a400pal)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
 	MCFG_SCREEN_SIZE_ANTIC_50HZ()
+
+	MCFG_DEVICE_MODIFY("gtia")
+	MCFG_GTIA_REGION(GTIA_PAL)
 MACHINE_CONFIG_END
 
 
@@ -2217,6 +2230,9 @@ MACHINE_CONFIG_START(a400_state::a800)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
 	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+
+	MCFG_DEVICE_MODIFY("gtia")
+	MCFG_GTIA_REGION(GTIA_NTSC)
 
 	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
 MACHINE_CONFIG_END
@@ -2235,6 +2251,9 @@ MACHINE_CONFIG_START(a400_state::a800pal)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
 	MCFG_SCREEN_SIZE_ANTIC_50HZ()
+
+	MCFG_DEVICE_MODIFY("gtia")
+	MCFG_GTIA_REGION(GTIA_PAL)
 
 	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
 MACHINE_CONFIG_END
@@ -2256,6 +2275,9 @@ MACHINE_CONFIG_START(a400_state::a600xl)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
 	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+
+	MCFG_DEVICE_MODIFY("gtia")
+	MCFG_GTIA_REGION(GTIA_NTSC)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -2281,6 +2303,9 @@ MACHINE_CONFIG_START(a400_state::a800xl)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
 	MCFG_SCREEN_SIZE_ANTIC_60HZ()
+
+	MCFG_DEVICE_MODIFY("gtia")
+	MCFG_GTIA_REGION(GTIA_NTSC)
 MACHINE_CONFIG_END
 
 
@@ -2294,6 +2319,9 @@ MACHINE_CONFIG_START(a400_state::a800xlpal)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
 	MCFG_SCREEN_SIZE_ANTIC_50HZ()
+
+	MCFG_DEVICE_MODIFY("gtia")
+	MCFG_GTIA_REGION(GTIA_PAL)
 
 	MCFG_SOUND_MODIFY("pokey")
 	MCFG_SOUND_CLOCK(1773000)
@@ -2350,12 +2378,13 @@ MACHINE_CONFIG_START(a400_state::a5200)
 	MCFG_SOUND_MODIFY("pokey")
 	MCFG_POKEY_SERIN_R_CB(NOOP)
 	MCFG_POKEY_SEROUT_W_CB(NOOP)
-	MCFG_POKEY_KEYBOARD_CB(atari_common_state, a5200_keypads)
-	MCFG_POKEY_INTERRUPT_CB(atari_common_state, interrupt_cb)
+	MCFG_POKEY_KEYBOARD_CB(a400_state, a5200_keypads)
+	MCFG_POKEY_INTERRUPT_CB(a400_state, interrupt_cb)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
+	MCFG_GTIA_REGION(GTIA_NTSC)
 
 	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
 	MCFG_ANTIC_GTIA("gtia")

@@ -783,7 +783,7 @@ void patinho_feio_cpu_device::execute_instruction()
 	printf("unimplemented opcode: 0x%02X\n", m_opcode);
 }
 
-util::disasm_interface *patinho_feio_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> patinho_feio_cpu_device::create_disassembler()
 {
-	return new patinho_feio_disassembler;
+	return std::make_unique<patinho_feio_disassembler>();
 }

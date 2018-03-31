@@ -28,31 +28,53 @@ public:
 	piggypas_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ticket(*this, "ticket")
+		m_hd44780(*this, "hd44780"),
+		m_ticket(*this, "ticket"),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void piggypas(machine_config &config);
+	void fidlstix(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
+	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
+private:
+	void output_digits();
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
-	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
+	DECLARE_WRITE8_MEMBER(led_strobe_w);
+	DECLARE_READ8_MEMBER(lcd_latch_r);
+	DECLARE_WRITE8_MEMBER(lcd_latch_w);
+	DECLARE_WRITE8_MEMBER(lcd_control_w);
 	HD44780_PIXEL_UPDATE(piggypas_pixel_update);
 
 	required_device<mcs51_cpu_device> m_maincpu;
+	required_device<hd44780_device> m_hd44780;
 	required_device<ticket_dispenser_device> m_ticket;
+	output_finder<4> m_digits;
 	uint8_t   m_ctrl;
-	uint8_t   m_digit_idx;
-	void piggypas(machine_config &config);
+	uint8_t   m_lcd_latch;
+	uint32_t  m_digit_latch;
 	void piggypas_io(address_map &map);
 	void piggypas_map(address_map &map);
+	void fidlstix_io(address_map &map);
 };
 
 
+void piggypas_state::output_digits()
+{
+	// Serial output driver is UCN5833A
+	m_digits[0] = bitswap<8>(m_digit_latch & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+	m_digits[1] = bitswap<8>((m_digit_latch >> 8) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+	m_digits[2] = bitswap<8>((m_digit_latch >> 16) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+	m_digits[3] = bitswap<8>((m_digit_latch >> 24) & 0xff, 7,6,4,3,2,1,0,5) & 0x7f;
+}
 
 WRITE8_MEMBER(piggypas_state::ctrl_w)
 {
-	if ((m_ctrl ^ data) & m_ctrl & 0x04)
-		m_digit_idx = 0;
+	if (!BIT(data, 2) && BIT(m_ctrl, 2))
+		output_digits();
 
 	m_ticket->motor_w(BIT(data, 6));
 
@@ -61,23 +83,68 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 
 WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
 {
-	// Serial output driver is UCN5833A
-	output().set_digit_value(m_digit_idx++, bitswap<8>(data,7,6,4,3,2,1,0,5) & 0x7f);
+	m_digit_latch = (m_digit_latch >> 8) | (u32(data) << 24);
 }
 
-ADDRESS_MAP_START(piggypas_state::piggypas_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+WRITE8_MEMBER(piggypas_state::led_strobe_w)
+{
+	if (!BIT(data, 0))
+		m_digit_latch = 0;
+}
 
-ADDRESS_MAP_START(piggypas_state::piggypas_io)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("hd44780", hd44780_device, write)
-	AM_RANGE(0x1802, 0x1803) AM_DEVREAD("hd44780", hd44780_device, read)
+READ8_MEMBER(piggypas_state::lcd_latch_r)
+{
+	return m_lcd_latch;
+}
 
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+WRITE8_MEMBER(piggypas_state::lcd_latch_w)
+{
+	// P1.7 might also be used to reset DS1232 watchdog
+	m_lcd_latch = data;
+}
+
+WRITE8_MEMBER(piggypas_state::lcd_control_w)
+{
+	// RXD (P3.0) = chip select
+	// TXD (P3.1) = register select
+	// INT0 (P3.2) = R/W
+	if (BIT(data, 0))
+	{
+		if (BIT(data, 2))
+			m_lcd_latch = m_hd44780->read(space, BIT(data, 1));
+		else
+			m_hd44780->write(space, BIT(data, 1), m_lcd_latch);
+	}
+
+	// T0 (P3.4) = output shift clock (serial data present at P1.0)
+	// T1 (P3.5) = output latch enable
+	if (BIT(data, 4))
+		m_digit_latch = (m_digit_latch >> 1) | (BIT(m_lcd_latch, 0) << 31);
+	if (BIT(data, 5) && !BIT(data, 4))
+		output_digits();
+}
+
+void piggypas_state::piggypas_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
+
+void piggypas_state::piggypas_io(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x1000, 0x1000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1800, 0x1801).w(m_hd44780, FUNC(hd44780_device::write));
+	map(0x1802, 0x1803).r(m_hd44780, FUNC(hd44780_device::read));
+}
+
+void piggypas_state::fidlstix_io(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x1000, 0x1000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x1800, 0x1800).nopw(); // input matrix scan?
+}
 
 
 INPUT_CHANGED_MEMBER(piggypas_state::ball_sensor)
@@ -116,9 +183,15 @@ static INPUT_PORTS_START( piggypas )
 INPUT_PORTS_END
 
 
+void piggypas_state::machine_start()
+{
+	m_digits.resolve();
+
+	m_digit_latch = 0;
+}
+
 void piggypas_state::machine_reset()
 {
-	m_digit_idx = 0;
 }
 
 HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
@@ -133,6 +206,8 @@ MACHINE_CONFIG_START(piggypas_state::piggypas)
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL(8'448'000)) // OKI M80C31F or M80C154S
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
 	MCFG_CPU_IO_MAP(piggypas_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(piggypas_state, led_strobe_w))
+	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("IN2"))
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(piggypas_state, mcs51_tx_callback))
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
 
@@ -165,6 +240,18 @@ MACHINE_CONFIG_START(piggypas_state::piggypas)
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(piggypas_state::fidlstix)
+	piggypas(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(fidlstix_io)
+	MCFG_MCS51_SERIAL_TX_CB(NOOP)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(piggypas_state, lcd_latch_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(piggypas_state, lcd_latch_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(piggypas_state, lcd_control_w))
+MACHINE_CONFIG_END
+
 
 
 
@@ -239,9 +326,9 @@ GAME( 1992, piggypas,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyl
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 05.22
 GAME( 1992, hoopshot,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Hoop Shot (version 05.22)", MACHINE_IS_SKELETON_MECHANICAL )
 // Quick $ilver   Development Co.    10/08/96      ROUND  REV 6
-GAME( 1996, rndrndqs,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1996, rndrndqs,  0,    fidlstix, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Round and Round (Rev 6) (Quick $ilver)", MACHINE_IS_SKELETON_MECHANICAL )
 //  Quick$ilver   Development Co.    10/02/95      -FIDDLESTIX-       REV 15T
-GAME( 1995, fidlstix,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, fidlstix,  0,    fidlstix, piggypas, piggypas_state,  0, ROT0, "Quick $ilver Development Co.", "Fiddle Stix (1st Rev)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown
 GAME( 199?, jackbean,  0,    piggypas, piggypas, piggypas_state,  0, ROT0, "Doyle & Assoc.", "Jack & The Beanstalk (Doyle & Assoc.?)", MACHINE_IS_SKELETON_MECHANICAL )
 // bad dump, so version unknown

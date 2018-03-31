@@ -232,39 +232,43 @@ INPUT_CHANGED_MEMBER(polyplay_state::input_changed)
 }
 
 /* memory mapping */
-ADDRESS_MAP_START(polyplay_state::polyplay_mem_zre)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x8fff) AM_ROM
-	AM_RANGE(0xe800, 0xebff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE(polyplay_characterram_w) AM_SHARE("characterram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void polyplay_state::polyplay_mem_zre(address_map &map)
+{
+	map(0x0000, 0x0bff).rom();
+	map(0x0c00, 0x0fff).ram();
+	map(0x1000, 0x8fff).rom();
+	map(0xe800, 0xebff).rom().region("gfx1", 0);
+	map(0xec00, 0xf7ff).ram().w(this, FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
-ADDRESS_MAP_START(polyplay_state::polyplay_mem_zrepp)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+void polyplay_state::polyplay_mem_zrepp(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
 
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	map(0xc000, 0xcfff).ram();
 
-	AM_RANGE(0xd000, 0xd7ff) AM_ROM AM_REGION("gfx1", 0)
+	map(0xd000, 0xd7ff).rom().region("gfx1", 0);
 
-	AM_RANGE(0xea00, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE(polyplay_characterram_w) AM_SHARE("characterram")
+	map(0xea00, 0xebff).ram();
+	map(0xec00, 0xf7ff).ram().w(this, FUNC(polyplay_state::polyplay_characterram_w)).share("characterram");
 
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+	map(0xf800, 0xffff).ram().share("videoram");
+}
 
 /* port mapping */
-ADDRESS_MAP_START(polyplay_state::polyplay_io_zre)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-ADDRESS_MAP_END
+void polyplay_state::polyplay_io_zre(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x84, 0x87).rw(m_z80pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
-ADDRESS_MAP_START(polyplay_state::polyplay_io_zrepp)
-	AM_IMPORT_FROM(polyplay_io_zre)
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_device, cd_ba_r, cd_ba_w)
-ADDRESS_MAP_END
+void polyplay_state::polyplay_io_zrepp(address_map &map)
+{
+	polyplay_io_zre(map);
+	map(0x88, 0x8b).rw(m_z80sio, FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+}
 
 static INPUT_PORTS_START( polyplay )
 	PORT_START("IN0")
@@ -410,12 +414,12 @@ ROM_END
 
 ROM_START( polyplay2 )
 	ROM_REGION( 0x10000, Z80CPU_TAG, 0 )
-	ROM_LOAD( "2_1.ROM",           0x0000, 0x2000, CRC(d728ca42) SHA1(7359a59ba7f205b3ac95c8a0946093f24bdaa4da) )
-	ROM_LOAD( "2_2.ROM",           0x2000, 0x2000, CRC(52316236) SHA1(88c159621d40953240c5d2f1d6dcebb8f5e1ee81) )
-	ROM_LOAD( "2_3.ROM",           0x4000, 0x2000, CRC(e199d303) SHA1(fea2c3c659222553f36b3e922c6ac017f7111025) )
-	ROM_LOAD( "2_4.ROM",           0x6000, 0x2000, CRC(1324c2e2) SHA1(c0102d5abbb2f4dbb5b8dff5ad515bc3f2af9166) )
-	ROM_LOAD( "2_5.ROM",           0x8000, 0x2000, CRC(2e959fe9) SHA1(1f0a80bb26d0ae332d4a4313ec22ab7eefcf1e34) )
-	ROM_LOAD( "2_6.ROM",           0xA000, 0x2000, CRC(85774542) SHA1(420349a0d812bc0052a77cbc6c5ab84262e58b32) )
+	ROM_LOAD( "2_1.rom",           0x0000, 0x2000, CRC(d728ca42) SHA1(7359a59ba7f205b3ac95c8a0946093f24bdaa4da) )
+	ROM_LOAD( "2_2.rom",           0x2000, 0x2000, CRC(52316236) SHA1(88c159621d40953240c5d2f1d6dcebb8f5e1ee81) )
+	ROM_LOAD( "2_3.rom",           0x4000, 0x2000, CRC(e199d303) SHA1(fea2c3c659222553f36b3e922c6ac017f7111025) )
+	ROM_LOAD( "2_4.rom",           0x6000, 0x2000, CRC(1324c2e2) SHA1(c0102d5abbb2f4dbb5b8dff5ad515bc3f2af9166) )
+	ROM_LOAD( "2_5.rom",           0x8000, 0x2000, CRC(2e959fe9) SHA1(1f0a80bb26d0ae332d4a4313ec22ab7eefcf1e34) )
+	ROM_LOAD( "2_6.rom",           0xA000, 0x2000, CRC(85774542) SHA1(420349a0d812bc0052a77cbc6c5ab84262e58b32) )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
 	ROM_LOAD( "1_1.bin",           0x0000, 0x0800, CRC(4f028af9) SHA1(319537234069b43cfffafe567cc599ae05f24e23) )

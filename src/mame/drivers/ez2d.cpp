@@ -69,8 +69,9 @@ uint32_t ez2d_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-ADDRESS_MAP_START(ez2d_state::ez2d_map)
-ADDRESS_MAP_END
+void ez2d_state::ez2d_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( ez2d )
 INPUT_PORTS_END
@@ -107,7 +108,7 @@ MACHINE_CONFIG_END
 
 ROM_START( ez2d2m )
 	ROM_REGION(0x40000, "bios", 0) \
-	ROM_LOAD("Ez2dancer2ndMove_Motherboard_V29C51002T_Award_BIOS", 0x00000, 0x40000, CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205) ) // 29f020
+	ROM_LOAD("ez2dancer2ndmove_motherboard_v29c51002t_award_bios", 0x00000, 0x40000, CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205) ) // 29f020
 
 	ROM_REGION( 0x10000, "vbios", 0 )   // video card BIOS, not dumped but downloaded from internet
 	ROM_LOAD( "62090211.rom", 0x000000, 0x00b000, CRC(5669135b) SHA1(b704ce0d20b71e40563d12bcc45bd1240227be74) )

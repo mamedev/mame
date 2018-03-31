@@ -570,15 +570,16 @@ public:
 
 
 
-ADDRESS_MAP_START(copera_state::copera_mem)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+void copera_state::copera_mem(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
 
-	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(pico_68k_io_read, pico_68k_io_write)
+	map(0x800000, 0x80001f).rw(this, FUNC(copera_state::pico_68k_io_read), FUNC(copera_state::pico_68k_io_write));
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
+	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000)
-ADDRESS_MAP_END
+	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
+}
 
 
 

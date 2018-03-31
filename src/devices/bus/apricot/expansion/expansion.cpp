@@ -121,26 +121,6 @@ void apricot_expansion_bus_device::add_card(device_apricot_expansion_card_interf
 	m_dev.append(*card);
 }
 
-//-------------------------------------------------
-//  set_cpu_tag - set cpu we are attached to
-//-------------------------------------------------
-
-void apricot_expansion_bus_device::set_cpu_tag(device_t &device, device_t *owner, const char *tag)
-{
-	apricot_expansion_bus_device &bus = dynamic_cast<apricot_expansion_bus_device &>(device);
-	bus.m_cpu_tag = tag;
-}
-
-//-------------------------------------------------
-//  set_iop_tag - set iop we are attached to
-//-------------------------------------------------
-
-void apricot_expansion_bus_device::set_iop_tag(device_t &device, device_t *owner, const char *tag)
-{
-	apricot_expansion_bus_device &bus = dynamic_cast<apricot_expansion_bus_device &>(device);
-	bus.m_iop_tag = tag;
-}
-
 // callbacks from slot device to the host
 WRITE_LINE_MEMBER( apricot_expansion_bus_device::dma1_w ) { m_dma1_handler(state); }
 WRITE_LINE_MEMBER( apricot_expansion_bus_device::dma2_w ) { m_dma2_handler(state); }

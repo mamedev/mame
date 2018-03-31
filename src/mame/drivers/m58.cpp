@@ -27,24 +27,25 @@
  *
  *************************************/
 
-ADDRESS_MAP_START(m58_state::yard_map)
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scroll_panel_w)
-	AM_RANGE(0xc820, 0xc87f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa000) AM_RAM AM_SHARE("scroll_x_low")
-	AM_RANGE(0xa200, 0xa200) AM_RAM AM_SHARE("scroll_x_high")
-	AM_RANGE(0xa400, 0xa400) AM_RAM AM_SHARE("scroll_y_low")
-	AM_RANGE(0xa800, 0xa800) AM_RAM AM_SHARE("score_disable")
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("irem_audio", irem_audio_device, cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(flipscreen_w)    /* + coin counters */
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1")
-	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
-	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void m58_state::yard_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0x8fff).ram().w(this, FUNC(m58_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9fff).w(this, FUNC(m58_state::scroll_panel_w));
+	map(0xc820, 0xc87f).ram().share("spriteram");
+	map(0xa000, 0xa000).ram().share("scroll_x_low");
+	map(0xa200, 0xa200).ram().share("scroll_x_high");
+	map(0xa400, 0xa400).ram().share("scroll_y_low");
+	map(0xa800, 0xa800).ram().share("score_disable");
+	map(0xd000, 0xd000).w("irem_audio", FUNC(irem_audio_device::cmd_w));
+	map(0xd001, 0xd001).w(this, FUNC(m58_state::flipscreen_w));    /* + coin counters */
+	map(0xd000, 0xd000).portr("IN0");
+	map(0xd001, 0xd001).portr("IN1");
+	map(0xd002, 0xd002).portr("IN2");
+	map(0xd003, 0xd003).portr("DSW1");
+	map(0xd004, 0xd004).portr("DSW2");
+	map(0xe000, 0xefff).ram();
+}
 
 
 

@@ -32,15 +32,6 @@ MACHINE_CONFIG_START(msx_slot_fs4600_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-void msx_slot_fs4600_device::set_rom_start(device_t &device, const char *region, uint32_t offset)
-{
-	msx_slot_fs4600_device &dev = downcast<msx_slot_fs4600_device &>(device);
-
-	dev.m_rom_region.set_tag(region);
-	dev.m_region_offset = offset;
-}
-
-
 void msx_slot_fs4600_device::device_start()
 {
 	// Sanity checks

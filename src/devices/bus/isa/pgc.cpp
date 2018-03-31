@@ -105,21 +105,23 @@ read only
     3C001       INIT L/INIT H
 */
 
-ADDRESS_MAP_START(isa8_pgc_device::pgc_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x07fff) AM_ROM
-	AM_RANGE(0x08000, 0x0ffff) AM_ROM AM_REGION("maincpu", 0x8000)
-	AM_RANGE(0x10000, 0x1001f) AM_READWRITE(stateparam_r, stateparam_w)
+void isa8_pgc_device::pgc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x07fff).rom();
+	map(0x08000, 0x0ffff).rom().region("maincpu", 0x8000);
+	map(0x10000, 0x1001f).rw(this, FUNC(isa8_pgc_device::stateparam_r), FUNC(isa8_pgc_device::stateparam_w));
 //  AM_RANGE(0x18000, 0x18fff) AM_RAM   // ??
-	AM_RANGE(0x28000, 0x287ff) AM_RAM AM_REGION("commarea", 0) AM_MIRROR(0x800)
-	AM_RANGE(0x3c000, 0x3c001) AM_READ(init_r)
+	map(0x28000, 0x287ff).ram().region("commarea", 0).mirror(0x800);
+	map(0x3c000, 0x3c001).r(this, FUNC(isa8_pgc_device::init_r));
 //  AM_RANGE(0x3e000, 0x3efff) AM_RAM   // ??
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x8000)
-ADDRESS_MAP_END
+	map(0xf8000, 0xfffff).rom().region("maincpu", 0x8000);
+}
 
-ADDRESS_MAP_START(isa8_pgc_device::pgc_io)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void isa8_pgc_device::pgc_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
 static const gfx_layout pgc_charlayout =
 {

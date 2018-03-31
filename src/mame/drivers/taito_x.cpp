@@ -27,23 +27,6 @@ Supported games:
 This file contains routines to interface with the Taito Controller Chip
 (or "Command Chip") version 1. It's currently used by Superman.
 
-Superman (revised SJ 060601)
---------
-
-In Superman, the C-chip's main purpose is to handle player inputs and
-coins and pass commands along to the sound chip.
-
-The 68k queries the c-chip, which passes back $100 bytes of 68k code which
-are then executed in RAM. To get around this, we hack in our own code to
-communicate with the sound board, since we are familiar with the interface
-as it's used in Rastan and Super Space Invaders '91.
-
-It is believed that the NOPs in the 68k code are there to supply the
-necessary cycles to the cchip to switch banks.
-
-This code requires that the player & coin inputs be in input ports 2-4.
-
-
 Memory map:
 ----------------------------------------------------
   0x000000 - 0x07ffff : ROM
@@ -345,113 +328,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "screen.h"
 #include "speaker.h"
 
-
-/* This code for sound communication is a hack, it will not be
-   identical to the code derived from the real c-chip */
-
-static const uint8_t superman_code[40] =
+WRITE8_MEMBER(taitox_state::superman_counters_w)
 {
-	0x48, 0xe7, 0x80, 0x80,             /* MOVEM.L  D0/A0,-(A7)   ( Preserve Regs ) */
-	0x20, 0x6d, 0x1c, 0x40,             /* MOVEA.L  ($1C40,A5),A0 ( Load sound pointer in A0 ) */
-	0x30, 0x2f, 0x00, 0x0c,             /* MOVE.W   ($0C,A7),D0   ( Fetch sound number ) */
-	0x10, 0x80,                         /* MOVE.B   D0,(A0)       ( Store it on sound pointer ) */
-	0x52, 0x88,                         /* ADDQ.W   #1,A0         ( Increment sound pointer ) */
-	0x20, 0x3c, 0x00, 0xf0, 0x1c, 0x40, /* MOVE.L   #$F01C40,D0   ( Load top of buffer in D0 ) */
-	0xb1, 0xc0,                         /* CMPA.L   D0,A0         ( Are we there yet? ) */
-	0x66, 0x04,                         /* BNE.S    *+$6          ( No, we arent, skip next line ) */
-	0x41, 0xed, 0x1c, 0x20,             /* LEA      ($1C20,A5),A0 ( Point to the start of the buffer ) */
-	0x2b, 0x48, 0x1c, 0x40,             /* MOVE.L   A0,($1C40,A5) ( Store new sound pointer ) */
-	0x4c, 0xdf, 0x01, 0x01,             /* MOVEM.L  (A7)+, D0/A0  ( Restore Regs ) */
-	0x4e, 0x75                          /* RTS                    ( Return ) */
-};
-
-/*************************************
- *
- * Writes to C-Chip - Important Bits
- *
- *************************************/
-
-WRITE16_MEMBER( taitox_state::cchip1_ctrl_w )
-{
-	/* value 2 is written here */
+	machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+	machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
-
-WRITE16_MEMBER( taitox_state::cchip1_bank_w )
-{
-	m_current_bank = data & 7;
-}
-
-WRITE16_MEMBER( taitox_state::cchip1_ram_w )
-{
-	if (m_current_bank == 0 && offset == 0x03)
-	{
-		m_cc_port = data;
-
-		machine().bookkeeping().coin_lockout_w(1, data & 0x08);
-		machine().bookkeeping().coin_lockout_w(0, data & 0x04);
-		machine().bookkeeping().coin_counter_w(1, data & 0x02);
-		machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	}
-	else
-	{
-		logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",m_maincpu->pc(),m_current_bank,offset,data);
-	}
-}
-
-
-/*************************************
- *
- * Reads from C-Chip
- *
- *************************************/
-
-READ16_MEMBER( taitox_state::cchip1_ctrl_r )
-{
-	/*
-	    Bit 2 = Error signal
-	    Bit 0 = Ready signal
-	*/
-	return 0x01; /* Return 0x05 for C-Chip error */
-}
-
-READ16_MEMBER( taitox_state::cchip1_ram_r )
-{
-	/* Check for input ports */
-	if (m_current_bank == 0)
-	{
-		switch (offset)
-		{
-		case 0x00: return machine().root_device().ioport("IN0")->read();    /* Player 1 controls + START1 */
-		case 0x01: return machine().root_device().ioport("IN1")->read();    /* Player 2 controls + START2 */
-		case 0x02: return machine().root_device().ioport("IN2")->read();    /* COINn + SERVICE1 + TILT */
-		case 0x03: return m_cc_port;
-		}
-	}
-
-	/* Other non-standard offsets */
-
-	if (m_current_bank == 1 && offset <= 0xff)
-	{
-		if (offset < 40)    /* our hack code is only 40 bytes long */
-			return superman_code[offset];
-		else    /* so pad with zeros */
-			return 0;
-	}
-
-	if (m_current_bank == 2)
-	{
-		switch (offset)
-		{
-			case 0x000: return 0x47;
-			case 0x001: return 0x57;
-			case 0x002: return 0x4b;
-		}
-	}
-
-	logerror("cchip1_r bank: %02x offset: %04x\n",m_current_bank,offset);
-	return 0;
-}
-
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
 {
@@ -534,99 +417,108 @@ WRITE8_MEMBER(taitox_state::sound_bankswitch_w)
 
 /**************************************************************************/
 
-ADDRESS_MAP_START(taitox_state::superman_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x300000, 0x300001) AM_WRITENOP    /* written each frame at $3a9c, mostly 0x10 */
-	AM_RANGE(0x400000, 0x400001) AM_WRITENOP    /* written each frame at $3aa2, mostly 0x10 */
-	AM_RANGE(0x500000, 0x500007) AM_READ(superman_dsw_input_r)
-	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* written each frame at $3ab0, mostly 0x10 */
-	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x900000, 0x9007ff) AM_READWRITE(cchip1_ram_r, cchip1_ram_w)
-	AM_RANGE(0x900802, 0x900803) AM_READWRITE(cchip1_ctrl_r, cchip1_ctrl_w)
-	AM_RANGE(0x900c00, 0x900c01) AM_WRITE(cchip1_bank_w)
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
-	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
-	AM_RANGE(0xf00000, 0xf03fff) AM_RAM         /* Main RAM */
-ADDRESS_MAP_END
+void taitox_state::superman_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x300000, 0x300001).nopw();    /* written each frame at $3a9c, mostly 0x10 */
+	map(0x400000, 0x400001).nopw();    /* written each frame at $3aa2, mostly 0x10 */
+	map(0x500000, 0x500007).r(this, FUNC(taitox_state::superman_dsw_input_r));
+	map(0x600000, 0x600001).nopw();    /* written each frame at $3ab0, mostly 0x10 */
+	map(0x800000, 0x800001).nopr();
+	map(0x800001, 0x800001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x800003, 0x800003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0x900000, 0x9007ff).rw(m_cchip, FUNC(taito_cchip_device::mem68_r), FUNC(taito_cchip_device::mem68_w)).umask16(0x00ff);
+	map(0x900800, 0x900fff).rw(m_cchip, FUNC(taito_cchip_device::asic_r), FUNC(taito_cchip_device::asic68_w)).umask16(0x00ff);
+	map(0xb00000, 0xb00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); // Sprites Y
+	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16)); // Sprites Code + X + Attr
+	map(0xf00000, 0xf03fff).ram();         /* Main RAM */
+}
 
-ADDRESS_MAP_START(taitox_state::daisenpu_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-//  AM_RANGE(0x400000, 0x400001) AM_WRITENOP    /* written each frame at $2ac, values change */
-	AM_RANGE(0x500000, 0x50000f) AM_READ(superman_dsw_input_r)
-//  AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* written each frame at $2a2, values change */
-	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
-	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
-	AM_RANGE(0xf00000, 0xf03fff) AM_RAM         /* Main RAM */
-ADDRESS_MAP_END
+void taitox_state::daisenpu_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+//  map(0x400000, 0x400001).nopw();    /* written each frame at $2ac, values change */
+	map(0x500000, 0x50000f).r(this, FUNC(taitox_state::superman_dsw_input_r));
+//  map(0x600000, 0x600001).nopw();    /* written each frame at $2a2, values change */
+	map(0x800000, 0x800001).nopr();
+	map(0x800001, 0x800001).w("ciu", FUNC(pc060ha_device::master_port_w));
+	map(0x800003, 0x800003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
+	map(0x900000, 0x90000f).rw(this, FUNC(taitox_state::daisenpu_input_r), FUNC(taitox_state::daisenpu_input_w));
+	map(0xb00000, 0xb00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); // Sprites Y
+	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16)); // Sprites Code + X + Attr
+	map(0xf00000, 0xf03fff).ram();         /* Main RAM */
+}
 
-ADDRESS_MAP_START(taitox_state::gigandes_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_WRITENOP    /* 0x1 written each frame at $d42, watchdog? */
-	AM_RANGE(0x500000, 0x500007) AM_READ(superman_dsw_input_r)
-	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* 0x1 written each frame at $d3c, watchdog? */
-	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
-	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
-	AM_RANGE(0xf00000, 0xf03fff) AM_RAM         /* Main RAM */
-ADDRESS_MAP_END
+void taitox_state::gigandes_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x400000, 0x400001).nopw();    /* 0x1 written each frame at $d42, watchdog? */
+	map(0x500000, 0x500007).r(this, FUNC(taitox_state::superman_dsw_input_r));
+	map(0x600000, 0x600001).nopw();    /* 0x1 written each frame at $d3c, watchdog? */
+	map(0x800000, 0x800001).nopr();
+	map(0x800001, 0x800001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x800003, 0x800003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0x900000, 0x90000f).rw(this, FUNC(taitox_state::daisenpu_input_r), FUNC(taitox_state::daisenpu_input_w));
+	map(0xb00000, 0xb00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); // Sprites Y
+	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16)); // Sprites Code + X + Attr
+	map(0xf00000, 0xf03fff).ram();         /* Main RAM */
+}
 
-ADDRESS_MAP_START(taitox_state::ballbros_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_WRITENOP    /* 0x1 written each frame at $c56, watchdog? */
-	AM_RANGE(0x500000, 0x50000f) AM_READ(superman_dsw_input_r)
-	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* 0x1 written each frame at $c4e, watchdog? */
-	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
-	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
-	AM_RANGE(0xf00000, 0xf03fff) AM_RAM         /* Main RAM */
-ADDRESS_MAP_END
+void taitox_state::ballbros_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x400000, 0x400001).nopw();    /* 0x1 written each frame at $c56, watchdog? */
+	map(0x500000, 0x50000f).r(this, FUNC(taitox_state::superman_dsw_input_r));
+	map(0x600000, 0x600001).nopw();    /* 0x1 written each frame at $c4e, watchdog? */
+	map(0x800000, 0x800001).nopr();
+	map(0x800001, 0x800001).w("tc0140syt", FUNC(tc0140syt_device::master_port_w));
+	map(0x800003, 0x800003).rw("tc0140syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
+	map(0x900000, 0x90000f).rw(this, FUNC(taitox_state::daisenpu_input_r), FUNC(taitox_state::daisenpu_input_w));
+	map(0xb00000, 0xb00fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16)); // Sprites Y
+	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16)); // Sprites Code + X + Attr
+	map(0xf00000, 0xf03fff).ram();         /* Main RAM */
+}
 
 
 /**************************************************************************/
 
-ADDRESS_MAP_START(taitox_state::sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
-	AM_RANGE(0xea00, 0xea00) AM_READNOP
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
-ADDRESS_MAP_END
+void taitox_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe200, 0xe200).nopr().w("tc0140syt", FUNC(tc0140syt_device::slave_port_w));
+	map(0xe201, 0xe201).rw("tc0140syt", FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
+	map(0xe400, 0xe403).nopw(); /* pan */
+	map(0xea00, 0xea00).nopr();
+	map(0xee00, 0xee00).nopw(); /* ? */
+	map(0xf000, 0xf000).nopw(); /* ? */
+	map(0xf200, 0xf200).w(this, FUNC(taitox_state::sound_bankswitch_w));
+}
 
-ADDRESS_MAP_START(taitox_state::daisenpu_sound_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
-	AM_RANGE(0xea00, 0xea00) AM_READNOP
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
-ADDRESS_MAP_END
+void taitox_state::daisenpu_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xe200, 0xe200).nopr().w("ciu", FUNC(pc060ha_device::slave_port_w));
+	map(0xe201, 0xe201).rw("ciu", FUNC(pc060ha_device::slave_comm_r), FUNC(pc060ha_device::slave_comm_w));
+	map(0xe400, 0xe403).nopw(); /* pan */
+	map(0xea00, 0xea00).nopr();
+	map(0xee00, 0xee00).nopw(); /* ? */
+	map(0xf000, 0xf000).nopw();
+	map(0xf200, 0xf200).w(this, FUNC(taitox_state::sound_bankswitch_w));
+}
 
 
 /**************************************************************************/
@@ -737,6 +629,16 @@ static INPUT_PORTS_START( superman )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supermanu )
@@ -904,16 +806,18 @@ MACHINE_START_MEMBER(taitox_state,taitox)
 	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
 }
 
-MACHINE_START_MEMBER(taitox_state,superman)
+INTERRUPT_GEN_MEMBER(taitox_state::interrupt)
 {
-	int banks = memregion("audiocpu")->bytes() / 0x4000;
-	membank("z80bank")->configure_entries(0, banks, memregion("audiocpu")->base(), 0x4000);
-
-	m_current_bank = 0;
-	m_cc_port = 0;
-	save_item(NAME(m_current_bank));
-	save_item(NAME(m_cc_port));
+	m_maincpu->set_input_line(6, HOLD_LINE);
+	m_cchip->ext_interrupt(ASSERT_LINE);
+	m_cchip_irq_clear->adjust(attotime::zero);
 }
+
+TIMER_DEVICE_CALLBACK_MEMBER(taitox_state::cchip_irq_clear_cb)
+{
+	m_cchip->ext_interrupt(CLEAR_LINE);
+}
+
 
 /**************************************************************************/
 
@@ -922,16 +826,22 @@ MACHINE_CONFIG_START(taitox_state::superman)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(superman_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(16'000'000)/2) /* 8MHz measured on pin 20 */
+	MCFG_CCHIP_IN_PORTA_CB(IOPORT("IN0"))
+	MCFG_CCHIP_IN_PORTB_CB(IOPORT("IN1"))
+	MCFG_CCHIP_IN_PORTAD_CB(IOPORT("IN2"))
+	MCFG_CCHIP_OUT_PORTC_CB(WRITE8(taitox_state, superman_counters_w))
+
+	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", taitox_state, cchip_irq_clear_cb)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MCFG_MACHINE_START_OVERRIDE(taitox_state,superman)
+	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -1178,7 +1088,7 @@ ROM_START( superman )
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, CRC(3bc5d44b) SHA1(6ba3ba35fe313af77d732412572d91a202b50542) )
 ROM_END
 
 ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage difference, see notes above */
@@ -1201,7 +1111,7 @@ ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage di
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, CRC(3bc5d44b) SHA1(6ba3ba35fe313af77d732412572d91a202b50542) )
 ROM_END
 
 ROM_START( supermanj ) /* Shows a Japan copyright notice */
@@ -1224,7 +1134,7 @@ ROM_START( supermanj ) /* Shows a Japan copyright notice */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "b61_11.m11", 0x0000, 0x2000, CRC(3bc5d44b) SHA1(6ba3ba35fe313af77d732412572d91a202b50542) )
 ROM_END
 
 /*

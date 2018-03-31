@@ -15,21 +15,23 @@
 
 #define Z80_TAG "mpegcpu"
 
-ADDRESS_MAP_START(dsbz80_device::dsbz80_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION(":mpegcpu", 0)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void dsbz80_device::dsbz80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region(":mpegcpu", 0);
+	map(0x8000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(dsbz80_device::dsbz80io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(mpeg_trigger_w)
-	AM_RANGE(0xe2, 0xe4) AM_READWRITE(mpeg_pos_r, mpeg_start_w)
-	AM_RANGE(0xe5, 0xe7) AM_WRITE(mpeg_end_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITE(mpeg_volume_w)
-	AM_RANGE(0xe9, 0xe9) AM_WRITE(mpeg_stereo_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xf1, 0xf1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void dsbz80_device::dsbz80io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xe0, 0xe0).w(this, FUNC(dsbz80_device::mpeg_trigger_w));
+	map(0xe2, 0xe4).rw(this, FUNC(dsbz80_device::mpeg_pos_r), FUNC(dsbz80_device::mpeg_start_w));
+	map(0xe5, 0xe7).w(this, FUNC(dsbz80_device::mpeg_end_w));
+	map(0xe8, 0xe8).w(this, FUNC(dsbz80_device::mpeg_volume_w));
+	map(0xe9, 0xe9).w(this, FUNC(dsbz80_device::mpeg_stereo_w));
+	map(0xf0, 0xf0).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf1, 0xf1).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 
 //**************************************************************************

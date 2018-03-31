@@ -320,31 +320,32 @@ WRITE16_MEMBER(acommand_state::output_lamps_w)
 	// --xx --xx lamps
 }
 
-ADDRESS_MAP_START(acommand_state::acommand_map)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x082000, 0x082005) AM_DEVWRITE("bgtmap", megasys1_tilemap_device, scroll_w)
-	AM_RANGE(0x082100, 0x082105) AM_DEVWRITE("txtmap", megasys1_tilemap_device, scroll_w)
-	AM_RANGE(0x082208, 0x082209) AM_WRITE(ac_unk2_w)
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_DEVWRITE("bgtmap", megasys1_tilemap_device, write) AM_SHARE("bgtmap")
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_DEVWRITE("txtmap", megasys1_tilemap_device, write) AM_SHARE("txtmap")
-	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
+void acommand_state::acommand_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x082000, 0x082005).w(m_bgtmap, FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082100, 0x082105).w(m_txtmap, FUNC(megasys1_tilemap_device::scroll_w));
+	map(0x082208, 0x082209).w(this, FUNC(acommand_state::ac_unk2_w));
+	map(0x0a0000, 0x0a3fff).ram().w(m_bgtmap, FUNC(megasys1_tilemap_device::write)).share("bgtmap");
+	map(0x0b0000, 0x0b3fff).ram().w(m_txtmap, FUNC(megasys1_tilemap_device::write)).share("txtmap");
+	map(0x0b8000, 0x0bffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0f0000, 0x0f7fff).ram();
+	map(0x0f8000, 0x0f8fff).ram().share("spriteram");
+	map(0x0f9000, 0x0fffff).ram();
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITE8(oki_bank_w,0x00ff)
-	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0") AM_WRITE(output_lamps_w)
-	AM_RANGE(0x100014, 0x100017) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x100018, 0x10001b) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
+	map(0x100001, 0x100001).w(this, FUNC(acommand_state::oki_bank_w));
+	map(0x100008, 0x100009).portr("IN0").w(this, FUNC(acommand_state::output_lamps_w));
+	map(0x100014, 0x100017).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x100018, 0x10001b).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x100040, 0x100041) AM_READWRITE(ext_devices_0_r,ext_devices_0_w)
-	AM_RANGE(0x100044, 0x100045) AM_READWRITE(ext_devices_1_r,ext_devices_1_w)
-	AM_RANGE(0x100048, 0x100049) AM_WRITE(ext_devices_2_w)
+	map(0x100040, 0x100041).rw(this, FUNC(acommand_state::ext_devices_0_r), FUNC(acommand_state::ext_devices_0_w));
+	map(0x100044, 0x100045).rw(this, FUNC(acommand_state::ext_devices_1_r), FUNC(acommand_state::ext_devices_1_w));
+	map(0x100048, 0x100049).w(this, FUNC(acommand_state::ext_devices_2_w));
 
-	AM_RANGE(0x100050, 0x100051) AM_WRITE(output_7seg0_w)
-	AM_RANGE(0x100054, 0x100055) AM_WRITE(output_7seg1_w)
-	AM_RANGE(0x10005c, 0x10005d) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+	map(0x100050, 0x100051).w(this, FUNC(acommand_state::output_7seg0_w));
+	map(0x100054, 0x100055).w(this, FUNC(acommand_state::output_7seg1_w));
+	map(0x10005c, 0x10005d).portr("DSW");
+}
 
 static INPUT_PORTS_START( acommand )
 	PORT_START("IN0")

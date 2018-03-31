@@ -34,10 +34,10 @@ class peribox_device : public bus::ti99::internal::ioport_attached_device
 public:
 	peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &static_set_inta_callback(device_t &device, Object &&cb)  { return downcast<peribox_device &>(device).m_slot1_inta.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_intb_callback(device_t &device, Object &&cb)  { return downcast<peribox_device &>(device).m_slot1_intb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_ready_callback(device_t &device, Object &&cb) { return downcast<peribox_device &>(device).m_slot1_ready.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_lcp_callback(device_t &device, Object &&cb)   { return downcast<peribox_device &>(device).m_slot1_lcp.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_inta_callback(Object &&cb)  { return m_slot1_inta.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_intb_callback(Object &&cb)  { return m_slot1_intb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ready_callback(Object &&cb) { return m_slot1_ready.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_lcp_callback(Object &&cb)   { return m_slot1_lcp.set_callback(std::forward<Object>(cb)); }
 
 	// Next eight methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz) override;
@@ -238,16 +238,16 @@ private:
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false)
 
 #define MCFG_PERIBOX_INTA_HANDLER( _inta ) \
-	devcb = &bus::ti99::peb::peribox_device::static_set_inta_callback( *device, DEVCB_##_inta );
+	devcb = &downcast<bus::ti99::peb::peribox_device &>(*device).set_inta_callback(DEVCB_##_inta);
 
 #define MCFG_PERIBOX_INTB_HANDLER( _intb ) \
-	devcb = &bus::ti99::peb::peribox_device::static_set_intb_callback( *device, DEVCB_##_intb );
+	devcb = &downcast<bus::ti99::peb::peribox_device &>(*device).set_intb_callback(DEVCB_##_intb);
 
 #define MCFG_PERIBOX_READY_HANDLER( _ready ) \
-	devcb = &bus::ti99::peb::peribox_device::static_set_ready_callback( *device, DEVCB_##_ready );
+	devcb = &downcast<bus::ti99::peb::peribox_device &>(*device).set_ready_callback(DEVCB_##_ready);
 
 #define MCFG_PERIBOX_LCP_HANDLER( _lcp ) \
-	devcb = &bus::ti99::peb::peribox_device::static_set_lcp_callback( *device, DEVCB_##_lcp );
+	devcb = &downcast<bus::ti99::peb::peribox_device &>(*device).set_lcp_callback(DEVCB_##_lcp);
 
 } } } // end namespace bus::ti99::peb
 

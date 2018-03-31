@@ -38,10 +38,10 @@
 
 #define MCFG_CS4031_ADD(_tag, _clock, _cputag, _isatag, _biostag, _keybctag) \
 	MCFG_DEVICE_ADD(_tag, CS4031, _clock) \
-	cs4031_device::static_set_cputag(*device, _cputag); \
-	cs4031_device::static_set_isatag(*device, _isatag); \
-	cs4031_device::static_set_biostag(*device, _biostag); \
-	cs4031_device::static_set_keybctag(*device, _keybctag);
+	downcast<cs4031_device &>(*device).set_cputag(_cputag); \
+	downcast<cs4031_device &>(*device).set_isatag(_isatag); \
+	downcast<cs4031_device &>(*device).set_biostag(_biostag); \
+	downcast<cs4031_device &>(*device).set_keybctag(_keybctag);
 
 #define MCFG_CS4031_IOR(_ior) \
 	devcb = &downcast<cs4031_device *>(device)->set_ior_callback(DEVCB_##_ior);
@@ -142,10 +142,10 @@ public:
 	IRQ_CALLBACK_MEMBER(int_ack_r) { return m_intc1->acknowledge(); }
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	static void static_set_isatag(device_t &device, const char *tag);
-	static void static_set_biostag(device_t &device, const char *tag);
-	static void static_set_keybctag(device_t &device, const char *tag);
+	void set_cputag(const char *tag) { m_cputag = tag; }
+	void set_isatag(const char *tag) { m_isatag = tag; }
+	void set_biostag(const char *tag) { m_biostag = tag; }
+	void set_keybctag(const char *tag) { m_keybctag = tag; }
 
 protected:
 	// device-level overrides

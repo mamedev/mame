@@ -30,7 +30,7 @@ public:
 	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cdrom_image_device();
 
-	static void static_set_interface(device_t &device, const char *_interface) { downcast<cdrom_image_device &>(device).m_interface = _interface; }
+	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -76,6 +76,6 @@ DECLARE_DEVICE_TYPE(CDROM, cdrom_image_device)
 	MCFG_DEVICE_ADD(_tag, CDROM, 0)
 
 #define MCFG_CDROM_INTERFACE(_interface)                         \
-	cdrom_image_device::static_set_interface(*device, _interface);
+	downcast<cdrom_image_device &>(*device).set_interface(_interface);
 
 #endif // MAME_DEVICES_IMAGEDEV_CHD_CD_H

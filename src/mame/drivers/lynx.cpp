@@ -13,21 +13,21 @@
 #include "audio/lynx.h"
 
 #include "cpu/m6502/m65sc02.h"
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
 #include "lynx.lh"
 
-ADDRESS_MAP_START(lynx_state::lynx_mem)
-	AM_RANGE(0x0000, 0xfbff) AM_RAM AM_SHARE("mem_0000")
-	AM_RANGE(0xfc00, 0xfcff) AM_RAM AM_SHARE("mem_fc00")
-	AM_RANGE(0xfd00, 0xfdff) AM_RAM AM_SHARE("mem_fd00")
-	AM_RANGE(0xfe00, 0xfff7) AM_READ_BANK("bank3") AM_WRITEONLY AM_SHARE("mem_fe00")
-	AM_RANGE(0xfff8, 0xfff8) AM_RAM
-	AM_RANGE(0xfff9, 0xfff9) AM_READWRITE(lynx_memory_config_r, lynx_memory_config_w)
-	AM_RANGE(0xfffa, 0xffff) AM_READ_BANK("bank4") AM_WRITEONLY AM_SHARE("mem_fffa")
-ADDRESS_MAP_END
+void lynx_state::lynx_mem(address_map &map)
+{
+	map(0x0000, 0xfbff).ram().share("mem_0000");
+	map(0xfc00, 0xfcff).ram().share("mem_fc00");
+	map(0xfd00, 0xfdff).ram().share("mem_fd00");
+	map(0xfe00, 0xfff7).bankr("bank3").writeonly().share("mem_fe00");
+	map(0xfff8, 0xfff8).ram();
+	map(0xfff9, 0xfff9).rw(this, FUNC(lynx_state::lynx_memory_config_r), FUNC(lynx_state::lynx_memory_config_w));
+	map(0xfffa, 0xffff).bankr("bank4").writeonly().share("mem_fffa");
+}
 
 static INPUT_PORTS_START( lynx )
 	PORT_START("JOY")
@@ -60,7 +60,7 @@ PALETTE_INIT_MEMBER(lynx_state, lynx)
 
 void lynx_state::video_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 uint32_t lynx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

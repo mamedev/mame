@@ -333,28 +333,32 @@ private:
 	virtual void machine_reset() override;
 };
 
-ADDRESS_MAP_START(fanucs15_state::maincpu_mem)
-	AM_RANGE(0x00000000, 0x0017ffff) AM_ROM AM_REGION("base1b", 0)
-	AM_RANGE(0x000f8000, 0x000fffff) AM_RAM // filled with 0x96 on boot
-	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM // initial stack
-ADDRESS_MAP_END
+void fanucs15_state::maincpu_mem(address_map &map)
+{
+	map(0x00000000, 0x0017ffff).rom().region("base1b", 0);
+	map(0x000f8000, 0x000fffff).ram(); // filled with 0x96 on boot
+	map(0xffff0000, 0xffffffff).ram(); // initial stack
+}
 
-ADDRESS_MAP_START(fanucs15_state::pmccpu_mem)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("base1a", 0)
-	AM_RANGE(0xfde000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void fanucs15_state::pmccpu_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("base1a", 0);
+	map(0xfde000, 0xffffff).ram();
+}
 
-ADDRESS_MAP_START(fanucs15_state::gfxcpu_mem)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("gfxboard", 0)
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
-ADDRESS_MAP_END
+void fanucs15_state::gfxcpu_mem(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom().region("gfxboard", 0);
+	map(0xfe0000, 0xfeffff).ram();
+}
 
-ADDRESS_MAP_START(fanucs15_state::convcpu_mem)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("conversational", 0x40000)
-	AM_RANGE(0x040000, 0x07ffff) AM_ROM AM_REGION("conversational", 0)
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("conversational", 0)
-ADDRESS_MAP_END
+void fanucs15_state::convcpu_mem(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("conversational", 0x40000);
+	map(0x040000, 0x07ffff).rom().region("conversational", 0);
+	map(0x800000, 0x87ffff).ram();
+	map(0xf80000, 0xffffff).rom().region("conversational", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( fanucs15 )

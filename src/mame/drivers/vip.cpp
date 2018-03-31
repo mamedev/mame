@@ -372,20 +372,22 @@ WRITE8_MEMBER( vip_state::io_w )
 //  ADDRESS_MAP( vip_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vip_state::vip_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void vip_state::vip_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(vip_state::read), FUNC(vip_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vip_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(vip_state::vip_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x07) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void vip_state::vip_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x07).rw(this, FUNC(vip_state::io_r), FUNC(vip_state::io_w));
+}
 
 
 

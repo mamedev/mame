@@ -373,58 +373,63 @@ WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
  *
  *************************************/
 
-ADDRESS_MAP_START(djmain_state::maincpu_djmain)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM                         // PRG ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM                         // WORK RAM
-	AM_RANGE(0x480000, 0x48443f) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")       // COLOR RAM
-	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)               // SOUND RAM
-	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE("k056832", k056832_device, long_r, long_w)      // VIDEO REG (tilemap)
-	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)                  // ??
-	AM_RANGE(0x5a0000, 0x5a005f) AM_DEVWRITE("k055555", k055555_device, K055555_long_w)                  // 055555: priority encoder
-	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00ff00)
-	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("k054539_2", k054539_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
-	AM_RANGE(0x5c8000, 0x5c8003) AM_READ8(inp2_r, 0xffffffff)  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
-	AM_RANGE(0x5d0000, 0x5d0003) AM_WRITE(light_ctrl_1_w)                   // light/coin blocker control
-	AM_RANGE(0x5d2000, 0x5d2003) AM_WRITE(light_ctrl_2_w)                   // light/coin blocker control
-	AM_RANGE(0x5d4000, 0x5d4003) AM_WRITE(v_ctrl_w)                     // VIDEO control
-	AM_RANGE(0x5d6000, 0x5d6003) AM_WRITE(sndram_bank_w)                    // SOUND RAM bank
-	AM_RANGE(0x5e0000, 0x5e0003) AM_READWRITE(turntable_r, turntable_select_w)      // input port control (turn tables)
-	AM_RANGE(0x600000, 0x601fff) AM_READ(v_rom_r)                       // VIDEO ROM readthrough (for POST)
-	AM_RANGE(0x801000, 0x8017ff) AM_RAM AM_SHARE("obj_ram")             // OBJECT RAM
-	AM_RANGE(0x802000, 0x802fff) AM_WRITE(unknown802000_w)                  // ??
-	AM_RANGE(0x803000, 0x80309f) AM_READWRITE(obj_ctrl_r, obj_ctrl_w)           // OBJECT REGS
-	AM_RANGE(0x803800, 0x803fff) AM_READ(obj_rom_r)                     // OBJECT ROM readthrough (for POST)
-ADDRESS_MAP_END
+void djmain_state::maincpu_djmain(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                         // PRG ROM
+	map(0x400000, 0x40ffff).ram();                         // WORK RAM
+	map(0x480000, 0x48443f).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");       // COLOR RAM
+	map(0x500000, 0x57ffff).rw(this, FUNC(djmain_state::sndram_r), FUNC(djmain_state::sndram_w));               // SOUND RAM
+	map(0x580000, 0x58003f).rw(m_k056832, FUNC(k056832_device::long_r), FUNC(k056832_device::long_w));      // VIDEO REG (tilemap)
+	map(0x590000, 0x590007).w(this, FUNC(djmain_state::unknown590000_w));                  // ??
+	map(0x5a0000, 0x5a005f).w(m_k055555, FUNC(k055555_device::K055555_long_w));                  // 055555: priority encoder
+	map(0x5b0000, 0x5b04ff).rw("k054539_1", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask32(0xff00ff00);
+	map(0x5b0000, 0x5b04ff).rw("k054539_2", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask32(0x00ff00ff);
+	map(0x5c0000, 0x5c0003).r(this, FUNC(djmain_state::inp1_r));  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
+	map(0x5c8000, 0x5c8003).r(this, FUNC(djmain_state::inp2_r));  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
+	map(0x5d0000, 0x5d0003).w(this, FUNC(djmain_state::light_ctrl_1_w));                   // light/coin blocker control
+	map(0x5d2000, 0x5d2003).w(this, FUNC(djmain_state::light_ctrl_2_w));                   // light/coin blocker control
+	map(0x5d4000, 0x5d4003).w(this, FUNC(djmain_state::v_ctrl_w));                     // VIDEO control
+	map(0x5d6000, 0x5d6003).w(this, FUNC(djmain_state::sndram_bank_w));                    // SOUND RAM bank
+	map(0x5e0000, 0x5e0003).rw(this, FUNC(djmain_state::turntable_r), FUNC(djmain_state::turntable_select_w));      // input port control (turn tables)
+	map(0x600000, 0x601fff).r(this, FUNC(djmain_state::v_rom_r));                       // VIDEO ROM readthrough (for POST)
+	map(0x801000, 0x8017ff).ram().share("obj_ram");             // OBJECT RAM
+	map(0x802000, 0x802fff).w(this, FUNC(djmain_state::unknown802000_w));                  // ??
+	map(0x803000, 0x80309f).rw(this, FUNC(djmain_state::obj_ctrl_r), FUNC(djmain_state::obj_ctrl_w));           // OBJECT REGS
+	map(0x803800, 0x803fff).r(this, FUNC(djmain_state::obj_rom_r));                     // OBJECT ROM readthrough (for POST)
+}
 
-ADDRESS_MAP_START(djmain_state::maincpu_djmainj)
-	AM_IMPORT_FROM(maincpu_djmain)
+void djmain_state::maincpu_djmainj(address_map &map)
+{
+	maincpu_djmain(map);
 
-	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (beatmania)
-	AM_RANGE(0xc02000, 0xc02047) AM_WRITE(unknownc02000_w)                  // ??
-	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (beatmania)
-	AM_RANGE(0xf40000, 0xf4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (beatmania)
-ADDRESS_MAP_END
+	map(0xc00000, 0xc01fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));  // VIDEO RAM (tilemap) (beatmania)
+	map(0xc02000, 0xc02047).w(this, FUNC(djmain_state::unknownc02000_w));                  // ??
+	map(0xf00000, 0xf0000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)); // IDE control regs (beatmania)
+	map(0xf40000, 0xf4000f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)); // IDE status control reg (beatmania)
+}
 
-ADDRESS_MAP_START(djmain_state::maincpu_djmainu)
-	AM_IMPORT_FROM(maincpu_djmain)
+void djmain_state::maincpu_djmainu(address_map &map)
+{
+	maincpu_djmain(map);
 
-	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs (hiphopmania)
-	AM_RANGE(0xd40000, 0xd4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg (hiphopmania)
-	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap) (hiphopmania)
-ADDRESS_MAP_END
+	map(0xd00000, 0xd0000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)); // IDE control regs (hiphopmania)
+	map(0xd40000, 0xd4000f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)); // IDE status control reg (hiphopmania)
+	map(0xe00000, 0xe01fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));  // VIDEO RAM (tilemap) (hiphopmania)
+}
 
-ADDRESS_MAP_START(djmain_state::maincpu_djmaina)
-	AM_IMPORT_FROM(maincpu_djmain)
+void djmain_state::maincpu_djmaina(address_map &map)
+{
+	maincpu_djmain(map);
 
-	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff) // IDE control regs
-	AM_RANGE(0xc40000, 0xc4000f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff) // IDE status control reg
-	AM_RANGE(0xf00000, 0xf01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap)
-ADDRESS_MAP_END
+	map(0xc00000, 0xc0000f).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0)); // IDE control regs
+	map(0xc40000, 0xc4000f).rw(m_ata, FUNC(ata_interface_device::read_cs1), FUNC(ata_interface_device::write_cs1)); // IDE status control reg
+	map(0xf00000, 0xf01fff).rw(m_k056832, FUNC(k056832_device::ram_long_r), FUNC(k056832_device::ram_long_w));  // VIDEO RAM (tilemap)
+}
 
-ADDRESS_MAP_START(djmain_state::k054539_map)
-	AM_RANGE(0x000000, 0xffffff) AM_RAM AM_SHARE("sndram")
-ADDRESS_MAP_END
+void djmain_state::k054539_map(address_map &map)
+{
+	map(0x000000, 0xffffff).ram().share("sndram");
+}
 
 
 /*************************************

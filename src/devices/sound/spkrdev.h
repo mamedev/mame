@@ -14,7 +14,7 @@
 
 
 #define MCFG_SPEAKER_LEVELS(_num, _levels) \
-		speaker_sound_device::static_set_levels(*device, _num, _levels);
+	downcast<speaker_sound_device &>(*device).set_levels(_num, _levels);
 
 class speaker_sound_device : public device_t,
 								public device_sound_interface
@@ -23,8 +23,8 @@ public:
 	speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~speaker_sound_device() {}
 
-	// static configuration
-	static void static_set_levels(device_t &device, int num_levels, const int16_t *levels) { downcast<speaker_sound_device &>(device).m_num_levels = num_levels; downcast<speaker_sound_device &>(device).m_levels = levels;}
+	// configuration
+	void set_levels(int num_levels, const int16_t *levels) { m_num_levels = num_levels; m_levels = levels;}
 
 	void level_w(int new_level);
 

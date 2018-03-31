@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_req_w);
 	DECLARE_WRITE_LINE_MEMBER(smpc_irq_w);
 
-	static void static_set_hostcpu(device_t &device, const char *cputag);
+	void set_hostcpu(const char *cputag) { m_hostcpu_tag = cputag; }
 
 protected:
 	// device-level overrides

@@ -47,8 +47,8 @@ enum
 };
 
 
-DEFINE_DEVICE_TYPE(TMS32051, tms32051_device, "tms32051", "TMS32051")
-DEFINE_DEVICE_TYPE(TMS32053, tms32053_device, "tms32053", "TMS32053")
+DEFINE_DEVICE_TYPE(TMS32051, tms32051_device, "tms32051", "Texas Instruments TMS32051")
+DEFINE_DEVICE_TYPE(TMS32053, tms32053_device, "tms32053", "Texas Instruments TMS32053")
 
 
 /**************************************************************************
@@ -118,9 +118,9 @@ tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag,
 }
 
 
-util::disasm_interface *tms32051_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms32051_device::create_disassembler()
 {
-	return new tms32051_disassembler;
+	return std::make_unique<tms32051_disassembler>();
 }
 
 

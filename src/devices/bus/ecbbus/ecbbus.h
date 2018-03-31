@@ -66,14 +66,14 @@
 #define MCFG_ECBBUS_SLOT_ADD(_num, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ECBBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	ecbbus_slot_device::static_set_ecbbus_slot(*device, ECBBUS_TAG, _num);
+	downcast<ecbbus_slot_device &>(*device).set_ecbbus_slot(ECBBUS_TAG, _num);
 
 
 #define MCFG_ECBBUS_IRQ_CALLBACK(_write) \
-	devcb = &ecbbus_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<ecbbus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_ECBBUS_NMI_CALLBACK(_write) \
-	devcb = &ecbbus_device::set_nmi_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<ecbbus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
 
 
 
@@ -96,7 +96,7 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	static void static_set_ecbbus_slot(device_t &device, const char *tag, int num);
+	void set_ecbbus_slot(const char *tag, int num) { m_bus_tag = tag; m_bus_num = num; }
 
 private:
 	// configuration
@@ -123,8 +123,8 @@ public:
 	// construction/destruction
 	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<ecbbus_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nmi_wr_callback(device_t &device, Object &&cb) { return downcast<ecbbus_device &>(device).m_write_nmi.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
 
 	void add_card(device_ecbbus_card_interface *card, int pos);
 

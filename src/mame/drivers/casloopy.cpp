@@ -167,25 +167,34 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen") { }
 
+	void casloopy(machine_config &config);
+
+	DECLARE_DRIVER_INIT(casloopy);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_shared_ptr<uint32_t> m_bios_rom;
 	required_shared_ptr<uint32_t> m_vregs;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 
 	std::unique_ptr<uint16_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_bitmap_vram;
 	uint16_t sh7021_regs[0x100];
 	int m_gfx_index;
-	DECLARE_DRIVER_INIT(casloopy);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER(vregs_r);
 	DECLARE_WRITE16_MEMBER(vregs_w);
 	DECLARE_READ16_MEMBER(pal_r);
@@ -198,7 +207,7 @@ public:
 	DECLARE_READ8_MEMBER(bitmap_r);
 	DECLARE_WRITE8_MEMBER(bitmap_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(loopy_cart);
-	void casloopy(machine_config &config);
+
 	void casloopy_map(address_map &map);
 	void casloopy_sub_map(address_map &map);
 };
@@ -244,7 +253,7 @@ void casloopy_state::video_start()
 	m_gfxdecode->set_gfx(m_gfx_index+1, std::make_unique<gfx_element>(m_palette, casloopy_8bpp_layout, m_vram.get(), 0, 1, 0));
 }
 
-uint32_t casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t casloopy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(m_gfx_index);
 	int x,y;
@@ -308,11 +317,11 @@ READ16_MEMBER(casloopy_state::vregs_r)
 {
 	if(offset == 4/2)
 	{
-		return (machine().first_screen()->vblank() << 8) | (machine().rand() & 0xff); // vblank + vpos?
+		return (m_screen->vblank() << 8) | (machine().rand() & 0xff); // vblank + vpos?
 	}
 
 	if(offset == 2/2)
-		return machine().rand();/*(machine().first_screen()->hblank() << 8) | (machine().first_screen()->hpos() & 0xff);*/ // hblank + hpos?
+		return machine().rand();/*(m_screen->hblank() << 8) | (m_screen->hpos() & 0xff);*/ // hblank + hpos?
 
 	if(offset == 0/2)
 		return machine().rand(); // pccllect
@@ -415,23 +424,24 @@ READ32_MEMBER(casloopy_state::cart_r)
 }
 
 
-ADDRESS_MAP_START(casloopy_state::casloopy_map)
-	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("bios_rom")
-	AM_RANGE(0x01000000, 0x0107ffff) AM_RAM AM_SHARE("wram")// stack pointer points here
-	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE8(bitmap_r, bitmap_w, 0xffffffff)
-	AM_RANGE(0x04040000, 0x0404ffff) AM_READWRITE8(vram_r, vram_w, 0xffffffff) // tilemap + PCG
-	AM_RANGE(0x04050000, 0x040503ff) AM_RAM // ???
-	AM_RANGE(0x04051000, 0x040511ff) AM_READWRITE16(pal_r, pal_w, 0xffffffff)
-	AM_RANGE(0x04058000, 0x04058007) AM_READWRITE16(vregs_r, vregs_w, 0xffffffff)
-	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM AM_SHARE("vregs") // RGB555 brightness control plus scrolling
+void casloopy_state::casloopy_map(address_map &map)
+{
+	map(0x00000000, 0x00007fff).ram().share("bios_rom");
+	map(0x01000000, 0x0107ffff).ram().share("wram");// stack pointer points here
+	map(0x04000000, 0x0401ffff).rw(this, FUNC(casloopy_state::bitmap_r), FUNC(casloopy_state::bitmap_w));
+	map(0x04040000, 0x0404ffff).rw(this, FUNC(casloopy_state::vram_r), FUNC(casloopy_state::vram_w)); // tilemap + PCG
+	map(0x04050000, 0x040503ff).ram(); // ???
+	map(0x04051000, 0x040511ff).rw(this, FUNC(casloopy_state::pal_r), FUNC(casloopy_state::pal_w));
+	map(0x04058000, 0x04058007).rw(this, FUNC(casloopy_state::vregs_r), FUNC(casloopy_state::vregs_w));
+	map(0x0405b000, 0x0405b00f).ram().share("vregs"); // RGB555 brightness control plus scrolling
 //  AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
 //  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
-	AM_RANGE(0x06000000, 0x062fffff) AM_READ(cart_r)
-	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
-	AM_RANGE(0x09000000, 0x0907ffff) AM_RAM AM_SHARE("wram")
-	AM_RANGE(0x0e000000, 0x0e2fffff) AM_READ(cart_r)
-	AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")
-ADDRESS_MAP_END
+	map(0x06000000, 0x062fffff).r(this, FUNC(casloopy_state::cart_r));
+	map(0x07000000, 0x070003ff).ram().share("oram");// on-chip RAM, actually at 0xf000000 (1 kb)
+	map(0x09000000, 0x0907ffff).ram().share("wram");
+	map(0x0e000000, 0x0e2fffff).r(this, FUNC(casloopy_state::cart_r));
+	map(0x0f000000, 0x0f0003ff).ram().share("oram");
+}
 
 #if 0
 ADDRESS_MAP_START(casloopy_state::casloopy_sub_map)
@@ -522,7 +532,7 @@ MACHINE_CONFIG_START(casloopy_state::casloopy)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 //  MCFG_SCREEN_SIZE(444, 263)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
+	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)

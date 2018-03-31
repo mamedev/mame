@@ -184,53 +184,58 @@ uint32_t segam1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-ADDRESS_MAP_START(segam1_state::segam1_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x340000, 0x340fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0x00ff)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE("tile", segas24_tile_device, tile_r, tile_w)
-	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP        /* Horizontal split position (ABSEL) */
-	AM_RANGE(0xb40000, 0xb40001) AM_WRITENOP        /* Scanline trigger position (XHOUT) */
-	AM_RANGE(0xb60000, 0xb60001) AM_WRITENOP        /* Frame trigger position (XVOUT) */
-	AM_RANGE(0xb70000, 0xb70001) AM_WRITENOP        /* Synchronization mode */
-	AM_RANGE(0xb80000, 0xbfffff) AM_DEVREADWRITE("tile", segas24_tile_device, char_r, char_w)
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc04000, 0xc0401f) AM_DEVREADWRITE("mixer", segas24_mixer_device, read, write)
-	AM_RANGE(0xe00000, 0xe0001f) AM_DEVREADWRITE8("io1", sega_315_5296_device, read, write, 0x00ff)
-	AM_RANGE(0xe40000, 0xe40001) AM_READ_PORT("INX")
-	AM_RANGE(0xe40002, 0xe40003) AM_READ_PORT("INY")
-	AM_RANGE(0xe40004, 0xe40005) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0xe40006, 0xe40007) AM_WRITENOP
-	AM_RANGE(0xe40008, 0xe40009) AM_READ_PORT("INZ")
-	AM_RANGE(0xe80000, 0xe8001f) AM_DEVREADWRITE8("io2", sega_315_5296_device, read, write, 0x00ff)
-	AM_RANGE(0xf00000, 0xf03fff) AM_MIRROR(0x0fc000) AM_RAM // NVRAM?
-ADDRESS_MAP_END
+void segam1_state::segam1_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x340000, 0x340fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask16(0x00ff);
+	map(0xb00000, 0xb0ffff).rw(m_tile, FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
+	map(0xb20000, 0xb20001).nopw();        /* Horizontal split position (ABSEL) */
+	map(0xb40000, 0xb40001).nopw();        /* Scanline trigger position (XHOUT) */
+	map(0xb60000, 0xb60001).nopw();        /* Frame trigger position (XVOUT) */
+	map(0xb70000, 0xb70001).nopw();        /* Synchronization mode */
+	map(0xb80000, 0xbfffff).rw(m_tile, FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
+	map(0xc00000, 0xc03fff).ram().w(this, FUNC(segam1_state::paletteram_w)).share("paletteram");
+	map(0xc04000, 0xc0401f).rw(m_mixer, FUNC(segas24_mixer_device::read), FUNC(segas24_mixer_device::write));
+	map(0xe00000, 0xe0001f).rw("io1", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
+	map(0xe40000, 0xe40001).portr("INX");
+	map(0xe40002, 0xe40003).portr("INY");
+	map(0xe40005, 0xe40005).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0xe40006, 0xe40007).nopw();
+	map(0xe40008, 0xe40009).portr("INZ");
+	map(0xe80000, 0xe8001f).rw("io2", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
+	map(0xf00000, 0xf03fff).mirror(0x0fc000).ram(); // NVRAM?
+}
 
-ADDRESS_MAP_START(segam1_state::segam1_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segam1_state::segam1_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xbfff).bankr("soundbank");
+	map(0xf000, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segam1_state::unkm1_sound_map)
-	AM_IMPORT_FROM(segam1_sound_map)
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+void segam1_state::unkm1_sound_map(address_map &map)
+{
+	segam1_sound_map(map);
+	map(0xe000, 0xefff).ram();
+}
 
-ADDRESS_MAP_START(segam1_state::segam1_sound_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(sound_a0_bank_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP
-ADDRESS_MAP_END
+void segam1_state::segam1_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x83).rw(m_ymsnd, FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xa0, 0xa0).w(this, FUNC(segam1_state::sound_a0_bank_w));
+	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read)).nopw();
+}
 
-ADDRESS_MAP_START(segam1_state::segam1_comms_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITENOP // ???
-ADDRESS_MAP_END
+void segam1_state::segam1_comms_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa7ff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0xc000, 0xc000).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc001, 0xc001).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xe003, 0xe003).nopw(); // ???
+}
 
 
 static INPUT_PORTS_START( segam1 )

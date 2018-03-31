@@ -213,37 +213,40 @@ WRITE8_MEMBER(appoooh_state::adpcm_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(appoooh_state::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM /* RAM ? */
+void appoooh_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).rom();
+	map(0xa000, 0xdfff).bankr("bank1");
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram(); /* RAM ? */
 
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-	AM_RANGE(0xf000, 0xf01f) AM_SHARE("spriteram")
-	AM_RANGE(0xf020, 0xf3ff) AM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf420, 0xf7ff) AM_WRITE(fg_colorram_w) AM_SHARE("fg_colorram")
-	AM_RANGE(0xf800, 0xf81f) AM_SHARE("spriteram_2")
-	AM_RANGE(0xf820, 0xfbff) AM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xfc20, 0xffff) AM_WRITE(bg_colorram_w) AM_SHARE("bg_colorram")
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram();
+	map(0xf000, 0xf01f).share("spriteram");
+	map(0xf020, 0xf3ff).w(this, FUNC(appoooh_state::fg_videoram_w)).share("fg_videoram");
+	map(0xf420, 0xf7ff).w(this, FUNC(appoooh_state::fg_colorram_w)).share("fg_colorram");
+	map(0xf800, 0xf81f).share("spriteram_2");
+	map(0xf820, 0xfbff).w(this, FUNC(appoooh_state::bg_videoram_w)).share("bg_videoram");
+	map(0xfc20, 0xffff).w(this, FUNC(appoooh_state::bg_colorram_w)).share("bg_colorram");
+}
 
-ADDRESS_MAP_START(appoooh_state::decrypted_opcodes_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("maincpu", 0x8000)
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void appoooh_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x8000, 0x9fff).rom().region("maincpu", 0x8000);
+	map(0xa000, 0xdfff).bankr("bank1");
+}
 
-ADDRESS_MAP_START(appoooh_state::main_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76489_device, write)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76489_device, write)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76489_device, write)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(adpcm_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("BUTTON3") AM_WRITE(out_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(scroll_w) /* unknown */
-ADDRESS_MAP_END
+void appoooh_state::main_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1").w("sn1", FUNC(sn76489_device::write));
+	map(0x01, 0x01).portr("P2").w("sn2", FUNC(sn76489_device::write));
+	map(0x02, 0x02).w("sn3", FUNC(sn76489_device::write));
+	map(0x03, 0x03).portr("DSW1").w(this, FUNC(appoooh_state::adpcm_w));
+	map(0x04, 0x04).portr("BUTTON3").w(this, FUNC(appoooh_state::out_w));
+	map(0x05, 0x05).w(this, FUNC(appoooh_state::scroll_w)); /* unknown */
+}
 
 
 /*************************************

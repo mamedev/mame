@@ -19,6 +19,7 @@ naomi.h -> NAOMI includes
 #include "machine/naomim2.h"
 #include "machine/naomim4.h"
 #include "machine/awboard.h"
+#include "machine/nvram.h"
 #include "cpu/sh/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
@@ -59,8 +60,7 @@ class naomi_state : public dc_state
 	DECLARE_DRIVER_INIT(hotd2);
 	DECLARE_DRIVER_INIT(naomi_mp);
 
-	DECLARE_READ64_MEMBER( naomi_unknown1_r );
-	DECLARE_WRITE64_MEMBER( naomi_unknown1_w );
+	DECLARE_READ16_MEMBER( naomi_g2bus_r );
 	DECLARE_READ64_MEMBER( eeprom_93c46a_r );
 	DECLARE_WRITE64_MEMBER( eeprom_93c46a_w );
 
@@ -87,6 +87,8 @@ class naomi_state : public dc_state
 	void naomim4(machine_config &config);
 	void naomi_map(address_map &map);
 	void naomi_port(address_map &map);
+protected:
+	void set_drc_options();
 };
 
 class naomi2_state : public naomi_state
@@ -127,8 +129,6 @@ public:
 	DECLARE_WRITE64_MEMBER( aw_flash_w );
 	DECLARE_READ64_MEMBER( aw_modem_r );
 	DECLARE_WRITE64_MEMBER( aw_modem_w );
-	DECLARE_READ64_MEMBER( aw_unknown1_r );
-	DECLARE_WRITE64_MEMBER( aw_unknown1_w );
 
 	DECLARE_DRIVER_INIT(atomiswave);
 	DECLARE_DRIVER_INIT(xtrmhnt2);

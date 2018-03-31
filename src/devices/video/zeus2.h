@@ -102,10 +102,10 @@ typedef zeus2_renderer::extent_t z2_poly_extent;
 *  Zeus2 Video Device
 *************************************/
 #define MCFG_ZEUS2_VBLANK_CB(_devcb) \
-	devcb = &zeus2_device::set_vblank_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<zeus2_device &>(*device).set_vblank_callback(DEVCB_##_devcb);
 
 #define MCFG_ZEUS2_IRQ_CB(_devcb) \
-	devcb = &zeus2_device::set_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<zeus2_device &>(*device).set_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_ZEUS2_FLOAT_MODE(_mode) \
 	downcast<zeus2_device *>(device)->set_float_mode(_mode);
@@ -121,8 +121,8 @@ public:
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(display_irq);
 
-	template <class Object> static devcb_base &set_vblank_callback(device_t &device, Object &&cb) { return downcast<zeus2_device &>(device).m_vblank.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<zeus2_device &>(device).m_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq.set_callback(std::forward<Object>(cb)); }
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_irq;
 

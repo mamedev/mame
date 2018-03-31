@@ -53,17 +53,19 @@ private:
 };
 
 
-ADDRESS_MAP_START(mccpm_state::mccpm_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void mccpm_state::mccpm_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram().share("ram");
+}
 
-ADDRESS_MAP_START(mccpm_state::mccpm_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("pio", z80pio_device, read_alt, write_alt)  // init bytes look like those for a Z80PIO
-ADDRESS_MAP_END
+void mccpm_state::mccpm_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf0, 0xf3).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0xf4, 0xf7).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));  // init bytes look like those for a Z80PIO
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mccpm )

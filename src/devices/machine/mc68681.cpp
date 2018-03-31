@@ -137,17 +137,16 @@ mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, const 
 }
 
 //-------------------------------------------------
-//  static_set_clocks - configuration helper to set
+//  set_clocks - configuration helper to set
 //  the external clocks
 //-------------------------------------------------
 
-void duart_base_device::static_set_clocks(device_t &device, int clk3, int clk4, int clk5, int clk6)
+void duart_base_device::set_clocks(int clk3, int clk4, int clk5, int clk6)
 {
-	duart_base_device &duart = downcast<duart_base_device &>(device);
-	duart.ip3clk = clk3;
-	duart.ip4clk = clk4;
-	duart.ip5clk = clk5;
-	duart.ip6clk = clk6;
+	ip3clk = clk3;
+	ip4clk = clk4;
+	ip5clk = clk5;
+	ip6clk = clk6;
 }
 
 /*-------------------------------------------------

@@ -50,13 +50,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(cg_exp_slot_carts, nullptr, false)
 
 #define MCFG_CG_EXP_SLOT_INT_HANDLER(_devcb) \
-	devcb = &cg_exp_slot_device::set_int_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<cg_exp_slot_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_CG_EXP_SLOT_NMI_HANDLER(_devcb) \
-	devcb = &cg_exp_slot_device::set_nmi_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<cg_exp_slot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 #define MCFG_CG_EXP_SLOT_RESET_HANDLER(_devcb) \
-	devcb = &cg_exp_slot_device::set_reset_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<cg_exp_slot_device &>(*device).set_reset_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -76,14 +76,9 @@ public:
 	void set_io_space(address_space *io);
 
 	// callbacks
-	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb)
-	{ return downcast<cg_exp_slot_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<cg_exp_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_reset_handler(device_t &device, Object &&cb)
-	{ return downcast<cg_exp_slot_device &>(device).m_reset_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_reset_handler(Object &&cb) { return m_reset_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from cart device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }

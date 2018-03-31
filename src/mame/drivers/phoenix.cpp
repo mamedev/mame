@@ -56,38 +56,41 @@ Pleiads:
 #include "speaker.h"
 
 
-ADDRESS_MAP_START(phoenix_state::phoenix_memory_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("cust", phoenix_sound_device, control_a_w)
-	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE("cust", phoenix_sound_device, control_b_w)
-	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")                            /* IN0 or IN1 */
-	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
-ADDRESS_MAP_END
+void phoenix_state::phoenix_memory_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).bankr("bank1").w(this, FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(this, FUNC(phoenix_state::phoenix_videoreg_w));
+	map(0x5800, 0x5bff).w(this, FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x6000, 0x63ff).w("cust", FUNC(phoenix_sound_device::control_a_w));
+	map(0x6800, 0x6bff).w("cust", FUNC(phoenix_sound_device::control_b_w));
+	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 */
+	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
+}
 
-ADDRESS_MAP_START(phoenix_state::pleiads_memory_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(pleiads_videoreg_w)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("pleiads_custom", pleiads_sound_device, control_a_w)
-	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE("pleiads_custom", pleiads_sound_device, control_b_w)
-	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")                            /* IN0 or IN1 + protection */
-	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
-ADDRESS_MAP_END
+void phoenix_state::pleiads_memory_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).bankr("bank1").w(this, FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(this, FUNC(phoenix_state::pleiads_videoreg_w));
+	map(0x5800, 0x5bff).w(this, FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x6000, 0x63ff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_a_w));
+	map(0x6800, 0x6bff).w(m_pleiads_custom, FUNC(pleiads_sound_device::control_b_w));
+	map(0x7000, 0x73ff).portr("IN0");                            /* IN0 or IN1 + protection */
+	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
+}
 
-ADDRESS_MAP_START(phoenix_state::survival_memory_map)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x6900, 0x69ff) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0x7000, 0x73ff) AM_READ(survival_input_port_0_r)               /* IN0 or IN1 */
-	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
-ADDRESS_MAP_END
+void phoenix_state::survival_memory_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).bankr("bank1").w(this, FUNC(phoenix_state::phoenix_videoram_w)); /* 2 pages selected by bit 0 of the video register */
+	map(0x5000, 0x53ff).w(this, FUNC(phoenix_state::phoenix_videoreg_w));
+	map(0x5800, 0x5bff).w(this, FUNC(phoenix_state::phoenix_scroll_w));
+	map(0x6800, 0x68ff).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x6900, 0x69ff).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x7000, 0x73ff).r(this, FUNC(phoenix_state::survival_input_port_0_r));               /* IN0 or IN1 */
+	map(0x7800, 0x7bff).portr("DSW0");                           /* DSW */
+}
 
 
 
@@ -867,26 +870,26 @@ ROM_END
 
 ROM_START( phoenixha ) // verified 2 PROMs, numer of boards unknown (probably 2)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "IC45",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
-	ROM_LOAD( "IC46",  0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
-	ROM_LOAD( "IC47",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
-	ROM_LOAD( "IC48",  0x1800, 0x0800, CRC(b2672265) SHA1(dfc635f2089b521c61b3b493e7c3aefcef65c8d0) )
-	ROM_LOAD( "IC49",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
-	ROM_LOAD( "IC50",  0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
-	ROM_LOAD( "IC51",  0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
-	ROM_LOAD( "IC52",  0x3800, 0x0800, CRC(f3f10ac5) SHA1(aebf35ea59197fff511096dbba7320a4e79216a7) )
+	ROM_LOAD( "ic45",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) ) // sldh
+	ROM_LOAD( "ic46",  0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) ) // sldh
+	ROM_LOAD( "ic47",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) ) // sldh
+	ROM_LOAD( "ic48",  0x1800, 0x0800, CRC(b2672265) SHA1(dfc635f2089b521c61b3b493e7c3aefcef65c8d0) ) // sldh
+	ROM_LOAD( "ic49",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "ic50",  0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "ic51",  0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "ic52",  0x3800, 0x0800, CRC(f3f10ac5) SHA1(aebf35ea59197fff511096dbba7320a4e79216a7) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "IC23",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "IC24",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "ic23",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "ic24",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "IC39",  0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
-	ROM_LOAD( "IC40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+	ROM_LOAD( "ic39",  0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "ic40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "IC40_B",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "IC41_A",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "ic40_b",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "ic41_a",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
 ROM_START( phoenixi ) // verified single PCB, single PROM
@@ -932,8 +935,8 @@ ROM_START( condor )
 	ROM_LOAD( "cond12c.bin",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 // PCB is marked: "NOVARMATIC" and "13200"
@@ -981,8 +984,8 @@ ROM_START( falcon )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
 ROM_END
 
 ROM_START( vautour )

@@ -35,13 +35,6 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type ty
 {
 }
 
-void isa8_slot_device::static_set_isa8_slot(device_t &device, device_t *owner, const char *isa_tag)
-{
-	isa8_slot_device &isa_card = dynamic_cast<isa8_slot_device &>(device);
-	isa_card.m_owner = owner;
-	isa_card.m_isa_tag = isa_tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -53,7 +46,7 @@ void isa8_slot_device::device_start()
 	if (get_card_device() && get_card_device()->interface(intf))
 		fatalerror("ISA16 device in ISA8 slot\n");
 
-	if (dev) device_isa8_card_interface::static_set_isabus(*dev,m_owner->subdevice(m_isa_tag));
+	if (dev) dev->set_isabus(m_owner->subdevice(m_isa_tag));
 }
 
 
@@ -76,13 +69,6 @@ isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *
 {
 }
 
-void isa16_slot_device::static_set_isa16_slot(device_t &device, device_t *owner, const char *isa_tag)
-{
-	isa16_slot_device &isa_card = dynamic_cast<isa16_slot_device &>(device);
-	isa_card.m_owner = owner;
-	isa_card.m_isa_tag = isa_tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -90,7 +76,7 @@ void isa16_slot_device::static_set_isa16_slot(device_t &device, device_t *owner,
 void isa16_slot_device::device_start()
 {
 	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
-	if (dev) device_isa8_card_interface::static_set_isabus(*dev,m_owner->subdevice(m_isa_tag));
+	if (dev) dev->set_isabus(m_owner->subdevice(m_isa_tag));
 }
 
 
@@ -99,19 +85,6 @@ void isa16_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ISA8, isa8_device, "isa8", "8-bit ISA bus")
-
-void isa8_device::static_set_cputag(device_t &device, const char *tag)
-{
-	isa8_device &isa = downcast<isa8_device &>(device);
-	isa.m_maincpu.set_tag(tag);
-}
-
-void isa8_device::static_set_custom_spaces(device_t &device)
-{
-	isa8_device &isa = downcast<isa8_device &>(device);
-
-	isa.m_allocspaces = true;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -425,12 +398,6 @@ void device_isa8_card_interface::dack_w(int line,uint8_t data)
 }
 void device_isa8_card_interface::eop_w(int state)
 {
-}
-
-void device_isa8_card_interface::static_set_isabus(device_t &device, device_t *isa_device)
-{
-	device_isa8_card_interface &isa_card = dynamic_cast<device_isa8_card_interface &>(device);
-	isa_card.m_isa_dev = isa_device;
 }
 
 void device_isa8_card_interface::set_isa_device()

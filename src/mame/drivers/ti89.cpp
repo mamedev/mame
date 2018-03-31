@@ -196,51 +196,56 @@ TIMER_DEVICE_CALLBACK_MEMBER(ti68k_state::ti68k_timer_callback)
 }
 
 
-ADDRESS_MAP_START(ti68k_state::ti92_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x200000, 0x5fffff) AM_UNMAP   // ROM
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
-ADDRESS_MAP_END
+void ti68k_state::ti92_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x0fffff).ram().share("nvram");
+	map(0x200000, 0x5fffff).unmaprw();   // ROM
+	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+}
 
 
-ADDRESS_MAP_START(ti68k_state::ti89_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x200000, 0x3fffff) AM_READWRITE(flash_r, flash_w)
-	AM_RANGE(0x400000, 0x5fffff) AM_NOP
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
-	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(ti68k_io2_r, ti68k_io2_w)
-ADDRESS_MAP_END
+void ti68k_state::ti89_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x0fffff).ram().share("nvram");
+	map(0x200000, 0x3fffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x400000, 0x5fffff).noprw();
+	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x7fffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+}
 
 
-ADDRESS_MAP_START(ti68k_state::ti92p_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x200000, 0x3fffff) AM_NOP
-	AM_RANGE(0x400000, 0x5fffff) AM_READWRITE(flash_r, flash_w)
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
-	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(ti68k_io2_r, ti68k_io2_w)
-ADDRESS_MAP_END
+void ti68k_state::ti92p_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x0fffff).ram().share("nvram");
+	map(0x200000, 0x3fffff).noprw();
+	map(0x400000, 0x5fffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x7fffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+}
 
 
-ADDRESS_MAP_START(ti68k_state::v200_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x200000, 0x5fffff) AM_READWRITE(flash_r, flash_w)
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
-	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(ti68k_io2_r, ti68k_io2_w)
-ADDRESS_MAP_END
+void ti68k_state::v200_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x0fffff).ram().share("nvram");
+	map(0x200000, 0x5fffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x70ffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+}
 
 
-ADDRESS_MAP_START(ti68k_state::ti89t_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_MIRROR(0x200000) AM_SHARE("nvram")
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
-	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(ti68k_io2_r, ti68k_io2_w)
-	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE(flash_r, flash_w)
-	AM_RANGE(0xc00000, 0xffffff) AM_NOP
-ADDRESS_MAP_END
+void ti68k_state::ti89t_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x0fffff).ram().mirror(0x200000).share("nvram");
+	map(0x600000, 0x6fffff).rw(this, FUNC(ti68k_state::ti68k_io_r), FUNC(ti68k_state::ti68k_io_w));
+	map(0x700000, 0x70ffff).rw(this, FUNC(ti68k_state::ti68k_io2_r), FUNC(ti68k_state::ti68k_io2_w));
+	map(0x800000, 0xbfffff).rw(this, FUNC(ti68k_state::flash_r), FUNC(ti68k_state::flash_w));
+	map(0xc00000, 0xffffff).noprw();
+}
 
 
 INPUT_CHANGED_MEMBER(ti68k_state::ti68k_on_key)

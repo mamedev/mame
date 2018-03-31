@@ -207,24 +207,26 @@ WRITE16_MEMBER(foodf_state::analog_w)
  *************************************/
 
 // complete memory map derived from schematics
-ADDRESS_MAP_START(foodf_state::main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x00ffff) AM_MIRROR(0x3e0000) AM_ROM
-	AM_RANGE(0x014000, 0x014fff) AM_MIRROR(0x3e3000) AM_RAM
-	AM_RANGE(0x018000, 0x018fff) AM_MIRROR(0x3e3000) AM_RAM
-	AM_RANGE(0x01c000, 0x01c0ff) AM_MIRROR(0x3e3f00) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
-	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_DEVREADWRITE8("nvram", x2212_device, read, write, 0x00ff)
-	AM_RANGE(0x940000, 0x940007) AM_MIRROR(0x023ff8) AM_READ(analog_r)
-	AM_RANGE(0x944000, 0x944007) AM_MIRROR(0x023ff8) AM_WRITE(analog_w)
-	AM_RANGE(0x948000, 0x948001) AM_MIRROR(0x023ffe) AM_READ_PORT("SYSTEM") AM_WRITE8(digital_w, 0x00ff)
-	AM_RANGE(0x950000, 0x9501ff) AM_MIRROR(0x023e00) AM_WRITE(foodf_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x954000, 0x954001) AM_MIRROR(0x023ffe) AM_WRITE(nvram_recall_w)
-	AM_RANGE(0x958000, 0x958001) AM_MIRROR(0x023ffe) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
-	AM_RANGE(0xa40000, 0xa4001f) AM_MIRROR(0x03ffe0) AM_DEVREADWRITE8("pokey2", pokey_device, read, write, 0x00ff)
-	AM_RANGE(0xa80000, 0xa8001f) AM_MIRROR(0x03ffe0) AM_DEVREADWRITE8("pokey1", pokey_device, read, write, 0x00ff)
-	AM_RANGE(0xac0000, 0xac001f) AM_MIRROR(0x03ffe0) AM_DEVREADWRITE8("pokey3", pokey_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void foodf_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x00ffff).mirror(0x3e0000).rom();
+	map(0x014000, 0x014fff).mirror(0x3e3000).ram();
+	map(0x018000, 0x018fff).mirror(0x3e3000).ram();
+	map(0x01c000, 0x01c0ff).mirror(0x3e3f00).ram().share("spriteram");
+	map(0x800000, 0x8007ff).mirror(0x03f800).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+	map(0x900000, 0x9001ff).mirror(0x03fe00).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
+	map(0x940000, 0x940007).mirror(0x023ff8).r(this, FUNC(foodf_state::analog_r));
+	map(0x944000, 0x944007).mirror(0x023ff8).w(this, FUNC(foodf_state::analog_w));
+	map(0x948000, 0x948001).mirror(0x023ffe).portr("SYSTEM");
+	map(0x948001, 0x948001).mirror(0x023ffe).w(this, FUNC(foodf_state::digital_w));
+	map(0x950000, 0x9501ff).mirror(0x023e00).w(this, FUNC(foodf_state::foodf_paletteram_w)).share("paletteram");
+	map(0x954000, 0x954001).mirror(0x023ffe).w(this, FUNC(foodf_state::nvram_recall_w));
+	map(0x958000, 0x958001).mirror(0x023ffe).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
+	map(0xa40000, 0xa4001f).mirror(0x03ffe0).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
+	map(0xa80000, 0xa8001f).mirror(0x03ffe0).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
+	map(0xac0000, 0xac001f).mirror(0x03ffe0).rw("pokey3", FUNC(pokey_device::read), FUNC(pokey_device::write)).umask16(0x00ff);
+}
 
 
 

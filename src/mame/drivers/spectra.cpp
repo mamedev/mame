@@ -77,14 +77,15 @@ private:
 };
 
 
-ADDRESS_MAP_START(spectra_state::spectra_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("nvram") // battery backed, 2x 5101L
-	AM_RANGE(0x0100, 0x017f) AM_RAM // RIOT RAM
-	AM_RANGE(0x0180, 0x019f) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0x0400, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void spectra_state::spectra_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xfff);
+	map(0x0000, 0x00ff).ram().share("nvram"); // battery backed, 2x 5101L
+	map(0x0100, 0x017f).ram(); // RIOT RAM
+	map(0x0180, 0x019f).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
+	map(0x0400, 0x0fff).rom();
+}
 
 static INPUT_PORTS_START( spectra )
 	PORT_START("SWITCH.0")

@@ -61,12 +61,14 @@ Texas Inst. 749X 75146
 Signetics? 74LS373N
 8-bit D-type latch. This has eight inputs and eight outputs.
 */
-ADDRESS_MAP_START(vt320_state::vt320_mem)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void vt320_state::vt320_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-ADDRESS_MAP_START(vt320_state::vt320_io)
-ADDRESS_MAP_END
+void vt320_state::vt320_io(address_map &map)
+{
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vt320 )
@@ -126,7 +128,7 @@ ROM_START( vt330 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "vt330" )
 	ROM_SYSTEM_BIOS( 0, "vt330", "VT330" )
-	ROMX_LOAD( "23-236E6", 0x0000, 0x8000, CRC(38379339) SHA1(394e8511581abc796c8c612149eff280146b0ac8), ROM_BIOS(1) ) // 27256 EPROM
+	ROMX_LOAD( "23-236e6", 0x0000, 0x8000, CRC(38379339) SHA1(394e8511581abc796c8c612149eff280146b0ac8), ROM_BIOS(1) ) // 27256 EPROM
 ROM_END
 
 /* Driver */

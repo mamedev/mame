@@ -68,16 +68,17 @@ private:
 };
 
 
-ADDRESS_MAP_START(cfx9850_state::cfx9850)
-	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
-	AM_RANGE( 0x080000, 0x0807ff ) AM_RAM AM_SHARE("video_ram")
+void cfx9850_state::cfx9850(address_map &map)
+{
+	map(0x000000, 0x007fff).rom();
+	map(0x080000, 0x0807ff).ram().share("video_ram");
 //  AM_RANGE( 0x100000, 0x10ffff ) // some memory mapped i/o???
 //  AM_RANGE( 0x110000, 0x11ffff ) // some memory mapped i/o???
-	AM_RANGE( 0x200000, 0x27ffff ) AM_ROM AM_REGION( "bios", 0 )
-	AM_RANGE( 0x400000, 0x40ffff ) AM_RAM
-	AM_RANGE( 0x600000, 0x6007ff ) AM_MIRROR(0xf800) AM_RAM AM_SHARE("display_ram")
+	map(0x200000, 0x27ffff).rom().region("bios", 0);
+	map(0x400000, 0x40ffff).ram();
+	map(0x600000, 0x6007ff).mirror(0xf800).ram().share("display_ram");
 //  AM_RANGE( 0xe10000, 0xe1ffff ) // some memory mapped i/o???
-ADDRESS_MAP_END
+}
 
 
 WRITE8_MEMBER(cfx9850_state::kol_w)

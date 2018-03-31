@@ -35,46 +35,111 @@
 ***************************************************************************/
 
 #define MCFG_PIT8253_CLK0(_clk) \
-	pit8253_device::set_clk0(*device, _clk);
+	downcast<pit8253_device &>(*device).set_clk<0>(_clk);
 
 #define MCFG_PIT8253_CLK1(_clk) \
-	pit8253_device::set_clk1(*device, _clk);
+	downcast<pit8253_device &>(*device).set_clk<1>(_clk);
 
 #define MCFG_PIT8253_CLK2(_clk) \
-	pit8253_device::set_clk2(*device, _clk);
+	downcast<pit8253_device &>(*device).set_clk<2>(_clk);
 
 #define MCFG_PIT8253_OUT0_HANDLER(_devcb) \
-	devcb = &pit8253_device::set_out0_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<pit8253_device &>(*device).set_out_handler<0>(DEVCB_##_devcb);
 
 #define MCFG_PIT8253_OUT1_HANDLER(_devcb) \
-	devcb = &pit8253_device::set_out1_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<pit8253_device &>(*device).set_out_handler<1>(DEVCB_##_devcb);
 
 #define MCFG_PIT8253_OUT2_HANDLER(_devcb) \
-	devcb = &pit8253_device::set_out2_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<pit8253_device &>(*device).set_out_handler<2>(DEVCB_##_devcb);
 
+
+enum class pit_type
+{
+	I8254,
+	I8253,
+	FE2010
+};
+
+class pit_counter_device : public device_t
+{
+	friend class pit8253_device;
+	friend class pit8254_device;
+
+public:
+	// construction/destruction
+	pit_counter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	inline uint32_t adjusted_count() const;
+	void decrease_counter_value(int64_t cycles);
+	void load_counter_value();
+	void set_output(int output);
+	void simulate2(int64_t elapsed_cycles);
+	void simulate(int64_t elapsed_cycles);
+	void update();
+	uint16_t masked_value() const;
+	uint8_t read();
+	void load_count(uint16_t newcount);
+	void readback(int command);
+	void control_w(uint8_t data);
+	void count_w(uint8_t data);
+	void gate_w(int state);
+	void set_clock_signal(int state);
+	void set_clockin(double new_clockin);
+
+	// internal state
+	int m_index;                // index number of the timer
+	double m_clockin;           // input clock frequency in Hz
+	int m_clock_signal;         // clock signal when clockin is 0
+
+	attotime m_last_updated;    // time when last updated
+
+	emu_timer *m_updatetimer;   // MAME timer to process updates
+
+	uint16_t m_value;           // current counter value ("CE" in Intel docs)
+	uint16_t m_latch;           // latched counter value ("OL" in Intel docs)
+	uint16_t m_count;           // new counter value ("CR" in Intel docs)
+	uint8_t m_control;          // 6-bit control byte
+	uint8_t m_status;           // status byte - 8254 only
+	uint8_t m_lowcount;         // LSB of new counter value for 16-bit writes
+	bool m_rmsb;                // true = Next read is MSB of 16-bit value
+	bool m_wmsb;                // true = Next write is MSB of 16-bit value
+	int m_output;               // 0 = low, 1 = high
+
+	int m_gate;                 // gate input (0 = low, 1 = high)
+	int m_latched_count;        // number of bytes of count latched
+	int m_latched_status;       // 1 = status latched (8254 only)
+	int m_null_count;           // 1 = mode control or count written, 0 = count loaded
+	int m_phase;                // see phase definition tables in simulate2(), below
+};
+
+DECLARE_DEVICE_TYPE(PIT_COUNTER, pit_counter_device)
 
 class pit8253_device : public device_t
 {
+	friend class pit_counter_device;
+
 public:
+	// construction/destruction
 	pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void set_clk0(device_t &device, double clk0) { downcast<pit8253_device &>(device).m_clk0 = clk0; }
-	static void set_clk1(device_t &device, double clk1) { downcast<pit8253_device &>(device).m_clk1 = clk1; }
-	static void set_clk2(device_t &device, double clk2) { downcast<pit8253_device &>(device).m_clk2 = clk2; }
-	static void set_clk0(device_t &device, const XTAL &xtal) { set_clk0(device, xtal.dvalue()); }
-	static void set_clk1(device_t &device, const XTAL &xtal) { set_clk1(device, xtal.dvalue()); }
-	static void set_clk2(device_t &device, const XTAL &xtal) { set_clk2(device, xtal.dvalue()); }
-	template <class Object> static devcb_base &set_out0_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out0_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out1_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out2_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out2_handler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <unsigned N> void set_clk(double clk) { m_clk[N] = clk; }
+	template <unsigned N> void set_clk(const XTAL &xtal) { set_clk<N>(xtal.dvalue()); }
+	template <unsigned N, class Object> devcb_base &set_out_handler(Object &&cb) { return m_out_handler[N].set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	WRITE_LINE_MEMBER(write_gate0);
-	WRITE_LINE_MEMBER(write_gate1);
-	WRITE_LINE_MEMBER(write_gate2);
+	WRITE_LINE_MEMBER(write_gate0) { m_counter[0]->gate_w(state); }
+	WRITE_LINE_MEMBER(write_gate1) { m_counter[1]->gate_w(state); }
+	WRITE_LINE_MEMBER(write_gate2) { m_counter[2]->gate_w(state); }
 
 	/* In the 8253/8254 the CLKx input lines can be attached to a regular clock
 	 signal. Another option is to use the output from one timer as the input
@@ -86,87 +151,28 @@ public:
 	 to 0 with pit8253_set_clockin and call pit8253_clkX_w to change
 	 the state of the input CLKx signal.
 	 */
-	WRITE_LINE_MEMBER(write_clk0);
-	WRITE_LINE_MEMBER(write_clk1);
-	WRITE_LINE_MEMBER(write_clk2);
+	WRITE_LINE_MEMBER(write_clk0) { m_counter[0]->set_clock_signal(state); }
+	WRITE_LINE_MEMBER(write_clk1) { m_counter[1]->set_clock_signal(state); }
+	WRITE_LINE_MEMBER(write_clk2) { m_counter[2]->set_clock_signal(state); }
 
-	void set_clockin(int timer, double new_clockin);
+	void set_clockin(int timer, double new_clockin) { m_counter[timer]->set_clockin(new_clockin); }
 
 protected:
-	pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int chip_type);
+	pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, pit_type chip_type);
 
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	// internal state
-	struct pit8253_timer
-	{
-		int index;              /* index number of the timer */
-		double clockin;         /* input clock frequency in Hz */
-		int clock;              /* clock signal when clockin is 0 */
-
-		attotime last_updated;  /* time when last updated */
-
-		emu_timer *updatetimer; /* MAME timer to process updates */
-
-		uint16_t value;           /* current counter value ("CE" in Intel docs) */
-		uint16_t latch;           /* latched counter value ("OL" in Intel docs) */
-		uint16_t count;           /* new counter value ("CR" in Intel docs) */
-		uint8_t control;          /* 6-bit control byte */
-		uint8_t status;           /* status byte - 8254 only */
-		uint8_t lowcount;         /* LSB of new counter value for 16-bit writes */
-		int rmsb;               /* 1 = Next read is MSB of 16-bit value */
-		int wmsb;               /* 1 = Next write is MSB of 16-bit value */
-		int output;             /* 0 = low, 1 = high */
-
-		int gate;               /* gate input (0 = low, 1 = high) */
-		int latched_count;      /* number of bytes of count latched */
-		int latched_status;     /* 1 = status latched (8254 only) */
-		int null_count;         /* 1 = mode control or count written, 0 = count loaded */
-		int phase;              /* see phase definition tables in simulate2(), below */
-	};
-
-	void readback(pit8253_timer *timer, int command);
 	virtual void readback_command(uint8_t data);
-	pit8253_timer *get_timer(int which);
 
-	enum
-	{
-		I8254,
-		I8253,
-		FE2010
-	};
+	double m_clk[3];
+	devcb_write_line m_out_handler[3];
 
-private:
-	double m_clk0;
-	double m_clk1;
-	double m_clk2;
-	devcb_write_line m_out0_handler;
-	devcb_write_line m_out1_handler;
-	devcb_write_line m_out2_handler;
+	required_device_array<pit_counter_device, 3> m_counter;
 
-	enum
-	{
-		PIT8253_MAX_TIMER = 3
-	};
-
-	pit8253_timer m_timers[PIT8253_MAX_TIMER];
-
-	inline uint32_t adjusted_count(int bcd, uint16_t val);
-	void decrease_counter_value(pit8253_timer *timer, int64_t cycles);
-	void load_counter_value(pit8253_timer *timer);
-	void set_output(pit8253_timer *timer, int output);
-	void simulate2(pit8253_timer *timer, int64_t elapsed_cycles);
-	void simulate(pit8253_timer *timer, int64_t elapsed_cycles);
-	void update(pit8253_timer *timer);
-	uint16_t masked_value(pit8253_timer *timer);
-	void load_count(pit8253_timer *timer, uint16_t newcount);
-	void gate_w(int gate, int state);
-	void set_clock_signal(int timerno, int state);
-
-	int m_type;
+	pit_type m_type;
 };
 
 DECLARE_DEVICE_TYPE(PIT8253, pit8253_device)

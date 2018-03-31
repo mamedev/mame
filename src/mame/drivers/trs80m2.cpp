@@ -319,40 +319,43 @@ WRITE8_MEMBER( trs80m16_state::ual_w )
 //  ADDRESS_MAP( z80_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(trs80m2_state::z80_mem)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void trs80m2_state::z80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(trs80m2_state::read), FUNC(trs80m2_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( z80_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(trs80m2_state::z80_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-	AM_RANGE(0xe4, 0xe7) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xef, 0xef) AM_WRITE(drvslt_w)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80SIO_TAG, z80sio0_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(rom_enable_w)
-	AM_RANGE(0xfc, 0xfc) AM_READ(keyboard_r) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-	AM_RANGE(0xfd, 0xfd) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-	AM_RANGE(0xfe, 0xfe) AM_READ(rtc_r)
-	AM_RANGE(0xff, 0xff) AM_READWRITE(nmi_r, nmi_w)
-ADDRESS_MAP_END
+void trs80m2_state::z80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xe0, 0xe3).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xe4, 0xe7).rw(this, FUNC(trs80m2_state::fdc_r), FUNC(trs80m2_state::fdc_w));
+	map(0xef, 0xef).w(this, FUNC(trs80m2_state::drvslt_w));
+	map(0xf0, 0xf3).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0xf4, 0xf7).rw(Z80SIO_TAG, FUNC(z80sio0_device::cd_ba_r), FUNC(z80sio0_device::cd_ba_w));
+	map(0xf8, 0xf8).rw(m_dmac, FUNC(z80dma_device::read), FUNC(z80dma_device::write));
+	map(0xf9, 0xf9).w(this, FUNC(trs80m2_state::rom_enable_w));
+	map(0xfc, 0xfc).r(this, FUNC(trs80m2_state::keyboard_r)).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0xfd, 0xfd).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xfe, 0xfe).r(this, FUNC(trs80m2_state::rtc_r));
+	map(0xff, 0xff).rw(this, FUNC(trs80m2_state::nmi_r), FUNC(trs80m2_state::nmi_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( m16_z80_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(trs80m16_state::m16_z80_io)
-	AM_IMPORT_FROM(z80_io)
-	AM_RANGE(0xde, 0xde) AM_WRITE(tcl_w)
-	AM_RANGE(0xdf, 0xdf) AM_WRITE(ual_w)
-ADDRESS_MAP_END
+void trs80m16_state::m16_z80_io(address_map &map)
+{
+	z80_io(map);
+	map(0xde, 0xde).w(this, FUNC(trs80m16_state::tcl_w));
+	map(0xdf, 0xdf).w(this, FUNC(trs80m16_state::ual_w));
+}
 
 
 //-------------------------------------------------

@@ -42,15 +42,16 @@
 #include "screen.h"
 #include "speaker.h"
 
-ADDRESS_MAP_START(concept_state::concept_memmap)
-	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM mirror */
-	AM_RANGE(0x000008, 0x000fff) AM_RAM                                     /* static RAM */
-	AM_RANGE(0x010000, 0x011fff) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM */
-	AM_RANGE(0x020000, 0x021fff) AM_ROM AM_REGION("macsbug", 0x0)       /* macsbugs ROM (optional) */
-	AM_RANGE(0x030000, 0x03ffff) AM_READWRITE(concept_io_r,concept_io_w)    /* I/O space */
+void concept_state::concept_memmap(address_map &map)
+{
+	map(0x000000, 0x000007).rom().region("maincpu", 0x010000);  /* boot ROM mirror */
+	map(0x000008, 0x000fff).ram();                                     /* static RAM */
+	map(0x010000, 0x011fff).rom().region("maincpu", 0x010000);  /* boot ROM */
+	map(0x020000, 0x021fff).rom().region("macsbug", 0x0);       /* macsbugs ROM (optional) */
+	map(0x030000, 0x03ffff).rw(this, FUNC(concept_state::concept_io_r), FUNC(concept_state::concept_io_w));    /* I/O space */
 
-	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_SHARE("videoram")/* AM_RAMBANK(2) */ /* DRAM */
-ADDRESS_MAP_END
+	map(0x080000, 0x0fffff).ram().share("videoram");/* AM_RAMBANK(2) */ /* DRAM */
+}
 
 
 static INPUT_PORTS_START( concept )

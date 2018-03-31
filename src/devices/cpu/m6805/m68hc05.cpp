@@ -90,9 +90,9 @@ constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
  * Global variables
  ****************************************************************************/
 
-DEFINE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device,   "m68hc05c4",   "MC68HC05C4")
-DEFINE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device,   "m68hc05c8",   "MC68HC05C8")
-DEFINE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device, "m68hc705c8a", "MC68HC705C8A")
+DEFINE_DEVICE_TYPE(M68HC05C4,   m68hc05c4_device,   "m68hc05c4",   "Motorola MC68HC05C4")
+DEFINE_DEVICE_TYPE(M68HC05C8,   m68hc05c8_device,   "m68hc05c8",   "Motorola MC68HC05C8")
+DEFINE_DEVICE_TYPE(M68HC705C8A, m68hc705c8a_device, "m68hc705c8a", "Motorola MC68HC705C8A")
 
 
 
@@ -542,9 +542,9 @@ u64 m68hc05_device::execute_cycles_to_clocks(u64 cycles) const
 	return cycles * 2;
 }
 
-util::disasm_interface *m68hc05_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68hc05_device::create_disassembler()
 {
-	return new m68hc05_disassembler;
+	return std::make_unique<m68hc05_disassembler>();
 }
 
 
@@ -772,9 +772,9 @@ void m68hc05c4_device::device_start()
 }
 
 
-util::disasm_interface *m68hc05c4_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68hc05c4_device::create_disassembler()
 {
-	return new m68hc05_disassembler(m68hc05c4_syms);
+	return std::make_unique<m68hc05_disassembler>(m68hc05c4_syms);
 }
 
 
@@ -835,10 +835,10 @@ void m68hc05c8_device::device_start()
 }
 
 
-util::disasm_interface *m68hc05c8_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68hc05c8_device::create_disassembler()
 {
 	// same I/O registers as MC68HC05C4
-	return new m68hc05_disassembler(m68hc05c4_syms);
+	return std::make_unique<m68hc05_disassembler>(m68hc05c4_syms);
 }
 
 
@@ -922,7 +922,7 @@ void m68hc705c8a_device::device_reset()
 }
 
 
-util::disasm_interface *m68hc705c8a_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m68hc705c8a_device::create_disassembler()
 {
-	return new m68hc05_disassembler(m68hc705c8a_syms);
+	return std::make_unique<m68hc05_disassembler>(m68hc705c8a_syms);
 }

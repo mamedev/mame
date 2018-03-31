@@ -33,8 +33,7 @@
 
 // ======================> tms3556_device
 
-class tms3556_device :  public device_t,
-						public device_memory_interface
+class tms3556_device : public device_t, public device_memory_interface, public device_video_interface
 {
 public:
 	static constexpr unsigned TOP_BORDER = 1;

@@ -31,7 +31,7 @@ const uint8_t Z80_DAISY_IEO = 0x02;       // interrupt disable mask (IEO)
 
 // configure devices
 #define MCFG_Z80_DAISY_CHAIN(_config) \
-	z80_daisy_chain_interface::static_set_daisy_config(*device, _config);
+	dynamic_cast<z80_daisy_chain_interface &>(*device).set_daisy_config(_config);
 
 
 
@@ -81,7 +81,7 @@ public:
 	virtual ~z80_daisy_chain_interface();
 
 	// configuration helpers
-	static void static_set_daisy_config(device_t &device, const z80_daisy_config *config);
+	void set_daisy_config(const z80_daisy_config *config) { m_daisy_config = config; }
 
 	// getters
 	bool daisy_chain_present() const { return (m_chain != nullptr); }

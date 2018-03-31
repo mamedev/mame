@@ -719,6 +719,11 @@ WRITE_LINE_MEMBER(i8251_device::write_txc)
 	}
 }
 
+READ_LINE_MEMBER(i8251_device::txrdy_r)
+{
+	return is_tx_enabled() && (m_status & I8251_STATUS_TX_READY) != 0;
+}
+
 WRITE8_MEMBER(v53_scu_device::command_w)
 {
 	i8251_device::command_w(data);

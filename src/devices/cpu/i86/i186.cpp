@@ -118,15 +118,15 @@ const uint8_t i80186_cpu_device::m_i80186_timing[] =
 	33,             /* (80186) BOUND */
 };
 
-DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "I80186")
-DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "I80188")
+DEFINE_DEVICE_TYPE(I80186, i80186_cpu_device, "i80186", "Intel I80186")
+DEFINE_DEVICE_TYPE(I80188, i80188_cpu_device, "i80188", "Intel I80188")
 
 i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
 	m_fetch_xor = 0;
-	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
+	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -134,7 +134,7 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
 	m_fetch_xor = BYTE_XOR_LE(0);
-	static_set_irq_acknowledge_callback(*this, device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
+	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)

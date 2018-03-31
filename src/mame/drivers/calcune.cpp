@@ -28,8 +28,8 @@
 class calcune_state : public driver_device
 {
 public:
-	calcune_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	calcune_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		vdp_state(0),
 		m_maincpu(*this, "maincpu"),
 		m_vdp(*this, "gen_vdp"),
@@ -123,24 +123,25 @@ WRITE16_MEMBER(calcune_state::cal_vdp_w)
 		m_vdp2->vdp_w(space, offset, data, mem_mask);
 }
 
-ADDRESS_MAP_START(calcune_state::calcune_map)
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+void calcune_state::calcune_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
 
-	AM_RANGE(0x700000, 0x700001) AM_READ(cal_700000_r)
+	map(0x700000, 0x700001).r(this, FUNC(calcune_state::cal_700000_r));
 
-	AM_RANGE(0x710000, 0x710001) AM_READ_PORT("710000")
-	AM_RANGE(0x720000, 0x720001) AM_READ_PORT("720000")
+	map(0x710000, 0x710001).portr("710000");
+	map(0x720000, 0x720001).portr("720000");
 //  AM_RANGE(0x730000, 0x730001) possible Z80 control?
-	AM_RANGE(0x760000, 0x760003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
+	map(0x760000, 0x760003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 
-	AM_RANGE(0x770000, 0x770001) AM_WRITE(cal_770000_w)
+	map(0x770000, 0x770001).w(this, FUNC(calcune_state::cal_770000_w));
 
-	AM_RANGE(0xA14100, 0xA14101) AM_NOP // on startup, possible z80 control
+	map(0xA14100, 0xA14101).noprw(); // on startup, possible z80 control
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(cal_vdp_r, cal_vdp_w)
+	map(0xc00000, 0xc0001f).rw(this, FUNC(calcune_state::cal_vdp_r), FUNC(calcune_state::cal_vdp_w));
 
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram") // battery on PCB
-ADDRESS_MAP_END
+	map(0xff0000, 0xffffff).ram().share("nvram"); // battery on PCB
+}
 
 
 uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -319,16 +320,16 @@ DRIVER_INIT_MEMBER(calcune_state,calcune)
 
 ROM_START( calcune )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code - ROM check fails, but probably due to prototype status, not bad ROM */
-	ROM_LOAD16_BYTE( "1.IC101.27C4001", 0x000001, 0x080000, CRC(2d25544c) SHA1(ef778cbf2aa4fcec43ce2dce9bcefb964f458c0a) )
-	ROM_LOAD16_BYTE( "2.IC102.27C4001", 0x000000, 0x080000, CRC(09330dc9) SHA1(fd888a7469a6290cd372a4b1eed577c2444f0c80) )
-	ROM_LOAD16_BYTE( "3.IC103.27C4001", 0x100001, 0x080000, CRC(736a356d) SHA1(372fa5989a67746efc439d76df1733cf70df57e7) )
-	ROM_LOAD16_BYTE( "4.IC104.27C4001", 0x100000, 0x080000, CRC(0bec031a) SHA1(69b255743f20408b2f14bddf0b85c85a13f29615) )
+	ROM_LOAD16_BYTE( "1.ic101.27c4001", 0x000001, 0x080000, CRC(2d25544c) SHA1(ef778cbf2aa4fcec43ce2dce9bcefb964f458c0a) )
+	ROM_LOAD16_BYTE( "2.ic102.27c4001", 0x000000, 0x080000, CRC(09330dc9) SHA1(fd888a7469a6290cd372a4b1eed577c2444f0c80) )
+	ROM_LOAD16_BYTE( "3.ic103.27c4001", 0x100001, 0x080000, CRC(736a356d) SHA1(372fa5989a67746efc439d76df1733cf70df57e7) )
+	ROM_LOAD16_BYTE( "4.ic104.27c4001", 0x100000, 0x080000, CRC(0bec031a) SHA1(69b255743f20408b2f14bddf0b85c85a13f29615) )
 
 	ROM_REGION( 0x200000, "ymz", 0 )
-	ROM_LOAD( "Sound1.1C.27C4001", 0x000000, 0x080000, CRC(5fb63e84) SHA1(6fad8e76162c81b2cfa4778effb81b78ed4fa299) )
-	ROM_LOAD( "Sound2.2D.27C4001", 0x080000, 0x080000, CRC(8924c6cc) SHA1(c76e6cfcf92a2c2834de62d7136c69e6edda46cc) )
-	ROM_LOAD( "Sound3.3A.27C4001", 0x100000, 0x080000, CRC(18cfa7f4) SHA1(201ea186eb3af9138db6699c9dcf527795f7c0db) )
-	ROM_LOAD( "Sound4.4B.27C4001", 0x180000, 0x080000, CRC(61a8510b) SHA1(177e56c374aa5697545ede28140cb42b5a4b737b) )
+	ROM_LOAD( "sound1.1c.27c4001", 0x000000, 0x080000, CRC(5fb63e84) SHA1(6fad8e76162c81b2cfa4778effb81b78ed4fa299) )
+	ROM_LOAD( "sound2.2d.27c4001", 0x080000, 0x080000, CRC(8924c6cc) SHA1(c76e6cfcf92a2c2834de62d7136c69e6edda46cc) )
+	ROM_LOAD( "sound3.3a.27c4001", 0x100000, 0x080000, CRC(18cfa7f4) SHA1(201ea186eb3af9138db6699c9dcf527795f7c0db) )
+	ROM_LOAD( "sound4.4b.27c4001", 0x180000, 0x080000, CRC(61a8510b) SHA1(177e56c374aa5697545ede28140cb42b5a4b737b) )
 ROM_END
 
 

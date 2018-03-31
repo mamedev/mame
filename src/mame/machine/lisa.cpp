@@ -1343,7 +1343,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 				/* problem : due to collisions with video, timings of the LISA CPU
 				are slightly different from timings of a bare 68k */
 				/* so we use a kludge... */
-				int time_in_frame = machine().first_screen()->vpos();
+				int time_in_frame = m_screen->vpos();
 
 				/* the BOOT ROM only reads 56 bits, so there must be some wrap-around for
 				videoROM_address <= 56 */
@@ -1756,7 +1756,7 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 			if (m_VTIR<=1)
 // GFE : needs to be in phase with Serial NUM
 			{
-				int time_in_frame = machine().first_screen()->vpos();
+				int time_in_frame = m_screen->vpos();
 				if (m_features.has_mac_xl_video)
 				{
 					if ((time_in_frame >= 374) && (time_in_frame <= 392))   /* these values have not been tested */

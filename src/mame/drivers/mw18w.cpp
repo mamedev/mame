@@ -162,22 +162,24 @@ CUSTOM_INPUT_MEMBER(mw18w_state::mw18w_sensors_r)
 }
 
 
-ADDRESS_MAP_START(mw18w_state::mw18w_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void mw18w_state::mw18w_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-ADDRESS_MAP_START(mw18w_state::mw18w_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mw18w_sound0_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(mw18w_sound1_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(mw18w_lamps_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(mw18w_led_display_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4")
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(mw18w_irq0_clear_w)
-ADDRESS_MAP_END
+void mw18w_state::mw18w_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(mw18w_state::mw18w_sound0_w));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(mw18w_state::mw18w_sound1_w));
+	map(0x02, 0x02).portr("IN2").w(this, FUNC(mw18w_state::mw18w_lamps_w));
+	map(0x03, 0x03).portr("DSW").w(this, FUNC(mw18w_state::mw18w_led_display_w));
+	map(0x04, 0x04).portr("IN4");
+	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x07, 0x07).w(this, FUNC(mw18w_state::mw18w_irq0_clear_w));
+}
 
 
 

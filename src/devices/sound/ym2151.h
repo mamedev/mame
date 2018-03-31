@@ -44,9 +44,9 @@
 	MCFG_DEVICE_ADD(_tag, YM2151, _clock)
 
 #define MCFG_YM2151_IRQ_HANDLER(_devcb) \
-	devcb = &ym2151_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ym2151_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 #define MCFG_YM2151_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &ym2151_device::set_port_write_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<ym2151_device &>(*device).set_port_write_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -63,9 +63,9 @@ public:
 	// construction/destruction
 	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym2151_device &>(device).m_irqhandler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<ym2151_device &>(device).m_portwritehandler.set_callback(std::forward<Object>(cb)); }
+	// configuration helpers
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irqhandler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_port_write_handler(Object &&cb) { return m_portwritehandler.set_callback(std::forward<Object>(cb)); }
 
 	// read/write
 	DECLARE_READ8_MEMBER(read);

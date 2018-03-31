@@ -47,11 +47,24 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
+		, m_lamps(*this, "lamp%u", 0U)
+		, m_digits(*this, "digit%u%u", 1U, 1U)
+		, m_solenoids(*this, "solenoid%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(by17);
 	DECLARE_DRIVER_INIT(matahari);
 	DECLARE_DRIVER_INIT(pwerplay);
+
+	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
+	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
+	DECLARE_CUSTOM_INPUT_MEMBER(saucer_x3);
+	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x2);
+
+	void by17(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(u10_a_r);
 	DECLARE_WRITE8_MEMBER(u10_a_w);
 	DECLARE_READ8_MEMBER(u10_b_r);
@@ -69,18 +82,15 @@ public:
 	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(saucer_x3);
-	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x2);
-	DECLARE_MACHINE_RESET(by17);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
-	void by17(machine_config &config);
+
 	void by17_map(address_map &map);
+
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -91,7 +101,6 @@ private:
 	bool m_u10_cb2;
 	bool m_u11_ca1;
 	bool m_u11_cb2;
-	uint8_t m_digit;
 	uint8_t m_segment[6];
 	uint8_t m_lamp_decode;
 	uint8_t m_solenoid_features[20][4];
@@ -110,17 +119,21 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
+	output_finder<15 * 4> m_lamps;
+	output_finder<5, 8> m_digits;
+	output_finder<20> m_solenoids;
 };
 
 
-ADDRESS_MAP_START(by17_state::by17_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_READWRITE(nibble_nvram_r, nibble_nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0 )
-ADDRESS_MAP_END
+void by17_state::by17_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x007f).ram();
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0200, 0x02ff).ram().rw(this, FUNC(by17_state::nibble_nvram_r), FUNC(by17_state::nibble_nvram_w)).share("nvram");
+	map(0x1000, 0x1fff).rom().region("roms", 0);
+}
 
 
 static INPUT_PORTS_START( by17 )
@@ -533,15 +546,13 @@ WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 #if 0                   // Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
 	if (state == 0)
 	{
-		int digit;
-
-		for (digit=1; digit<=8; digit++)
+		for (int digit=0; digit<8; digit++)
 		{
-			output().set_digit_value(10+digit, 0);
-			output().set_digit_value(20+digit, 0);
-			output().set_digit_value(30+digit, 0);
-			output().set_digit_value(40+digit, 0);
-			output().set_digit_value(50+digit, 0);
+			m_digits[0][digit] = 0
+			m_digits[1][digit] = 0
+			m_digits[2][digit] = 0
+			m_digits[3][digit] = 0
+			m_digits[4][digit] = 0
 		}
 	}
 #endif
@@ -609,10 +620,10 @@ WRITE8_MEMBER( by17_state::u10_a_w )
 	{
 		if ((m_lamp_decode & 0x0f) < 0x0f)
 		{
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00), ((data & 0x10) ? false : true));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15), ((data & 0x20) ? false : true));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30), ((data & 0x40) ? false : true));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45), ((data & 0x80) ? false : true));
+			if (!m_lamps[(m_lamp_decode & 0x0f)+00]) m_lamps[(m_lamp_decode & 0x0f)+00] = !BIT(data, 4);
+			if (!m_lamps[(m_lamp_decode & 0x0f)+15]) m_lamps[(m_lamp_decode & 0x0f)+15] = !BIT(data, 5);
+			if (!m_lamps[(m_lamp_decode & 0x0f)+30]) m_lamps[(m_lamp_decode & 0x0f)+30] = !BIT(data, 6);
+			if (!m_lamps[(m_lamp_decode & 0x0f)+45]) m_lamps[(m_lamp_decode & 0x0f)+45] = !BIT(data, 7);
 		}
 		else
 		{
@@ -675,33 +686,32 @@ WRITE8_MEMBER( by17_state::u11_a_w )
 	}
 
 
-	m_digit = 0;
+	uint8_t digit = 0;
 
 	if (BIT(data, 7))
-		m_digit = 1;
+		digit = 1;
 	else if (BIT(data, 6))
-		m_digit = 2;
+		digit = 2;
 	else if (BIT(data, 5))
-		m_digit = 3;
+		digit = 3;
 	else if (BIT(data, 4))
-		m_digit = 4;
+		digit = 4;
 	else if (BIT(data, 3))
-		m_digit = 5;
+		digit = 5;
 	else if (BIT(data, 2))
-		m_digit = 6;
+		digit = 6;
 	else if (BIT(data, 2) && BIT(data, 3))   // Aftermarket 7th digit strobe for 6 digit games
-		m_digit = 7;
+		digit = 7;
 
-	if ((m_u10_ca2==0) && m_digit)
+	if ((m_u10_ca2==0) && digit)
 	{
-		static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 - BCD to 7 Segment Display Decoder
+		static constexpr uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543 - BCD to 7 Segment Display Decoder
 
-		output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
-		output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
-		output().set_digit_value(30+m_digit, patterns[m_segment[3]]);
-		output().set_digit_value(40+m_digit, patterns[m_segment[4]]);
-		output().set_digit_value(50+m_digit, patterns[m_segment[5]]);
-
+		m_digits[0][digit - 1] = patterns[m_segment[1]];
+		m_digits[1][digit - 1] = patterns[m_segment[2]];
+		m_digits[2][digit - 1] = patterns[m_segment[3]];
+		m_digits[3][digit - 1] = patterns[m_segment[4]];
+		m_digits[4][digit - 1] = patterns[m_segment[5]];
 	}
 
 	m_u11a = data;
@@ -713,7 +723,7 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 	{
 		if ((data & 0x0f) < 0x0f)   // Momentary Solenoids
 		{
-			output().set_indexed_value( "solenoid", (data & 0x0f), true);
+			m_solenoids[data & 0x0f] = true;
 
 			if (m_solenoid_features[(data & 0x0f)][3])  // Reset/release relevant switch after firing Solenoid
 				m_io_hold_x[(m_solenoid_features[(data & 0x0f)][2])] &= (m_solenoid_features[(data & 0x0f)][3]);
@@ -723,59 +733,56 @@ WRITE8_MEMBER( by17_state::u11_b_w )
 		}
 		else                        // Rest output - all momentary solenoids are off
 		{
-			for (int i=0; i<15; i++)
-			{
-				output().set_indexed_value( "solenoid", i, false);
-			}
+			std::fill_n(std::begin(m_solenoids), 15, false);
 		}
 	}
 
 
 	if ((m_u11b & 0x10) && ((data & 0x10)==0))
 	{
-		output().set_value("solenoid16", true);
+		m_solenoids[16] = true;
 		if (m_solenoid_features[16][0] != 0xff)
 			m_samples->start(m_solenoid_features[16][0], m_solenoid_features[16][1]);
 	}
 	else if ((data & 0x10) && ((m_u11b & 0x10)==0))
 	{
-		output().set_value("solenoid16", false);
+		m_solenoids[16] = false;
 		if (m_solenoid_features[16][0] != 0xff)
 			m_samples->start(m_solenoid_features[16][0], m_solenoid_features[16][2]);
 	}
 	if ((m_u11b & 0x20) && ((data & 0x20)==0))
 	{
-		output().set_value("solenoid17", true);                   // Coin Lockout Coil engage
+		m_solenoids[17] = true;                   // Coin Lockout Coil engage
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][1]);
 	}
 	else if ((data & 0x20) && ((m_u11b & 0x20)==0))
 	{
-		output().set_value("solenoid17", false);                  // Coin Lockout Coil release
+		m_solenoids[17] = false;                  // Coin Lockout Coil release
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][2]);
 	}
 	if ((m_u11b & 0x40) && ((data & 0x40)==0))
 	{
-		output().set_value("solenoid18", true);                   // Flipper Enable Relay engage
+		m_solenoids[18] = true;                   // Flipper Enable Relay engage
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][1]);
 	}
 	else if ((data & 0x40) && ((m_u11b & 0x40)==0))
 	{
-		output().set_value("solenoid18", false);                  // Flipper Enable Relay release
+		m_solenoids[18] = false;                  // Flipper Enable Relay release
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][2]);
 	}
 	if ((m_u11b & 0x80) && ((data & 0x80)==0))
 	{
-		output().set_value("solenoid19", true);
+		m_solenoids[19] = true;
 		if (m_solenoid_features[19][0] != 0xff)
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][1]);
 	}
 	else if ((data & 0x80) && ((m_u11b & 0x80)==0))
 	{
-		output().set_value("solenoid19", false);
+		m_solenoids[19] = false;
 		if (m_solenoid_features[19][0] != 0xff)
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][2]);
 	}
@@ -805,12 +812,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_freq )
 
 	/*** Zero Crossing - power to all Lamp SCRs is cut off and reset ***/
 
-	for (int i=0; i<60; i++)
-	{
-		output().set_indexed_value( "lamp", i, 0 );
-	}
-
+	std::fill(std::begin(m_lamps), std::end(m_lamps), 0);
 }
+
 TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_pulse )
 {
 	/*** Line Power to DC Zero Crossing has ended ***/
@@ -959,8 +963,19 @@ DRIVER_INIT_MEMBER( by17_state, pwerplay )
 
 
 
-MACHINE_RESET_MEMBER( by17_state, by17 )
+void by17_state::machine_start()
 {
+	genpin_class::machine_start();
+
+	m_lamps.resolve();
+	m_digits.resolve();
+	m_solenoids.resolve();
+}
+
+void by17_state::machine_reset()
+{
+	genpin_class::machine_reset();
+
 	render_target *target = machine().render().first_target();
 
 	target->set_view(0);
@@ -980,8 +995,6 @@ MACHINE_CONFIG_START(by17_state::by17)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 530000)  // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_CPU_PROGRAM_MAP(by17_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE( by17_state, by17 )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")   // 'F' filled causes Credit Display to be blank on first startup
 
@@ -1094,14 +1107,14 @@ ROM_END
 /-------------------------------*/
 ROM_START(eightbll)   // Fixes tilt exploit in previous version - if tilt is held closed, next ball will not be served until the tilt switch is released
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "E723-20.U2", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
-	ROM_LOAD( "E720-20.U6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+	ROM_LOAD( "e723-20.u2", 0x0000, 0x0800, CRC(33559e7b) SHA1(49008db95c8f012e7e3b613e6eee811512207fa9))
+	ROM_LOAD( "e720-20.u6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
 ROM_END
 
 ROM_START(eightblo)   // Has an exploit if you tilt the ball in play and hold tilt active, after the ball enters the outhole the next ball will be served with tilt state flagged off and the tilt switch is ignored until it's released
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "E723-17.U2", 0x0000, 0x0800, CRC(7e7554ae) SHA1(e03c47c4a7a7352293f246ae5bff970fb53fcd88))
-	ROM_LOAD( "E720-20.U6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
+	ROM_LOAD( "e723-17.u2", 0x0000, 0x0800, CRC(7e7554ae) SHA1(e03c47c4a7a7352293f246ae5bff970fb53fcd88))
+	ROM_LOAD( "e720-20.u6", 0x0800, 0x0800, CRC(0c17aa4d) SHA1(729e61a29691857112579efcdb96a35e8e5b1279))
 ROM_END
 
 /*--------------------------------

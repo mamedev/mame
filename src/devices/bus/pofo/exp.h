@@ -64,13 +64,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(_write) \
-	devcb = &portfolio_expansion_slot_device::set_eint_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<portfolio_expansion_slot_device &>(*device).set_eint_wr_callback(DEVCB_##_write);
 
 #define MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(_write) \
-	devcb = &portfolio_expansion_slot_device::set_nmio_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<portfolio_expansion_slot_device &>(*device).set_nmio_wr_callback(DEVCB_##_write);
 
 #define MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(_write) \
-	devcb = &portfolio_expansion_slot_device::set_wake_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<portfolio_expansion_slot_device &>(*device).set_wake_wr_callback(DEVCB_##_write);
 
 
 
@@ -117,9 +117,9 @@ public:
 	// construction/destruction
 	portfolio_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_eint_wr_callback(device_t &device, Object &&cb) { return downcast<portfolio_expansion_slot_device &>(device).m_write_eint.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_nmio_wr_callback(device_t &device, Object &&cb) { return downcast<portfolio_expansion_slot_device &>(device).m_write_nmio.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_wake_wr_callback(device_t &device, Object &&cb) { return downcast<portfolio_expansion_slot_device &>(device).m_write_wake.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_eint_wr_callback(Object &&cb) { return m_write_eint.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmio_wr_callback(Object &&cb) { return m_write_nmio.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_wake_wr_callback(Object &&cb) { return m_write_wake.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	bool nmd1_r() { return (m_card != nullptr) ? m_card->nmd1() : 1; }

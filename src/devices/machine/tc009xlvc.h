@@ -17,8 +17,8 @@ class tc0091lvc_device : public device_t, public device_memory_interface
 public:
 	tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
+	// configuration
+	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
 
 	DECLARE_READ8_MEMBER( vregs_r );
 	DECLARE_WRITE8_MEMBER( vregs_w );
@@ -85,6 +85,6 @@ DECLARE_DEVICE_TYPE(TC0091LVC, tc0091lvc_device)
 
 
 #define MCFG_TC0091LVC_GFXDECODE(gfxtag) \
-	tc0091lvc_device::static_set_gfxdecode_tag(*device, ("^" gfxtag));
+	downcast<tc0091lvc_device &>(*device).set_gfxdecode_tag(("^" gfxtag));
 
 #endif // MAME_MACHINE_TL009XLVC_H

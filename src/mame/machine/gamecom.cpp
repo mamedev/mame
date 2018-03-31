@@ -266,7 +266,7 @@ void gamecom_state::recompute_lcd_params()
 	hblank_period = (H_timing + 200);
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
-	machine().first_screen()->configure((hblank_period), (vblank_period), visarea, refresh );
+	m_screen->configure(hblank_period, vblank_period, visarea, refresh);
 }
 
 WRITE8_MEMBER( gamecom_state::gamecom_internal_w )

@@ -64,7 +64,7 @@
 //**************************************************************************
 
 #define MCFG_CPU_AVR8_EEPROM(_tag) \
-	avr8_device::set_eeprom_tag(*device, "^" _tag);
+	downcast<avr8_device &>(*device).set_eeprom_tag("^" _tag);
 
 
 //**************************************************************************
@@ -80,7 +80,7 @@ class avr8_device : public cpu_device
 {
 public:
 	// inline configuration helpers
-	static void set_eeprom_tag(device_t &device, const char *tag) { downcast<avr8_device &>(device).m_eeprom.set_tag(tag); }
+	void set_eeprom_tag(const char *tag) { m_eeprom.set_tag(tag); }
 
 	// fuse configs
 	void set_low_fuses(uint8_t byte);
@@ -123,7 +123,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -850,4 +850,4 @@ enum
 #define AVR8_SPCR_CPHA_MASK     0x04
 #define AVR8_SPCR_SPR_MASK      0x03
 
-#endif /* __AVR8_H__ */
+#endif /* MAME_CPU_AVR8_AVR8_H */

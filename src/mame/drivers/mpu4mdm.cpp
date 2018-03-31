@@ -25,7 +25,7 @@ ROM_END
 
 ROM_START( m4nud2p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "classic 2p nudger v0-1 (27512)", 0x0000, 0x010000, CRC(9c22f5f8) SHA1(5391f5d5b3a0861b93702e476d9635ff304a02a2) )
+	ROM_LOAD( "classic 2p nudger v0-1,27512", 0x0000, 0x010000, CRC(9c22f5f8) SHA1(5391f5d5b3a0861b93702e476d9635ff304a02a2) )
 
 	ROM_REGION( 0x080000, "msm6376", 0 )
 	ROM_LOAD( "ctnsnd.hex", 0x0000, 0x080000, CRC(150a4513) SHA1(97147e11b49d18225c527d8a0926118a83ee906c)) // == 2p Unlimited?
@@ -399,7 +399,7 @@ ROM_END
 
 ROM_START( m4ewshft )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "each_way_shifter(mdm)_v1-0.bin", 0x0000, 0x010000, CRC(506b6cf0) SHA1(870e356b9785e51c5be5d6bc6af9ea7640b51ee8) )
+	ROM_LOAD( "each_way_shifter=mdm=_v1-0.bin", 0x0000, 0x010000, CRC(506b6cf0) SHA1(870e356b9785e51c5be5d6bc6af9ea7640b51ee8) )
 
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 )
 	ROM_LOAD( "each_way_shifter-snd1.bin", 0x000000, 0x080000, CRC(b21f9b09) SHA1(69ac3ca2874fc3aebd34dd225a195ad1c0305d00) )

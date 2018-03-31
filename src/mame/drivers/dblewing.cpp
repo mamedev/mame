@@ -173,29 +173,31 @@ WRITE_LINE_MEMBER( dblewing_state::soundlatch_irq_w )
 	m_soundlatch_pending = bool(state);
 }
 
-ADDRESS_MAP_START(dblewing_state::dblewing_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void dblewing_state::dblewing_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_SHARE("pf2_rowscroll")
+	map(0x100000, 0x100fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x102000, 0x102fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x104000, 0x104fff).ram().share("pf1_rowscroll");
+	map(0x106000, 0x106fff).ram().share("pf2_rowscroll");
 
 //  AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
-	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(wf_protection_region_0_104_r,wf_protection_region_0_104_w) AM_SHARE("prot16ram") /* Protection device */
+	map(0x280000, 0x283fff).rw(this, FUNC(dblewing_state::wf_protection_region_0_104_r), FUNC(dblewing_state::wf_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
 
-	AM_RANGE(0x284000, 0x284001) AM_RAM
-	AM_RANGE(0x288000, 0x288001) AM_RAM
-	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x320000, 0x3207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
-ADDRESS_MAP_END
+	map(0x284000, 0x284001).ram();
+	map(0x288000, 0x288001).ram();
+	map(0x28c000, 0x28c00f).ram().w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x300000, 0x3007ff).ram().share("spriteram");
+	map(0x320000, 0x3207ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0xff0000, 0xff3fff).mirror(0xc000).ram();
+}
 
-ADDRESS_MAP_START(dblewing_state::decrypted_opcodes_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void dblewing_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().share("decrypted_opcodes");
+}
 
 READ8_MEMBER(dblewing_state::irq_latch_r)
 {
@@ -203,19 +205,21 @@ READ8_MEMBER(dblewing_state::irq_latch_r)
 	return m_soundlatch_pending ? 0 : 1;
 }
 
-ADDRESS_MAP_START(dblewing_state::sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_device, status_r, write)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("ioprot", deco104_device, soundlatch_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
-	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void dblewing_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
+	map(0xb000, 0xb000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xc000, 0xc000).r(m_deco104, FUNC(deco104_device::soundlatch_r));
+	map(0xd000, 0xd000).r(this, FUNC(dblewing_state::irq_latch_r)); //timing? sound latch?
+	map(0xf000, 0xf000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-ADDRESS_MAP_START(dblewing_state::sound_io)
-	AM_RANGE(0x0000, 0xffff)  AM_ROM AM_REGION("audiocpu", 0)
-ADDRESS_MAP_END
+void dblewing_state::sound_io(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("audiocpu", 0);
+}
 
 
 

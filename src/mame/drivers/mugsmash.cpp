@@ -175,33 +175,35 @@ READ16_MEMBER(mugsmash_state::mugsmash_input_ports_r)
 }
 #endif
 
-ADDRESS_MAP_START(mugsmash_state::mugsmash_map)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_SHARE("videoram1")
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_SHARE("regs1") /* video registers*/
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_SHARE("regs2") /* sound + ? */
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* main ram? */
-	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
+void mugsmash_state::mugsmash_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x080fff).ram().w(this, FUNC(mugsmash_state::mugsmash_videoram1_w)).share("videoram1");
+	map(0x082000, 0x082fff).ram().w(this, FUNC(mugsmash_state::mugsmash_videoram2_w)).share("videoram2");
+	map(0x0c0000, 0x0c0007).w(this, FUNC(mugsmash_state::mugsmash_reg_w)).share("regs1"); /* video registers*/
+	map(0x100000, 0x1005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x140000, 0x140007).w(this, FUNC(mugsmash_state::mugsmash_reg2_w)).share("regs2"); /* sound + ? */
+	map(0x1c0000, 0x1c3fff).ram(); /* main ram? */
+	map(0x1c4000, 0x1cffff).ram();
+	map(0x200000, 0x203fff).ram().share("spriteram"); /* sprite ram */
 #if USE_FAKE_INPUT_PORTS
-	AM_RANGE(0x180000, 0x180007) AM_READ(mugsmash_input_ports_r)
+	map(0x180000, 0x180007).r(this, FUNC(mugsmash_state::mugsmash_input_ports_r));
 #else
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
-	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("IN3")
+	map(0x180000, 0x180001).portr("IN0");
+	map(0x180002, 0x180003).portr("IN1");
+	map(0x180004, 0x180005).portr("IN2");
+	map(0x180006, 0x180007).portr("IN3");
 #endif
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(mugsmash_state::mugsmash_sound_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void mugsmash_state::mugsmash_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 #define MUGSMASH_PLAYER_INPUT( player, start ) \

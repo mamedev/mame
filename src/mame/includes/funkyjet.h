@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "cpu/h6280/h6280.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
 #include "machine/deco146.h"
@@ -35,7 +36,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<h6280_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	DECLARE_DRIVER_INIT(funkyjet);
 	virtual void machine_start() override;

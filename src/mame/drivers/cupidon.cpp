@@ -79,23 +79,24 @@ uint32_t cupidon_state::screen_update_cupidon(screen_device &screen, bitmap_ind1
 }
 
 // could be pumped through the get_cs function (if they use the memory protection features we might have to) but that's slow...
-ADDRESS_MAP_START(cupidon_state::cupidon_map)
-	AM_RANGE(0x0000000, 0x07fffff) AM_ROM AM_MIRROR(0x1000000)
+void cupidon_state::cupidon_map(address_map &map)
+{
+	map(0x0000000, 0x07fffff).rom().mirror(0x1000000);
 
-	AM_RANGE(0x1000000, 0x100ffff) AM_RAM
-	AM_RANGE(0x1800000, 0x1800003) AM_READ(cupidon_return_ffffffff)
-	AM_RANGE(0x2000074, 0x2000077) AM_RAM // port
+	map(0x1000000, 0x100ffff).ram();
+	map(0x1800000, 0x1800003).r(this, FUNC(cupidon_state::cupidon_return_ffffffff));
+	map(0x2000074, 0x2000077).ram(); // port
 
 //  AM_RANGE(0x2000040, 0x200004f) AM_RAM
 
 
 // might just be 4mb of VRAM
-	AM_RANGE(0x3000000, 0x33bffff) AM_RAM
-	AM_RANGE(0x33c0000, 0x33fffff) AM_RAM AM_SHARE("gfxram") // seems to upload graphics to here, tiles etc. if you skip the loop after the romtest in funnyfm
+	map(0x3000000, 0x33bffff).ram();
+	map(0x33c0000, 0x33fffff).ram().share("gfxram"); // seems to upload graphics to here, tiles etc. if you skip the loop after the romtest in funnyfm
 //  AM_RANGE(0x3400000, 0x3400fff) AM_RAM
 //  AM_RANGE(0x3F80000, 0x3F80003) AM_RAM
-	AM_RANGE(0x3FF0400, 0x3FF0403) AM_RAM // register? gangrose likes to read this?
-ADDRESS_MAP_END
+	map(0x3FF0400, 0x3FF0403).ram(); // register? gangrose likes to read this?
+}
 
 static INPUT_PORTS_START(  cupidon )
 INPUT_PORTS_END

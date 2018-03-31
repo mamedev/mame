@@ -78,8 +78,8 @@ Package: 132-pin PGA, 200-pin QFP
 #include "v60d.h"
 #include "debugger.h"
 
-DEFINE_DEVICE_TYPE(V60, v60_device, "v60", "V60")
-DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "V70")
+DEFINE_DEVICE_TYPE(V60, v60_device, "v60", "NEC V60")
+DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "NEC V70")
 
 
 // Set m_PIR (Processor ID) for NEC m_ LSB is reserved to NEC,
@@ -116,9 +116,9 @@ device_memory_interface::space_config_vector v60_device::memory_space_config() c
 }
 
 
-util::disasm_interface *v60_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> v60_device::create_disassembler()
 {
-	return new v60_disassembler;
+	return std::make_unique<v60_disassembler>();
 }
 
 

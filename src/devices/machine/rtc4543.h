@@ -24,7 +24,7 @@
 		MCFG_DEVICE_ADD((tag), RTC4543, (clock))
 
 #define MCFG_RTC4543_DATA_CALLBACK(cb) \
-		devcb = &rtc4543_device::set_data_cb(*device, DEVCB_##cb);
+		devcb = &downcast<rtc4543_device &>(*device).set_data_cb(DEVCB_##cb);
 
 #define MCFG_JRC6355E_ADD(tag, clock) \
 		MCFG_DEVICE_ADD((tag), JRC6355E, (clock))
@@ -52,7 +52,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( data_r );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
 
-	template <class Object> static devcb_base &set_data_cb(device_t &device, Object &&cb) { return downcast<rtc4543_device &>(device).data_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_data_cb(Object &&cb) { return data_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	rtc4543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

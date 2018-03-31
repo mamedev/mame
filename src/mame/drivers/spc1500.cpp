@@ -679,12 +679,13 @@ READ8_MEMBER( spc1500_state::io_r)
 	return 0xff;
 }
 
-ADDRESS_MAP_START(spc1500_state::spc1500_double_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x2000, 0xffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0000, 0x17ff) AM_RAM AM_SHARE("pcgram")
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_r, double_w)
-ADDRESS_MAP_END
+void spc1500_state::spc1500_double_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x2000, 0xffff).ram().share("videoram");
+	map(0x0000, 0x17ff).ram().share("pcgram");
+	map(0x0000, 0xffff).rw(this, FUNC(spc1500_state::io_r), FUNC(spc1500_state::double_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( spc1500 )
@@ -814,11 +815,12 @@ static INPUT_PORTS_START( spc1500 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH,IPT_UNUSED) // DIP SW3 for 200/400 line
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(spc1500_state::spc1500_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE_BANK("bank4")
-ADDRESS_MAP_END
+void spc1500_state::spc1500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).bankr("bank1").bankw("bank2");
+	map(0x8000, 0xffff).bankrw("bank4");
+}
 
 void spc1500_state::machine_start()
 {

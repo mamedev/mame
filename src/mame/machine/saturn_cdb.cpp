@@ -23,9 +23,10 @@ void saturn_cdb_device::device_start()
 {
 }
 
-ADDRESS_MAP_START(saturn_cdb_device::saturn_cdb_map)
-	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM
-ADDRESS_MAP_END
+void saturn_cdb_device::saturn_cdb_map(address_map &map)
+{
+	map(0x00000000, 0x0000ffff).rom();
+}
 
 MACHINE_CONFIG_START(saturn_cdb_device::device_add_mconfig)
 	MCFG_CPU_ADD("cdbcpu", SH1, DERIVED_CLOCK(1, 1))

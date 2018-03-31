@@ -180,26 +180,27 @@ WRITE8_MEMBER(cloak_state::cloak_nvram_enable_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(cloak_state::master_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)       /* DSW0 also */
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)       /* DSW1 also */
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P1")
-	AM_RANGE(0x2200, 0x2200) AM_READ_PORT("P2")
-	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2600, 0x2600) AM_WRITE(cloak_custom_w)
-	AM_RANGE(0x2800, 0x29ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2f00, 0x2fff) AM_NOP
-	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3200, 0x327f) AM_WRITE(cloak_paletteram_w)
-	AM_RANGE(0x3800, 0x3807) AM_DEVWRITE("outlatch", ls259_device, write_d7)
-	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(cloak_irq_reset_0_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(cloak_nvram_enable_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cloak_state::master_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(this, FUNC(cloak_state::cloak_videoram_w)).share("videoram");
+	map(0x0800, 0x0fff).ram().share("share1");
+	map(0x1000, 0x100f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));       /* DSW0 also */
+	map(0x1800, 0x180f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));       /* DSW1 also */
+	map(0x2000, 0x2000).portr("P1");
+	map(0x2200, 0x2200).portr("P2");
+	map(0x2400, 0x2400).portr("SYSTEM");
+	map(0x2600, 0x2600).w(this, FUNC(cloak_state::cloak_custom_w));
+	map(0x2800, 0x29ff).ram().share("nvram");
+	map(0x2f00, 0x2fff).noprw();
+	map(0x3000, 0x30ff).ram().share("spriteram");
+	map(0x3200, 0x327f).w(this, FUNC(cloak_state::cloak_paletteram_w));
+	map(0x3800, 0x3807).w("outlatch", FUNC(ls259_device::write_d7));
+	map(0x3a00, 0x3a00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x3c00, 0x3c00).w(this, FUNC(cloak_state::cloak_irq_reset_0_w));
+	map(0x3e00, 0x3e00).w(this, FUNC(cloak_state::cloak_nvram_enable_w));
+	map(0x4000, 0xffff).rom();
+}
 
 
 /*************************************
@@ -208,16 +209,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(cloak_state::slave_map)
-	AM_RANGE(0x0000, 0x0007) AM_RAM
-	AM_RANGE(0x0008, 0x000f) AM_READWRITE(graph_processor_r, graph_processor_w)
-	AM_RANGE(0x0010, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(cloak_irq_reset_1_w)
-	AM_RANGE(0x1200, 0x1200) AM_WRITE(cloak_clearbmp_w)
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(cloak_custom_w)
-	AM_RANGE(0x2000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cloak_state::slave_map(address_map &map)
+{
+	map(0x0000, 0x0007).ram();
+	map(0x0008, 0x000f).rw(this, FUNC(cloak_state::graph_processor_r), FUNC(cloak_state::graph_processor_w));
+	map(0x0010, 0x07ff).ram();
+	map(0x0800, 0x0fff).ram().share("share1");
+	map(0x1000, 0x1000).w(this, FUNC(cloak_state::cloak_irq_reset_1_w));
+	map(0x1200, 0x1200).w(this, FUNC(cloak_state::cloak_clearbmp_w));
+	map(0x1400, 0x1400).w(this, FUNC(cloak_state::cloak_custom_w));
+	map(0x2000, 0xffff).rom();
+}
 
 
 

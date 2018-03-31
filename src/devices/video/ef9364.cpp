@@ -73,28 +73,6 @@ ef9364_device::ef9364_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void ef9364_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<ef9364_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_nb_of_pages: Set the number of hardware pages
-//-------------------------------------------------
-
-void ef9364_device::static_set_nb_of_pages(device_t &device, int nb_of_pages )
-{
-	if( nb_of_pages > 0 && nb_of_pages <= 8 )
-	{
-		downcast<ef9364_device &>(device).nb_of_pages = nb_of_pages;
-	}
-}
-
-//-------------------------------------------------
 //  set_color_entry: Set the color value
 //  into the palette
 //-------------------------------------------------

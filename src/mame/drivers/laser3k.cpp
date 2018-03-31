@@ -71,6 +71,7 @@ public:
 	laser3k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_ram(*this, "mainram")
 		, m_bank0(*this, "bank0")
 		, m_bank1(*this, "bank1")
@@ -83,6 +84,7 @@ public:
 	{ }
 
 	required_device<m6502_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_bank0;
 	required_device<address_map_bank_device> m_bank1;
@@ -136,20 +138,22 @@ private:
     ADDRESS MAP
 ***************************************************************************/
 
-ADDRESS_MAP_START(laser3k_state::laser3k_map)
-	AM_RANGE(0x0000, 0x3fff) AM_DEVICE("bank0", address_map_bank_device, amap8)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("bank1", address_map_bank_device, amap8)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVICE("bank2", address_map_bank_device, amap8)
-	AM_RANGE(0xc000, 0xffff) AM_DEVICE("bank3", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void laser3k_state::laser3k_map(address_map &map)
+{
+	map(0x0000, 0x3fff).m(m_bank0, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x7fff).m(m_bank1, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xbfff).m(m_bank2, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xffff).m(m_bank3, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(laser3k_state::banks_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0x38000, 0x3bfff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x3c000, 0x3c0ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x3c100, 0x3c1ff) AM_READ(io2_r)
-	AM_RANGE(0x3c200, 0x3ffff) AM_ROM AM_REGION("maincpu", 0x4200)
-ADDRESS_MAP_END
+void laser3k_state::banks_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rw(this, FUNC(laser3k_state::ram_r), FUNC(laser3k_state::ram_w));
+	map(0x38000, 0x3bfff).rom().region("maincpu", 0);
+	map(0x3c000, 0x3c0ff).rw(this, FUNC(laser3k_state::io_r), FUNC(laser3k_state::io_w));
+	map(0x3c100, 0x3c1ff).r(this, FUNC(laser3k_state::io2_r));
+	map(0x3c200, 0x3ffff).rom().region("maincpu", 0x4200);
+}
 
 void laser3k_state::machine_start()
 {
@@ -468,10 +472,10 @@ READ8_MEMBER( laser3k_state::io2_r )
 	switch (offset)
 	{
 		case 0xc2:  // h-blank status
-			return machine().first_screen()->hblank() ? 0x80 : 0x00;
+			return m_screen->hblank() ? 0x80 : 0x00;
 
 		case 0xc3:  // v-blank status
-			return machine().first_screen()->vblank() ? 0x80 : 0x00;
+			return m_screen->vblank() ? 0x80 : 0x00;
 
 		case 0xc5:  // CPU 1/2 MHz status?
 			return 0x00;

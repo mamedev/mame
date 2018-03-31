@@ -182,32 +182,6 @@ s32 output_manager::get_value(const char *outname)
 
 
 /*-------------------------------------------------
-    output_get_indexed_value - get the value of an
-    indexed output
--------------------------------------------------*/
-
-s32 output_manager::get_indexed_value(const char *basename, int index)
-{
-	char buffer[100];
-	char *dest = buffer;
-
-	/* copy the string */
-	while (*basename != 0)
-		*dest++ = *basename++;
-
-	/* append the index */
-	if (index >= 1000) *dest++ = '0' + ((index / 1000) % 10);
-	if (index >= 100) *dest++ = '0' + ((index / 100) % 10);
-	if (index >= 10) *dest++ = '0' + ((index / 10) % 10);
-	*dest++ = '0' + (index % 10);
-	*dest++ = 0;
-
-	/* set the value */
-	return get_value(buffer);
-}
-
-
-/*-------------------------------------------------
     output_set_notifier - sets a notifier callback
     for a particular output, or for all outputs
     if nullptr is specified

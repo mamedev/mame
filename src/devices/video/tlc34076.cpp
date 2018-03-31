@@ -49,16 +49,6 @@ tlc34076_device::tlc34076_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
-//  static_set_bits - set DAC resolution
-//-------------------------------------------------
-void tlc34076_device::static_set_bits(device_t &device, tlc34076_bits bits)
-{
-	tlc34076_device &tlc = downcast<tlc34076_device &>(device);
-	tlc.m_dacbits = bits;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 void tlc34076_device::device_start()

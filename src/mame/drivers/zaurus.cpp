@@ -1712,13 +1712,14 @@ WRITE32_MEMBER(zaurus_state::pxa255_rtc_w)
 
 }
 
-ADDRESS_MAP_START(zaurus_state::zaurus_map)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_REGION("firmware", 0)
-	AM_RANGE(0x40900000, 0x4090000f) AM_READWRITE(pxa255_rtc_r,pxa255_rtc_w)
-	AM_RANGE(0x40a00000, 0x40a0001f) AM_READWRITE(pxa255_ostimer_r, pxa255_ostimer_w )
-	AM_RANGE(0x40d00000, 0x40d00017) AM_READWRITE(pxa255_intc_r, pxa255_intc_w )
-	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void zaurus_state::zaurus_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram().region("firmware", 0);
+	map(0x40900000, 0x4090000f).rw(this, FUNC(zaurus_state::pxa255_rtc_r), FUNC(zaurus_state::pxa255_rtc_w));
+	map(0x40a00000, 0x40a0001f).rw(this, FUNC(zaurus_state::pxa255_ostimer_r), FUNC(zaurus_state::pxa255_ostimer_w));
+	map(0x40d00000, 0x40d00017).rw(this, FUNC(zaurus_state::pxa255_intc_r), FUNC(zaurus_state::pxa255_intc_w));
+	map(0xa0000000, 0xa07fffff).ram().share("ram");
+}
 
 
 static INPUT_PORTS_START( zaurus )
@@ -1784,22 +1785,22 @@ MACHINE_CONFIG_END
 /* was labeled SL-C500 */
 ROM_START( zsl5500 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-	ROM_LOAD( "sl-c500 v1.20 (zimage).bin", 0x000000, 0x13c000, BAD_DUMP CRC(dc1c259f) SHA1(8150744196a72821ae792462d0381182274c2ce0) )
+	ROM_LOAD( "sl-c500 v1.20,zimage.bin", 0x000000, 0x13c000, BAD_DUMP CRC(dc1c259f) SHA1(8150744196a72821ae792462d0381182274c2ce0) )
 ROM_END
 
 ROM_START( zsl5600 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-	ROM_LOAD( "zaurus sl-b500 - 5600 (zimage).bin", 0x000000, 0x11b6b0, BAD_DUMP CRC(779c70a1) SHA1(26824e3dc563b681f195029f220dfaa405613f9e) )
+	ROM_LOAD( "zaurus sl-b500 - 5600,zimage.bin", 0x000000, 0x11b6b0, BAD_DUMP CRC(779c70a1) SHA1(26824e3dc563b681f195029f220dfaa405613f9e) )
 ROM_END
 
 ROM_START( zslc750 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-	ROM_LOAD( "zaurus sl-c750 (zimage).bin", 0x000000, 0x121544, BAD_DUMP CRC(56353f4d) SHA1(8e1fff6e93d560bd6572c5c163bbd81378693f68) )
+	ROM_LOAD( "zaurus sl-c750,zimage.bin", 0x000000, 0x121544, BAD_DUMP CRC(56353f4d) SHA1(8e1fff6e93d560bd6572c5c163bbd81378693f68) )
 ROM_END
 
 ROM_START( zslc760 )
 	ROM_REGION32_LE( 0x200000, "firmware", ROMREGION_ERASE00 )
-	ROM_LOAD( "zaurus sl-c760 (zimage).bin", 0x000000, 0x120b44, BAD_DUMP CRC(feedcba3) SHA1(1821ad0fc03a8c3832ad5fe2221c21c1ca277508) )
+	ROM_LOAD( "zaurus sl-c760,zimage.bin", 0x000000, 0x120b44, BAD_DUMP CRC(feedcba3) SHA1(1821ad0fc03a8c3832ad5fe2221c21c1ca277508) )
 ROM_END
 
 ROM_START( zslc3000 )

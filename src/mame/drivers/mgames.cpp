@@ -524,24 +524,25 @@ WRITE8_MEMBER(mgames_state::outport7_w)
 
 */
 
-ADDRESS_MAP_START(mgames_state::main_map)
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
+void mgames_state::main_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
 //  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
-	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("nvram")   /* NVRAM = 2x SCM5101E */
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("video")   /* 4x MM2114N-3 */
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("SW1")
-	AM_RANGE(0x8001, 0x8001) AM_READ(mixport_r) /* DIP switch bank 2 + a sort of watchdog */
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1")
-	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN2")
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(outport0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(outport1_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(outport2_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(outport3_w)
-	AM_RANGE(0x8004, 0x8004) AM_WRITE(outport4_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE(outport5_w)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(outport6_w)
-	AM_RANGE(0x8007, 0x8007) AM_WRITE(outport7_w)
-ADDRESS_MAP_END
+	map(0x3800, 0x38ff).ram().share("nvram");   /* NVRAM = 2x SCM5101E */
+	map(0x4000, 0x47ff).ram().share("video");   /* 4x MM2114N-3 */
+	map(0x8000, 0x8000).portr("SW1");
+	map(0x8001, 0x8001).r(this, FUNC(mgames_state::mixport_r)); /* DIP switch bank 2 + a sort of watchdog */
+	map(0x8002, 0x8002).portr("IN1");
+	map(0x8003, 0x8003).portr("IN2");
+	map(0x8000, 0x8000).w(this, FUNC(mgames_state::outport0_w));
+	map(0x8001, 0x8001).w(this, FUNC(mgames_state::outport1_w));
+	map(0x8002, 0x8002).w(this, FUNC(mgames_state::outport2_w));
+	map(0x8003, 0x8003).w(this, FUNC(mgames_state::outport3_w));
+	map(0x8004, 0x8004).w(this, FUNC(mgames_state::outport4_w));
+	map(0x8005, 0x8005).w(this, FUNC(mgames_state::outport5_w));
+	map(0x8006, 0x8006).w(this, FUNC(mgames_state::outport6_w));
+	map(0x8007, 0x8007).w(this, FUNC(mgames_state::outport7_w));
+}
 
 
 static INPUT_PORTS_START( mgames )

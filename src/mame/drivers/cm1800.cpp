@@ -48,9 +48,7 @@ public:
 		, m_uart(*this, "uart")
 	{ }
 
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_WRITE8_MEMBER(port00_w);
+	DECLARE_READ8_MEMBER(uart_status_r);
 
 	void cm1800(machine_config &config);
 	void io_map(address_map &map);
@@ -61,35 +59,24 @@ private:
 	required_device<ay31015_device> m_uart;
 };
 
-WRITE8_MEMBER( cm1800_state::port00_w )
-{
-	m_uart->set_transmit_data(data);
-}
-
-READ8_MEMBER( cm1800_state::port01_r )
+READ8_MEMBER(cm1800_state::uart_status_r)
 {
 	return (m_uart->dav_r()) | (m_uart->tbmt_r() << 2);
 }
 
-READ8_MEMBER( cm1800_state::port00_r )
+void cm1800_state::mem_map(address_map &map)
 {
-	m_uart->write_rdav(0);
-	u8 result = m_uart->get_received_data();
-	m_uart->write_rdav(1);
-	return result;
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom().region("roms", 0);
+	map(0x0800, 0xffff).ram();
 }
 
-ADDRESS_MAP_START(cm1800_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE( 0x0800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START(cm1800_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_READWRITE(port00_r,port00_w)
-	AM_RANGE(0x01, 0x01) AM_READ(port01_r)
-ADDRESS_MAP_END
+void cm1800_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0x01, 0x01).r(this, FUNC(cm1800_state::uart_status_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( cm1800 )
@@ -122,6 +109,7 @@ MACHINE_CONFIG_START(cm1800_state::cm1800)
 	MCFG_AY51013_RX_CLOCK(153600)
 	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
 	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_AUTO_RDAV(true)
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 MACHINE_CONFIG_END
 

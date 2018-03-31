@@ -264,20 +264,21 @@ WRITE8_MEMBER(tattack_state::sound_w)
 	}
 }
 
-ADDRESS_MAP_START(tattack_state::tattack_map)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("AN_PADDLE") // $315, checks again with same memory, loops if different (?)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("colorram")    // color map ? something else .. only bits 1-3 are used
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")       // dsw ? something else ?
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITE(sound_w) // sound
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(brick_dma_w) // bit 7 = strobe ($302)
-	AM_RANGE(0xc002, 0xc002) AM_WRITENOP // same as sound port, outputs?
-	AM_RANGE(0xc005, 0xc005) AM_WRITE(paddle_w)
-	AM_RANGE(0xc006, 0xc007) AM_WRITE(ball_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void tattack_state::tattack_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x4000, 0x4000).portr("AN_PADDLE"); // $315, checks again with same memory, loops if different (?)
+	map(0x5000, 0x53ff).ram().share("videoram");
+	map(0x6000, 0x6000).portr("DSW2");
+	map(0x7000, 0x73ff).ram().share("colorram");    // color map ? something else .. only bits 1-3 are used
+	map(0xa000, 0xa000).portr("DSW1");       // dsw ? something else ?
+	map(0xc000, 0xc000).portr("INPUTS").w(this, FUNC(tattack_state::sound_w)); // sound
+	map(0xc001, 0xc001).w(this, FUNC(tattack_state::brick_dma_w)); // bit 7 = strobe ($302)
+	map(0xc002, 0xc002).nopw(); // same as sound port, outputs?
+	map(0xc005, 0xc005).w(this, FUNC(tattack_state::paddle_w));
+	map(0xc006, 0xc007).w(this, FUNC(tattack_state::ball_w));
+	map(0xe000, 0xe3ff).ram().share("ram");
+}
 
 static INPUT_PORTS_START( tattack )
 	PORT_START("INPUTS")

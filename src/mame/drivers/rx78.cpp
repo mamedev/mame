@@ -275,29 +275,31 @@ WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
 }
 
 
-ADDRESS_MAP_START(rx78_state::rx78_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
+void rx78_state::rx78_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom().region("roms", 0);
 	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
-	AM_RANGE(0x6000, 0xafff) AM_RAM //ext RAM
-	AM_RANGE(0xb000, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+	map(0x6000, 0xafff).ram(); //ext RAM
+	map(0xb000, 0xebff).ram();
+	map(0xec00, 0xffff).rw(this, FUNC(rx78_state::vram_r), FUNC(rx78_state::vram_w));
+}
 
-ADDRESS_MAP_START(rx78_state::rx78_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void rx78_state::rx78_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 //  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
 //  AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(cass_r, cass_w) //cmt
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(vram_read_bank_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(vram_write_bank_w)
-	AM_RANGE(0xf4, 0xf4) AM_READWRITE(key_r, key_w) //keyboard
-	AM_RANGE(0xf5, 0xfb) AM_WRITE(vdp_reg_w) //vdp
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(vdp_bg_reg_w) //vdp
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(vdp_pri_mask_w)
-	AM_RANGE(0xff, 0xff) AM_DEVWRITE("sn1", sn76489a_device, write) //psg
-ADDRESS_MAP_END
+	map(0xf0, 0xf0).rw(this, FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
+	map(0xf1, 0xf1).w(this, FUNC(rx78_state::vram_read_bank_w));
+	map(0xf2, 0xf2).w(this, FUNC(rx78_state::vram_write_bank_w));
+	map(0xf4, 0xf4).rw(this, FUNC(rx78_state::key_r), FUNC(rx78_state::key_w)); //keyboard
+	map(0xf5, 0xfb).w(this, FUNC(rx78_state::vdp_reg_w)); //vdp
+	map(0xfc, 0xfc).w(this, FUNC(rx78_state::vdp_bg_reg_w)); //vdp
+	map(0xfe, 0xfe).w(this, FUNC(rx78_state::vdp_pri_mask_w));
+	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::write)); //psg
+}
 
 /* Input ports */
 static INPUT_PORTS_START( rx78 )

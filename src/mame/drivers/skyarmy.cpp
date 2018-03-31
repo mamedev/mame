@@ -210,27 +210,29 @@ WRITE_LINE_MEMBER(skyarmy_state::nmi_enable_w)
 }
 
 
-ADDRESS_MAP_START(skyarmy_state::skyarmy_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram") /* Video RAM */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram") /* Color RAM */
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("scrollram")  /* Scroll RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
-	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
-	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("latch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void skyarmy_state::skyarmy_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8fff).ram().w(this, FUNC(skyarmy_state::videoram_w)).share("videoram"); /* Video RAM */
+	map(0x9000, 0x93ff).ram().w(this, FUNC(skyarmy_state::colorram_w)).share("colorram"); /* Color RAM */
+	map(0x9800, 0x983f).ram().share("spriteram"); /* Sprites */
+	map(0x9840, 0x985f).ram().share("scrollram");  /* Scroll RAM */
+	map(0xa000, 0xa000).portr("DSW");
+	map(0xa001, 0xa001).portr("P1");
+	map(0xa002, 0xa002).portr("P2");
+	map(0xa003, 0xa003).portr("SYSTEM");
+	map(0xa000, 0xa007).w("latch", FUNC(ls259_device::write_d0));
+}
 
-ADDRESS_MAP_START(skyarmy_state::skyarmy_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay0", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay0", ay8910_device, data_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay1", ay8910_device, data_r)
-ADDRESS_MAP_END
+void skyarmy_state::skyarmy_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay0", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).r("ay0", FUNC(ay8910_device::data_r));
+	map(0x04, 0x05).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x06, 0x06).r("ay1", FUNC(ay8910_device::data_r));
+}
 
 
 /* verified from Z80 code */

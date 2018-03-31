@@ -43,9 +43,10 @@ WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 	}
 }
 
-ADDRESS_MAP_START(pecom_state::cdp1869_page_ram)
-	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM
-ADDRESS_MAP_END
+void pecom_state::cdp1869_page_ram(address_map &map)
+{
+	map(0x000, 0x3ff).mirror(0x400).ram();
+}
 
 CDP1869_CHAR_RAM_READ_MEMBER(pecom_state::pecom_char_ram_r )
 {

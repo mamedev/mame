@@ -52,6 +52,8 @@ private:
 	required_memory_region m_osrom;
 	required_memory_bank_array<3> m_cpubank;
 
+	uint32_t m_bankmask;
+
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE8_MEMBER(duart_output);
 

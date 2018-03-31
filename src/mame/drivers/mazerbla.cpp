@@ -453,59 +453,65 @@ WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
  *
  *************************************/
 
-ADDRESS_MAP_START(mazerbla_state::mazerbla_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void mazerbla_state::mazerbla_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xc7ff).ram().share("share1");
+	map(0xd800, 0xd800).r(this, FUNC(mazerbla_state::cfb_zpu_int_req_clr));
+	map(0xe000, 0xefff).ram().share("nvram");
+}
 
-ADDRESS_MAP_START(mazerbla_state::mazerbla_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x4c, 0x4f) AM_READWRITE(ls670_1_r, ls670_0_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w) // AM_READ from protection pal, if populated
-	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
+void mazerbla_state::mazerbla_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x4c, 0x4f).rw(this, FUNC(mazerbla_state::ls670_1_r), FUNC(mazerbla_state::ls670_0_w));
+	map(0x60, 0x60).w(this, FUNC(mazerbla_state::zpu_bcd_decoder_w)); // AM_READ from protection pal, if populated
+	map(0x62, 0x62).r(this, FUNC(mazerbla_state::zpu_inputs_r));
 	// 64 is some sort of output latch, unpopulated?
 	// 66 is some sort of output latch, unpopulated?
-	AM_RANGE(0x68, 0x68) AM_WRITE(zpu_coin_counter_w)
-	AM_RANGE(0x6a, 0x6a) AM_WRITE(zpu_lamps_w)
+	map(0x68, 0x68).w(this, FUNC(mazerbla_state::zpu_coin_counter_w));
+	map(0x6a, 0x6a).w(this, FUNC(mazerbla_state::zpu_lamps_w));
 	// 6c RW is a 6850 acia for communication with another cabinet or debug console? unpopulated?
-	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
-ADDRESS_MAP_END
+	map(0x6e, 0x6f).w(this, FUNC(mazerbla_state::zpu_led_w));
+}
 
-ADDRESS_MAP_START(mazerbla_state::mazerbla_cpu2_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM /* main RAM (stack) */
-	AM_RANGE(0x8000, 0x83ff) AM_RAM /* waveform ???*/
-	AM_RANGE(0xc000, 0xc003) AM_WRITENOP
-ADDRESS_MAP_END
+void mazerbla_state::mazerbla_cpu2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram(); /* main RAM (stack) */
+	map(0x8000, 0x83ff).ram(); /* waveform ???*/
+	map(0xc000, 0xc003).nopw();
+}
 
-ADDRESS_MAP_START(mazerbla_state::mazerbla_cpu2_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(vsb_ls273_audio_control_w)
-	AM_RANGE(0x40, 0x41) AM_WRITENOP
-	AM_RANGE(0x80, 0x83) AM_READWRITE(ls670_0_r, ls670_1_w)
-ADDRESS_MAP_END
+void mazerbla_state::mazerbla_cpu2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(mazerbla_state::vsb_ls273_audio_control_w));
+	map(0x40, 0x41).nopw();
+	map(0x80, 0x83).rw(this, FUNC(mazerbla_state::ls670_0_r), FUNC(mazerbla_state::ls670_1_w));
+}
 
-ADDRESS_MAP_START(mazerbla_state::mazerbla_cpu3_map)
-	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")                    /* GFX roms */
-	AM_RANGE(0x4000, 0x4003) AM_DEVWRITE("vcu", mb_vcu_device, write_vregs)
-	AM_RANGE(0x6000, 0x67ff) AM_DEVREADWRITE("vcu", mb_vcu_device, read_ram, write_ram)
-	AM_RANGE(0xa000, 0xa7ff) AM_DEVREAD("vcu", mb_vcu_device, load_params)
-	AM_RANGE(0xc000, 0xdfff) AM_DEVREAD("vcu", mb_vcu_device, load_gfx)
-	AM_RANGE(0xe000, 0xffff) AM_DEVREAD("vcu", mb_vcu_device, load_set_clr)
-ADDRESS_MAP_END
+void mazerbla_state::mazerbla_cpu3_map(address_map &map)
+{
+	map(0x0000, 0x37ff).rom();
+	map(0x3800, 0x3fff).ram().share("share1");
+	map(0x4000, 0x5fff).bankr("bank1");                    /* GFX roms */
+	map(0x4000, 0x4003).w(m_vcu, FUNC(mb_vcu_device::write_vregs));
+	map(0x6000, 0x67ff).rw(m_vcu, FUNC(mb_vcu_device::read_ram), FUNC(mb_vcu_device::write_ram));
+	map(0xa000, 0xa7ff).r(m_vcu, FUNC(mb_vcu_device::load_params));
+	map(0xc000, 0xdfff).r(m_vcu, FUNC(mb_vcu_device::load_gfx));
+	map(0xe000, 0xffff).r(m_vcu, FUNC(mb_vcu_device::load_set_clr));
+}
 
-ADDRESS_MAP_START(mazerbla_state::mazerbla_cpu3_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("vcu", mb_vcu_device, background_color_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("vcu", mb_vcu_device, status_r) AM_WRITE(cfb_led_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("vcu", mb_vcu_device, vbank_w)
-ADDRESS_MAP_END
+void mazerbla_state::mazerbla_cpu3_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).w(m_vcu, FUNC(mb_vcu_device::background_color_w));
+	map(0x02, 0x02).r(m_vcu, FUNC(mb_vcu_device::status_r)).w(this, FUNC(mazerbla_state::cfb_led_w));
+	map(0x03, 0x03).w(this, FUNC(mazerbla_state::cfb_zpu_int_req_set_w));
+	map(0x04, 0x04).w(this, FUNC(mazerbla_state::cfb_rom_bank_sel_w));
+	map(0x05, 0x05).w(m_vcu, FUNC(mb_vcu_device::vbank_w));
+}
 
 
 /*************************************
@@ -514,31 +520,34 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(mazerbla_state::greatgun_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x4c, 0x4c) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
-	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
-	AM_RANGE(0x66, 0x66) AM_WRITENOP
-	AM_RANGE(0x68, 0x68) AM_WRITENOP
-	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
-ADDRESS_MAP_END
+void mazerbla_state::greatgun_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x4c, 0x4c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x60, 0x60).w(this, FUNC(mazerbla_state::zpu_bcd_decoder_w));
+	map(0x62, 0x62).r(this, FUNC(mazerbla_state::zpu_inputs_r));
+	map(0x66, 0x66).nopw();
+	map(0x68, 0x68).nopw();
+	map(0x6e, 0x6f).w(this, FUNC(mazerbla_state::zpu_led_w));
+}
 
-ADDRESS_MAP_START(mazerbla_state::greatgun_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_int_clear_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
-ADDRESS_MAP_END
+void mazerbla_state::greatgun_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x4000, 0x4001).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x6000, 0x6001).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x8000, 0x8000).w(this, FUNC(mazerbla_state::sound_int_clear_w));
+	map(0xa000, 0xa000).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
+}
 
-ADDRESS_MAP_START(mazerbla_state::greatgun_cpu3_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_IMPORT_FROM( mazerbla_cpu3_io_map )
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("vcu", mb_vcu_device, vbank_clear_w)
-ADDRESS_MAP_END
+void mazerbla_state::greatgun_cpu3_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	mazerbla_cpu3_io_map(map);
+	map(0x05, 0x05).w(m_vcu, FUNC(mb_vcu_device::vbank_clear_w));
+}
 
 
 /*************************************

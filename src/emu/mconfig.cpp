@@ -68,7 +68,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 				char const *const default_bios = option->default_bios();
 				if (default_bios != nullptr)
-					device_t::static_set_default_bios_tag(*new_dev, default_bios);
+					new_dev->set_default_bios_tag(default_bios);
 
 				auto additions = option->machine_config();
 				if (additions)
@@ -76,7 +76,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 				input_device_default const *const input_device_defaults = option->input_device_defaults();
 				if (input_device_defaults)
-					device_t::static_set_input_default(*new_dev, input_device_defaults);
+					new_dev->set_input_default(input_device_defaults);
 			}
 			else
 				throw emu_fatalerror("Unknown slot option '%s' in slot '%s'", selval, owner.tag()+1);
@@ -96,17 +96,6 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 machine_config::~machine_config()
 {
-}
-
-
-//-------------------------------------------------
-//  first_screen - return a pointer to the first
-//  screen device
-//-------------------------------------------------
-
-screen_device *machine_config::first_screen() const
-{
-	return screen_device_iterator(root_device()).first();
 }
 
 

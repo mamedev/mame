@@ -52,11 +52,14 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(minicom_io_w);
-	DECLARE_READ8_MEMBER(minicom_io_r);
+	DECLARE_WRITE8_MEMBER(i87c52_p0_w);
+	DECLARE_WRITE8_MEMBER(i87c52_p1_w);
+	DECLARE_WRITE8_MEMBER(i87c52_p2_w);
+	DECLARE_WRITE8_MEMBER(i87c52_p3_w);
+	DECLARE_READ8_MEMBER(i87c52_p1_r);
+	DECLARE_READ8_MEMBER(i87c52_p2_r);
 	DECLARE_DRIVER_INIT(minicom);
 	void minicom(machine_config &config);
-	void i87c52_io(address_map &map);
 private:
 	uint8_t m_p[4];
 	uint16_t m_display_data;
@@ -65,10 +68,6 @@ private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
-
-ADDRESS_MAP_START(minicom_state::i87c52_io)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(minicom_io_r, minicom_io_w)
-ADDRESS_MAP_END
 
 void minicom_state::machine_start()
 {
@@ -92,24 +91,18 @@ void minicom_state::machine_reset()
 		output().set_digit_value(i, 0);
 }
 
-READ8_MEMBER(minicom_state::minicom_io_r)
+READ8_MEMBER(minicom_state::i87c52_p1_r)
 {
-	switch (offset)
-	{
-		case 1:
-			//P1.3 seems to be an indicator of whether or not we have a printer device attached.
-			// at address 0xABF the code checks this flag in order to decide which string to display:
-			// "MINIPRINT IS RESET" or "MINICOM IS RESET"
-			return PRINTER_ATTACHED << 3;
-		case 2:
+	//P1.3 seems to be an indicator of whether or not we have a printer device attached.
+	// at address 0xABF the code checks this flag in order to decide which string to display:
+	// "MINIPRINT IS RESET" or "MINICOM IS RESET"
+	return PRINTER_ATTACHED << 3;
+}
+
+READ8_MEMBER(minicom_state::i87c52_p2_r)
+{
 //          return 0; //para a palestra no Garoa... :-)
-			return 1; //to skip the "NO POWER" warning. I'm not sure why.
-		default:
-#if LOG_IO_PORTS
-			printf("Unhandled I/O Read at offset 0x%02X (return 0)\n", offset);
-#endif
-			return 0;
-		}
+	return 1; //to skip the "NO POWER" warning. I'm not sure why.
 }
 
 #if LOG_IO_PORTS
@@ -125,101 +118,94 @@ static void printbits(uint8_t v) {
 #define P1_UNKNOWN_BITS (0xFF & ~(1 << 2))
 #define P2_UNKNOWN_BITS 0xFF
 #define P3_UNKNOWN_BITS (0xFF & ~((1 << 4)|(1 << 5)))
-WRITE8_MEMBER(minicom_state::minicom_io_w)
+WRITE8_MEMBER(minicom_state::i87c52_p0_w)
 {
-	switch (offset)
+	if (data != m_p[0])
 	{
-		case 0x00:
-		{
-			if (data != m_p[offset])
-			{
-				m_p[offset]=data;
+		m_p[0]=data;
 
-				//Bit P0.1 is the serial-input of a 20-bit shift register (made of a couple of chained UCN5810AF chips)
-				//We are emulating the display based on the assumption that the firmware will multiplex it by defining one digit at a given time
-				//It would be better (in terms of being closer to the actual hardware) to emulate the 20 bit shift register and update all digits
-				//for which a bit is TTL high. It seems to me that in the real hardware that would result in dimmer brightness in the display and it
-				//does not seem trivial to me to implement this using our current layout system. I'm leaving this note to whoever finds it exciting
+		//Bit P0.1 is the serial-input of a 20-bit shift register (made of a couple of chained UCN5810AF chips)
+		//We are emulating the display based on the assumption that the firmware will multiplex it by defining one digit at a given time
+		//It would be better (in terms of being closer to the actual hardware) to emulate the 20 bit shift register and update all digits
+		//for which a bit is TTL high. It seems to me that in the real hardware that would result in dimmer brightness in the display and it
+		//does not seem trivial to me to implement this using our current layout system. I'm leaving this note to whoever finds it exciting
 				//to explore these possibilities (perhaps myself in the future?).
-				if (BIT(data,1)){
-					m_digit_index = 0;
-				}
-			}
-			break;
+		if (BIT(data,1)){
+			m_digit_index = 0;
 		}
-		case 0x01:
-		{
-			if (data != m_p[offset])
-			{
+	}
+}
+
+WRITE8_MEMBER(minicom_state::i87c52_p1_w)
+{
+	if (data != m_p[1])
+	{
 #if LOG_IO_PORTS
-				uint8_t changed = m_p[offset] ^ data;
-				if (changed ^ P1_UNKNOWN_BITS)
-				{
-					printf("Write to P1: %02X changed: (        ) (", data);
-					printbits(changed);
-					printf(") (        ) (        )\n");
-				}
+		uint8_t changed = m_p[1] ^ data;
+		if (changed ^ P1_UNKNOWN_BITS)
+		{
+			printf("Write to P1: %02X changed: (        ) (", data);
+			printbits(changed);
+			printf(") (        ) (        )\n");
+		}
 #endif
-				if (FALLING_EDGE(m_p[offset], data, 2))
-				{
-					m_digit_index--;
-					if (m_digit_index<0) m_digit_index = 19;
-				}
-				m_p[offset]=data;
-			}
-			break;
-		}
-		case 0x02:
+		if (FALLING_EDGE(m_p[1], data, 2))
 		{
-			if (data != m_p[offset])
-			{
+			m_digit_index--;
+			if (m_digit_index<0) m_digit_index = 19;
+		}
+		m_p[1] = data;
+	}
+}
+
+WRITE8_MEMBER(minicom_state::i87c52_p2_w)
+{
+	if (data != m_p[2])
+	{
 #if LOG_IO_PORTS
-				uint8_t changed = m_p[offset] ^ data;
-				if (changed ^ P2_UNKNOWN_BITS)
-				{
-					printf("Write to P2: %02X changed: (        ) (        ) (", data);
-					printbits(changed);
-					printf(") (        )\n");
-				}
+		uint8_t changed = m_p[2] ^ data;
+		if (changed ^ P2_UNKNOWN_BITS)
+		{
+			printf("Write to P2: %02X changed: (        ) (        ) (", data);
+			printbits(changed);
+			printf(") (        )\n");
+		}
 #endif
-				m_p[offset]=data;
-			}
-			break;
-		}
-		case 0x03:
-		{
-			if (data != m_p[offset])
-			{
-				uint8_t changed = m_p[offset] ^ data;
+		m_p[2] = data;
+	}
+}
+
+WRITE8_MEMBER(minicom_state::i87c52_p3_w)
+{
+	if (data != m_p[3])
+	{
+		uint8_t changed = m_p[3] ^ data;
 #if LOG_IO_PORTS
-				if (changed ^ P3_UNKNOWN_BITS)
-				{
-					printf("Write to P3: %02X changed: (        ) (        ) (        ) (", data);
-					printbits(changed);
-					printf(")\n");
-				}
+		if (changed ^ P3_UNKNOWN_BITS)
+		{
+			printf("Write to P3: %02X changed: (        ) (        ) (        ) (", data);
+			printbits(changed);
+			printf(")\n");
+		}
 #endif
 
-				if (FALLING_EDGE(m_p[offset], data, 4)) //P3.4 = T0
-				{
-					m_display_data &= 0xFF00;
-					m_display_data |= m_p[0];
-				}
-
-				if (FALLING_EDGE(m_p[offset], data, 5)) //P3.5 = T1
-				{
-					m_display_data &= 0xFF;
-					m_display_data |= (m_p[0] << 8);
-				}
-
-				if (BIT(changed,4) || BIT(changed,5))
-				{
-					output().set_digit_value(m_digit_index, bitswap<16>(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
-				}
-				m_p[offset]=data;
-			}
-			break;
+		if (FALLING_EDGE(m_p[3], data, 4)) //P3.4 = T0
+		{
+			m_display_data &= 0xFF00;
+			m_display_data |= m_p[0];
 		}
+
+		if (FALLING_EDGE(m_p[3], data, 5)) //P3.5 = T1
+		{
+			m_display_data &= 0xFF;
+			m_display_data |= (m_p[0] << 8);
+		}
+
+		if (BIT(changed,4) || BIT(changed,5))
+		{
+			output().set_digit_value(m_digit_index, bitswap<16>(m_display_data,  9,  1,  3, 11, 12,  4,  2, 10, 14, 6,  7, 5,  0, 15,  13, 8) & 0x3FFF);
+		}
+		m_p[3] = data;
 	}
 }
 
@@ -230,7 +216,12 @@ DRIVER_INIT_MEMBER( minicom_state, minicom )
 MACHINE_CONFIG_START(minicom_state::minicom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I87C52, XTAL(10'000'000)) /*FIX-ME: verify the correct clock frequency */
-	MCFG_CPU_IO_MAP(i87c52_io)
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(minicom_state, i87c52_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(minicom_state, i87c52_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(minicom_state, i87c52_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(minicom_state, i87c52_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(minicom_state, i87c52_p2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(minicom_state, i87c52_p3_w))
 
 	/* video hardware */
 	/* fluorescent 14-segment display forming a row of 20 characters */

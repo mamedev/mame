@@ -334,72 +334,74 @@ WRITE_LINE_MEMBER(cgc7900_state::write_rs449_clock)
     ADDRESS_MAP( cgc7900_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(cgc7900_state::cgc7900_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chrom_ram")
-	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
-	AM_RANGE(0x810000, 0x9fffff) AM_READ(unmapped_r)
-	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(z_mode_r, z_mode_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_SHARE("plane_ram")
-	AM_RANGE(0xe00000, 0xe1ffff) AM_WRITE(color_status_w)
+void cgc7900_state::cgc7900_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).ram().share("chrom_ram");
+	map(0x800000, 0x80ffff).rom().region(M68000_TAG, 0);
+	map(0x810000, 0x9fffff).r(this, FUNC(cgc7900_state::unmapped_r));
+	map(0xa00000, 0xbfffff).rw(this, FUNC(cgc7900_state::z_mode_r), FUNC(cgc7900_state::z_mode_w));
+	map(0xc00000, 0xdfffff).ram().share("plane_ram");
+	map(0xe00000, 0xe1ffff).w(this, FUNC(cgc7900_state::color_status_w));
 //  AM_RANGE(0xe20000, 0xe23fff) Raster Processor
-	AM_RANGE(0xe30000, 0xe303ff) AM_RAM AM_SHARE("clut_ram")
-	AM_RANGE(0xe38000, 0xe3bfff) AM_RAM AM_SHARE("overlay_ram")
-	AM_RANGE(0xe40000, 0xe40001) AM_RAM AM_SHARE("roll_bitmap")
-	AM_RANGE(0xe40002, 0xe40003) AM_RAM AM_SHARE("pan_x")
-	AM_RANGE(0xe40004, 0xe40005) AM_RAM AM_SHARE("pan_y")
-	AM_RANGE(0xe40006, 0xe40007) AM_RAM AM_SHARE("zoom")
-	AM_RANGE(0xe40008, 0xe40009) AM_RAM
-	AM_RANGE(0xe4000a, 0xe4000f) AM_RAM // Raster Processor
-	AM_RANGE(0xe40010, 0xe40011) AM_RAM AM_SHARE("blink_select")
-	AM_RANGE(0xe40012, 0xe40013) AM_RAM AM_SHARE("plane_select")
-	AM_RANGE(0xe40014, 0xe40015) AM_RAM AM_SHARE("plane_switch")
-	AM_RANGE(0xe40016, 0xe40017) AM_RAM AM_SHARE("color_status_fg")
-	AM_RANGE(0xe40018, 0xe40019) AM_RAM AM_SHARE("color_status_bg")
-	AM_RANGE(0xe4001a, 0xe4001b) AM_RAM AM_SHARE("roll_overlay")
-	AM_RANGE(0xe4001c, 0xe40fff) AM_RAM
+	map(0xe30000, 0xe303ff).ram().share("clut_ram");
+	map(0xe38000, 0xe3bfff).ram().share("overlay_ram");
+	map(0xe40000, 0xe40001).ram().share("roll_bitmap");
+	map(0xe40002, 0xe40003).ram().share("pan_x");
+	map(0xe40004, 0xe40005).ram().share("pan_y");
+	map(0xe40006, 0xe40007).ram().share("zoom");
+	map(0xe40008, 0xe40009).ram();
+	map(0xe4000a, 0xe4000f).ram(); // Raster Processor
+	map(0xe40010, 0xe40011).ram().share("blink_select");
+	map(0xe40012, 0xe40013).ram().share("plane_select");
+	map(0xe40014, 0xe40015).ram().share("plane_switch");
+	map(0xe40016, 0xe40017).ram().share("color_status_fg");
+	map(0xe40018, 0xe40019).ram().share("color_status_bg");
+	map(0xe4001a, 0xe4001b).ram().share("roll_overlay");
+	map(0xe4001c, 0xe40fff).ram();
 //  AM_RANGE(0xefc440, 0xefc441) HVG Load X
 //  AM_RANGE(0xefc442, 0xefc443) HVG Load Y
 //  AM_RANGE(0xefc444, 0xefc445) HVG Load dX
 //  AM_RANGE(0xefc446, 0xefc447) HVG Load dY
 //  AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
 //  AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(INS8251_0_TAG, i8251_device, data_r, data_w, 0xff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(INS8251_0_TAG, i8251_device, status_r, control_w, 0xff)
-	AM_RANGE(0xff8040, 0xff8041) AM_DEVREADWRITE8(INS8251_1_TAG, i8251_device, data_r, data_w, 0xff)
-	AM_RANGE(0xff8042, 0xff8043) AM_DEVREADWRITE8(INS8251_1_TAG, i8251_device, status_r, control_w, 0xff)
-	AM_RANGE(0xff8080, 0xff8081) AM_READWRITE(keyboard_r, keyboard_w)
+	map(0xff8001, 0xff8001).rw(m_i8251_0, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xff8003, 0xff8003).rw(m_i8251_0, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xff8041, 0xff8041).rw(m_i8251_1, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xff8043, 0xff8043).rw(m_i8251_1, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xff8080, 0xff8081).rw(this, FUNC(cgc7900_state::keyboard_r), FUNC(cgc7900_state::keyboard_w));
 //  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
 //  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
 //  AM_RANGE(0xff80cc, 0xff80cd) Joystick Z axis
-	AM_RANGE(0xff8100, 0xff8101) AM_READWRITE(disk_data_r, disk_data_w)
-	AM_RANGE(0xff8120, 0xff8121) AM_READWRITE(disk_status_r, disk_command_w)
-	AM_RANGE(0xff8140, 0xff8141) AM_READ_PORT("BEZEL")
-	AM_RANGE(0xff8180, 0xff8181) AM_WRITE8(baud_write, 0xff00)
-	AM_RANGE(0xff81c0, 0xff81ff) AM_DEVREADWRITE8(MM58167_TAG, mm58167_device, read, write, 0xff)
-	AM_RANGE(0xff8200, 0xff8201) AM_WRITE(interrupt_mask_w)
+	map(0xff8100, 0xff8101).rw(this, FUNC(cgc7900_state::disk_data_r), FUNC(cgc7900_state::disk_data_w));
+	map(0xff8120, 0xff8121).rw(this, FUNC(cgc7900_state::disk_status_r), FUNC(cgc7900_state::disk_command_w));
+	map(0xff8140, 0xff8141).portr("BEZEL");
+	map(0xff8180, 0xff8180).w(this, FUNC(cgc7900_state::baud_write));
+	map(0xff81c0, 0xff81ff).rw(MM58167_TAG, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
+	map(0xff8200, 0xff8201).w(this, FUNC(cgc7900_state::interrupt_mask_w));
 //  AM_RANGE(0xff8240, 0xff8241) Light Pen enable
 //  AM_RANGE(0xff8242, 0xff8243) Light Pen X value
 //  AM_RANGE(0xff8244, 0xff8245) Light Pen Y value
 //  AM_RANGE(0xff8246, 0xff8247) Buffer memory parity check
 //  AM_RANGE(0xff8248, 0xff8249) Buffer memory parity set/reset
-	AM_RANGE(0xff824a, 0xff824b) AM_READ(sync_r)
-	AM_RANGE(0xff83c0, 0xff83c1) AM_DEVWRITE8(AY8910_TAG, ay8910_device, address_w, 0xff00)
-	AM_RANGE(0xff83c2, 0xff83c3) AM_DEVREAD8(AY8910_TAG, ay8910_device, data_r, 0xff00)
-	AM_RANGE(0xff83c4, 0xff83c5) AM_DEVWRITE8(AY8910_TAG, ay8910_device, data_w, 0xff00)
+	map(0xff824a, 0xff824b).r(this, FUNC(cgc7900_state::sync_r));
+	map(0xff83c0, 0xff83c0).w(AY8910_TAG, FUNC(ay8910_device::address_w));
+	map(0xff83c2, 0xff83c2).r(AY8910_TAG, FUNC(ay8910_device::data_r));
+	map(0xff83c4, 0xff83c4).w(AY8910_TAG, FUNC(ay8910_device::data_w));
 	// DDMA option board
 //  AM_RANGE(0xff8500, 0xff8501) Disk DMA Command Register
 //  AM_RANGE(0xff8502, 0xff8503) Disk DMA Address Register
 //  AM_RANGE(0xff8507, 0xff8507) Disk DMA Control/Status Register
-ADDRESS_MAP_END
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( keyboard_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(cgc7900_state::keyboard_mem)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void cgc7900_state::keyboard_mem(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
 /***************************************************************************
     INPUT PORTS

@@ -65,25 +65,25 @@
 //**************************************************************************
 
 #define MCFG_Z8536_IRQ_CALLBACK(_write) \
-	devcb = &z8536_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<z8536_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 #define MCFG_Z8536_PA_IN_CALLBACK(_read) \
-	devcb = &z8536_device::set_pa_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<z8536_device &>(*device).set_pa_rd_callback(DEVCB_##_read);
 
 #define MCFG_Z8536_PA_OUT_CALLBACK(_write) \
-	devcb = &z8536_device::set_pa_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<z8536_device &>(*device).set_pa_wr_callback(DEVCB_##_write);
 
 #define MCFG_Z8536_PB_IN_CALLBACK(_read) \
-	devcb = &z8536_device::set_pb_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<z8536_device &>(*device).set_pb_rd_callback(DEVCB_##_read);
 
 #define MCFG_Z8536_PB_OUT_CALLBACK(_write) \
-	devcb = &z8536_device::set_pb_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<z8536_device &>(*device).set_pb_wr_callback(DEVCB_##_write);
 
 #define MCFG_Z8536_PC_IN_CALLBACK(_read) \
-	devcb = &z8536_device::set_pc_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<z8536_device &>(*device).set_pc_rd_callback(DEVCB_##_read);
 
 #define MCFG_Z8536_PC_OUT_CALLBACK(_write) \
-	devcb = &z8536_device::set_pc_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<z8536_device &>(*device).set_pc_wr_callback(DEVCB_##_write);
 
 
 
@@ -97,13 +97,13 @@ class cio_base_device : public device_t
 {
 public:
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<cio_base_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pa_rd_callback(device_t &device, Object &&cb) { return downcast<cio_base_device &>(device).m_read_pa.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pa_wr_callback(device_t &device, Object &&cb) { return downcast<cio_base_device &>(device).m_write_pa.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pb_rd_callback(device_t &device, Object &&cb) { return downcast<cio_base_device &>(device).m_read_pb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pb_wr_callback(device_t &device, Object &&cb) { return downcast<cio_base_device &>(device).m_write_pb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pc_rd_callback(device_t &device, Object &&cb) { return downcast<cio_base_device &>(device).m_read_pc.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pc_wr_callback(device_t &device, Object &&cb) { return downcast<cio_base_device &>(device).m_write_pc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pa_rd_callback(Object &&cb) { return m_read_pa.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pa_wr_callback(Object &&cb) { return m_write_pa.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pb_rd_callback(Object &&cb) { return m_read_pb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pb_wr_callback(Object &&cb) { return m_write_pb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pc_rd_callback(Object &&cb) { return m_read_pc.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pc_wr_callback(Object &&cb) { return m_write_pc.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { external_port_w(PORT_A, 0, state); }
 	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { external_port_w(PORT_A, 1, state); }
