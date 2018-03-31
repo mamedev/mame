@@ -264,15 +264,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 TODO:
 -----
 
-- With the correct clock speed of 12MHz for the 68000, garbage graphics remain
-  over the Taito logo on startup. This seems to be a bug in the original which
-  would have no effect if our timing was 100% right. The interrupt handling
-  should be quite correct, it's derived straight from the schematics and PAL
-  dump.
-  The current workaround is to make the 68000 run at 13MHz. Lowering below
-  12MHz would work as well, and possibly be closer to the real reason (wait
-  states slowing the CPU down?)
-
 - The "FIRE!" arrows pointing to padlocks are not in perfect sync with the
   background scrolling. Should they?
 
@@ -667,8 +658,7 @@ void othunder_state::machine_reset()
 MACHINE_CONFIG_START(othunder_state::othunder)
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
-	MCFG_CPU_ADD("maincpu", M68000, 13000000 )  /* fixes garbage graphics on startup */
+	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(othunder_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", othunder_state, vblank_interrupt)
 
@@ -710,7 +700,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -722,17 +712,17 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_SOUND_ROUTE(2, "2610.2r", 1.0)
 
 	MCFG_FILTER_VOLUME_ADD("2610.0l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.0r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -978,4 +968,4 @@ GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, 0, ORIENT
 GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )

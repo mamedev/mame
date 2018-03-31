@@ -51,11 +51,11 @@ uint8_t* NeoZ80ROMActive;
 uint8_t NeoSystem = NEOCD_REGION_JAPAN;
 
 
-class ngcd_state : public aes_state
+class ngcd_state : public aes_base_state
 {
 public:
 	ngcd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: aes_state(mconfig, type, tag)
+		: aes_base_state(mconfig, type, tag)
 		, m_tempcdc(*this,"tempcdc")
 	{
 		NeoCDDMAAddress1 = 0;
@@ -87,9 +87,6 @@ public:
 	DECLARE_WRITE8_MEMBER(neocd_transfer_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
-
-	DECLARE_MACHINE_START(neocd);
-	DECLARE_MACHINE_RESET(neocd);
 
 	// neoCD
 
@@ -137,7 +134,10 @@ public:
 	void neocd_audio_io_map(address_map &map);
 	void neocd_audio_map(address_map &map);
 	void neocd_main_map(address_map &map);
+
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	int32_t SekIdle(int32_t nCycles);
 };
@@ -828,17 +828,14 @@ if (NeoCDDMAAddress2 == 0x0800)  {
  *
  *************************************/
 
-MACHINE_START_MEMBER(ngcd_state,neocd)
+void ngcd_state::machine_start()
 {
-	m_type = NEOGEO_CD;
-	common_machine_start();
+	aes_base_state::machine_start();
 
 	// set curr_slot to 0, so to allow checking m_slots[m_curr_slot] != nullptr
 	m_curr_slot = 0;
 
 	// initialize sprite to point to memory regions
-	m_sprgen->m_fixed_layer_bank_type = 0;
-	m_sprgen->set_screen(m_screen);
 	m_sprgen->set_sprite_region(m_region_sprites->base(), m_region_sprites->bytes());
 	m_sprgen->set_fixed_regions(m_region_fixed->base(), m_region_fixed->bytes(), m_region_fixedbios);
 	m_sprgen->neogeo_set_fixed_layer_source(1);
@@ -853,8 +850,6 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
 	machine().device<nvram_device>("saveram")->set_base(m_meminternal_data.get(), 0x2000);
 	save_pointer(NAME(m_meminternal_data.get()), 0x2000);
 
-	m_use_cart_vectors = 0;
-
 	m_tempcdc->reset_cd();
 }
 
@@ -865,9 +860,9 @@ MACHINE_START_MEMBER(ngcd_state,neocd)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(ngcd_state,neocd)
+void ngcd_state::machine_reset()
 {
-	neogeo_state::machine_reset();
+	aes_base_state::machine_reset();
 
 	NeoSpriteRAM = memregion("sprites")->base();
 	YM2610ADPCMAROM = memregion("ymsnd")->base();
@@ -891,23 +886,11 @@ MACHINE_RESET_MEMBER(ngcd_state,neocd)
 
 void ngcd_state::neocd_main_map(address_map &map)
 {
-//  AM_RANGE(0x000000, 0x00007f) AM_READ_BANK("vectors") // writes will fall through to area below
-	map(0x000000, 0x1fffff).ram().region("maincpu", 0x00000);
-	map(0x000000, 0x00007f).r(this, FUNC(ngcd_state::banked_vectors_r));
+	aes_base_main_map(map);
 
-	map(0x300000, 0x300000).mirror(0x01fffe).r(m_ctrl1, FUNC(neogeo_control_port_device::ctrl_r));
-	map(0x320000, 0x320001).mirror(0x01fffe).portr("AUDIO");
-	map(0x320000, 0x320000).mirror(0x01fffe).w(this, FUNC(ngcd_state::audio_command_w));
-	map(0x340000, 0x340000).mirror(0x01fffe).r(m_ctrl2, FUNC(neogeo_control_port_device::ctrl_r));
-	map(0x360000, 0x37ffff).r(this, FUNC(ngcd_state::unmapped_r));
-	map(0x380000, 0x380001).mirror(0x01fffe).r(this, FUNC(ngcd_state::aes_in2_r));
-	map(0x380000, 0x38007f).mirror(0x01ff80).w(this, FUNC(ngcd_state::io_control_w)).umask16(0x00ff);
-	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).r(this, FUNC(ngcd_state::unmapped_r));
-	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).w("systemlatch", FUNC(hc259_device::write_a3)).umask16(0x00ff);
-	map(0x3c0000, 0x3c0007).mirror(0x01fff8).r(this, FUNC(ngcd_state::video_register_r));
-	map(0x3c0000, 0x3c000f).mirror(0x01fff0).w(this, FUNC(ngcd_state::video_register_w));
-	map(0x3e0000, 0x3fffff).r(this, FUNC(ngcd_state::unmapped_r));
-	map(0x400000, 0x401fff).mirror(0x3fe000).rw(this, FUNC(ngcd_state::paletteram_r), FUNC(ngcd_state::paletteram_w));
+	map(0x000000, 0x1fffff).ram().region("maincpu", 0x00000);
+	map(0x000000, 0x00007f).r(this, FUNC(ngcd_state::banked_vectors_r)); // writes will fall through to area above
+
 	map(0x800000, 0x803fff).rw(this, FUNC(ngcd_state::neocd_memcard_r), FUNC(ngcd_state::neocd_memcard_w));
 	map(0xc00000, 0xc7ffff).mirror(0x080000).rom().region("mainbios", 0);
 	map(0xd00000, 0xdfffff).r(this, FUNC(ngcd_state::unmapped_r));
@@ -933,7 +916,7 @@ void ngcd_state::neocd_audio_map(address_map &map)
 
 void ngcd_state::neocd_audio_io_map(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xff00).r(this, FUNC(ngcd_state::audio_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::clear_w));
+	map(0x00, 0x00).mirror(0xff00).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::clear_w));
 	map(0x04, 0x07).mirror(0xff00).rw(m_ym, FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x08, 0x08).mirror(0xff00).select(0x0010).w(this, FUNC(ngcd_state::audio_cpu_enable_nmi_w));
 	// banking reads are actually NOP on NeoCD? but some games still access them
@@ -1048,6 +1031,7 @@ uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 
 MACHINE_CONFIG_START(ngcd_state::neocd)
 	neogeo_base(config);
+	neogeo_stereo(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
@@ -1071,9 +1055,6 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ngcd_state, interrupt_callback_type3 )
 
 	MCFG_NVRAM_ADD_0FILL("saveram")
-
-	MCFG_MACHINE_START_OVERRIDE(ngcd_state,neocd)
-	MCFG_MACHINE_RESET_OVERRIDE(ngcd_state,neocd)
 
 	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_controls, "joy", false)
 	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_controls, "joy", false)

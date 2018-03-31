@@ -85,17 +85,18 @@ class tec1_state : public driver_device
 {
 public:
 	tec1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
-		m_cass(*this, "cassette"),
-		m_wave(*this, WAVE_TAG),
-		m_key_pressed(0),
-		m_io_line0(*this, "LINE0"),
-		m_io_line1(*this, "LINE1"),
-		m_io_line2(*this, "LINE2"),
-		m_io_line3(*this, "LINE3"),
-		m_io_shift(*this, "SHIFT")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
+		, m_wave(*this, WAVE_TAG)
+		, m_key_pressed(0)
+		, m_io_line0(*this, "LINE0")
+		, m_io_line1(*this, "LINE1")
+		, m_io_line2(*this, "LINE2")
+		, m_io_line3(*this, "LINE3")
+		, m_io_shift(*this, "SHIFT")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -108,6 +109,7 @@ public:
 	required_ioport m_io_line2;
 	required_ioport m_io_line3;
 	required_ioport m_io_shift;
+	output_finder<6> m_digits;
 	emu_timer *m_kbd_timer;
 	DECLARE_READ8_MEMBER( tec1_kbd_r );
 	DECLARE_READ8_MEMBER( latch_r );
@@ -241,12 +243,12 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 		if (BIT(m_digit, i))
 		{
 			m_refresh[i] = 1;
-			output().set_digit_value(i, m_segment);
+			m_digits[i] = m_segment;
 		}
 		else
 		if (m_refresh[i] == 0x80)
 		{
-			output().set_digit_value(i, 0);
+			m_digits[i] = 0;
 			m_refresh[i] = 0;
 		}
 		else
@@ -310,6 +312,7 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 
 void tec1_state::machine_start()
 {
+	m_digits.resolve();
 	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tec1_state::tec1_kbd_callback),this));
 	m_kbd_timer->adjust( attotime::zero, 0, attotime::from_hz(500) );
 }

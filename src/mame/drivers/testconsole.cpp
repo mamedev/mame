@@ -75,30 +75,36 @@ class whouse_testcons_state : public driver_device
 public:
 	whouse_testcons_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_dsp(*this, "dsp%u", 0)
+		, m_dsp(*this, "dsp%u", 0U)
+		, m_digit(*this, "digit%u", 0U)
 	{
-	}
-
-	DECLARE_DRIVER_INIT(whousetc)
-	{
-	}
-
-	template <unsigned Dsp> DECLARE_WRITE16_MEMBER(update_dsp)
-	{
-		output().set_digit_value((Dsp << 2) | offset, data);
 	}
 
 	void whousetc(machine_config &config);
-	void io_map(address_map &map);
-	void program_map(address_map &map);
+
 protected:
+	template <unsigned Dsp> DECLARE_WRITE16_MEMBER(update_dsp)
+	{
+		m_digit[(Dsp << 2) | offset] = data;
+	}
+
+	virtual void machine_start() override
+	{
+		m_digit.resolve();
+	}
+
 	virtual void machine_reset() override
 	{
 		for (required_device<dl1416_device> const &dsp : m_dsp)
 			dsp->cu_w(1);
 	}
 
+	void io_map(address_map &map);
+	void program_map(address_map &map);
+
+private:
 	required_device_array<dl1416_device, 4> m_dsp;
+	output_finder<16> m_digit;
 };
 
 
@@ -203,5 +209,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE                  INIT      COMPANY         FULLNAME                  FLAGS
-COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, whousetc, "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     STATE                  INIT  COMPANY         FULLNAME                  FLAGS
+COMP( 1980?, whousetc, 0,      0,      whousetc, whousetc, whouse_testcons_state, 0,    "Westinghouse", "Test Console Serial #5", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_CLICKABLE_ARTWORK )

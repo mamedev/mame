@@ -270,7 +270,7 @@ uint8_t z8_device::fetch()
 uint8_t z8_device::fetch_opcode()
 {
 	m_ppc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
-	debugger_instruction_hook(this, m_ppc);
+	debugger_instruction_hook(m_ppc);
 
 	uint8_t data = m_direct->read_byte(m_ppc);
 
@@ -809,7 +809,7 @@ void z8_device::device_start()
 	save_item(NAME(m_irq_line));
 	save_item(NAME(m_irq_taken));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 /***************************************************************************

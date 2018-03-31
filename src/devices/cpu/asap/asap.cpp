@@ -209,7 +209,7 @@ void asap_device::device_start()
 	save_item(NAME(m_irq_state));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -484,7 +484,7 @@ inline void asap_device::fetch_instruction_debug()
 {
 	// debugging
 	m_ppc = m_pc;
-	debugger_instruction_hook(this, m_pc);
+	debugger_instruction_hook(m_pc);
 
 	// instruction fetch
 	m_op = readop(m_pc);

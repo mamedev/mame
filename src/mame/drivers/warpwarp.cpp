@@ -148,10 +148,10 @@ void warpwarp_state::machine_start()
 }
 
 /* Interrupt Gen */
-INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
+WRITE_LINE_MEMBER(warpwarp_state::vblank_irq)
 {
-	if (m_ball_on)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_ball_on)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 /* B&W Games I/O */
@@ -715,7 +715,6 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(geebee_map)
 	MCFG_CPU_IO_MAP(geebee_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 5N
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
@@ -732,6 +731,7 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(warpwarp_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 1k)
 	MCFG_PALETTE_ADD("palette", 4*2)
@@ -769,7 +769,6 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)
 	MCFG_CPU_PROGRAM_MAP(bombbee_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 6L on Warp Warp
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
@@ -788,6 +787,7 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(warpwarp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(warpwarp_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", color)
 

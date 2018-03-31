@@ -3446,7 +3446,7 @@ void z80_device::device_start()
 	state_add(Z80_HALT,        "HALT",      m_halt).mask(0x1);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	/* setup cycle tables */
 	m_cc_op = cc_op;
@@ -3517,7 +3517,7 @@ void z80_device::execute_run()
 		m_after_ldair = false;
 
 		PRVPC = PCD;
-		debugger_instruction_hook(this, PCD);
+		debugger_instruction_hook(PCD);
 		m_r++;
 		EXEC(op,rop());
 	} while (m_icount > 0);
@@ -3546,7 +3546,7 @@ void nsc800_device::execute_run()
 		m_after_ldair = false;
 
 		PRVPC = PCD;
-		debugger_instruction_hook(this, PCD);
+		debugger_instruction_hook(PCD);
 		m_r++;
 		EXEC(op,rop());
 	} while (m_icount > 0);

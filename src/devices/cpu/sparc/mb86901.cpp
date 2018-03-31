@@ -360,7 +360,7 @@ void mb86901_device::device_start()
 	save_item(NAME(m_hold_bus));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -2953,7 +2953,7 @@ void mb86901_device::execute_step()
 	{
 		execute_trap();
 		BREAK_PSR;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 	}
 
 	if (m_execute_mode)
@@ -3076,7 +3076,7 @@ void mb86901_device::execute_run()
 		}
 
 		BREAK_PSR;
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		if (m_reset_mode)
 		{

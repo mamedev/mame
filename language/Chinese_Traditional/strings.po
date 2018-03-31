@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-03-25 02:01+1100\n"
-"PO-Revision-Date: 2018-01-28 17:35+0800\n"
+"PO-Revision-Date: 2018-03-25 00:48+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -2658,7 +2658,7 @@ msgstr "儲存目前 -- #"
 #: plugins/cheatfind/init.lua:536
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "總計發現 %d 符合"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Compare"
@@ -2794,9 +2794,6 @@ msgstr "輸入埠名稱檔案儲存至 %s"
 #: plugins/portname/init.lua:124
 msgid "Input ports"
 msgstr "輸入埠"
-
-#~ msgid " total matches found"
-#~ msgstr " 總計發現符合"
 
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"

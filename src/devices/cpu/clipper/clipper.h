@@ -190,6 +190,17 @@ protected:
 	virtual int get_ireg_count() const { return 16; }
 	virtual int get_freg_count() const { return 8; }
 
+	// register pair helpers
+	u64 get_64(const u8 reg) const
+	{
+		return u64(m_r[reg | 0x1]) << 32 | u64(m_r[reg & 0xe]);
+	}
+	void set_64(const u8 reg, const u64 data)
+	{
+		m_r[reg & 0xe] = u32(data & ~u32(0));
+		m_r[reg | 0x1] = u32(data >> 32);
+	}
+
 	// floating point helpers
 	float32 get_fp32(const u8 reg) const { return m_f[reg & 0xf]; }
 	float64 get_fp64(const u8 reg) const { return m_f[reg & 0xf]; }
@@ -268,7 +279,6 @@ protected:
 	};
 
 	int m_icount;    // instruction cycle count
-	bool m_wait;
 
 	// program-visible cpu state
 	u32 m_pc;  // current instruction address
@@ -284,15 +294,16 @@ protected:
 	u64 m_fp_dst; // original value of destination register during fp exception
 
 	// non-visible cpu state
-	u32 m_ip;        // next instruction address
-	int m_irq;       // interrupt request state
+	bool m_wait;     // waiting for interrupt
 	int m_nmi;       // non-maskable interrupt state
+	int m_irq;       // interrupt request state
 	u8 m_ivec;       // interrupt vector
 	u16 m_exception; // pending exception
 
 	// decoded instruction information
 	struct decode
 	{
+		u32 pc;       // base address of instruction
 		u8 opcode;    // primary instruction opcode
 		u8 subopcode; // secondary instruction opcode
 		u8 r1;        // r1 instruction operand
@@ -338,6 +349,9 @@ public:
 	clipper_c400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	virtual u32 intrap(const u16 vector, const u32 old_pc) override;
 
 	// C400 has additional 8 floating point registers

@@ -29,6 +29,7 @@ class marywu_state : public driver_device
 public:
 	marywu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(display_7seg_data_w);
@@ -43,6 +44,8 @@ public:
 	void program_map(address_map &map);
 private:
 	uint8_t m_selected_7seg_module;
+	virtual void machine_start() override;
+	output_finder<32> m_digits;
 };
 
 static INPUT_PORTS_START( marywu )
@@ -153,8 +156,8 @@ WRITE8_MEMBER( marywu_state::display_7seg_data_w )
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
 
-	output().set_digit_value(2 * m_selected_7seg_module + 0, patterns[data & 0x0F]);
-	output().set_digit_value(2 * m_selected_7seg_module + 1, patterns[(data >> 4) & 0x0F]);
+	m_digits[2 * m_selected_7seg_module + 0] = patterns[data & 0x0F];
+	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
 }
 
 void marywu_state::program_map(address_map &map)
@@ -171,6 +174,11 @@ void marywu_state::io_map(address_map &map)
 	map(0x9003, 0x9003).mirror(0x0ffc).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb000, 0xb001).mirror(0x0ffe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0xf000, 0xf000).noprw(); /* TODO: Investigate this. There's something going on at this address range. */
+}
+
+void marywu_state::machine_start()
+{
+	m_digits.resolve();
 }
 
 MACHINE_CONFIG_START(marywu_state::marywu)

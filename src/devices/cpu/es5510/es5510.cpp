@@ -553,7 +553,7 @@ void es5510_device::device_start() {
 	gpr = std::make_unique<int32_t[]>(0xc0);     // 24 bits, right justified
 	instr = std::make_unique<uint64_t[]>(160);    // 48 bits, right justified
 	dram = std::make_unique<int16_t[]>(DRAM_SIZE);   // there are up to 20 address bits (at least 16 expected), left justified within the 24 bits of a gpr or dadr; we preallocate all of it.
-	m_icountptr = &icount;
+	set_icountptr(icount);
 	state_add(STATE_GENPC,"GENPC", pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", pc).noshow();
 

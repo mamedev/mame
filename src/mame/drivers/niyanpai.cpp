@@ -685,9 +685,10 @@ static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(niyanpai_state::interrupt)
+WRITE_LINE_MEMBER(niyanpai_state::vblank_irq)
 {
-	m_tmp68301->external_interrupt_0();
+	if (state)
+		m_tmp68301->external_interrupt_0();
 }
 
 
@@ -696,7 +697,6 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */
 	MCFG_CPU_PROGRAM_MAP(niyanpai_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", niyanpai_state,  interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
@@ -714,6 +714,7 @@ MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(niyanpai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(niyanpai_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 256*3)
 

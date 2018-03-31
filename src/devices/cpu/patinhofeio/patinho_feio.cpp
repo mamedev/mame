@@ -145,7 +145,7 @@ void patinho_feio_cpu_device::device_start()
 			m_iodev_write_cb[i].resolve();
 	}
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void patinho_feio_cpu_device::device_reset()
@@ -175,7 +175,7 @@ void patinho_feio_cpu_device::execute_run() {
 		m_ext = READ_ACC_EXTENSION_REG();
 		m_idx = READ_INDEX_REG();
 		((patinho_feio_state*) owner())->update_panel(ACC, READ_BYTE_PATINHO(PC), READ_BYTE_PATINHO(m_addr), m_addr, PC, FLAGS, RC, m_mode);
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		if (!m_run){
 			if (!m_buttons_read_cb.isnull()){

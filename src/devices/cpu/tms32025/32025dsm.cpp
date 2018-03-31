@@ -32,7 +32,10 @@
 
 #include "emu.h"
 #include "32025dsm.h"
+
 #include <ctype.h>
+#include <stdexcept>
+
 
 const char *const tms32025_disassembler::arith[8] = { "*", "*-", "*+", "??", "BR0-", "*0-", "*0+", "*BR0+" } ;
 const char *const tms32025_disassembler::nextar[16] = { "", "", "", "", "", "", "", "", ",AR0", ",AR1", ",AR2", ",AR3", ",AR4", ",AR5", ",AR6", ",AR7" } ;
@@ -339,16 +342,15 @@ tms32025_disassembler::tms32025_disassembler()
 				case 't':
 				case 'w':
 				case 'x':
-					bit --;
+					bit--;
 					break;
-				default: fatalerror("Invalid instruction encoding '%s %s'\n",
-					ops[0],ops[1]);
+				default:
+					throw std::logic_error(util::string_format("Invalid instruction encoding '%s %s'\n", ops[0],ops[1]));
 			}
 		}
 		if (bit != -1 )
 		{
-			fatalerror("not enough bits in encoding '%s %s' %d\n",
-				ops[0],ops[1],bit);
+			throw std::logic_error(util::string_format("not enough bits in encoding '%s %s' %d\n", ops[0],ops[1],bit));
 		}
 		while (isspace((uint8_t)*p)) p++;
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
@@ -426,7 +428,7 @@ offs_t tms32025_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			case 'x': bit--; break;
 			case ' ': break;
 			case '1': case '0': bit--; break;
-			case '\0': fatalerror("premature end of parse string, opcode %x, bit = %d\n",code,bit);
+			case '\0': throw std::logic_error(util::string_format("premature end of parse string, opcode %x, bit = %d\n",code,bit));
 		}
 		cp++;
 	}
@@ -461,7 +463,7 @@ offs_t tms32025_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 				case 'W': sprintf(num,"%04Xh",w); break;
 				case 'X': break;
 				default:
-					fatalerror("illegal escape character in format '%s'\n",Op[op].fmt);
+					throw std::logic_error(util::string_format("illegal escape character in format '%s'\n",Op[op].fmt));
 			}
 			stream << num;
 		}

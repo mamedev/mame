@@ -2518,7 +2518,7 @@ void tlcs870_device::execute_run()
 	do
 	{
 		m_prvpc.d = m_pc.d;
-		debugger_instruction_hook(this, m_pc.d);
+		debugger_instruction_hook(m_pc.d);
 
 		//check_interrupts();
 		m_temppc = m_pc.d;
@@ -3141,7 +3141,7 @@ void tlcs870_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_sp.w.l).formatstr("%04X");
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_F ).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 

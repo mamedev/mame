@@ -552,7 +552,7 @@ void ssp1601_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", PPC).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", rST).formatstr("%4s").noshow();
 
-	m_icountptr = &m_g_cycles;
+	set_icountptr(m_g_cycles);
 }
 
 
@@ -589,7 +589,7 @@ void ssp1601_device::execute_run()
 
 		PPC = rPC;
 
-		debugger_instruction_hook(this, rPC);
+		debugger_instruction_hook(rPC);
 
 		op = FETCH();
 

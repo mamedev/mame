@@ -1045,7 +1045,6 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
 	MCFG_CPU_PROGRAM_MAP(snookr10_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", snookr10_state,  nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1058,6 +1057,7 @@ MACHINE_CONFIG_START(snookr10_state::snookr10)
 	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(snookr10_state, screen_update_snookr10)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", snookr10)
 	MCFG_PALETTE_ADD("palette", 256)

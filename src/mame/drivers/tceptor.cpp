@@ -40,14 +40,6 @@ WRITE8_MEMBER(tceptor_state::m68k_shared_w)
 
 /*******************************************************************/
 
-INTERRUPT_GEN_MEMBER(tceptor_state::m6809_vb_interrupt)
-{
-	if (m_m6809_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
-	else
-		m_m6809_irq_enable = 1;
-}
-
 WRITE8_MEMBER(tceptor_state::m6809_irq_enable_w)
 {
 	m_m6809_irq_enable = 1;
@@ -59,25 +51,11 @@ WRITE8_MEMBER(tceptor_state::m6809_irq_disable_w)
 }
 
 
-INTERRUPT_GEN_MEMBER(tceptor_state::m68k_vb_interrupt)
-{
-	if (m_m68k_irq_enable)
-		device.execute().set_input_line(M68K_IRQ_1, HOLD_LINE);
-}
-
 WRITE16_MEMBER(tceptor_state::m68k_irq_enable_w)
 {
 	m_m68k_irq_enable = data;
 }
 
-
-INTERRUPT_GEN_MEMBER(tceptor_state::mcu_vb_interrupt)
-{
-	if (m_mcu_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
-	else
-		m_mcu_irq_enable = 1;
-}
 
 WRITE8_MEMBER(tceptor_state::mcu_irq_enable_w)
 {
@@ -350,7 +328,6 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL(49'152'000)/32)
 	MCFG_CPU_PROGRAM_MAP(m6809_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, m6809_vb_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M65C02, XTAL(49'152'000)/24)
 	MCFG_CPU_PROGRAM_MAP(m6502_a_map)
@@ -360,12 +337,10 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 
 	MCFG_CPU_ADD("sub", M68000, XTAL(49'152'000)/4)
 	MCFG_CPU_PROGRAM_MAP(m68k_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, m68k_vb_interrupt)
 
 	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8) // or compatible 6808 with extra instructions
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, mcu_vb_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 

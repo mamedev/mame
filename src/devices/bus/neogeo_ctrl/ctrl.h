@@ -5,7 +5,6 @@
    SNK Neo Geo controller port emulation
 
 **********************************************************************/
-
 #ifndef MAME_BUS_NEOGEO_CTRL_CTRL_H
 #define MAME_BUS_NEOGEO_CTRL_CTRL_H
 

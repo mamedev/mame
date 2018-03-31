@@ -111,10 +111,10 @@ WRITE8_MEMBER(jailbrek_state::coin_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt)
+WRITE_LINE_MEMBER(jailbrek_state::vblank_irq)
 {
-	if (m_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_enable)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt_nmi)
@@ -266,7 +266,6 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/12)
 	MCFG_CPU_PROGRAM_MAP(jailbrek_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jailbrek_state,  interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(jailbrek_state, interrupt_nmi,  500) /* ? */
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -281,6 +280,7 @@ MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(jailbrek_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jailbrek_state, vblank_irq))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

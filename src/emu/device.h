@@ -45,6 +45,8 @@
 	device->set_clock(_clock);
 #define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
 	device->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(_config));
+#define MCFG_DEVICE_BIOS(...) \
+	device->set_default_bios_tag(__VA_ARGS__);
 
 #define DECLARE_READ_LINE_MEMBER(name)      int  name()
 #define READ_LINE_MEMBER(name)              int  name()
@@ -455,9 +457,9 @@ public:
 	const std::vector<rom_entry> &rom_region_vector() const;
 	const tiny_rom_entry *rom_region() const { return device_rom_region(); }
 	ioport_constructor input_ports() const { return device_input_ports(); }
-	u8 default_bios() const { return m_default_bios; }
+	std::string const &get_default_bios_tag() const { return m_default_bios_tag; }
+	u8 default_bios() const { assert(configured()); return m_default_bios; }
 	u8 system_bios() const { return m_system_bios; }
-	const std::string &default_bios_tag() const { return m_default_bios_tag; }
 
 	// interface helpers
 	interface_list &interfaces() { return m_interfaces; }
@@ -500,7 +502,7 @@ public:
 	void set_clock(u32 clock);
 	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
 	void set_input_default(const input_device_default *config) { m_input_defaults = config; }
-	void set_default_bios_tag(const char *tag) { m_default_bios_tag = tag; }
+	template <typename... Params> void set_default_bios_tag(Params &&... args) { assert(!configured()); m_default_bios_tag.assign(std::forward<Params>(args)...); }
 
 	// state helpers
 	void config_complete();
@@ -536,7 +538,6 @@ public:
 	offs_t safe_pc() const;
 	offs_t safe_pcbase() const;
 
-	void set_default_bios(u8 bios) { m_default_bios = bios; }
 	void set_system_bios(u8 bios) { m_system_bios = bios; }
 	bool findit(bool pre_map, bool isvalidation) const;
 

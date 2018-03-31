@@ -219,7 +219,7 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_cond));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 }
 

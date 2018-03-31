@@ -1097,16 +1097,16 @@ static GFXDECODE_START( toprollr )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, cclimber_charlayout,   24*4, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(cclimber_state::vblank_irq)
+WRITE_LINE_MEMBER(cclimber_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(cclimber_state::bagmanf_vblank_irq)
+WRITE_LINE_MEMBER(cclimber_state::bagmanf_vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 MACHINE_CONFIG_START(cclimber_state::root)
@@ -1115,7 +1115,6 @@ MACHINE_CONFIG_START(cclimber_state::root)
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(cclimber_map)
 	MCFG_CPU_IO_MAP(cclimber_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cclimber_state, nmi_mask_w))
@@ -1130,6 +1129,7 @@ MACHINE_CONFIG_START(cclimber_state::root)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_cclimber)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cclimber_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cclimber)
 	MCFG_PALETTE_ADD("palette", 16*4+8*4)
@@ -1185,7 +1185,9 @@ MACHINE_CONFIG_START(cclimber_state::bagmanf)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bagmanf_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state, bagmanf_vblank_irq)
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cclimber_state, bagmanf_vblank_irq))
 MACHINE_CONFIG_END
 
 
@@ -1196,7 +1198,6 @@ MACHINE_CONFIG_START(cclimber_state::yamato)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(yamato_map)
 	MCFG_CPU_IO_MAP(yamato_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state,  vblank_irq)
 	MCFG_CPU_OPCODES_MAP(yamato_decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
@@ -1228,7 +1229,6 @@ MACHINE_CONFIG_START(cclimber_state::toprollr)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(toprollr_map)
 	MCFG_CPU_IO_MAP(cclimber_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state,  vblank_irq)
 	MCFG_CPU_OPCODES_MAP(toprollr_decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_SIZE(0)
 	MCFG_SEGACRPT_SET_NUMBANKS(3)
@@ -1255,7 +1255,6 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(swimmer_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cclimber_state, nmi_mask_w))
@@ -1277,6 +1276,7 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_swimmer)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cclimber_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", swimmer)
 	MCFG_PALETTE_ADD("palette", 32*8+4*8+1)
