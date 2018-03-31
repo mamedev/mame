@@ -258,7 +258,7 @@ void fuuki32_state::fuuki32_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(this, FUNC(fuuki32_state::sound_bw_w));
 	map(0x30, 0x30).nopw(); // leftover/unused nmi handler related
-	map(0x40, 0x45).r("ymf1", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
+	map(0x40, 0x45).rw("ymf", FUNC(ymf278b_device::read), FUNC(ymf278b_device::write));
 }
 
 /***************************************************************************
@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(fuuki32_state::fuuki32)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymf1", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
+	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
@@ -616,7 +616,7 @@ ROM_START( asurabld )
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
 	ROM_LOAD16_WORD_SWAP( "map.u5", 0x00000, 0x200000, CRC(e681155e) SHA1(458845b9c86df72685d92d0d4052aacc2fa7d1bd) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
 	ROM_LOAD( "pcm.u6", 0x00000, 0x400000, CRC(ac72225a) SHA1(8d16399ed34ac5bd69dbf43b2de2b0db9ac1c610) )
 ROM_END
 
@@ -659,7 +659,7 @@ ROM_START( asurabus )
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
 	ROM_LOAD16_WORD_SWAP( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
 ROM_END
 
@@ -694,7 +694,7 @@ ROM_START( asurabusa )
 	ROM_REGION( 0x200000, "gfx4", 0 ) // background tiles
 	ROM_LOAD16_WORD_SWAP( "map.u5", 0x00000, 0x200000, CRC(bd179dc5) SHA1(ce3fcac573b14fd5365eb5dcec3257e439d2c129) )
 
-	ROM_REGION( 0x400000, "ymf1", 0 ) // OPL4 samples
+	ROM_REGION( 0x400000, "ymf", 0 ) // OPL4 samples
 	ROM_LOAD( "opm.u6", 0x00000, 0x400000, CRC(31b05be4) SHA1(d0f4f387f84a74591224b0f42b7f5c538a3dc498) )
 ROM_END
 
