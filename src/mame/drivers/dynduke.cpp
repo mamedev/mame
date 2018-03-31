@@ -341,8 +341,8 @@ MACHINE_CONFIG_START(dynduke_state::dynduke)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dynduke_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(dynduke_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dynduke_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dynduke)
 
@@ -422,9 +422,9 @@ ROM_START( dynduke )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dyndukea )
@@ -474,9 +474,9 @@ ROM_START( dyndukea )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dyndukej )
@@ -526,9 +526,9 @@ ROM_START( dyndukej )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dyndukeja )
@@ -578,9 +578,9 @@ ROM_START( dyndukeja )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dyndukeu )
@@ -630,9 +630,9 @@ ROM_START( dyndukeu )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dbldynj )
@@ -682,9 +682,9 @@ ROM_START( dbldynj )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 ROM_START( dbldynu )
@@ -734,9 +734,9 @@ ROM_START( dbldynu )
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "26.n2", 0x0000, 0x0100, NO_DUMP ) // N82S135N
-	ROM_LOAD( "61-d.u3", 0x0100, 0x0100, NO_DUMP ) // N82S1??AN (part number obscured)
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "26.n2",   0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) ) // N82S135N
+	ROM_LOAD( "61-d.u3", 0x0100, 0x0200, CRC(4c6527d8) SHA1(d775a0c79adbf381b56977daa702d2de2736d862) ) // N82S147AN
 ROM_END
 
 

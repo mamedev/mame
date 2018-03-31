@@ -41,6 +41,18 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	void othunder(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	void update_irq();
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs);
+
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(coins_w);
@@ -53,18 +65,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 
-	void othunder(machine_config &config);
 	void othunder_map(address_map &map);
 	void z80_sound_map(address_map &map);
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
-	void update_irq();
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs);
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;

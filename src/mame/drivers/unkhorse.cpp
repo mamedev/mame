@@ -53,7 +53,6 @@ public:
 
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
 	void horse(machine_config &config);
 	void horse_io_map(address_map &map);
 	void horse_map(address_map &map);
@@ -190,21 +189,14 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(horse_state::interrupt)
-{
-	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
-	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
-}
-
 MACHINE_CONFIG_START(horse_state::horse)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(horse_map)
 	MCFG_CPU_IO_MAP(horse_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", horse_state,  interrupt)
 
-	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 2) // port A input, B output, C output but unused
+	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 4) // port A input, B output, C output but unused
 	MCFG_I8155_IN_PORTA_CB(READ8(horse_state, input_r))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(horse_state, output_w))
 	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
@@ -216,6 +208,7 @@ MACHINE_CONFIG_START(horse_state::horse)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_3BIT_BGR("palette")
 
