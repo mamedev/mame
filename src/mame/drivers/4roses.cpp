@@ -255,6 +255,14 @@ READ8_MEMBER(_4roses_state::_4roses_opcode_r)
 	case 0x6c00:
 		data = bitswap<8>(data ^ 0x5e, 6, 1, 4, 5, 2, 3, 0, 7);
 		break;
+
+	case 0x7000:
+		data = bitswap<8>(data ^ 0x34, 3, 7, 2, 6, 1, 5, 0, 4);
+		break;
+
+	case 0x7400:
+		data = bitswap<8>(data ^ 0x43, 7, 2, 5, 0, 6, 1, 3, 4);
+		break;
 	}
 
 	return data;
