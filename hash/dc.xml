@@ -49,6 +49,7 @@ Developer
   T-95***-** : Konami
   T-97***-** : Midway
   T-100**-** : THQ
+  T-103**-** : Takara
   T-110**-** : Sierra On-Line
   T-125**-** : Interplay
   T-130**-** : Activision
@@ -61,7 +62,7 @@ Developer
   T-166**-** : Altron
   T-177**-** : Ubisoft
   T-187**-** : Pionesoft
-  T-188**-** : Spike
+  T-188**-** : Spike / Maxbet
   T-195**-** : Datam Polystar
   T-197**-** : KID
   T-201**-** : NEC Interchannel
@@ -70,11 +71,13 @@ Developer
   T-300**-** : Warp
   T-341**-** : AKI
   T-342**-** : From Software
+  T-354**-** : FortyFive
   T-368**-** : Eidos Interactive
   T-370**-** : Shouei System
   T-379**-** : Takuyo
   T-383**-** : AquaPlus
   T-387**-** : Entertainment Software Publishing
+  T-388**-** : NEC Home Electronics
   T-392**-** : Toyota
   T-394**-** : Vivarium
   T-398**-** : NetVillage
@@ -82,9 +85,11 @@ Developer
   T-403**-** : Metro3D
   T-405**-** : Take-Two Interactive
   T-406**-** : Hasbro Interactive
+  T-407**-** : Rage Software
   T-408**-** : Marvelous Entertainment
   T-409**-** : Bottom Up
   T-412**-** : Bimboosoft
+  T-413**-** : UFO
   T-414**-** : Mattel Interactive / GAME Studios
   T-415**-** : CaramelPot
   T-416**-** : Vatical Entertainment
@@ -92,7 +97,11 @@ Developer
   T-419**-** : Gathering of Developers
   T-421**-** : Rockstar Games
   T-423**-** : Cyberfront
+  T-425**-** :
   T-429**-** : Fujicom
+  T-434**-** : Visit
+  T-435**-** : Global A Entertainment
+  T-436**-** : J-Data
   T-438**-** : Studio Wonder Effect
   T-439**-** : Media Factory
   T-441**-** : Red Storm Entertainment
@@ -104,7 +113,9 @@ Developer
   T-450**-** : Swing! Entertainment
   T-454**-** : AAA Game
   T-455**-** : TV Asahi
+  T-456**-** : Crazy Games
   T-458**-** : Hackberry
+  T-460**-** : AIA
   T-461**-** : Starfish-SD
   T-463**-** : Broccoli
   T-465**-** : Princess Soft
@@ -383,7 +394,6 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 	<!--
 	<software name="2dhot">
-
 	    <description>2D House of Terror (World)</description>
 	    <year>2012</year>
 	    <publisher>2D-Retroperspectives</publisher>
@@ -4149,6 +4159,27 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
+	<!--
+	<rom name="NXDC.mdf" size="751137072" md5="1db4fae90bbbae80db0a08187a374f29" sha1="37a55e33e73550a5cfd42f81c00d26ae86630968"/>
+	<rom name="NXDC.mds" size="4734" md5="1557910dc22eefd4480a59ec29736442" sha1="3b451aa2e12aa7203991c04e81f97cce9c09ff02"/>
+
+	This game was released onto the Internet as a MDF/MDS image, which chdman cannot handle correctly right now.
+	When a proper CHD can be created, this dump will be added.
+	-->
+	<!--
+	<software name="cavstory">
+
+		<description>Cave Story (World)</description>
+		<year>2013</year>
+		<publisher>histat</publisher>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cave story (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
 	<software name="centiped">
 		<!--
 		<rom name="Centipede v1.004 (1999)(Hasbro)(NTSC)(US)[!].gdi" size="594" md5="3e8f8eaea71a32a227a2e00a19b1ff2a" sha1="bb11488d896f8d1f8d9a40e29c98f266da8798b3"/>
@@ -7836,6 +7867,22 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
+	<!-- This was released on the Internet as an unofficial conversion patch to be applied on the Windows version. -->
+	<!--
+	<software name="dividead">
+		<description>Divi-Dead (World)</description>
+		<year>2008</year>
+		<publisher>Tales Translations</publisher>
+		<info name="release" value="20081022" />
+		<info name="alt_title" value="ディヴァイデッド" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="divi-dead (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
 	<software name="dshaou">
 		<!--
 		<rom name="Doguu Senki - Haoh v1.004 (2000)(Victor)(NTSC)(JP)[!].gdi" size="150" md5="d1df10f9f7ff613b67a925e3305434d5" sha1="a97a016e72d10889734300e1f357e36daa3f9998"/>
@@ -9374,6 +9421,21 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			</diskarea>
 		</part>
 	</software>
+
+	<!--
+	<software name="jcode" cloneof="drmpass2">
+		<description>J-Code Passport (Jpn)</description>
+		<year>????</year>
+		<publisher>J-Data</publisher>
+		<info name="serial" value="T-43601M"/>
+		<info name="alt_title" value="J・コード パスポート" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="j-code passport (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
 
 	<!--
 	Bundled together with Dreamcast consoles.
@@ -13714,6 +13776,19 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 
 	<!--
+	<software name="gauntlegd" cloneof="gauntleg">
+		<description>Gauntlet Legends - Demo CD (USA)</description>
+		<year>2000</year>
+		<publisher>Midway</publisher>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="gauntlet legends - demo cd (usa)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
 	<rom name="Geist.Force-Resorted.cdi" size="812094891" md5="30fe0122b93a3c9d03711c5f74d759a9" sha1="91b221e916f389118190e141547d92a8df476985"/>
 
 	This prototype was released onto the Internet as a CDI image, which chdman cannot handle correctly right now.
@@ -16147,4 +16222,1102 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 			</diskarea>
 		</part>
 	</software>
+
+	<!--
+	<software name="idoljan">
+		<description>Idol Janshi wo Tsukucchaou (Jpn)</description>
+		<year>1999</year>
+		<publisher>Jaleco</publisher>
+		<info name="serial" value="T-5703M"/>
+		<info name="release" value="19990923" />
+		<info name="alt_title" value="アイドル雀士をつくっちゃおう♡" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="idol janshi wo tsukucchaou (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- The Limited Edition (T-5702M) comes in a double-CD case and includes an audio CD. -->
+	<!--
+	<software name="idoljansg" cloneof="idoljan">
+		<description>Idol Janshi wo Tsukucchaou - Shokai Genteiban (Jpn)</description>
+		<year>1999</year>
+		<publisher>Jaleco</publisher>
+		<info name="serial" value="T-5702M"/>
+		<info name="release" value="19990923" />
+		<info name="alt_title" value="アイドル雀士をつくっちゃおう♡ 初回限定版" />
+		<part interface="cdrom" name="cdrom1">
+			<feature name="part_id" value="Idol Janshi wo Tsukucchaou"/>
+			<diskarea name="cdrom">
+				<disk name="idol janshi wo tsukucchaou - shokai genteiban (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+		<part interface="cdrom" name="cdrom2">
+			<feature name="part_id" value="Suchie-Pai Radio Station Dream"/>
+			<diskarea name="cdrom">
+				<disk name="idol janshi wo tsukucchaou - shokai genteiban (jpn) (suchie-pai radio station dream)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="ikaruga">
+		<!--
+		<rom name="Ikaruga v1.002 (2002)(ESP)(NTSC)(JP)[!].gdi" size="88" md5="33ad1b9bbabd1b15424b66f0ecc48b48" sha1="5625eb2eb50da61066580ea437426e9dbecdcf24"/>
+		<rom name="track01.bin" size="13982640" md5="086b733e316c73c886bfe702df179b17" sha1="7ae5dd349e119e230b54a020d2f6111f203122c1"/>
+		<rom name="track02.raw" size="1735776" md5="edc989e45ad19b9066f2d617e927c9b7" sha1="e6772f7d2f9e2775010a619739ceaf41eca4bdce"/>
+		<rom name="track03.bin" size="1185760800" md5="b8df989116c51e7ec8c2b79e218f0bec" sha1="93ada1de5f514b3ec2e8b7d286922c0dc3d10b15"/>
+		-->
+		<description>Ikaruga (Jpn)</description>
+		<year>2002</year>
+		<publisher>Entertainment Software Publishing</publisher>
+		<info name="serial" value="T-38706M"/>
+		<info name="release" value="20020905" />
+		<info name="alt_title" value="斑鳩" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ikaruga (jpn)" sha1="17ac50da3abe8427c8a9537380d8f0b5c04871c0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="illbleed">
+		<!--
+		<rom name="Illbleed v1.002 (2001)(AIA)(NTSC)(US)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="6cee8dba8ced037c175d02d744aa8fdd" sha1="85707c32656a1a2d787412e995e5b62c03619be5"/>
+		<rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
+		<rom name="track03.bin" size="1185760800" md5="6be1a24b034e8aabc2665aa38b9a0a8a" sha1="46e700f62f8a67b9a3150a0e5c4b013039bfff71"/>
+		-->
+		<description>Illbleed (USA)</description>
+		<year>2001</year>
+		<publisher>AIA</publisher>
+		<info name="serial" value="T-46001N"/>
+		<info name="release" value="20010416" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="illbleed (usa)" sha1="1f69f735f5414c1f335b5468649a47a4c50d33c1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="illbleedj" cloneof="illbleed">
+		<description>Illbleed (Jpn)</description>
+		<year>2001</year>
+		<publisher>Crazy Games</publisher>
+		<info name="serial" value="T-45601M"/>
+		<info name="release" value="20010329" />
+		<info name="alt_title" value="イルブリード" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="illbleed (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="illbleedtw" cloneof="illbleed">
+		<description>Illbleed (Twn)</description>
+		<year>2002</year>
+		<publisher>Mr.Game</publisher>
+		<info name="serial" value="T-45601"/>
+		<info name="alt_title" value="勇闖鬼界" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="illbleed (twn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- Bundled with the Mars 16th, 2001 issue of "Famitsu DC". -->
+	<!--
+	<software name="specialgd">
+		<description>Imakoso!! Dreamcast with SPECIAL GD!! (Jpn)</description>
+		<year>2001</year>
+		<publisher>Enterbrain</publisher>
+		<info name="serial" value="610-7993"/>
+		<info name="release" value="20010316" />
+		<info name="alt_title" value="いまこそ!! Dreamcast with SPECIAL GD!!" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="imakoso dreamcast with special gd (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="incoming">
+		<!--
+		<rom name="Incoming v1.000 (1999)(Interplay)(NTSC)(US)[!].gdi" size="434" md5="eed18d750ae64c55066d8db85dc1b258" sha1="188e92e253ead9ccdb067fcd4029352ab68ab63d"/>
+		<rom name="track01.bin" size="705600" md5="6f0570f29e5e2b7501ba7a6ffc4069b4" sha1="e0a8681f72297eab44c4298b2a2c089b2ccff07d"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="748037136" md5="7cb90dfd819f0a51de49f083e4d4ea14" sha1="257a69a6c42e0135dbbe02813b480ce9beffade6"/>
+		<rom name="track04.raw" size="52863552" md5="330f28b1054548a825e65ca37d916b2b" sha1="7495273efa429df64224592ae42da98a5ed86615"/>
+		<rom name="track05.raw" size="30103248" md5="24130b39ebe401aa8824b0079465a43a" sha1="21f9efeda82117d4d166fb3b3a46589c9a1b34c1"/>
+		<rom name="track06.raw" size="39708816" md5="18a937c049fcca2e00d327aa11f46850" sha1="6077d30cd3dcdc4d4f4ee60ac3dce589598ce485"/>
+		<rom name="track07.raw" size="31380384" md5="fce10ce1f6449679d8e5a1744931f753" sha1="311e25e3e8d7c2d72d758ea9f0fba62275a83ad3"/>
+		<rom name="track08.raw" size="42225456" md5="d5096349849aace08cc1ef53ff6afe53" sha1="2151eee11103fcf130d8151e7353bdcdd0e0c68e"/>
+		<rom name="track09.raw" size="29141280" md5="f3ccf0b67118749780a0779b40e835fb" sha1="e8a3b84fece1364f185f066f7ee6b221584f3a38"/>
+		<rom name="track10.raw" size="42208992" md5="c80858760b78aae9ea354f88415ec1f8" sha1="0c29a1b842c36c01799034f61c7cf645c53a938e"/>
+		<rom name="track11.raw" size="27588960" md5="f6f845f8ad98c5148fb6febae36ae4f8" sha1="004bae2f8ec72891bd39970f82664b753b4a4b11"/>
+		<rom name="track12.raw" size="28793184" md5="2452fc60ea05018b302426e04377b419" sha1="b3932d05629b716c948ec0419a1db3a880990fbe"/>
+		<rom name="track13.raw" size="20739936" md5="cb07182601f245f8cfd6d8a34a354d4e" sha1="f8117af1eb563e8a5d986fd3e6dab0ce20f5217b"/>
+		<rom name="track14.bin" size="92264256" md5="86534857383a03fe3b783c9f62321f00" sha1="84f345d1692345a67aa18f01630c83b7376e22df"/>
+		-->
+		<description>Incoming (USA)</description>
+		<year>1999</year>
+		<publisher>Interplay</publisher>
+		<info name="serial" value="T-12503N"/>
+		<info name="release" value="19991130" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="incoming (usa)" sha1="14cd290814bd8e9aeabcb63d802f354e6355003a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="incominge" cloneof="incoming">
+		<!--
+		<rom name="Incoming v1.002 (1999)(Rage)(PAL)(M5)[!].gdi" size="434" md5="c211ee0620ab67794774d7aa525aa1a7" sha1="faba883798d75e90c0c9be0125009de92c32a5ae"/>
+		<rom name="track01.bin" size="705600" md5="6ed3c43f776ff1c3df5562fdb4d00b66" sha1="bbdad1e9c3b8b2fb99e8c58233897478c29b7cf0"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="748041840" md5="005e1b52790d48c07cbf367649d9bcba" sha1="3072b890c5049ae031db53165d0f3ae9f7662ae5"/>
+		<rom name="track04.raw" size="52863552" md5="330f28b1054548a825e65ca37d916b2b" sha1="7495273efa429df64224592ae42da98a5ed86615"/>
+		<rom name="track05.raw" size="30103248" md5="24130b39ebe401aa8824b0079465a43a" sha1="21f9efeda82117d4d166fb3b3a46589c9a1b34c1"/>
+		<rom name="track06.raw" size="39708816" md5="18a937c049fcca2e00d327aa11f46850" sha1="6077d30cd3dcdc4d4f4ee60ac3dce589598ce485"/>
+		<rom name="track07.raw" size="31380384" md5="fce10ce1f6449679d8e5a1744931f753" sha1="311e25e3e8d7c2d72d758ea9f0fba62275a83ad3"/>
+		<rom name="track08.raw" size="42225456" md5="d5096349849aace08cc1ef53ff6afe53" sha1="2151eee11103fcf130d8151e7353bdcdd0e0c68e"/>
+		<rom name="track09.raw" size="29141280" md5="f3ccf0b67118749780a0779b40e835fb" sha1="e8a3b84fece1364f185f066f7ee6b221584f3a38"/>
+		<rom name="track10.raw" size="42208992" md5="c80858760b78aae9ea354f88415ec1f8" sha1="0c29a1b842c36c01799034f61c7cf645c53a938e"/>
+		<rom name="track11.raw" size="27588960" md5="f6f845f8ad98c5148fb6febae36ae4f8" sha1="004bae2f8ec72891bd39970f82664b753b4a4b11"/>
+		<rom name="track12.raw" size="28793184" md5="2452fc60ea05018b302426e04377b419" sha1="b3932d05629b716c948ec0419a1db3a880990fbe"/>
+		<rom name="track13.raw" size="20739936" md5="cb07182601f245f8cfd6d8a34a354d4e" sha1="f8117af1eb563e8a5d986fd3e6dab0ce20f5217b"/>
+		<rom name="track14.bin" size="92259552" md5="edae4717e297a67676308660280c64aa" sha1="12849d565f52fd13e0e122f716627fbcd1c9912f"/>
+		-->
+		<description>Incoming (Euro)</description>
+		<year>1999</year>
+		<publisher>Rage Software</publisher>
+		<info name="serial" value="T-40701D-50"/>
+		<info name="release" value="19991014" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="incoming (euro)" sha1="daf5d3254dc5f84387a6c89e9885c8be71831273"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="incomingj" cloneof="incoming">
+		<!--
+		<rom name="Incoming - Humanity Last Battle v1.001 (1998)(Imagineer)(NTSC)(JP)[!].gdi" size="434" md5="9c96f15c1b443bcfbd06587398a376f6" sha1="e72cc0286be0b050c2f4600a80d298b5b00508b5"/>
+		<rom name="track01.bin" size="1220688" md5="c54268c5bb6b3329049d9416de98fe7d" sha1="3d935876fbc5896b4db13baaa52068a294e829bb"/>
+		<rom name="track02.raw" size="1949808" md5="c28a4d0b40eee409fe201f3c1c47a0b1" sha1="437a4512cac2d8dc384ab8e7240790925158f1d9"/>
+		<rom name="track03.bin" size="802050816" md5="6ac1f90b748c66406ff5f2567ae78e4c" sha1="3c62a6481e1f4e71d326c2ca8da0cfd20b976d00"/>
+		<rom name="track04.raw" size="52863552" md5="330f28b1054548a825e65ca37d916b2b" sha1="7495273efa429df64224592ae42da98a5ed86615"/>
+		<rom name="track05.raw" size="30103248" md5="24130b39ebe401aa8824b0079465a43a" sha1="21f9efeda82117d4d166fb3b3a46589c9a1b34c1"/>
+		<rom name="track06.raw" size="39708816" md5="18a937c049fcca2e00d327aa11f46850" sha1="6077d30cd3dcdc4d4f4ee60ac3dce589598ce485"/>
+		<rom name="track07.raw" size="31380384" md5="fce10ce1f6449679d8e5a1744931f753" sha1="311e25e3e8d7c2d72d758ea9f0fba62275a83ad3"/>
+		<rom name="track08.raw" size="42225456" md5="d5096349849aace08cc1ef53ff6afe53" sha1="2151eee11103fcf130d8151e7353bdcdd0e0c68e"/>
+		<rom name="track09.raw" size="29141280" md5="f3ccf0b67118749780a0779b40e835fb" sha1="e8a3b84fece1364f185f066f7ee6b221584f3a38"/>
+		<rom name="track10.raw" size="42208992" md5="c80858760b78aae9ea354f88415ec1f8" sha1="0c29a1b842c36c01799034f61c7cf645c53a938e"/>
+		<rom name="track11.raw" size="27588960" md5="f6f845f8ad98c5148fb6febae36ae4f8" sha1="004bae2f8ec72891bd39970f82664b753b4a4b11"/>
+		<rom name="track12.raw" size="28793184" md5="2452fc60ea05018b302426e04377b419" sha1="b3932d05629b716c948ec0419a1db3a880990fbe"/>
+		<rom name="track13.raw" size="20739936" md5="cb07182601f245f8cfd6d8a34a354d4e" sha1="f8117af1eb563e8a5d986fd3e6dab0ce20f5217b"/>
+		<rom name="track14.bin" size="38250576" md5="f15d07219dabded6672a078d2383a228" sha1="904ee7b2506356e6cc0112caa3f11021aaf09e92"/>
+		-->
+		<description>Incoming: Jinrui Saisyuu Kessen (Jpn)</description>
+		<year>1998</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-15001M"/>
+		<info name="release" value="19981217" />
+		<info name="alt_title" value="インカミング 人類最終決戦" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="incoming jinrui saisyuu kessen (jpn)" sha1="5d8406941a6d90a00dfabf0fe632458b6d205aab"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Apparently dumped via Dreamshell, which is known to give bad dumps. -->
+	<software name="incomingp" cloneof="incoming">
+		<!--
+		<rom name="INCOMING.gdi" size="419" md5="772d82be03950d860e59bdf2a235be0c" sha1="025e8482729816dc2f5a9d5692d3915a72bd7330"/>
+		<rom name="track01.iso" size="614400" md5="2a96be59c6161d5dc9c5930c6153a96d" sha1="b0cbb2c0657945cce854b2134fd025d8f16e55a0"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.iso" size="651356160" md5="328fbf206f54ecfa7e3337b33eaa84b9" sha1="94b695be2ec68d82170ee1224d5133aabdd7dfb2"/>
+		<rom name="track04.raw" size="52863552" md5="330f28b1054548a825e65ca37d916b2b" sha1="7495273efa429df64224592ae42da98a5ed86615"/>
+		<rom name="track05.raw" size="30103248" md5="24130b39ebe401aa8824b0079465a43a" sha1="21f9efeda82117d4d166fb3b3a46589c9a1b34c1"/>
+		<rom name="track06.raw" size="39708816" md5="18a937c049fcca2e00d327aa11f46850" sha1="6077d30cd3dcdc4d4f4ee60ac3dce589598ce485"/>
+		<rom name="track07.raw" size="31380384" md5="fce10ce1f6449679d8e5a1744931f753" sha1="311e25e3e8d7c2d72d758ea9f0fba62275a83ad3"/>
+		<rom name="track08.raw" size="42225456" md5="d5096349849aace08cc1ef53ff6afe53" sha1="2151eee11103fcf130d8151e7353bdcdd0e0c68e"/>
+		<rom name="track09.raw" size="29141280" md5="f3ccf0b67118749780a0779b40e835fb" sha1="e8a3b84fece1364f185f066f7ee6b221584f3a38"/>
+		<rom name="track10.raw" size="42208992" md5="c80858760b78aae9ea354f88415ec1f8" sha1="0c29a1b842c36c01799034f61c7cf645c53a938e"/>
+		<rom name="track11.raw" size="27588960" md5="f6f845f8ad98c5148fb6febae36ae4f8" sha1="004bae2f8ec72891bd39970f82664b753b4a4b11"/>
+		<rom name="track12.raw" size="28793184" md5="047f686c7c9dd3fd57d0200160db336f" sha1="1e82d8454619d50d3d07f7a9ad20a403d28a8be8"/>
+		<rom name="track13.raw" size="20739936" md5="d6c74d7a365948404c494f0a82f4599f" sha1="258715ad794e5dccba3df9b9fd1dc70c306cf6c6"/>
+		<rom name="track14.iso" size="80334848" md5="6bd43e032402ab10939a7cab5b8f2695" sha1="cb410a46060a13d7bee14c6547c23f56e16d8517"/>
+		-->
+		<description>Incoming (Euro, Prototype 19990906)</description>
+		<year>1999</year>
+		<publisher>Rage Software</publisher>
+		<info name="release" value="19990906" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="incoming (euro, prototype 19990906)" sha1="4d4def1b1f2e632fcd4dff850e3d2a1beb4e9893" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="induspy">
+		<!--
+		<rom name="Industrial Spy - Operation Espionage v1.001 (2000)(UFO)(NTSC)(US)[!].gdi" size="89" md5="3cbecdf8736802853854f57930141db3" sha1="9255fdbb4f10cf52dfd95495dcf8e031ceab1de0"/>
+		<rom name="track01.bin" size="39033792" md5="c7edc0c98a5a08c34d508c90a6feaa9c" sha1="22b6ea72db6f7f181ddecc871fb6aa2d79289d16"/>
+		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
+		<rom name="track03.bin" size="1185760800" md5="e474718b020611c91697320c161888f1" sha1="cd0ae7277e1ee590c4080d73e6337f6695012a35"/>
+		-->
+		<description>Industrial Spy: Operation Espionage (USA)</description>
+		<year>2000</year>
+		<publisher>UFO</publisher>
+		<info name="serial" value="T-41302N"/>
+		<info name="release" value="20000601" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="industrial spy operation espionage (usa)" sha1="98dcb9d4f2e1d2497cf5a1f4916b543ce3569316"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="espionage" cloneof="induspy">
+		<!--
+		<rom name="ESPION-AGE-NTS - Industrial Agents for Active Espionage v1.001 (1999)(NEC)(NTSC)(JP)[!].gdi" size="89" md5="56d895cdf0949ce91a18c217d756df1e" sha1="b78215b5c34ff6261701a591ff168254bafd60d8"/>
+		<rom name="track01.bin" size="33666528" md5="d2422cd76e2bc16efced7c975708c951" sha1="7ff1c0a55d718094b7b29fb1e0b5619df538fee1"/>
+		<rom name="track02.raw" size="1806336" md5="ab7bc495518bdce0fdf0bed285161a45" sha1="1fd1daec523e5ea569be4ab20ff36464c525f08d"/>
+		<rom name="track03.bin" size="1185760800" md5="9fbc6c79f698bd75b689c72025f535d0" sha1="e83f8b0a7df5a581cbcc02678c7128254d4971bf"/>
+		-->
+		<description>Espion-Age-Nts: Industrial Agents for Active Espionage (Jpn)</description>
+		<year>1999</year>
+		<publisher>NEC Home Electronics</publisher>
+		<info name="serial" value="T-38804M"/>
+		<info name="release" value="19990923" />
+		<info name="alt_title" value="エスピオネージェンツ" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="espion-age-nts industrial agents for active espionage (jpn)" sha1="89ca11774d3a94673e6b02d31a4cdd373b7e7785"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="espionagetdm" cloneof="induspy">
+		<description>Espion-Age-Nts: Industrial Agents for Active Espionage - Tentouyou Demonstration Movie (Jpn)</description>
+		<year>1999</year>
+		<publisher>NEC Home Electronics</publisher>
+		<info name="serial" value="610-7185"/>
+		<info name="alt_title" value="エスピオネージェンツ 店頭用デモンストレーションムービー" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="espion-age-nts industrial agents for active espionage - tentouyou demonstration movie (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="inhabit">
+		<description>Inhabitants (World)</description>
+		<year>2005</year>
+		<publisher>GOAT Store Publishing</publisher>
+		<info name="release" value="20050119" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="inhabitants (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="irlast">
+		<description>Inoue Ryouko: Last Scene (Jpn)</description>
+		<year>2001</year>
+		<publisher>Datam Polystar</publisher>
+		<info name="serial" value="T-19506M"/>
+		<info name="release" value="20011108" />
+		<info name="alt_title" value="井上涼子 〜ラストシーン〜" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="inoue ryouko last scene (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- Also released as a Dorikore version, which is identical to retail. -->
+	<!--
+	<software name="irroommt">
+		<description>Inoue Ryouko: Roommate (Jpn)</description>
+		<year>2001</year>
+		<publisher>Datam Polystar</publisher>
+		<info name="serial" value="T-19505M"/>
+		<info name="release" value="20010705" />
+		<info name="alt_title" value="井上涼子 〜ルームメイト〜" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="inoue ryouko roommate (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- Also released as a Dorikore version, which is identical to retail. -->
+	<!--
+	<software name="intrlude">
+		<description>Interlude (Jpn)</description>
+		<year>2003</year>
+		<publisher>NEC Interchannel</publisher>
+		<info name="serial" value="T-20127M"/>
+		<info name="release" value="20030424" />
+		<info name="alt_title" value="インタールード" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="interlude (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- The Limited Edition (T-20117M) comes in a double-CD case and includes an audio CD. -->
+	<!--
+	<software name="intrludesg" cloneof="intrlude">
+		<description>Interlude - Shokai Genteiban (Jpn)</description>
+		<year>2003</year>
+		<publisher>NEC Interchannel</publisher>
+		<info name="serial" value="T-20117M"/>
+		<info name="release" value="20030313" />
+		<info name="alt_title" value="インタールード 初回限定版" />
+		<part interface="cdrom" name="cdrom1">
+			<feature name="part_id" value="Interlude"/>
+			<diskarea name="cdrom">
+				<disk name="interlude - shokai genteiban (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+		<part interface="cdrom" name="cdrom2">
+			<feature name="part_id" value="Sound Track"/>
+			<diskarea name="cdrom">
+				<disk name="interlude - shokai genteiban (jpn) (sound track)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="irides">
+		<description>Irides: Master of Blocks (World)</description>
+		<year>2009</year>
+		<publisher>GOAT Store Publishing</publisher>
+		<info name="release" value="20091212" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="irides master of blocks (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- The Limited Edition includes an expanded instruction manual, a poster, and collector's coin. -->
+	<!--
+	<software name="iridesle" cloneof="irides">
+		<description>Irides: Master of Blocks - Limited Edition (World)</description>
+		<year>2009</year>
+		<publisher>GOAT Store Publishing</publisher>
+		<info name="release" value="20091212" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="irides master of blocks - limited edition (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="iris">
+		<description>Iris (Jpn)</description>
+		<year>2003</year>
+		<publisher>KID</publisher>
+		<info name="serial" value="T-19722M"/>
+		<info name="release" value="20030807" />
+		<info name="alt_title" value="イリス" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="iris (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- The Limited Edition (T-19721M) comes in a larger cardboard case and includes a hand puppet. -->
+	<!--
+	<software name="irissg" cloneof="iris">
+		<description>Iris - Shokai Genteiban (Jpn)</description>
+		<year>2003</year>
+		<publisher>KID</publisher>
+		<info name="serial" value="T-19721M"/>
+		<info name="release" value="20030807" />
+		<info name="alt_title" value="イリス 初回限定版" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="iris - shokai genteiban (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="ironaces">
+		<!--
+		<rom name="Iron Aces v1.000 (2000)(Infogrames - XICAT Interactive)(NTSC)(US)[!].gdi" size="87" md5="6b91c320ee1f4ac2dcfba3c3b43df09d" sha1="595bf24112edff3e88efe62407a36c0d47bba59a"/>
+		<rom name="track01.bin" size="1425312" md5="a3cfa32ea4fe3467a0d617c044d75a4b" sha1="e008e968278f2385aad3ade5aa87e7694a3ad22e"/>
+		<rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
+		<rom name="track03.bin" size="1185760800" md5="934e495bbe7605651127dd8e7a707999" sha1="d428cf51fac0a9c326f0b81e469abf38822b207e"/>
+		-->
+		<description>Iron Aces (USA)</description>
+		<year>2001</year>
+		<publisher>Infogrames</publisher>
+		<info name="serial" value="T-15129N"/>
+		<info name="release" value="20010206" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="iron aces (usa)" sha1="663990fd2605bd5168150664003624fd8b72d6de"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- A promo version exists (950-0139-50 952-0132-50), it is most likely the same as retail. -->
+	<software name="ironacese" cloneof="ironaces">
+		<!--
+		<rom name="Iron Aces v1.000 (2001)(XICAT Interactive)(PAL)[!].gdi" size="87" md5="6b91c320ee1f4ac2dcfba3c3b43df09d" sha1="595bf24112edff3e88efe62407a36c0d47bba59a"/>
+		<rom name="track01.bin" size="1425312" md5="93b98eb6db5c116b0a2bd798a31aba8a" sha1="18806436a98b47d4140ced4dba11ca06853fc449"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="1185760800" md5="f1b5fcf8f81764bf66e246bacd177fa6" sha1="a49adbec3821a9d176d4886197cf356a23f7c244"/>
+		-->
+		<description>Iron Aces (Euro)</description>
+		<year>2001</year>
+		<publisher>Xicat Interactive</publisher>
+		<info name="serial" value="T-44904D-50"/>
+		<info name="release" value="20010629" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="iron aces (euro)" sha1="82c0f92af18786291f9c6bfb997bed2d93f4fd87"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="imperial" cloneof="ironaces">
+		<!--
+		<rom name="Imperial no Taka - Fighter of Zero v1.004 (2000)(Global A Entertainment)(NTSC)(JP)[!].gdi" size="87" md5="fd4d9a5d43a530d229ee0076d32506fb" sha1="eecb4856b5bc0c31573ce72b705cf0519e90c7f6"/>
+		<rom name="track01.bin" size="1996848" md5="b1662735c8533f5741df2591247bd4bf" sha1="884f51d0ea27747432e9505c470918ad21455ec6"/>
+		<rom name="track02.raw" size="1735776" md5="d09be539a7074a058159505b7f5fdcb3" sha1="db680939aae4bf61d0e588414c72a47c6dd92cdd"/>
+		<rom name="track03.bin" size="1185760800" md5="9d1934d114241f6225cb78d48f38d6ee" sha1="a1a17314d1022843ab1d8f5f67ec4dfbadcb8056"/>
+		-->
+		<description>Imperial no Taka: Fighter of Zero (Jpn)</description>
+		<year>2000</year>
+		<publisher>Global A Entertainment</publisher>
+		<info name="serial" value="T-43501M"/>
+		<info name="release" value="20000629" />
+		<info name="alt_title" value="インペリアルの鷹 FIGHTER OF ZERO" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="imperial no taka fighter of zero (jpn)" sha1="0aded497b63ff43e7d1f7f062ff5558605708a2e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="izumo">
+		<!--
+		<rom name="Izumo v1.002 (2003)(Symbio Planning)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="d9c35824cc2b095d4854668af65449cb" sha1="a5f628a9783c034c5ca7c2c6be43c29b2b69da7d"/>
+		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
+		<rom name="track03.bin" size="1185760800" md5="9a369a53d877e65ffc1d48882d073866" sha1="01487891f61c22ab35bf14704c29fb8214d44ddd"/>
+		-->
+		<description>Izumo (Jpn)</description>
+		<year>2004</year>
+		<publisher>Symbio Planning</publisher>
+		<info name="serial" value="T-46902M"/>
+		<info name="release" value="20040129" />
+		<info name="alt_title" value="イズモ" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="izumo (jpn)" sha1="34bf4be6da64b77e64f69b46fa88b60c21b1a8f6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="jltsuk">
+		<description>J.League Pro Soccer Club o Tsukurou! (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0028"/>
+		<info name="release" value="19990930" />
+		<info name="alt_title" value="J.LEAGUE プロサッカークラブをつくろう!" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="j.league pro soccer club o tsukurou (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="jahmong">
+		<description>Jahmong (Jpn)</description>
+		<year>2000</year>
+		<publisher>Visit</publisher>
+		<info name="serial" value="T-43401M"/>
+		<info name="release" value="20000831" />
+		<info name="alt_title" value="ジャーマン" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jahmong (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="jmg2k">
+		<!--
+		<rom name="Jeremy McGrath Supercross 2000 v1.001 (2000)(Acclaim)(NTSC)(US)[!][1S T-8104N].gdi" size="149" md5="a06cfaaa2a3eff8d178e9ea5b0c4b17b" sha1="fabfd5461b32668c884e776162e2cd9e30941131"/>
+		<rom name="track01.bin" size="1418256" md5="9889570b65e93b5e9f57d81b57589e32" sha1="02de129ecf5f8070fa5c89103d2a825008a47c78"/>
+		<rom name="track02.raw" size="1237152" md5="b78d6a9d1dafdafb44eb8c18f90fafe0" sha1="d296e491becacd2eaf05867b52ab9ee53788aae5"/>
+		<rom name="track03.bin" size="885323376" md5="7afa0c64bd3af04234242a51ba2a4527" sha1="bba11aa5c835fc10a25080bfb1ffccbbff953465"/>
+		<rom name="track04.raw" size="1060752" md5="79b56a63ec50e779b8a78fedb989247e" sha1="083896176f6989e147ece00017640a3204a5a142"/>
+		<rom name="track05.bin" size="298671072" md5="237e831c6b7a98d44de1c4dcd7e0a5cc" sha1="dc2b940c102de3b3d5be8278c3c98b77a6e8c8e7"/>
+		-->
+		<description>Jeremy McGrath Supercross 2000 (USA)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="T-8104N"/>
+		<info name="release" value="20000808" />
+		<info name="ring_code" value="1S T-8104N"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jeremy mcgrath supercross 2000 (usa)" sha1="b2ae0a2cf429d9f1752cb61af59e99342cf7778e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	The English (T-8114D-05), German (T-8114D-18), French/German (T-8114D-56) and Spanish/Italian (T-8114D-60)
+	releases all share the same disc (T-8114D-50).
+
+ 	A promo version exists (950-0094-50 952-0088-50), it is most likely the same as retail.
+	-->
+	<software name="jmg2ke" cloneof="jmg2k">
+		<!--
+		<rom name="Jeremy McGrath Supercross 2000 v1.004 (2000)(Acclaim)(PAL)(M3)[!].gdi" size="150" md5="cc193bfb0bf2c959045a216d4233e432" sha1="75be3b2f90f2cef12fd7b16e9fc912378cfe500f"/>
+		<rom name="track01.bin" size="16075920" md5="9521aef6c3f15905a2534f5eac36ad4b" sha1="a4d801874e3f95939f3abf9dfe88e02088e911d2"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="863381568" md5="66d5cc1fa48ce0e0f09d9bd2cee44cd5" sha1="30edb199f27c330db9da265a99dbf6d5209615ba"/>
+		<rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+		<rom name="track05.bin" size="307855632" md5="511ba646edfe23789a2b6820cd805179" sha1="4cfa321413a24105018462d5dd03a5dffef2fb2c"/>
+		-->
+		<description>Jeremy McGrath Supercross 2000 (Euro)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="T-8114D-05, T-8114D-18, T-8114D-50, T-8114D-56, T-8114D-60"/>
+		<info name="release" value="20000908" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jeremy mcgrath supercross 2000 (euro)" sha1="32b8cbb5b523b0c885c97f6a46f9bdfa1c447b0f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="Jeremy Mc Grath Supercross v0.800 (US) BETA.cdi" size="814515344" md5="aecbb2faf64f9d5798bfa4439d5395d1" sha1="65301fdcad204e2d7d9a4584509b7bbbb1788151"/>
+
+	This prototype was released onto the Internet as a CDI image, which chdman cannot handle correctly right now.
+	When a proper CHD can be created, this dump will be added.
+	-->
+	<!--
+	<software name="jmg2kp" cloneof="jmg2k">
+		<description>Jeremy McGrath Supercross 2000 (World, Prototype 20000515)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="release" value="20000515" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jeremy mcgrath supercross 2000 (world, prototype 20000515)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="jcd2">
+		<description>Jet Coaster Dream 2 (Jpn)</description>
+		<year>2000</year>
+		<publisher>Bimboosoft</publisher>
+		<info name="serial" value="T-41201M"/>
+		<info name="release" value="20001102" />
+		<info name="alt_title" value="ジェットコースタードリーム2" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet coaster dream 2 (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- The VMU+Jet Grind Radio bundle shares the same disc as the regular edition (51058) but includes a VMU. -->
+	<software name="jetgrind">
+		<!--
+		<rom name="Jet Grind Radio v1.005 (2000)(Sega)(NTSC)(US)[!].gdi" size="87" md5="6b91c320ee1f4ac2dcfba3c3b43df09d" sha1="595bf24112edff3e88efe62407a36c0d47bba59a"/>
+		<rom name="track01.bin" size="1425312" md5="4390c2b462ff6467ce3a05f36d1b2dd4" sha1="0b9938e8d9af00f65831d4809bb9bfaf271df5e8"/>
+		<rom name="track02.raw" size="1237152" md5="3d6b7c9657ff92046a3f9c49cb411e45" sha1="989d383f136e63e7567f648a103106964918bac9"/>
+		<rom name="track03.bin" size="1185760800" md5="77bc0b131e14d35f909f02e6778b2c87" sha1="f9ed8434bc1570fd785d6f4900752adc91d39dd9"/>
+		-->
+		<description>Jet Grind Radio (USA)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="51058, 51084"/>
+		<info name="release" value="20001101" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet grind radio (usa)" sha1="bcdbe0779a59b37a0f74c4f6d52e3c1d74fa26f5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Promo version has the markings 950-0107-50 952-0101-50 -->
+	<software name="jetsetr" cloneof="jetgrind">
+		<!--
+		<rom name="Jet Set Radio v1.002 (2000)(Sega)(PAL)(M4)[!].gdi" size="88" md5="35a74f41b867392736be1a8fc2792a9b" sha1="92d97cb1e6812a088477ac8abf9d884388dd699f"/>
+		<rom name="track01.bin" size="16075920" md5="0c94177c78c36f548572af98e4e9a86e" sha1="27135330816762d197f129e596ca6e38e3a5ac03"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="1185760800" md5="41e04e0db314d1719f4806d4e0ae1169" sha1="ce82e77c72389817b29cfa9b67770f1558f54f16"/>
+		-->
+		<description>Jet Set Radio (Euro)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="MK-51058-50, 952-0101-50"/>
+		<info name="release" value="20001124" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet set radio (euro)" sha1="595b3c4c517220eed0f0fa86241ada67691c20e9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="jetsetrj" cloneof="jetgrind">
+		<description>Jet Set Radio (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0078"/>
+		<info name="release" value="20000629" />
+		<info name="alt_title" value="ジェット セット ラジオ" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet set radio (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!-- Also released as a Dorikore version (HDR-0212) and a 610-7969 labled version. It is unknown if these differ. -->
+	<software name="dljetsetr" cloneof="jetgrind">
+		<!--
+		<rom name="De La Jet Set Radio v1.001 (2000)(Sega)(NTSC)(JP)(M5)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+		<rom name="track01.bin" size="1058400" md5="c30ba961a0cb330b117f17e5508f9c90" sha1="7e7c94d0784bca3ffb4698c11b8f629567aaed0f"/>
+		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
+		<rom name="track03.bin" size="1185760800" md5="972ffdfcfb0230d0696593c26cfd6f62" sha1="9f8ac764524692eef619eef526f5391ee5e5971d"/>
+		-->
+		<description>De La Jet Set Radio (Jpn)</description>
+		<year>2001</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0186"/>
+		<info name="release" value="20011018" />
+		<info name="alt_title" value="デ・ラ・ジェット セット ラジオ" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="de la jet set radio (jpn)" sha1="4ee7c06c2be198cd2791838cb14e3ea621a7c40d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The Sega Direct version (HDR-0128) comes in a larger cardboard box and includes a t-shirt. -->
+	<!--
+	<software name="dljetsetrsd" cloneof="jetgrind">
+		<description>Jet Set Radio (Jpn, Sega Direct)</description>
+		<year>2001</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0128"/>
+		<info name="release" value="20010101" />
+		<info name="alt_title" value="デ・ラ・ジェット セット ラジオ" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet set radio (jpn, sega direct)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="jetgrindb" cloneof="jetgrind">
+		<description>Jet Grind Radio (Bra)</description>
+		<year>200?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="197093"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet grind radio (bra)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="jetsetrt" cloneof="jetgrind">
+		<description>Jet Set Radio - Taikenban (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="610-7888"/>
+		<info name="alt_title" value="ジェット セット ラジオ 体験版" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet set radio - taikenban (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="jetgrindp" cloneof="jetgrind">
+		<!--
+		<rom name="Jet Grind Radio [GD-R] (US).gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="307effd4eb0eedf532d6237382e6fcfb" sha1="788588651fbef95e476f2f38814156abb1780f5d"/>
+		<rom name="track02.raw" size="1237152" md5="9eef669a6adf2577aedb687d0605fbfd" sha1="13ffe1f95015a5bd325c6cbc369ab2dd27ae461e"/>
+		<rom name="track03.bin" size="1185760800" md5="77bc0b131e14d35f909f02e6778b2c87" sha1="f9ed8434bc1570fd785d6f4900752adc91d39dd9"/>
+		-->
+		<description>Jet Grind Radio (USA, Prototype 20001002)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="release" value="20001002" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet grind radio (usa, prototype 20001002)" sha1="1088557a8038e7314dda86ac509fd7a3f87f79da"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Apparently dumped via Dreamshell, which is known to give bad dumps. -->
+	<software name="jetsetrp" cloneof="jetgrind">
+		<!--
+		<rom name="jet_set_radio_TEST.gdi" size="84" md5="e9df2a6b7d6980ddbd6503547d5467e9" sha1="dcb087d1582e6afa1920eaf991bdbc2032a61520"/>
+		<rom name="track01.iso" size="13998080" md5="92843d4bdd062560989eb1ac1d5ee532" sha1="016ef5b87a9459b131665477018f28e81301dc89"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.iso" size="1032499200" md5="b6676bec4a24dacc43ca9376cd4970b5" sha1="2ec596cf2f5cf2f0aa7b2026964a301b477836a0"/>
+		-->
+		<description>Jet Set Radio (Euro, Prototype 20001003)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="release" value="20001003" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jet set radio (euro, prototype 20001003)" sha1="6f6056be0737b6caeba5d9545fd4704da4e30d85" status="baddump"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="powyak">
+		<!--
+		<rom name="Jikkyou Powerful Pro Yakyu - Dreamcast Edition v1.003 (2000)(Konami)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+		<rom name="track01.bin" size="705600" md5="eddb390978ed03f1706c07bbaa0b5a51" sha1="d26c97d0139f699284174b44c15262beb784cbff"/>
+		<rom name="track02.raw" size="1735776" md5="d09be539a7074a058159505b7f5fdcb3" sha1="db680939aae4bf61d0e588414c72a47c6dd92cdd"/>
+		<rom name="track03.bin" size="1185760800" md5="b0c73d82f36dd05235c5f2b38793c15b" sha1="8b073759e6cb0a2bc5f4e77978d7a129e22c0878"/>
+		-->
+		<description>Jikkyou Powerful Pro Yakyuu - Dreamcast Edition (Jpn)</description>
+		<year>2000</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="T-9507M"/>
+		<info name="release" value="20000330" />
+		<info name="alt_title" value="実況パワフルプロ野球 Dreamcast Edition" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jikkyou powerful pro yakyuu - dreamcast edition (jpn)" sha1="07e2e64eaa62690b431998750e7d3976d36db6a0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="jwhite2">
+		<!--
+		<rom name="Jimmy White's 2 - Cueball v1.100 (1999)(Virgin)(PAL)[!].gdi" size="87" md5="b069d76de20167d9547dcb6ae5266518" sha1="f979e2cf7d9385e0acdc5d70e32d3e38af530f43"/>
+		<rom name="track01.bin" size="1658160" md5="156055389aaedce7aae1936ec3558653" sha1="459373c3eba3bd27d9282b7a82d3aabb7cff0307"/>
+		<rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+		<rom name="track03.bin" size="1185760800" md5="f427fbf18ba2513d9ca08e5f43015b19" sha1="4418cf37362d61439369414049ce28e7c82d065b"/>
+		-->
+		<description>Jimmy White's 2: Cueball (Euro)</description>
+		<year>1999</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="serial" value="T-7001D-50"/>
+		<info name="release" value="199911xx" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jimmy white's 2 cueball (euro)" sha1="51995d91c6667cc4d28247921e4005e5c74a4bfd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="jinsei">
+		<!--
+		<rom name="Jinsei Game for Dreamcast v1.001 (2000)(Takara)(NTSC)(JP)[!][T-10301M-0381 2MM1].gdi" size="87" md5="fd4d9a5d43a530d229ee0076d32506fb" sha1="eecb4856b5bc0c31573ce72b705cf0519e90c7f6"/>
+		<rom name="track01.bin" size="1996848" md5="46527f57ed80f71d1f766153b053dbcf" sha1="69381a0b6dec7fc7cf0d5aa7407dee043ed13936"/>
+		<rom name="track02.raw" size="1735776" md5="5d76bfa8d1e11df82d32b677579f8962" sha1="530ad1db55b9ca089593e6ed28b2ed9b0ede2ee1"/>
+		<rom name="track03.bin" size="1185760800" md5="6e1e89765bbec60f401e015c0359724c" sha1="961bcbf1b1bbb316a6ad676f3034cc3d48f73c13"/>
+		-->
+		<description>Jinsei Game for Dreamcast (Jpn)</description>
+		<year>2000</year>
+		<publisher>Takara</publisher>
+		<info name="serial" value="T-10301M"/>
+		<info name="release" value="20000622" />
+		<info name="alt_title" value="人生ゲーム for Dreamcast" />
+		<info name="ring_code" value="T-10301M-0381 2MM1"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jinsei game for dreamcast (jpn)" sha1="1078883bc371e99373019ca80c40dcba9f1becf4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- It is not known if there ever was regular edition released. -->
+	<software name="kongdom">
+		<!--
+		<rom name="Jissen Pachislo Hisshouhou! @ VP@CHI - Kongdom v1.004 (2000)(Maxbet)(NTSC)(JP)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+		<rom name="track01.bin" size="1058400" md5="e02b4c9d0c16bc1b8dc5cc4e66f770dd" sha1="ca044d145f7910d6adc9a06f6707df21e5cada07"/>
+		<rom name="track02.raw" size="1735776" md5="8659426a29f58924f5f0458cc720098b" sha1="e12b9ae5ebc79b7da5271bce29df450671ce5d93"/>
+		<rom name="track03.bin" size="1185760800" md5="cf94d6775a19ed857458c92e1a98730d" sha1="ba8f731e82fc79daca7e37b371e66bddcd7d05db"/>
+		-->
+		<description>Jissen Pachi-Slot Hisshouhou! @ VP@CHI: Kongdom - Shokai Genteiban (Jpn)</description>
+		<year>2000</year>
+		<publisher>Maxbet</publisher>
+		<info name="serial" value="T-18801M"/>
+		<info name="release" value="20000928" />
+		<info name="alt_title" value="実戦パチスロ必勝法!@VP@CHI 〜コングダム〜" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jissen pachislot hisshouhou at vpachi kongdom - shokai genteiban (jpn)" sha1="11deb121971dba2df3b6a895953f437ef3db0ca2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="jojoba">
+		<!--
+		<rom name="Jojo's Bizarre Adventure v1.001 (2000)(Capcom)(NTSC)(US)[!].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
+		<rom name="track01.bin" size="1232448" md5="14fa302e1e293b6843efff282228ec84" sha1="df0b2d70f0851d9c025a690b8420b9d4559ca04e"/>
+		<rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
+		<rom name="track03.bin" size="1185760800" md5="2bf40ecf5f0ac9a90fe97d09d0071798" sha1="23c31f10e3be528476b9a1778cb467a502a5f506"/>
+		-->
+		<description>Jojo's Bizarre Adventure (USA)</description>
+		<year>1999</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="T-1206N"/>
+		<info name="release" value="19991031" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jojo's bizarre adventure (usa)" sha1="40cccac2746f3175833f8c99fbf4f93dc732b4c4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="jojobae" cloneof="jojoba">
+		<!--
+		<rom name="Jojo's Bizarre Adventure v1.001 (2000)(Virgin)(PAL)[!].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
+		<rom name="track01.bin" size="1232448" md5="c02bbfd5635b0fd9b161a781fb5e0e2c" sha1="a372d3990e370e4ca01f1294d6bca567a40fd928"/>
+		<rom name="track02.raw" size="13994400" md5="26b90a822cf308523edf2fa2aab8cab2" sha1="99d7c73a8cf819579a56702e86b4fc3969f85343"/>
+		<rom name="track03.bin" size="1185760800" md5="954766cd052a26d0e897bcb77b3afd2c" sha1="d4d3cc5d56df716a2820965d815f8543d4d972e2"/>
+		-->
+		<description>Jojo's Bizarre Adventure (Euro)</description>
+		<year>2000</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="serial" value="T-7007D-50"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jojo's bizarre adventure (euro)" sha1="263b09bac283d77c5805f119902434c5086a65bb"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="jojobaj" cloneof="jojoba">
+		<!--
+		<rom name="Jojo no Kimyouna Bouken - Mirai He no Isan v1.001 (1999)(Capcom)(NTSC)(JP)(en)[!].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
+		<rom name="track01.bin" size="1232448" md5="8939cf12123b135e25f9ed4707e0ec75" sha1="54a5e0d6934eb5be7fbaacd7e3f5811ba31d3eeb"/>
+		<rom name="track02.raw" size="1735776" md5="83063f347231ce18aeaf56fe02c5e5f9" sha1="cb55e18da6c69d19bef63e1c7f8f981bd9fa5a3a"/>
+		<rom name="track03.bin" size="1185760800" md5="6c45e0bf32e8f0111c1036f5dac6069a" sha1="cf2f51e920ba42b338fae878b4fd0d2d1418593a"/>
+		-->
+		<description>Jojo no Kimyou na Bouken: Mirai e no Isan (Jpn)</description>
+		<year>1999</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="T-1205M"/>
+		<info name="release" value="19991125" />
+		<info name="alt_title" value="ジョジョの奇妙な冒険 未来への遺産" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jojo no kimyou na bouken mirai e no isan (jpn)" sha1="14dd7b84d0196bacc664ea9914939ab18315348c"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="jojobafms" cloneof="jojoba">
+		<!--
+		<rom name="Jojo no Kimyouna Bouken - Mirai He no Isan for Matching Service v1.000 (2000)(Capcom)(NTSC)(JP)(en)[!].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
+		<rom name="track01.bin" size="1232448" md5="e67b1b68b64d0b1820d738feaac0c900" sha1="3893410a4ee8c64afdc87b3d8cb03cccce638e64"/>
+		<rom name="track02.raw" size="1735776" md5="3aa6188846ba5818beab83bf1395af50" sha1="3ae25c5b7fd80f8ae79e8ba6b4b8ffb10a5c102c"/>
+		<rom name="track03.bin" size="1185760800" md5="db7351e0e8528db79c7011b720f23f68" sha1="d85cd89637442d7d716fd103591f61963056d2ce"/>
+		-->
+		<description>Jojo no Kimyou na Bouken: Mirai e no Isan for Matching Service (Jpn)</description>
+		<year>2000</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="T-1231M"/>
+		<info name="release" value="20001026" />
+		<info name="alt_title" value="ジョジョの奇妙な冒険 未来への遺産 for Matching Service" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jojo no kimyou na bouken mirai e no isan for matching service (jpn)" sha1="a4010dcad32d47bcf9dd5ac3168ca5640f306007"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<software name="jojobatt" cloneof="jojoba">
+		<description>Jojo no Kimyou na Bouken: Mirai e no Isan - Tentou-you Taikenban (Jpn)</description>
+		<year>1999</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="610-7357"/>
+		<info name="alt_title" value="ジョジョの奇妙な冒険 未来への遺産 店頭用体験版" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jojo no kimyou na bouken mirai e no isan - tentou-you taikenban (jpn)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="jrapatv40l10" cloneof="jrapat">
+		<description>JRA PAT for Dreamcast (Jpn, V40L10)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="T-42501M"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jra pat for dreamcast (jpn, v40l10)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="jrapatv40l11" cloneof="jrapat">
+		<description>JRA PAT for Dreamcast (Jpn, V40L11)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="T-42501M"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jra pat for dreamcast (jpn, v40l11)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="jrapatv40l12" cloneof="jrapat">
+		<description>JRA PAT for Dreamcast (Jpn, V40L12)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="T-42501M"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jra pat for dreamcast (jpn, v40l12)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<!--
+	<software name="jrapat">
+		<description>JRA PAT for Dreamcast (Jpn, V50L10)</description>
+		<year>2000</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HDR-0204"/>
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jra pat for dreamcast (jpn, v50l10)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
+
+	<software name="july1" cloneof="july">
+		<!--
+		<rom name="July v1.001 (1998)(Fortyfive)(NTSC)(JP)[!].gdi" size="87" md5="44fd0bf037defd18330131f7c4798bc5" sha1="bdf79a7f7b5ff359865de7b61661aeefd5ef11d2"/>
+		<rom name="track01.bin" size="1166592" md5="7c5aaf0c0d36bcdf026195ae76bb1a7a" sha1="2a1f0cecc8490178f298762b1e0d3f6d932a00d7"/>
+		<rom name="track02.raw" size="1735776" md5="2a0118809a9198ebe849a7ccf4ed64f4" sha1="7e5e75943a66329fb6d50eda1ef3ac1ce81e7516"/>
+		<rom name="track03.bin" size="1185760800" md5="c1cf7958dabb71fa263281787b2fe4c3" sha1="99e14e8ae8fff09bf478228d3acaef28c9425073"/>
+		-->
+		<description>July (Jpn)</description>
+		<year>1998</year>
+		<publisher>FortyFive</publisher>
+		<info name="serial" value="T-35401M"/>
+		<info name="release" value="19981127" />
+		<info name="alt_title" value="ジュライ" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="july (jpn)" sha1="00e326a2e8076c0caecbb53aa48be541fb69a8f2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="july">
+		<!--
+		<rom name="July v2.000 (1998)(Fortyfive)(NTSC)(JP)[!].gdi" size="87" md5="44fd0bf037defd18330131f7c4798bc5" sha1="bdf79a7f7b5ff359865de7b61661aeefd5ef11d2"/>
+		<rom name="track01.bin" size="1166592" md5="d0bf0f734ebf8eb3ce260969717241d6" sha1="9f50fd94eeafd8a995e6f8b0002ff904809c6f8b"/>
+		<rom name="track02.raw" size="2036832" md5="b62b490782ae03865592d79f13168c17" sha1="4fd817ccaa746651a1e277fdebd25ea4868ffb86"/>
+		<rom name="track03.bin" size="1185760800" md5="23e70871f0bc0cb0fc094ec4072b8629" sha1="a64cffa8a721b8730f8d80a908f0c3f1f823b7fd"/>
+		-->
+		<description>July (Jpn, Rev. 1)</description>
+		<year>1998</year>
+		<publisher>FortyFive</publisher>
+		<info name="serial" value="T-35401M"/>
+		<info name="release" value="19981127" />
+		<info name="alt_title" value="ジュライ" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="july (jpn, rev. 1)" sha1="4265f137c03c4d98ad3d28aeee8c3ca4c306a578"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!--
+	<rom name="jump_n_blob.cdi" size="777980022" md5="ff52d84d50c5e852b8ee0e3e7f76cd59" sha1="4704d1e8b746b3364214c6f5860f372d5873edfd"/>
+	<rom name="jump_n_blob.nrg" size="777624424" md5="3b7d91260de37744259b3589f0d00e49" sha1="6be11c12c643a7016035ee65a5154836878d897a"/>
+
+	This game was released onto the Internet as a CDI and NRG image, which chdman cannot handle correctly right now.
+	When a proper CHD can be created, this dump will be added.
+	-->
+	<!--
+	<software name="jumpblob">
+		<description>Jump'n Blob (World)</description>
+		<year>2011</year>
+		<publisher>2D-Retroperspectives</publisher>
+		<info name="release" value="20110104" />
+		<part interface="cdrom" name="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jump'n blob (world)" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+	-->
 </softwarelist>
