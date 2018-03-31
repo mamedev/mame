@@ -403,8 +403,10 @@ int retro_window_info::window_init()
 	result = complete_create();
 	
 	oldfps=retro_fps;
-	if(machine().first_screen()!= nullptr)
-		retro_fps = ATTOSECONDS_TO_HZ(machine().first_screen()->refresh_attoseconds());
+
+    const screen_device *primary_screen = screen_device_iterator(machine().root_device()).first();
+    if(primary_device != nullptr)
+        retro_fps = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
 	
 
 	if(alternate_renderer==false){
