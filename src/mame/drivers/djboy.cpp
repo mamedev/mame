@@ -151,15 +151,9 @@ Notes:
 
 /* KANEKO BEAST state */
 
-WRITE8_MEMBER(djboy_state::beast_data_w)
-{
-	m_beastlatch->write(space, 0, data);
-	m_z80_to_beast_full = 1;
-}
-
 READ8_MEMBER(djboy_state::beast_status_r)
 {
-	return (m_slavelatch->pending_r() ? 0x0 : 0x4) | (m_z80_to_beast_full << 3);
+	return (m_slavelatch->pending_r() ? 0x0 : 0x4) | (m_beastlatch->pending_r() ? 0x8 : 0x0);
 }
 
 /******************************************************************************/
@@ -241,7 +235,7 @@ void djboy_state::slavecpu_port_am(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(this, FUNC(djboy_state::slavecpu_bankswitch_w));
 	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x04, 0x04).r(m_slavelatch, FUNC(generic_latch_8_device::read)).w(this, FUNC(djboy_state::beast_data_w));
+	map(0x04, 0x04).r(m_slavelatch, FUNC(generic_latch_8_device::read)).w(m_beastlatch, FUNC(generic_latch_8_device::write));
 	map(0x06, 0x06).w(this, FUNC(djboy_state::djboy_scrolly_w));
 	map(0x08, 0x08).w(this, FUNC(djboy_state::djboy_scrollx_w));
 	map(0x0a, 0x0a).w(this, FUNC(djboy_state::trigger_nmi_on_mastercpu));
@@ -284,7 +278,7 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 	}
 
 	if (BIT(data, 0) == 1)
-		m_z80_to_beast_full = 0;
+		m_beastlatch->acknowledge_w(space, 0, data); // TODO : Acknowloge at here too?
 
 	m_beast_p0 = data;
 }
@@ -477,7 +471,6 @@ void djboy_state::machine_start()
 	save_item(NAME(m_scrolly));
 
 	/* Kaneko BEAST */
-	save_item(NAME(m_z80_to_beast_full));
 	save_item(NAME(m_beast_p0));
 	save_item(NAME(m_beast_p1));
 	save_item(NAME(m_beast_p2));
@@ -489,8 +482,6 @@ void djboy_state::machine_reset()
 	m_videoreg = 0;
 	m_scrollx = 0;
 	m_scrolly = 0;
-
-	m_z80_to_beast_full = 0;
 }
 
 MACHINE_CONFIG_START(djboy_state::djboy)

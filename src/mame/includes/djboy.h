@@ -60,7 +60,6 @@ public:
 	uint8_t       m_scrolly;
 
 	/* Kaneko BEAST state */
-	uint8_t       m_z80_to_beast_full;
 	uint8_t       m_beast_p0;
 	uint8_t       m_beast_p1;
 	uint8_t       m_beast_p2;
@@ -78,7 +77,6 @@ public:
 	required_device<generic_latch_8_device> m_slavelatch;
 	required_device<generic_latch_8_device> m_beastlatch;
 
-	DECLARE_WRITE8_MEMBER(beast_data_w);
 	DECLARE_READ8_MEMBER(beast_status_r);
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_mastercpu);
 	DECLARE_WRITE8_MEMBER(mastercpu_bankswitch_w);
