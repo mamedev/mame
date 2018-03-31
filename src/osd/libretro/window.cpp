@@ -405,9 +405,10 @@ int retro_window_info::window_init()
 	oldfps=retro_fps;
 
     const screen_device *primary_screen = screen_device_iterator(machine().root_device()).first();
-    if(primary_device != nullptr)
+
+    if (primary_screen != nullptr){
         retro_fps = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
-	
+	}
 
 	if(alternate_renderer==false){
 	//test correct aspect
