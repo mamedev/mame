@@ -1155,8 +1155,8 @@ ROM_START( ptblank ) /* World set using 4Mb sound data rom (verified) */
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
 	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
 
-	ROM_REGION( 0x800, "eeprom", 0 ) // default gun calibration and settings
-	ROM_LOAD( "eeprom", 0x000, 0x800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
+	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
+	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
 ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's prefix for Nebulas Ray, but NOT here!!), verified on 2 seperate PCBs */
@@ -1186,8 +1186,8 @@ ROM_START( ptblanka ) /* World set using non standard ROM labels (NR is Namco's 
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
 	ROM_LOAD( "nr9_spr0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) ) // == gn1-sha0.5m
 
-	ROM_REGION( 0x800, "eeprom", 0 ) // default gun calibration and settings
-	ROM_LOAD( "eeprom", 0x000, 0x800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
+	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
+	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
 ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
@@ -1217,8 +1217,8 @@ ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
 	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
 
-	ROM_REGION( 0x800, "eeprom", 0 ) // default gun calibration and settings
-	ROM_LOAD( "eeprom", 0x000, 0x800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
+	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
+	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
 ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data rom (verified) */
@@ -1248,8 +1248,8 @@ ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data rom (verified) */
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
 	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
 
-	ROM_REGION( 0x800, "eeprom", 0 ) // default gun calibration and settings
-	ROM_LOAD( "eeprom", 0x000, 0x800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
+	ROM_REGION( 0x0800, "eeprom", 0 ) // default gun calibration and settings
+	ROM_LOAD( "eeprom", 0x0000, 0x0800, CRC(95760d0f) SHA1(94ac5a261d9afc77c2a163a50950b0e86b1f8041) )
 ROM_END
 
 ROM_START( nebulray )
@@ -1274,13 +1274,13 @@ ROM_START( nebulray )
 	ROM_LOAD32_WORD( "nr1obj3l", 0xc00000, 0x200000, CRC(c90d13ae) SHA1(675f7b8b3325aac91b2bae1cbebe274a65aedc43) )
 
 	ROM_REGION( 0x400000, NAMCONB1_TILEGFXREGION, 0 )
-	ROM_LOAD( "nr1-chr0", 0x000000, 0x100000,CRC(8d5b54ea) SHA1(616d5729f474da91da19a8246066280652da998c) )
-	ROM_LOAD( "nr1-chr1", 0x100000, 0x100000,CRC(cd21630c) SHA1(9974c0eb1051ca52f001e6631264a1936bb50620) )
-	ROM_LOAD( "nr1-chr2", 0x200000, 0x100000,CRC(70a11023) SHA1(bead486a86bd96c6fdfd2ea4d4d37c38bbe9bfbb) )
-	ROM_LOAD( "nr1-chr3", 0x300000, 0x100000,CRC(8f4b1d51) SHA1(b48fb2c8ccd9105a5b48be44dd3fe4309769efa4) )
+	ROM_LOAD( "nr1-chr0", 0x000000, 0x100000, CRC(8d5b54ea) SHA1(616d5729f474da91da19a8246066280652da998c) )
+	ROM_LOAD( "nr1-chr1", 0x100000, 0x100000, CRC(cd21630c) SHA1(9974c0eb1051ca52f001e6631264a1936bb50620) )
+	ROM_LOAD( "nr1-chr2", 0x200000, 0x100000, CRC(70a11023) SHA1(bead486a86bd96c6fdfd2ea4d4d37c38bbe9bfbb) )
+	ROM_LOAD( "nr1-chr3", 0x300000, 0x100000, CRC(8f4b1d51) SHA1(b48fb2c8ccd9105a5b48be44dd3fe4309769efa4) )
 
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
-	ROM_LOAD( "nr1-sha0", 0, 0x80000,CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
+	ROM_LOAD( "nr1-sha0", 0, 0x080000, CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
 
 	ROM_REGION( 0x20, "proms", 0 ) /* custom key data? */
 	ROM_LOAD( "c366.bin", 0, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
@@ -1308,13 +1308,13 @@ ROM_START( nebulrayj )
 	ROM_LOAD32_WORD( "nr1obj3l", 0xc00000, 0x200000, CRC(c90d13ae) SHA1(675f7b8b3325aac91b2bae1cbebe274a65aedc43) )
 
 	ROM_REGION( 0x400000, NAMCONB1_TILEGFXREGION, 0 )
-	ROM_LOAD( "nr1-chr0", 0x000000, 0x100000,CRC(8d5b54ea) SHA1(616d5729f474da91da19a8246066280652da998c) )
-	ROM_LOAD( "nr1-chr1", 0x100000, 0x100000,CRC(cd21630c) SHA1(9974c0eb1051ca52f001e6631264a1936bb50620) )
-	ROM_LOAD( "nr1-chr2", 0x200000, 0x100000,CRC(70a11023) SHA1(bead486a86bd96c6fdfd2ea4d4d37c38bbe9bfbb) )
-	ROM_LOAD( "nr1-chr3", 0x300000, 0x100000,CRC(8f4b1d51) SHA1(b48fb2c8ccd9105a5b48be44dd3fe4309769efa4) )
+	ROM_LOAD( "nr1-chr0", 0x000000, 0x100000, CRC(8d5b54ea) SHA1(616d5729f474da91da19a8246066280652da998c) )
+	ROM_LOAD( "nr1-chr1", 0x100000, 0x100000, CRC(cd21630c) SHA1(9974c0eb1051ca52f001e6631264a1936bb50620) )
+	ROM_LOAD( "nr1-chr2", 0x200000, 0x100000, CRC(70a11023) SHA1(bead486a86bd96c6fdfd2ea4d4d37c38bbe9bfbb) )
+	ROM_LOAD( "nr1-chr3", 0x300000, 0x100000, CRC(8f4b1d51) SHA1(b48fb2c8ccd9105a5b48be44dd3fe4309769efa4) )
 
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 )
-	ROM_LOAD( "nr1-sha0", 0, 0x80000,CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
+	ROM_LOAD( "nr1-sha0", 0, 0x080000, CRC(ca667e13) SHA1(685032603224cb81bcb85361921477caec570d5e) )
 
 	ROM_REGION( 0x20, "proms", 0 ) /* custom key data? */
 	ROM_LOAD( "c366.bin", 0, 0x20, CRC(8c96f31d) SHA1(d186859cfc19a63266084372080d0a5bee687ae2) )
@@ -1794,10 +1794,10 @@ ROM_START( outfxies )
 	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
 	ROM_REGION( 0x200000, NAMCONB1_TILEMASKREGION, 0 )
-	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_LOAD( "ou1shas.12s", 0, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTMASKREGION, 0 )
-	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_LOAD( "ou1shar.18s", 0, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
 
 	ROM_REGION( 0x2000000, NAMCONB1_SPRITEGFXREGION, 0 )
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )
@@ -1836,10 +1836,10 @@ ROM_START( outfxiesj )
 	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
 
 	ROM_REGION( 0x200000, NAMCONB1_TILEMASKREGION, 0 )
-	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+	ROM_LOAD( "ou1shas.12s", 0, 0x200000, CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTMASKREGION, 0 )
-	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+	ROM_LOAD( "ou1shar.18s", 0, 0x200000, CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
 
 	ROM_REGION( 0x2000000, NAMCONB1_SPRITEGFXREGION, 0 )
 	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(1b4f7184) SHA1(a05d67842fce92f321d1fdd3bd30aa3427775a0c) )
@@ -1885,7 +1885,7 @@ ROM_START( machbrkr ) /* Defaults to Asia / 4 Player cabinet */
 	ROM_LOAD( "mb1_shas.12s", 0, 0x100000, CRC(c51c614b) SHA1(519ecad2e4543c05ec35a727f4c875ab006291af) )
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTMASKREGION, 0 )
-	ROM_LOAD( "mb1_shar.18s", 0, 0x80000, CRC(d9329b10) SHA1(149c8804c07350f47af36bc7902371f1dfbed272) )
+	ROM_LOAD( "mb1_shar.18s", 0, 0x080000, CRC(d9329b10) SHA1(149c8804c07350f47af36bc7902371f1dfbed272) )
 
 	ROM_REGION( 0x2000000, NAMCONB1_SPRITEGFXREGION, 0 )
 	ROM_LOAD32_WORD( "mb1obj0l.4c", 0x0000000, 0x200000, CRC(056e6b1c) SHA1(44e49de80c925c8fbe04bf9328a77a50a305a5a7) )
@@ -1931,7 +1931,7 @@ ROM_START( machbrkrj )
 	ROM_LOAD( "mb1_shas.12s", 0, 0x100000, CRC(c51c614b) SHA1(519ecad2e4543c05ec35a727f4c875ab006291af) )
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTMASKREGION, 0 )
-	ROM_LOAD( "mb1_shar.18s", 0, 0x80000, CRC(d9329b10) SHA1(149c8804c07350f47af36bc7902371f1dfbed272) )
+	ROM_LOAD( "mb1_shar.18s", 0, 0x080000, CRC(d9329b10) SHA1(149c8804c07350f47af36bc7902371f1dfbed272) )
 
 	ROM_REGION( 0x2000000, NAMCONB1_SPRITEGFXREGION, 0 )
 	ROM_LOAD32_WORD( "mb1obj0l.4c", 0x0000000, 0x200000, CRC(056e6b1c) SHA1(44e49de80c925c8fbe04bf9328a77a50a305a5a7) )
