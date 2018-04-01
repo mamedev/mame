@@ -8,7 +8,7 @@
 
     Games supported:
         * Arcade Classics (1992)
-        * Sparkz (1982)
+        * Sparkz (1992)
 
     Known bugs:
         * none at this time
@@ -300,10 +300,10 @@ static const gfx_layout molayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	8*8*4
 };
 
 
@@ -331,7 +331,6 @@ MACHINE_CONFIG_START(sparkz_state::sparkz)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadecl)
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_MEMBITS(8)
@@ -355,6 +354,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(arcadecl_state::arcadecl)
 	sparkz(config);
 
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadecl)
 	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", arcadecl_state::s_mob_config)
 	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
 MACHINE_CONFIG_END
@@ -384,9 +384,6 @@ ROM_START( sparkz )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sparkzpg.0", 0x00000, 0x80000, CRC(a75c331c) SHA1(855ed44bd23c1dd0ca64926cacc8be62aca82fe2) )
 	ROM_LOAD16_BYTE( "sparkzpg.1", 0x00001, 0x80000, CRC(1af1fc04) SHA1(6d92edb1a881ba6b63e0144c9c3e631b654bf8ae) )
-
-	ROM_REGION( 0x20, "gfx1", ROMREGION_ERASE00 )
-	/* empty */
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sparkzsn",      0x00000, 0x80000, CRC(87097ce2) SHA1(dc4d199b5af692d111c087af3edc01e2ac0287a8) )
