@@ -55,6 +55,7 @@ SOUNDS["VOLT_REG"] = true
 --------------------------------------------------
 
 MACHINES["6821PIA"] = true
+MACHINES["ADC0808"] = true
 MACHINES["TTL74148"] = true
 MACHINES["TTL74153"] = true
 MACHINES["TTL74157"] = true

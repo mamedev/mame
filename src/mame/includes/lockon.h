@@ -46,6 +46,14 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
+	void lockon(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_char_ram;
 	required_shared_ptr<uint16_t> m_hud_ram;
@@ -120,25 +128,20 @@ public:
 	DECLARE_WRITE16_MEMBER(main_z80_w);
 	DECLARE_WRITE16_MEMBER(inten_w);
 	DECLARE_WRITE16_MEMBER(emres_w);
-	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE8_MEMBER(sound_vol);
 	DECLARE_WRITE8_MEMBER(ym2203_out_b);
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lockon);
 	uint32_t screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_lockon);
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 	TIMER_CALLBACK_MEMBER(bufend_callback);
-	void scene_draw(  );
-	void ground_draw(  );
-	void objects_draw(  );
+	void scene_draw();
+	void ground_draw();
+	void objects_draw();
 	void rotate_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irq);
-	void lockon(machine_config &config);
 	void ground_v30(address_map &map);
 	void main_v30(address_map &map);
 	void object_v30(address_map &map);

@@ -16,6 +16,7 @@
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0808.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
 #include "speaker.h"
@@ -200,7 +201,7 @@ void lockon_state::sound_prg(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7000).w(this, FUNC(lockon_state::sound_vol));
-	map(0x7400, 0x7403).r(this, FUNC(lockon_state::adc_r)).nopw();
+	map(0x7400, 0x7407).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
 	map(0x7800, 0x7fff).mirror(0x8000).ram();
 }
 
@@ -330,24 +331,6 @@ static INPUT_PORTS_START( lockone )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On )  )
 INPUT_PORTS_END
 
-
-/*************************************
- *
- *  M58990P ADC
- *
- *************************************/
-
-READ8_MEMBER(lockon_state::adc_r)
-{
-	switch (offset)
-	{
-		case 0:  return ioport("ADC_BANK")->read();
-		case 1:  return ioport("ADC_PITCH")->read();
-		case 2:  return ioport("ADC_MISSILE")->read();
-		case 3:  return ioport("ADC_HOVER")->read();
-		default: return 0;
-	}
-}
 
 /*************************************
  *
@@ -504,6 +487,11 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_DEVICE_ADD("adc", M58990P, 1000000) // unknown clock (needs to be faster than 640khz for the wait loop)
+	MCFG_ADC0808_IN0_CB(IOPORT("ADC_BANK"))
+	MCFG_ADC0808_IN1_CB(IOPORT("ADC_PITCH"))
+	MCFG_ADC0808_IN2_CB(IOPORT("ADC_MISSILE"))
+	MCFG_ADC0808_IN3_CB(IOPORT("ADC_HOVER"))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
