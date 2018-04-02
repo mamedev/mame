@@ -52,4 +52,18 @@
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=w6LsIeLsUFw -->
+	<software name="colorful">
+		<description>Colorful Animals</description>
+		<year>2018</year>
+		<publisher>Genesis Project</publisher>
+		<info name="usage" value="RUN&quot;A.B&quot;" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="colorful_animals.dsk" size="163840" crc="ba6ba9a1" sha1="36f9a0b814b222eb5664a87f3b52c0268dfd18c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

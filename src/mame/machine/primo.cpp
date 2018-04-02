@@ -27,10 +27,10 @@
 
 *******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(primo_state::primo_vblank_interrupt)
+WRITE_LINE_MEMBER(primo_state::vblank_irq)
 {
-	if (m_nmi)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*******************************************************************************

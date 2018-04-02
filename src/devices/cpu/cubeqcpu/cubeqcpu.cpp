@@ -243,7 +243,7 @@ void cquestsnd_cpu_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%02X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%02X").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -347,7 +347,7 @@ void cquestrot_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%02X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%3s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -480,7 +480,7 @@ void cquestlin_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_curpc).formatstr("%02X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).formatstr("%6s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -563,7 +563,7 @@ void cquestsnd_cpu_device::execute_run()
 		int rtn     = (inslow >> 27) & 1;
 		int _rin    = (inslow >> 26) & 1;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		/* Don't think this matters, but just in case */
 		if (rtn)
@@ -821,7 +821,7 @@ void cquestrot_cpu_device::execute_run()
 		int dsrclatch;
 		uint16_t data_in = 0xffff;
 
-		debugger_instruction_hook(this, ROT_PC);
+		debugger_instruction_hook(ROT_PC);
 
 		/* Handle DRAM accesses - I ought to check this... */
 		if (!(m_clkcnt & 3))
@@ -1238,7 +1238,7 @@ void cquestlin_cpu_device::execute_run()
 
 		uint16_t  data_in = 0;
 
-		debugger_instruction_hook(this, m_pc[prog]);
+		debugger_instruction_hook(m_pc[prog]);
 
 		/* Handle accesses to and from shared SRAM */
 		if (prog == FOREGROUND)

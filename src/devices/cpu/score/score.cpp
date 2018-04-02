@@ -76,7 +76,7 @@ void score7_cpu_device::device_start()
 	m_direct = m_program->direct<0>();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// register state for debugger
 	state_add(SCORE_PC  , "PC"  , m_pc).callimport().callexport().formatstr("%08X");
@@ -172,7 +172,7 @@ void score7_cpu_device::execute_run()
 	do
 	{
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		check_irq();
 
@@ -325,7 +325,7 @@ void score7_cpu_device::check_irq()
 			if (m_pending_interrupt[i])
 			{
 				m_pending_interrupt[i] = false;
-				debugger_interrupt_hook(this, i);
+				debugger_interrupt_hook(i);
 				gen_exception(EXCEPTION_INTERRUPT, i);
 				return;
 			}
@@ -335,7 +335,7 @@ void score7_cpu_device::check_irq()
 
 void score7_cpu_device::gen_exception(int cause, uint32_t param)
 {
-	debugger_exception_hook(this, cause);
+	debugger_exception_hook(cause);
 
 	REG_ECR = (REG_ECR & ~0x0000001f) | (cause & 0x1f);              // set exception cause
 	REG_PSR = (REG_PSR & ~0x0000000f) | ((REG_PSR << 2) & 0x0c);     // push status bits

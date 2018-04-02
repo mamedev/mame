@@ -482,7 +482,8 @@ void voodoo_device::init_fbi(voodoo_device* vd,fbi_state *f, void *memory, int f
 	}
 
 	/* allocate a VBLANK timer */
-	f->vblank_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_callback),vd), vd);
+	f->vsync_stop_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_off_callback), vd), vd);
+	f->vsync_start_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_callback),vd), vd);
 	f->vblank = false;
 
 	/* initialize the memory FIFO */
@@ -643,7 +644,8 @@ void voodoo_device::init_save_state(voodoo_device *vd)
 	vd->save_item(NAME(vd->fbi.height));
 	vd->save_item(NAME(vd->fbi.xoffs));
 	vd->save_item(NAME(vd->fbi.yoffs));
-	vd->save_item(NAME(vd->fbi.vsyncscan));
+	vd->save_item(NAME(vd->fbi.vsyncstart));
+	vd->save_item(NAME(vd->fbi.vsyncstop));
 	vd->save_item(NAME(vd->fbi.rowpixels));
 	vd->save_item(NAME(vd->fbi.vblank));
 	vd->save_item(NAME(vd->fbi.vblank_count));
@@ -930,14 +932,14 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 }
 
 
-static void adjust_vblank_timer(voodoo_device *vd)
+void voodoo_device::adjust_vblank_timer()
 {
-	attotime vblank_period = vd->screen->time_until_pos(vd->fbi.vsyncscan);
-	if (LOG_VBLANK_SWAP) vd->logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
+	attotime vblank_period = screen->time_until_pos(fbi.vsyncstart);
+	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (vblank_period == attotime::zero)
-		vblank_period = vd->screen->frame_period();
-	vd->fbi.vblank_timer->adjust(vblank_period);
+		vblank_period = screen->frame_period();
+	fbi.vsync_start_timer->adjust(vblank_period);
 }
 
 
@@ -965,7 +967,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_off_callback )
 		m_vblank(false);
 
 	/* go to the end of the next frame */
-	adjust_vblank_timer(this);
+	adjust_vblank_timer();
 }
 
 
@@ -995,7 +997,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
 		swap_buffers(this);
 
 	/* set a timer for the next off state */
-	machine().scheduler().timer_set(screen->time_until_pos(0), timer_expired_delegate(FUNC(voodoo_device::vblank_off_callback),this), 0, this);
+	fbi.vsync_stop_timer->adjust(screen->time_until_pos(fbi.vsyncstop));
 
 
 
@@ -2632,10 +2634,11 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					vd->fbi.height = vvis;
 					vd->fbi.xoffs = hbp;
 					vd->fbi.yoffs = vbp;
-					vd->fbi.vsyncscan = (vd->reg[vSync].u >> 16) & 0xfff;
-
+					vd->fbi.vsyncstart = (vd->reg[vSync].u >> 16) & 0xfff;
+					vd->fbi.vsyncstop = (vd->reg[vSync].u >> 0) & 0xfff;
+					osd_printf_debug("yoffs: %d vsyncstart: %d vsyncstop: %d\n", vbp, vd->fbi.vsyncstart, vd->fbi.vsyncstop);
 					/* recompute the time of VBLANK */
-					adjust_vblank_timer(vd);
+					vd->adjust_vblank_timer();
 
 					/* if changing dimensions, update video memory layout */
 					if (regnum == videoDimensions)
@@ -3947,7 +3950,6 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 
 		/* return the current visible scanline */
 		case vRetrace:
-
 			/* eat some cycles since people like polling here */
 			if (EAT_CYCLES) vd->cpu->execute().eat_cycles(10);
 			// Return 0 if vblank is active
@@ -4950,9 +4952,18 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 			int vtotal = banshee.crtc[6];
 			vtotal |= ((banshee.crtc[7] >> 0) & 0x1) << 8;
 			vtotal |= ((banshee.crtc[7] >> 5) & 0x1) << 9;
+			vtotal += 2;
+
 			int vstart = banshee.crtc[0x10];
 			vstart |= ((banshee.crtc[7] >> 2) & 0x1) << 8;
 			vstart |= ((banshee.crtc[7] >> 7) & 0x1) << 9;
+
+			int vstop = banshee.crtc[0x11] & 0xf;
+			// Compare to see if vstop is before or after low 4 bits of vstart
+			if (vstop < (vstart & 0xf))
+				vstop |= (vstart + 0x10) & ~0xf;
+			else
+				vstop |= vstart & ~0xf;
 
 			// Get pll k, m and n from pllCtrl0
 			const uint32_t k = (banshee.io[io_pllCtrl0] >> 0) & 0x3;
@@ -4964,21 +4975,24 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 
 			int width = fbi.width;
 			int height = fbi.height;
+			//vd->fbi.xoffs = hbp;
+			//vd->fbi.yoffs = vbp;
 
 			if (banshee.io[io_vidOverlayDudx] != 0)
 				width = (fbi.width * banshee.io[io_vidOverlayDudx]) / 1048576;
 			if (banshee.io[io_vidOverlayDvdy] != 0)
 				height = (fbi.height * banshee.io[io_vidOverlayDvdy]) / 1048576;
 			if (LOG_REGISTERS)
-				logerror("configure screen: htotal: %d vtotal: %d vstart: %d width: %d height: %d refresh: %f\n",
-					htotal, vtotal, vstart, width, height, 1.0 / frame_period);
+				logerror("configure screen: htotal: %d vtotal: %d vstart: %d vstop: %d width: %d height: %d refresh: %f\n",
+					htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
 			if (htotal > 0 && vtotal > 0) {
 				rectangle visarea(0, width - 1, 0, height - 1);
 				screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
 
-				// Set the vsync start
-				fbi.vsyncscan = vstart;
-				adjust_vblank_timer(this);
+				// Set the vsync start and stop
+				fbi.vsyncstart = vstart;
+				fbi.vsyncstop = vstop;
+				adjust_vblank_timer();
 			}
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);

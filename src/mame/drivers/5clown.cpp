@@ -1024,7 +1024,6 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)  /* guess, seems ok */
 	MCFG_CPU_PROGRAM_MAP(fclown_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _5clown_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, MASTER_CLOCK/8) /* guess, seems ok */
 	MCFG_CPU_PROGRAM_MAP(fcaudio_map)
@@ -1058,6 +1057,7 @@ MACHINE_CONFIG_START(_5clown_state::fclown)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

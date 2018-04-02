@@ -74,9 +74,7 @@ public:
 	uint32_t screen_update_superpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mappy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(main_vblank_irq);
-	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
-	INTERRUPT_GEN_MEMBER(sub2_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	DECLARE_DRIVER_INIT(grobda);
 	DECLARE_DRIVER_INIT(digdug2);
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);

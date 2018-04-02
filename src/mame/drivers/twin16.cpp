@@ -58,10 +58,6 @@ Known Issues:
 #include "speaker.h"
 
 
-#define CPUA_IRQ_ENABLE (m_CPUA_register & 0x20)
-#define CPUB_IRQ_ENABLE (m_CPUB_register & 0x02)
-
-
 
 
 int twin16_state::spriteram_process_enable(  )
@@ -638,18 +634,6 @@ WRITE8_MEMBER(twin16_state::volume_callback)
 	m_k007232->set_volume(1,0,(data & 0x0f) * 0x11);
 }
 
-/* Interrupt Generators */
-
-INTERRUPT_GEN_MEMBER(twin16_state::CPUA_interrupt)
-{
-	if (CPUA_IRQ_ENABLE) device.execute().set_input_line(5, HOLD_LINE);
-}
-
-INTERRUPT_GEN_MEMBER(twin16_state::CPUB_interrupt)
-{
-	if (CPUB_IRQ_ENABLE) device.execute().set_input_line(5, HOLD_LINE);
-}
-
 /* Machine Drivers */
 
 void twin16_state::machine_reset()
@@ -669,11 +653,9 @@ MACHINE_CONFIG_START(twin16_state::twin16)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state, CPUA_interrupt)
 
 	MCFG_CPU_ADD("sub", M68000, XTAL(18'432'000)/2)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state, CPUB_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -728,7 +710,6 @@ MACHINE_CONFIG_START(fround_state::fround)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'432'000)/2)
 	MCFG_CPU_PROGRAM_MAP(fround_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", twin16_state, CPUA_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_map)

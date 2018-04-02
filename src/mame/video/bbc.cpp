@@ -266,6 +266,7 @@ WRITE_LINE_MEMBER(bbc_state::bbc_hsync_changed)
 WRITE_LINE_MEMBER(bbc_state::bbc_vsync_changed)
 {
 	m_vsync = state;
+	m_via6522_0->write_ca1(state); // screen refresh interrupts
 	m_trom->dew_w(state);
 }
 

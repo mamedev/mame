@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
-// thanks-to:Ian F./trinitr0n
+// thanks-to:Ian F. & trinitr0n
 /******************************************************************************
     Symbolics 36x0 (really in this case, 3670; the original 3600 is considerably rarer, 3670 is backwards compatible for the most part)
     TODO: add credits, backstory, history, etc here
@@ -261,7 +261,8 @@ void symbolics_state::m68k_mem(address_map &map)
 	//AM_RANGE(0x040000, 0xffffff) AM_READ(buserror_r);
 	//AM_RANGE(0x800000, 0xffffff) AM_RAM /* paged access to lispm ram? */
 	//FF00B0 is readable, may be to read the MC/SQ/DP/AU continuity lines?
-	map(0xff00b0, 0xff00b1).r(this, FUNC(symbolics_state::fep_paddle_id_prom_r));
+	map(0xff00a0, 0xff00bf).rom().region("fep_paddle_prom",0);
+	map(0xff00c0, 0xff00df).rom().region("fep_prom",0);
 	//FF00E1 is writable, may control the LBUS_POWER_RESET line, see http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf page 90
 	// or may be writing to FEP-LBUS-CONTROL bit 0x02 DOORBELL INT ENABLE ?
 	// or may actually be setting LBUS_ID_REQ as the patent map shows
@@ -352,7 +353,12 @@ ROM_START( s3670 )
 	ROMX_LOAD("10l.127.27c128.d10", 0x08001, 0x2000, CRC(b8ddb3c8) SHA1(e6c3b96340c5c767ef18abf48b73fa8e5d7353b9), ROM_SKIP(1) | ROM_BIOS(1)) // Label: "10L.127" @D10
 	ROM_CONTINUE( 0x18001, 0x2000 )
 	// D17, D11 are empty sockets; these would map to 0x0c000-0ffff and 0x1c000-0x1ffff
+	ROM_REGION16_BE( 0x20,"fep_paddle_prom", 0)
+	ROM_LOAD("fpa-458.bin", 0x0000, 0x0020, CRC(5e034b33) SHA1(fea84183825013b2adc290f71d97e5cffd0cf7fd)) // nFEP Paddle S/N 458
+	ROM_REGION16_BE( 0x20,"fep_prom", 0)
+	ROM_LOAD("fep-3973.d5", 0x0000, 0x0020, CRC(29910aa0) SHA1(433ea99b8e21055abb80bebc1d7dfc9e3aacd097)) // nFEP S/N 3973
 	// note: load all the PLAs, PALs and PROMs here
+	
 	// picture is at https://4310b1a9-a-11c96037-s-sites.googlegroups.com/a/ricomputermuseum.org/home/Home/equipment/symbolics-3645/Symbolics_3645_FEP.jpg
 	/*
 	    LBBUFA.4 mb7124   @A6 <- 4887235 page 630 has LBBUFC.UCODE rev27 \
@@ -368,11 +374,11 @@ ROM_START( s3670 )
 	    DV2ACK   pal16L8A @C23 <- 4887235 page 629 has DEVACK rev?, pal16l8 <- controls fep mem map; this is DIFFERENT between FEP v24 (DEVACK) and NFEP v127 (DV2ACK)
 	    PROC.4   pal?     @C25 <- 4887235 page 622 has PROC rev4, pal16l8
 	    UDMAHA.4 pal?     @D3 <- 4887235 page 619 has UDMAHA rev2, pal16l8
-	    FEP 4642 16pprom? @D5 <- this is the serial number of the FEP board stored in a prom, readable at one of the local-io addresses
+	    FEP 3973 16pprom? @D5 <- the number after FEP is the serial number of the FEP board (and is also supposedly stored in the prom), prom is readable at one of the local-io addresses
 	    HSRQ.4   pal      @D6 <- 4887235 page 626 has HSRQ rev?, pal16l8
-	    d7, d8, d10 are eproms, see above
+	    d7, d8, d10 are EPROMs, see above
 	    d11 is empty socket marked 2764
-	    d13, d14, d16 are eproms, see above
+	    d13, d14, d16 are EPROMs, see above
 	    d17 is empty socket marked 2764
 	    DV2NUM            @E21 <- 4887235 page 629 has DEVNUM rev8, pal16l8 <- controls fep mem map; this is DIFFERENT between FEP v24 (DEVNUM) and NFEP v127 (DV2NUM)
 	    LBBD.4   pal16L8A @G18 <- 4887235 page 624 has LBBD rev6, pal16l8
@@ -383,7 +389,8 @@ ROM_START( s3670 )
 	    LBARB.4           @I18 <- 4887235 page 625 has LBARB rev1, pal16l8
 	    SERCTL.4          @K6 <- 4887235 page 620 has SERCTL rev4, pal16l8
 	*/
-	ROM_REGION16_BE( 0x20000, "fepdram", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x20000, "fepdram", ROMREGION_ERASE00 )
+
 ROM_END
 
 /******************************************************************************

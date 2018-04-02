@@ -10,6 +10,8 @@ public:
 	tceptor_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_mcu(*this, "mcu"),
 		m_cus30(*this, "namco"),
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_attr(*this, "tile_attr"),
@@ -25,6 +27,8 @@ public:
 	uint8_t m_m68k_irq_enable;
 	uint8_t m_mcu_irq_enable;
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_attr;

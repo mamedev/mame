@@ -11,6 +11,7 @@
 #pragma once
 
 #include "machine/timer.h"
+#include "sound/pokey.h"
 #include "screen.h"
 
 #define IR_TIMING               1       /* try to emulate MB and VG running time */
@@ -39,7 +40,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_pokey(*this, "pokey%u", 1U)
 	{ }
 
 	DECLARE_DRIVER_INIT(irobot);
@@ -59,8 +61,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(irobot_statwr_w);
 	DECLARE_WRITE8_MEMBER(irobot_out0_w);
 	DECLARE_WRITE8_MEMBER(irobot_rom_banksel_w);
-	DECLARE_WRITE8_MEMBER(irobot_control_w);
-	DECLARE_READ8_MEMBER(irobot_control_r);
 	DECLARE_READ8_MEMBER(irobot_status_r);
 	DECLARE_WRITE8_MEMBER(irobot_paletteram_w);
 	DECLARE_READ8_MEMBER(quad_pokeyn_r);
@@ -96,7 +96,6 @@ private:
 	uint8_t *m_comRAM[2];
 	uint8_t *m_mbRAM;
 	uint8_t *m_mbROM;
-	uint8_t m_control_num;
 	uint8_t m_statwr;
 	uint8_t m_out0;
 	uint8_t m_outx;
@@ -117,6 +116,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device_array<pokey_device, 4> m_pokey;
 };
 
 #endif // MAME_INCLUDES_IROBOT_H

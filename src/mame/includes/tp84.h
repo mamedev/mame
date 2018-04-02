@@ -8,6 +8,7 @@ public:
 	tp84_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "cpu1"),
+		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
 		m_palette_bank(*this, "palette_bank"),
 		m_scroll_x(*this, "scroll_x"),
@@ -22,6 +23,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<uint8_t> m_palette_bank;
 	required_shared_ptr<uint8_t> m_scroll_x;
@@ -59,8 +61,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tp84);
 	uint32_t screen_update_tp84(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(main_vblank_irq);
-	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tp84(machine_config &config);
 	void tp84b(machine_config &config);

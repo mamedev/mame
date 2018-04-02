@@ -12631,6 +12631,7 @@ punipic2                        // bootleg
 punipic3                        // bootleg
 sf2b                            // bootleg
 sf2b2                           // bootleg
+sf2ceb                          // bootleg
 sf2m1                           // hack
 sf2m9                           // bootleg
 sf2mdt                          // bootleg
@@ -12952,6 +12953,7 @@ jolycdid                        // 1990 bootleg
 jolycdie                        // 1990 bootleg
 jolycdif                        // 1990 bootleg
 jolycdig                        // 1993 bootleg
+jolycdih                        // 1990 bootleg
 jolycdit                        // 199? bootleg
 jolycdsp                        // (c) 1992 TAB-Austria
 jolycmzs                        // (c) 1993 MZS Tech
@@ -14832,8 +14834,11 @@ tgaiden                         // Tiger
 tgaunt                          // Tiger
 tgoldeye                        // Tiger
 tgoldnaxe                       // Tiger
+thalone                         // Tiger
+thalone2                        // Tiger
 thook                           // Tiger
 tigarden                        // Tronica
+tinday                          // Tiger
 tjdredd                         // Tiger
 tjpark                          // Tiger
 tkarnov                         // Tiger
@@ -14855,6 +14860,7 @@ tsonic2                         // Tiger
 tspidman                        // Tiger
 tstrider                        // Tiger
 tswampt                         // Tiger
+ttransf2                        // Tiger
 tvindictr                       // Tiger
 txmenpx                         // Tiger
 
@@ -15588,6 +15594,7 @@ shufshot137                     // (c) Strata/Incredible Technologies
 shufshot139                     // (c) Strata/Incredible Technologies
 timekill                        // (c) 1992 Strata/Incredible Technologies
 timekill121                     // (c) 1992 Strata/Incredible Technologies
+timekill121a                    // (c) 1992 Strata/Incredible Technologies
 timekill131                     // (c) 1992 Strata/Incredible Technologies
 timekill132i                    // (c) 1992 Strata/Incredible Technologies
 wcbowl                          // (c) 1995 Incredible Technologies
@@ -17307,6 +17314,7 @@ brapboysp                       // (c) 1992 Kaneko
 brapboyspj                      // (c) 1992 Kaneko
 brapboyspu                      // (c) 1992 Kaneko
 explbrkr                        // (c) 1992 Kaneko
+explbrkrk                       // (c) 1992 Kaneko
 fjbuster                        // (c) 1992 Kaneko
 gtmr                            // (c) 1994 Kaneko
 gtmr2                           // (c) 1995 Kaneko
@@ -21078,6 +21086,7 @@ umk3r11                         // (c) 1994 Midway
 wwfmania                        // (c) 1995 Midway
 wwfmaniab                       // (c) 1995 Midway
 wwfmaniac                       // (c) 1995 Midway
+wwfmaniap                       // (c) 1995 Midway
 
 @source:midxunit.cpp
 revx                            // (c) 1994 Midway
@@ -29556,7 +29565,12 @@ salamandj                       // GX587 (c) 1986
 twinbee                         // GX412 (c) 1985
 
 @source:neogeo.cpp
-neogeo                          // NeoGeo MVS
+neogeo                          // NeoGeo MV-6F
+ng_mv4f                         // NeoGeo MV-4F
+ng_mv2f                         // NeoGeo MV-2F
+ng_mv1                          // NeoGeo MV-1
+ng_mv1f                         // NeoGeo MV-1F
+ng_mv1fz                        // NeoGeo MV-1FZ
 aes                             // NeoGeo AES
 2020bb                          // 0030 (c) 1991 SNK / Pallas
 2020bba                         // 0030 (c) 1991 SNK / Pallas
@@ -29613,6 +29627,7 @@ ganryu                          // 0252 (c) 1999 Visco
 garou                           // 0253 (c) 1999 SNK
 garoubl                         // bootleg
 garouh                          // 0253 (c) 1999 SNK
+garouha                         // 0253 (c) 1999 SNK
 garoup                          // 0253 (c) 1999 SNK
 ghostlop                        // 0228 GhostLop (prototype) 1996? Data East
 goalx3                          // 0209 (c) 1995 Visco
@@ -29732,6 +29747,7 @@ pbobblen                        // 0083 (c) 1994 Taito
 pbobblenb                       // bootleg
 pgoal                           // 0219 (c) 1996 Saurus
 pnyaa                           // 0267 (c) 2003 Aiky / Taito
+pnyaaa                          // 0267 (c) 2003 Aiky / Taito
 popbounc                        // 0237 (c) 1997 Video System Co.
 preisle2                        // 0255 (c) 1999 Yumekobo
 pspikes2                        // 0068 (c) 1994 Video System Co.
@@ -32570,6 +32586,7 @@ rabbitjt                        // (c) 1996 Electronic Arts
 
 @source:rad_eu3a14.cpp
 rad_gtg
+rad_foot
 
 @source:rad_eu3a05.cpp
 rad_sinv
@@ -33405,6 +33422,7 @@ pzlestar                        // (c) 199? Sang Ho Soft
 sexyboom                        // (c) 1992 Sang Ho Soft
 
 @source:sanremmg.cpp
+elsypokr                        // Elsy
 sanremmg                        // San Remo / Elsy
 
 @source:sanremo.cpp
@@ -33704,8 +33722,9 @@ zektor                          // (c) 1982
 @source:segahang.cpp
 endurob2                        // (c) 1985 (Beta bootleg)
 endurobl                        // (c) 1985 (Herb bootleg)
-enduror                         // (c) 1985 (FD1089B)
-enduror1                        // (c) 1985 (FD1089B)
+enduror                         // (c) 1985 (YM2151, FD1089B)
+enduror1                        // (c) 1985 (YM2203, FD1089B)
+endurora                        // (c) 1985 (YM2151, Mask ROM sprites, FD1089B)
 enduror1d                       // bootleg
 endurord                        // bootleg
 hangon                          // (c) 1985 (Rev A)
@@ -37952,6 +37971,7 @@ zone40                          // Zone 40
 zone60                          // Zone 60
 rad_skat                        //
 rad_skatp                       //
+rad_crik                        //
 
 @source:vsmilepro.cpp
 vsmilpro

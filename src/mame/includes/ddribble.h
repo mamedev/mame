@@ -21,6 +21,7 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_snd_sharedram(*this, "snd_sharedram"),
 		m_maincpu(*this, "maincpu"),
+		m_cpu1(*this, "cpu1"),
 		m_vlm(*this, "vlm"),
 		m_filter1(*this, "filter1"),
 		m_filter2(*this, "filter2"),
@@ -47,6 +48,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_cpu1;
 	required_device<vlm5030_device> m_vlm;
 	required_device<filter_rc_device> m_filter1;
 	required_device<filter_rc_device> m_filter2;
@@ -73,8 +75,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ddribble);
 	uint32_t screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ddribble_interrupt_0);
-	INTERRUPT_GEN_MEMBER(ddribble_interrupt_1);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* source, int lenght, int gfxset, int flipscreen );
 	void ddribble(machine_config &config);
 	void cpu0_map(address_map &map);

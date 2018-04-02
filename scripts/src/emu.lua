@@ -35,6 +35,7 @@ includedirs {
 	ext_includedir("flac"),
 	ext_includedir("jpeg"),
 	ext_includedir("rapidjson"),
+	ext_includedir("pugixml"),
 }
 
 files {

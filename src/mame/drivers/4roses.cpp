@@ -190,11 +190,25 @@ class _4roses_state : public funworld_state
 {
 public:
 	_4roses_state(const machine_config &mconfig, device_type type, const char *tag)
-		: funworld_state(mconfig, type, tag) { }
+		: funworld_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
 	DECLARE_DRIVER_INIT(4roses);
+	DECLARE_DRIVER_INIT(rugby);
 	void _4roses(machine_config &config);
+	void rugby(machine_config &config);
+private:
+	DECLARE_READ8_MEMBER(_4roses_opcode_r);
+	DECLARE_READ8_MEMBER(rugby_opcode_r);
+
 	void _4roses_map(address_map &map);
+	void _4roses_opcodes_map(address_map &map);
+	void rugby_map(address_map &map);
+	void rugby_opcodes_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -211,9 +225,79 @@ public:
 void _4roses_state::_4roses_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
-	map(0x6000, 0x6fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
-	map(0x8000, 0xffff).rom();
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x4fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0xffff).rom().region("maincpu", 0x6000);
+}
+
+READ8_MEMBER(_4roses_state::_4roses_opcode_r)
+{
+	uint8_t data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+
+	switch (offset & 0x7c00)
+	{
+	case 0x6000:
+		data = bitswap<8>(data ^ 0x68, 4, 3, 2, 1, 0, 7, 6, 5);
+		break;
+
+	case 0x6400:
+		data = bitswap<8>(data ^ 0x3f, 3, 4, 2, 5, 1, 6, 0, 7);
+		break;
+
+	case 0x6800:
+		data = bitswap<8>(data ^ 0x6a, 7, 0, 2, 1, 4, 3, 6, 5);
+		break;
+
+	case 0x6c00:
+		data = bitswap<8>(data ^ 0x5e, 6, 1, 4, 5, 2, 3, 0, 7);
+		break;
+
+	case 0x7000:
+		data = bitswap<8>(data ^ 0x34, 3, 7, 2, 6, 1, 5, 0, 4);
+		break;
+
+	case 0x7400:
+		data = bitswap<8>(data ^ 0x43, 7, 2, 5, 0, 6, 1, 3, 4);
+		break;
+	}
+
+	return data;
+}
+
+void _4roses_state::_4roses_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r(this, FUNC(_4roses_state::_4roses_opcode_r));
+	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
+}
+
+void _4roses_state::rugby_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0xffff).rom().region("maincpu", 0x4000);
+}
+
+READ8_MEMBER(_4roses_state::rugby_opcode_r)
+{
+	uint8_t data = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	if ((offset >> 12) == 4)
+		data = bitswap<8>(data ^ 0xae, 2, 3, 0, 5, 6, 4, 7, 1);
+	return data;
+}
+
+void _4roses_state::rugby_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).r(this, FUNC(_4roses_state::rugby_opcode_r));
+	map(0x8000, 0xffff).rom().region("maincpu", 0x8000);
 }
 
 /*
@@ -360,7 +444,7 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(_4roses_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _4roses_state,  nmi_line_pulse)
+	MCFG_CPU_OPCODES_MAP(_4roses_opcodes_map)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -380,13 +464,23 @@ MACHINE_CONFIG_START(_4roses_state::_4roses)
 	MCFG_PALETTE_INIT_OWNER(_4roses_state,funworld)
 	MCFG_VIDEO_START_OVERRIDE(_4roses_state,funworld)
 
-//  MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8) /* 2MHz, guess */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8) /* 2MHz, guess */
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(4)
+	//MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz, guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(_4roses_state::rugby)
+	_4roses(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rugby_map)
+	MCFG_CPU_OPCODES_MAP(rugby_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -461,6 +555,16 @@ ROM_END
 
 DRIVER_INIT_MEMBER(_4roses_state,4roses)
 {
+	uint8_t *rom = memregion("maincpu")->base();
+	for (offs_t addr = 0x8000; addr < 0x10000; addr++)
+		rom[addr] = bitswap<8>(rom[addr] ^ 0xca, 6, 5, 4, 3, 2, 1, 0, 7);
+}
+
+DRIVER_INIT_MEMBER(_4roses_state,rugby)
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	for (offs_t addr = 0x8000; addr < 0x10000; addr++)
+		rom[addr] = bitswap<8>(rom[addr], 6, 7, 4, 5, 2, 3, 0, 1);
 }
 
 
@@ -471,4 +575,4 @@ DRIVER_INIT_MEMBER(_4roses_state,4roses)
 /*    YEAR  NAME     PARENT  MACHINE  INPUT   STATE          INIT    ROT   COMPANY      FULLNAME                         FLAGS  */
 GAME( 1999, 4roses,  0,      _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 1999, 4rosesa, 4roses, _4roses, 4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, rugby,   0,      _4roses, 4roses, _4roses_state, 4roses, ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, rugby,   0,      rugby,   4roses, _4roses_state, rugby,  ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

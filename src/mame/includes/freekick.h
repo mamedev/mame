@@ -62,7 +62,7 @@ public:
 	uint32_t screen_update_pbillrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_freekick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gigas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(freekick_irqgen);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

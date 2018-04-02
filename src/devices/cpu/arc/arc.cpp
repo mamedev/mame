@@ -66,7 +66,7 @@ void arc_cpu_device::device_start()
 	state_add(ARC_PC,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -122,7 +122,7 @@ void arc_cpu_device::execute_run()
 
 	while (m_icount > 0)
 	{
-		debugger_instruction_hook(this, m_pc<<2);
+		debugger_instruction_hook(m_pc<<2);
 
 		//uint32_t op = READ32(m_pc);
 

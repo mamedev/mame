@@ -388,7 +388,7 @@ void tlcs900h_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc.d ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_sr.w.l ).formatstr("%12s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1052,7 +1052,7 @@ void tlcs900h_device::execute_run()
 			m_check_irqs = 0;
 		}
 
-		debugger_instruction_hook( this, m_pc.d );
+		debugger_instruction_hook( m_pc.d );
 
 		if ( m_halted )
 		{

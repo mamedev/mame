@@ -900,11 +900,6 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(ninjakd2_state::ninjakd2_interrupt)
-{
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
-}
-
 void ninjakd2_state::machine_start()
 {
 }
@@ -940,7 +935,6 @@ MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_main_cpu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ninjakd2_state,  ninjakd2_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)     /* verified */
 	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)

@@ -15,6 +15,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
@@ -40,14 +41,6 @@ WRITE8_MEMBER(tceptor_state::m68k_shared_w)
 
 /*******************************************************************/
 
-INTERRUPT_GEN_MEMBER(tceptor_state::m6809_vb_interrupt)
-{
-	if (m_m6809_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
-	else
-		m_m6809_irq_enable = 1;
-}
-
 WRITE8_MEMBER(tceptor_state::m6809_irq_enable_w)
 {
 	m_m6809_irq_enable = 1;
@@ -59,25 +52,11 @@ WRITE8_MEMBER(tceptor_state::m6809_irq_disable_w)
 }
 
 
-INTERRUPT_GEN_MEMBER(tceptor_state::m68k_vb_interrupt)
-{
-	if (m_m68k_irq_enable)
-		device.execute().set_input_line(M68K_IRQ_1, HOLD_LINE);
-}
-
 WRITE16_MEMBER(tceptor_state::m68k_irq_enable_w)
 {
 	m_m68k_irq_enable = data;
 }
 
-
-INTERRUPT_GEN_MEMBER(tceptor_state::mcu_vb_interrupt)
-{
-	if (m_mcu_irq_enable)
-		device.execute().set_input_line(0, HOLD_LINE);
-	else
-		m_mcu_irq_enable = 1;
-}
 
 WRITE8_MEMBER(tceptor_state::mcu_irq_enable_w)
 {
@@ -153,11 +132,7 @@ void tceptor_state::m6809_map(address_map &map)
 	map(0x2000, 0x3fff).ram().w(this, FUNC(tceptor_state::tceptor_bg_ram_w)).share("bg_ram");  // background (VIEW RAM)
 	map(0x4000, 0x43ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
 	map(0x4800, 0x4800).w(this, FUNC(tceptor_state::tceptor2_shutter_w));
-	map(0x4f00, 0x4f00).nopr();             // unknown
-	map(0x4f01, 0x4f01).portr("PEDAL");          // analog input (accel)
-	map(0x4f02, 0x4f02).portr("STICKX");         // analog input (left/right)
-	map(0x4f03, 0x4f03).portr("STICKY");         // analog input (up/down)
-	map(0x4f00, 0x4f03).nopw();                // analog input control?
+	map(0x4f00, 0x4f07).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
 	map(0x5000, 0x5006).w(this, FUNC(tceptor_state::tceptor_bg_scroll_w));  // bg scroll
 	map(0x6000, 0x7fff).ram().share("m68k_shared_ram"); // COM RAM
 	map(0x8000, 0x8000).w(this, FUNC(tceptor_state::m6809_irq_disable_w));
@@ -350,7 +325,6 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, XTAL(49'152'000)/32)
 	MCFG_CPU_PROGRAM_MAP(m6809_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, m6809_vb_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M65C02, XTAL(49'152'000)/24)
 	MCFG_CPU_PROGRAM_MAP(m6502_a_map)
@@ -360,16 +334,20 @@ MACHINE_CONFIG_START(tceptor_state::tceptor)
 
 	MCFG_CPU_ADD("sub", M68000, XTAL(49'152'000)/4)
 	MCFG_CPU_PROGRAM_MAP(m68k_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, m68k_vb_interrupt)
 
 	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8) // or compatible 6808 with extra instructions
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tceptor_state, mcu_vb_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock (needs to >640khz or the wait loop is too fast)
+	MCFG_ADC0808_IN0_CB(NOOP) // unknown
+	MCFG_ADC0808_IN1_CB(IOPORT("PEDAL"))
+	MCFG_ADC0808_IN2_CB(IOPORT("STICKX"))
+	MCFG_ADC0808_IN3_CB(IOPORT("STICKY"))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tceptor)

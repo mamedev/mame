@@ -150,7 +150,7 @@ void necdsp_device::device_start()
 	save_item(NAME(m_irq));
 	save_item(NAME(m_irq_firing));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	for (auto & elem : dataRAM)
 	{
@@ -335,7 +335,7 @@ void necdsp_device::execute_run()
 		// call debugger hook if necessary
 		if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
 		{
-			debugger_instruction_hook(this, regs.pc);
+			debugger_instruction_hook(regs.pc);
 		}
 
 		if (m_irq_firing == 0) // normal opcode

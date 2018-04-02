@@ -28,6 +28,9 @@
 
 #pragma once
 
+#include <unordered_map>
+
+
 class mcs51_disassembler : public util::disasm_interface
 {
 public:

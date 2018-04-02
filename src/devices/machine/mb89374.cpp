@@ -129,7 +129,7 @@ mb89374_device::mb89374_device( const machine_config &mconfig, const char *tag, 
 void mb89374_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();

@@ -173,7 +173,7 @@ u32 tms0980_cpu_device::read_micro()
 
 void tms0980_cpu_device::read_opcode()
 {
-	debugger_instruction_hook(this, m_rom_address);
+	debugger_instruction_hook(m_rom_address);
 	m_opcode = m_program->read_word(m_rom_address) & 0x1ff;
 	m_c4 = bitswap<8>(m_opcode,7,6,5,4,0,1,2,3) & 0xf; // opcode operand is bitswapped for most opcodes
 

@@ -42,6 +42,7 @@ public:
 		, m_pio_2(*this, "z80pio_2")
 		, m_ctc(*this, "z80ctc")
 		, m_keyboard(*this, "X%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void babbage(machine_config &config);
@@ -63,11 +64,13 @@ private:
 	uint8_t m_key;
 	uint8_t m_prev_key;
 	bool m_step;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio_1;
 	required_device<z80pio_device> m_pio_2;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport_array<4> m_keyboard;
+	output_finder<33> m_digits;
 };
 
 
@@ -179,7 +182,7 @@ WRITE8_MEMBER( babbage_state::pio2_b_w )
 	}
 	else
 	{
-		output().set_digit_value(data, m_segment);
+		m_digits[data] = m_segment;
 	}
 }
 

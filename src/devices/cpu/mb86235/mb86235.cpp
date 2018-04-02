@@ -65,7 +65,7 @@ void mb86235_device::execute_run()
 
 		curpc = check_previous_op_stall() ? m_core->cur_fifo_state.pc : m_core->pc;
 
-		debugger_instruction_hook(this, curpc);
+		debugger_instruction_hook(curpc);
 		opcode = m_direct->read_qword(curpc);
 
 		m_core->ppc = curpc;
@@ -217,7 +217,7 @@ void mb86235_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_core->pc ).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
-	m_icountptr = &m_core->icount;
+	set_icountptr(m_core->icount);
 
 	m_core->fp0 = 0.0f;
 	save_pointer(NAME(m_core->pr), 24);

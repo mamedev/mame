@@ -937,6 +937,51 @@ private:
 	bool                    m_empty;
 };
 
+
+template <typename E>
+using enable_enum_t = typename std::enable_if_t<std::is_enum<E>::value, typename std::underlying_type_t<E> >;
+
+// template function which takes a strongly typed enumerator and returns its value as a compile-time constant
+template <typename E>
+constexpr enable_enum_t<E> underlying_value(E e) noexcept
+{
+	return static_cast<typename std::underlying_type_t<E> >(e);
+}
+
+// template function which takes an integral value and returns its representation as enumerator (even strongly typed)
+template <typename E , typename T>
+constexpr typename std::enable_if_t<std::is_enum<E>::value && std::is_integral<T>::value, E> enum_value(T value) noexcept
+{
+	return static_cast<E>(value);
+}
+
+
+// useful functions to deal with bit shuffling
+template <typename T, typename U> constexpr T BIT(T x, U n) noexcept { return (x >> n) & T(1); }
+
+template <typename T, typename U> constexpr T bitswap(T val, U b) noexcept { return BIT(val, b) << 0U; }
+
+template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b, V... c) noexcept
+{
+	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
+}
+
+// explicit version that checks number of bit position arguments
+template <unsigned B, typename T, typename... U> T bitswap(T val, U... b) noexcept
+{
+	static_assert(sizeof...(b) == B, "wrong number of bits");
+	static_assert((sizeof(std::remove_reference_t<T>) * 8) >= B, "return type too small for result");
+	return bitswap(val, b...);
+}
+
+
+// constexpr absolute value of an integer
+template <typename T>
+constexpr std::enable_if_t<std::is_signed<T>::value, T> iabs(T v) noexcept
+{
+	return (v < T(0)) ? -v : v;
+}
+
 }; // namespace util
 
 #endif // MAME_UTIL_CORETMPL_H

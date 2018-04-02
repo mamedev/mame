@@ -19,13 +19,14 @@ class c80_state : public driver_device
 {
 public:
 	c80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_pio1(*this, Z80PIO1_TAG),
-			m_cassette(*this, "cassette"),
-			m_row0(*this, "ROW0"),
-			m_row1(*this, "ROW1"),
-			m_row2(*this, "ROW2")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_pio1(*this, Z80PIO1_TAG)
+		, m_cassette(*this, "cassette")
+		, m_row0(*this, "ROW0")
+		, m_row1(*this, "ROW1")
+		, m_row2(*this, "ROW2")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -34,6 +35,7 @@ public:
 	required_ioport m_row0;
 	required_ioport m_row1;
 	required_ioport m_row2;
+	output_finder<9> m_digits;
 
 	virtual void machine_start() override;
 

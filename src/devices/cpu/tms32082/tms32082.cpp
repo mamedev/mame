@@ -223,7 +223,7 @@ void tms32082_mp_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = m_program->direct<0>();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void tms32082_mp_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -445,7 +445,7 @@ uint32_t tms32082_mp_device::fetch()
 
 void tms32082_mp_device::delay_slot()
 {
-	debugger_instruction_hook(this, m_pc);
+	debugger_instruction_hook(m_pc);
 	m_ir = fetch();
 	execute();
 
@@ -460,7 +460,7 @@ void tms32082_mp_device::execute_run()
 
 		check_interrupts();
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		m_ir = fetch();
 		execute();
@@ -521,7 +521,7 @@ void tms32082_pp_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = m_program->direct<0>();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void tms32082_pp_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -543,7 +543,7 @@ void tms32082_pp_device::device_reset()
 void tms32082_pp_device::execute_run()
 {
 	m_pc = m_fetchpc;
-	debugger_instruction_hook(this, m_pc);
+	debugger_instruction_hook(m_pc);
 
 	m_icount = 0;
 

@@ -144,6 +144,7 @@
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0808.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
@@ -227,7 +228,7 @@ void apache3_state::apache3_v20_map(address_map &map)
 	map(0x06000, 0x06001).portr("IN0"); // esw
 	map(0x08000, 0x08001).r(this, FUNC(apache3_state::tatsumi_hack_ym2151_r)).w("ymsnd", FUNC(ym2151_device::write));
 	map(0x0a000, 0x0a000).r(this, FUNC(apache3_state::tatsumi_hack_oki_r)).w(m_oki, FUNC(okim6295_device::write));
-	map(0x0e000, 0x0e007).rw(this, FUNC(apache3_state::apache3_adc_r), FUNC(apache3_state::apache3_adc_w)); //adc select
+	map(0x0e000, 0x0e007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
 	map(0xf0000, 0xfffff).rom();
 }
 
@@ -866,6 +867,15 @@ MACHINE_CONFIG_START(apache3_state::apache3)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
+	MCFG_DEVICE_ADD("adc", M58990, 1000000) // unknown clock
+	MCFG_ADC0808_IN0_CB(IOPORT("STICK_X"))
+	MCFG_ADC0808_IN1_CB(IOPORT("STICK_Y"))
+	MCFG_ADC0808_IN2_CB(GND) // VSP1
+	MCFG_ADC0808_IN4_CB(READ8(apache3_state, apache3_vr1_r))
+	MCFG_ADC0808_IN5_CB(IOPORT("THROTTLE"))
+	MCFG_ADC0808_IN6_CB(GND) // RPSNC
+	MCFG_ADC0808_IN7_CB(GND) // LPSNC
+
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 
 	/* video hardware */
@@ -1383,10 +1393,8 @@ DRIVER_INIT_MEMBER(apache3_state,apache3)
 
 	tatsumi_reset();
 
-	m_apache3_adc = 0;
 	m_apache3_rot_idx = 0;
 
-	save_item(NAME(m_apache3_adc));
 	save_item(NAME(m_apache3_rot_idx));
 	save_item(NAME(m_apache3_rotate_ctrl));
 

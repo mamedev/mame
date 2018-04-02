@@ -266,7 +266,7 @@ void m6805_base_device::device_start()
 	m_direct = m_program->direct<0>();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w.l).noshow();
@@ -492,7 +492,7 @@ void m6805_base_device::execute_run()
 			interrupt();
 		}
 
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 		u8 const ireg = rdop(PC++);
 
