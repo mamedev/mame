@@ -34,6 +34,7 @@ but requires a special level III player for proper control. Video: CAV. Audio: A
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
 #include "machine/74259.h"
+#include "machine/adc0808.h"
 #include "machine/ldvp931.h"
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
@@ -61,9 +62,9 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
 		m_tms(*this, "tms"),
+		m_nvram_1c(*this, "nvram_1c"),
+		m_nvram_1d(*this, "nvram_1d"),
 		m_mainbank(*this, "mainbank"),
-		m_pitch_io(*this, "PITCH"),
-		m_yaw_io(*this, "YAW"),
 		m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -128,21 +129,17 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<tms5220_device> m_tms;
+	required_device<x2212_device> m_nvram_1c;
+	required_device<x2212_device> m_nvram_1d;
 
 	required_memory_bank m_mainbank;
 	
-	required_ioport m_pitch_io;
-	required_ioport m_yaw_io;
-
 	output_finder<4> m_leds;
 
 	int m_n_disc_lock;
 	int m_n_disc_data;
 	int m_n_disc_read_data;
-	x2212_device *m_nvram_1c;
-	x2212_device *m_nvram_1d;
 	tilemap_t *m_bgtiles;
-	int m_control_num;
 	int m_sprite_bank;
 };
 
@@ -395,28 +392,6 @@ WRITE8_MEMBER(firefox_state::riot_porta_w)
 
 /*************************************
  *
- *  ADC input and control
- *
- *************************************/
-
-READ8_MEMBER(firefox_state::adc_r)
-{
-	if( m_control_num == 0 )
-	{
-		return m_pitch_io->read();
-	}
-
-	return m_yaw_io->read();
-}
-
-WRITE8_MEMBER(firefox_state::adc_select_w)
-{
-	m_control_num = offset;
-}
-
-
-/*************************************
- *
  *  Non-Volatile RAM (NOVRAM)
  *
  *************************************/
@@ -509,12 +484,9 @@ void firefox_state::machine_start()
 	m_leds.resolve();
 
 	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x1000);
-	m_nvram_1c = machine().device<x2212_device>("nvram_1c");
-	m_nvram_1d = machine().device<x2212_device>("nvram_1d");
 
 	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(&firefox_state::firq_gen, this));
 
-	m_control_num = 0;
 	m_sprite_bank = 0;
 }
 
@@ -542,12 +514,12 @@ void firefox_state::main_map(address_map &map)
 	map(0x4104, 0x4104).mirror(0x00f8).portr("opt1");             /* OPT1 */
 	map(0x4105, 0x4105).mirror(0x00f8).r(this, FUNC(firefox_state::firefox_disc_data_r));     /* DREAD */
 	map(0x4106, 0x4106).mirror(0x00f8).r(m_soundlatch2, FUNC(generic_latch_8_device::read));         /* RDSOUND */
-	map(0x4107, 0x4107).mirror(0x00f8).r(this, FUNC(firefox_state::adc_r));                   /* ADC */
+	map(0x4107, 0x4107).mirror(0x00f8).r("adc", FUNC(adc0808_device::data_r));               /* ADC */
 	map(0x4200, 0x4200).mirror(0x0047).w(this, FUNC(firefox_state::main_irq_clear_w));       /* RSTIRQ */
 	map(0x4208, 0x4208).mirror(0x0047).w(this, FUNC(firefox_state::main_firq_clear_w));      /* RSTFIRQ */
 	map(0x4210, 0x4210).mirror(0x0047).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* WDCLK */
 	map(0x4218, 0x4218).mirror(0x0047).w(this, FUNC(firefox_state::firefox_disc_read_w));    /* DSKREAD */
-	map(0x4220, 0x4223).mirror(0x0044).w(this, FUNC(firefox_state::adc_select_w));           /* ADCSTART */
+	map(0x4220, 0x4223).mirror(0x0044).w("adc", FUNC(adc0808_device::address_offset_start_w));       /* ADCSTART */
 	map(0x4230, 0x4230).mirror(0x0047).w(this, FUNC(firefox_state::self_reset_w));           /* AMUCK */
 	map(0x4280, 0x4287).mirror(0x0040).w("latch0", FUNC(ls259_device::write_d7));
 	map(0x4288, 0x428f).mirror(0x0040).w("latch1", FUNC(ls259_device::write_d7));
@@ -716,6 +688,10 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
+
+	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_XTAL/16) // nominally 900 kHz
+	MCFG_ADC0808_IN0_CB(IOPORT("PITCH"))
+	MCFG_ADC0808_IN1_CB(IOPORT("YAW"))
 
 	MCFG_DEVICE_ADD("latch0", LS259, 0) // 7F
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("nvram_1c", x2212_device, recall))   // NVRECALL
