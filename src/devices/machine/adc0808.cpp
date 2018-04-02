@@ -25,7 +25,7 @@
 
 DEFINE_DEVICE_TYPE(ADC0808, adc0808_device, "adc0808", "ADC0808 A/D Converter")
 DEFINE_DEVICE_TYPE(ADC0809, adc0809_device, "adc0809", "ADC0809 A/D Converter")
-DEFINE_DEVICE_TYPE(M58990P, m58990p_device, "m58990p", "M58990P A/D Converter")
+DEFINE_DEVICE_TYPE(M58990, m58990_device, "m58990", "M58990 A/D Converter")
 
 
 //**************************************************************************
@@ -64,11 +64,11 @@ adc0809_device::adc0809_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  m58990p_device - constructor
+//  m58990_device - constructor
 //-------------------------------------------------
 
-m58990p_device::m58990p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	adc0808_device(mconfig, M58990P, tag, owner, clock)
+m58990_device::m58990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	adc0808_device(mconfig, M58990, tag, owner, clock)
 {
 }
 
