@@ -47,7 +47,7 @@
 ***************************************************************************/
 
 template<int Layer>
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info<0>)
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info)
 {
 	uint16_t code = m_vram[Layer][2 * tile_index + 0];
 	uint16_t attr = m_vram[Layer][2 * tile_index + 1];
