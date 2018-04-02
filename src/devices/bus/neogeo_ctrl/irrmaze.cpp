@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "irrmaze.h"
 
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -32,16 +33,6 @@ static INPUT_PORTS_START( neogeo_irrmaze )
 INPUT_PORTS_END
 
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-ioport_constructor neogeo_irrmaze_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( neogeo_irrmaze );
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -55,8 +46,21 @@ neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, cons
 	device_neogeo_ctrl_edge_interface(mconfig, *this),
 	m_tx(*this, "TRACK_X"),
 	m_ty(*this, "TRACK_Y"),
-	m_buttons(*this, "BUTTONS")
+	m_buttons(*this, "BUTTONS"),
+	m_spi_outputs(*this, "sit%u", 0U),
+	m_spi_sr(0U),
+	m_ctrl_sel(0U)
 {
+}
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor neogeo_irrmaze_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( neogeo_irrmaze );
 }
 
 
@@ -66,17 +70,10 @@ neogeo_irrmaze_device::neogeo_irrmaze_device(const machine_config &mconfig, cons
 
 void neogeo_irrmaze_device::device_start()
 {
+	m_spi_outputs.resolve();
+
+	save_item(NAME(m_spi_sr));
 	save_item(NAME(m_ctrl_sel));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void neogeo_irrmaze_device::device_reset()
-{
-	m_ctrl_sel = 0;
 }
 
 
@@ -110,5 +107,14 @@ READ8_MEMBER(neogeo_irrmaze_device::in1_r)
 
 void neogeo_irrmaze_device::write_ctrlsel(uint8_t data)
 {
+	if (BIT(data & ~m_ctrl_sel, 3) && BIT(m_ctrl_sel, 1))
+	{
+		for (unsigned i = 0; 16U > i; ++i)
+			m_spi_outputs[i] = BIT(m_spi_sr, i);
+	}
+
+	if (BIT(data & ~m_ctrl_sel, 2))
+		m_spi_sr = (m_spi_sr >> 1) | (uint16_t(BIT(m_ctrl_sel, 1)) << 15);
+
 	m_ctrl_sel = data;
 }

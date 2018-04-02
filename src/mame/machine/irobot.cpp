@@ -186,21 +186,6 @@ void irobot_state::machine_reset()
 	m_outx = 0;
 }
 
-WRITE8_MEMBER(irobot_state::irobot_control_w)
-{
-	m_control_num = offset & 0x03;
-}
-
-READ8_MEMBER(irobot_state::irobot_control_r)
-{
-	if (m_control_num == 0)
-		return ioport("AN0")->read();
-	else if (m_control_num == 1)
-		return ioport("AN1")->read();
-	return 0;
-
-}
-
 /*  we allow irmb_running and irvg_running to appear running before clearing
     them to simulate the mathbox and vector generator running in real time */
 READ8_MEMBER(irobot_state::irobot_status_r)

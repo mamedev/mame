@@ -23,6 +23,15 @@ enum
 	OUTBOUND = 1
 };
 
+/* Line */
+enum
+{
+	HEXBUS_LINE_HSK = 0x10,
+	HEXBUS_LINE_BAV = 0x04,
+	HEXBUS_LINE_BIT32 = 0xc0,
+	HEXBUS_LINE_BIT10 = 0x03
+};
+
 class hexbus_device;
 class hexbus_chained_device;
 
@@ -54,8 +63,6 @@ public:
 	virtual void device_start() override;
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-
 	void set_outbound_hexbus(hexbus_device *outbound) { m_hexbus_outbound = outbound; }
 
 	// Link to the inbound Hexbus (if not null, see Oso chip)
@@ -72,13 +79,24 @@ protected:
 	virtual void bus_write(int dir, uint8_t data) override;
 
 	// Methods to be used from subclasses
+	// Write a byte to the Hexbus. Returns the actual line state.
+	// This is important because the bus is a wired-and bus.
 	void hexbus_write(uint8_t data);
+
+	// Levels on the bus, except for this device
+	uint8_t hexbus_get_levels();
+
+	// Read hexbus
 	uint8_t hexbus_read();
 
-	// For interrupts
+	// Callback for changes on the hexbus
 	virtual void hexbus_value_changed(uint8_t data) { };
 
+	// Levels of the lines at this device. 0 means pull down, 1 means release.
 	uint8_t m_myvalue;
+
+	// Utility method to create a Hexbus line state
+	uint8_t to_line_state(uint8_t data, bool bav, bool hsk);
 };
 
 // ------------------------------------------------------------------------

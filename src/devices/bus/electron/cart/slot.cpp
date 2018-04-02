@@ -271,6 +271,7 @@ void electron_cartslot_device::write(address_space &space, offs_t offset, uint8_
 #include "aqr.h"
 #include "click.h"
 #include "cumana.h"
+#include "mgc.h"
 #include "peg400.h"
 #include "sndexp.h"
 #include "sndexp3.h"
@@ -286,6 +287,7 @@ SLOT_INTERFACE_START(electron_cart)
 	SLOT_INTERFACE_INTERNAL("aqr", ELECTRON_AQR)
 	SLOT_INTERFACE_INTERNAL("click", ELECTRON_CLICK)
 	SLOT_INTERFACE_INTERNAL("cumana", ELECTRON_CUMANA)
+	SLOT_INTERFACE_INTERNAL("mgc", ELECTRON_MGC)
 	SLOT_INTERFACE_INTERNAL("peg400", ELECTRON_PEG400)
 	SLOT_INTERFACE_INTERNAL("sndexp", ELECTRON_SNDEXP)
 	SLOT_INTERFACE_INTERNAL("sndexp3", ELECTRON_SNDEXP3)
