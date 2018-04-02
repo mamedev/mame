@@ -150,7 +150,7 @@ WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_control_w )
 		if ((offset & 7) < 6)
 		{
 			if (offset & 8) // 30-3f Color
-				m_c123_TilemapInfo.tmap[offset & 7]->set_palette_offset( 0, (newword&7)*256 );
+				m_c123_TilemapInfo.tmap[offset & 7]->set_palette_offset( (newword&7)*256 );
 			else // 20-2f Priority
 				m_c123_TilemapInfo.tmap[offset & 7]->enable( 0, (newword & 8) ? 0 : 1 );
 		}
@@ -488,7 +488,7 @@ void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &
 			zdrawgfxzoom(
 				screen,
 				bitmap,
-				rect,
+				cliprect,
 				gfx,
 				sprn, color,
 				flipx,flipy,
