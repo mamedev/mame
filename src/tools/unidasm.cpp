@@ -8,9 +8,11 @@
 
 ****************************************************************************/
 
-#include "emu.h"
+// the disassemblers assume they're in MAME and emu.h is a PCH, so we minimally pander to them
+#include "disasmintf.h"
 
-#include <ctype.h>
+using offs_t = osd::u32;
+using util::BIT;
 
 #include "cpu/8x300/8x300dasm.h"
 #include "cpu/adsp2100/2100dasm.h"
@@ -147,9 +149,21 @@
 #include "cpu/z80/z80dasm.h"
 #include "cpu/z8000/8000dasm.h"
 
+#include "corefile.h"
+#include "corestr.h"
+#include "eminline.h"
+
 #include <algorithm>
 #include <cstring>
+#include <iostream>
 #include <stdexcept>
+
+#include <ctype.h>
+
+using u8 = util::u8;
+using u16 = util::u16;
+using u32 = util::u32;
+using u64 = util::u64;
 
 // Configuration classes
 

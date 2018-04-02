@@ -1771,6 +1771,9 @@ MACHINE_CONFIG_START(itech32_state::drivedge)
 	MCFG_MACHINE_RESET_OVERRIDE(itech32_state,drivedge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(NOOP) // interrupt not used?
+
 	MCFG_SPEAKER_STANDARD_STEREO("left_back", "right_back")
 
 	MCFG_SOUND_MODIFY("ensoniq")

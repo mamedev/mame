@@ -225,6 +225,7 @@ protected:
 	int standard_irq_callback(int irqline);
 
 	// debugger hooks
+	bool debugger_enabled() const { return bool(device().machine().debug_flags & DEBUG_FLAG_ENABLED); }
 	void debugger_instruction_hook(offs_t curpc)
 	{
 		if (device().machine().debug_flags & DEBUG_FLAG_CALL_HOOK)

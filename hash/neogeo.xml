@@ -7951,6 +7951,53 @@
 		</part>
 	</software>
 
+	<software name="garouha" cloneof="garou">
+		<description>Garou - Mark of the Wolves (NGH-2530)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NGM-2530"/>
+		<info name="release" value="19991126"/>
+		<info name="alt_title" value="餓狼"/>
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<!-- later revision -->
+			<feature name="slot" value="sma_garou" />
+			<dataarea name="maincpu" width="16" endianness="big" size="0x900000">
+				<rom loadflag="load16_word_swap" name="neo-sma" offset="0x0c0000" size="0x040000" crc="9aa450e6" sha1="ba9c6fe10ef97255b004fcbf05065826d219a968" />
+				<!-- stored in the custom chip -->
+				<rom loadflag="load16_word_swap" name="253-ep1.p1" offset="0x100000" size="0x200000" crc="ea3171a4" sha1="bbda40f652baa0dc5fc6a006c001a1bdb0df43f6" />  <!-- M27C160 -->
+				<rom loadflag="load16_word_swap" name="253-ep2.p2" offset="0x300000" size="0x200000" crc="382f704b" sha1="0ace9c84a8b8a0524fd9a503e7d872de1bf1bd52" />  <!-- M27C160 -->
+				<rom loadflag="load16_word_swap" name="253-ep3.p3" offset="0x500000" size="0x200000" crc="e395bfdd" sha1="6b50f5ac15bf66b7e4e9bff57594fd3d7530c831" />  <!-- M27C160 -->
+				<rom loadflag="load16_word_swap" name="253-ep4.p4" offset="0x700000" size="0x200000" crc="da92c08e" sha1="5556f983ebcebc33160e90a6a6cf589d54c8cedc" />  <!-- M27C160 -->
+			</dataarea>
+			<dataarea name="fixed" size="0x80000">
+				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
+				<rom value="0" size="0x80000" offset="0x000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x040000">
+				<rom offset="0x000000" size="0x040000" name="253-m1.m1" crc="36a806be" sha1="90fb44dc0c3fb57946a0f35716056abb84a0f191" />   <!-- TC532000 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x1000000">
+				<rom name="253-v1.v1" offset="0x000000" size="0x400000" crc="263e388c" sha1="11f05feee170370c4bfc5053af79246a6e3de5dc" />   <!-- TC5332204 -->
+				<rom name="253-v2.v2" offset="0x400000" size="0x400000" crc="2c6bc7be" sha1="c9c61054ce1a47bf1bf77a31117726b499df24a4" />   <!-- TC5332204 -->
+				<rom name="253-v3.v3" offset="0x800000" size="0x400000" crc="0425b27d" sha1="986863c98fc3445487242dcf2ea75b075e7f33ee" />   <!-- TC5332204 -->
+				<rom name="253-v4.v4" offset="0xc00000" size="0x400000" crc="a54be8a9" sha1="d7123e79b43e8adfaa5ecadbfcbeb6be890ec311" />   <!-- TC5332204 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x4000000">
+				<!-- Encrypted -->
+				<rom loadflag="load16_byte" name="253-c1.c1" offset="0x000000" size="0x800000" crc="0603e046" sha1="5ef4557ce90ba65d36129de97be1fdc049c4a3d0" />    <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="253-c2.c2" offset="0x000001" size="0x800000" crc="0917d2a4" sha1="d4ed3a13ae22f880fb399671c1752f1a0283f316" />    <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="253-c3.c3" offset="0x1000000" size="0x800000" crc="6737c92d" sha1="678f0c9cc1267bd131546981b9989bfb7289d8ba" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="253-c4.c4" offset="0x1000001" size="0x800000" crc="5ba92ec6" sha1="aae36b050a3a0321026a96eba06dd184c0e2acca" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="253-c5.c5" offset="0x2000000" size="0x800000" crc="3eab5557" sha1="47c433015aa81a0b0a1d3ee51382c4948b80c023" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="253-c6.c6" offset="0x2000001" size="0x800000" crc="308d098b" sha1="b052f1fa9fbc69606004c250e2505360eaa24949" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="253-c7.c7" offset="0x3000000" size="0x800000" crc="c0e995ae" sha1="8675ca787d28246174c313167f82557f021366fc" />   <!-- TC5364205 -->
+				<rom loadflag="load16_byte" name="253-c8.c8" offset="0x3000001" size="0x800000" crc="21a11303" sha1="fd61221ad257c185ef5c1f9694bd6b840b591af3" />   <!-- TC5364205 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="garoup" cloneof="garou">
 		<description>Garou - Mark of the Wolves (prototype)</description>
 		<year>1999</year>
@@ -8797,7 +8844,41 @@
 	-->
 
 	<software name="pnyaa">
-		<description>Pochi and Nyaa</description>
+		<description>Pochi and Nyaa (Ver 2.02)</description>
+		<year>2003</year>
+		<publisher>Aiky / Taito</publisher>
+		<info name="serial" value="NGM-2670"/>
+		<info name="release" value="20031224"/>
+		<info name="alt_title" value="ポチッとにゃ～"/>
+		<sharedfeat name="release" value="MVS" />   <!-- MVS ONLY RELEASE -->
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<feature name="slot" value="pcm2_pnyaa" />
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="pn202.p1" offset="0x000000" size="0x100000" crc="bf34e71c" sha1="cfa7a2c7c41601a758414faf34e59583d7537363" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
+				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
+			</dataarea>
+				<!-- Encrypted -->
+			<dataarea name="audiocrypt" size="0x80000">
+				<rom offset="0x00000" size="0x80000" name="267-m1.m1" crc="c7853ccd" sha1="1b7a4c5093cf0fe3861ce44fd1d3b30c71ad0abe" /> <!-- mask rom TC534000 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x400000">
+				<!-- Encrypted -->
+				<rom name="267-v1.v1" offset="0x000000" size="0x400000" crc="e2e8e917" sha1="7f412d55aebff3d38a225a88c632916295ab0584" />   <!-- mask rom TC5332204 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x1000000">
+				<!-- Encrypted -->
+				<rom loadflag="load16_byte" name="267-c1.c1" offset="0x000000" size="0x800000" crc="5eebee65" sha1="7eb3eefdeb24e19831d0f51d4ea07a0292c25ab6" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="267-c2.c2" offset="0x000001" size="0x800000" crc="2b67187b" sha1="149c3efd3c444fd0d35a97fa2268102bf76be3ed" />    <!-- mask rom TC5364205 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pnyaaa" cloneof="pnyaa">
+		<description>Pochi and Nyaa (Ver 2.00)</description>
 		<year>2003</year>
 		<publisher>Aiky / Taito</publisher>
 		<info name="serial" value="NGM-2670"/>
@@ -8829,8 +8910,7 @@
 			</dataarea>
 		</part>
 	</software>
-
-
+	
 	<!--
 	ID-0268
 	. NGM-2680

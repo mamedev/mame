@@ -63,7 +63,8 @@ public:
 		: tatsumi_state(mconfig, type, tag),
 		m_subcpu2(*this, "sub2"),
 		m_apache3_g_ram(*this, "apache3_g_ram"),
-		m_apache3_z80_ram(*this, "apache3_z80_ram")
+		m_apache3_z80_ram(*this, "apache3_z80_ram"),
+		m_vr1(*this, "VR1")
 	{
 	}
 
@@ -74,8 +75,7 @@ public:
 	DECLARE_WRITE16_MEMBER(apache3_v30_v20_w);
 	DECLARE_READ16_MEMBER(apache3_z80_r);
 	DECLARE_WRITE16_MEMBER(apache3_z80_w);
-	DECLARE_READ8_MEMBER(apache3_adc_r);
-	DECLARE_WRITE8_MEMBER(apache3_adc_w);
+	DECLARE_READ8_MEMBER(apache3_vr1_r);
 	DECLARE_WRITE16_MEMBER(apache3_rotate_w);
 	DECLARE_WRITE16_MEMBER(apache3_road_z_w);
 	DECLARE_WRITE8_MEMBER(apache3_road_x_w);
@@ -100,8 +100,9 @@ private:
 	required_shared_ptr<uint16_t> m_apache3_g_ram;
 	required_shared_ptr<uint8_t> m_apache3_z80_ram;
 
+	required_ioport m_vr1;
+
 	uint16_t m_apache3_rotate_ctrl[12];
-	uint8_t m_apache3_adc;
 	int m_apache3_rot_idx;
 	std::unique_ptr<uint8_t[]> m_apache3_road_x_ram;
 	uint8_t m_apache3_road_z;
