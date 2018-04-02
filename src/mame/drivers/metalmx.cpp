@@ -331,8 +331,8 @@ WRITE32_MEMBER(metalmx_state::reset_w)
 	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
-		m_dsp32c_1->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
-		m_dsp32c_2->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+		m_dsp32c[0]->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+		m_dsp32c[1]->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -373,7 +373,8 @@ WRITE8_MEMBER(metalmx_state::cage_irq_callback)
  *
  *************************************/
 
-WRITE32_MEMBER(metalmx_state::dsp32c_1_w)
+template<int Chip>
+WRITE32_MEMBER(metalmx_state::dsp32c_w)
 {
 	offset <<= 1;
 
@@ -382,10 +383,11 @@ WRITE32_MEMBER(metalmx_state::dsp32c_1_w)
 	else if (ACCESSING_BITS_16_31)
 		data >>= 16;
 
-	m_dsp32c_1->pio_w(offset, data);
+	m_dsp32c[Chip]->pio_w(offset, data);
 }
 
-READ32_MEMBER(metalmx_state::dsp32c_1_r)
+template<int Chip>
+READ32_MEMBER(metalmx_state::dsp32c_r)
 {
 	uint32_t data;
 
@@ -394,36 +396,7 @@ READ32_MEMBER(metalmx_state::dsp32c_1_r)
 	if (ACCESSING_BITS_0_15)
 		offset += 1;
 
-	data = m_dsp32c_1->pio_r(offset);
-
-	if (ACCESSING_BITS_16_31)
-		data <<= 16;
-
-	return data;
-}
-
-WRITE32_MEMBER(metalmx_state::dsp32c_2_w)
-{
-	offset <<= 1;
-
-	if (ACCESSING_BITS_0_15)
-		offset += 1;
-	else if (ACCESSING_BITS_16_31)
-		data >>= 16;
-
-	m_dsp32c_2->pio_w(offset, data);
-}
-
-READ32_MEMBER(metalmx_state::dsp32c_2_r)
-{
-	uint32_t data;
-
-	offset <<= 1;
-
-	if (ACCESSING_BITS_0_15)
-		offset += 1;
-
-	data = m_dsp32c_2->pio_r(offset);
+	data = m_dsp32c[Chip]->pio_r(offset);
 
 	if (ACCESSING_BITS_16_31)
 		data <<= 16;
@@ -512,9 +485,9 @@ void metalmx_state::main_map(address_map &map)
 	map(0x400000, 0x4000ff).rw(this, FUNC(metalmx_state::host_gsp_r), FUNC(metalmx_state::host_gsp_w));
 	map(0x600000, 0x6fffff).rw(this, FUNC(metalmx_state::host_dram_r), FUNC(metalmx_state::host_dram_w));
 	map(0x700000, 0x7fffff).rw(this, FUNC(metalmx_state::host_vram_r), FUNC(metalmx_state::host_vram_w));
-	map(0x800000, 0x80001f).rw(this, FUNC(metalmx_state::dsp32c_2_r), FUNC(metalmx_state::dsp32c_2_w));
+	map(0x800000, 0x80001f).rw(this, FUNC(metalmx_state::dsp32c_r<1>), FUNC(metalmx_state::dsp32c_w<1>));
 	map(0x800020, 0x85ffff).noprw();         /* Unknown */
-	map(0x880000, 0x88001f).rw(this, FUNC(metalmx_state::dsp32c_1_r), FUNC(metalmx_state::dsp32c_1_w));
+	map(0x880000, 0x88001f).rw(this, FUNC(metalmx_state::dsp32c_r<0>), FUNC(metalmx_state::dsp32c_w<0>));
 	map(0x980000, 0x9800ff).w(this, FUNC(metalmx_state::reset_w));
 	map(0xb40000, 0xb40003).rw(this, FUNC(metalmx_state::sound_data_r), FUNC(metalmx_state::sound_data_w));
 	map(0xf00000, 0xf00003).ram();         /* Network message port */
@@ -713,7 +686,6 @@ MACHINE_CONFIG_START(metalmx_state::metalmx)
 	MCFG_CPU_ADD("dsp32c_2", DSP32C, 40000000)      /* Unverified */
 	MCFG_CPU_PROGRAM_MAP(dsp32c_2_map)
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -739,8 +711,8 @@ DRIVER_INIT_MEMBER(metalmx_state,metalmx)
 
 void metalmx_state::machine_reset()
 {
-	m_dsp32c_1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_dsp32c_2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp32c[0]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp32c[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -775,7 +747,7 @@ ROM_START( metalmx )
 /* ------------------------------------------------
     ROMCH31 A053443 (there are 2 of these boards)
 -------------------------------------------------*/
-	ROM_REGION32_LE( 0x200000, "cageboot", 0 )
+	ROM_REGION32_LE( 0x200000, "cage:boot", 0 )
 	ROM_LOAD32_BYTE( "bootmetl.r34", 0x00000, 0x80000, CRC(ec799644) SHA1(32c77abb70fee1da8e3d7141bce2032e73e0eb35) )
 
 	ROM_REGION32_LE( 0x80000, "cage", 0 )

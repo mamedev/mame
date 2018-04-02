@@ -20,13 +20,14 @@ class atarigt_state : public atarigen_state
 {
 public:
 	atarigt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_colorram(*this, "colorram", 32),
-			m_playfield_tilemap(*this, "playfield"),
-			m_alpha_tilemap(*this, "alpha"),
-			m_rle(*this, "rle"),
-			m_mo_command(*this, "mo_command"),
-			m_cage(*this, "cage") { }
+		: atarigen_state(mconfig, type, tag)
+		, m_colorram(*this, "colorram", 32)
+		, m_playfield_tilemap(*this, "playfield")
+		, m_alpha_tilemap(*this, "alpha")
+		, m_rle(*this, "rle")
+		, m_mo_command(*this, "mo_command")
+		, m_cage(*this, "cage")
+	{ }
 
 	uint8_t           m_is_primrage;
 	required_shared_ptr<uint16_t> m_colorram;
@@ -45,7 +46,7 @@ public:
 
 	uint32_t          m_tram_checksum;
 
-	uint32_t          m_expanded_mram[MRAM_ENTRIES * 3];
+	std::unique_ptr<uint32_t[]> m_expanded_mram[MRAM_ENTRIES * 3];
 
 	required_shared_ptr<uint32_t> m_mo_command;
 	optional_device<atari_cage_device> m_cage;

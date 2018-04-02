@@ -78,6 +78,7 @@ TILEMAP_MAPPER_MEMBER(atarigt_state::atarigt_playfield_scan)
 
 VIDEO_START_MEMBER(atarigt_state,atarigt)
 {
+	m_expanded_mram = make_unique_clear<uint32_t[]>(MRAM_ENTRIES * 3);
 	/* blend the playfields and free the temporary one */
 	blend_gfx(0, 2, 0x0f, 0x30);
 
@@ -94,7 +95,7 @@ VIDEO_START_MEMBER(atarigt_state,atarigt)
 	save_item(NAME(m_playfield_xscroll));
 	save_item(NAME(m_playfield_yscroll));
 	save_item(NAME(m_tram_checksum));
-	save_item(NAME(m_expanded_mram));
+	save_pointer(NAME(m_expanded_mram), MRAM_ENTRIES * 3);
 }
 
 
@@ -503,7 +504,7 @@ uint32_t atarigt_state::screen_update_atarigt(screen_device &screen, bitmap_rgb3
 	color_latch = m_colorram[0x30000/2];
 	cram = (uint16_t *)&m_colorram[0x00000/2] + 0x2000 * ((color_latch >> 3) & 1);
 	tram = (uint16_t *)&m_colorram[0x20000/2] + 0x1000 * ((color_latch >> 4) & 3);
-	mram = m_expanded_mram + 0x2000 * ((color_latch >> 6) & 3);
+	mram = &m_expanded_mram[0x2000 * ((color_latch >> 6) & 3)];
 
 	/* now do the nasty blend */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
