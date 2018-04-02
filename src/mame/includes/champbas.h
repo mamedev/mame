@@ -82,6 +82,7 @@ public:
 	virtual void machine_reset() override;
 	void champbas(machine_config &config);
 	void champbb2(machine_config &config);
+	void champbb2j(machine_config &config);
 	void exctsccr(machine_config &config);
 	void talbot(machine_config &config);
 	void tbasebal(machine_config &config);
@@ -95,6 +96,7 @@ public:
 	void champbasja_map(address_map &map);
 	void champbasjb_map(address_map &map);
 	void champbb2_map(address_map &map);
+	void champbb2j_map(address_map &map);
 	void exctsccr_map(address_map &map);
 	void exctsccr_sound_io_map(address_map &map);
 	void exctsccr_sound_map(address_map &map);
