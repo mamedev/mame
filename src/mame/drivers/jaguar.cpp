@@ -1420,7 +1420,7 @@ void jaguar_state::gpu_map(address_map &map)
 
 void jaguar_state::gpu_rom_map(address_map &map)
 {
-	gpu_map(address_map);
+	gpu_map(map);
 	map(0x800000, 0xbfffff).bankr("gpugfxbank");
 	map(0xc00000, 0xdfffff).bankr("dspsndbank");
 }
