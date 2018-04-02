@@ -8,6 +8,7 @@
 
 #include "machine/6532riot.h"
 #include "machine/gen_latch.h"
+#include "sound/pokey.h"
 #include "includes/slapstic.h"
 
 
@@ -22,6 +23,7 @@ public:
 		m_mathram(*this, "mathram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_pokey(*this, "pokey%u", 1U),
 		m_slapstic_device(*this, "slapstic")
 		{ }
 
@@ -31,12 +33,12 @@ public:
 	required_shared_ptr<uint8_t> m_mathram;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device_array<pokey_device, 4> m_pokey;
 	optional_device<atari_slapstic_device> m_slapstic_device;
 
 	uint8_t *m_slapstic_source;
 	uint8_t *m_slapstic_base;
 	uint8_t m_slapstic_current_bank;
-	uint8_t m_control_num;
 	int m_MPA;
 	int m_BIC;
 	uint16_t m_dvd_shift;
@@ -62,8 +64,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(led1_w);
 	DECLARE_WRITE_LINE_MEMBER(led2_w);
 	DECLARE_WRITE_LINE_MEMBER(led3_w);
-	DECLARE_READ8_MEMBER(starwars_adc_r);
-	DECLARE_WRITE8_MEMBER(starwars_adc_select_w);
 	DECLARE_READ8_MEMBER(starwars_prng_r);
 	DECLARE_WRITE_LINE_MEMBER(prng_reset_w);
 	DECLARE_READ8_MEMBER(starwars_div_reh_r);

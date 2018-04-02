@@ -487,7 +487,8 @@ uint32_t psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 
 		tmptilemap[layer]->set_scrolly(0, scrolly[layer]);
 		if (layer_ctrl[layer] & 0x0300) /* per-line rowscroll */
 		{
-			int tile_rowscroll = (layer_ctrl[layer] & 0x0200) >> 5; /* per-tile rowscroll */
+			int tile_rowscroll = (layer_ctrl[layer] & 0x0200) >> 7; /* per-tile rowscroll */
+			assert(tile_rowscroll == 0 || tile_rowscroll == 4);
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
 				tmptilemap[layer]->set_scroll_rows(tilemap_width(tmsize[layer]) >> tile_rowscroll);

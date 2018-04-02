@@ -382,7 +382,7 @@ void dsp16_device_base::device_reset()
 
 void dsp16_device_base::execute_run()
 {
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (debugger_enabled())
 	{
 		while (m_core->icount_remaining())
 		{

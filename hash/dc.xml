@@ -1074,7 +1074,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="after... wasureenu kizuna - shokai genteiban (jpn)" sha1="4ca05216dd45b9a5218186e7c2c0b5cd0be76d13"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom1">
+		<part interface="dc_cdrom" name="cdrom2">
 			<feature name="part_id" value="Kaze no Form"/>
 			<diskarea name="cdrom">
 				<disk name="after... wasureenu kizuna - shokai genteiban (jpn) (kaze no form)" sha1="9cb6682fca57e78679c215baeae00d8205465fb4"/>
@@ -3027,7 +3027,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="blue-sky-blue[s] sora o mau tsubasa - shokai genteiban (jpn)" sha1="1b6db61f78b11afc250aac17f5ad4cfa651c9e19"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom1">
+		<part interface="dc_cdrom" name="cdrom2">
 			<feature name="part_id" value="Premium Fan Disc"/>
 			<diskarea name="cdrom">
 				<disk name="blue-sky-blue[s] sora o mau tsubasa - shokai genteiban (jpn) (premium fan disc)" sha1="9fc87706b7fc652cba2a6c58e709c7cacc3da03f"/>
@@ -3987,7 +3987,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn)" sha1="79a8dccf13f16beaa3b6293672c08d90d0c5f64e"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom1">
+		<part interface="dc_cdrom" name="cdrom2">
 			<feature name="part_id" value="Special Talk CD"/>
 			<diskarea name="cdrom">
 				<disk name="card of destiny hikari to yami no tougousha - genteiban (jpn) (special talk cd)" sha1="c8dba781762c063d543370a2797c5c4a3a933742"/>
@@ -5857,7 +5857,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="d+vine [luv] - shokai genteiban (jpn)" sha1="a55d24f09e8d191a8671fd1fcb63fc2e5c1ceb9c"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom1">
+		<part interface="dc_cdrom" name="cdrom2">
 			<feature name="part_id" value="Opening Themesong CD"/>
 			<diskarea name="cdrom">
 				<disk name="d+vine [luv] - shokai genteiban (jpn) (opening themesong cd)" sha1="5b86e1e4a3f786c0d4e2b479ba819d05a72373db"/>
@@ -7339,7 +7339,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="di gi charat fantasy (jpn)" sha1="20c245d693f0d4701be99d71ea164d0cf0468539"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom1">
+		<part interface="dc_cdrom" name="cdrom2">
 			<feature name="part_id" value="Soundtrack Arrangement CD"/>
 			<diskarea name="cdrom">
 				<disk name="di gi charat fantasy - shokai genteiban (jpn) (soundtrack arrangement cd)" sha1="566cd0a7b3817f346a01bd6a6da6e2df62c59339"/>
@@ -14766,7 +14766,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="grandia ii (usa)" sha1="5a1a449de242d31bf47931096ebe7ce5412d0215"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom1">
+		<part interface="dc_cdrom" name="cdrom2">
 			<feature name="part_id" value="Music Selections"/>
 			<diskarea name="cdrom">
 				<disk name="grandia ii (usa) (music selections)" sha1="36b8d4c10044de33e05343cb1a68c4b28c13ee33"/>
@@ -14851,7 +14851,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 				<disk name="grandia ii (jpn)" sha1="6e927eb2fcd840edc12d77b7916139122c54fd13"/>
 			</diskarea>
 		</part>
-		<part interface="dc_cdrom" name="cdrom1">
+		<part interface="dc_cdrom" name="cdrom2">
 			<feature name="part_id" value="Melodia"/>
 			<diskarea name="cdrom">
 				<disk name="grandia ii (jpn) (melodia)" sha1="8f59f6369f6efcc175f16044e9145bd2867c3ac1"/>
