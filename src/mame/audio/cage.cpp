@@ -617,7 +617,7 @@ MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	
+
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch1")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("cage", TMS3203X_IRQ0))
