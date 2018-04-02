@@ -229,6 +229,13 @@ void champbas_state::champbb2_map(address_map &map)
 	map(0x7800, 0x7fff).rom();
 }
 
+void champbas_state::champbb2j_map(address_map &map)
+{
+	champbasj_map(map);
+	map(0x7001, 0x7002).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x7800, 0x7fff).rom();
+}
+
 void champbas_state::tbasebal_map(address_map &map)
 {
 	champbas_map(map);
@@ -657,6 +664,13 @@ MACHINE_CONFIG_START(champbas_state::champbb2)
 	MCFG_CPU_PROGRAM_MAP(champbb2_map)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(champbas_state::champbb2j)
+	champbasj(config);
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(champbb2j_map)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(champbas_state::tbasebal)
 	champbas(config);
@@ -1310,7 +1324,7 @@ GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, champbas
 GAME( 1983, champbasja, champbas, champbasja, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", MACHINE_SUPPORTS_SAVE ) // simplified protection, no mcu
 GAME( 1983, champbasjb, champbas, champbasjb, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 3)", MACHINE_SUPPORTS_SAVE ) // no protection
 GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbb2j,  champbb2, champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbb2j,  champbb2, champbb2j,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tbasebal,   champbb2, tbasebal,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Taikyoku Base Ball", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 68705 protection instead
 
 GAME( 1983, exctsccr,   0,        exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", MACHINE_SUPPORTS_SAVE )
