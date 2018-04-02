@@ -105,7 +105,7 @@ ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *ta
 void ncr53c7xx_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve line callbacks
 	m_irq_handler.resolve_safe();

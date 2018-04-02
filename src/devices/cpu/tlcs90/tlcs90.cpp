@@ -1366,7 +1366,7 @@ void tlcs90_device::execute_run()
 	do
 	{
 		m_prvpc.d = m_pc.d;
-		debugger_instruction_hook(this, m_pc.d);
+		debugger_instruction_hook(m_pc.d);
 
 		check_interrupts();
 
@@ -2849,7 +2849,7 @@ void tlcs90_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_sp.w.l).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", F ).formatstr("%8s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 

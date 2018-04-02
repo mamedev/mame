@@ -1880,7 +1880,7 @@ void sh34_base_device::execute_run()
 	do
 	{
 		m_ppc = m_sh2_state->pc & SH34_AM;
-		debugger_instruction_hook(this, m_sh2_state->pc & SH34_AM);
+		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
 
 		uint16_t opcode;
 
@@ -1923,7 +1923,7 @@ void sh3be_device::execute_run()
 	do
 	{
 		m_ppc = m_sh2_state->pc & SH34_AM;
-		debugger_instruction_hook(this, m_sh2_state->pc & SH34_AM);
+		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
 
 		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
 
@@ -1963,7 +1963,7 @@ void sh4be_device::execute_run()
 	do
 	{
 		m_ppc = m_sh2_state->pc & SH34_AM;
-		debugger_instruction_hook(this, m_sh2_state->pc & SH34_AM);
+		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
 
 		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
 

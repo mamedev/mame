@@ -63,8 +63,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pacland);
 
-	INTERRUPT_GEN_MEMBER(main_vblank_irq);
-	INTERRUPT_GEN_MEMBER(mcu_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void switch_palette();

@@ -253,7 +253,7 @@ vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, d
 
 void vgmplay_device::device_start()
 {
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_file = &space(AS_PROGRAM);
 	m_io   = &space(AS_IO);
 	m_io16  = &space(AS_IO16);
@@ -356,7 +356,7 @@ void vgmplay_device::execute_run()
 		}
 		case RUN: {
 			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debugger_instruction_hook(this, m_pc);
+				debugger_instruction_hook(m_pc);
 			uint8_t code = m_file->read_byte(m_pc);
 			switch(code) {
 			case 0x4f:
@@ -641,7 +641,7 @@ void vgmplay_device::execute_run()
 				done = true;
 			}
 			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debugger_instruction_hook(this, m_pc);
+				debugger_instruction_hook(m_pc);
 			m_icount = 0;
 			break;
 		}

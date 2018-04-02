@@ -41,6 +41,17 @@ public:
 		m_spriteram(*this,"spriteram"),
 		m_spriteext(*this,"spriteext") { }
 
+
+	void opwolf3(machine_config &config);
+	void slapshot(machine_config &config);
+	DECLARE_DRIVER_INIT(slapshot);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0140syt_device> m_tc0140syt;
@@ -75,27 +86,15 @@ public:
 	DECLARE_READ16_MEMBER(msb_sound_r);
 	DECLARE_WRITE8_MEMBER(coin_control_w);
 
-	// opwolf specific
-	DECLARE_READ16_MEMBER(opwolf3_adc_r);
-	DECLARE_WRITE16_MEMBER(opwolf3_adc_req_w);
-
-	DECLARE_DRIVER_INIT(slapshot);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_taito_no_buffer);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset );
-	void taito_handle_sprite_buffering(  );
-	void taito_update_sprites_active_area(  );
+	void taito_handle_sprite_buffering();
+	void taito_update_sprites_active_area();
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	void opwolf3(machine_config &config);
-	void slapshot(machine_config &config);
 	void opwolf3_map(address_map &map);
 	void opwolf3_z80_sound_map(address_map &map);
 	void slapshot_map(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

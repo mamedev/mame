@@ -78,13 +78,14 @@
 #include "emu.h"
 #include "includes/foodf.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/atarigen.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        12096000
+#define MASTER_CLOCK        12.096_MHz_XTAL
 
 
 /*************************************
@@ -141,7 +142,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 void foodf_state::machine_start()
 {
 	atarigen_state::machine_start();
-	save_item(NAME(m_whichport));
 }
 
 
@@ -181,27 +181,6 @@ WRITE8_MEMBER(foodf_state::digital_w)
 
 /*************************************
  *
- *  Analog inputs
- *
- *************************************/
-
-READ16_MEMBER(foodf_state::analog_r)
-{
-	static const char *const portnames[] = { "STICK0_X", "STICK1_X", "STICK0_Y", "STICK1_Y" };
-
-	return ioport(portnames[m_whichport])->read();
-}
-
-
-WRITE16_MEMBER(foodf_state::analog_w)
-{
-	m_whichport = offset ^ 3;
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -216,8 +195,8 @@ void foodf_state::main_map(address_map &map)
 	map(0x01c000, 0x01c0ff).mirror(0x3e3f00).ram().share("spriteram");
 	map(0x800000, 0x8007ff).mirror(0x03f800).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x900000, 0x9001ff).mirror(0x03fe00).rw(m_nvram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0x00ff);
-	map(0x940000, 0x940007).mirror(0x023ff8).r(this, FUNC(foodf_state::analog_r));
-	map(0x944000, 0x944007).mirror(0x023ff8).w(this, FUNC(foodf_state::analog_w));
+	map(0x940001, 0x940001).mirror(0x023ffe).r("adc", FUNC(adc0809_device::data_r));
+	map(0x944000, 0x944007).mirror(0x023ff8).w("adc", FUNC(adc0809_device::address_offset_start_w)).umask16(0x00ff);
 	map(0x948000, 0x948001).mirror(0x023ffe).portr("SYSTEM");
 	map(0x948001, 0x948001).mirror(0x023ffe).w(this, FUNC(foodf_state::digital_w));
 	map(0x950000, 0x9501ff).mirror(0x023e00).w(this, FUNC(foodf_state::foodf_paletteram_w)).share("paletteram");
@@ -237,19 +216,19 @@ void foodf_state::main_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( foodf )
-	PORT_START("STICK0_X")  /* IN0 */
+	PORT_START("STICK0_X")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("STICK1_X")  /* IN1 */
+	PORT_START("STICK1_X")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
-	PORT_START("STICK0_Y")  /* IN2 */
+	PORT_START("STICK0_Y")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("STICK1_Y")  /* IN3 */
+	PORT_START("STICK1_Y")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
-	PORT_START("SYSTEM")    /* IN4 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -342,7 +321,12 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", foodf_state, video_int_gen)
+
+	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK/16)
+	MCFG_ADC0808_IN0_CB(IOPORT("STICK1_Y"))
+	MCFG_ADC0808_IN1_CB(IOPORT("STICK0_Y"))
+	MCFG_ADC0808_IN2_CB(IOPORT("STICK1_X"))
+	MCFG_ADC0808_IN3_CB(IOPORT("STICK0_X"))
 
 	MCFG_X2212_ADD_AUTOSAVE("nvram")
 
@@ -361,6 +345,7 @@ MACHINE_CONFIG_START(foodf_state::foodf)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 256, 259, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(foodf_state, screen_update_foodf)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(foodf_state, video_int_write_line))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

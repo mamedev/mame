@@ -183,9 +183,11 @@ public:
 	DECLARE_VIDEO_START(jrpacman);
 	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(vblank_nmi);
-	INTERRUPT_GEN_MEMBER(s2650_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(periodic_irq);
+	DECLARE_WRITE_LINE_MEMBER(rocktrv2_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_nmi);
+	DECLARE_WRITE_LINE_MEMBER(s2650_interrupt);
 
 private:
 	void init_save_state();

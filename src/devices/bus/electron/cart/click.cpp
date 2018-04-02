@@ -70,6 +70,7 @@ electron_click_device::electron_click_device(const machine_config &mconfig, cons
 
 void electron_click_device::device_start()
 {
+	save_item(NAME(m_page_register));
 }
 
 //-------------------------------------------------

@@ -364,7 +364,6 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_CPU_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(tugboat_state,input_r))
@@ -379,6 +378,7 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tugboat)
 	MCFG_PALETTE_ADD("palette", 256)

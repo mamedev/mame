@@ -372,10 +372,10 @@ void slapfght_state::slapfighb2_map(address_map &map)
 
 /**************************************************************************/
 
-INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
+WRITE_LINE_MEMBER(slapfght_state::vblank_irq)
 {
-	if (m_main_irq_enabled)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_main_irq_enabled)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(slapfght_state::irq_enable_w)
@@ -895,7 +895,6 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4) // 4MHz? XTAL is known, divider is guessed
 	MCFG_CPU_PROGRAM_MAP(perfrman_map)
 	MCFG_CPU_IO_MAP(io_map_nomcu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(slapfght_state, sound_reset_w))
@@ -919,6 +918,7 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_perfrman)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", perfrman)
@@ -946,7 +946,6 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(36'000'000)/6) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(tigerh_map_mcu)
 	MCFG_CPU_IO_MAP(io_map_mcu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(slapfght_state, sound_reset_w))
@@ -971,6 +970,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
@@ -1017,7 +1017,6 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_CPU_ADD("maincpu",Z80, XTAL(36'000'000)/6) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(slapfigh_map_mcu)
 	MCFG_CPU_IO_MAP(io_map_mcu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(slapfght_state, sound_reset_w))
@@ -1044,6 +1043,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)

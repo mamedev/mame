@@ -381,7 +381,6 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4)      /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(main_program_map)
 	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wardner_state,  wardner_interrupt)
 
 	MCFG_DEVICE_ADD("membank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(main_bank_map)
@@ -430,6 +429,7 @@ MACHINE_CONFIG_START(wardner_state::wardner)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000)/2, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(wardner_state, screen_update_toaplan0)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram8", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(wardner_state, wardner_vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wardner)

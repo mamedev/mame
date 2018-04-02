@@ -198,7 +198,7 @@ void lc8670_cpu_device::device_start()
 	m_direct = m_program->direct<0>();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_bankswitch_func.resolve();
@@ -420,7 +420,7 @@ void lc8670_cpu_device::execute_run()
 		check_irqs();
 
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		int cycles;
 

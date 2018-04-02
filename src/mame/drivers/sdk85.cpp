@@ -52,23 +52,22 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_keyboard(*this, "X%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-
 	void sdk85(machine_config &config);
-
 	void sdk85_io(address_map &map);
 	void sdk85_mem(address_map &map);
-protected:
-	virtual void machine_reset() override;
-
 private:
 	u8 m_digit;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<3> m_keyboard;
+	output_finder<6> m_digits;
 };
 
 void sdk85_state::machine_reset()
@@ -138,7 +137,7 @@ WRITE8_MEMBER( sdk85_state::scanlines_w )
 WRITE8_MEMBER( sdk85_state::digit_w )
 {
 	if (m_digit < 6)
-		output().set_digit_value(m_digit, bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4)^0xff);
+		m_digits[m_digit] = bitswap<8>(~data, 3, 2, 1, 0, 7, 6, 5, 4);
 }
 
 READ8_MEMBER( sdk85_state::kbd_r )

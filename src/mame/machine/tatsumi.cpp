@@ -102,26 +102,9 @@ WRITE16_MEMBER(apache3_state::apache3_z80_w)
 	m_apache3_z80_ram[offset] = data & 0xff;
 }
 
-READ8_MEMBER(apache3_state::apache3_adc_r)
+READ8_MEMBER(apache3_state::apache3_vr1_r)
 {
-	switch (m_apache3_adc)
-	{
-		case 0: return ioport("STICK_X")->read();
-		case 1: return ioport("STICK_Y")->read();
-		case 2: return 0; // VSP1
-		case 3: return 0;
-		case 4: return (uint8_t)((255./100) * (100 - ioport("VR1")->read()));
-		case 5: return ioport("THROTTLE")->read();
-		case 6: return 0; // RPSNC
-		case 7: return 0; // LPSNC
-	}
-
-	return 0;
-}
-
-WRITE8_MEMBER(apache3_state::apache3_adc_w)
-{
-	m_apache3_adc = offset;
+	return (uint8_t)((255./100) * (100 - m_vr1->read()));
 }
 
 /* Ground/sky rotation control

@@ -264,15 +264,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 TODO:
 -----
 
-- With the correct clock speed of 12MHz for the 68000, garbage graphics remain
-  over the Taito logo on startup. This seems to be a bug in the original which
-  would have no effect if our timing was 100% right. The interrupt handling
-  should be quite correct, it's derived straight from the schematics and PAL
-  dump.
-  The current workaround is to make the 68000 run at 13MHz. Lowering below
-  12MHz would work as well, and possibly be closer to the real reason (wait
-  states slowing the CPU down?)
-
 - The "FIRE!" arrows pointing to padlocks are not in perfect sync with the
   background scrolling. Should they?
 
@@ -291,6 +282,7 @@ TODO:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -302,45 +294,30 @@ TODO:
                 INTERRUPTS
 ***********************************************************/
 
-void othunder_state::update_irq()
-{
-	m_maincpu->set_input_line(6, m_ad_irq ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(5, m_vblank_irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE16_MEMBER(othunder_state::irq_ack_w)
+WRITE16_MEMBER( othunder_state::irq_ack_w )
 {
 	switch (offset)
 	{
 		case 0:
-			m_vblank_irq = 0;
+			m_maincpu->set_input_line(5, CLEAR_LINE);
 			break;
 
 		case 1:
-			m_ad_irq = 0;
+			m_maincpu->set_input_line(6, CLEAR_LINE);
 			break;
 	}
-
-	update_irq();
 }
 
-INTERRUPT_GEN_MEMBER(othunder_state::vblank_interrupt)
+WRITE_LINE_MEMBER( othunder_state::vblank_w )
 {
-	m_vblank_irq = 1;
-	update_irq();
+	if (state)
+		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-void othunder_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+WRITE_LINE_MEMBER( othunder_state::adc_eoc_w )
 {
-	switch (id)
-	{
-	case TIMER_AD_INTERRUPT:
-		m_ad_irq = 1;
-		update_irq();
-		break;
-	default:
-		assert_always(false, "Unknown id in othunder_state::device_timer");
-	}
+	if (state)
+		m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
 
@@ -382,33 +359,6 @@ WRITE8_MEMBER(othunder_state::coins_w)
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
 	machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
-}
-
-
-/**********************************************************
-            GAME INPUTS
-**********************************************************/
-
-#define P1X_PORT_TAG     "P1X"
-#define P1Y_PORT_TAG     "P1Y"
-#define P2X_PORT_TAG     "P2X"
-#define P2Y_PORT_TAG     "P2Y"
-#define ROTARY_PORT_TAG  "ROTARY"
-
-READ16_MEMBER(othunder_state::lightgun_r)
-{
-	static const char *const portname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
-	return ioport(portname[offset])->read();
-}
-
-WRITE16_MEMBER(othunder_state::lightgun_w)
-{
-	/* A write starts the A/D conversion. An interrupt will be triggered when
-	   the conversion is complete.
-	   The ADC60808 clock is 512kHz. Conversion takes between 0 and 8 clock
-	   cycles, so would end in a maximum of 15.625us. We'll use 10. */
-
-	m_ad_interrupt_timer->adjust(attotime::from_usec(10));
 }
 
 
@@ -481,7 +431,7 @@ void othunder_state::othunder_map(address_map &map)
 	map(0x220000, 0x22000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
 	map(0x300000, 0x300003).rw(this, FUNC(othunder_state::sound_r), FUNC(othunder_state::sound_w));
 	map(0x400000, 0x4005ff).ram().share("spriteram");
-	map(0x500000, 0x500007).rw(this, FUNC(othunder_state::lightgun_r), FUNC(othunder_state::lightgun_w));
+	map(0x500000, 0x500007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 	map(0x600000, 0x600003).w(this, FUNC(othunder_state::irq_ack_w));
 }
 
@@ -498,7 +448,7 @@ void othunder_state::z80_sound_map(address_map &map)
 	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
 	map(0xe400, 0xe403).w(this, FUNC(othunder_state::tc0310fam_w)); /* pan */
 	map(0xe600, 0xe600).nopw(); /* ? */
-	map(0xea00, 0xea00).portr(ROTARY_PORT_TAG);  /* rotary input */
+	map(0xea00, 0xea00).portr("ROTARY");  /* rotary input */
 	map(0xee00, 0xee00).nopw(); /* ? */
 	map(0xf000, 0xf000).nopw(); /* ? */
 	map(0xf200, 0xf200).w(this, FUNC(othunder_state::sound_bankswitch_w));
@@ -569,20 +519,20 @@ static INPUT_PORTS_START( othunder )
 	   enough and being accurate enough not to miss targets. 20 is too
 	   inaccurate, and 10 is too slow. */
 
-	PORT_START(P1X_PORT_TAG)
+	PORT_START("P1X")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START(P1Y_PORT_TAG)
+	PORT_START("P1Y")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_CROSSHAIR(Y, 1.0, -0.057, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_PLAYER(1)
 
-	PORT_START(P2X_PORT_TAG)
+	PORT_START("P2X")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START(P2Y_PORT_TAG)
+	PORT_START("P2Y")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_CROSSHAIR(Y, 1.0, -0.057, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13) PORT_PLAYER(2)
 
 	/* rotary volume control */
-	PORT_START(ROTARY_PORT_TAG)
+	PORT_START("ROTARY")
 	PORT_CONFNAME( 0x07, 0x07, "Stereo Separation" )
 	PORT_CONFSETTING(    0x07, "Maximum" )
 	PORT_CONFSETTING(    0x03, DEF_STR( High ) )
@@ -651,32 +601,26 @@ void othunder_state::machine_start()
 {
 	membank("z80bank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	m_ad_interrupt_timer = timer_alloc(TIMER_AD_INTERRUPT);
-
-	save_item(NAME(m_vblank_irq));
-	save_item(NAME(m_ad_irq));
 	save_item(NAME(m_pan));
-}
-
-void othunder_state::machine_reset()
-{
-	m_vblank_irq = 0;
-	m_ad_irq = 0;
 }
 
 MACHINE_CONFIG_START(othunder_state::othunder)
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
-	MCFG_CPU_ADD("maincpu", M68000, 13000000 )  /* fixes garbage graphics on startup */
+	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(othunder_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", othunder_state, vblank_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,16000000/4 )   /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/2/2)
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
+	MCFG_DEVICE_ADD("adc", ADC0808, 16_MHz_XTAL/2/2/8)
+	MCFG_ADC0808_EOC_CB(WRITELINE(othunder_state, adc_eoc_w))
+	MCFG_ADC0808_IN0_CB(IOPORT("P1X"))
+	MCFG_ADC0808_IN1_CB(IOPORT("P1Y"))
+	MCFG_ADC0808_IN2_CB(IOPORT("P2X"))
+	MCFG_ADC0808_IN3_CB(IOPORT("P2Y"))
 
 	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
@@ -695,6 +639,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(othunder_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(othunder_state, vblank_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", othunder)
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -710,7 +655,7 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_TC0110PCR_PALETTE("palette")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -722,17 +667,17 @@ MACHINE_CONFIG_START(othunder_state::othunder)
 	MCFG_SOUND_ROUTE(2, "2610.2r", 1.0)
 
 	MCFG_FILTER_VOLUME_ADD("2610.0l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.0r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_VOLUME_ADD("2610.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")
@@ -978,4 +923,4 @@ GAME( 1988, othundero,   othunder, othunder, othunder, othunder_state, 0, ORIENT
 GAME( 1988, othunderu,   othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US, rev 1)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1988, othunderuo,  othunder, othunder, othundu,  othunder_state, 0, ORIENTATION_FLIP_X, "Taito America Corporation", "Operation Thunderbolt (US)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1988, othunderj,   othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, othunderjsc, othunder, othunder, othundrj, othunder_state, 0, ORIENTATION_FLIP_X, "Taito Corporation",         "Operation Thunderbolt (Japan, SC)",    MACHINE_SUPPORTS_SAVE )

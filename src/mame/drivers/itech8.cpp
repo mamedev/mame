@@ -566,13 +566,23 @@ TIMER_CALLBACK_MEMBER(itech8_state::irq_off)
 }
 
 
-INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
+WRITE_LINE_MEMBER(itech8_state::generate_nmi)
 {
-	/* signal the NMI */
-	update_interrupts(1, -1, -1);
-	m_irq_off_timer->adjust(attotime::from_usec(1));
+	if (state)
+	{
+		/* signal the NMI */
+		update_interrupts(1, -1, -1);
+		m_irq_off_timer->adjust(attotime::from_usec(1));
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+		if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+	}
+}
+
+WRITE_LINE_MEMBER(itech8_state::ninclown_irq)
+{
+	// definitely doesn't like the generate_nmi code, so we just generate VBlank irq here instead
+	if (state)
+		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 
@@ -1680,7 +1690,6 @@ MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, CLOCK_8MHz)
 	MCFG_CPU_PROGRAM_MAP(tmslo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
 
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
@@ -1693,6 +1702,7 @@ MACHINE_CONFIG_START(itech8_state::itech8_core_lo)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(512, 263)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(itech8_state, generate_nmi))
 
 	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
@@ -1942,7 +1952,6 @@ MACHINE_CONFIG_START(itech8_state::rimrockn)
 
 	MCFG_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(tmshi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  generate_nmi)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1959,13 +1968,12 @@ MACHINE_CONFIG_START(itech8_state::ninclown)
 
 	MCFG_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ninclown_map)
-	// definitely doesn't like the generate_nmi code, so we just generate VBlank irq here instead
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech8_state,  irq3_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(64, 423, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(itech8_state, screen_update_2page_large)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(itech8_state, ninclown_irq))
 MACHINE_CONFIG_END
 
 

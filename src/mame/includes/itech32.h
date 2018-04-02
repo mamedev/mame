@@ -184,7 +184,7 @@ public:
 	void init_gt_common();
 
 	uint32_t screen_update_itech32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(generate_int1);
+	WRITE_LINE_MEMBER(generate_int1);
 	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	inline offs_t compute_safe_address(int x, int y);

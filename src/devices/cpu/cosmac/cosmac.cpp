@@ -385,7 +385,7 @@ void cosmac_device::device_start()
 	save_item(NAME(m_q));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -766,7 +766,7 @@ inline void cosmac_device::debug()
 {
 	if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debugger_instruction_hook(this, R[P]);
+		debugger_instruction_hook(R[P]);
 	}
 }
 

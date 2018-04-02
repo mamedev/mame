@@ -15,19 +15,21 @@
 #define LOG(x) do { if (LOG_DSP_CALLS) logerror x; } while (0)
 
 
-INTERRUPT_GEN_MEMBER(twincobr_state::twincobr_interrupt)
+WRITE_LINE_MEMBER(twincobr_state::twincobr_vblank_irq)
 {
-	if (m_intenable) {
+	if (state && m_intenable)
+	{
 		m_intenable = 0;
-		device.execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 	}
 }
 
-INTERRUPT_GEN_MEMBER(twincobr_state::wardner_interrupt)
+WRITE_LINE_MEMBER(twincobr_state::wardner_vblank_irq)
 {
-	if (m_intenable) {
+	if (state && m_intenable)
+	{
 		m_intenable = 0;
-		device.execute().set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 

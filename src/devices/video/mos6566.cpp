@@ -646,7 +646,7 @@ mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, d
 void mos6566_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();

@@ -110,8 +110,8 @@ public:
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void cclimber_decode(const uint8_t convtable[8][16]);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(bagmanf_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(bagmanf_vblank_irq);
 	void root(machine_config &config);
 	void swimmer(machine_config &config);
 	void guzzler(machine_config &config);
