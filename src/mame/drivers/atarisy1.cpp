@@ -273,6 +273,9 @@ READ8_MEMBER(atarisy1_state::adc_r)
 
 WRITE8_MEMBER(atarisy1_state::adc_w)
 {
+	if (!m_adc.found())
+		return;
+
 	m_adc->address_offset_start_w(space, offset & 7, 0);
 
 	/* the A4 bit enables/disables joystick IRQs */
