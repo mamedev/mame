@@ -75,15 +75,15 @@ private:
 	required_device<timer_device> m_dma_timer;
 	required_device_array<timer_device, 2> m_timer;
 	optional_device_array<dmadac_sound_device, 4> m_dmadac;
-	
+
 	required_memory_bank m_bootbank;
 	required_memory_bank m_mainbank;
-	
+
 	required_memory_region m_bootrom;
 	required_memory_region m_mainrom;
-	
+
 	devcb_write8 m_irqhandler;
-	
+
 	attotime m_cpu_h1_clock_period;
 	attotime m_serial_period_per_word;
 

@@ -484,12 +484,7 @@ WRITE32_MEMBER( atari_cage_device::cage_to_main_w )
 
 READ32_MEMBER( atari_cage_device::cage_io_status_r )
 {
-	int result = 0;
-	if (m_soundlatch[1]->pending_r())
-		result |= 0x80;
-	if (!m_soundlatch[0]->pending_r())
-		result |= 0x40;
-	return result;
+	return (m_soundlatch[1]->pending_r() ? 0x80 : 0x00) | (m_soundlatch[0]->pending_r() ? 0x00 : 0x40);
 }
 
 
@@ -519,14 +514,7 @@ void atari_cage_device::main_w(uint16_t data)
 
 uint16_t atari_cage_device::control_r()
 {
-	uint16_t result = 0;
-
-	if (m_soundlatch[1]->pending_r())
-		result |= 2;
-	if (m_soundlatch[0]->pending_r())
-		result |= 1;
-
-	return result;
+	return (m_soundlatch[1]->pending_r() ? 2 : 0) | (m_soundlatch[0]->pending_r() ? 1 : 0);
 }
 
 
