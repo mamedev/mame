@@ -360,6 +360,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_jsa(*this, "jsa"),
 			m_screen(*this, "screen"),
 			m_duartn68681(*this, "duartn68681"),
+			m_adc8(*this, "adc8"),
 			m_hd34010_host_access(0),
 			m_msp_ram(*this, "msp_ram"),
 			m_dsk_ram(nullptr),
@@ -393,7 +394,6 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_in0(*this, "IN0"),
 			m_sw1(*this, "SW1"),
 			m_a80000(*this, "a80000"),
-			m_8badc(*this, "8BADC.%u", 0),
 			m_12badc(*this, "12BADC.%u", 0),
 			m_irq_state(0),
 			m_gsp_irq_state(0),
@@ -441,8 +441,6 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_ds3xdsp_sdata(0),
 			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
 			m_adc_control(0),
-			m_adc8_select(0),
-			m_adc8_data(0),
 			m_adc12_select(0),
 			m_adc12_byte(0),
 			m_adc12_data(0),
@@ -549,7 +547,8 @@ void harddriv_state::driver_68k_map(address_map &map)
 	map(0x60c000, 0x60ffff).w(this, FUNC(harddriv_state::hd68k_irq_ack_w));
 	map(0xa00000, 0xa7ffff).w(this, FUNC(harddriv_state::hd68k_wr0_write));
 	map(0xa80000, 0xafffff).r(this, FUNC(harddriv_state::hd68k_a80000_r)).w(this, FUNC(harddriv_state::hd68k_wr1_write));
-	map(0xb00000, 0xb7ffff).rw(this, FUNC(harddriv_state::hd68k_adc8_r), FUNC(harddriv_state::hd68k_wr2_write));
+	map(0xb00001, 0xb00001).mirror(0x7fffe).r("adc8", FUNC(adc0808_device::data_r));
+	map(0xb00000, 0xb7ffff).w(this, FUNC(harddriv_state::hd68k_wr2_write));
 	map(0xb80000, 0xbfffff).rw(this, FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
 	map(0xc00000, 0xc03fff).rw(this, FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
 	map(0xc04000, 0xc07fff).rw(this, FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
@@ -599,7 +598,8 @@ void harddriv_state::multisync_68k_map(address_map &map)
 	map(0x60c000, 0x60ffff).rw(this, FUNC(harddriv_state::hd68k_port0_r), FUNC(harddriv_state::hd68k_irq_ack_w));
 	map(0xa00000, 0xa7ffff).w(this, FUNC(harddriv_state::hd68k_wr0_write));
 	map(0xa80000, 0xafffff).r(this, FUNC(harddriv_state::hd68k_a80000_r)).w(this, FUNC(harddriv_state::hd68k_wr1_write));
-	map(0xb00000, 0xb7ffff).rw(this, FUNC(harddriv_state::hd68k_adc8_r), FUNC(harddriv_state::hd68k_wr2_write));
+	map(0xb00001, 0xb00001).mirror(0x7fffe).r("adc8", FUNC(adc0808_device::data_r));
+	map(0xb00000, 0xb7ffff).w(this, FUNC(harddriv_state::hd68k_wr2_write));
 	map(0xb80000, 0xbfffff).rw(this, FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
 	map(0xc00000, 0xc03fff).rw(this, FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
 	map(0xc04000, 0xc07fff).rw(this, FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
@@ -639,7 +639,8 @@ void harddriv_state::multisync2_68k_map(address_map &map)
 	map(0x60c000, 0x60ffff).rw(this, FUNC(harddriv_state::hd68k_port0_r), FUNC(harddriv_state::hd68k_irq_ack_w));
 	map(0xa00000, 0xa7ffff).w(this, FUNC(harddriv_state::hd68k_wr0_write));
 	map(0xa80000, 0xafffff).r(this, FUNC(harddriv_state::hd68k_a80000_r)).w(this, FUNC(harddriv_state::hd68k_wr1_write));
-	map(0xb00000, 0xb7ffff).rw(this, FUNC(harddriv_state::hd68k_adc8_r), FUNC(harddriv_state::hd68k_wr2_write));
+	map(0xb00001, 0xb00001).mirror(0x7fffe).r("adc8", FUNC(adc0808_device::data_r));
+	map(0xb00000, 0xb7ffff).w(this, FUNC(harddriv_state::hd68k_wr2_write));
 	map(0xb80000, 0xbfffff).rw(this, FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
 	map(0xc00000, 0xc03fff).rw(this, FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
 	map(0xc04000, 0xc07fff).rw(this, FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
@@ -788,7 +789,7 @@ static INPUT_PORTS_START( harddriv )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -871,7 +872,7 @@ static INPUT_PORTS_START( racedriv )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -955,7 +956,7 @@ static INPUT_PORTS_START( racedriv_pan )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("leftpcb:screen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("leftpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -967,7 +968,7 @@ static INPUT_PORTS_START( racedriv_pan )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("rightpcb:screen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("rightpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -994,7 +995,7 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1083,7 +1084,7 @@ static INPUT_PORTS_START( stunrun )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1172,7 +1173,7 @@ static INPUT_PORTS_START( steeltal )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1262,7 +1263,7 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1352,7 +1353,7 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1462,6 +1463,16 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_SLAPSTIC_68K_ACCESS(1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_DEVICE_ADD("adc8", ADC0809, 1000000) // unknown clock
+	MCFG_ADC0808_IN0_CB(IOPORT("8BADC.0"))
+	MCFG_ADC0808_IN1_CB(IOPORT("8BADC.1"))
+	MCFG_ADC0808_IN2_CB(IOPORT("8BADC.2"))
+	MCFG_ADC0808_IN3_CB(IOPORT("8BADC.3"))
+	MCFG_ADC0808_IN4_CB(IOPORT("8BADC.4"))
+	MCFG_ADC0808_IN5_CB(IOPORT("8BADC.5"))
+	MCFG_ADC0808_IN6_CB(IOPORT("8BADC.6"))
+	MCFG_ADC0808_IN7_CB(IOPORT("8BADC.7"))
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)
