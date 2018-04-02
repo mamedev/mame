@@ -39,7 +39,6 @@ public:
 	uint8_t *m_slapstic_source;
 	uint8_t *m_slapstic_base;
 	uint8_t m_slapstic_current_bank;
-	uint8_t m_control_num;
 	int m_MPA;
 	int m_BIC;
 	uint16_t m_dvd_shift;
