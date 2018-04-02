@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "upd7810_dasm.h"
 
+#include <stdexcept>
+
+
 const char *upd7810_base_disassembler::dasm_s::name() const
 {
 	return token_names[m_token];
@@ -38,7 +41,10 @@ bool upd7810_base_disassembler::dasm_s::is_return() const
 
 const upd7810_base_disassembler::dasm_s &upd7810_base_disassembler::dasm_s::prefix_get(uint8_t op) const
 {
-	assert(m_token == prefix);
+#ifndef NDEBUG
+	if (m_token != prefix)
+		throw std::logic_error("cannot get prefix with current token");
+#endif
 	return reinterpret_cast<const dasm_s *>(m_args)[op];
 }
 
