@@ -42,35 +42,35 @@
 //**************************************************************************
 
 #define MCFG_ADC0808_EOC_CB(_devcb) \
-	devcb = &adc0808_device::set_eoc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<adc0808_device &>(*device).set_eoc_callback(DEVCB_##_devcb);
 
 // common hookup where the eoc output is connected to a flip-flop
 #define MCFG_ADC0808_EOC_FF_CB(_devcb) \
-	devcb = &adc0808_device::set_eoc_ff_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<adc0808_device &>(*device).set_eoc_ff_callback(DEVCB_##_devcb);
 
 #define MCFG_ADC0808_IN0_CB(_devcb) \
-	devcb = &adc0808_device::set_in_callback(*device, DEVCB_##_devcb, 0);
+	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 0);
 
 #define MCFG_ADC0808_IN1_CB(_devcb) \
-	devcb = &adc0808_device::set_in_callback(*device, DEVCB_##_devcb, 1);
+	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 1);
 
 #define MCFG_ADC0808_IN2_CB(_devcb) \
-	devcb = &adc0808_device::set_in_callback(*device, DEVCB_##_devcb, 2);
+	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 2);
 
 #define MCFG_ADC0808_IN3_CB(_devcb) \
-	devcb = &adc0808_device::set_in_callback(*device, DEVCB_##_devcb, 3);
+	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 3);
 
 #define MCFG_ADC0808_IN4_CB(_devcb) \
-	devcb = &adc0808_device::set_in_callback(*device, DEVCB_##_devcb, 4);
+	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 4);
 
 #define MCFG_ADC0808_IN5_CB(_devcb) \
-	devcb = &adc0808_device::set_in_callback(*device, DEVCB_##_devcb, 5);
+	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 5);
 
 #define MCFG_ADC0808_IN6_CB(_devcb) \
-	devcb = &adc0808_device::set_in_callback(*device, DEVCB_##_devcb, 6);
+	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 6);
 
 #define MCFG_ADC0808_IN7_CB(_devcb) \
-	devcb = &adc0808_device::set_in_callback(*device, DEVCB_##_devcb, 7);
+	devcb = &downcast<adc0808_device &>(*device).set_in_callback(DEVCB_##_devcb, 7);
 
 
 //**************************************************************************
@@ -84,14 +84,14 @@ public:
 	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <class Object> static devcb_base &set_eoc_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0808_device &>(device).m_eoc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_eoc_callback(Object &&cb)
+	{ return m_eoc_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_eoc_ff_callback(device_t &device, Object &&cb)
-	{ return downcast<adc0808_device &>(device).m_eoc_ff_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_eoc_ff_callback(Object &&cb)
+	{ return m_eoc_ff_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_in_callback(device_t &device, Object &&cb, int index)
-	{ return downcast<adc0808_device &>(device).m_in_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_callback(Object &&cb, int index)
+	{ return m_in_cb[index].set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(address_w);
