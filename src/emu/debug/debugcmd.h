@@ -110,6 +110,8 @@ private:
 	void execute_focus(int ref, const std::vector<std::string> &params);
 	void execute_ignore(int ref, const std::vector<std::string> &params);
 	void execute_observe(int ref, const std::vector<std::string> &params);
+	void execute_suspend(int ref, const std::vector<std::string> &params);
+	void execute_resume(int ref, const std::vector<std::string> &params);
 	void execute_next(int ref, const std::vector<std::string> &params);
 	void execute_comment_add(int ref, const std::vector<std::string> &params);
 	void execute_comment_del(int ref, const std::vector<std::string> &params);

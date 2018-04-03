@@ -29,8 +29,7 @@ public:
 			m_alpha_tilemap(*this, "alpha"),
 			m_soundcomm(*this, "soundcomm"),
 			m_ym2151(*this, "ymsnd"),
-			m_pokey1(*this, "pokey1"),
-			m_pokey2(*this, "pokey2"),
+			m_pokey(*this, "pokey%u", 1U),
 			m_tms5220(*this, "tms"),
 			m_rombank1(*this, "rombank1"),
 			m_rombank2(*this, "rombank2"),
@@ -51,11 +50,8 @@ public:
 
 	required_device<atari_sound_comm_device> m_soundcomm;
 	required_device<ym2151_device> m_ym2151;
-	required_device<pokey_device> m_pokey1;
-	required_device<pokey_device> m_pokey2;
+	required_device_array<pokey_device, 2> m_pokey;
 	optional_device<tms5220_device> m_tms5220;
-
-	uint8_t           m_which_adc;
 
 	uint8_t           m_p2portwr_state;
 	uint8_t           m_p2portrd_state;
@@ -92,8 +88,6 @@ public:
 	DECLARE_READ16_MEMBER(switch_r);
 	DECLARE_READ8_MEMBER(switch_6502_r);
 	DECLARE_WRITE8_MEMBER(switch_6502_w);
-	DECLARE_WRITE16_MEMBER(adc_strobe_w);
-	DECLARE_READ16_MEMBER(adc_r);
 	DECLARE_READ8_MEMBER(leta_r);
 	DECLARE_WRITE8_MEMBER(mixer_w);
 	DECLARE_WRITE8_MEMBER(sound_reset_w);

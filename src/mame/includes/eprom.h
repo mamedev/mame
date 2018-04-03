@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "machine/adc0808.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
@@ -23,6 +24,7 @@ public:
 		m_alpha_tilemap(*this, "alpha"),
 		m_mob(*this, "mob"),
 		m_jsa(*this, "jsa"),
+		m_adc(*this, "adc"),
 		m_extra(*this, "extra")
 	{ }
 
@@ -36,7 +38,7 @@ protected:
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(special_port1_r);
-	DECLARE_READ16_MEMBER(adc_r);
+	DECLARE_READ8_MEMBER(adc_r);
 	DECLARE_WRITE16_MEMBER(eprom_latch_w);
 	DECLARE_READ16_MEMBER(sync_r);
 	template<bool maincpu> DECLARE_WRITE16_MEMBER(sync_w);
@@ -60,7 +62,7 @@ private:
 	int             m_screen_intensity;
 	int             m_video_disable;
 	uint16_t          m_sync_data;
-	int         m_last_offset;
+	optional_device<adc0808_device> m_adc;
 	optional_device<cpu_device> m_extra;
 	static const atari_motion_objects_config s_mob_config;
 	static const atari_motion_objects_config s_guts_mob_config;

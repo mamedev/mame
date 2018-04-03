@@ -384,7 +384,7 @@ ROM_START( sparkz )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sparkzpg.0", 0x00000, 0x80000, CRC(a75c331c) SHA1(855ed44bd23c1dd0ca64926cacc8be62aca82fe2) )
 	ROM_LOAD16_BYTE( "sparkzpg.1", 0x00001, 0x80000, CRC(1af1fc04) SHA1(6d92edb1a881ba6b63e0144c9c3e631b654bf8ae) )
-	
+
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 ) // Unknown size, Unpopulated
 
 	ROM_REGION( 0x80000, "oki", 0 )
