@@ -810,7 +810,6 @@ void atari_vad_device::eof_update(emu_timer &timer)
 atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 		m_scanline_int_state(0),
-		m_sound_int_state(0),
 		m_video_int_state(0),
 		m_xscroll(*this, "xscroll"),
 		m_yscroll(*this, "yscroll"),
@@ -845,7 +844,6 @@ void atarigen_state::machine_start()
 	}
 
 	save_item(NAME(m_scanline_int_state));
-	save_item(NAME(m_sound_int_state));
 	save_item(NAME(m_video_int_state));
 
 	save_item(NAME(m_slapstic_num));
@@ -860,7 +858,7 @@ void atarigen_state::machine_start()
 void atarigen_state::machine_reset()
 {
 	// reset the interrupt states
-	m_video_int_state = m_sound_int_state = m_scanline_int_state = 0;
+	m_video_int_state = m_scanline_int_state = 0;
 
 	// reset the slapstic
 	if (m_slapstic_num != 0)
@@ -919,7 +917,7 @@ void atarigen_state::scanline_int_set(screen_device &screen, int scanline)
 
 
 //-------------------------------------------------
-//  sound_int_write_line: Standard write line
+//  scanline_int_write_line: Standard write line
 //  callback for the scanline interrupt
 //-------------------------------------------------
 
@@ -950,30 +948,6 @@ INTERRUPT_GEN_MEMBER(atarigen_state::scanline_int_gen)
 WRITE16_MEMBER(atarigen_state::scanline_int_ack_w)
 {
 	m_scanline_int_state = 0;
-	update_interrupts();
-}
-
-
-//-------------------------------------------------
-//  sound_int_write_line: Standard write line
-//  callback for the sound interrupt
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER(atarigen_state::sound_int_write_line)
-{
-	m_sound_int_state = state;
-	update_interrupts();
-}
-
-
-//-------------------------------------------------
-//  sound_int_ack_w: Resets the state of the sound
-//  interrupt.
-//-------------------------------------------------
-
-WRITE16_MEMBER(atarigen_state::sound_int_ack_w)
-{
-	m_sound_int_state = 0;
 	update_interrupts();
 }
 

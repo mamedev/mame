@@ -279,9 +279,6 @@ protected:
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
-	DECLARE_WRITE16_MEMBER(sound_int_ack_w);
-
 	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
 	DECLARE_WRITE16_MEMBER(video_int_ack_w);
 
@@ -312,7 +309,6 @@ protected:
 	};
 
 	uint8_t               m_scanline_int_state;
-	uint8_t               m_sound_int_state;
 	uint8_t               m_video_int_state;
 
 	optional_shared_ptr<uint16_t> m_xscroll;

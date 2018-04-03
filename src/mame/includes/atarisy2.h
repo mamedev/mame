@@ -108,7 +108,7 @@ public:
 	DECLARE_MACHINE_RESET(atarisy2);
 	DECLARE_VIDEO_START(atarisy2);
 	uint32_t screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_int);
+	DECLARE_WRITE_LINE_MEMBER(vblank_int);
 	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
 	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);
 	DECLARE_READ16_MEMBER(slapstic_r);

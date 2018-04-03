@@ -71,7 +71,6 @@
 
 void atarigt_state::update_interrupts()
 {
-	m_maincpu->set_input_line(3, m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(4, m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -93,7 +92,7 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 
 WRITE8_MEMBER(atarigt_state::cage_irq_callback)
 {
-	sound_int_write_line(data != 0 ? 1 : 0);
+	m_maincpu->set_input_line(M68K_IRQ_3, data != 0 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*************************************
