@@ -42,6 +42,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
 		, m_dac1(*this, "dac1")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void atari_s2(machine_config &config);
@@ -71,9 +72,11 @@ private:
 	uint8_t m_segment[7];
 	uint8_t *m_p_prom;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_4bit_binary_weighted_device> m_dac;
 	required_device<dac_3bit_binary_weighted_device> m_dac1;
+	output_finder<68> m_digits;
 };
 
 
@@ -369,7 +372,7 @@ WRITE8_MEMBER( atari_s2_state::display_w )
 	{
 		data &= 7;
 		for (uint8_t i = 0; i < 7; i++)
-			output().set_digit_value(i * 10 + data, m_segment[i]);
+			m_digits[i * 10 + data] = m_segment[i];
 	}
 }
 
