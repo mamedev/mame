@@ -366,8 +366,8 @@ WRITE8_MEMBER( turbo_state::digit_w )
 	static const uint8_t ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-	output().set_digit_value(m_i8279_scanlines * 2 + 0, ls48_map[data & 0x0f]);
-	output().set_digit_value(m_i8279_scanlines * 2 + 1, ls48_map[(data>>4) & 0x0f]);
+	m_digits[m_i8279_scanlines * 2] = ls48_map[data & 0x0f];
+	m_digits[m_i8279_scanlines * 2 + 1] = ls48_map[data>>4];
 }
 
 /*************************************
