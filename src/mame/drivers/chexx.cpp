@@ -251,7 +251,7 @@ static INPUT_PORTS_START( chexx83 )
 	PORT_DIPSETTING(    0x08, "4" ) // 80
 	PORT_DIPSETTING(    0x0c, "5" ) // 100
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) // multiplexed inputs
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) // multiplexed inputs
 INPUT_PORTS_END
 
 // Machine

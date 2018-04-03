@@ -388,7 +388,7 @@ void aleck64_state::rsp_map(address_map &map)
 
 static INPUT_PORTS_START( aleck64 )
 	PORT_START("input")
-	PORT_BIT( 0xff, 0x05, IPT_SPECIAL )                                     // Tell base driver to expect two gamepads
+	PORT_BIT( 0xff, 0x05, IPT_CUSTOM )                                     // Tell base driver to expect two gamepads
 
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)          // Button A
@@ -576,7 +576,7 @@ static INPUT_PORTS_START( mtetrisc )
 
 	// The basic N64 controls are unused in this game
 	PORT_START("input")
-	PORT_BIT( 0xff, 0x00, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM )
 
 	PORT_START("INMJ")
 
@@ -609,7 +609,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( starsldr )
 	PORT_START("input")
-	PORT_BIT( 0xff, 0x05, IPT_SPECIAL )                                     // Tell base driver to expect two gamepads
+	PORT_BIT( 0xff, 0x05, IPT_CUSTOM )                                     // Tell base driver to expect two gamepads
 
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)          // Button A
@@ -715,7 +715,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( doncdoon )
 	PORT_START("input")
-	PORT_BIT( 0xff, 0x00, IPT_SPECIAL ) // Disable standard N64 controls
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM ) // Disable standard N64 controls
 
 	PORT_START("IN0")
 	PORT_BIT(0xfcff8080, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -759,7 +759,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( twrshaft )
 	PORT_START("input")
-	PORT_BIT( 0xff, 0x00, IPT_SPECIAL ) // Disable standard N64 controls
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM ) // Disable standard N64 controls
 
 	PORT_START("INMJ")
 
@@ -784,7 +784,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hipai )
 	PORT_START("input")
-	PORT_BIT( 0xff, 0x00, IPT_SPECIAL ) // Disable standard N64 controls
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM ) // Disable standard N64 controls
 
 	PORT_START("INMJ")
 	PORT_BIT( 0xe1c1c0c1, IP_ACTIVE_LOW, IPT_UNUSED )
