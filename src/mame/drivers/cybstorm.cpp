@@ -29,15 +29,8 @@
  *
  *************************************/
 
-void cybstorm_state::update_interrupts()
-{
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void cybstorm_state::machine_start()
 {
-	atarigen_state::machine_start();
 	save_item(NAME(m_latch_data));
 	save_item(NAME(m_alpha_tile_bank));
 }
@@ -90,7 +83,7 @@ WRITE32_MEMBER(cybstorm_state::latch_w)
 void cybstorm_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x200000, 0x20ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x200000, 0x20ffff).ram().w("palette", FUNC(palette_device::write32)).share("palette");
 	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 	map(0x3f0000, 0x3fffff).m(m_vadbank, FUNC(address_map_bank_device::amap16));
 	map(0x9f0000, 0x9f0003).portr("9F0000");
@@ -240,7 +233,7 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(cybstorm_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
 	MCFG_ATARI_VAD_PLAYFIELD(cybstorm_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_PLAYFIELD2(cybstorm_state, "gfxdecode", get_playfield2_tile_info)
 	MCFG_ATARI_VAD_ALPHA(cybstorm_state, "gfxdecode", get_alpha_tile_info)
@@ -262,7 +255,6 @@ MACHINE_CONFIG_START(cybstorm_state::round2)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cybstorm_state, video_int_write_line))
 
 	MCFG_SCREEN_UPDATE_DRIVER(cybstorm_state, screen_update_cybstorm)
 MACHINE_CONFIG_END
