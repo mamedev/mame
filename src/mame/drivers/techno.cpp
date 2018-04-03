@@ -27,6 +27,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_switch(*this, "SWITCH.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	enum
@@ -61,6 +62,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_switch;
+	output_finder<48> m_digits;
 
 	emu_timer *m_irq_set_timer;
 	emu_timer *m_irq_advance_timer;
@@ -88,22 +90,22 @@ void techno_state::techno_map(address_map &map)
 	map(0x17800, 0x17fff).w(this, FUNC(techno_state::setout_w));
 }
 
-ADDRESS_MAP_START(techno_state::techno_sub_map)
-//       no ram here, must be internal to the cpu
-	AM_RANGE(0x0000, 0x3fff) AM_READ(rd_r) // to TKY2016A audio processor which has its own 3.58MHz clock
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(wr_w) // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
-	AM_RANGE(0x4000, 0xbfff) AM_ROM // 4000-7FFF is same as 8000-BFFF; 4x 16k ROMS bankswitched
-	AM_RANGE(0xc000, 0xffff) AM_ROM // another 16k ROM
-ADDRESS_MAP_END
+void techno_state::techno_sub_map(address_map &map)
+{ //       no ram here, must be internal to the cpu
+	map(0x0000, 0x3fff).r(this, FUNC(techno_state::rd_r)); // to TKY2016A audio processor which has its own 3.58MHz clock
+	map(0x4000, 0x7fff).w(this, FUNC(techno_state::wr_w)); // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
+	map(0x4000, 0xbfff).rom(); // 4000-7FFF is same as 8000-BFFF; 4x 16k ROMS bankswitched
+	map(0xc000, 0xffff).rom(); // another 16k ROM
+}
 
 WRITE16_MEMBER( techno_state::disp1_w )
 {
-	output().set_digit_value(m_digit, bitswap<16>(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
+	m_digits[m_digit] = bitswap<16>(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 WRITE16_MEMBER( techno_state::disp2_w )
 {
-	output().set_digit_value(m_digit+30, bitswap<16>(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
+	m_digits[m_digit+30] = bitswap<16>(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 WRITE16_MEMBER( techno_state::sound_w )
@@ -276,6 +278,7 @@ void techno_state::machine_start()
 
 void techno_state::machine_reset()
 {
+	m_digits.resolve();
 	m_vector = 0x88;
 	m_digit = 0;
 
