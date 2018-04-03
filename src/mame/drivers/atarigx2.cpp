@@ -63,7 +63,6 @@ void atarigx2_state::machine_reset()
 READ32_MEMBER(atarigx2_state::special_port2_r)
 {
 	int temp = ioport("SERVICE")->read();
-	temp ^= 0x0008;     /* A2D.EOC always high for now */
 	return (temp << 16) | temp;
 }
 
@@ -76,21 +75,12 @@ READ32_MEMBER(atarigx2_state::special_port3_r)
 
 
 
-READ32_MEMBER(atarigx2_state::a2d_data_r)
+READ8_MEMBER(atarigx2_state::a2d_data_r)
 {
-	switch (offset)
-	{
-		case 0:
-			return (ioport("A2D0")->read() << 24) | (ioport("A2D1")->read() << 8);
-		case 1:
-			return (ioport("A2D2")->read() << 24) | (ioport("A2D3")->read() << 8);
-		case 2:
-			return (ioport("A2D4")->read() << 24) | (ioport("A2D5")->read() << 8);
-		case 3:
-			return (ioport("A2D6")->read() << 24) | (ioport("A2D7")->read() << 8);
-	}
-
-	return 0;
+	uint8_t result = m_adc->data_r(space, 0);
+	if (!machine().side_effects_disabled())
+		m_adc->address_offset_start_w(space, offset, 0);
+	return result;
 }
 
 
@@ -1201,7 +1191,7 @@ void atarigx2_state::main_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom();
 	map(0xc80000, 0xc80fff).ram();
-	map(0xd00000, 0xd1ffff).r(this, FUNC(atarigx2_state::a2d_data_r));
+	map(0xd00000, 0xd0000f).r(this, FUNC(atarigx2_state::a2d_data_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd40fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xd70000, 0xd7ffff).ram();
@@ -1253,7 +1243,7 @@ static INPUT_PORTS_START( spclords )
 
 	PORT_START("SERVICE")      /* 68.STATUS (A2=0) */
 	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* A2D.EOC */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r) // A2D.EOC
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa") // /AUDIRQ
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // /AUDFULL
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
@@ -1273,16 +1263,16 @@ static INPUT_PORTS_START( spclords )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A2D1")      /* A2D @ 0xD00002 */
-	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) // Pilot L/R
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) // Co-Pilot U/D
 
 	PORT_START("A2D2")      /* A2D @ 0xD00004 */
-	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) // Pilot U/D
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) // Pilot L/R
 
 	PORT_START("A2D3")      /* A2D @ 0xD00006 */
-	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) // Co-Pilot L/R
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) // Pilot U/D
 
 	PORT_START("A2D4")      /* A2D @ 0xD00008 */
-	PORT_BIT ( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) // Co-Pilot U/D
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) // Co-Pilot L/R
 
 	PORT_START("A2D5")      /* A2D @ 0xD0000A */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1307,7 +1297,7 @@ static INPUT_PORTS_START( motofren )
 
 	PORT_START("SERVICE")       /* 68.STATUS (A2=0) */
 	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_UNUSED )   /* +5V */
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* A2D.EOC */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r) // A2D.EOC
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa") // /AUDIRQ
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // /AUDFULL
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
@@ -1324,13 +1314,13 @@ static INPUT_PORTS_START( motofren )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A2D0")      /* A2D @ 0xD00000 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_NAME("Throttle") PORT_REVERSE
-
-	PORT_START("A2D1")      /* A2D @ 0xD00002 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("A2D2")      /* A2D @ 0xD00004 */
+	PORT_START("A2D1")      /* A2D @ 0xD00002 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE
+
+	PORT_START("A2D2")      /* A2D @ 0xD00004 */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_NAME("Throttle") PORT_REVERSE
 
 	PORT_START("A2D3")      /* A2D @ 0xD00006 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1365,7 +1355,7 @@ static INPUT_PORTS_START( rrreveng )
 
 	PORT_START("SERVICE")       /* 68.STATUS (A2=0) */
 	PORT_BIT( 0x0007, IP_ACTIVE_LOW, IPT_SPECIAL )  /* +5V */
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* A2D.EOC */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r) // A2D.EOC
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_SOUND_TO_MAIN_READY("jsa") // /AUDIRQ
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") // /AUDFULL
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
@@ -1382,13 +1372,13 @@ static INPUT_PORTS_START( rrreveng )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("A2D0")      /* A2D @ 0xD00000 */
-	PORT_BIT ( 0xff, 0x10, IPT_PEDAL ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-
-	PORT_START("A2D1")      /* A2D @ 0xD00002 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("A2D1")      /* A2D @ 0xD00002 */
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
 	PORT_START("A2D2")      /* A2D @ 0xD00004 */
-	PORT_BIT ( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+	PORT_BIT( 0xff, 0x10, IPT_PEDAL ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START("A2D3")      /* A2D @ 0xD00006 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1500,6 +1490,16 @@ MACHINE_CONFIG_START(atarigx2_state::atarigx2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
+
+	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
+	MCFG_ADC0808_IN0_CB(IOPORT("A2D0"))
+	MCFG_ADC0808_IN1_CB(IOPORT("A2D1"))
+	MCFG_ADC0808_IN2_CB(IOPORT("A2D2"))
+	MCFG_ADC0808_IN3_CB(IOPORT("A2D3"))
+	MCFG_ADC0808_IN4_CB(IOPORT("A2D4"))
+	MCFG_ADC0808_IN5_CB(IOPORT("A2D5"))
+	MCFG_ADC0808_IN6_CB(IOPORT("A2D6"))
+	MCFG_ADC0808_IN7_CB(IOPORT("A2D7"))
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
