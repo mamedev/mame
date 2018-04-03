@@ -27,6 +27,7 @@
   For some reason the 'rol $46' instruction outputs the original data
   followed by the new result, so I've had to employ a horrible hack.
 
+  Hold down X while inserting a coin.
   At the start of each ball, the display will be flashing. You need to
   hit Z, and then you can get a score. When the ball indicator goes out,
   your game is over.
@@ -63,6 +64,7 @@ public:
 		, m_ic6(*this, "ic6")
 		, m_ic7(*this, "ic7")
 		, m_ic8(*this, "ic8")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ic1_b_w);
@@ -99,6 +101,7 @@ private:
 	uint8_t m_ic6b4;
 	uint8_t m_ic6b7;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
 	required_device<pia6821_device> m_ic2;
@@ -107,6 +110,7 @@ private:
 	required_device<mos6530_device> m_ic6;
 	required_device<pia6821_device> m_ic7;
 	required_device<pia6821_device> m_ic8;
+	output_finder<42> m_digits;
 };
 
 
@@ -413,34 +417,34 @@ WRITE8_MEMBER( allied_state::ic4_b_w )
 	{
 		if (!BIT(data, i+4))
 		{
-			output().set_digit_value(i*10, patterns[0]);
+			m_digits[i*10] = patterns[0];
 			segment = (m_player_score[i] >> 0) & 15;
-			output().set_digit_value(i*10+1, patterns[segment]);
+			m_digits[i*10+1] = patterns[segment];
 			segment = (m_player_score[i] >> 4) & 15;
-			output().set_digit_value(i*10+2, patterns[segment]);
+			m_digits[i*10+2] =  patterns[segment];
 			segment = (m_player_score[i] >> 8) & 15;
-			output().set_digit_value(i*10+3, patterns[segment]);
+			m_digits[i*10+3] = patterns[segment];
 			segment = (m_player_score[i] >> 12) & 15;
-			output().set_digit_value(i*10+4, patterns[segment]);
+			m_digits[i*10+4] = patterns[segment];
 			segment = (m_player_score[i] >> 16) & 15;
-			output().set_digit_value(i*10+5, patterns[segment]);
+			m_digits[i*10+5] = patterns[segment];
 		}
 		else
 		{
-			output().set_digit_value(i*10, 0);
-			output().set_digit_value(i*10+1, 0);
-			output().set_digit_value(i*10+2, 0);
-			output().set_digit_value(i*10+3, 0);
-			output().set_digit_value(i*10+4, 0);
-			output().set_digit_value(i*10+5, 0);
+			m_digits[i*10] = 0;
+			m_digits[i*10+1] = 0;
+			m_digits[i*10+2] = 0;
+			m_digits[i*10+3] = 0;
+			m_digits[i*10+4] = 0;
+			m_digits[i*10+5] = 0;
 		}
 	}
 
 	// doesn't seem to be a strobe for the credits display
 	segment = (m_player_score[4] >> 0) & 15;
-	output().set_digit_value(40, patterns[segment]);
+	m_digits[40] = patterns[segment];
 	segment = (m_player_score[4] >> 4) & 15;
-	output().set_digit_value(41, patterns[segment]);
+	m_digits[41] = patterns[segment];
 
 // PB0-3 - player 1-4 LED - to do
 }
