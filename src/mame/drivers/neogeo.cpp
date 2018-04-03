@@ -1801,21 +1801,21 @@ INPUT_PORTS_START( neogeo )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_base_state, get_memcard_status, nullptr)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1). Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* Hardware type (AES=0, MVS=1). Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
 
 	PORT_START("AUDIO/COIN")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // coin 1 (combined) or P1 coin 1 (separate) for BIOS that supports it
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) // coin 2 (combined) or P2 coin 1 (separate) for BIOS that supports it
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0018, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) // sense: 4-slot
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", upd1990a_device, tp_r)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", upd1990a_device, data_out_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) // sense: 4-slot
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", upd1990a_device, tp_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("upd4990a", upd1990a_device, data_out_r)
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_base_state,get_audio_result, nullptr)
 
 	PORT_START("TEST")
 	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) // sense: JAMMA
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) // sense: JAMMA
 	PORT_SERVICE_NO_TOGGLE( 0x0080, IP_ACTIVE_LOW )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1832,14 +1832,14 @@ static INPUT_PORTS_START( neogeo_mvs )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN4 ) // P2 coin 2 (separate) for BIOS that supports it
 
 	PORT_MODIFY("TEST")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL ) // sense: MVS
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM ) // sense: MVS
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( neogeo_mvs6 )
 	PORT_INCLUDE( neogeo_mvs )
 
 	PORT_MODIFY("AUDIO/COIN")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) // sense: 6-slot
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) // sense: 6-slot
 INPUT_PORTS_END
 
 
@@ -1849,7 +1849,7 @@ INPUT_PORTS_START( aes )
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
 	// Start & Select are read from controller slot device
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_base_state, get_memcard_status, nullptr)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Hardware type (AES=0, MVS=1) Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* Hardware type (AES=0, MVS=1) Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
 
 	PORT_START("AUDIO")
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )  /* AES has no coin slots, it's a console */

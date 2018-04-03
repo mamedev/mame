@@ -360,7 +360,7 @@ static INPUT_PORTS_START( thedealr )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_NAME("Attendant Clear?") // !ACL (reset jackpots, only if there are no credits)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // A.P (attendant payout? clears credits, port 0 = ef)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT          ) // TLT (tilt)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL       ) // HOV (hopper?)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM       ) // HOV (hopper?)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) // CPN (coupon, port 3 = fb)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2         ) PORT_IMPULSE(5) // CS2
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(5) // CS1 (coin1, port 3 = fd)

@@ -44,6 +44,7 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(by6803);
@@ -78,6 +79,7 @@ private:
 	//uint8_t m_digit;
 	uint8_t m_segment;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<m6803_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
@@ -87,6 +89,7 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
+	output_finder<40> m_digits;
 };
 
 
@@ -229,19 +232,19 @@ WRITE8_MEMBER( by6803_state::pia0_a_w )
 	switch (m_pia0_a)
 	{
 		case 0x10: // wrong
-			output().set_digit_value(m_digit, m_segment);
+			m_digits[m_digit] = m_segment;
 			break;
 		case 0x1d:
-			output().set_digit_value(8+m_digit, m_segment);
+			m_digits[8+m_digit] = m_segment;
 			break;
 		case 0x1b:
-			output().set_digit_value(16+m_digit, m_segment);
+			m_digits[16+m_digit] = m_segment;
 			break;
 		case 0x07:
-			output().set_digit_value(24+m_digit, m_segment);
+			m_digits[24+m_digit] = m_segment;
 			break;
 		case 0x0f:
-			output().set_digit_value(32+m_digit, m_segment);
+			m_digits[32+m_digit] m_segment;
 			break;
 		default:
 			break;

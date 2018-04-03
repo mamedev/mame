@@ -300,9 +300,9 @@ static INPUT_PORTS_START( cyberbal )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* output buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    /* input buffer full */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* self test */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* output buffer full */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    /* input buffer full */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* self test */
 INPUT_PORTS_END
 
 

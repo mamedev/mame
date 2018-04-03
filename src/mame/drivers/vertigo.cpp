@@ -131,11 +131,12 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	MCFG_CPU_PROGRAM_MAP(vertigo_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
 
-	MCFG_DEVICE_ADD("adc", ADC0808, 500000) // unknown clock
+	MCFG_DEVICE_ADD("adc", ADC0808, 24_MHz_XTAL / 30) // E clock from 68000
 	MCFG_ADC0808_EOC_FF_CB(WRITELINE(vertigo_state, adc_eoc_w))
 	MCFG_ADC0808_IN0_CB(IOPORT("P1X"))
 	MCFG_ADC0808_IN1_CB(IOPORT("P1Y"))
 	MCFG_ADC0808_IN2_CB(IOPORT("PADDLE"))
+	// IN3-IN7 tied to Vss
 
 	exidy440_audio(config);
 

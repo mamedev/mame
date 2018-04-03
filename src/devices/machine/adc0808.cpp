@@ -25,7 +25,7 @@
 
 DEFINE_DEVICE_TYPE(ADC0808, adc0808_device, "adc0808", "ADC0808 A/D Converter")
 DEFINE_DEVICE_TYPE(ADC0809, adc0809_device, "adc0809", "ADC0809 A/D Converter")
-DEFINE_DEVICE_TYPE(M58990P, m58990p_device, "m58990p", "M58990P A/D Converter")
+DEFINE_DEVICE_TYPE(M58990, m58990_device, "m58990", "M58990 A/D Converter")
 
 
 //**************************************************************************
@@ -45,7 +45,7 @@ adc0808_device::adc0808_device(const machine_config &mconfig, device_type type, 
 	m_in_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 	m_state(STATE_IDLE),
 	m_cycle_timer(nullptr),
-	m_start(0), m_cycle(0), m_step(0), m_address(0), m_sar(0xff), m_eoc_pending(false)
+	m_start(0), m_cycle(0), m_step(0), m_address(0), m_sar(0xff), m_eoc(true), m_eoc_pending(false)
 {
 }
 
@@ -64,11 +64,11 @@ adc0809_device::adc0809_device(const machine_config &mconfig, const char *tag, d
 }
 
 //-------------------------------------------------
-//  m58990p_device - constructor
+//  m58990_device - constructor
 //-------------------------------------------------
 
-m58990p_device::m58990p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	adc0808_device(mconfig, M58990P, tag, owner, clock)
+m58990_device::m58990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	adc0808_device(mconfig, M58990, tag, owner, clock)
 {
 }
 
@@ -96,6 +96,7 @@ void adc0808_device::device_start()
 	save_item(NAME(m_step));
 	save_item(NAME(m_address));
 	save_item(NAME(m_sar));
+	save_item(NAME(m_eoc));
 	save_item(NAME(m_eoc_pending));
 }
 
@@ -108,6 +109,7 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	// eoc is delayed one cycle
 	if (m_eoc_pending)
 	{
+		m_eoc = true;
 		m_eoc_cb(1);
 		m_eoc_ff_cb(1);
 		m_eoc_pending = false;
@@ -167,11 +169,17 @@ WRITE_LINE_MEMBER( adc0808_device::start_w )
 	else if (m_start == 0 && state == 1)
 	{
 		m_sar = 0;
+		m_eoc = false;
 		m_eoc_cb(0);
 		m_eoc_pending = false;
 	}
 
 	m_start = state;
+}
+
+READ_LINE_MEMBER( adc0808_device::eoc_r )
+{
+	return m_eoc ? 1 : 0;
 }
 
 WRITE8_MEMBER( adc0808_device::address_offset_start_w )

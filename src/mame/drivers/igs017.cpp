@@ -2439,7 +2439,7 @@ static INPUT_PORTS_START( lhzb2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL   )  // hopper switch (unimplemented)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM   )  // hopper switch (unimplemented)
 	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // service mode (keep pressed during boot too)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(5) // coin error otherwise
@@ -2552,7 +2552,7 @@ static INPUT_PORTS_START( lhzb2a )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL   ) // hopper switch
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM   ) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW ) // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(2)
@@ -2665,7 +2665,7 @@ static INPUT_PORTS_START( mgcs )
 	// the top 2 bits of COINS (port A) and KEYx (port B) are read and combined with the bottom 4 bits read from port C (see code at 1C83A)
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // service mode (keep pressed during boot too)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_NAME("Statistics")  // press with the above for sound test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1    ) PORT_IMPULSE(5)
@@ -2777,7 +2777,7 @@ static INPUT_PORTS_START( sdmg2 )
 	PORT_DIPSETTING(    0x00, "Tile" )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL   ) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM   ) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2  ) // shown in test mode
 	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW ) // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics")
@@ -2905,7 +2905,7 @@ static INPUT_PORTS_START( mgdh )
 	PORT_DIPSETTING(    0x00, "10" )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL   ) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM   ) // hopper switch
 	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // service mode (keep pressed during boot too)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(5) // coin error otherwise
@@ -3037,7 +3037,7 @@ static INPUT_PORTS_START( slqz2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SPECIAL   ) // hopper switch (unimplemented)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM   ) // hopper switch (unimplemented)
 	PORT_SERVICE_NO_TOGGLE( 0x02,   IP_ACTIVE_LOW ) // service mode (keep pressed during boot too)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1  ) PORT_NAME("Statistics") // press with the above for sound test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1     ) PORT_IMPULSE(5) // coin error otherwise
@@ -3169,7 +3169,7 @@ static INPUT_PORTS_START( tjsb )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_SPECIAL ) // hopper switch
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_CUSTOM ) // hopper switch
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 

@@ -96,6 +96,7 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(address_w);
 	DECLARE_WRITE_LINE_MEMBER(start_w);
+	DECLARE_READ_LINE_MEMBER(eoc_r);
 
 	// common hookups
 	DECLARE_WRITE8_MEMBER(address_offset_start_w); // start and ale connected, address to the address bus
@@ -130,6 +131,7 @@ private:
 	int m_step;
 	int m_address;
 	uint8_t m_sar;
+	bool m_eoc;
 	bool m_eoc_pending;
 };
 
@@ -139,16 +141,16 @@ public:
 	adc0809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class m58990p_device : public adc0808_device
+class m58990_device : public adc0808_device
 {
 public:
-	m58990p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	m58990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(ADC0808, adc0808_device)
 DECLARE_DEVICE_TYPE(ADC0809, adc0809_device)
-DECLARE_DEVICE_TYPE(M58990P, m58990p_device)
+DECLARE_DEVICE_TYPE(M58990, m58990_device)
 
 #endif // MAME_DEVICES_MACHINE_ADC0808_H

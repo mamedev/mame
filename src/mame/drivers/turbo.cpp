@@ -657,7 +657,7 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_6C ))
 
 	PORT_START("DSW3")  /* Collision and DSW 3 */
-	PORT_BIT( 0x0f,     0x00, IPT_SPECIAL ) /* Merged with collision bits */
+	PORT_BIT( 0x0f,     0x00, IPT_CUSTOM ) /* Merged with collision bits */
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

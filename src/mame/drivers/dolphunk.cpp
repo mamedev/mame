@@ -99,6 +99,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(cass_r);
@@ -116,9 +117,11 @@ private:
 	bool m_cass_state;
 	bool m_cassold;
 	bool m_speaker_state;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
+	output_finder<4> m_digits;
 };
 
 READ_LINE_MEMBER( dauphin_state::cass_r )
@@ -133,7 +136,7 @@ WRITE_LINE_MEMBER( dauphin_state::cass_w )
 
 WRITE8_MEMBER( dauphin_state::port00_w )
 {
-	output().set_digit_value(offset, data);
+	m_digits[offset] = data;
 }
 
 WRITE8_MEMBER( dauphin_state::port06_w )
