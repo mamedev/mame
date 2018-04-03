@@ -1312,7 +1312,7 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 
 DRIVER_INIT_MEMBER(atarigt_state,tmek)
 {
-	m_is_primrage = 0;
+	m_is_primrage = false;
 
 	/* setup protection */
 	m_protection_r = &atarigt_state::tmek_protection_r;
@@ -1325,7 +1325,7 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 
 DRIVER_INIT_MEMBER(atarigt_state,primrage)
 {
-	m_is_primrage = 1;
+	m_is_primrage = true;
 
 	/* install protection */
 	m_protection_r = &atarigt_state::primrage_protection_r;

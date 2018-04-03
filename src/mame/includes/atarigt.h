@@ -31,7 +31,7 @@ public:
 		, m_cage(*this, "cage")
 	{ }
 
-	uint8_t           m_is_primrage;
+	bool           m_is_primrage;
 	required_shared_ptr<uint16_t> m_colorram;
 
 	optional_device<adc0808_device> m_adc;
