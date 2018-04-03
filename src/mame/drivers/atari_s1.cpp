@@ -72,6 +72,7 @@ public:
 		, m_p_ram(*this, "ram")
 		, m_dac(*this, "dac")
 		, m_switch(*this, "SWITCH.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(m1080_r);
@@ -108,10 +109,12 @@ private:
 	uint8_t m_t_c;
 	uint8_t *m_p_prom;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<dac_4bit_r2r_device> m_dac;
 	required_ioport_array<10> m_switch;
+	output_finder<78> m_digits;
 };
 
 void atari_s1_state::atari_s1_map(address_map &map)
@@ -393,8 +396,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 	else
 	{
 		// Digits
-		output().set_digit_value(m_out_offs << 1, patterns[m_p_ram[m_out_offs]>>4]);
-		output().set_digit_value((m_out_offs << 1)+1, patterns[m_p_ram[m_out_offs]&15]);
+		m_digits[m_out_offs << 1] = patterns[m_p_ram[m_out_offs]>>4];
+		m_digits[(m_out_offs << 1)+1] = patterns[m_p_ram[m_out_offs]&15];
 	}
 }
 
