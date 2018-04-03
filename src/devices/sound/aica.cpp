@@ -8,6 +8,7 @@
     - No FM mode
     - A third sample format (ADPCM) has been added
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
+	- Internal ARM7DI Core
 */
 
 #include "emu.h"

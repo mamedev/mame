@@ -5,9 +5,9 @@
     by R. Belmont & Angelo Salese
 
     SH-4 @ 200 MHz
-    ARM7DI @ 2.8223 MHz (no T or M extensions)
     PowerVR 3D video
     AICA audio
+		ARM7DI @ 2.8223 MHz (no T or M extensions)
     GD-ROM drive (modified ATAPI interface)
 
             NTSC/N  NTSC/I   PAL/N   PAL/I   VGA
