@@ -529,6 +529,9 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 //  MCFG_SOUND_ADD("aica", AICA, 0)
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 //  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+//
+//	MCFG_RAM_MODIFY("aica:ram")
+//	MCFG_RAM_DEFAULT_SIZE("8M")
 MACHINE_CONFIG_END
 
 
