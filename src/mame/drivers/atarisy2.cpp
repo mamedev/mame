@@ -1413,6 +1413,92 @@ ROM_START( paperboyr1 )
 ROM_END
 
 
+/*
+
+Paperboy prototype pcb
+
+brown in colour, A042571-01 rev 2 
+handwritten in red '#10'
+sticky label with '10' on it. 
+Had a tag attatched saying 'suspect reset problem'
+
+SOUND section:
+There is a quad pokey onboard, with a TMS5220 and a YM2151 and YM3012.
+There is a 6502 next to the quad pokey. 3 roms are nearby, with the naming convention paptst.
+
+CPU section:
+one empty 40pin socket, looks like the main cpu.
+
+There are no designations for IC location, only a 
+handwritten column of letters to denote the left/right.
+I am guessing at the up/down by making up my own numbers, 
+as atari used to start the numbers from furthest away from the edge connector first.
+
+All IC's and components on this pcb are hand soldered-in
+*********************************************************************************************
+NOT ALL ROMS READ CONSISTENTLY IN MY READER, AFTER READING 2-3 TIMES I GOT A STABLE CHECKSUM.
+So bear this in mind, there may be a few bytes out here and there.
+*********************************************************************************************
+
+
+Label 		    Loc. 	Type 	File
+FIX-LOW CA50	5P	    27128	fix-low.bin
+FIX-HI 0AB3	    5M	    27128	fix-hi.bin
+L-0 208E	    7T	    27128	l-0.bin
+H-0 9C75	    6T	    27128	h-0.bin
+PAGROM L-1	    6R/S	27128	pagroml-1.bin
+H-1	  	        5T	    27128	h-1.bin
+PAGROM L-2	    7R/S	27128	pagroml-2.bin
+PAGROM H-2	    4T	    27128	pagromh-2.bin
+LOW-3		    5R/S	27128	low-3.bin
+HI-3		    4R/S	27128	hi-3.bin
+
+PAPTST 4000	    2A	    27128	paptst4000.bin
+PAPTST 8000	    2C	    27128	paptst8000.bin
+PAPTST c000	    2G	    27128	paptstc000.bin
+
+*/
+
+ROM_START( paperboyp )
+	// program roms are all marked as BAD_DUMP due to (non-specific) comments about some roms not reading consistently (the first 4 had checksums printed on so could be verified)
+	ROM_REGION( 0x90000, "maincpu", 0 ) /* 9*64k for T11 code */
+	ROM_LOAD16_BYTE( "fix-low.5p",   0x008000, 0x004000, BAD_DUMP CRC(55a7137b) SHA1(19bc2b7a64ab277b0e8e3d131d427db96da8e91e) )
+	ROM_LOAD16_BYTE( "fix-hi.5m",    0x008001, 0x004000, BAD_DUMP CRC(e386b4f9) SHA1(0c156c4fca38d6aaae1e5b4c52c6bfd0231f9954) )
+	ROM_LOAD16_BYTE( "l-0.7t",       0x010000, 0x004000, BAD_DUMP CRC(fbf26418) SHA1(f34e7ac253723f175dedf8126a3ee25e37ebdc5b) )
+	ROM_LOAD16_BYTE( "h-0.6t",       0x010001, 0x004000, BAD_DUMP CRC(ee4334ea) SHA1(0ada76c4251b75fb8bb35fafbfd15490f2c80f2c) )
+	ROM_LOAD16_BYTE( "pagroml-1.6rs",0x030000, 0x004000, BAD_DUMP CRC(1414b432) SHA1(1d5f990499925a5474a11730989f86c4807fd4a7) )
+	ROM_LOAD16_BYTE( "h-1.5t",       0x030001, 0x004000, BAD_DUMP CRC(ee902968) SHA1(e292da19cc56fdb18709dc6040b80a6860f0fb45) )
+	ROM_LOAD16_BYTE( "pagroml-2.7rs",0x050000, 0x004000, BAD_DUMP CRC(be537e48) SHA1(906eeaffeb4a97fa3afe864dbbae7a544c1ddb7c) )
+	ROM_LOAD16_BYTE( "pagromh-2.4t", 0x050001, 0x004000, BAD_DUMP CRC(949defeb) SHA1(07305311e8446636171f29d3b20142c03f982cb9) )
+	ROM_LOAD16_BYTE( "low-3.5rs",    0x070000, 0x004000, BAD_DUMP CRC(a0afde83) SHA1(f4188af58c08b180fe2799a42f3cd92d425370df) )
+	ROM_LOAD16_BYTE( "hi-3.4rs",     0x070001, 0x004000, BAD_DUMP CRC(7a1a4d69) SHA1(492e95d4d418d91c0693c04664d3ee9c220e21f5) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_LOAD( "paptst4000.2a", 0x004000, 0x004000, BAD_DUMP CRC(e5ee1bca) SHA1(f467aae75ea3fe7178f64fe0cbcc20503ac0fa21) )
+	ROM_LOAD( "paptst8000.2c", 0x008000, 0x004000, BAD_DUMP CRC(c51ebdb0) SHA1(abba5c8a408c709ad447af02304bc04f887cf914) )
+	ROM_LOAD( "paptstc000.2g", 0x00c000, 0x004000, BAD_DUMP CRC(e663d9c2) SHA1(4d0c0e3b6710d2db03b35d0eded413d1cb43c9a7) )
+
+	// there was no video board, so all GFX roms are marked as BAD_DUMP as they might not be correct for this revision	
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "vid_a06.rv1", 0x000000, 0x008000, BAD_DUMP CRC(b32ffddf) SHA1(5b7619008e34ed7f5eb5e85e5f45c375e078086a) )
+	ROM_LOAD( "vid_b06.rv1", 0x00c000, 0x004000, BAD_DUMP CRC(301b849d) SHA1(d608a854027da5eb88c071df1d01f31124db89a8) )
+	ROM_LOAD( "vid_c06.rv1", 0x010000, 0x008000, BAD_DUMP CRC(7bb59d68) SHA1(fcaa8bd32448d8f951ae446eb425b608f2cecbef) )
+	ROM_LOAD( "vid_d06.rv1", 0x01c000, 0x004000, BAD_DUMP CRC(1a1d4ba8) SHA1(603d61fd17e312d0784d883a50ce6b03aba27d10) )
+
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT )
+	ROM_LOAD( "vid_l06.rv1", 0x000000, 0x008000, BAD_DUMP CRC(067ef202) SHA1(519f32995a32ed96086f4ed3d49530b6917ad7d3) )
+	ROM_LOAD( "vid_k06.rv1", 0x008000, 0x008000, BAD_DUMP CRC(76b977c4) SHA1(09988aceaf398279556980e3a21c0dc1b619fb72) )
+	ROM_LOAD( "vid_j06.rv1", 0x010000, 0x008000, BAD_DUMP CRC(2a3cc8d0) SHA1(c0165286486a0844baf99c782d2fffdd6ad003b6) )
+	ROM_LOAD( "vid_h06.rv1", 0x018000, 0x008000, BAD_DUMP CRC(6763a321) SHA1(15ed912f0346f6b5c3ad23ff22e7493d31ad18a7) )
+	ROM_LOAD( "vid_s06.rv1", 0x020000, 0x008000, BAD_DUMP CRC(0a321b7b) SHA1(681317494a0bd50569bb822783336e68551cfd5e) )
+	ROM_LOAD( "vid_p06.rv1", 0x028000, 0x008000, BAD_DUMP CRC(5bd089ee) SHA1(9ac98391a6c70d3cfbe609342294668530d690b4) )
+	ROM_LOAD( "vid_n06.rv1", 0x030000, 0x008000, BAD_DUMP CRC(c34a517d) SHA1(f0af3db87f73c1fad00a270269ba380898ef5a4b) )
+	ROM_LOAD( "vid_m06.rv1", 0x038000, 0x008000, BAD_DUMP CRC(df723956) SHA1(613d398f30463086c0cc720a760bda652e0f3832) )
+
+	ROM_REGION( 0x2000, "gfx3", 0 )
+	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, BAD_DUMP CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
+ROM_END
+
 ROM_START( 720 )
 	ROM_REGION( 0x90000, "maincpu", 0 )     /* 9 * 64k T11 code */
 	ROM_LOAD16_BYTE( "136047-3126.7lm", 0x008000, 0x004000, CRC(43abd367) SHA1(bb58c42f25ef0ee5357782652e9e2b28df0ba82e) )
@@ -3235,6 +3321,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,apb)
 GAME( 1984, paperboy, 0,         paperboy, paperboy, atarisy2_state, paperboy,  ROT0,   "Atari Games", "Paperboy (rev 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, paperboyr2,paperboy, paperboy, paperboy, atarisy2_state, paperboy,  ROT0,   "Atari Games", "Paperboy (rev 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, paperboyr1,paperboy, paperboy, paperboy, atarisy2_state, paperboy,  ROT0,   "Atari Games", "Paperboy (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, paperboyp, paperboy, paperboy, paperboy, atarisy2_state, paperboy,  ROT0,   "Atari Games", "Paperboy (prototype)", MACHINE_NOT_WORKING )
 
 GAME( 1986, 720,      0,        _720,     720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, 720r3,    720,      _720,     720,       atarisy2_state,  720,      ROT0,   "Atari Games", "720 Degrees (rev 3)", MACHINE_SUPPORTS_SAVE )
