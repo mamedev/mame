@@ -280,7 +280,6 @@ protected:
 	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
 
 	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
-	INTERRUPT_GEN_MEMBER(sound_int_gen);
 	DECLARE_WRITE16_MEMBER(sound_int_ack_w);
 
 	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);

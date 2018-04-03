@@ -93,10 +93,7 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 
 WRITE8_MEMBER(atarigt_state::cage_irq_callback)
 {
-	if (data)
-		sound_int_gen(*m_maincpu);
-	else
-		sound_int_ack_w(space,0,0);
+	sound_int_write_line(data != 0 ? 1 : 0);
 }
 
 /*************************************

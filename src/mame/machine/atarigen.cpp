@@ -967,18 +967,6 @@ WRITE_LINE_MEMBER(atarigen_state::sound_int_write_line)
 
 
 //-------------------------------------------------
-//  sound_int_gen: Standard interrupt routine which
-//  sets the sound interrupt state.
-//-------------------------------------------------
-
-INTERRUPT_GEN_MEMBER(atarigen_state::sound_int_gen)
-{
-	m_sound_int_state = 1;
-	update_interrupts();
-}
-
-
-//-------------------------------------------------
 //  sound_int_ack_w: Resets the state of the sound
 //  interrupt.
 //-------------------------------------------------
