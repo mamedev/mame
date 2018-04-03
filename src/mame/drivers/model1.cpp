@@ -673,11 +673,11 @@ WRITE16_MEMBER(model1_state::io_w)
 		output().set_led_value(4, data & 0x40);  // VIEW4
 		output().set_led_value(5, data & 0x80);  // RACE LEADER
 		m_lamp_state = data;
-		output().set_digit_value(1, data);
+		m_digits[1] = data;
 		return;
 	} else if (offset == 0x11) {
 		// drive board commands
-		output().set_digit_value(0, data);
+		m_digits[0] = data;
 		return;
 	}
 	logerror("IOW: %02x %02x\n", offset, data);

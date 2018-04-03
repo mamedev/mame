@@ -52,6 +52,7 @@ public:
 		, m_tiles(*this, "tile")
 		, m_analog_ports(*this, "AN.%u", 0)
 		, m_digital_ports(*this, "IN.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{
 	}
 
@@ -501,7 +502,7 @@ private:
 	uint16_t  m_lamp_state;
 	optional_ioport_array<8> m_analog_ports;
 	required_ioport_array<3> m_digital_ports;
-
+	output_finder<2> m_digits;
 };
 
 
