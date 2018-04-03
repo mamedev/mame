@@ -13,6 +13,8 @@
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
+#include "video/atarivad.h"
+#include "screen.h"
 
 class thunderj_state : public atarigen_state
 {

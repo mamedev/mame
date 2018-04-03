@@ -11,8 +11,9 @@
 #pragma once
 
 #include "audio/atarijsa.h"
-#include "machine/atarigen.h"
 #include "machine/bankdev.h"
+#include "video/atarivad.h"
+#include "screen.h"
 
 
 class cybstorm_state : public driver_device

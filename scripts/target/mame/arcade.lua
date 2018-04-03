@@ -1271,6 +1271,8 @@ files {
 	MAME_DIR .. "src/mame/video/atarimo.h",
 	MAME_DIR .. "src/mame/video/atarirle.cpp",
 	MAME_DIR .. "src/mame/video/atarirle.h",
+	MAME_DIR .. "src/mame/video/atarivad.cpp",
+	MAME_DIR .. "src/mame/video/atarivad.h",
 }
 
 createMAMEProjects(_target, _subtarget, "atlus")

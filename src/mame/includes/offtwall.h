@@ -10,9 +10,10 @@
 
 #pragma once
 
-#include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
+#include "video/atarivad.h"
+#include "screen.h"
 
 class offtwall_state : public driver_device
 {
