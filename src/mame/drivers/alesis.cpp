@@ -45,15 +45,15 @@ READ8_MEMBER( alesis_state::kb_r )
 
 WRITE8_MEMBER( alesis_state::led_w )
 {
-	output().set_value("patt_led",  data & 0x01 ? 1 : 0);
-	output().set_value("song_led",  data & 0x01 ? 0 : 1);
-	output().set_value("play_led",  data & 0x02 ? 0 : 1);
-	output().set_value("record_led",data & 0x04 ? 0 : 1);
-	output().set_value("voice_led", data & 0x08 ? 0 : 1);
-	output().set_value("tune_led",  data & 0x10 ? 0 : 1);
-	output().set_value("mix_led",   data & 0x20 ? 0 : 1);
-	output().set_value("tempo_led", data & 0x40 ? 0 : 1);
-	output().set_value("midi_led",  data & 0x80 ? 0 : 1);
+	m_patt_led		= BIT(data, 0) ? 1 : 0;
+	m_song_led		= BIT(data, 0) ? 0 : 1;
+	m_play_led		= BIT(data, 1) ? 0 : 1;
+	m_record_led	= BIT(data, 2) ? 0 : 1;
+	m_voice_led		= BIT(data, 3) ? 0 : 1;
+	m_tune_led		= BIT(data, 4) ? 0 : 1;
+	m_mix_led		= BIT(data, 5) ? 0 : 1;
+	m_tempo_led		= BIT(data, 6) ? 0 : 1;
+	m_midi_led		= BIT(data, 7) ? 0 : 1;
 }
 
 READ8_MEMBER( alesis_state::p3_r )
@@ -77,13 +77,13 @@ WRITE8_MEMBER( alesis_state::sr16_lcd_w )
 
 WRITE8_MEMBER( alesis_state::mmt8_led_w )
 {
-	output().set_value("play_led", data & 0x01 ? 0 : 1);
-	output().set_value("record_led" , data & 0x02 ? 0 : 1);
-	output().set_value("part_led", data & 0x04 ? 0 : 1);
-	output().set_value("edit_led", data & 0x08 ? 0 : 1);
-	output().set_value("song_led", data & 0x10 ? 0 : 1);
-	output().set_value("echo_led", data & 0x20 ? 0 : 1);
-	output().set_value("loop_led", data & 0x40 ? 0 : 1);
+	m_play_led		= BIT(data, 0) ? 0 : 1;
+	m_record_led	= BIT(data, 1) ? 0 : 1;
+	m_part_led		= BIT(data, 2) ? 0 : 1;
+	m_edit_led		= BIT(data, 3) ? 0 : 1;
+	m_song_led		= BIT(data, 4) ? 0 : 1;
+	m_echo_led		= BIT(data, 5) ? 0 : 1;
+	m_loop_led		= BIT(data, 6) ? 0 : 1;
 
 	m_leds = data;
 }
@@ -95,7 +95,7 @@ READ8_MEMBER( alesis_state::mmt8_led_r )
 
 WRITE8_MEMBER( alesis_state::track_led_w )
 {
-	for (int i=0; i<8; i++)
+	for (int i=0; i < 8; i++)
 		m_track_led[i] = BIT(data, i);
 }
 
@@ -338,6 +338,62 @@ PALETTE_INIT_MEMBER(alesis_state, alesis)
 void alesis_state::machine_start()
 {
 	m_track_led.resolve();
+	m_patt_led.resolve();
+	m_song_led.resolve();
+	m_play_led.resolve();
+	m_record_led.resolve();
+	m_voice_led.resolve();
+	m_tune_led.resolve();
+	m_mix_led.resolve();
+	m_tempo_led.resolve();
+	m_midi_led.resolve();
+	m_part_led.resolve();
+	m_edit_led.resolve();
+	m_echo_led.resolve();
+	m_loop_led.resolve();
+	m_a_next.resolve();
+	m_b_next.resolve();
+	m_fill_next.resolve();
+	m_user_next.resolve();
+	m_play.resolve();
+	m_record.resolve();
+	m_compose.resolve();
+	m_perform.resolve();
+	m_song.resolve();
+	m_b.resolve();
+	m_a.resolve();
+	m_fill.resolve();
+	m_user.resolve();
+	m_edited.resolve();
+	m_set.resolve();
+	m_drum.resolve();
+	m_press_play.resolve();
+	m_metronome.resolve();
+	m_tempo.resolve();
+	m_step_edit.resolve();
+	m_swing_off.resolve();
+	m_swing_62.resolve();
+	m_click_l1.resolve();
+	m_click_note.resolve();
+	m_click_l2.resolve();
+	m_click_3.resolve();
+	m_backup.resolve();
+	m_drum_set.resolve();
+	m_swing.resolve();
+	m_swing_58.resolve();
+	m_click_off.resolve();
+	m_click.resolve();
+	m_quantize_off.resolve();
+	m_quantize_3.resolve();
+	m_midi_setup.resolve();
+	m_record_setup.resolve();
+	m_quantize.resolve();
+	m_swing_54.resolve();
+	m_quantize_l1.resolve();
+	m_quantize_l2.resolve();
+	m_quantize_l3.resolve();
+	m_quantize_note.resolve();
+	m_setup.resolve();
 }
 
 void alesis_state::machine_reset()

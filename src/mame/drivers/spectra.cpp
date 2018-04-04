@@ -54,6 +54,7 @@ public:
 		, m_snsnd(*this, "snsnd")
 		, m_switch(*this, "SWITCH.%u", 0)
 		, m_p_ram(*this, "nvram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(porta_r);
@@ -70,10 +71,12 @@ private:
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<sn76477_device> m_snsnd;
 	required_ioport_array<4> m_switch;
 	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<40> m_digits;
 };
 
 
@@ -196,7 +199,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 	{
 		uint8_t data = m_p_ram[m_out_offs];
 		uint8_t segments = patterns[data&15] | (BIT(data, 4) ? 0x80 : 0);
-		output().set_digit_value(m_out_offs, segments);
+		m_digits[m_out_offs] = segments;
 	}
 	else
 	if (m_out_offs < 0x6f)

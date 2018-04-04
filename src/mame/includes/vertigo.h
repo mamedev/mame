@@ -12,6 +12,7 @@
 
 #include "audio/exidy440.h"
 #include "machine/74148.h"
+#include "machine/adc0808.h"
 #include "video/vector.h"
 
 /*************************************
@@ -33,14 +34,15 @@ public:
 		m_custom(*this, "custom"),
 		m_ttl74148(*this, "74148"),
 		m_vector(*this, "vector"),
+		m_adc(*this, "adc"),
 		m_vectorram(*this, "vectorram")
 	{ }
 
 	void vertigo(machine_config &config);
 
 protected:
+	DECLARE_WRITE_LINE_MEMBER(adc_eoc_w);
 	DECLARE_READ16_MEMBER(vertigo_io_convert);
-	DECLARE_READ16_MEMBER(vertigo_io_adc);
 	DECLARE_READ16_MEMBER(vertigo_coin_r);
 	DECLARE_WRITE16_MEMBER(vertigo_wsot_w);
 	DECLARE_WRITE16_MEMBER(vertigo_audio_w);
@@ -134,10 +136,10 @@ private:
 	required_device<exidy440_sound_device> m_custom;
 	required_device<ttl74148_device> m_ttl74148;
 	required_device<vector_device> m_vector;
+	required_device<adc0808_device> m_adc;
 	required_shared_ptr<uint16_t> m_vectorram;
 	attotime m_irq4_time;
 	uint8_t m_irq_state;
-	uint8_t m_adc_result;
 	vproc m_vs;
 	am2901 m_bsp;
 	vector_generator m_vgen;

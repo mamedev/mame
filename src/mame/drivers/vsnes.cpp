@@ -1073,10 +1073,10 @@ static INPUT_PORTS_START( iceclmbj )
 	PORT_INCLUDE( iceclimb )
 
 	PORT_MODIFY("IN0")  /* IN0 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SPECIAL )       // protection /* START on a nes */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
 
 	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SPECIAL )       // protection /* START on a nes */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
 
 	PORT_MODIFY("COINS")    /* IN2 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
@@ -1619,16 +1619,16 @@ static INPUT_PORTS_START( bnglngby )
 	PORT_INCLUDE( vsnes_rev )
 
 	PORT_MODIFY("IN0")  /* IN0 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SPECIAL )       // protection /* START on a nes */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
 
 	PORT_MODIFY("IN1")  /* IN1 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SPECIAL )       // protection /* START on a nes */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_CUSTOM )       // protection /* START on a nes */
 
 	PORT_MODIFY("COINS")    /* IN2 */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )      /* service credit? */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )
 
 	PORT_START("DSW0")  /* bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!1,!2,!3")

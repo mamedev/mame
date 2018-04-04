@@ -139,6 +139,7 @@ Region byte at offset 0x031:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0808.h"
 #include "machine/timekpr.h"
 #include "sound/2610intf.h"
 #include "screen.h"
@@ -184,39 +185,6 @@ READ16_MEMBER(slapshot_state::service_input_r)
 		default:
 			return m_tc0640fio->read(space, offset) << 8;
 	}
-}
-
-
-READ16_MEMBER(slapshot_state::opwolf3_adc_r)
-{
-	static const char *const adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
-
-	return ioport(adcnames[offset])->read() << 8;
-}
-
-WRITE16_MEMBER(slapshot_state::opwolf3_adc_req_w)
-{
-	switch (offset)
-	{
-	case 0:
-	/* gun outputs... not 100% sure they are correct yet */
-	/* p2 gun recoil seems ever so slighty slower than p1 */
-	/* also you get a false fire every once in a while on the p1 gun */
-
-	if (((data & 0x100) == 0x100) && ((data & 0x400)==0))
-		output().set_value("Player1_Gun_Recoil",1);
-	else
-		output().set_value("Player1_Gun_Recoil",0);
-
-	if (((data & 0x100) == 0x100) && ((data & 0x400)==0x400))
-		output().set_value("Player2_Gun_Recoil",1);
-	else
-		output().set_value("Player2_Gun_Recoil",0);
-	break;
-	}
-
-	/* 4 writes a frame - one for each analogue port */
-	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 WRITE8_MEMBER(slapshot_state::coin_control_w)
@@ -292,7 +260,8 @@ void slapshot_state::opwolf3_map(address_map &map)
 	map(0xc00000, 0xc0000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
 	map(0xc00020, 0xc0002f).r(this, FUNC(slapshot_state::service_input_r));   /* service mirror */
 	map(0xd00000, 0xd00003).rw(this, FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
-	map(0xe00000, 0xe00007).rw(this, FUNC(slapshot_state::opwolf3_adc_r), FUNC(slapshot_state::opwolf3_adc_req_w));
+	map(0xe00000, 0xe0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0xff00);
+//	map(0xe80000, 0xe80001) // gun recoil here?
 }
 
 
@@ -544,6 +513,13 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
+	MCFG_ADC0808_IN0_CB(IOPORT("GUN1X"))
+	MCFG_ADC0808_IN1_CB(IOPORT("GUN1Y"))
+	MCFG_ADC0808_IN2_CB(IOPORT("GUN2X"))
+	MCFG_ADC0808_IN3_CB(IOPORT("GUN2Y"))
 
 	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))

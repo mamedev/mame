@@ -128,6 +128,7 @@
 #include "emu.h"
 #include "includes/atarisy2.h"
 
+#include "machine/adc0808.h"
 #include "machine/eeprompar.h"
 #include "speaker.h"
 
@@ -199,7 +200,6 @@ MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 	atarigen_state::machine_start();
 
 	save_item(NAME(m_interrupt_enable));
-	save_item(NAME(m_which_adc));
 	save_item(NAME(m_p2portwr_state));
 	save_item(NAME(m_p2portrd_state));
 	save_item(NAME(m_sound_reset_state));
@@ -217,8 +217,6 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
 
 	m_p2portwr_state = 0;
 	m_p2portrd_state = 0;
-
-	m_which_adc = 0;
 }
 
 
@@ -229,10 +227,10 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(atarisy2_state::vblank_int)
+WRITE_LINE_MEMBER(atarisy2_state::vblank_int)
 {
 	/* clock the VBLANK through */
-	if (m_interrupt_enable & 8)
+	if (state && BIT(m_interrupt_enable, 3))
 		video_int_write_line(1);
 }
 
@@ -354,23 +352,6 @@ WRITE8_MEMBER(atarisy2_state::switch_6502_w)
  *  Controls read
  *
  *************************************/
-
-WRITE16_MEMBER(atarisy2_state::adc_strobe_w)
-{
-	m_which_adc = offset & 3;
-}
-
-
-READ16_MEMBER(atarisy2_state::adc_r)
-{
-	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-
-	if (m_which_adc < m_pedal_count)
-		return ~ioport(adcnames[m_which_adc])->read();
-
-	return ioport(adcnames[m_which_adc])->read() | 0xff00;
-}
-
 
 READ8_MEMBER(atarisy2_state::leta_r)
 {
@@ -637,8 +618,8 @@ WRITE8_MEMBER(atarisy2_state::mixer_w)
 	if (!(data & 0x08)) rbott += 1.0/47;
 	if (!(data & 0x10)) rbott += 1.0/22;
 	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	m_pokey1->set_output_gain(ALL_OUTPUTS, gain);
-	m_pokey2->set_output_gain(ALL_OUTPUTS, gain);
+	m_pokey[0]->set_output_gain(ALL_OUTPUTS, gain);
+	m_pokey[1]->set_output_gain(ALL_OUTPUTS, gain);
 
 	/* bits 5-7 control the volume of the TMS5220, using 22k, 47k, and 100k resistors */
 	if (m_tms5220.found())
@@ -755,10 +736,12 @@ WRITE8_MEMBER(atarisy2_state::coincount_w)
 /* full memory map derived from schematics */
 void atarisy2_state::main_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x11ff).mirror(0x0200).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x1400, 0x1403).mirror(0x007c).rw(this, FUNC(atarisy2_state::adc_r), FUNC(atarisy2_state::bankselect_w));
-	map(0x1480, 0x1487).mirror(0x0078).w(this, FUNC(atarisy2_state::adc_strobe_w));
+	map(0x1400, 0x1400).mirror(0x007e).r("adc", FUNC(adc0808_device::data_r));
+	map(0x1400, 0x1403).mirror(0x007c).w(this, FUNC(atarisy2_state::bankselect_w));
+	map(0x1480, 0x148f).mirror(0x0070).w("adc", FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 	map(0x1580, 0x1581).mirror(0x001e).w(this, FUNC(atarisy2_state::int0_ack_w));
 	map(0x15a0, 0x15a1).mirror(0x001e).w(this, FUNC(atarisy2_state::int1_ack_w));
 	map(0x15c0, 0x15c1).mirror(0x001e).w(this, FUNC(atarisy2_state::scanline_int_ack_w));
@@ -789,9 +772,9 @@ void atarisy2_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).mirror(0x2000).ram();
 	map(0x1000, 0x17ff).mirror(0x2000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0x1800, 0x180f).mirror(0x2780).rw(m_pokey1, FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1800, 0x180f).mirror(0x2780).rw(m_pokey[0], FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1810, 0x1813).mirror(0x278c).r(this, FUNC(atarisy2_state::leta_r));
-	map(0x1830, 0x183f).mirror(0x2780).rw(m_pokey2, FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0x1830, 0x183f).mirror(0x2780).rw(m_pokey[1], FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1840, 0x1840).mirror(0x278f).r(this, FUNC(atarisy2_state::switch_6502_r));
 	map(0x1850, 0x1851).mirror(0x278e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x1860, 0x1860).mirror(0x278f).r(this, FUNC(atarisy2_state::sound_6502_r));
@@ -818,7 +801,7 @@ static INPUT_PORTS_START( paperboy )
 	PORT_START("1840")  /*(sound) */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -998,13 +981,13 @@ static INPUT_PORTS_START( ssprint )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_MODIFY("ADC0")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_INVERT PORT_PLAYER(1)
 
 	PORT_MODIFY("ADC1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_INVERT PORT_PLAYER(2)
 
 	PORT_MODIFY("ADC2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(3)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_INVERT PORT_PLAYER(3)
 
 	PORT_MODIFY("LETA0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1086,10 +1069,10 @@ static INPUT_PORTS_START( apb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_MODIFY("ADC0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("ADC1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x3f) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_INVERT PORT_PLAYER(1)
 
 	PORT_MODIFY("LETA0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1193,7 +1176,6 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_CPU_ADD("maincpu", T11, MASTER_CLOCK/2)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy2_state,  vblank_int)
 
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1201,6 +1183,16 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
+
+	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK/32) // 625 kHz
+	MCFG_ADC0808_IN0_CB(IOPORT("ADC0")) // J102 pin 5 (POT1)
+	MCFG_ADC0808_IN1_CB(IOPORT("ADC1")) // J102 pin 7 (POT2)
+	MCFG_ADC0808_IN2_CB(IOPORT("ADC2")) // J102 pin 9 (POT3)
+	MCFG_ADC0808_IN3_CB(IOPORT("ADC3")) // J102 pin 8 (POT4)
+	// IN4 = J102 pin 6 (unused)
+	// IN5 = J102 pin 4 (unused)
+	// IN6 = J102 pin 2 (unused)
+	// IN7 = J102 pin 3 (unused)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 
@@ -1222,11 +1214,12 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy2_state, screen_update_atarisy2)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarisy2_state, vblank_int))
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarisy2_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", NOOP)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)

@@ -56,6 +56,7 @@ public:
 		, m_1863(*this, "1863")
 		, m_aysnd1(*this, "aysnd1")
 		, m_keyboard(*this, "X.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port01_w);
@@ -94,12 +95,14 @@ private:
 	uint8_t m_psg_latch;
 	uint8_t m_port06;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cosmac_device> m_maincpu;
 	required_device<ttl7474_device> m_4013a;
 	required_device<ttl7474_device> m_4013b;
 	optional_device<cdp1863_device> m_1863;
 	optional_device<ay8910_device> m_aysnd1;
 	required_ioport_array<8> m_keyboard;
+	output_finder<60> m_digits;
 };
 
 
@@ -223,7 +226,7 @@ WRITE8_MEMBER( play_2_state::port01_w )
 		for (uint8_t j = 0; j < 6; j++)
 			if (BIT(m_kbdrow, j))
 				for (uint8_t i = 0; i < 5; i++)
-					output().set_digit_value(j*10 + i, m_segment[i] & 0x7f);
+					m_digits[j*10 + i] = m_segment[i] & 0x7f;
 	}
 	m_1863->set_output_gain(0, BIT(data, 7) ? 1.00 : 0.00);
 }
@@ -395,7 +398,7 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(play_2_state::zira)

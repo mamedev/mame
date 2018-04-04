@@ -1300,28 +1300,28 @@ static INPUT_PORTS_START( vcc )
 	PORT_INCLUDE( vcc_base )
 
 	PORT_START("IN.4") // language setting, hardwired with 4 jumpers (0: English, 1: German, 2: French, 4: Spanish, 8:Special(unused))
-	PORT_BIT(0x0f, 0x00, IPT_SPECIAL)
+	PORT_BIT(0x0f, 0x00, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccsp )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4") // set to Spanish
-	PORT_BIT(0x0f, 0x04, IPT_SPECIAL)
+	PORT_BIT(0x0f, 0x04, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccg )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4") // set to German
-	PORT_BIT(0x0f, 0x01, IPT_SPECIAL)
+	PORT_BIT(0x0f, 0x01, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccfr )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4") // set to French
-	PORT_BIT(0x0f, 0x02, IPT_SPECIAL)
+	PORT_BIT(0x0f, 0x02, IPT_CUSTOM)
 INPUT_PORTS_END
 
 
@@ -1601,28 +1601,28 @@ static INPUT_PORTS_START( vsc )
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.10") // language setting, hardwired with 2 diodes (0: English, 1: German, 2: French, 3: Spanish)
-	PORT_BIT(0x03, 0x00, IPT_SPECIAL)
+	PORT_BIT(0x03, 0x00, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vscsp )
 	PORT_INCLUDE( vsc )
 
 	PORT_MODIFY("IN.10") // set to Spanish
-	PORT_BIT(0x03, 0x03, IPT_SPECIAL)
+	PORT_BIT(0x03, 0x03, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vscg )
 	PORT_INCLUDE( vsc )
 
 	PORT_MODIFY("IN.10") // set to German
-	PORT_BIT(0x03, 0x01, IPT_SPECIAL)
+	PORT_BIT(0x03, 0x01, IPT_CUSTOM)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vscfr )
 	PORT_INCLUDE( vsc )
 
 	PORT_MODIFY("IN.10") // set to French
-	PORT_BIT(0x03, 0x02, IPT_SPECIAL)
+	PORT_BIT(0x03, 0x02, IPT_CUSTOM)
 INPUT_PORTS_END
 
 

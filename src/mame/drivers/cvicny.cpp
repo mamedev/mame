@@ -40,25 +40,29 @@ class cvicny_state : public driver_device
 {
 public:
 	cvicny_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_digit_last(0)
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_digit_last(0)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
-	required_device<cpu_device> m_maincpu;
+	void cvicny(machine_config &config);
+	void cvicny_mem(address_map &map);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(segment_w );
+private:
 	uint8_t m_digit;
 	uint8_t m_digit_last;
-	void cvicny(machine_config &config);
-	void cvicny_mem(address_map &map);
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<8> m_digits;
 };
 
 WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digit
 {
 	if (m_digit != m_digit_last)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 
 	m_digit_last = m_digit;
 }

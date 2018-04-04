@@ -1934,6 +1934,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
 
 MACHINE_START_MEMBER(model1_state,model1)
 {
+	m_digits.resolve();
 	m_ram_data = std::make_unique<uint32_t[]>(0x10000);
 	m_io_command = 0;
 

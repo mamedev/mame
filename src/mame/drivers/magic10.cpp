@@ -444,7 +444,7 @@ static INPUT_PORTS_START( magic10 )
 	PORT_DIPNAME( 0x0001, 0x0001, "Display Logo" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Yes ) )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) // empty dispenser
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) // empty dispenser
 	PORT_DIPNAME( 0x00ee, 0x00ee, "Disable Free Play" )
 	PORT_DIPSETTING(      0x00ee, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

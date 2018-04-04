@@ -63,6 +63,10 @@ and two large (paddles pretending to be) guns.
 #include "screen.h"
 #include "speaker.h"
 
+void m79amb_state::machine_start()
+{
+	m_self_test.resolve();
+}
 
 WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
 {

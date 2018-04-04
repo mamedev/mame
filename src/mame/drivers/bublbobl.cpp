@@ -454,10 +454,10 @@ static INPUT_PORTS_START( bublbobl )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL )    // output: coin lockout
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )    // output: select 1-way or 2-way coin counter
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // output: trigger IRQ on main CPU (jumper switchable to vblank)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )    // output: select read or write shared RAM
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )    // output: coin lockout
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )    // output: select 1-way or 2-way coin counter
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // output: trigger IRQ on main CPU (jumper switchable to vblank)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )    // output: select read or write shared RAM
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x05, 0x04, "Mode" )                      PORT_DIPLOCATION("DSW-A:1,3")
@@ -702,8 +702,8 @@ static INPUT_PORTS_START( tokio_base )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) // see INPUT_PORTS_START( tokio )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) // see INPUT_PORTS_START( tokio )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) // see INPUT_PORTS_START( tokio )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) // see INPUT_PORTS_START( tokio )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -732,8 +732,8 @@ static INPUT_PORTS_START( tokio )
 	PORT_INCLUDE( tokio_base )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r, nullptr)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r, nullptr)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bublboblp )

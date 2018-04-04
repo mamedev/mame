@@ -154,9 +154,9 @@ WRITE8_MEMBER( s11a_state::dig0_w )
 	data &= 0x7f;
 	set_strobe(data & 15);
 	set_diag((data & 0x70) >> 4);
-	output().set_digit_value(60, 0);  // +5VDC (always on)
-	output().set_digit_value(61, get_diag() & 0x01);  // connected to PA4
-	output().set_digit_value(62, 0);  // Blanking (pretty much always on)
+	m_digits[60] = 0;  // +5VDC (always on)
+	m_digits[61] = get_diag() & 0x01;  // connected to PA4
+	m_digits[62] = 0;  // Blanking (pretty much always on)
 	set_segment1(0);
 	set_segment2(0);
 }
