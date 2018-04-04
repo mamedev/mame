@@ -395,6 +395,7 @@ public:
 	void galaxian_map_discrete(address_map &map);
 	void jumpbug_map(address_map &map);
 	void jungsub_map(address_map &map);
+	void jungsub_io_map(address_map &map);
 	void kingball_sound_map(address_map &map);
 	void kingball_sound_portmap(address_map &map);
 	void konami_sound_map(address_map &map);

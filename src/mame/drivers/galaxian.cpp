@@ -1864,16 +1864,24 @@ void galaxian_state::jungsub_map(address_map &map) // TODO: preliminary
 	map(0x4000, 0x4fff).ram();
 	map(0x5000, 0x53ff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
 	map(0x5800, 0x58ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram"); // but also at 0x5900-059ff and 0x5a00-5aff?
+	map(0x5900, 0x5aff).nopr().nopw();
 	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0"); // seems ok
-	map(0x6000, 0x6001).mirror(0x07f8).w(this, FUNC(galaxian_state::start_lamp_w));
-	map(0x6002, 0x6002).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_lock_w));
-	map(0x6003, 0x6003).mirror(0x07f8).w(this, FUNC(galaxian_state::coin_count_0_w));
+	map(0x6003, 0x6003).nopw(); // always 0x01?
+	map(0x6184, 0x6184).w(this, FUNC(galaxian_state::coin_count_0_w)); // seems ok
+	map(0x6186, 0x6186).w(this, FUNC(galaxian_state::coin_count_1_w)); // seems ok
 	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1"); // seems ok
 	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w)); // seems ok
 	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w)); // seems ok
 	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w)); // seems ok
 	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r)); // seems ok
 	map(0x7800, 0x7800).nopw(); // always 0xff?
+}
+
+void galaxian_state::jungsub_io_map(address_map &map) // TODO: preliminary
+{
+	map.unmap_value_high();
+	map.global_mask(0x0f);
+	map(0x00, 0x00).mirror(0x0f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 /* map derived from schematics */
@@ -4669,7 +4677,7 @@ static INPUT_PORTS_START( scramble )
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( jungsub ) // TODO: hook up and verify dip-switches
+static INPUT_PORTS_START( jungsub ) // TODO: are there more dip-switches?
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
@@ -4687,34 +4695,12 @@ static INPUT_PORTS_START( jungsub ) // TODO: hook up and verify dip-switches
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test (255 lives)" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "20P 1 play, 50P 3 plays" )
+	PORT_DIPSETTING(    0x40, "10P 1 play, 50P 6 plays" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( strfbomb )
@@ -6221,15 +6207,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::jungsub)
 	galaxian_base(config);
-	konami_sound_1x_ay8910(config);
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jungsub_map)
+	MCFG_CPU_IO_MAP(jungsub_io_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8) // clock not verified
 	MCFG_CPU_PROGRAM_MAP(checkman_sound_map)
 	MCFG_CPU_IO_MAP(checkman_sound_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state, irq0_line_hold)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8) // clock not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::explorer)
@@ -12391,7 +12385,7 @@ GAME( 1981, atlantis,    0,        theend,     atlantis,   galaxian_state, atlan
 GAME( 1981, atlantis2,   atlantis, theend,     atlantis,   galaxian_state, atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 2)", MACHINE_SUPPORTS_SAVE )
 
 // Konami L-1200-2 base board with custom Subelectro 113 rom board
-GAME( 1981, jungsub,    jungler,   jungsub,    jungsub,    galaxian_state, jungsub,    ROT90,  "bootleg (Subelectro)", "Jungler (Subelectro, bootleg on Scramble hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // mostly works, bad GFX ROM causes lots of glitches
+GAME( 1981, jungsub,    jungler,   jungsub,    jungsub,    galaxian_state, jungsub,    ROT90,  "bootleg (Subelectro)", "Jungler (Subelectro, bootleg on Scramble hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // mostly works, bad GFX ROM causes lots of glitches
 
 /* Scorpion hardware; based on Scramble but with a 3rd AY-8910 and a speech chip */
 GAME( 1982, scorpion,    0,        scorpion,   scorpion,   galaxian_state, scorpion,   ROT90,  "Zaccaria", "Scorpion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
