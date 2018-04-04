@@ -110,8 +110,9 @@ public:
 		m_rtc(*this, "rtc"),
 		m_crtc(*this, "crtc"),
 		m_screen(*this, "screen"),
-		m_hopper(*this, "hopper")
-		{ }
+		m_hopper(*this, "hopper"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
@@ -127,14 +128,18 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_PALETTE_INIT(amusco);
+
 	void amusco(machine_config &config);
 	void draw88pkr(machine_config &config);
-	void amusco_io_map(address_map &map);
-	void amusco_mem_map(address_map &map);
+
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
+
 private:
+	void amusco_mem_map(address_map &map);
+	void amusco_io_map(address_map &map);
+
 	std::unique_ptr<uint8_t []> m_videoram;
 	tilemap_t *m_bg_tilemap;
 
@@ -146,6 +151,8 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<ticket_dispenser_device> m_hopper;
+	output_finder<8> m_lamps;
+
 	uint8_t m_mc6845_address;
 	uint16_t m_video_update_address;
 	bool m_blink_state;
@@ -192,6 +199,7 @@ void amusco_state::video_start()
 
 void amusco_state::machine_start()
 {
+	m_lamps.resolve();
 }
 
 
@@ -244,12 +252,8 @@ WRITE8_MEMBER(amusco_state::output_a_w)
   xx-- ----  Unknown.
 
 */
-	output().set_lamp_value(0, (data) & 1);         // Lamp 0 (Bet)
-	output().set_lamp_value(1, (data >> 1) & 1);    // Lamp 1 (Hold/Disc 5)
-	output().set_lamp_value(2, (data >> 2) & 1);    // Lamp 2 (Hold/Disc 3)
-	output().set_lamp_value(3, (data >> 3) & 1);    // Lamp 3 (Hold/Disc 1)
-	output().set_lamp_value(4, (data >> 4) & 1);    // Lamp 4 (Hold/Disc 2)
-	output().set_lamp_value(5, (data >> 5) & 1);    // Lamp 5 (Hold/Disc 4)
+	for (int i = 0; i < 6; i++)
+		m_lamps[i] = BIT(data, i);
 
 //  logerror("Writing %02Xh to PPI output A\n", data);
 }
@@ -268,8 +272,8 @@ WRITE8_MEMBER(amusco_state::output_b_w)
   x--- ----  Special: NMI enable (cleared and set along with CPU interrupt flag).
 
 */
-	output().set_lamp_value(6, (data >> 2) & 1);    // Lamp 6 (Start/Draw)
-	output().set_lamp_value(7, (data >> 1) & 1);    // Lamp 7 (Unknown)
+	m_lamps[6] = BIT(data, 2); // Lamp 6 (Start/Draw)
+	m_lamps[7] = BIT(data, 1); // Lamp 7 (Unknown)
 
 	m_pit->write_gate0(!BIT(data, 4));
 
