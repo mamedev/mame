@@ -144,7 +144,7 @@ void dio16_98644_device::device_start()
 
 void dio16_98644_device::device_reset()
 {
-	uint code = m_switches->read() >> REG_SWITCHES_SELECT_CODE_SHIFT;
+	uint8_t code = m_switches->read() >> REG_SWITCHES_SELECT_CODE_SHIFT;
 	code &= REG_SWITCHES_SELECT_CODE_MASK;
 
 	m_dio->install_memory(0x600000 + (code * 0x10000), 0x6007ff + (code * 0x10000), read16_delegate(FUNC(dio16_98644_device::io_r), this),
