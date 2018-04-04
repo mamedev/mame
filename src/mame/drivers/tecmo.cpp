@@ -41,6 +41,7 @@ f806      DSWA bit 0-3
 f807      DSWA bit 4-7
 f808      DSWB bit 0-3
 f809      DSWB bit 4-7
+f80e      SYS_3 bit 0 (swap jeep/heli, proto sets only)
 f80f      COIN
 
 write:
@@ -214,6 +215,7 @@ void tecmo_state::silkworm_map(address_map &map)
 	map(0xf807, 0xf807).r(this, FUNC(tecmo_state::dswa_h_r));
 	map(0xf808, 0xf808).r(this, FUNC(tecmo_state::dswb_l_r));
 	map(0xf809, 0xf809).r(this, FUNC(tecmo_state::dswb_h_r));
+	map(0xf80e, 0xf80e).portr("SYS_3");
 	map(0xf80f, 0xf80f).portr("SYS_2");
 	map(0xf800, 0xf802).w(this, FUNC(tecmo_state::fgscroll_w));
 	map(0xf803, 0xf805).w(this, FUNC(tecmo_state::bgscroll_w));
@@ -248,10 +250,9 @@ void tecmo_state::tecmo_sound_map(address_map &map)
 	map(0xcc00, 0xcc00).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 }
 
-void tecmo_state::silkwormb_sound_map(address_map &map)
+void tecmo_state::silkwormp_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x2000, 0x207f).ram();
 	map(0x8000, 0x87ff).ram();
 	map(0xa000, 0xa001).w("ymsnd", FUNC(ym3812_device::write));
 	map(0xc000, 0xc000).r("soundlatch", FUNC(generic_latch_8_device::read));
@@ -290,6 +291,9 @@ static INPUT_PORTS_START( tecmo_default )
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("SYS_2")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+	PORT_START("SYS_3")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSWA")
@@ -575,14 +579,19 @@ static INPUT_PORTS_START( silkworm )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( silkwormb )
+
+// Bootleg/prototype sets don't have the "disable continue" feature (dip B, sw 8) and coin inputs are switched.
+// They also have a "swap vehicle" feature which allows 1P to be the jeep and 2P to be the heli.
+// Setting dip B, sw 7 on enables the feature and it is performed on the start screen with an extra input @ 1P button 4 (jamma pin 25, maps to 0xf80e bit 0).
+// Seems this feature was removed for the production release of the game.
+static INPUT_PORTS_START( silkwormp )
 	PORT_INCLUDE(tecmo_default)
 
 	PORT_MODIFY("BUTTONS1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-
+	
 	PORT_MODIFY("JOY2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -593,12 +602,15 @@ static INPUT_PORTS_START( silkwormb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-
+	
 	PORT_MODIFY("SYS_2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )   // Coin inputs are switched
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
+	
+	PORT_MODIFY("SYS_3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 )   // Vehicle swap extra button
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!1,!2")
@@ -616,6 +628,9 @@ static INPUT_PORTS_START( silkwormb )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPNAME( 0x40, 0x00, "Allow Vehicle Swap" )    PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -630,17 +645,13 @@ static INPUT_PORTS_START( silkwormb )
 	PORT_DIPSETTING(    0x05, "100000" )
 	PORT_DIPSETTING(    0x06, "200000" )
 	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
-	PORT_DIPNAME( 0x70, 0x30, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:!5,!6,!7")  // Not verified
-    PORT_DIPSETTING(    0x10, "1" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPNAME( 0x70, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:!5,!6,!7")
+    PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )          // from the Tecmo US manual
+	PORT_DIPSETTING(    0x60, "3" )          //  (although conflicting info exists, so unverified)
+	PORT_DIPSETTING(    0x30, "4" )
 	PORT_DIPSETTING(    0x50, "5" )
-    /* Doesn't work
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:!8")
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	*/
+	// no allow continue setting
 INPUT_PORTS_END
 
 
@@ -786,13 +797,13 @@ MACHINE_CONFIG_START(tecmo_state::backfirt)
 	MCFG_DEVICE_REMOVE("msm")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(tecmo_state::silkwormb)
+MACHINE_CONFIG_START(tecmo_state::silkwormp)
 	silkworm(config);
 	
 	/* bootleg pcb doesn't have the MSM5205 populated */
 	MCFG_DEVICE_REMOVE("msm")
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(silkwormb_sound_map)
+	MCFG_CPU_PROGRAM_MAP(silkwormp_sound_map)
 MACHINE_CONFIG_END
 
 
@@ -1089,9 +1100,12 @@ ROM_START( silkwormj )
 	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
 	ROM_LOAD( "silkworm.1",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) )
 ROM_END
+
 // 6217A
 // SILKWORM H T737
 // board have Japanese label "ADONO"
+// this set shows "AD" (revision?) on title screen
+// sound cpu isn't attempting to use samples, so removed the parent rom reference, have to assume it doesn't exist like the other proto set
 ROM_START( silkwormp )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "silkworm_pr4ma.4",  0x00000, 0x10000, CRC(5e2a39cc) SHA1(e2fb0fa2d4e3d439935b7814c8572224eddf271e) )  /* c000-ffff is not used */
@@ -1120,11 +1134,16 @@ ROM_START( silkwormp )
 	ROM_LOAD( "silkworm.15",  0x10000, 0x10000, CRC(6e4052c9) SHA1(e2e3d7221b75cb044449a25a076a93c3def1f11b) )  /* tiles #2 */
 	ROM_LOAD( "silkworm.16",  0x20000, 0x10000, CRC(9292ed63) SHA1(70aa46fcc187b8200c5d246870e2e2dc4b2985cb) )  /* tiles #2 */
 	ROM_LOAD( "silkworm.17",  0x30000, 0x10000, CRC(3fa4563d) SHA1(46e3cc41491d63efcdda43c84c7ac1385a1926d0) )  /* tiles #2 */
-
-	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
-	ROM_LOAD( "silkworm.1",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) ) // not dumped
 ROM_END
 
+/*
+ markings:  CPU board:   HE 202 (silkscreen)  SK-50 (sticker)
+            video board: HE 203 (silkscreen)
+ main cpu:  zilog Z8400BPS Z80B @ 6MHz  8609
+ sound cpu: sharp LH0080A  Z80A @ 4MHz  8705
+ this set shows "GF" (revision?) on title screen
+ this seems to be a bootleg of a prototype, not sure if it's the other proto set hacked or another rev proto
+*/
 ROM_START( silkwormb )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "e3.4",         0x00000, 0x10000, CRC(3d86fd58) SHA1(7245186259e08bda33a7dc0d5f895f847c94519b) )
@@ -1143,16 +1162,16 @@ ROM_START( silkwormb )
 	ROM_LOAD( "silkworm.9",   0x30000, 0x10000, CRC(8ce3cdf5) SHA1(635248514c4e1e5aab7a2ed4d620a5b970d4a43a) )  /* sprites */
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "silkworm.10",  0x00000, 0x10000, CRC(8c7138bb) SHA1(0cfd69fa77d5b546f7dad80537d8d2497ae758bc) )  /* tiles #1 */
-	ROM_LOAD( "e10.11",       0x10000, 0x08000, CRC(c0c4687d) SHA1(afe05eb7e5a65c995aeac9ea773ad79eb053303f) )  /* tiles #1 */
-	ROM_LOAD( "silkworm.12",  0x20000, 0x10000, CRC(bb0f568f) SHA1(b66c6d0407ed0b068c6bf07987f1b923d4a6e4f8) )  /* tiles #1 */
-	ROM_LOAD( "e12.13",       0x30000, 0x08000, CRC(fc472811) SHA1(e862ec9b38f3f3a1f4668fbc587063eee8e9e821) )  /* tiles #1 */
+	ROM_LOAD( "silkworm.10",  0x00000, 0x10000, CRC(8c7138bb) SHA1(0cfd69fa77d5b546f7dad80537d8d2497ae758bc) )  /* fg tiles TMM24512 */
+	ROM_LOAD( "e10.11",       0x10000, 0x08000, CRC(c0c4687d) SHA1(afe05eb7e5a65c995aeac9ea773ad79eb053303f) )  /* fg tiles TMM24256 */
+	ROM_LOAD( "silkworm.12",  0x20000, 0x10000, CRC(bb0f568f) SHA1(b66c6d0407ed0b068c6bf07987f1b923d4a6e4f8) )  /* fg tiles TMM24512 */
+	ROM_LOAD( "e12.13",       0x30000, 0x08000, CRC(fc472811) SHA1(e862ec9b38f3f3a1f4668fbc587063eee8e9e821) )  /* fg tiles 27C256   */
 	
 	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "silkworm.14",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )  /* tiles #2 */
-	ROM_LOAD( "e14.15",       0x10000, 0x08000, CRC(b02acdb6) SHA1(6be74bb89680b79b3a5d13af638ed5a0bb077dad) )  /* tiles #2 */
-	ROM_LOAD( "e15.16",       0x20000, 0x08000, CRC(caf7b25e) SHA1(2c348af9d03efd801cbbc06deb02869bd6449518) )  /* tiles #2 */
-	ROM_LOAD( "e16.17",       0x30000, 0x08000, CRC(7ec93873) SHA1(0993a3b3e5ca84ef0ea32159825e379ba4cc5fbb) )  /* tiles #2 */
+	ROM_LOAD( "silkworm.14",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )  /* bg tiles TMM24512 */
+	ROM_LOAD( "e14.15",       0x10000, 0x08000, CRC(b02acdb6) SHA1(6be74bb89680b79b3a5d13af638ed5a0bb077dad) )  /* bg tiles 27C256   */
+	ROM_LOAD( "e15.16",       0x20000, 0x08000, CRC(caf7b25e) SHA1(2c348af9d03efd801cbbc06deb02869bd6449518) )  /* bg tiles 27C256   */
+	ROM_LOAD( "e16.17",       0x30000, 0x08000, CRC(7ec93873) SHA1(0993a3b3e5ca84ef0ea32159825e379ba4cc5fbb) )  /* bg tiles 27C256   */
 ROM_END
 
 /*
@@ -1334,6 +1353,6 @@ GAME( 1987, gemini,    0,        gemini,    gemini,    tecmo_state, gemini,   RO
 GAME( 1987, geminib,   gemini,   geminib,   gemini,    tecmo_state, gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",        MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
 GAME( 1988, silkworm,  0,        silkworm,  silkworm,  tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (World)",            MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
 GAME( 1988, silkwormj, silkworm, silkworm,  silkworm,  tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",            MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
-GAME( 1988, silkwormp, silkworm, silkworm,  silkworm,  tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (prototype?)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, silkwormb, silkworm, silkwormb, silkwormb, tecmo_state, silkworm, ROT0,  "bootleg", "Silk Worm (bootleg)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, silkwormp, silkworm, silkwormp, silkwormp, tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (prototype)",        MACHINE_SUPPORTS_SAVE ) // prototype
+GAME( 1988, silkwormb, silkworm, silkwormp, silkwormp, tecmo_state, silkworm, ROT0,  "bootleg", "Silk Worm (bootleg)",          MACHINE_SUPPORTS_SAVE ) // bootleg of (a different?) prototype
 GAME( 1988, backfirt,  0,        backfirt,  backfirt,  tecmo_state, backfirt, ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",   MACHINE_SUPPORTS_SAVE )
