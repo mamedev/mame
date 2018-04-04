@@ -17,7 +17,6 @@ public:
 	s11b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: s11a_state(mconfig, type, tag)
 		, m_bg_hc55516(*this, "hc55516_bg")
-		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(dig1_w);
@@ -38,12 +37,10 @@ public:
 	void s11b_main_map(address_map &map);
 protected:
 	optional_device<hc55516_device> m_bg_hc55516;
-	output_finder<64> m_digits;
 
 	void set_invert(bool inv) { m_invert = inv; }
 
 private:
-	virtual void machine_start() override { m_digits.resolve(); }
 	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
 
 
