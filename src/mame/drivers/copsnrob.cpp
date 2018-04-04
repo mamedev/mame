@@ -238,6 +238,7 @@ void copsnrob_state::machine_start()
 {
 	save_item(NAME(m_ic_h3_data));
 	save_item(NAME(m_misc));
+	m_led.resolve();
 }
 
 void copsnrob_state::machine_reset()
