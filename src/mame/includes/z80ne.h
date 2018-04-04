@@ -83,7 +83,6 @@ public:
 		m_io_lx_385(*this, "LX.385"),
 		m_io_lx387_brk(*this, "LX387_BRK"),
 		m_io_modifiers(*this, "MODIFIERS"),
-		m_io_config(*this, "CONFIG"),
 		m_lx383_digits(*this, "digit%u", 0U)
 	{
 	}
@@ -151,7 +150,6 @@ protected:
 	required_ioport m_io_lx_385;
 	optional_ioport m_io_lx387_brk;
 	optional_ioport m_io_modifiers;
-	optional_ioport m_io_config;
 	output_finder<8> m_lx383_digits;
 
 	emu_timer *m_timer_nmi;
@@ -175,6 +173,7 @@ class z80netf_state : public z80ne_state
 public:
 	z80netf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: z80ne_state(mconfig, type, tag),
+		m_io_config(*this, "CONFIG"),
 		m_floppy(*this, "wd1771:%u", 0U),
 		m_wd1771(*this, "wd1771"),
 		m_drv_led(*this, "drv%u", 0U)
@@ -197,6 +196,7 @@ private:
 
 	void reset_lx390_banking();
 
+	required_ioport m_io_config;
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<fd1771_device> m_wd1771;
 	wd17xx_state_t m_wd17xx_state;
