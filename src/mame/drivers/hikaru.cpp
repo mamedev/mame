@@ -526,9 +526,17 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 
 
 //  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MCFG_SOUND_ADD("aica", AICA, 0)
+//  MCFG_SOUND_ADD("aica", AICA, XTAL(33'868'800))
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-//  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
+//
+//	MCFG_RAM_MODIFY("aica:ram")
+//	MCFG_RAM_DEFAULT_SIZE("8M")
+//
+//	Second AICA with External Sound Board is Enable
+//  MCFG_SOUND_ADD("aica_2", AICA, XTAL(33'868'800))
+//  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+//  MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 //
 //	MCFG_RAM_MODIFY("aica:ram")
 //	MCFG_RAM_DEFAULT_SIZE("8M")

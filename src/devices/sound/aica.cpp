@@ -102,7 +102,7 @@ static constexpr double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,11820
 					14800.0,12700.0,11100.0,8900.0,7400.0,6300.0,5500.0,4400.0,3700.0,3200.0,2800.0,2200.0,1800.0,1600.0,1400.0,1100.0,
 					920.0,790.0,690.0,550.0,460.0,390.0,340.0,270.0,230.0,200.0,170.0,140.0,110.0,98.0,85.0,68.0,57.0,49.0,43.0,34.0,
 					28.0,25.0,22.0,18.0,14.0,12.0,11.0,8.5,7.1,6.1,5.4,4.3,3.6,3.1};
-					
+
 #define MN(aica)        ((m_udata.data[0]>>0x0)&0x8000)
 #define MEM8B(aica)     ((m_udata.data[0]>>0x0)&0x0200)
 #define DAC18B(aica)    ((m_udata.data[0]>>0x0)&0x0100)
@@ -367,32 +367,31 @@ void aica_device::Compute_LFO(AICA_SLOT *slot)
 		AICALFO_ComputeStep(&(slot->ALFO),LFOF(slot),ALFOWS(slot),ALFOS(slot),1);
 }
 
-// Yamaha ADPCM Format
+#define ADPCMSHIFT  8
+static constexpr int ADFIX(float f) { return int(f * float(1 << ADPCMSHIFT)); }
 
-static constexpr int TableQuant[8]={ 230, 230, 230, 230, 307, 409, 512, 614 };
-static constexpr int quant_mul[16]= { 1, 3, 5, 7, 9, 11, 13, 15, -1, -3, -5, -7, -9, -11, -13, -15 };
+static constexpr int TableQuant[8]={ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(0.8984375),ADFIX(1.19921875),ADFIX(1.59765625),ADFIX(2.0),ADFIX(2.3984375)};
+static constexpr int quant_mul[16]= { 1, 3, 5, 7, 9, 11, 13, 15, -1, -3, -5, -7, -9, -11, -13, -15};
 
 void aica_device::InitADPCM(int *PrevSignal, int *PrevQuant)
 {
 	*PrevSignal=0;
-	*PrevQuant=127;
+	*PrevQuant=0x7f;
 }
 
 signed short aica_device::DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
 {
-	int x = (*PrevSignal) + ((*PrevQuant * quant_mul[Delta & 15]) / 8);
-#if 0 // older implementation
 	int x = (*PrevQuant * quant_mul[Delta & 7]) / 8;
-	if (x > 0x7FFF) x = 0x7FFF;
+	if (x > 0x7fff) x = 0x7fff;
 	if (Delta & 8)  x = -x;
 	x += *PrevSignal;
-	// oldest implementation
+#if 0 // older implementation
 	int x = *PrevQuant * quant_mul [Delta & 15];
 		x = *PrevSignal + ((int)(x + ((uint32_t)x >> 29)) >> 3);
 #endif
 	*PrevSignal=ICLIP16(x);
-	*PrevQuant=(*PrevQuant*TableQuant[Delta&7]) >> 8;
-	*PrevQuant=CLIP(*PrevQuant,127,24576);
+	*PrevQuant=(*PrevQuant*TableQuant[Delta&7])>>ADPCMSHIFT;
+	*PrevQuant=(*PrevQuant<0x7f)?0x7f:((*PrevQuant>0x6000)?0x6000:*PrevQuant);
 	return *PrevSignal;
 }
 
@@ -1481,6 +1480,7 @@ READ32_MEMBER( aica_device::host_aica_reg_r )
 
 WRITE32_MEMBER( aica_device::host_aica_reg_w )
 {
+	// these are can accessed only on SH4
 	if (offset == (0x2c00/4))
 	{
 		if(ACCESSING_BITS_0_7)
@@ -1553,6 +1553,7 @@ READ16_MEMBER( aica_device::read )
 
 WRITE16_MEMBER( aica_device::write )
 {
+	// these are can accessed only on internal ARM7DI core
 	if ((offset*4) == 0x2d00)
 	{
 		m_IRQL = data;

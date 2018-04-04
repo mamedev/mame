@@ -41,8 +41,8 @@ class naomi_state : public dc_state
 {
 public:
 	naomi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dc_state(mconfig, type, tag),
-		, m_eeprom(*this, "main_eeprom"),
+		: dc_state(mconfig, type, tag)
+		, m_eeprom(*this, "main_eeprom")
 		, m_rombase(*this, "rombase")
 	{ }
 
@@ -95,11 +95,12 @@ class naomi2_state : public naomi_state
 {
 public:
 	naomi2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: naomi_state(mconfig, type, tag),
-		m_pvr2_texture_ram(*this, "textureram2"),
-		m_pvr2_framebuffer_ram(*this, "frameram2"),
-		m_elan_ram(*this, "elan_ram"),
-		m_powervr2_slave(*this, "powervr2_slave") { }
+		: naomi_state(mconfig, type, tag)
+		, m_pvr2_texture_ram(*this, "textureram2")
+		, m_pvr2_framebuffer_ram(*this, "frameram2")
+		, m_elan_ram(*this, "elan_ram")
+		, m_powervr2_slave(*this, "powervr2_slave")
+	{ }
 
 	required_shared_ptr<uint64_t> m_pvr2_texture_ram;
 	required_shared_ptr<uint64_t> m_pvr2_framebuffer_ram;
@@ -119,14 +120,12 @@ class atomiswave_state : public dc_state
 {
 public:
 	atomiswave_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dc_state(mconfig, type, tag),
-		m_awflash(*this, "awflash")
-	   { }
+		: dc_state(mconfig, type, tag)
+		, m_awflash(*this, "awflash")
+	{ }
 
 	required_device<macronix_29l001mc_device> m_awflash;
 
-	DECLARE_READ64_MEMBER( aw_flash_r );
-	DECLARE_WRITE64_MEMBER( aw_flash_w );
 	DECLARE_READ64_MEMBER( aw_modem_r );
 	DECLARE_WRITE64_MEMBER( aw_modem_w );
 
