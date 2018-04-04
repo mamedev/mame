@@ -42,6 +42,7 @@ Interrupt frequency on audio CPU is not a periodical signal, but there are a lot
 
 void speedbal_state::machine_start()
 {
+	m_digits.resolve();
 	save_item(NAME(m_leds_start));
 	save_item(NAME(m_leds_shiftreg));
 }
@@ -101,9 +102,9 @@ WRITE8_MEMBER(speedbal_state::leds_output_block)
 	// The shift register is 28 bits, led block number is in the upper bits
 	// and the other 3 bytes in it go to each 7seg led of the current block.
 	int block = m_leds_shiftreg >> 24 & 7;
-	output().set_digit_value(10 * block + 0, ~m_leds_shiftreg >> 0 & 0xff);
-	output().set_digit_value(10 * block + 1, ~m_leds_shiftreg >> 8 & 0xff);
-	output().set_digit_value(10 * block + 2, ~m_leds_shiftreg >> 16 & 0xff);
+	m_digits[10 * block] = ~m_leds_shiftreg & 0xff;
+	m_digits[10 * block + 1] = ~m_leds_shiftreg >> 8 & 0xff;
+	m_digits[10 * block + 2] = ~m_leds_shiftreg >> 16 & 0xff;
 }
 
 WRITE8_MEMBER(speedbal_state::leds_start_block)

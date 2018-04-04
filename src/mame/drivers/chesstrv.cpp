@@ -20,10 +20,10 @@ class chesstrv_state : public driver_device
 {
 public:
 	chesstrv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
-
-	virtual void machine_start() override;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	DECLARE_READ8_MEMBER( ram_addr_r );
 	DECLARE_WRITE8_MEMBER( ram_addr_w );
@@ -34,17 +34,20 @@ public:
 	DECLARE_READ8_MEMBER( keypad_r );
 	DECLARE_WRITE8_MEMBER( diplomat_display_w );
 	DECLARE_READ8_MEMBER( diplomat_keypad_r );
-
-	uint8_t m_ram_addr;
-	uint8_t *m_ram;
-	uint8_t m_matrix;
 	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
-	required_device<cpu_device> m_maincpu;
 	void chesstrv(machine_config &config);
 	void borisdpl(machine_config &config);
 	void borisdpl_io(address_map &map);
 	void chesstrv_io(address_map &map);
 	void chesstrv_mem(address_map &map);
+
+private:
+	uint8_t m_ram_addr;
+	uint8_t *m_ram;
+	uint8_t m_matrix;
+	virtual void machine_start() override;
+	required_device<cpu_device> m_maincpu;
+	output_finder<8> m_digits;
 };
 
 WRITE8_MEMBER( chesstrv_state::ram_addr_w )
@@ -72,13 +75,13 @@ WRITE8_MEMBER( chesstrv_state::display_w )
 	uint8_t seg_data = bitswap<8>(data,0,1,2,3,4,5,6,7);
 
 	if(!(m_matrix & 0x01))
-		output().set_digit_value( 3, seg_data );
+		m_digits[ 3 ] = seg_data;
 	if(!(m_matrix & 0x02))
-		output().set_digit_value( 2, seg_data );
+		m_digits[ 2 ] = seg_data;
 	if(!(m_matrix & 0x04))
-		output().set_digit_value( 1, seg_data );
+		m_digits[ 1 ] = seg_data;
 	if(!(m_matrix & 0x08))
-		output().set_digit_value( 0, seg_data );
+		m_digits[ 0 ] = seg_data;
 }
 
 WRITE8_MEMBER( chesstrv_state::matrix_w )
@@ -104,7 +107,7 @@ READ8_MEMBER( chesstrv_state::keypad_r )
 
 WRITE8_MEMBER( chesstrv_state::diplomat_display_w )
 {
-	output().set_digit_value( m_matrix & 7, data ^ 0xff );
+	m_digits[m_matrix & 7] = data ^ 0xff;
 }
 
 READ8_MEMBER( chesstrv_state::diplomat_keypad_r )
@@ -216,6 +219,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(chesstrv_state::borisdpl_timer_interrupt)
 
 void chesstrv_state::machine_start()
 {
+	m_digits.resolve();
 	m_ram = memregion("ram")->base();
 
 	save_item(NAME(m_ram_addr));
