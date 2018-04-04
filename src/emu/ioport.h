@@ -388,12 +388,10 @@ enum ioport_type
 
 	IPT_UI_LAST,
 
-	// other meaning not mapped to standard defaults
-	IPT_OTHER,
+	IPT_OTHER, // not mapped to standard defaults
 
-	// special meaning handled by custom code
-	IPT_SPECIAL,
-	IPT_CUSTOM,
+	IPT_SPECIAL, // uninterpreted characters
+	IPT_CUSTOM, // handled by custom code
 	IPT_OUTPUT,
 
 	IPT_COUNT

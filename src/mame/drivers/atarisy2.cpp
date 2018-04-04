@@ -227,10 +227,10 @@ MACHINE_RESET_MEMBER(atarisy2_state,atarisy2)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(atarisy2_state::vblank_int)
+WRITE_LINE_MEMBER(atarisy2_state::vblank_int)
 {
 	/* clock the VBLANK through */
-	if (m_interrupt_enable & 8)
+	if (state && BIT(m_interrupt_enable, 3))
 		video_int_write_line(1);
 }
 
@@ -801,7 +801,7 @@ static INPUT_PORTS_START( paperboy )
 	PORT_START("1840")  /*(sound) */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -1176,7 +1176,6 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_CPU_ADD("maincpu", T11, MASTER_CLOCK/2)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy2_state,  vblank_int)
 
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1215,11 +1214,12 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy2_state, screen_update_atarisy2)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarisy2_state, vblank_int))
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarisy2_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", NOOP)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)

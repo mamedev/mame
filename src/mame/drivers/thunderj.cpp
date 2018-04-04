@@ -51,17 +51,15 @@
  *
  *************************************/
 
-void thunderj_state::update_interrupts()
+WRITE_LINE_MEMBER(thunderj_state::scanline_int_write_line)
 {
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_extra->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_4, state ? ASSERT_LINE : CLEAR_LINE);
+	m_extra->set_input_line(M68K_IRQ_4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 void thunderj_state::machine_start()
 {
-	atarigen_state::machine_start();
 	save_item(NAME(m_alpha_tile_bank));
 }
 
@@ -124,7 +122,7 @@ void thunderj_state::main_map(address_map &map)
 	map(0x360010, 0x360011).w(this, FUNC(thunderj_state::latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
-	map(0x3e0000, 0x3e0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x3e0000, 0x3e0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 	map(0x3f0000, 0x3f1fff).ram().w(m_vad, FUNC(atari_vad_device::playfield2_latched_msb_w)).share("vad:playfield2");
 	map(0x3f2000, 0x3f3fff).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
@@ -153,7 +151,6 @@ void thunderj_state::extra_map(address_map &map)
 	map(0x260010, 0x260011).portr("260010");
 	map(0x260012, 0x260013).r(this, FUNC(thunderj_state::special_port2_r));
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
-	map(0x360000, 0x360001).w(this, FUNC(thunderj_state::video_int_ack_w));
 	map(0x360010, 0x360011).w(this, FUNC(thunderj_state::latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
@@ -282,7 +279,7 @@ MACHINE_CONFIG_START(thunderj_state::thunderj)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(thunderj_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260012", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
