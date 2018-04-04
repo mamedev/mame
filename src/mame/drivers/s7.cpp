@@ -83,6 +83,7 @@ public:
 		, m_pia24(*this, "pia24")
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(sound_r);
@@ -139,6 +140,7 @@ private:
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
+	output_finder<61> m_digits;
 };
 
 void s7_state::s7_main_map(address_map &map)
@@ -309,7 +311,7 @@ WRITE8_MEMBER( s7_state::dig0_w )
 	m_strobe = data & 15;
 	data ^= 0xf0; // inverted by ic33
 	m_data_ok = true;
-	output().set_digit_value(60, patterns[data>>4]); // diag digit
+	m_digits[60] = patterns[data>>4]; // diag digit
 }
 
 WRITE8_MEMBER( s7_state::dig1_w )
@@ -317,8 +319,8 @@ WRITE8_MEMBER( s7_state::dig1_w )
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
 	{
-		output().set_digit_value(m_strobe+16, patterns[data&15]);
-		output().set_digit_value(m_strobe, patterns[data>>4]);
+		m_digits[m_strobe+16] = patterns[data&15];
+		m_digits[m_strobe] = patterns[data>>4];
 	}
 	m_data_ok = false;
 }
@@ -412,6 +414,7 @@ void s7_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 
 void s7_state::machine_start()
 {
+	m_digits.resolve();
 	m_memprotect = 0;
 	save_item(NAME(m_nvram));
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
