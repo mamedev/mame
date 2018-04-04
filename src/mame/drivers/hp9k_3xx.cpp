@@ -64,6 +64,7 @@
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
 #include "bus/hp_dio/hp98603.h"
+#include "bus/hp_dio/hp98644.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -383,6 +384,7 @@ READ8_MEMBER(hp9k3xx_state::iocpu_test0_r)
 static SLOT_INTERFACE_START(dio16_cards)
 	SLOT_INTERFACE("98544", HPDIO_98544) /* 98544 High Resolution Monochrome Card */
 	SLOT_INTERFACE("98603", HPDIO_98603) /* 98603 ROM BASIC */
+	SLOT_INTERFACE("98644", HPDIO_98644) /* 98644 Async serial interface */
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
@@ -411,7 +413,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_DIO16_CPU(":maincpu")
 	MCFG_DIO16_SLOT_ADD("diobus", "sl1", dio16_cards, "98544", true)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603", true)
-	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
+	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, "98644", true)
+	MCFG_DIO16_SLOT_ADD("diobus", "sl4", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
@@ -440,7 +443,8 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_DIO32_CPU(":maincpu")
 	MCFG_DIO32_SLOT_ADD("diobus", "sl1", dio16_cards, "98544", true)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603", true)
-	MCFG_DIO32_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
+	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, "98644", true)
+	MCFG_DIO32_SLOT_ADD("diobus", "sl4", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
