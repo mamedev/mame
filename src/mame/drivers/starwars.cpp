@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // custom designated as "157249-120"
+	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // designated as "137243-001" on parts list and "157249-120" on schematics
 	MCFG_ADC0808_IN0_CB(IOPORT("STICKY")) // pitch
 	MCFG_ADC0808_IN1_CB(IOPORT("STICKX")) // yaw
 	MCFG_ADC0808_IN2_CB(GND) // thrust (unused)
