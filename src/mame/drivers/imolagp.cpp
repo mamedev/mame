@@ -281,15 +281,15 @@ WRITE8_MEMBER(imolagp_state::imola_led_board_w)
 	if (i < 5 && j < 6)
 		m_digits[i][j] = ls48_map[data & 0x0f];
 /*
-    score:         0,  1,  2,  3
-    time:          4,  5
-    result:       10, 11
-    credits:      12, 13
-    highscore 1:  32, 33, 34, 35
-    highscore 2:  36, 37, 24, 25
-    highscore 3:  26, 27, 28, 29
-    highscore 4:  16, 17, 18, 19
-    highscore 5:  20, 21,  8,  9
+    score:        00, 01, 02, 03
+    time:         04, 05
+    result:       12, 13
+    credits:      14, 15
+    highscore 1:  40, 41, 42, 43
+    highscore 2:  44, 45, 30, 31
+    highscore 3:  32, 33, 34, 35
+    highscore 4:  20, 21, 22, 23
+    highscore 5:  24, 25, 10, 11
 */
 }
 
