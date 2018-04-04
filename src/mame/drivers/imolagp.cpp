@@ -98,13 +98,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_slavecpu(*this, "slave"),
 		m_steer_pot_timer(*this, "pot"),
-		m_steer_inp(*this, "STEER")
+		m_steer_inp(*this, "STEER"),
+		m_digits(*this, "digit%u%u", 0U, 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<timer_device> m_steer_pot_timer;
 	required_ioport m_steer_inp;
+	output_finder<5, 6> m_digits;
 
 	uint8_t m_videoram[2][0x4000]; // 2 layers of 16KB
 	uint8_t m_comms_latch[2];
@@ -124,7 +126,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vreg_control_w);
 	DECLARE_WRITE8_MEMBER(vreg_data_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
 	virtual void machine_start() override;
@@ -228,10 +230,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
 		m_steer_pot_timer->adjust(attotime::from_msec(20));
 }
 
-INTERRUPT_GEN_MEMBER(imolagp_state::slave_vblank_irq)
+WRITE_LINE_MEMBER(imolagp_state::vblank_irq)
 {
-	m_scroll = m_vreg[0xe]; // latch scroll
-	device.execute().set_input_line(0, HOLD_LINE);
+	if (state)
+	{
+		m_scroll = m_vreg[0xe]; // latch scroll
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_slavecpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 
@@ -270,7 +276,10 @@ WRITE8_MEMBER(imolagp_state::imola_led_board_w)
 	static const uint8_t ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-	output().set_digit_value(offset, ls48_map[data & 0x0f]);
+	int i = offset >> 3;
+	int j = offset & 7;
+	if (i < 5 && j < 6)
+		m_digits[i][j] = ls48_map[data & 0x0f];
 /*
     score:         0,  1,  2,  3
     time:          4,  5
@@ -478,6 +487,8 @@ INPUT_PORTS_END
 
 void imolagp_state::machine_start()
 {
+	m_digits.resolve();
+
 	save_item(NAME(m_vcontrol));
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_scroll));
@@ -500,13 +511,11 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	MCFG_CPU_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
 	MCFG_CPU_PROGRAM_MAP(imolagp_master_map)
 	MCFG_CPU_IO_MAP(imolagp_master_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", imolagp_state, irq0_line_hold)
 	MCFG_TIMER_DRIVER_ADD("pot", imolagp_state, imolagp_pot_callback) // maincpu nmi
 
 	MCFG_CPU_ADD("slave", Z80, 4000000) // ?
 	MCFG_CPU_PROGRAM_MAP(imolagp_slave_map)
 	MCFG_CPU_IO_MAP(imolagp_slave_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", imolagp_state, slave_vblank_irq)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -526,6 +535,7 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	MCFG_SCREEN_UPDATE_DRIVER(imolagp_state, screen_update_imolagp)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(imolagp_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(imolagp_state, imolagp)
