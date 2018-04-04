@@ -27,6 +27,7 @@ public:
 		, m_rambase(*this, "rambase")
 		, m_analog_x(*this, "ANALOGX")
 		, m_analog_y(*this, "ANALOGY")
+		, m_led(*this, "led")
 	{ }
 
 	required_device<ccpu_cpu_device> m_maincpu;
@@ -39,6 +40,8 @@ public:
 
 	optional_ioport m_analog_x;
 	optional_ioport m_analog_y;
+
+	output_finder<> m_led;
 
 	uint32_t m_current_shift;
 	uint32_t m_last_shift;

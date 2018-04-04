@@ -58,6 +58,7 @@ void cinemat_state::machine_start()
 	save_item(NAME(m_coin_detected));
 	save_item(NAME(m_coin_last_reset));
 	save_item(NAME(m_mux_select));
+	m_led.resolve();
 }
 
 
