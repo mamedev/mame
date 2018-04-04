@@ -126,40 +126,40 @@ void alesis_state::update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t
 			case 2:
 				switch(y)
 				{
-					m_step_edit = state;   break;
-					m_swing_off = state;   break;
-					m_swing_62 = state;    break;
-					m_click_l1 = state;    break;
-					m_click_note = state;  break;
-					m_click_l2 = state;    break;
-					m_click_3 = state;     break;
-					m_backup = state;      break;
+					case 0: m_step_edit = state;   break;
+					case 1: m_swing_off = state;   break;
+					case 2: m_swing_62 = state;    break;
+					case 3: m_click_l1 = state;    break;
+					case 4: m_click_note = state;  break;
+					case 5: m_click_l2 = state;    break;
+					case 6: m_click_3 = state;     break;
+					case 7: m_backup = state;      break;
 				}
 				break;
 			case 3:
 				switch(y)
 				{
-					m_drum_set = state;    break;
-					m_swing = state;       break;
-					m_swing_58 = state;    break;
-					m_click_off = state;   break;
-					m_click = state;       break;
-					m_quantize_off = state; break;
-					m_quantize_3 = state;  break;
-					m_midi_setup = state;  break;
+					case 0: m_drum_set = state;    break;
+					case 1: m_swing = state;       break;
+					case 2: m_swing_58 = state;    break;
+					case 3: m_click_off = state;   break;
+					case 4: m_click = state;       break;
+					case 5: m_quantize_off = state; break;
+					case 6: m_quantize_3 = state;  break;
+					case 7: m_midi_setup = state;  break;
 				}
 				break;
 			case 4:
 				switch(y)
 				{
-					m_record_setup = state; break;
-					m_quantize = state;    break;
-					m_swing_54 = state;    break;
-					m_quantize_l1 = state; break;
-					m_quantize_l2 = state; break;
-					m_quantize_l3 = state; break;
-					m_quantize_note = state; break;
-					m_setup = state;       break;
+					case 0: m_record_setup = state; break;
+					case 1: m_quantize = state;    break;
+					case 2: m_swing_54 = state;    break;
+					case 3: m_quantize_l1 = state; break;
+					case 4: m_quantize_l2 = state; break;
+					case 5: m_quantize_l3 = state; break;
+					case 6: m_quantize_note = state; break;
+					case 7: m_setup = state;       break;
 				}
 				break;
 		}
