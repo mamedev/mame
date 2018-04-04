@@ -71,7 +71,20 @@ public:
 		m_col5(*this, "COL5"),
 		m_col6(*this, "COL6"),
 		m_select(*this, "SELECT"),
-		m_track_led(*this, "track_led%u", 1U)
+		m_track_led(*this, "track_led%u", 1U),
+		m_patt_led(*this, "patt_led"),
+		m_song_led(*this, "song_led"),
+		m_play_led(*this, "play_led"),
+		m_record_led(*this, "record_led"),
+		m_voice_led(*this, "voice_led"),
+		m_tune_led(*this, "tune_led"),
+		m_mix_led(*this, "mix_led"),
+		m_tempo_led(*this, "tempo_led"),
+		m_midi_led(*this, "midi_led"),
+		m_part_led(*this, "part_led"),
+		m_edit_led(*this, "edit_led"),
+		m_echo_led(*this, "echo_led"),
+		m_loop_led(*this, "loop_led")
 	{ }
 
 	DECLARE_DRIVER_INIT(hr16);
@@ -121,6 +134,19 @@ private:
 	required_ioport m_col6;
 	optional_ioport m_select;
 	output_finder<8> m_track_led;
+	output_finder<> m_patt_led;
+	output_finder<> m_song_led;
+	output_finder<> m_play_led;
+	output_finder<> m_record_led;
+	output_finder<> m_voice_led;
+	output_finder<> m_tune_led;
+	output_finder<> m_mix_led;
+	output_finder<> m_tempo_led;
+	output_finder<> m_midi_led;
+	output_finder<> m_part_led;
+	output_finder<> m_edit_led;
+	output_finder<> m_echo_led;
+	output_finder<> m_loop_led;
 };
 
 // device type definition
