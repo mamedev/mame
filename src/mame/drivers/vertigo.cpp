@@ -41,7 +41,7 @@ void vertigo_state::vertigo_map(address_map &map)
 	map(0x000008, 0x001fff).ram().mirror(0x010000);
 	map(0x002000, 0x003fff).ram().share("vectorram");
 	map(0x004000, 0x00400f).r(this, FUNC(vertigo_state::vertigo_io_convert)).mirror(0x001000);
-	map(0x004010, 0x00401f).r(this, FUNC(vertigo_state::vertigo_io_adc)).mirror(0x001000);
+	map(0x004010, 0x00401f).r(m_adc, FUNC(adc0808_device::data_r)).mirror(0x001000);
 	map(0x004020, 0x00402f).r(this, FUNC(vertigo_state::vertigo_coin_r)).mirror(0x001000);
 	map(0x004030, 0x00403f).portr("GIO").mirror(0x001000);
 	map(0x004040, 0x00404f).r(this, FUNC(vertigo_state::vertigo_sio_r)).mirror(0x001000);
@@ -130,6 +130,13 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL / 3)
 	MCFG_CPU_PROGRAM_MAP(vertigo_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
+
+	MCFG_DEVICE_ADD("adc", ADC0808, 24_MHz_XTAL / 30) // E clock from 68000
+	MCFG_ADC0808_EOC_FF_CB(WRITELINE(vertigo_state, adc_eoc_w))
+	MCFG_ADC0808_IN0_CB(IOPORT("P1X"))
+	MCFG_ADC0808_IN1_CB(IOPORT("P1Y"))
+	MCFG_ADC0808_IN2_CB(IOPORT("PADDLE"))
+	// IN3-IN7 tied to Vss
 
 	exidy440_audio(config);
 

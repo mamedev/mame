@@ -1820,6 +1820,29 @@ void device_debug::ignore(bool ignore)
 	}
 }
 
+//-------------------------------------------------
+//  suspend
+//-------------------------------------------------
+
+void device_debug::suspend(bool suspend)
+{
+	assert(m_exec != nullptr);
+
+	if (suspend) {
+        m_flags |= DEBUG_FLAG_SUSPENDED;
+        m_exec->suspend(SUSPEND_REASON_HALT, 1);
+    }
+	else {
+        m_flags &= ~DEBUG_FLAG_SUSPENDED;
+        m_exec->resume(SUSPEND_REASON_HALT);
+    }
+
+	if (&m_device == m_device.machine().debugger().cpu().live_cpu() && suspend)
+	{
+		assert(m_exec != nullptr);
+		go_next_device();
+	}
+}
 
 //-------------------------------------------------
 //  single_step - single step the device past the

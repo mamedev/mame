@@ -361,7 +361,7 @@ void suprgolf_state::io_map(address_map &map)
 
 static INPUT_PORTS_START( suprgolf )
 	PORT_START("P1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* low port of P1 Pedal */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) /* low port of P1 Pedal */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)      /* D.L */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)       /* D.R */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)         /* CNT - shot switch */
@@ -375,7 +375,7 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) /* release power? */
 
 	PORT_START("P2")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* low port of P2 Pedal */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) /* low port of P2 Pedal */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)      /* D.L */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)       /* D.R */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)         /* CNT - shot switch */

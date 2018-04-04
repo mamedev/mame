@@ -27,6 +27,7 @@
   For some reason the 'rol $46' instruction outputs the original data
   followed by the new result, so I've had to employ a horrible hack.
 
+  Hold down X while inserting a coin.
   At the start of each ball, the display will be flashing. You need to
   hit Z, and then you can get a score. When the ball indicator goes out,
   your game is over.
@@ -63,6 +64,8 @@ public:
 		, m_ic6(*this, "ic6")
 		, m_ic7(*this, "ic7")
 		, m_ic8(*this, "ic8")
+		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 1U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ic1_b_w);
@@ -99,6 +102,7 @@ private:
 	uint8_t m_ic6b4;
 	uint8_t m_ic6b7;
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
 	required_device<pia6821_device> m_ic2;
@@ -107,6 +111,8 @@ private:
 	required_device<mos6530_device> m_ic6;
 	required_device<pia6821_device> m_ic7;
 	required_device<pia6821_device> m_ic8;
+	output_finder<42> m_digits;
+	output_finder<7> m_leds;
 };
 
 
@@ -413,34 +419,34 @@ WRITE8_MEMBER( allied_state::ic4_b_w )
 	{
 		if (!BIT(data, i+4))
 		{
-			output().set_digit_value(i*10, patterns[0]);
+			m_digits[i*10] = patterns[0];
 			segment = (m_player_score[i] >> 0) & 15;
-			output().set_digit_value(i*10+1, patterns[segment]);
+			m_digits[i*10+1] = patterns[segment];
 			segment = (m_player_score[i] >> 4) & 15;
-			output().set_digit_value(i*10+2, patterns[segment]);
+			m_digits[i*10+2] =  patterns[segment];
 			segment = (m_player_score[i] >> 8) & 15;
-			output().set_digit_value(i*10+3, patterns[segment]);
+			m_digits[i*10+3] = patterns[segment];
 			segment = (m_player_score[i] >> 12) & 15;
-			output().set_digit_value(i*10+4, patterns[segment]);
+			m_digits[i*10+4] = patterns[segment];
 			segment = (m_player_score[i] >> 16) & 15;
-			output().set_digit_value(i*10+5, patterns[segment]);
+			m_digits[i*10+5] = patterns[segment];
 		}
 		else
 		{
-			output().set_digit_value(i*10, 0);
-			output().set_digit_value(i*10+1, 0);
-			output().set_digit_value(i*10+2, 0);
-			output().set_digit_value(i*10+3, 0);
-			output().set_digit_value(i*10+4, 0);
-			output().set_digit_value(i*10+5, 0);
+			m_digits[i*10] = 0;
+			m_digits[i*10+1] = 0;
+			m_digits[i*10+2] = 0;
+			m_digits[i*10+3] = 0;
+			m_digits[i*10+4] = 0;
+			m_digits[i*10+5] = 0;
 		}
 	}
 
 	// doesn't seem to be a strobe for the credits display
 	segment = (m_player_score[4] >> 0) & 15;
-	output().set_digit_value(40, patterns[segment]);
+	m_digits[40] = patterns[segment];
 	segment = (m_player_score[4] >> 4) & 15;
-	output().set_digit_value(41, patterns[segment]);
+	m_digits[41] = patterns[segment];
 
 // PB0-3 - player 1-4 LED - to do
 }
@@ -574,12 +580,8 @@ WRITE8_MEMBER( allied_state::ic8_a_w )
 // PB0-4 = ball 1-5 LED; PB5 = shoot again lamp
 WRITE8_MEMBER( allied_state::ic8_b_w )
 {
-	output().set_value("led1", !BIT(data, 0));
-	output().set_value("led2", !BIT(data, 1));
-	output().set_value("led3", !BIT(data, 2));
-	output().set_value("led4", !BIT(data, 3));
-	output().set_value("led5", !BIT(data, 4));
-	output().set_value("led6", !BIT(data, 5));
+	for (int i = 0; i < 6; i++)
+		m_leds[i+1] = !BIT(data, i);
 }
 
 // this line not emulated in PinMAME, maybe it isn't needed
@@ -598,6 +600,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 	m_ic8->ca2_w(BIT(data, 6));
 }
 
+void allied_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
+}
+
 void allied_state::machine_reset()
 {
 	m_display = 0;
@@ -609,7 +617,7 @@ void allied_state::machine_reset()
 	m_ic6a2 = 0;
 	m_ic6b4 = 0;
 	m_ic6b7 = 0;
-	output().set_value("led0", 1);  //1=off
+	m_leds[0] = 1;
 }
 
 MACHINE_CONFIG_START(allied_state::allied)

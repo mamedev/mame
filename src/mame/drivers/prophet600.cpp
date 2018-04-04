@@ -79,16 +79,14 @@ public:
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
 		m_acia(*this, UART_TAG),
+		m_digits(*this, "digit%u", 0U),
 		m_dac(0),
 		m_scanrow(0),
 		m_comparitor(0),
 		m_nmi_gate(false)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<acia6850_device> m_acia;
-
-	DECLARE_DRIVER_INIT(prophet600);
+	virtual void machine_start() override;
 
 	DECLARE_WRITE_LINE_MEMBER( pit_ch0_tick_w );
 	DECLARE_WRITE_LINE_MEMBER( pit_ch2_tick_w );
@@ -109,6 +107,11 @@ public:
 	void cpu_map(address_map &map);
 	void io_map(address_map &map);
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<acia6850_device> m_acia;
+
+	output_finder<2> m_digits;
+
 	uint16_t m_dac;
 	uint8_t m_scanrow;
 	uint8_t m_comparitor;
@@ -175,11 +178,11 @@ WRITE8_MEMBER(prophet600_state::led_w)
 	}
 	else if (m_scanrow & 0x20)
 	{
-		output().set_digit_value(0, data);
+		m_digits[0] = data;
 	}
 	else if (m_scanrow & 0x40)
 	{
-		output().set_digit_value(1, data);
+		m_digits[1] = data;
 	}
 }
 
@@ -260,8 +263,9 @@ void prophet600_state::io_map(address_map &map)
 	map(0x0e, 0x0e).mirror(0xff00).w(this, FUNC(prophet600_state::mask_w));
 }
 
-DRIVER_INIT_MEMBER(prophet600_state, prophet600)
+void prophet600_state::machine_start()
 {
+	m_digits.resolve();
 }
 
 // master crystal is 8 MHz, all clocks derived from there
@@ -301,4 +305,4 @@ ROM_START( prpht600 )
 	ROM_LOAD( "p600.bin",     0x000000, 0x002000, CRC(78e3f048) SHA1(61548b6de3d9b5c0ae76f8e751ece0b57de17118) )
 ROM_END
 
-CONS( 1983, prpht600, 0, 0, prophet600, prophet600, prophet600_state, prophet600, "Sequential Circuits", "Prophet-600", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1983, prpht600, 0, 0, prophet600, prophet600, prophet600_state, 0, "Sequential Circuits", "Prophet-600", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

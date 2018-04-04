@@ -491,7 +491,7 @@ static INPUT_PORTS_START( musobana )    // I don't have manual for this game.
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
@@ -545,7 +545,7 @@ static INPUT_PORTS_START( 4psimasy )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
@@ -611,7 +611,7 @@ static INPUT_PORTS_START( mhhonban )    // I don't have manual for this game.
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
@@ -677,7 +677,7 @@ static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, niyanpai_state,musobana_outcoin_flag_r, nullptr)   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 

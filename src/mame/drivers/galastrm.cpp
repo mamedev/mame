@@ -41,6 +41,7 @@ $305.b invincibility
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "machine/taitoio.h"
 #include "sound/es5506.h"
@@ -50,30 +51,11 @@ $305.b invincibility
 
 /*********************************************************************/
 
-void galastrm_state::machine_start()
-{
-	m_interrupt6_timer = timer_alloc(TIMER_GALASTRM_INTERRUPT6);
-}
-
-
 INTERRUPT_GEN_MEMBER(galastrm_state::galastrm_interrupt)
 {
 	m_frame_counter ^= 1;
 	device.execute().set_input_line(5, HOLD_LINE);
 }
-
-void galastrm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_GALASTRM_INTERRUPT6:
-		m_maincpu->set_input_line(6, HOLD_LINE);
-		break;
-	default:
-		assert_always(false, "Unknown id in galastrm_state::device_timer");
-	}
-}
-
 
 WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
 {
@@ -113,22 +95,6 @@ WRITE8_MEMBER(galastrm_state::coin_word_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x04);
 }
 
-READ32_MEMBER(galastrm_state::galastrm_adstick_ctrl_r)
-{
-	if (offset == 0x00)
-	{
-		if (ACCESSING_BITS_24_31)
-			return ioport("STICKX")->read() << 24;
-		if (ACCESSING_BITS_16_23)
-			return ioport("STICKY")->read() << 16;
-	}
-	return 0;
-}
-
-WRITE32_MEMBER(galastrm_state::galastrm_adstick_ctrl_w)
-{
-	m_interrupt6_timer->adjust(m_maincpu->cycles_to_attotime(1000));
-}
 
 /***********************************************************
              MEMORY STRUCTURES
@@ -141,7 +107,7 @@ void galastrm_state::galastrm_map(address_map &map)
 	map(0x300000, 0x303fff).ram().share("spriteram");
 	map(0x400000, 0x400007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
 	map(0x40fff0, 0x40fff3).nopw();
-	map(0x500000, 0x500007).rw(this, FUNC(galastrm_state::galastrm_adstick_ctrl_r), FUNC(galastrm_state::galastrm_adstick_ctrl_w));
+	map(0x500000, 0x500007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x600000, 0x6007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)); /* Sound shared ram */
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
@@ -159,7 +125,7 @@ void galastrm_state::galastrm_map(address_map &map)
 static INPUT_PORTS_START( galastrm )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state,frame_counter_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galastrm_state,frame_counter_r, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -175,7 +141,7 @@ static INPUT_PORTS_START( galastrm )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN2")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
@@ -241,6 +207,11 @@ MACHINE_CONFIG_START(galastrm_state::galastrm)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", galastrm_state,  galastrm_interrupt) /* VBL */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 6))
+	MCFG_ADC0808_IN0_CB(IOPORT("STICKX"))
+	MCFG_ADC0808_IN1_CB(IOPORT("STICKY"))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))

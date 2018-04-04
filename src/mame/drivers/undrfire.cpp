@@ -193,6 +193,7 @@ Board contains only 29 ROMs and not much else.
 #include "audio/taito_en.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "machine/taitoio.h"
 #include "machine/watchdog.h"
@@ -200,23 +201,6 @@ Board contains only 29 ROMs and not much else.
 #include "screen.h"
 
 #include "cbombers.lh"
-
-
-/***********************************************************
-                INTERRUPTS
-***********************************************************/
-
-void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_INTERRUPT5:
-		m_maincpu->set_input_line(5, HOLD_LINE);
-		break;
-	default:
-		assert_always(false, "Unknown id in undrfire_state::device_timer");
-	}
-}
 
 
 /**********************************************************
@@ -257,36 +241,6 @@ WRITE16_MEMBER(undrfire_state::shared_ram_w)
 			m_shared_ram[offset/2]=(m_shared_ram[offset/2]&0xffffff00)|((data&0x00ff)<< 0);
 	}
 }
-
-
-
-/* Some unknown hardware byte mapped at $600002-5 */
-
-READ32_MEMBER(undrfire_state::unknown_hardware_r)
-{
-	switch (offset) /* four single bytes are read in sequence at $156e */
-	{
-		case 0x00:  /* $600002-3 */
-		{
-			return 0xffff;  // no idea what they should be
-		}
-
-		case 0x01:  /* $600004-5 */
-		{
-			return 0xffff0000;  // no idea what they should be
-		}
-	}
-
-	return 0x0;
-}
-
-
-WRITE32_MEMBER(undrfire_state::unknown_int_req_w)
-{
-	/* 10000 cycle delay is arbitrary */
-	timer_set(m_maincpu->cycles_to_attotime(10000), TIMER_INTERRUPT5);
-}
-
 
 READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
 {
@@ -380,20 +334,6 @@ WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ32_MEMBER(undrfire_state::cbombers_adc_r)
-{
-	return (ioport("STEER")->read() << 24);
-}
-
-WRITE8_MEMBER(undrfire_state::cbombers_adc_w)
-{
-	/* One interrupt per input port (4 per frame, though only 2 used).
-	    1000 cycle delay is arbitrary */
-	/* TODO: hook it up to offset 0 only otherwise cbomber proto keeps sending irqs.
-	         Could or could not be right. */
-	if(offset == 0)
-		timer_set(m_maincpu->cycles_to_attotime(1000), TIMER_INTERRUPT5);
-}
 
 /***********************************************************
              MEMORY STRUCTURES
@@ -408,7 +348,7 @@ void undrfire_state::undrfire_map(address_map &map)
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
 	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::motor_control_w));      /* gun vibration */
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x600000, 0x600007).rw(this, FUNC(undrfire_state::unknown_hardware_r), FUNC(undrfire_state::unknown_int_req_w));    /* int request for unknown hardware */
+	map(0x600000, 0x600007).noprw(); // space for ADC0809, not fitted on pcb
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
@@ -428,7 +368,7 @@ void undrfire_state::cbombers_cpua_map(address_map &map)
 	map(0x300000, 0x303fff).ram().share("spriteram");
 	map(0x400000, 0x400003).w(this, FUNC(undrfire_state::cbombers_cpua_ctrl_w));
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x600000, 0x600007).r(this, FUNC(undrfire_state::cbombers_adc_r)).w(this, FUNC(undrfire_state::cbombers_adc_w));
+	map(0x600000, 0x600007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));        /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));
@@ -691,6 +631,10 @@ MACHINE_CONFIG_START(undrfire_state::cbombers)
 	MCFG_QUANTUM_TIME(attotime::from_hz(480))   /* CPU slices - Need to interleave Cpu's 1 & 3 */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 5))
+	MCFG_ADC0808_IN0_CB(IOPORT("STEER"))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("INPUTS0"))

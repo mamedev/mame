@@ -15,9 +15,8 @@ class s11b_state : public s11a_state
 {
 public:
 	s11b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: s11a_state(mconfig, type, tag),
-		m_bg_hc55516(*this, "hc55516_bg")
-
+		: s11a_state(mconfig, type, tag)
+		, m_bg_hc55516(*this, "hc55516_bg")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(dig1_w);

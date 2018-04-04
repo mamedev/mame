@@ -594,7 +594,7 @@ INPUT_PORTS_START( aladmdb )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
-//  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )         /* to avoid it being changed and corrupting Coinage settings */
+//  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM )         /* to avoid it being changed and corrupting Coinage settings */
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )       /* code at 0x1b2680 */
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )             /* "PRACTICE" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )           /* "NORMAL" */

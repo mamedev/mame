@@ -1922,7 +1922,7 @@ static INPUT_PORTS_START( daytona )
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME("VR 4 (Green)")
 	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,daytona_gearbox_r, nullptr)
+	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,daytona_gearbox_r, nullptr)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN2")
@@ -1999,7 +1999,7 @@ static INPUT_PORTS_START( srallyc )
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,daytona_gearbox_r, nullptr)
+	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,daytona_gearbox_r, nullptr)
 	PORT_BIT(0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("GEARS") // fake to handle gear bits
@@ -2074,7 +2074,7 @@ static INPUT_PORTS_START( rchase2 )
 	PORT_INCLUDE( gunblade )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,rchase2_devices_r, nullptr)
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,rchase2_devices_r, nullptr)
 
 	// reversed p1 and p2 wrt Gunblade
 	PORT_MODIFY("ANA0")
@@ -2228,7 +2228,7 @@ static INPUT_PORTS_START( waverunr )
 
 	PORT_MODIFY("IN2")
 	// TODO: safety sensor
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT(0xf7, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	// TODO: requires LEFT/RIGHT_AD_STICK in framework
