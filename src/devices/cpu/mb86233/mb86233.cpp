@@ -727,7 +727,7 @@ void mb86233_device::execute_run()
 			alu_pre(alu);
 
 			switch(op) {
-			case 0: {
+			case 0: case 1: {
 				// lab mem, mem (e)
 
 				u32 ea1 = ea_pre_0(r1);
@@ -785,7 +785,8 @@ void mb86233_device::execute_run()
 			}
 
 			default:
-				logerror("unhandler lab subop %x\n", op);
+				logerror("unhandled lab subop %x\n", op);
+				logerror("%x\n", m_ppc);
 				break;
 
 			}

@@ -34,7 +34,7 @@
     3322 2222 2222 1111 1111 1100 0000 0000
     1098 7654 3210 9876 5432 1098 7654 3210
 
-    0000 00aa aaa0 00yy yyyy yyyx xxxx xxxx lab adx, ady (e)
+    0000 00aa aaa0 0?yy yyyy yyyx xxxx xxxx lab adx, ady (e)
     0000 00aa aaa0 11yy yyyy yyyx xxxx xxxx lab adx, ady + 0x200
     0000 00aa aaa1 00yy yyyy yyyx xxxx xxxx lab adx + 0x200, ady
 
@@ -271,7 +271,7 @@ offs_t mb86233_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			util::stream_format(stream, "%s : ", alu0_func(alu) );
 
 		switch(op) {
-		case 0:
+		case 0: case 1:
 			util::stream_format(stream, "lab %s, %s (e)", memory(r1, false, false), memory(r2, true, false));
 			break;
 
