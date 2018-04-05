@@ -307,6 +307,14 @@ void mb86233_device::alu_pre(u32 alu)
 		break;
 	}
 
+	case 0x04: {
+		// notd
+		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
+		m_alu_r1 = ~m_d;
+		m_alu_stset = m_alu_r1 ? m_alu_r1 & 0x80000000 ? F_SGD : 0 : F_ZRD;
+		break;
+	}
+
 	case 0x05: {
 		// fcpd
 		m_alu_stmask = F_ZRD|F_SGD|F_CPD|F_OVD|F_DVZD;
@@ -504,11 +512,11 @@ void mb86233_device::alu_post(u32 alu)
 		alu_update_st();
 		break;
 
-	case 0x01: case 0x02: case 0x03: case 0x06:
-	case 0x07: case 0x0b: case 0x0c: case 0x0e:
-	case 0x0f: case 0x10: case 0x11: case 0x13:
-	case 0x14: case 0x16: case 0x17: case 0x18:
-	case 0x19: case 0x1a: case 0x1b:
+	case 0x01: case 0x02: case 0x03: case 0x04:
+	case 0x06: case 0x07: case 0x0b: case 0x0c:
+	case 0x0e: case 0x0f: case 0x10: case 0x11:
+	case 0x13: case 0x14: case 0x16: case 0x17:
+	case 0x18: case 0x19: case 0x1a: case 0x1b:
 		// d update
 		m_d = m_alu_r1;
 		alu_update_st();

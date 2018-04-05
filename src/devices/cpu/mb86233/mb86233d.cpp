@@ -222,7 +222,7 @@ std::string mb86233_disassembler::alu0_func(u32 alu)
 	case 0x01: util::stream_format(stream, "andd"); break;
 	case 0x02: util::stream_format(stream, "orad"); break;
 	case 0x03: util::stream_format(stream, "eord"); break;
-		// 04
+	case 0x04: util::stream_format(stream, "notd"); break;
 	case 0x05: util::stream_format(stream, "fcpd"); break;
 	case 0x06: util::stream_format(stream, "fadd"); break;
 	case 0x07: util::stream_format(stream, "fsbd"); break;
