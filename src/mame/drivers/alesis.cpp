@@ -337,6 +337,7 @@ PALETTE_INIT_MEMBER(alesis_state, alesis)
 
 void alesis_state::machine_start()
 {
+	m_digit.resolve();
 	m_track_led.resolve();
 	m_patt_led.resolve();
 	m_song_led.resolve();
@@ -370,6 +371,7 @@ void alesis_state::machine_start()
 	m_press_play.resolve();
 	m_metronome.resolve();
 	m_tempo.resolve();
+	m_page.resolve();
 	m_step_edit.resolve();
 	m_swing_off.resolve();
 	m_swing_62.resolve();
