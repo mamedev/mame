@@ -508,15 +508,6 @@ MACHINE_CONFIG_START(renegade_state::renegade)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(renegade_state::renegadeb)
-	renegade(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(renegade_nomcu_map)
-
-	MCFG_DEVICE_REMOVE("mcu")
-MACHINE_CONFIG_END
-
-
 MACHINE_CONFIG_START(renegade_state::kuniokunb)
 	renegade(config);
 	MCFG_CPU_MODIFY("maincpu")
@@ -691,6 +682,6 @@ ROM_END
 
 
 GAME( 1986, renegade,  0,        renegade,  renegade, renegade_state, 0, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, renegadeb, renegade, renegadeb, renegade, renegade_state, 0, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, renegadeb, renegade, kuniokunb, renegade, renegade_state, 0, ROT0, "bootleg", "Renegade (US bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, kuniokun,  renegade, renegade,  renegade, renegade_state, 0, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, renegade_state, 0, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
