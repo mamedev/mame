@@ -1784,7 +1784,7 @@ void galaxian_state::spactrai_map(address_map &map)
 	map(0x0000, 0x01ff).rom();
 	map(0x0200, 0x05ff).ram(); // this sits over ROM, does the 0x400 bytes of ROM underneath bank or appear elsewhere?
 	map(0x0600, 0x11ff).rom();
-	map(0x1200, 0x15ff).ram().ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram"); // see above comment
+	map(0x1200, 0x15ff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram"); // see above comment
 	map(0x1600, 0x4fff).rom();
 
 // cleared on startup
@@ -1809,7 +1809,7 @@ void galaxian_state::spactrai_map(address_map &map)
 	map(0x7000, 0x7000).portr("IN2");
 	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 
-	map(0xfe00, 0xfeff).ram().ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0xfe00, 0xfeff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 
 }
 
@@ -1841,8 +1841,8 @@ void galaxian_state::anteatergg_map(address_map &map)
 	galaxian_map_discrete(map);
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4fff).ram();
-	map(0x5000, 0x53ff).ram().ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
-	map(0x5800, 0x58ff).ram().ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
+	map(0x5000, 0x53ff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800, 0x58ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram");
 //  AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0");
 //  AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x07f8) AM_WRITE(start_lamp_w)
@@ -1855,6 +1855,33 @@ void galaxian_state::anteatergg_map(address_map &map)
 	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w));
 	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w));
 	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+}
+
+void galaxian_state::jungsub_map(address_map &map) // TODO: preliminary
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).ram();
+	map(0x5000, 0x53ff).ram().w(this, FUNC(galaxian_state::galaxian_videoram_w)).share("videoram");
+	map(0x5800, 0x58ff).ram().w(this, FUNC(galaxian_state::galaxian_objram_w)).share("spriteram"); // but also at 0x5900-059ff and 0x5a00-5aff?
+	map(0x5900, 0x5aff).nopr().nopw();
+	map(0x6000, 0x6000).mirror(0x07ff).portr("IN0"); // seems ok
+	map(0x6003, 0x6003).nopw(); // always 0x01?
+	map(0x6184, 0x6184).w(this, FUNC(galaxian_state::coin_count_0_w)); // seems ok
+	map(0x6186, 0x6186).w(this, FUNC(galaxian_state::coin_count_1_w)); // seems ok
+	map(0x6800, 0x6800).mirror(0x07ff).portr("IN1"); // seems ok
+	map(0x7001, 0x7001).mirror(0x07f8).w(this, FUNC(galaxian_state::irq_enable_w)); // seems ok
+	map(0x7006, 0x7006).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_x_w)); // seems ok
+	map(0x7007, 0x7007).mirror(0x07f8).w(this, FUNC(galaxian_state::galaxian_flip_screen_y_w)); // seems ok
+	map(0x7800, 0x7800).r("watchdog", FUNC(watchdog_timer_device::reset_r)); // seems ok
+	map(0x7800, 0x7800).nopw(); // always 0xff?
+}
+
+void galaxian_state::jungsub_io_map(address_map &map) // TODO: preliminary
+{
+	map.unmap_value_high();
+	map.global_mask(0x0f);
+	map(0x00, 0x00).mirror(0x0f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 /* map derived from schematics */
@@ -4650,6 +4677,31 @@ static INPUT_PORTS_START( scramble )
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jungsub ) // TODO: are there more dip-switches?
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "20P 1 play, 50P 3 plays" )
+	PORT_DIPSETTING(    0x40, "10P 1 play, 50P 6 plays" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( strfbomb )
 	PORT_INCLUDE(scramble)
@@ -6153,6 +6205,26 @@ MACHINE_CONFIG_START(galaxian_state::scramble)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(galaxian_state, scramble_protection_w))
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(galaxian_state::jungsub)
+	galaxian_base(config);
+
+	/* alternate memory map */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(jungsub_map)
+	MCFG_CPU_IO_MAP(jungsub_io_map)
+
+	MCFG_CPU_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8) // clock not verified
+	MCFG_CPU_PROGRAM_MAP(checkman_sound_map)
+	MCFG_CPU_IO_MAP(checkman_sound_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxian_state, irq0_line_hold)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8) // clock not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galaxian_state::explorer)
 	galaxian_base(config);
@@ -7513,6 +7585,8 @@ DRIVER_INIT_MEMBER(galaxian_state,jungsub)
 {
 	/* todo, decrypt program rom */
 	// seems slightly address dependent based on text strings
+
+	decode_mooncrst(0x4000, memregion("maincpu")->base());
 
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, nullptr, nullptr);
@@ -12311,7 +12385,7 @@ GAME( 1981, atlantis,    0,        theend,     atlantis,   galaxian_state, atlan
 GAME( 1981, atlantis2,   atlantis, theend,     atlantis,   galaxian_state, atlantis,   ROT90,  "Comsoft", "Battle of Atlantis (set 2)", MACHINE_SUPPORTS_SAVE )
 
 // Konami L-1200-2 base board with custom Subelectro 113 rom board
-GAME( 1981, jungsub,    jungler,        scramble,   scramble,   galaxian_state, jungsub,   ROT90,  "bootleg (Subelectro)", "Jungler (Subelectro, bootleg on Scramble hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, jungsub,    jungler,   jungsub,    jungsub,    galaxian_state, jungsub,    ROT90,  "bootleg (Subelectro)", "Jungler (Subelectro, bootleg on Scramble hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // mostly works, bad GFX ROM causes lots of glitches
 
 /* Scorpion hardware; based on Scramble but with a 3rd AY-8910 and a speech chip */
 GAME( 1982, scorpion,    0,        scorpion,   scorpion,   galaxian_state, scorpion,   ROT90,  "Zaccaria", "Scorpion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)

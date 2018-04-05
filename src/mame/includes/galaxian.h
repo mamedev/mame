@@ -373,6 +373,7 @@ public:
 	void amigo2(machine_config &config);
 	void zigzag(machine_config &config);
 	void checkman(machine_config &config);
+	void jungsub(machine_config &config);
 	void galaxian_audio(machine_config &config);
 	void mooncrst_audio(machine_config &config);
 	void amigo2_map(address_map &map);
@@ -393,6 +394,8 @@ public:
 	void galaxian_map_base(address_map &map);
 	void galaxian_map_discrete(address_map &map);
 	void jumpbug_map(address_map &map);
+	void jungsub_map(address_map &map);
+	void jungsub_io_map(address_map &map);
 	void kingball_sound_map(address_map &map);
 	void kingball_sound_portmap(address_map &map);
 	void konami_sound_map(address_map &map);

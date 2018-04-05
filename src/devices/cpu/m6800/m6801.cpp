@@ -646,9 +646,9 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 	switch (irqline)
 	{
 	case M6801_SC1_LINE:
-		if (!m_port3_latched && (m_p3csr & M6801_P3CSR_LE))
+		if (!m_sc1_state && (CLEAR_LINE != state))
 		{
-			if (!m_sc1_state && (CLEAR_LINE != state))
+			if (!m_port3_latched && (m_p3csr & M6801_P3CSR_LE))
 			{
 				// latch input data to port 3
 				m_port3_data = (m_io->read_byte(M6801_PORT3) & (m_port3_ddr ^ 0xff)) | (m_port3_data & m_port3_ddr);
@@ -658,8 +658,14 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 				// set IS3 flag bit
 				m_p3csr |= M6801_P3CSR_IS3_FLAG;
 			}
+			else
+			{
+				LOGPORT("Not latching Port 3 Data:%s%s", m_port3_latched ? " already latched" : "", (m_p3csr & M6801_P3CSR_LE) ? "" : " LE clear");
+			}
 		}
 		m_sc1_state = ASSERT_LINE == state;
+		if (CLEAR_LINE != state)
+			standard_irq_callback(M6801_SC1_LINE); // re-entrant - do it after setting m_sc1_state
 		break;
 
 	case M6801_TIN_LINE:

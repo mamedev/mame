@@ -65,6 +65,7 @@ public:
 		, m_ic7(*this, "ic7")
 		, m_ic8(*this, "ic8")
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 1U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ic1_b_w);
@@ -101,7 +102,7 @@ private:
 	uint8_t m_ic6b4;
 	uint8_t m_ic6b7;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
 	required_device<pia6821_device> m_ic2;
@@ -111,6 +112,7 @@ private:
 	required_device<pia6821_device> m_ic7;
 	required_device<pia6821_device> m_ic8;
 	output_finder<42> m_digits;
+	output_finder<7> m_leds;
 };
 
 
@@ -578,12 +580,8 @@ WRITE8_MEMBER( allied_state::ic8_a_w )
 // PB0-4 = ball 1-5 LED; PB5 = shoot again lamp
 WRITE8_MEMBER( allied_state::ic8_b_w )
 {
-	output().set_value("led1", !BIT(data, 0));
-	output().set_value("led2", !BIT(data, 1));
-	output().set_value("led3", !BIT(data, 2));
-	output().set_value("led4", !BIT(data, 3));
-	output().set_value("led5", !BIT(data, 4));
-	output().set_value("led6", !BIT(data, 5));
+	for (int i = 0; i < 6; i++)
+		m_leds[i+1] = !BIT(data, i);
 }
 
 // this line not emulated in PinMAME, maybe it isn't needed
@@ -602,6 +600,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 	m_ic8->ca2_w(BIT(data, 6));
 }
 
+void allied_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
+}
+
 void allied_state::machine_reset()
 {
 	m_display = 0;
@@ -613,7 +617,7 @@ void allied_state::machine_reset()
 	m_ic6a2 = 0;
 	m_ic6b4 = 0;
 	m_ic6b7 = 0;
-	output().set_value("led0", 1);  //1=off
+	m_leds[0] = 1;
 }
 
 MACHINE_CONFIG_START(allied_state::allied)

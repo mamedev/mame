@@ -38,6 +38,7 @@ public:
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
 		, m_switches(*this, "X.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(gts3a);
@@ -64,11 +65,13 @@ private:
 	uint8_t m_u4b;
 	uint8_t m_dmd;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<m65c02_device> m_maincpu;
 	required_device<m65c02_device> m_dmdcpu;
 	required_device<via6522_device> m_u4;
 	required_device<via6522_device> m_u5;
 	required_ioport_array<12> m_switches;
+	output_finder<40> m_digits;
 };
 
 
@@ -238,7 +241,7 @@ WRITE8_MEMBER( gts3a_state::segbank_w )
 	m_segment[offset] = data;
 	seg1 = m_segment[offset&2] | (m_segment[offset|1] << 8);
 	seg2 = bitswap<32>(seg1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
-	output().set_digit_value(m_digit+(BIT(offset, 1) ? 0 : 20), seg2);
+	m_digits[m_digit+(BIT(offset, 1) ? 0 : 20)] = seg2;
 }
 
 WRITE8_MEMBER( gts3a_state::u4b_w )

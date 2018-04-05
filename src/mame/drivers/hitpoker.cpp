@@ -84,10 +84,11 @@ public:
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_READ8_MEMBER(hitpoker_pic_r);
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
+	DECLARE_WRITE_LINE_MEMBER(hitpoker_irq);
+	DECLARE_READ8_MEMBER(irq_clear_r);
 	DECLARE_DRIVER_INIT(hitpoker);
 	virtual void video_start() override;
 	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(hitpoker_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -256,6 +257,19 @@ READ8_MEMBER(hitpoker_state::test_r)
 }
 #endif
 
+WRITE_LINE_MEMBER(hitpoker_state::hitpoker_irq)
+{
+	if (state)
+		m_maincpu->set_input_line(MC68HC11_IRQ_LINE, ASSERT_LINE);
+}
+
+READ8_MEMBER(hitpoker_state::irq_clear_r)
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(MC68HC11_IRQ_LINE, CLEAR_LINE);
+	return 0xff;
+}
+
 /* overlap empty rom addresses */
 void hitpoker_state::hitpoker_map(address_map &map)
 {
@@ -267,7 +281,7 @@ void hitpoker_state::hitpoker_map(address_map &map)
 	map(0x8000, 0xb5ff).rw(this, FUNC(hitpoker_state::hitpoker_vram_r), FUNC(hitpoker_state::hitpoker_vram_w));
 	map(0xb600, 0xbdff).ram();
 	map(0xbe0a, 0xbe0a).portr("IN0");
-	map(0xbe0c, 0xbe0c).portr("IN2"); //irq ack?
+	map(0xbe0c, 0xbe0c).r(this, FUNC(hitpoker_state::irq_clear_r));
 	map(0xbe0d, 0xbe0d).r(this, FUNC(hitpoker_state::rtc_r));
 	map(0xbe0e, 0xbe0e).portr("IN1");
 	map(0xbe50, 0xbe51).w(this, FUNC(hitpoker_state::eeprom_offset_w));
@@ -339,32 +353,6 @@ static INPUT_PORTS_START( hitpoker )
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -470,17 +458,11 @@ static GFXDECODE_START( hitpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_8bpp,   0, 8  )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(hitpoker_state::hitpoker_irq)
-{
-	device.execute().set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
-}
-
 MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_CPU_ADD("maincpu", MC68HC11,1000000)
 	MCFG_CPU_PROGRAM_MAP(hitpoker_map)
 	MCFG_CPU_IO_MAP(hitpoker_io)
 	MCFG_MC68HC11_CONFIG(0, 0x100, 0x01)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hitpoker_state,  hitpoker_irq)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -496,6 +478,7 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_MC6845_ADD("crtc", H46505, "screen", CRTC_CLOCK/2)  /* hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hitpoker_state, hitpoker_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitpoker)
 	MCFG_PALETTE_ADD("palette", 0x800)

@@ -231,6 +231,7 @@
 void bzone_state::machine_start()
 {
 	save_item(NAME(m_analog_data));
+	m_startled.resolve();
 }
 
 

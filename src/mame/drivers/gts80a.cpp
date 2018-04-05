@@ -29,6 +29,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_r0_sound(*this, "r0sound")
 		, m_r1_sound(*this, "r1sound")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(gts80a);
@@ -49,9 +50,11 @@ private:
 	uint8_t m_lamprow;
 	uint8_t m_swrow;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
+	output_finder<60> m_digits;
 };
 
 void gts80a_state::gts80a_map(address_map &map)
@@ -296,15 +299,15 @@ WRITE8_MEMBER( gts80a_state::port2a_w )
 	{
 		case 0x10: // player 1&2
 			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output().set_digit_value(data & 15, seg2);
+			m_digits[data & 15] = seg2;
 			break;
 		case 0x20: // player 3&4
 			if (!BIT(m_segment, 7)) seg2 |= 0x300; // put '1' in the middle
-			output().set_digit_value((data & 15)+20, seg2);
+			m_digits[(data & 15)+20] = seg2;
 			break;
 		case 0x40: // credits & balls
 			if (!BIT(m_segment, 7)) m_segment = 1; // turn '1' back to normal
-			output().set_digit_value((data & 15)+40, patterns[m_segment & 15]);
+			m_digits[(data & 15)+40] = patterns[m_segment & 15];
 			break;
 	}
 }

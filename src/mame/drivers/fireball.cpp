@@ -2,7 +2,7 @@
 // copyright-holders:ANY
 /***********************************************************************************
 
-    fireball.c
+    fireball.cpp
 
     Mechanical game where you have a gun shooting rubber balls.
 
@@ -48,19 +48,12 @@ class fireball_state : public driver_device
 {
 public:
 	fireball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ay(*this, "aysnd"),
-		m_eeprom(*this, "eeprom")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ay(*this, "aysnd")
+		, m_eeprom(*this, "eeprom")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
-
-	uint8_t m_p1_data;
-	uint8_t m_p3_data;
-	uint8_t int_timing;
-	uint8_t int_data;
-	uint8_t ay_data;
-	uint8_t to_ay_data;
-	uint8_t m_display_data;
 
 	DECLARE_WRITE8_MEMBER(io_00_w);
 	DECLARE_READ8_MEMBER(io_00_r);
@@ -79,17 +72,21 @@ public:
 	void fireball(machine_config &config);
 	void fireball_io_map(address_map &map);
 	void fireball_map(address_map &map);
-protected:
 
-	// devices
+private:
+	uint8_t m_p1_data;
+	uint8_t m_p3_data;
+	uint8_t int_timing;
+	uint8_t int_data;
+	uint8_t ay_data;
+	uint8_t to_ay_data;
+	uint8_t m_display_data;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8912_device> m_ay;
 	required_device<eeprom_serial_x24c44_device> m_eeprom;
-
-	// driver_device overrides
-	virtual void machine_reset() override;
-
-private:
+	output_finder<8> m_digits;
 };
 
 /****************************
@@ -116,13 +113,13 @@ WRITE8_MEMBER(fireball_state::io_00_w)
 
 	switch (data&0x0f)
 	{
-		case 1: output().set_digit_value(2, m_display_data);
+		case 1: m_digits[2] = m_display_data;
 				break;
-		case 2: output().set_digit_value(1, m_display_data);
+		case 2: m_digits[1] = m_display_data;
 				break;
-		case 4: output().set_digit_value(4, m_display_data);
+		case 4: m_digits[4] = m_display_data;
 				break;
-		case 8: output().set_digit_value(3, m_display_data);
+		case 8: m_digits[3] = m_display_data;
 				break;
 	}
 
@@ -201,7 +198,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 	if (LOG_DISPLAY2)
 		logerror("On board display write %02X\n",uint8_t(~(data&0xff)));
 
-	output().set_digit_value(7, uint8_t(~(data&0xff)));
+	m_digits[7] = uint8_t(~(data&0xff));
 }
 
 
@@ -448,8 +445,8 @@ INPUT_PORTS_END
 void fireball_state::machine_reset()
 {
 	int_timing=1;
-	output().set_digit_value(5, 0x3f);
-	output().set_digit_value(6, 0x3f);
+	m_digits[5] = 0x3f;
+	m_digits[6] = 0x3f;
 
 	output().set_value("Hopper1", 0);
 	output().set_value("Hopper2", 0);
