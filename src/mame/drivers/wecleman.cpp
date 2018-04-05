@@ -1030,10 +1030,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-
-MACHINE_RESET_MEMBER(wecleman_state,wecleman)
+MACHINE_RESET_MEMBER(wecleman_state, wecleman)
 {
 	m_k007232[0]->set_bank( 0, 1 );
+}
+
+MACHINE_START_MEMBER(wecleman_state, wecleman)
+{
+	m_led.resolve();
 }
 
 MACHINE_CONFIG_START(wecleman_state::wecleman)
@@ -1052,7 +1056,8 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,wecleman)
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1093,7 +1098,12 @@ INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(wecleman_state,hotchase)
+MACHINE_START_MEMBER(wecleman_state, hotchase)
+{
+	m_led.resolve();
+}
+
+MACHINE_RESET_MEMBER(wecleman_state, hotchase)
 {
 	int i;
 
@@ -1123,7 +1133,8 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,hotchase)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
