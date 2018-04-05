@@ -56,7 +56,6 @@ template<typename T> void generic_fifo_device_base<T>::device_start()
 	m_sync_full = timer_alloc(1);
 
 	// This is not saving the fifo, let's hope it's empty...
-	save_item(NAME(m_size));
 	save_item(NAME(m_empty_triggered));
 	save_item(NAME(m_full_triggered));
 }
