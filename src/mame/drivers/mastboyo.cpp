@@ -237,4 +237,4 @@ ROM_START( mastboyo )
 	ROM_LOAD( "masterboy-1987-82s129-l-ic40.bin", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
 ROM_END
 
-GAME( 1987, mastboyo,  0,    mastboyo, mastboyo,  mastboyo_state, 0, ROT0, "Gaelco", "Master Boy (1987, Z80 hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyo,  0,    mastboyo, mastboyo,  mastboyo_state, 0, ROT0, "Gaelco (Covielsa license)", "Master Boy (1987, Z80 hardware)", MACHINE_SUPPORTS_SAVE )
