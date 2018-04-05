@@ -1749,13 +1749,17 @@ MACHINE_START_MEMBER(model1_state,model1)
 							   [this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 							   [this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
 							   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
-							   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); });
+							   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
+							   [    ]() { },
+							   [    ]() { });
 		m_copro_fifo_out->setup(16,
 								[this]() { m_maincpu->stall(); },
 								[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 								[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
 								[this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
-								[this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); });
+								[this]() { m_tgp_copro->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
+								[    ]() { },
+								[    ]() { });
 
 	} else {
 		bool is_swa =
@@ -1773,18 +1777,21 @@ MACHINE_START_MEMBER(model1_state,model1)
 			push_cb = [this]() { copro_hle_vf(); };
 
 		m_copro_fifo_in->setup(16,
-							   [](){},
-							   [](){},
-							   [](){},
+							   [    ]() { },
+							   [    ]() { },
+							   [    ]() { },
 							   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 							   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
-							   push_cb);
+							   push_cb,
+							   [    ]() { });
 		m_copro_fifo_out->setup(16,
 								[this]() { m_maincpu->stall(); },
 								[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 								[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
-								[](){},
-								[](){});
+								[    ]() { },
+								[    ]() { },
+								[    ]() { },
+								[    ]() { });
 	}
 }
 

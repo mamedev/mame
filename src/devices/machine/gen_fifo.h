@@ -58,7 +58,7 @@
  *     (rasterizer, etc).
  *
  * - on_pop:
- *     Called when a new value was just pushed.  That callback is
+ *     Called when a new value was just popped.  That callback is
  *     usually not needed, but it can be useful when the source is not
  *     an executable device but something hardcoded.
  *
@@ -88,8 +88,8 @@ public:
 			   std::function<void ()> on_fifo_unempty,
 			   std::function<void ()> on_fifo_full_post_sync,
 			   std::function<void ()> on_fifo_unfull,
-			   std::function<void ()> on_push = [](){},
-			   std::function<void ()> on_pop = [](){}) {
+			   std::function<void ()> on_push,
+			   std::function<void ()> on_pop) {
 		m_on_fifo_empty_pre_sync = on_fifo_empty_pre_sync;
 		m_on_fifo_empty_post_sync = on_fifo_empty_post_sync;
 		m_on_fifo_unempty = on_fifo_unempty;
