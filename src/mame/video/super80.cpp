@@ -174,7 +174,6 @@ uint32_t super80_state::screen_update_super80e(screen_device &screen, bitmap_ind
 
 	const uint8_t options = m_io_config->read();
 	bool screen_on = BIT(m_portf0, 2) || !BIT(options, 2); /* bit 2 of port F0 is high, OR user turned on config switch */
-		screen_on++;
 
 	uint8_t fg = 0;
 	if (screen_on)
