@@ -209,9 +209,9 @@ MACHINE_START_MEMBER(model2b_state,model2b)
 	MACHINE_START_CALL_MEMBER(model2);
 
 	m_copro_fifo_in->setup(16,
-						   [this]() { },
-						   [this]() { },
-						   [this]() { },
+						   []() { },
+						   []() { },
+						   []() { },
 						   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 						   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
 						   [this]() { m_copro_adsp->set_flag_input(0, m_copro_fifo_in->is_empty()); },
@@ -220,8 +220,8 @@ MACHINE_START_MEMBER(model2b_state,model2b)
 							[this]() { m_maincpu->i960_stall(); },
 							[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 							[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
-							[this]() { },
-							[this]() { },
+							[]() { },
+							[]() { },
 							[this]() { m_copro_adsp->set_flag_input(1, m_copro_fifo_in->is_full()); },
 							[this]() { m_copro_adsp->set_flag_input(1, m_copro_fifo_in->is_full()); });
 }
@@ -231,17 +231,17 @@ MACHINE_START_MEMBER(model2c_state,model2c)
 	MACHINE_START_CALL_MEMBER(model2);
 
 	m_copro_fifo_in->setup(16,
-						   [this]() { },
-						   [this]() { },
-						   [this]() { },
+						   []() { },
+						   []() { },
+						   []() { },
 						   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 						   [this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); });
 	m_copro_fifo_out->setup(16,
 							[this]() { m_maincpu->i960_stall(); },
 							[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); },
 							[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
-							[this]() { },
-							[this]() { });
+							[]() { },
+							[]() { });
 }
 
 MACHINE_START_MEMBER(model2_tgp_state,srallyc)
