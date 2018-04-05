@@ -19,6 +19,10 @@ palazzol@home.com
 #include "screen.h"
 #include "speaker.h"
 
+void starcrus_state::machine_start()
+{
+	m_led.resolve();
+}
 
 void starcrus_state::starcrus_map(address_map &map)
 {
