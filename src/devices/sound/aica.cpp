@@ -15,7 +15,6 @@
 #include "aica.h"
 
 #define ICLIP16(x) (x<-32768)?-32768:((x>32767)?32767:x)
-#define CLIP(x,min,max) (x<min)?min:((x>max)?max:x)
 
 #define SHIFT   12
 #define FIX(v)  ((uint32_t) ((float) (1<<SHIFT)*(v)))
