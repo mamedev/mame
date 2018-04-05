@@ -2101,6 +2101,8 @@ void address_space::check_optimize_all(const char *function, int width, offs_t a
 
 		addrstart &= ~default_lowbits_mask;
 		addrend |= default_lowbits_mask;
+		if(changing_bits < default_lowbits_mask)
+			changing_bits = default_lowbits_mask;
 	}
 
 	nstart = addrstart;

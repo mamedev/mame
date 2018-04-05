@@ -731,7 +731,7 @@ void skns_state::skns_map(address_map &map)
 	/* In between is write only */
 	map(0x0040000c, 0x0040000f).portr("40000c");
 	map(0x00800000, 0x00801fff).ram().share("nvram"); /* 'backup' RAM */
-	map(0x00c00000, 0x00c00003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0xffff0000); /* ymz280_w (sound) */
+	map(0x00c00000, 0x00c00001).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)); /* ymz280_w (sound) */
 	map(0x01000000, 0x0100000f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x01800000, 0x01800003).w(this, FUNC(skns_state::hit2_w));
 	map(0x02000000, 0x02003fff).ram().share("spriteram"); /* sprite ram */
