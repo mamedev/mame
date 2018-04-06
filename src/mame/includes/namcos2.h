@@ -284,6 +284,21 @@ public:
 		, m_rozram(*this, "rozram")
 		, m_roz_ctrl(*this, "rozctrl")
 		, m_c45_road(*this, "c45_road")
+		, m_zip1_output(*this, "zip1")
+		, m_zip10_output(*this, "zip10")
+		, m_zip100_output(*this, "zip100")
+		, m_zap1_output(*this, "zap1")
+		, m_zap10_output(*this, "zap10")
+		, m_zap100_output(*this, "zap100")
+		, m_time1_output(*this, "time1")
+		, m_time10_output(*this, "time10")
+		, m_dollhouse_output(*this, "dollhouse")
+		, m_toybox_output(*this, "toybox")
+		, m_bathroom_output(*this, "bathroom")
+		, m_bureau_output(*this, "bureau")
+		, m_refrigerator_output(*this, "refrigerator")
+		, m_porch_output(*this, "porch")
+		, m_gunrecoil_output(*this, "Player%u_Gun_Recoil", 1U)
 	{ }
 
 	DECLARE_READ8_MEMBER(c68_p5_r);
@@ -293,6 +308,7 @@ public:
 	DECLARE_READ8_MEMBER(dpram_byte_r);
 	DECLARE_WRITE8_MEMBER(dpram_byte_w);
 	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
+	DECLARE_MACHINE_START(gollygho);
 	DECLARE_MACHINE_RESET(sgunner2);
 	DECLARE_DRIVER_INIT(cosmogng);
 	DECLARE_DRIVER_INIT(sgunner2);
@@ -368,6 +384,23 @@ public:
 	uint8_t m_player_mux; // sgunner2 specific
 
 	optional_device<namco_c45_road_device> m_c45_road;
+	
+	// gollygho specific
+	output_finder<> m_zip1_output;
+	output_finder<> m_zip10_output;
+	output_finder<> m_zip100_output;
+	output_finder<> m_zap1_output;
+	output_finder<> m_zap10_output;
+	output_finder<> m_zap100_output;
+	output_finder<> m_time1_output;
+	output_finder<> m_time10_output;
+	output_finder<> m_dollhouse_output;
+	output_finder<> m_toybox_output;
+	output_finder<> m_bathroom_output;
+	output_finder<> m_bureau_output;
+	output_finder<> m_refrigerator_output;
+	output_finder<> m_porch_output;
+	output_finder<2> m_gunrecoil_output;
 
 	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
 	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );

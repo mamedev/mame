@@ -150,6 +150,26 @@ MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 	machine().device<nvram_device>("nvram")->set_base(m_eeprom.get(), m_eeprom_size);
 }
 
+MACHINE_START_MEMBER(namcos2_state,gollygho)
+{
+	MACHINE_START_CALL_MEMBER(namcos2);
+	m_zip1_output.resolve();
+	m_zip10_output.resolve();
+	m_zip100_output.resolve();
+	m_zap1_output.resolve();
+	m_zap10_output.resolve();
+	m_zap100_output.resolve();
+	m_time1_output.resolve();
+	m_time10_output.resolve();
+	m_dollhouse_output.resolve();
+	m_toybox_output.resolve();
+	m_bathroom_output.resolve();
+	m_bureau_output.resolve();
+	m_refrigerator_output.resolve();
+	m_porch_output.resolve();
+	m_gunrecoil_output.resolve();
+}
+
 MACHINE_RESET_MEMBER(namcos2_shared_state, namcos2)
 {
 //  address_space &space = m_maincpu->space(AS_PROGRAM);

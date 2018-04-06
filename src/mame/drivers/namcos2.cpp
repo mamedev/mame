@@ -479,55 +479,55 @@ $a00000 checks have been seen on the Final Lap boards.
 
 void namcos2_state::GollyGhostUpdateLED_c4( int data )
 {
-	output().set_value("zip100", data >> 4);
-	output().set_value("zip10", data & 0x0f);
+	m_zip100_output = data >> 4;
+	m_zip10_output = data & 0x0f;
 }
 
 void namcos2_state::GollyGhostUpdateLED_c6( int data )
 {
-	output().set_value("zip1", data >> 4);
-	output().set_value("time10", data & 0x0f);
+	m_zip1_output = data >> 4;
+	m_time10_output = data & 0x0f;
 }
 
 void namcos2_state::GollyGhostUpdateLED_c8( int data )
 {
-	output().set_value("time1", data >> 4);
-	output().set_value("zap100", data & 0x0f);
+	m_time1_output = data >> 4;
+	m_zap100_output = data & 0x0f;
 }
 
 void namcos2_state::GollyGhostUpdateLED_ca( int data )
 {
-	output().set_value("zap10", data >> 4);
-	output().set_value("zap1", data & 0x0f);
+	m_zap10_output = data >> 4;
+	m_zap1_output = data & 0x0f;
 }
 
 void namcos2_state::GollyGhostUpdateDiorama_c0( int data )
 {
 	if (data & 0x80)
 	{
-		output().set_value("dollhouse", 1); /* diorama is lit up */
+		m_dollhouse_output, 1; /* diorama is lit up */
 
 		/* dollhouse controller; solenoids control physical components */
-		output().set_value("toybox",      (data >> 0) & 1);
-		output().set_value("bathroom",    (data >> 1) & 1);
-		output().set_value("bureau",      (data >> 2) & 1);
-		output().set_value("refrigerator",(data >> 3) & 1);
-		output().set_value("porch",       (data >> 4) & 1);
+		m_toybox_output =        (data >> 0) & 1;
+		m_bathroom_output =      (data >> 1) & 1;
+		m_bureau_output =        (data >> 2) & 1;
+		m_refrigerator_output =  (data >> 3) & 1;
+		m_porch_output =         (data >> 4) & 1;
 		/* gun recoils */
-		output().set_value("Player1_Gun_Recoil",(data & 0x20)>>5);
-		output().set_value("Player2_Gun_Recoil",(data & 0x40)>>6);
+		m_gunrecoil_output[0] = (data & 0x20)>>5;
+		m_gunrecoil_output[1] = (data & 0x40)>>6;
 
 	}
 	else
 	{
-		output().set_value("dollhouse",0);
-		output().set_value("toybox", 0);
-		output().set_value("bathroom", 0);
-		output().set_value("bureau", 0);
-		output().set_value("refrigerator", 0);
-		output().set_value("porch", 0);
-		output().set_value("Player1_Gun_Recoil",0);
-		output().set_value("Player2_Gun_Recoil",0);
+		m_dollhouse_output = 0;
+		m_toybox_output = 0;
+		m_bathroom_output = 0;
+		m_bureau_output = 0;
+		m_refrigerator_output = 0;
+		m_porch_output = 0;
+		m_gunrecoil_output[0] = 0;
+		m_gunrecoil_output[1] = 0;
 	}
 }
 
@@ -1793,7 +1793,7 @@ MACHINE_CONFIG_START(namcos2_state::gollygho)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
-	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,gollygho)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
