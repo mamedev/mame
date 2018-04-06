@@ -295,7 +295,6 @@ void aica_device::Compute_EG(AICA_SLOT *slot)
 	slot->EG.D1R=Get_DR(rate,D1R(slot));
 	slot->EG.D2R=Get_DR(rate,D2R(slot));
 	slot->EG.RR=Get_RR(rate,RR(slot));
-	slot->EG.RR=Get_RR(rate,RR(slot));
 	slot->EG.DL=0x1f-DL(slot);
 }
 
@@ -833,7 +832,7 @@ void aica_device::UpdateRegR(address_space &space, int reg)
 					EG = 0x1fff - EG;
 					if (EG < 0) EG = 0;
 
-					m_udata.data[0x10/2] = (EG & 0x1fF8) | SGC | LP;
+					m_udata.data[0x10/2] = (EG & 0x1ff8) | SGC | LP;
 				}
 				else
 				{
@@ -1329,7 +1328,7 @@ void aica_device::aica_exec_dma(address_space &space)
 			for(i=0;i < m_dma.dlg;i+=2)
 			{
 				uint16_t tmp;
-				tmp = r16(space, m_dma.drga);;
+				tmp = r16(space, m_dma.drga);
 				m_AICARAM[m_dma.dmea] = tmp & 0xff;
 				m_AICARAM[m_dma.dmea+1] = tmp>>8;
 				m_dma.dmea+=4;
