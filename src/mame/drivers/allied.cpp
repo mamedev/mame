@@ -65,7 +65,7 @@ public:
 		, m_ic7(*this, "ic7")
 		, m_ic8(*this, "ic8")
 		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led%u", 1U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ic1_b_w);
