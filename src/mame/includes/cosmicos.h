@@ -54,22 +54,9 @@ public:
 			m_io_data(*this, "DATA"),
 			m_special(*this, "SPECIAL"),
 			m_buttons(*this, "BUTTONS")
+		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
-
-	required_device<cosmac_device> m_maincpu;
-	required_device<cdp1864_device> m_cti;
-	required_device<dm9368_device> m_led;
-	required_device<cassette_image_device> m_cassette;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<ram_device> m_ram;
-	required_memory_region m_rom;
-	required_ioport_array<4> m_key_row;
-	required_ioport m_io_data;
-	required_ioport m_special;
-	required_ioport m_buttons;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -105,7 +92,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cosmicos );
+	DECLARE_DRIVER_INIT(cosmicos);
+	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
+	void cosmicos(machine_config &config);
+	void cosmicos_io(address_map &map);
+	void cosmicos_mem(address_map &map);
 
+private:
 	void set_cdp1802_mode(int mode);
 	void clear_input_data();
 
@@ -132,12 +126,21 @@ public:
 	int m_efx;
 	int m_video_on;
 
-	DECLARE_DRIVER_INIT(cosmicos);
-	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
-	void cosmicos(machine_config &config);
-	void cosmicos_io(address_map &map);
-	void cosmicos_mem(address_map &map);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	required_device<cosmac_device> m_maincpu;
+	required_device<cdp1864_device> m_cti;
+	required_device<dm9368_device> m_led;
+	required_device<cassette_image_device> m_cassette;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_ioport_array<4> m_key_row;
+	required_ioport m_io_data;
+	required_ioport m_special;
+	required_ioport m_buttons;
+	output_finder<10> m_digits;
+	output_finder<14> m_leds;
 };
 
 #endif // MAME_INCLUDES_COSMICOS_H
