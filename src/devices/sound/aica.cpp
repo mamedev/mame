@@ -687,7 +687,7 @@ void aica_device::UpdateReg(address_space &space, int reg)
 				time = (m_clock / m_TimPris[0]) / (255-(m_udata.data[0x90/2]&0xff));
 				if (time)
 				{
-					m_timerA->adjust(attotime::from_hz(double(time / 768.0)));
+					m_timerA->adjust(attotime::from_ticks(768, time));
 				}
 			}
 			break;
@@ -703,7 +703,7 @@ void aica_device::UpdateReg(address_space &space, int reg)
 				time = (m_clock / m_TimPris[1]) / (255-(m_udata.data[0x94/2]&0xff));
 				if (time)
 				{
-					m_timerB->adjust(attotime::from_hz(double(time / 768.0)));
+					m_timerB->adjust(attotime::from_ticks(768, time));
 				}
 			}
 			break;
@@ -719,7 +719,7 @@ void aica_device::UpdateReg(address_space &space, int reg)
 				time = (m_clock / m_TimPris[2]) / (255-(m_udata.data[0x98/2]&0xff));
 				if (time)
 				{
-					m_timerC->adjust(attotime::from_hz(double(time / 768.0)));
+					m_timerC->adjust(attotime::from_ticks(768, time));
 				}
 			}
 			break;
