@@ -1360,7 +1360,7 @@ void metro_state::vmetal_map(address_map &map)
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW,  IPT_START1   ) \
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW,  IPT_START2   ) \
 	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN  ) \
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF, metro_state,custom_soundstatus_r, nullptr)   /* From Sound CPU */
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(DEVICE_SELF, metro_state,custom_soundstatus_r, nullptr)   /* From Sound CPU */
 
 
 #define COINAGE_SERVICE_LOC(DIPBANK) \

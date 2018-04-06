@@ -52,6 +52,7 @@ public:
 		, m_ldv1000(*this, "ldv1000")
 		, m_maincpu(*this, "maincpu")
 		, m_row(*this, "ROW.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{
 	}
 
@@ -103,6 +104,7 @@ public:
 	void check_interrupt();
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_row;
+	output_finder<16> m_digits;
 
 	void thayers(machine_config &config);
 	void thayers_io_map(address_map &map);
@@ -464,7 +466,7 @@ WRITE8_MEMBER(thayers_state::den1_w)
 
 	*/
 
-	output().set_digit_value(data >> 4, led_map[data & 0x0f]);
+	m_digits[data >> 4] = led_map[data & 0x0f];
 }
 
 WRITE8_MEMBER(thayers_state::den2_w)
@@ -484,7 +486,7 @@ WRITE8_MEMBER(thayers_state::den2_w)
 
 	*/
 
-	output().set_digit_value(8 + (data >> 4), led_map[data & 0x0f]);
+	m_digits[8 + (data >> 4)] = led_map[data & 0x0f];
 }
 
 /* SSI-263 */
@@ -696,8 +698,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_START("COIN")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, nullptr)
 
 	PORT_START("ROW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 YES") PORT_CODE(KEYCODE_1)
@@ -764,6 +766,7 @@ INPUT_PORTS_END
 
 void thayers_state::machine_start()
 {
+	m_digits.resolve();
 	memset(&m_ssi263, 0, sizeof(m_ssi263));
 }
 

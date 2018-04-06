@@ -544,24 +544,24 @@ CUSTOM_INPUT_MEMBER( cubo_state::cd32_sel_mirror_input )
 
 static INPUT_PORTS_START( cubo )
 	PORT_START("CIA0PORTA")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM )
 	/* this is the regular port for reading a single button joystick on the Amiga, many CD32 games require this to mirror the pad start button! */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)0)
 
 	PORT_START("CIA0PORTB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)1)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)0)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cubo_input, nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cubo_input, nullptr)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 

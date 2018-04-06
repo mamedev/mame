@@ -31,6 +31,7 @@ public:
 	zac_proto_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(out0_w);
@@ -41,7 +42,9 @@ public:
 	void zac_proto_map(address_map &map);
 private:
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
+	output_finder<11> m_digits;
 };
 
 
@@ -221,9 +224,9 @@ WRITE8_MEMBER( zac_proto_state::digit_w )
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
 	static const uint8_t decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
 	offset<<=1;
-	output().set_digit_value(offset, patterns[data&15] | decimals[offset]);
+	m_digits[offset] = patterns[data&15] | decimals[offset];
 	offset++;
-	output().set_digit_value(offset, patterns[data>>4] | decimals[offset]);
+	m_digits[offset] = patterns[data>>4] | decimals[offset];
 }
 
 WRITE8_MEMBER( zac_proto_state::sound_w )
@@ -233,7 +236,7 @@ WRITE8_MEMBER( zac_proto_state::sound_w )
 
 void zac_proto_state::machine_reset()
 {
-	output().set_digit_value(10, 0x3f); // units shows zero all the time
+	m_digits[10] = 0x3f; // units shows zero all the time
 }
 
 MACHINE_CONFIG_START(zac_proto_state::zac_proto)

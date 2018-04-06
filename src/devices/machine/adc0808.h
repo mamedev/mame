@@ -96,6 +96,7 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(address_w);
 	DECLARE_WRITE_LINE_MEMBER(start_w);
+	DECLARE_READ_LINE_MEMBER(eoc_r);
 
 	// common hookups
 	DECLARE_WRITE8_MEMBER(address_offset_start_w); // start and ale connected, address to the address bus
@@ -130,6 +131,7 @@ private:
 	int m_step;
 	int m_address;
 	uint8_t m_sar;
+	bool m_eoc;
 	bool m_eoc_pending;
 };
 

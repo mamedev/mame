@@ -166,6 +166,10 @@ vt100_keyboard_device::vt100_keyboard_device(const machine_config &mconfig, cons
 	, m_speaker(*this, "beeper")
 	, m_scan_counter(*this, "counter")
 	, m_key_row(*this, "LINE%X", 0)
+	, m_online_led(*this, "online_led")
+	, m_local_led(*this, "local_led")
+	, m_locked_led(*this, "locked_led")
+	, m_ln_led(*this, "l%u_led", 1U)
 	, m_signal_line(true)
 	, m_last_signal_change(attotime::zero)
 	, m_last_scan(0)
@@ -230,13 +234,16 @@ void vt100_keyboard_device::device_start()
 	m_uart->write_cs(1);
 	m_uart->write_swe(0);
 
-	machine().output().set_value("online_led",0);
-	machine().output().set_value("local_led", 1);
-	machine().output().set_value("locked_led",1);
-	machine().output().set_value("l1_led", 1);
-	machine().output().set_value("l2_led", 1);
-	machine().output().set_value("l3_led", 1);
-	machine().output().set_value("l4_led", 1);
+	m_online_led.resolve();
+	m_local_led.resolve();
+	m_locked_led.resolve();
+	m_ln_led.resolve();
+
+	m_online_led = 0;
+	m_local_led = 1;
+	m_locked_led = 1;
+	for (int n = 0; n < 4; n++)
+		m_ln_led[n] = 1;
 
 	save_item(NAME(m_signal_line));
 	save_item(NAME(m_last_signal_change));
@@ -267,13 +274,11 @@ WRITE_LINE_MEMBER(vt100_keyboard_device::signal_line_w)
 		if (dav)
 		{
 			u8 data = m_uart->get_received_data();
-			machine().output().set_value("online_led",BIT(data, 5) ? 1 : 0);
-			machine().output().set_value("local_led", BIT(data, 5) ? 0 : 1);
-			machine().output().set_value("locked_led",BIT(data, 4) ? 0 : 1);
-			machine().output().set_value("l1_led", BIT(data, 3) ? 0 : 1);
-			machine().output().set_value("l2_led", BIT(data, 2) ? 0 : 1);
-			machine().output().set_value("l3_led", BIT(data, 1) ? 0 : 1);
-			machine().output().set_value("l4_led", BIT(data, 0) ? 0 : 1);
+			m_online_led = BIT(data, 5) ? 1 : 0;
+			m_local_led = BIT(data, 5) ? 0 : 1;
+			m_locked_led = BIT(data, 4) ? 0 : 1;
+			for (int n = 0; n < 4; n++)
+				m_ln_led[n] = BIT(data, 3 - n) ? 0 : 1;
 			m_speaker->set_state(BIT(data, 7));
 
 			if (BIT(data, 6))

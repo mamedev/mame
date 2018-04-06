@@ -666,11 +666,11 @@ static INPUT_PORTS_START( dunhuang )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SERVICE3 )      // clear (during boot)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE2 )      // book
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE  )      // test (in game: dips, during boot: service mode)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL  )      // hopper sensor
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM  )      // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE4 )      // payout
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_IMPULSE(2) // "coin jam" otherwise
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )       // 0 = tiles block transferrer busy
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )       // 0 = tiles block transferrer busy
 
 	PORT_START("IN0")       /* IN6 - P1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )

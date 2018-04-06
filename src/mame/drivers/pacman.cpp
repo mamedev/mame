@@ -1847,7 +1847,7 @@ static INPUT_PORTS_START( crush4 )
 	PORT_INCLUDE( maketrax )
 
 	PORT_START("GAME")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) // always select 2nd part of code
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) // always select 2nd part of code
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( korosuke )
@@ -3018,7 +3018,7 @@ static INPUT_PORTS_START( numcrash )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // all ipt_unknown probably ipt_unused, game is one player only
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_SPECIAL ) // or it won't boot "I CAN NOT RUN"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_CUSTOM ) // or it won't boot "I CAN NOT RUN"
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
