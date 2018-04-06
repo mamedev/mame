@@ -41,21 +41,21 @@ enum
 class cosmicos_state : public driver_device
 {
 public:
-	cosmicos_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_cti(*this, CDP1864_TAG),
-			m_led(*this, DM9368_TAG),
-			m_cassette(*this, "cassette"),
-			m_speaker(*this, "speaker"),
-			m_ram(*this, RAM_TAG),
-			m_rom(*this, CDP1802_TAG),
-			m_key_row(*this, {"Y1", "Y2", "Y3", "Y4"}),
-			m_io_data(*this, "DATA"),
-			m_special(*this, "SPECIAL"),
-			m_buttons(*this, "BUTTONS")
-		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led%u", 0U)
+	cosmicos_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, CDP1802_TAG),
+		m_cti(*this, CDP1864_TAG),
+		m_led(*this, DM9368_TAG),
+		m_cassette(*this, "cassette"),
+		m_speaker(*this, "speaker"),
+		m_ram(*this, RAM_TAG),
+		m_rom(*this, CDP1802_TAG),
+		m_key_row(*this, {"Y1", "Y2", "Y3", "Y4"}),
+		m_io_data(*this, "DATA"),
+		m_special(*this, "SPECIAL"),
+		m_buttons(*this, "BUTTONS"),
+		m_digits(*this, "digit%u", 0U),
+		m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER( read );
