@@ -6,15 +6,19 @@
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_TX      (1U << 1)
-#define LOG_RX      (1U << 2)
-#define LOG_PORT    (1U << 3)
+#define LOG_TXTICK  (1U << 2)
+#define LOG_RX      (1U << 3)
+#define LOG_RXTICK  (1U << 4)
+#define LOG_PORT    (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL | LOG_TX | LOG_RS | LOG_PORT)
+//#define VERBOSE (LOG_GENERAL | LOG_TX | LOG_RX | LOG_PORT)
 //#define LOG_OUTPUT_STREAM std::cerr
 #include "logmacro.h"
 
 #define LOGTX(...)      LOGMASKED(LOG_TX, __VA_ARGS__)
+#define LOGTXTICK(...)  LOGMASKED(LOG_TXTICK, __VA_ARGS__)
 #define LOGRX(...)      LOGMASKED(LOG_RX, __VA_ARGS__)
+#define LOGRXTICK(...)  LOGMASKED(LOG_RXTICK, __VA_ARGS__)
 #define LOGPORT(...)    LOGMASKED(LOG_PORT, __VA_ARGS__)
 
 
@@ -443,7 +447,7 @@ int m6801_cpu_device::m6800_rx()
 
 void m6801_cpu_device::serial_transmit()
 {
-	LOGTX("Tx Tick\n");
+	LOGTXTICK("Tx Tick\n");
 
 	if (m_trcsr & M6801_TRCSR_TE)
 	{
@@ -525,7 +529,7 @@ void m6801_cpu_device::serial_transmit()
 
 void m6801_cpu_device::serial_receive()
 {
-	LOGRX("Rx Tick TRCSR %02x bits %u check %02x\n", m_trcsr, m_rxbits, m_trcsr & M6801_TRCSR_RE);
+	LOGRXTICK("Rx Tick TRCSR %02x bits %u check %02x\n", m_trcsr, m_rxbits, m_trcsr & M6801_TRCSR_RE);
 
 	if (m_trcsr & M6801_TRCSR_RE)
 	{
@@ -717,10 +721,7 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_port2_data));
 	save_item(NAME(m_port3_data));
 	save_item(NAME(m_port4_data));
-	save_item(NAME(m_port2_written));
-	save_item(NAME(m_port3_latched));
 	save_item(NAME(m_p3csr));
-	save_item(NAME(m_p3csr_is3_flag_read));
 	save_item(NAME(m_tcsr));
 	save_item(NAME(m_pending_tcsr));
 	save_item(NAME(m_irq2));
@@ -729,8 +730,9 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_counter.d));
 	save_item(NAME(m_output_compare.d));
 	save_item(NAME(m_input_capture));
-	save_item(NAME(m_timer_over.d));
-	save_item(NAME(m_timer_next));
+	save_item(NAME(m_p3csr_is3_flag_read));
+	save_item(NAME(m_port3_latched));
+	save_item(NAME(m_port2_written));
 
 	save_item(NAME(m_trcsr));
 	save_item(NAME(m_rmcr));
@@ -745,6 +747,14 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_trcsr_read_orfe));
 	save_item(NAME(m_trcsr_read_rdrf));
 	save_item(NAME(m_tx));
+	save_item(NAME(m_ext_serclock));
+	save_item(NAME(m_use_ext_serclock));
+
+	save_item(NAME(m_latch09));
+
+	save_item(NAME(m_timer_over.d));
+
+	save_item(NAME(m_timer_next));
 
 	save_item(NAME(m_sc1_state));
 }

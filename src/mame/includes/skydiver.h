@@ -38,7 +38,16 @@ public:
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_leds(*this, "led%u", 0U),
+		m_lamp_s(*this, "lamps"),
+		m_lamp_k(*this, "lampk"),
+		m_lamp_y(*this, "lampy"),
+		m_lamp_d(*this, "lampd"),
+		m_lamp_i(*this, "lampi"),
+		m_lamp_v(*this, "lampv"),
+		m_lamp_e(*this, "lampe"),
+		m_lamp_r(*this, "lampr")
 	{ }
 
 	void skydiver(machine_config &config);
@@ -84,6 +93,15 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
+	output_finder<2> m_leds;
+	output_finder<> m_lamp_s;
+	output_finder<> m_lamp_k;
+	output_finder<> m_lamp_y;
+	output_finder<> m_lamp_d;
+	output_finder<> m_lamp_i;
+	output_finder<> m_lamp_v;
+	output_finder<> m_lamp_e;
+	output_finder<> m_lamp_r;
 	int m_nmion;
 	tilemap_t *m_bg_tilemap;
 	int m_width;

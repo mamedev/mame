@@ -948,42 +948,74 @@ MACHINE_CONFIG_END
 uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	screen_update_n64(screen,bitmap,cliprect);
-
+	screen_update_n64(screen,bitmap,cliprect);	
+	// TODO: extract from the real tables (maybe RLEd inside paletteram words 0xa - 0xf?)
+	static constexpr u8 pal_table[8*8] = 
+	{
+		8, 6, 6, 6, 6, 5, 4, 3,
+		9, 7, 5, 6, 4, 1, 1, 4,
+		9, 8, 6, 5, 1, 1, 1, 5,
+		9, 8, 7, 5, 1, 1, 4, 6,
+		9, 8, 7, 6, 5, 5, 6, 6,
+		9, 8, 6, 7, 7, 6, 5, 6,
+		9, 8, 8, 8, 8, 8, 7, 6,
+		8, 9, 9, 9, 9, 9, 9, 8
+	};
+	
 	for(int offs=0;offs<0x1000/4;offs+=2)
 	{
 		int xi,yi;
 		int r,g,b;
 		int pal_offs;
 		int pal_shift;
+		// 0x400 is another enable? end code if off?
 		//uint16_t tile = m_e90_vram[offs] >> 16;
-		uint16_t pal = m_e90_vram[offs] & 0xff; // guess: 0x1000 entries / word / 4bpp = 0x7f, divided by two below (TODO: why?)
+		
+		// TODO: mask 0x300 on tile seems to be tile number 
+		// (active piece drawn with 0x100, special square blocks drawn with cycling 0x1c0, 0x200 & 0x240)
+		uint16_t attr = m_e90_vram[offs] & 0xffff;
+		// bit 5 disables?
+		if(attr & 0x20)
+			continue;
+		
+		// guess: 0x1000 entries / word / 4bpp = 0x7f, divided by two below
+		// bits 5 and 6 of palette bank seems to be highlight and shadow, separated from this bank
+		uint16_t pal = (attr & 0x06) >> 1;
 		int16_t x = m_e90_vram[offs+1] >> 16;
 		int16_t y = m_e90_vram[offs+1] & 0xffff;
-		pal>>=1;
 		x>>=1;
-		pal_offs = (pal*0x20);
-		pal_offs+= 1; // edit this to get the other colors in the range
-		pal_shift = pal_offs & 1 ? 0 : 16;
-		r = m_e90_pal[pal_offs>>1] >> pal_shift;
-		g = (m_e90_pal[pal_offs>>1] >> (5+pal_shift));
-		b = (m_e90_pal[pal_offs>>1] >> (10+pal_shift));
-		r&=0x1f;
-		g&=0x1f;
-		b&=0x1f;
-		r = (r << 3) | (r >> 2);
-		g = (g << 3) | (g >> 2);
-		b = (b << 3) | (b >> 2);
+		// ghost piece, probably enabled thru one bit of these (as weird as it sounds)
+		if((y & 0xff00) == 0xbc00)
+			pal |= (0x40 >> 1);
+	
+		// color banks
+		// some pieces needs this color adjustment (see T piece / 5 block version of I piece)
+		pal |= (attr & 0xc0) >> 4;
+
 		for(yi=0;yi<8;yi++)
+		{
 			for(xi=0;xi<8;xi++)
 			{
 				int res_x,res_y;
+				uint16_t raw_rgb;
 				res_x = x+xi + 4;
-				res_y = y+yi + 7;
+				res_y = (y & 0xff)+yi + 7;
 
+				pal_offs = (pal*0x10);
+				pal_offs+= pal_table[xi+yi*8];
+				pal_shift = pal_offs & 1 ? 0 : 16;
+				raw_rgb = m_e90_pal[pal_offs>>1] >> pal_shift;
+				r = (raw_rgb & 0x001f) >> 0;
+				g = (raw_rgb & 0x03e0) >> 5;
+				b = (raw_rgb & 0x7c00) >> 10;
+				r = pal5bit(r);
+				g = pal5bit(g);
+				b = pal5bit(b);
+				
 				if(cliprect.contains(res_x, res_y))
 					bitmap.pix32(res_y, res_x) = r << 16 | g << 8 | b;
 			}
+		}
 	}
 	return 0;
 }

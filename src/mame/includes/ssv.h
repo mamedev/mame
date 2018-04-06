@@ -3,6 +3,7 @@
 
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "machine/timer.h"
 #include "machine/upd4701.h"
@@ -19,6 +20,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_dsp(*this, "dsp"),
 		m_upd4701(*this, "upd4701"),
+		m_adc(*this, "adc"),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_scroll(*this, "scroll"),
@@ -27,11 +29,7 @@ public:
 		m_gdfs_tmapscroll(*this, "gdfs_tmapscroll"),
 		m_gdfs_st0020(*this, "st0020_spr"),
 		m_input_sel(*this, "input_sel"),
-		m_io_gun(*this, {"GUNX1", "GUNY1", "GUNX2", "GUNY2"}),
-		m_io_key0(*this, "KEY0"),
-		m_io_key1(*this, "KEY1"),
-		m_io_key2(*this, "KEY2"),
-		m_io_key3(*this, "KEY3"),
+		m_io_key(*this, "KEY%u", 0U),
 		m_io_service(*this, "SERVICE"),
 		m_io_paddle(*this, "PADDLE"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -44,6 +42,7 @@ public:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<upd96050_device> m_dsp;
 	optional_device<upd4701_device> m_upd4701;
+	optional_device<adc0808_device> m_adc;
 
 	required_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_spriteram;
@@ -63,12 +62,9 @@ public:
 	std::unique_ptr<uint16_t[]> m_eaglshot_gfxram;
 	tilemap_t *m_gdfs_tmap;
 	int m_interrupt_ultrax;
-	int m_gdfs_lightgun_select;
 	uint16_t m_sxyreact_serial;
 	int m_sxyreact_dial;
-	uint16_t m_gdfs_eeprom_old;
 	uint32_t m_latches[8];
-	uint8_t m_trackball_select;
 
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(irq_enable_w);
@@ -138,7 +134,7 @@ public:
 	uint32_t screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(gdfs_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(gdfs_adc_int_w);
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -196,11 +192,7 @@ public:
 	void twineag2_map(address_map &map);
 	void ultrax_map(address_map &map);
 protected:
-	optional_ioport_array<4> m_io_gun;
-	optional_ioport m_io_key0;
-	optional_ioport m_io_key1;
-	optional_ioport m_io_key2;
-	optional_ioport m_io_key3;
+	optional_ioport_array<4> m_io_key;
 	optional_ioport m_io_service;
 	optional_ioport m_io_paddle;
 	required_device<gfxdecode_device> m_gfxdecode;

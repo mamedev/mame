@@ -554,5 +554,5 @@ WRITE_LINE_MEMBER(tceptor_state::screen_vblank_tceptor)
 WRITE8_MEMBER(tceptor_state::tceptor2_shutter_w)
 {
 	// 3D scope shutter control
-	output().set_value("shutter", data & 1);
+	m_shutter = BIT(data, 0);
 }
