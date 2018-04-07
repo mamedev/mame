@@ -14,12 +14,12 @@
 
 void model1_state::fifoout_push(u32 data)
 {
-	m_copro_fifo_out->push(u32(data));
+	m_copro_fifo_out->push(std::move(u32(data)));
 }
 
 void model1_state::fifoout_push_f(float data)
 {
-	m_copro_fifo_out->push(f2u(data));
+	m_copro_fifo_out->push(std::move(f2u(data)));
 }
 
 u32 model1_state::fifoin_pop()
@@ -1874,7 +1874,7 @@ WRITE16_MEMBER(model1_state::v60_copro_fifo_w)
 	if(offset) {
 		m_v60_copro_fifo_w = (m_v60_copro_fifo_w & 0x0000ffff) | (data << 16);
 		m_pushpc = m_maincpu->pc();
-		m_copro_fifo_in->push(u32(m_v60_copro_fifo_w));
+		m_copro_fifo_in->push(std::move(u32(m_v60_copro_fifo_w)));
 
 	} else
 		m_v60_copro_fifo_w = (m_v60_copro_fifo_w & 0xffff0000) | data;

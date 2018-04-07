@@ -406,13 +406,13 @@ void mb86235_device::read_fifoin(void *param)
 void mb86235_device::write_fifoout0(void *param)
 {
 	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_fifoout0->push(u32(cpu->m_cur_value));
+	cpu->m_fifoout0->push(std::move(u32(cpu->m_cur_value)));
 }
 
 void mb86235_device::write_fifoout1(void *param)
 {
 	mb86235_device *cpu = (mb86235_device *)param;
-	cpu->m_fifoout1->push(u32(cpu->m_cur_value));
+	cpu->m_fifoout1->push(std::move(u32(cpu->m_cur_value)));
 }
 
 void mb86235_device::empty_fifoin(void *param)
