@@ -124,9 +124,9 @@
  *
  *************************************/
 
-#define CPU_CLOCK           8000000     /* not used when video board is connected */
-#define VIDEO_CLOCK         15468000
-#define SINDBADM_SOUND_CLOCK 8000000
+#define CPU_CLOCK           8_MHz_XTAL     /* not used when video board is connected */
+#define VIDEO_CLOCK         15.46848_MHz_XTAL
+#define SINDBADM_SOUND_CLOCK 8_MHz_XTAL
 
 #define PIXEL_CLOCK         (VIDEO_CLOCK/3)
 
@@ -974,10 +974,10 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/4)
+	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/2) /* matches PCB videos, correct? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/2)
+	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/4) /* matches PCB videos, correct? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
