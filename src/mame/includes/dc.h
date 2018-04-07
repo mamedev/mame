@@ -18,24 +18,22 @@
 
 class dc_state : public driver_device
 {
-	public:
-		dc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		dc_framebuffer_ram(*this, "frameram"),
-		dc_texture_ram(*this, "dc_texture_ram"),
-		dc_sound_ram(*this, "dc_sound_ram"),
-		dc_ram(*this, "dc_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_powervr2(*this, "powervr2"),
-		m_maple(*this, "maple_dc"),
-		m_naomig1(*this, "rom_board"),
-		m_aica(*this, "aica") { }
+public:
+	dc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, dc_framebuffer_ram(*this, "frameram")
+		, dc_texture_ram(*this, "dc_texture_ram")
+		, dc_ram(*this, "dc_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_powervr2(*this, "powervr2")
+		, m_maple(*this, "maple_dc")
+		, m_naomig1(*this, "rom_board")
+		, m_aica(*this, "aica")
+	{ }
 
 	required_shared_ptr<uint64_t> dc_framebuffer_ram; // '32-bit access area'
 	required_shared_ptr<uint64_t> dc_texture_ram; // '64-bit access area'
 
-	required_shared_ptr<uint32_t> dc_sound_ram;
 	required_shared_ptr<uint64_t> dc_ram;
 
 	/* machine related */
@@ -59,10 +57,6 @@ class dc_state : public driver_device
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(g2_dma_irq);
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
-	DECLARE_READ32_MEMBER(dc_aica_reg_r);
-	DECLARE_WRITE32_MEMBER(dc_aica_reg_w);
-	DECLARE_READ32_MEMBER(dc_arm_aica_r);
-	DECLARE_WRITE32_MEMBER(dc_arm_aica_w);
 	void g2_dma_execute(address_space &space, int channel);
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 	inline int decode_reg3216_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
@@ -79,14 +73,10 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER( dc_modem_w );
 	DECLARE_WRITE8_MEMBER( g1_irq );
 	DECLARE_WRITE8_MEMBER( pvr_irq );
-	DECLARE_READ64_MEMBER( sh4_soundram_r );
-	DECLARE_WRITE64_MEMBER( sh4_soundram_w );
-	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
 
 
 	required_device<sh4_base_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
 	required_device<powervr2_device> m_powervr2;
 	required_device<maple_dc_device> m_maple;
 	optional_device<naomi_g1_device> m_naomig1;
@@ -97,7 +87,6 @@ class dc_state : public driver_device
 	DECLARE_MACHINE_RESET(dc_console);
 
 	void naomi_aw_base(machine_config &config);
-	void dc_audio_map(address_map &map);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/
