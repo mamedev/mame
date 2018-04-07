@@ -245,27 +245,32 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			}
 		}
 
+		int memreg = (opcode >> 16) & 0xf;
 		WritePadding(stream, start_position);
-		util::stream_format( stream, "R%d, [R%d",
-			(opcode>>12)&0xf, (opcode>>16)&0xf );
+		util::stream_format(stream, "R%d, [R%d", (opcode >> 12) & 0xf, memreg);
 
 		if( opcode&0x02000000 )
 		{
 			/* register form */
-			WriteRegisterOperand1( stream, opcode );
-			util::stream_format( stream, "]" );
+			WriteRegisterOperand1(stream, opcode);
+			util::stream_format(stream, "]");
 		}
 		else
 		{
 			/* immediate form */
-			util::stream_format( stream, "]" );
+			util::stream_format(stream, "]");
+			uint16_t displacement = opcode & 0xfff;
 			if( opcode&0x00800000 )
 			{
-				util::stream_format( stream, ", #$%x", opcode&0xfff );
+				util::stream_format(stream, ", #$%x", displacement);
+				if (memreg == 15)
+					util::stream_format(stream, " ; [$%x]", pc + 8 + displacement);
 			}
 			else
 			{
-				util::stream_format( stream, ", -#$%x", opcode&0xfff );
+				util::stream_format(stream, ", -#$%x", displacement);
+				if (memreg == 15)
+					util::stream_format(stream, " ; [$%x]", pc + 8 - displacement);
 			}
 		}
 	}
