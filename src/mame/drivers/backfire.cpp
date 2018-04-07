@@ -42,10 +42,6 @@ public:
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
 		m_eeprom(*this, "eeprom"),
-		m_io_in0(*this, "IN0"),
-		m_io_in1(*this, "IN1"),
-		m_io_in2(*this, "IN2"),
-		m_io_in3(*this, "IN3"),
 		m_adc(*this, "adc"),
 		m_palette(*this, "palette"),
 		m_lscreen(*this, "lscreen")
@@ -69,14 +65,14 @@ private:
 	DECLARE_READ32_MEMBER(spriteram2_r);
 	DECLARE_WRITE32_MEMBER(spriteram2_w);
 	DECLARE_READ32_MEMBER(backfire_speedup_r);
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ32_MEMBER(pot_select_r);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(deco32_vbl_interrupt);
+	DECLARE_WRITE32_MEMBER(irq_ack_w);
 	void descramble_sound();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
@@ -102,20 +98,16 @@ private:
 	required_device<deco16ic_device> m_deco_tilegen2;
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<adc0808_device> m_adc;
+
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_lscreen;
 
 	/* memory */
 	uint16_t    m_pf1_rowscroll[0x0800/2];
 	uint16_t    m_pf2_rowscroll[0x0800/2];
 	uint16_t    m_pf3_rowscroll[0x0800/2];
 	uint16_t    m_pf4_rowscroll[0x0800/2];
-
-	required_ioport m_io_in0;
-	required_ioport m_io_in1;
-	required_ioport m_io_in2;
-	required_ioport m_io_in3;
-	required_device<adc0808_device> m_adc;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_lscreen;
 };
 
 //uint32_t *backfire_180010, *backfire_188010;
@@ -208,37 +200,11 @@ uint32_t backfire_state::screen_update_right(screen_device &screen, bitmap_ind16
 
 
 
-READ32_MEMBER(backfire_state::eeprom_r)
+WRITE8_MEMBER(backfire_state::eeprom_w)
 {
-	return (m_eeprom->do_read() << 24) | m_io_in0->read()
-			| ((m_io_in2->read() & 0xbf) << 16)
-			| ((m_io_in3->read() & 0x40) << 16) | (m_adc->eoc_r() << 26) ;
-}
-
-READ32_MEMBER(backfire_state::control2_r)
-{
-//  logerror("%08x:Read eprom %08x (%08x)\n", m_maincpu->pc(), offset << 1, mem_mask);
-	return (m_eeprom->do_read() << 24) | m_io_in1->read() | (m_io_in1->read() << 16);
-}
-
-#ifdef UNUSED_FUNCTION
-READ32_MEMBER(backfire_state::control3_r)
-{
-//  logerror("%08x:Read eprom %08x (%08x)\n", m_maincpu->pc(), offset << 1, mem_mask);
-	return (m_eeprom->do_read() << 24) | m_io_in2->read() | (m_io_in2->read() << 16);
-}
-#endif
-
-
-WRITE32_MEMBER(backfire_state::eeprom_w)
-{
-//  logerror("%s:write eprom %08x (%08x) %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
-	if (ACCESSING_BITS_0_7)
-	{
-		m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->di_write(BIT(data, 0));
-		m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write(BIT(data, 0));
+	m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -305,76 +271,66 @@ void backfire_state::backfire_map(address_map &map)
 	map(0x154000, 0x154fff).rw(this, FUNC(backfire_state::pf4_rowscroll_r), FUNC(backfire_state::pf4_rowscroll_w));
 	map(0x160000, 0x161fff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
 	map(0x170000, 0x177fff).ram().share("mainram");// main ram
-
 	map(0x180010, 0x180013).nopw(); // always 180010 ?
-	map(0x188010, 0x188013).nopw(); // always 188010 ?
-
 	map(0x184000, 0x185fff).rw(this, FUNC(backfire_state::spriteram1_r), FUNC(backfire_state::spriteram1_w));
+	map(0x188010, 0x188013).nopw(); // always 188010 ?
 	map(0x18c000, 0x18dfff).rw(this, FUNC(backfire_state::spriteram2_r), FUNC(backfire_state::spriteram2_w));
-	map(0x190000, 0x190003).r(this, FUNC(backfire_state::eeprom_r));
-	map(0x194000, 0x194003).r(this, FUNC(backfire_state::control2_r));
-	map(0x1a4000, 0x1a4003).w(this, FUNC(backfire_state::eeprom_w));
-
+	map(0x190000, 0x190003).portr("IN0");
+	map(0x194000, 0x194003).portr("IN1");
+	map(0x1a4000, 0x1a4000).w(this, FUNC(backfire_state::eeprom_w));
 	map(0x1a8000, 0x1a8003).ram().share("left_priority");
 	map(0x1ac000, 0x1ac003).ram().share("right_priority");
-	map(0x1b0000, 0x1b0003).nopw(); // always 1b0000
-
+	map(0x1b0000, 0x1b0003).w(this, FUNC(backfire_state::irq_ack_w));
+	map(0x1c0000, 0x1c0007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
 	map(0x1e4000, 0x1e4000).r("adc", FUNC(adc0808_device::data_r));
 	map(0x1e8000, 0x1e8007).r(this, FUNC(backfire_state::pot_select_r));
-
-	map(0x1c0000, 0x1c0007).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x000000ff);
 }
 
 
 static INPUT_PORTS_START( backfire )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x00080000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("lscreen")
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED ) /* 'soundmask' */
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("lscreen")
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
+	PORT_BIT( 0xf8000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("lscreen")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) /* 'soundmask' */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN3")
-	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED ) /* all other bits like low IN2 */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("lscreen")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0xfff80000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PADDLE0")
-	PORT_BIT ( 0xff, 0x80, IPT_PADDLE ) PORT_PLAYER(1) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_BIT ( 0xff, 0x80, IPT_PADDLE ) PORT_PLAYER(1) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
 	PORT_START("PADDLE1")
-	PORT_BIT ( 0xff, 0x80, IPT_PADDLE ) PORT_PLAYER(2) PORT_MINMAX(0x40, 0xc0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_BIT ( 0xff, 0x80, IPT_PADDLE ) PORT_PLAYER(2) PORT_MINMAX(0x20, 0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 INPUT_PORTS_END
 
 
@@ -429,7 +385,12 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(backfire_state::deco32_vbl_interrupt)
 {
 	if (state)
-		m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
+}
+
+WRITE32_MEMBER(backfire_state::irq_ack_w)
+{
+	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 }
 
 
