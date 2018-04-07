@@ -2625,8 +2625,6 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gdfs_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(ssv_state, interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2635,7 +2633,7 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	MCFG_ADC0808_IN1_CB(IOPORT("GUNY1"))
 	MCFG_ADC0808_IN2_CB(IOPORT("GUNX2"))
 	MCFG_ADC0808_IN3_CB(IOPORT("GUNY2"))
-	MCFG_ADC0808_EOC_FF_CB(WRITELINE(ssv_state, gdfs_adc_int_w))
+	MCFG_ADC0808_EOC_CB(WRITELINE(ssv_state, gdfs_adc_int_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
