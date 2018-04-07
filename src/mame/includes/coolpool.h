@@ -33,9 +33,6 @@ public:
 	required_shared_ptr<uint16_t> m_nvram;
 	required_region_ptr<uint8_t> m_dsp_rom;
 
-	uint8_t m_cmd_pending;
-	uint16_t m_iop_cmd;
-	uint16_t m_iop_answer;
 	int m_iop_romaddr;
 
 	uint8_t m_newx[3];
