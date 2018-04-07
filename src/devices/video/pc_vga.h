@@ -519,6 +519,11 @@ public:
 	virtual WRITE8_MEMBER(port_03d0_w) override;
 	virtual READ8_MEMBER(mem_r) override;
 	virtual WRITE8_MEMBER(mem_w) override;
+	
+	READ8_MEMBER(isa_aperture_r);
+	WRITE8_MEMBER(isa_aperture_w);
+	READ16_MEMBER(isa_aperture16_r);
+	WRITE16_MEMBER(isa_aperture16_w);
 
 protected:
 	virtual void device_start() override;
@@ -537,6 +542,7 @@ private:
 		uint8_t dac_ctrl;
 		uint8_t dac_state;
 		uint8_t horz_overflow;
+		uint8_t vsconf1;
 		uint8_t aux_ctrl;
 		bool ext_reg_ena;
 		uint8_t misc1;

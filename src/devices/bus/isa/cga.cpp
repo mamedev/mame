@@ -615,7 +615,6 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_gfx_4bpph_update_row )
 	}
 }
 
-
 /***************************************************************************
   Draw graphics mode with 320x200 pixels (default) with 2 bits/pixel.
   Even scanlines are from CGA_base + 0x0000, odd from CGA_base + 0x2000

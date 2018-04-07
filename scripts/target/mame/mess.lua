@@ -2161,6 +2161,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/68ksbc.cpp",
 	MAME_DIR .. "src/mame/drivers/craft.cpp",
 	MAME_DIR .. "src/mame/drivers/homez80.cpp",
+	MAME_DIR .. "src/mame/drivers/luigisbc.cpp",
 	MAME_DIR .. "src/mame/drivers/p112.cpp",
 	MAME_DIR .. "src/mame/drivers/phunsy.cpp",
 	MAME_DIR .. "src/mame/drivers/pimps.cpp",
