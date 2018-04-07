@@ -29,19 +29,11 @@ public:
 		m_paletterom(*this, "palette")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_WRITE8_MEMBER(fgram2_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_PALETTE_INIT(mastboyo);
-
 	void mastboyo(machine_config &config);
-	void mastboyo_map(address_map &map);
-	void mastboyo_portmap(address_map &map);
+
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	uint32_t screen_update_mastboyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	tilemap_t *m_fg_tilemap;
@@ -53,6 +45,16 @@ private:
 	required_memory_bank m_bank1;
 	required_region_ptr<uint8_t> m_questionrom;
 	required_region_ptr<uint8_t> m_paletterom;
+
+	void mastboyo_map(address_map &map);
+	void mastboyo_portmap(address_map &map);
+
+	DECLARE_WRITE8_MEMBER(fgram_w);
+	DECLARE_WRITE8_MEMBER(fgram2_w);
+	DECLARE_WRITE8_MEMBER(rombank_w);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	uint32_t screen_update_mastboyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(mastboyo);
 };
 
 TILE_GET_INFO_MEMBER(mastboyo_state::get_fg_tile_info)
@@ -103,12 +105,12 @@ void mastboyo_state::mastboyo_portmap(address_map &map)
 
 void mastboyo_state::mastboyo_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom(); 
+	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("nvram");
 	map(0x5000, 0x53ff).ram().w(this, FUNC(mastboyo_state::fgram_w)).share("fgram");
 	map(0x5400, 0x57ff).ram().w(this, FUNC(mastboyo_state::fgram2_w)).share("fgram2");
 	map(0x6000, 0x6000).w(this, FUNC(mastboyo_state::rombank_w));
-//	map(0x7000, 0x7000).portr("UNK"); // possible watchdog? or IRQ ack?
+//  map(0x7000, 0x7000).portr("UNK"); // possible watchdog? or IRQ ack?
 	map(0x8000, 0xffff).bankr("bank1");
 }
 

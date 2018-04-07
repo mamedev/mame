@@ -3,7 +3,7 @@
 /*
     Master Boy - Gaelco (c)1991
 
-	this is the 2nd release of Master Boy, the original 1987 game is on different hardware, see mastboyo.cpp for that one
+    this is the 2nd release of Master Boy, the original 1987 game is on different hardware, see mastboyo.cpp for that one
 
     MAME Driver by David Haywood
 
@@ -468,6 +468,14 @@ public:
 		, m_vram(*this, "vram")
 	{ }
 
+	void mastboy(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<ls259_device> m_outlatch;
@@ -494,14 +502,10 @@ public:
 	DECLARE_READ8_MEMBER(nmi_read);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-	void mastboy(machine_config &config);
+
 	void bank_c000_map(address_map &map);
 	void mastboy_io_map(address_map &map);
 	void mastboy_map(address_map &map);
@@ -925,7 +929,7 @@ ROM_START( mastboya )
 	/*                  0x1c0000 tt 0x1fffff EMPTY */
 ROM_END
 
-/* Is this actually official, or a hack? - I think the internal ROM shouild be different on the Italian sets as it indexes the wrong strings on the startup screens, showing MARK instead of PLAY MARK etc. so marked as BAD_DUMP on these sets */
+/* Is this actually official, or a hack? - I think the internal ROM should be different on the Italian sets as it indexes the wrong strings on the startup screens, showing MARK instead of PLAY MARK etc. so marked as BAD_DUMP on these sets */
 ROM_START( mastboyi )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
