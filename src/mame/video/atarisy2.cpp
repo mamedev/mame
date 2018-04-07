@@ -218,7 +218,7 @@ WRITE16_MEMBER( atarisy2_state::slapstic_w )
 WRITE16_MEMBER( atarisy2_state::spriteram_w )
 {
 	/* force an update if the link of object 0 is about to change */
-	if (offs == 0x0003)
+	if (offset == 0x0003)
 		m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_mob->spriteram()[offset]);
 }
