@@ -210,9 +210,9 @@ uint32_t backfire_state::screen_update_right(screen_device &screen, bitmap_ind16
 
 READ32_MEMBER(backfire_state::eeprom_r)
 {
-	return ((m_eeprom->do_read() << 24) | m_io_in0->read()
+	return (m_eeprom->do_read() << 24) | m_io_in0->read()
 			| ((m_io_in2->read() & 0xbf) << 16)
-			| ((m_io_in3->read() & 0x40) << 16)) ^ (m_adc->eoc_r() << 26) ;
+			| ((m_io_in3->read() & 0x40) << 16) | (m_adc->eoc_r() << 26) ;
 }
 
 READ32_MEMBER(backfire_state::control2_r)
