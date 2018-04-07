@@ -1858,6 +1858,7 @@ files {
 	MAME_DIR .. "src/mame/includes/glass.h",
 	MAME_DIR .. "src/mame/video/glass.cpp",
 	MAME_DIR .. "src/mame/drivers/mastboy.cpp",
+	MAME_DIR .. "src/mame/drivers/mastboyo.cpp",
 	MAME_DIR .. "src/mame/drivers/rollext.cpp",
 	MAME_DIR .. "src/mame/drivers/splash.cpp",
 	MAME_DIR .. "src/mame/includes/splash.h",
