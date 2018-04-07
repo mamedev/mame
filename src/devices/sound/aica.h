@@ -12,14 +12,16 @@
 #pragma once
 
 #include "aicadsp.h"
-#include "cpu/arm7/arm7.h"
-#include "cpu/arm7/arm7core.h"
-#include "machine/input_merger.h"
-#include "machine/ram.h"
 
+
+#define MCFG_AICA_MASTER \
+	downcast<aica_device &>(*device).set_master(true);
 
 #define MCFG_AICA_ROFFSET(offs) \
 	downcast<aica_device &>(*device).set_roffset((offs));
+
+#define MCFG_AICA_IRQ_CB(cb) \
+	devcb = &downcast<aica_device &>(*device).set_irq_callback((DEVCB_##cb));
 
 #define MCFG_AICA_MAIN_IRQ_CB(cb) \
 	devcb = &downcast<aica_device &>(*device).set_main_irq_callback((DEVCB_##cb));
@@ -28,17 +30,12 @@ class aica_device : public device_t,
 									public device_sound_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
-
 	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_master(bool master) { m_master = master; }
 	void set_roffset(int roffset) { m_roffset = roffset; }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> devcb_base &set_main_irq_callback(Object &&cb) { return m_main_irq_cb.set_callback(std::forward<Object>(cb)); }
-	
-	// AICA RAM access
-	DECLARE_READ8_MEMBER( ram_r );
-	DECLARE_READ8_MEMBER( ram_host_r );
-	DECLARE_WRITE8_MEMBER( ram_w );
 
 	// AICA register access
 	DECLARE_READ16_MEMBER( read );
@@ -48,13 +45,11 @@ public:
 	DECLARE_WRITE16_MEMBER( midi_in );
 	DECLARE_READ16_MEMBER( midi_out_r );
 
-	void internal_map(address_map &map);
+	void set_ram_base(void *base, int size);
+
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -111,8 +106,8 @@ private:
 		uint8_t lpend;
 	};
 
+
 	unsigned char DecodeSCI(unsigned char irq);
-	void InterruptUpdate(int line, int state);
 	void ResetInterrupts();
 
 	void CheckPendingIRQ();
@@ -148,15 +143,11 @@ private:
 	inline signed int AICAALFO_Step(AICA_LFO_t *LFO);
 	void AICALFO_ComputeStep(AICA_LFO_t *LFO,uint32_t LFOF,uint32_t LFOWS,uint32_t LFOS,int ALFO);
 
-	required_device<arm7_cpu_device> m_arm7di;
-	required_device<input_merger_any_high_device> m_armirq;
-	required_device<ram_device> m_ram;
-
-	int m_ram_size;
-	uint32_t m_clock, m_rate;
-
+	bool m_master;
 	int m_roffset;                /* offset in the region */
+	devcb_write_line m_irq_cb;
 	devcb_write_line m_main_irq_cb;
+	optional_memory_region m_ram_region;
 
 	union
 	{
@@ -173,6 +164,9 @@ private:
 	uint32_t m_AICARAM_LENGTH, m_RAM_MASK, m_RAM_MASK16;
 	sound_stream * m_stream;
 
+	std::unique_ptr<int32_t[]> m_buffertmpl;
+	std::unique_ptr<int32_t[]> m_buffertmpr;
+
 	uint32_t m_IrqTimA;
 	uint32_t m_IrqTimBC;
 	uint32_t m_IrqMidi;
@@ -186,9 +180,6 @@ private:
 
 	int m_TimPris[3];
 	int m_TimCnt[3];
-	
-	int m_armrst;
-	int m_rp;
 
 	uint16_t m_mcieb, m_mcipd;
 
