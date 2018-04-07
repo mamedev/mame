@@ -246,19 +246,19 @@ void tnx1_state::maincpu_io_map(address_map &map)
 }
 
 
-template<typename t>
-class brazehs : public t
+template<typename T>
+class brazehs : public T
 {
 public:
 	brazehs(const machine_config &mconfig, device_type type, const char *tag) :
-		t(mconfig, type, tag),
+		T(mconfig, type, tag),
 		m_eeprom(*this, "eeprom")
 	{
 	}
 
 	virtual void config(machine_config &config) override
 	{
-		t::config(config);
+		T::config(config);
 		config.device_add(this, "eeprom", EEPROM_SERIAL_93C46_8BIT, 0);
 	}
 
@@ -267,7 +267,7 @@ protected:
 
 	virtual void driver_start() override
 	{
-		t::driver_start();
+		T::driver_start();
 
 		uint8_t *rom = this->memregion("brazehs")->base();
 		int len = this->memregion("brazehs")->bytes();
@@ -293,7 +293,7 @@ protected:
 
 	virtual void maincpu_program_map(address_map &map) override
 	{
-		t::maincpu_program_map(map);
+		T::maincpu_program_map(map);
 		map(0x0000, 0x7fff).rom().region("brazehs", 0);
 		map(0x9000, 0x9000).rw(this, FUNC(brazehs::eeprom_r), FUNC(brazehs::eeprom_w));
 	}
