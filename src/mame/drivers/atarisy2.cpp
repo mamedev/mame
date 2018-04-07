@@ -204,8 +204,8 @@ MACHINE_START_MEMBER(atarisy2_state,atarisy2)
 	save_item(NAME(m_p2portrd_state));
 	save_item(NAME(m_sound_reset_state));
 
-	m_rombank1->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x2000);
-	m_rombank2->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x2000);
+	for (int bank = 0; bank < 2; bank++)
+		m_rombank[bank]->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
 
@@ -296,10 +296,7 @@ WRITE16_MEMBER(atarisy2_state::bankselect_w)
 	int banknumber = ((data >> 10) & 0x3f) ^ 0x03;
 	banknumber = bitswap<16>(banknumber, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 1, 0, 3, 2);
 
-	if (offset)
-		m_rombank2->set_entry(banknumber);
-	else
-		m_rombank1->set_entry(banknumber);
+	m_rombank[offset]->set_entry(banknumber);
 }
 
 
@@ -726,7 +723,6 @@ WRITE8_MEMBER(atarisy2_state::coincount_w)
 }
 
 
-
 /*************************************
  *
  *  Main CPU memory handlers
@@ -752,13 +748,29 @@ void atarisy2_state::main_map(address_map &map)
 	map(0x1780, 0x1781).mirror(0x007e).w(this, FUNC(atarisy2_state::yscroll_w)).share("yscroll");
 	map(0x1800, 0x1801).mirror(0x03fe).r(this, FUNC(atarisy2_state::switch_r)).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x1c00, 0x1c01).mirror(0x03fe).r(this, FUNC(atarisy2_state::sound_r));
-	map(0x2000, 0x3fff).rw(this, FUNC(atarisy2_state::videoram_r), FUNC(atarisy2_state::videoram_w));
+	map(0x2000, 0x3fff).m(m_vrambank, FUNC(address_map_bank_device::amap16));
 	map(0x4000, 0x5fff).bankr("rombank1");
 	map(0x6000, 0x7fff).bankr("rombank2");
 	map(0x8000, 0xffff).rom();
 	map(0x8000, 0x81ff).rw(this, FUNC(atarisy2_state::slapstic_r), FUNC(atarisy2_state::slapstic_w)).share("slapstic_base");
 }
 
+
+/*************************************
+ *
+ *  Bankswitched VRAM handlers
+ *
+ *************************************/
+
+/* full memory map derived from schematics */
+void atarisy2_state::vrambank_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x17ff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
+	map(0x1800, 0x1fff).ram().w(this, FUNC(atarisy2_state::spriteram_w)).share("mob");
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x7fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
+}
 
 
 /*************************************
@@ -788,7 +800,6 @@ void atarisy2_state::sound_map(address_map &map)
 	map(0x187e, 0x187e).mirror(0x2781).w(this, FUNC(atarisy2_state::sound_reset_w));
 	map(0x4000, 0xffff).rom();
 }
-
 
 
 /*************************************
@@ -1114,7 +1125,6 @@ static INPUT_PORTS_START( apb )
 INPUT_PORTS_END
 
 
-
 /*************************************
  *
  *  Graphics definitions
@@ -1127,9 +1137,9 @@ static const gfx_layout anlayout =
 	RGN_FRAC(1,1),
 	2,
 	{ 0, 4 },
-	{ 0, 1, 2, 3, 8, 9, 10, 11 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	8*16
+	{ STEP4(0,1), STEP4(8,1) },
+	{ STEP8(0,8*2) },
+	8*8*2
 };
 
 
@@ -1139,9 +1149,9 @@ static const gfx_layout pflayout =
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
-	{ 0, 1, 2, 3, 8, 9, 10, 11 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	8*16
+	{ STEP4(0,1), STEP4(8,1) },
+	{ STEP8(0,8*2) },
+	8*8*2
 };
 
 
@@ -1151,9 +1161,9 @@ static const gfx_layout molayout =
 	RGN_FRAC(1,2),
 	4,
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
-	{ 0, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19, 24, 25, 26, 27 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
-	8*64
+	{ STEP4(8*0,1), STEP4(8*1,1), STEP4(8*2,1), STEP4(8*3,1) },
+	{ STEP8(0,8*4) },
+	16*16*2
 };
 
 
@@ -1216,6 +1226,13 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarisy2_state, vblank_int))
 
+	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+
 	MCFG_VIDEO_START_OVERRIDE(atarisy2_state,atarisy2)
 
 	/* sound hardware */
@@ -1277,8 +1294,6 @@ MACHINE_CONFIG_START(atarisy2_state::apb)
 	atarisy2(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 110)
 MACHINE_CONFIG_END
-
-
 
 
 /*************************************
@@ -1499,6 +1514,7 @@ ROM_START( paperboyp )
 	ROM_REGION( 0x2000, "gfx3", 0 )
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, BAD_DUMP CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 ROM_END
+
 
 ROM_START( 720 )
 	ROM_REGION( 0x90000, "maincpu", 0 )     /* 9 * 64k T11 code */
@@ -1906,7 +1922,6 @@ ROM_START( 720gr1 )
 	ROM_REGION( 0x200, "eeprom", 0 )
 	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
 ROM_END
-
 
 
 ROM_START( ssprint )
@@ -3237,7 +3252,6 @@ ROM_START( apbf )
 ROM_END
 
 
-
 /*************************************
  *
  *  Driver initialization
@@ -3310,7 +3324,6 @@ DRIVER_INIT_MEMBER(atarisy2_state,apb)
 	m_pedal_count = 2;
 	m_tms5220->rsq_w(1); // /RS is tied high on sys2 hw
 }
-
 
 
 /*************************************
