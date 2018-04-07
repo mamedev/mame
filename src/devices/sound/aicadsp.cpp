@@ -10,7 +10,7 @@ static uint16_t PACK(int32_t val)
 	int sign,exponent,k;
 
 	sign = (val >> 23) & 0x1;
-	temp = (val ^ (val << 1)) & 0xffffff;
+	temp = (val ^ (val << 1)) & 0xFFFFFF;
 	exponent = 0;
 	for (k=0; k<12; k++)
 	{
@@ -20,11 +20,11 @@ static uint16_t PACK(int32_t val)
 		exponent += 1;
 	}
 	if (exponent < 12)
-		val = (val << exponent) & 0x3fffff;
+		val = (val << exponent) & 0x3FFFFF;
 	else
 		val <<= 11;
 	val >>= 11;
-	val &= 0x7ff;
+	val &= 0x7FF;
 	val |= sign << 15;
 	val |= exponent << 11;
 
@@ -37,8 +37,8 @@ static int32_t UNPACK(uint16_t val)
 	int32_t uval;
 
 	sign = (val >> 15) & 0x1;
-	exponent = (val >> 11) & 0xf;
-	mantissa = val & 0x7ff;
+	exponent = (val >> 11) & 0xF;
+	mantissa = val & 0x7FF;
 	uval = mantissa << 11;
 	if (exponent > 11)
 	{
@@ -94,21 +94,21 @@ void AICADSP::step()
 //      if(IPtr[0]==0 && IPtr[1]==0 && IPtr[2]==0 && IPtr[3]==0)
 //          break;
 
-		uint32_t TRA=(IPtr[0]>>9)&0x7f;
+		uint32_t TRA=(IPtr[0]>>9)&0x7F;
 		uint32_t TWT=(IPtr[0]>>8)&0x01;
-		uint32_t TWA=(IPtr[0]>>1)&0x7f;
+		uint32_t TWA=(IPtr[0]>>1)&0x7F;
 
 		uint32_t XSEL=(IPtr[2]>>15)&0x01;
 		uint32_t YSEL=(IPtr[2]>>13)&0x03;
-		uint32_t IRA=(IPtr[2]>>7)&0x3f;
+		uint32_t IRA=(IPtr[2]>>7)&0x3F;
 		uint32_t IWT=(IPtr[2]>>6)&0x01;
-		uint32_t IWA=(IPtr[2]>>1)&0x1f;
+		uint32_t IWA=(IPtr[2]>>1)&0x1F;
 
 		uint32_t TABLE=(IPtr[4]>>15)&0x01;
 		uint32_t MWT=(IPtr[4]>>14)&0x01;
 		uint32_t MRD=(IPtr[4]>>13)&0x01;
 		uint32_t EWT=(IPtr[4]>>12)&0x01;
-		uint32_t EWA=(IPtr[4]>>8)&0x0f;
+		uint32_t EWA=(IPtr[4]>>8)&0x0F;
 		uint32_t ADRL=(IPtr[4]>>7)&0x01;
 		uint32_t FRCL=(IPtr[4]>>6)&0x01;
 		uint32_t SHIFT=(IPtr[4]>>4)&0x03;
@@ -166,7 +166,7 @@ void AICADSP::step()
 		INPUTS<<=8;
 		INPUTS>>=8;
 		//if(INPUTS&0x00800000)
-		//  INPUTS|=0xff000000;
+		//  INPUTS|=0xFF000000;
 
 		if(IWT)
 		{
@@ -183,11 +183,11 @@ void AICADSP::step()
 				B=ACC;
 			else
 			{
-				B=TEMP[(TRA+DEC)&0x7f];
+				B=TEMP[(TRA+DEC)&0x7F];
 				B<<=8;
 				B>>=8;
 				//if(B&0x00800000)
-				//  B|=0xff000000;  //Sign extend
+				//  B|=0xFF000000;  //Sign extend
 			}
 			if(NEGB)
 				B=0-B;
@@ -200,11 +200,11 @@ void AICADSP::step()
 			X=INPUTS;
 		else
 		{
-			X=TEMP[(TRA+DEC)&0x7f];
+			X=TEMP[(TRA+DEC)&0x7F];
 			X<<=8;
 			X>>=8;
 			//if(X&0x00800000)
-			//  X|=0xff000000;
+			//  X|=0xFF000000;
 		}
 
 		//Y
@@ -213,9 +213,9 @@ void AICADSP::step()
 		else if(YSEL==1)
 			Y=this->COEF[COEF<<1]>>3;    //COEF is 16 bits
 		else if(YSEL==2)
-			Y=(Y_REG>>11)&0x1fff;
+			Y=(Y_REG>>11)&0x1FFF;
 		else if(YSEL==3)
-			Y=(Y_REG>>4)&0x0fff;
+			Y=(Y_REG>>4)&0x0FFF;
 
 		if(YRL)
 			Y_REG=INPUTS;
@@ -224,16 +224,16 @@ void AICADSP::step()
 		if(SHIFT==0)
 		{
 			SHIFTED=ACC;
-			if(SHIFTED>0x007fffff)
-				SHIFTED=0x007fffff;
+			if(SHIFTED>0x007FFFFF)
+				SHIFTED=0x007FFFFF;
 			if(SHIFTED<(-0x00800000))
 				SHIFTED=-0x00800000;
 		}
 		else if(SHIFT==1)
 		{
 			SHIFTED=ACC*2;
-			if(SHIFTED>0x007fffff)
-				SHIFTED=0x007fffff;
+			if(SHIFTED>0x007FFFFF)
+				SHIFTED=0x007FFFFF;
 			if(SHIFTED<(-0x00800000))
 				SHIFTED=-0x00800000;
 		}
@@ -242,38 +242,38 @@ void AICADSP::step()
 			SHIFTED=ACC*2;
 			SHIFTED<<=8;
 			SHIFTED>>=8;
-			//SHIFTED&=0x00ffffff;
+			//SHIFTED&=0x00FFFFFF;
 			//if(SHIFTED&0x00800000)
-			//  SHIFTED|=0xff000000;
+			//  SHIFTED|=0xFF000000;
 		}
 		else if(SHIFT==3)
 		{
 			SHIFTED=ACC;
 			SHIFTED<<=8;
 			SHIFTED>>=8;
-			//SHIFTED&=0x00ffffff;
+			//SHIFTED&=0x00FFFFFF;
 			//if(SHIFTED&0x00800000)
-			//  SHIFTED|=0xff000000;
+			//  SHIFTED|=0xFF000000;
 		}
 
 		//ACCUM
 		Y<<=19;
 		Y>>=19;
 		//if(Y&0x1000)
-		//  Y|=0xfffff000;
+		//  Y|=0xFFFFF000;
 
 		v=(((int64_t) X*(int64_t) Y)>>12);
 		ACC=(int) v+B;
 
 		if(TWT)
-			TEMP[(TWA+DEC)&0x7f]=SHIFTED;
+			TEMP[(TWA+DEC)&0x7F]=SHIFTED;
 
 		if(FRCL)
 		{
 			if(SHIFT==3)
-				FRC_REG=SHIFTED&0x0fff;
+				FRC_REG=SHIFTED&0x0FFF;
 			else
-				FRC_REG=(SHIFTED>>11)&0x1fff;
+				FRC_REG=(SHIFTED>>11)&0x1FFF;
 		}
 
 		if(MRD || MWT)
@@ -283,13 +283,13 @@ void AICADSP::step()
 			if(!TABLE)
 				ADDR+=DEC;
 			if(ADREB)
-				ADDR+=ADRS_REG&0x0fff;
+				ADDR+=ADRS_REG&0x0FFF;
 			if(NXADR)
 				ADDR++;
 			if(!TABLE)
 				ADDR&=RBL-1;
 			else
-				ADDR&=0xffff;
+				ADDR&=0xFFFF;
 			//ADDR<<=1;
 			//ADDR+=RBP<<13;
 			//MEMVAL=AICARAM[ADDR>>1];
@@ -313,7 +313,7 @@ void AICADSP::step()
 		if(ADRL)
 		{
 			if(SHIFT==3)
-				ADRS_REG=(SHIFTED>>12)&0xfff;
+				ADRS_REG=(SHIFTED>>12)&0xFFF;
 			else
 				ADRS_REG=(INPUTS>>16);
 		}

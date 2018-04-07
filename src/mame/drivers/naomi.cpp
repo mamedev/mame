@@ -1701,9 +1701,9 @@ void naomi_state::naomi_map(address_map &map)
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
 	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_modem_r), FUNC(naomi_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(m_aica, FUNC(aica_device::host_aica_reg_r), FUNC(aica_device::host_aica_reg_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(naomi_state::dc_aica_reg_r), FUNC(naomi_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(m_aica, FUNC(aica_device::ram_host_r), FUNC(aica_device::ram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(naomi_state::sh4_soundram_r), FUNC(naomi_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
 	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(this, FUNC(naomi_state::naomi_g2bus_r));
@@ -1760,9 +1760,9 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
 	map(0x00600000, 0x006007ff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_modem_r), FUNC(naomi2_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(m_aica, FUNC(aica_device::host_aica_reg_r), FUNC(aica_device::host_aica_reg_w));
+	map(0x00700000, 0x00707fff).mirror(0x02000000).rw(this, FUNC(naomi2_state::dc_aica_reg_r), FUNC(naomi2_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(m_aica, FUNC(aica_device::ram_host_r), FUNC(aica_device::ram_w));           // sound RAM (8 MB)
+	map(0x00800000, 0x00ffffff).mirror(0x02000000).rw(this, FUNC(naomi2_state::sh4_soundram_r), FUNC(naomi2_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* External Device */
 	map(0x01000000, 0x01ffffff).mirror(0x02000000).r(this, FUNC(naomi2_state::naomi_g2bus_r));
@@ -1816,6 +1816,31 @@ void naomi_state::naomi_port(address_map &map)
  * Atomiswave address map, almost identical to Dreamcast
  */
 
+READ64_MEMBER(atomiswave_state::aw_flash_r )
+{
+	return (uint64_t)m_awflash->read(offset*8) | (uint64_t)m_awflash->read((offset*8)+1)<<8 | (uint64_t)m_awflash->read((offset*8)+2)<<16 | (uint64_t)m_awflash->read((offset*8)+3)<<24 |
+			(uint64_t)m_awflash->read((offset*8)+4)<<32 | (uint64_t)m_awflash->read((offset*8)+5)<<40 | (uint64_t)m_awflash->read((offset*8)+6)<<48 | (uint64_t)m_awflash->read((offset*8)+7)<<56;
+}
+
+WRITE64_MEMBER(atomiswave_state::aw_flash_w )
+{
+	int i;
+	uint32_t addr = offset * 8;
+
+	for (i = 0; i < 8; i++)
+	{
+		if (mem_mask & ((uint64_t)0xff)<< (i*8))
+		{
+			addr += i;
+			break;
+		}
+	}
+
+	data >>= (i*8);
+
+	m_awflash->write(addr, data);
+}
+
 // TODO: don't we have a common function for this?
 inline int atomiswave_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
 {
@@ -1855,7 +1880,7 @@ READ64_MEMBER(atomiswave_state::aw_modem_r )
 
 	             (ab == 0) -> BIOS skip RAM test
 	    */
-		return 0xffffffff00000000U | (ioport("COINS")->read() & 0x0f);
+		return 0xffffffff00000000U | (ioport("COINS")->read() & 0x0F);
 	} else
 		if (reg == 0x284/4)
 			return 0xffffffff00000000U | aw_ctrl_type;
@@ -1875,7 +1900,7 @@ WRITE64_MEMBER(atomiswave_state::aw_modem_w )
 	dat = (uint32_t)(data >> shift);
 	if (reg == 0x284/4)
 	{
-		aw_ctrl_type = dat & 0xf0;
+		aw_ctrl_type = dat & 0xF0;
 	}
 	/*
 	        0x00600284 rw ddcc0000
@@ -1900,8 +1925,8 @@ WRITE64_MEMBER(atomiswave_state::aw_modem_w )
 void atomiswave_state::aw_map(address_map &map)
 {
 	/* Area 0 */
-	map(0x00000000, 0x0001ffff).rw(m_awflash, FUNC(macronix_29l001mc_device::read), FUNC(macronix_29l001mc_device::write)).region("awflash", 0);
-	map(0xa0000000, 0xa001ffff).rw(m_awflash, FUNC(macronix_29l001mc_device::read), FUNC(macronix_29l001mc_device::write)).region("awflash", 0);
+	map(0x00000000, 0x0001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
+	map(0xa0000000, 0xa001ffff).rw(this, FUNC(atomiswave_state::aw_flash_r), FUNC(atomiswave_state::aw_flash_w)).region("awflash", 0);
 
 	map(0x00200000, 0x0021ffff).ram().share("sram");     // battery backed up RAM
 	map(0x005f6800, 0x005f69ff).rw(this, FUNC(atomiswave_state::dc_sysctrl_r), FUNC(atomiswave_state::dc_sysctrl_w));
@@ -1912,9 +1937,9 @@ void atomiswave_state::aw_map(address_map &map)
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
 	map(0x00600000, 0x006007ff).rw(this, FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w));
-	map(0x00700000, 0x00707fff).rw(m_aica, FUNC(aica_device::host_aica_reg_r), FUNC(aica_device::host_aica_reg_w));
+	map(0x00700000, 0x00707fff).rw(this, FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x00ffffff).rw(m_aica, FUNC(aica_device::ram_host_r), FUNC(aica_device::ram_w));           // Atomiswave has only 2MB of sound RAM, but Games are accessing full 8MB area?
+	map(0x00800000, 0x00ffffff).rw(this, FUNC(atomiswave_state::sh4_soundram_r), FUNC(atomiswave_state::sh4_soundram_w));           // sound RAM (8 MB)
 
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
 	map(0x04000000, 0x047fffff).ram().mirror(0x00800000).share("dc_texture_ram");      // texture memory 64 bit access
@@ -1953,6 +1978,13 @@ void atomiswave_state::aw_map(address_map &map)
 void atomiswave_state::aw_port(address_map &map)
 {
 //  ???
+}
+
+void dc_state::dc_audio_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x007fffff).ram().share("dc_sound_ram");                /* shared with SH-4 */
+	map(0x00800000, 0x00807fff).rw(this, FUNC(dc_state::dc_arm_aica_r), FUNC(dc_state::dc_arm_aica_w));
 }
 
 /*
@@ -2633,6 +2665,7 @@ INPUT_PORTS_END
 MACHINE_RESET_MEMBER(naomi_state,naomi)
 {
 	naomi_state::machine_reset();
+	m_aica->set_ram_base(dc_sound_ram, 8*1024*1024);
 }
 
 /*
@@ -2656,6 +2689,9 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
+	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
+
 	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 
 	/* video hardware */
@@ -2666,13 +2702,13 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("aica", AICA, XTAL(33'868'800))
+	MCFG_SOUND_ADD("aica", AICA, 0)
+	MCFG_AICA_MASTER
+	MCFG_AICA_IRQ_CB(WRITELINE(dc_state, aica_irq))
 	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_state, sh4_aica_irq))
+
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
-
-	MCFG_RAM_MODIFY("aica:ram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
 
 	MCFG_AICARTC_ADD("aicartc", XTAL(32'768) )
 MACHINE_CONFIG_END
@@ -10494,37 +10530,37 @@ ROM_END
 /* Atomiswave */
 GAME( 2001, awbios,    0,        aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Atomiswave Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 																																									// game "exe" build timestamps, shown in SYSTEM MENU -> TEST MODE
-GAME( 2003, ggx15,     awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", GAME_FLAGS)                                               // none
-GAME( 2003, sprtshot,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy USA",                "Sports Shooting USA", GAME_FLAGS )                                                 // May 02 2003 09:40:31
-GAME( 2003, sushibar,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Sushi Bar / Tore Tore! Sushi", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )// May 23 2003 14:40:15
-GAME( 2003, demofist,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS )                                                       // Jun 02 2003 16:45:35
-GAME( 2003, maxspeed,  awbios,   aw1c, aw1w, atomiswave_state, atomiswave, ROT0,   "SIMS / Sammy",             "Maximum Speed", GAME_FLAGS )                                                       // Jun 09 2003 10:20:37
-GAME( 2003, dolphin,   awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", GAME_FLAGS)                                                         // Jun 27 2003 09:00:03
-GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", GAME_FLAGS)                                // Nov 24 2003 16:56:01
-GAME( 2004, ggisuka,   awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", GAME_FLAGS)                                                    // Jan 14 2004 10:04:24
-GAME( 2004, rumblefp,  rumblef,  aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish (prototype)", GAME_FLAGS)                                          // Feb 20 2004 09:15:34
-GAME( 2004, rangrmsn,  awbios,   aw2c, aw1w, atomiswave_state, atomiswave, ROT0,   "RIZ Inc./ Sammy",          "Ranger Mission", GAME_FLAGS )                                                      // Mar 01 2004 19:08:15
-GAME( 2004, rumblef,   awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", GAME_FLAGS)                                                      // Mar 10 2004 19:07:43
-GAME( 2004, salmankt,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Yuki Enterprise / Sammy",  "Net Select: Salaryman Kintaro", GAME_FLAGS )                                       // Jun 14 2004 22:50:03
-GAME( 2004, kofnw,     awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave", GAME_FLAGS )                                        // Jul 09 2004 15:05:53
-GAME( 2004, kofnwj,    kofnw,    aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave (Japan)", GAME_FLAGS )                                // Jul 09 2004 15:05:53
-GAME( 2004, ftspeed,   awbios,   aw1c, aw1w, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Faster Than Speed", GAME_FLAGS )                                                   // Aug 24 2004 18:40:24
-GAME( 2004, xtrmhunt,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Extreme Hunting", GAME_FLAGS )                                                     // Nov 23 2004 10:14:14
-GAME( 2004, blokpong,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT270, "MOSS / Sammy",             "Block Pong-Pong", GAME_FLAGS )                                                     // Dec 22 2004 12:32:52
-GAME( 2005, rumblf2p,  rumblef2, aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2 (prototype)", GAME_FLAGS )                                       // Jan 11 2005 14:31:05
-GAME( 2005, anmlbskta, anmlbskt, aw2c, aw2c, atomiswave_state, atomiswave, ROT270, "MOSS / Sammy",             "Animal Basket (19 Jan 2005)", GAME_FLAGS )                                         // Jan 19 2005 13:09:07
-GAME( 2005, anmlbskt,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT270, "MOSS / Sammy",             "Animal Basket (24 Jan 2005)", GAME_FLAGS )                                         // Jan 24 2005 14:12:29
-GAME( 2005, waidrive,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT270, "MOSS / Sammy",             "WaiWai Drive", GAME_FLAGS )                                                        // Jan 27 2005 16:21:21
-GAME( 2005, vfurlong,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Progress / Sammy",         "Net Select Horse Racing: Victory Furlong", GAME_FLAGS )                            // Mar 02 2005 22:10:33
-GAME( 2005, rumblef2,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2", GAME_FLAGS )                                                   // Mar 04 2005 19:26:32
-GAME( 2005, ngbc,      awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum", GAME_FLAGS )                                              // Jun 25 2005 17:00:38
-GAME( 2005, ngbcj,     ngbc,     aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum (Japan)", GAME_FLAGS )                                      // Jun 25 2005 17:00:38
-GAME( 2005, samsptk,   awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "Samurai Spirits Tenkaichi Kenkakuden", GAME_FLAGS )                                // Aug 05 2005 16:43:48
-GAME( 2005, kofxi,     awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters XI", GAME_FLAGS )                                             // Aug 07 2005 18:11:25
-GAME( 2005, fotns,     awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Arc System Works / Sega",  "Fist Of The North Star", GAME_FLAGS )                                              // Nov 28 2005 21:04:40
-GAME( 2006, mslug6,    awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", GAME_FLAGS)                                                         // Jan 13 2006 00:49:12
-GAME( 2006, xtrmhnt2,  awbios,   aw2c, aw2c, atomiswave_state, xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )                                                   // May 26 2006 14:03:22
-GAME( 2006, dirtypig,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", GAME_FLAGS)                                               // Sep 10 2006 20:24:14
-GAME( 2008, claychal,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sega",                     "Sega Clay Challenge", GAME_FLAGS )                                                 // Oct 15 2008 16:08:20
-GAME( 2009, basschalo, basschal, aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge", GAME_FLAGS )                                         // Feb 08 2009 22:35:34
-GAME( 2009, basschal,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge Version A", GAME_FLAGS )                               // Jul 25 2009 16:27:40
+GAME( 2003, ggx15,     awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", GAME_FLAGS)                            // none
+GAME( 2003, sprtshot,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy USA",                "Sports Shooting USA", GAME_FLAGS )                              // May 02 2003 09:40:31
+GAME( 2003, sushibar,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Sushi Bar", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )// May 23 2003 14:40:15
+GAME( 2003, demofist,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS )                                    // Jun 02 2003 16:45:35
+GAME( 2003, maxspeed,  awbios,   aw1c, aw1w, atomiswave_state, atomiswave, ROT0,   "SIMS / Sammy",             "Maximum Speed", GAME_FLAGS )                                    // Jun 09 2003 10:20:37
+GAME( 2003, dolphin,   awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", GAME_FLAGS)                                      // Jun 27 2003 09:00:03
+GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", GAME_FLAGS)             // Nov 24 2003 16:56:01
+GAME( 2004, ggisuka,   awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", GAME_FLAGS)                                 // Jan 14 2004 10:04:24
+GAME( 2004, rumblefp,  rumblef,  aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish (prototype)", GAME_FLAGS)                       // Feb 20 2004 09:15:34
+GAME( 2004, rangrmsn,  awbios,   aw2c, aw1w, atomiswave_state, atomiswave, ROT0,   "RIZ Inc./ Sammy",          "Ranger Mission", GAME_FLAGS )                                   // Mar 01 2004 19:08:15
+GAME( 2004, rumblef,   awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", GAME_FLAGS)                                   // Mar 10 2004 19:07:43
+GAME( 2004, salmankt,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Yuki Enterprise / Sammy",  "Net Select: Salaryman Kintaro", GAME_FLAGS )                    // Jun 14 2004 22:50:03
+GAME( 2004, kofnw,     awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave", GAME_FLAGS )                     // Jul 09 2004 15:05:53
+GAME( 2004, kofnwj,    kofnw,    aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave (Japan)", GAME_FLAGS )             // Jul 09 2004 15:05:53
+GAME( 2004, ftspeed,   awbios,   aw1c, aw1w, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Faster Than Speed", GAME_FLAGS )                                // Aug 24 2004 18:40:24
+GAME( 2004, xtrmhunt,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Extreme Hunting", GAME_FLAGS )                                  // Nov 23 2004 10:14:14
+GAME( 2004, blokpong,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT270, "MOSS / Sammy",             "Block Pong-Pong", GAME_FLAGS )                                  // Dec 22 2004 12:32:52
+GAME( 2005, rumblf2p,  rumblef2, aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2 (prototype)", GAME_FLAGS )                    // Jan 11 2005 14:31:05
+GAME( 2005, anmlbskta, anmlbskt, aw2c, aw2c, atomiswave_state, atomiswave, ROT270, "MOSS / Sammy",             "Animal Basket (19 Jan 2005)", GAME_FLAGS )                      // Jan 19 2005 13:09:07
+GAME( 2005, anmlbskt,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT270, "MOSS / Sammy",             "Animal Basket (24 Jan 2005)", GAME_FLAGS )                      // Jan 24 2005 14:12:29
+GAME( 2005, waidrive,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT270, "MOSS / Sammy",             "WaiWai Drive", GAME_FLAGS )                                     // Jan 27 2005 16:21:21
+GAME( 2005, vfurlong,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Progress / Sammy",         "Net Select Horse Racing: Victory Furlong", GAME_FLAGS )         // Mar 02 2005 22:10:33
+GAME( 2005, rumblef2,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2", GAME_FLAGS )                                // Mar 04 2005 19:26:32
+GAME( 2005, ngbc,      awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum", GAME_FLAGS )                           // Jun 25 2005 17:00:38
+GAME( 2005, ngbcj,     ngbc,     aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum (Japan)", GAME_FLAGS )                   // Jun 25 2005 17:00:38
+GAME( 2005, samsptk,   awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "Samurai Spirits Tenkaichi Kenkakuden", GAME_FLAGS )             // Aug 05 2005 16:43:48
+GAME( 2005, kofxi,     awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters XI", GAME_FLAGS )                          // Aug 07 2005 18:11:25
+GAME( 2005, fotns,     awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Arc System Works / Sega",  "Fist Of The North Star", GAME_FLAGS )                           // Nov 28 2005 21:04:40
+GAME( 2006, mslug6,    awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", GAME_FLAGS)                                      // Jan 13 2006 00:49:12
+GAME( 2006, xtrmhnt2,  awbios,   aw2c, aw2c, atomiswave_state, xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )                                // May 26 2006 14:03:22
+GAME( 2006, dirtypig,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", GAME_FLAGS)                            // Sep 10 2006 20:24:14
+GAME( 2008, claychal,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sega",                     "Sega Clay Challenge", GAME_FLAGS )                              // Oct 15 2008 16:08:20
+GAME( 2009, basschalo, basschal, aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge", GAME_FLAGS )                      // Feb 08 2009 22:35:34
+GAME( 2009, basschal,  awbios,   aw2c, aw2c, atomiswave_state, atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge Version A", GAME_FLAGS )            // Jul 25 2009 16:27:40

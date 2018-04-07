@@ -12,9 +12,9 @@ class segasp_state : public naomi_state
 {
 public:
 	segasp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: naomi_state(mconfig, type, tag)
-		, m_sp_eeprom(*this, "sp_eeprom")
-	{ }
+		: naomi_state(mconfig, type, tag),
+		m_sp_eeprom(*this, "sp_eeprom")
+	{   }
 	required_device<eeprom_serial_93cxx_device> m_sp_eeprom;
 
 	DECLARE_DRIVER_INIT(segasp);

@@ -658,6 +658,7 @@ void dc_state::machine_start()
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
 	save_pointer(NAME(g2bus_regs), 0x100/4);
+	save_pointer(NAME(dc_sound_ram.target()),dc_sound_ram.bytes()/4);
 	SAVE_G2DMA(0)
 	SAVE_G2DMA(1)
 	SAVE_G2DMA(2)
@@ -666,9 +667,74 @@ void dc_state::machine_start()
 
 void dc_state::machine_reset()
 {
+	/* halt the ARM7 */
+	m_armrst = 1;
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
 	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
+}
+
+READ32_MEMBER(dc_state::dc_aica_reg_r)
+{
+//  osd_printf_verbose("%s",string_format("AICA REG: [%08x] read %x, mask %x\n", 0x700000+reg*4, (uint64_t)offset, mem_mask).c_str());
+
+	if(offset == 0x2c00/4)
+		return m_armrst;
+
+	return m_aica->read(space, offset*2, 0xffff);
+}
+
+WRITE32_MEMBER(dc_state::dc_aica_reg_w)
+{
+	if (offset == (0x2c00/4))
+	{
+		if(ACCESSING_BITS_0_7)
+		{
+			m_armrst = data & 1;
+
+			if (data & 1)
+			{
+				/* halt the ARM7 */
+				m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			}
+			else
+			{
+				/* it's alive ! */
+				m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			}
+		}
+	}
+
+	m_aica->write(space, offset*2, data, 0xffff);
+
+//  osd_printf_verbose("%s",string_format("AICA REG: [%08x=%x] write %x to %x, mask %x\n", 0x700000+reg*4, data, offset, mem_mask).c_str());
+}
+
+READ32_MEMBER(dc_state::dc_arm_aica_r)
+{
+	return m_aica->read(space, offset*2, 0xffff) & 0xffff;
+}
+
+WRITE32_MEMBER(dc_state::dc_arm_aica_w)
+{
+	m_aica->write(space, offset*2, data, mem_mask&0xffff);
+}
+
+READ64_MEMBER(dc_state::sh4_soundram_r )
+{
+	return *((uint64_t *)dc_sound_ram.target()+offset);
+}
+
+WRITE64_MEMBER(dc_state::sh4_soundram_w )
+{
+	COMBINE_DATA((uint64_t *)dc_sound_ram.target() + offset);
+}
+
+WRITE_LINE_MEMBER(dc_state::aica_irq)
+{
+	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(dc_state::sh4_aica_irq)
@@ -685,6 +751,7 @@ MACHINE_RESET_MEMBER(dc_state,dc_console)
 {
 	dc_state::machine_reset();
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_aica->set_ram_base(dc_sound_ram, 2*1024*1024);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)

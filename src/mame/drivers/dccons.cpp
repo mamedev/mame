@@ -5,9 +5,9 @@
     by R. Belmont & Angelo Salese
 
     SH-4 @ 200 MHz
+    ARM7DI @ 2.8223 MHz (no T or M extensions)
     PowerVR 3D video
     AICA audio
-		ARM7DI @ 2.8223 MHz (no T or M extensions)
     GD-ROM drive (modified ATAPI interface)
 
             NTSC/N  NTSC/I   PAL/N   PAL/I   VGA
@@ -377,9 +377,9 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
 	map(0x00600000, 0x006007ff).rw(this, FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
-	map(0x00700000, 0x00707fff).rw(m_aica, FUNC(aica_device::host_aica_reg_r), FUNC(aica_device::host_aica_reg_w));
+	map(0x00700000, 0x00707fff).rw(this, FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x009fffff).rw(m_aica, FUNC(aica_device::ram_host_r), FUNC(aica_device::ram_w));
+	map(0x00800000, 0x009fffff).rw(this, FUNC(dc_cons_state::sh4_soundram_r), FUNC(dc_cons_state::sh4_soundram_w));
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
 //  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
@@ -415,6 +415,13 @@ void dc_cons_state::dc_map(address_map &map)
 void dc_cons_state::dc_port(address_map &map)
 {
 	map(0x00000000, 0x00000007).rw(this, FUNC(dc_cons_state::dc_pdtra_r), FUNC(dc_cons_state::dc_pdtra_w));
+}
+
+void dc_cons_state::dc_audio_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x001fffff).ram().share("dc_sound_ram");        /* shared with SH-4 */
+	map(0x00800000, 0x00807fff).rw(this, FUNC(dc_cons_state::dc_arm_aica_r), FUNC(dc_cons_state::dc_arm_aica_w));
 }
 
 static INPUT_PORTS_START( dc )
@@ -591,6 +598,9 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
+	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
+
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
 
 //  MCFG_MACRONIX_29LV160TMC_ADD("dcflash")
@@ -609,13 +619,12 @@ MACHINE_CONFIG_START(dc_cons_state::dc)
 	MCFG_POWERVR2_ADD("powervr2", WRITE8(dc_state, pvr_irq))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("aica", AICA, XTAL(33'868'800))
+	MCFG_SOUND_ADD("aica", AICA, 0)
+	MCFG_AICA_MASTER
+	MCFG_AICA_IRQ_CB(WRITELINE(dc_state, aica_irq))
 	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_state, sh4_aica_irq))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
-
-	MCFG_RAM_MODIFY("aica:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
 	MCFG_AICARTC_ADD("aicartc", XTAL(32'768))
 

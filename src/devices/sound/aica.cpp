@@ -8,7 +8,6 @@
     - No FM mode
     - A third sample format (ADPCM) has been added
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
-	- Internal ARM7DI Core
 */
 
 #include "emu.h"
@@ -42,55 +41,41 @@
 #define LPCTL(slot)     ((slot->udata.data[0x0]>>0x9)&0x0001)
 #define PCMS(slot)      ((slot->udata.data[0x0]>>0x7)&0x0003)
 
-#define SA(slot)        (((slot->udata.data[0x0]&0x7f)<<16)|(slot->udata.data[0x4/2]))
+#define SA(slot)        (((slot->udata.data[0x0]&0x7F)<<16)|(slot->udata.data[0x4/2]))
 
 #define LSA(slot)       (slot->udata.data[0x8/2])
 
 #define LEA(slot)       (slot->udata.data[0xc/2])
 
-#define D2R(slot)       ((slot->udata.data[0x10/2]>>0xB)&0x001f)
-#define D1R(slot)       ((slot->udata.data[0x10/2]>>0x6)&0x001f)
-#define AR(slot)        ((slot->udata.data[0x10/2]>>0x0)&0x001f)
+#define D2R(slot)       ((slot->udata.data[0x10/2]>>0xB)&0x001F)
+#define D1R(slot)       ((slot->udata.data[0x10/2]>>0x6)&0x001F)
+#define AR(slot)        ((slot->udata.data[0x10/2]>>0x0)&0x001F)
 
 #define LPSLNK(slot)    ((slot->udata.data[0x14/2]>>0x0)&0x4000)
-#define KRS(slot)       ((slot->udata.data[0x14/2]>>0xA)&0x000f)
-#define DL(slot)        ((slot->udata.data[0x14/2]>>0x5)&0x001f)
-#define RR(slot)        ((slot->udata.data[0x14/2]>>0x0)&0x001f)
+#define KRS(slot)       ((slot->udata.data[0x14/2]>>0xA)&0x000F)
+#define DL(slot)        ((slot->udata.data[0x14/2]>>0x5)&0x001F)
+#define RR(slot)        ((slot->udata.data[0x14/2]>>0x0)&0x001F)
 
-#define TL(slot)        ((slot->udata.data[0x28/2]>>0x8)&0x00ff)
+#define TL(slot)        ((slot->udata.data[0x28/2]>>0x8)&0x00FF)
 
-#define OCT(slot)       ((slot->udata.data[0x18/2]>>0xB)&0x000f)
+#define OCT(slot)       ((slot->udata.data[0x18/2]>>0xB)&0x000F)
 #define FNS(slot)       ((slot->udata.data[0x18/2]>>0x0)&0x03FF)
 
 #define LFORE(slot)     ((slot->udata.data[0x1c/2]>>0x0)&0x8000)
-#define LFOF(slot)      ((slot->udata.data[0x1c/2]>>0xA)&0x001f)
+#define LFOF(slot)      ((slot->udata.data[0x1c/2]>>0xA)&0x001F)
 #define PLFOWS(slot)    ((slot->udata.data[0x1c/2]>>0x8)&0x0003)
 #define PLFOS(slot)     ((slot->udata.data[0x1c/2]>>0x5)&0x0007)
 #define ALFOWS(slot)    ((slot->udata.data[0x1c/2]>>0x3)&0x0003)
 #define ALFOS(slot)     ((slot->udata.data[0x1c/2]>>0x0)&0x0007)
 
-#define ISEL(slot)      ((slot->udata.data[0x20/2]>>0x0)&0x000f)
-#define IMXL(slot)      ((slot->udata.data[0x20/2]>>0x4)&0x000f)
+#define ISEL(slot)      ((slot->udata.data[0x20/2]>>0x0)&0x000F)
+#define IMXL(slot)      ((slot->udata.data[0x20/2]>>0x4)&0x000F)
 
-#define DISDL(slot)     ((slot->udata.data[0x24/2]>>0x8)&0x000f)
-#define DIPAN(slot)     ((slot->udata.data[0x24/2]>>0x0)&0x001f)
+#define DISDL(slot)     ((slot->udata.data[0x24/2]>>0x8)&0x000F)
+#define DIPAN(slot)     ((slot->udata.data[0x24/2]>>0x0)&0x001F)
 
 #define EFSDL(slot)     ((m_EFSPAN[slot*4]>>8)&0x000f)
 #define EFPAN(slot)     ((m_EFSPAN[slot*4]>>0)&0x001f)
-
-/*
-Unimplemented Registers
-#define Q(slot)        ((slot->udata.data[0x28/2]>>0x0)&0x001f) // resonance; (0.75 * Q - 3)dB
-#define FLV0(slot)     ((slot->udata.data[0x2c/2]>>0x0)&0x1fff) // FLV0 : Cutoff frequency at attack start
-#define FLV1(slot)     ((slot->udata.data[0x30/2]>>0x0)&0x1fff) // FLV1 : Cutoff frequency at attack End(decay start)
-#define FLV2(slot)     ((slot->udata.data[0x34/2]>>0x0)&0x1fff) // FLV2 : Cutoff frequency at decay End(sustain start)
-#define FLV3(slot)     ((slot->udata.data[0x38/2]>>0x0)&0x1fff) // FLV3 : Cutoff frequency at KOFF
-#define FLV4(slot)     ((slot->udata.data[0x3c/2]>>0x0)&0x1fff) // FLV4 : Cutoff frequency after release
-#define FAR(slot)      ((slot->udata.data[0x40/2]>>0x8)&0x001f)
-#define FD1R(slot)     ((slot->udata.data[0x40/2]>>0x0)&0x001f)
-#define FD2R(slot)     ((slot->udata.data[0x44/2]>>0x8)&0x001f)
-#define FRR(slot)      ((slot->udata.data[0x44/2]>>0x0)&0x001f)
-*/
 
 //Envelope times in ms
 static constexpr double ARTimes[64]={100000/*infinity*/,100000/*infinity*/,8100.0,6900.0,6000.0,4800.0,4000.0,3400.0,3000.0,2400.0,2000.0,1700.0,1500.0,
@@ -102,10 +87,9 @@ static constexpr double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,11820
 					920.0,790.0,690.0,550.0,460.0,390.0,340.0,270.0,230.0,200.0,170.0,140.0,110.0,98.0,85.0,68.0,57.0,49.0,43.0,34.0,
 					28.0,25.0,22.0,18.0,14.0,12.0,11.0,8.5,7.1,6.1,5.4,4.3,3.6,3.1};
 
-#define MN(aica)        ((m_udata.data[0]>>0x0)&0x8000)
-#define MEM8B(aica)     ((m_udata.data[0]>>0x0)&0x0200)
+#define MEM4B(aica)     ((m_udata.data[0]>>0x0)&0x0200)
 #define DAC18B(aica)    ((m_udata.data[0]>>0x0)&0x0100)
-#define MVOL(aica)      ((m_udata.data[0]>>0x0)&0x000f)
+#define MVOL(aica)      ((m_udata.data[0]>>0x0)&0x000F)
 #define RBL(aica)       ((m_udata.data[2]>>0xD)&0x0003)
 #define RBP(aica)       ((m_udata.data[2]>>0x0)&0x0fff)
 #define MOFULL(aica)    ((m_udata.data[4]>>0x0)&0x1000)
@@ -115,7 +99,7 @@ static constexpr double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,11820
 #define MIEMPTY(aica)   ((m_udata.data[4]>>0x0)&0x0100)
 
 #define AFSEL(aica)     ((m_udata.data[0xc/2]>>0x0)&0x4000)
-#define MSLC(aica)      ((m_udata.data[0xc/2]>>0x8)&0x3f)
+#define MSLC(aica)      ((m_udata.data[0xc/2]>>0x8)&0x3F)
 
 #define SCILV0(aica)    ((m_udata.data[0xa8/2]>>0x0)&0xff)
 #define SCILV1(aica)    ((m_udata.data[0xac/2]>>0x0)&0xff)
@@ -124,7 +108,6 @@ static constexpr double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,11820
 #define MCIEB(aica)     ((m_udata.data[0xb4/2]>>0x0)&0xff)
 #define MCIPD(aica)     ((m_udata.data[0xb8/2]>>0x0)&0xff)
 #define MCIRE(aica)     ((m_udata.data[0xbc/2]>>0x0)&0xff)
-#define MCIEB(aica)     ((m_udata.data[0xb4/2]>>0x0)&0xff)
 
 #define SCIEX0  0
 #define SCIEX1  1
@@ -150,29 +133,16 @@ unsigned char aica_device::DecodeSCI(unsigned char irq)
 	return SCI;
 }
 
-void aica_device::InterruptUpdate(int line, int state)
-{
-	switch(line)
-	{
-		case 0: m_armirq->in_w<0>(state); break;
-		case 1: m_armirq->in_w<1>(state); break;
-		case 2: m_armirq->in_w<2>(state); break;
-		case 3: m_armirq->in_w<3>(state); break;
-		case 4: m_armirq->in_w<4>(state); break;
-		case 5: m_armirq->in_w<5>(state); break;
-		case 6: m_armirq->in_w<6>(state); break;
-		case 7: m_armirq->in_w<7>(state); break;
-	}
-}
-
 void aica_device::ResetInterrupts()
 {
+#if 0
 	uint32_t reset = m_udata.data[0xa4/2];
 
 	if (reset & 0x40)
-		InterruptUpdate(m_IrqTimA, CLEAR_LINE);
+		m_irq_cb(-m_IrqTimA);
 	if (reset & 0x180)
-		InterruptUpdate(m_IrqTimBC, CLEAR_LINE);
+		m_irq_cb(-m_IrqTimBC);
+#endif
 }
 
 void aica_device::CheckPendingIRQ()
@@ -183,7 +153,7 @@ void aica_device::CheckPendingIRQ()
 	if(m_MidiW!=m_MidiR)
 	{
 		m_IRQL = m_IrqMidi;
-		InterruptUpdate(m_IrqMidi, ASSERT_LINE);
+		m_irq_cb(1);
 		return;
 	}
 	if(!pend)
@@ -192,21 +162,21 @@ void aica_device::CheckPendingIRQ()
 		if(en&0x40)
 		{
 			m_IRQL = m_IrqTimA;
-			InterruptUpdate(m_IrqTimA, ASSERT_LINE);
+			m_irq_cb(1);
 			return;
 		}
 	if(pend&0x80)
 		if(en&0x80)
 		{
 			m_IRQL = m_IrqTimBC;
-			InterruptUpdate(m_IrqTimBC, ASSERT_LINE);
+			m_irq_cb(1);
 			return;
 		}
 	if(pend&0x100)
 		if(en&0x100)
 		{
 			m_IRQL = m_IrqTimBC;
-			InterruptUpdate(m_IrqTimBC, ASSERT_LINE);
+			m_irq_cb(1);
 			return;
 		}
 }
@@ -222,7 +192,7 @@ void aica_device::CheckPendingIRQ_SH4()
 
 TIMER_CALLBACK_MEMBER( aica_device::timerA_cb )
 {
-	m_TimCnt[0] = 0xffff;
+	m_TimCnt[0] = 0xFFFF;
 	m_udata.data[0xa0/2]|=0x40;
 	m_mcipd |= 0x40;
 	m_udata.data[0x90/2]&=0xff00;
@@ -235,7 +205,7 @@ TIMER_CALLBACK_MEMBER( aica_device::timerA_cb )
 
 TIMER_CALLBACK_MEMBER( aica_device::timerB_cb )
 {
-	m_TimCnt[1] = 0xffff;
+	m_TimCnt[1] = 0xFFFF;
 	m_udata.data[0xa0/2]|=0x80;
 	m_mcipd |= 0x80;
 	m_udata.data[0x94/2]&=0xff00;
@@ -247,7 +217,7 @@ TIMER_CALLBACK_MEMBER( aica_device::timerB_cb )
 
 TIMER_CALLBACK_MEMBER( aica_device::timerC_cb )
 {
-	m_TimCnt[2] = 0xffff;
+	m_TimCnt[2] = 0xFFFF;
 	m_udata.data[0xa0/2]|=0x100;
 	m_mcipd |= 0x100;
 	m_udata.data[0x98/2]&=0xff00;
@@ -294,6 +264,7 @@ void aica_device::Compute_EG(AICA_SLOT *slot)
 	slot->EG.AR=Get_AR(rate,AR(slot));
 	slot->EG.D1R=Get_DR(rate,D1R(slot));
 	slot->EG.D2R=Get_DR(rate,D2R(slot));
+	slot->EG.RR=Get_RR(rate,RR(slot));
 	slot->EG.RR=Get_RR(rate,RR(slot));
 	slot->EG.DL=0x1f-DL(slot);
 }
@@ -357,6 +328,7 @@ uint32_t aica_device::Step(AICA_SLOT *slot)
 	return Fn;
 }
 
+
 void aica_device::Compute_LFO(AICA_SLOT *slot)
 {
 	if(PLFOS(slot)!=0)
@@ -380,7 +352,7 @@ void aica_device::InitADPCM(int *PrevSignal, int *PrevQuant)
 signed short aica_device::DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
 {
 	int x = (*PrevQuant * quant_mul[Delta & 7]) / 8;
-	if (x > 0x7fff) x = 0x7fff;
+	if (x > 0x7FFF) x = 0x7FFF;
 	if (Delta & 8)  x = -x;
 	x += *PrevSignal;
 #if 0 // older implementation
@@ -446,13 +418,16 @@ void aica_device::Init()
 	m_MidiOutR=m_MidiOutW=0;
 
 	// get AICA RAM
-	m_AICARAM = m_ram->pointer();
-	m_AICARAM += m_roffset;
-	m_AICARAM_LENGTH = m_ram->size();
-	m_RAM_MASK = m_AICARAM_LENGTH-1;
-	m_RAM_MASK16 = m_RAM_MASK & ~1;
-	m_DSP.AICARAM = (uint16_t *)m_AICARAM;
-	m_DSP.AICARAM_LENGTH = m_AICARAM_LENGTH/2;
+	if (m_ram_region != nullptr)
+	{
+		m_AICARAM = m_ram_region->base();
+		m_AICARAM += m_roffset;
+		m_AICARAM_LENGTH = m_ram_region->bytes();
+		m_RAM_MASK = m_AICARAM_LENGTH-1;
+		m_RAM_MASK16 = m_RAM_MASK & 0x7ffffe;
+		m_DSP.AICARAM = (uint16_t *)m_AICARAM;
+		m_DSP.AICARAM_LENGTH = m_AICARAM_LENGTH/2;
+	}
 
 	m_timerA = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerA_cb), this));
 	m_timerB = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aica_device::timerB_cb), this));
@@ -469,7 +444,7 @@ void aica_device::Init()
 	{
 		int iTL =(i>>0x0)&0xff;
 		int iPAN=(i>>0x8)&0x1f;
-		int iSDL=(i>>0xD)&0x0f;
+		int iSDL=(i>>0xD)&0x0F;
 		float TL;
 		float SegaDB=0;
 		float fSDL;
@@ -548,6 +523,8 @@ void aica_device::Init()
 	}
 
 	AICALFO_Init();
+	m_buffertmpl=make_unique_clear<int32_t[]>(44100);
+	m_buffertmpr=make_unique_clear<int32_t[]>(44100);
 
 	// no "pend"
 	m_udata.data[0xa0/2] = 0;
@@ -677,49 +654,58 @@ void aica_device::UpdateReg(address_space &space, int reg)
 
 		case 0x90:
 		case 0x91:
-			uint32_t time;
-
-			m_TimPris[0]=1<<((m_udata.data[0x90/2]>>8)&0x7);
-			m_TimCnt[0]=(m_udata.data[0x90/2]&0xff)<<8;
-
-			if ((m_udata.data[0x90/2]&0xff) != 255)
+			if(m_master)
 			{
-				time = (m_clock / m_TimPris[0]) / (255-(m_udata.data[0x90/2]&0xff));
-				if (time)
+				uint32_t time;
+
+				m_TimPris[0]=1<<((m_udata.data[0x90/2]>>8)&0x7);
+				m_TimCnt[0]=(m_udata.data[0x90/2]&0xff)<<8;
+
+				if ((m_udata.data[0x90/2]&0xff) != 255)
 				{
-					m_timerA->adjust(attotime::from_ticks(768, time));
+					time = (44100 / m_TimPris[0]) / (255-(m_udata.data[0x90/2]&0xff));
+					if (time)
+					{
+						m_timerA->adjust(attotime::from_hz(time));
+					}
 				}
 			}
 			break;
 		case 0x94:
 		case 0x95:
-			uint32_t time;
-
-			m_TimPris[1]=1<<((m_udata.data[0x94/2]>>8)&0x7);
-			m_TimCnt[1]=(m_udata.data[0x94/2]&0xff)<<8;
-
-			if ((m_udata.data[0x94/2]&0xff) != 255)
+			if(m_master)
 			{
-				time = (m_clock / m_TimPris[1]) / (255-(m_udata.data[0x94/2]&0xff));
-				if (time)
+				uint32_t time;
+
+				m_TimPris[1]=1<<((m_udata.data[0x94/2]>>8)&0x7);
+				m_TimCnt[1]=(m_udata.data[0x94/2]&0xff)<<8;
+
+				if ((m_udata.data[0x94/2]&0xff) != 255)
 				{
-					m_timerB->adjust(attotime::from_ticks(768, time));
+					time = (44100 / m_TimPris[1]) / (255-(m_udata.data[0x94/2]&0xff));
+					if (time)
+					{
+						m_timerB->adjust(attotime::from_hz(time));
+					}
 				}
 			}
 			break;
 		case 0x98:
 		case 0x99:
-			uint32_t time;
-
-			m_TimPris[2]=1<<((m_udata.data[0x98/2]>>8)&0x7);
-			m_TimCnt[2]=(m_udata.data[0x98/2]&0xff)<<8;
-
-			if ((m_udata.data[0x98/2]&0xff) != 255)
+			if(m_master)
 			{
-				time = (m_clock / m_TimPris[2]) / (255-(m_udata.data[0x98/2]&0xff));
-				if (time)
+				uint32_t time;
+
+				m_TimPris[2]=1<<((m_udata.data[0x98/2]>>8)&0x7);
+				m_TimCnt[2]=(m_udata.data[0x98/2]&0xff)<<8;
+
+				if ((m_udata.data[0x98/2]&0xff) != 255)
 				{
-					m_timerC->adjust(attotime::from_ticks(768, time));
+					time = (44100 / m_TimPris[2]) / (255-(m_udata.data[0x98/2]&0xff));
+					if (time)
+					{
+						m_timerC->adjust(attotime::from_hz(time));
+					}
 				}
 			}
 			break;
@@ -733,22 +719,25 @@ void aica_device::UpdateReg(address_space &space, int reg)
 		case 0xa4:  //SCIRE
 		case 0xa5:
 
-			m_udata.data[0xa0/2] &= ~m_udata.data[0xa4/2];
-			ResetInterrupts();
+			if(m_master)
+			{
+				m_udata.data[0xa0/2] &= ~m_udata.data[0xa4/2];
+				ResetInterrupts();
 
-			// behavior from real hardware (SCSP, assumed to carry over): if you SCIRE a timer that's expired,
-			// it'll immediately pop up again
-			if (m_TimCnt[0] >= 0xff00)
-			{
-				m_udata.data[0xa0/2] |= 0x40;
-			}
-			if (m_TimCnt[1] >= 0xff00)
-			{
-				m_udata.data[0xa0/2] |= 0x80;
-			}
-			if (m_TimCnt[2] >= 0xff00)
-			{
-				m_udata.data[0xa0/2] |= 0x100;
+				// behavior from real hardware (SCSP, assumed to carry over): if you SCIRE a timer that's expired,
+				// it'll immediately pop up again
+				if (m_TimCnt[0] >= 0xff00)
+				{
+					m_udata.data[0xa0/2] |= 0x40;
+				}
+				if (m_TimCnt[1] >= 0xff00)
+				{
+					m_udata.data[0xa0/2] |= 0x80;
+				}
+				if (m_TimCnt[2] >= 0xff00)
+				{
+					m_udata.data[0xa0/2] |= 0x100;
+				}
 			}
 			break;
 		case 0xa8:
@@ -757,9 +746,12 @@ void aica_device::UpdateReg(address_space &space, int reg)
 		case 0xad:
 		case 0xb0:
 		case 0xb1:
-			m_IrqTimA=DecodeSCI(SCITMA);
-			m_IrqTimBC=DecodeSCI(SCITMB);
-			m_IrqMidi=DecodeSCI(SCIMID);
+			if(m_master)
+			{
+				m_IrqTimA=DecodeSCI(SCITMA);
+				m_IrqTimBC=DecodeSCI(SCITMB);
+				m_IrqMidi=DecodeSCI(SCIMID);
+			}
 			break;
 
 		case 0xb4: //MCIEB
@@ -793,17 +785,13 @@ void aica_device::UpdateRegR(address_space &space, int reg)
 {
 	switch(reg&0xff)
 	{
-		case 0x0:
-			m_stream->set_output_gain(0,MVOL() / 15.0);
-			m_stream->set_output_gain(1,MVOL() / 15.0);
-			break;
 		case 8:
 		case 9:
 			{
 				unsigned short v=m_udata.data[0x8/2];
 				v&=0xff00;
 				v|=m_MidiStack[m_MidiR];
-				InterruptUpdate(m_IrqMidi, CLEAR_LINE);    // cancel the IRQ
+				m_irq_cb(0);    // cancel the IRQ
 				if(m_MidiR!=m_MidiW)
 				{
 					++m_MidiR;
@@ -829,10 +817,10 @@ void aica_device::UpdateRegR(address_space &space, int reg)
 					SGC = (slot->EG.state << 13) & 0x6000;
 					EG = slot->active ? slot->EG.volume : 0;
 					EG >>= (EG_SHIFT - 13);
-					EG = 0x1fff - EG;
+					EG = 0x1FFF - EG;
 					if (EG < 0) EG = 0;
 
-					m_udata.data[0x10/2] = (EG & 0x1ff8) | SGC | LP;
+					m_udata.data[0x10/2] = (EG & 0x1FF8) | SGC | LP;
 				}
 				else
 				{
@@ -884,10 +872,6 @@ void aica_device::w16(address_space &space,unsigned int addr,unsigned short val)
 	}
 	else if (addr < 0x2800)
 	{
-		if (addr == 0x2000)
-		{
-			m_ram_size = MEM8B() ? 0x800000 : 0x200000;
-		}
 		if (addr <= 0x2044)
 		{
 //          printf("%x to EFSxx slot %d (addr %x)\n", val, (addr-0x2000)/4, addr&0x7f);
@@ -902,6 +886,25 @@ void aica_device::w16(address_space &space,unsigned int addr,unsigned short val)
 			*((unsigned short *) (m_udata.datab+((addr&0xff)))) = val;
 			UpdateReg(space, addr&0xff);
 
+		}
+		else if (addr == 0x2d00)
+		{
+			m_IRQL = val;
+			popmessage("AICA: write to IRQL?");
+		}
+		else if (addr == 0x2d04)
+		{
+			m_IRQR = val;
+
+			if (val & 1)
+			{
+				m_irq_cb(0);
+			}
+			if (val & 0x100)
+				popmessage("AICA: SH-4 write protection enabled!");
+
+			if (val & 0xfefe)
+				popmessage("AICA: IRQR %04x!",val);
 		}
 	}
 	else
@@ -977,7 +980,16 @@ unsigned short aica_device::r16(address_space &space, unsigned int addr)
 		{
 			UpdateRegR(space, addr&0xff);
 			v= *((unsigned short *) (m_udata.datab+((addr&0xff))));
-			if((addr&0xfffe)==0x2810) m_udata.data[0x10/2] &= 0x7fff;   // reset LP on read
+			if((addr&0xfffe)==0x2810) m_udata.data[0x10/2] &= 0x7FFF;   // reset LP on read
+		}
+		else if (addr == 0x2d00)
+		{
+			return m_IRQL;
+		}
+		else if (addr == 0x2d04)
+		{
+			//popmessage("AICA: read to IRQR?");
+			return m_IRQR;
 		}
 	}
 	else
@@ -1030,9 +1042,9 @@ void aica_device::TimersAddTicks(int ticks)
 	if(m_TimCnt[0]<=0xff00)
 	{
 		m_TimCnt[0] += ticks << (8-((m_udata.data[0x18/2]>>8)&0x7));
-		if (m_TimCnt[0] > 0xfF00)
+		if (m_TimCnt[0] > 0xFF00)
 		{
-			m_TimCnt[0] = 0xffff;
+			m_TimCnt[0] = 0xFFFF;
 			m_udata.data[0xa0/2]|=0x40;
 		}
 		m_udata.data[0x90/2]&=0xff00;
@@ -1042,9 +1054,9 @@ void aica_device::TimersAddTicks(int ticks)
 	if(m_TimCnt[1]<=0xff00)
 	{
 		m_TimCnt[1] += ticks << (8-((m_udata.data[0x1a/2]>>8)&0x7));
-		if (m_TimCnt[1] > 0xfF00)
+		if (m_TimCnt[1] > 0xFF00)
 		{
-			m_TimCnt[1] = 0xffff;
+			m_TimCnt[1] = 0xFFFF;
 			m_udata.data[0xa0/2]|=0x80;
 		}
 		m_udata.data[0x94/2]&=0xff00;
@@ -1054,9 +1066,9 @@ void aica_device::TimersAddTicks(int ticks)
 	if(m_TimCnt[2]<=0xff00)
 	{
 		m_TimCnt[2] += ticks << (8-((m_udata.data[0x1c/2]>>8)&0x7));
-		if (m_TimCnt[2] > 0xfF00)
+		if (m_TimCnt[2] > 0xFF00)
 		{
-			m_TimCnt[2] = 0xffff;
+			m_TimCnt[2] = 0xFFFF;
 			m_udata.data[0xa0/2]|=0x100;
 		}
 		m_udata.data[0x98/2]&=0xff00;
@@ -1279,16 +1291,8 @@ void aica_device::DoMasterSamples(int nsamples)
 			}
 		}
 
-		if (MN()) // Mono
-		{
-			*bufl++ = ICLIP16((smpl+smpr)>>4);
-			*bufr++ = ICLIP16((smpl+smpr)>>4);
-		}
-		else
-		{
-			*bufl++ = ICLIP16(smpl>>3);
-			*bufr++ = ICLIP16(smpr>>3);
-		}
+		*bufl++ = ICLIP16(smpl>>3);
+		*bufr++ = ICLIP16(smpr>>3);
 	}
 }
 
@@ -1328,7 +1332,7 @@ void aica_device::aica_exec_dma(address_space &space)
 			for(i=0;i < m_dma.dlg;i+=2)
 			{
 				uint16_t tmp;
-				tmp = r16(space, m_dma.drga);
+				tmp = r16(space, m_dma.drga);;
 				m_AICARAM[m_dma.dmea] = tmp & 0xff;
 				m_AICARAM[m_dma.dmea+1] = tmp>>8;
 				m_dma.dmea+=4;
@@ -1395,35 +1399,19 @@ void aica_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 }
 
 //-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(aica_device::device_add_mconfig)
-	MCFG_CPU_ADD("arm7di", ARM7, DERIVED_CLOCK(2, 3*8))   // ARM7DI; AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MCFG_CPU_PROGRAM_MAP(internal_map)
-
-	MCFG_INPUT_MERGER_ANY_HIGH("armirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("arm7di", ARM7_FIRQ_LINE))
-
-	MCFG_RAM_ADD("ram")
-	MCFG_RAM_DEFAULT_VALUE(0xff) // TODO : Correct?
-MACHINE_CONFIG_END
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void aica_device::device_start()
 {
-	m_clock = clock();
-	m_rate = clock()/768;
 	// init the emulation
 	Init();
 
 	// set up the IRQ callbacks
+	m_irq_cb.resolve_safe();
 	m_main_irq_cb.resolve_safe();
 
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, 44100);
 
 	// save state
 	save_item(NAME(m_IrqTimA));
@@ -1440,148 +1428,28 @@ void aica_device::device_start()
 	save_item(NAME(m_TimCnt),3);
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void aica_device::device_reset()
+void aica_device::set_ram_base(void *base, int size)
 {
-	/* halt the ARM7 */
-	m_armrst = 1;
-	m_arm7di->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
-
-//-------------------------------------------------
-//  device_clock_changed - called if the clock
-//  changes
-//-------------------------------------------------
-
-void aica_device::device_clock_changed()
-{
-	if (m_clock != clock())
-	{
-		m_clock = clock();
-		m_rate = clock()/768;
-		m_stream->set_sample_rate(m_rate);
-	}
-}
-
-READ32_MEMBER( aica_device::host_aica_reg_r )
-{
-//  osd_printf_verbose("%s",string_format("AICA REG: [%08x] read %x, mask %x\n", 0x700000+reg*4, (uint64_t)offset, mem_mask).c_str());
-
-	if(offset == 0x2c00/4)
-		return m_armrst;
-
-	return r16(space,offset*4);
-}
-
-WRITE32_MEMBER( aica_device::host_aica_reg_w )
-{
-	// these are can accessed only on SH4
-	if (offset == (0x2c00/4))
-	{
-		if(ACCESSING_BITS_0_7)
-		{
-			m_armrst = data & 1;
-
-			if (data & 1)
-			{
-				/* halt the ARM7 */
-				m_arm7di->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			}
-			else
-			{
-				/* it's alive ! */
-				m_arm7di->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-			}
-		}
-	}
-	else
-	{
-		mem_mask = 0xffff; // TODO
-		uint16_t tmp;
-
-		tmp = r16(space, offset*4);
-		COMBINE_DATA(&tmp);
-		w16(space, offset*4, tmp);
-	}
-
-//  osd_printf_verbose("%s",string_format("AICA REG: [%08x=%x] write %x to %x, mask %x\n", 0x700000+reg*4, data, offset, mem_mask).c_str());
-}
-
-READ8_MEMBER( aica_device::ram_r )
-{
-	if (offset < std::min(m_ram->size(), m_ram_size))
-	{
-		return m_ram->read(offset);
-	}
-	return 0xff;
-}
-
-READ8_MEMBER( aica_device::ram_host_r )
-{
-	if ((m_rp == 0) && (offset < std::min(m_ram->size(), m_ram_size)))
-	{
-		return m_ram->read(offset);
-	}
-	return 0xff; // Unverified
-}
-
-WRITE8_MEMBER( aica_device::ram_w )
-{
-	assert(offset < std::min(m_ram->size(), m_ram_size));
-	m_ram->write(offset, data);
+	m_AICARAM = (unsigned char *)base;
+	m_AICARAM_LENGTH = size;
+	m_RAM_MASK = m_AICARAM_LENGTH-1;
+	m_RAM_MASK16 = m_RAM_MASK & 0x7ffffe;
+	m_DSP.AICARAM = (uint16_t *)base;
+	m_DSP.AICARAM_LENGTH = size;
 }
 
 READ16_MEMBER( aica_device::read )
 {
-	if ((offset*4) == 0x2d00)
-	{
-		return m_IRQL;
-	}
-	else if ((offset*4) == 0x2d04)
-	{
-		//popmessage("AICA: read to IRQR?");
-		return m_IRQR;
-	}
-
-	return r16(space,offset*4);
+	return r16(space,offset*2);
 }
 
 WRITE16_MEMBER( aica_device::write )
 {
-	// these are can accessed only on internal ARM7DI core
-	if ((offset*4) == 0x2d00)
-	{
-		m_IRQL = data;
-		popmessage("AICA: write to IRQL?");
-	}
-	else if ((offset*4) == 0x2d04)
-	{
-		m_IRQR = data;
+	uint16_t tmp;
 
-		if (data & 1)
-		{
-			for (int i = 0; i < 8; i++)
-			{
-				InterruptUpdate(i,CLEAR_LINE);
-			}
-		}
-
-		m_rp = data & 0x100;
-
-		if (data & 0xfefe)
-			popmessage("AICA: IRQR %04x!",data);
-	}
-	else
-	{
-		uint16_t tmp;
-
-		tmp = r16(space, offset*4);
-		COMBINE_DATA(&tmp);
-		w16(space, offset*4, tmp);
-	}
+	tmp = r16(space, offset*2);
+	COMBINE_DATA(&tmp);
+	w16(space, offset*2, tmp);
 }
 
 WRITE16_MEMBER( aica_device::midi_in )
@@ -1599,46 +1467,38 @@ READ16_MEMBER( aica_device::midi_out_r )
 	return val;
 }
 
-void aica_device::internal_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x00000000, 0x007fffff).rw(this, FUNC(aica_device::ram_r), FUNC(aica_device::ram_w))
-	map(0x00800000, 0x00807fff).rw(this, FUNC(aica_device::read), FUNC(aica_device::write)).umask32(0x0000ffff);
-}
-
 DEFINE_DEVICE_TYPE(AICA, aica_device, "aica", "AICA")
 
 aica_device::aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, AICA, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_arm7di(*this, "arm7di")
-	, m_armirq(*this, "armirq")
-	, m_ram(*this, "ram")
-	, m_ram_size(0x200000)
-	, m_roffset(0)
-	, m_main_irq_cb(*this)
-	, m_IRQL(0)
-	, m_IRQR(0)
-	, m_BUFPTR(0)
-	, m_AICARAM(nullptr)
-	, m_AICARAM_LENGTH(0)
-	, m_RAM_MASK(0)
-	, m_RAM_MASK16(0)
-	, m_IrqTimA(0)
-	, m_IrqTimBC(0)
-	, m_IrqMidi(0)
-	, m_MidiOutW(0)
-	, m_MidiOutR(0)
-	, m_MidiW(0)
-	, m_MidiR(0)
-	, m_armrst(0)
-	, m_rp(0)
-	, m_mcieb(0)
-	, m_mcipd(0)
-	, m_bufferl(nullptr)
-	, m_bufferr(nullptr)
-	, m_length(0)
-	, m_RBUFDST(nullptr)
+	: device_t(mconfig, AICA, tag, owner, clock),
+		device_sound_interface(mconfig, *this),
+		m_master(false),
+		m_roffset(0),
+		m_irq_cb(*this),
+		m_main_irq_cb(*this),
+		m_ram_region(*this, this->tag()),
+		m_IRQL(0),
+		m_IRQR(0),
+		m_BUFPTR(0),
+		m_AICARAM(nullptr),
+		m_AICARAM_LENGTH(0),
+		m_RAM_MASK(0),
+		m_RAM_MASK16(0),
+		m_buffertmpl(nullptr),
+		m_buffertmpr(nullptr),
+		m_IrqTimA(0),
+		m_IrqTimBC(0),
+		m_IrqMidi(0),
+		m_MidiOutW(0),
+		m_MidiOutR(0),
+		m_MidiW(0),
+		m_MidiR(0),
+		m_mcieb(0),
+		m_mcipd(0),
+		m_bufferl(nullptr),
+		m_bufferr(nullptr),
+		m_length(0),
+		m_RBUFDST(nullptr)
 
 {
 	memset(&m_udata.data, 0, sizeof(m_udata.data));
