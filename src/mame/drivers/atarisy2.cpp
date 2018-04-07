@@ -1162,7 +1162,7 @@ static const gfx_layout molayout =
 	4,
 	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
 	{ STEP4(8*0,1), STEP4(8*1,1), STEP4(8*2,1), STEP4(8*3,1) },
-	{ STEP8(0,8*4) },
+	{ STEP16(0,8*4) },
 	16*16*2
 };
 
