@@ -831,7 +831,7 @@ WRITE32_MEMBER(model2_tgp_state::copro_function_port_w)
 	uint32_t a = (offset >> 2) & 0xff;
 	d |= a << 23;
 
-	m_copro_fifo_in->push(u32(d));
+	m_copro_fifo_in->push(std::move(u32(d)));
 }
 
 void model2_tgp_state::copro_halt()
@@ -860,7 +860,7 @@ WRITE32_MEMBER(model2_tgp_state::copro_fifo_w)
 		m_coprocnt++;
 	}
 	else
-		m_copro_fifo_in->push(u32(data));
+		m_copro_fifo_in->push(std::move(u32(data)));
 }
 
 
@@ -910,7 +910,7 @@ WRITE32_MEMBER(model2b_state::copro_fifo_w)
 	}
 	else
 	{
-		m_copro_fifo_in->push(u32(data));
+		m_copro_fifo_in->push(std::move(u32(data)));
 	}
 }
 
@@ -957,7 +957,7 @@ WRITE32_MEMBER(model2b_state::copro_function_port_w)
 	uint32_t a = (offset >> 2) & 0xff;
 	d |= a << 23;
 
-	m_copro_fifo_in->push(u32(d));
+	m_copro_fifo_in->push(std::move(u32(d)));
 }
 
 
@@ -998,7 +998,7 @@ WRITE32_MEMBER(model2c_state::copro_fifo_w)
 	}
 	else
 	{
-		m_copro_fifo_in->push(u32(data));
+		m_copro_fifo_in->push(std::move(u32(data)));
 	}
 }
 
@@ -1008,7 +1008,7 @@ WRITE32_MEMBER(model2c_state::copro_function_port_w)
 	uint32_t a = (offset >> 2) & 0xff;
 	d |= a << 23;
 
-	m_copro_fifo_in->push(u32(d));
+	m_copro_fifo_in->push(std::move(u32(d)));
 }
 
 void model2c_state::copro_tgpx4_map(address_map &map)

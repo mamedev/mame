@@ -836,7 +836,7 @@ inline void mb86235_device::set_transfer_reg(uint8_t which, uint32_t value)
 						}
 
 						m_core->cur_fifo_state.has_stalled = false;
-						m_fifoout0->push(u32(value));
+						m_fifoout0->push(std::move(u32(value)));
 					}	
 					break;
 				case 4: m_core->pdr = value; break;
