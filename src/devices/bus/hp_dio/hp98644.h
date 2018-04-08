@@ -9,9 +9,6 @@
 #include "hp_dio.h"
 #include "machine/ins8250.h"
 
-#define RS232_TAG       "rs232"
-#define INS8250_TAG     "ins8250"
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -26,11 +23,6 @@ public:
 	// construction/destruction
 	dio16_98644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
-
-	required_device<ins8250_device> m_uart;
-
 protected:
 	dio16_98644_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -43,11 +35,17 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	DECLARE_READ16_MEMBER(io_r);
+	DECLARE_WRITE16_MEMBER(io_w);
+
+	required_device<ins8250_device> m_uart;
+
 private:
 	required_ioport m_switches;
-	uint8_t m_control;
+	bool     m_installed_io;
+	uint8_t  m_control;
 
-	bool m_loopback;
+	bool     m_loopback;
 	uint8_t  m_data;
 };
 
