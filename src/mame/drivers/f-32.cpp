@@ -339,7 +339,7 @@ L00-L03 & U00-U03 are 29F1610ML Flash roms
 todo: royalpk2 layout (it's very different)
 */
 
-ROM_START( mosaicf2 )
+ROM_START( mosaicf2 ) /* Released October 1999 */
 	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "rom1.bin",            0x80000, 0x080000, CRC(fceb6f83) SHA1(b98afb477627c3b2d584c0f0fb26c4dd5b1a31e2) )

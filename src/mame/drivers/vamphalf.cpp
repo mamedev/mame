@@ -1663,7 +1663,7 @@ Measured Clocks:
 
 */
 
-ROM_START( newxpang )
+ROM_START( newxpang ) /* Released January 1999 */
 	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* ROM1 empty */
 	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(6d69c799) SHA1(e8c9b8c00056c4d019b44918a2e03e18cf68b833) )
