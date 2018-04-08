@@ -13,6 +13,7 @@
     Minigame Cool Collection        (c) 1999 SemiCom
     Jumping Break                   (c) 1999 F2 System
     Poosho Poosho                   (c) 1999 F2 System
+    New Cross Pang                  (c) 1999 F2 System
     Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8 and 2.9)
     Super Lup Lup Puzzle            (c) 1999 Omega System       (version 4.0)
@@ -49,7 +50,6 @@
    Red Wyvern - A semi-sequel or update?
    Choice III: Joker's Dream (c) 2001 (likely SEMICOM-003 hardware)
  Undumped F2 System games on F-E1-16-002 hardware:
-   New Cross Pang
    World Adventure
 
 TODO:
@@ -156,6 +156,7 @@ public:
 	DECLARE_READ32_MEMBER(aoh_speedup_r);
 	DECLARE_READ16_MEMBER(jmpbreak_speedup_r);
 	DECLARE_READ16_MEMBER(poosho_speedup_r);
+	DECLARE_READ16_MEMBER(newxpang_speedup_r);
 	DECLARE_READ16_MEMBER(mrdig_speedup_r);
 	DECLARE_READ16_MEMBER(dtfamily_speedup_r);
 	DECLARE_READ16_MEMBER(toyland_speedup_r);
@@ -186,6 +187,7 @@ public:
 	DECLARE_DRIVER_INIT(mrdig);
 	DECLARE_DRIVER_INIT(jmpbreak);
 	DECLARE_DRIVER_INIT(poosho);
+	DECLARE_DRIVER_INIT(newxpang);
 	DECLARE_DRIVER_INIT(dtfamily);
 	DECLARE_DRIVER_INIT(dquizgo2);
 	DECLARE_DRIVER_INIT(suplup);
@@ -222,6 +224,7 @@ public:
 	void wyvernwg(machine_config &config);
 	void boonggab(machine_config &config);
 	void jmpbreak(machine_config &config);
+	void newxpang(machine_config &config);
 	void aoh(machine_config &config);
 	void coolmini(machine_config &config);
 	void mrkicker(machine_config &config);
@@ -564,8 +567,6 @@ void vamphalf_state::mrkickera_io(address_map &map)
 	map(0x7800, 0x7803).portr("P1_P2");
 	map(0x7c00, 0x7c03).portr("SYSTEM");
 }
-
-
 
 void vamphalf_state::jmpbreak_io(address_map &map)
 {
@@ -1156,6 +1157,15 @@ MACHINE_CONFIG_START(vamphalf_state::jmpbreak)
 	sound_ym_oki(config);
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(vamphalf_state::newxpang)
+	common(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(mrdig_io)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
+
+	sound_ym_oki(config);
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(vamphalf_state::mrdig)
 	common(config);
 	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL(50'000'000))   /* 50 MHz */
@@ -1593,6 +1603,77 @@ ROM_START( poosho ) /* Released November 1999 - Updated sequel to Jumping Break 
 
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "gal1.bin",  0x0000, 0x02e5, CRC(90352c93) SHA1(cb72e52313dcd9fc0c8b794a1745d54af76a6129) )
+ROM_END
+
+/*
+
+New Cross Pang
+F2 System, 1999
+
+F-E1-16-002
++----------------------------------------------+
+|     VR1                   M6295  VROM1 28MHz |
+|                 YM3012                       |
+|                 YM2151            MEM2       |
+|                                   MEM3       |
+|               CRAM1               MEM5       |
+|               CRAM2               MEM7       |
+|J                                             |
+|A              MEM1U  +----------++----------+|
+|M                     |          ||          ||
+|M              MEM1L  |Quicklogic||Quicklogic||
+|A                     | QL2003-  || QL2003-  ||
+|                      | XPL84C   || XPL84C   ||
+|                      |          ||          ||
+|                      +----------++----------+|
+|             GAL1                             |
+| 93C46          DRAM1     ROM1* ROML00  ROMU00|
+|P1 P2   50MHz   E1-16T    ROM2  ROML01  ROMU01|
+|                                              |
++----------------------------------------------+
+
+Notes:
+CPU: Hyperstone E1-16T @ 50.000MHz
+
+     DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
+MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
+      GAL1 - PALCE22V10H
+
+Oki M6295 rebaged as AD-65
+YM3012/YM2151 rebaged as KA12/BS901
+
+ P1 - Setup push button
+ P2 - Reset push button
+VR1 - Volume adjust pot
+
+ROMs:
+    ROML00/01, ROMU00/01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    VROM1                - TMS 27C020 2MBit DIP32 EPROM
+  * ROM1                 - Unpopulated space for DIP32 EPROM (up to 4MBit)
+    ROM2                 - ST M27C4001 4MBit DIP32 EPROM
+
+Measured Clocks:
+  E1-16T  @ 50MHz
+  YM2151  @ 3.5MHz (28MHz/8)
+  M6295   @ 1.75MH (28MHz/16), Pin7 High
+   H-Sync @ 15.625KHz
+   V-Sync @ 59.189Hz
+
+*/
+
+ROM_START( newxpang )
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	/* ROM1 empty */
+	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(6d69c799) SHA1(e8c9b8c00056c4d019b44918a2e03e18cf68b833) )
+
+	ROM_REGION( 0x800000, "gfx", 0 ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, CRC(4f8253d3) SHA1(0a4d5db879da6412326bff3edc3007402883fb02) )
+	ROM_LOAD32_WORD( "romu00.bin", 0x000002, 0x200000, CRC(0ac8f8e4) SHA1(af89b1bb422faa42f5a0980a999803150e7d9f39) )
+	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, CRC(66e6e05e) SHA1(032fa6155590bea879ce09ce8d08101c9eed8b7b) )
+	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, CRC(73907b33) SHA1(63320131f9c1c07ab537c98cf5f31a077fb70799) )
+
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(0f339d68) SHA1(9dc128aa35d37c84c2caee839f69bd0d090bae8f) )
 ROM_END
 
 /*
@@ -2888,6 +2969,19 @@ READ16_MEMBER(vamphalf_state::poosho_speedup_r)
 	return m_wram[0xc8b58 / 2];
 }
 
+READ16_MEMBER(vamphalf_state::newxpang_speedup_r)
+{
+	if (m_maincpu->pc() == 0x8b8e)
+	{
+		if (irq_active())
+			m_maincpu->spin_until_interrupt();
+		else
+			m_maincpu->eat_cycles(50);
+	}
+
+	return m_wram[0x61218 / 2];
+}
+
 READ16_MEMBER(vamphalf_state::mrdig_speedup_r)
 {
 	if (m_maincpu->pc() == 0xae38)
@@ -3175,6 +3269,14 @@ DRIVER_INIT_MEMBER(vamphalf_state,poosho)
 	m_palshift = 0;
 }
 
+DRIVER_INIT_MEMBER(vamphalf_state,newxpang)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x061218, 0x061219, read16_delegate(FUNC(vamphalf_state::newxpang_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
+
+	m_palshift = 0;
+}
+
 DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 {
 	banked_oki(0);
@@ -3189,6 +3291,7 @@ GAME( 1999, coolmini,  0,        coolmini,  common,   vamphalf_state, coolmini, 
 GAME( 1999, coolminii, coolmini, coolmini,  common,   vamphalf_state, coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, jmpbreak,  0,        jmpbreak,  common,   vamphalf_state, jmpbreak,  ROT0,   "F2 System",                     "Jumping Break" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, poosho,    0,        jmpbreak,  common,   vamphalf_state, poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, newxpang,  0,        newxpang,  common,   vamphalf_state, newxpang,  ROT0,   "F2 System",                     "New Cross Pang" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, suplup,    0,        suplup,    common,   vamphalf_state, suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup,    suplup,   suplup,    common,   vamphalf_state, luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup29,  suplup,   suplup,    common,   vamphalf_state, luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
