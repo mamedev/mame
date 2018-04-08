@@ -166,7 +166,7 @@ void bladestl_state::sound_map(address_map &map)
  *
  *************************************/
 
-static INPUT_PORTS_START( bladestl )
+static INPUT_PORTS_START( bladestl_joy ) // Joystick set does not even have a Trackball test
 	PORT_START("DSW1")
 	KONAMI_COINAGE_ALT_LOC(SW1)
 
@@ -212,20 +212,20 @@ static INPUT_PORTS_START( bladestl )
 	KONAMI8_B123_UNK(2)
 
 	PORT_START("TRACKBALL.0")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRACKBALL.1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRACKBALL.2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("TRACKBALL.3")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bladestle )
-	PORT_INCLUDE( bladestl )
+static INPUT_PORTS_START( bladestl_track ) // Joystick inputs are still read in test mode, but not used
+	PORT_INCLUDE( bladestl_joy )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )    /* Listed as "Unused" */
@@ -233,6 +233,12 @@ static INPUT_PORTS_START( bladestle )
 
 	PORT_MODIFY("P1")
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:4" )    /* Listed as "Unused" */
+
+	PORT_MODIFY("TRACKBALL.0")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_MODIFY("TRACKBALL.1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(1)
 
 	PORT_MODIFY("TRACKBALL.2")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(63) PORT_PLAYER(2)
@@ -445,6 +451,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl,  bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestll, bladestl, bladestl, bladestle, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladestle, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version T, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )
