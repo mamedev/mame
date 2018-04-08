@@ -51,9 +51,6 @@ public:
 		m_copro_data(*this, "copro_data"),
 		m_in(*this, "IN%u", 0),
 		m_dsw(*this, "DSW"),
-		m_steer(*this, "STEER"),
-		m_accel(*this, "ACCEL"),
-		m_brake(*this, "BRAKE"),
 		m_gears(*this, "GEARS"),
 		m_analog_ports(*this, "ANA%u", 0),
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
@@ -113,10 +110,7 @@ protected:
 	optional_memory_region m_copro_data;
 
 	optional_ioport_array<5> m_in;
-	required_ioport m_dsw;
-	optional_ioport m_steer;
-	optional_ioport m_accel;
-	optional_ioport m_brake;
+	optional_ioport m_dsw;
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
@@ -394,13 +388,17 @@ public:
 
 	DECLARE_MACHINE_RESET(model2o);
 
-	void daytona(machine_config &config);
 	void model2o(machine_config &config);
+	void daytona(machine_config &config);
+	void desert(machine_config &config);
+	void vcop(machine_config &config);
 
 protected:
 	DECLARE_READ32_MEMBER(daytona_unk_r);
-	DECLARE_READ8_MEMBER(model2o_in_r);
 	DECLARE_READ32_MEMBER(fifo_control_2o_r);
+	DECLARE_WRITE8_MEMBER(daytona_output_w);
+	DECLARE_WRITE8_MEMBER(desert_output_w);
+	DECLARE_WRITE8_MEMBER(vcop_output_w);
 
 	void model2o_mem(address_map &map);
 };

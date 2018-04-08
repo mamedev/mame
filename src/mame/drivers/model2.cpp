@@ -98,6 +98,7 @@
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
+#include "machine/315-5338a.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
 #include "speaker.h"
@@ -1507,20 +1508,45 @@ READ32_MEMBER(model2o_state::fifo_control_2o_r)
 	return 0xffffffff;
 }
 
-READ8_MEMBER(model2o_state::model2o_in_r)
+WRITE8_MEMBER( model2o_state::daytona_output_w )
 {
-	// TODO: original model 2 actually uses a separate board for inputs, which transmits them to dual-port RAM
-	switch (offset)
-	{
-	case 0x00: return m_steer.read_safe(0xff);
-	case 0x01: return m_accel.read_safe(0xff);
-	case 0x02: return m_brake.read_safe(0xff);
-	case 0x08: return m_in[0]->read();
-	case 0x09: return m_in[1]->read();
-	case 0x0a: return m_in[2]->read();
-	case 0x0f: return m_dsw->read();
-	default: return 0xff;
-	}
+	// 7-------  leader led
+	// -6------  vr4 led
+	// --5-----  vr3 led
+	// ---4----  vr2 led
+	// ----3---  vr1 led
+	// -----2--  start led
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+WRITE8_MEMBER( model2o_state::desert_output_w )
+{
+	// 7-------  cannon motor
+	// -6------  machine gun motor
+	// --5-----  vr1
+	// ---4----  vr2
+	// ----3---  vr3
+	// -----2--  start
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+WRITE8_MEMBER( model2o_state::vcop_output_w )
+{
+	// 7654----  unknown (not used?)
+	// ----32--  start leds (always set together)
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+	machine().bookkeeping().coin_counter_w(1, BIT(~data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(~data, 0));
 }
 
 /* model 2/2a common memory map */
@@ -1549,7 +1575,7 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
 
-	map(0x01c00000, 0x01c0001f).r(this, FUNC(model2o_state::model2o_in_r)).umask32(0x00ff00ff);
+	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).r(this, FUNC(model2o_state::daytona_unk_r));
 	map(0x01c00100, 0x01c0010f).r(this, FUNC(model2o_state::virtuacop_lightgun_r)).umask32(0x00ff00ff);
 	map(0x01c00110, 0x01c00113).r(this, FUNC(model2o_state::virtuacop_lightgun_offscreen_r)).umask32(0x00ff00ff);
@@ -1746,6 +1772,106 @@ void model2c_state::model2c_5881_mem(address_map &map)
  *
  **********************************/
 
+static INPUT_PORTS_START( gears )
+	PORT_START("GEARS") // fake to handle gear bits
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("GEAR N")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("GEAR 1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("GEAR 2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("GEAR 3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("GEAR 4")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( daytona )
+	PORT_INCLUDE(gears)
+
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON6)  PORT_NAME("VR1 (Red)")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON7)  PORT_NAME("VR2 (Blue)")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON8)  PORT_NAME("VR3 (Yellow)")
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON9)  PORT_NAME("VR4 (Green)")
+	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM)  PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state, daytona_gearbox_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("STEER")
+	PORT_BIT(0xff, 0x80, IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+
+	PORT_START("ACCEL")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)  PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+
+	PORT_START("BRAKE")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( desert )
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("VR1 (Blue)")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("VR2 (Green)")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("VR3 (Red)")
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Shift") PORT_TOGGLE
+	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Machine Gun")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Cannon")
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("STEER")
+	PORT_BIT(0xff, 0x80, IPT_PADDLE)     PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+
+	PORT_START("ACCEL")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL)      PORT_SENSITIVITY(60) PORT_KEYDELTA(20)
+
+	PORT_START("BRAKE")
+	PORT_BIT(0xff, 0x00, IPT_AD_STICK_Y) PORT_SENSITIVITY(60) PORT_KEYDELTA(20)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vcop )
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2)
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("DEBUG")
+	PORT_DIPNAME(0x02, 0x02, "No enemies") PORT_DIPLOCATION("DEBUG:1")
+	PORT_DIPSETTING(   0x02, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))
+	PORT_BIT(0xfd, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("P1_X")
+	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("P1_Y")
+	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("P2_X")
+	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2)
+
+	PORT_START("P2_Y")
+	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( model2 )
 	PORT_START("IN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1820,73 +1946,6 @@ static INPUT_PORTS_START( zerogun )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( desert )
-	PORT_INCLUDE( model2 )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("VR1 (Blue)")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("VR2 (Green)")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("VR3 (Red)")
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_TOGGLE PORT_NAME("P1 Shift")
-	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Machine Gun")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Cannon")
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("STEER")
-	PORT_BIT(0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("ACCEL")
-	PORT_BIT(0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START("BRAKE")
-	PORT_BIT(0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(60) PORT_KEYDELTA(20) PORT_PLAYER(1)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( vcop )
-	PORT_INCLUDE( model2 )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // vcop: bit 1 enables "debug mode" -> no enemies will appear
-
-	PORT_START("IN3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN4")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P1_X")
-	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
-
-	PORT_START("P1_Y")
-	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(1)
-
-	PORT_START("P2_X")
-	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2)
-
-	PORT_START("P2_Y")
-	PORT_BIT(0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX( 0, 0x3ff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2)
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( gunblade )
 	PORT_INCLUDE( vcop )
 
@@ -1913,40 +1972,6 @@ static INPUT_PORTS_START( gunblade )
 
 	PORT_START("ANA3")
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX( 0, 0xff ) PORT_SENSITIVITY( 50 ) PORT_KEYDELTA( 15 ) PORT_PLAYER(2) PORT_REVERSE
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( daytona )
-	PORT_INCLUDE( model2 )
-
-	PORT_MODIFY("IN0")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("VR 1 (Red)")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("VR 2 (Blue)")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("VR 3 (Yellow)")
-
-	PORT_MODIFY("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME("VR 4 (Green)")
-	PORT_BIT(0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,daytona_gearbox_r, nullptr)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("IN2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("STEER")
-	PORT_BIT(0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("ACCEL")
-	PORT_BIT(0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("BRAKE")
-	PORT_BIT(0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("GEARS") // fake to handle gear bits
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("GEAR N")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("GEAR 1")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(1) PORT_NAME("GEAR 2")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(1) PORT_NAME("GEAR 3")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(1) PORT_NAME("GEAR 4")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( manxtt )
@@ -1993,6 +2018,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( srallyc )
 	PORT_INCLUDE( model2 )
+	PORT_INCLUDE( gears )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("VR") // VR
@@ -2005,13 +2031,6 @@ static INPUT_PORTS_START( srallyc )
 	PORT_MODIFY("IN2")
 	PORT_BIT(0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,daytona_gearbox_r, nullptr)
 	PORT_BIT(0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("GEARS") // fake to handle gear bits
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("GEAR N")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("GEAR 1")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("GEAR 2")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("GEAR 3")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("GEAR 4")
 
 	PORT_START("IN3")
 	PORT_BIT(0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_NAME("P1 Hand Brake")
@@ -2077,7 +2096,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( rchase2 )
 	PORT_INCLUDE( gunblade )
 
-	PORT_MODIFY("IN2")
+	PORT_START("IN2")
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, model2_state,rchase2_devices_r, nullptr)
 
 	// reversed p1 and p2 wrt Gunblade
@@ -2491,6 +2510,10 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 	MCFG_NVRAM_ADD_1FILL("backup2")
 
+	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0)
+	MCFG_315_5338A_DI0_CB(IOPORT("IN0"))
+	MCFG_315_5338A_DI1_CB(IOPORT("IN1"))
+
 	model2_timers(config);
 	model2_screen(config);
 
@@ -2557,8 +2580,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model2o_state::daytona)
 	model2o(config);
 	sj25_0207_01(config);
-MACHINE_CONFIG_END
 
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5338A_AN0_CB(IOPORT("STEER"))
+	MCFG_315_5338A_AN1_CB(IOPORT("ACCEL"))
+	MCFG_315_5338A_AN2_CB(IOPORT("BRAKE"))
+	MCFG_315_5338A_DO_CB(WRITE8(model2o_state, daytona_output_w))
+MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
 	daytona(config);
@@ -2572,6 +2600,24 @@ MACHINE_CONFIG_START(model2o_gtx_state::daytona_gtx)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(model2o_gtx_mem)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model2o_state::desert)
+	model2o(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5338A_AN0_CB(IOPORT("STEER"))
+	MCFG_315_5338A_AN1_CB(IOPORT("ACCEL"))
+	MCFG_315_5338A_AN2_CB(IOPORT("BRAKE"))
+	MCFG_315_5338A_DO_CB(WRITE8(model2o_state, desert_output_w))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model2o_state::vcop)
+	model2o(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_315_5338A_DI2_CB(IOPORT("DEBUG"))
+	MCFG_315_5338A_DO_CB(WRITE8(model2o_state, vcop_output_w))
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
@@ -6415,9 +6461,9 @@ GAME( 1994?,daytonat,  daytona, daytona,     daytona, model2o_state,       srall
 GAME( 1994?,daytonata, daytona, daytona,     daytona, model2o_state,       srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (Turbo hack, set 2)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, daytonam,  daytona, daytona_maxx,daytona, model2o_maxx_state,  srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (To The MAXX)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2003, daytonagtx,daytona, daytona_gtx, daytona, model2o_gtx_state,   srallyc, ROT0, "hack (Kyle Hodgetts)", "Daytona USA (GTX 2004 Edition)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, desert,    0,       model2o,     desert,  model2o_state,       0,       ROT0, "Sega / Martin Marietta", "Desert Tank", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vcop,      0,       model2o,     vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, vcopa,     vcop,    model2o,     vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, desert,    0,       desert,      desert,  model2o_state,       0,       ROT0, "Sega / Martin Marietta", "Desert Tank", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vcop,      0,       vcop,        vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, vcopa,     vcop,    vcop,        vcop,    model2o_state,       0,       ROT0, "Sega", "Virtua Cop (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2A-CRX (TGPs, SCSP sound board)
 GAME( 1994, vf2,       0,       model2a,      model2,   model2a_state, 0,       ROT0, "Sega",   "Virtua Fighter 2 (Version 2.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
