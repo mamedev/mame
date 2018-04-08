@@ -4,9 +4,9 @@
 
     Backfire!
 
-    inputs are incomplete (p2 side.., alt control modes etc.)
+    Note that the alternate "Potentiometer" controls (which set 2 has as the default) must first be calibrated by holding 1P Button 2 + Start on the "I/O Check" screen.
 
-    Potentiometer controls (which set 2 has as default) are mapped now, but don't seem to work in-game
+    The alternate "Optical Sensor" controls are not currently emulated.
 
     there may still be some problems with the 156 co-processor, but it seems to be mostly correct
 
