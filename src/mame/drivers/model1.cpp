@@ -636,7 +636,7 @@ Notes:
 #include "cpu/i386/i386.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
-#include "machine/315-5338a.h"
+#include "machine/m1io.h"
 #include "speaker.h"
 
 #include "vr.lh"
@@ -930,7 +930,7 @@ void model1_state::model1_mem(address_map &map)
 	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
 	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	map(0xc00000, 0xc0001f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0x00ff);
+	map(0xc00000, 0xc0001f).rw("io", FUNC(m1io_device::read), FUNC(m1io_device::write)).umask16(0x00ff);
 	map(0xc00020, 0xc0003f).w(this, FUNC(model1_state::drive_board_w));
 
 	map(0xc00040, 0xc00043).rw(this, FUNC(model1_state::network_ctl_r), FUNC(model1_state::network_ctl_w));
@@ -1659,10 +1659,10 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0)
-	MCFG_315_5338A_DI0_CB(IOPORT("IN.0"))
-	MCFG_315_5338A_DI1_CB(IOPORT("IN.1"))
-	MCFG_315_5338A_DI2_CB(IOPORT("IN.2"))
+	MCFG_DEVICE_ADD("io", SEGA_M1IO, 0)
+	MCFG_M1IO_DI0_CB(IOPORT("IN.0"))
+	MCFG_M1IO_DI1_CB(IOPORT("IN.1"))
+	MCFG_M1IO_DI2_CB(IOPORT("IN.2"))
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
@@ -1699,17 +1699,17 @@ MACHINE_CONFIG_START(model1_state::vf)
 	model1_hle(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_DO_CB(WRITE8(model1_state, vf_outputs_w))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, vf_outputs_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::vr)
 	model1(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_AN0_CB(IOPORT("WHEEL"))
-	MCFG_315_5338A_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5338A_AN2_CB(IOPORT("BRAKE"))
-	MCFG_315_5338A_DO_CB(WRITE8(model1_state, vr_outputs_w))
+	MCFG_M1IO_AN0_CB(IOPORT("WHEEL"))
+	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, vr_outputs_w))
 
 	MCFG_M1COMM_ADD(M1COMM_TAG)
 	MCFG_DEVICE_BIOS("epr15112");
@@ -1719,10 +1719,10 @@ MACHINE_CONFIG_START(model1_state::vformula)
 	model1(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_AN0_CB(IOPORT("WHEEL"))
-	MCFG_315_5338A_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5338A_AN2_CB(IOPORT("BRAKE"))
-	MCFG_315_5338A_DO_CB(WRITE8(model1_state, vr_outputs_w))
+	MCFG_M1IO_AN0_CB(IOPORT("WHEEL"))
+	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, vr_outputs_w))
 
 	MCFG_M1COMM_ADD(M1COMM_TAG)
 	MCFG_DEVICE_BIOS("epr15624");
@@ -1732,13 +1732,13 @@ MACHINE_CONFIG_START(model1_state::swa)
 	model1_hle(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_AN0_CB(IOPORT("STICK1X"))
-	MCFG_315_5338A_AN1_CB(IOPORT("STICK1Y"))
-	MCFG_315_5338A_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_315_5338A_AN3_CB(NOOP)
-	MCFG_315_5338A_AN4_CB(IOPORT("STICK2X"))
-	MCFG_315_5338A_AN5_CB(IOPORT("STICK2Y"))
-	MCFG_315_5338A_DO_CB(WRITE8(model1_state, swa_outputs_w))
+	MCFG_M1IO_AN0_CB(IOPORT("STICK1X"))
+	MCFG_M1IO_AN1_CB(IOPORT("STICK1Y"))
+	MCFG_M1IO_AN2_CB(IOPORT("THROTTLE"))
+	MCFG_M1IO_AN3_CB(NOOP)
+	MCFG_M1IO_AN4_CB(IOPORT("STICK2X"))
+	MCFG_M1IO_AN5_CB(IOPORT("STICK2Y"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, swa_outputs_w))
 
 	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
@@ -1758,10 +1758,10 @@ MACHINE_CONFIG_START(model1_state::wingwar)
 	MCFG_CPU_PROGRAM_MAP(model1_comm_mem)
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_AN0_CB(IOPORT("STICKX"))
-	MCFG_315_5338A_AN1_CB(IOPORT("STICKY"))
-	MCFG_315_5338A_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_315_5338A_DO_CB(WRITE8(model1_state, wingwar_outputs_w))
+	MCFG_M1IO_AN0_CB(IOPORT("STICKX"))
+	MCFG_M1IO_AN1_CB(IOPORT("STICKY"))
+	MCFG_M1IO_AN2_CB(IOPORT("THROTTLE"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, wingwar_outputs_w))
 
 	MCFG_M1COMM_ADD(M1COMM_TAG)
 	MCFG_DEVICE_BIOS("epr15112");
@@ -1771,7 +1771,7 @@ MACHINE_CONFIG_START(model1_state::wingwar360)
 	wingwar(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_DO_CB(WRITE8(model1_state, wingwar360_outputs_w))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, wingwar360_outputs_w))
 MACHINE_CONFIG_END
 
 void model1_state::polhemus_map(address_map &map)
@@ -1787,9 +1787,9 @@ MACHINE_CONFIG_START(model1_state::netmerc)
 	MCFG_CPU_PROGRAM_MAP(polhemus_map)
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_AN0_CB(IOPORT("STICKX"))
-	MCFG_315_5338A_AN2_CB(IOPORT("STICKY"))
-	MCFG_315_5338A_DO_CB(WRITE8(model1_state, netmerc_outputs_w))
+	MCFG_M1IO_AN0_CB(IOPORT("STICKX"))
+	MCFG_M1IO_AN2_CB(IOPORT("STICKY"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, netmerc_outputs_w))
 MACHINE_CONFIG_END
 
 

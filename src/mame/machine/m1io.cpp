@@ -2,14 +2,12 @@
 // copyright-holders: Dirk Best
 /***************************************************************************
 
-    Sega 315-5338A
-
-    I/O Controller
+    Sega Model 1/2 I/O RAM Abstraction
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "315-5338a.h"
+#include "m1io.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -19,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SEGA_315_5338A, sega_315_5338a_device, "315_5338a", "315-5338A I/O Controller")
+DEFINE_DEVICE_TYPE(SEGA_M1IO, m1io_device, "m1io", "Sega Model 1/2 I/O RAM")
 
 
 //**************************************************************************
@@ -27,11 +25,11 @@ DEFINE_DEVICE_TYPE(SEGA_315_5338A, sega_315_5338a_device, "315_5338a", "315-5338
 //**************************************************************************
 
 //-------------------------------------------------
-//  sega_315_5338a_device - constructor
+//  m1io_device - constructor
 //-------------------------------------------------
 
-sega_315_5338a_device::sega_315_5338a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, SEGA_315_5338A, tag, owner, clock),
+m1io_device::m1io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, SEGA_M1IO, tag, owner, clock),
 	m_an_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 	m_di_cb{ {*this}, {*this}, {*this} },
 	m_do_cb(*this),
@@ -43,7 +41,7 @@ sega_315_5338a_device::sega_315_5338a_device(const machine_config &mconfig, cons
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void sega_315_5338a_device::device_start()
+void m1io_device::device_start()
 {
 	// resolve callbacks
 	for (int i = 0; i < 8; i++)
@@ -60,7 +58,7 @@ void sega_315_5338a_device::device_start()
 //  INTERFACE
 //**************************************************************************
 
-READ8_MEMBER( sega_315_5338a_device::read )
+READ8_MEMBER( m1io_device::read )
 {
 	uint8_t data = 0xff;
 
@@ -96,7 +94,7 @@ READ8_MEMBER( sega_315_5338a_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( sega_315_5338a_device::write )
+WRITE8_MEMBER( m1io_device::write )
 {
 	LOG("WR %02x = %02x\n", offset, data);
 

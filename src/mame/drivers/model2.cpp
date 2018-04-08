@@ -98,7 +98,7 @@
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
-#include "machine/315-5338a.h"
+#include "machine/m1io.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
 #include "speaker.h"
@@ -1575,7 +1575,7 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
 
-	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask32(0x00ff00ff);
+	map(0x01c00000, 0x01c0001f).rw("io", FUNC(m1io_device::read), FUNC(m1io_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).r(this, FUNC(model2o_state::daytona_unk_r));
 	map(0x01c00100, 0x01c0010f).r(this, FUNC(model2o_state::virtuacop_lightgun_r)).umask32(0x00ff00ff);
 	map(0x01c00110, 0x01c00113).r(this, FUNC(model2o_state::virtuacop_lightgun_offscreen_r)).umask32(0x00ff00ff);
@@ -2510,9 +2510,9 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_NVRAM_ADD_1FILL("backup1")
 	MCFG_NVRAM_ADD_1FILL("backup2")
 
-	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0)
-	MCFG_315_5338A_DI0_CB(IOPORT("IN0"))
-	MCFG_315_5338A_DI1_CB(IOPORT("IN1"))
+	MCFG_DEVICE_ADD("io", SEGA_M1IO, 0)
+	MCFG_M1IO_DI0_CB(IOPORT("IN0"))
+	MCFG_M1IO_DI1_CB(IOPORT("IN1"))
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2582,10 +2582,10 @@ MACHINE_CONFIG_START(model2o_state::daytona)
 	sj25_0207_01(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5338A_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5338A_AN2_CB(IOPORT("BRAKE"))
-	MCFG_315_5338A_DO_CB(WRITE8(model2o_state, daytona_output_w))
+	MCFG_M1IO_AN0_CB(IOPORT("STEER"))
+	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_M1IO_DO_CB(WRITE8(model2o_state, daytona_output_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
@@ -2606,18 +2606,18 @@ MACHINE_CONFIG_START(model2o_state::desert)
 	model2o(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_AN0_CB(IOPORT("STEER"))
-	MCFG_315_5338A_AN1_CB(IOPORT("ACCEL"))
-	MCFG_315_5338A_AN2_CB(IOPORT("BRAKE"))
-	MCFG_315_5338A_DO_CB(WRITE8(model2o_state, desert_output_w))
+	MCFG_M1IO_AN0_CB(IOPORT("STEER"))
+	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_M1IO_DO_CB(WRITE8(model2o_state, desert_output_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_state::vcop)
 	model2o(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5338A_DI2_CB(IOPORT("DEBUG"))
-	MCFG_315_5338A_DO_CB(WRITE8(model2o_state, vcop_output_w))
+	MCFG_M1IO_DI2_CB(IOPORT("DEBUG"))
+	MCFG_M1IO_DO_CB(WRITE8(model2o_state, vcop_output_w))
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
