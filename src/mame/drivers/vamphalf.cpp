@@ -1610,6 +1610,8 @@ ROM_END
 New Cross Pang
 F2 System, 1999
 
+sequel to "Cross Pang" (see crospang.c)
+
 F-E1-16-002
 +----------------------------------------------+
 |     VR1                   M6295  VROM1 28MHz |
