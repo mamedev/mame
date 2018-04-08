@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "emu.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
