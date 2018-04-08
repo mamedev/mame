@@ -1642,7 +1642,7 @@ MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
       GAL1 - PALCE22V10H
 
 Oki M6295 rebaged as AD-65
-YM3012/YM2151 rebaged as KA12/BS901
+YM3012/YM2151 rebaged as KA12/KA51
 
  P1 - Setup push button
  P2 - Reset push button
