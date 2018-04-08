@@ -3368,6 +3368,8 @@ files {
 	MAME_DIR .. "src/mame/video/zaxxon.cpp",
 	MAME_DIR .. "src/mame/machine/315_5296.cpp",
 	MAME_DIR .. "src/mame/machine/315_5296.h",
+	MAME_DIR .. "src/mame/machine/315-5338a.cpp",
+	MAME_DIR .. "src/mame/machine/315-55338a.h",
 	MAME_DIR .. "src/mame/machine/fd1089.cpp",
 	MAME_DIR .. "src/mame/machine/fd1089.h",
 	MAME_DIR .. "src/mame/machine/fd1094.cpp",
