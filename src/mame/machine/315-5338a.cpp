@@ -8,15 +8,11 @@
 
 ***************************************************************************/
 
-#include "315-5338a.h"
 #include "emu.h"
+#include "315-5338a.h"
 
-
-//**************************************************************************
-//  CONSTANTS/MACROS
-//**************************************************************************
-
-#define VERBOSE 0
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -95,16 +91,14 @@ READ8_MEMBER( sega_315_5338a_device::read )
 	case 0x0f: data = m_out;
 	}
 
-	if (VERBOSE)
-		logerror("RD %02x = %02x\n", offset, data);
+	LOG("RD %02x = %02x\n", offset, data);
 
 	return data;
 }
 
 WRITE8_MEMBER( sega_315_5338a_device::write )
 {
-	if (VERBOSE)
-		logerror("WR %02x = %02x\n", offset, data);
+	LOG("WR %02x = %02x\n", offset, data);
 
 	switch (offset)
 	{
