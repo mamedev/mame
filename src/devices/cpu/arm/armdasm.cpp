@@ -9,58 +9,63 @@
 #include "emu.h"
 #include "armdasm.h"
 
-void arm_disassembler::WriteImmediateOperand( std::ostream &stream, uint32_t opcode ) const
+uint32_t arm_disassembler::ExtractImmediateOperand(uint32_t opcode) const
 {
-	/* rrrrbbbbbbbb */
-	uint32_t imm;
-	int r;
-
-	imm = opcode&0xff;
-	r = ((opcode>>8)&0xf)*2;
-	imm = (imm>>r)|(r?(imm<<(32-r)):0);
-	util::stream_format( stream, ", #$%x", imm );
+	// rrrrbbbbbbbb
+	uint32_t imm = opcode & 0xff;
+	uint8_t r = ((opcode >> 8) & 0xf) * 2;
+	return (imm >> r) | (r ? (imm << (32 - r)) : 0);
 }
 
-void arm_disassembler::WriteDataProcessingOperand( std::ostream &stream, uint32_t opcode, bool printOp0, bool printOp1) const
+void arm_disassembler::WriteDataProcessingOperand(std::ostream &stream, uint32_t opcode, bool printOp0, bool printOp1, offs_t pc) const
 {
-	/* ccccctttmmmm */
+	// ccccctttmmmm
 	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
 
 	if (printOp0)
-		util::stream_format(stream, "R%d, ", (opcode>>12)&0xf);
+		util::stream_format(stream, "R%d, ", (opcode >> 12) & 0xf);
 	if (printOp1)
-		util::stream_format(stream, "R%d, ", (opcode>>16)&0xf);
+		util::stream_format(stream, "R%d, ", (opcode >> 16) & 0xf);
 
-	/* Immediate Op2 */
+	// Immediate Op2
 	if (opcode & 0x02000000)
 	{
-		stream.seekp(-2, std::ios_base::cur);
-		WriteImmediateOperand(stream, opcode);
-		return;
-	}
+		uint32_t imm = ExtractImmediateOperand(opcode);
+		util::stream_format(stream, "#$%x", imm);
 
-	/* Register Op2 */
-	util::stream_format(stream, "R%d", (opcode>>0)&0xf);
-
-	int shiftop = (opcode >> 5) & 3;
-	if( opcode&0x10 ) /* Shift amount specified in bottom bits of RS */
-	{
-		util::stream_format(stream, ", %s R%d", pRegOp[shiftop], (opcode >> 8) & 0xf);
+		// Calculate result of ADD/SUB Rn, R15, #imm
+		if ((opcode & 0x01ef0000) == 0x008f0000)
+			util::stream_format(stream, " ; =$%x", pc + 8 + imm);
+		else if ((opcode & 0x01ef0000) == 0x004f0000)
+			util::stream_format(stream, " ; =$%x", pc + 8 - imm);
 	}
-	else /* Shift amount immediate 5 bit unsigned integer */
+	else
 	{
-		int c = (opcode >> 7) & 0x1f;
-		if (c == 0)
+		// Register Op2
+		util::stream_format(stream, "R%d", (opcode >> 0) & 0xf);
+
+		int shiftop = (opcode >> 5) & 3;
+		if ((opcode & 0x10) != 0)
 		{
-			if (shiftop == 0)
-				return;
-			c = 32;
+			// Shift amount specified in bottom bits of RS
+			util::stream_format(stream, ", %s R%d", pRegOp[shiftop], (opcode >> 8) & 0xf);
 		}
-		util::stream_format( stream, ", %s #%d", pRegOp[shiftop], c);
+		else
+		{
+			// Shift amount immediate 5 bit unsigned integer
+			int c = (opcode >> 7) & 0x1f;
+			if (c == 0)
+			{
+				if (shiftop == 0)
+				return;
+				c = 32;
+			}
+			util::stream_format(stream, ", %s #%d", pRegOp[shiftop], c);
+		}
 	}
 }
 
-void arm_disassembler::WriteRegisterOperand1( std::ostream &stream, uint32_t opcode ) const
+void arm_disassembler::WriteRegisterOperand1(std::ostream &stream, uint32_t opcode) const
 {
 	/* ccccctttmmmm */
 	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
@@ -89,7 +94,7 @@ void arm_disassembler::WriteRegisterOperand1( std::ostream &stream, uint32_t opc
 } /* WriteRegisterOperand */
 
 
-void arm_disassembler::WriteBranchAddress( std::ostream &stream, uint32_t pc, uint32_t opcode ) const
+void arm_disassembler::WriteBranchAddress(std::ostream &stream, uint32_t pc, uint32_t opcode) const
 {
 	opcode &= 0x00ffffff;
 	if( opcode&0x00800000 )
@@ -144,10 +149,9 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			util::stream_format( stream, "MUL" );
 		}
 		util::stream_format( stream, "%s", pConditionCode );
-		if( opcode&0x00100000 )
-		{
+		if ((opcode & 0x00100000) != 0)
 			stream << 'S';
-		}
+
 		WritePadding(stream, start_position);
 
 		util::stream_format(stream,
@@ -174,10 +178,8 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			pOperation[op],
 			pConditionCode);
 
-		if( (opcode&0x01000000) )
-		{
+		if ((opcode & 0x00100000) != 0)
 			stream << 'S';
-		}
 
 		WritePadding(stream, start_position);
 
@@ -192,20 +194,20 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 		case 0x07:
 		case 0x0c:
 		case 0x0e:
-			WriteDataProcessingOperand(stream, opcode, true, true);
+			WriteDataProcessingOperand(stream, opcode, true, true, pc);
 			break;
 		case 0x08:
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
-			WriteDataProcessingOperand(stream, opcode, false, true);
+			WriteDataProcessingOperand(stream, opcode, false, true, pc);
 			break;
 		case 0x0d:
 			/* look for mov pc,lr */
 			if (((opcode >> 12) & 0x0f) == 15 && ((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02000000) == 0)
 				dasmflags = STEP_OUT;
 		case 0x0f:
-			WriteDataProcessingOperand(stream, opcode, true, false);
+			WriteDataProcessingOperand(stream, opcode, true, false, pc);
 			break;
 		}
 	}
