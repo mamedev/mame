@@ -121,12 +121,12 @@ void tehkanwc_state::video_start()
    bit 7 = enable (0 = display off)
  */
 
-void tehkanwc_state::gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t led,int player)
+void tehkanwc_state::gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t led, int player)
 {
-	if (led&0x80)
-		output().set_digit_value(player, led&0x7f);
-		else
-		output().set_digit_value(player, 0x00);
+	if (led & 0x80)
+		m_digits[player] = led & 0x7f;
+	else
+		m_digits[player] = 0;
 }
 
 void tehkanwc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -189,6 +189,10 @@ public:
 	void ignore(bool ignore = true);
 	bool observing() const { return ((m_flags & DEBUG_FLAG_OBSERVING) != 0); }
 
+	// debugger suspend/unsuspend
+	void suspend(bool suspend = true);
+	bool suspended() const { return ((m_flags & DEBUG_FLAG_SUSPENDED) != 0); }
+
 	// single stepping
 	void single_step(int numsteps = 1);
 	void single_step_over(int numsteps = 1);
@@ -447,6 +451,7 @@ private:
 	static constexpr u32 DEBUG_FLAG_STOP_EXCEPTION  = 0x00000800;       // there is a pending stop on the next exception
 	static constexpr u32 DEBUG_FLAG_STOP_VBLANK     = 0x00001000;       // there is a pending stop on the next VBLANK
 	static constexpr u32 DEBUG_FLAG_STOP_TIME       = 0x00002000;       // there is a pending stop at cpu->stoptime
+	static constexpr u32 DEBUG_FLAG_SUSPENDED       = 0x00004000;       // CPU currently suspended
 	static constexpr u32 DEBUG_FLAG_LIVE_BP         = 0x00010000;       // there are live breakpoints for this CPU
 
 	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;

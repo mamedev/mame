@@ -52,6 +52,7 @@
 #include "ne1000.h"
 #include "ne2000.h"
 #include "3c505.h"
+#include "eis_sad8852.h"
 
 // communication ports
 #include "lpt.h"
@@ -159,4 +160,5 @@ SLOT_INTERFACE_START( pc_isa16_cards )
 	SLOT_INTERFACE("mach64", ISA16_SVGA_MACH64)
 	SLOT_INTERFACE("sb16_lle", ISA16_SB16)
 	SLOT_INTERFACE("mcd", ISA16_MCD)
+	SLOT_INTERFACE("sad8852", ISA16_SAD8852)
 SLOT_INTERFACE_END

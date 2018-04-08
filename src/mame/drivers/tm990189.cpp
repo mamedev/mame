@@ -90,6 +90,7 @@ public:
 		, m_tms9918(*this, "tms9918")
 		, m_tms9901_usr(*this, TMS9901_0_TAG)
 		, m_tms9901_sys(*this, TMS9901_1_TAG)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	required_device<tms9980a_device> m_tms9980a;
@@ -170,6 +171,7 @@ private:
 	void digitsel(int offset, bool state);
 	required_device<tms9901_device>     m_tms9901_usr;
 	required_device<tms9901_device>     m_tms9901_sys;
+	output_finder<10> m_digits;
 };
 
 
@@ -184,11 +186,13 @@ MACHINE_RESET_MEMBER(tm990189_state,tm990_189)
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189)
 {
+	m_digits.resolve();
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 }
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 {
+	m_digits.resolve();
 	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
 
 	m_joy1x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
@@ -253,8 +257,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 	for (i = 0; i < 10; i++)
 	{
 		m_old_segment_state[i] |= m_segment_state[i];
-		sprintf(ledname,"digit%d",i);
-		output().set_digit_value(i, m_old_segment_state[i]);
+		m_digits[i] = m_old_segment_state[i];
 		m_old_segment_state[i] = m_segment_state[i];
 		m_segment_state[i] = 0;
 	}

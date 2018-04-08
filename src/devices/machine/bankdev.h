@@ -18,6 +18,9 @@
 #define MCFG_ADDRESS_MAP_BANK_STRIDE(_stride) \
 	downcast<address_map_bank_device &>(*device).set_stride(_stride);
 
+#define MCFG_ADDRESS_MAP_BANK_SHIFT(_shift) \
+	downcast<address_map_bank_device &>(*device).set_shift(_shift);
+
 class address_map_bank_device :
 	public device_t,
 	public device_memory_interface
@@ -31,6 +34,7 @@ public:
 	void set_data_width(uint8_t data_width) { m_data_width = data_width; }
 	void set_addr_width(uint8_t addr_width) { m_addr_width = addr_width; }
 	void set_stride(uint32_t stride) { m_stride = stride; }
+	void set_shift(uint32_t shift) { m_shift = shift; }
 
 	void amap8(address_map &map);
 	void amap16(address_map &map);
@@ -65,6 +69,7 @@ private:
 	address_space_config m_program_config;
 	address_space *m_program;
 	offs_t m_offset;
+	int m_shift;
 };
 
 

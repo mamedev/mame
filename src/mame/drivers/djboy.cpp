@@ -277,8 +277,8 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 		m_slavelatch->write(space, 0, m_beast_p1);
 	}
 
-	if (BIT(data, 0) == 1)
-		m_beastlatch->acknowledge_w(space, 0, data); // TODO : Acknowloge at here too?
+	if (BIT(data, 0) == 0)
+		m_beastlatch->acknowledge_w(space, 0, data);
 
 	m_beast_p0 = data;
 }
@@ -293,11 +293,6 @@ READ8_MEMBER(djboy_state::beast_p1_r)
 
 WRITE8_MEMBER(djboy_state::beast_p1_w)
 {
-	if (data == 0xff)
-	{
-		m_beastlatch->acknowledge_w(space, 0, data);
-	}
-
 	m_beast_p1 = data;
 }
 

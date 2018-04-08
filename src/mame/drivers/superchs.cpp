@@ -46,6 +46,7 @@
 #include "machine/taitoio.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "screen.h"
@@ -90,7 +91,6 @@ WRITE32_MEMBER(superchs_state::cpua_ctrl_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_subcpu->set_input_line(INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
-		if (data&0x8000) m_maincpu->set_input_line(3, HOLD_LINE); /* Guess */
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -107,24 +107,11 @@ WRITE8_MEMBER(superchs_state::coin_word_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-READ32_MEMBER(superchs_state::superchs_stick_r)
+READ8_MEMBER( superchs_state::volume_r )
 {
-	uint8_t b0 = ioport("UNKNOWN")->read();
-	uint8_t b1 = ((ioport("SOUND")->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
-	uint8_t b2 = ioport("ACCEL")->read() ^ 0xff;
-	uint8_t b3 = ioport("WHEEL")->read();
-
-	return b3 << 24 | b2 << 16 | b1 << 8 | b0;
+	return ((m_volume->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
 }
 
-WRITE32_MEMBER(superchs_state::superchs_stick_w)
-{
-	/* This is guess work - the interrupts are in groups of 4, with each writing to a
-	    different byte in this long word before the RTE.  I assume all but the last
-	    (top) byte cause an IRQ with the final one being an ACK.  (Total guess but it works). */
-	if (mem_mask != 0xff000000)
-		m_maincpu->set_input_line(3, HOLD_LINE);
-}
 
 /***********************************************************
              MEMORY STRUCTURES
@@ -142,7 +129,7 @@ void superchs_state::superchs_map(address_map &map)
 	map(0x280000, 0x287fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x2c0000, 0x2c07ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x300000, 0x300007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x340000, 0x340003).rw(this, FUNC(superchs_state::superchs_stick_r), FUNC(superchs_state::superchs_stick_w));   /* stick int request */
+	map(0x340000, 0x340007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 }
 
 void superchs_state::superchs_cpub_map(address_map &map)
@@ -189,18 +176,14 @@ static INPUT_PORTS_START( superchs )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch")   /* upright doesn't have brake? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )
 
-	// 4 analog ports
 	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE PORT_NAME("Steering Wheel")
 
 	PORT_START("ACCEL")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Gas Pedal")    /* in upright cab, it is a digital (1 bit) switch instead */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_REVERSE PORT_NAME("Gas Pedal")    /* in upright cab, it is a digital (1 bit) switch instead */
 
 	PORT_START("SOUND")
 	PORT_ADJUSTER( 75, "PCB - Sound Volume" )
-
-	PORT_START("UNKNOWN") // unused?
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /***********************************************************
@@ -254,6 +237,12 @@ MACHINE_CONFIG_START(superchs_state::superchs)
 	MCFG_QUANTUM_TIME(attotime::from_hz(480)) /* Need to interleave CPU 1 & 3 */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
+	MCFG_ADC0808_IN0_CB(IOPORT("WHEEL"))
+	MCFG_ADC0808_IN1_CB(IOPORT("ACCEL"))
+	MCFG_ADC0808_IN2_CB(READ8(superchs_state, volume_r))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("COINS"))

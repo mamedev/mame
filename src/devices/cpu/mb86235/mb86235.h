@@ -13,8 +13,19 @@
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
+#include "machine/gen_fifo.h"
+
+#define MCFG_MB86235_FIFOIN(tag) \
+	downcast<mb86235_device &>(*device).set_fifoin_tag(tag);
+
+#define MCFG_MB86235_FIFOOUT0(tag) \
+	downcast<mb86235_device &>(*device).set_fifoout0_tag(tag);
+
+#define MCFG_MB86235_FIFOOUT1(tag) \
+	downcast<mb86235_device &>(*device).set_fifoout1_tag(tag);
 
 class mb86235_frontend;
+
 
 
 class mb86235_device :  public cpu_device
@@ -25,6 +36,10 @@ public:
 	// construction/destruction
 	mb86235_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t clock);
 
+	void set_fifoin_tag(const char *tag) { m_fifoin.set_tag(tag); }
+	void set_fifoout0_tag(const char *tag) { m_fifoout0.set_tag(tag); }
+	void set_fifoout1_tag(const char *tag) { m_fifoout1.set_tag(tag); }
+
 	void unimplemented_op();
 	void unimplemented_alu();
 	void unimplemented_control();
@@ -32,13 +47,6 @@ public:
 	void unimplemented_double_xfer2();
 	void pcs_overflow();
 	void pcs_underflow();
-
-	void fifoin_w(uint32_t data);
-	bool is_fifoin_full();
-	bool is_fifoin_empty();
-	uint32_t fifoout0_r();
-	bool is_fifoout0_empty();
-	bool is_fifoout0_full();
 
 	enum
 	{
@@ -52,10 +60,6 @@ public:
 		MB86235_PRP, MB86235_PWP,
 		MB86235_ST
 	};
-
-	static constexpr int FIFOIN_SIZE = 16;
-	static constexpr int FIFOOUT0_SIZE = 16;
-	static constexpr int FIFOOUT1_SIZE = 16;
 
 	void internal_abus(address_map &map);
 	void internal_bbus(address_map &map);
@@ -100,14 +104,6 @@ private:
 		uint32_t mv;
 		uint32_t mu;
 		uint32_t md;
-	};
-
-	struct fifo
-	{
-		int rpos;
-		int wpos;
-		int num;
-		uint32_t data[16];
 	};
 
 	struct fifo_state
@@ -164,9 +160,6 @@ private:
 		float fp0;
 		bool delay_slot;
 
-		fifo fifoin;
-		fifo fifoout0;
-		fifo fifoout1;
 		fifo_state cur_fifo_state;
 	};
 
@@ -177,18 +170,16 @@ private:
 	uml::code_handle *m_entry;                      /* entry point */
 	uml::code_handle *m_nocode;                     /* nocode exception handler */
 	uml::code_handle *m_out_of_cycles;              /* out of cycles exception handler */
-	uml::code_handle *m_clear_fifo_in;
-	uml::code_handle *m_clear_fifo_out0;
-	uml::code_handle *m_clear_fifo_out1;
-	uml::code_handle *m_read_fifo_in;
-	uml::code_handle *m_write_fifo_out0;
-	uml::code_handle *m_write_fifo_out1;
 	uml::code_handle *m_read_abus;
 	uml::code_handle *m_write_abus;
 
 	address_space_config m_program_config;
 	address_space_config m_dataa_config;
 	address_space_config m_datab_config;
+	optional_device<generic_fifo_u32_device> m_fifoin;
+	optional_device<generic_fifo_u32_device> m_fifoout0;
+	optional_device<generic_fifo_u32_device> m_fifoout1;
+
 	drc_cache m_cache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<mb86235_frontend> m_drcfe;
@@ -216,7 +207,6 @@ private:
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
-	void static_generate_fifo();
 	void static_generate_memory_accessors();
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
@@ -243,6 +233,19 @@ private:
 	bool has_register_clash(const opcode_desc *desc, int outreg);
 	bool aluop_has_result(int aluop);
 	bool check_previous_op_stall();
+
+	// UML is sad...
+	u32 m_cur_value;
+
+	static void clear_fifoin(void *param);
+	static void clear_fifoout0(void *param);
+	static void clear_fifoout1(void *param);
+	static void read_fifoin(void *param);
+	static void write_fifoout0(void *param);
+	static void write_fifoout1(void *param);
+	static void empty_fifoin(void *param);
+	static void full_fifoout0(void *param);
+	static void full_fifoout1(void *param);
 
 //  interpreter
 	void execute_op(uint32_t h, uint32_t l);

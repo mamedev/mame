@@ -488,7 +488,7 @@ static INPUT_PORTS_START( nmg5 )
 	PORT_START("SYSTEM")    /* Coins */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2 )
-	PORT_BIT( 0x0050, IP_ACTIVE_HIGH, IPT_SPECIAL )         // otherwise it doesn't boot (unneeded for 'nmg5e' - see notes)
+	PORT_BIT( 0x0050, IP_ACTIVE_HIGH, IPT_CUSTOM )         // otherwise it doesn't boot (unneeded for 'nmg5e' - see notes)
 	PORT_BIT( 0xffac, IP_ACTIVE_LOW,  IPT_UNUSED )          // tested in service mode
 
 	PORT_START("INPUTS")

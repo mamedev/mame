@@ -922,7 +922,7 @@ when forming the background. They jerk a bit relative to
 each other... probably a cpu sync thing, perhaps also some
 fine-tuning required on the zoomed sprite dimension calcs.
 
-Light gun interrupt timing arbitrary.
+ADC clock unknown.
 
 
 Double Axle
@@ -975,6 +975,7 @@ DIP switches are not verified
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
@@ -1030,15 +1031,10 @@ void taitoz_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		/* 68000 A */
 		m_maincpu->set_input_line(6, HOLD_LINE);
 		break;
-	case TIMER_TAITOZ_CPUB_INTERRUPT5:
-		/* 68000 B */
-		m_subcpu->set_input_line(5, HOLD_LINE);
-		break;
 	default:
 		assert_always(false, "Unknown id in taitoz_state::device_timer");
 	}
 }
-
 
 /***** Routines for particular games *****/
 
@@ -1160,63 +1156,6 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 }
 
 
-READ16_MEMBER(taitoz_state::bshark_stick_r)
-{
-	switch (offset)
-	{
-		case 0x00:
-			return ioport("STICKX")->read();
-
-		case 0x01:
-			return ioport("X_ADJUST")->read();
-
-		case 0x02:
-			return ioport("STICKY")->read();
-
-		case 0x03:
-			return ioport("Y_ADJUST")->read();
-	}
-
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", m_maincpu->pc(), offset);
-
-	return 0xff;
-}
-
-
-READ16_MEMBER(taitoz_state::nightstr_stick_r)
-{
-	switch (offset)
-	{
-		case 0x00:
-			return ioport("STICKX")->read();
-
-		case 0x01:
-			return ioport("STICKY")->read();
-
-		case 0x02:
-			return ioport("X_ADJUST")->read();
-
-		case 0x03:
-			return ioport("Y_ADJUST")->read();
-	}
-
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", m_maincpu->pc(), offset);
-
-	return 0xff;
-}
-
-WRITE16_MEMBER(taitoz_state::bshark_stick_w)
-{
-	/* Each write invites a new interrupt as soon as the
-	   hardware has got the next a/d conversion ready. We set a token
-	   delay of 10000 cycles; our "coords" are always ready
-	   but we don't want CPUA to have an int6 before int4 is over (?)
-	*/
-
-	timer_set(m_maincpu->cycles_to_attotime(10000), TIMER_TAITOZ_INTERRUPT6);
-}
-
-
 READ16_MEMBER(taitoz_state::sci_steer_input_r)
 {
 	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
@@ -1235,39 +1174,6 @@ READ16_MEMBER(taitoz_state::sci_steer_input_r)
 	return 0xff;
 }
 
-
-READ16_MEMBER(taitoz_state::spacegun_lightgun_r)
-{
-	switch (offset)
-	{
-		case 0x00:
-			return ioport("STICKX1")->read();
-
-		case 0x01:
-			return ioport("STICKY1")->read();
-
-		case 0x02:
-			return ioport("STICKX2")->read();
-
-		case 0x03:
-			return ioport("STICKY2")->read();
-	}
-
-	return 0x00;
-}
-
-WRITE16_MEMBER(taitoz_state::spacegun_lightgun_w)
-{
-	/* Each write invites a new lightgun interrupt as soon as the
-	   hardware has got the next coordinate ready. We set a token
-	   delay of 10000 cycles; our "lightgun" coords are always ready
-	   but we don't want CPUB to have an int5 before int4 is over (?).
-
-	   Four lightgun interrupts happen before the collected coords
-	   are moved to shared ram where CPUA can use them. */
-
-	timer_set(m_subcpu->cycles_to_attotime(10000), TIMER_TAITOZ_CPUB_INTERRUPT5);
-}
 
 WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
 {
@@ -1538,7 +1444,7 @@ void taitoz_state::bshark_map(address_map &map)
 	map(0x110000, 0x113fff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x600000, 0x600001).w(this, FUNC(taitoz_state::cpua_ctrl_w));
-	map(0x800000, 0x800007).rw(this, FUNC(taitoz_state::bshark_stick_r), FUNC(taitoz_state::bshark_stick_w));
+	map(0x800000, 0x80000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 	map(0xa00000, 0xa01fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
@@ -1552,7 +1458,7 @@ void taitoz_state::bsharkjjs_map(address_map &map)
 	map(0x110000, 0x113fff).ram().share("share1");
 	map(0x400000, 0x40000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0x00ff);
 	map(0x600000, 0x600001).w(this, FUNC(taitoz_state::cpua_ctrl_w));
-//  map(0x800000, 0x800007).rw(this, FUNC(taitoz_state::bshark_stick_r), FUNC(taitoz_state::bshark_stick_w)); /* No analog stick, this is the Joystick version */
+//  map(0x800000, 0x80000f) // No analog stick, this is the Joystick version
 	map(0xa00000, 0xa01fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0xc00000, 0xc00fff).ram().share("spriteram");
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));    /* tilemaps */
@@ -1612,7 +1518,7 @@ void taitoz_state::nightstr_map(address_map &map)
 	map(0xc20000, 0xc2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
 	map(0xd00000, 0xd007ff).ram().share("spriteram");
 	map(0xe00000, 0xe00011).w(this, FUNC(taitoz_state::nightstr_motor_w));    /* Motor outputs */
-	map(0xe40000, 0xe40007).rw(this, FUNC(taitoz_state::nightstr_stick_r), FUNC(taitoz_state::bshark_stick_w));
+	map(0xe40000, 0xe4000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 }
 
 void taitoz_state::nightstr_cpub_map(address_map &map)
@@ -1672,7 +1578,7 @@ void taitoz_state::spacegun_cpub_map(address_map &map)
 	map(0xc0000e, 0xc0000f).noprw();
 	map(0xc20000, 0xc20007).w(this, FUNC(taitoz_state::taitoz_pancontrol)).umask16(0x00ff);  /* pan */
 	map(0xe00000, 0xe00001).w(this, FUNC(taitoz_state::spacegun_gun_output_w));    /* gun outputs */
-	map(0xf00000, 0xf00007).rw(this, FUNC(taitoz_state::spacegun_lightgun_r), FUNC(taitoz_state::spacegun_lightgun_w));
+	map(0xf00000, 0xf0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 }
 
 
@@ -2051,7 +1957,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00)
 
 	PORT_START("IN1")
@@ -2060,7 +1966,7 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x01, EQUALS, 0x00) // no function?
 
 	PORT_START("IN2")   /* unused */
@@ -2133,7 +2039,7 @@ static INPUT_PORTS_START( chasehq ) // IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "BRAKE") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN1")
@@ -2142,7 +2048,7 @@ static INPUT_PORTS_START( chasehq ) // IN3-6 perhaps used with cockpit setup? //
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Calibrate") // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Shifter") PORT_TOGGLE
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitoz_state, taitoz_pedal_r, "GAS") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Gas Switch") PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 
 	PORT_START("IN2")   /* unused */
@@ -3222,6 +3128,13 @@ MACHINE_CONFIG_START(taitoz_state::bshark)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // clock unknown
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 6))
+	MCFG_ADC0808_IN0_CB(IOPORT("STICKX"))
+	MCFG_ADC0808_IN1_CB(IOPORT("X_ADJUST"))
+	MCFG_ADC0808_IN2_CB(IOPORT("STICKY"))
+	MCFG_ADC0808_IN3_CB(IOPORT("Y_ADJUST"))
+
 	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
@@ -3283,6 +3196,7 @@ MACHINE_CONFIG_START(taitoz_state::bsharkjjs)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bsharkjjs_map)
 
+	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 
@@ -3381,6 +3295,13 @@ MACHINE_CONFIG_START(taitoz_state::nightstr)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // clock unknown
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 6))
+	MCFG_ADC0808_IN0_CB(IOPORT("STICKX"))
+	MCFG_ADC0808_IN1_CB(IOPORT("STICKY"))
+	MCFG_ADC0808_IN2_CB(IOPORT("X_ADJUST"))
+	MCFG_ADC0808_IN3_CB(IOPORT("Y_ADJUST"))
 
 	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
@@ -3540,6 +3461,13 @@ MACHINE_CONFIG_START(taitoz_state::spacegun)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(spacegun_default_eeprom, 128)
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // clock unknown
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("sub", 5))
+	MCFG_ADC0808_IN0_CB(IOPORT("STICKX1"))
+	MCFG_ADC0808_IN1_CB(IOPORT("STICKY1"))
+	MCFG_ADC0808_IN2_CB(IOPORT("STICKX2"))
+	MCFG_ADC0808_IN3_CB(IOPORT("STICKY2"))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))

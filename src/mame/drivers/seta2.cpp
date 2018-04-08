@@ -1683,7 +1683,7 @@ static INPUT_PORTS_START( pzlbowl )
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )    // Protection?
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM )    // Protection?
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1838,7 +1838,7 @@ static INPUT_PORTS_START( reelquak )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 
 	PORT_START("TICKET")    // $400003.b
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r)    // ticket sensor
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r)    // ticket sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Knock Down")    // knock down
@@ -2021,12 +2021,12 @@ static INPUT_PORTS_START( deerhunt )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )  // P2 gun, read but not used
 
 	PORT_START("TRIGGER")   // $700000
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL )  // trigger
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM )  // trigger
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0xff3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("PUMP")  // $700003.b
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL )  // pump
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM )  // pump
 	PORT_BIT( 0xffbf, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COIN")  // $700005.b
@@ -2091,14 +2091,14 @@ static INPUT_PORTS_START( wschamp )
 	PORT_BIT( 0xff00, 0x8000, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1, 0, 0) PORT_MINMAX(0x0800,0xf800) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	PORT_MODIFY("TRIGGER")  // $700000
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  // trigger P2
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL )  // trigger P1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  // trigger P2
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM )  // trigger P1
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0xff1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("PUMP") // $700003.b
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  // pump P2
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL )  // pump P1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  // pump P2
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_CUSTOM )  // pump P1
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2  )
 	PORT_BIT( 0xff1f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -2203,7 +2203,7 @@ static INPUT_PORTS_START( telpacfl )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1       ) PORT_NAME("Bet") // bet switch (converts credits into balls)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR   ) // door switch
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r) // coin out switch (medals jam error when stuck i.e. メダルづまり)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM       ) PORT_READ_LINE_DEVICE_MEMBER("dispenser", ticket_dispenser_device, line_r) // coin out switch (medals jam error when stuck i.e. メダルづまり)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN       ) // -
@@ -2241,8 +2241,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( funcube )
 	PORT_START("SWITCH")    // c00030.l
 	PORT_BIT(     0x01, IP_ACTIVE_LOW,  IPT_COIN1    ) PORT_IMPULSE(1)  // coin solenoid 1
-	PORT_BIT(     0x02, IP_ACTIVE_HIGH, IPT_SPECIAL  )                  // coin solenoid 2
-	PORT_BIT(     0x04, IP_ACTIVE_HIGH, IPT_SPECIAL  )                  // hopper sensor
+	PORT_BIT(     0x02, IP_ACTIVE_HIGH, IPT_CUSTOM  )                  // coin solenoid 2
+	PORT_BIT(     0x04, IP_ACTIVE_HIGH, IPT_CUSTOM  )                  // hopper sensor
 	PORT_BIT(     0x08, IP_ACTIVE_LOW,  IPT_BUTTON2  )                  // game select
 	PORT_BIT(     0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT(     0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_NAME( "Reset Key" )

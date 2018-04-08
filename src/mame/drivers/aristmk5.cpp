@@ -480,6 +480,7 @@ public:
 		, m_p1(*this, "P1")
 		, m_p2(*this, "P2")
 		, m_extra_ports(*this, "EXTRA")
+		, m_lamps(*this, "lamp%u", 0U)
 	 { }
 
 	DECLARE_WRITE32_MEMBER(Ns5w48);
@@ -543,6 +544,8 @@ private:
 	required_ioport m_p2;
 	required_ioport m_extra_ports;
 
+	output_finder<64> m_lamps;
+
 	emu_timer *     m_mk5_2KHz_timer;
 	emu_timer *     m_mk5_VSYNC_timer;
 	emu_timer *     m_spi_timer;
@@ -575,7 +578,9 @@ WRITE8_MEMBER(aristmk5_state::spi_mux_w)
 
 	case 2: // Mechanical meters
 		for(int i = 0; i < 4; i++)
-			output().set_lamp_value(32 + i, BIT(m_spi_data[m_spi_mux], 1 + i));     // Tower Lamps
+		{
+			m_lamps[32+i] = BIT(m_spi_data[m_spi_mux], 1 + i); // Tower Lamps
+		}
 		break;
 
 	case 4: // Door inputs
@@ -584,7 +589,9 @@ WRITE8_MEMBER(aristmk5_state::spi_mux_w)
 
 	case 5: // Door outputs
 		for(int i = 0; i < 32; i++)
-			output().set_lamp_value(i, BIT(m_spi_data[m_spi_mux], i));
+		{
+			m_lamps[i] = BIT(m_spi_data[m_spi_mux], i);
+		}
 		break;
 
 	case 6: // Main board slow I/O
@@ -895,19 +902,19 @@ WRITE8_MEMBER(aristmk5_state::sram_banksel_w)
 WRITE8_MEMBER(aristmk5_state::buttons_lamps_w)
 {
 	for(int i = 0; i < 8; i++)
-		output().set_lamp_value((offset >> 2) * 8 + i, BIT(data, i));
+		m_lamps[(offset >> 2) * 8 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(aristmk5_state::other_lamps_w)
 {
 	for(int i = 0; i < 8; i++)
-		output().set_lamp_value(16 + i, BIT(data, i));
+		m_lamps[16 + i] = BIT(data, i);
 }
 
 WRITE8_MEMBER(aristmk5_state::bill_acceptor_lamps_w)
 {
 	for(int i = 0; i < 8; i++)
-		output().set_lamp_value(24 + i, BIT(data, i));
+		m_lamps[24 + i] = BIT(data, i);
 }
 
 void aristmk5_state::aristmk5_map(address_map &map)
@@ -1121,7 +1128,7 @@ static INPUT_PORTS_START( aristmk5_usa )
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
 
 	PORT_START("P4")
-	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_usa_r, nullptr)
+	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_usa_r, nullptr)
 
 	PORT_START("P5")
 	PORT_BIT(0x00000008, IP_ACTIVE_LOW,  IPT_OTHER)   // Meters
@@ -1184,7 +1191,7 @@ static INPUT_PORTS_START( aristmk5 )
 
 PORT_START("P3")
 	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, hopper_r, nullptr)
-	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
+	PORT_BIT(0x000000f8, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
 
 	PORT_START("P6")
 	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_OTHER)    // Battery
@@ -1987,6 +1994,8 @@ void aristmk5_state::machine_start()
 	m_mk5_2KHz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_2KHz_callback),this));
 	m_mk5_VSYNC_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_VSYNC_callback),this));
 	m_spi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::spi_timer), this));
+
+	m_lamps.resolve();
 }
 
 void aristmk5_state::machine_reset()

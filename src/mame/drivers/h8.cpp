@@ -69,6 +69,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(portf0_r);
@@ -93,10 +94,12 @@ private:
 	bool m_cass_state;
 	bool m_cassold;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
+	output_finder<16> m_digits;
 };
 
 
@@ -151,7 +154,7 @@ WRITE8_MEMBER( h8_state::portf0_w )
 	// d7 = beeper enable
 
 	m_digit = data & 15;
-	if (m_digit) output().set_digit_value(m_digit, m_segment);
+	if (m_digit) m_digits[m_digit] = m_segment;
 
 	output().set_value("mon_led", !BIT(data, 5));
 	m_beep->set_state(!BIT(data, 7));
@@ -174,7 +177,7 @@ WRITE8_MEMBER( h8_state::portf1_w )
 	//d0 segment g
 
 	m_segment = 0xff ^ bitswap<8>(data, 7, 0, 6, 5, 4, 3, 2, 1);
-	if (m_digit) output().set_digit_value(m_digit, m_segment);
+	if (m_digit) m_digits[m_digit] = m_segment;
 }
 
 void h8_state::h8_mem(address_map &map)

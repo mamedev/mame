@@ -250,18 +250,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::interrupt)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::gdfs_interrupt)
+WRITE_LINE_MEMBER(ssv_state::gdfs_adc_int_w)
 {
-	int scanline = param;
-
-	if ((scanline % 64) == 0)
+	if (state)
 	{
 		m_requested_int |= 1 << 6;  // reads lightgun (4 times for 4 axis)
-		update_irq_state();
-	}
-	else if(scanline == 240)
-	{
-		m_requested_int |= 1 << 3;  // vblank
 		update_irq_state();
 	}
 }
@@ -452,7 +445,7 @@ void ssv_state::drifto94_map(address_map &map)
 
 READ16_MEMBER(ssv_state::gdfs_eeprom_r)
 {
-	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ m_io_gun[m_gdfs_lightgun_select]->read()) | (m_eeprom->do_read() << 8);
+	return m_adc->data_r(space, 0) | (m_eeprom->do_read() << 8);
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
@@ -466,19 +459,17 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 //      data & 0x0001 ?
 
 		// latch the bit
-		m_eeprom->di_write((data & 0x4000) >> 14);
+		m_eeprom->di_write(BIT(data, 14));
 
 		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x1000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->cs_write(BIT(data, 12) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write(BIT(data, 13) ? ASSERT_LINE : CLEAR_LINE);
 
-		if (!(m_gdfs_eeprom_old & 0x0800) && (data & 0x0800))   // rising clock
-			m_gdfs_lightgun_select = (data & 0x0300) >> 8;
+		m_adc->address_w(space, 0, (data & 0x0700) >> 8);
+		m_adc->start_w(BIT(data, 11));
 	}
-
-	COMBINE_DATA(&m_gdfs_eeprom_old);
 }
 
 
@@ -513,10 +504,10 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 {
 	uint16_t input_sel = *m_input_sel;
 
-	if (input_sel & 0x0001) return m_io_key0->read();
-	if (input_sel & 0x0002) return m_io_key1->read();
-	if (input_sel & 0x0004) return m_io_key2->read();
-	if (input_sel & 0x0008) return m_io_key3->read();
+	if (input_sel & 0x0001) return m_io_key[0]->read();
+	if (input_sel & 0x0002) return m_io_key[1]->read();
+	if (input_sel & 0x0004) return m_io_key[2]->read();
+	if (input_sel & 0x0008) return m_io_key[3]->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",m_maincpu->pc(),input_sel);
 	return 0xffff;
 }
@@ -643,10 +634,10 @@ READ16_MEMBER(ssv_state::srmp4_input_r)
 {
 	uint16_t input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002) return m_io_key0->read();
-	if (input_sel & 0x0004) return m_io_key1->read();
-	if (input_sel & 0x0008) return m_io_key2->read();
-	if (input_sel & 0x0010) return m_io_key3->read();
+	if (input_sel & 0x0002) return m_io_key[0]->read();
+	if (input_sel & 0x0004) return m_io_key[1]->read();
+	if (input_sel & 0x0008) return m_io_key[2]->read();
+	if (input_sel & 0x0010) return m_io_key[3]->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",m_maincpu->pc(),input_sel);
 	return 0xffff;
 }
@@ -691,10 +682,10 @@ READ16_MEMBER(ssv_state::srmp7_input_r)
 {
 	uint16_t input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002) return m_io_key0->read();
-	if (input_sel & 0x0004) return m_io_key1->read();
-	if (input_sel & 0x0008) return m_io_key2->read();
-	if (input_sel & 0x0010) return m_io_key3->read();
+	if (input_sel & 0x0002) return m_io_key[0]->read();
+	if (input_sel & 0x0004) return m_io_key[1]->read();
+	if (input_sel & 0x0008) return m_io_key[2]->read();
+	if (input_sel & 0x0010) return m_io_key[3]->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",m_maincpu->pc(),input_sel);
 	return 0xffff;
 }
@@ -1344,13 +1335,13 @@ static INPUT_PORTS_START( gdfs )
 	PORT_DIPSETTING(      0x0000, "Heavy" )
 
 	PORT_START("GUNX1") // IN5 - $540000(0)
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_INVERT
 
 	PORT_START("GUNY1") // IN6 - $540000(1)
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("GUNX2") // IN7 - $540000(2)
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(2) PORT_INVERT
 
 	PORT_START("GUNY2") // IN8 - $540000(3)
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(2)
@@ -2541,8 +2532,8 @@ void ssv_state::init_st010()
 }
 
 DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init(0); init_st010();  }
-DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init(0); init_eaglshot_banking(); save_item(NAME(m_trackball_select)); }
-DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init(0); save_item(NAME(m_gdfs_lightgun_select)); save_item(NAME(m_gdfs_eeprom_old)); }
+DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init(0); init_eaglshot_banking(); }
+DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,hypreact)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,hypreac2)     {    init(0); init_hypreac2_common();    }
 DRIVER_INIT_MEMBER(ssv_state,janjans1)     {    init(0); }
@@ -2634,10 +2625,15 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gdfs_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(ssv_state, gdfs_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock
+	MCFG_ADC0808_IN0_CB(IOPORT("GUNX1"))
+	MCFG_ADC0808_IN1_CB(IOPORT("GUNY1"))
+	MCFG_ADC0808_IN2_CB(IOPORT("GUNX2"))
+	MCFG_ADC0808_IN3_CB(IOPORT("GUNY2"))
+	MCFG_ADC0808_EOC_CB(WRITELINE(ssv_state, gdfs_adc_int_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

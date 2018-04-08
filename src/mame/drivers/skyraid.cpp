@@ -14,7 +14,10 @@ Atari Sky Raider driver
 #include "screen.h"
 #include "speaker.h"
 
-
+void skyraid_state::machine_start()
+{
+	m_led.resolve();
+}
 
 PALETTE_INIT_MEMBER(skyraid_state, skyraid)
 {
