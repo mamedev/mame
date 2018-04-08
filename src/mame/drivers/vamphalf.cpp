@@ -14,7 +14,7 @@
     Jumping Break                   (c) 1999 F2 System
     Poosho Poosho                   (c) 1999 F2 System
     New Cross Pang                  (c) 1999 F2 System
-    Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0 and 2.9)
+    Lup Lup Puzzle                  (c) 1999 Omega System       (version 3.0, 2.9 and 1.05)
     Puzzle Bang Bang                (c) 1999 Omega System       (version 2.8 and 2.9)
     Super Lup Lup Puzzle            (c) 1999 Omega System       (version 4.0)
     Vamf 1/2                        (c) 1999 Danbi & F2 System  (Europe version 1.1.0908 and 1.0.0903)
@@ -144,6 +144,7 @@ public:
 	DECLARE_READ16_MEMBER(suplup_speedup_r);
 	DECLARE_READ16_MEMBER(luplup_speedup_r);
 	DECLARE_READ16_MEMBER(luplup29_speedup_r);
+	DECLARE_READ16_MEMBER(luplup10_speedup_r);
 	DECLARE_READ16_MEMBER(puzlbang_speedup_r);
 	DECLARE_READ16_MEMBER(puzlbanga_speedup_r);
 	DECLARE_READ32_MEMBER(wivernwg_speedup_r);
@@ -193,6 +194,7 @@ public:
 	DECLARE_DRIVER_INIT(suplup);
 	DECLARE_DRIVER_INIT(luplup);
 	DECLARE_DRIVER_INIT(luplup29);
+	DECLARE_DRIVER_INIT(luplup10);
 	DECLARE_DRIVER_INIT(puzlbang);
 	DECLARE_DRIVER_INIT(toyland);
 	DECLARE_DRIVER_INIT(aoh);
@@ -1468,7 +1470,6 @@ ROM_START( luplup ) /* version 3.0 / 990128 */
 	ROM_LOAD( "gal22v10b.gal1", 0x0000, 0x02e5, NO_DUMP ) /* GAL is read protected */
 ROM_END
 
-
 ROM_START( luplup29 ) /* version 2.9 / 990108 */
 	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "luplup-rom1.v29", 0x00000, 0x80000, CRC(36a8b8c1) SHA1(fed3eb2d83adc1b071a12ce5d49d4cab0ca20cc7) )
@@ -1484,6 +1485,20 @@ ROM_START( luplup29 ) /* version 2.9 / 990108 */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
 ROM_END
 
+ROM_START( luplup10 ) /* version 1.05 / 981214 */
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "p0_rom1.rom1", 0x00000, 0x80000, CRC(a2684e3c) SHA1(9178ab6e7695cfb5bcdac3f3b8f3ea2a86372018) )
+	ROM_LOAD( "p1_rom2.rom2", 0x80000, 0x80000, CRC(1043ce44) SHA1(13a23f35ff2335d837f682761f774a70e298e77a) )
+
+	ROM_REGION( 0x800000, "gfx", 0 ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00.roml00", 0x000000, 0x200000, BAD_DUMP CRC(1575b2be) SHA1(e4e67ecc15518a1c8ea7ab5cbd0fe9c6f7f64edd) )
+	ROM_LOAD32_WORD( "romu00.romu00", 0x000002, 0x200000, CRC(9ee855b9) SHA1(a51b268a640b667d88a8ceab562607a811602fff) )
+	ROM_LOAD32_WORD( "roml01.roml01", 0x400000, 0x200000, CRC(7182864c) SHA1(48789b20d9b8f41d7c9f5690f4f44bc6f15b8cfe) )
+	ROM_LOAD32_WORD( "romu01.romu01", 0x400002, 0x200000, CRC(44f76640) SHA1(6a49ed4d5584ecd0496b9ce19aefd5f4e0126da7) )
+
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
+ROM_END
 
 ROM_START( puzlbang ) /* version 2.9 / 990108 - Korea only, cannot select title, language and limited selection of background choices, EI: censored  */
 	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
@@ -1499,7 +1514,6 @@ ROM_START( puzlbang ) /* version 2.9 / 990108 - Korea only, cannot select title,
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
 ROM_END
-
 
 ROM_START( puzlbanga ) /* version 2.8 / 990106 - Korea only, cannot select title, language or change background selection, EI: censored */
 	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
@@ -2818,6 +2832,19 @@ READ16_MEMBER(vamphalf_state::luplup29_speedup_r)
 	return m_wram[0x113f08 / 2];
 }
 
+READ16_MEMBER(vamphalf_state::luplup10_speedup_r)
+{
+	if (m_maincpu->pc() == 0xb1128)
+	{
+		if (irq_active())
+			m_maincpu->spin_until_interrupt();
+		else
+			m_maincpu->eat_cycles(50);
+	}
+
+	return m_wram[0x113b78 / 2];
+}
+
 READ16_MEMBER(vamphalf_state::puzlbang_speedup_r)
 {
 	if (m_maincpu->pc() == 0xae6cc)
@@ -3121,6 +3148,14 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
 	/* no flipscreen */
 }
 
+DRIVER_INIT_MEMBER(vamphalf_state,luplup10)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113b78, 0x00113b79, read16_delegate(FUNC(vamphalf_state::luplup10_speedup_r), this));
+
+	m_palshift = 8;
+	/* no flipscreen */
+}
+
 DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f14, 0x00113f15, read16_delegate(FUNC(vamphalf_state::puzlbang_speedup_r), this));
@@ -3297,6 +3332,7 @@ GAME( 1999, newxpang,  0,        newxpang,  common,   vamphalf_state, newxpang, 
 GAME( 1999, suplup,    0,        suplup,    common,   vamphalf_state, suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup,    suplup,   suplup,    common,   vamphalf_state, luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup29,  suplup,   suplup,    common,   vamphalf_state, luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, luplup10,  suplup,   suplup,    common,   vamphalf_state, luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // graphics ROML00 needs redump
 GAME( 1999, puzlbang,  suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, puzlbanga, suplup,   suplup,    common,   vamphalf_state, puzlbang,  ROT0,   "Omega System",                  "Puzzle Bang Bang (Korea, version 2.8 / 990106)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, vamphalf,  0,        vamphalf,  common,   vamphalf_state, vamphalf,  ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
