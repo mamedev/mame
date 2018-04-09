@@ -117,6 +117,7 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z80/tmpz84c015.h"
 #include "sound/ay8910.h"
 #include "sound/ym2413.h"
 #include "machine/74259.h"
@@ -223,7 +224,6 @@ public:
 	/* ddenlovr misc (TODO: merge with dynax.h, where possible) */
 	uint8_t m_palram[0x200];
 	int m_okibank;
-	uint8_t m_rongrong_blitter_busy_select;
 	uint8_t m_prot_val;
 	uint16_t m_prot_16;
 	uint16_t m_quiz365_protection[2];
@@ -255,21 +255,13 @@ public:
 	uint32_t screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(ddenlovr_irq);
-	DECLARE_WRITE_LINE_MEMBER(quizchq_irq);
 	DECLARE_WRITE_LINE_MEMBER(mmpanic_irq);
-	DECLARE_WRITE_LINE_MEMBER(quizchq_rtc_irq);
 	DECLARE_WRITE_LINE_MEMBER(mmpanic_rtc_irq);
 	DECLARE_WRITE_LINE_MEMBER(hanakanz_irq);
-	DECLARE_WRITE_LINE_MEMBER(mjchuuka_irq);
-	DECLARE_WRITE_LINE_MEMBER(funkyfig_irq);
-	DECLARE_WRITE_LINE_MEMBER(hginga_irq);
+	DECLARE_WRITE_LINE_MEMBER(funkyfig_sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(mjflove_irq);
-	DECLARE_WRITE_LINE_MEMBER(hparadis_irq);
 	DECLARE_WRITE_LINE_MEMBER(hanakanz_rtc_irq);
-	DECLARE_WRITE_LINE_MEMBER(mjchuuka_rtc_irq);
-	DECLARE_WRITE_LINE_MEMBER(hginga_rtc_irq);
 	DECLARE_WRITE_LINE_MEMBER(mjflove_rtc_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(mjmyster_irq);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_blitter_irq_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
@@ -305,8 +297,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ddenlovr_select2_w);
 	DECLARE_READ8_MEMBER(rongrong_input2_r);
 	DECLARE_READ16_MEMBER(quiz365_input2_r);
-	DECLARE_WRITE8_MEMBER(rongrong_blitter_busy_w);
-	DECLARE_READ8_MEMBER(rongrong_blitter_busy_r);
 	DECLARE_WRITE8_MEMBER(quiz365_coincounter_w);
 	DECLARE_READ16_MEMBER(quiz365_protection_r);
 	DECLARE_WRITE16_MEMBER(quiz365_protection_w);
@@ -413,7 +403,7 @@ public:
 	DECLARE_WRITE8_MEMBER(daimyojn_blitter_data_palette_w);
 	DECLARE_READ8_MEMBER(daimyojn_year_hack_r);
 	DECLARE_WRITE8_MEMBER(janshinp_coincounter_w);
-	DECLARE_READ8_MEMBER(seljan2_busy_r);
+	DECLARE_WRITE_LINE_MEMBER(seljan2_blitter_irq);
 	DECLARE_WRITE8_MEMBER(seljan2_rombank_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_enab_w);
 	DECLARE_WRITE8_MEMBER(seljan2_palette_w);
@@ -1193,6 +1183,7 @@ g_profiler.start(PROFILER_VIDEO);
 				#endif
 			}
 
+			m_blitter_irq_handler(0);
 			m_blitter_irq_handler(1);
 			break;
 
@@ -1349,6 +1340,7 @@ g_profiler.start(PROFILER_VIDEO);
 				#endif
 			}
 
+			m_blitter_irq_handler(0);
 			m_blitter_irq_handler(1);
 			break;
 
@@ -1562,8 +1554,9 @@ g_profiler.stop();
 
 WRITE_LINE_MEMBER(ddenlovr_state::rongrong_blitter_irq)
 {
-	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
+	auto &cpu = downcast<tmpz84c015_device &>(*m_maincpu);
+	cpu.trg0(state);
+	cpu.trg1(state);
 }
 
 WRITE8_MEMBER(ddenlovr_state::ddenlovr_blitter_w)
@@ -1911,27 +1904,6 @@ READ16_MEMBER(ddenlovr_state::quiz365_input2_r)
 		case 0x10:  return ioport("P1")->read();
 		case 0x11:  return ioport("P2")->read();
 		case 0x12:  return ioport("SYSTEM")->read();
-	}
-	return 0xff;
-}
-
-
-WRITE8_MEMBER(ddenlovr_state::rongrong_blitter_busy_w)
-{
-	m_rongrong_blitter_busy_select = data;
-
-	if (data != 0x18)
-		logerror("%04x: rongrong_blitter_busy_w data = %02x\n", m_maincpu->pc(), data);
-}
-
-READ8_MEMBER(ddenlovr_state::rongrong_blitter_busy_r)
-{
-	switch (m_rongrong_blitter_busy_select)
-	{
-		case 0x18:  return 0;   // bit 5 = blitter busy
-
-		default:
-			logerror("%04x: rongrong_blitter_busy_r with select = %02x\n", m_maincpu->pc(), m_rongrong_blitter_busy_select);
 	}
 	return 0xff;
 }
@@ -2318,31 +2290,27 @@ void ddenlovr_state::quizchq_map(address_map &map)
 
 void ddenlovr_state::quizchq_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x1b, 0x1b).rw(this, FUNC(ddenlovr_state::rongrong_blitter_busy_r), FUNC(ddenlovr_state::rongrong_blitter_busy_w));
+	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
 
-	map(0x1c, 0x1c).r(this, FUNC(ddenlovr_state::rongrong_input_r));
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::rongrong_select_w));
-	map(0x20, 0x20).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
-	map(0x22, 0x23).r(this, FUNC(ddenlovr_state::rongrong_input2_r));
+	map(0x20, 0x20).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0x22, 0x23).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_input2_r));
 
-	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x60, 0x61).w("ym2413", FUNC(ym2413_device::write));
+	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x60, 0x61).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
 
-	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r));                         // ? must be 78 on startup
+	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                         // ? must be 78 on startup
 
-	map(0xa0, 0xaf).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xc0, 0xc0).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
-	map(0xc2, 0xc2).nopw();                        // enables palette RAM at 8000
+	map(0xa0, 0xaf).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xc0, 0xc0).mirror(0xff00).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
+	map(0xc2, 0xc2).mirror(0xff00).nopw();                        // enables palette RAM at 8000
 }
 
 
@@ -2358,30 +2326,25 @@ void ddenlovr_state::rongrong_map(address_map &map)
 
 void ddenlovr_state::rongrong_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x1b, 0x1b).rw(this, FUNC(ddenlovr_state::rongrong_blitter_busy_r), FUNC(ddenlovr_state::rongrong_blitter_busy_w));
+	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
 
-	map(0x1c, 0x1c).r(this, FUNC(ddenlovr_state::rongrong_input_r));
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::rongrong_select_w));
+	map(0x20, 0x2f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x60, 0x61).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
 
-	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x60, 0x61).w("ym2413", FUNC(ym2413_device::write));
+	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
 
-	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
-
-	map(0xa0, 0xa0).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
-	map(0xa2, 0xa3).r(this, FUNC(ddenlovr_state::rongrong_input2_r));
-	map(0xc2, 0xc2).nopw();                                    // enables palette RAM at f000, and protection device at f705/f706/f601
+	map(0xa0, 0xa0).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0xa2, 0xa3).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_input2_r));
+	map(0xc2, 0xc2).mirror(0xff00).nopw();                                    // enables palette RAM at f000, and protection device at f705/f706/f601
 }
 /*
 1e input select,1c input read
@@ -2560,7 +2523,7 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_blitter_w)
 
 WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_blitter_irq)
 {
-	if (state)
+	if (0) // this vector looks wrong
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);
 }
 
@@ -2625,33 +2588,30 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_lockout_w)
 
 void ddenlovr_state::funkyfig_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
-	map(0x01, 0x01).w(this, FUNC(ddenlovr_state::mmpanic_leds_w));       // Leds
-	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x04, 0x04).r(this, FUNC(ddenlovr_state::funkyfig_busy_r));
-	map(0x1c, 0x1c).r(this, FUNC(ddenlovr_state::funkyfig_dsw_r));
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::funkyfig_rombank_w));
-	map(0x20, 0x21).w(this, FUNC(ddenlovr_state::funkyfig_blitter_w));
-	map(0x23, 0x23).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));     // Video Chip
-	map(0x40, 0x4f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x00, 0x00).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
+	map(0x01, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::mmpanic_leds_w));       // Leds
+	map(0x02, 0x02).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x04, 0x04).mirror(0xff00).r(this, FUNC(ddenlovr_state::funkyfig_busy_r));
+	map(0x20, 0x21).mirror(0xff00).w(this, FUNC(ddenlovr_state::funkyfig_blitter_w));
+	map(0x23, 0x23).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));     // Video Chip
+	map(0x40, 0x4f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 
 	// Layers 0-3:
-	map(0x60, 0x63).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x64, 0x67).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x68, 0x6b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x6c, 0x6f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x74, 0x74).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x75, 0x75).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x76, 0x76).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x78, 0x78).r(this, FUNC(ddenlovr_state::unk_r));                 // ? must be 78 on startup
+	map(0x60, 0x63).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x64, 0x67).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x68, 0x6b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x6c, 0x6f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x74, 0x74).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x75, 0x75).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x76, 0x76).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x78, 0x78).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                 // ? must be 78 on startup
 
-	map(0x80, 0x80).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
-	map(0x81, 0x81).w(this, FUNC(ddenlovr_state::funkyfig_lockout_w));
-	map(0x82, 0x82).r(this, FUNC(ddenlovr_state::funkyfig_coin_r));
-	map(0x83, 0x83).r(this, FUNC(ddenlovr_state::funkyfig_key_r));
+	map(0x80, 0x80).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0x81, 0x81).mirror(0xff00).w(this, FUNC(ddenlovr_state::funkyfig_lockout_w));
+	map(0x82, 0x82).mirror(0xff00).r(this, FUNC(ddenlovr_state::funkyfig_coin_r));
+	map(0x83, 0x83).mirror(0xff00).r(this, FUNC(ddenlovr_state::funkyfig_key_r));
 
-	map(0xa2, 0xa2).w(this, FUNC(ddenlovr_state::mmpanic_leds2_w));
+	map(0xa2, 0xa2).mirror(0xff00).w(this, FUNC(ddenlovr_state::mmpanic_leds2_w));
 }
 
 
@@ -3035,9 +2995,6 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_oki_bank_w )
 
 void ddenlovr_state::mjchuuka_portmap(address_map &map)
 {     // 16 bit I/O
-	map(0x13, 0x13).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0x1c, 0x1c).mirror(0xff00).w(this, FUNC(ddenlovr_state::hanakanz_rombank_w));
-	map(0x1e, 0x1e).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjchuuka_oki_bank_w));
 	map(0x20, 0x20).select(0xff00).w(this, FUNC(ddenlovr_state::mjchuuka_blitter_w));
 	map(0x21, 0x21).select(0xff00).w(this, FUNC(ddenlovr_state::mjchuuka_palette_w));
 	map(0x23, 0x23).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjchuuka_gfxrom_0_r));
@@ -3081,41 +3038,38 @@ READ8_MEMBER(ddenlovr_state::mjschuka_protection_r)
 
 void ddenlovr_state::mjschuka_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x1c, 0x1c).nopr().w(this, FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::mjflove_rombank_w));
+	map(0x00, 0x0f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 
-	map(0x20, 0x23).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x24, 0x27).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x28, 0x2b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x2c, 0x2f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x34, 0x34).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x35, 0x35).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x36, 0x36).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x38, 0x38).nopr();         // ? ack or watchdog
+	map(0x20, 0x23).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).mirror(0xff00).nopr();         // ? ack or watchdog
 
-	map(0x40, 0x41).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x50, 0x50).w(this, FUNC(ddenlovr_state::mjflove_okibank_w));
+	map(0x40, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x50, 0x50).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjflove_okibank_w));
 
-	map(0x54, 0x54).rw(this, FUNC(ddenlovr_state::mjschuka_protection_r), FUNC(ddenlovr_state::mjschuka_protection_w));
+	map(0x54, 0x54).mirror(0xff00).rw(this, FUNC(ddenlovr_state::mjschuka_protection_r), FUNC(ddenlovr_state::mjschuka_protection_w));
 	// 58 writes ? (0/1)
-	map(0x5c, 0x5c).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x5c, 0x5c).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
 
-	map(0x60, 0x60).w(this, FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x61, 0x61).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x62, 0x62).portr("SYSTEM");
-	map(0x63, 0x64).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
+	map(0x60, 0x60).mirror(0xff00).w(this, FUNC(ddenlovr_state::sryudens_coincounter_w));
+	map(0x61, 0x61).mirror(0xff00).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x62, 0x62).mirror(0xff00).portr("SYSTEM");
+	map(0x63, 0x64).mirror(0xff00).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
 
-	map(0x68, 0x68).portr("DSW1");
-	map(0x69, 0x69).portr("DSW2");
-	map(0x6a, 0x6a).portr("DSW3");
-	map(0x6b, 0x6b).portr("DSW4");
-	map(0x6c, 0x6c).portr("DSW5");     // DSW 1-4 high bits
-	map(0x70, 0x71).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x74, 0x74).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x78, 0x79).w("ym2413", FUNC(ym2413_device::write));
+	map(0x68, 0x68).mirror(0xff00).portr("DSW1");
+	map(0x69, 0x69).mirror(0xff00).portr("DSW2");
+	map(0x6a, 0x6a).mirror(0xff00).portr("DSW3");
+	map(0x6b, 0x6b).mirror(0xff00).portr("DSW4");
+	map(0x6c, 0x6c).mirror(0xff00).portr("DSW5");     // DSW 1-4 high bits
+	map(0x70, 0x71).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x74, 0x74).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x78, 0x79).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
 }
 
 
@@ -3209,37 +3163,35 @@ WRITE8_MEMBER(ddenlovr_state::mjmyster_coincounter_w)
 
 WRITE_LINE_MEMBER(ddenlovr_state::mjmyster_blitter_irq)
 {
-	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
+	auto &cpu = downcast<tmpz84c015_device &>(*m_maincpu);
+	cpu.trg1(state);
+	cpu.trg2(state);
 }
 
 void ddenlovr_state::mjmyster_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x1c, 0x1c).w(this, FUNC(ddenlovr_state::mjmyster_rambank_w));
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::mmpanic_rombank_w));
-	map(0x20, 0x20).w(this, FUNC(ddenlovr_state::mjmyster_select2_w));
-	map(0x21, 0x21).w(this, FUNC(ddenlovr_state::mjmyster_coincounter_w));
-	map(0x22, 0x22).r(this, FUNC(ddenlovr_state::mjmyster_coins_r));
-	map(0x23, 0x23).r(this, FUNC(ddenlovr_state::mjmyster_keyb_r));
-	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x42, 0x43).w("ym2413", FUNC(ym2413_device::write));
-	map(0x44, 0x44).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x46, 0x46).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x48, 0x48).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x60, 0x6f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r));                         // ? must be 78 on startup
-	map(0xc2, 0xc2).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0xc3, 0xc3).r(this, FUNC(ddenlovr_state::mjmyster_dsw_r));
+	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x20, 0x20).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjmyster_select2_w));
+	map(0x21, 0x21).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjmyster_coincounter_w));
+	map(0x22, 0x22).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_coins_r));
+	map(0x23, 0x23).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_keyb_r));
+	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x42, 0x43).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x44, 0x44).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x46, 0x46).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x48, 0x48).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x60, 0x6f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                         // ? must be 78 on startup
+	map(0xc2, 0xc2).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0xc3, 0xc3).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_dsw_r));
 }
 
 /***************************************************************************
@@ -3387,29 +3339,26 @@ WRITE8_MEMBER(ddenlovr_state::hginga_blitter_w)
 
 void ddenlovr_state::hginga_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
-	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x1c, 0x1c).nopr().w(this, FUNC(ddenlovr_state::mjmyster_rambank_w));
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::hginga_rombank_w));
-	map(0x22, 0x23).w("ym2413", FUNC(ym2413_device::write));
-	map(0x24, 0x24).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x26, 0x26).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x28, 0x28).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x40, 0x40).w(this, FUNC(ddenlovr_state::hginga_input_w));
-	map(0x41, 0x41).w(this, FUNC(ddenlovr_state::hginga_coins_w));
-	map(0x42, 0x42).r(this, FUNC(ddenlovr_state::hginga_coins_r));
-	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::hginga_input_r));
-	map(0x60, 0x6f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x80, 0x80).w(this, FUNC(ddenlovr_state::hginga_80_w));
-	map(0xa0, 0xa3).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0xa4, 0xa7).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0xa8, 0xab).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0xac, 0xaf).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0xb4, 0xb4).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0xb5, 0xb5).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0xb6, 0xb6).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0xb8, 0xb8).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
+	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
+	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x22, 0x23).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x24, 0x24).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x26, 0x26).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x28, 0x28).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x40, 0x40).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_input_w));
+	map(0x41, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_coins_w));
+	map(0x42, 0x42).mirror(0xff00).r(this, FUNC(ddenlovr_state::hginga_coins_r));
+	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::hginga_input_r));
+	map(0x60, 0x6f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x80, 0x80).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_80_w));
+	map(0xa0, 0xa3).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xa4, 0xa7).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xa8, 0xab).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xac, 0xaf).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0xb4, 0xb4).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0xb5, 0xb5).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0xb6, 0xb6).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0xb8, 0xb8).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
 }
 
 
@@ -3499,29 +3448,26 @@ void ddenlovr_state::hgokou_map(address_map &map)
 
 void ddenlovr_state::hgokou_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
-	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x1c, 0x1c).nopr().w(this, FUNC(ddenlovr_state::mjmyster_rambank_w));        // ? ack on RTC int
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::hginga_rombank_w));
-	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x40, 0x43).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x44, 0x47).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x48, 0x4b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x4c, 0x4f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x54, 0x54).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x55, 0x55).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x56, 0x56).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x58, 0x58).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
-	map(0x60, 0x60).w(this, FUNC(ddenlovr_state::hgokou_dsw_sel_w));
-	map(0x61, 0x61).w(this, FUNC(ddenlovr_state::hgokou_input_w));
-	map(0x62, 0x62).r(this, FUNC(ddenlovr_state::hgokou_input_r));
-	map(0x80, 0x80).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x82, 0x83).w("ym2413", FUNC(ym2413_device::write));
-	map(0x84, 0x84).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x86, 0x86).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x88, 0x88).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0xb0, 0xb0).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
+	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x20, 0x2f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x40, 0x43).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x44, 0x47).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x48, 0x4b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x4c, 0x4f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x54, 0x54).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x55, 0x55).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x56, 0x56).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x58, 0x58).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
+	map(0x60, 0x60).mirror(0xff00).w(this, FUNC(ddenlovr_state::hgokou_dsw_sel_w));
+	map(0x61, 0x61).mirror(0xff00).w(this, FUNC(ddenlovr_state::hgokou_input_w));
+	map(0x62, 0x62).mirror(0xff00).r(this, FUNC(ddenlovr_state::hgokou_input_r));
+	map(0x80, 0x80).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x82, 0x83).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x84, 0x84).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x86, 0x86).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x88, 0x88).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xb0, 0xb0).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
 }
 
 
@@ -3555,30 +3501,27 @@ READ8_MEMBER(ddenlovr_state::hgokbang_input_r)
 
 void ddenlovr_state::hgokbang_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
-	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x1c, 0x1c).nopr().w(this, FUNC(ddenlovr_state::mjmyster_rambank_w));        // ? ack on RTC int
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::hginga_rombank_w));
-	map(0x20, 0x20).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x22, 0x23).w("ym2413", FUNC(ym2413_device::write));
-	map(0x24, 0x24).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x26, 0x26).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x28, 0x28).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x40, 0x40).w(this, FUNC(ddenlovr_state::hgokou_dsw_sel_w));
-	map(0x41, 0x41).w(this, FUNC(ddenlovr_state::hgokou_input_w));
-	map(0x42, 0x42).r(this, FUNC(ddenlovr_state::hgokou_input_r));
-	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::hgokbang_input_r));
-	map(0x60, 0x6f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xa0, 0xa3).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0xa4, 0xa7).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0xa8, 0xab).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0xac, 0xaf).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0xb4, 0xb4).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0xb5, 0xb5).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0xb6, 0xb6).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0xb8, 0xb8).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
-	map(0xe0, 0xe0).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
+	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x20, 0x20).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x22, 0x23).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x24, 0x24).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x26, 0x26).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x28, 0x28).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x40, 0x40).mirror(0xff00).w(this, FUNC(ddenlovr_state::hgokou_dsw_sel_w));
+	map(0x41, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::hgokou_input_w));
+	map(0x42, 0x42).mirror(0xff00).r(this, FUNC(ddenlovr_state::hgokou_input_r));
+	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::hgokbang_input_r));
+	map(0x60, 0x6f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xa0, 0xa3).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xa4, 0xa7).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xa8, 0xab).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xac, 0xaf).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0xb4, 0xb4).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0xb5, 0xb5).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0xb6, 0xb6).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0xb8, 0xb8).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
+	map(0xe0, 0xe0).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
 }
 
 
@@ -3644,29 +3587,24 @@ void ddenlovr_state::hparadis_map(address_map &map)
 	map(0xc000, 0xc1ff).w(this, FUNC(ddenlovr_state::rongrong_palette_w));
 }
 
-// the RTC seems unused
 void ddenlovr_state::hparadis_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x1b, 0x1b).rw(this, FUNC(ddenlovr_state::rongrong_blitter_busy_r), FUNC(ddenlovr_state::rongrong_blitter_busy_w));
-	map(0x1c, 0x1c).r(this, FUNC(ddenlovr_state::hparadis_dsw_r));
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::hparadis_select_w));
-	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x60, 0x61).w("ym2413", FUNC(ym2413_device::write));
-	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
-	map(0xa0, 0xa0).w(this, FUNC(ddenlovr_state::hginga_input_w));
-	map(0xa1, 0xa1).w(this, FUNC(ddenlovr_state::hparadis_coin_w));
-	map(0xa2, 0xa3).r(this, FUNC(ddenlovr_state::hparadis_input_r));
-	map(0xc2, 0xc2).nopw();    // enables palette RAM at c000
+	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x60, 0x61).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
+	map(0xa0, 0xa0).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_input_w));
+	map(0xa1, 0xa1).mirror(0xff00).w(this, FUNC(ddenlovr_state::hparadis_coin_w));
+	map(0xa2, 0xa3).mirror(0xff00).r(this, FUNC(ddenlovr_state::hparadis_input_r));
+	map(0xc2, 0xc2).mirror(0xff00).nopw();    // enables palette RAM at c000
 }
 
 
@@ -3691,31 +3629,28 @@ READ8_MEMBER(ddenlovr_state::mjmywrld_coins_r)
 
 void ddenlovr_state::mjmywrld_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x1c, 0x1c).w(this, FUNC(ddenlovr_state::mjmyster_rambank_w));
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::hginga_rombank_w));
-	map(0x20, 0x20).w(this, FUNC(ddenlovr_state::mjmyster_select2_w));
-	map(0x21, 0x21).w(this, FUNC(ddenlovr_state::mjmyster_coincounter_w));
-	map(0x22, 0x22).r(this, FUNC(ddenlovr_state::mjmywrld_coins_r));
-	map(0x23, 0x23).r(this, FUNC(ddenlovr_state::mjmyster_keyb_r));
-	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x42, 0x43).w("ym2413", FUNC(ym2413_device::write));
-	map(0x44, 0x44).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x46, 0x46).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x48, 0x48).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x60, 0x6f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
-	map(0xc0, 0xc0).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0xe0, 0xe0).r(this, FUNC(ddenlovr_state::mjmyster_dsw_r));
+	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x20, 0x20).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjmyster_select2_w));
+	map(0x21, 0x21).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjmyster_coincounter_w));
+	map(0x22, 0x22).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmywrld_coins_r));
+	map(0x23, 0x23).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_keyb_r));
+	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x42, 0x43).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x44, 0x44).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x46, 0x46).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x48, 0x48).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x60, 0x6f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
+	map(0xc0, 0xc0).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0xe0, 0xe0).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_dsw_r));
 }
 
 
@@ -3874,9 +3809,6 @@ WRITE8_MEMBER(ddenlovr_state::mjflove_coincounter_w)
 
 void ddenlovr_state::mjflove_portmap(address_map &map)
 {  // 16 bit I/O
-	map(0x0010, 0x0010).r(this, FUNC(ddenlovr_state::hanakanz_rand_r)).mirror(0xff00);
-	map(0x001c, 0x001c).portr("DSW2").mirror(0xff00);
-	map(0x001e, 0x001e).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w)).mirror(0xff00);
 	map(0x0020, 0x0023).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
 	map(0x0024, 0x0027).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
 	map(0x0028, 0x002b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
@@ -4059,34 +3991,31 @@ WRITE8_MEMBER(ddenlovr_state::sryudens_rambank_w)
 
 void ddenlovr_state::sryudens_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x02, 0x03).w("ym2413", FUNC(ym2413_device::write));
-	map(0x04, 0x05).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x1c, 0x1c).nopr().w(this, FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::mjflove_rombank_w));
-	map(0x20, 0x23).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x24, 0x27).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x28, 0x2b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x2c, 0x2f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x34, 0x34).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x35, 0x35).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x36, 0x36).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x38, 0x38).nopr();         // ? ack or watchdog
-	map(0x40, 0x41).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x50, 0x50).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0x70, 0x70).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
-	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x90, 0x90).portr("DSW1");
-	map(0x91, 0x91).portr("DSW2");
-	map(0x92, 0x92).portr("DSW4");
-	map(0x93, 0x93).portr("DSW3");
-	map(0x94, 0x94).portr("DSWTOP");
-	map(0x98, 0x98).w(this, FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x99, 0x99).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x9a, 0x9a).portr("SYSTEM");
-	map(0x9b, 0x9c).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
+	map(0x00, 0x00).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x02, 0x03).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x04, 0x05).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x20, 0x23).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).mirror(0xff00).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x50, 0x50).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x70, 0x70).mirror(0xff00).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
+	map(0x80, 0x8f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x90, 0x90).mirror(0xff00).portr("DSW1");
+	map(0x91, 0x91).mirror(0xff00).portr("DSW2");
+	map(0x92, 0x92).mirror(0xff00).portr("DSW4");
+	map(0x93, 0x93).mirror(0xff00).portr("DSW3");
+	map(0x94, 0x94).mirror(0xff00).portr("DSWTOP");
+	map(0x98, 0x98).mirror(0xff00).w(this, FUNC(ddenlovr_state::sryudens_coincounter_w));
+	map(0x99, 0x99).mirror(0xff00).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x9a, 0x9a).mirror(0xff00).portr("SYSTEM");
+	map(0x9b, 0x9c).mirror(0xff00).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
 }
 
 
@@ -4123,35 +4052,32 @@ void ddenlovr_state::janshinp_map(address_map &map)
 
 void ddenlovr_state::janshinp_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x00).portr("DSW1");
-	map(0x01, 0x01).portr("DSW2");
-	map(0x02, 0x02).portr("DSW4");
-	map(0x03, 0x03).portr("DSW3");
-	map(0x04, 0x04).portr("DSWTOP");
-	map(0x08, 0x08).w(this, FUNC(ddenlovr_state::janshinp_coincounter_w));
-	map(0x09, 0x09).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x0a, 0x0a).portr("SYSTEM");
-	map(0x0b, 0x0c).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
-	map(0x1c, 0x1c).nopr().w(this, FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::mjflove_rombank_w));
-	map(0x20, 0x23).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x24, 0x27).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x28, 0x2b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x2c, 0x2f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x34, 0x34).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x35, 0x35).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x36, 0x36).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x38, 0x38).nopr();         // ? ack or watchdog
-	map(0x40, 0x41).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x50, 0x5f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x60, 0x60).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0x70, 0x70).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
-	map(0x80, 0x80).ram();
-	map(0x90, 0x90).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x92, 0x93).w("ym2413", FUNC(ym2413_device::write));
-	map(0x94, 0x95).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x00, 0x00).mirror(0xff00).portr("DSW1");
+	map(0x01, 0x01).mirror(0xff00).portr("DSW2");
+	map(0x02, 0x02).mirror(0xff00).portr("DSW4");
+	map(0x03, 0x03).mirror(0xff00).portr("DSW3");
+	map(0x04, 0x04).mirror(0xff00).portr("DSWTOP");
+	map(0x08, 0x08).mirror(0xff00).w(this, FUNC(ddenlovr_state::janshinp_coincounter_w));
+	map(0x09, 0x09).mirror(0xff00).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x0a, 0x0a).mirror(0xff00).portr("SYSTEM");
+	map(0x0b, 0x0c).mirror(0xff00).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
+	map(0x20, 0x23).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).mirror(0xff00).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x50, 0x5f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x60, 0x60).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x70, 0x70).mirror(0xff00).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
+	map(0x80, 0x80).mirror(0xff00).ram();
+	map(0x90, 0x90).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x92, 0x93).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x94, 0x95).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
 
@@ -4159,9 +4085,10 @@ void ddenlovr_state::janshinp_portmap(address_map &map)
                              Return Of Sel Jan II
 ***************************************************************************/
 
-READ8_MEMBER(ddenlovr_state::seljan2_busy_r)
+WRITE_LINE_MEMBER(ddenlovr_state::seljan2_blitter_irq)
 {
-	return 0x00;    // bit 7 = blitter busy
+	// PA bit 7 = blitter busy
+	downcast<tmpz84c015_device &>(*m_maincpu).pa7_w(!state);
 }
 
 WRITE8_MEMBER(ddenlovr_state::seljan2_rombank_w)
@@ -4210,31 +4137,28 @@ void ddenlovr_state::seljan2_map(address_map &map)
 
 void ddenlovr_state::seljan2_portmap(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x1c, 0x1c).r(this, FUNC(ddenlovr_state::seljan2_busy_r)).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x1e, 0x1e).w(this, FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x20, 0x23).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x24, 0x27).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x28, 0x2b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x2c, 0x2f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x34, 0x34).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x35, 0x35).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x36, 0x36).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x38, 0x38).nopr();         // ? ack or watchdog
-	map(0x40, 0x41).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x50, 0x51).w("ym2413", FUNC(ym2413_device::write));
-	map(0x54, 0x54).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x58, 0x58).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x5c, 0x5c).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));   // dsw
-	map(0x60, 0x60).nopr().w(this, FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
-	map(0x70, 0x70).w(this, FUNC(ddenlovr_state::seljan2_rombank_w));
-	map(0x80, 0x80).portr("SYSTEM").w(this, FUNC(ddenlovr_state::seljan2_palette_enab_w));    // writes: 1 = palette RAM at b000, 0 = ROM
-	map(0x84, 0x84).r(this, FUNC(ddenlovr_state::daimyojn_keyb1_r));
-	map(0x88, 0x88).r(this, FUNC(ddenlovr_state::daimyojn_keyb2_r));
-	map(0x90, 0x90).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
-	map(0xa0, 0xa0).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x00, 0x0f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x20, 0x23).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).mirror(0xff00).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x50, 0x51).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x54, 0x54).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x58, 0x58).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x5c, 0x5c).mirror(0xff00).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));   // dsw
+	map(0x60, 0x60).mirror(0xff00).nopr().w(this, FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
+	map(0x70, 0x70).mirror(0xff00).w(this, FUNC(ddenlovr_state::seljan2_rombank_w));
+	map(0x80, 0x80).mirror(0xff00).portr("SYSTEM").w(this, FUNC(ddenlovr_state::seljan2_palette_enab_w));    // writes: 1 = palette RAM at b000, 0 = ROM
+	map(0x84, 0x84).mirror(0xff00).r(this, FUNC(ddenlovr_state::daimyojn_keyb1_r));
+	map(0x88, 0x88).mirror(0xff00).r(this, FUNC(ddenlovr_state::daimyojn_keyb2_r));
+	map(0x90, 0x90).mirror(0xff00).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
+	map(0xa0, 0xa0).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
 }
 
 
@@ -9640,7 +9564,6 @@ MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 	save_item(NAME(m_hopper));
 
 	save_item(NAME(m_okibank));
-	save_item(NAME(m_rongrong_blitter_busy_select));
 
 	save_item(NAME(m_prot_val));
 	save_item(NAME(m_prot_16));
@@ -9665,7 +9588,6 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_hopper = 0;
 
 	m_okibank = 0;
-	m_rongrong_blitter_busy_select = 0;
 	m_prot_val = 0;
 	m_prot_16 = 0;
 	m_mmpanic_leds = 0;
@@ -9892,32 +9814,16 @@ MACHINE_CONFIG_END
    0xee is vblank
    0xfc is from the 6242RTC
  */
-WRITE_LINE_MEMBER(ddenlovr_state::quizchq_irq)
-{
-	if (!state)
-		return;
-
-	/* I haven't found a irq ack register, so I need this kludge to
-	   make sure I don't lose any interrupt generated by the blitter,
-	   otherwise quizchq would lock up. */
-//  if (downcast<cpu_device *>(m_maincpu)->input_state(0))
-//      return;
-
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xee);
-}
-
-WRITE_LINE_MEMBER(ddenlovr_state::quizchq_rtc_irq)
-{
-	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
-}
 
 MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(16'000'000)/2)  /* Verified */
 	MCFG_CPU_PROGRAM_MAP(quizchq_map)
 	MCFG_CPU_IO_MAP(quizchq_portmap)
+	MCFG_TMPZ84C015_IN_PA_CB(READ8(ddenlovr_state, rongrong_input_r))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, rongrong_select_w))
+	// bit 5 of 0x1b (SIO CTSB?) = blitter busy
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,rongrong)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -9931,7 +9837,7 @@ MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, quizchq_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, strobe_a)) MCFG_DEVCB_INVERT
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -9950,7 +9856,7 @@ MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, quizchq_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg2)) MCFG_DEVCB_INVERT
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::rongrong)
@@ -10092,7 +9998,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 MACHINE_CONFIG_START(ddenlovr_state::hanakanz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,8000000) // TMPZ84C015BF-8
+	MCFG_CPU_ADD("maincpu",Z80,8000000) // KL5C80A12
 	MCFG_CPU_PROGRAM_MAP(hanakanz_map)
 	MCFG_CPU_IO_MAP(hanakanz_portmap)
 
@@ -10202,80 +10108,49 @@ MACHINE_CONFIG_END
     0xf8 is vblank
     0xfa is from the 6242RTC
  */
-WRITE_LINE_MEMBER(ddenlovr_state::mjchuuka_irq)
-{
-	if (!state)
-		return;
-
-	/* I haven't found a irq ack register, so I need this kludge to
-	   make sure I don't lose any interrupt generated by the blitter,
-	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(m_maincpu)->input_state(0))
-	//  return;
-
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
-}
-
-WRITE_LINE_MEMBER(ddenlovr_state::mjchuuka_rtc_irq)
-{
-	if (!state)
-		return;
-
-	/* I haven't found a irq ack register, so I need this kludge to
-	   make sure I don't lose any interrupt generated by the blitter,
-	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(drvm_maincpu)->input_state(0))
-	//  return;
-
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
-}
-
 MACHINE_CONFIG_START(ddenlovr_state::mjchuuka)
 	hanakanz(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", TMPZ84C015, 8000000)
+	MCFG_CPU_PROGRAM_MAP(hanakanz_map)
 	MCFG_CPU_IO_MAP(mjchuuka_portmap)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, hanakanz_rombank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, mjchuuka_oki_bank_w))
 
 	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, mjchuuka_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0))
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg1))
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789772)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_irq)
+WRITE_LINE_MEMBER(ddenlovr_state::funkyfig_sound_irq)
 {
-	if (!state)
-		return;
-
-	/* I haven't found a irq ack register, so I need this kludge to
-	   make sure I don't lose any interrupt generated by the blitter,
-	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(m_maincpu)->input_state(0))
-	//  return;
-
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8); // RST 08, vblank
-	m_soundcpu->set_input_line(0, HOLD_LINE);   // NMI by main cpu
+	if (state)
+		m_soundcpu->set_input_line(0, HOLD_LINE);   // NMI by main cpu
 }
 
 MACHINE_CONFIG_START(ddenlovr_state::funkyfig)
 	mmpanic(config);
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", TMPZ84C015, 8000000)
 	MCFG_CPU_PROGRAM_MAP(funkyfig_map)
 	MCFG_CPU_IO_MAP(funkyfig_portmap)
+	MCFG_TMPZ84C015_IN_PA_CB(READ8(ddenlovr_state, funkyfig_dsw_r))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, funkyfig_rombank_w))
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,funkyfig)
 
 	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, funkyfig_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(ddenlovr_state, funkyfig_sound_irq))
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg1)) MCFG_DEVCB_INVERT
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, funkyfig_blitter_irq)
 
@@ -10293,9 +10168,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL(16'000'000)/2)
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(16'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(mjmyster_map)
 	MCFG_CPU_IO_MAP(mjschuka_portmap)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, sryudens_rambank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, mjflove_rombank_w))
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -10309,7 +10186,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, hginga_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0))
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
@@ -10331,7 +10208,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hginga_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, pa7_w)) MCFG_DEVCB_INVERT
 MACHINE_CONFIG_END
 
 
@@ -10344,43 +10221,21 @@ MACHINE_CONFIG_END
     0xf8 is vblank
     0xfa and/or 0xfc are from the blitter (almost identical)
     NMI triggered by the RTC
-
-    To do:
-
-    The game randomly locks up (like quizchq?) because of some lost
-    blitter interrupt I guess (nested blitter irqs?). Hence the hack
-    to trigger the blitter irq every frame.
  */
-
-TIMER_DEVICE_CALLBACK_MEMBER(ddenlovr_state::mjmyster_irq)
-{
-	int scanline = param;
-
-	/* I haven't found a irq ack register, so I need this kludge to
-	   make sure I don't lose any interrupt generated by the blitter,
-	   otherwise quizchq would lock up. */
-	if (m_maincpu->input_state(0))
-		return;
-
-	if(scanline == 245)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
-
-	if(scanline == 0)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
-}
-
 
 MACHINE_CONFIG_START(ddenlovr_state::mjmyster)
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjmyster_map)
 	MCFG_CPU_IO_MAP(mjmyster_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddenlovr_state, mjmyster_irq, "screen", 0, 1)
+	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, mjmyster_rambank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, mmpanic_rombank_w))
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_MODIFY("rtc")
 	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
@@ -10404,33 +10259,6 @@ MACHINE_CONFIG_END
     0xfa and/or 0xfc are from the blitter (almost identical)
     0xee triggered by the RTC
  */
-WRITE_LINE_MEMBER(ddenlovr_state::hginga_irq)
-{
-	if (!state)
-		return;
-
-	/* I haven't found a irq ack register, so I need this kludge to
-	   make sure I don't lose any interrupt generated by the blitter,
-	   otherwise hginga would lock up. */
-//  if (downcast<cpu_device *>(m_maincpu)->input_state(0))
-//      return;
-
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
-}
-
-WRITE_LINE_MEMBER(ddenlovr_state::hginga_rtc_irq)
-{
-	if (!state)
-		return;
-
-	/* I haven't found a irq ack register, so I need this kludge to
-	   make sure I don't lose any interrupt generated by the blitter,
-	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(drvm_maincpu)->input_state(0))
-	//  return;
-
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xee);
-}
 
 
 MACHINE_CONFIG_START(ddenlovr_state::hginga)
@@ -10440,12 +10268,15 @@ MACHINE_CONFIG_START(ddenlovr_state::hginga)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hginga_map)
 	MCFG_CPU_IO_MAP(hginga_portmap)
+	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, mjmyster_rambank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, hginga_rombank_w))
 
 	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, hginga_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0))
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hginga_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, pa7_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
@@ -10464,12 +10295,15 @@ MACHINE_CONFIG_START(ddenlovr_state::hgokou)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hgokou_map)
 	MCFG_CPU_IO_MAP(hgokou_portmap)
+	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, mjmyster_rambank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, hginga_rombank_w))
 
 	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, hginga_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0))
 
 	MCFG_DEVICE_MODIFY("rtc")
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hginga_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, pa7_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjmyster_blitter_irq)
 
@@ -10487,7 +10321,6 @@ MACHINE_CONFIG_START(ddenlovr_state::hgokbang)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(hgokbang_portmap)
-
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::mjmywrld)
@@ -10497,19 +10330,23 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmywrld)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hginga_map)
 	MCFG_CPU_IO_MAP(mjmywrld_portmap)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, mjmyster_rambank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, hginga_rombank_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ddenlovr_state::mjmyuniv)
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjmyster_map)
 	MCFG_CPU_IO_MAP(mjmyster_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddenlovr_state, mjmyster_irq, "screen", 0, 1)
+	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, mjmyster_rambank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, mmpanic_rombank_w))
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjmyster)
 
@@ -10527,13 +10364,15 @@ MACHINE_CONFIG_START(ddenlovr_state::mjmyornt)
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(quizchq_map)
 	MCFG_CPU_IO_MAP(mjmyster_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddenlovr_state, mjmyster_irq, "screen", 0, 1)
+	MCFG_TMPZ84C015_IN_PA_CB(NOOP)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, mjmyster_rambank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, mmpanic_rombank_w))
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(NOOP)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) MCFG_DEVCB_INVERT
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 4, 256-16+4-1)
@@ -10580,14 +10419,17 @@ MACHINE_CONFIG_START(ddenlovr_state::mjflove)
 	quizchq(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rongrong_map)
 	MCFG_CPU_IO_MAP(mjflove_portmap)
+	MCFG_TMPZ84C015_IN_PA_CB(IOPORT("DSW2"))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, hanakanz_keyb_w))
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, mjflove_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("maincpu", tmpz84c015_device, trg0)) // frame counter?
 
 	MCFG_DEVICE_REPLACE("rtc", RTC72421, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjflove_rtc_irq))
@@ -10600,14 +10442,6 @@ MACHINE_CONFIG_START(ddenlovr_state::mjflove)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-/*  It runs in IM 2, thus needs a vector on the data bus:
-    0xee is vblank  */
-WRITE_LINE_MEMBER(ddenlovr_state::hparadis_irq)
-{
-	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xee);
-}
-
 MACHINE_CONFIG_START(ddenlovr_state::hparadis)
 	quizchq(config);
 
@@ -10615,9 +10449,11 @@ MACHINE_CONFIG_START(ddenlovr_state::hparadis)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hparadis_map)
 	MCFG_CPU_IO_MAP(hparadis_portmap)
+	MCFG_TMPZ84C015_IN_PA_CB(READ8(ddenlovr_state, hparadis_dsw_r))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, hparadis_select_w))
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, hparadis_irq))
+	// the RTC seems unused
+	MCFG_DEVICE_REMOVE("rtc")
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hparadis)
 MACHINE_CONFIG_END
@@ -10627,7 +10463,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(20'000'000) / 2) // TMPZ84C015
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(20'000'000) / 2) // KL5C80A12
 	MCFG_CPU_PROGRAM_MAP(hanakanz_map)
 	MCFG_CPU_IO_MAP(jongtei_portmap)
 
@@ -10682,9 +10518,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 2) // ?
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(16'000'000) / 2) // ?
 	MCFG_CPU_PROGRAM_MAP(sryudens_map)
 	MCFG_CPU_IO_MAP(sryudens_portmap)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, sryudens_rambank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, mjflove_rombank_w))
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,sryudens)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -10698,7 +10536,7 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, mjchuuka_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -10720,7 +10558,7 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg1))
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -10731,9 +10569,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 2)
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(janshinp_map)
 	MCFG_CPU_IO_MAP(janshinp_portmap)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, sryudens_rambank_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, mjflove_rombank_w))
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -10747,7 +10587,7 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, mjchuuka_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
@@ -10769,7 +10609,7 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg1))
 MACHINE_CONFIG_END
 
 // Same PCB as janshinp
@@ -10801,9 +10641,11 @@ MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 2)
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(seljan2_map)
 	MCFG_CPU_IO_MAP(seljan2_portmap)
+	MCFG_TMPZ84C015_OUT_PA_CB(WRITE8(ddenlovr_state, hanakanz_keyb_w))
+	MCFG_TMPZ84C015_OUT_PB_CB(WRITE8(ddenlovr_state, sryudens_coincounter_w))
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,seljan2)
 	MCFG_MACHINE_RESET_OVERRIDE(ddenlovr_state,ddenlovr)
@@ -10817,11 +10659,11 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 	MCFG_SCREEN_UPDATE_DRIVER(ddenlovr_state, screen_update_ddenlovr)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddenlovr_state, mjchuuka_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("maincpu", tmpz84c015_device, trg0))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 
-	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, mjflove_blitter_irq)
+	MCFG_DDENLOVR_BLITTER_IRQ(ddenlovr_state, seljan2_blitter_irq)
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
 
@@ -10841,7 +10683,7 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("maincpu", tmpz84c015_device, trg1))
 MACHINE_CONFIG_END
 
 
