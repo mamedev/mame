@@ -14,7 +14,7 @@
 #include "machine/segag80.h"
 #include "sound/sn76496.h"
 #include "audio/segasnd.h"
-#include "machine/gen_latch.h"
+#include "machine/i8255.h"
 #include "screen.h"
 
 
@@ -43,7 +43,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
+		m_ppi(*this, "ppi8255"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_shared_ptr<uint8_t> m_mainram;
@@ -60,7 +60,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	std::vector<uint8_t> m_paletteram;
@@ -125,7 +125,7 @@ public:
 	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
-	DECLARE_WRITE8_MEMBER(sindbadm_soundport_w);
+	DECLARE_READ8_MEMBER(sindbadm_sound_data_r);
 	DECLARE_WRITE8_MEMBER(sindbadm_misc_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn1_SN76496_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn2_SN76496_w);
