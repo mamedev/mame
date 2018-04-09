@@ -86,13 +86,6 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-	//logerror("(sound) write %02x\n", data);
-}
-
 WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 {
 	// bits 3-5 = ROM bank select
@@ -137,7 +130,7 @@ void bladestl_state::main_map(address_map &map)
 	map(0x2e02, 0x2e02).portr("P2");                 /* 2P controls */
 	map(0x2e03, 0x2e03).portr("DSW2");               /* DISPW #2 */
 	map(0x2e40, 0x2e40).portr("DSW1");               /* DIPSW #1 */
-	map(0x2e80, 0x2e80).w(this, FUNC(bladestl_state::bladestl_sh_irqtrigger_w)); /* cause interrupt on audio CPU */
+	map(0x2e80, 0x2e80).w("soundlatch", FUNC(generic_latch_8_device::write)); /* cause interrupt on audio CPU */
 	map(0x2ec0, 0x2ec0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2f00, 0x2f03).r(this, FUNC(bladestl_state::trackball_r));               /* Trackballs */
 	map(0x2f40, 0x2f40).w(this, FUNC(bladestl_state::bladestl_bankswitch_w));    /* bankswitch control */
@@ -154,8 +147,8 @@ void bladestl_state::sound_map(address_map &map)
 	map(0x1000, 0x1001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));    /* YM2203 */
 	map(0x3000, 0x3000).w(this, FUNC(bladestl_state::bladestl_speech_ctrl_w));   /* UPD7759 */
 	map(0x4000, 0x4000).r(this, FUNC(bladestl_state::bladestl_speech_busy_r));    /* UPD7759 */
-	map(0x5000, 0x5000).nopw();                                /* ??? */
-	map(0x6000, 0x6000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x5000, 0x5000).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0xffff).rom();
 }
 
@@ -305,6 +298,8 @@ void bladestl_state::machine_reset()
 
 	for (i = 0; i < 4 ; i++)
 		m_last_track[i] = 0;
+
+	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 }
 
 MACHINE_CONFIG_START(bladestl_state::bladestl)
@@ -354,6 +349,8 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("upd", UPD7759, XTAL(640'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
