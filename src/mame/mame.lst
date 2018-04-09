@@ -32780,6 +32780,7 @@ relief3                         // 136093           (c) 1992
 kuniokun                        // TA-0018 (c) 1986
 kuniokunb                       // bootleg
 renegade                        // TA-0018 (c) 1986 + Taito America license
+renegadeb                       // bootleg
 
 @source:replicator.cpp
 replica1                        // Makerbot Replicator 1 desktop 3d printer
@@ -36647,6 +36648,7 @@ rygarj                          // 6002 - (c) 1986 Tecmo
 silkworm                        // 6217 - (c) 1988 Tecmo
 silkwormj                       // 6217 - (c) 1988 Tecmo
 silkwormp                       // 6217 - (c) 1988 Tecmo
+silkwormb                       // bootleg
 
 @source:tecmo16.cpp
 fstarfrc                        // (c) 1992 Tecmo
