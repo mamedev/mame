@@ -156,21 +156,19 @@ class nevada_state : public driver_device
 public:
 	nevada_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_duart18_68681(*this, "duart18_68681"),
-		m_duart39_68681(*this, "duart39_68681"),
-		m_duart40_68681(*this, "duart40_68681"),
-		m_maincpu(*this,"maincpu"),
-		m_microtouch(*this,"microtouch"),
-		m_nvram(*this,"nvram"),
+		m_duart(*this, {"duart18", "duart40", "duart39"}),
+		m_rtc(*this, "rtc"),
+		m_maincpu(*this, "maincpu"),
+		m_microtouch(*this, "microtouch"),
+		m_nvram(*this, "nvram"),
 		m_ram62256(*this, "ram62256"),
 		m_backup(*this, "backup"),
 		m_vram(*this, "vram"),
 		m_gfxdecode(*this, "gfxdecode")
 		{ }
 
-	required_device<mc68681_device> m_duart18_68681;
-	required_device<mc68681_device> m_duart39_68681;
-	required_device<mc68681_device> m_duart40_68681;
+	required_device_array<mc68681_device, 3> m_duart;
+	required_device<msm6242_device> m_rtc;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<microtouch_device> m_microtouch;
@@ -193,10 +191,10 @@ public:
 	uint32_t screen_update_nevada(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(nevada);
 
-	DECLARE_WRITE_LINE_MEMBER(duart18_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart39_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart40_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(nevada_rtc_irq);
+	template<int N> DECLARE_READ8_MEMBER(duart_r);
+	template<int N> DECLARE_WRITE8_MEMBER(duart_w);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_READ16_MEMBER(io_board_r);
 	DECLARE_WRITE16_MEMBER(io_board_w);
 	DECLARE_WRITE16_MEMBER (io_board_x);
@@ -329,51 +327,42 @@ void nevada_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 
     U18 MC68681 RS232 UART  SIDEA = MODEM 1200 Baud
     U18 MC68681 RS232 UART  SIDEB = not used
-    Interrupt 4
-***************************************************************************/
-
-WRITE_LINE_MEMBER(nevada_state::duart18_irq_handler)
-{
-	m_maincpu->set_input_line_and_vector(4, state, m_duart18_68681->get_irq_vector());
-}
-
-/***************************************************************************/
-/***************************************************************************/
-/***************************************************************************/
-/***************************************************************************
+    Interrupt 4 (autovectored)
 
     U39 MC68681 RS232 UART SIDEA = Printer J3 (rs232)
     U39 MC68681 RS232 UART SIDEB = Player Tracking Interface J2 (not used)
-    Interrupt 3
-***************************************************************************/
-
-WRITE_LINE_MEMBER(nevada_state::duart39_irq_handler)
-{
-	m_maincpu->set_input_line_and_vector(3, state, m_duart39_68681->get_irq_vector());
-}
-
-/***************************************************************************/
-/***************************************************************************/
-/***************************************************************************/
-/***************************************************************************
+    Interrupt 3 (autovectored)
 
     68681 DUART <-> Microtouch touch screen controller communication
     U40 MC68681 RS232 UART  SIDEA = TouchScreen J1 (RS232)
     U40 MC68681 RS232 UART  SIDEB = JCM Bill Acceptor (RS422)
-    Interrupt 5
+    Interrupt 5 (autovectored)
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(nevada_state::duart40_irq_handler)
+template<int N>
+READ8_MEMBER(nevada_state::duart_r)
 {
-	m_maincpu->set_input_line_and_vector(5, state, m_duart40_68681->get_irq_vector());
+	return m_duart[N]->read(space, offset >> 3);
+}
+
+template<int N>
+WRITE8_MEMBER(nevada_state::duart_w)
+{
+	m_duart[N]->write(space, offset >> 3, data);
 }
 
 /***************************************************************************/
 /*********************    RTC SECTION       ********************************/
 /***************************************************************************/
-WRITE_LINE_MEMBER(nevada_state::nevada_rtc_irq)
+
+READ8_MEMBER(nevada_state::rtc_r)
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);  // rtc interrupt on INT1
+	return m_rtc->read(space, offset >> 3);
+}
+
+WRITE8_MEMBER(nevada_state::rtc_w)
+{
+	m_rtc->write(space, offset >> 3, data);
 }
 
 /***************************************************************************/
@@ -523,12 +512,12 @@ void nevada_state::nevada_map(address_map &map)
 	map(0x00a10000, 0x00a10001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x00a20001, 0x00a20001).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x00a28001, 0x00a28001).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x00a30000, 0x00A300ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x00a40000, 0x00A40001).rw(this, FUNC(nevada_state::nevada_sec_r), FUNC(nevada_state::nevada_sec_w));
+	map(0x00a30000, 0x00a30001).select(0xf0).rw(this, FUNC(nevada_state::rtc_r), FUNC(nevada_state::rtc_w)).umask16(0x00ff);
+	map(0x00a40000, 0x00a40001).rw(this, FUNC(nevada_state::nevada_sec_r), FUNC(nevada_state::nevada_sec_w));
 	map(0x00b00000, 0x00b03fff).ram().w(this, FUNC(nevada_state::vram_w)).share("vram");
-	map(0x00b10000, 0x00b100ff).rw(m_duart40_68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Lower byte
-	map(0x00b20000, 0x00b200ff).rw(m_duart39_68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Lower byte
-	map(0x00e00000, 0x00e000ff).rw(m_duart18_68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00); // Upper byte
+	map(0x00b10000, 0x00b10001).select(0xf0).rw(this, FUNC(nevada_state::duart_r<1>), FUNC(nevada_state::duart_w<1>)).umask16(0x00ff); // Lower byte
+	map(0x00b20000, 0x00b20001).select(0xf0).rw(this, FUNC(nevada_state::duart_r<2>), FUNC(nevada_state::duart_w<2>)).umask16(0x00ff); // Lower byte
+	map(0x00e00000, 0x00e00001).select(0xf0).rw(this, FUNC(nevada_state::duart_r<0>), FUNC(nevada_state::duart_w<0>)).umask16(0xff00); // Upper byte
 	map(0x00fa0000, 0x00fbffff).ram();  // not used
 	map(0x00fc0000, 0x00ffffff).rom();  // ROM ext + ROM boot
 }
@@ -627,24 +616,24 @@ MACHINE_CONFIG_START(nevada_state::nevada)
 	MCFG_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_DEVICE_ADD("duart18_68681", MC68681, XTAL(3'686'400))  // UARTA = Modem 1200Baud
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart18_irq_handler))
+	MCFG_DEVICE_ADD("duart18", MC68681, XTAL(3'686'400))  // UARTA = Modem 1200Baud
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_4))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW1"))
 
-	MCFG_DEVICE_ADD("duart39_68681", MC68681, XTAL(3'686'400))  // UARTA = Printer
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart39_irq_handler))
+	MCFG_DEVICE_ADD("duart39", MC68681, XTAL(3'686'400))  // UARTA = Printer
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_3))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW2"))
 
-	MCFG_DEVICE_ADD("duart40_68681", MC68681, XTAL(3'686'400))  // UARTA = Touch , UARTB = Bill Acceptor
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(nevada_state, duart40_irq_handler))
+	MCFG_DEVICE_ADD("duart40", MC68681, XTAL(3'686'400))  // UARTA = Touch , UARTB = Bill Acceptor
+	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_5))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_MC68681_INPORT_CALLBACK(IOPORT("DSW3"))
 
-	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart40_68681", mc68681_device, rx_a_w) )
+	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("duart40", mc68681_device, rx_a_w) )
 
 	/* devices */
 	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
-	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(nevada_state, nevada_rtc_irq))
+	MCFG_MSM6242_OUT_INT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_1))  // rtc interrupt on INT1
 
 MACHINE_CONFIG_END
 
