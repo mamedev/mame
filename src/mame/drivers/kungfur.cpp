@@ -69,11 +69,11 @@ class kungfur_state : public driver_device
 {
 public:
 	kungfur_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_adpcm1(*this, "adpcm1")
-		, m_adpcm2(*this, "adpcm2")
-		, m_digits(*this, "digit%u", 0U)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_adpcm1(*this, "adpcm1"),
+		m_adpcm2(*this, "adpcm2"),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
