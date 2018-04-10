@@ -363,7 +363,12 @@ public:
 		m_samples(*this, "samples"),
 		m_mkiv_vram(*this, "mkiv_vram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_credit_spend_meter(*this, "creditspendmeter"),
+		m_credit_out_meter(*this, "creditoutmeter"),
+		m_hopper_motor_out(*this, "hopper_motor"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
@@ -374,6 +379,11 @@ public:
 	required_shared_ptr<uint8_t> m_mkiv_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	output_finder<> m_credit_spend_meter;
+	output_finder<> m_credit_out_meter;
+	output_finder<> m_hopper_motor_out;
+	output_finder<21> m_lamps;
 
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
@@ -555,8 +565,8 @@ READ8_MEMBER(aristmk4_state::u3_p2)
 	int u3_p2_ret= ioport("5002")->read();
 	int u3_p3_ret= ioport("5003")->read();
 
-	output().set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
-	output().set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
+	m_lamps[19] = BIT(u3_p2_ret, 4);
+	m_lamps[20] = BIT(u3_p3_ret, 2);
 
 	if (m_u3_p0_w&0x20) // DOPTE on
 	{
@@ -710,10 +720,10 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 			switch(i+1)
 			{
 				case 4:
-					output().set_value("creditspendmeter", emet[i]);
+					m_credit_spend_meter = emet[i];
 					break;
 				case 5:
-					output().set_value("creditoutmeter", emet[i]);
+					m_credit_out_meter = emet[i];
 					break;
 				default:
 					printf("Unhandled Mechanical meter %d pulse: %02d\n",i+1, emet[i]);
@@ -728,10 +738,10 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 			switch(i+1)
 			{
 				case 4:
-					output().set_value("creditspendmeter", 0);
+					m_credit_spend_meter = 0;
 					break;
 				case 5:
-					output().set_value("creditoutmeter", 0);
+					m_credit_out_meter = 0;
 					break;
 				default:
 					break;
@@ -763,7 +773,7 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::coin_input_reset)
 TIMER_CALLBACK_MEMBER(aristmk4_state::hopper_reset)
 {
 	m_hopper_motor = 0x01;
-	output().set_value("hopper_motor", m_hopper_motor);
+	m_hopper_motor_out = 1;
 }
 
 // Port A read (SW1)
@@ -822,8 +832,8 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 	case 0x00:
 		ret=ret^0x40;
 		machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
-		m_hopper_motor=0x02;
-		output().set_value("hopper_motor", m_hopper_motor);
+		m_hopper_motor = 0x02;
+		m_hopper_motor_out = 2;
 		break;
 	case 0x01:
 		break; //default
@@ -928,47 +938,47 @@ WRITE_LINE_MEMBER(aristmk4_state::via_cb2_w)
 	// when it goes to 0, we're expecting to coins to be paid out, handled in via_b_r
 	// as soon as it is 1, HOPCO1 to remain 'ON'
 
-	if (state==0x01)
-		m_hopper_motor=state;
-	else if (m_hopper_motor<0x02)
-		m_hopper_motor=state;
+	if (state == 0x01)
+		m_hopper_motor = state;
+	else if (m_hopper_motor < 0x02)
+		m_hopper_motor = state;
 
-	output().set_value("hopper_motor", m_hopper_motor); // stop motor
+	m_hopper_motor_out = m_hopper_motor;
 }
 
 // Lamp output
 
 WRITE8_MEMBER(aristmk4_state::pblp_out)
 {
-	output().set_lamp_value(1, (data) & 1);
-	output().set_lamp_value(5, (data >> 1) & 1);
-	output().set_lamp_value(9, (data >> 2) & 1);
-	output().set_lamp_value(11,(data >> 3) & 1);
-	output().set_lamp_value(3, (data >> 4) & 1);
-	output().set_lamp_value(4, (data >> 5) & 1);
-	output().set_lamp_value(2, (data >> 6) & 1);
-	output().set_lamp_value(10,(data >> 7) & 1);
+	m_lamps[ 1] = BIT(data, 0);
+	m_lamps[ 5] = BIT(data, 1);
+	m_lamps[ 9] = BIT(data, 2);
+	m_lamps[11] = BIT(data, 3);
+	m_lamps[ 3] = BIT(data, 4);
+	m_lamps[ 4] = BIT(data, 5);
+	m_lamps[ 2] = BIT(data, 6);
+	m_lamps[10] = BIT(data, 7);
 	//logerror("Lights port A %02X\n",data);
 }
 
 WRITE8_MEMBER(aristmk4_state::pbltlp_out)
 {
-	output().set_lamp_value(8,  (data) & 1);
-	output().set_lamp_value(12, (data >> 1) & 1);
-	output().set_lamp_value(6,  (data >> 2) & 1);
-	output().set_lamp_value(7,  (data >> 3) & 1);
-	output().set_lamp_value(14, (data >> 4) & 1); // light tower
-	output().set_lamp_value(15, (data >> 5) & 1); // light tower
-	output().set_lamp_value(16, (data >> 6) & 1); // light tower
-	output().set_lamp_value(17, (data >> 7) & 1); // light tower
+	m_lamps[ 8] = BIT(data, 0);
+	m_lamps[12] = BIT(data, 1);
+	m_lamps[ 6] = BIT(data, 2);
+	m_lamps[ 7] = BIT(data, 3);
+	m_lamps[14] = BIT(data, 4); // light tower
+	m_lamps[15] = BIT(data, 5); // light tower
+	m_lamps[16] = BIT(data, 6); // light tower
+	m_lamps[17] = BIT(data, 7); // light tower
 	//logerror("Lights port B: %02X\n",data);
 }
 
 WRITE8_MEMBER(aristmk4_state::mlamps)
 {
 	/* TAKE WIN AND GAMBLE LAMPS */
-	output().set_lamp_value(18, (data >> 5) & 1);
-	output().set_lamp_value(13, (data >> 6) & 1);
+	m_lamps[18] = BIT(data, 5);
+	m_lamps[13] = BIT(data, 6);
 }
 
 WRITE8_MEMBER(aristmk4_state::zn434_w)
@@ -1712,6 +1722,10 @@ DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
 void aristmk4_state::machine_start()
 {
 	save_pointer(NAME(m_nvram.get()), 0x1000); // m_nvram
+	m_credit_spend_meter.resolve();
+	m_credit_out_meter.resolve();
+	m_hopper_motor_out.resolve();
+	m_lamps.resolve();
 }
 
 void aristmk4_state::machine_reset()

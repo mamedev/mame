@@ -212,10 +212,9 @@ RoadBlasters (aka Future Vette):005*
 
 void atarisy1_state::update_interrupts()
 {
-	m_maincpu->set_input_line(2, m_joystick_int && m_joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2, m_joystick_int ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(3, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -223,9 +222,8 @@ MACHINE_START_MEMBER(atarisy1_state,atarisy1)
 {
 	atarigen_state::machine_start();
 
+	m_joystick_int = 0;
 	save_item(NAME(m_joystick_int));
-	save_item(NAME(m_joystick_int_enable));
-	save_item(NAME(m_joystick_value));
 }
 
 
@@ -233,10 +231,8 @@ MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
 {
 	atarigen_state::machine_reset();
 
-	/* reset the joystick parameters */
-	m_joystick_value = 0;
-	m_joystick_int = 0;
-	m_joystick_int_enable = 0;
+	if (m_adc.found())
+		m_ajsint->in_w<0>(0);
 }
 
 
@@ -246,47 +242,43 @@ MACHINE_RESET_MEMBER(atarisy1_state,atarisy1)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::delayed_joystick_int)
+WRITE_LINE_MEMBER(atarisy1_state::joystick_int)
 {
-	m_joystick_value = param;
-	m_joystick_int = 1;
+	m_joystick_int = state;
 	update_interrupts();
 }
 
 
-READ16_MEMBER(atarisy1_state::joystick_r)
+template<int Input>
+READ8_MEMBER(atarisy1_state::digital_joystick_r)
 {
-	int newval = 0xff;
-	static const char *const portnames[] = { "IN0", "IN1" };
-
-	/* digital joystick type */
-	if (m_joystick_type == 1)
-		newval = (ioport("IN0")->read() & (0x80 >> offset)) ? 0xf0 : 0x00;
-
-	/* Hall-effect analog joystick */
-	else if (m_joystick_type == 2)
-		newval = ioport(portnames[offset & 1])->read();
-
-	/* Road Blasters gas pedal */
-	else if (m_joystick_type == 3)
-		newval = ioport("IN1")->read();
-
-	/* the A4 bit enables/disables joystick IRQs */
-	m_joystick_int_enable = ((offset >> 3) & 1) ^ 1;
-
-	/* clear any existing interrupt and set a timer for a new one */
-	m_joystick_int = 0;
-	m_joystick_timer->adjust(attotime::from_usec(50), newval);
-	update_interrupts();
-
-	return m_joystick_value;
+	return BIT(ioport("IN0")->read(), 7 - Input) ? 0xf0 : 0x00;
 }
 
 
-WRITE16_MEMBER(atarisy1_state::joystick_w)
+READ8_MEMBER(atarisy1_state::adc_r)
 {
+	if (!m_adc.found())
+		return 0xff;
+
+	int value = m_adc->data_r(space, 0);
+
+	if (!machine().side_effects_disabled())
+		adc_w(space, offset, 0);
+
+	return value;
+}
+
+
+WRITE8_MEMBER(atarisy1_state::adc_w)
+{
+	if (!m_adc.found())
+		return;
+
+	m_adc->address_offset_start_w(space, offset & 7, 0);
+
 	/* the A4 bit enables/disables joystick IRQs */
-	m_joystick_int_enable = ((offset >> 3) & 1) ^ 1;
+	m_ajsint->in_w<0>(!BIT(offset, 3));
 }
 
 
@@ -465,7 +457,7 @@ void atarisy1_state::main_map(address_map &map)
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xf00000, 0xf00fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0xf20000, 0xf20007).r(this, FUNC(atarisy1_state::trakball_r));
-	map(0xf40000, 0xf4001f).rw(this, FUNC(atarisy1_state::joystick_r), FUNC(atarisy1_state::joystick_w));
+	map(0xf40000, 0xf4001f).rw(this, FUNC(atarisy1_state::adc_r), FUNC(atarisy1_state::adc_w)).umask16(0x00ff);
 	map(0xf60000, 0xf60003).portr("F60000");
 	map(0xf80001, 0xf80001).w(m_soundcomm, FUNC(atari_sound_comm_device::main_command_w)); /* used by roadbls2 */
 	map(0xfc0001, 0xfc0001).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r));
@@ -531,7 +523,7 @@ static INPUT_PORTS_START( marble )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -570,7 +562,7 @@ static INPUT_PORTS_START( peterpak )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -609,7 +601,7 @@ static INPUT_PORTS_START( indytemp )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -657,7 +649,7 @@ static INPUT_PORTS_START( roadrunn )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -692,7 +684,7 @@ static INPUT_PORTS_START( roadblst )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_MAIN_TO_SOUND_READY("soundcomm")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_ATARI_COMM_SOUND_TO_MAIN_READY("soundcomm")
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -732,13 +724,26 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarisy1_state, video_int_gen)
 
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy1_state,atarisy1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy1_state,atarisy1)
+
+	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
+	MCFG_ADC0808_EOC_CB(DEVWRITELINE("ajsint", input_merger_device, in_w<1>))
+	// IN7 = J102 pin 2
+	// IN6 = J102 pin 3
+	// IN5 = J102 pin 4
+	// IN4 = J102 pin 6
+	// IN3 = J102 pin 8
+	// IN2 = J102 pin 9
+	// IN1 = J102 pin 7
+	// IN0 = J102 pin 5
+
+	MCFG_INPUT_MERGER_ALL_HIGH("ajsint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(atarisy1_state, joystick_int))
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -752,7 +757,6 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_TIMER_DRIVER_ADD("joystick_timer", atarisy1_state, delayed_joystick_int)
 	MCFG_TIMER_DRIVER_ADD("scan_timer", atarisy1_state, atarisy1_int3_callback)
 	MCFG_TIMER_DRIVER_ADD("int3off_timer", atarisy1_state, atarisy1_int3off_callback)
 	MCFG_TIMER_DRIVER_ADD("yreset_timer", atarisy1_state, atarisy1_reset_yscroll_callback)
@@ -776,11 +780,12 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy1_state, screen_update_atarisy1)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarisy1_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarisy1_state,atarisy1)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(atarisy1_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
@@ -807,31 +812,62 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(atarisy1_state::marble)
 	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 103)
+
+	// No joystick
+	MCFG_DEVICE_REMOVE("adc")
+	MCFG_DEVICE_REMOVE("ajsint")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::peterpak)
 	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
+
+	// Digital joystick read through ADC
+	MCFG_DEVICE_MODIFY("adc")
+	MCFG_ADC0808_IN0_CB(READ8(atarisy1_state, digital_joystick_r<0>))
+	MCFG_ADC0808_IN1_CB(READ8(atarisy1_state, digital_joystick_r<1>))
+	MCFG_ADC0808_IN2_CB(READ8(atarisy1_state, digital_joystick_r<2>))
+	MCFG_ADC0808_IN3_CB(READ8(atarisy1_state, digital_joystick_r<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::indytemp)
 	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 105)
+
+	// Digital joystick read through ADC
+	MCFG_DEVICE_MODIFY("adc")
+	MCFG_ADC0808_IN0_CB(READ8(atarisy1_state, digital_joystick_r<0>))
+	MCFG_ADC0808_IN1_CB(READ8(atarisy1_state, digital_joystick_r<1>))
+	MCFG_ADC0808_IN2_CB(READ8(atarisy1_state, digital_joystick_r<2>))
+	MCFG_ADC0808_IN3_CB(READ8(atarisy1_state, digital_joystick_r<3>))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadrunn)
 	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 108)
+
+	// Hall-effect analog joystick
+	MCFG_DEVICE_MODIFY("adc")
+	MCFG_ADC0808_IN6_CB(IOPORT("IN0"))
+	MCFG_ADC0808_IN7_CB(IOPORT("IN1"))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadb109)
 	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 109)
+
+	// Road Blasters gas pedal
+	MCFG_DEVICE_MODIFY("adc")
+	MCFG_ADC0808_IN2_CB(IOPORT("IN1"))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarisy1_state::roadb110)
 	atarisy1(config);
 	MCFG_SLAPSTIC_ADD("slapstic", 110)
+
+	// Road Blasters gas pedal
+	MCFG_DEVICE_MODIFY("adc")
+	MCFG_ADC0808_IN2_CB(IOPORT("IN1"))
 MACHINE_CONFIG_END
 
 
@@ -2466,7 +2502,6 @@ DRIVER_INIT_MEMBER(atarisy1_state,marble)
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
-	m_joystick_type = 0;    /* none */
 	m_trackball_type = 1;   /* rotated */
 }
 
@@ -2475,7 +2510,6 @@ DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
-	m_joystick_type = 1;    /* digital */
 	m_trackball_type = 0;   /* none */
 }
 
@@ -2484,7 +2518,6 @@ DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
-	m_joystick_type = 1;    /* digital */
 	m_trackball_type = 0;   /* none */
 }
 
@@ -2493,7 +2526,6 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
-	m_joystick_type = 2;    /* analog */
 	m_trackball_type = 0;   /* none */
 }
 
@@ -2502,7 +2534,6 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadblst)
 {
 	slapstic_configure(*m_maincpu, 0x080000, 0, memregion("maincpu")->base() + 0x80000);
 
-	m_joystick_type = 3;    /* pedal */
 	m_trackball_type = 2;   /* steering wheel */
 }
 

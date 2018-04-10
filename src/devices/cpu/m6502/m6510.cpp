@@ -34,9 +34,9 @@ void m6510_device::set_pulls(uint8_t _pullup, uint8_t _floating)
 	floating = _floating;
 }
 
-util::disasm_interface *m6510_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m6510_device::create_disassembler()
 {
-	return new m6510_disassembler;
+	return std::make_unique<m6510_disassembler>();
 }
 
 void m6510_device::device_start()

@@ -2258,6 +2258,19 @@
 		</part>
 	</software>
 
+	<!-- Windows 3.1, Windows 95, Macintosh -->
+	<!-- http://redump.org/disc/50161/ -->
+	<software name="fredfisk" supported="no">
+		<description>Freddi Fisk och fallet med de försvunna sjögräsfröna (Sweden)</description>
+		<year>1997</year>
+		<publisher>Levande Böcker</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="freddi fisk och fallet med de forsvunna sjograsfrona (sweden)" sha1="10c19256b8aca3d1b868a97a08670ba72bb9e257" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="moon" supported="no">
 		<description>Moon (Japan)</description>
 		<year>1998</year>

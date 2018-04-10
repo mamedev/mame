@@ -148,7 +148,7 @@ r3000_device::r3000_device(const machine_config &mconfig, device_type type, cons
 		m_in_brcond3(*this)
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// clear some additional state
 	memset(m_r, 0, sizeof(m_r));
@@ -458,9 +458,9 @@ void r3000_device::state_string_export(const device_state_entry &entry, std::str
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *r3000_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> r3000_device::create_disassembler()
 {
-	return new r3000_disassembler;
+	return std::make_unique<r3000_disassembler>();
 }
 
 
@@ -1028,7 +1028,7 @@ void r3000_device::execute_run()
 
 		// debugging
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		// instruction fetch
 		m_op = readop(m_pc);

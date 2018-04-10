@@ -360,6 +360,7 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_jsa(*this, "jsa"),
 			m_screen(*this, "screen"),
 			m_duartn68681(*this, "duartn68681"),
+			m_adc8(*this, "adc8"),
 			m_hd34010_host_access(0),
 			m_msp_ram(*this, "msp_ram"),
 			m_dsk_ram(nullptr),
@@ -393,7 +394,6 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_in0(*this, "IN0"),
 			m_sw1(*this, "SW1"),
 			m_a80000(*this, "a80000"),
-			m_8badc(*this, "8BADC.%u", 0),
 			m_12badc(*this, "12BADC.%u", 0),
 			m_irq_state(0),
 			m_gsp_irq_state(0),
@@ -441,8 +441,6 @@ harddriv_state::harddriv_state(const machine_config &mconfig, device_type type, 
 			m_ds3xdsp_sdata(0),
 			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
 			m_adc_control(0),
-			m_adc8_select(0),
-			m_adc8_data(0),
 			m_adc12_select(0),
 			m_adc12_byte(0),
 			m_adc12_data(0),
@@ -549,7 +547,8 @@ void harddriv_state::driver_68k_map(address_map &map)
 	map(0x60c000, 0x60ffff).w(this, FUNC(harddriv_state::hd68k_irq_ack_w));
 	map(0xa00000, 0xa7ffff).w(this, FUNC(harddriv_state::hd68k_wr0_write));
 	map(0xa80000, 0xafffff).r(this, FUNC(harddriv_state::hd68k_a80000_r)).w(this, FUNC(harddriv_state::hd68k_wr1_write));
-	map(0xb00000, 0xb7ffff).rw(this, FUNC(harddriv_state::hd68k_adc8_r), FUNC(harddriv_state::hd68k_wr2_write));
+	map(0xb00001, 0xb00001).mirror(0x7fffe).r("adc8", FUNC(adc0808_device::data_r));
+	map(0xb00000, 0xb7ffff).w(this, FUNC(harddriv_state::hd68k_wr2_write));
 	map(0xb80000, 0xbfffff).rw(this, FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
 	map(0xc00000, 0xc03fff).rw(this, FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
 	map(0xc04000, 0xc07fff).rw(this, FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
@@ -599,7 +598,8 @@ void harddriv_state::multisync_68k_map(address_map &map)
 	map(0x60c000, 0x60ffff).rw(this, FUNC(harddriv_state::hd68k_port0_r), FUNC(harddriv_state::hd68k_irq_ack_w));
 	map(0xa00000, 0xa7ffff).w(this, FUNC(harddriv_state::hd68k_wr0_write));
 	map(0xa80000, 0xafffff).r(this, FUNC(harddriv_state::hd68k_a80000_r)).w(this, FUNC(harddriv_state::hd68k_wr1_write));
-	map(0xb00000, 0xb7ffff).rw(this, FUNC(harddriv_state::hd68k_adc8_r), FUNC(harddriv_state::hd68k_wr2_write));
+	map(0xb00001, 0xb00001).mirror(0x7fffe).r("adc8", FUNC(adc0808_device::data_r));
+	map(0xb00000, 0xb7ffff).w(this, FUNC(harddriv_state::hd68k_wr2_write));
 	map(0xb80000, 0xbfffff).rw(this, FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
 	map(0xc00000, 0xc03fff).rw(this, FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
 	map(0xc04000, 0xc07fff).rw(this, FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
@@ -639,7 +639,8 @@ void harddriv_state::multisync2_68k_map(address_map &map)
 	map(0x60c000, 0x60ffff).rw(this, FUNC(harddriv_state::hd68k_port0_r), FUNC(harddriv_state::hd68k_irq_ack_w));
 	map(0xa00000, 0xa7ffff).w(this, FUNC(harddriv_state::hd68k_wr0_write));
 	map(0xa80000, 0xafffff).r(this, FUNC(harddriv_state::hd68k_a80000_r)).w(this, FUNC(harddriv_state::hd68k_wr1_write));
-	map(0xb00000, 0xb7ffff).rw(this, FUNC(harddriv_state::hd68k_adc8_r), FUNC(harddriv_state::hd68k_wr2_write));
+	map(0xb00001, 0xb00001).mirror(0x7fffe).r("adc8", FUNC(adc0808_device::data_r));
+	map(0xb00000, 0xb7ffff).w(this, FUNC(harddriv_state::hd68k_wr2_write));
 	map(0xb80000, 0xbfffff).rw(this, FUNC(harddriv_state::hd68k_adc12_r), FUNC(harddriv_state::hd68k_adc_control_w));
 	map(0xc00000, 0xc03fff).rw(this, FUNC(harddriv_state::hd68k_gsp_io_r), FUNC(harddriv_state::hd68k_gsp_io_w));
 	map(0xc04000, 0xc07fff).rw(this, FUNC(harddriv_state::hd68k_msp_io_r), FUNC(harddriv_state::hd68k_msp_io_w));
@@ -785,10 +786,10 @@ static INPUT_PORTS_START( harddriv )
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -832,7 +833,7 @@ static INPUT_PORTS_START( harddriv )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_NAME("Clutch Pedal")
 
 	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - seat */
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 - shifter lever Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(128) PORT_CODE_DEC(KEYCODE_R) PORT_CODE_INC(KEYCODE_F) PORT_NAME("Shifter Lever Y")
@@ -844,10 +845,10 @@ static INPUT_PORTS_START( harddriv )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Wheel")
 
 	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - line volts */
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 - shift force */
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("mainpcb:12BADC.0")       /* b80000 - 12 bit ADC 0 - steering wheel */
 	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x010,0xff0) PORT_SENSITIVITY(400) PORT_KEYDELTA(5) PORT_NAME("Steering Wheel")
@@ -868,10 +869,10 @@ static INPUT_PORTS_START( racedriv )
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -915,7 +916,7 @@ static INPUT_PORTS_START( racedriv )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_NAME("Clutch Pedal")
 
 	PORT_START("mainpcb:8BADC.2")        /* b00000 - 8 bit ADC 2 - seat */
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("mainpcb:8BADC.3")        /* b00000 - 8 bit ADC 3 - shifter lever Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(128) PORT_CODE_DEC(KEYCODE_R) PORT_CODE_INC(KEYCODE_F) PORT_NAME("Shifter Lever Y")
@@ -927,7 +928,7 @@ static INPUT_PORTS_START( racedriv )
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_NAME("Wheel")
 
 	PORT_START("mainpcb:8BADC.6")        /* b00000 - 8 bit ADC 6 - line volts */
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("mainpcb:8BADC.7")        /* b00000 - 8 bit ADC 7 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -952,10 +953,10 @@ static INPUT_PORTS_START( racedriv_pan )
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper (Left)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("leftpcb:screen")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("leftpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -964,10 +965,10 @@ static INPUT_PORTS_START( racedriv_pan )
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper (Right)" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("rightpcb:screen")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rightpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -991,10 +992,10 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1035,7 +1036,7 @@ static INPUT_PORTS_START( racedrivc )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("3rd Gear")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("4th Gear")
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* center edge on steering wheel */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* center edge on steering wheel */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
@@ -1080,10 +1081,10 @@ static INPUT_PORTS_START( stunrun )
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1169,10 +1170,10 @@ static INPUT_PORTS_START( steeltal )
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1259,10 +1260,10 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1304,7 +1305,7 @@ static INPUT_PORTS_START( strtdriv )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 )  /* wings */
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 )  /* wings */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* center edge on steering wheel */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* center edge on steering wheel */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
@@ -1349,10 +1350,10 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_DIPNAME( 0x01, 0x01, "Diagnostic jumper" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* HBLANK */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* HBLANK */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("mainpcb:screen")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 12-bit EOC */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* 8-bit EOC */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* 12-bit EOC */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainpcb:adc8", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1394,7 +1395,7 @@ static INPUT_PORTS_START( hdrivair )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 )  /* wings */
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON3 )  /* wings */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* center edge on steering wheel */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* center edge on steering wheel */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:8BADC.0")        /* b00000 - 8 bit ADC 0 - gas pedal */
@@ -1440,10 +1441,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(harddriv_state::video_int_gen)
+WRITE_LINE_MEMBER(harddriv_state::video_int_write_line)
 {
-	m_video_int_state = 1;
-	update_interrupts();
+	if (state)
+	{
+		m_video_int_state = 1;
+		update_interrupts();
+	}
 }
 
 
@@ -1453,13 +1457,22 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, HARDDRIV_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(driver_68k_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", harddriv_state, video_int_gen)
 	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 117)
 	MCFG_SLAPSTIC_68K_ACCESS(1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
+
+	MCFG_DEVICE_ADD("adc8", ADC0809, 1000000) // unknown clock
+	MCFG_ADC0808_IN0_CB(IOPORT("8BADC.0"))
+	MCFG_ADC0808_IN1_CB(IOPORT("8BADC.1"))
+	MCFG_ADC0808_IN2_CB(IOPORT("8BADC.2"))
+	MCFG_ADC0808_IN3_CB(IOPORT("8BADC.3"))
+	MCFG_ADC0808_IN4_CB(IOPORT("8BADC.4"))
+	MCFG_ADC0808_IN5_CB(IOPORT("8BADC.5"))
+	MCFG_ADC0808_IN6_CB(IOPORT("8BADC.6"))
+	MCFG_ADC0808_IN7_CB(IOPORT("8BADC.7"))
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)
@@ -1492,6 +1505,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_SCREEN_UPDATE_DEVICE("gsp", tms34010_device, tms340x0_ind16)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(harddriv_state, video_int_write_line))
 MACHINE_CONFIG_END
 
 
@@ -1807,6 +1821,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(racedrivc_panorama_side_board_device_state::device_add_mconfig)
 
 	multisync_nomsp(config);
+
+	MCFG_DEVICE_MODIFY("adc8") // 8-bit analog inputs read but not used?
+	MCFG_ADC0808_IN0_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN1_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN2_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN3_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN4_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN5_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN6_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN7_CB(CONSTANT(0xff))
 
 	/* basic machine hardware */        /* multisync board without MSP */
 	adsp(config);                       /* ADSP board */

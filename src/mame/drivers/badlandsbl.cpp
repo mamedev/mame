@@ -203,7 +203,6 @@ GFXDECODE_END
 void badlandsbl_state::machine_reset()
 {
 //  m_pedal_value[0] = m_pedal_value[1] = 0x80;
-	atarigen_state::machine_reset();
 //  scanline_timer_reset(*m_screen, 32);
 
 //  memcpy(m_bank_base, &m_bank_source_data[0x0000], 0x1000);

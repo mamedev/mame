@@ -90,9 +90,9 @@ z180_device::z180_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-util::disasm_interface *z180_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> z180_device::create_disassembler()
 {
-	return new z180_disassembler;
+	return std::make_unique<z180_disassembler>();
 }
 
 #define CF  0x01
@@ -2162,7 +2162,7 @@ void z180_device::device_start()
 
 	save_item(NAME(m_mmu));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 /****************************************************************************
@@ -2420,7 +2420,7 @@ again:
 		if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 			(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			debugger_instruction_hook(this, _PCD);
+			debugger_instruction_hook(_PCD);
 
 			/* FIXME z180_dma0 should be handled in handle_io_timers */
 			curcycles = z180_dma0(m_icount);
@@ -2437,7 +2437,7 @@ again:
 				m_after_EI = 0;
 
 				_PPC = _PCD;
-				debugger_instruction_hook(this, _PCD);
+				debugger_instruction_hook(_PCD);
 
 				if (!m_HALT)
 				{
@@ -2495,7 +2495,7 @@ again:
 			m_after_EI = 0;
 
 			_PPC = _PCD;
-			debugger_instruction_hook(this, _PCD);
+			debugger_instruction_hook(_PCD);
 
 			if (!m_HALT)
 			{

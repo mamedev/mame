@@ -179,7 +179,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
 	DECLARE_DRIVER_INIT(ssingles);
 	virtual void video_start() override;
-	INTERRUPT_GEN_MEMBER(atamanot_irq);
+	DECLARE_WRITE_LINE_MEMBER(atamanot_irq);
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);
 	required_device<cpu_device> m_maincpu;
@@ -426,7 +426,7 @@ static INPUT_PORTS_START( ssingles )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //must be LOW
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ssingles_state,controls_r, nullptr)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ssingles_state,controls_r, nullptr)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
@@ -551,7 +551,6 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(ssingles_map)
 	MCFG_CPU_IO_MAP(ssingles_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssingles_state,  nmi_line_pulse)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
@@ -565,6 +564,7 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, ssingles_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(ssingles_state::ssingles)
 
 MACHINE_CONFIG_END
 
-INTERRUPT_GEN_MEMBER(ssingles_state::atamanot_irq)
+WRITE_LINE_MEMBER(ssingles_state::atamanot_irq)
 {
 	// ...
 }
@@ -587,7 +587,6 @@ MACHINE_CONFIG_START(ssingles_state::atamanot)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atamanot_map)
 	MCFG_CPU_IO_MAP(atamanot_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssingles_state,  atamanot_irq)
 
 	MCFG_DEVICE_REMOVE("crtc")
 
@@ -595,6 +594,7 @@ MACHINE_CONFIG_START(ssingles_state::atamanot)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, atamanot_update_row)
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(ssingles_state, atamanot_irq))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", atamanot)
 MACHINE_CONFIG_END

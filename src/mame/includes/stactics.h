@@ -29,7 +29,12 @@ public:
 		m_score_digits(*this, "digit%u", 0U),
 		m_credit_leds(*this, "credit_led%u", 0U),
 		m_barrier_leds(*this, "barrier_led%u", 0U),
-		m_round_leds(*this, "round_led%u", 0U)
+		m_round_leds(*this, "round_led%u", 0U),
+		m_barrier_lamp(*this, "barrier_lamp"),
+		m_start_lamp(*this, "start_lamp"),
+		m_sight_led(*this, "sight_led"),
+		m_in3(*this, "IN3"),
+		m_fake(*this, "FAKE")
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(get_frame_count_d3);
@@ -94,6 +99,12 @@ private:
 	output_finder<8> m_credit_leds;
 	output_finder<12> m_barrier_leds;
 	output_finder<16> m_round_leds;
+	output_finder<> m_barrier_lamp;
+	output_finder<> m_start_lamp;
+	output_finder<> m_sight_led;
+
+	required_ioport m_in3;
+	required_ioport m_fake;
 
 	/* machine state */
 	int    m_vert_pos;

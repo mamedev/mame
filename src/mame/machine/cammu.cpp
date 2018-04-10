@@ -32,6 +32,8 @@
 #include "emu.h"
 #include "cammu.h"
 
+#include <algorithm>
+
 #define LOG_GENERAL (1U << 0)
 #define LOG_ACCESS  (1U << 1)
 #define LOG_DTU     (1U << 2)
@@ -219,8 +221,7 @@ void cammu_device::set_spaces(std::vector<address_space *> spaces)
 {
 	assert_always(spaces.size() == 8, "exactly 8 address space pointers are required");
 
-	for (int i = 0; i < spaces.size(); i++)
-		m_space[i] = spaces[i];
+	std::copy(spaces.begin(), spaces.end(), std::begin(m_space));
 }
 
 cammu_device::translated_t cammu_device::translate_address(const u32 ssw, const u32 virtual_address, const access_size size, const access_type mode)

@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+
+<mamelayout version="2">
+	<element name="background">
+	</element>
+	<element name="led" defstate="0">
+		<rect state="0">
+			<color red="0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0" green="0.8" blue="0" />
+		</rect>
+	</element>
+	<view name="Debugging Lamps">
+		<bezel element="background">
+			<bounds x="0" y="0" width="776" height="200" />
+		</bezel>
+		<screen index="0">
+			<bounds left="0" top="0" right="776" bottom="152" />
+		</screen>
+		<bezel name="led_0" element="led">
+			<bounds x="10" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_1" element="led">
+			<bounds x="30" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_2" element="led">
+			<bounds x="50" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_3" element="led">
+			<bounds x="70" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_4" element="led">
+			<bounds x="90" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_5" element="led">
+			<bounds x="110" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_6" element="led">
+			<bounds x="130" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_7" element="led">
+			<bounds x="150" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_8" element="led">
+			<bounds x="170" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_9" element="led">
+			<bounds x="190" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_10" element="led">
+			<bounds x="210" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_11" element="led">
+			<bounds x="230" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_12" element="led">
+			<bounds x="250" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_13" element="led">
+			<bounds x="270" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_14" element="led">
+			<bounds x="290" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_15" element="led">
+			<bounds x="310" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_16" element="led">
+			<bounds x="330" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_17" element="led">
+			<bounds x="350" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_18" element="led">
+			<bounds x="370" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_19" element="led">
+			<bounds x="390" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_20" element="led">
+			<bounds x="410" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_21" element="led">
+			<bounds x="430" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_22" element="led">
+			<bounds x="450" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_23" element="led">
+			<bounds x="470" y="160" width="10" height="10" />
+		</bezel>
+		<bezel name="led_24" element="led">
+			<bounds x="10" y="180" width="10" height="10" />
+		</bezel>
+		<bezel name="led_25" element="led">
+			<bounds x="30" y="180" width="10" height="10" />
+		</bezel>
+		<bezel name="led_26" element="led">
+			<bounds x="50" y="180" width="10" height="10" />
+		</bezel>
+		<bezel name="led_27" element="led">
+			<bounds x="70" y="180" width="10" height="10" />
+		</bezel>
+		<bezel name="led_28" element="led">
+			<bounds x="90" y="180" width="10" height="10" />
+		</bezel>
+		<bezel name="led_29" element="led">
+			<bounds x="110" y="180" width="10" height="10" />
+		</bezel>
+		<bezel name="led_30" element="led">
+			<bounds x="130" y="180" width="10" height="10" />
+		</bezel>
+		<bezel name="led_31" element="led">
+			<bounds x="150" y="180" width="10" height="10" />
+		</bezel>
+	</view>
+</mamelayout>

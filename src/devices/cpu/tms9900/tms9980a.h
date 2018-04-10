@@ -44,7 +44,7 @@ protected:
 	uint32_t      execute_input_lines() const override;
 	void        execute_set_input(int irqline, int state) override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config    m_program_config80;
 	address_space_config    m_io_config80;

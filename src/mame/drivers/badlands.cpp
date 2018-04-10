@@ -174,18 +174,6 @@ Measurements -
  *
  *************************************/
 
-void badlands_state::update_interrupts()
-{
-	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-void badlands_state::scanline_update(screen_device &screen, int scanline)
-{
-	// sound CPU irq is scanline controlled, we update it below to make bootlegs happy
-}
-
 TIMER_DEVICE_CALLBACK_MEMBER(badlands_state::sound_scanline)
 {
 	int scanline = param;
@@ -199,7 +187,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(badlands_state::sound_scanline)
 
 MACHINE_START_MEMBER(badlands_state,badlands)
 {
-	atarigen_state::machine_start();
 	save_item(NAME(m_pedal_value));
 }
 
@@ -208,7 +195,6 @@ MACHINE_RESET_MEMBER(badlands_state,badlands)
 {
 	m_pedal_value[0] = m_pedal_value[1] = 0x80;
 
-	atarigen_state::machine_reset();
 	//scanline_timer_reset(*m_screen, 32);
 
 	membank("soundbank")->set_entry(0);
@@ -236,7 +222,12 @@ INTERRUPT_GEN_MEMBER(badlands_state::vblank_int)
 			m_pedal_value[i]++;
 	}
 
-	video_int_gen(device);
+	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+}
+
+WRITE16_MEMBER(badlands_state::video_int_ack_w)
+{
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 
@@ -384,7 +375,7 @@ void badlands_state::main_map(address_map &map)
 	map(0xfea000, 0xfebfff).r(m_soundcomm, FUNC(atari_sound_comm_device::main_response_r)).umask16(0xff00);
 	map(0xfec000, 0xfedfff).w(this, FUNC(badlands_state::badlands_pf_bank_w));
 	map(0xfee000, 0xfeffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0xffc000, 0xffc3ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
+	map(0xffc000, 0xffc3ff).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0xffe000, 0xffefff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0xfff000, 0xfff1ff).ram().share("mob");
 	map(0xfff200, 0xffffff).ram();
@@ -489,7 +480,7 @@ MACHINE_CONFIG_START(badlands_state::badlands)
 	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(badlands_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)

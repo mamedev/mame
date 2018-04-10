@@ -1,13 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl, Miodrag Milanovic, Vas Crabb
-#pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_DISERIAL_H
 #define MAME_EMU_DISERIAL_H
+
+#pragma once
 
 // Windows headers are crap, let me count the ways
 #undef PARITY_NONE
@@ -262,4 +258,4 @@ private:
 	u8  m_empty = 1U;
 };
 
-#endif  // MAME_EMU_DISERIAL_H
+#endif // MAME_EMU_DISERIAL_H

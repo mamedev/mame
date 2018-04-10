@@ -277,7 +277,7 @@ static INPUT_PORTS_START( lbeach )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "4" ) // fast
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -332,7 +332,6 @@ MACHINE_CONFIG_START(lbeach_state::lbeach)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL(16'000'000) / 32) // Motorola MC6800P, 500kHz
 	MCFG_CPU_PROGRAM_MAP(lbeach_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lbeach_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -344,6 +343,7 @@ MACHINE_CONFIG_START(lbeach_state::lbeach)
 	MCFG_SCREEN_UPDATE_DRIVER(lbeach_state, screen_update_lbeach)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // needed for collision detection
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lbeach)
 	MCFG_PALETTE_ADD("palette", 2+8+2)

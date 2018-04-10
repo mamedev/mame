@@ -465,16 +465,13 @@ void gyruss_state::machine_start()
 	save_item(NAME(m_slave_irq_mask));
 }
 
-INTERRUPT_GEN_MEMBER(gyruss_state::master_vblank_irq)
+WRITE_LINE_MEMBER(gyruss_state::vblank_irq)
 {
-	if (m_master_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-}
+	if (state && m_master_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-INTERRUPT_GEN_MEMBER(gyruss_state::slave_vblank_irq)
-{
-	if (m_slave_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_slave_irq_mask)
+		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(gyruss_state::gyruss)
@@ -482,11 +479,9 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gyruss_state,  master_vblank_irq)
 
 	MCFG_CPU_ADD("sub", KONAMI1, MASTER_CLOCK/12)     /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gyruss_state,  slave_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)    /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(audio_cpu1_map)
@@ -511,6 +506,7 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(gyruss_state, screen_update_gyruss)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gyruss_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gyruss)
 	MCFG_PALETTE_ADD("palette", 16*4+16*16)

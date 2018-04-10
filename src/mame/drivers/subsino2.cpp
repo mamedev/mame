@@ -1577,7 +1577,7 @@ static INPUT_PORTS_START( bishjan )
 	PORT_START("SYSTEM") // IN A
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN        )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE        )   PORT_IMPULSE(1) // service mode (press twice for inputs)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_SPECIAL        )   // hopper sensor
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_CUSTOM        )   // hopper sensor
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1       )   // stats
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2       )   // pay out? "hopper empty"
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN1          )   PORT_IMPULSE(2) // coin
@@ -1795,7 +1795,7 @@ static INPUT_PORTS_START( expcard )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER        ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)  // reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN      )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN      )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL      )                                   // serial in?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM      )                                   // serial in?
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -1942,7 +1942,7 @@ static INPUT_PORTS_START( mtrain )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL  )   // serial in?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  )   // serial in?
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2141,7 +2141,7 @@ static INPUT_PORTS_START( xplan )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL       )                      // serial in?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM       )                      // serial in?
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2207,7 +2207,7 @@ static INPUT_PORTS_START( xtrain )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER         ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) // reset
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN       )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN       )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL       )                                      // serial in?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM       )                                      // serial in?
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -2354,7 +2354,7 @@ static INPUT_PORTS_START( wtrnymph )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER    ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL  )   // serial in?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM  )   // serial in?
 INPUT_PORTS_END
 
 

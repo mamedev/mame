@@ -29,6 +29,8 @@
 
 #include "video/mc6845.h"
 
+#include "imagedev/snapquik.h"
+
 
 /***********************************************************
 
@@ -61,6 +63,8 @@ public:
 	{ }
 
 	void aussiebyte(machine_config &config);
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(aussiebyte);
 
 protected:
 	DECLARE_READ8_MEMBER(memory_read_byte);

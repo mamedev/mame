@@ -565,7 +565,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			}
 			break;
 		}
-			
+
 		case 0x12:      /* FEXT Rx BY <bit6>:<len6> (Sign Extended) */
 		{
 			uint32_t ext = (REG(rx) & MAKE_EXTRACT_MASK(bit, len)) >> bit;
@@ -749,12 +749,12 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 			}
 
 			// TODO: verify this (Gunblade NY Score Attack Remix mode)
-			case 0x1d: 
+			case 0x1d:
 			{
 				compute_fmul_abs(fm, fxm, fym, fa, fxa, fya);
 				break;
 			}
-			
+
 			case 0x1e:      /* Fm = Fxm * Fym,   Fa = MAX(Fxa, Fya) */
 			{
 				compute_fmul_fmax(fm, fxm, fym, fa, fxa, fya);

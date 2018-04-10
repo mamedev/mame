@@ -10,6 +10,8 @@ public:
 	tceptor_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_mcu(*this, "mcu"),
 		m_cus30(*this, "namco"),
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_attr(*this, "tile_attr"),
@@ -19,12 +21,16 @@ public:
 		m_c45_road(*this, "c45_road"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_shutter(*this, "shutter")
+	{ }
 
 	uint8_t m_m6809_irq_enable;
 	uint8_t m_m68k_irq_enable;
 	uint8_t m_mcu_irq_enable;
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_attr;
@@ -68,6 +74,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	output_finder<> m_shutter;
 
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);

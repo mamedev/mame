@@ -90,7 +90,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 	virtual void clock_melody() override;
@@ -161,7 +161,7 @@ protected:
 	void program_1_8k(address_map &map);
 	void data_5x13x4(address_map &map);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void execute_one() override;
 	virtual int get_trs_field() override { return 1; }
 };

@@ -338,9 +338,9 @@ device_memory_interface::space_config_vector mcs48_cpu_device::memory_space_conf
 		};
 }
 
-util::disasm_interface *mcs48_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mcs48_cpu_device::create_disassembler()
 {
-	return new mcs48_disassembler((m_feature_mask & UPI41_FEATURE) != 0, (m_feature_mask & I802X_FEATURE) != 0);
+	return std::make_unique<mcs48_disassembler>((m_feature_mask & UPI41_FEATURE) != 0, (m_feature_mask & I802X_FEATURE) != 0);
 }
 
 /***************************************************************************
@@ -1149,7 +1149,7 @@ void mcs48_cpu_device::device_start()
 
 	save_item(NAME(m_a11));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1293,7 +1293,7 @@ void mcs48_cpu_device::execute_run()
 
 		/* fetch next opcode */
 		m_prevpc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		opcode = opcode_fetch();
 
 		/* process opcode and count cycles */

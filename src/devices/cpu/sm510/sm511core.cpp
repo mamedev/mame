@@ -44,9 +44,9 @@ ADDRESS_MAP_END
 
 
 // disasm
-util::disasm_interface *sm511_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sm511_device::create_disassembler()
 {
-	return new sm511_disassembler;
+	return std::make_unique<sm511_disassembler>();
 }
 
 

@@ -4,16 +4,16 @@
 
     GX455 - Konami Badlands
 
-	driver by Angelo Salese
-	
-	TODO:
-	- verify interrupts, service mode seems way too fast and it randomly crashes;
-	- fix overlay positioning & transparency enable;
-	- dipswitches;
-	- add sn76496 latch mechanism (should actually be in the device itself);
-	
-	Notes:
-	- to enter service mode hold start 1 & 2 at POST.
+    driver by Angelo Salese
+
+    TODO:
+    - verify interrupts, service mode seems way too fast and it randomly crashes;
+    - fix overlay positioning & transparency enable;
+    - dipswitches;
+    - add sn76496 latch mechanism (should actually be in the device itself);
+
+    Notes:
+    - to enter service mode hold start 1 & 2 at POST.
 
 ***************************************************************************/
 
@@ -35,7 +35,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_laserdisc(*this, "laserdisc")
 		, m_vram(*this, "vram")
-   		, m_gfxdecode(*this, "gfxdecode")
+		, m_gfxdecode(*this, "gfxdecode")
 	{
 	}
 
@@ -68,7 +68,7 @@ private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
-	
+
 	bool m_nmi_enable, m_irq_enable, m_firq_enable;
 };
 
@@ -184,57 +184,40 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( konblands )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DSW1:1,2,3,4,5,6,7,8")
+	PORT_DIPSETTING(    0x22, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x55, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x88, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x44, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x11, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0xff, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x77, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x33, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0xee, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x66, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0xdd, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xcc, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xbb, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xaa, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x99, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )		PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPSETTING(    0x03, "2")
+	PORT_DIPSETTING(    0x02, "3")
+	PORT_DIPSETTING(    0x01, "5")
+	PORT_DIPSETTING(    0x00, "7")
+    /* SW3-SW7 NOT IN USE.  Keep switches in OFF position (per manual) */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DSW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "DSW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -242,12 +225,7 @@ static INPUT_PORTS_START( konblands )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -342,11 +320,11 @@ ROM_START( kbadlands )
 	ROM_LOAD( "badlands.a14",   0x2000, 0x2000, CRC(82cb4614) SHA1(0cab824b4f3fb29e300f9c05911422d6047d073b) )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
-	ROM_LOAD( "badlands.c8",   0x0000, 0x2000, CRC(590209fe) SHA1(8dfc836420e4c3fa417ec0aefb617a7abd0ccbc2) )	
+	ROM_LOAD( "badlands.c8",   0x0000, 0x2000, CRC(590209fe) SHA1(8dfc836420e4c3fa417ec0aefb617a7abd0ccbc2) )
 
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "badlands.c4",    0x000, 0x020, CRC(6757be8d) SHA1(1c9c24e29017f0a16b8a7dedd9776109e7e5734c) )
-	
+
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "badlands", 0, NO_DUMP )
 ROM_END
@@ -354,15 +332,15 @@ ROM_END
 
 ROM_START( kbadlandsh )
 	ROM_REGION( 0x4000, "ipl", ROMREGION_ERASE00 )
-    ROM_LOAD( "bl_hit.7a",    0x0000, 0x2000, CRC(a135e444) SHA1(7ef5394c698a5867aef200f577b8708df455b653) )
-    ROM_LOAD( "bl_hit.6a",    0x2000, 0x2000, CRC(4c287f37) SHA1(b6b6b64174f1fd014b6c808015f1b0e65b56d24b) )
+	ROM_LOAD( "bl_hit.7a",    0x0000, 0x2000, CRC(a135e444) SHA1(7ef5394c698a5867aef200f577b8708df455b653) )
+	ROM_LOAD( "bl_hit.6a",    0x2000, 0x2000, CRC(4c287f37) SHA1(b6b6b64174f1fd014b6c808015f1b0e65b56d24b) )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
-    ROM_LOAD( "bl_hit.9c",    0x000000, 0x002000, CRC(44c3441e) SHA1(6b42961d31e5d025758cdfdc573648a83004577d) )
+	ROM_LOAD( "bl_hit.9c",    0x000000, 0x002000, CRC(44c3441e) SHA1(6b42961d31e5d025758cdfdc573648a83004577d) )
 
 	ROM_REGION( 0x20, "proms", 0 )
-    ROM_LOAD( "bl_hit.4f",    0x000000, 0x000020, CRC(0226f881) SHA1(b17c5681fca5ae65128793cf263725e2fe1314de) )
-		
+	ROM_LOAD( "bl_hit.4f",    0x000000, 0x000020, CRC(0226f881) SHA1(b17c5681fca5ae65128793cf263725e2fe1314de) )
+
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "badlands", 0, NO_DUMP )
 ROM_END

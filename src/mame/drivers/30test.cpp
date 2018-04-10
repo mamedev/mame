@@ -56,9 +56,11 @@ class namco_30test_state : public driver_device
 {
 public:
 	namco_30test_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	uint8_t m_mux_data;
 	uint8_t m_oki_bank;
@@ -77,6 +79,7 @@ public:
 	void _30test(machine_config &config);
 	void namco_30test_io(address_map &map);
 	void namco_30test_map(address_map &map);
+	output_finder<72> m_digits;
 };
 
 
@@ -85,14 +88,17 @@ static const uint8_t led_map[16] =
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_led_w)
 {
-	output().set_digit_value(0 + offset * 2, led_map[(data & 0xf0) >> 4]);
-	output().set_digit_value(1 + offset * 2, led_map[(data & 0x0f) >> 0]);
+	m_digits[offset * 2] = led_map[data >> 4];
+	m_digits[1 + offset * 2] =  led_map[data & 0x0f];
 }
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_led_rank_w)
 {
-	output().set_digit_value(64 + offset * 2, led_map[(data & 0xf0) >> 4]);
-	output().set_digit_value(65 + offset * 2, led_map[(data & 0x0f) >> 0]);
+	if (offset < 4)
+	{
+		m_digits[64 + offset * 2] = led_map[data >> 4];
+		m_digits[65 + offset * 2] = led_map[data & 0x0f];
+	}
 }
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_lamps_w)
@@ -233,6 +239,7 @@ INPUT_PORTS_END
 
 void namco_30test_state::machine_start()
 {
+	m_digits.resolve();
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_oki_bank));
 }

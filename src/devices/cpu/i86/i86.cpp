@@ -237,7 +237,7 @@ void i8086_cpu_device::execute_run()
 
 		if (!m_seg_prefix)
 		{
-			debugger_instruction_hook( this, update_pc() );
+			debugger_instruction_hook( update_pc() );
 		}
 
 		uint8_t op = fetch_op();
@@ -504,7 +504,7 @@ void i8086_common_cpu_device::device_start()
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_lock_handler.resolve_safe();
 }
@@ -615,9 +615,9 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 	}
 }
 
-util::disasm_interface *i8086_common_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8086_common_cpu_device::create_disassembler()
 {
-	return new i386_disassembler(this);
+	return std::make_unique<i386_disassembler>(this);
 }
 
 int i8086_common_cpu_device::get_mode() const

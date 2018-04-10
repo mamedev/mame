@@ -114,9 +114,9 @@ MACHINE_CONFIG_END
 
 
 // disasm
-util::disasm_interface *tms1000_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms1000_cpu_device::create_disassembler()
 {
-	return new tms1000_disassembler;
+	return std::make_unique<tms1000_disassembler>();
 }
 
 

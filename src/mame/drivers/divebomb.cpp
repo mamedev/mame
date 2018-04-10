@@ -120,8 +120,8 @@ void divebomb_state::divebomb_fgcpu_iomap(address_map &map)
 	map(0x03, 0x03).w("sn3", FUNC(sn76489_device::write));
 	map(0x04, 0x04).w("sn4", FUNC(sn76489_device::write));
 	map(0x05, 0x05).w("sn5", FUNC(sn76489_device::write));
-	map(0x10, 0x10).rw(this, FUNC(divebomb_state::fgcpu_roz_comm_r), FUNC(divebomb_state::fgcpu_roz_comm_w));
-	map(0x20, 0x20).rw(this, FUNC(divebomb_state::fgcpu_spr_comm_r), FUNC(divebomb_state::fgcpu_spr_comm_w));
+	map(0x10, 0x10).r(m_roz2fg_latch, FUNC(generic_latch_8_device::read)).w("fg2roz", FUNC(generic_latch_8_device::write));
+	map(0x20, 0x20).r(m_spr2fg_latch, FUNC(generic_latch_8_device::read)).w("fg2spr", FUNC(generic_latch_8_device::write));
 	map(0x30, 0x30).portr("IN0");
 	map(0x31, 0x31).portr("IN1");
 	map(0x32, 0x32).portr("DSW1");
@@ -134,48 +134,17 @@ void divebomb_state::divebomb_fgcpu_iomap(address_map &map)
 }
 
 
-READ8_MEMBER(divebomb_state::fgcpu_spr_comm_r)
-{
-	has_fromsprite = false;
-	update_irqs();
-	return from_sprite;
-}
-
-
-WRITE8_MEMBER(divebomb_state::fgcpu_spr_comm_w)
-{
-	m_spritecpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	to_spritecpu = data;
-}
-
-
-READ8_MEMBER(divebomb_state::fgcpu_roz_comm_r)
-{
-	has_fromroz = false;
-	update_irqs();
-	return from_roz;
-}
-
-
-WRITE8_MEMBER(divebomb_state::fgcpu_roz_comm_w)
-{
-	m_rozcpucpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	to_rozcpu = data;
-}
-
-
 READ8_MEMBER(divebomb_state::fgcpu_comm_flags_r)
 {
 	uint8_t result = 0;
 
-	if (has_fromroz)
+	if (m_roz2fg_latch->pending_r())
 		result |= 1;
-	if (has_fromsprite)
+	if (m_spr2fg_latch->pending_r())
 		result |= 2;
 
 	return result;
 }
-
 
 
 /*************************************
@@ -197,22 +166,7 @@ void divebomb_state::divebomb_spritecpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(this, FUNC(divebomb_state::spritecpu_port00_w));
-	map(0x80, 0x80).rw(this, FUNC(divebomb_state::spritecpu_comm_r), FUNC(divebomb_state::spritecpu_comm_w));
-}
-
-
-READ8_MEMBER(divebomb_state::spritecpu_comm_r)
-{
-	m_spritecpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	return to_spritecpu;
-}
-
-
-WRITE8_MEMBER(divebomb_state::spritecpu_comm_w)
-{
-	from_sprite = data;
-	has_fromsprite = true;
-	update_irqs();
+	map(0x80, 0x80).r("fg2spr", FUNC(generic_latch_8_device::read)).w(m_spr2fg_latch, FUNC(generic_latch_8_device::write));
 }
 
 
@@ -223,19 +177,32 @@ WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
 }
 
 
-
 /*************************************
  *
  *  ROZ CPU
  *
  *************************************/
 
+template<int Chip>
+WRITE8_MEMBER(divebomb_state::rozcpu_wrap_enable_w)
+{
+	m_k051316[Chip]->wraparound_enable(!(data & 1));
+}
+
+
+template<int Chip>
+WRITE8_MEMBER(divebomb_state::rozcpu_enable_w)
+{
+	m_roz_enable[Chip] = !(data & 1);
+}
+
+
 void divebomb_state::divebomb_rozcpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc7ff).ram().rw(m_k051316_1, FUNC(k051316_device::read), FUNC(k051316_device::write));
-	map(0xd000, 0xd7ff).ram().rw(m_k051316_2, FUNC(k051316_device::read), FUNC(k051316_device::write));
+	map(0x8000, 0xbfff).bankr("rozbank");
+	map(0xc000, 0xc7ff).ram().rw(m_k051316[0], FUNC(k051316_device::read), FUNC(k051316_device::write));
+	map(0xd000, 0xd7ff).ram().rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write));
 	map(0xe000, 0xffff).ram();
 }
 
@@ -244,13 +211,13 @@ void divebomb_state::divebomb_rozcpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(this, FUNC(divebomb_state::rozcpu_bank_w));
-	map(0x10, 0x10).w(this, FUNC(divebomb_state::rozcpu_wrap2_enable_w));
-	map(0x12, 0x12).w(this, FUNC(divebomb_state::rozcpu_enable1_w));
-	map(0x13, 0x13).w(this, FUNC(divebomb_state::rozcpu_enable2_w));
-	map(0x14, 0x14).w(this, FUNC(divebomb_state::rozcpu_wrap1_enable_w));
-	map(0x20, 0x2f).w(m_k051316_1, FUNC(k051316_device::ctrl_w));
-	map(0x30, 0x3f).w(m_k051316_2, FUNC(k051316_device::ctrl_w));
-	map(0x40, 0x40).rw(this, FUNC(divebomb_state::rozcpu_comm_r), FUNC(divebomb_state::rozcpu_comm_w));
+	map(0x10, 0x10).w(this, FUNC(divebomb_state::rozcpu_wrap_enable_w<1>));
+	map(0x12, 0x12).w(this, FUNC(divebomb_state::rozcpu_enable_w<0>));
+	map(0x13, 0x13).w(this, FUNC(divebomb_state::rozcpu_enable_w<1>));
+	map(0x14, 0x14).w(this, FUNC(divebomb_state::rozcpu_wrap_enable_w<0>));
+	map(0x20, 0x2f).w(m_k051316[0], FUNC(k051316_device::ctrl_w));
+	map(0x30, 0x3f).w(m_k051316[1], FUNC(k051316_device::ctrl_w));
+	map(0x40, 0x40).r("fg2roz", FUNC(generic_latch_8_device::read)).w(m_roz2fg_latch, FUNC(generic_latch_8_device::write));
 	map(0x50, 0x50).w(this, FUNC(divebomb_state::rozcpu_pal_w));
 }
 
@@ -258,43 +225,11 @@ void divebomb_state::divebomb_rozcpu_iomap(address_map &map)
 WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)
 {
 	uint32_t bank = bitswap<8>(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
-	m_bank1->set_entry(bank);
+	m_rozbank->set_entry(bank);
 
 	if (data & 0x0f)
 		logerror("rozcpu_bank_w %02x\n", data);
 }
-
-
-READ8_MEMBER(divebomb_state::rozcpu_comm_r)
-{
-	m_rozcpucpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-	return to_rozcpu;
-}
-
-
-WRITE8_MEMBER(divebomb_state::rozcpu_comm_w)
-{
-	from_roz = data;
-	has_fromroz = true;
-	update_irqs();
-}
-
-
-
-/*************************************
- *
- *  IRQs
- *
- *************************************/
-
-void divebomb_state::update_irqs()
-{
-	if (has_fromsprite || has_fromroz)
-		m_fgcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	else
-		m_fgcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-}
-
 
 
 /*************************************
@@ -420,9 +355,9 @@ static const gfx_layout tiles8x8_layout =
 	RGN_FRAC(1,1),
 	2,
 	{ 8,0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
+	8*8*2
 };
 
 
@@ -432,15 +367,15 @@ static const gfx_layout tiles16x16_layout =
 	RGN_FRAC(1,1),
 	4,
 	{ 24,16,8,0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 32,33,34,35,36,37,38,39 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
-	64*16
+	{ STEP8(0,1), STEP8(4*8,1) },
+	{ STEP16(0,4*16) },
+	16*16*4
 };
 
 
 static GFXDECODE_START( divebomb )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x400+0x400, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0x400+0x400+0x400, 16 )
+	GFXDECODE_ENTRY( "fgrom", 0, tiles8x8_layout, 0x400+0x400, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16_layout, 0x400+0x400+0x400, 16 )
 GFXDECODE_END
 
 
@@ -469,6 +404,21 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", divebomb_state,  nmi_line_pulse)
 
 	MCFG_QUANTUM_PERFECT_CPU("fgcpu")
+
+	MCFG_INPUT_MERGER_ANY_HIGH("fgcpu_irq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("fgcpu", INPUT_LINE_IRQ0))
+
+	MCFG_GENERIC_LATCH_8_ADD("fg2spr")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("spritecpu", INPUT_LINE_IRQ0))
+
+	MCFG_GENERIC_LATCH_8_ADD("fg2roz")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("rozcpu", INPUT_LINE_IRQ0))
+
+	MCFG_GENERIC_LATCH_8_ADD("spr2fg")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<0>))
+
+	MCFG_GENERIC_LATCH_8_ADD("roz2fg")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
 	MCFG_GFX_PALETTE("palette")
@@ -545,11 +495,11 @@ ROM_START( divebomb )
 	ROM_LOAD( "u11.27512", 0x20000, 0x10000, CRC(8d46be7d) SHA1(7751df1f39b208169f04a5b904cb63e9fb53bba8) )
 	// u12 not populated
 
-	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_REGION( 0x10000, "fgrom", 0 )
 	ROM_LOAD16_BYTE( "u22.27256", 0x00000, 0x08000, CRC(f816f9c5) SHA1(b8e136463a1b4c81960c6b7350472d82af0fb1fb) )
 	ROM_LOAD16_BYTE( "u23.27256", 0x00001, 0x08000, CRC(d2600570) SHA1(a7f7e182670e7b95321c4ec8278ce915bbe2b5ca) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD32_BYTE( "u15.27c100", 0x00000, 0x20000, CRC(ccba7fa0) SHA1(5eb4c1e458e7810e0f9db92946474d6da65f1a1b) )
 	ROM_LOAD32_BYTE( "u16.27c100", 0x00001, 0x20000, CRC(16891fef) SHA1(a4723958509bccc73138306e58c355325ec342a3) )
 	ROM_LOAD32_BYTE( "u17.27c100", 0x00002, 0x20000, CRC(f4cbc97f) SHA1(1e13bc18db128575ca8e6998e9dd6f7dc37a99b8) )
@@ -601,30 +551,22 @@ ROM_END
 
 MACHINE_START_MEMBER(divebomb_state, divebomb)
 {
-	m_bank1->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
+	m_rozbank->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
 
-	save_item(NAME(roz1_enable));
-	save_item(NAME(roz2_enable));
-	save_item(NAME(roz1_wrap));
-	save_item(NAME(roz2_wrap));
-	save_item(NAME(to_spritecpu));
-	save_item(NAME(to_rozcpu));
-	save_item(NAME(has_fromsprite));
-	save_item(NAME(has_fromroz));
-	save_item(NAME(from_sprite));
-	save_item(NAME(from_roz));
-	save_item(NAME(roz_pal));
+	save_item(NAME(m_roz_enable));
+	save_item(NAME(m_roz_pal));
 }
 
 
 MACHINE_RESET_MEMBER(divebomb_state, divebomb)
 {
-	roz1_enable = false;
-	roz2_enable = false;
-	roz1_wrap = false;
-	roz2_wrap = false;
-	has_fromsprite = false;
-	has_fromroz = false;
+	for (int chip = 0; chip < 2; chip++)
+	{
+		m_roz_enable[chip] = false;
+		m_k051316[chip]->wraparound_enable(false);
+	}
+	m_fgcpu_irq->in_w<0>(CLEAR_LINE);
+	m_fgcpu_irq->in_w<1>(CLEAR_LINE);
 }
 
 

@@ -38,7 +38,6 @@
 void xybots_state::update_interrupts()
 {
 	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -118,7 +117,7 @@ static INPUT_PORTS_START( xybots )
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa") /* /AUDBUSY */
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* 256H */
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* 256H */
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* VBLANK */
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -180,7 +179,6 @@ MACHINE_CONFIG_START(xybots_state::xybots)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xybots_state, video_int_gen)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
 
@@ -207,11 +205,12 @@ MACHINE_CONFIG_START(xybots_state::xybots)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(xybots_state, screen_update_xybots)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xybots_state, video_int_write_line))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(xybots_state, sound_int_write_line))
+	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_ATARI_JSA_TEST_PORT("FFE200", 8)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)

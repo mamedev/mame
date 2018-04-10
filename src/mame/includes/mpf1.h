@@ -32,26 +32,20 @@ public:
 			m_ctc(*this, Z80CTC_TAG),
 			m_speaker(*this, "speaker"),
 			m_cassette(*this, "cassette"),
-			m_pc0(*this, "PC0"),
-			m_pc1(*this, "PC1"),
-			m_pc2(*this, "PC2"),
-			m_pc3(*this, "PC3"),
-			m_pc4(*this, "PC4"),
-			m_pc5(*this, "PC5"),
-			m_special(*this, "SPECIAL")
+			m_pc(*this, "PC%u", 0U),
+			m_special(*this, "SPECIAL"),
+			m_digits(*this, "digit%u", 0U),
+			m_leds(*this, "led%u", 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
-	required_ioport m_pc0;
-	required_ioport m_pc1;
-	required_ioport m_pc2;
-	required_ioport m_pc3;
-	required_ioport m_pc4;
-	required_ioport m_pc5;
+	required_ioport_array<6> m_pc;
 	required_ioport m_special;
+	output_finder<6> m_digits;
+	output_finder<2> m_leds;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -30,9 +30,9 @@ tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-util::disasm_interface *tms57002_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms57002_device::create_disassembler()
 {
-	return new tms57002_disassembler;
+	return std::make_unique<tms57002_disassembler>();
 }
 
 WRITE_LINE_MEMBER(tms57002_device::pload_w)
@@ -724,7 +724,7 @@ void tms57002_device::execute_run()
 	while(icount > 0 && !(sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
 		int iipc;
 
-		debugger_instruction_hook(this, pc);
+		debugger_instruction_hook(pc);
 
 		if(ipc == -1)
 			ipc = decode_get_pc();
@@ -842,7 +842,7 @@ void tms57002_device::device_start()
 	state_add(TMS57002_HOST2, "HOST2",  host[2]);
 	state_add(TMS57002_HOST3, "HOST3",  host[3]);
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	stream_alloc(4, 4, STREAM_SYNC);
 

@@ -551,6 +551,18 @@ INTERRUPT_GEN_MEMBER(taitof2_state::taitof2_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
+INTERRUPT_GEN_MEMBER(taitof2_state::megab_interrupt)
+{
+	taitof2_interrupt(device);
+	m_cchip->ext_interrupt(ASSERT_LINE);
+	m_cchip_irq_clear->adjust(attotime::zero);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(taitof2_state::cchip_irq_clear_cb)
+{
+	m_cchip->ext_interrupt(CLEAR_LINE);
+}
+
 
 /****************************************************************
                             SOUND
@@ -2658,7 +2670,7 @@ static INPUT_PORTS_START( yesnoj )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME( "P2 No" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )                 /* printer : paper time-out ? */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )                 /* printer : paper time-out ? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -2666,9 +2678,9 @@ static INPUT_PORTS_START( yesnoj )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )                /* printer : unknown */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )                /* printer : paper */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )                 /* printer : unknown */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )                /* printer : unknown */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )                /* printer : paper */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )                 /* printer : unknown */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -2985,8 +2997,12 @@ MACHINE_CONFIG_START(taitof2_state::megab)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megab_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitof2_state,  megab_interrupt)
 
 	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(24'000'000)/2) /* 12MHz */
+	// the ports don't appear to hook up to anything
+
+	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", taitof2_state, cchip_irq_clear_cb)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_megab)
@@ -4057,7 +4073,7 @@ ROM_START( megablst )
 	ROM_LOAD16_BYTE( "c11-11.38",  0x40001, 0x20000, CRC(263ecbf9) SHA1(b49c59058d6d11ea0d9f9b041789e381e5742905) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_c11", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "c11-15.ic59", 0x0000, 0x2000, CRC(af49ee7f) SHA1(824d7ed371c19f31768b20117027edba6ffc890e) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
@@ -4093,7 +4109,7 @@ ROM_START( megablstu )
 	ROM_LOAD16_BYTE( "c11-10.38",  0x40001, 0x20000, CRC(bf379a43) SHA1(2a0294e55c2ce514caa2885b728e6387311ed482) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_c11", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "c11-15.ic59", 0x0000, 0x2000, CRC(af49ee7f) SHA1(824d7ed371c19f31768b20117027edba6ffc890e) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
@@ -4121,7 +4137,7 @@ ROM_START( megablstj )
 	ROM_LOAD16_BYTE( "c11-09.38",  0x40001, 0x20000, CRC(c830aad5) SHA1(967ad3e052572300f5f49375e5f8348f2d595680) ) // c11-09.18
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
-	ROM_LOAD( "cchip_c11", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "c11-15.ic59", 0x0000, 0x2000, CRC(af49ee7f) SHA1(824d7ed371c19f31768b20117027edba6ffc890e) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )

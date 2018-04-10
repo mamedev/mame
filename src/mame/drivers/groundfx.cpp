@@ -70,26 +70,10 @@
 #include "machine/taitoio.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "screen.h"
-
-
-/***********************************************************
-                INTERRUPTS
-***********************************************************/
-
-void groundfx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_GROUNDFX_INTERRUPT5:
-		m_maincpu->set_input_line(5, HOLD_LINE); //from 5... ADC port
-		break;
-	default:
-		assert_always(false, "Unknown id in groundfx_state::device_timer");
-	}
-}
 
 
 /**********************************************************
@@ -109,18 +93,6 @@ WRITE8_MEMBER(groundfx_state::coin_word_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-READ32_MEMBER(groundfx_state::adc_r)
-{
-	return (ioport("AN0")->read() << 8) | ioport("AN1")->read();
-}
-
-WRITE32_MEMBER(groundfx_state::adc_w)
-{
-	/* One interrupt per input port (4 per frame, though only 2 used).
-	    1000 cycle delay is arbitrary */
-	m_interrupt5_timer->adjust(m_maincpu->cycles_to_attotime(1000));
-}
-
 WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotation */
 {
 		if (ACCESSING_BITS_0_15)
@@ -134,7 +106,6 @@ WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotati
 			m_port_sel = (data &0x70000) >> 16;
 		}
 }
-
 
 WRITE32_MEMBER(groundfx_state::motor_control_w)
 {
@@ -152,6 +123,7 @@ WRITE32_MEMBER(groundfx_state::motor_control_w)
 */
 }
 
+
 /***********************************************************
              MEMORY STRUCTURES
 ***********************************************************/
@@ -163,7 +135,7 @@ void groundfx_state::groundfx_map(address_map &map)
 	map(0x300000, 0x303fff).ram().share("spriteram"); /* sprite ram */
 	map(0x400000, 0x400003).w(this, FUNC(groundfx_state::motor_control_w));  /* gun vibration */
 	map(0x500000, 0x500007).rw("tc0510nio", FUNC(tc0510nio_device::read), FUNC(tc0510nio_device::write));
-	map(0x600000, 0x600003).rw(this, FUNC(groundfx_state::adc_r), FUNC(groundfx_state::adc_w));
+	map(0x600000, 0x600007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask32(0xffffffff);
 	map(0x700000, 0x7007ff).rw("taito_en:dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
 	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::long_r), FUNC(tc0480scp_device::long_w));      /* tilemaps */
 	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_long_r), FUNC(tc0480scp_device::ctrl_long_w));  // debugging
@@ -182,11 +154,11 @@ void groundfx_state::groundfx_map(address_map &map)
 
 static INPUT_PORTS_START( groundfx )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )      /* shift hi */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )      /* brake */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift Hi")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Brake")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )      /* shift low */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Low")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -201,17 +173,11 @@ static INPUT_PORTS_START( groundfx )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN0")   /* IN 2, steering wheel */
+	PORT_START("WHEEL")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START("AN1")   /* IN 3, accel */
+	PORT_START("ACCEL")
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
-	PORT_START("AN2")   /* IN 4, sound volume */
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
-
-	PORT_START("AN3")   /* IN 5, unknown */
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 /**********************************************************
@@ -277,6 +243,13 @@ MACHINE_CONFIG_START(groundfx_state::groundfx)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", groundfx_state, interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 5))
+	MCFG_ADC0808_IN0_CB(NOOP) // unknown
+	MCFG_ADC0808_IN1_CB(NOOP) // unknown (used to be labeled 'volume' - but doesn't seem to affect it
+	MCFG_ADC0808_IN2_CB(IOPORT("WHEEL"))
+	MCFG_ADC0808_IN3_CB(IOPORT("ACCEL"))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("BUTTONS"))
@@ -387,8 +360,6 @@ DRIVER_INIT_MEMBER(groundfx_state,groundfx)
 {
 	uint8_t *gfx = memregion("gfx3")->base();
 	int size=memregion("gfx3")->bytes();
-
-	m_interrupt5_timer = timer_alloc(TIMER_GROUNDFX_INTERRUPT5);
 
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r),this));

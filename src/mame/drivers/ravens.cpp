@@ -89,6 +89,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "terminal")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(port07_r);
@@ -111,9 +112,11 @@ public:
 private:
 	uint8_t m_term_char;
 	uint8_t m_term_data;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	optional_device<generic_terminal_device> m_terminal;
 	required_device<cassette_image_device> m_cass;
+	output_finder<7> m_digits;
 };
 
 WRITE_LINE_MEMBER( ravens_state::cass_w )
@@ -128,7 +131,7 @@ READ_LINE_MEMBER( ravens_state::cass_r )
 
 WRITE8_MEMBER( ravens_state::display_w )
 {
-	output().set_digit_value(offset, data);
+	m_digits[offset] = data;
 }
 
 WRITE8_MEMBER( ravens_state::leds_w )
@@ -202,7 +205,7 @@ WRITE8_MEMBER( ravens_state::port1c_w )
 MACHINE_RESET_MEMBER( ravens_state, ravens2 )
 {
 	m_term_data = 0x80;
-	output().set_digit_value(6, 0);
+	m_digits[6] = 0;
 }
 
 

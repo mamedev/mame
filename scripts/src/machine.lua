@@ -1660,6 +1660,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mb89374.h,MACHINES["MB89374"] = true
+---------------------------------------------------
+
+if (MACHINES["MB89374"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mb89374.cpp",
+		MAME_DIR .. "src/devices/machine/mb89374.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mc146818.h,MACHINES["MC146818"] = true
 ---------------------------------------------------
 
@@ -3431,5 +3443,17 @@ if (MACHINES["28FXXX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/28fxxx.cpp",
 		MAME_DIR .. "src/devices/machine/28fxxx.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/gen_fifo.h,MACHINES["GEN_FIFO"] = true
+---------------------------------------------------
+
+if (MACHINES["GEN_FIFO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/gen_fifo.cpp",
+		MAME_DIR .. "src/devices/machine/gen_fifo.h",
 	}
 end

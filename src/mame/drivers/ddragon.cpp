@@ -682,7 +682,7 @@ static INPUT_PORTS_START( ddragon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state, subcpu_bus_free, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state, subcpu_bus_free, nullptr)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -947,14 +947,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ddragon_state::ddragon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
+	MCFG_CPU_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(ddragon_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)    /* 6 MHz / 4 internally */
+	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)    /* HD63701YOP, 6 MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", MC6809, MAIN_CLOCK / 2) /* 6 MHz / 4 internally */
+	MCFG_CPU_ADD("soundcpu", MC6809, MAIN_CLOCK / 2) /* HD68A09P, 6 MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
@@ -1072,7 +1072,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddragon_state::ddragon2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
+	MCFG_CPU_ADD("maincpu", HD6309E, MAIN_CLOCK / 4)     /* HD63C09EP, 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(dd2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 

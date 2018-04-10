@@ -537,6 +537,25 @@ ROM_START( amazonia )
 	ROM_LOAD( "igs_s2102.u28", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
 ROM_END
 
+ROM_START( amazonkp )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	/* Internal rom of IGS027A type G ARM based MCU */
+	ROM_LOAD( "amazonia_igs027a", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "ak_plus_v-204br.u23", 0x00000, 0x80000, CRC(e71f6272) SHA1(1717cc4dad9858f1a54988b7459631de8bac8ebd) )
+
+	ROM_REGION( 0x480000, "tilemaps", 0 )
+	ROM_LOAD( "igs_t2105.u12", 0x000000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x480000, "sprites", 0 )
+	ROM_LOAD( "igs_a2107.u13",      0x000000, 0x400000,CRC(d8dadfd7) SHA1(b40a46d56ff46d91e3377be8616c3eed321f7db4) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	ROM_LOAD( "ak_plus_ext_cg.u11", 0x400000, 0x80000, CRC(26796bc0) SHA1(bd259fbd05834de3d90af87235f13b467a492fed) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102.u37", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) ) // this came dumped with 4 identical quarters, 1 quarter matches the ROM from the amazonia set
+ROM_END
+
 /*
 Amazonia King II by IGS 2004 ( International Game System )
 Patented by EAGO.
@@ -1104,17 +1123,18 @@ DRIVER_INIT_MEMBER(igs_m027_state,amazoni2)
 
 ***************************************************************************/
 
-GAME( 1999,  slqz3,     0, igs_majhong, sdwx, igs_m027_state, slqz3,       ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
-GAME( 1999,  amazonia,  0, amazonia,amazonia, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
-GAME( 200?,  fruitpar,  0, igs_majhong, sdwx, igs_m027_state, fruitpar,    ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
-GAME( 2002,  sdwx,      0, igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
-GAME( 2002,  amazoni2,  0, igs_majhong, sdwx, igs_m027_state, amazoni2,    ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
-GAME( 200?,  sddz,      0, igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
-GAME( 2000,  zhongguo,  0, igs_majhong, sdwx, igs_m027_state, zhongguo,    ROT0, "IGS", "Zhong Guo Chu Da D",  MACHINE_IS_SKELETON )
-GAME( 200?,  lhzb3,     0, igs_majhong, sdwx, igs_m027_state, lhzb3,       ROT0, "IGS", "Long Hu Zheng Ba 3", MACHINE_IS_SKELETON )
-GAME( 200?,  lhzb4,     0, igs_majhong, sdwx, igs_m027_state, lhzb4,       ROT0, "IGS", "Long Hu Zheng Ba 4", MACHINE_IS_SKELETON )
-GAME( 200?,  klxyj,     0, igs_majhong, sdwx, igs_m027_state, klxyj,       ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
-GAME( 2000,  mgfx,      0, igs_majhong, sdwx, igs_m027_state, mgfx,        ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
-GAME( 200?,  gonefsh2,  0, igs_majhong, sdwx, igs_m027_state, gonefsh2,    ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
-GAME( 200?,  chessc2,   0, igs_majhong, sdwx, igs_m027_state, chessc2,     ROT0, "IGS", "Chess Challenge 2",   MACHINE_IS_SKELETON )
-GAME( 200?,  haunthig,  0, igs_majhong, sdwx, igs_m027_state, hauntedh,    ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )
+GAME( 1999,  slqz3,     0,        igs_majhong, sdwx, igs_m027_state, slqz3,       ROT0, "IGS", "Mahjong Shuang Long Qiang Zhu 3 (China, VS107C)", MACHINE_IS_SKELETON )
+GAME( 1999,  amazonia,  0,        amazonia,amazonia, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_IS_SKELETON )
+GAME( 1999,  amazonkp,  amazonia, amazonia,amazonia, igs_m027_state, amazonia,    ROT0, "IGS", "Amazonia King Plus (V204BR)", MACHINE_IS_SKELETON )
+GAME( 200?,  fruitpar,  0,        igs_majhong, sdwx, igs_m027_state, fruitpar,    ROT0, "IGS", "Fruit Paradise (V214)", MACHINE_IS_SKELETON )
+GAME( 2002,  sdwx,      0,        igs_majhong, sdwx, igs_m027_state, sdwx,        ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_IS_SKELETON ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
+GAME( 2002,  amazoni2,  0,        igs_majhong, sdwx, igs_m027_state, amazoni2,    ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_IS_SKELETON )
+GAME( 200?,  sddz,      0,        igs_majhong, sdwx, igs_m027_state, sddz,        ROT0, "IGS", "Super Dou Di Zhu",  MACHINE_IS_SKELETON )
+GAME( 2000,  zhongguo,  0,        igs_majhong, sdwx, igs_m027_state, zhongguo,    ROT0, "IGS", "Zhong Guo Chu Da D",  MACHINE_IS_SKELETON )
+GAME( 200?,  lhzb3,     0,        igs_majhong, sdwx, igs_m027_state, lhzb3,       ROT0, "IGS", "Long Hu Zheng Ba 3", MACHINE_IS_SKELETON )
+GAME( 200?,  lhzb4,     0,        igs_majhong, sdwx, igs_m027_state, lhzb4,       ROT0, "IGS", "Long Hu Zheng Ba 4", MACHINE_IS_SKELETON )
+GAME( 200?,  klxyj,     0,        igs_majhong, sdwx, igs_m027_state, klxyj,       ROT0, "IGS", "Kuai Le Xi You Ji",  MACHINE_IS_SKELETON )
+GAME( 2000,  mgfx,      0,        igs_majhong, sdwx, igs_m027_state, mgfx,        ROT0, "IGS", "Man Guan Fu Xing",   MACHINE_IS_SKELETON )
+GAME( 200?,  gonefsh2,  0,        igs_majhong, sdwx, igs_m027_state, gonefsh2,    ROT0, "IGS", "Gone Fishing 2",   MACHINE_IS_SKELETON )
+GAME( 200?,  chessc2,   0,        igs_majhong, sdwx, igs_m027_state, chessc2,     ROT0, "IGS", "Chess Challenge 2",   MACHINE_IS_SKELETON )
+GAME( 200?,  haunthig,  0,        igs_majhong, sdwx, igs_m027_state, hauntedh,    ROT0, "IGS", "Haunted House (IGS)",   MACHINE_IS_SKELETON )

@@ -41,6 +41,7 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(u10_a_r);
@@ -74,6 +75,7 @@ private:
 	uint8_t m_counter;
 	uint8_t m_segment[5];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
@@ -87,6 +89,7 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
+	output_finder<48> m_digits;
 };
 
 
@@ -616,11 +619,11 @@ WRITE8_MEMBER( st_mp100_state::u11_a_w )
 		if (BIT(data, 0) && (m_counter > 8))
 		{
 			static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-			output().set_digit_value(m_digit, patterns[m_segment[0]]);
-			output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
-			output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
-			output().set_digit_value(30+m_digit, patterns[m_segment[3]]);
-			output().set_digit_value(40+m_digit, patterns[m_segment[4]]);
+			m_digits[m_digit] = patterns[m_segment[0]];
+			m_digits[10+m_digit] = patterns[m_segment[1]];
+			m_digits[20+m_digit] = patterns[m_segment[2]];
+			m_digits[30+m_digit] = patterns[m_segment[3]];
+			m_digits[40+m_digit] = patterns[m_segment[4]];
 		}
 	}
 }

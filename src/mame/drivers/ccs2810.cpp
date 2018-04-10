@@ -916,7 +916,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2810)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_OUT1_CB(DEVWRITELINE("rs232", rs232_port_device, write_etc)) // RLSD
+	MCFG_INS8250_OUT_OUT1_CB(DEVWRITELINE("rs232", rs232_port_device, write_spds)) // RLSD
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ins8250", ins8250_device, rx_w))

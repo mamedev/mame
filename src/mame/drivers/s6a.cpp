@@ -65,6 +65,7 @@ public:
 		, m_pia24(*this, "pia24")
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(sound_r);
@@ -101,6 +102,7 @@ private:
 	emu_timer* m_irq_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<hc55516_device> m_hc55516;
@@ -109,6 +111,7 @@ private:
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
+	output_finder<32> m_digits;
 };
 
 void s6a_state::s6a_main_map(address_map &map)
@@ -313,8 +316,8 @@ WRITE8_MEMBER( s6a_state::dig1_w )
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
 	{
-		output().set_digit_value(m_strobe+16, patterns[data&15]);
-		output().set_digit_value(m_strobe, patterns[data>>4]);
+		m_digits[m_strobe+16] = patterns[data&15];
+		m_digits[m_strobe] = patterns[data>>4];
 	}
 	m_data_ok = false;
 }

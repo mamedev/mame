@@ -71,7 +71,6 @@
 
 void atarigt_state::update_interrupts()
 {
-	m_maincpu->set_input_line(3, m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(4, m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -93,10 +92,7 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 
 WRITE8_MEMBER(atarigt_state::cage_irq_callback)
 {
-	if (data)
-		sound_int_gen(*m_maincpu);
-	else
-		sound_int_ack_w(space,0,0);
+	m_maincpu->set_input_line(M68K_IRQ_3, data != 0 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*************************************
@@ -109,7 +105,6 @@ READ32_MEMBER(atarigt_state::special_port2_r)
 {
 	int temp = ioport("SERVICE")->read();
 	temp ^= 0x0001;     /* /A2DRDY always high for now */
-	temp ^= 0x0008;     /* A2D.EOC always high for now */
 	return (temp << 16) | temp;
 }
 
@@ -156,26 +151,32 @@ inline void atarigt_state::compute_fake_pots(int *pots)
 }
 
 
-READ32_MEMBER(atarigt_state::analog_port0_r)
+READ8_MEMBER(atarigt_state::analog_port_r)
 {
+	if (!m_adc.found())
+		return 0xff;
+
 #if (HACK_TMEK_CONTROLS)
 	int pots[4];
 	compute_fake_pots(pots);
-	return (pots[0] << 24) | (pots[3] << 8);
+	switch (offset)
+	{
+	case 2:
+		return pots[0];
+	case 3:
+		return pots[3];
+	case 6:
+		return pots[2];
+	case 7:
+		return pots[1];
+	default:
+		return 0xff;
+	}
 #else
-	return (ioport("AN1")->read() << 24) | (ioport("AN2")->read() << 8);
-#endif
-}
-
-
-READ32_MEMBER(atarigt_state::analog_port1_r)
-{
-#if (HACK_TMEK_CONTROLS)
-	int pots[4];
-	compute_fake_pots(pots);
-	return (pots[2] << 24) | (pots[1] << 8);
-#else
-	return (ioport("AN3")->read() << 24) | (ioport("AN4")->read() << 8);
+	uint8_t result = m_adc->data_r(space, 0);
+	if (!machine().side_effects_disabled())
+		m_adc->address_offset_start_w(space, offset, 0);
+	return result;
 #endif
 }
 
@@ -600,8 +601,7 @@ void atarigt_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	map(0xc00000, 0xc00003).rw(this, FUNC(atarigt_state::sound_data_r), FUNC(atarigt_state::sound_data_w));
-	map(0xd00014, 0xd00017).r(this, FUNC(atarigt_state::analog_port0_r));
-	map(0xd0001c, 0xd0001f).r(this, FUNC(atarigt_state::analog_port1_r));
+	map(0xd00010, 0xd0001f).r(this, FUNC(atarigt_state::analog_port_r)).umask32(0xff00ff00);
 	map(0xd20000, 0xd20fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0xd40000, 0xd4ffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write32));
 	map(0xd70000, 0xd7ffff).ram();
@@ -651,22 +651,22 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("SERVICE")       /* 68.STATUS (A2=0) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /A2DRDY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /A2DRDY */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_TILT )     /* TILT */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ23 */
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* A2D.EOC */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XIRQ23 */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )   /* A2D.EOC */
 	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )   /* NC */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           /* SELFTEST */
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")    /* VBLANK */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")          /* 68.STATUS (A2=1) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /VBIRQ */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /4MSIRQ */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ0 */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ1 */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SERVICER */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SER.L */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /VBIRQ */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /4MSIRQ */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XIRQ0 */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XIRQ1 */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SERVICER */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SER.L */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )    /* COINR */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )    /* COINL */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -682,6 +682,8 @@ static INPUT_PORTS_START( tmek )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 #else
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
 
 	PORT_START("AN1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
@@ -711,18 +713,6 @@ static INPUT_PORTS_START( primrage )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-
-	PORT_START("AN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -806,10 +796,15 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarigt_state, video_int_gen)
 	MCFG_CPU_PERIODIC_INT_DRIVER(atarigt_state, scanline_int_gen, 250)
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
+
+	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16) // should be 447 kHz according to schematics, but that fails the self-test
+	MCFG_ADC0808_IN2_CB(IOPORT("AN4"))
+	MCFG_ADC0808_IN3_CB(IOPORT("AN1"))
+	MCFG_ADC0808_IN6_CB(IOPORT("AN2"))
+	MCFG_ADC0808_IN7_CB(IOPORT("AN3"))
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -827,6 +822,7 @@ MACHINE_CONFIG_START(atarigt_state::atarigt)
 	/* the board uses a pair of GALs to determine H and V parameters */
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarigt_state, screen_update_atarigt)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarigt_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
@@ -848,6 +844,7 @@ MACHINE_CONFIG_START(atarigt_state::primrage)
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
+	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atarigt_state::primrage20)
@@ -856,6 +853,7 @@ MACHINE_CONFIG_START(atarigt_state::primrage20)
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
+	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 /*************************************

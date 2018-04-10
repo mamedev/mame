@@ -265,6 +265,10 @@
 	MCFG_PALETTE_ADD(_tag, 65536) \
 	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB), downcast<palette_device *>(device)));
 
+#define MCFG_PALETTE_ADD_BBBBBGGGGGGRRRRR(_tag) \
+	MCFG_PALETTE_ADD(_tag, 65536) \
+	downcast<palette_device &>(*device).set_init(palette_init_delegate(FUNC(palette_device::palette_init_BBBBBGGGGGGRRRRR), downcast<palette_device *>(device)));
+
 
 // other standard palettes
 #define MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS(_tag, _region, _entries) \
@@ -413,6 +417,7 @@ public:
 	void palette_init_RRRRRGGGGGBBBBB(palette_device &palette);
 	void palette_init_BBBBBGGGGGRRRRR(palette_device &palette);
 	void palette_init_RRRRRGGGGGGBBBBB(palette_device &palette);
+	void palette_init_BBBBBGGGGGGRRRRR(palette_device &palette);
 
 	// helper to update palette when data changed
 	void update() { if (!m_init.isnull()) m_init(*this); }

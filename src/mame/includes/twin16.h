@@ -77,8 +77,6 @@ public:
 
 	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_twin16);
-	INTERRUPT_GEN_MEMBER(CPUA_interrupt);
-	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
 	TIMER_CALLBACK_MEMBER(sprite_tick);
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	void devilw(machine_config &config);

@@ -200,7 +200,7 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -233,7 +233,7 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 
@@ -256,7 +256,7 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 };
 
 

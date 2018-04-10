@@ -67,6 +67,14 @@ using osd::s16;
 using osd::s32;
 using osd::s64;
 
+// useful utility functions
+using util::underlying_value;
+using util::enum_value;
+using util::BIT;
+using util::bitswap;
+using util::iabs;
+
+
 // genf is a generic function pointer; cast function pointers to this instead of void *
 typedef void genf(void);
 
@@ -242,29 +250,6 @@ inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 #define ENDIAN_VALUE_NE_NNE(endian,neval,nneval) (((endian) == ENDIANNESS_NATIVE) ? (neval) : (nneval))
 
 
-// useful functions to deal with bit shuffling encryptions
-template <typename T, typename U> constexpr T BIT(T x, U n) { return (x >> n) & T(1); }
-
-template <typename T, typename U> constexpr T bitswap(T val, U b)
-{
-	return BIT(val, b) << 0U;
-}
-
-template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b, V... c)
-{
-	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
-}
-
-// explicit version that checks number of bit position arguments
-template <unsigned B, typename T, typename... U> T bitswap(T val, U... b)
-{
-	static_assert(sizeof...(b) == B, "wrong number of bits");
-	static_assert((sizeof(std::remove_reference_t<T>) * 8) >= B, "return type too small for result");
-	return bitswap(val, b...);
-}
-
-
-
 //**************************************************************************
 //  EXCEPTION CLASSES
 //**************************************************************************
@@ -343,25 +328,6 @@ inline Dest downcast(Source &src)
 	return static_cast<Dest>(src);
 }
 
-// template function which takes a strongly typed enumerator and returns its value as a compile-time constant
-template <typename E>
-using enable_enum_t = typename std::enable_if_t<std::is_enum<E>::value, typename std::underlying_type_t<E>>;
-
-template <typename E>
-constexpr inline enable_enum_t<E>
-underlying_value(E e) noexcept
-{
-	return static_cast< typename std::underlying_type<E>::type >( e );
-}
-
-// template function which takes an integral value and returns its representation as enumerator (even strongly typed)
-template <typename E , typename T>
-constexpr inline typename std::enable_if_t<std::is_enum<E>::value && std::is_integral<T>::value, E>
-enum_value(T value) noexcept
-{
-	return static_cast<E>(value);
-}
-
 
 
 //**************************************************************************
@@ -420,14 +386,6 @@ inline u64 d2u(double d)
 	} u;
 	u.dd = d;
 	return u.vv;
-}
-
-
-// constexpr absolute value of an integer
-template <typename T>
-constexpr std::enable_if_t<std::is_signed<T>::value, T> iabs(T v)
-{
-	return (v < T(0)) ? -v : v;
 }
 
 #endif  /* MAME_EMU_EMUCORE_H */

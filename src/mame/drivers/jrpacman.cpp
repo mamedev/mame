@@ -117,7 +117,7 @@ public:
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(jrpacman);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void jrpacman(machine_config &config);
 	void main_map(address_map &map);
 	void port_map(address_map &map);
@@ -269,10 +269,10 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(jrpacman_state::vblank_irq)
+WRITE_LINE_MEMBER(jrpacman_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 MACHINE_CONFIG_START(jrpacman_state::jrpacman)
@@ -281,7 +281,6 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jrpacman_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("latch1", LS259, 0) // 5P
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jrpacman_state, irq_mask_w))
@@ -306,6 +305,7 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jrpacman_state, screen_update_pacman)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jrpacman_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jrpacman)
 	MCFG_PALETTE_ADD("palette", 128*4)

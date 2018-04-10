@@ -64,10 +64,10 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(timeplt_state::interrupt)
+WRITE_LINE_MEMBER(timeplt_state::vblank_irq)
 {
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -275,7 +275,7 @@ static INPUT_PORTS_START( chkun )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Bet 3B")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet 1B")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Bet 2B")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -324,7 +324,7 @@ static INPUT_PORTS_START( bikkuric )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -430,7 +430,6 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* not confirmed, but common for Konami games of the era */
 	MCFG_CPU_PROGRAM_MAP(timeplt_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  interrupt)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(timeplt_state, nmi_enable_w))
@@ -452,6 +451,7 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(timeplt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(timeplt_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", timeplt)
 	MCFG_PALETTE_ADD("palette", 32*4+64*4)
@@ -470,7 +470,9 @@ MACHINE_CONFIG_START(timeplt_state::psurge)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psurge_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  nmi_line_pulse)
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP)

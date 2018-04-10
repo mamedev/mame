@@ -1360,7 +1360,7 @@ void metro_state::vmetal_map(address_map &map)
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW,  IPT_START1   ) \
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW,  IPT_START2   ) \
 	PORT_BIT(  0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN  ) \
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF, metro_state,custom_soundstatus_r, nullptr)   /* From Sound CPU */
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_CUSTOM_MEMBER(DEVICE_SELF, metro_state,custom_soundstatus_r, nullptr)   /* From Sound CPU */
 
 
 #define COINAGE_SERVICE_LOC(DIPBANK) \
@@ -3251,7 +3251,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::puzzli)
 	daitorid(config);
-	
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_REMOVE()
 	MCFG_CPU_PERIODIC_INT_REMOVE()
@@ -3735,7 +3735,7 @@ MACHINE_CONFIG_START(metro_state::gstrik2)
 	MCFG_DEVICE_REMOVE("lspeaker")
 	MCFG_DEVICE_REMOVE("rspeaker")
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, 16_MHz_XTAL/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -4017,7 +4017,7 @@ Notes:
              HSync: 15.11kHz
 
 TODO:
-	HUM-002-A-(B) PCB set is also exists, but not dumped. it's blazing tornado conversion?
+    HUM-002-A-(B) PCB set is also exists, but not dumped. it's blazing tornado conversion?
 */
 
 
@@ -5674,7 +5674,7 @@ GAME( 1994, blzntrnd,  0,        blzntrnd,  blzntrnd,   metro_state, blzntrnd, R
 GAME( 1996, gstrik2,   0,        gstrik2,   gstrik2,    metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1996, gstrik2j,  gstrik2,  gstrik2,   gstrik2,    metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // priority between rounds
 
-// ES-9309B-B 
+// ES-9309B-B
 GAME( 1995, vmetal,    0,        vmetal,    vmetal,     metro_state, vmetal,   ROT90,  "Excellent System",                                "Varia Metal", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, vmetaln,   vmetal,   vmetal,    vmetal,     metro_state, vmetal,   ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)", MACHINE_SUPPORTS_SAVE )
 

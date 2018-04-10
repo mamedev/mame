@@ -46,11 +46,10 @@ Test Paste:
 
 void poly880_state::update_display()
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_digit, i)) output().set_digit_value(7 - i, m_segment);
+		if (BIT(m_digit, i))
+			m_digits[7 - i] = m_segment;
 	}
 }
 
@@ -191,9 +190,9 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 	{
 		if (BIT(m_digit, i))
 		{
-			if (!BIT(m_ki1->read(), i)) data &= ~0x10;
-			if (!BIT(m_ki2->read(), i)) data &= ~0x20;
-			if (!BIT(m_ki3->read(), i)) data &= ~0x80;
+			if (!BIT(m_ki[0]->read(), i)) data &= ~0x10;
+			if (!BIT(m_ki[1]->read(), i)) data &= ~0x20;
+			if (!BIT(m_ki[2]->read(), i)) data &= ~0x80;
 		}
 	}
 
@@ -237,6 +236,8 @@ static const z80_daisy_config poly880_daisy_chain[] =
 
 void poly880_state::machine_start()
 {
+	m_digits.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));

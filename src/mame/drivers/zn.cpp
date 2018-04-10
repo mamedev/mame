@@ -585,7 +585,7 @@ READ16_MEMBER(zn_state::capcom_kickharness_r)
 
 WRITE8_MEMBER(zn_state::bank_coh1000c_w)
 {
-	m_rombank[0]->set_entry( data );
+	m_rombank[0]->set_entry( data & 0x0f);
 }
 
 WRITE8_MEMBER(zn_state::qsound_bankswitch_w)
@@ -2858,7 +2858,7 @@ static INPUT_PORTS_START( jdredd )
 	PORT_BIT( 0x6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zn_state,jdredd_gun_mux_read, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zn_state,jdredd_gun_mux_read, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 

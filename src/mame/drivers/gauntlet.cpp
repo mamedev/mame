@@ -142,7 +142,6 @@
 void gauntlet_state::update_interrupts()
 {
 	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -493,7 +492,6 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gauntlet_state, video_int_gen)
 
 	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -521,9 +519,10 @@ MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(gauntlet_state, screen_update_gauntlet)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gauntlet_state, video_int_write_line))
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(gauntlet_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)

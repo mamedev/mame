@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:AJR
 /***********************************************************************************************************************************
 
 Skeleton driver for first-generation C. Itoh video terminals.
@@ -44,10 +44,11 @@ CIG-267
 ************************************************************************************************************************************/
 
 #include "emu.h"
-//#include "bus/rs232/rs232.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/er2055.h"
 #include "machine/i8251.h"
+#include "machine/input_merger.h"
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
 #include "screen.h"
@@ -115,12 +116,12 @@ void cit101_state::mem_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x4000, 0xbfff).ram();
 	map(0xc000, 0xcfff).ram().share("videoram");
-	map(0xfc00, 0xfc00).rw("usart0", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc01, 0xfc01).rw("usart0", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfc20, 0xfc20).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc21, 0xfc21).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xfc40, 0xfc40).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xfc41, 0xfc41).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc00, 0xfc00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xfc01, 0xfc01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc20, 0xfc20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xfc21, 0xfc21).rw("comuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xfc40, 0xfc40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xfc41, 0xfc41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xfc60, 0xfc63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc80, 0xfc83).w("pit0", FUNC(pit8253_device::write));
 	map(0xfcc0, 0xfcc3).w("pit1", FUNC(pit8253_device::write));
@@ -128,12 +129,12 @@ void cit101_state::mem_map(address_map &map)
 
 void cit101_state::io_map(address_map &map)
 {
-	map(0x00, 0x00).rw("usart0", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw("usart0", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x20, 0x20).rw("usart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x21, 0x21).rw("usart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x40, 0x40).rw("usart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw("usart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00, 0x00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x01, 0x01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x20, 0x20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x21, 0x21).rw("comuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x40, 0x40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x41, 0x41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x60, 0x63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa0).nopw(); // ?
 	map(0xe0, 0xe0).noprw(); // ?
@@ -153,21 +154,56 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_SCREEN_RAW_PARAMS(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240)
 	//MCFG_SCREEN_RAW_PARAMS(22.464_MHz_XTAL, 1440, 0, 1188, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(cit101_state, screen_update)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 
-	MCFG_DEVICE_ADD("usart0", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_DEVICE_ADD("usart1", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_DEVICE_ADD("usart2", I8251, 6.144_MHz_XTAL / 2)
+	MCFG_DEVICE_ADD("comuart", I8251, 6.144_MHz_XTAL / 2)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<2>))
 
-	//MCFG_RS232_PORT_ADD("comm", default_rs232_devices, nullptr)
-	//MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD("comm", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("comuart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("comuart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("comuart", i8251_device, write_cts))
+
+	MCFG_DEVICE_ADD("auxuart", I8251, 6.144_MHz_XTAL / 2)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<1>))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<3>))
+
+	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_cts))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("uartint")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE))
+
+	MCFG_DEVICE_ADD("kbduart", I8251, 6.144_MHz_XTAL / 2)
+	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
 
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
+	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
+	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
+	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
+
 	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
+	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
+	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
+	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(cit101_state, nvr_address_w))
 	MCFG_I8255_IN_PORTB_CB(READ8(cit101_state, nvr_data_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(cit101_state, nvr_data_w))
+	MCFG_I8255_IN_PORTC_CB(DEVREADLINE("comm", rs232_port_device, cts_r)) MCFG_DEVCB_BIT(0)
+	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, dcd_r)) MCFG_DEVCB_BIT(1) // tied to DSR for loopback test
+	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, ri_r)) MCFG_DEVCB_BIT(2) // tied to CTS for loopback test
+	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, si_r)) MCFG_DEVCB_BIT(3) // tied to CTS for loopback test
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(cit101_state, nvr_control_w))
 
 	MCFG_DEVICE_ADD("nvr", ER2055, 0)

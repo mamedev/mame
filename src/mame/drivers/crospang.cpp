@@ -406,7 +406,7 @@ MACHINE_CONFIG_START(crospang_state::bestria)
 MACHINE_CONFIG_END
 
 
-ROM_START( crospang )
+ROM_START( crospang ) /* Developed April 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "p1.bin", 0x00001, 0x20000, CRC(0bcbbaad) SHA1(807f07be340d7af0aad8d49461b5a7f0221ea3b7) )
 	ROM_LOAD16_BYTE( "p2.bin", 0x00000, 0x20000, CRC(0947d204) SHA1(35e7e277c51888a66d305994bf05c3f6bfc3c29e) )
@@ -529,7 +529,7 @@ ud17.e12 D
 
 */
 
-ROM_START( bestri )
+ROM_START( bestri ) /* Developed March 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ua02.i3", 0x00001, 0x80000, CRC(9e94023d) SHA1(61a07eb835d324cb4fe7e3d366dd3907838b2554) )
 	ROM_LOAD16_BYTE( "ua03.i5", 0x00000, 0x80000, CRC(08cfa8d8) SHA1(684729887bf2dd2fe22e5bd2e32073169d426e02) )
@@ -566,7 +566,7 @@ ROM_START( bestri )
 	ROM_LOAD16_BYTE( "ud17.e12", 0x100001, 0x80000, CRC(3a3a3f1a) SHA1(48843140cd63c9387e09b84bd41b13dba35f48ad) )
 ROM_END
 
-ROM_START( bestria )
+ROM_START( bestria ) /* Developed March 1998 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "o_ua02.i3", 0x00001, 0x80000, CRC(035c86f6) SHA1(d501553ed7fdb462c9c26fff6473cefe71424e26) )
 	ROM_LOAD16_BYTE( "e_ua03.i5", 0x00000, 0x80000, CRC(7c53d9f8) SHA1(92dc92471497292d3ba90f3f2fb35f7b4fba240c) )

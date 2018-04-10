@@ -96,8 +96,6 @@ class dc_state : public driver_device
 	TIMER_DEVICE_CALLBACK_MEMBER(dc_scanline);
 	DECLARE_MACHINE_RESET(dc_console);
 
-	DECLARE_INPUT_CHANGED_MEMBER(mastercpu_cheat_r);
-
 	void naomi_aw_base(machine_config &config);
 	void dc_audio_map(address_map &map);
 };

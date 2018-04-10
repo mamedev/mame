@@ -77,7 +77,7 @@ uint16_t bbc_state::calculate_video_address(uint16_t ma, uint8_t ra)
 	else
 		m = ((ma & 0xff)<<3) | (s<<11) | (ra & 0x7);
 
-	if (m_memorySize == 16) m &= 0x3fff;
+	if (m_ram->size() == 16 * 1024) m &= 0x3fff;
 
 	return m;
 }
@@ -266,6 +266,7 @@ WRITE_LINE_MEMBER(bbc_state::bbc_hsync_changed)
 WRITE_LINE_MEMBER(bbc_state::bbc_vsync_changed)
 {
 	m_vsync = state;
+	m_via6522_0->write_ca1(state); // screen refresh interrupts
 	m_trom->dew_w(state);
 }
 
@@ -281,13 +282,13 @@ WRITE_LINE_MEMBER(bbc_state::bbc_de_changed)
 
 /**** BBC B+/Master Shadow Ram change ****/
 
-void bbc_state::bbc_setvideoshadow(int vdusel)
+void bbc_state::setvideoshadow(int vdusel)
 {
 	// LYNNE lives at 0xb000 in our map, but the offset we use here is 0x8000
 	// as the video circuitry will already be looking at 0x3000 or so above
 	// the offset.
 	if (vdusel)
-		m_video_ram = m_region_maincpu->base()+0x8000;
+		m_video_ram = m_region_maincpu->base() + 0x8000;
 	else
 		m_video_ram = m_region_maincpu->base();
 }
@@ -304,5 +305,4 @@ VIDEO_START_MEMBER(bbc_state, bbc)
 	set_pixel_lookup();
 
 	m_video_ram = m_region_maincpu->base();
-	m_memorySize = m_ram->size() / 1024;
 }

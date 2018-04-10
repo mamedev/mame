@@ -131,8 +131,8 @@ public:
 	devcb_write_line                m_out_irq4_cb;
 	devcb_write_line                m_out_drq_cb;
 
-	device_iq151cart_interface*		m_cart;
-	required_device<screen_device>	m_screen;
+	device_iq151cart_interface*     m_cart;
+	required_device<screen_device>  m_screen;
 };
 
 

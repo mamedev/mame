@@ -24,7 +24,7 @@
 
 #define COP421_TAG      "u9f"
 #define KB_COP421_TAG   "kbcop"
-#define SCREEN_TAG		"screen"
+#define SCREEN_TAG      "screen"
 
 /* lisa MMU segment regs */
 struct real_mmu_entry

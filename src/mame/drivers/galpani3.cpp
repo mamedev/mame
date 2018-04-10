@@ -150,7 +150,7 @@ void galpani3_state::video_start()
 {
 	/* so we can use video/sknsspr.c */
 	m_spritegen->skns_sprite_kludge(0,0);
-	
+
 	m_spriteram32 = make_unique_clear<uint32_t[]>(0x4000/4);
 	m_spc_regs = make_unique_clear<uint32_t[]>(0x40/4);
 
@@ -190,9 +190,9 @@ void galpani3_state::video_start()
 uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = m_palette->pens();
-	
+
 	bitmap.fill(0, cliprect);
-	
+
 	m_sprite_bitmap.fill(0x0000, cliprect);
 
 	m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram32.get(), 0x4000, m_spc_regs.get() );
@@ -209,7 +209,7 @@ uint32_t galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rg
 			uint16_t* srcline3 = m_grap2[2]->m_framebuffer.get() + ((drawy+m_grap2[2]->m_framebuffer_scrolly+11)&0x1ff) * 0x200;
 
 			uint16_t* priline  = m_priority_buffer + ((drawy+m_priority_buffer_scrolly+11)&0x1ff) * 0x200;
-			
+
 			uint32_t* dst = &bitmap.pix32(drawy & 0x3ff);
 
 			for (drawx=cliprect.min_x;drawx<=cliprect.max_x;drawx++)
@@ -407,7 +407,7 @@ void galpani3_state::galpani3_map(address_map &map)
 	map(0x680000, 0x680001).w("toybox", FUNC(kaneko_toybox_device::mcu_com2_w));
 	map(0x700000, 0x700001).w("toybox", FUNC(kaneko_toybox_device::mcu_com3_w));
 	map(0x780000, 0x780001).r("toybox", FUNC(kaneko_toybox_device::mcu_status_r));
-	
+
 	map(0x800000, 0x9fffff).m("grap2_0", FUNC(kaneko_grap2_device::grap2_map));
 	map(0xa00000, 0xbfffff).m("grap2_1", FUNC(kaneko_grap2_device::grap2_map));
 	map(0xc00000, 0xdfffff).m("grap2_2", FUNC(kaneko_grap2_device::grap2_map));

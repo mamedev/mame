@@ -1341,7 +1341,7 @@ static INPUT_PORTS_START( digdug )
 	PORT_DIPSETTING(    0xc0, "5" )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, digdug_state,shifted_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, digdug_state,shifted_port_r, "DSWA")
 
 	PORT_START("DSWB") // reverse order against SWA
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SWB:1,2")
@@ -1368,7 +1368,7 @@ static INPUT_PORTS_START( digdug )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, digdug_state,shifted_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, digdug_state,shifted_port_r, "DSWB")
 INPUT_PORTS_END
 
 /*
@@ -1553,16 +1553,13 @@ static const char *const battles_sample_names[] =
 	nullptr   /* end of array */
 };
 
-INTERRUPT_GEN_MEMBER(galaga_state::main_vblank_irq)
+WRITE_LINE_MEMBER(galaga_state::vblank_irq)
 {
-	if(m_main_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
-}
+	if (state && m_main_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
-INTERRUPT_GEN_MEMBER(galaga_state::sub_vblank_irq)
-{
-	if(m_sub_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_sub_irq_mask)
+		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(bosco_state::bosco)
@@ -1570,11 +1567,9 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(bosco_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(bosco_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(bosco_map)
@@ -1643,6 +1638,7 @@ MACHINE_CONFIG_START(bosco_state::bosco)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 16, 224+16)
 	MCFG_SCREEN_UPDATE_DRIVER(bosco_state, screen_update_bosco)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bosco_state, screen_vblank_bosco))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(galaga_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bosco)
@@ -1669,11 +1665,9 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(galaga_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(galaga_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(galaga_map)
@@ -1720,6 +1714,7 @@ MACHINE_CONFIG_START(galaga_state::galaga)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(galaga_state, screen_update_galaga)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galaga_state, screen_vblank_galaga))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(galaga_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaga)
@@ -1776,11 +1771,9 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(xevious_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80,MASTER_CLOCK/6) /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(xevious_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(xevious_map)
@@ -1828,6 +1821,7 @@ MACHINE_CONFIG_START(xevious_state::xevious)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(xevious_state, screen_update_xevious)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galaga_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xevious)
 	MCFG_PALETTE_ADD("palette", 128*4+64*8+64*2)
@@ -1865,7 +1859,10 @@ MACHINE_CONFIG_START(xevious_state::battles)
 
 	MCFG_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(battles_mem4)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xevious_state, battles_interrupt_4)
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galaga_state, vblank_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(xevious_state, battles_interrupt_4))
 
 	MCFG_TIMER_DRIVER_ADD("battles_nmi", xevious_state, battles_nmi_generate)
 
@@ -1885,11 +1882,9 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(digdug_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(digdug_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaga_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)   /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(digdug_map)
@@ -1948,6 +1943,7 @@ MACHINE_CONFIG_START(digdug_state::digdug)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 288, 264, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(digdug_state, screen_update_digdug)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galaga_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", digdug)
 	MCFG_PALETTE_ADD("palette", 16*2+64*4+64*4)

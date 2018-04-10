@@ -47,30 +47,28 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_int_ack_w)
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
 {
-	output().set_value("lampGO", (data >> 0) & 1);
-	output().set_value("lampEP", (data >> 1) & 1);
+	output().set_value("lampGO", BIT(data, 0));
+	output().set_value("lampEP", BIT(data, 1));
 	machine().bookkeeping().coin_counter_w(0, data & 8);
 }
 
 
 /* uses a 7447A, which is equivalent to an LS47/48 */
-static const uint8_t ls48_map[16] =
+constexpr uint8_t ls48_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)
 {
 	data = data & 15;
-	output().set_digit_value(0x18 + offset, ls48_map[data]);
+	m_digits[24 + offset] = ls48_map[data];
 	m_led_TIME[offset] = data;
 }
 
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_score_w)
 {
-	char buf[20];
-	sprintf(buf, "LED%02d", offset);
 	data = ~data & 15;
-	output().set_digit_value(offset, ls48_map[data]);
+	m_digits[offset] = ls48_map[data];
 	m_led_SCORE[offset] = data;
 }
 

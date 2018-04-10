@@ -2,7 +2,6 @@
 // copyright-holders:Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
 
-#include "machine/eepromser.h"
 #include "video/resnet.h"
 
 class tnx1_state : public driver_device

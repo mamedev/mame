@@ -29,6 +29,7 @@
 #include "video/mc6845.h"
 #include "screen.h"
 #include "softlist.h"
+#include "imagedev/snapquik.h"
 #include "speaker.h"
 
 
@@ -100,6 +101,8 @@ public:
 	DECLARE_WRITE8_MEMBER(floppy_select_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	
+	DECLARE_QUICKLOAD_LOAD_MEMBER(smc777);
 
 	void smc777(machine_config &config);
 	void smc777_io(address_map &map);
@@ -391,6 +394,53 @@ WRITE8_MEMBER(smc777_state::fbuf_w)
 	vram_index |= ((offset & 0xff00) >> 8);
 
 	m_gvram[vram_index] = data;
+}
+
+
+/***********************************************************
+
+    Quickload
+
+    This loads a .COM file to address 0x100 then jumps
+    there. Sometimes .COM has been renamed to .CPM to
+    prevent windows going ballistic. These can be loaded
+    as well.
+
+************************************************************/
+
+QUICKLOAD_LOAD_MEMBER( smc777_state, smc777 )
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+
+	if (quickload_size >= 0xfd00)
+		return image_init_result::FAIL;
+
+	/* The right RAM bank must be active */
+
+	/* Avoid loading a program if CP/M-80 is not in memory */
+	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
+	{
+		machine_reset();
+		return image_init_result::FAIL;
+	}
+
+	/* Load image to the TPA (Transient Program Area) */
+	for (uint16_t i = 0; i < quickload_size; i++)
+	{
+		uint8_t data;
+		if (image.fread( &data, 1) != 1)
+			return image_init_result::FAIL;
+		prog_space.write_byte(i+0x100, data);
+	}
+
+	/* clear out command tail */
+	prog_space.write_byte(0x80, 0);   prog_space.write_byte(0x81, 0);
+
+	/* Roughly set SP basing on the BDOS position */
+	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
+	m_maincpu->set_pc(0x100);       // start program
+
+	return image_init_result::PASS;
 }
 
 READ8_MEMBER( smc777_state::fdc_r )
@@ -1006,6 +1056,7 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "smc777")
+	MCFG_QUICKLOAD_ADD("quickload", smc777_state, smc777, "com,cpm", 3)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -24,9 +24,9 @@ m65ce02_device::m65ce02_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-util::disasm_interface *m65ce02_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> m65ce02_device::create_disassembler()
 {
-	return new m65ce02_disassembler;
+	return std::make_unique<m65ce02_disassembler>();
 }
 
 void m65ce02_device::init()

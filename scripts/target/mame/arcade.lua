@@ -480,6 +480,7 @@ MACHINES["MB87078"] = true
 --MACHINES["MB8795"] = true
 MACHINES["MB89352"] = true
 MACHINES["MB89371"] = true
+MACHINES["MB89374"] = true
 --MACHINES["MC14411"] = true
 MACHINES["MC146818"] = true
 MACHINES["MC2661"] = true
@@ -618,6 +619,7 @@ MACHINES["WATCHDOG"] = true
 MACHINES["INPUT_MERGER"] = true
 MACHINES["K054321"] = true
 MACHINES["ADC0844"] = true
+MACHINES["GEN_FIFO"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1270,6 +1272,8 @@ files {
 	MAME_DIR .. "src/mame/video/atarimo.h",
 	MAME_DIR .. "src/mame/video/atarirle.cpp",
 	MAME_DIR .. "src/mame/video/atarirle.h",
+	MAME_DIR .. "src/mame/video/atarivad.cpp",
+	MAME_DIR .. "src/mame/video/atarivad.h",
 }
 
 createMAMEProjects(_target, _subtarget, "atlus")
@@ -1854,6 +1858,7 @@ files {
 	MAME_DIR .. "src/mame/includes/glass.h",
 	MAME_DIR .. "src/mame/video/glass.cpp",
 	MAME_DIR .. "src/mame/drivers/mastboy.cpp",
+	MAME_DIR .. "src/mame/drivers/mastboyo.cpp",
 	MAME_DIR .. "src/mame/drivers/rollext.cpp",
 	MAME_DIR .. "src/mame/drivers/splash.cpp",
 	MAME_DIR .. "src/mame/includes/splash.h",
@@ -3363,6 +3368,8 @@ files {
 	MAME_DIR .. "src/mame/video/zaxxon.cpp",
 	MAME_DIR .. "src/mame/machine/315_5296.cpp",
 	MAME_DIR .. "src/mame/machine/315_5296.h",
+	MAME_DIR .. "src/mame/machine/m1io.cpp",
+	MAME_DIR .. "src/mame/machine/m1io.h",
 	MAME_DIR .. "src/mame/machine/fd1089.cpp",
 	MAME_DIR .. "src/mame/machine/fd1089.h",
 	MAME_DIR .. "src/mame/machine/fd1094.cpp",

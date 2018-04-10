@@ -9,7 +9,7 @@
     Golden Tee variants & World Class Bowling Deluxe additions by Brian A. Troha
 
     Games supported:
-        * Time Killers (4 sets)
+        * Time Killers (5 sets)
         * Bloodstorm (5 sets)
         * Hard Yardage (3 sets)
         * Pairs (4 sets)
@@ -421,11 +421,14 @@ void itech32_state::itech32_update_interrupts(int vint, int xint, int qint)
 }
 
 
-INTERRUPT_GEN_MEMBER(itech32_state::generate_int1)
+WRITE_LINE_MEMBER(itech32_state::generate_int1)
 {
-	/* signal the NMI */
-	itech32_update_interrupts(1, -1, -1);
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+	if (state)
+	{
+		/* signal the NMI */
+		itech32_update_interrupts(1, -1, -1);
+		if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+	}
 }
 
 
@@ -1120,7 +1123,7 @@ static INPUT_PORTS_START( timekill )
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
 	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "-" )
 	PORT_DIPSETTING(      0x0010, "+" )
@@ -1165,7 +1168,7 @@ static INPUT_PORTS_START( itech32_base_16bit )
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
 	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, "-" )
 	PORT_DIPSETTING(      0x0010, "+" )
@@ -1283,7 +1286,7 @@ static INPUT_PORTS_START( drivedge )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_DIPNAME( 0x70000000, 0x00000000, "Network Number" ) PORT_DIPLOCATION("SW1:4,3,2")
 	PORT_DIPSETTING(          0x00000000, "1" )
 	PORT_DIPSETTING(          0x10000000, "2" )
@@ -1384,7 +1387,7 @@ static INPUT_PORTS_START( itech32_base_32bit )
 	PORT_SERVICE_NO_TOGGLE( 0x00010000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
 	PORT_DIPNAME( 0x00100000, 0x00000000, "Video Sync" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x00000000, "-" )
 	PORT_DIPSETTING(          0x00100000, "+" )
@@ -1684,7 +1687,6 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(timekill_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech32_state,  generate_int1)
 
 	MCFG_CPU_ADD("soundcpu", MC6809, SOUND_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1705,7 +1707,7 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 //  MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256) // sftm, wcbowl and shufshot configure it this way
 	MCFG_SCREEN_UPDATE_DRIVER(itech32_state, screen_update_itech32)
 	MCFG_SCREEN_PALETTE("palette")
-
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(itech32_state, generate_int1))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1769,6 +1771,9 @@ MACHINE_CONFIG_START(itech32_state::drivedge)
 	MCFG_MACHINE_RESET_OVERRIDE(itech32_state,drivedge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(NOOP) // interrupt not used?
+
 	MCFG_SPEAKER_STANDARD_STEREO("left_back", "right_back")
 
 	MCFG_SOUND_MODIFY("ensoniq")
@@ -1785,7 +1790,6 @@ MACHINE_CONFIG_START(itech32_state::sftm)
 
 	MCFG_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(itech020_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech32_state,  generate_int1)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(sound_020_map)
@@ -1820,12 +1824,8 @@ MACHINE_CONFIG_END
 #undef  CODE_SIZE
 #define CODE_SIZE   0x0400000
 
-/*
-NOTE: There is known to exist a Time Killer rom board P/N 1049 REV1 that uses 20 4Mbit EPROMs numbered GROM00 through GROM19
-instead of the 4 4Mbit EPROMs and 4 16Mbit MASK ROMs shown below as found on rom board P/N 1051 REV0
-*/
 
-ROM_START( timekill )
+ROM_START( timekill ) /* Version 1.32 (3-tier board set: P/N 1050 Rev 1, P/N 1051 Rev 0 &  P/N 1052 Rev 2) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.32_u54.u54", 0x00000, 0x40000, CRC(68c74b81) SHA1(acdf677f82d7428acc6cf01076d43dd6330e9cb3) ) /* Labeled TK00 V1.32 (U54) */
 	ROM_LOAD16_BYTE( "tk01_v1.32_u53.u53", 0x00001, 0x40000, CRC(2158d8ef) SHA1(14aa66e020a9fa890fadbaf0936dfdc4e272f543) ) /* Labeled TK01 V1.32 (U53) */
@@ -1853,7 +1853,7 @@ ROM_START( timekill )
 	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
 ROM_END
 
-ROM_START( timekill132i ) /* Additional Violence Level:  Level 4 - Limbs, Decapitations, No Blood */
+ROM_START( timekill132i ) /* Version 1.32I (3-tier board set: P/N 1050 Rev 1, P/N 1051 Rev 0 &  P/N 1052 Rev 2) - Additional Violence Level:  Level 4 - Limbs, Decapitations, No Blood */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.32i_u54.u54", 0x00000, 0x40000, CRC(6cef5e8c) SHA1(43cd3e704567be7a60558e12c43f0bb4456ec96d) ) /* Labeled TK00 V1.32I (U54) */
 	ROM_LOAD16_BYTE( "tk01_v1.32i_u53.u53", 0x00001, 0x40000, CRC(3360f6a3) SHA1(37b49928db6d672a2bc9ddf4d35d649655450c08) ) /* Labeled TK01 V1.32I (U53) */
@@ -1881,14 +1881,14 @@ ROM_START( timekill132i ) /* Additional Violence Level:  Level 4 - Limbs, Decapi
 	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
 ROM_END
 
-ROM_START( timekill131 )
+ROM_START( timekill131 ) /* Version 1.31 (3-tier board set: P/N 1050 Rev 1, P/N 1051 Rev 0 &  P/N 1052 Rev 2) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.31_u54.u54", 0x00000, 0x40000, CRC(e09ae32b) SHA1(b090a38600d0499f7b4cb80a2715f27216d408b0) ) /* Labeled TK00 V1.31 (U54) */
 	ROM_LOAD16_BYTE( "tk01_v1.31_u53.u53", 0x00001, 0x40000, CRC(c29137ec) SHA1(4dcfba13b6f865a256bcb0406b6c83c309b17313) ) /* Labeled TK01 V1.31 (U53) */
 
 	ROM_REGION( 0x28000, "soundcpu", 0 ) /* At 0x18002 in rom: ITS Ver 4.0 OTTO Sound Board 6255 I/O 6/3/92 */
-	ROM_LOAD( "tksnd.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) )
-	ROM_CONTINUE(          0x08000, 0x08000 )
+	ROM_LOAD( "timekillsnd_u17.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) ) /* Labeled TIMEKILLSND (U17) */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1051 REV0 */
 	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin MASK ROM */
@@ -1909,14 +1909,14 @@ ROM_START( timekill131 )
 	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
 ROM_END
 
-ROM_START( timekill121 )
+ROM_START( timekill121 ) /* Version 1.21 (3-tier board set: P/N 1050 Rev 1, P/N 1051 Rev 0 &  P/N 1052 Rev 2) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.21_u54.u54", 0x00000, 0x40000, CRC(4938a940) SHA1(c42c5067ba0536ab22071c80a50434905acd93c2) ) /* Labeled TK00 V1.21 (U54) */
 	ROM_LOAD16_BYTE( "tk01_v1.21_u53.u53", 0x00001, 0x40000, CRC(0bb75c40) SHA1(99829ecb0692ea8b313bd8c2e982258c97599b06) ) /* Labeled TK01 V1.21 (U53) */
 
 	ROM_REGION( 0x28000, "soundcpu", 0 ) /* At 0x18002 in rom: ITS Ver 4.0 OTTO Sound Board 6255 I/O 6/3/92 */
-	ROM_LOAD( "tksnd.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) )
-	ROM_CONTINUE(          0x08000, 0x08000 )
+	ROM_LOAD( "timekillsnd_u17.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) ) /* Labeled TIMEKILLSND (U17) */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1051 REV0 */
 	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin MASK ROM */
@@ -1930,6 +1930,43 @@ ROM_START( timekill121 )
 	ROM_LOAD32_BYTE( "timekill_grom02.grom2", 0x800001, 0x020000, CRC(e98492a4) SHA1(fe8fb4bd3900109f3872f2930e8ddc9d19f599fd) )
 	ROM_LOAD32_BYTE( "timekill_grom03.grom3", 0x800002, 0x020000, CRC(6088fa64) SHA1(a3eee10bdef48fefec3836f551172dbe0819acf6) )
 	ROM_LOAD32_BYTE( "timekill_grom04.grom4", 0x800003, 0x020000, CRC(95be2318) SHA1(60580c87d63a114df44e2580e138128388ff447b) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 ) /* Sound board P/N 1052 REV 4 */
+	ROM_LOAD16_BYTE( "tksrom00_u18.u18", 0x000000, 0x80000, CRC(79d8b83a) SHA1(78934b4d0ccca8fefcf8277e4296eb1d59cd575b) ) /* Labeled TKSROM00 (U18) */
+	ROM_LOAD16_BYTE( "tksrom01_u20.u20", 0x100000, 0x80000, CRC(ec01648c) SHA1(b83c66cf22db5d89b9ed79b79861b79429d8380c) ) /* Labeled TKSROM01 (U20) */
+	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
+ROM_END
+
+ROM_START( timekill121a ) /* Version 1.32 (3-tier board set: P/N 1050 Rev 1, P/N 1049 Rev 1 &  P/N 1052 Rev 2) */
+	ROM_REGION16_BE( 0x80000, "user1", 0 )
+	ROM_LOAD16_BYTE( "tk00_v1.21_u54.u54", 0x00000, 0x40000, CRC(4938a940) SHA1(c42c5067ba0536ab22071c80a50434905acd93c2) ) /* Labeled TK00 V1.21 (U54) */
+	ROM_LOAD16_BYTE( "tk01_v1.21_u53.u53", 0x00001, 0x40000, CRC(0bb75c40) SHA1(99829ecb0692ea8b313bd8c2e982258c97599b06) ) /* Labeled TK01 V1.21 (U53) */
+
+	ROM_REGION( 0x28000, "soundcpu", 0 ) /* At 0x18002 in rom: ITS Ver 4.0 OTTO Sound Board 6255 I/O 6/3/92 */
+	ROM_LOAD( "timekillsnd_u17.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) ) /* Labeled TIMEKILLSND (U17) */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1049 REV1 */
+	ROM_LOAD32_BYTE( "timekill_grom00.grom00", 0x000000, 0x080000, CRC(980aab02) SHA1(c5ce18748b1677d7b8fc599355d282d7fb9dda11) )
+	ROM_LOAD32_BYTE( "timekill_grom05.grom05", 0x000001, 0x080000, CRC(0b28ae65) SHA1(854091d312512eedb0f5acc7b31d7033dd138352) )
+	ROM_LOAD32_BYTE( "timekill_grom10.grom10", 0x000002, 0x080000, CRC(6092c59e) SHA1(70be57e2039786f9384f7d39daccfea3028afdd6) )
+	ROM_LOAD32_BYTE( "timekill_grom15.grom15", 0x000003, 0x080000, CRC(b08497c1) SHA1(8a7f4fffae2903e38c4f00662bcf3dee3086c087) )
+	ROM_LOAD32_BYTE( "timekill_grom01.grom01", 0x200000, 0x080000, CRC(c37d9486) SHA1(a0623855ffb72d4a8e1b22476481a8d3bf3d9813) )
+	ROM_LOAD32_BYTE( "timekill_grom06.grom06", 0x200001, 0x080000, CRC(f698fc14) SHA1(5325faa3fababa2e5492f2aedb759ec5774f9482) )
+	ROM_LOAD32_BYTE( "timekill_grom11.grom11", 0x200002, 0x080000, CRC(69735cd0) SHA1(3deef8975eeca41c6588bb39185b6ecd8286f6bf) )
+	ROM_LOAD32_BYTE( "timekill_grom16.grom16", 0x200003, 0x080000, CRC(1fe7cd97) SHA1(f7d29e9fe228b0e5d768b8eefc6fe945e54c1682) )
+	ROM_LOAD32_BYTE( "timekill_grom02.grom02", 0x400000, 0x080000, CRC(a7b9240c) SHA1(e80728b2f09cbef3fce7cd3653cddd28f494f4c0) )
+	ROM_LOAD32_BYTE( "timekill_grom07.grom07", 0x400001, 0x080000, CRC(fb9c04d2) SHA1(44063fe860473891276021d2561c692e50e6f8fb) )
+	ROM_LOAD32_BYTE( "timekill_grom12.grom12", 0x400002, 0x080000, CRC(383adf84) SHA1(c03bb975646c01c731bd1cd6c89ef9d14bf83da8) )
+	ROM_LOAD32_BYTE( "timekill_grom17.grom17", 0x400003, 0x080000, CRC(77dcbf80) SHA1(06bf9e83d93f7e980f83a5a7dc5cd3016315c54c) )
+	ROM_LOAD32_BYTE( "timekill_grom03.grom03", 0x600000, 0x080000, CRC(7a464aa0) SHA1(57af1d838534117c459146d1f375900337a8b99d) )
+	ROM_LOAD32_BYTE( "timekill_grom08.grom08", 0x600001, 0x080000, CRC(7d6f7ba9) SHA1(cc4a51a3e883345d3dee600913f3d6ba5b74951e) )
+	ROM_LOAD32_BYTE( "timekill_grom13.grom13", 0x600002, 0x080000, CRC(ecde039d) SHA1(83f5d979e3055ac09b5b652e40115338559f9a53) )
+	ROM_LOAD32_BYTE( "timekill_grom18.grom18", 0x600003, 0x080000, CRC(05cb6d82) SHA1(ddba15ceabcbcce86baf95d844e3ef5e1246d926) )
+	ROM_LOAD32_BYTE( "timekill_grom04.grom04", 0x800000, 0x020000, CRC(b030c3d9) SHA1(f5c21285ec8ff4f74205e0cf18da67e733e31183) ) /* == timekill_grom01.grom1 */
+	ROM_LOAD32_BYTE( "timekill_grom09.grom09", 0x800001, 0x020000, CRC(e98492a4) SHA1(fe8fb4bd3900109f3872f2930e8ddc9d19f599fd) ) /* == timekill_grom02.grom2 */
+	ROM_LOAD32_BYTE( "timekill_grom14.grom14", 0x800002, 0x020000, CRC(6088fa64) SHA1(a3eee10bdef48fefec3836f551172dbe0819acf6) ) /* == timekill_grom03.grom3 */
+	ROM_LOAD32_BYTE( "timekill_grom19.grom19", 0x800003, 0x020000, CRC(95be2318) SHA1(60580c87d63a114df44e2580e138128388ff447b) ) /* == timekill_grom04.grom4 */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 ) /* Sound board P/N 1052 REV 4 */
 	ROM_LOAD16_BYTE( "tksrom00_u18.u18", 0x000000, 0x80000, CRC(79d8b83a) SHA1(78934b4d0ccca8fefcf8277e4296eb1d59cd575b) ) /* Labeled TKSROM00 (U18) */
@@ -2127,7 +2164,7 @@ ROM_START( bloodstm10 )
 ROM_END
 
 
-ROM_START( hardyard )   /* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( hardyard ) /* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "fb00_v1.20_u83.u83", 0x00000, 0x40000, CRC(c7497692) SHA1(6c11535cf011e15dd7ffb5eba8e8da557c38277e) ) /* Labeled FB00 V1.20 (U83) */
 	ROM_LOAD16_BYTE( "fb01_v1.20_u88.u88", 0x00001, 0x40000, CRC(3320c79a) SHA1(d1d32048c541782e60c525d9789fe12607a6df3a) ) /* Labeled FB01 V1.20 (U88) */
@@ -2159,7 +2196,7 @@ ROM_START( hardyard )   /* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 1
 ROM_END
 
 
-ROM_START( hardyard11 )   /* Version 1.1 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( hardyard11 ) /* Version 1.1 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "fb00_v1.10_u83.u83", 0x00000, 0x40000, CRC(603f8a03) SHA1(b6c037c960dd09269b948533109ff379e091c62d) ) /* Labeled FB00 V1.10 (U83) */
 	ROM_LOAD16_BYTE( "fb01_v1.10_u88.u88", 0x00001, 0x40000, CRC(7b11db88) SHA1(d45eb5dece4b86b833f0824ffc04ad406a15603d) ) /* Labeled FB01 V1.10 (U88) */
@@ -4627,6 +4664,7 @@ GAME( 1992, timekill,     0,        timekill, timekill, itech32_state, timekill,
 GAME( 1992, timekill132i, timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32I)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, timekill131,  timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.31)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, timekill121,  timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, timekill121a, timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21, alternate ROM board)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hardyard,     0,        bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.20)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hardyard11,   hardyard, bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hardyard10,   hardyard, bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.00)", MACHINE_SUPPORTS_SAVE )

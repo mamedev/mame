@@ -235,9 +235,12 @@ TIMER_CALLBACK_MEMBER(gaplus_state::namcoio1_run)
 	m_namco56xx->customio_run();
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::vblank_main_irq)
+WRITE_LINE_MEMBER(gaplus_state::vblank_irq)
 {
-	if(m_main_irq_mask)
+	if (!state)
+		return;
+
+	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!m_namco58xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
@@ -245,29 +248,32 @@ INTERRUPT_GEN_MEMBER(gaplus_state::vblank_main_irq)
 
 	if (!m_namco56xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
 		m_namcoio1_run_timer->adjust(attotime::from_usec(50));
-}
 
-INTERRUPT_GEN_MEMBER(gaplus_state::gapluso_vblank_main_irq)
-{
-	if(m_main_irq_mask)
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-
-	if (!m_namco58xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
-		m_namcoio1_run_timer->adjust(attotime::from_usec(50));
-
-	if (!m_namco56xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
-		m_namcoio0_run_timer->adjust(attotime::from_usec(50));
-}
-
-INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub_irq)
-{
-	if(m_sub_irq_mask)
+	if (m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
+
+	if (m_sub2_irq_mask)
+		m_subcpu2->set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub2_irq)
+WRITE_LINE_MEMBER(gaplus_state::gapluso_vblank_irq)
 {
-	if(m_sub2_irq_mask)
+	if (!state)
+		return;
+
+	if (m_main_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+
+	if (!m_namco58xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
+		m_namcoio1_run_timer->adjust(attotime::from_usec(50));
+
+	if (!m_namco56xx->read_reset_line())       /* give the cpu a tiny bit of time to write the command before processing it */
+		m_namcoio0_run_timer->adjust(attotime::from_usec(50));
+
+	if (m_sub_irq_mask)
+		m_subcpu->set_input_line(0, ASSERT_LINE);
+
+	if (m_sub2_irq_mask)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);
 }
 
@@ -520,15 +526,12 @@ MACHINE_CONFIG_START(gaplus_state::gaplus)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(24'576'000)/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_main_irq)
 
 	MCFG_CPU_ADD("sub", MC6809E, XTAL(24'576'000)/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_sub_irq)
 
 	MCFG_CPU_ADD("sub2", MC6809E, XTAL(24'576'000)/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_sub2_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* a high value to ensure proper synchronization of the CPUs */
 
@@ -564,6 +567,7 @@ MACHINE_CONFIG_START(gaplus_state::gaplus)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaplus_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gaplus_state, screen_vblank))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(gaplus_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaplus)
@@ -604,8 +608,9 @@ MACHINE_CONFIG_START(gaplus_state::gapluso)
 	gaplusd(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  gapluso_vblank_main_irq)
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(gaplus_state, screen_vblank))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(gaplus_state, gapluso_vblank_irq))
 
 	MCFG_DEVICE_REPLACE("namcoio_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(IOPORT("COINS"))

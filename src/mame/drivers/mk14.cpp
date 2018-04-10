@@ -54,6 +54,7 @@ public:
 		, m_keyboard(*this, "X.%u", 0)
 		, m_cass(*this, "cassette")
 		, m_dac(*this, "dac")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -65,10 +66,12 @@ public:
 	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<8> m_keyboard;
 	required_device<cassette_image_device> m_cass;
 	required_device<dac_bit_interface> m_dac;
+	output_finder<8> m_digits;
 };
 
 /*
@@ -100,7 +103,7 @@ READ8_MEMBER( mk14_state::keyboard_r )
 WRITE8_MEMBER( mk14_state::display_w )
 {
 	if (offset < 8 )
-		output().set_digit_value(offset, data);
+		m_digits[offset] = data;
 	else
 	{
 		//logerror("write %02x to %02x\n",data,offset);
@@ -189,6 +192,11 @@ READ_LINE_MEMBER( mk14_state::cass_r )
 
 void mk14_state::machine_reset()
 {
+}
+
+void mk14_state::machine_start()
+{
+	m_digits.resolve();
 }
 
 MACHINE_CONFIG_START(mk14_state::mk14)

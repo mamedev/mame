@@ -16925,7 +16925,7 @@
 
 	<software name="pokeyells" cloneof="pokeyell">
 		<!-- Notes: SGB enhanced -->
-		<description>Pokémon - Edicion Amarilla (Spa)</description>
+		<description>Pokémon - Edición Amarilla (Spa)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-APSS-ESP"/>
