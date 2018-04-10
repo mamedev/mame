@@ -124,7 +124,6 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 
 #include "speaker.h"
 
