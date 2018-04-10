@@ -2729,6 +2729,20 @@
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<!-- TODO: playback doesn't work properly, needs mouse left button user pressed? Eventually hangs anyway. -->
+	<software name="whoshoti" supported="no">
+		<description>Who Shot Johnny Rock (Italy)</description>
+		<year>1993</year>
+		<publisher>American Laser Games</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="who shot johnny rock [DOS IT]" sha1="eb68c0469a43bd16d412180dc0022cb260a31773" />
+			</diskarea>
+		</part>
+	</software>
+	
 	<!-- Windows 95 -->
 	<!-- Contains Pressure Drop and Under Pressure games -->
 	<software name="wpressure">
