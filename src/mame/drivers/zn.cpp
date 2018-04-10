@@ -1085,7 +1085,7 @@ WRITE8_MEMBER(zn_state::bank_coh1000t_w)
 
 WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
 {
-	m_soundbank->set_entry( ( data - 1 ) & 0x07 );
+	m_soundbank->set_entry( data & 0x07 );
 }
 
 void zn_state::coh1000ta_map(address_map &map)
@@ -1102,7 +1102,7 @@ MACHINE_START_MEMBER(zn_state,coh1000ta)
 {
 	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
 	if (m_soundbank.found())
-		m_soundbank->configure_entries( 0, 8, memregion( "audiocpu" )->base() + 0x4000, 0x4000 );
+		m_soundbank->configure_entries( 0, 8, memregion( "audiocpu" )->base(), 0x4000 );
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
