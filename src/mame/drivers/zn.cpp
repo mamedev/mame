@@ -1112,7 +1112,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
 	m_rombank[0]->set_entry( 0 );
 	if (m_soundbank.found())
-		m_soundbank->set_entry( 0 );
+		m_soundbank->set_entry( 1 );
 }
 
 void zn_state::fx1a_sound_map(address_map &map)
