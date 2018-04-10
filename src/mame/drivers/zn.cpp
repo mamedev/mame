@@ -1102,10 +1102,7 @@ MACHINE_START_MEMBER(zn_state,coh1000ta)
 {
 	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
 	if (m_soundbank.found())
-	{
-		m_soundbank->configure_entry( 0, memregion( "audiocpu" )->base() + 0x1c000 );
-		m_soundbank->configure_entries( 1, 7, memregion( "audiocpu" )->base() + 0x4000, 0x4000 );
-	}
+		m_soundbank->configure_entries( 0, 8, memregion( "audiocpu" )->base(), 0x4000 ); /* TODO : Bank 0 is addressing First 16 KB of ROM? */
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
