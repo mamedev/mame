@@ -168,8 +168,9 @@ protected:
 	DECLARE_WRITE32_MEMBER(videoctl_w);
 	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
 	DECLARE_WRITE32_MEMBER(srallyc_devices_w);
-	DECLARE_READ8_MEMBER(hotd_lightgun_r);
-	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
+	DECLARE_READ8_MEMBER(lightgun_coords_r);
+	DECLARE_READ8_MEMBER(lightgun_offscreen_r);
+	DECLARE_WRITE8_MEMBER(lightgun_mux_w);
 	DECLARE_READ32_MEMBER(irq_request_r);
 	DECLARE_WRITE32_MEMBER(irq_ack_w);
 	DECLARE_READ32_MEMBER(irq_enable_r);
@@ -207,8 +208,6 @@ protected:
 //  DECLARE_WRITE_LINE_MEMBER(sound_ready_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	DECLARE_WRITE8_MEMBER(scsp_irq);
-	DECLARE_READ8_MEMBER(virtuacop_lightgun_r);
-	DECLARE_READ8_MEMBER(virtuacop_lightgun_offscreen_r);
 
 	void model2_3d_frame_start( void );
 	void geo_parse( void );
