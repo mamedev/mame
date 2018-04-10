@@ -534,9 +534,6 @@ static GFXDECODE_START( grchamp )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,       0, 2 )
 	GFXDECODE_ENTRY( "gfx4", 0x0000, tile_layout,       0, 2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprite_layout,     0, 8 )
-	GFXDECODE_ENTRY( "gfx5", 0x0000, tile_layout,       0, 2 )
-	GFXDECODE_ENTRY( "gfx6", 0x0000, tile_layout,       0, 2 )
-	GFXDECODE_ENTRY( "gfx7", 0x0000, tile_layout,       0, 2 )
 GFXDECODE_END
 
 
