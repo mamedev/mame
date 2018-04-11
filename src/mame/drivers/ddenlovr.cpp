@@ -2289,27 +2289,29 @@ void ddenlovr_state::quizchq_map(address_map &map)
 
 void ddenlovr_state::quizchq_portmap(address_map &map)
 {
-	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map.global_mask(0xff);
 
-	map(0x20, 0x20).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
-	map(0x22, 0x23).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_input2_r));
+	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
 
-	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x60, 0x61).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x20, 0x20).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0x22, 0x23).r(this, FUNC(ddenlovr_state::rongrong_input2_r));
 
-	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                         // ? must be 78 on startup
+	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x60, 0x61).w("ym2413", FUNC(ym2413_device::write));
 
-	map(0xa0, 0xaf).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xc0, 0xc0).mirror(0xff00).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
-	map(0xc2, 0xc2).mirror(0xff00).nopw();                        // enables palette RAM at 8000
+	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r));                         // ? must be 78 on startup
+
+	map(0xa0, 0xaf).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xc0, 0xc0).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
+	map(0xc2, 0xc2).nopw();                        // enables palette RAM at 8000
 }
 
 
@@ -2325,25 +2327,27 @@ void ddenlovr_state::rongrong_map(address_map &map)
 
 void ddenlovr_state::rongrong_portmap(address_map &map)
 {
-	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map.global_mask(0xff);
 
-	map(0x20, 0x2f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x60, 0x61).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
 
-	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
+	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x60, 0x61).w("ym2413", FUNC(ym2413_device::write));
 
-	map(0xa0, 0xa0).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
-	map(0xa2, 0xa3).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_input2_r));
-	map(0xc2, 0xc2).mirror(0xff00).nopw();                                    // enables palette RAM at f000, and protection device at f705/f706/f601
+	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
+
+	map(0xa0, 0xa0).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0xa2, 0xa3).r(this, FUNC(ddenlovr_state::rongrong_input2_r));
+	map(0xc2, 0xc2).nopw();                                    // enables palette RAM at f000, and protection device at f705/f706/f601
 }
 /*
 1e input select,1c input read
@@ -2587,30 +2591,31 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_lockout_w)
 
 void ddenlovr_state::funkyfig_portmap(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
-	map(0x01, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::mmpanic_leds_w));       // Leds
-	map(0x02, 0x02).mirror(0xff00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x04, 0x04).mirror(0xff00).r(this, FUNC(ddenlovr_state::funkyfig_busy_r));
-	map(0x20, 0x21).mirror(0xff00).w(this, FUNC(ddenlovr_state::funkyfig_blitter_w));
-	map(0x23, 0x23).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));     // Video Chip
-	map(0x40, 0x4f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
+	map(0x01, 0x01).w(this, FUNC(ddenlovr_state::mmpanic_leds_w));       // Leds
+	map(0x02, 0x02).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x04, 0x04).r(this, FUNC(ddenlovr_state::funkyfig_busy_r));
+	map(0x20, 0x21).w(this, FUNC(ddenlovr_state::funkyfig_blitter_w));
+	map(0x23, 0x23).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));     // Video Chip
+	map(0x40, 0x4f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 
 	// Layers 0-3:
-	map(0x60, 0x63).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x64, 0x67).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x68, 0x6b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x6c, 0x6f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x74, 0x74).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x75, 0x75).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x76, 0x76).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x78, 0x78).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                 // ? must be 78 on startup
+	map(0x60, 0x63).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x64, 0x67).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x68, 0x6b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x6c, 0x6f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x74, 0x74).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x75, 0x75).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x76, 0x76).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x78, 0x78).r(this, FUNC(ddenlovr_state::unk_r));                 // ? must be 78 on startup
 
-	map(0x80, 0x80).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
-	map(0x81, 0x81).mirror(0xff00).w(this, FUNC(ddenlovr_state::funkyfig_lockout_w));
-	map(0x82, 0x82).mirror(0xff00).r(this, FUNC(ddenlovr_state::funkyfig_coin_r));
-	map(0x83, 0x83).mirror(0xff00).r(this, FUNC(ddenlovr_state::funkyfig_key_r));
+	map(0x80, 0x80).w(this, FUNC(ddenlovr_state::ddenlovr_select2_w));
+	map(0x81, 0x81).w(this, FUNC(ddenlovr_state::funkyfig_lockout_w));
+	map(0x82, 0x82).r(this, FUNC(ddenlovr_state::funkyfig_coin_r));
+	map(0x83, 0x83).r(this, FUNC(ddenlovr_state::funkyfig_key_r));
 
-	map(0xa2, 0xa2).mirror(0xff00).w(this, FUNC(ddenlovr_state::mmpanic_leds2_w));
+	map(0xa2, 0xa2).w(this, FUNC(ddenlovr_state::mmpanic_leds2_w));
 }
 
 
@@ -3037,38 +3042,40 @@ READ8_MEMBER(ddenlovr_state::mjschuka_protection_r)
 
 void ddenlovr_state::mjschuka_portmap(address_map &map)
 {
-	map(0x00, 0x0f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map.global_mask(0xff);
 
-	map(0x20, 0x23).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x24, 0x27).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x28, 0x2b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x2c, 0x2f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x34, 0x34).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x35, 0x35).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x38, 0x38).mirror(0xff00).nopr();         // ? ack or watchdog
+	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 
-	map(0x40, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x50, 0x50).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjflove_okibank_w));
+	map(0x20, 0x23).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).nopr();         // ? ack or watchdog
 
-	map(0x54, 0x54).mirror(0xff00).rw(this, FUNC(ddenlovr_state::mjschuka_protection_r), FUNC(ddenlovr_state::mjschuka_protection_w));
+	map(0x40, 0x41).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x50, 0x50).w(this, FUNC(ddenlovr_state::mjflove_okibank_w));
+
+	map(0x54, 0x54).rw(this, FUNC(ddenlovr_state::mjschuka_protection_r), FUNC(ddenlovr_state::mjschuka_protection_w));
 	// 58 writes ? (0/1)
-	map(0x5c, 0x5c).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x5c, 0x5c).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
 
-	map(0x60, 0x60).mirror(0xff00).w(this, FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x61, 0x61).mirror(0xff00).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x62, 0x62).mirror(0xff00).portr("SYSTEM");
-	map(0x63, 0x64).mirror(0xff00).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
+	map(0x60, 0x60).w(this, FUNC(ddenlovr_state::sryudens_coincounter_w));
+	map(0x61, 0x61).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x62, 0x62).portr("SYSTEM");
+	map(0x63, 0x64).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
 
-	map(0x68, 0x68).mirror(0xff00).portr("DSW1");
-	map(0x69, 0x69).mirror(0xff00).portr("DSW2");
-	map(0x6a, 0x6a).mirror(0xff00).portr("DSW3");
-	map(0x6b, 0x6b).mirror(0xff00).portr("DSW4");
-	map(0x6c, 0x6c).mirror(0xff00).portr("DSW5");     // DSW 1-4 high bits
-	map(0x70, 0x71).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x74, 0x74).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x78, 0x79).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0x68, 0x68).portr("DSW1");
+	map(0x69, 0x69).portr("DSW2");
+	map(0x6a, 0x6a).portr("DSW3");
+	map(0x6b, 0x6b).portr("DSW4");
+	map(0x6c, 0x6c).portr("DSW5");     // DSW 1-4 high bits
+	map(0x70, 0x71).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x74, 0x74).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x78, 0x79).w("ym2413", FUNC(ym2413_device::write));
 }
 
 
@@ -3169,28 +3176,29 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjmyster_blitter_irq)
 
 void ddenlovr_state::mjmyster_portmap(address_map &map)
 {
-	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x20, 0x20).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjmyster_select2_w));
-	map(0x21, 0x21).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjmyster_coincounter_w));
-	map(0x22, 0x22).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_coins_r));
-	map(0x23, 0x23).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_keyb_r));
-	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x42, 0x43).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0x44, 0x44).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x46, 0x46).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x48, 0x48).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x60, 0x6f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                         // ? must be 78 on startup
-	map(0xc2, 0xc2).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0xc3, 0xc3).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_dsw_r));
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x20, 0x20).w(this, FUNC(ddenlovr_state::mjmyster_select2_w));
+	map(0x21, 0x21).w(this, FUNC(ddenlovr_state::mjmyster_coincounter_w));
+	map(0x22, 0x22).r(this, FUNC(ddenlovr_state::mjmyster_coins_r));
+	map(0x23, 0x23).r(this, FUNC(ddenlovr_state::mjmyster_keyb_r));
+	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x42, 0x43).w("ym2413", FUNC(ym2413_device::write));
+	map(0x44, 0x44).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x46, 0x46).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x48, 0x48).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x60, 0x6f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r));                         // ? must be 78 on startup
+	map(0xc2, 0xc2).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0xc3, 0xc3).r(this, FUNC(ddenlovr_state::mjmyster_dsw_r));
 }
 
 /***************************************************************************
@@ -3338,26 +3346,27 @@ WRITE8_MEMBER(ddenlovr_state::hginga_blitter_w)
 
 void ddenlovr_state::hginga_portmap(address_map &map)
 {
-	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
-	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x22, 0x23).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0x24, 0x24).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x26, 0x26).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x28, 0x28).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x40, 0x40).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_input_w));
-	map(0x41, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_coins_w));
-	map(0x42, 0x42).mirror(0xff00).r(this, FUNC(ddenlovr_state::hginga_coins_r));
-	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::hginga_input_r));
-	map(0x60, 0x6f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x80, 0x80).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_80_w));
-	map(0xa0, 0xa3).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0xa4, 0xa7).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0xa8, 0xab).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0xac, 0xaf).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0xb4, 0xb4).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0xb5, 0xb5).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0xb6, 0xb6).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0xb8, 0xb8).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
+	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x22, 0x23).w("ym2413", FUNC(ym2413_device::write));
+	map(0x24, 0x24).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x26, 0x26).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x28, 0x28).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x40, 0x40).w(this, FUNC(ddenlovr_state::hginga_input_w));
+	map(0x41, 0x41).w(this, FUNC(ddenlovr_state::hginga_coins_w));
+	map(0x42, 0x42).r(this, FUNC(ddenlovr_state::hginga_coins_r));
+	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::hginga_input_r));
+	map(0x60, 0x6f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x80, 0x80).w(this, FUNC(ddenlovr_state::hginga_80_w));
+	map(0xa0, 0xa3).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xa4, 0xa7).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xa8, 0xab).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xac, 0xaf).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0xb4, 0xb4).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0xb5, 0xb5).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0xb6, 0xb6).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0xb8, 0xb8).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
 }
 
 
@@ -3447,26 +3456,27 @@ void ddenlovr_state::hgokou_map(address_map &map)
 
 void ddenlovr_state::hgokou_portmap(address_map &map)
 {
-	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
-	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x20, 0x2f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x40, 0x43).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x44, 0x47).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x48, 0x4b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x4c, 0x4f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x54, 0x54).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x55, 0x55).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x56, 0x56).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x58, 0x58).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
-	map(0x60, 0x60).mirror(0xff00).w(this, FUNC(ddenlovr_state::hgokou_dsw_sel_w));
-	map(0x61, 0x61).mirror(0xff00).w(this, FUNC(ddenlovr_state::hgokou_input_w));
-	map(0x62, 0x62).mirror(0xff00).r(this, FUNC(ddenlovr_state::hgokou_input_r));
-	map(0x80, 0x80).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x82, 0x83).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0x84, 0x84).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x86, 0x86).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x88, 0x88).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0xb0, 0xb0).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
+	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x20, 0x2f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x40, 0x43).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x44, 0x47).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x48, 0x4b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x4c, 0x4f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x54, 0x54).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x55, 0x55).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x56, 0x56).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x58, 0x58).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
+	map(0x60, 0x60).w(this, FUNC(ddenlovr_state::hgokou_dsw_sel_w));
+	map(0x61, 0x61).w(this, FUNC(ddenlovr_state::hgokou_input_w));
+	map(0x62, 0x62).r(this, FUNC(ddenlovr_state::hgokou_input_r));
+	map(0x80, 0x80).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x82, 0x83).w("ym2413", FUNC(ym2413_device::write));
+	map(0x84, 0x84).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x86, 0x86).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x88, 0x88).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0xb0, 0xb0).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
 }
 
 
@@ -3500,27 +3510,28 @@ READ8_MEMBER(ddenlovr_state::hgokbang_input_r)
 
 void ddenlovr_state::hgokbang_portmap(address_map &map)
 {
-	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
-	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x20, 0x20).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x22, 0x23).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0x24, 0x24).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x26, 0x26).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x28, 0x28).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x40, 0x40).mirror(0xff00).w(this, FUNC(ddenlovr_state::hgokou_dsw_sel_w));
-	map(0x41, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::hgokou_input_w));
-	map(0x42, 0x42).mirror(0xff00).r(this, FUNC(ddenlovr_state::hgokou_input_r));
-	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::hgokbang_input_r));
-	map(0x60, 0x6f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xa0, 0xa3).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0xa4, 0xa7).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0xa8, 0xab).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0xac, 0xaf).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0xb4, 0xb4).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0xb5, 0xb5).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0xb6, 0xb6).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0xb8, 0xb8).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
-	map(0xe0, 0xe0).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::hginga_blitter_w));
+	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x20, 0x20).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x22, 0x23).w("ym2413", FUNC(ym2413_device::write));
+	map(0x24, 0x24).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x26, 0x26).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x28, 0x28).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x40, 0x40).w(this, FUNC(ddenlovr_state::hgokou_dsw_sel_w));
+	map(0x41, 0x41).w(this, FUNC(ddenlovr_state::hgokou_input_w));
+	map(0x42, 0x42).r(this, FUNC(ddenlovr_state::hgokou_input_r));
+	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::hgokbang_input_r));
+	map(0x60, 0x6f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xa0, 0xa3).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xa4, 0xa7).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xa8, 0xab).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xac, 0xaf).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0xb4, 0xb4).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0xb5, 0xb5).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0xb6, 0xb6).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0xb8, 0xb8).r(this, FUNC(ddenlovr_state::unk_r));                                 // ? must be 78 on startup
+	map(0xe0, 0xe0).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
 }
 
 
@@ -3588,22 +3599,23 @@ void ddenlovr_state::hparadis_map(address_map &map)
 
 void ddenlovr_state::hparadis_portmap(address_map &map)
 {
-	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x60, 0x61).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
-	map(0xa0, 0xa0).mirror(0xff00).w(this, FUNC(ddenlovr_state::hginga_input_w));
-	map(0xa1, 0xa1).mirror(0xff00).w(this, FUNC(ddenlovr_state::hparadis_coin_w));
-	map(0xa2, 0xa3).mirror(0xff00).r(this, FUNC(ddenlovr_state::hparadis_input_r));
-	map(0xc2, 0xc2).mirror(0xff00).nopw();    // enables palette RAM at c000
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x60, 0x61).w("ym2413", FUNC(ym2413_device::write));
+	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
+	map(0xa0, 0xa0).w(this, FUNC(ddenlovr_state::hginga_input_w));
+	map(0xa1, 0xa1).w(this, FUNC(ddenlovr_state::hparadis_coin_w));
+	map(0xa2, 0xa3).r(this, FUNC(ddenlovr_state::hparadis_input_r));
+	map(0xc2, 0xc2).nopw();    // enables palette RAM at c000
 }
 
 
@@ -3628,28 +3640,29 @@ READ8_MEMBER(ddenlovr_state::mjmywrld_coins_r)
 
 void ddenlovr_state::mjmywrld_portmap(address_map &map)
 {
-	map(0x00, 0x01).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x03, 0x03).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x20, 0x20).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjmyster_select2_w));
-	map(0x21, 0x21).mirror(0xff00).w(this, FUNC(ddenlovr_state::mjmyster_coincounter_w));
-	map(0x22, 0x22).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmywrld_coins_r));
-	map(0x23, 0x23).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_keyb_r));
-	map(0x40, 0x40).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x42, 0x43).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0x44, 0x44).mirror(0xff00).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x46, 0x46).mirror(0xff00).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x48, 0x48).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x60, 0x6f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x80, 0x83).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x84, 0x87).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x88, 0x8b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x8c, 0x8f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x94, 0x94).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x95, 0x95).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x96, 0x96).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x98, 0x98).mirror(0xff00).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
-	map(0xc0, 0xc0).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0xe0, 0xe0).mirror(0xff00).r(this, FUNC(ddenlovr_state::mjmyster_dsw_r));
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x03, 0x03).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x20, 0x20).w(this, FUNC(ddenlovr_state::mjmyster_select2_w));
+	map(0x21, 0x21).w(this, FUNC(ddenlovr_state::mjmyster_coincounter_w));
+	map(0x22, 0x22).r(this, FUNC(ddenlovr_state::mjmywrld_coins_r));
+	map(0x23, 0x23).r(this, FUNC(ddenlovr_state::mjmyster_keyb_r));
+	map(0x40, 0x40).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x42, 0x43).w("ym2413", FUNC(ym2413_device::write));
+	map(0x44, 0x44).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x46, 0x46).w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x48, 0x48).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x60, 0x6f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x80, 0x83).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x84, 0x87).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x88, 0x8b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x8c, 0x8f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x94, 0x94).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x95, 0x95).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x96, 0x96).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x98, 0x98).r(this, FUNC(ddenlovr_state::unk_r)); // ? must be 78 on startup
+	map(0xc0, 0xc0).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0xe0, 0xe0).r(this, FUNC(ddenlovr_state::mjmyster_dsw_r));
 }
 
 
@@ -3990,31 +4003,32 @@ WRITE8_MEMBER(ddenlovr_state::sryudens_rambank_w)
 
 void ddenlovr_state::sryudens_portmap(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x02, 0x03).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0x04, 0x05).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_data_w));
-	map(0x20, 0x23).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x24, 0x27).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x28, 0x2b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x2c, 0x2f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x34, 0x34).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x35, 0x35).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x38, 0x38).mirror(0xff00).nopr();         // ? ack or watchdog
-	map(0x40, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x50, 0x50).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0x70, 0x70).mirror(0xff00).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
-	map(0x80, 0x8f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x90, 0x90).mirror(0xff00).portr("DSW1");
-	map(0x91, 0x91).mirror(0xff00).portr("DSW2");
-	map(0x92, 0x92).mirror(0xff00).portr("DSW4");
-	map(0x93, 0x93).mirror(0xff00).portr("DSW3");
-	map(0x94, 0x94).mirror(0xff00).portr("DSWTOP");
-	map(0x98, 0x98).mirror(0xff00).w(this, FUNC(ddenlovr_state::sryudens_coincounter_w));
-	map(0x99, 0x99).mirror(0xff00).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x9a, 0x9a).mirror(0xff00).portr("SYSTEM");
-	map(0x9b, 0x9c).mirror(0xff00).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
+	map.global_mask(0xff);
+	map(0x00, 0x00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x02, 0x03).w("ym2413", FUNC(ym2413_device::write));
+	map(0x04, 0x05).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x20, 0x23).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x50, 0x50).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x70, 0x70).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
+	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x90, 0x90).portr("DSW1");
+	map(0x91, 0x91).portr("DSW2");
+	map(0x92, 0x92).portr("DSW4");
+	map(0x93, 0x93).portr("DSW3");
+	map(0x94, 0x94).portr("DSWTOP");
+	map(0x98, 0x98).w(this, FUNC(ddenlovr_state::sryudens_coincounter_w));
+	map(0x99, 0x99).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x9a, 0x9a).portr("SYSTEM");
+	map(0x9b, 0x9c).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
 }
 
 
@@ -4051,32 +4065,33 @@ void ddenlovr_state::janshinp_map(address_map &map)
 
 void ddenlovr_state::janshinp_portmap(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xff00).portr("DSW1");
-	map(0x01, 0x01).mirror(0xff00).portr("DSW2");
-	map(0x02, 0x02).mirror(0xff00).portr("DSW4");
-	map(0x03, 0x03).mirror(0xff00).portr("DSW3");
-	map(0x04, 0x04).mirror(0xff00).portr("DSWTOP");
-	map(0x08, 0x08).mirror(0xff00).w(this, FUNC(ddenlovr_state::janshinp_coincounter_w));
-	map(0x09, 0x09).mirror(0xff00).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
-	map(0x0a, 0x0a).mirror(0xff00).portr("SYSTEM");
-	map(0x0b, 0x0c).mirror(0xff00).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
-	map(0x20, 0x23).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x24, 0x27).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x28, 0x2b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x2c, 0x2f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x34, 0x34).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x35, 0x35).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x38, 0x38).mirror(0xff00).nopr();         // ? ack or watchdog
-	map(0x40, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x50, 0x5f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x60, 0x60).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
-	map(0x70, 0x70).mirror(0xff00).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
-	map(0x80, 0x80).mirror(0xff00).ram();
-	map(0x90, 0x90).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x92, 0x93).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0x94, 0x95).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW1");
+	map(0x01, 0x01).portr("DSW2");
+	map(0x02, 0x02).portr("DSW4");
+	map(0x03, 0x03).portr("DSW3");
+	map(0x04, 0x04).portr("DSWTOP");
+	map(0x08, 0x08).w(this, FUNC(ddenlovr_state::janshinp_coincounter_w));
+	map(0x09, 0x09).w(this, FUNC(ddenlovr_state::hanakanz_keyb_w));
+	map(0x0a, 0x0a).portr("SYSTEM");
+	map(0x0b, 0x0c).r(this, FUNC(ddenlovr_state::sryudens_keyb_r));
+	map(0x20, 0x23).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x50, 0x5f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x60, 0x60).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map(0x70, 0x70).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
+	map(0x80, 0x80).ram();
+	map(0x90, 0x90).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x92, 0x93).w("ym2413", FUNC(ym2413_device::write));
+	map(0x94, 0x95).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
 
@@ -4136,28 +4151,29 @@ void ddenlovr_state::seljan2_map(address_map &map)
 
 void ddenlovr_state::seljan2_portmap(address_map &map)
 {
-	map(0x00, 0x0f).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x20, 0x23).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
-	map(0x24, 0x27).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
-	map(0x28, 0x2b).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
-	map(0x2c, 0x2f).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
-	map(0x34, 0x34).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
-	map(0x35, 0x35).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
-	map(0x36, 0x36).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
-	map(0x38, 0x38).mirror(0xff00).nopr();         // ? ack or watchdog
-	map(0x40, 0x41).mirror(0xff00).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
-	map(0x43, 0x43).mirror(0xff00).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
-	map(0x50, 0x51).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0x54, 0x54).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x58, 0x58).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_w));
-	map(0x5c, 0x5c).mirror(0xff00).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));   // dsw
-	map(0x60, 0x60).mirror(0xff00).nopr().w(this, FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
-	map(0x70, 0x70).mirror(0xff00).w(this, FUNC(ddenlovr_state::seljan2_rombank_w));
-	map(0x80, 0x80).mirror(0xff00).portr("SYSTEM").w(this, FUNC(ddenlovr_state::seljan2_palette_enab_w));    // writes: 1 = palette RAM at b000, 0 = ROM
-	map(0x84, 0x84).mirror(0xff00).r(this, FUNC(ddenlovr_state::daimyojn_keyb1_r));
-	map(0x88, 0x88).mirror(0xff00).r(this, FUNC(ddenlovr_state::daimyojn_keyb2_r));
-	map(0x90, 0x90).mirror(0xff00).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
-	map(0xa0, 0xa0).mirror(0xff00).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
+	map.global_mask(0xff);
+	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x20, 0x23).w(this, FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).w(this, FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).w(this, FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).w(this, FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).w(this, FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).w(this, FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).w(this, FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).r(this, FUNC(ddenlovr_state::rongrong_gfxrom_r));
+	map(0x50, 0x51).w("ym2413", FUNC(ym2413_device::write));
+	map(0x54, 0x54).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x58, 0x58).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x5c, 0x5c).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));   // dsw
+	map(0x60, 0x60).nopr().w(this, FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
+	map(0x70, 0x70).w(this, FUNC(ddenlovr_state::seljan2_rombank_w));
+	map(0x80, 0x80).portr("SYSTEM").w(this, FUNC(ddenlovr_state::seljan2_palette_enab_w));    // writes: 1 = palette RAM at b000, 0 = ROM
+	map(0x84, 0x84).r(this, FUNC(ddenlovr_state::daimyojn_keyb1_r));
+	map(0x88, 0x88).r(this, FUNC(ddenlovr_state::daimyojn_keyb2_r));
+	map(0x90, 0x90).w(this, FUNC(ddenlovr_state::quizchq_oki_bank_w));
+	map(0xa0, 0xa0).r(this, FUNC(ddenlovr_state::hanakanz_rand_r));
 }
 
 
