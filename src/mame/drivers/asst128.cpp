@@ -32,7 +32,7 @@ void asst128_mb_device::map(address_map &map)
 	map(0x0060, 0x006f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x0080, 0x008f).w(this, FUNC(asst128_mb_device::pc_page_w));
 	map(0x00a0, 0x00a1).w(this, FUNC(asst128_mb_device::nmi_enable_w));
-ADDRESS_MAP_END
+}
 
 DEFINE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device, "asst128_mb", "ASST128_MOTHERBOARD")
 

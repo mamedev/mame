@@ -39,7 +39,7 @@ void a2600_base_state::a2600_mem(address_map &map) // 6507 has 13-bit address sp
 	map(0x0280, 0x029f).mirror(0x0d00).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 #endif
 	// map(0x1000, 0x1fff) is cart data and it is configured at reset time, depending on the mounted cart!
-ADDRESS_MAP_END
+}
 
 
 READ8_MEMBER(a2600_state::cart_over_all_r)

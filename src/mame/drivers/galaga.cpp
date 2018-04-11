@@ -937,11 +937,12 @@ void xevious_state::battles_mem4(address_map &map)
 	map(0x8000, 0x80ff).ram();
 }
 
-ADDRESS_MAP_START(galaga_state::dzigzag_mem4)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x107f) AM_RAM
-	AM_RANGE(0x4000, 0x4007) AM_READONLY    // dip switches? bits 0 & 1 used
-ADDRESS_MAP_END
+void galaga_state::dzigzag_mem4(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x107f).ram();
+	map(0x4000, 0x4007).readonly();    // dip switches? bits 0 & 1 used
+}
 
 
 static INPUT_PORTS_START( bosco )
