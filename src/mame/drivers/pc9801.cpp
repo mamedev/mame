@@ -1395,8 +1395,8 @@ READ16_MEMBER(pc9801_state::pc9821_grcg_gvram0_r)
 	{
 		switch(offset*2)
 		{
-			case 4: return m_analog256.bank[0] & 0xf;
-			case 6: return m_analog256.bank[1] & 0xf;
+			case 4: return m_analog256.bank[0];
+			case 6: return m_analog256.bank[1];
 		}
 
 		//return 0;
@@ -1410,12 +1410,15 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
 		//printf("%08x %08x\n",offset*2,data);
-		switch(offset*2)
+		if(mem_mask & 0xff)
 		{
-			case 4: COMBINE_DATA(&m_analog256.bank[0]); break;
-			case 6: COMBINE_DATA(&m_analog256.bank[1]); break;
+			switch(offset*2)
+			{
+				case 4: m_analog256.bank[0] = data & 0xf; break;
+				case 6: m_analog256.bank[1] = data & 0xf; break;
+			}
 		}
-		//return;
+		return;
 	}
 
 	grcg_gvram0_w(space,offset,data,mem_mask);
