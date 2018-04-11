@@ -59,10 +59,11 @@ void lc80_state::lc80_mem(address_map &map)
 }
 
 #if 0
-ADDRESS_MAP_START(lc80_state::sc80_mem)
-	AM_IMPORT_FROM(lc80_mem)
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-ADDRESS_MAP_END
+void lc80_state::sc80_mem(address_map &map)
+{
+	lc80_mem(map);
+	map(0xc000, 0xcfff).rom();
+}
 #endif
 
 void lc80_state::lc80_io(address_map &map)

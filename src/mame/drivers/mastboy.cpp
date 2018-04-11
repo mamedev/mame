@@ -649,11 +649,12 @@ void mastboy_state::mastboy_map(address_map &map)
 }
 
 // TODO : banked map is mirrored?
-ADDRESS_MAP_START(mastboy_state::bank_c000_map)
-	AM_RANGE(0x000000, 0x00ffff) AM_MIRROR(0x1e0000) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
-	AM_RANGE(0x010000, 0x01ffff) AM_MIRROR(0x1e0000) AM_ROM AM_REGION("vrom", 0)
-	AM_RANGE(0x200000, 0x3fffff) AM_ROM AM_REGION("bankedrom", 0)
-ADDRESS_MAP_END
+void mastboy_state::bank_c000_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).mirror(0x1e0000).rw(this, FUNC(mastboy_state::vram_r), FUNC(mastboy_state::vram_w)).share("vram");
+	map(0x010000, 0x01ffff).mirror(0x1e0000).rom().region("vrom", 0);
+	map(0x200000, 0x3fffff).rom().region("bankedrom", 0);
+}
 
 /* Ports */
 
