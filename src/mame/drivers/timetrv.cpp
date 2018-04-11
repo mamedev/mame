@@ -9,6 +9,7 @@ preliminary driver by Angelo Salese
 TODO:
 - unemulated Pioneer LDV-4200 and Sony LDP-1450 players, needs a dump of the BIOSes and proper
   hook-up;
+- ICM7243B 14-segment alphanumeric LED display driver
 
 ==================================================================================================
 
@@ -156,7 +157,7 @@ MACHINE_CONFIG_START(timetrv_state::timetrv)
 	MCFG_I8255_IN_PORTB_CB(READ8(timetrv_state, in_r)) //dsw
 	MCFG_I8255_IN_PORTC_CB(READ8(timetrv_state, in_r)) //dsw
 
-	MCFG_DEVICE_ADD("uart", INS8250, 1843200) // serial interface for laserdisc
+	MCFG_DEVICE_ADD("uart", NS16450, 1843200) // P82050 (serial interface for laserdisc)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
