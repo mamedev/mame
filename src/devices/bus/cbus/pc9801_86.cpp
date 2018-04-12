@@ -63,8 +63,8 @@ MACHINE_CONFIG_START(pc9801_86_device::device_add_mconfig)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_86_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // burr brown pcm61p
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // burr brown pcm61p
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
@@ -332,21 +332,21 @@ void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int pa
 			m_rdac->write(queue_pop() << 8);
 			break;
 		case 0x30: // 16bit stereo
-			lsample = queue_pop();
-			lsample |= queue_pop() << 8;
-			rsample = queue_pop();
-			rsample |= queue_pop() << 8;
+			lsample = queue_pop() << 8;
+			lsample |= queue_pop();
+			rsample = queue_pop() << 8;
+			rsample |= queue_pop();
 			m_ldac->write(lsample);
 			m_rdac->write(rsample);
 			break;
 		case 0x20: // 16bit left only
-			lsample = queue_pop();
-			lsample |= queue_pop() << 8;
+			lsample = queue_pop() << 8;
+			lsample |= queue_pop();
 			m_ldac->write(lsample);
 			break;
 		case 0x10: // 16bit right only
-			rsample = queue_pop();
-			rsample |= queue_pop() << 8;
+			rsample = queue_pop() << 8;
+			rsample |= queue_pop();
 			m_rdac->write(rsample);
 			break;
 	}
