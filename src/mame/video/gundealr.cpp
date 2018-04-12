@@ -95,21 +95,6 @@ WRITE8_MEMBER(gundealr_state::paletteram_w)
 	m_palette->set_pen_color(offset / 2, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-template<int Xor>
-WRITE8_MEMBER(gundealr_state::fg_scroll_w)
-{
-	m_scroll[offset] = data;
-	m_fg_tilemap->set_scrollx(0, m_scroll[0^Xor] | ((m_scroll[1^Xor] & 0x03) << 8));
-	m_fg_tilemap->set_scrolly(0, m_scroll[2^Xor] | ((m_scroll[3^Xor] & 0x03) << 8));
-}
-
-template<int Bit>
-WRITE8_MEMBER(gundealr_state::flipscreen_w)
-{
-	machine().tilemap().set_flip_all(BIT(data, Bit) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-}
-
-
 
 /***************************************************************************
 
