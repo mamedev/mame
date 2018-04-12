@@ -5,7 +5,16 @@
     xavix.c
 
     6502 with custom opcodes
-    integrated gfx / sound / coprocessor?
+    integrated gfx / sound
+
+	special notes
+
+	0x0000-0x7fff seems to be a 'low bus' area, it is always the same regardless
+	              of banking
+	0x8000-0xffff is a banked area with individual code and data banks
+	              0x00ff contains the DATA bank, set manually in code
+				  0x00fe appears to be the current CODE bank, set with either the
+				         custom opcodes, or manually (if running from lowbus only?)
 
 ***************************************************************************/
 
@@ -52,7 +61,7 @@ void xavix_device::device_start()
 
 void xavix_device::device_reset()
 {
-	m_farbank = 0;
+	set_farbank(0);
 	m6502_device::device_reset();
 }
 
@@ -64,40 +73,24 @@ xavix_device::mi_xavix_normal::mi_xavix_normal(xavix_device *_base)
 
 uint8_t xavix_device::mi_xavix_normal::read(uint16_t adr)
 {
-	if (adr < 0x8000)
-		return program->read_byte(adr);
-	else
-	{
-		uint8_t data_bank = program->read_byte(0xff);
-		return program->read_byte((data_bank << 16) | adr);
-	}
+	uint8_t data_bank = program->read_byte(0xff);
+	return program->read_byte((data_bank << 16) | adr);
 }
 
 uint8_t xavix_device::mi_xavix_normal::read_sync(uint16_t adr)
 {
-	if (adr < 0x8000)
-		return sdirect->read_byte(adr);
-	else
-		return sdirect->read_byte(base->adr_with_bank(adr));
+	return sdirect->read_byte(base->adr_with_bank(adr));
 }
 
 uint8_t xavix_device::mi_xavix_normal::read_arg(uint16_t adr)
 {
-	if (adr < 0x8000)
-		return direct->read_byte(adr);
-	else
-		return direct->read_byte(base->adr_with_bank(adr));
+	return direct->read_byte(base->adr_with_bank(adr));
 }
 
 void xavix_device::mi_xavix_normal::write(uint16_t adr, uint8_t val)
 {
-	if (adr < 0x8000)
-		program->write_byte(adr, val);
-	else
-	{
-		uint8_t data_bank = program->read_byte(0xff);
-		program->write_byte((data_bank << 16) | adr, val);
-	}
+	uint8_t data_bank = program->read_byte(0xff);
+	program->write_byte((data_bank << 16) | adr, val);
 }
 
 xavix_device::mi_xavix_nd::mi_xavix_nd(xavix_device *_base) : mi_xavix_normal(_base)
@@ -106,19 +99,26 @@ xavix_device::mi_xavix_nd::mi_xavix_nd(xavix_device *_base) : mi_xavix_normal(_b
 
 uint8_t xavix_device::mi_xavix_nd::read_sync(uint16_t adr)
 {
-	if (adr < 0x8000)
-		return sprogram->read_byte(adr);
-	else
-		return sprogram->read_byte(base->adr_with_bank(adr));
+	return sprogram->read_byte(base->adr_with_bank(adr));
 }
 
 uint8_t xavix_device::mi_xavix_nd::read_arg(uint16_t adr)
 {
-	if (adr < 0x8000)
-		return program->read_byte(adr);
-	else
-		return program->read_byte(base->adr_with_bank(adr));
+	return program->read_byte(base->adr_with_bank(adr));
 }
+
+void xavix_device::set_farbank(uint8_t farbank)
+{
+	space().write_byte(0xfe, farbank);
+	//m_farbank = farbank;
+}
+	
+uint8_t xavix_device::get_farbank()
+{
+	return space().read_byte(0xfe);
+//	return m_farbank;
+}
+
 
 
 #include "cpu/m6502/xavix.hxx"
