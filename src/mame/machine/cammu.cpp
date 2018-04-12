@@ -224,13 +224,32 @@ void cammu_device::set_spaces(std::vector<address_space *> spaces)
 	std::copy(spaces.begin(), spaces.end(), std::begin(m_space));
 }
 
+bool cammu_device::memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address)
+{
+	// translate the address
+	translated_t translated = translate_address(ssw, address, BYTE,
+		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_READ ? READ : 
+		(intention & TRANSLATE_TYPE_MASK) == TRANSLATE_WRITE ? WRITE : 
+		EXECUTE);
+
+	// check that the requested space number matches the mapped space
+	if (translated.space != nullptr && translated.space->spacenum() == spacenum)
+	{
+		address = translated.address;
+
+		return true;
+	}
+
+	return false;
+}
+
 cammu_device::translated_t cammu_device::translate_address(const u32 ssw, const u32 virtual_address, const access_size size, const access_type mode)
 {
 	// get effective user/supervisor mode
 	const bool user = mode == EXECUTE ? ssw & SSW_U : ssw & (SSW_U | SSW_UU);
 
 	// check for alignment faults
-	if (get_alignment() && !machine().side_effects_disabled())
+	if (!machine().side_effects_disabled() && get_alignment())
 	{
 		if ((mode == EXECUTE && (virtual_address & 0x1)) || (mode != EXECUTE && virtual_address & (size - 1)))
 		{
