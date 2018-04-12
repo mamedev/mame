@@ -3319,6 +3319,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/rad_eu3a05.cpp",
 	MAME_DIR .. "src/mame/audio/rad_eu3a05.cpp",
 	MAME_DIR .. "src/mame/audio/rad_eu3a05.h",
+	MAME_DIR .. "src/mame/video/rad_hsvpal.cpp",
+	MAME_DIR .. "src/mame/video/rad_hsvpal.h",
 	MAME_DIR .. "src/mame/machine/rad_eu3a05gpio.cpp",
 	MAME_DIR .. "src/mame/machine/rad_eu3a05gpio.h",
 	MAME_DIR .. "src/mame/drivers/tvgame.cpp",

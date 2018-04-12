@@ -159,6 +159,7 @@
 #include "machine/bankdev.h"
 #include "audio/rad_eu3a05.h"
 #include "machine/rad_eu3a05gpio.h"
+#include "video/rad_hsvpal.h"
 
 class radica_eu3a05_state : public driver_device
 {
@@ -169,7 +170,6 @@ public:
 		m_ram(*this, "ram"),
 		m_vram(*this, "vram"),
 		m_spriteram(*this, "spriteram"),
-		m_palram(*this, "palram"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -250,11 +250,10 @@ private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	required_device<radica_hsvpal_device> m_palette;
 
 	uint8_t m_rombank_hi;
 	uint8_t m_rombank_lo;
@@ -424,16 +423,6 @@ void radica_eu3a05_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 	}
 }
 
-double hue2rgb(double p, double q, double t)
-{
-	if (t < 0) t += 1;
-	if (t > 1) t -= 1;
-	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
-	if (t < 1 / 2.0f) return q;
-	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
-	return p;
-}
-
 // a hacky mess for now
 bool radica_eu3a05_state::get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2)
 {
@@ -589,42 +578,6 @@ void radica_eu3a05_state::draw_tilemaps(screen_device &screen, bitmap_ind16 &bit
 uint32_t radica_eu3a05_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-
-	// Palette
-	int offs = 0;
-	for (int index = 0;index < 256; index++)
-	{
-		uint16_t dat = m_palram[offs++] << 8;
-		dat |= m_palram[offs++];
-
-		// llll lsss ---h hhhh
-		int l_raw = (dat & 0xf800) >> 11;
-		int sl_raw = (dat & 0x0700) >> 8;
-		int h_raw = (dat & 0x001f) >> 0;
-
-		double l = (double)l_raw / 31.0f;
-		double s = (double)sl_raw / 7.0f;
-		double h = (double)h_raw / 24.0f;
-
-		double r, g, b;
-
-		if (s == 0) {
-			r = g = b = l; // greyscale
-		} else {
-			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-			double p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1/3.0f);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1/3.0f);
-		}
-
-		int r_real = r * 255.0f;
-		int g_real = g * 255.0f;
-		int b_real = b * 255.0f;
-
-		m_palette->set_pen_color(index, r_real, g_real, b_real);
-	}
-
 
 	draw_tilemaps(screen,bitmap,cliprect,0);
 	draw_sprites(screen,bitmap,cliprect);
@@ -909,7 +862,7 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 	map(0x0000, 0x05ff).ram().share("ram");
 	map(0x0600, 0x3dff).ram().share("vram");
 	map(0x3e00, 0x3fff).ram().share("spriteram");
-	map(0x4800, 0x49ff).ram().share("palram");
+	map(0x4800, 0x49ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	// 500x system regs?
 	map(0x5003, 0x5003).r(this, FUNC(radica_eu3a05_state::radicasi_5003_r));
@@ -1169,7 +1122,9 @@ MACHINE_CONFIG_START(radica_eu3a05_state::radicasi)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_DEVICE_ADD("palette", RADICA_HSVPAL, 0)
+	MCFG_PALETTE_ENTRIES(256)
+	MCFG_PALETTE_FORMAT(XXXHHHHHVVVVVSSS_RADICA)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", radicasi_fake)
 

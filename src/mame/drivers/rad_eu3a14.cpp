@@ -36,6 +36,7 @@
 #include "machine/bankdev.h"
 #include "audio/rad_eu3a05.h"
 #include "machine/timer.h"
+#include "video/rad_hsvpal.h"
 
 /*
 
@@ -72,7 +73,6 @@ public:
 	radica_eu3a14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palram(*this, "palram"),
 		m_scrollregs(*this, "scrollregs"),
 		m_tilecfg(*this, "tilecfg"),
 		m_tilebase(*this, "tilebase"),
@@ -126,17 +126,14 @@ protected:
 	virtual void video_start() override;
 
 private:
-	double hue2rgb(double p, double q, double t);
-
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_scrollregs;
 	required_shared_ptr<uint8_t> m_tilecfg;
 	required_shared_ptr<uint8_t> m_tilebase;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_dmaparams;
 	required_device<address_map_bank_device> m_bank;
-	required_device<palette_device> m_palette;
+	required_device<radica_hsvpal_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	uint8_t m_rombank_hi;
@@ -144,7 +141,6 @@ private:
 	int m_tilerambase;
 	int m_spriterambase;
 
-	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -153,55 +149,6 @@ private:
 
 void radica_eu3a14_state::video_start()
 {
-}
-
-double radica_eu3a14_state::hue2rgb(double p, double q, double t)
-{
-	if (t < 0) t += 1;
-	if (t > 1) t -= 1;
-	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
-	if (t < 1 / 2.0f) return q;
-	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
-	return p;
-}
-
-void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// Palette
-	int offs = 0;
-	for (int index = 0; index < 512; index++)
-	{
-		uint16_t dat = m_palram[offs++] << 8;
-		dat |= m_palram[offs++];
-
-		// llll lsss ---h hhhh
-		int l_raw = (dat & 0xf800) >> 11;
-		int sl_raw = (dat & 0x0700) >> 8;
-		int h_raw = (dat & 0x001f) >> 0;
-
-		double l = (double)l_raw / 31.0f;
-		double s = (double)sl_raw / 7.0f;
-		double h = (double)h_raw / 24.0f;
-
-		double r, g, b;
-
-		if (s == 0) {
-			r = g = b = l; // greyscale
-		}
-		else {
-			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-			double p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1 / 3.0f);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1 / 3.0f);
-		}
-
-		int r_real = r * 255.0f;
-		int g_real = g * 255.0f;
-		int b_real = b * 255.0f;
-
-		m_palette->set_pen_color(index, r_real, g_real, b_real);
-	}
 }
 
 void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size)
@@ -417,7 +364,6 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 {
 	bitmap.fill(0, cliprect);
 
-	handle_palette(screen, bitmap, cliprect);
 	draw_background(screen, bitmap, cliprect);
 	draw_sprites(screen, bitmap, cliprect);
 
@@ -504,7 +450,7 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x3fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
 
-	map(0x4800, 0x4bff).ram().share("palram");
+	map(0x4800, 0x4bff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	// similar to eu3a05, at least for pal flags and rom banking
 	map(0x5007, 0x5007).noprw();
@@ -813,10 +759,11 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 	MCFG_SCREEN_UPDATE_DRIVER(radica_eu3a14_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 512)
+	MCFG_DEVICE_ADD("palette", RADICA_HSVPAL, 0)
+	MCFG_PALETTE_ENTRIES(512)
+	MCFG_PALETTE_FORMAT(XXXHHHHHVVVVVSSS_RADICA)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
