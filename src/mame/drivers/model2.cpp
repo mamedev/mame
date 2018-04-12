@@ -1453,7 +1453,7 @@ READ8_MEMBER( model2_state::lightgun_coords_r )
 READ8_MEMBER( model2_state::lightgun_offscreen_r )
 {
 	// 5 percent border size
-	const float BORDER_SIZE = 0.05;
+	const float BORDER_SIZE = 0.05f;
 
 	// calculate width depending on min/max port value
 	const int BORDER_P1X = (m_lightgun_ports[1]->field(0x3ff)->maxval() - m_lightgun_ports[1]->field(0x3ff)->minval()) * BORDER_SIZE;
