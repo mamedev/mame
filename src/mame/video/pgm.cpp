@@ -615,7 +615,6 @@ VIDEO_START_MEMBER(pgm_state,pgm)
 {
 	int i;
 
-	m_bdata = memregion("sprmask")->base();
 	m_aoffset = 0;
 	m_boffset = 0;
 
