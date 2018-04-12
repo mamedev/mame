@@ -21,16 +21,77 @@ PAL16R6A 11H
 */
 
 #include "emu.h"
-#include "includes/dietgo.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/h6280/h6280.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/decocrpt.h"
 #include "machine/deco102.h"
+#include "machine/deco104.h"
 #include "machine/gen_latch.h"
+#include "video/decospr.h"
+#include "video/deco16ic.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+class dietgo_state : public driver_device
+{
+public:
+	dietgo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_deco104(*this, "ioprot104")
+		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
+		, m_spriteram(*this, "spriteram")
+		, m_sprgen(*this, "spritegen")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_deco_tilegen(*this, "tilegen")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
+
+	optional_device<deco104_device> m_deco104;
+	/* memory pointers */
+	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_device<decospr_device> m_sprgen;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<h6280_device> m_audiocpu;
+	required_device<deco16ic_device> m_deco_tilegen;
+	required_shared_ptr<uint16_t> m_decrypted_opcodes;
+	DECLARE_DRIVER_INIT(dietgo);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECO16IC_BANK_CB_MEMBER(bank_callback);
+
+	DECLARE_READ16_MEMBER( dietgo_protection_region_0_104_r );
+	DECLARE_WRITE16_MEMBER( dietgo_protection_region_0_104_w );
+	void dietgo(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void dietgo_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+
+uint32_t dietgo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	address_space &space = machine().dummy_space();
+	uint16_t flip = m_deco_tilegen->pf_control_r(space, 0, 0xffff);
+
+	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
+	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+
+	bitmap.fill(256, cliprect); /* not verified */
+
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	return 0;
+}
 
 
 READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
@@ -54,9 +115,9 @@ WRITE16_MEMBER( dietgo_state::dietgo_protection_region_0_104_w )
 void dietgo_state::dietgo_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x200000, 0x20000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x210000, 0x211fff).w(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_w));
-	map(0x212000, 0x213fff).w(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_w));
+	map(0x200000, 0x20000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
+	map(0x210000, 0x211fff).w(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_w));
+	map(0x212000, 0x213fff).w(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_w));
 	map(0x220000, 0x2207ff).writeonly().share("pf1_rowscroll");
 	map(0x222000, 0x2227ff).writeonly().share("pf2_rowscroll");
 	map(0x280000, 0x2807ff).ram().share("spriteram");
@@ -80,9 +141,9 @@ void dietgo_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).noprw();     /* This board only has 1 oki chip */
 	map(0x140000, 0x140000).r(m_deco104, FUNC(deco104_device::soundlatch_r));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 
@@ -207,10 +268,6 @@ DECO16IC_BANK_CB_MEMBER(dietgo_state::bank_callback)
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-void dietgo_state::machine_start()
-{
-}
-
 MACHINE_CONFIG_START(dietgo_state::dietgo)
 
 	/* basic machine hardware */
@@ -229,7 +286,7 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dietgo_state, screen_update_dietgo)
+	MCFG_SCREEN_UPDATE_DRIVER(dietgo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -237,7 +294,7 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dietgo)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DEVICE_ADD("tilegen", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
 	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)

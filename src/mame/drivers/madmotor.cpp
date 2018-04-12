@@ -46,7 +46,7 @@ public:
 	void madmotor(machine_config &config);
 
 protected:
-	uint32_t screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void madmotor_map(address_map &map);
 	void sound_map(address_map &map);
 
@@ -102,9 +102,9 @@ void madmotor_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -248,7 +248,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-uint32_t madmotor_state::screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t madmotor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool flip = m_tilegen[0]->get_flip_state();
 	m_tilegen[0]->set_flip_screen(flip);
@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ /* frames per second, vblank duration taken from Burger Time */)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update_madmotor)
+	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madmotor)

@@ -90,16 +90,72 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/funkyjet.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/h6280/h6280.h"
+#include "machine/deco146.h"
 #include "machine/decocrpt.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "video/decospr.h"
+#include "video/deco16ic.h"
 #include "screen.h"
 #include "speaker.h"
 
+/******************************************************************************/
+
+class funkyjet_state : public driver_device
+{
+public:
+	funkyjet_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_deco146(*this, "ioprot")
+		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
+		, m_sprgen(*this, "spritegen")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_deco_tilegen(*this, "tilegen")
+	{ }
+
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<deco146_device> m_deco146;
+	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
+	required_device<decospr_device> m_sprgen;
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<h6280_device> m_audiocpu;
+	required_device<deco16ic_device> m_deco_tilegen;
+	DECLARE_DRIVER_INIT(funkyjet);
+	uint32_t screen_update_funkyjet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ16_MEMBER( funkyjet_protection_region_0_146_r );
+	DECLARE_WRITE16_MEMBER( funkyjet_protection_region_0_146_w );
+	void funkyjet(machine_config &config);
+	void funkyjet_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+/******************************************************************************/
+
+uint32_t funkyjet_state::screen_update_funkyjet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	address_space &space = machine().dummy_space();
+	uint16_t flip = m_deco_tilegen->pf_control_r(space, 0, 0xffff);
+
+	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
+	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
+
+	bitmap.fill(768, cliprect);
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	return 0;
+}
 
 /******************************************************************************/
 
@@ -139,9 +195,9 @@ void funkyjet_state::funkyjet_map(address_map &map)
 	map(0x180000, 0x183fff).rw(this, FUNC(funkyjet_state::funkyjet_protection_region_0_146_r), FUNC(funkyjet_state::funkyjet_protection_region_0_146_w)).share("prot16ram"); /* Protection device */ // unlikely to be cs0 region
 	map(0x184000, 0x184001).nopw();
 	map(0x188000, 0x188001).nopw();
-	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
-	map(0x320000, 0x321fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
-	map(0x322000, 0x323fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x300000, 0x30000f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x321fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x323fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x340000, 0x340bff).ram().share("pf1_rowscroll");
 	map(0x342000, 0x342bff).ram().share("pf2_rowscroll");
 }
@@ -157,9 +213,9 @@ void funkyjet_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).noprw(); /* This board only has 1 oki chip */
 	map(0x140000, 0x140000).r(m_deco146, FUNC(deco146_device::soundlatch_r));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 /******************************************************************************/
@@ -307,10 +363,6 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-void funkyjet_state::machine_start()
-{
-}
-
 MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 
 	/* basic machine hardware */
@@ -320,7 +372,6 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -338,12 +389,11 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
-
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funkyjet)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
+	MCFG_DEVICE_ADD("tilegen", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
 	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)

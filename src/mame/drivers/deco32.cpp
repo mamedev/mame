@@ -415,7 +415,7 @@ void captaven_state::captaven_map(address_map &map)
 void fghthist_state::fghthist_map(address_map &map)
 {
 	map.unmap_value_high();
-//  map(0x000000, 0x001fff) AM_ROM AM_WRITE(pf1_data_w) // wtf??
+//  map(0x000000, 0x001fff).rom().w(this, FUNC(fghthist_state::pf1_data_w)); // wtf??
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x11ffff).ram();
 	map(0x120020, 0x120021).r(this, FUNC(fghthist_state::fghthist_in0_r));
@@ -650,8 +650,8 @@ void deco32_state::h6280_sound_map(address_map &map)
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 	map(0x1f0000, 0x1f1fff).ram();
-	map(0x1fec00, 0x1fec01).w("audiocpu", FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+	map(0x1fec00, 0x1fec01).rw(m_audiocpu, FUNC(h6280_device::timer_r), FUNC(h6280_device::timer_w)).mirror(0x3fe);
+	map(0x1ff400, 0x1ff403).rw(m_audiocpu, FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w)).mirror(0x3fc);
 }
 
 void deco32_state::h6280_sound_custom_latch_map(address_map &map)
