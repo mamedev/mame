@@ -23,75 +23,13 @@ PAL16R6A 11H
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "machine/decocrpt.h"
 #include "machine/deco102.h"
-#include "machine/deco104.h"
 #include "machine/gen_latch.h"
-#include "video/decospr.h"
-#include "video/deco16ic.h"
 #include "screen.h"
 #include "speaker.h"
-
-
-class dietgo_state : public driver_device
-{
-public:
-	dietgo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_deco104(*this, "ioprot104")
-		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
-		, m_spriteram(*this, "spriteram")
-		, m_sprgen(*this, "spritegen")
-		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_deco_tilegen(*this, "tilegen")
-		, m_decrypted_opcodes(*this, "decrypted_opcodes")
-	{ }
-
-	optional_device<deco104_device> m_deco104;
-	/* memory pointers */
-	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
-	required_shared_ptr<uint16_t> m_spriteram;
-	optional_device<decospr_device> m_sprgen;
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<h6280_device> m_audiocpu;
-	required_device<deco16ic_device> m_deco_tilegen;
-	required_shared_ptr<uint16_t> m_decrypted_opcodes;
-	DECLARE_DRIVER_INIT(dietgo);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECO16IC_BANK_CB_MEMBER(bank_callback);
-
-	DECLARE_READ16_MEMBER( dietgo_protection_region_0_104_r );
-	DECLARE_WRITE16_MEMBER( dietgo_protection_region_0_104_w );
-	void dietgo(machine_config &config);
-	void decrypted_opcodes_map(address_map &map);
-	void dietgo_map(address_map &map);
-	void sound_map(address_map &map);
-};
-
-
-uint32_t dietgo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen->pf_control_r(space, 0, 0xffff);
-
-	flip_screen_set(BIT(flip, 7));
-	m_sprgen->set_flip_screen(BIT(flip, 7));
-	m_deco_tilegen->pf_update(m_pf_rowscroll[0], m_pf_rowscroll[1]);
-
-	bitmap.fill(256, cliprect); /* not verified */
-
-	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-	return 0;
-}
 
 
 READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
