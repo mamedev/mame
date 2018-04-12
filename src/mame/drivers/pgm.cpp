@@ -501,8 +501,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 MACHINE_START_MEMBER(pgm_state,pgm)
 {
 //  machine().base_datetime(m_systime);
-
-	m_ics = machine().device("ics");
 }
 
 MACHINE_RESET_MEMBER(pgm_state,pgm)
