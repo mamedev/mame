@@ -43,7 +43,7 @@ std::unique_ptr<util::disasm_interface> xavix_device::create_disassembler()
 
 offs_t xavix_device::pc_to_external(u16 pc)
 {
-	return adr_with_bank(pc);
+	return adr_with_codebank(pc);
 }
 
 void xavix_device::device_start()
@@ -61,7 +61,8 @@ void xavix_device::device_start()
 
 void xavix_device::device_reset()
 {
-	set_farbank(0);
+	set_codebank(0);
+	set_databank(0);
 	m6502_device::device_reset();
 }
 
@@ -73,24 +74,48 @@ xavix_device::mi_xavix_normal::mi_xavix_normal(xavix_device *_base)
 
 uint8_t xavix_device::mi_xavix_normal::read(uint16_t adr)
 {
-	uint8_t data_bank = program->read_byte(0xff);
-	return program->read_byte((data_bank << 16) | adr);
+	if (adr == 0xfe)
+		return base->m_codebank;
+	else if (adr == 0xff)
+		return base->m_databank;
+
+	return program->read_byte((base->get_databank() << 16) | adr);
 }
 
 uint8_t xavix_device::mi_xavix_normal::read_sync(uint16_t adr)
 {
-	return sdirect->read_byte(base->adr_with_bank(adr));
+	if (adr == 0xfe)
+		return base->m_codebank;
+	else if (adr == 0xff)
+		return base->m_databank;
+
+	return sdirect->read_byte(base->adr_with_codebank(adr));
 }
 
 uint8_t xavix_device::mi_xavix_normal::read_arg(uint16_t adr)
 {
-	return direct->read_byte(base->adr_with_bank(adr));
+	if (adr == 0xfe)
+		return base->m_codebank;
+	else if (adr == 0xff)
+		return base->m_databank;
+
+	return direct->read_byte(base->adr_with_codebank(adr));
 }
 
 void xavix_device::mi_xavix_normal::write(uint16_t adr, uint8_t val)
 {
-	uint8_t data_bank = program->read_byte(0xff);
-	program->write_byte((data_bank << 16) | adr, val);
+	if (adr == 0xfe)
+	{
+		base->m_codebank = val;
+		return;
+	}
+	else if (adr == 0xff)
+	{
+		base->m_databank = val;
+		return;
+	}
+
+	program->write_byte((base->get_databank() << 16) | adr, val);
 }
 
 xavix_device::mi_xavix_nd::mi_xavix_nd(xavix_device *_base) : mi_xavix_normal(_base)
@@ -99,25 +124,48 @@ xavix_device::mi_xavix_nd::mi_xavix_nd(xavix_device *_base) : mi_xavix_normal(_b
 
 uint8_t xavix_device::mi_xavix_nd::read_sync(uint16_t adr)
 {
-	return sprogram->read_byte(base->adr_with_bank(adr));
+	if (adr == 0xfe)
+		return base->m_codebank;
+	else if (adr == 0xff)
+		return base->m_databank;
+
+	return sprogram->read_byte(base->adr_with_codebank(adr));
 }
 
 uint8_t xavix_device::mi_xavix_nd::read_arg(uint16_t adr)
 {
-	return program->read_byte(base->adr_with_bank(adr));
+	if (adr == 0xfe)
+		return base->m_codebank;
+	else if (adr == 0xff)
+		return base->m_databank;
+
+	return program->read_byte(base->adr_with_codebank(adr));
 }
 
-void xavix_device::set_farbank(uint8_t farbank)
+inline void xavix_device::set_codebank(uint8_t bank)
 {
-	space().write_byte(0xfe, farbank);
-	//m_farbank = farbank;
+//	space().write_byte(0xfe, bank);
+	m_codebank = bank;
 }
 	
-uint8_t xavix_device::get_farbank()
+inline uint8_t xavix_device::get_codebank()
 {
-	return space().read_byte(0xfe);
-//	return m_farbank;
+//	return space().read_byte(0xfe);
+	return m_codebank;
 }
+
+inline void xavix_device::set_databank(uint8_t bank)
+{
+//	space().write_byte(0xff, bank);
+	m_databank = bank;
+}
+	
+inline uint8_t xavix_device::get_databank()
+{
+//	return space().read_byte(0xff);
+	return m_databank;
+}
+
 
 
 
