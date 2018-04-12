@@ -17,15 +17,13 @@ Notes:
 
 #include "emu.h"
 #include "includes/popeye.h"
-
 #include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
 #include "machine/netlist.h"
+#include "netlist/devices/net_lib.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
-
-#include "netlist/devices/net_lib.h"
-
 
 /* This is the output stage of the audio circuit.
  * It is solely an impedance changer and could be left away
@@ -132,9 +130,9 @@ void tnx1_state::decrypt_rom()
 
 	/* decrypt the program ROMs */
 	std::vector<uint8_t> buffer(len);
-	for (int i = 0;i < len; i++)
-		buffer[i] = bitswap<8>(rom[bitswap<16>(i,15,14,13,12,11,10,8,7,0,1,2,4,5,9,3,6) ^ 0xfc],3,4,2,5,1,6,0,7);
-	memcpy(rom,&buffer[0],len);
+	for (int i = 0; i < len; i++)
+		buffer[i] = bitswap<8>(rom[bitswap<16>(i, 15, 14, 13, 12, 11, 10, 8, 7, 0, 1, 2, 4, 5, 9, 3, 6) ^ 0xfc], 3, 4, 2, 5, 1, 6, 0, 7);
+	std::copy_n(buffer.begin(), len, rom);
 }
 
 void popeyebl_state::decrypt_rom()
@@ -148,9 +146,9 @@ void tpp2_state::decrypt_rom()
 
 	/* decrypt the program ROMs */
 	std::vector<uint8_t> buffer(len);
-	for (int i = 0;i < len; i++)
-		buffer[i] = bitswap<8>(rom[bitswap<16>(i,15,14,13,12,11,10,8,7,6,3,9,5,4,2,1,0) ^ 0x3f],3,4,2,5,1,6,0,7);
-	memcpy(rom,&buffer[0],len);
+	for (int i = 0; i < len; i++)
+		buffer[i] = bitswap<8>(rom[bitswap<16>(i, 15, 14, 13, 12, 11, 10, 8, 7, 6, 3, 9, 5, 4, 2, 1, 0) ^ 0x3f], 3, 4, 2, 5, 1, 6, 0, 7);
+	std::copy_n(buffer.begin(), len, rom);
 }
 
 WRITE8_MEMBER(tnx1_state::refresh_w)
@@ -162,8 +160,8 @@ WRITE_LINE_MEMBER(tnx1_state::screen_vblank)
 {
 	if (state)
 	{
-		std::copy(&m_dmasource[0], &m_dmasource[m_dmasource.bytes()], m_sprite_ram.begin());
-		std::copy(&m_dmasource[0], &m_dmasource[3], m_background_scroll);
+		std::copy_n(m_dmasource.target(), m_dmasource.bytes(), m_sprite_ram.begin());
+		std::copy_n(m_dmasource.target(), 3, m_background_scroll);
 		m_palette_bank = m_dmasource[3];
 
 		m_field ^= 1;
@@ -204,8 +202,6 @@ WRITE8_MEMBER(tnx1_state::protection_w)
 }
 
 
-
-
 void tnx1_state::maincpu_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -219,23 +215,25 @@ void tnx1_state::maincpu_program_map(address_map &map)
 	map(0xe000, 0xe001).rw(this, FUNC(tnx1_state::protection_r), FUNC(tnx1_state::protection_w));
 }
 
-ADDRESS_MAP_START(tpp2_state::maincpu_program_map)
-	AM_IMPORT_FROM(tpp1_state::maincpu_program_map)
-	AM_RANGE(0x8000, 0x87ff) AM_UNMAP // 7f (unpopulated)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM // 7h
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(background_w)
-ADDRESS_MAP_END
+void tpp2_state::maincpu_program_map(address_map &map)
+{
+	tpp1_state::maincpu_program_map(map);
+	map(0x8000, 0x87ff).unmaprw(); // 7f (unpopulated)
+	map(0x8800, 0x8bff).ram(); // 7h
+	map(0xc000, 0xdfff).w(this, FUNC(tpp2_state::background_w));
+}
 
-ADDRESS_MAP_START(tpp2_noalu_state::maincpu_program_map)
-	AM_IMPORT_FROM(tpp2_state::maincpu_program_map)
-	AM_RANGE(0xe000, 0xe000) AM_READUNMAP AM_WRITENOP // game still writes level number
-	AM_RANGE(0xe001, 0xe001) AM_READNOP AM_WRITEUNMAP // game still reads status but then discards it
-ADDRESS_MAP_END
+void tpp2_noalu_state::maincpu_program_map(address_map &map)
+{
+	tpp2_state::maincpu_program_map(map);
+	map(0xe000, 0xe001).noprw(); // game still writes level number & reads status, but then discards it
+}
 
-ADDRESS_MAP_START(popeyebl_state::maincpu_program_map)
-	AM_IMPORT_FROM(tnx1_state::maincpu_program_map)
-	AM_RANGE(0xe000, 0xe01f) AM_ROM AM_REGION("blprot", 0x00)
-ADDRESS_MAP_END
+void popeyebl_state::maincpu_program_map(address_map &map)
+{
+	tnx1_state::maincpu_program_map(map);
+	map(0xe000, 0xe01f).rom().region("blprot", 0);
+}
 
 void tnx1_state::maincpu_io_map(address_map &map)
 {
@@ -246,6 +244,60 @@ void tnx1_state::maincpu_io_map(address_map &map)
 	map(0x02, 0x02).portr("SYSTEM");
 	map(0x03, 0x03).r("aysnd", FUNC(ay8910_device::data_r));
 }
+
+
+template<typename T>
+class brazehs : public T
+{
+public:
+	brazehs(const machine_config &mconfig, device_type type, const char *tag) :
+		T(mconfig, type, tag),
+		m_eeprom(*this, "eeprom")
+	{
+	}
+
+	virtual void config(machine_config &config) override
+	{
+		T::config(config);
+		config.device_add(this, "eeprom", EEPROM_SERIAL_93C46_8BIT, 0);
+	}
+
+protected:
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+
+	virtual void driver_start() override
+	{
+		T::driver_start();
+
+		uint8_t *rom = this->memregion("brazehs")->base();
+		int len = this->memregion("brazehs")->bytes();
+
+		/* decrypt the program ROMs */
+		std::vector<uint8_t> buffer(len);
+		for (int i = 0; i < len; i++)
+			buffer[i] = bitswap<8>(rom[bitswap<16>(i, 15, 10, 8, 9, 13, 14, 12, 11, 7, 6, 5, 4, 3, 2, 1, 0)], 1, 4, 5, 7, 6, 0, 3, 2);
+		std::copy_n(buffer.begin(), len, rom);
+	}
+
+	DECLARE_READ8_MEMBER(eeprom_r)
+	{
+		return m_eeprom->do_read();
+	}
+
+	DECLARE_WRITE8_MEMBER(eeprom_w)
+	{
+		m_eeprom->di_write(data & 0x01);
+		m_eeprom->cs_write(data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->clk_write(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	}
+
+	virtual void maincpu_program_map(address_map &map) override
+	{
+		T::maincpu_program_map(map);
+		map(0x0000, 0x7fff).rom().region("brazehs", 0);
+		map(0x9000, 0x9000).rw(this, FUNC(brazehs::eeprom_r), FUNC(brazehs::eeprom_w));
+	}
+};
 
 
 CUSTOM_INPUT_MEMBER(tnx1_state::dsw1_read)
@@ -554,7 +606,7 @@ ROM_START( skyskipr )
 	ROM_LOAD( "tnx1-c.2e",    0x4000, 0x1000, CRC(6b0c0525) SHA1(e4e12ea9e3140736d7543a274f3b266e58059356) )
 	ROM_LOAD( "tnx1-c.2f",    0x5000, 0x1000, CRC(d1712424) SHA1(2de42c379f18bfbd68fc64db24c9b0d38de26c29) )
 	ROM_LOAD( "tnx1-c.2g",    0x6000, 0x1000, CRC(8b33c4cf) SHA1(86d51b5098dffc69330b28662b04bd906d962792) )
-	/* 7000-7fff empty */
+	ROM_FILL( 0x7000, 0x1000, 0xff )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "tnx1-v.3h",    0x0000, 0x0800, CRC(ecb6a046) SHA1(7fd2312d39fefe6237699e2916e0c313165755ad) )
@@ -831,6 +883,38 @@ ROM_START( popeyejo )
 	ROM_LOAD( "tpp1-t.3j.82s129", 0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* video timing prom */
 ROM_END
 
+ROM_START( popeyehs )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "tpp2-c.7a", 0x0000, 0x2000, CRC(9af7c821) SHA1(592acfe221b5c3bd9b920f639b141f37a56d6997) )
+	ROM_LOAD( "tpp2-c.7b", 0x2000, 0x2000, CRC(c3704958) SHA1(af96d10fa9bdb86b00c89d10f67cb5ca5586f446) )
+	ROM_LOAD( "tpp2-c.7c", 0x4000, 0x2000, CRC(5882ebf9) SHA1(5531229b37f9ba0ede7fdc24909e3c3efbc8ade4) )
+	ROM_LOAD( "tpp2-c.7e", 0x6000, 0x2000, CRC(ef8649ca) SHA1(a0157f91600e56e2a953dadbd76da4330652e5c8) )
+
+	ROM_REGION( 0x8000, "brazehs", 0 )
+	ROM_LOAD( "p100d.bin", 0x0000, 0x8000, CRC(ab8d7821) SHA1(368352af26caaac8abd95c391263c59c1358fd28) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "tpp2-v.5n", 0x0000, 0x0800, CRC(cca61ddd) SHA1(239f87947c3cc8c6693c295ebf5ea0b7638b781c) )   /* first half is empty */
+	ROM_CONTINUE(          0x0000, 0x0800 )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "tpp2-v.1e", 0x0000, 0x2000, CRC(0f2cd853) SHA1(426c9b4f6579bfcebe72b976bfe4f05147d53f96) )
+	ROM_LOAD( "tpp2-v.1f", 0x2000, 0x2000, CRC(888f3474) SHA1(ddee56b2b49bd50aaf9c98d8ef6e905e3f6ab859) )
+	ROM_LOAD( "tpp2-v.1j", 0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
+	ROM_LOAD( "tpp2-v.1k", 0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	ROM_LOAD( "tpp2-c.4a", 0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
+	ROM_LOAD( "tpp2-c.3a", 0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
+
+	ROM_REGION( 0x0100, "sprpal", 0 )
+	ROM_LOAD_NIB_LOW(  "tpp2-c.5b", 0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "tpp2-c.5a", 0x0000, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+
+	ROM_REGION( 0x0100, "timing", 0 )
+	ROM_LOAD( "tpp2-v.7j", 0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* video timing prom */
+ROM_END
+
 
 GAME( 1981, skyskipr, 0,        config,  skyskipr, tnx1_state,       0, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1982, popeye,   0,        config,  popeye,   tpp2_state,       0, ROT0, "Nintendo", "Popeye (revision D)",                  MACHINE_SUPPORTS_SAVE )
@@ -841,3 +925,4 @@ GAME( 1982, popeyeb2, popeye,   config,  popeye,   popeyebl_state,   0, ROT0, "b
 GAME( 1982, popeyeb3, popeye,   config,  popeye,   tpp2_noalu_state, 0, ROT0, "bootleg",  "Popeye (bootleg set 3)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1982, popeyej,  popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1982, popeyejo, popeye,   config,  popeye,   tpp1_state,       0, ROT0, "Nintendo", "Popeye (Japan, Older)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, popeyehs, popeye,   config,  popeye,   brazehs<tpp2_noalu_state>, 0, ROT0, "hack (Braze Technologies)", "Popeye (Braze High Score Kit P1.00D)", MACHINE_SUPPORTS_SAVE )

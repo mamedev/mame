@@ -273,10 +273,11 @@ void argus_state::sound_map_b(address_map &map)
 }
 
 #if 0
-ADDRESS_MAP_START(argus_state::sound_portmap_1)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-ADDRESS_MAP_END
+void argus_state::sound_portmap_1(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 #endif
 
 void argus_state::sound_portmap_2(address_map &map)

@@ -2520,6 +2520,7 @@ csprints1                       // 136045           (c) 1986
 paperboy                        // 136034           (c) 1984
 paperboyr1                      // 136034           (c) 1984
 paperboyr2                      // 136034           (c) 1984
+paperboyp                       // (proto)
 ssprint                         // 136042           (c) 1986
 ssprint1                        // 136042           (c) 1986
 ssprint3                        // 136042           (c) 1986
@@ -13940,6 +13941,7 @@ homo                            // bootleg
 
 @source:gokidetor.cpp
 gokidetor                       // (c) 1992 Taito
+gokidetor2                      // (c) 1992 Taito
 
 @source:goldngam.cpp
 moviecrd                        // (c) 1998 Golden Games
@@ -15271,6 +15273,7 @@ fearless                        // (c) 2006
 @source:igs_m027.cpp
 amazoni2                        // (c) 2002
 amazonia                        // (c) 1999
+amazonkp                        // (c) 1999
 chessc2                         // (c) 200?
 fruitpar                        // (c) 200?
 gonefsh2                        // (c) 200?
@@ -18509,10 +18512,13 @@ markham                         // TVG14 (c) 1983 Sun Electronics
 marywu                          //
 
 @source:mastboy.cpp
-mastboy                         // (c) 1987 - No Ref on the PCB
-mastboya                        // (c) 1987 - No Ref on the PCB
-mastboyi                        // (c) 1987 - No Ref on the PCB
-mastboyia                       // (c) 1987 - No Ref on the PCB
+mastboy                         // (c) 1991 - No Ref on the PCB
+mastboya                        // (c) 1991 - No Ref on the PCB
+mastboyi                        // (c) 1991 - No Ref on the PCB
+mastboyia                       // (c) 1991 - No Ref on the PCB
+
+@source:mastboyo.cpp
+mastboyo                        // (c) 1987 - No Ref on the PCB
 
 @source:matmania.cpp
 excthour                        // TA-0015 (c) 1985 + Taito license
@@ -32081,6 +32087,7 @@ pooyans                         // GX320 (c) 1982 Stern
 
 @source:popeye.cpp
 popeye                          // (c) 1982
+popeyehs
 popeyebl                        // bootleg
 popeyeb2                        // bootleg
 popeyeb3                        // bootleg
@@ -32774,6 +32781,7 @@ relief3                         // 136093           (c) 1992
 kuniokun                        // TA-0018 (c) 1986
 kuniokunb                       // bootleg
 renegade                        // TA-0018 (c) 1986 + Taito America license
+renegadeb                       // bootleg
 
 @source:replicator.cpp
 replica1                        // Makerbot Replicator 1 desktop 3d printer
@@ -36641,6 +36649,7 @@ rygarj                          // 6002 - (c) 1986 Tecmo
 silkworm                        // 6217 - (c) 1988 Tecmo
 silkwormj                       // 6217 - (c) 1988 Tecmo
 silkwormp                       // 6217 - (c) 1988 Tecmo
+silkwormb                       // bootleg
 
 @source:tecmo16.cpp
 fstarfrc                        // (c) 1992 Tecmo
@@ -37718,11 +37727,13 @@ jmpbreak                        // (c) 1999 F2 System
 poosho                          // (c) 1999 F2 System
 luplup                          // (c) 1999 Omega System
 luplup29                        // (c) 1999 Omega System
+luplup10                        // (c) 1999 Omega System (Adko license)
 misncrft                        // (c) 2000 Sun
 misncrfta                       // (c) 2000 Sun
 mrdig                           // (c) 2000 Sun
 mrkicker                        // (c) 2001 Semicom
 mrkickera                       // (c) 2001 Semicom
+newxpang                        // (c) 1999 F2 System
 puzlbang                        // (c) 1999 Omega System
 puzlbanga                       // (c) 1999 Omega System
 suplup                          // (c) 1999 Omega System

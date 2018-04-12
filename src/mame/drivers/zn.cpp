@@ -585,7 +585,7 @@ READ16_MEMBER(zn_state::capcom_kickharness_r)
 
 WRITE8_MEMBER(zn_state::bank_coh1000c_w)
 {
-	m_rombank[0]->set_entry( data );
+	m_rombank[0]->set_entry( data & 0x0f);
 }
 
 WRITE8_MEMBER(zn_state::qsound_bankswitch_w)

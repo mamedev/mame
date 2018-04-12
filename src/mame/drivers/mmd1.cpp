@@ -155,8 +155,10 @@ class mmd1_state : public driver_device
 {
 public:
 	mmd1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
@@ -169,18 +171,22 @@ public:
 	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
 	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
-	uint8_t m_return_code;
-	uint8_t m_digit;
 	DECLARE_DRIVER_INIT(mmd2);
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
-	required_device<cpu_device> m_maincpu;
 	void mmd1(machine_config &config);
 	void mmd2(machine_config &config);
 	void mmd1_io(address_map &map);
 	void mmd1_mem(address_map &map);
 	void mmd2_io(address_map &map);
 	void mmd2_mem(address_map &map);
+
+private:
+	uint8_t m_return_code;
+	uint8_t m_digit;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<9> m_digits;
 };
 
 
@@ -404,7 +410,7 @@ WRITE8_MEMBER( mmd1_state::mmd2_scanlines_w )
 WRITE8_MEMBER( mmd1_state::mmd2_digit_w )
 {
 	if (m_digit < 9)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 }
 
 READ8_MEMBER( mmd1_state::mmd2_kbd_r )

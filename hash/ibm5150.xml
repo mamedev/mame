@@ -7024,6 +7024,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="breach2">
+		<description>Breach 2</description>
+		<year>1990</year>
+		<publisher>Mindcraft Software</publisher>
+		<info name="developer" value="Omnitrend Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Breach 2 [Mindcraft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="6f60695e" sha1="beb951a4e9df014f1e3226333e3b2625e386f8b0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1989</year>
@@ -7569,6 +7581,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Future Wars - Adventures in Time (1990)(Interplay)(Disk 3 of 3).dsk" size="368640" crc="2f54bdc2" sha1="33fd871aa3607bcb1bad4c3939edf6c06045c29e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="futurwar35" cloneof="futurwar">
+		<description>Future Wars - Adventures in Time (3.5")</description>
+		<year>1990</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Delphine Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Future Wars [Interplay] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="c0fa70bd" sha1="14c2fc05da4959da3c8bb63d445695f0cf553972" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Future Wars [Interplay] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="fb6d55bc" sha1="62f879d61334684222c72473e8a83eb2fcd32efe" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8746,6 +8775,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Monty Python's Flying Circus (1990)(Virgin Games)(Disk 2 of 2).dsk" size="368640" crc="c1c40d8c" sha1="b724017f7a314cac625463d1aa106eaeac669288" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monumars">
+		<description>The Monuments of Mars!</description>
+		<year>1991</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Scenerio Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Monuments of Mars [Apogee Software] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="5750f887" sha1="40eacb771aad0a017aece21be734f1fd4253d1a7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

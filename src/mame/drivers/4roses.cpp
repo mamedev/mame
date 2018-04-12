@@ -281,9 +281,9 @@ void _4roses_state::rugby_map(address_map &map)
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x2000, 0x2fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
-	map(0x3000, 0x3fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
-	map(0x4000, 0xffff).rom().region("maincpu", 0x4000);
+	map(0x2000, 0xffff).rom().region("maincpu", 0x2000);
+	map(0x6000, 0x6fff).ram().w(this, FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
 }
 
 READ8_MEMBER(_4roses_state::rugby_opcode_r)

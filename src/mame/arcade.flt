@@ -685,6 +685,7 @@ mario.cpp
 markham.cpp
 marywu.cpp
 mastboy.cpp
+mastboyo.cpp
 matmania.cpp
 maxaflex.cpp
 maygay1b.cpp
@@ -1397,6 +1398,11 @@ zwackery.cpp
 -jaguarcd
 //neogeo.cpp
 -aes
+-ng_mv1
+-ng_mv1f
+-ng_mv1fz
+-ng_mv2f
+-ng_mv4f
 //saturn.cpp
 -saturn
 -saturnjp

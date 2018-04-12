@@ -270,7 +270,7 @@ void giclassicsvr_state::server_main(address_map &map)
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x080000, 0x08ffff).ram();
 	map(0x090000, 0x093fff).ram();
-	map(0x100000, 0x107fff).ram().ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x100000, 0x107fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x183fff).ram();
 	map(0x280000, 0x281fff).ram().rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x300000, 0x300007).w(m_k055673, FUNC(k055673_device::k053246_word_w)); // SPRITES

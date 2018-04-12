@@ -752,7 +752,7 @@ inline uint32_t mb86235_device::get_transfer_reg(uint8_t which)
 				case 1: // FI
 				{
 					FCLR(IFE);
-					if(is_fifoin_empty() == true)
+					if(m_fifoin->is_empty())
 					{
 						FSET(IFE);
 						m_core->cur_fifo_state.has_stalled = true;
@@ -765,13 +765,7 @@ inline uint32_t mb86235_device::get_transfer_reg(uint8_t which)
 					}
 
 					m_core->cur_fifo_state.has_stalled = false;
-					uint32_t res = (uint32_t)m_core->fifoin.data[m_core->fifoin.rpos];
-
-					m_core->fifoin.rpos++;
-					m_core->fifoin.rpos &= FIFOIN_SIZE-1;
-					m_core->fifoin.num--;
-
-					return res;
+					return m_fifoin->pop();
 				}
 			}
 		}
@@ -827,24 +821,23 @@ inline void mb86235_device::set_transfer_reg(uint8_t which, uint32_t value)
 					break;
 				case 2: // FO0
 					FCLR(OFF);
-					if(is_fifoout0_full() == true)
+					if(m_fifoout0)
 					{
-						FSET(OFF);
-						m_core->cur_fifo_state.has_stalled = true;
-						if((m_core->st & RP) == 0)
-							m_core->cur_fifo_state.pc = m_core->ppc;
+						if(m_fifoout0->is_full())
+						{
+							FSET(OFF);
+							m_core->cur_fifo_state.has_stalled = true;
+							if((m_core->st & RP) == 0)
+								m_core->cur_fifo_state.pc = m_core->ppc;
 
-						//else
-						//  fatalerror("check me (writes)");
-						return;
-					}
+							//else
+							//  fatalerror("check me (writes)");
+							return;
+						}
 
-					m_core->cur_fifo_state.has_stalled = false;
-					m_core->fifoout0.data[m_core->fifoin.wpos] = value;
-
-					m_core->fifoout0.wpos++;
-					m_core->fifoout0.wpos &= FIFOIN_SIZE-1;
-					m_core->fifoout0.num++;
+						m_core->cur_fifo_state.has_stalled = false;
+						m_fifoout0->push(u32(value));
+					}	
 					break;
 				case 4: m_core->pdr = value; break;
 				case 5: m_core->ddr = value; break;
@@ -1193,21 +1186,18 @@ void mb86235_device::do_control(uint32_t h, uint32_t l)
 		case 0x03: // CLRF
 			if(ef1 & 1) // clear fifo in (CLRFI)
 			{
-				m_core->fifoin.wpos = 0;
-				m_core->fifoin.rpos = 0;
-				m_core->fifoin.num = 0;
+				if(m_fifoin)
+					m_fifoin->clear();
 				FSET(IFE);
 				FCLR(IFF);
 				m_core->cur_fifo_state.has_stalled = false;
 			}
 			if(ef1 & 2) // clear fifo0/1 out (CLRFO)
 			{
-				m_core->fifoout0.wpos = 0;
-				m_core->fifoout0.rpos = 0;
-				m_core->fifoout0.num = 0;
-				m_core->fifoout1.wpos = 0;
-				m_core->fifoout1.rpos = 0;
-				m_core->fifoout1.num = 0;
+				if(m_fifoout0)
+					m_fifoout0->clear();
+				if(m_fifoout1)
+					m_fifoout1->clear();
 				FSET(OFE);
 				FCLR(OFF);
 				m_core->cur_fifo_state.has_stalled = false;
