@@ -677,6 +677,12 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 			osd_printf_error("In %s memory range %x-%x, start address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
 		if (entry.m_addrend & ~globalmask)
 			osd_printf_error("In %s memory range %x-%x, end address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
+		if (entry.m_addrmask & ~globalmask)
+			osd_printf_error("In %s range %x-%x mask %x mirror %x select %x, mask is outside of the global address mask %x, did you mean %x ?\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, globalmask, entry.m_addrmask & globalmask);
+		if ((entry.m_addrmirror & ~globalmask) && (entry.m_addrmirror | globalmask) != 0xffffffff >> (32 - spaceconfig.m_addr_width))
+			osd_printf_error("In %s range %x-%x mask %x mirror %x select %x, mirror is outside of the global address mask %x, did you mean %x ?\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, globalmask, entry.m_addrmirror & globalmask);
+		if (entry.m_addrselect & ~globalmask)
+			osd_printf_error("In %s range %x-%x mask %x mirror %x select %x, select is outside of the global address mask %x, did you mean %x ?\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, globalmask, entry.m_addrselect & globalmask);
 
 		// look for misaligned entries
 		if (entry.m_read.m_type != AMH_NONE)
