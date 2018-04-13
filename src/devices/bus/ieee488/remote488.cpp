@@ -157,8 +157,11 @@
 #include "remote488.h"
 
 // Debugging
-#define VERBOSE 1
 #include "logmacro.h"
+#define LOG_PARSER_MASK	(LOG_GENERAL << 1)
+#define LOG_PARSER(...)	LOGMASKED(LOG_PARSER_MASK, __VA_ARGS__)
+#undef VERBOSE
+#define VERBOSE LOG_GENERAL
 
 // Bit manipulation
 namespace {
@@ -544,7 +547,7 @@ char remote488_device::recv_update(uint8_t& data)
 
 	// Do not iterate too much..
 	for (i = 0; i < 8 && m_stream->input(&c , 1); i++) {
-		//int prev_state = m_rx_state;
+		int prev_state = m_rx_state;
 		switch (m_rx_state) {
 		case REM_RX_WAIT_CH:
 			if (is_msg_type(c)) {
@@ -586,7 +589,7 @@ char remote488_device::recv_update(uint8_t& data)
 		case REM_RX_WAIT_SEP:
 			if (is_terminator(c) || is_space(c)) {
 				m_rx_state = REM_RX_WAIT_CH;
-				//LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
+				LOG_PARSER("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
 				data = m_rx_data;
 				return m_rx_ch;
 			} else {
@@ -604,7 +607,7 @@ char remote488_device::recv_update(uint8_t& data)
 			m_rx_state = REM_RX_WAIT_CH;
 			break;
 		}
-		//LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
+		LOG_PARSER("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
 	}
 	return 0;
 }
