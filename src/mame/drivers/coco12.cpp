@@ -499,6 +499,8 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("coco_cart_list", "coco_cart")
 	MCFG_SOFTWARE_LIST_FILTER("coco_cart_list", "COCO")
+	MCFG_SOFTWARE_LIST_ADD("coco_flop_list", "coco_flop")
+	MCFG_SOFTWARE_LIST_FILTER("coco_flop_list", "COCO")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("dragon_cart_list", "dragon_cart")
 MACHINE_CONFIG_END
 
