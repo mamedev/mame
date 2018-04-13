@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_XAVIX_H
+#define MAME_INCLUDES_XAVIX_H
 
 #include "cpu/m6502/xavix.h"
 #include "machine/timer.h"
@@ -260,3 +262,5 @@ private:
 	int m_alt_addressing;
 	required_device<address_map_bank_device> m_lowbus;
 };
+
+#endif // MAME_INCLUDES_XAVIX_H
