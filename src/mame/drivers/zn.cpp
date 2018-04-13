@@ -1085,7 +1085,7 @@ WRITE8_MEMBER(zn_state::bank_coh1000t_w)
 
 WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
 {
-	m_soundbank->set_entry( ( data - 1 ) & 0x07 );
+	m_soundbank->set_entry( data & 0x07 );
 }
 
 void zn_state::coh1000ta_map(address_map &map)
@@ -1102,14 +1102,17 @@ MACHINE_START_MEMBER(zn_state,coh1000ta)
 {
 	m_rombank[0]->configure_entries( 0, 4, m_bankedroms->base(), 0x800000 ); /* banked game rom */
 	if (m_soundbank.found())
-		m_soundbank->configure_entries( 0, 8, memregion( "audiocpu" )->base() + 0x4000, 0x4000 );
+	{
+		m_soundbank->configure_entry( 0, memregion( "audiocpu" )->base() + 0x20000 ); /* TODO : Bank 0 is addressing First 16 KB of ROM? */
+		m_soundbank->configure_entries( 1, 7, memregion( "audiocpu" )->base() + 0x4000, 0x4000 );
+	}
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
 	m_rombank[0]->set_entry( 0 );
 	if (m_soundbank.found())
-		m_soundbank->set_entry( 0 );
+		m_soundbank->set_entry( 1 );
 }
 
 void zn_state::fx1a_sound_map(address_map &map)
@@ -4579,7 +4582,7 @@ ROM_START( mgcldate )
 	ROM_LOAD( "e32-02.6",            0x0800000, 0x400000, CRC(61c8438c) SHA1(bdbe6079cc634c0cd6580f76619eb2944c9a31d9) )
 	ROM_LOAD( "e32-03.12",           0x0c00000, 0x200000, CRC(190d1618) SHA1(838a651d32752015baa7e8caea62fd739631b8be) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e32-07.22",           0x0000000, 0x020000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )
@@ -4599,7 +4602,7 @@ ROM_START( mgcldtex )
 	ROM_LOAD( "e32-02.6",            0x0800000, 0x400000, CRC(61c8438c) SHA1(bdbe6079cc634c0cd6580f76619eb2944c9a31d9) )
 	ROM_LOAD( "e32-03.12",           0x0c00000, 0x200000, CRC(190d1618) SHA1(838a651d32752015baa7e8caea62fd739631b8be) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e32-10.22",           0x0000000, 0x020000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x400000, "ymsnd", 0 )
@@ -4620,7 +4623,7 @@ ROM_START( psyforce )
 	ROM_LOAD( "e22-03.19",           0x0a00000, 0x200000, CRC(8372f839) SHA1(646b3919b6be63412c11850ec1524685abececc0) )
 	ROM_LOAD( "e22-04.21",           0x0c00000, 0x200000, CRC(397b71aa) SHA1(48743c362503c1d2dbeb3c8be4cb2aaaae015b88) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x020000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )// 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4640,7 +4643,7 @@ ROM_START( psyforcej )
 	ROM_LOAD( "e22-03.19",           0x0a00000, 0x200000, CRC(8372f839) SHA1(646b3919b6be63412c11850ec1524685abececc0) )
 	ROM_LOAD( "e22-04.21",           0x0c00000, 0x200000, CRC(397b71aa) SHA1(48743c362503c1d2dbeb3c8be4cb2aaaae015b88) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x020000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )// 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4660,7 +4663,7 @@ ROM_START( psyforcex )
 	ROM_LOAD( "e22-03.19",           0x0a00000, 0x200000, CRC(8372f839) SHA1(646b3919b6be63412c11850ec1524685abececc0) )
 	ROM_LOAD( "e22-04.21",           0x0c00000, 0x200000, CRC(397b71aa) SHA1(48743c362503c1d2dbeb3c8be4cb2aaaae015b88) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x020000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )// 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4757,7 +4760,7 @@ ROM_START( sfchamp )
 	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
 	ROM_LOAD( "e18-05.21",           0x0c00000, 0x200000, CRC(2e984c50) SHA1(6d8255e38c67d68bf489c9885663ed2edf148188) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4778,7 +4781,7 @@ ROM_START( sfchampo )
 	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
 	ROM_LOAD( "e18-05.21",           0x0c00000, 0x200000, CRC(2e984c50) SHA1(6d8255e38c67d68bf489c9885663ed2edf148188) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4799,7 +4802,7 @@ ROM_START( sfchampu )
 	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
 	ROM_LOAD( "e18-05.21",           0x0c00000, 0x200000, CRC(2e984c50) SHA1(6d8255e38c67d68bf489c9885663ed2edf148188) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
@@ -4820,7 +4823,7 @@ ROM_START( sfchampj )
 	ROM_LOAD( "e18-04.19",           0x0a00000, 0x200000, CRC(fc3731da) SHA1(58948aad8d7bb7a8449d2bf12e9d5e6d7b4426b5) )
 	ROM_LOAD( "e18-05.21",           0x0c00000, 0x200000, CRC(2e984c50) SHA1(6d8255e38c67d68bf489c9885663ed2edf148188) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
 	ROM_REGION( 0x200000, "ymsnd", 0 )
