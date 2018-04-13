@@ -205,6 +205,21 @@ constexpr unsigned MAX_MISSED_HB    = 3;    // Missed heartbeats to declare the 
 // device type definition
 DEFINE_DEVICE_TYPE(REMOTE488, remote488_device, "remote488", "IEEE-488 Remotizer")
 
+DEFINE_DEVICE_TYPE_NS(REMOTE488_IO , bus::ieee488::remote488 , remote488_io_device, "remote488_io", "IEEE-488 Remotizer I/O")
+
+namespace bus {
+	namespace ieee488 {
+		namespace remote488 {
+
+			remote488_io_device::remote488_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: bitbanger_device(mconfig , tag , owner , clock)
+			{
+			}
+
+		}
+	}
+}
+
 remote488_device::remote488_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig , REMOTE488 , tag , owner , clock),
 	device_ieee488_interface(mconfig , *this),
@@ -213,7 +228,7 @@ remote488_device::remote488_device(const machine_config &mconfig, const char *ta
 }
 
 MACHINE_CONFIG_START(remote488_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("stream", BITBANGER, 0)
+	MCFG_DEVICE_ADD("stream", REMOTE488_IO, 0)
 MACHINE_CONFIG_END
 
 void remote488_device::ieee488_eoi(int state)
@@ -325,8 +340,8 @@ void remote488_device::process_input_msgs()
 			if (m_flush_bytes) {
 				LOG("Flushed\n");
 			} else {
-				recvd_data_byte(data , false);
 				m_poll_timer->reset();
+				recvd_data_byte(data , false);
 				return;
 			}
 			break;
@@ -336,8 +351,8 @@ void remote488_device::process_input_msgs()
 				LOG("Flushed\n");
 				m_flush_bytes = false;
 			} else {
-				recvd_data_byte(data , true);
 				m_poll_timer->reset();
+				recvd_data_byte(data , true);
 				return;
 			}
 			break;
@@ -544,7 +559,7 @@ char remote488_device::recv_update(uint8_t& data)
 
 	// Do not iterate too much..
 	for (i = 0; i < 8 && m_stream->input(&c , 1); i++) {
-		int prev_state = m_rx_state;
+		//int prev_state = m_rx_state;
 		switch (m_rx_state) {
 		case REM_RX_WAIT_CH:
 			if (is_msg_type(c)) {
@@ -586,7 +601,7 @@ char remote488_device::recv_update(uint8_t& data)
 		case REM_RX_WAIT_SEP:
 			if (is_terminator(c) || is_space(c)) {
 				m_rx_state = REM_RX_WAIT_CH;
-				LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
+				//LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
 				data = m_rx_data;
 				return m_rx_ch;
 			} else {
@@ -604,7 +619,7 @@ char remote488_device::recv_update(uint8_t& data)
 			m_rx_state = REM_RX_WAIT_CH;
 			break;
 		}
-		LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
+		//LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
 	}
 	return 0;
 }

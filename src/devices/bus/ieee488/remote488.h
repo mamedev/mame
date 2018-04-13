@@ -14,6 +14,24 @@
 #include "ieee488.h"
 #include "imagedev/bitbngr.h"
 
+namespace bus {
+	namespace ieee488 {
+		namespace remote488 {
+
+			class remote488_io_device : public bitbanger_device
+			{
+			public:
+				remote488_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+				virtual const char *custom_instance_name() const override { return "remotizer"; }
+				virtual const char *custom_brief_instance_name() const override { return "remt"; }
+			};
+		}
+	}
+}
+
+DECLARE_DEVICE_TYPE_NS(REMOTE488_IO, bus::ieee488::remote488 , remote488_io_device)
+
 class remote488_device : public device_t,
 						 public device_ieee488_interface
 {
@@ -78,7 +96,7 @@ private:
 		REM_RX_WAIT_WS
 	};
 
-	required_device<bitbanger_device> m_stream;
+	required_device<bus::ieee488::remote488::remote488_io_device> m_stream;
 	uint8_t m_in_signals;
 	uint8_t m_out_signals;
 	bool m_no_propagation;
