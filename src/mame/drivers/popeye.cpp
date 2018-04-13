@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Couriersud
+// copyright-holders:smf, Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
 /***************************************************************************
 
@@ -21,7 +21,6 @@ Notes:
 #include "machine/eepromser.h"
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
-#include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -121,6 +120,22 @@ void tnx1_state::driver_start()
 	save_item(NAME(m_prot1));
 	save_item(NAME(m_prot_shift));
 	save_item(NAME(m_nmi_enabled));
+
+	m_prot0 = 0;
+	m_prot1 = 0;
+	m_prot_shift = 0;
+	m_nmi_enabled = false;
+}
+
+void tpp2_state::driver_start()
+{
+	tnx1_state::driver_start();
+
+	save_item(NAME(m_watchdog_enabled));
+	save_item(NAME(m_watchdog_counter));
+
+	m_watchdog_enabled = false;
+	m_watchdog_counter = 0;
 }
 
 void tnx1_state::decrypt_rom()
@@ -153,7 +168,21 @@ void tpp2_state::decrypt_rom()
 
 WRITE8_MEMBER(tnx1_state::refresh_w)
 {
-	m_nmi_enabled = ((offset >> 8) & 1) != 0;
+	const bool nmi_enabled = ((offset >> 8) & 1) != 0;
+	if (m_nmi_enabled != nmi_enabled)
+	{
+		m_nmi_enabled = nmi_enabled;
+
+		if (!m_nmi_enabled)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
+WRITE8_MEMBER(tpp2_state::refresh_w)
+{
+	tnx1_state::refresh_w(space, offset, data, mem_mask);
+
+	m_watchdog_enabled = ((offset >> 9) & 1) != 0;
 }
 
 WRITE_LINE_MEMBER(tnx1_state::screen_vblank)
@@ -166,10 +195,32 @@ WRITE_LINE_MEMBER(tnx1_state::screen_vblank)
 
 		m_field ^= 1;
 		if (m_nmi_enabled)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
+WRITE_LINE_MEMBER(tpp2_state::screen_vblank)
+{
+	tnx1_state::screen_vblank(state);
+
+	if (state)
+	{
+		uint8_t watchdog_counter = m_watchdog_counter;
+
+		if (m_nmi_enabled || !m_watchdog_enabled)
+			watchdog_counter = 0;
+		else
+			watchdog_counter = (watchdog_counter + 1) & 0xf;
+
+		if ((watchdog_counter ^ m_watchdog_counter) & 4)
+		{
+			m_maincpu->set_input_line(INPUT_LINE_RESET, watchdog_counter & 4 ? ASSERT_LINE : CLEAR_LINE);
+			m_aysnd->reset();
+		}
+
+		m_watchdog_counter = watchdog_counter;
+	}
+}
 
 /* the protection device simply returns the last two values written shifted left */
 /* by a variable amount. */

@@ -1167,21 +1167,23 @@ void cbm2_state::cbm2_mem(address_map &map)
 //  ADDRESS_MAP( ext_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(cbm2_state::ext_mem)
-	AM_RANGE(0x00000, 0xeffff) AM_READWRITE(ext_read, ext_write)
-	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0xf000) AM_ROM AM_REGION(EXT_I8088_TAG, 0)
-ADDRESS_MAP_END
+void cbm2_state::ext_mem(address_map &map)
+{
+	map(0x00000, 0xeffff).r(this, FUNC(cbm2_state::ext_read)).w(this, FUNC(cbm2_state::ext_write));
+	map(0xf0000, 0xf0fff).mirror(0xf000).rom().region(EXT_I8088_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( ext_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(cbm2_state::ext_io)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0x1e) AM_DEVREADWRITE(EXT_I8259A_TAG, pic8259_device, read, write)
-	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x18) AM_DEVREADWRITE(EXT_MOS6525_TAG, tpi6525_device, read, write)
-ADDRESS_MAP_END
+void cbm2_state::ext_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x0000, 0x0001).mirror(0x1e).rw(EXT_I8259A_TAG, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0020, 0x0027).mirror(0x18).rw(EXT_MOS6525_TAG, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
+}
 
 
 //-------------------------------------------------

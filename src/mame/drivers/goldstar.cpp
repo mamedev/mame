@@ -486,9 +486,10 @@ void sanghopm_state::star100_readport(address_map &map)
   E1:  W    Reels enable/disable register
  */
 
-ADDRESS_MAP_START(goldstar_state::ramdac_map)
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
-ADDRESS_MAP_END
+void goldstar_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
 
 /*
   RAMDAC written commands:

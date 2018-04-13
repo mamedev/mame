@@ -109,6 +109,23 @@ public:
 	{
 	}
 
+	void pc9821v20(machine_config &config);
+	void pc9801ux(machine_config &config);
+	void pc9801vm(machine_config &config);
+	void pc9801(machine_config &config);
+	void pc9801bx2(machine_config &config);
+	void pc9821ap2(machine_config &config);
+	void pc9821(machine_config &config);
+	void pc9801rs(machine_config &config);
+	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
+	DECLARE_DRIVER_INIT(pc9801_kanji);
+
+protected:
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
 	required_device<pit8253_device> m_pit8253;
@@ -160,7 +177,6 @@ public:
 	DECLARE_READ8_MEMBER(gvram_r);
 	DECLARE_WRITE8_MEMBER(gvram_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_mouse_freq_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	DECLARE_READ16_MEMBER(grcg_gvram_r);
 	DECLARE_WRITE16_MEMBER(grcg_gvram_w);
 	DECLARE_READ16_MEMBER(grcg_gvram0_r);
@@ -285,7 +301,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 	DECLARE_READ8_MEMBER(unk_r);
 
-	DECLARE_DRIVER_INIT(pc9801_kanji);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t a20_286(bool state);
@@ -296,14 +311,6 @@ public:
 	void pc9801_sasi(machine_config &config);
 	void pc9801_ide(machine_config &config);
 	void pc9801_common(machine_config &config);
-	void pc9821v20(machine_config &config);
-	void pc9801ux(machine_config &config);
-	void pc9801vm(machine_config &config);
-	void pc9801(machine_config &config);
-	void pc9801bx2(machine_config &config);
-	void pc9821ap2(machine_config &config);
-	void pc9821(machine_config &config);
-	void pc9801rs(machine_config &config);
 	void ipl_bank(address_map &map);
 	void pc9801_common_io(address_map &map);
 	void pc9801_io(address_map &map);
@@ -317,12 +324,7 @@ public:
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
 	void upd7220_grcg_2_map(address_map &map);
-protected:
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-
-private:
 	enum
 	{
 		TIMER_VBIRQ
@@ -380,8 +382,7 @@ private:
 	struct {
 		uint8_t pal_entry;
 		uint8_t r[0x100],g[0x100],b[0x100];
-		uint16_t read_bank;
-		uint16_t write_bank;
+		uint16_t bank[2];
 	}m_analog256;
 	struct {
 		uint8_t mode;

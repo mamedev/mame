@@ -309,7 +309,7 @@ void kaneko16_berlwall_state::berlwall(address_map &map)
 	map(0x680000, 0x680001).portr("P1");
 	map(0x680002, 0x680003).portr("P2");
 	map(0x680004, 0x680005).portr("SYSTEM");
-//  AM_RANGE(0x680006, 0x680007) AM_READ_PORT("UNK")
+//  map(0x680006, 0x680007) AM_READ_PORT("UNK")
 	map(0x700000, 0x700001).w(this, FUNC(kaneko16_berlwall_state::kaneko16_coin_lockout_w));  // Coin Lockout
 	map(0x780000, 0x780001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 	map(0x800000, 0x80001f).rw(this, FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_r<0>), FUNC(kaneko16_berlwall_state::kaneko16_ay_YM2149_w<0>)); // Sound
@@ -376,7 +376,7 @@ void kaneko16_state::blazeon(address_map &map)
 	map(0xe00000, 0xe00001).nopr(); // Read = IRQ Ack ?
 	map(0xe00000, 0xe00000).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xe40000, 0xe40001).nopr(); // IRQ Ack ?
-//  AM_RANGE(0xe80000, 0xe80001) AM_READNOP // IRQ Ack ?
+//  map(0xe80000, 0xe80001) AM_READNOP // IRQ Ack ?
 	map(0xec0000, 0xec0001).nopr(); // Lev 4 IRQ Ack ?
 }
 
@@ -583,7 +583,7 @@ void kaneko16_gtmr_state::gtmr2_map(address_map &map)
 	map(0xa00000, 0xa00001).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));   // Watchdog
 
 	map(0xb00000, 0xb00001).portr("P1");
-//  AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
+//  map(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	map(0xb00002, 0xb00003).r(this, FUNC(kaneko16_gtmr_state::gtmr2_IN1_r));
 	map(0xb00004, 0xb00005).portr("SYSTEM");
 	map(0xb00006, 0xb00007).portr("EXTRA");
@@ -644,7 +644,7 @@ void kaneko16_shogwarr_state::shogwarr(address_map &map)
 	map(0x280000, 0x280001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com0_w));
 	map(0x290000, 0x290001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com1_w));
 	map(0x2b0000, 0x2b0001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com2_w));
-	//AM_RANGE(0x2c0000, 0x2c0001) // run calc 3? or irq ack?
+	//map(0x2c0000, 0x2c0001) // run calc 3? or irq ack?
 	map(0x2d0000, 0x2d0001).w(m_calc3_prot, FUNC(kaneko_calc3_device::mcu_com3_w));
 	map(0x380000, 0x380fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x400001, 0x400001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // Samples
@@ -696,7 +696,7 @@ void kaneko16_state::blazeon_soundport(address_map &map)
 void kaneko16_state::wingforc_soundport(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x00) // 02 written at boot
+//  map(0x00, 0x00) // 02 written at boot
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0a, 0x0a).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -2038,14 +2038,16 @@ MACHINE_CONFIG_END
     VIDEO_UPDATE_AFTER_VBLANK fixes the mangled/wrong colored sprites
 */
 
-ADDRESS_MAP_START(kaneko16_state::gtmr_oki1_map)
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank1")
-ADDRESS_MAP_END
+void kaneko16_state::gtmr_oki1_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr("okibank1");
+}
 
-ADDRESS_MAP_START(kaneko16_state::gtmr_oki2_map)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("okibank2")
-ADDRESS_MAP_END
+void kaneko16_state::gtmr_oki2_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).bankr("okibank2");
+}
 
 MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 

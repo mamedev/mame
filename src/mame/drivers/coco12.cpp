@@ -54,9 +54,9 @@
 //  ADDRESS_MAP( coco_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(coco_state::coco_mem)
-ADDRESS_MAP_END
-
+void coco_state::coco_mem(address_map &map)
+{
+}
 
 
 //**************************************************************************
