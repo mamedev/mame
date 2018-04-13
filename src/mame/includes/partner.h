@@ -24,6 +24,7 @@ public:
 		: radio86_state(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
 		, m_fdc(*this, "wd1793")
+		, m_bank(*this, "bank%u", 1U)
 	{
 	}
 
@@ -51,6 +52,7 @@ protected:
 
 	required_device<ram_device> m_ram;
 	required_device<fd1793_device> m_fdc;
+	required_memory_bank_array<13> m_bank;
 };
 
 
