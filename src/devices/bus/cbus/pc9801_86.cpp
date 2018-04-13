@@ -252,7 +252,8 @@ READ8_MEMBER(pc9801_86_device::pcm_r)
 
 WRITE8_MEMBER(pc9801_86_device::pcm_w)
 {
-	const int rates[] = {44100, 33075, 22050, 16538, 11025, 8268, 5513, 4134};
+	const int rate = 44100*3 // TODO : unknown clock / divider
+	const int divs[] = {3, 4, 6, 8, 12, 16, 24, 32};
 	if((offset & 1) == 0)
 	{
 		switch(offset >> 1)
@@ -263,7 +264,7 @@ WRITE8_MEMBER(pc9801_86_device::pcm_w)
 			case 2:
 				m_pcm_ctrl = data & ~0x10;
 				if(data & 0x80)
-					m_dac_timer->adjust(attotime::from_hz(rates[data & 7]), 0, attotime::from_hz(rates[data & 7]));
+					m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
 				else
 					m_dac_timer->adjust(attotime::never);
 				if(data & 8)
