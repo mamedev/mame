@@ -48,6 +48,66 @@ void xavix_state::video_start()
 }
 
 
+double xavix_state::hue2rgb(double p, double q, double t)
+{
+	if (t < 0) t += 1;
+	if (t > 1) t -= 1;
+	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
+	if (t < 1 / 2.0f) return q;
+	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
+	return p;
+}
+
+
+void xavix_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// not verified
+	int offs = 0;
+	for (int index = 0; index < 256; index++)
+	{
+		uint16_t dat = m_palram1[offs];
+		dat |= m_palram2[offs]<<8;
+		offs++;
+
+		int l_raw = (dat & 0x1f00) >> 8;
+		int sl_raw =(dat & 0x00e0) >> 5;
+		int h_raw = (dat & 0x001f) >> 0;
+
+		//if (h_raw > 24)
+		//  logerror("hraw >24 (%02x)\n", h_raw);
+
+		//if (l_raw > 17)
+		//  logerror("lraw >17 (%02x)\n", l_raw);
+
+		//if (sl_raw > 7)
+		//  logerror("sl_raw >5 (%02x)\n", sl_raw);
+
+		double l = (double)l_raw / 17.0f;
+		double s = (double)sl_raw / 7.0f;
+		double h = (double)h_raw / 24.0f;
+
+		double r, g, b;
+
+		if (s == 0) {
+			r = g = b = l; // greyscale
+		}
+		else {
+			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+			double p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1 / 3.0f);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1 / 3.0f);
+		}
+
+		int r_real = r * 255.0f;
+		int g_real = g * 255.0f;
+		int b_real = b * 255.0f;
+
+		m_palette->set_pen_color(index, r_real, g_real, b_real);
+
+	}
+}
+
 void xavix_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
 	int alt_tileaddressing = 0;
@@ -472,6 +532,8 @@ void xavix_state::draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 uint32_t xavix_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	handle_palette(screen, bitmap, cliprect);
+
 	bitmap.fill(0, cliprect);
 
 	draw_tilemap(screen,bitmap,cliprect,0);

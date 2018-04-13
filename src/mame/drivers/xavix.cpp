@@ -259,8 +259,8 @@ void xavix_state::xavix_lowbus_map(address_map &map)
 	map(0x6500, 0x65ff).ram().share("spr_addr_lo");
 	map(0x6600, 0x66ff).ram().share("spr_addr_md");
 	map(0x6700, 0x67ff).ram().share("spr_addr_hi");
-	map(0x6800, 0x68ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x6900, 0x69ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x6800, 0x68ff).ram().share("palram1"); // written with 6900
+	map(0x6900, 0x69ff).ram().share("palram2"); // startup (taitons1)
 	map(0x6a00, 0x6a1f).ram().share("spr_attra"); // test mode, pass flag 0x20
 
 	map(0x6fc0, 0x6fc0).w(this, FUNC(xavix_state::xavix_6fc0_w)); // startup (maybe this is a mirror of tmap1_regs_w)
@@ -614,9 +614,7 @@ MACHINE_CONFIG_START(xavix_state::xavix)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xavix)
 
-	MCFG_DEVICE_ADD("palette", RADICA_HSVPAL, 0)
-	MCFG_PALETTE_ENTRIES(256)
-	MCFG_PALETTE_FORMAT(XXXVVVVVSSSHHHHH_XAVIX)
+	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

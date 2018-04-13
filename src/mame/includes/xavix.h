@@ -6,7 +6,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
-#include "video/rad_hsvpal.h"
+
 
 class xavix_state : public driver_device
 {
@@ -22,6 +22,8 @@ public:
 		m_spr_addr_lo(*this, "spr_addr_lo"),
 		m_spr_addr_md(*this, "spr_addr_md"),
 		m_spr_addr_hi(*this, "spr_addr_hi"),
+		m_palram1(*this, "palram1"),
+		m_palram2(*this, "palram2"),
 		m_spr_attra(*this, "spr_attra"),
 		m_palette(*this, "palette"),
 		m_in0(*this, "IN0"),
@@ -224,9 +226,12 @@ private:
 	required_shared_ptr<uint8_t> m_spr_addr_md;
 	required_shared_ptr<uint8_t> m_spr_addr_hi;
 
+	required_shared_ptr<uint8_t> m_palram1;
+	required_shared_ptr<uint8_t> m_palram2;
+
 	required_shared_ptr<uint8_t> m_spr_attra;
 
-	required_device<radica_hsvpal_device> m_palette;
+	required_device<palette_device> m_palette;
 
 	required_ioport m_in0;
 	required_ioport m_in1;
@@ -234,6 +239,8 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	double hue2rgb(double p, double q, double t);
 	void draw_tile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int opaque);
 	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
