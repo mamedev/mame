@@ -260,20 +260,14 @@ WRITE8_MEMBER(topspeed_state::coins_w)
                         SOUND
 *****************************************************/
 
-WRITE8_MEMBER(topspeed_state::sound_bankswitch_w)
-{
-	membank("sndbank")->set_entry(data & 3);
-}
-
 void topspeed_state::msm5205_update(int chip)
 {
 	if (m_msm_reset[chip])
 		return;
 
-	uint8_t data = m_msm_rom[chip][m_msm_pos[chip]];
-	msm5205_device *msm = chip ? m_msm2 : m_msm1;
+	uint8_t data = m_msm_rom[(chip << 16) | m_msm_pos[chip]];
 
-	msm->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
+	m_msm[chip]->data_w((m_msm_nibble[chip] ? data : data >> 4) & 0xf);
 
 	if (m_msm_nibble[chip])
 		++m_msm_pos[chip];
@@ -289,7 +283,6 @@ WRITE_LINE_MEMBER(topspeed_state::msm5205_1_vck)
 WRITE8_MEMBER(topspeed_state::msm5205_command_w)
 {
 	int chip = (offset >> 12) & 1;
-	msm5205_device *msm = chip ? m_msm2 : m_msm1;
 
 	switch (offset >> 8 & 0x2e)
 	{
@@ -301,14 +294,14 @@ WRITE8_MEMBER(topspeed_state::msm5205_command_w)
 		// $b400 / $c400: Run
 		case 0x04:
 			m_msm_reset[chip] = 0;
-			msm->reset_w(0);
+			m_msm[chip]->reset_w(0);
 			break;
 
 		// $b800 / $c800: Stop
 		case 0x08:
 			m_msm_reset[chip] = 1;
 			m_msm_nibble[chip] = 0;
-			msm->reset_w(1);
+			m_msm[chip]->reset_w(1);
 			break;
 
 		// $cc00: ? Chip 2 only
@@ -344,7 +337,7 @@ WRITE_LINE_MEMBER(topspeed_state::z80ctc_to0)
 		// CTC output is divided by 2
 		if (m_msm2_vck)
 		{
-			m_msm2->vclk_w(1);
+			m_msm[1]->vclk_w(1);
 		}
 		else
 		{
@@ -357,13 +350,13 @@ WRITE_LINE_MEMBER(topspeed_state::z80ctc_to0)
 			if ((oldpos >> 8) == 0x0f && ((m_msm_pos[1] >> 8) == 0x10))
 			{
 				m_msm_pos[1] = 0;
-				m_msm2->reset_w(1);
-				m_msm2->vclk_w(0);
-				m_msm2->reset_w(0);
+				m_msm[1]->reset_w(1);
+				m_msm[1]->vclk_w(0);
+				m_msm[1]->reset_w(0);
 			}
 			else
 			{
-				m_msm2->vclk_w(0);
+				m_msm[1]->vclk_w(0);
 			}
 		}
 
@@ -389,14 +382,14 @@ void topspeed_state::cpua_map(address_map &map)
 	map(0x800000, 0x8003ff).ram().share("raster_ctrl");
 	map(0x800400, 0x80ffff).ram();
 	map(0x880000, 0x880007).nopw(); // Lamps/outputs?
-	map(0xa00000, 0xa0ffff).rw(m_pc080sn_1, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
-	map(0xa20000, 0xa20003).w(m_pc080sn_1, FUNC(pc080sn_device::yscroll_word_w));
-	map(0xa40000, 0xa40003).w(m_pc080sn_1, FUNC(pc080sn_device::xscroll_word_w));
-	map(0xa50000, 0xa50003).w(m_pc080sn_1, FUNC(pc080sn_device::ctrl_word_w));
-	map(0xb00000, 0xb0ffff).rw(m_pc080sn_2, FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
-	map(0xb20000, 0xb20003).w(m_pc080sn_2, FUNC(pc080sn_device::yscroll_word_w));
-	map(0xb40000, 0xb40003).w(m_pc080sn_2, FUNC(pc080sn_device::xscroll_word_w));
-	map(0xb50000, 0xb50003).w(m_pc080sn_2, FUNC(pc080sn_device::ctrl_word_w));
+	map(0xa00000, 0xa0ffff).rw(m_pc080sn[0], FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
+	map(0xa20000, 0xa20003).w(m_pc080sn[0], FUNC(pc080sn_device::yscroll_word_w));
+	map(0xa40000, 0xa40003).w(m_pc080sn[0], FUNC(pc080sn_device::xscroll_word_w));
+	map(0xa50000, 0xa50003).w(m_pc080sn[0], FUNC(pc080sn_device::ctrl_word_w));
+	map(0xb00000, 0xb0ffff).rw(m_pc080sn[1], FUNC(pc080sn_device::word_r), FUNC(pc080sn_device::word_w));
+	map(0xb20000, 0xb20003).w(m_pc080sn[1], FUNC(pc080sn_device::yscroll_word_w));
+	map(0xb40000, 0xb40003).w(m_pc080sn[1], FUNC(pc080sn_device::xscroll_word_w));
+	map(0xb50000, 0xb50003).w(m_pc080sn[1], FUNC(pc080sn_device::ctrl_word_w));
 	map(0xd00000, 0xd00fff).ram().share("spriteram");
 	map(0xe00000, 0xe0ffff).ram().share("spritemap");
 }
@@ -515,10 +508,10 @@ static const gfx_layout tile16x8_layout =
 	16,8,   // 16*8 sprites
 	RGN_FRAC(1,1),
 	4,      // 4 bits per pixel
-	{ 0, 8, 16, 24 },
-	{ 32, 33, 34, 35, 36, 37, 38, 39, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	64*8    // every sprite takes 64 consecutive bytes
+	{ STEP4(0,8) },
+	{ STEP8(8*4,1), STEP8(0,1) },
+	{ STEP8(0,8*4*2) },
+	16*8*4    // every sprite takes 64 consecutive bytes
 };
 
 static const gfx_layout charlayout =
@@ -526,10 +519,10 @@ static const gfx_layout charlayout =
 	8,8,    // 8*8 characters
 	RGN_FRAC(1,1),
 	4,      // 4 bits per pixel
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    // every sprite takes 32 consecutive bytes
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	8*8*4    // every sprite takes 32 consecutive bytes
 };
 
 static GFXDECODE_START( topspeed )
@@ -545,10 +538,8 @@ GFXDECODE_END
 
 void topspeed_state::machine_start()
 {
-	membank("sndbank")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
-
-	m_msm_rom[0] = memregion("adpcm")->base();
-	m_msm_rom[1] = memregion("adpcm")->base() + 0x10000;
+	membank("sndbank")->configure_entry(0, memregion("audiocpu")->base() + 0x10000);
+	membank("sndbank")->configure_entries(1, 3, memregion("audiocpu")->base() + 0x4000, 0x4000);
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_ioc220_port));
@@ -566,8 +557,8 @@ void topspeed_state::machine_reset()
 
 	m_msm_reset[0] = 0;
 	m_msm_reset[1] = 0;
-	m_msm1->reset_w(1);
-	m_msm2->reset_w(1);
+	m_msm[0]->reset_w(1);
+	m_msm[1]->reset_w(1);
 	m_msm2_vck = 0;
 	m_msm2_vck2 = 0;
 }
@@ -631,7 +622,7 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000) / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(topspeed_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("sndbank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "filter1l", 1.0)
 	MCFG_SOUND_ROUTE(1, "filter1r", 1.0)
 
@@ -679,13 +670,12 @@ ROM_START( topspeed )
 	ROM_LOAD16_BYTE( "b14-69.80",   0x00000, 0x10000, CRC(d652e300) SHA1(b559bdb564d96da4c656dc7b2c88dae84c4861ae) )
 	ROM_LOAD16_BYTE( "b14-70.81",   0x00001, 0x10000, CRC(b720592b) SHA1(13298b498a198dcc1a56e533d106545dd77e1bbc) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 ) // Z80 sound CPU
-	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
-	ROM_CONTINUE(          0x10000, 0x0c000 ) // Banked stuff
+	ROM_REGION( 0x14000, "audiocpu", ROMREGION_ERASE00 ) // Z80 sound CPU
+	ROM_LOAD( "b14-25.67", 0x00000, 0x10000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
-	ROM_LOAD16_BYTE( "b14-07.54",   0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
-	ROM_LOAD16_BYTE( "b14-06.52",   0x00001, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
+	ROM_LOAD16_BYTE( "b14-06.52",   0x00000, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
+	ROM_LOAD16_BYTE( "b14-07.54",   0x00001, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROMX_LOAD( "b14-48.16", 0x000003, 0x20000, CRC(30c7f265) SHA1(3e52e2aabf2c456d0b57d9414f99bd942bafc887) , ROM_SKIP(7) ) // OBJ, bitplane 3
@@ -729,13 +719,12 @@ ROM_START( topspeedu )
 	ROM_LOAD16_BYTE( "b14-26", 0x00000, 0x10000, CRC(659dc872) SHA1(0a168122fe6324510c830e21a56eace9c8a2c189) )
 	ROM_LOAD16_BYTE( "b14-56", 0x00001, 0x10000, CRC(d165cf1b) SHA1(bfbb8699c5671d3841d4057678ef4085c1927684) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 ) // Z80 sound CPU
-	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
-	ROM_CONTINUE(          0x10000, 0x0c000 ) // Banked stuff
+	ROM_REGION( 0x14000, "audiocpu", ROMREGION_ERASE00 ) // Z80 sound CPU
+	ROM_LOAD( "b14-25.67", 0x00000, 0x10000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
-	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
-	ROM_LOAD16_BYTE( "b14-06.52", 0x00001, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
+	ROM_LOAD16_BYTE( "b14-06.52", 0x00000, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
+	ROM_LOAD16_BYTE( "b14-07.54", 0x00001, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) // OBJ: each rom has 1 bitplane, forming 16x8 tiles
 	ROM_LOAD32_BYTE( "b14-01", 0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) )
@@ -764,13 +753,12 @@ ROM_START( fullthrl )
 	ROM_LOAD16_BYTE( "b14-69.80", 0x00000, 0x10000, CRC(d652e300) SHA1(b559bdb564d96da4c656dc7b2c88dae84c4861ae) )
 	ROM_LOAD16_BYTE( "b14-71",    0x00001, 0x10000, CRC(f7081727) SHA1(f0ab6ce9975dd7a1fadd439fd3dfd2f1bf88796c) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 ) // Z80 sound CPU
-	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
-	ROM_CONTINUE(          0x10000, 0x0c000 ) // Banked stuff
+	ROM_REGION( 0x14000, "audiocpu", ROMREGION_ERASE00 ) // Z80 sound CPU
+	ROM_LOAD( "b14-25.67", 0x00000, 0x10000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
-	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
-	ROM_LOAD16_BYTE( "b14-06.52", 0x00001, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
+	ROM_LOAD16_BYTE( "b14-06.52", 0x00000, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
+	ROM_LOAD16_BYTE( "b14-07.54", 0x00001, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) // OBJ: each rom has 1 bitplane, forming 16x8 tiles
 	ROM_LOAD32_BYTE( "b14-01", 0x00000, 0x80000, CRC(84a56f37) SHA1(926bcae5bd75a4172de2a2078718b2940c5c1966) )
