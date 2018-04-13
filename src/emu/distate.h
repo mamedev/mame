@@ -251,7 +251,7 @@ public:
 	void set_pc(offs_t pc) { set_state_int(STATE_GENPC, pc); }
 
 	// deliberately ambiguous functions; if you have the state interface
-	// just use it or pc() and pcbase() directly
+	// just use it directly
 	device_state_interface &state() { return *this; }
 
 public: // protected eventually
