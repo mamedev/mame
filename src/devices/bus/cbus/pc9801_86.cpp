@@ -252,7 +252,7 @@ READ8_MEMBER(pc9801_86_device::pcm_r)
 
 WRITE8_MEMBER(pc9801_86_device::pcm_w)
 {
-	const int rate = 44100*3 // TODO : unknown clock / divider
+	const int rate = 44100*3; // TODO : unknown clock / divider
 	const int divs[] = {3, 4, 6, 8, 12, 16, 24, 32};
 	if((offset & 1) == 0)
 	{
