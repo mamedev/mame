@@ -20,7 +20,6 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK_X1 XTAL(1'996'800)
 #define QUEUE_SIZE 32768
 
 //**************************************************************************
@@ -55,7 +54,7 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 
 MACHINE_CONFIG_START(pc9801_86_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
+	MCFG_SOUND_ADD("opna", YM2608, 7.987_MHz_XTAL)
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_86_device, sound_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(pc9801_86_device, opn_porta_r))
 	//MCFG_AY8910_PORT_B_READ_CB(READ8(pc9801_state, opn_portb_r))
@@ -252,8 +251,8 @@ READ8_MEMBER(pc9801_86_device::pcm_r)
 
 WRITE8_MEMBER(pc9801_86_device::pcm_w)
 {
-	const int rate = 44100*3; // TODO : unknown clock / divider
-	const int divs[8] = {3, 4, 6, 8, 12, 16, 24, 32};
+	const u32 rate = (25.4_MHz_XTAL).value() / 16;
+	const int divs[8] = {36, 48, 72, 96, 144, 192, 288, 384};
 	if((offset & 1) == 0)
 	{
 		switch(offset >> 1)
