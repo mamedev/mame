@@ -123,6 +123,8 @@ Notes:
 
 - There are images/videos on the net of kaitei and geebee running in 3bpp
   (aka 7 colors), this is assumed to be a homebrew repair or hack.
+  Update: Gee Bee definitely uses an overlay while kaitei actually outputs 
+  colors depending on the monitor type used (color or b&w)
 
 ***************************************************************************/
 
@@ -441,9 +443,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( kaitei_config )
 	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Color Type" )
-	PORT_CONFSETTING( 0x00, "Black & White" )
-	PORT_CONFSETTING( 0x01, "Color" )
+	PORT_CONFNAME( 0x01, 0x01, "Monitor Type" )
+	PORT_CONFSETTING(    0x00, "Monochrome" )
+	PORT_CONFSETTING(    0x01, "Color" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kaitein )

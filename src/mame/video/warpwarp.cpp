@@ -42,9 +42,10 @@ PALETTE_INIT_MEMBER(warpwarp_state,navarone)
 
 MACHINE_RESET_MEMBER(warpwarp_state,kaitei)
 {
-	// TODO: some PCB videos/images shows a b&w arrangement, others a full colorized one.
-	//       Both versions seems to have equal distribution (latter is hack/homebrew?) therefore 
-	//       support both under machine configuration.
+	// Some PCB videos/images shows a b&w arrangement, others a full colorized one.
+	// This is due of the monitor type used, cfr. http://news.livedoor.com/article/detail/5604337/ 
+	
+	// We change color palette at reset time, according to the configuration switch.
 	if(m_in_config->read() & 1) // color
 	{
 		m_palette->set_pen_color(0, rgb_t(0x00,0x00,0x00));
