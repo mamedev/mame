@@ -124,7 +124,7 @@ WRITE_LINE_MEMBER(taitosj_state::mcu_busrq_w)
 
 READ8_MEMBER(taitosj_state::spacecr_prot_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if( pc != 0x368A && pc != 0x36A6 )
 		logerror("Read protection from an unknown location: %04X\n",pc);

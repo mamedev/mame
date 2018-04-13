@@ -495,7 +495,7 @@ void bfcobra_state::RunBlit(address_space &space)
 		/* This debug is now wrong ! */
 		if (DEBUG_BLITTER)
 		{
-			osd_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context(), blitter.program.addr - 12);
+			osd_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context().c_str(), blitter.program.addr - 12);
 			osd_printf_debug("Command Reg         %.2x",   blitter.command);
 			osd_printf_debug("     %s %s %s %s %s %s %s\n",
 				blitter.command & CMD_RUN ? "RUN" : "     ",

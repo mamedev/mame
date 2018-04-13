@@ -97,7 +97,7 @@ READ16_MEMBER(kaneko_grap2_device::regs1_r)
 		}
 
 		default:
-			logerror("cpu '%s' (PC=%06X): regs1_r %02x %04x\n", space.device().tag(), space.device().safe_pcbase(), offset, mem_mask);
+			logerror("%s: regs1_r %02x %04x\n", machine().describe_context(), offset, mem_mask);
 			break;
 
 	}

@@ -260,7 +260,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		{
 			data &= ~0x38;
 			data |= (m_montype.read_safe(2)<<3);
-//            printf("rbv_r montype: %02x (PC %x)\n", data, space.cpu->safe_pc());
+//            printf("%s rbv_r montype: %02x\n", machine().describe_context().c_str(), data);
 		}
 
 		// bit 7 of these registers always reads as 0 on RBV
