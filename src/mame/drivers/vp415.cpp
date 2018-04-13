@@ -52,6 +52,7 @@
 
 #include "machine/i8155.h"
 #include "machine/i8255.h"
+#include "machine/saa1043.h"
 #include "video/mb88303.h"
 
 class vp415_state : public driver_device
@@ -89,6 +90,8 @@ public:
 	DECLARE_READ8_MEMBER(drive_i8255_pc_r);
 	DECLARE_WRITE8_MEMBER(drive_cpu_port1_w);
 
+	DECLARE_WRITE_LINE_MEMBER(refv_w);
+
 	static const char* Z80CPU_TAG;
 	static const char* Z80RAM_TAG;
 	static const char* CTRLCPU_TAG;
@@ -102,6 +105,7 @@ public:
 	static const char* I8155_TAG;
 	static const char* I8255_TAG;
 	static const char* CHARGEN_TAG;
+	static const char* SYNCGEN_TAG;
 
 protected:
 	enum
@@ -184,6 +188,27 @@ protected:
 		CTRL_PARITY_BIT   = 2,
 	};
 
+	enum
+	{
+		I8255PB_COMM1    = 0x01,
+		I8255PB_COMM2    = 0x02,
+		I8255PB_COMM3    = 0x04,
+		I8255PB_COMM4    = 0x08,
+		I8255PB_RLS_N    = 0x10,
+		I8255PB_SL_PWR   = 0x20,
+		I8255PB_RAD_FS_N = 0x40,
+		I8255PB_STR1     = 0x80,
+
+		I8255PB_COMM1_BIT    = 0,
+		I8255PB_COMM2_BIT    = 1,
+		I8255PB_COMM3_BIT    = 2,
+		I8255PB_COMM4_BIT    = 3,
+		I8255PB_RLS_N_BIT    = 4,
+		I8255PB_SL_PWR_BIT   = 5,
+		I8255PB_RAD_FS_N_BIT = 6,
+		I8255PB_STR1_BIT     = 7,
+	};
+
 	virtual void video_start() override;
 
 	void z80_program_map(address_map &map);
@@ -214,6 +239,8 @@ protected:
 	uint8_t m_aux_status_reg;
 	uint8_t m_diag_status_reg;
 	uint8_t m_intn_lines[2];
+
+	uint8_t m_refv;
 };
 
 /*static*/ const char* vp415_state::Z80CPU_TAG = "z80cpu";
@@ -229,6 +256,7 @@ protected:
 /*static*/ const char* vp415_state::I8155_TAG = "i8155";
 /*static*/ const char* vp415_state::I8255_TAG = "i8255";
 /*static*/ const char* vp415_state::CHARGEN_TAG = "mb88303";
+/*static*/ const char* vp415_state::SYNCGEN_TAG = "saa1043";
 
 void vp415_state::machine_reset()
 {
@@ -246,6 +274,12 @@ void vp415_state::machine_reset()
 
 void vp415_state::machine_start()
 {
+}
+
+WRITE_LINE_MEMBER(vp415_state::refv_w)
+{
+	m_refv = state;
+	m_drivecpu->set_input_line(MCS51_INT0_LINE, m_refv ? ASSERT_LINE : CLEAR_LINE);
 }
 
 // CPU Datagrabber Module (W)
@@ -475,7 +509,16 @@ WRITE8_MEMBER(vp415_state::drive_i8255_pa_w)
 
 WRITE8_MEMBER(vp415_state::drive_i8255_pb_w)
 {
-	logerror("%s: drive_i8255_pb_w: %02x\n", machine().describe_context(), data);
+	logerror("%s: drive_i8255_pb_w: COMM-1:%d, COMM-2:%d, COMM-3:%d, COMM-4:%d, /RLS:%d, SL-PWR:%d, /RAD-FS:%d, STR1:%d\n"
+		, machine().describe_context()
+		, BIT(data, I8255PB_COMM1_BIT)
+		, BIT(data, I8255PB_COMM2_BIT)
+		, BIT(data, I8255PB_COMM3_BIT)
+		, BIT(data, I8255PB_COMM4_BIT)
+		, BIT(data, I8255PB_RLS_N_BIT)
+		, BIT(data, I8255PB_SL_PWR_BIT)
+		, BIT(data, I8255PB_RAD_FS_N_BIT)
+		, BIT(data, I8255PB_STR1_BIT));
 }
 
 READ8_MEMBER(vp415_state::drive_i8255_pc_r)
@@ -560,6 +603,9 @@ MACHINE_CONFIG_START(vp415_state::vp415)
 	MCFG_I8255_IN_PORTC_CB(READ8(vp415_state, drive_i8255_pc_r))
 
 	MCFG_DEVICE_ADD(CHARGEN_TAG, MB88303, 0)
+
+	MCFG_DEVICE_ADD(SYNCGEN_TAG, SAA1043, XTAL(5'000'000))
+	MCFG_SAA1043_V2_CALLBACK(WRITELINE(vp415_state, refv_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
