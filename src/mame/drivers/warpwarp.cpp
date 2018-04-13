@@ -136,6 +136,7 @@ Notes:
 
 #include "geebee.lh"
 #include "navarone.lh"
+#include "sos.lh"
 
 #define MASTER_CLOCK        XTAL(18'432'000)
 
@@ -438,7 +439,16 @@ static INPUT_PORTS_START( navarone )
 	PORT_BIT( 0x02, 0x00, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kaitei_config )
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x00, "Color Type" )
+	PORT_CONFSETTING( 0x00, "Black & White" )
+	PORT_CONFSETTING( 0x01, "Color" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( kaitein )
+	PORT_INCLUDE( kaitei_config )
+
 	PORT_START("SW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_COCKTAIL
@@ -479,6 +489,8 @@ static INPUT_PORTS_START( kaitein )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kaitei )
+	PORT_INCLUDE( kaitei_config )
+
 	PORT_START("SW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
@@ -764,6 +776,18 @@ MACHINE_CONFIG_START(warpwarp_state::navarone)
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(warpwarp_state::kaitei)
+	geebee(config);
+
+	/* basic machine hardware */
+	MCFG_GFXDECODE_MODIFY("gfxdecode", 1k)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_ENTRIES(4*2+1)
+
+	MCFG_MACHINE_RESET_OVERRIDE(warpwarp_state,kaitei)
+MACHINE_CONFIG_END
+
+
 MACHINE_CONFIG_START(warpwarp_state::bombbee)
 
 	/* basic machine hardware */
@@ -972,7 +996,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,kaitein)
 {
 	m_handle_joystick = 1;
 
-	m_ball_pen = 1;
+	m_ball_pen = 8;
 	m_ball_sizex = 1;
 	m_ball_sizey = 16;
 }
@@ -981,7 +1005,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,kaitei)
 {
 	m_handle_joystick = 0;
 
-	m_ball_pen = 1;
+	m_ball_pen = 8;
 	m_ball_sizex = 1;
 	m_ball_sizey = 16;
 }
@@ -1021,9 +1045,9 @@ GAMEL(1978, geebeeb,    geebee,   geebeeb,  geebeeb,   warpwarp_state, geebee,  
 GAMEL(1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 
 GAMEL(1980, navarone,   0,        navarone, navarone,  warpwarp_state, navarone, ROT90, "Namco", "Navarone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_navarone )
-GAME( 1980, kaitein,    kaitei,   navarone, kaitein,   warpwarp_state, kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", MACHINE_SUPPORTS_SAVE ) // pretty sure it didn't have a color overlay
-GAME( 1980, kaitei,     0,        navarone, kaitei,    warpwarp_state, kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1980, sos,        0,        navarone, sos,       warpwarp_state, sos,      ROT90, "Namco", "SOS", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // developed by Shoei?
+GAME( 1980, kaitein,    kaitei,   kaitei,   kaitein,   warpwarp_state, kaitein,  ROT90, "K.K. Tokki (Namco license)", "Kaitei Takara Sagashi (Namco license)", MACHINE_SUPPORTS_SAVE ) // pretty sure it didn't have a color overlay
+GAME( 1980, kaitei,     0,        kaitei,   kaitei,    warpwarp_state, kaitei,   ROT90, "K.K. Tokki", "Kaitei Takara Sagashi", MACHINE_SUPPORTS_SAVE ) // "
+GAMEL( 1980, sos,        0,       navarone, sos,       warpwarp_state, sos,      ROT90, "Namco", "SOS", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_sos ) // developed by Shoei?
 
 /* Color games */
 GAME( 1979, bombbee,    0,        bombbee,  bombbee,   warpwarp_state, bombbee,  ROT90, "Namco", "Bomb Bee", MACHINE_SUPPORTS_SAVE )
