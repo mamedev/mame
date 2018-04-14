@@ -13067,7 +13067,6 @@ touchgoe                        // (c) 1995 - Ref 950510-1
 touchgon                        // (c) 1995 - Ref 950906
 touchgok                        // (c) 1995 - Ref 950510-1
 wrally2                         // (c) 1995 - Ref 950510
-wrally2a                        // (c) 1995 - Ref 950510
 
 @source:gaelco3d.cpp
 footbpow                        // (c) 1999 - Ref 000208
@@ -14303,6 +14302,8 @@ gradius3js                      // GX945 (c) 1989 (Japan, split)
 
 @source:grchamp.cpp
 grchamp                         // GM  (c) 1981 Taito Corporation
+grchampa                        // GM  (c) 1981 Taito Corporation
+grchampb                        // GM  (c) 1981 Taito Corporation
 
 @source:grfd2301.cpp
 grfd2301                        //
