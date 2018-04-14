@@ -1968,6 +1968,56 @@ ROM_START( wrally2 )
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
 
+	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
+	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
+	ROM_LOAD( "wr2_ic68.ic68",  0x0800000, 0x0100000, CRC(4a75ffaa) SHA1(ffae561ad4fa100398ab6b94d8dcb13e9fae4272) ) /* GFX only - read as 27C080 */
+
+	ROM_REGION( 0x0800000, "gfx2", 0 ) /* Temporary storage */
+	ROM_LOAD( "wr2_ic69.ic69",  0x0000000, 0x0400000, CRC(a174d196) SHA1(4a7da1cd288e73518143a027782f3140e6582cf4) ) /* GFX & Sound - read as 27C332 */
+	ROM_LOAD( "wr2_ic70.ic70",  0x0400000, 0x0200000, CRC(8d1e43ba) SHA1(79eed51788c6c55a4347be70a3be4eb14a0d1747) ) /* GFX only - read as 27C160 */
+	ROM_FILL(                   0x0600000, 0x0200000, 0x00 )          /* Empty */
+ROM_END
+
+ROM_START( wrally2a )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "wr2.64",  0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
+	ROM_LOAD16_BYTE( "wr2.63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	/* This SRAM has been dumped from 2 PCBs.  The first had unused space filled as 0xff, the 2nd space was filled as 0x00.
+	   In addition, the first had 2 bad bytes, one of which was identified at the time, the other not.  For reference the
+	   one that was not is "1938: 18 <-> 9B" (part of a data table)
+
+	   A little less obvious is why the older dump had the following startup code, which appears to have been partially
+	   patched out
+
+	    0200: mov   sp,#$70
+	    0203: mov   a,pcon
+	    0205: anl   a,#$20
+	    0207: jnz   $0203
+	    0209: nop
+	    020A: nop
+	    020B: nop
+	    020C: mov   dptr,#$FC01
+
+	   while the newer dump has this
+
+	    0200: mov   sp,#$70
+	    0203: mov   mcon,#$68
+	    0206: mov   i2cfg,#$00
+	    0209: mov   crcr,#$80
+	    020C: mov   dptr,#$FC01
+
+	   either way the 2nd dump is in much better state, so we're using that.
+	*/
+	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x69 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
 	ROM_REGION( 0x0a00000, "gfx1", 0 )  /* GFX + Sound */
 	ROM_LOAD( "wr2.16d",    0x0000000, 0x0080000, CRC(ad26086b) SHA1(487ffaaca57c9d030fc486b8cae6735ee40a0ac3) )    /* GFX only */
 	ROM_LOAD( "wr2.17d",    0x0080000, 0x0080000, CRC(c1ec0745) SHA1(a6c3ce9c889e6a53f4155f54d6655825af34a35b) )    /* GFX only */
@@ -2000,7 +2050,8 @@ GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touc
 GAME( 1995, touchgoe, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
 GAME( 1995, touchgok, touchgo,  touchgo,           touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", 0 )
+GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (MASK ROM version)", 0 )
+GAME( 1995, wrally2a, wrally2,  wrally2,           wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
 GAME( 1996, maniacsq,  0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
