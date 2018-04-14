@@ -35,7 +35,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_vdp(*this, "gp9001_%u", 0U)
 		, m_nmk112(*this, "nmk112")
-		, m_oki(*this, "oki%u", 1)
+		, m_oki(*this, "oki%u", 1U)
 		, m_eeprom(*this, "eeprom")
 		, m_rtc(*this, "rtc")
 		, m_gfxdecode(*this, "gfxdecode")
