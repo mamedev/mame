@@ -645,7 +645,7 @@ INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
 	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write
 	//       between these operations brings us to this.
 	//       Game currently returns error on MIX CPU RAM because halt-ing BACK CPU doesn't happen when it should of course ...
-//  uint8_t dp_r = (uint8_t)device.state().state_int(M6809_DP);
+//  uint8_t dp_r = (uint8_t)m_subcpu->state_int(M6809_DP);
 //  m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }

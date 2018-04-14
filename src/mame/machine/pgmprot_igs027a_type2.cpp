@@ -229,7 +229,7 @@ READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
 	if (pc==0x080109b4)
 	{
 		/* if we've hit the loop where this is read and both values are 0 then the only way out is an interrupt */
-		int r4 = (space.device().state().state_int(ARM7_R4));
+		int r4 = (m_prot->state_int(ARM7_R4));
 		r4 += 0xe;
 
 		if (r4==0x18002f9e)
