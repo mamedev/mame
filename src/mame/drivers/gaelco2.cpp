@@ -1886,9 +1886,9 @@ REF: 950510-1
  |         POT2                                                               |
  |                                                                            |
  |                                                                            |
- |                                              PROM IC68                     |
- |---                                           PROM IC69                     |
-    |                                           PROM IC70                     |
+ |                                               WR2-IC68                     |
+ |---                                            WR2-IC69                     |
+    |                                            WR2-IC70                     |
     |                                                                         |
  |---                                                                         |
  |                                                                            |
@@ -1921,14 +1921,19 @@ REF: 950510-1
 
 Notes
 -----
-Gaelco's PROMs IC70 and IC69 has DIP42 package (gfx rom)
-Gaelco's PROM IC68 has DIP32 package (sound rom)
+Gaelco's MASK ROMs:
+ WR2 IC70 42pin 16Mbit MASK read as 27C160 (Graphics)
+ WR2 IC69 42pin 32Mbit MASK read as 27C332 (Graphics & Sound)
+ WR2 IC68 32pin  8Mbit MASK read as 27C801 (Graphics)
+
 TI F20L8 is a Texas Ins. DIP24 (may be a PAL). Is marked as F 406 XF 21869 F20L8-25CNT
 TLC569 (IC2 and IC7) is a 8-bit serial ADC
 
+Also known to come with the GAE1 449 istead of the GAE1 506
+
 */
 
-ROM_START( wrally2 )
+ROM_START( wrally2 ) // REF: 950510-1
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "wr2.64",  0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
 	ROM_LOAD16_BYTE( "wr2.63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
@@ -1978,7 +1983,7 @@ ROM_START( wrally2 )
 	ROM_FILL(                   0x0600000, 0x0200000, 0x00 )          /* Empty */
 ROM_END
 
-ROM_START( wrally2a )
+ROM_START( wrally2a ) // REF: 950510
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "wr2.64",  0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
 	ROM_LOAD16_BYTE( "wr2.63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
