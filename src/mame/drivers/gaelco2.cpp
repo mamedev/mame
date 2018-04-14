@@ -1974,7 +1974,7 @@ ROM_START( wrally2 ) // REF: 950510-1
 	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
-	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
+	/* 0x0000000-0x06fffff filled in in the DRIVER_INIT */
 	ROM_LOAD( "wr2_ic68.ic68",  0x0800000, 0x0100000, CRC(4a75ffaa) SHA1(ffae561ad4fa100398ab6b94d8dcb13e9fae4272) ) /* GFX only - read as 27C801 */
 
 	ROM_REGION( 0x0600000, "gfx2", 0 ) /* Temporary storage */
