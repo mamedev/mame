@@ -2249,7 +2249,6 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 
 	MCFG_CPU_ADD("sub", MC6809E, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_s_map)
@@ -2272,6 +2271,7 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("sub", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
@@ -2363,7 +2363,6 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  /* MC68A09EP */
 	MCFG_CPU_PROGRAM_MAP(srdarwin_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
@@ -2388,6 +2387,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_srdarwin)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srdarwin)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
@@ -2416,7 +2416,6 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  /* MC68B09EP */
 	MCFG_CPU_PROGRAM_MAP(cobra_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
@@ -2445,6 +2444,7 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_cobracom)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cobracom)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
