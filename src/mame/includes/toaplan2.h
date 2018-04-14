@@ -5,8 +5,10 @@
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
 #include "cpu/m68000/m68000.h"
+#include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/nmk112.h"
 #include "machine/ticket.h"
 #include "machine/upd4992.h"
@@ -21,29 +23,33 @@ class toaplan2_state : public driver_device
 {
 public:
 	toaplan2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_shared_ram(*this, "shared_ram"),
-		m_paletteram(*this, "palette"),
-		m_tx_videoram(*this, "tx_videoram"),
-		m_tx_lineselect(*this, "tx_lineselect"),
-		m_tx_linescroll(*this, "tx_linescroll"),
-		m_tx_gfxram16(*this, "tx_gfxram16"),
-		m_mainram16(*this, "mainram16"),
-		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
-		m_vdp0(*this, "gp9001"),
-		m_vdp1(*this, "gp9001_1"),
-		m_nmk112(*this, "nmk112"),
-		m_oki(*this, "oki"),
-		m_oki1(*this, "oki1"),
-		m_eeprom(*this, "eeprom"),
-		m_rtc(*this, "rtc"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
-		m_hopper(*this, "hopper") { }
+		: driver_device(mconfig, type, tag)
+		, m_shared_ram(*this, "shared_ram")
+		, m_paletteram(*this, "palette")
+		, m_tx_videoram(*this, "tx_videoram")
+		, m_tx_lineselect(*this, "tx_lineselect")
+		, m_tx_linescroll(*this, "tx_linescroll")
+		, m_tx_gfxram16(*this, "tx_gfxram16")
+		, m_mainram16(*this, "mainram16")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_vdp(*this, "gp9001_%u", 0U)
+		, m_nmk112(*this, "nmk112")
+		, m_oki(*this, "oki%u", 1)
+		, m_eeprom(*this, "eeprom")
+		, m_rtc(*this, "rtc")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_soundlatch2(*this, "soundlatch2")
+		, m_hopper(*this, "hopper")
+		, m_batrider_sndirq(*this, "batrider_sndirq")
+		, m_dma_space(*this, "dma_space")
+		, m_z80_rom(*this, "audiocpu")
+		, m_audiobank(*this, "audiobank")
+		, m_okibank(*this, "okibank")
+	{ }
 
 	optional_shared_ptr<uint8_t> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<uint16_t> m_paletteram;
@@ -55,11 +61,9 @@ public:
 
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	required_device<gp9001vdp_device> m_vdp0;
-	optional_device<gp9001vdp_device> m_vdp1;
+	optional_device_array<gp9001vdp_device, 2> m_vdp;
 	optional_device<nmk112_device> m_nmk112;
-	optional_device<okim6295_device> m_oki;
-	optional_device<okim6295_device> m_oki1;
+	optional_device_array<okim6295_device, 2> m_oki;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<upd4992_device> m_rtc;
 	optional_device<gfxdecode_device> m_gfxdecode;
@@ -68,6 +72,13 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch; // tekipaki, batrider, bgaregga, batsugun
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_device<ticket_dispenser_device> m_hopper;
+	optional_device<input_merger_any_high_device> m_batrider_sndirq;
+
+	optional_device<address_map_bank_device> m_dma_space;
+
+	optional_region_ptr<uint8_t> m_z80_rom;
+	optional_memory_bank m_audiobank;
+	optional_memory_bank m_okibank;
 
 	int8_t m_old_p1_paddle_h; /* For Ghox */
 	int8_t m_old_p2_paddle_h;
@@ -96,8 +107,6 @@ public:
 	DECLARE_READ16_MEMBER(batrider_z80_busack_r);
 	DECLARE_WRITE16_MEMBER(batrider_z80_busreq_w);
 	DECLARE_READ16_MEMBER(batrider_z80rom_r);
-	DECLARE_WRITE16_MEMBER(batrider_soundlatch_w);
-	DECLARE_WRITE16_MEMBER(batrider_soundlatch2_w);
 	DECLARE_WRITE16_MEMBER(batrider_unknown_sound_w);
 	DECLARE_WRITE16_MEMBER(batrider_clear_sndirq_w);
 	DECLARE_WRITE8_MEMBER(batrider_sndirq_w);
@@ -108,11 +117,10 @@ public:
 	DECLARE_WRITE16_MEMBER(toaplan2_tx_linescroll_w);
 	DECLARE_WRITE16_MEMBER(toaplan2_tx_gfxram16_w);
 	DECLARE_WRITE16_MEMBER(batrider_textdata_dma_w);
-	DECLARE_WRITE16_MEMBER(batrider_unknown_dma_w);
+	DECLARE_WRITE16_MEMBER(batrider_pal_text_dma_w);
 	DECLARE_WRITE16_MEMBER(batrider_objectbank_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
-	DECLARE_WRITE16_MEMBER(oki_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(oki1_bankswitch_w);
+	template<int Chip> DECLARE_WRITE16_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(enmadaio_oki_bank_w);
 	DECLARE_DRIVER_INIT(bbakraid);
 	DECLARE_DRIVER_INIT(pipibibsbl);
