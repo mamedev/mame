@@ -154,7 +154,7 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 static constexpr unsigned GP9001_PRIMASK = 0x000f;
 static constexpr unsigned GP9001_PRIMASK_TMAPS = 0x000e;
 // TODO : Wrong; It's possibly lower than 256 at real hardware
-// Most noticeable at boss explosion scene in bgaregga
+// Most noticeable at some boss explosion scene in bgaregga
 static constexpr unsigned MAX_SPRITES = 256;
 
 template<int Layer>
