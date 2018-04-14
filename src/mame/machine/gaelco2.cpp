@@ -142,7 +142,6 @@ DRIVER_INIT_MEMBER(gaelco2_state,wrally2)
 	For "gfx2" we have this memory map:
 	    0x0000000-0x03fffff ROM wr2_ic69.ic69
 	    0x0400000-0x05fffff ROM wr2_ic70.ic70
-	    0x0600000-0x07fffff ROM_FILL 00
 
 	and we are going to construct this one for "gfx1":
 	    0x0000000-0x01fffff ROM wr2_ic69.ic69 even bytes

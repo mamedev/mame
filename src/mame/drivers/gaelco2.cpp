@@ -1975,12 +1975,11 @@ ROM_START( wrally2 ) // REF: 950510-1
 
 	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "wr2_ic68.ic68",  0x0800000, 0x0100000, CRC(4a75ffaa) SHA1(ffae561ad4fa100398ab6b94d8dcb13e9fae4272) ) /* GFX only - read as 27C080 */
+	ROM_LOAD( "wr2_ic68.ic68",  0x0800000, 0x0100000, CRC(4a75ffaa) SHA1(ffae561ad4fa100398ab6b94d8dcb13e9fae4272) ) /* GFX only - read as 27C801 */
 
-	ROM_REGION( 0x0800000, "gfx2", 0 ) /* Temporary storage */
+	ROM_REGION( 0x0600000, "gfx2", 0 ) /* Temporary storage */
 	ROM_LOAD( "wr2_ic69.ic69",  0x0000000, 0x0400000, CRC(a174d196) SHA1(4a7da1cd288e73518143a027782f3140e6582cf4) ) /* GFX & Sound - read as 27C332 */
 	ROM_LOAD( "wr2_ic70.ic70",  0x0400000, 0x0200000, CRC(8d1e43ba) SHA1(79eed51788c6c55a4347be70a3be4eb14a0d1747) ) /* GFX only - read as 27C160 */
-	ROM_FILL(                   0x0600000, 0x0200000, 0x00 )          /* Empty */
 ROM_END
 
 ROM_START( wrally2a ) // REF: 950510
