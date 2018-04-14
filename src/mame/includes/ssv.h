@@ -146,7 +146,6 @@ public:
 	void init(int interrupt_ultrax);
 	void init_hypreac2_common();
 	void init_eaglshot_banking();
-	void init_st010();
 
 	void ssv(machine_config &config);
 	void gdfs(machine_config &config);
