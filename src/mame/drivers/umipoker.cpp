@@ -9,7 +9,7 @@
     Additional work by Roberto Fresca.
 
     TODO:
-    - Fix clocks;
+    - Verify clocks (XTALs are 14.3181 and 2.000MHz)
 
     TMP68HC000-16 + z80 + YM3812 + OKI6295
 
@@ -691,14 +691,14 @@ void saiyukip_state::machine_start()
 	m_lamps.resolve();
 }
 
-// TODO: clocks (XTALs are 14.3181 and 2.000MHz)
+// TODO: Verify clocks (XTALs are 14.3181 and 2.000MHz)
 MACHINE_CONFIG_START(umipoker_state::umipoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,16000000) // TMP68HC000-16
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(14'318'181)) // TMP68HC000-16
 	MCFG_CPU_PROGRAM_MAP(umipoker_map)
 
-	MCFG_CPU_ADD("audiocpu",Z80,4000000)
+	MCFG_CPU_ADD("audiocpu",Z80, XTAL(14'318'181)/4) // 3.579545MHz
 	MCFG_CPU_PROGRAM_MAP(umipoker_audio_map)
 	MCFG_CPU_IO_MAP(umipoker_audio_io_map)
 
@@ -724,11 +724,11 @@ MACHINE_CONFIG_START(umipoker_state::umipoker)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym", YM3812, 3579545)
+	MCFG_SOUND_ADD("ym", YM3812, XTAL(14'318'181)/4) // 3.579545MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 2, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(2'000'000), PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
