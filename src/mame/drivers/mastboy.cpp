@@ -504,8 +504,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
-
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void bank_c000_map(address_map &map);
 	void mastboy_io_map(address_map &map);
 	void mastboy_map(address_map &map);
@@ -612,12 +611,10 @@ WRITE_LINE_MEMBER(mastboy_state::irq0_ack_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mastboy_state::interrupt)
+WRITE_LINE_MEMBER(mastboy_state::vblank_irq)
 {
-	if (m_outlatch->q0_r() == 1)
-	{
-		device.execute().set_input_line(0, ASSERT_LINE);
-	}
+	if (state && m_outlatch->q0_r() == 1)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 /* Memory Maps */
@@ -814,7 +811,6 @@ MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
 	MCFG_CPU_PROGRAM_MAP(mastboy_map)
 	MCFG_CPU_IO_MAP(mastboy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mastboy_state,  interrupt)
 
 	MCFG_EEPROM_2816_ADD("earom")
 
@@ -840,6 +836,7 @@ MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mastboy_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mastboy_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mastboy)
 	MCFG_PALETTE_ADD("palette", 0x100)

@@ -56,7 +56,7 @@ public:
 	tilemap_t *m_spr1_tilemap_flipx;
 	tilemap_t *m_spr2_tilemap;
 
-	uint8_t m_nmi_mask;
+	bool m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(punchout_2a03_reset_w);
 	DECLARE_READ8_MEMBER(spunchout_exp_r);
 	DECLARE_WRITE8_MEMBER(spunchout_exp_w);
@@ -84,7 +84,7 @@ public:
 	uint32_t screen_update_punchout_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
 	void armwrest_draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
 	void drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

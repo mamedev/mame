@@ -61,7 +61,7 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(igs_majhong_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
@@ -319,18 +319,17 @@ INPUT_PORTS_END
 
 
 
-INTERRUPT_GEN_MEMBER(igs_m027_state::igs_majhong_interrupt)
+WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 {
-	device.execute().pulse_input_line(ARM7_FIRQ_LINE, device.execute().minimum_quantum_time());
+	if (state)
+		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 }
 
 
 MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
-	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
-
+	MCFG_CPU_ADD("maincpu", ARM7, 20000000)
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_m027_state,  igs_majhong_interrupt)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 
@@ -341,6 +340,7 @@ MACHINE_CONFIG_START(igs_m027_state::igs_majhong)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igs_m027_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
@@ -360,11 +360,9 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(igs_m027_state::amazonia)
-	MCFG_CPU_ADD("maincpu",ARM7, 20000000)
-
+	MCFG_CPU_ADD("maincpu", ARM7, 20000000)
 	MCFG_CPU_PROGRAM_MAP(igs_majhong_map)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_m027_state,  igs_majhong_interrupt)
 	//MCFG_NVRAM_ADD_0FILL("nvram")
 
 
@@ -376,6 +374,7 @@ MACHINE_CONFIG_START(igs_m027_state::amazonia)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igs_m027_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 //  MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
