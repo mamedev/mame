@@ -167,9 +167,9 @@ void smc91c9x_device::postload()
 	m_comp_tx.resize(m_comp_tx_size);
 	m_comp_rx.resize(m_comp_rx_size);
 	m_trans_tx.resize(m_trans_tx_size);
-	memcpy(m_comp_rx.data(), m_comp_rx_data, m_comp_rx_size * sizeof(int));
-	memcpy(m_comp_tx.data(), m_comp_tx_data, m_comp_tx_size * sizeof(int));
-	memcpy(m_trans_tx.data(), m_trans_tx_data, m_trans_tx_size * sizeof(int));
+	memcpy(m_comp_rx.data(), m_comp_rx_data, m_comp_rx_size * sizeof(u32));
+	memcpy(m_comp_tx.data(), m_comp_tx_data, m_comp_tx_size * sizeof(u32));
+	memcpy(m_trans_tx.data(), m_trans_tx_data, m_trans_tx_size * sizeof(u32));
 
 	//osd_printf_info("Restore: comp_tx: %d comp_rx: %d trans_tx: %d\n", m_comp_tx_size, m_comp_rx_size, m_trans_tx_size);
 	//if (m_comp_tx_size)

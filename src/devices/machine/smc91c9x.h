@@ -53,7 +53,7 @@ private:
 	// Fifo for allocated (queued) transmit packets
 	std::vector<u32> m_trans_tx;
 	// Save vector data and sizes for proper save state restoration
-	int m_comp_tx_data[ETHER_BUFFERS], m_comp_rx_data[ETHER_BUFFERS], m_trans_tx_data[ETHER_BUFFERS];
+	u32 m_comp_tx_data[ETHER_BUFFERS], m_comp_rx_data[ETHER_BUFFERS], m_trans_tx_data[ETHER_BUFFERS];
 	u32 m_comp_tx_size, m_comp_rx_size, m_trans_tx_size;
 	// Requests a packet allocation and returns true
 	// and sets the packet number if successful
