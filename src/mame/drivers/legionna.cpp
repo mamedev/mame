@@ -274,6 +274,22 @@ void legionna_state::godzilla_map(address_map &map)
 							       // Development leftover/coding bug? Game doesn't seem to care at all anyway.
 }
 
+// additional z80 i/o port, present only in Godzilla (512KB OKI ROM vs 256KB)
+// Notice Denjin Makai has a 512KB OKI ROM too but latter half is empty
+WRITE8_MEMBER(legionna_state::godzilla_oki_bank_w)
+{
+	// bit 1 used, unknown purpose (always on?)
+	m_oki->set_rom_bank(data & 1);
+	if((data & 0xfe) != 0x02)
+		printf("oki_bank_w %02x!\n",data);
+}
+
+void legionna_state::godzilla_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(legionna_state::godzilla_oki_bank_w));
+}
+
 // Denjin Makai: Looks like they specifically swapped address line A1 in this range? 
 // Initially thought it was a palette DMA mode 4 but it doesn't apply for Godzilla, causing color bugs in the background tilemap.
 WRITE16_MEMBER(legionna_state::palette_swap_w)
@@ -1321,6 +1337,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
+	MCFG_CPU_IO_MAP(godzilla_sound_io_map)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
