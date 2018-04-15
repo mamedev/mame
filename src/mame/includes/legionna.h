@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE16_MEMBER(foreground_w);
 	DECLARE_WRITE16_MEMBER(text_w);
 	DECLARE_READ8_MEMBER(denjinmk_sound_comms_r);
+	DECLARE_WRITE8_MEMBER(godzilla_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
 	DECLARE_WRITE16_MEMBER(heatbrl_setgfxbank);
 	DECLARE_WRITE16_MEMBER(grainbow_layer_config_w);
@@ -120,4 +121,5 @@ public:
 	void heatbrl_map(address_map &map);
 	void legionna_cop_map(address_map &map);
 	void legionna_map(address_map &map);
+	void godzilla_sound_io_map(address_map &map);
 };

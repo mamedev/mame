@@ -274,6 +274,22 @@ void legionna_state::godzilla_map(address_map &map)
 							       // Development leftover/coding bug? Game doesn't seem to care at all anyway.
 }
 
+// additional z80 i/o port, present only in Godzilla (512KB OKI ROM vs 256KB)
+// Notice Denjin Makai has a 512KB OKI ROM too but latter half is empty
+WRITE8_MEMBER(legionna_state::godzilla_oki_bank_w)
+{
+	// bit 1 used, unknown purpose (always on?)
+	m_oki->set_rom_bank(data & 1);
+	if((data & 0xfe) != 0x02)
+		printf("oki_bank_w %02x!\n",data);
+}
+
+void legionna_state::godzilla_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(legionna_state::godzilla_oki_bank_w));
+}
+
 // Denjin Makai: Looks like they specifically swapped address line A1 in this range? 
 // Initially thought it was a palette DMA mode 4 but it doesn't apply for Godzilla, causing color bugs in the background tilemap.
 WRITE16_MEMBER(legionna_state::palette_swap_w)
@@ -1274,6 +1290,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
+	MCFG_CPU_IO_MAP(godzilla_sound_io_map)
 
 	MCFG_DEVICE_ADD("raiden2cop", RAIDEN2COP, 0)
 	MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(WRITE16(legionna_state, videowrite_cb_w))
@@ -1915,7 +1932,6 @@ ROM_START( godzilla )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* ADPCM samples */
 	ROM_LOAD( "pcm.922",      0x000000, 0x080000, CRC(59cbef10) SHA1(6b89b7286f80f9c903dfb81dc93a03c38dff707c) )
-	// ROM contains 2 * 0x40000 Bank of ADPCM, but bankswitching isn't verified/implemented
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "s68e08.844",   0x000000, 0x000200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
@@ -2550,7 +2566,7 @@ GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         R
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (US)", 0 )
 GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
 
-GAME( 1993, godzilla, 0,        godzilla, godzilla, legionna_state, 0,         ROT0, "Banpresto", "Godzilla (Japan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1993, godzilla, 0,        godzilla, godzilla, legionna_state, 0,         ROT0, "Banpresto", "Godzilla (Japan)", 0 )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1993, grainbowk,grainbow, grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1994, denjinmk, 0,        denjinmk, denjinmk, legionna_state, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )

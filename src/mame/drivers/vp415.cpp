@@ -79,8 +79,13 @@ public:
 	DECLARE_READ8_MEMBER(ncr5385_r);
 	DECLARE_WRITE8_MEMBER(sel34_w);
 	DECLARE_READ8_MEMBER(sel37_r);
+
 	DECLARE_WRITE8_MEMBER(ctrl_regs_w);
 	DECLARE_READ8_MEMBER(ctrl_regs_r);
+	DECLARE_WRITE8_MEMBER(ctrl_cpu_port1_w);
+	DECLARE_READ8_MEMBER(ctrl_cpu_port1_r);
+	DECLARE_WRITE8_MEMBER(ctrl_cpu_port3_w);
+	DECLARE_READ8_MEMBER(ctrl_cpu_port3_r);
 
 	DECLARE_READ8_MEMBER(drive_i8155_pb_r);
 	DECLARE_READ8_MEMBER(drive_i8155_pc_r);
@@ -190,6 +195,12 @@ protected:
 
 	enum
 	{
+		I8255PC_NOT_FOCUSED     = 0x02,
+		I8255PC_DISC_REFLECTION = 0x10,
+	};
+
+	enum
+	{
 		I8255PB_COMM1    = 0x01,
 		I8255PB_COMM2    = 0x02,
 		I8255PB_COMM3    = 0x04,
@@ -241,6 +252,12 @@ protected:
 	uint8_t m_intn_lines[2];
 
 	uint8_t m_refv;
+
+	uint8_t m_ctrl_p1;
+	uint8_t m_ctrl_p3;
+
+	uint8_t m_drive_p1;
+	uint8_t m_drive_pc_bits;
 };
 
 /*static*/ const char* vp415_state::Z80CPU_TAG = "z80cpu";
@@ -270,6 +287,13 @@ void vp415_state::machine_reset()
 	m_sel37 = SEL37_BRD | SEL37_MON_N | SEL37_SK1c | SEL37_SK1d;
 	m_intn_lines[0] = 1;
 	m_intn_lines[1] = 1;
+
+	m_ctrl_p1 = 0;
+	m_ctrl_p3 = 0;
+
+	m_drive_p1 = 0;
+
+	m_drive_pc_bits = I8255PC_DISC_REFLECTION | I8255PC_NOT_FOCUSED;
 }
 
 void vp415_state::machine_start()
@@ -279,7 +303,8 @@ void vp415_state::machine_start()
 WRITE_LINE_MEMBER(vp415_state::refv_w)
 {
 	m_refv = state;
-	m_drivecpu->set_input_line(MCS51_INT0_LINE, m_refv ? ASSERT_LINE : CLEAR_LINE);
+	m_drivecpu->set_input_line(MCS51_INT0_LINE, m_refv ? CLEAR_LINE : ASSERT_LINE);
+	//printf("Current time in ms: %f\n", machine().scheduler().time().as_double() * 1000.0D);
 }
 
 // CPU Datagrabber Module (W)
@@ -468,6 +493,38 @@ READ8_MEMBER(vp415_state::ctrl_regs_r)
 	return value;
 }
 
+WRITE8_MEMBER(vp415_state::ctrl_cpu_port1_w)
+{
+	uint8_t old = m_ctrl_p1;
+	m_ctrl_p1 = data;
+
+	if ((m_ctrl_p1 ^ old) & 0xdf) // Ignore petting the watchdog (bit 5)
+	{
+		logerror("%s: ctrl_cpu_port1_w: %02x\n", machine().describe_context(), data);
+	}
+}
+
+READ8_MEMBER(vp415_state::ctrl_cpu_port1_r)
+{
+	uint8_t ret = m_ctrl_p1;
+	m_ctrl_p1 ^= 0x10;
+	logerror("%s: ctrl_cpu_port1_r (%02x)\n", machine().describe_context(), ret);
+	return ret;// | (m_refv << 4);
+}
+
+WRITE8_MEMBER(vp415_state::ctrl_cpu_port3_w)
+{
+	m_ctrl_p3 = data;
+	logerror("%s: ctrl_cpu_port3_w: %02x\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(vp415_state::ctrl_cpu_port3_r)
+{
+	uint8_t ret = m_ctrl_p3;
+	logerror("%s: ctrl_cpu_port3_r (%02x)\n", machine().describe_context(), ret);
+	return ret;
+}
+
 uint8_t vp415_state::sd_r()
 {
 	return 0;
@@ -519,17 +576,34 @@ WRITE8_MEMBER(vp415_state::drive_i8255_pb_w)
 		, BIT(data, I8255PB_SL_PWR_BIT)
 		, BIT(data, I8255PB_RAD_FS_N_BIT)
 		, BIT(data, I8255PB_STR1_BIT));
+	if (BIT(data, I8255PB_RLS_N_BIT))
+	{
+	}
 }
 
 READ8_MEMBER(vp415_state::drive_i8255_pc_r)
 {
-	logerror("%s: drive_i8255_pc_r: %02x\n", machine().describe_context(), 0);
-	return 0;
+	static int focus_kludge = 250;
+	logerror("%s: drive_i8255_pc_r: %02x\n", machine().describe_context(), m_drive_pc_bits);
+	if (focus_kludge > 0)
+	{
+		focus_kludge--;
+	}
+	else
+	{
+		m_drive_pc_bits &= ~I8255PC_NOT_FOCUSED;
+	}
+	return m_drive_pc_bits;
 }
 
 WRITE8_MEMBER(vp415_state::drive_cpu_port1_w)
 {
-	//logerror("%s: drive_cpu_port1_w: %02x\n", machine().describe_context(), data);
+	uint8_t old = m_drive_p1;
+	m_drive_p1 = data;
+	if ((m_drive_p1 ^ old) & 0xfb) // Ignore bit 2 when logging (LDI)
+	{
+		logerror("%s: drive_cpu_port1_w: %02x\n", machine().describe_context(), data);
+	}
 	m_chargen->ldi_w(BIT(data, 2));
 }
 
@@ -583,7 +657,11 @@ MACHINE_CONFIG_START(vp415_state::vp415)
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
 
-	MCFG_CPU_ADD(CTRLCPU_TAG, I8031, XTAL(11'059'200)) // 12MHz, per schematic
+	MCFG_CPU_ADD(CTRLCPU_TAG, I8031, XTAL(11'059'200)) // 11.059MHz, per schematic
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(vp415_state, ctrl_cpu_port1_w));
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(vp415_state, ctrl_cpu_port1_r));
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(vp415_state, ctrl_cpu_port1_w));
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(vp415_state, ctrl_cpu_port1_r));
 	MCFG_CPU_PROGRAM_MAP(ctrl_program_map)
 	MCFG_CPU_IO_MAP(ctrl_io_map)
 
