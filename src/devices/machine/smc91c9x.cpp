@@ -143,12 +143,10 @@ void smc91c9x_device::device_start()
 	save_item(NAME(m_comp_tx_size));
 	save_item(NAME(m_comp_rx_size));
 	save_item(NAME(m_trans_tx_size));
-	machine().save().register_presave(save_prepost_delegate(FUNC(smc91c9x_device::presave), this));
-	machine().save().register_postload(save_prepost_delegate(FUNC(smc91c9x_device::postload), this));
-
 }
+
 // Save state presave to save vector sizes
-void smc91c9x_device::presave()
+void smc91c9x_device::device_pre_save()
 {
 	m_comp_tx_size = m_comp_tx.size();
 	m_comp_rx_size = m_comp_rx.size();
@@ -161,8 +159,9 @@ void smc91c9x_device::presave()
 	//if (m_comp_tx_size)
 	//	osd_printf_info("comp_tx packet: %d\n", m_comp_tx.front());
 }
+
 // Save state preload to restore vector sizes
-void smc91c9x_device::postload()
+void smc91c9x_device::device_post_load()
 {
 	m_comp_tx.resize(m_comp_tx_size);
 	m_comp_rx.resize(m_comp_rx_size);

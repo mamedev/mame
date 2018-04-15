@@ -34,8 +34,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	void presave(void);
-	void postload(void);
+	virtual void device_pre_save(void) override;
+	virtual void device_post_load(void) override;
 
 private:
 	static constexpr unsigned ETHER_BUFFER_SIZE   = 2048;
