@@ -114,7 +114,7 @@ READ32_MEMBER( konppc_device::cgboard_dsp_comm_r_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-//      osd_printf_debug("dsp_cmd_r: (board %d) %08X, %08X %s\n", cgboard_id, offset, mem_mask, machine().describe_context());
+//      osd_printf_debug("%s dsp_cmd_r: (board %d) %08X, %08X\n", machine().describe_context().c_str(), cgboard_id, offset, mem_mask);
 		return dsp_comm_sharc[cgboard_id][offset] | (dsp_state[cgboard_id] << 16);
 	}
 	else
@@ -129,7 +129,7 @@ WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 	const char *pcitag = (cgboard_id == 0) ? "k033906_1" : "k033906_2";
 	device_t *dsp = machine().device(dsptag);
 	k033906_device *k033906 = machine().device<k033906_device>(pcitag);
-//  osd_printf_debug("dsp_cmd_w: (board %d) %08X, %08X, %08X %s\n", cgboard_id, data, offset, mem_mask, machine().describe_context());
+//  osd_printf_debug("%s dsp_cmd_w: (board %d) %08X, %08X, %08X\n", machine().describe_context().c_str(), cgboard_id, data, offset, mem_mask);
 
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -261,7 +261,7 @@ void konppc_device::dsp_comm_sharc_w(address_space &space, int board, int offset
 		}
 	}
 
-//  printf("%s:cgboard_dsp_comm_w_sharc: %08X, %08X, %08X\n", machine().describe_context(), data, offset, mem_mask);
+//  printf("%s:cgboard_dsp_comm_w_sharc: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
 
 	dsp_comm_sharc[board][offset] = data;
 }

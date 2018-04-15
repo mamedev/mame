@@ -132,7 +132,7 @@ public:
 	DECLARE_READ8_MEMBER(irq_vector_r);
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(frame_number_r);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_READ16_MEMBER(version_r);
@@ -586,9 +586,9 @@ void igt_gameking_state::machine_reset()
 	m_quart1->ip2_w(1); // needs to be high
 }
 
-INTERRUPT_GEN_MEMBER(igt_gameking_state::vblank_irq)
+WRITE_LINE_MEMBER(igt_gameking_state::vblank_irq)
 {
-	if(m_irq_enable & 8)
+	if (state && BIT(m_irq_enable, 3))
 	{
 		m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 		//machine().debug_break();
@@ -610,7 +610,6 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I960, XTAL(24'000'000))
 	MCFG_CPU_PROGRAM_MAP(igt_gameking_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", igt_gameking_state,  vblank_irq)
 
 	MCFG_SC28C94_ADD("quart1", XTAL(24'000'000) / 6)
 	MCFG_SC28C94_D_TX_CALLBACK(DEVWRITELINE("diag", rs232_port_device, write_txd))
@@ -631,6 +630,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igt_gameking_state, screen_update_igt_gameking)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igt_gameking_state, vblank_irq))
 	// Xilinx used as video chip XTAL(26'666'666) on board
 
 	MCFG_PALETTE_ADD("palette", 0x100)

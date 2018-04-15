@@ -376,12 +376,12 @@ static INPUT_PORTS_START( hitme )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                 /* Start button */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* Always high */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* P1 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* P1 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* P1 Bet button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -391,19 +391,19 @@ static INPUT_PORTS_START( hitme )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* P2 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* P2 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* P2 Bet button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x00, "Extra Hand On Natural" )         /* Aux 1 dipswitch */
 	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR ( On )  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                 /* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )                 /* Always high */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) /* P3 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) /* P3 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) /* P3 Bet button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                /* Time out counter (TOC1) */
@@ -413,7 +413,7 @@ static INPUT_PORTS_START( hitme )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) /* P4 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) /* P4 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) /* P4 Bet button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN4")
 	PORT_DIPNAME( 0x07, 0x07, "Number of Chips" )
@@ -452,12 +452,12 @@ static INPUT_PORTS_START( super21 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )                /* Always high */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) /* P4 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) /* P4 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4) /* P4 Ante button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -467,17 +467,17 @@ static INPUT_PORTS_START( super21 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) /* P3 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) /* P3 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) /* P3 Ante button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                /* Aux 1 dipswitch? */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* P2 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* P2 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* P2 Ante button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                /* Time out counter (TOC1) */
@@ -487,7 +487,7 @@ static INPUT_PORTS_START( super21 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* P1 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* P1 Hit button */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* P1 Ante button */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                /* Time out counter (*TO) */
 
 	PORT_START("IN4")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -508,12 +508,12 @@ static INPUT_PORTS_START( barricad )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                         /* Start button */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                         /* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Time out counter (*TO) */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -523,17 +523,17 @@ static INPUT_PORTS_START( barricad )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(3)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(3)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Time out counter (*TO) */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                        /* ??? */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                         /* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Hblank */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Hblank */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(4)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(4)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(4)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Time out counter (*TO) */
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )                        /* Time out counter (TOC1) */
@@ -543,7 +543,7 @@ static INPUT_PORTS_START( barricad )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                        /* Time out counter (*TO) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                        /* Time out counter (*TO) */
 
 	/* On the flyer it says that barricade has both user adjustable points per
 	    game, and speed. From experimenting it looks like points per game is the

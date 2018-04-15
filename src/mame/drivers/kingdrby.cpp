@@ -547,8 +547,8 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //1p hopper i/o
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper i/o
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
 
 	PORT_START("IN1")   // ppi0 (5001)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
@@ -704,8 +704,8 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) //1p hopper i/o
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper i/o
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
 
 	PORT_START("IN0")   // ppi0 (5001)
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )

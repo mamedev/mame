@@ -60,7 +60,7 @@ WRITE16_MEMBER(legionna_state::tile_scroll_base_w)
 	if(offset == 7)
 		m_text_layer->set_scrolldy(0x1ef - data,0x1ef - data);
 
-	printf("%02x %04x\n",offset,data);
+	//printf("%02x %04x\n",offset,data);
 }
 
 WRITE16_MEMBER(legionna_state::heatbrl_setgfxbank)

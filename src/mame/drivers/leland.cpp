@@ -248,12 +248,12 @@ Memory configurations:
  *************************************/
 
 /* Helps document the input ports. */
-#define IPT_SLAVEHALT   IPT_SPECIAL
+#define IPT_SLAVEHALT   IPT_CUSTOM
 
 
 static INPUT_PORTS_START( cerberus )        /* complete, verified from code */
 	PORT_START("IN0")   /* 0x80 */
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_PLAYER(1)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
@@ -265,12 +265,12 @@ static INPUT_PORTS_START( cerberus )        /* complete, verified from code */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")   /* 0x90 */
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_PLAYER(2)
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -316,7 +316,7 @@ static INPUT_PORTS_START( mayhem )      /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -349,7 +349,7 @@ static INPUT_PORTS_START( wseries )     /* complete, verified from code */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Aim") PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( alleymas )        /* complete, verified from code */
 //  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )        /* redundant inputs */
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -424,7 +424,7 @@ static INPUT_PORTS_START( upyoural )        /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -459,7 +459,7 @@ static INPUT_PORTS_START( dangerz )     /* complete, verified from code */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -494,7 +494,7 @@ static INPUT_PORTS_START( basebal2 )        /* complete, verified from code */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Run/Cutoff") PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x51/D1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -531,7 +531,7 @@ static INPUT_PORTS_START( redline )     /* complete, verified in code */
 	PORT_BIT( 0xe0, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(64) PORT_PLAYER(2)
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -569,7 +569,7 @@ static INPUT_PORTS_START( quarterb )        /* complete, verified in code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -611,7 +611,7 @@ static INPUT_PORTS_START( teamqb )      /* complete, verified in code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -669,7 +669,7 @@ static INPUT_PORTS_START( aafb2p )      /* complete, verified in code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("IN3")   /* 0x91 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -724,7 +724,7 @@ static INPUT_PORTS_START( offroad )     /* complete, verified from code */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")   /* 0xD1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
@@ -798,7 +798,7 @@ static INPUT_PORTS_START( pigout )      /* complete, verified from code */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("IN3")   /* 0x51 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -831,7 +831,7 @@ static INPUT_PORTS_START( ataxx )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")       /* 0x00 - analog X */
@@ -862,7 +862,7 @@ static INPUT_PORTS_START( wsf )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -914,7 +914,7 @@ static INPUT_PORTS_START( indyheat )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")       /* Analog wheel 1 */
@@ -960,7 +960,7 @@ static INPUT_PORTS_START( brutforc )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")       /* 0x20 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")        /* 0x0E */

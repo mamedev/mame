@@ -58,6 +58,8 @@ void cinemat_state::machine_start()
 	save_item(NAME(m_coin_detected));
 	save_item(NAME(m_coin_last_reset));
 	save_item(NAME(m_mux_select));
+	m_led.resolve();
+	m_pressed.resolve();
 }
 
 
@@ -81,14 +83,14 @@ void cinemat_state::machine_reset()
 
 READ8_MEMBER(cinemat_state::inputs_r)
 {
-	return (ioport("INPUTS")->read() >> offset) & 1;
+	return (m_inputs->read() >> offset) & 1;
 }
 
 
 READ8_MEMBER(cinemat_state::switches_r)
 {
 	static const uint8_t switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
-	return (ioport("SWITCHES")->read() >> switch_shuffle[offset]) & 1;
+	return (m_switches->read() >> switch_shuffle[offset]) & 1;
 }
 
 
@@ -166,7 +168,7 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 	int delta_wheel;
 
 	/* the shift register is cleared once per 'frame' */
-	delta_wheel = int8_t(ioport("WHEEL")->read()) / 8;
+	delta_wheel = int8_t(m_wheel->read()) / 8;
 	if (delta_wheel > 3)
 		delta_wheel = 3;
 	else if (delta_wheel < -3)
@@ -178,14 +180,14 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 
 READ8_MEMBER(cinemat_state::speedfrk_gear_r)
 {
-	int gearval = ioport("GEAR")->read();
+	int gearval = m_gear_input->read();
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
 		m_gear = gearval & 0x0f;
 
 	/* add the start key into the mix -- note that it overlaps 4th gear */
-	if (!(ioport("INPUTS")->read() & 0x80))
+	if (!(m_inputs->read() & 0x80))
 		m_gear &= ~0x08;
 
 	return (m_gear >> offset) & 1;
@@ -233,7 +235,7 @@ READ8_MEMBER(cinemat_state::sundance_inputs_r)
 	if (sundance_port_map[offset].portname)
 		return (ioport(sundance_port_map[offset].portname)->read() & sundance_port_map[offset].bitmask) ? 0 : 1;
 	else
-		return (ioport("INPUTS")->read() >> offset) & 1;
+		return (m_inputs->read() >> offset) & 1;
 }
 
 
@@ -444,8 +446,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( speedfrk )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* steering wheel, fake below */
-	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_SPECIAL ) /* gear shift, fake below */
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) /* steering wheel, fake below */
+	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_CUSTOM ) /* gear shift, fake below */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* gas */
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -522,7 +524,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sundance )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P1 Pad */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
@@ -530,14 +532,14 @@ static INPUT_PORTS_START( sundance )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Toggle Grid") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4 Suns") PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P2 Pad */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P1 Pad */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P2 Pad */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2 Suns") PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P1 Pad */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P2 Pad */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P1 Pad */
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P2 Pad */
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x02, "Time" )
@@ -808,7 +810,7 @@ static INPUT_PORTS_START( boxingb )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0fc0, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* dial */
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* dial */
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -938,7 +940,7 @@ static INPUT_PORTS_START( qb3 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_JOYSTICKLEFT_LEFT )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON1 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SPECIAL )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_CUSTOM )
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )

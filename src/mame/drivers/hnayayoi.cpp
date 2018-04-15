@@ -282,7 +282,7 @@ static INPUT_PORTS_START( hnayayoi )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")  /* DSW3 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   // blitter busy flag
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -372,7 +372,7 @@ static INPUT_PORTS_START( hnfubuki )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")  /* DSW3 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   // blitter busy flag
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM )   // blitter busy flag
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

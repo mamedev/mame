@@ -388,6 +388,11 @@
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
 
+void ampoker2_state::machine_start()
+{
+	m_lamps.resolve();
+}
+
 /**********************
 * Read/Write Handlers *
 *  - Output Ports -   *
@@ -483,10 +488,10 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port31_w)
     BIT 4 = TWL_YELL      ;Tower Light YELLOW
 --------------------------------------------------*/
 {
-	output().set_lamp_value(1, ((data >> 1) & 1));    /* Lamp 1 - BET/RED */
-	output().set_lamp_value(6, ((data >> 2) & 1));    /* Lamp 6 - HOLD 4 */
-	output().set_lamp_value(4, ((data >> 3) & 1));    /* Lamp 4 - HOLD 2 */
-	output().set_lamp_value(8, ((data >> 4) & 1));    /* Lamp 8 - TWR.YELLOW */
+	m_lamps[1] = BIT(data, 1); // BET/RED
+	m_lamps[6] = BIT(data, 2); // HOLD 4
+	m_lamps[4] = BIT(data, 3); // HOLD 2
+	m_lamps[8] = BIT(data, 4); // TWR.YELLOW
 }
 
 
@@ -501,7 +506,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port32_w)
     BIT 4 =
 --------------------------------------------------*/
 {
-	output().set_lamp_value(5, ((data >> 3) & 1));    /* Lamp 5 - HOLD 3 */
+	m_lamps[5] = BIT(data, 3); // HOLD3
 }
 
 
@@ -530,7 +535,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port34_w)
     BIT 4 = LAMP_2        ;Lamp 3  (BLACK)
 --------------------------------------------------*/
 {
-	output().set_lamp_value(2, ((data >> 4) & 1));    /* Lamp 2 - BLACK */
+	m_lamps[2] = BIT(data, 4); // BLACK
 }
 
 
@@ -559,10 +564,10 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port36_w)
     BIT 4 = LAMP_3        ;Lamp 3  (HOLD1)
 --------------------------------------------------*/
 {
-	output().set_lamp_value(9, (data & 1));           /* Lamp 9 - TWR.GREEN */
-	output().set_lamp_value(7, ((data >> 2) & 1));    /* Lamp 7 - HOLD 5 */
-	output().set_lamp_value(0, ((data >> 3) & 1));    /* Lamp 0 - DEAL */
-	output().set_lamp_value(3, ((data >> 4) & 1));    /* Lamp 3 - HOLD 1 */
+	m_lamps[9] = BIT(data, 0); // TWR.GREEN
+	m_lamps[7] = BIT(data, 2); // HOLD 5
+	m_lamps[0] = BIT(data, 3); // DEAL
+	m_lamps[3] = BIT(data, 4); // HOLD 1
 }
 
 

@@ -176,7 +176,7 @@ WRITE16_MEMBER(midyunit_state::term2_sound_w)
 
 WRITE16_MEMBER(midyunit_state::term2_hack_w)
 {
-	if (offset == 1 && space.device().safe_pc() == 0xffce6520)
+	if (offset == 1 && m_maincpu->pc() == 0xffce6520)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -186,7 +186,7 @@ WRITE16_MEMBER(midyunit_state::term2_hack_w)
 
 WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
 {
-	if (offset == 0 && space.device().safe_pc() == 0xffce5230)
+	if (offset == 0 && m_maincpu->pc() == 0xffce5230)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -196,7 +196,7 @@ WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
 
 WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
 {
-	if (offset == 0 && space.device().safe_pc() == 0xffce4b80)
+	if (offset == 0 && m_maincpu->pc() == 0xffce4b80)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;
@@ -206,7 +206,7 @@ WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
 
 WRITE16_MEMBER(midyunit_state::term2la1_hack_w)
 {
-	if (offset == 0 && space.device().safe_pc() == 0xffce33f0)
+	if (offset == 0 && m_maincpu->pc() == 0xffce33f0)
 	{
 		m_t2_hack_mem[offset] = 0;
 		return;

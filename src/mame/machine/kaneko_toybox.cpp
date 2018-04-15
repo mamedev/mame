@@ -467,7 +467,7 @@ WRITE16_MEMBER(kaneko_toybox_device::mcu_com3_w){ mcu_com_w(offset, data, mem_ma
 */
 READ16_MEMBER(kaneko_toybox_device::mcu_status_r)
 {
-	logerror("CPU %s (PC=%06X) : read MCU status\n", space.device().tag(), space.device().safe_pcbase());
+	logerror("%s : read MCU status\n", machine().describe_context());
 	return 0; // most games test bit 0 for failure
 }
 

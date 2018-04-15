@@ -60,7 +60,8 @@ public:
 		m_reel0(*this, "reel0"),
 		m_reel1(*this, "reel1"),
 		m_reel2(*this, "reel2"),
-		m_reel3(*this, "reel3")
+		m_reel3(*this, "reel3"),
+		m_digits(*this, "digit%u", 0U)
 		{ }
 
 	int irq_toggle;
@@ -113,6 +114,7 @@ public:
 	DECLARE_DRIVER_INIT(ecoinfr);
 	DECLARE_DRIVER_INIT(ecoinfrmab);
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
 
 	uint8_t m_banksel;
@@ -123,6 +125,7 @@ public:
 	required_device<stepper_device> m_reel1;
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
+	output_finder<16> m_digits;
 	void ecoinfr(machine_config &config);
 	void memmap(address_map &map);
 	void portmap(address_map &map);
@@ -327,7 +330,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 	if (m_credsel!=0xff)
 	{
 		uint8_t bf7segdata = bitswap<8>(data,7,0,1,2,3,4,5,6);
-		output().set_digit_value(m_credsel+8, bf7segdata);
+		m_digits[m_credsel+8] = bf7segdata;
 	}
 }
 
@@ -340,7 +343,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 	if (m_banksel!=0xff)
 	{
 		uint8_t bf7segdata = bitswap<8>(data,7,0,1,2,3,4,5,6);
-		output().set_digit_value(m_banksel, bf7segdata);
+		m_digits[m_banksel] = bf7segdata;
 	}
 }
 
@@ -564,12 +567,12 @@ static INPUT_PORTS_START( ecoinfr_barx )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel1_opto_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel1_opto_r, nullptr)
 	PORT_DIPNAME( 0x02, 0x02, "IN1:02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel3_opto_r, nullptr)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel2_opto_r, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel3_opto_r, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ecoinfr_state,ecoinfr_reel2_opto_r, nullptr)
 	PORT_DIPNAME( 0x10, 0x10, "IN1:10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )

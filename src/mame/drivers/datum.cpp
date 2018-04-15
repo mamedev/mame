@@ -63,6 +63,7 @@ public:
 		, m_pia1(*this, "pia1")
 		, m_keyboard(*this, "X%u", 0)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(pa_r);
@@ -75,9 +76,11 @@ public:
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<pia6821_device> m_pia1;
 	required_ioport_array<4> m_keyboard;
 	required_device<cpu_device> m_maincpu;
+	output_finder<16> m_digits;
 };
 
 
@@ -164,7 +167,7 @@ WRITE8_MEMBER( datum_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output().set_digit_value(m_keydata, bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3));
+		m_digits[m_keydata] = bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3);
 		m_keydata = 0;
 	}
 

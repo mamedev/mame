@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
+// copyright-holders:Miodrag Milanovic, Robbbert
 /*
  * s11.h
  *
@@ -30,22 +30,23 @@ class s11_state : public genpin_class
 {
 public:
 	s11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_audiocpu(*this, "audiocpu"),
-	m_bgcpu(*this, "bgcpu"),
-	m_hc55516(*this, "hc55516"),
-	m_pias(*this, "pias"),
-	m_pia21(*this, "pia21"),
-	m_pia24(*this, "pia24"),
-	m_pia28(*this, "pia28"),
-	m_pia2c(*this, "pia2c"),
-	m_pia30(*this, "pia30"),
-	m_pia34(*this, "pia34"),
-	m_pia40(*this, "pia40"),
-	m_ym(*this, "ym2151"),
-	m_bg(*this, "bgm")
-	{ }
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_bgcpu(*this, "bgcpu")
+		, m_hc55516(*this, "hc55516")
+		, m_pias(*this, "pias")
+		, m_pia21(*this, "pia21")
+		, m_pia24(*this, "pia24")
+		, m_pia28(*this, "pia28")
+		, m_pia2c(*this, "pia2c")
+		, m_pia30(*this, "pia30")
+		, m_pia34(*this, "pia34")
+		, m_pia40(*this, "pia40")
+		, m_ym(*this, "ym2151")
+		, m_bg(*this, "bgm")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	DECLARE_READ8_MEMBER(sound_r);
 	DECLARE_WRITE8_MEMBER(bank_w);
@@ -100,6 +101,7 @@ protected:
 	optional_device<pia6821_device> m_pia40;
 	optional_device<ym2151_device> m_ym;
 	optional_device<s11c_bg_device> m_bg;
+	output_finder<63> m_digits;
 
 	// getters/setters
 	uint8_t get_strobe() { return m_strobe; }
@@ -112,6 +114,7 @@ protected:
 	void set_segment2(uint32_t s) { m_segment2 = s; }
 	void set_timer(emu_timer* t) { m_irq_timer = t; }
 
+	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 private:

@@ -57,10 +57,10 @@ public:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 private:
-	DECLARE_READ8_MEMBER(memory_read);
-	DECLARE_WRITE8_MEMBER(memory_write);
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
+	DECLARE_READ8_MEMBER(memory_r);
+	DECLARE_WRITE8_MEMBER(memory_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -76,7 +76,7 @@ private:
 };
 
 
-READ8_MEMBER(qtsbc_state::memory_read)
+READ8_MEMBER(qtsbc_state::memory_r)
 {
 	ioport_value jumpers = m_jumpers->read();
 	ioport_value dsw3 = m_dsw[2]->read();
@@ -107,7 +107,7 @@ READ8_MEMBER(qtsbc_state::memory_read)
 	}
 }
 
-WRITE8_MEMBER(qtsbc_state::memory_write)
+WRITE8_MEMBER(qtsbc_state::memory_w)
 {
 #ifdef NOT_IMPLEMENTED_CURRENTLY
 	if ((offset & 0xfc00) >> 10 == m_dsw[1]->read())
@@ -123,7 +123,7 @@ WRITE8_MEMBER(qtsbc_state::memory_write)
 	}
 }
 
-READ8_MEMBER(qtsbc_state::io_read)
+READ8_MEMBER(qtsbc_state::io_r)
 {
 	if ((offset & 0xf8) >> 3 == (m_dsw[0]->read() & 0x1f))
 	{
@@ -164,7 +164,7 @@ READ8_MEMBER(qtsbc_state::io_read)
 	}
 }
 
-WRITE8_MEMBER(qtsbc_state::io_write)
+WRITE8_MEMBER(qtsbc_state::io_w)
 {
 	if ((offset & 0x00f8) >> 3 == (m_dsw[0]->read() & 0x1f))
 	{
@@ -200,16 +200,18 @@ WRITE8_MEMBER(qtsbc_state::io_write)
 	}
 }
 
-ADDRESS_MAP_START(qtsbc_state::mem_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(memory_read, memory_write)
-ADDRESS_MAP_END
+void qtsbc_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).ram().share("ram");
+	map(0x0000, 0xffff).rw(this, FUNC(qtsbc_state::memory_r), FUNC(qtsbc_state::memory_w));
+}
 
-ADDRESS_MAP_START(qtsbc_state::io_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
-ADDRESS_MAP_END
+void qtsbc_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(qtsbc_state::io_r), FUNC(qtsbc_state::io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( qtsbc )

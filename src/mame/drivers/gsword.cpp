@@ -455,19 +455,20 @@ void josvolly_state::machine_reset()
 }
 
 
-ADDRESS_MAP_START(gsword_state_base::cpu1_map)
-	AM_RANGE(0x0000, 0x8fff) AM_ROM
-	AM_RANGE(0x9000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa37f) AM_RAM
-	AM_RANGE(0xa380, 0xa3ff) AM_RAM AM_SHARE("spritetile_ram")
-	AM_RANGE(0xa400, 0xa77f) AM_RAM
-	AM_RANGE(0xa780, 0xa7ff) AM_RAM AM_SHARE("spritexy_ram")
-	AM_RANGE(0xa980, 0xa980) AM_WRITE(charbank_w)
-	AM_RANGE(0xaa80, 0xaa80) AM_WRITE(videoctrl_w)   /* flip screen, char palette bank */
-	AM_RANGE(0xab00, 0xab00) AM_WRITE(scroll_w)
-	AM_RANGE(0xab80, 0xabff) AM_WRITEONLY AM_SHARE("spriteattram")
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void gsword_state_base::cpu1_map(address_map &map)
+{
+	map(0x0000, 0x8fff).rom();
+	map(0x9000, 0x9fff).ram();
+	map(0xa000, 0xa37f).ram();
+	map(0xa380, 0xa3ff).ram().share("spritetile_ram");
+	map(0xa400, 0xa77f).ram();
+	map(0xa780, 0xa7ff).ram().share("spritexy_ram");
+	map(0xa980, 0xa980).w(this, FUNC(gsword_state_base::charbank_w));
+	map(0xaa80, 0xaa80).w(this, FUNC(gsword_state_base::videoctrl_w));   /* flip screen, char palette bank */
+	map(0xab00, 0xab00).w(this, FUNC(gsword_state_base::scroll_w));
+	map(0xab80, 0xabff).writeonly().share("spriteattram");
+	map(0xb000, 0xb7ff).readonly().w(this, FUNC(gsword_state_base::videoram_w)).share("videoram");
+}
 
 
 void gsword_state::cpu1_io_map(address_map &map)
@@ -521,7 +522,7 @@ void josvolly_state::josvolly_cpu2_map(address_map &map)
 	/* NEC D8255A with silkscreen removed and replaced with "AA 007" */
 	map(0x8000, 0x8003).rw("aa_007", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-//  AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
+//  map(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
 	map(0xA000, 0xA001).rw("mcu2", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w));
 }
 

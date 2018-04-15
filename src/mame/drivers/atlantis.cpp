@@ -193,25 +193,25 @@ public:
 READ8_MEMBER(atlantis_state::parallel_r)
 {
 	uint8_t result = 0x7;
-	logerror("%06X: parallel_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, result);
+	logerror("%s: parallel_r %08x = %02x\n", machine().describe_context(), offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(atlantis_state::parallel_w)
 {
-	logerror("%06X: parallel_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+	logerror("%s: parallel_w %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
 // Expansion ROM
 READ8_MEMBER (atlantis_state::exprom_r)
 {
-	logerror("%06X: exprom_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, 0xff);
+	logerror("%s: exprom_r %08x = %02x\n", machine().describe_context(), offset, 0xff);
 	return 0xff;
 }
 
 WRITE8_MEMBER(atlantis_state::exprom_w)
 {
-	logerror("%06X: exprom_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+	logerror("%s: exprom_w %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
 // Board PLD
@@ -319,7 +319,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 			case 0xbf: digit = '|'; break;
 			case 0xfe: digit = '-'; break;
 			case 0xff: digit = 'Z'; break;
-				if (0) logerror("%06X: status_leds_w digit: %c %08x = %02x\n", machine().device("maincpu")->safe_pc(), digit, offset, data);
+				if (0) logerror("%s: status_leds_w digit: %c %08x = %02x\n", machine().describe_context(), digit, offset, data);
 			}
 		}
 		break;
@@ -355,7 +355,7 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 	if (offset == 0 && (m_user_io_state & 0x1)) {
 		// Data written is shifted by 1 bit each time.  Maybe a serial line output?
 		if (LOG_RTC && m_serial_count == 0)
-			logerror("%06X: cmos_w[0] start serial %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+			logerror("%s: cmos_w[0] start serial %08x = %02x\n", machine().describe_context(), offset, data);
 		m_serial_count++;
 		if (m_serial_count == 8)
 			m_serial_count = 0;
@@ -757,7 +757,7 @@ static INPUT_PORTS_START( mwskins )
 	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
-	//PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, atlantis_state, port_mod_r, "KEYPAD")
+	//PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, atlantis_state, port_mod_r, "KEYPAD")
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("AN.0")
@@ -776,9 +776,9 @@ static INPUT_PORTS_START( mwskins )
 	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) PORT_CODE(KEYCODE_7_PAD)   /* keypad 7 */
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_CODE(KEYCODE_8_PAD)   /* keypad 8 */
 	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) PORT_CODE(KEYCODE_9_PAD)   /* keypad 9 */
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_CODE(KEYCODE_ASTERISK)    /* keypad * */
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_OTHER) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_CODE(KEYCODE_ASTERISK)    /* keypad * */
 	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) PORT_CODE(KEYCODE_0_PAD)   /* keypad 0 */
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)   /* keypad + */
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)   /* keypad + */
 
 INPUT_PORTS_END
 

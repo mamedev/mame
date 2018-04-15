@@ -538,7 +538,7 @@ void sega315_5313_device::vdp_set_register(int regnum, uint8_t value)
 //  if (regnum == 0x0a)
 //      osd_printf_debug("Set HINT Reload Register to %d on scanline %d\n",value, get_scanline_counter());
 
-//  osd_printf_debug("%s: Setting VDP Register #%02x to %02x\n",machine().describe_context(), regnum,value);
+//  osd_printf_debug("%s: Setting VDP Register #%02x to %02x\n",machine().describe_context().c_str(), regnum,value);
 }
 
 void sega315_5313_device::update_code_and_address(void)
@@ -716,7 +716,7 @@ void sega315_5313_device::handle_dma_bits()
 		uint16_t length;
 		source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0xff)<<16))<<1;
 		length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
-		osd_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", machine().describe_context(), source, length, m_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, m_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
+		osd_printf_debug("%s 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", machine().describe_context().c_str(), source, length, m_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, m_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
 	}
 #endif
 	if (m_vdp_code==0x20)
@@ -1322,7 +1322,7 @@ READ16_MEMBER( sega315_5313_device::vdp_r )
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) osd_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters();
 		//  retvalue = machine().rand();
-		//  osd_printf_debug("%s: Read HV counters at scanline %d hpos %d (return %04x)\n",machine().describe_context(),get_scanline_counter(), get_hposition(),retvalue);
+		//  osd_printf_debug("%s: Read HV counters at scanline %d hpos %d (return %04x)\n",machine().describe_context().c_str(),get_scanline_counter(), get_hposition(),retvalue);
 			break;
 
 		case 0x10:

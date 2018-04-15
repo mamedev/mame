@@ -129,21 +129,22 @@ private:
 };
 
 
-ADDRESS_MAP_START(janshi_vdp_device::map)
-	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_SHARE("back_vram") // bg tilemap?
-	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_SHARE("vram1") // xpos, colour, tile number etc.
+void janshi_vdp_device::map(address_map &map)
+{
+	map(0xfc0000, 0xfc1fff).ram().share("back_vram"); // bg tilemap?
+	map(0xfc2000, 0xfc2fff).ram().share("vram1"); // xpos, colour, tile number etc.
 
-	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_SHARE("unk1") // ?? height related?
-	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_SHARE("widthflags")
-	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_SHARE("unk2") // 2x increasing tables 00 10 20 30 etc.
+	map(0xfc3700, 0xfc377f).ram().share("unk1"); // ?? height related?
+	map(0xfc3780, 0xfc37bf).ram().share("widthflags");
+	map(0xfc37c0, 0xfc37ff).ram().share("unk2"); // 2x increasing tables 00 10 20 30 etc.
 
-	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_SHARE("vram2") // y pos + unknown
+	map(0xfc3800, 0xfc3fff).ram().share("vram2"); // y pos + unknown
 
-	AM_RANGE(0xff0000, 0xff07ff) AM_RAM /*AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w)*/ AM_SHARE("paletteram")
-	AM_RANGE(0xff2000, 0xff27ff) AM_RAM /*AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w)*/ AM_SHARE("paletteram2")
+	map(0xff0000, 0xff07ff).ram().share("paletteram"); //AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w)
+	map(0xff2000, 0xff27ff).ram().share("paletteram2"); //AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w)
 
-	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_SHARE("crtc_regs")
-ADDRESS_MAP_END
+	map(0xff6000, 0xff601f).ram().share("crtc_regs");
+}
 
 DEFINE_DEVICE_TYPE(JANSHIVDP, janshi_vdp_device, "janshi_vdp", "Janshi VDP")
 

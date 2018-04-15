@@ -8724,6 +8724,39 @@
 		</part>
 	</software>
 
+	<software name="hocxl" cloneof="hoc">
+		<description>Heart of China (Kixx XL release)</description>
+		<year>1994</year>
+		<publisher>Dynamix</publisher>
+		<info name="developer" value="Dynamix" />
+		<info name="version" value="0.100" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Kixx XL release) [Dynamix] [1994] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="0425bec1" sha1="d5eb8b054e0a6071deed28c522733697e09b783c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Kixx XL release) [Dynamix] [1994] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="a97b942e" sha1="97793c0a3488d0dfd319dd4dbefa58b1b8ada23e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Kixx XL release) [Dynamix] [1994] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="ec412b8f" sha1="dc0774e3ecc0f8734ed3b8e7c7956362c14b4de5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Kixx XL release) [Dynamix] [1994] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="f633207e" sha1="4eb96f7eaeaa1fbc407d4f3ace32f3b6638f31bf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Heart of China (Kixx XL release) [Dynamix] [1994] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="ed8b1bbc" sha1="6636e8cb8f078b98e40d7fe6b012a304bf5946ea" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="heretic">
 		<description>Heretic</description>
 		<year>1994</year>
@@ -9375,6 +9408,44 @@
 		</part>
 	</software>
 
+	<software name="tentacle">
+		<description>Maniac Mansion: Day of the Tentacle</description>
+		<year>1993</year>
+		<publisher>LucasArts</publisher>
+		<info name="developer" value="LucasArts" />
+		<info name="version" value="1.5" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle [LucasArts] [1993] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="300dca15" sha1="69a11071f7c89a8356281bb4b2aac9b249dbc301" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle [LucasArts] [1993] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="7a1e1741" sha1="2a1452515fef62a3e6f16971e2dc60ee5aadf4f8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle [LucasArts] [1993] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="cefa378f" sha1="3fb5a2a15c425ea46a3387b267870ebc8947750c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle [LucasArts] [1993] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="7837652a" sha1="ba9dfdd23d480d8596bbcd62e85d08736271d1e0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle [LucasArts] [1993] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="b3dc6efc" sha1="ee88bd1cf47b9adea4c9fd3d6cbf561fa4e646ac" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Day of the Tentacle [LucasArts] [1993] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="b922faec" sha1="f0cb7eeca8d577aaa1bdd2abc7bc6ec68726a89b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="moo">
 		<description>Master of Orion</description>
 		<year>1993</year>
@@ -9668,6 +9739,38 @@
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Prince of Persia 2 - The Shadow &amp; The Flame (USA) (Disk 4).img" size="1474560" crc="f5366618" sha1="00d33bef46d8435665fce0727271376ac2b43f2e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quarantin">
+		<description>Quarantine</description>
+		<year>1994</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Imagexcel" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Quarantine [GameTek] [1994] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="30112229" sha1="2ad3106a10e560bc2e5ffa982a908878f4a11076" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Quarantine [GameTek] [1994] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="a9bfca89" sha1="30198f6ee1f8ee4b29808c38f12af8bc37da3608" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Quarantine [GameTek] [1994] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="454662d1" sha1="da6a05095797ba0a0722140760bf1e8220c03fba" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Quarantine [GameTek] [1994] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="3fa6e73c" sha1="f0f03951cf37807c453516995188d2466250a6d1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Quarantine [GameTek] [1994] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="c7a23652" sha1="a15596131c115aedb750e37c3e3bca11b0beba23" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10613,17 +10716,17 @@
 		<info name="developer" value="ORIGIN Systems" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Wing Commander 2 - Speech Accessory Pack [ORIGIN Systems] [1991] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="2c259119" sha1="f758dd456f5681736b490fb11660970772a0bdca" offset="0"/>
+				<rom name="[PC] Wing Commander II - Speech Accessory Pack [3.5HD] [Disk 1 of 3].img" size="1474560" crc="6927062f" sha1="11e567ca5e3b23079a6e52fe565c10b0ca8a790e" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Wing Commander 2 - Speech Accessory Pack [ORIGIN Systems] [1991] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="be8f095d" sha1="adea7b9ea3bac9e21eaf842dee41e6eb1ad7f0f7" offset="0"/>
+				<rom name="[PC] Wing Commander II - Speech Accessory Pack [3.5HD] [Disk 2 of 3].img" size="1474560" crc="be8f095d" sha1="adea7b9ea3bac9e21eaf842dee41e6eb1ad7f0f7" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Wing Commander 2 - Speech Accessory Pack [ORIGIN Systems] [1991] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="dc3ce5d6" sha1="2fbf2b8b98833bab2a9d7fe0597c4f1bcc95c540" offset="0"/>
+				<rom name="[PC] Wing Commander II - Speech Accessory Pack [3.5HD] [Disk 3 of 3].img" size="1474560" crc="a474e101" sha1="f8d8ee237ac539080db803b5451ba7fd31d3005e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10662,6 +10765,23 @@
 			<feature name="Disc Code" value="4861C" />
 			<dataarea name="flop" size="1474560">
 				<rom name="diskc.img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcusa94">
+		<description>World Cup USA '94</description>
+		<year>1994</year>
+		<publisher>US Gold</publisher>
+		<info name="developer" value="Tiertex Design Studios" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="World Cup USA '94 [US Gold] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="d255e7dd" sha1="6d689cf624ba154a8254d7e9c26c11c112ded93d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="World Cup USA '94 [US Gold] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="798bbcca" sha1="fc9ab648fa9cdf74b9b89ce34057a694cd0556e2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10710,6 +10830,32 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Wolfenstein 3-D (USA) (v1.4).img" size="1474560" crc="aad21524" sha1="1bc5905e2324cf34ef18aa028b77500e057bd033" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3dc" cloneof="wolf3d">
+		<description>Wolfenstein 3-D (v1.4, 3.5" HD, Apogee newer)</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Apogee Software" />
+		<info name="version" value="1.4" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Wolfenstein 3-D (v1.4) [Apogee] [1992] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="1c327217" sha1="a042c751755e703cdda085e84eed1591eaf420e8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3dd" cloneof="wolf3d">
+		<description>Wolfenstein 3-D (v1.4, 3.5" HD, Mindscape)</description>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<info name="developer" value="Apogee Software" />
+		<info name="version" value="1.4" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Wolfenstein 3-D (v1.4) [Mindscape] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="281c99b0" sha1="584daa625862c0d1e380eeabef569fcf24d639d2" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

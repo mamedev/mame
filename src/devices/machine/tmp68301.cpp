@@ -205,7 +205,7 @@ inline void tmp68301_device::write_word(offs_t address, uint16_t data)
 IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
 {
 	int vector = m_irq_vector[irqline];
-//  logerror("%s: irq callback returns %04X for level %x\n",machine.describe_context(),vector,int_level);
+//  logerror("%s: irq callback returns %04X for level %x\n",machine().describe_context(),vector,int_level);
 	return vector;
 }
 
@@ -216,7 +216,7 @@ TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
 	uint16_t ICR  =   m_regs[0x8e/2+i];    // Interrupt Controller Register (ICR7..9)
 	uint16_t IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
 
-//  logerror("s: callback timer %04X, j = %d\n",machine.describe_context(),i,tcount);
+//  logerror("s: callback timer %04X, j = %d\n",machine().describe_context(),i,tcount);
 
 	if  (   (TCR & 0x0004) &&   // INT
 			!(m_imr & (0x100<<i))

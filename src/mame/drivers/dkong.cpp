@@ -685,7 +685,7 @@ WRITE8_MEMBER(dkong_state::s2650_data_w)
 WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
 {
 #if DEBUG_PROTECTION
-	logerror("write : pc = %04x, FO = %02x\n",space.device().safe_pc(), data);
+	logerror("%s write : FO = %02x\n", machine().describe_context(), data);
 #endif
 
 	m_main_fo = state;
@@ -1019,7 +1019,7 @@ static INPUT_PORTS_START( dkong_in2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* not connected - held to high */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* not connected - held to high */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("virtual_p2", latch8_device, bit4_q_r) /* status from sound cpu */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("virtual_p2", latch8_device, bit4_q_r) /* status from sound cpu */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("SERVICE1")
@@ -1217,7 +1217,7 @@ static INPUT_PORTS_START( dkongjr )
 	PORT_INCLUDE( dkong_in2 )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SPECIAL)   /* dkongjr does not have the mcu line connected */
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_CUSTOM)   /* dkongjr does not have the mcu line connected */
 
 	PORT_INCLUDE( dkong_dsw0 )
 	PORT_MODIFY("DSW0")
@@ -1229,8 +1229,8 @@ static INPUT_PORTS_START( dkongjr )
 
 #if DEBUG_DISC_SOUND
 	PORT_START("TST")      /* TST */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
 #endif
 INPUT_PORTS_END
 

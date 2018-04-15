@@ -218,7 +218,7 @@ WRITE16_MEMBER( asic65_device::data_w )
 	else
 	{
 		int command = (data < MAX_COMMANDS) ? command_map[m_asic65_type][data] : OP_UNKNOWN;
-		if (m_log) fprintf(m_log, "\n(%06X)%c%04X:", safe_pcbase(), (command == OP_UNKNOWN) ? '*' : ' ', data);
+		if (m_log) fprintf(m_log, "\n%s %c%04X:", machine().describe_context().c_str(), (command == OP_UNKNOWN) ? '*' : ' ', data);
 
 		/* set the command number and reset the parameter/result indices */
 		m_command = data;
