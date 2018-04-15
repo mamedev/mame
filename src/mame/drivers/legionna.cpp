@@ -1169,7 +1169,6 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)  /* ??? */
 	MCFG_CPU_PROGRAM_MAP(legionna_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
@@ -1184,6 +1183,7 @@ MACHINE_CONFIG_START(legionna_state::legionna)
 	MCFG_SCREEN_SIZE(36*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_legionna)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))/* VBL */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -1220,7 +1220,6 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)  /* ??? */
 	MCFG_CPU_PROGRAM_MAP(heatbrl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
@@ -1235,6 +1234,7 @@ MACHINE_CONFIG_START(legionna_state::heatbrl)
 	MCFG_SCREEN_SIZE(36*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_heatbrl)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))/* VBL */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -1271,7 +1271,6 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(godzilla_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
@@ -1287,6 +1286,7 @@ MACHINE_CONFIG_START(legionna_state::godzilla)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'180)/2,455,0,320,258,0,224) // ~61 Hz, 15.734 kHz
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -1325,7 +1325,6 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(denjinmk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
@@ -1340,6 +1339,7 @@ MACHINE_CONFIG_START(legionna_state::denjinmk)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_godzilla)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", legionna)
@@ -1377,7 +1377,6 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(grainbow_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
@@ -1392,6 +1391,7 @@ MACHINE_CONFIG_START(legionna_state::grainbow)
 	MCFG_SCREEN_SIZE(64*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 42*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
@@ -1430,7 +1430,6 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(cupsoc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", legionna_state,  irq4_line_hold)/* VBL */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'180)/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
@@ -1445,6 +1444,7 @@ MACHINE_CONFIG_START(legionna_state::cupsoc)
 	MCFG_SCREEN_SIZE(42*8, 36*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(legionna_state, screen_update_grainbow)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", 4))/* VBL */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
