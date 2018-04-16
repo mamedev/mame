@@ -240,7 +240,7 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 WRITE8_MEMBER(segald_state::astron_FIX_write)
 {
 	m_fix_ram[offset] = data;
-	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, space.device().safe_pc()); */
+	/* logerror("%s FIX write : 0x%04x [0x%x]\n", machine().describe_context(), data, offset); */
 }
 
 WRITE8_MEMBER(segald_state::astron_io_bankswitch_w)

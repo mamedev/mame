@@ -312,32 +312,32 @@ public:
 	rgb_t operator()(u32 raw) const { return (*m_func)(raw); }
 
 	// generic raw-to-RGB conversion helpers
-	template<int _RedBits, int _GreenBits, int _BlueBits, int _RedShift, int _GreenShift, int _BlueShift>
+	template<int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t standard_rgb_decoder(u32 raw)
 	{
-		u8 const r = palexpand<_RedBits>(raw >> _RedShift);
-		u8 const g = palexpand<_GreenBits>(raw >> _GreenShift);
-		u8 const b = palexpand<_BlueBits>(raw >> _BlueShift);
+		u8 const r = palexpand<RedBits>(raw >> RedShift);
+		u8 const g = palexpand<GreenBits>(raw >> GreenShift);
+		u8 const b = palexpand<BlueBits>(raw >> BlueShift);
 		return rgb_t(r, g, b);
 	}
 
 	// data-inverted generic raw-to-RGB conversion helpers
-	template<int _RedBits, int _GreenBits, int _BlueBits, int _RedShift, int _GreenShift, int _BlueShift>
+	template<int RedBits, int GreenBits, int BlueBits, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t inverted_rgb_decoder(u32 raw)
 	{
-		u8 const r = palexpand<_RedBits>(~raw >> _RedShift);
-		u8 const g = palexpand<_GreenBits>(~raw >> _GreenShift);
-		u8 const b = palexpand<_BlueBits>(~raw >> _BlueShift);
+		u8 const r = palexpand<RedBits>(~raw >> RedShift);
+		u8 const g = palexpand<GreenBits>(~raw >> GreenShift);
+		u8 const b = palexpand<BlueBits>(~raw >> BlueShift);
 		return rgb_t(r, g, b);
 	}
 
-	template<int _IntBits, int _RedBits, int _GreenBits, int _BlueBits, int _IntShift, int _RedShift, int _GreenShift, int _BlueShift>
+	template<int IntBits, int RedBits, int GreenBits, int BlueBits, int IntShift, int RedShift, int GreenShift, int BlueShift>
 	static rgb_t standard_irgb_decoder(u32 raw)
 	{
-		u8 const i = palexpand<_IntBits>(raw >> _IntShift);
-		u8 const r = (i * palexpand<_RedBits>(raw >> _RedShift)) >> 8;
-		u8 const g = (i * palexpand<_GreenBits>(raw >> _GreenShift)) >> 8;
-		u8 const b = (i * palexpand<_BlueBits>(raw >> _BlueShift)) >> 8;
+		u8 const i = palexpand<IntBits>(raw >> IntShift);
+		u8 const r = (i * palexpand<RedBits>(raw >> RedShift)) >> 8;
+		u8 const g = (i * palexpand<GreenBits>(raw >> GreenShift)) >> 8;
+		u8 const b = (i * palexpand<BlueBits>(raw >> BlueShift)) >> 8;
 		return rgb_t(r, g, b);
 	}
 

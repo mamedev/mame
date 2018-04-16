@@ -252,10 +252,9 @@ void gt64xxx_device::device_start()
 	save_pointer(NAME(m_ram[2].data()), m_simm_size[2] / 4);
 	save_pointer(NAME(m_ram[3].data()), m_simm_size[3] / 4);
 	save_item(NAME(m_last_dma));
-	machine().save().register_postload(save_prepost_delegate(FUNC(gt64xxx_device::map_cpu_space), this));
 }
 
-void gt64xxx_device::postload()
+void gt64xxx_device::device_post_load()
 {
 	map_cpu_space();
 	remap_cb();

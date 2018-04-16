@@ -1241,7 +1241,7 @@ READ8_MEMBER(dkong_state::dkong_tune_r)
 	}
 	else
 	{
-		/* printf("%s:rom access\n",machine().describe_context()); */
+		/* printf("%s:rom access\n",machine().describe_context().c_str()); */
 		return (m_snd_rom[0x1000 + (page & 7) * 256 + offset]);
 	}
 }

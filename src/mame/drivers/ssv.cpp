@@ -2510,28 +2510,7 @@ void ssv_state::init_eaglshot_banking()
 	membank("gfxrom")->configure_entries(0, 6+1, memregion("gfxdata")->base(), 0x200000);
 }
 
-// massages the data from the BPMicro-compatible dump to runnable form
-void ssv_state::init_st010()
-{
-	uint8_t *dspsrc = (uint8_t *)memregion("st010")->base();
-	uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
-	uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
-
-	// copy DSP program
-	for (int i = 0; i < 0x10000; i+= 4)
-	{
-		*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
-		dspprg++;
-	}
-
-	// copy DSP data
-	for (int i = 0; i < 0x1000; i+= 2)
-	{
-		*dspdata++ = dspsrc[0x10000+i]<<8 | dspsrc[0x10001+i];
-	}
-}
-
-DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init(0); init_st010();  }
+DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init(0); init_eaglshot_banking(); }
 DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,hypreact)     {    init(0); }
@@ -2545,13 +2524,13 @@ DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init(0);
 //  ((uint16_t *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init(0); }
-DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); init_st010(); }
+DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,survarts)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,dynagear)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,sxyreact)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
 DRIVER_INIT_MEMBER(ssv_state,cairblad)     {    init(0); init_hypreac2_common();    }
 DRIVER_INIT_MEMBER(ssv_state,sxyreac2)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
-DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init(1); init_st010();  }
+DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init(1); }
 DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init(1); }
 DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latches)); }
@@ -3147,9 +3126,11 @@ ROM_START( drifto94 )
 	ROM_LOAD16_BYTE( "vg003-18.u15", 0x000000, 0x200000, CRC(511b3e93) SHA1(09eda175c8f1b21c18645519cc6e89c6ca1fc5de) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 
@@ -4336,9 +4317,11 @@ ROM_START( stmblade )
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 ROM_START( stmbladej )
@@ -4365,9 +4348,11 @@ ROM_START( stmbladej )
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 
@@ -4440,9 +4425,11 @@ ROM_START( twineag2 )
 	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 

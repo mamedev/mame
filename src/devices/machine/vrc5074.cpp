@@ -243,10 +243,9 @@ void vrc5074_device::device_start()
 	save_item(NAME(m_uart_irq));
 	save_item(NAME(m_irq_pins));
 	save_item(NAME(m_timer_period));
-	machine().save().register_postload(save_prepost_delegate(FUNC(vrc5074_device::postload), this));
 }
 
-void vrc5074_device::postload()
+void vrc5074_device::device_post_load()
 {
 	map_cpu_space();
 	setup_pci_space();

@@ -68,7 +68,7 @@ inline void ATTR_PRINTF(3,4) sgi_ip6_state::verboselog( int n_level, const char 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", machine().device("maincpu")->safe_pc(), buf);
+		logerror("%s: %s", machine().describe_context(), buf);
 	}
 #endif
 }

@@ -37,20 +37,18 @@ READ8_MEMBER(inder_sb_device::vec_bankswitch_r)
 
 READ16_MEMBER(inder_sb_device::megaphx_0x050002_r)
 {
+	//logerror("%s megaphx_0x050002_r (from z80?) %04x\n", machine().describe_context(), mem_mask);
 	machine().scheduler().synchronize();
-//  int pc = machine().device("maincpu")->safe_pc();
 	int ret = m_soundback;
 	//m_soundback = 0;
-	//logerror("(%06x) megaphx_0x050002_r (from z80?) %04x\n", pc, mem_mask);
 	return ret;
 }
 
 WRITE16_MEMBER(inder_sb_device::megaphx_0x050000_w)
 {
-//  int pc = machine().device("maincpu")->safe_pc();
+	//logerror("%s megaphx_0x050000_w (to z80?) %04x %04x\n", machine().describe_context(), data, mem_mask);
 	machine().scheduler().synchronize();
 
-	//logerror("(%06x) megaphx_0x050000_w (to z80?) %04x %04x\n", pc, data, mem_mask);
 	m_soundsent = 0xff;
 	m_sounddata = data;
 
@@ -90,9 +88,8 @@ READ8_MEMBER(inder_sb_device::megaphx_sound_sent_r)
 
 WRITE8_MEMBER(inder_sb_device::megaphx_sound_to_68k_w)
 {
-//  int pc = machine().device("audiocpu")->safe_pc();
+	//logerror("%s megaphx_sound_to_68k_w (to 68k?) %02x\n", machine().describe_context(), data);
 	machine().scheduler().synchronize();
-	//logerror("(%04x) megaphx_sound_to_68k_w (to 68k?) %02x\n", pc, data);
 
 	m_soundback = data;
 }

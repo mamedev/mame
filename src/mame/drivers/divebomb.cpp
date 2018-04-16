@@ -391,17 +391,14 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_CPU_ADD("fgcpu", Z80,XTAL1/4) // ?
 	MCFG_CPU_PROGRAM_MAP(divebomb_fgcpu_map)
 	MCFG_CPU_IO_MAP(divebomb_fgcpu_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", divebomb_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("spritecpu", Z80,XTAL1/4) // ?
 	MCFG_CPU_PROGRAM_MAP(divebomb_spritecpu_map)
 	MCFG_CPU_IO_MAP(divebomb_spritecpu_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", divebomb_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("rozcpu", Z80,XTAL1/4) // ?
 	MCFG_CPU_PROGRAM_MAP(divebomb_rozcpu_map)
 	MCFG_CPU_IO_MAP(divebomb_rozcpu_iomap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", divebomb_state,  nmi_line_pulse)
 
 	MCFG_QUANTUM_PERFECT_CPU("fgcpu")
 
@@ -447,6 +444,9 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1-32)
 	MCFG_SCREEN_UPDATE_DRIVER(divebomb_state, screen_update_divebomb)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("fgcpu", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("spritecpu", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("rozcpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", divebomb)
 	MCFG_PALETTE_ADD("palette", 0x400+0x400+0x400+0x100)

@@ -1493,6 +1493,7 @@ void pc9801_state::pc9821_io(address_map &map)
 //  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
+	map(0x2ed0, 0x2edf).r(read8_delegate([](address_space &s, offs_t o, u8 mm) { return 0xff; }, "pc9821_unkaudio")).umask32(0xffffffff); // unknown sound related
 	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
 	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
 	map(0x841c, 0x841f).rw(this, FUNC(pc9801_state::sdip_0_r), FUNC(pc9801_state::sdip_0_w));

@@ -324,7 +324,7 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
 			{
 				/* samples ? sound dma ? */
 				// speaglsht:  unknown DMA copy : src - 2B6740, dst - 4400, len - 1E400
-				logerror("unknown DMA copy : src - %X, dst - %X, len - %X, PC - %X\n",srcadr,dstadr,length,space.device().safe_pcbase());
+				logerror("%s unknown DMA copy : src - %X, dst - %X, len - %X\n", machine().describe_context(), srcadr, dstadr, length);
 				break;
 			}
 		}

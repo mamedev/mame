@@ -765,14 +765,14 @@ void notetaker_state::iop_reset()
 	m_eiauart->write_xr(0); // MR - pin 21
 	m_eiauart->write_xr(1); // ''
 	// reset the IPConReg ls273 latch at #f1
-	IPConReg_w(m_iop_cpu->device_t::memory().space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	IPConReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
 	// Clear the DAC FIFO
 	for (int i=0; i<16; i++) m_outfifo[i] = 0;
 	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
 	// reset the FIFOReg latch at #h9
-	FIFOReg_w(m_iop_cpu->device_t::memory().space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	FIFOReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
 	// reset the DiskReg latches at #c4 and #b4 on the disk/display/eia controller board
-	DiskReg_w(m_iop_cpu->device_t::memory().space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	DiskReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
 	// reset the framebuffer display address counter:
 	m_DispAddr = 0;
 }

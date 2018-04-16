@@ -356,6 +356,7 @@ VIDEOS["GBA_LCD"] = true
 VIDEOS["MGA2064W"] = true
 VIDEOS["PPU2C0X"] = true
 VIDEOS["DP8510"] = true
+VIDEOS["MB88303"] = true
 
 --------------------------------------------------
 -- specify available machine cores
@@ -542,6 +543,7 @@ MACHINES["RTC9701"] = true
 MACHINES["S3520CF"] = true
 MACHINES["S3C24XX"] = true
 MACHINES["S3C44B0"] = true
+MACHINES["SAA1043"] = true
 MACHINES["SATURN"] = true
 --MACHINES["SCSI"] = true
 MACHINES["SCUDSP"] = true
@@ -3701,6 +3703,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/vii.cpp",
 	MAME_DIR .. "src/mame/drivers/vp60.cpp",
 	MAME_DIR .. "src/mame/drivers/vp122.cpp",
+	MAME_DIR .. "src/mame/drivers/vp415.cpp",
 	MAME_DIR .. "src/mame/drivers/vsmilepro.cpp",
 	MAME_DIR .. "src/mame/drivers/wicat.cpp",
 	MAME_DIR .. "src/mame/drivers/wyse.cpp",

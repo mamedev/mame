@@ -1194,6 +1194,8 @@ WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 	//popmessage("unkcm_0x02_w %02x", data);
 
 	m_vblank_irq_enable = data & 0x80;
+	if (!m_vblank_irq_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	output().set_lamp_value(0, (data >> 0) & 1);  /* Bet-A / Stop 2 */
 	output().set_lamp_value(1, (data >> 1) & 1);  /* Start / Stop All */
@@ -8070,6 +8072,9 @@ WRITE8_MEMBER(wingco_state::system_outputc_w)
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
 	//popmessage("system_outputc_w %02x",data);
+
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(goldstar_state::ay8910_outputa_w)
@@ -8089,7 +8094,6 @@ MACHINE_CONFIG_START(goldstar_state::goldstar)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goldstar_map)
 	MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8099,6 +8103,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstar)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goldstar)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8126,7 +8131,6 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(goldstar_map)
 	MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8136,6 +8140,7 @@ MACHINE_CONFIG_START(goldstar_state::goldstbl)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bl)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8172,7 +8177,6 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(star100_map)
 	MCFG_CPU_IO_MAP(star100_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sanghopm_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8182,6 +8186,7 @@ MACHINE_CONFIG_START(sanghopm_state::star100)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sanghopm_state, screen_update_sangho)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -8213,7 +8218,6 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 //  MCFG_CPU_PROGRAM_MAP(nfm_map)
 	MCFG_CPU_IO_MAP(goldstar_readport)
 //  MCFG_CPU_IO_MAP(unkch_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -8223,6 +8227,7 @@ MACHINE_CONFIG_START(goldstar_state::super9)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super9)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8309,7 +8314,6 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ncb3_map)
 	MCFG_CPU_IO_MAP(ncb3_readwriteport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8331,6 +8335,7 @@ MACHINE_CONFIG_START(cb3_state::ncb3)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8384,7 +8389,6 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wcherry_map)
 	MCFG_CPU_IO_MAP(wcherry_readwriteport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8406,6 +8410,7 @@ MACHINE_CONFIG_START(goldstar_state::wcherry)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cb3e)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8433,7 +8438,6 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(cm_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8453,6 +8457,7 @@ MACHINE_CONFIG_START(cmaster_state::cm)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmbitmap)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8481,7 +8486,6 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(cmast91_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8501,6 +8505,7 @@ MACHINE_CONFIG_START(goldstar_state::cmast91)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_cmast91)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cmast91)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8519,10 +8524,10 @@ MACHINE_CONFIG_END
 
 
 
-INTERRUPT_GEN_MEMBER(wingco_state::masked_irq)
+WRITE_LINE_MEMBER(wingco_state::masked_irq)
 {
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(wingco_state::lucky8)
@@ -8531,7 +8536,6 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(lucky8_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wingco_state, masked_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8557,6 +8561,7 @@ MACHINE_CONFIG_START(wingco_state::lucky8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wingco_state, masked_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8586,7 +8591,6 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(lucky8_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wingco_state, masked_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8612,6 +8616,7 @@ MACHINE_CONFIG_START(wingco_state::bingowng)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_bingowng)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wingco_state, masked_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8713,7 +8718,6 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(magodds_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wingco_state, masked_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8739,6 +8743,7 @@ MACHINE_CONFIG_START(wingco_state::magodds)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wingco_state, screen_update_magical)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wingco_state, masked_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", magodds)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8768,7 +8773,6 @@ MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kkotnoli_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8790,6 +8794,7 @@ MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8812,7 +8817,6 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ladylinr_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8830,6 +8834,7 @@ MACHINE_CONFIG_START(goldstar_state::ladylinr)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8855,7 +8860,6 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wcat3_map)
 	//MCFG_CPU_IO_MAP(goldstar_readport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8881,6 +8885,7 @@ MACHINE_CONFIG_START(wingco_state::wcat3)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ncb3)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8912,7 +8917,6 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(amcoe1_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8932,6 +8936,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe1)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -8969,7 +8974,6 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(amcoe2_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -8989,6 +8993,7 @@ MACHINE_CONFIG_START(cmaster_state::amcoe2)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cm)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -9016,10 +9021,10 @@ MACHINE_CONFIG_START(cmaster_state::nfm)
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(unkch_state::vblank_irq)
+WRITE_LINE_MEMBER(unkch_state::vblank_irq)
 {
-	if (m_vblank_irq_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_vblank_irq_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(unkch_state::unkch)
@@ -9028,7 +9033,6 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(unkch_map)
 	MCFG_CPU_IO_MAP(unkch_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unkch_state, vblank_irq)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -9040,6 +9044,7 @@ MACHINE_CONFIG_START(unkch_state::unkch)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(unkch_state, screen_update_unkch)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(unkch_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", unkch)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -9067,7 +9072,6 @@ MACHINE_CONFIG_START(goldstar_state::pkrmast)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cm_map)
 	MCFG_CPU_IO_MAP(pkrmast_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -9077,6 +9081,7 @@ MACHINE_CONFIG_START(goldstar_state::pkrmast)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pkrmast)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -9100,7 +9105,6 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(megaline_map)
 	MCFG_CPU_IO_MAP(megaline_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
 	//MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	//MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
@@ -9114,6 +9118,7 @@ MACHINE_CONFIG_START(unkch_state::megaline)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaline)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -9150,7 +9155,6 @@ MACHINE_CONFIG_START(unkch_state::bonusch)
 	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(bonusch_map)
 	MCFG_CPU_IO_MAP(bonusch_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("mcu", I80C51, 12_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
@@ -9162,6 +9166,7 @@ MACHINE_CONFIG_START(unkch_state::bonusch)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", megaline)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -9322,6 +9327,26 @@ ROM_START( crazybon )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
 ROM_END
 
+ROM_START( crazybona )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "27c512_main.bin",  0x00000, 0x10000, CRC(61a5585d) SHA1(5fdcf80f62ed21c9e903da64cf67ed39ec55b8b9) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "crazy_h3.bin", 0x00000, 0x20000, CRC(6b3692b5) SHA1(ffdcd4e59d7c009fd76a65e8f87642da35f996f4) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "crazy_j3.bin", 0x00000, 0x20000, CRC(e375cd4b) SHA1(68888126ff9743cd589f3426205231bc3a896588) )
+
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+
+	/* proms taken from cmv4, probably wrong  */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
+	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) BAD_DUMP )
+ROM_END
 
 /*
 Cherry Gold  (Cherry 10)
@@ -16440,7 +16465,8 @@ GAMEL( 198?, cmpacmana, cmpacman, cm,       cmpacman, cmaster_state,  cm,      R
 GAMEL( 198?, cmtetris,  0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 1)",              0,                        layout_cmpacman ) // need to press K/L to switch between games...
 GAMEL( 198?, cmtetrsa,  0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (Corsica, v8.01, set 2)",              MACHINE_NOT_WORKING,      layout_cmpacman ) // seems banked...
 GAMEL( 198?, cmtetrsb,  0,        cm,       cmtetris, cmaster_state,  cm,      ROT0, "<unknown>",           "Tetris + Cherry Master (+K, Canada Version, encrypted)",      MACHINE_NOT_WORKING,      layout_cmpacman ) // different Tetris game. press insert to throttle and see the attract running.
-GAMEL( 1997, crazybon,  0,        pkrmast,  crazybon, goldstar_state, 0,       ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002",                                            MACHINE_IMPERFECT_COLORS, layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
+GAMEL( 1997, crazybon,  0,        pkrmast,  crazybon, goldstar_state, 0,       ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 1)",                            MACHINE_IMPERFECT_COLORS, layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
+GAMEL( 1997, crazybona, crazybon, pkrmast,  crazybon, goldstar_state, 0,       ROT0, "bootleg (Crazy Co.)", "Crazy Bonus 2002 (Ver. 1, set 2)",                            MACHINE_IMPERFECT_COLORS, layout_crazybon )
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.

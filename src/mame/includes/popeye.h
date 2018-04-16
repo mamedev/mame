@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Couriersud
+// copyright-holders:smf, Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
 
+#include "sound/ay8910.h"
 #include "video/resnet.h"
 
 class tnx1_state : public driver_device
@@ -10,6 +11,7 @@ public:
 	tnx1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_aysnd(*this, "aysnd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_dmasource(*this, "dmasource"),
@@ -24,6 +26,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<ay8910_device> m_aysnd;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_dmasource;
@@ -52,7 +55,7 @@ protected:
 	uint8_t m_dswbit;
 	bool m_nmi_enabled;
 
-	DECLARE_WRITE8_MEMBER(refresh_w);
+	virtual DECLARE_WRITE8_MEMBER(refresh_w);
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_WRITE8_MEMBER(popeye_videoram_w);
@@ -64,7 +67,7 @@ protected:
 	virtual void video_start() override;
 	virtual DECLARE_PALETTE_INIT(palette_init);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	virtual DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void update_palette();
 	virtual void decrypt_rom();
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -97,6 +100,12 @@ class tpp2_state : public tpp1_state
 public:
 	virtual void config(machine_config &config) override;
 protected:
+	bool m_watchdog_enabled;
+	uint8_t m_watchdog_counter;
+
+	virtual void driver_start() override;
+	virtual DECLARE_WRITE8_MEMBER(refresh_w) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(screen_vblank) override;
 	virtual void maincpu_program_map(address_map &map) override;
 	virtual void decrypt_rom() override;
 	virtual void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect) override;

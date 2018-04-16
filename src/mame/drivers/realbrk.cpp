@@ -753,10 +753,11 @@ GFXDECODE_END
                         Billiard Academy Real Break
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(realbrk_state::interrupt)
+WRITE_LINE_MEMBER(realbrk_state::vblank_irq)
 {
 	/* VBlank is connected to INT1 (external interrupts pin 1) */
-	m_tmp68301->external_interrupt_1();
+	if (state)
+		m_tmp68301->external_interrupt_1();
 }
 
 MACHINE_CONFIG_START(realbrk_state::realbrk)
@@ -764,7 +765,6 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL(32'000'000) / 2)          /* !! TMP68301 !! */
 	MCFG_CPU_PROGRAM_MAP(realbrk_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", realbrk_state,  interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
@@ -779,6 +779,7 @@ MACHINE_CONFIG_START(realbrk_state::realbrk)
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 	MCFG_SCREEN_UPDATE_DRIVER(realbrk_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(realbrk_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", realbrk)
 	MCFG_PALETTE_ADD("palette", 0x8000)

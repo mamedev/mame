@@ -92,12 +92,12 @@ static const uint8_t mk_prot_values[] =
 
 READ16_MEMBER(midtunit_state::mk_prot_r)
 {
-	logerror("%08X:Protection R @ %05X = %04X\n", space.device().safe_pc(), offset, mk_prot_values[m_mk_prot_index] << 9);
+	logerror("%s:Protection R @ %05X = %04X\n", machine().describe_context(), offset, mk_prot_values[m_mk_prot_index] << 9);
 
 	/* just in case */
 	if (m_mk_prot_index >= sizeof(mk_prot_values))
 	{
-		logerror("%08X:Unexpected protection R @ %05X\n", space.device().safe_pc(), offset);
+		logerror("%s:Unexpected protection R @ %05X\n", machine().describe_context(), offset);
 		m_mk_prot_index = 0;
 	}
 
@@ -122,11 +122,11 @@ WRITE16_MEMBER(midtunit_state::mk_prot_w)
 		/* just in case */
 		if (i == sizeof(mk_prot_values))
 		{
-			logerror("%08X:Unhandled protection W @ %05X = %04X\n", space.device().safe_pc(), offset, data);
+			logerror("%s:Unhandled protection W @ %05X = %04X\n", machine().describe_context(), offset, data);
 			m_mk_prot_index = 0;
 		}
 
-		logerror("%08X:Protection W @ %05X = %04X\n", space.device().safe_pc(), offset, data);
+		logerror("%s:Protection W @ %05X = %04X\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -294,7 +294,7 @@ static const uint8_t jdredd_prot_values_80020[] =
 
 WRITE16_MEMBER(midtunit_state::jdredd_prot_w)
 {
-	logerror("%08X:jdredd_prot_w(%04X,%04X)\n", space.device().safe_pcbase(), offset*16, data);
+	logerror("%s:jdredd_prot_w(%04X,%04X)\n", machine().describe_context(), offset*16, data);
 
 	switch (offset)
 	{
@@ -342,7 +342,7 @@ READ16_MEMBER(midtunit_state::jdredd_prot_r)
 	if (m_jdredd_prot_table && m_jdredd_prot_index < m_jdredd_prot_max)
 		result = m_jdredd_prot_table[m_jdredd_prot_index++] << 9;
 
-	logerror("%08X:jdredd_prot_r(%04X) = %04X\n", space.device().safe_pcbase(), offset*16, result);
+	logerror("%s:jdredd_prot_r(%04X) = %04X\n", machine().describe_context(), offset*16, result);
 	return result;
 }
 
@@ -511,7 +511,7 @@ MACHINE_RESET_MEMBER(midtunit_state,midtunit)
 
 READ16_MEMBER(midtunit_state::midtunit_sound_state_r)
 {
-/*  logerror("%08X:Sound status read\n", space.device().safe_pc());*/
+/*  logerror("%s:Sound status read\n", machine().describe_context());*/
 
 	if (m_chip_type == SOUND_DCS)
 		return m_dcs->control_r() >> 4;

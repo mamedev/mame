@@ -6,7 +6,7 @@
  * UNIX workstations.
  *
  * The first systems were built using the original C100 CLIPPER CPU, and used
- * an additional Intel 80186 as an I/O processor, later moving to a C300 with
+ * an additional Intel 80186 as an I/O processor, later upgraded to a C300 and
  * 80386 IOP. Around 1990, the CLIPPER became fast enough to obviate the need
  * for the separate I/O processor, and systems from that point used the main
  * CPU for both compute and I/O, along with some custom ASICs.
@@ -16,10 +16,11 @@
  *
  *   Year  Family    Models                   CPU
  *   1986  amethyst  32C/100/200              C100 (80186 IOP)
- *   1988  topaz     300/3000/4000/5000       C300/C300Plus (80386 IOP)
+ *                   300                      C100 (80386 IOP)
+ *   1988  topaz     3000/4000/5000           C300/C300Plus (80386 IOP)
  *   1990  emerald   6000/6100/6200/6500      C300/C300Plus
  *   1990  turquoise 2000                     C300
- *   1991  emerald?  6600                     C4?
+ *   1991  emerald   6600                     C4?
  *   1992  sapphire  2400/6400                C4T
  *   1993  sapphire  2500/2700/6700/6800      C4I
  *   1994  sapphire  2800                     C4I
@@ -28,12 +29,15 @@
  *
  *   Model  Year  CPU    Performance           Clock   Family       Bus
  *   6000   1990  C300   10 MIPS               40MHz   emerald      SRX
- *   6100   1990         14 MIPS                       emerald      IOI?, 6105 has 5-slot chassis
- *   6500         C300+                                emerald      IOI, QWIC bus?
+ *          1991         12 MIPS
+ *   6100   1990  C300+? 14 MIPS                       emerald      IOI, 12-slot
+            1991         15.5 MIPS
+ *   6500   1990  C300+  20 MIPS                       emerald      IOI, QWIC bus?, 12-slot
  *   6200   1990  C300+  14 MIPS               60MHz   emerald
  *          1991         18 MIPS
  *   2000   1990  C300   12.5 MIPS             50MHz?  turquoise    CBUS
- *   6600   1991  C400   40 MIPS                       emerald?     IOI, SRX bus?
+ *          1991         16 MIPS
+ *   6600   1991  C400   40 MIPS                       emerald      IOI, SRX bus?
  *   2400   1992  C4T    36 MIPS/33 SPECmarks  40MHz?  sapphire     CBUS
  *   6400   1992  C4T    36 MIPS/33 SPECmarks  40MHz   sapphire     SRX
  *   2700   1993  C400I  40.1 SPECmark89               sapphire 2   CBUS
@@ -73,10 +77,12 @@
  *   GT        1990?   360k 2D vec/s (in a 2020)
  *   EDGE-1            8 planes + 1 highlight plane, double buffered (6040)
  *   EDGE-2            24 bit, 400k 2D vec/s, 350k 3D vec/s (6280)
- *   GT+               760k 2D vec/s, 530k 3D vec/s (in a 2730)
- *   GTII              830k 2D vec/s, 640k 3D vec/s (in a 6750)
+ *   GT+               500k 2D vec/s, 300k 2D vec/s (in a 2430)
+ *                     760k 2D vec/s, 530k 3D vec/s (in a 2730)
+ *   GTII              800k 2D vec/s, 500k 3D vec/s (in a 6450)
+ *                     830k 2D vec/s, 640k 3D vec/s (in a 6750)
  *                     900k 2D vec/s, 700k 3D vec/s (in a 6850)
- *   EDGE II+          50k Gouraud-shaded poly/s (in a 6780)
+ *   EDGE II+          600k 2D vec/s, 500k 3D vec/s, 50k shaded poly/s (in a 6480)
  *
  * GT graphics are also referred to in various places as Memory Mapped Graphics
  * or MMG. EDGE stands for Extensible Display Geometry Engine.
@@ -94,7 +100,7 @@
  *   U39   Intel 82586               Ethernet controller
  *   U40   Zilog 8530 SCC            Keyboard and console serial controller
  *   U41   Zilog 8530 SCC            Serial controller for serial port 0 and 1
- *   U42   Xilinix XC3020-50         Plotter control FPGA?
+ *   U42   Xilinx XC3020-50          Plotter control FPGA?
  *   U43   (MPRGM610C)               Bitstream for XC3020?
  *   U54   4.9152 MHz crystal        Clock source for 8530s?
  *   U55   20.0 MHz crystal
@@ -111,7 +117,7 @@
  *   Ref   Part                      Function
  *   U31   Zilog Z85C30 SCC          Keyboard and console serial controller
  *   U32   Zilog Z85230 ESCC         Serial controller for serial port 0 and 1
- *   U34   Xilinix XC3020-50         Plotter control FPGA?
+ *   U34   Xilinx XC3020-50          Plotter control FPGA?
  *   U35   128 kB EPROM (MPRGW510B)  Boot ROM
  *   U43?  (MPRGM610P)               Bitstream for XC3020?
  *   U44   Intel 82596SX-20          Ethernet controller
@@ -137,7 +143,7 @@
  *   Ref   Part                      Function
  *   U31   Zilog Z85C30 SCC          Keyboard and console serial controller
  *   U32   Zilog Z85230 ESCC         Serial controller for serial port 0 and 1
- *   U34   Xilinix XC3020-70         Plotter control FPGA?
+ *   U34   Xilinx XC3020-70          Plotter control FPGA?
  *   U35   128 kB EPROM (MPRGZ530A)  Boot ROM
  *   U43?  (MPRGM610P)               Bitstream for XC3020?
  *   U44   Intel 82596SX-20          Ethernet controller
@@ -172,7 +178,7 @@
  *   SMT098B  6400 32-MHz Sapphire System Board
  *   SMT127   6700 Series System Board           MSMT1040A C4I: C4 CPU Rev 3 + C4 FPU Rev 3 + C4I CAMMU
  *   SMT128   2700 Series System Board           MSMT1040A C4I: C4 CPU Rev 3 + C4 FPU Rev 3 + C4I CAMMU
- *   SMT144   6800 Series System Board
+ *   SMT144   6800 Series System Board           integrated cpu?
  *   SMT145   2800 Series System Board
  */
 
@@ -442,13 +448,14 @@ void sapphire_state::sapphire_io_map(address_map &map)
 	map(0x00000000, 0x00001fff).m(m_mmu, FUNC(cammu_c4_device::map));
 }
 
-ADDRESS_MAP_START(interpro_state::interpro_boot_map)
+void interpro_state::interpro_boot_map(address_map &map)
+{
 	// FIXME: the real system may have some initial boot instructions in this boot
 	// memory space which jump to the start of the boot eprom code, or there may
 	// be some special address decoding logic for boot. For now, we fake it in the
 	// CPU by hard-coding the start address to point at the eprom.
-	AM_RANGE(0x00000000, 0x00001fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x00000000, 0x00001fff).ram();
+}
 
 void turquoise_state::interpro_82586_map(address_map &map)
 {
