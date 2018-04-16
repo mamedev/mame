@@ -636,51 +636,103 @@ Notes:
 #include "cpu/i386/i386.h"
 #include "machine/clock.h"
 #include "machine/nvram.h"
+#include "machine/m1io.h"
 #include "speaker.h"
 
 #include "vr.lh"
 
-READ16_MEMBER(model1_state::io_r)
+WRITE8_MEMBER( model1_state::vf_outputs_w )
 {
-	if(offset < 0x8)
-		return m_analog_ports[offset].read_safe(0x00);
+	// 7654----  unknown (not used?)
+	// ----3---  start 2 lamp
+	// -----2--  start 1 lamp
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
 
-	if(offset == 0x0f)
-		return m_lamp_state;
-
-	if(offset < 0x10)
-	{
-		offset -= 0x8;
-		if(offset < 3)
-			return m_digital_ports[offset]->read();
-		return 0xff;
-	}
-
-	logerror("IOR: %02x\n", offset);
-	return 0xffff;
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-WRITE16_MEMBER(model1_state::io_w)
+WRITE8_MEMBER( model1_state::vr_outputs_w )
 {
-	if(offset == 0x0f){
-		// lamp and coinmeters
-		// 0x01 = COIN METER 1
-		// 0x02 = COIN METER 2
-		output().set_led_value(0, data & 0x4);   // START (1)
-		output().set_led_value(1, data & 0x8);   // VIEW1 (START2 - VF)
-		output().set_led_value(2, data & 0x10);  // VIEW2 (VIEW - SWA)
-		output().set_led_value(3, data & 0x20);  // VIEW3
-		output().set_led_value(4, data & 0x40);  // VIEW4
-		output().set_led_value(5, data & 0x80);  // RACE LEADER
-		m_lamp_state = data;
-		m_digits[1] = data;
-		return;
-	} else if (offset == 0x11) {
+	// 7-------  race leader lamp
+	// -6------  vr4 (green) lamp
+	// --5-----  vr3 (yellow) lamp
+	// ---4----  vr2 (blue) lamp
+	// ----3---  vr1 (red) lamp
+	// -----2--  start lamp
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+
+	m_digits[1] = data;
+}
+
+WRITE8_MEMBER( model1_state::swa_outputs_w )
+{
+	// 7-------  unknown (not used?)
+	// -6------  unknown (1 while in-game)
+	// --5-----  unknown (not used?)
+	// ---4----  vr lamp
+	// ----3---  unknown (not used?)
+	// -----2--  start lamp
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+WRITE8_MEMBER( model1_state::wingwar_outputs_w )
+{
+	// 7-------  unknown (not used?)
+	// -6------  view selector 4 lamp
+	// --5-----  view selector 3 lamp
+	// ---4----  view selector 2 lamp
+	// ----3---  view selector 1 lamp
+	// -----2--  start lamp
+	// ------1-  unknown (not used?)
+	// -------0  coin counter 1
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+WRITE8_MEMBER( model1_state::wingwar360_outputs_w )
+{
+	// 7654----  unknown (not used?)
+	// ----3---  danger lamp
+	// -----2--  start lamp
+	// ------1-  coin counter 2
+	// -------0  coin counter 1
+
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+WRITE8_MEMBER( model1_state::netmerc_outputs_w )
+{
+	// 76------  unknown (not used?)
+	// --54----  mvd backlights
+	// ----3---  mvd holder light
+	// -----2--  trigger/thumb motor
+	// ------1-  unknown (not used?)
+	// -------0  coin counter 1
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+WRITE16_MEMBER( model1_state::drive_board_w )
+{
+	if (offset == 0x01)
+	{
 		// drive board commands
 		m_digits[0] = data;
 		return;
 	}
-	logerror("IOW: %02x %02x\n", offset, data);
+
+	logerror("drive_board_w: %02x %02x\n", offset, data);
 }
 
 READ16_MEMBER(model1_state::fifoin_status_r)
@@ -878,7 +930,8 @@ void model1_state::model1_mem(address_map &map)
 	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
 	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	map(0xc00000, 0xc0003f).rw(this, FUNC(model1_state::io_r), FUNC(model1_state::io_w));
+	map(0xc00000, 0xc0001f).rw("io", FUNC(m1io_device::read), FUNC(m1io_device::write)).umask16(0x00ff);
+	map(0xc00020, 0xc0003f).w(this, FUNC(model1_state::drive_board_w));
 
 	map(0xc00040, 0xc00043).rw(this, FUNC(model1_state::network_ctl_r), FUNC(model1_state::network_ctl_w));
 
@@ -916,152 +969,178 @@ void model1_state::model1_comm_mem(address_map &map)
 
 static INPUT_PORTS_START( vf )
 	PORT_START("IN.0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
 
 	PORT_START("IN.2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vr )
-	PORT_START("AN.0")   /* Steering */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(3)
-
-	PORT_START("AN.1")   /* Accel / Decel */
-	PORT_BIT( 0xff, 0x30, IPT_PEDAL ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
-
-	PORT_START("AN.2")   /* Brake */
-	PORT_BIT( 0xff, 0x30, IPT_PEDAL2 ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
-
 	PORT_START("IN.0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("VR1 (Red)") PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("VR2 (Blue)") PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("VR3 (Yellow)") PORT_PLAYER(1)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("VR1 (Red)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("VR2 (Blue)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("VR3 (Yellow)")
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("VR4 (Green)") PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Shift Down") PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Shift Up") PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("VR4 (Green)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.2")   /* 8Bit RX-line from drive board */
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-static INPUT_PORTS_START( wingwar )
-	PORT_START("AN.0")   /* X */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_START("WHEEL")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(3)
 
-	PORT_START("AN.1")   /* Y */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_START("ACCEL")
+	PORT_BIT( 0xff, 0x30, IPT_PEDAL ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START("AN.2")   /* Throttle */
-	PORT_BIT( 0xff, 0x01, IPT_PEDAL ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
+	PORT_START("BRAKE")
+	PORT_BIT( 0xff, 0x30, IPT_PEDAL2 ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START("IN.0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("View 1")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("View 2")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View 3")
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN.1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("View 4")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Machine Gun")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("Missile")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("Smoke")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN.2")   /* 8Bit RX-line from r360 board */
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swa )
-	PORT_START("AN.0")   /* X */
-	PORT_BIT( 0xff, 127, IPT_AD_STICK_X ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
-
-	PORT_START("AN.1")   /* Y */
-	PORT_BIT( 0xff, 127, IPT_AD_STICK_Y ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
-
-	PORT_START("AN.2")   /* Throttle */
-	PORT_BIT( 0xff, 228, IPT_PEDAL ) PORT_MINMAX(28,228) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_REVERSE
-
-	PORT_START("AN.4")   /* X */
-	PORT_BIT( 0xff, 127, IPT_AD_STICK_X ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE PORT_PLAYER(2)
-
-	PORT_START("AN.5")   /* Y */
-	PORT_BIT( 0xff, 127, IPT_AD_STICK_Y ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2)
-
 	PORT_START("IN.0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("STICK1X")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)  PORT_REVERSE
+
+	PORT_START("STICK1Y")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)  PORT_REVERSE
+
+	PORT_START("THROTTLE")
+	PORT_BIT( 0xff, 0xe4, IPT_PEDAL )      PORT_MINMAX(28,228) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_REVERSE
+
+	PORT_START("STICK2X")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)  PORT_PLAYER(2) PORT_REVERSE
+
+	PORT_START("STICK2Y")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)  PORT_PLAYER(2)
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( wingwar )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("View 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("View 2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("View 3")
+
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("View 4")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Machine Gun")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Missile")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Smoke")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.2")   /* 8Bit RX-line from r360 board */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("STICKX")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+
+	PORT_START("STICKY")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+
+	PORT_START("THROTTLE")
+	PORT_BIT( 0xff, 0x01, IPT_PEDAL ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wingwar360 )
+	PORT_INCLUDE(wingwar)
+
+	PORT_MODIFY("IN.0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( netmerc )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Thumb")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("MVD Holder")
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("STICKX")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+
+	PORT_START("STICKY")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+INPUT_PORTS_END
+
+
 
 #define MODEL1_CPU_BOARD \
 	ROM_REGION32_LE( 0x40000, "copro_tables", 0 ) \
@@ -1580,6 +1659,11 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_DEVICE_ADD("io", SEGA_M1IO, 0)
+	MCFG_M1IO_DI0_CB(IOPORT("IN.0"))
+	MCFG_M1IO_DI1_CB(IOPORT("IN.1"))
+	MCFG_M1IO_DI2_CB(IOPORT("IN.2"))
+
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
 
@@ -1605,24 +1689,57 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("m1uart", i8251_device, write_rxc))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model1_state::wingwar)
-	model1(config);
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model1_comm_mem)
-
-	MCFG_M1COMM_ADD(M1COMM_TAG)
-	MCFG_DEVICE_BIOS("epr15112");
-MACHINE_CONFIG_END
-
 MACHINE_CONFIG_START(model1_state::model1_hle)
 	model1(config);
 
 	MCFG_DEVICE_REMOVE("tgp_copro")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(model1_state::vf)
+	model1_hle(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, vf_outputs_w))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model1_state::vr)
+	model1(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_M1IO_AN0_CB(IOPORT("WHEEL"))
+	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, vr_outputs_w))
+
+	MCFG_M1COMM_ADD(M1COMM_TAG)
+	MCFG_DEVICE_BIOS("epr15112");
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model1_state::vformula)
+	model1(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_M1IO_AN0_CB(IOPORT("WHEEL"))
+	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, vr_outputs_w))
+
+	MCFG_M1COMM_ADD(M1COMM_TAG)
+	MCFG_DEVICE_BIOS("epr15624");
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(model1_state::swa)
 	model1_hle(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_M1IO_AN0_CB(IOPORT("STICK1X"))
+	MCFG_M1IO_AN1_CB(IOPORT("STICK1Y"))
+	MCFG_M1IO_AN2_CB(IOPORT("THROTTLE"))
+	MCFG_M1IO_AN3_CB(NOOP)
+	MCFG_M1IO_AN4_CB(IOPORT("STICK2X"))
+	MCFG_M1IO_AN5_CB(IOPORT("STICK2Y"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, swa_outputs_w))
+
 	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
 	MCFG_SOUND_ROUTE(0, "dleft", 1.0)
@@ -1632,6 +1749,29 @@ MACHINE_CONFIG_START(model1_state::swa)
 	MCFG_DEVICE_MODIFY(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model1_state::wingwar)
+	model1_hle(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(model1_comm_mem)
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_M1IO_AN0_CB(IOPORT("STICKX"))
+	MCFG_M1IO_AN1_CB(IOPORT("STICKY"))
+	MCFG_M1IO_AN2_CB(IOPORT("THROTTLE"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, wingwar_outputs_w))
+
+	MCFG_M1COMM_ADD(M1COMM_TAG)
+	MCFG_DEVICE_BIOS("epr15112");
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(model1_state::wingwar360)
+	wingwar(config);
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, wingwar360_outputs_w))
 MACHINE_CONFIG_END
 
 void model1_state::polhemus_map(address_map &map)
@@ -1645,21 +1785,13 @@ MACHINE_CONFIG_START(model1_state::netmerc)
 	model1_hle(config);
 	MCFG_CPU_ADD("polhemus", I386SX, 16000000)
 	MCFG_CPU_PROGRAM_MAP(polhemus_map)
+
+	MCFG_DEVICE_MODIFY("io")
+	MCFG_M1IO_AN0_CB(IOPORT("STICKX"))
+	MCFG_M1IO_AN2_CB(IOPORT("STICKY"))
+	MCFG_M1IO_DO_CB(WRITE8(model1_state, netmerc_outputs_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(model1_state::vr)
-	model1(config);
-
-	MCFG_M1COMM_ADD(M1COMM_TAG)
-	MCFG_DEVICE_BIOS("epr15112");
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(model1_state::vformula)
-	model1(config);
-
-	MCFG_M1COMM_ADD(M1COMM_TAG)
-	MCFG_DEVICE_BIOS("epr15624");
-MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(model1_state,wingwar360)
 {
@@ -1725,12 +1857,12 @@ WRITE16_MEMBER(model1_state::r360_w)
 	}
 }
 
-GAME( 1993, vf,         0,       model1_hle, vf,      model1_state,  0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,         0,       vr,         vr,      model1_state,  0,          ROT0, "Sega", "Virtua Racing", 0, layout_vr )
-GAME( 1993, vformula,   vr,      vformula,   vr,      model1_state,  0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,        swa,     model1_state,  0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,    0,       wingwar,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar, model1_state,  0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwar360, wingwar, wingwar,    wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       netmerc,    vf,      model1_state,  0,          ROT0, "Sega", "Sega NetMerc", MACHINE_NOT_WORKING )
+GAME( 1993, vf,         0,       vf,         vf,         model1_state,  0,          ROT0, "Sega", "Virtua Fighter",     MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       vr,         vr,         model1_state,  0,          ROT0, "Sega", "Virtua Racing",      0, layout_vr )
+GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state,  0,          ROT0, "Sega", "Virtua Formula",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,        swa,        model1_state,  0,          ROT0, "Sega", "Star Wars Arcade",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state,  0,          ROT0, "Sega", "Wing War (World)",   MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state,  0,          ROT0, "Sega", "Wing War (US)",      MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state,  0,          ROT0, "Sega", "Wing War (Japan)",   MACHINE_NOT_WORKING )
+GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,    netmerc,    model1_state,  0,          ROT0, "Sega", "Sega NetMerc",       MACHINE_NOT_WORKING )

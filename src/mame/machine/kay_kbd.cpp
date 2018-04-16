@@ -389,7 +389,7 @@ READ8_MEMBER(kaypro_10_keyboard_device::p2_r)
 
 WRITE8_MEMBER(kaypro_10_keyboard_device::p2_w)
 {
-	if ((VERBOSE & LOG_TXD) && (0x0014U >= static_cast<device_state_interface *>(m_mcu)->safe_pc()))
+	if ((VERBOSE & LOG_TXD) && (0x0014U >= m_mcu->pc()))
 	{
 		auto const suppressor(machine().disable_side_effects());
 		address_space &mcu_ram(m_mcu->space(AS_DATA));

@@ -129,7 +129,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_timer1);
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_tx_timer);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	std::unique_ptr<uint8_t[]>   m_nvram8;
 	uint8_t   m_io_reg;
@@ -417,9 +417,10 @@ WRITE_LINE_MEMBER( rastersp_state::scsi_irq )
 }
 
 
-INTERRUPT_GEN_MEMBER( rastersp_state::vblank_irq )
+WRITE_LINE_MEMBER( rastersp_state::vblank_irq )
 {
-	update_irq(IRQ_VBLANK, ASSERT_LINE);
+	if (state)
+		update_irq(IRQ_VBLANK, ASSERT_LINE);
 }
 
 
@@ -863,7 +864,6 @@ MACHINE_CONFIG_START(rastersp_state::rastersp)
 	MCFG_CPU_ADD("maincpu", I486, 33330000)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rastersp_state, vblank_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(rastersp_state,irq_callback)
 
 	MCFG_CPU_ADD("dsp", TMS32031, 33330000)
@@ -889,6 +889,7 @@ MACHINE_CONFIG_START(rastersp_state::rastersp)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rastersp_state, vblank_irq))
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 

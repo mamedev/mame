@@ -1599,7 +1599,7 @@ void eolith_state::speedup_read()
 {
 	/* for debug */
 	//if ((m_maincpu->pc()!=m_speedup_address) && (m_speedup_vblank!=1) )
-	//    printf("%s:eolith speedup_read data %02x\n",machine().describe_context(), m_speedup_vblank);
+	//    printf("%s:eolith speedup_read data %02x\n",machine().describe_context().c_str(), m_speedup_vblank);
 
 	if (m_speedup_vblank==0 && m_speedup_scanline < m_speedup_resume_scanline)
 	{

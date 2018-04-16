@@ -97,8 +97,6 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
 
-	INTERRUPT_GEN_MEMBER(vblank);
-
 	void hp16500(machine_config &config);
 	void hp16500a(machine_config &config);
 	void hp1651(machine_config &config);
@@ -324,11 +322,6 @@ void hp16500_state::hp16500_map(address_map &map)
 	map(0x00800000, 0x009fffff).ram();
 }
 
-INTERRUPT_GEN_MEMBER(hp16500_state::vblank)
-{
-	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-}
-
 void hp16500_state::video_start()
 {
 	m_count = 0;
@@ -480,17 +473,16 @@ MACHINE_CONFIG_START(hp16500_state::hp16500)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp16500_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hp16500_state, vblank)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hp16500_state, screen_update_hp16500)
 	MCFG_SCREEN_SIZE(576,384)
 	MCFG_SCREEN_VISIBLE_AREA(0, 576-1, 0, 384-1)
 	MCFG_SCREEN_REFRESH_RATE(60)
-
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp16500_state, vsync_changed))
 	// FIXME: Where is the AP line connected to? The MLC documentation recommends
 	// connecting it to VBLANK
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w))
 
 	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL(15'920'000)/2)
 	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp16500_state, irq_2))

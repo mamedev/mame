@@ -104,7 +104,7 @@ public:
 
 	/* Generic push/pop */
 	T pop();
-	void push(T &&value);
+	void push(T value);
 
 	/* Indicates whether the fifo is empty or full.  Note that a pop
 	   on a full fifo does not ensure it will become non-full, there

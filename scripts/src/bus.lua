@@ -3405,7 +3405,9 @@ if (BUSES["INTERPRO_KEYBOARD"]~=null) then
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/keyboard.cpp",
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/keyboard.h",
 		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.cpp",
-		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.h"
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/hle.h",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/lle.cpp",
+		MAME_DIR .. "src/devices/bus/interpro/keyboard/lle.h"
 	}
 end
 

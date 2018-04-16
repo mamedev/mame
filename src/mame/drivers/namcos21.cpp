@@ -1149,9 +1149,8 @@ WRITE16_MEMBER(namcos21_state::pointram_control_w)
 
 	/* m_pointram_control&0x20 : bank for depthcue data */
 #if 0
-	logerror( "dsp_control_w:'%s':%x[%x]:=%04x ",
-		cpu->tag,
-		cpu->safe_pc(),
+	logerror( "%s dsp_control_w:[%x]:=%04x ",
+		machine().describe_context(),
 		offset,
 		m_pointram_control );
 

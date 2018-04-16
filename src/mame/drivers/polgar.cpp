@@ -30,6 +30,7 @@ public:
 	mephisto_polgar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_keys(*this, "KEY")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(polgar_led_w);
@@ -38,8 +39,10 @@ public:
 	void polgar10(machine_config &config);
 	void polgar(machine_config &config);
 	void polgar_mem(address_map &map);
+	virtual void sound_start() override { m_digits.resolve(); }
 protected:
 	optional_ioport m_keys;
+	output_finder<4> m_digits;
 };
 
 class mephisto_risc_state : public mephisto_polgar_state
@@ -338,7 +341,7 @@ WRITE8_MEMBER(mephisto_modena_state::modena_io_w)
 
 WRITE8_MEMBER(mephisto_modena_state::modena_digits_w)
 {
-	output().set_digit_value(m_digits_idx, data ^ ((m_io_ctrl & 0x10) ? 0xff : 0x00));
+	m_digits[m_digits_idx] = data ^ ((m_io_ctrl & 0x10) ? 0xff : 0x00);
 	m_digits_idx = (m_digits_idx + 1) & 3;
 }
 

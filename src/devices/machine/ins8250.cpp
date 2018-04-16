@@ -69,6 +69,16 @@ PC16550D
 Same as NS16550A with subtle flaws corrected. This is revision D of the
 16550 family and is the latest design available from National Semiconductor.
 
+Intel 82050
+Essentially a NS16450 squeezed into a 28-pin package with some minor functions
+eliminated. Can be strapped for either a 18.432 MHz XTAL (divided by 10 to
+produce the BRG clock) or an externally generated 9.216 or 18.432 MHz clock.
+
+Intel 82510
+A functional expansion of the 82050 with dozens of extra registers. Adds 4-byte
+Tx/Rx FIFOs with programmable thresholds, MCS-51 compatible 9-bit protocol,
+ASCII/EBCDIC control character recognition, timed interrupts and more.
+
 
 Known issues:
 - MESS does currently not handle all these model specific features.

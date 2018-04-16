@@ -59,6 +59,7 @@ void cinemat_state::machine_start()
 	save_item(NAME(m_coin_last_reset));
 	save_item(NAME(m_mux_select));
 	m_led.resolve();
+	m_pressed.resolve();
 }
 
 
@@ -82,14 +83,14 @@ void cinemat_state::machine_reset()
 
 READ8_MEMBER(cinemat_state::inputs_r)
 {
-	return (ioport("INPUTS")->read() >> offset) & 1;
+	return (m_inputs->read() >> offset) & 1;
 }
 
 
 READ8_MEMBER(cinemat_state::switches_r)
 {
 	static const uint8_t switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
-	return (ioport("SWITCHES")->read() >> switch_shuffle[offset]) & 1;
+	return (m_switches->read() >> switch_shuffle[offset]) & 1;
 }
 
 
@@ -167,7 +168,7 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 	int delta_wheel;
 
 	/* the shift register is cleared once per 'frame' */
-	delta_wheel = int8_t(ioport("WHEEL")->read()) / 8;
+	delta_wheel = int8_t(m_wheel->read()) / 8;
 	if (delta_wheel > 3)
 		delta_wheel = 3;
 	else if (delta_wheel < -3)
@@ -179,14 +180,14 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 
 READ8_MEMBER(cinemat_state::speedfrk_gear_r)
 {
-	int gearval = ioport("GEAR")->read();
+	int gearval = m_gear_input->read();
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
 		m_gear = gearval & 0x0f;
 
 	/* add the start key into the mix -- note that it overlaps 4th gear */
-	if (!(ioport("INPUTS")->read() & 0x80))
+	if (!(m_inputs->read() & 0x80))
 		m_gear &= ~0x08;
 
 	return (m_gear >> offset) & 1;
@@ -234,7 +235,7 @@ READ8_MEMBER(cinemat_state::sundance_inputs_r)
 	if (sundance_port_map[offset].portname)
 		return (ioport(sundance_port_map[offset].portname)->read() & sundance_port_map[offset].bitmask) ? 0 : 1;
 	else
-		return (ioport("INPUTS")->read() >> offset) & 1;
+		return (m_inputs->read() >> offset) & 1;
 }
 
 

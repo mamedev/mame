@@ -5476,7 +5476,20 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 	{
 		stv2_current_tilemap.scrollx = stv_current_rotation_parameter_table.mx >> 16;
 		stv2_current_tilemap.scrolly = stv_current_rotation_parameter_table.my >> 16;
-
+		
+		if(stv2_current_tilemap.roz_mode3 == true)
+		{
+			// TODO: Cotton 2 enables mode 3 without an actual RP window enabled
+			//       Technically you could use split screen effect without rotation applied, 
+			//       which will be annoying to emulate with this video structure.
+			//       Let's see if anything will do it ...
+			if(STV_VDP2_RPW0E || STV_VDP2_RPW1E)
+				popmessage("ROZ Mode 3 enabled without zooming, contact MAMEdev!");
+			
+			if(iRP == 2)
+				return;
+		}
+		
 		stv_vdp2_check_tilemap(bitmap,cliprect);
 	}
 	else

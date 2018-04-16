@@ -2459,6 +2459,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/saa1043.h,MACHINES["SAA1043"] = true
+---------------------------------------------------
+
+if (MACHINES["SAA1043"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/saa1043.cpp",
+		MAME_DIR .. "src/devices/machine/saa1043.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scnxx562.h,MACHINES["DUSCC"] = true
 ---------------------------------------------------
 

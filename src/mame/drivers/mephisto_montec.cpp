@@ -40,6 +40,7 @@ public:
 		, m_board(*this, "board")
 		, m_beeper(*this, "beeper")
 		, m_keys(*this, "KEY.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 
@@ -83,6 +84,7 @@ private:
 	required_device<mephisto_board_device> m_board;
 	required_device<beep_device> m_beeper;
 	optional_ioport_array<2> m_keys;
+	output_finder<8> m_digits;
 
 	uint8_t m_lcd_mux;
 	uint8_t m_input_mux;
@@ -101,6 +103,8 @@ private:
 
 void mephisto_montec_state::machine_start()
 {
+	m_digits.resolve();
+
 	save_item(NAME(m_lcd_mux));
 	save_item(NAME(m_input_mux));
 	save_item(NAME(m_leds_mux));
@@ -173,8 +177,8 @@ WRITE8_MEMBER(mephisto_montec_state::montec_lcd_clk_w)
 
 	if (m_display.shift == 8)
 	{
-		if (m_lcd_mux & 0x01)   output().set_digit_value(0 + m_display.pos, bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1));
-		if (m_lcd_mux & 0x02)   output().set_digit_value(4 + m_display.pos, bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1));
+		if (m_lcd_mux & 0x01)   m_digits[0 + m_display.pos] = bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1);
+		if (m_lcd_mux & 0x02)   m_digits[4 + m_display.pos] = bitswap<8>(m_display.data, 0,3,2,7,6,5,4,1);
 
 		m_display.shift = 0;
 		m_display.pos = (m_display.pos + 1) & 3;

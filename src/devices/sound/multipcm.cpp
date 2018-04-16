@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Miguel Angel Horna
 /*
- * Yamaha YMW-258-F (aka Sega 315-5560) emulation.
+ * Yamaha YMW-258-F 'GEW8' (aka Sega 315-5560) emulation.
  *
  * by Miguel Angel Horna (ElSemi) for Model 2 Emulator and MAME.
  * Information by R. Belmont and the YMF278B (OPL4) manual.
@@ -19,6 +19,7 @@
  *
  * The first sample ROM contains a variable length table with 12
  * bytes per instrument/sample. This is very similar to the YMF278B.
+ * This sample format might be derived from the one used by the older YM7138 'GEW6' chip.
  *
  * The first 3 bytes are the offset into the file (big endian). (0, 1, 2)
  * The next 2 are the loop start offset into the file (big endian) (3, 4)

@@ -25,9 +25,14 @@ public:
 		, m_vector(*this, "vector")
 		, m_screen(*this, "screen")
 		, m_rambase(*this, "rambase")
+		, m_inputs(*this, "INPUTS")
+		, m_switches(*this, "SWITCHES")
+		, m_gear_input(*this, "GEAR")
+		, m_wheel(*this, "WHEEL")
 		, m_analog_x(*this, "ANALOGX")
 		, m_analog_y(*this, "ANALOGY")
 		, m_led(*this, "led")
+		, m_pressed(*this, "pressed%u", 0U)
 	{ }
 
 	required_device<ccpu_cpu_device> m_maincpu;
@@ -38,10 +43,15 @@ public:
 	required_device<screen_device> m_screen;
 	optional_shared_ptr<uint16_t> m_rambase;
 
+	required_ioport m_inputs;
+	required_ioport m_switches;
+	optional_ioport m_gear_input;
+	optional_ioport m_wheel;
 	optional_ioport m_analog_x;
 	optional_ioport m_analog_y;
 
 	output_finder<> m_led;
+	output_finder<10> m_pressed;
 
 	uint32_t m_current_shift;
 	uint32_t m_last_shift;

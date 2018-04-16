@@ -219,16 +219,21 @@ OKI M6295 (an AD65 on this board, note pin 7 is low): 1.5mhz
 
 */
 
+WRITE_LINE_MEMBER(pokechmp_state::sound_irq)
+{
+	// VBLANK is probably not the source of this interrupt
+	if (state)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
 MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", M6502, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -238,6 +243,8 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pokechmp_state, screen_update_pokechmp)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(pokechmp_state, sound_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pokechmp)
 	MCFG_PALETTE_ADD("palette", 0x400)

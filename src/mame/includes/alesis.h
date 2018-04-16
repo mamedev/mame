@@ -71,7 +71,7 @@ public:
 		m_col5(*this, "COL5"),
 		m_col6(*this, "COL6"),
 		m_select(*this, "SELECT"),
-		m_digit(*this, "digit", 0U),
+		m_digit(*this, "digit%u", 0U),
 		m_track_led(*this, "track_led%u", 1U),
 		m_patt_led(*this, "patt_led"),
 		m_song_led(*this, "song_led"),

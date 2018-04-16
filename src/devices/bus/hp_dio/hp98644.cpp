@@ -10,6 +10,7 @@
 #include "hp98644.h"
 #include "bus/rs232/rs232.h"
 
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -20,6 +21,9 @@ DEFINE_DEVICE_TYPE(HPDIO_98644, dio16_98644_device, "dio98644", "HP98644A Asynch
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
+
+#define RS232_TAG       "rs232"
+#define INS8250_TAG     "ins8250"
 
 MACHINE_CONFIG_START( dio16_98644_device::device_add_mconfig )
         MCFG_DEVICE_ADD(INS8250_TAG, INS8250, XTAL(2'457'600))
@@ -136,6 +140,7 @@ void dio16_98644_device::device_start()
 {
 	// set_nubus_device makes m_slot valid
 	set_dio_device();
+	m_installed_io = false;
 }
 
 //-------------------------------------------------
@@ -147,8 +152,15 @@ void dio16_98644_device::device_reset()
 	uint8_t code = m_switches->read() >> REG_SWITCHES_SELECT_CODE_SHIFT;
 	code &= REG_SWITCHES_SELECT_CODE_MASK;
 
-	m_dio->install_memory(0x600000 + (code * 0x10000), 0x6007ff + (code * 0x10000), read16_delegate(FUNC(dio16_98644_device::io_r), this),
-							write16_delegate(FUNC(dio16_98644_device::io_w), this));
+	if (!m_installed_io)
+	{
+		m_dio->install_memory(
+				0x600000 + (code * 0x10000),
+				0x6007ff + (code * 0x10000),
+				read16_delegate(FUNC(dio16_98644_device::io_r), this),
+				write16_delegate(FUNC(dio16_98644_device::io_w), this));
+		m_installed_io = true;
+	}
 }
 
 READ16_MEMBER(dio16_98644_device::io_r)

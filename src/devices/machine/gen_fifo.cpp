@@ -151,7 +151,7 @@ template<typename T> T generic_fifo_device_base<T>::pop()
 	}
 }
 
-template<typename T> void generic_fifo_device_base<T>::push(T &&t)
+template<typename T> void generic_fifo_device_base<T>::push(T t)
 {
 	// Are we already overflowed?
 	if(!m_extra_values.empty())

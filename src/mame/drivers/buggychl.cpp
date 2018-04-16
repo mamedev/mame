@@ -437,6 +437,8 @@ void buggychl_state::machine_start()
 	save_item(NAME(m_sky_on));
 	save_item(NAME(m_sprite_color_base));
 	save_item(NAME(m_bg_scrollx));
+
+	m_led.resolve();
 }
 
 void buggychl_state::machine_reset()

@@ -91,7 +91,7 @@ void harddriv_sound_board_device::update_68k_interrupts()
 READ16_MEMBER(harddriv_sound_board_device::hd68k_snd_data_r)
 {
 	m_soundflag = 0;
-	logerror("%06X:main read from sound=%04X\n", space.device().safe_pcbase(), m_sounddata);
+	logerror("%s:main read from sound=%04X\n", machine().describe_context(), m_sounddata);
 	return m_sounddata;
 }
 
@@ -113,7 +113,7 @@ TIMER_CALLBACK_MEMBER( harddriv_sound_board_device::delayed_68k_w )
 WRITE16_MEMBER(harddriv_sound_board_device::hd68k_snd_data_w)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_sound_board_device::delayed_68k_w), this), data);
-	logerror("%06X:main write to sound=%04X\n", space.device().safe_pcbase(), data);
+	logerror("%s:main write to sound=%04X\n", machine().describe_context(), data);
 }
 
 
@@ -123,7 +123,7 @@ WRITE16_MEMBER(harddriv_sound_board_device::hd68k_snd_reset_w)
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_mainflag = m_soundflag = 0;
 	update_68k_interrupts();
-	logerror("%06X:Reset sound\n", space.device().safe_pcbase());
+	logerror("%s:Reset sound\n", machine().describe_context());
 }
 
 
@@ -138,7 +138,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_data_r)
 {
 	m_mainflag = 0;
 	update_68k_interrupts();
-	logerror("%06X:sound read from main=%04X\n", space.device().safe_pcbase(), m_maindata);
+	logerror("%s:sound read from main=%04X\n", machine().describe_context(), m_maindata);
 	return m_maindata;
 }
 
@@ -147,7 +147,7 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_data_w)
 {
 	COMBINE_DATA(&m_sounddata);
 	m_soundflag = 1;
-	logerror("%06X:sound write to main=%04X\n", space.device().safe_pcbase(), data);
+	logerror("%s:sound write to main=%04X\n", machine().describe_context(), data);
 }
 
 
@@ -160,14 +160,14 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_data_w)
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_switches_r)
 {
-	logerror("%06X:hdsnd68k_switches_r(%04X)\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnd68k_switches_r(%04X)\n", machine().describe_context(), offset);
 	return 0;
 }
 
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_320port_r)
 {
-	logerror("%06X:hdsnd68k_320port_r(%04X)\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnd68k_320port_r(%04X)\n", machine().describe_context(), offset);
 	return 0;
 }
 
@@ -179,7 +179,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_status_r)
 //            D14 = 'Sound Flag'
 //            D13 = Test Switch
 //            D12 = 5220 Ready Flag (0=Ready)
-	logerror("%06X:hdsnd68k_status_r(%04X)\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnd68k_status_r(%04X)\n", machine().describe_context(), offset);
 	return (m_mainflag << 15) | (m_soundflag << 14) | 0x2000 | 0;//((ioport("IN0")->read() & 0x0020) << 8) | 0;
 }
 
@@ -234,7 +234,7 @@ WRITE_LINE_MEMBER(harddriv_sound_board_device::led_w)
 
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_speech_w)
 {
-	logerror("%06X:hdsnd68k_speech_w(%04X)=%04X\n", space.device().safe_pcbase(), offset, data);
+	logerror("%s:hdsnd68k_speech_w(%04X)=%04X\n", machine().describe_context(), offset, data);
 }
 
 
@@ -281,7 +281,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_320com_r)
 	if (m_cramen)
 		return m_comram[offset & 0x1ff];
 
-	logerror("%06X:hdsnd68k_320com_r(%04X) -- not allowed\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnd68k_320com_r(%04X) -- not allowed\n", machine().describe_context(), offset);
 	return 0xffff;
 }
 
@@ -291,7 +291,7 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320com_w)
 	if (m_cramen)
 		COMBINE_DATA(&m_comram[offset & 0x1ff]);
 	else
-		logerror("%06X:hdsnd68k_320com_w(%04X)=%04X -- not allowed\n", space.device().safe_pcbase(), offset, data);
+		logerror("%s:hdsnd68k_320com_w(%04X)=%04X -- not allowed\n", machine().describe_context(), offset, data);
 }
 
 
@@ -336,14 +336,14 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnddsp_dac_w)
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnddsp_comport_w)
 {
 	/* COM port TD0-7 */
-	logerror("%06X:hdsnddsp_comport_w=%d\n", space.device().safe_pcbase(), data);
+	logerror("%s:hdsnddsp_comport_w=%d\n", machine().describe_context(), data);
 }
 
 
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnddsp_mute_w)
 {
 	/* mute DAC audio, D0=1 */
-	logerror("%06X:mute DAC=%d\n", space.device().safe_pcbase(), data);
+	logerror("%s:mute DAC=%d\n", machine().describe_context(), data);
 }
 
 
@@ -387,7 +387,7 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnddsp_comram_r)
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnddsp_compare_r)
 {
-	logerror("%06X:hdsnddsp_compare_r(%04X)\n", space.device().safe_pcbase(), offset);
+	logerror("%s:hdsnddsp_compare_r(%04X)\n", machine().describe_context(), offset);
 	return 0;
 }
 

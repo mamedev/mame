@@ -535,8 +535,6 @@ public:
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
-	offs_t safe_pc() const;
-	offs_t safe_pcbase() const;
 
 	void set_system_bios(u8 bios) { m_system_bios = bios; }
 	bool findit(bool pre_map, bool isvalidation) const;

@@ -1365,7 +1365,11 @@ READ16_MEMBER(pc9801_state::pc9821_grcg_gvram_r)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
-		return space.read_word(0xf00000|(offset*2)|((m_analog256.write_bank)*0x8000),mem_mask);
+		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
+		int bank = offset >> 14;
+		if(bank <= 1)
+			return ext_gvram[((m_analog256.bank[bank])*0x4000) + (offset & 0x3fff)];
+		return 0xffff;
 	}
 
 	return grcg_gvram_r(space,offset,mem_mask);
@@ -1375,7 +1379,10 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram_w)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
-		space.write_word(0xf00000|(offset*2)|(m_analog256.write_bank*0x8000),data,mem_mask);
+		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
+		int bank = offset >> 14;
+		if(bank <= 1)
+			COMBINE_DATA(&ext_gvram[((m_analog256.bank[bank])*0x4000) + (offset & 0x3fff)]);
 		return;
 	}
 
@@ -1388,8 +1395,8 @@ READ16_MEMBER(pc9801_state::pc9821_grcg_gvram0_r)
 	{
 		switch(offset*2)
 		{
-			case 4: return m_analog256.write_bank;
-//          case 6: return m_analog256.read_bank;
+			case 4: return m_analog256.bank[0];
+			case 6: return m_analog256.bank[1];
 		}
 
 		//return 0;
@@ -1403,12 +1410,15 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
 		//printf("%08x %08x\n",offset*2,data);
-		switch(offset*2)
+		if(mem_mask & 0xff)
 		{
-			case 4: COMBINE_DATA(&m_analog256.write_bank); break;
-//          case 6: COMBINE_DATA(&m_analog256.read_bank); break;
+			switch(offset*2)
+			{
+				case 4: m_analog256.bank[0] = data & 0xf; break;
+				case 6: m_analog256.bank[1] = data & 0xf; break;
+			}
 		}
-		//return;
+		return;
 	}
 
 	grcg_gvram0_w(space,offset,data,mem_mask);
@@ -1417,12 +1427,12 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
 
 void pc9801_state::pc9821_map(address_map &map)
 {
-	//AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE8(winram_r, winram_w, 0xffffffff)
+	//map(0x00080000, 0x0009ffff).rw(this, FUNC(pc9801_state::winram_r), FUNC(pc9801_state::winram_w))
 	map(0x000a0000, 0x000a3fff).rw(this, FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
 	map(0x000a4000, 0x000a4fff).rw(this, FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
 	map(0x000a8000, 0x000bffff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram_r), FUNC(pc9801_state::pc9821_grcg_gvram_w));
 	map(0x000cc000, 0x000cdfff).rom().region("sound_bios", 0); //sound BIOS
-//  AM_RANGE(0x000d8000, 0x000d9fff) AM_ROM AM_REGION("ide",0)
+	//map(0x000d8000, 0x000d9fff).rom().region("ide",0)
 	map(0x000da000, 0x000dbfff).ram(); // ide ram
 	map(0x000e0000, 0x000e7fff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram0_r), FUNC(pc9801_state::pc9821_grcg_gvram0_w));
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
@@ -1483,6 +1493,7 @@ void pc9801_state::pc9821_io(address_map &map)
 //  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
+	map(0x2ed0, 0x2edf).r(read8_delegate([](address_space &s, offs_t o, u8 mm) { return 0xff; }, "pc9821_unkaudio")).umask32(0xffffffff); // unknown sound related
 	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
 	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
 	map(0x841c, 0x841f).rw(this, FUNC(pc9801_state::sdip_0_r), FUNC(pc9801_state::sdip_0_w));

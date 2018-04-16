@@ -219,7 +219,7 @@ WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 READ_LINE_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 {
 	/* Skip idle checking */
-	if (m_old_cmd == m_cmd_pending)
+	if (m_old_cmd == m_main2dsp->pending_r())
 		m_same_cmd_count += 1;
 	else
 		m_same_cmd_count = 0;
@@ -229,40 +229,10 @@ READ_LINE_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 		m_same_cmd_count = 5;
 		m_dsp->spin();
 	}
-	m_old_cmd = m_cmd_pending;
+	m_old_cmd = m_main2dsp->pending_r();
 
-	return m_cmd_pending ? CLEAR_LINE : ASSERT_LINE;
+	return m_main2dsp->pending_r() ? CLEAR_LINE : ASSERT_LINE;
 }
-
-READ16_MEMBER(coolpool_state::amerdart_iop_r)
-{
-//  logerror("%08x:IOP read %04x\n",m_maincpu->pc(),m_iop_answer);
-	m_maincpu->set_input_line(1, CLEAR_LINE);
-
-	return m_iop_answer;
-}
-
-WRITE16_MEMBER(coolpool_state::amerdart_iop_w)
-{
-//  logerror("%08x:IOP write %04x\n", m_maincpu->pc(), data);
-	COMBINE_DATA(&m_iop_cmd);
-	m_cmd_pending = 1;
-}
-
-READ16_MEMBER(coolpool_state::amerdart_dsp_cmd_r)
-{
-//  logerror("%08x:DSP cmd_r %04x\n", m_dsp->pc(), m_iop_cmd);
-	m_cmd_pending = 0;
-	return m_iop_cmd;
-}
-
-WRITE16_MEMBER(coolpool_state::amerdart_dsp_answer_w)
-{
-//  logerror("%08x:DSP answer %04x\n", m_maincpu->pc(), data);
-	m_iop_answer = data;
-	m_maincpu->set_input_line(1, ASSERT_LINE);
-}
-
 
 /*************************************
  *
@@ -429,42 +399,6 @@ WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
 }
 
 
-
-/*************************************
- *
- *  Cool Pool IOP communications
- *  (from TMS34010 side)
- *
- *************************************/
-
-TIMER_CALLBACK_MEMBER(coolpool_state::deferred_iop_w)
-{
-	m_iop_cmd = param;
-	m_cmd_pending = 1;
-	m_dsp->set_input_line(0, HOLD_LINE);    /* ???  I have no idea who should generate this! */
-											/* the DSP polls the status bit so it isn't strictly */
-											/* necessary to also have an IRQ */
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
-}
-
-
-WRITE16_MEMBER(coolpool_state::coolpool_iop_w)
-{
-	logerror("%08x:IOP write %04x\n", m_maincpu->pc(), data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(coolpool_state::deferred_iop_w),this), data);
-}
-
-
-READ16_MEMBER(coolpool_state::coolpool_iop_r)
-{
-	logerror("%08x:IOP read %04x\n",m_maincpu->pc(),m_iop_answer);
-	m_maincpu->set_input_line(1, CLEAR_LINE);
-
-	return m_iop_answer;
-}
-
-
-
 /*************************************
  *
  *  Cool Pool IOP communications
@@ -472,25 +406,10 @@ READ16_MEMBER(coolpool_state::coolpool_iop_r)
  *
  *************************************/
 
-READ16_MEMBER(coolpool_state::dsp_cmd_r)
-{
-	m_cmd_pending = 0;
-	logerror("%08x:IOP cmd_r %04x\n", m_dsp->pc(), m_iop_cmd);
-	return m_iop_cmd;
-}
-
-
-WRITE16_MEMBER(coolpool_state::dsp_answer_w)
-{
-	logerror("%08x:IOP answer %04x\n", m_dsp->pc(), data);
-	m_iop_answer = data;
-	m_maincpu->set_input_line(1, ASSERT_LINE);
-}
-
 
 READ16_MEMBER(coolpool_state::dsp_bio_line_r)
 {
-	return m_cmd_pending ? CLEAR_LINE : ASSERT_LINE;
+	return m_main2dsp->pending_r() ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
@@ -498,7 +417,6 @@ READ16_MEMBER(coolpool_state::dsp_hold_line_r)
 {
 	return CLEAR_LINE;  /* ??? */
 }
-
 
 
 /*************************************
@@ -509,9 +427,7 @@ READ16_MEMBER(coolpool_state::dsp_hold_line_r)
 
 READ16_MEMBER(coolpool_state::dsp_rom_r)
 {
-	uint8_t *rom = memregion("user2")->base();
-
-	return rom[m_iop_romaddr & (memregion("user2")->bytes() - 1)];
+	return m_dsp_rom[m_iop_romaddr & (m_dsp_rom.mask())];
 }
 
 
@@ -609,10 +525,10 @@ void coolpool_state::amerdart_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram().share("vram_base");
 	map(0x04000000, 0x0400000f).w(this, FUNC(coolpool_state::amerdart_misc_w));
-	map(0x05000000, 0x0500000f).rw(this, FUNC(coolpool_state::amerdart_iop_r), FUNC(coolpool_state::amerdart_iop_w));
+	map(0x05000000, 0x0500000f).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
 	map(0x06000000, 0x06007fff).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
-	map(0xffb00000, 0xffffffff).rom().region("user1", 0);
+	map(0xffb00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
 
@@ -620,25 +536,25 @@ void coolpool_state::coolpool_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram_base");
 	map(0x01000000, 0x010000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
-	map(0x02000000, 0x020000ff).rw(this, FUNC(coolpool_state::coolpool_iop_r), FUNC(coolpool_state::coolpool_iop_w));
+	map(0x02000000, 0x020000ff).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
 	map(0x03000000, 0x0300000f).w(this, FUNC(coolpool_state::coolpool_misc_w));
 	map(0x03000000, 0x03ffffff).rom().region("gfx1", 0);
 	map(0x06000000, 0x06007fff).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
-	map(0xffe00000, 0xffffffff).rom().region("user1", 0);
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
 
 void coolpool_state::nballsht_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("vram_base");
-	map(0x02000000, 0x020000ff).rw(this, FUNC(coolpool_state::coolpool_iop_r), FUNC(coolpool_state::coolpool_iop_w));
+	map(0x02000000, 0x020000ff).r(m_dsp2main, FUNC(generic_latch_16_device::read)).w(m_main2dsp, FUNC(generic_latch_16_device::write));
 	map(0x03000000, 0x0300000f).w(this, FUNC(coolpool_state::coolpool_misc_w));
 	map(0x04000000, 0x040000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);    // IMSG176P-40
 	map(0x06000000, 0x0601ffff).mirror(0x00020000).ram().w(this, FUNC(coolpool_state::nvram_thrash_data_w)).share("nvram");
 	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xff000000, 0xff7fffff).rom().region("gfx1", 0);
-	map(0xffc00000, 0xffffffff).rom().region("user1", 0);
+	map(0xffc00000, 0xffffffff).rom().region("maincpu", 0);
 }
 
 
@@ -659,14 +575,13 @@ void coolpool_state::amerdart_dsp_pgm_map(address_map &map)
 void coolpool_state::amerdart_dsp_io_map(address_map &map)
 {
 	map(0x00, 0x01).w(this, FUNC(coolpool_state::dsp_romaddr_w));
-	map(0x02, 0x02).w(this, FUNC(coolpool_state::amerdart_dsp_answer_w));
+	map(0x02, 0x02).w(m_dsp2main, FUNC(generic_latch_16_device::write));
 	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::write));
 	map(0x04, 0x04).r(this, FUNC(coolpool_state::dsp_rom_r));
 	map(0x05, 0x05).portr("IN0");
 	map(0x06, 0x06).r(this, FUNC(coolpool_state::amerdart_trackball_r));
-	map(0x07, 0x07).r(this, FUNC(coolpool_state::amerdart_dsp_cmd_r));
+	map(0x07, 0x07).r(m_main2dsp, FUNC(generic_latch_16_device::read));
 }
-
 
 
 void coolpool_state::coolpool_dsp_pgm_map(address_map &map)
@@ -675,16 +590,28 @@ void coolpool_state::coolpool_dsp_pgm_map(address_map &map)
 }
 
 
-void coolpool_state::coolpool_dsp_io_map(address_map &map)
+void coolpool_state::coolpool_dsp_io_base_map(address_map &map)
 {
 	map(0x00, 0x01).w(this, FUNC(coolpool_state::dsp_romaddr_w));
-	map(0x02, 0x02).rw(this, FUNC(coolpool_state::dsp_cmd_r), FUNC(coolpool_state::dsp_answer_w));
+	map(0x02, 0x02).r(m_main2dsp, FUNC(generic_latch_16_device::read)).w(m_dsp2main, FUNC(generic_latch_16_device::write));
 	map(0x03, 0x03).w("dac", FUNC(dac_word_interface::write));
 	map(0x04, 0x04).r(this, FUNC(coolpool_state::dsp_rom_r));
 	map(0x05, 0x05).portr("IN0");
-	map(0x07, 0x07).portr("IN1");
 }
 
+
+void coolpool_state::coolpool_dsp_io_map(address_map &map)
+{
+	coolpool_dsp_io_base_map(map);
+	map(0x07, 0x07).r(this, FUNC(coolpool_state::coolpool_input_r));
+}
+
+
+void coolpool_state::nballsht_dsp_io_map(address_map &map)
+{
+	coolpool_dsp_io_base_map(map);
+	map(0x07, 0x07).portr("IN1");
+}
 
 
 /*************************************
@@ -803,6 +730,10 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_CPU_IO_MAP(amerdart_dsp_io_map)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(coolpool_state, amerdart_dsp_bio_line_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
+	
+	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
+	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
 
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,amerdart)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -841,6 +772,14 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_TMS32025_HOLD_IN_CB(READ16(coolpool_state, dsp_hold_line_r))
 //  MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(coolpool_state, dsp_HOLDA_signal_w))
 
+	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("dsp", 0)) /* ???  I have no idea who should generate this! */
+                                                            /* the DSP polls the status bit so it isn't strictly */
+                                                            /* necessary to also have an IRQ */
+
+	MCFG_GENERIC_LATCH_16_ADD("dsp2main")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("maincpu", 1))
+
 	MCFG_MACHINE_RESET_OVERRIDE(coolpool_state,coolpool)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -866,6 +805,9 @@ MACHINE_CONFIG_START(coolpool_state::_9ballsht)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nballsht_map)
+
+	MCFG_CPU_MODIFY("dsp")
+	MCFG_CPU_IO_MAP(nballsht_dsp_io_map)
 MACHINE_CONFIG_END
 
 
@@ -877,7 +819,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 ROM_START( amerdart ) /* You need to check the sum16 values listed on the labels to determine different sets */
-	ROM_REGION16_LE( 0x0a0000, "user1", 0 ) /* 34010 code */
+	ROM_REGION16_LE( 0x0a0000, "maincpu", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u31 4e74", 0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u32 0ef7", 0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u38 10b4", 0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
@@ -892,7 +834,7 @@ ROM_START( amerdart ) /* You need to check the sum16 values listed on the labels
 	ROM_REGION( 0x10000, "dsp", 0 ) /* TMS32015 code  */
 	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) /* Passes internal checksum routine */
 
-	ROM_REGION( 0x100000, "user2", 0 )              /* TMS32015 audio sample data */
+	ROM_REGION( 0x100000, "dspdata", 0 )              /* TMS32015 audio sample data */
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 4461",  0x000000, 0x10000, CRC(3f459482) SHA1(d9d489efd0d9217fceb3bf1a3b37a78d6823b4d9) ) /* Different then set 2 or 3 */
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u16 abd6", 0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u2 cae4",  0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
@@ -912,7 +854,7 @@ ROM_START( amerdart ) /* You need to check the sum16 values listed on the labels
 ROM_END
 
 ROM_START( amerdart2 ) /* You need to check the sum16 values listed on the labels to determine different sets */
-	ROM_REGION16_LE( 0x0a0000, "user1", 0 ) /* 34010 code */
+	ROM_REGION16_LE( 0x0a0000, "maincpu", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u31 4e74", 0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u32 0ef7", 0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u38 10b4", 0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
@@ -927,7 +869,7 @@ ROM_START( amerdart2 ) /* You need to check the sum16 values listed on the label
 	ROM_REGION( 0x10000, "dsp", 0 ) /* TMS32015 code  */
 	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) /* Passes internal checksum routine */
 
-	ROM_REGION( 0x100000, "user2", 0 )              /* TMS32015 audio sample data */
+	ROM_REGION( 0x100000, "dspdata", 0 )              /* TMS32015 audio sample data */
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 222f",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) ) /* Different then set 1 */
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u16 abd6", 0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u2 cae4",  0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
@@ -947,7 +889,7 @@ ROM_START( amerdart2 ) /* You need to check the sum16 values listed on the label
 ROM_END
 
 ROM_START( amerdart3 ) /* You need to check the sum16 values listed on the labels to determine different sets */
-	ROM_REGION16_LE( 0x0a0000, "user1", 0 ) /* 34010 code */
+	ROM_REGION16_LE( 0x0a0000, "maincpu", 0 ) /* 34010 code */
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u31 4e74", 0x000001, 0x10000, CRC(9628c422) SHA1(46b71acc746760962e34e9d7876f9499ea7d5c7c) )
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u32 0ef7", 0x000000, 0x10000, CRC(2d651ed0) SHA1(e2da2c3d8f25c17e26fd435c75983b2db8691993) )
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u38 10b4", 0x020001, 0x10000, CRC(1eb8c887) SHA1(220f566043535c54ad1cf2216966c7f42099e50b) )
@@ -962,7 +904,7 @@ ROM_START( amerdart3 ) /* You need to check the sum16 values listed on the label
 	ROM_REGION( 0x10000, "dsp", 0 ) /* TMS32015 code  */
 	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) /* Passes internal checksum routine */
 
-	ROM_REGION( 0x100000, "user2", 0 )              /* TMS32015 audio sample data */
+	ROM_REGION( 0x100000, "dspdata", 0 )              /* TMS32015 audio sample data */
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 222f",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) ) /* Same as set 2 */
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u16 abd6", 0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u2 cae4",  0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
@@ -983,7 +925,7 @@ ROM_END
 
 
 ROM_START( coolpool )
-	ROM_REGION16_LE( 0x40000, "user1", 0 )  /* 34010 code */
+	ROM_REGION16_LE( 0x40000, "maincpu", 0 )  /* 34010 code */
 	ROM_LOAD16_BYTE( "u112b",        0x00000, 0x20000, CRC(aa227769) SHA1(488e357a7aad07369cade3110cde14ba8562c66c) )
 	ROM_LOAD16_BYTE( "u113b",        0x00001, 0x20000, CRC(5b5f82f1) SHA1(82afb6a8d94cf09960b962d5208aab451b56feae) )
 
@@ -1009,7 +951,7 @@ ROM_START( coolpool )
 	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x200000, "user2", 0 )  /* TMS32026 data */
+	ROM_REGION( 0x200000, "dspdata", 0 )  /* TMS32026 data */
 	ROM_LOAD( "u17c",         0x000000, 0x40000, CRC(ea3cc41d) SHA1(e703e789dfbcfaec878a990031ce839164c51253) )
 	ROM_LOAD( "u16c",         0x040000, 0x40000, CRC(2e6680ea) SHA1(cb30dc789039aab491428d075fee9e0bc04fd2ce) )
 	ROM_LOAD( "u15c",         0x080000, 0x40000, CRC(8e5f248e) SHA1(a954d3c20dc0b70f83c4c238db30a33285fcb353) )
@@ -1022,7 +964,7 @@ ROM_END
 
 
 ROM_START( 9ballsht )
-	ROM_REGION16_LE( 0x80000, "user1", 0 )  /* 34010 code */
+	ROM_REGION16_LE( 0x80000, "maincpu", 0 )  /* 34010 code */
 	ROM_LOAD16_BYTE( "u112",         0x00000, 0x40000, CRC(b3855e59) SHA1(c3175df24b85897783169bcaccd61630e512f7f6) )
 	ROM_LOAD16_BYTE( "u113",         0x00001, 0x40000, CRC(30cbf462) SHA1(64b2e2d40c2a92c4f4823dc866e5464792954ac3) )
 
@@ -1034,7 +976,7 @@ ROM_START( 9ballsht )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, "user2", 0 )  /* TMS32026 data */
+	ROM_REGION( 0x100000, "dspdata", 0 )  /* TMS32026 data */
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
@@ -1044,7 +986,7 @@ ROM_END
   I assume the others are the same.
  */
 ROM_START( 9ballsht2 )
-	ROM_REGION16_LE( 0x80000, "user1", 0 )  /* 34010 code */
+	ROM_REGION16_LE( 0x80000, "maincpu", 0 )  /* 34010 code */
 	ROM_LOAD16_BYTE( "e-scape.112",  0x00000, 0x40000, CRC(aee8114f) SHA1(a0d0e9e3a879393585b85ac6d04e31a7d4221179) )
 	ROM_LOAD16_BYTE( "e-scape.113",  0x00001, 0x40000, CRC(ccd472a7) SHA1(d074080e987c233b26b3c72248411c575f7a2293) )
 
@@ -1056,13 +998,13 @@ ROM_START( 9ballsht2 )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, "user2", 0 )  /* TMS32026 data */
+	ROM_REGION( 0x100000, "dspdata", 0 )  /* TMS32026 data */
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
 
 ROM_START( 9ballsht3 )
-	ROM_REGION16_LE( 0x80000, "user1", 0 )  /* 34010 code */
+	ROM_REGION16_LE( 0x80000, "maincpu", 0 )  /* 34010 code */
 	ROM_LOAD16_BYTE( "8e_1826.112",  0x00000, 0x40000, CRC(486f7a8b) SHA1(635e3b1e7a21a86dd3d0ea994e9b923b06df587e) )
 	ROM_LOAD16_BYTE( "8e_6166.113",  0x00001, 0x40000, CRC(c41db70a) SHA1(162112f9f5bb6345920a45c41da6a249796bd21f) )
 
@@ -1074,7 +1016,7 @@ ROM_START( 9ballsht3 )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, "user2", 0 )  /* TMS32026 data */
+	ROM_REGION( 0x100000, "dspdata", 0 )  /* TMS32026 data */
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
@@ -1082,7 +1024,7 @@ ROM_END
 
 // all checksums correctly match sum16 printed on rom labels
 ROM_START( 9ballshtc )
-	ROM_REGION16_LE( 0x80000, "user1", 0 )  /* 34010 code */
+	ROM_REGION16_LE( 0x80000, "maincpu", 0 )  /* 34010 code */
 	ROM_LOAD16_BYTE( "e-scape =c=1994 3990.u112",  0x00000, 0x40000, CRC(7ba2749a) SHA1(e2ddc2600234dbebbb423f201cc4061fd0b9911a) )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 b72f.u113",  0x00001, 0x40000, CRC(1e0f3c62) SHA1(3c24a38dcb553fd84b0b44a5a8d93a14435e22b0) )
 
@@ -1094,7 +1036,7 @@ ROM_START( 9ballshtc )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, "user2", 0 )  /* TMS32026 data */
+	ROM_REGION( 0x100000, "dspdata", 0 )  /* TMS32026 data */
 	ROM_LOAD( "e-scape =c=1994 0000.u54", 0x00000, 0x80000, CRC(04b509a0) SHA1(093343741a3d8d0786fd443e68dd85b414c6cf9e) )
 	ROM_LOAD( "e-scape =c=1994 2df8.u53", 0x80000, 0x80000, CRC(c8a7b576) SHA1(7eb71dd791fdcbfe71764a454f0a1d3130d8a57e) )
 ROM_END
@@ -1115,9 +1057,6 @@ void coolpool_state::register_state_save()
 	save_item(NAME(m_result));
 	save_item(NAME(m_lastresult));
 
-	save_item(NAME(m_cmd_pending));
-	save_item(NAME(m_iop_cmd));
-	save_item(NAME(m_iop_answer));
 	save_item(NAME(m_iop_romaddr));
 }
 
@@ -1132,8 +1071,6 @@ DRIVER_INIT_MEMBER(coolpool_state,amerdart)
 
 DRIVER_INIT_MEMBER(coolpool_state,coolpool)
 {
-	m_dsp->space(AS_IO).install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
-
 	register_state_save();
 }
 
@@ -1144,8 +1081,8 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 	uint16_t *rom;
 
 	/* decrypt the main program ROMs */
-	rom = (uint16_t *)memregion("user1")->base();
-	len = memregion("user1")->bytes();
+	rom = (uint16_t *)memregion("maincpu")->base();
+	len = memregion("maincpu")->bytes();
 	for (a = 0;a < len/2;a++)
 	{
 		int hi,lo,nhi,nlo;
@@ -1168,8 +1105,8 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 	}
 
 	/* decrypt the sub data ROMs */
-	rom = (uint16_t *)memregion("user2")->base();
-	len = memregion("user2")->bytes();
+	rom = (uint16_t *)memregion("dspdata")->base();
+	len = memregion("dspdata")->bytes();
 	for (a = 1;a < len/2;a+=4)
 	{
 		/* just swap bits 1 and 2 of the address */

@@ -1896,10 +1896,10 @@ WRITE8_MEMBER(mpu4_state::characteriser_w)
 {
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", space.device().safe_pcbase(),offset,data));
+	LOG_CHR_FULL(("%s Characteriser write offset %02X data %02X\n", machine().describe_context(), offset, data));
 	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		logerror("%s No Characteriser Table\n", machine().describe_context());
 		return;
 	}
 
@@ -1973,10 +1973,10 @@ READ8_MEMBER(mpu4_state::characteriser_r)
 {
 	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x", space.device().safe_pcbase());
+		logerror("%s No Characteriser Table\n", machine().describe_context());
 
 		/* a cheat ... many early games use a standard check */
-		int addr = space.device().state().state_int(M6809_X);
+		int addr = m_maincpu->state_int(M6809_X);
 		if ((addr>=0x800) && (addr<=0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
 
 		uint8_t ret = space.read_byte(addr);
@@ -2044,9 +2044,9 @@ WRITE8_MEMBER(mpu4_state::bwb_characteriser_w)
 {
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", space.device().safe_pcbase(),offset,data));
+	LOG_CHR_FULL(("%s Characteriser write offset %02X data %02X\n", machine().describe_context(), offset, data));
 	if (!m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		fatalerror("%s No Characteriser Table\n", machine().describe_context().c_str());
 
 	if ((offset & 0x3f)== 0)//initialisation is always at 0x800
 	{

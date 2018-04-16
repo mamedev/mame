@@ -251,7 +251,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
-	INTERRUPT_GEN_MEMBER(vsync_interrupt);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
@@ -473,6 +472,9 @@ WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
 				m_palette->set_pen_color(entry & 0xf, pal4bit(entry >> 12), pal4bit(entry >> 8), pal4bit(entry >> 4));
 			}
 		}
+
+		if (m_vsync_latch_preset)
+			m_maincpu->set_input_line(3, ASSERT_LINE);
 	}
 }
 
@@ -866,17 +868,9 @@ void maygayv1_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(maygayv1_state::vsync_interrupt)
-{
-	if (m_vsync_latch_preset)
-		m_maincpu->set_input_line(3, ASSERT_LINE);
-}
-
-
 MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", maygayv1_state,  vsync_interrupt)
 
 	MCFG_CPU_ADD("soundcpu", I8052, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sound_prg)

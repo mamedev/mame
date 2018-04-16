@@ -217,7 +217,7 @@ void vt100_state::vt100_io(address_map &map)
 	// 0xC2 Video processor DC011
 	map(0xc2, 0xc2).w(m_crtc, FUNC(vt100_video_device::dc011_w));
 	// 0xE2 Graphics port
-	// AM_RANGE (0xe2, 0xe2)
+	// map (0xe2, 0xe2)
 }
 
 READ8_MEMBER(vt100_state::printer_r)
@@ -230,11 +230,12 @@ WRITE8_MEMBER(vt100_state::printer_w)
 	m_printer_uart->ins8250_w(space, offset >> 2, data);
 }
 
-ADDRESS_MAP_START(vt100_state::vt102_io)
-	AM_IMPORT_FROM(vt100_io)
-	AM_RANGE(0x03, 0x03) AM_SELECT(0x1c) AM_READ(printer_r)
-	AM_RANGE(0x23, 0x23) AM_SELECT(0x1c) AM_WRITE(printer_w)
-ADDRESS_MAP_END
+void vt100_state::vt102_io(address_map &map)
+{
+	vt100_io(map);
+	map(0x03, 0x03).select(0x1c).r(this, FUNC(vt100_state::printer_r));
+	map(0x23, 0x23).select(0x1c).w (this, FUNC(vt100_state::printer_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( vt100 )
@@ -373,20 +374,22 @@ MACHINE_CONFIG_START(vt100_state::vt100)
 	MCFG_RST_BUFFER_INT_CALLBACK(INPUTLINE("maincpu", 0))
 MACHINE_CONFIG_END
 
-ADDRESS_MAP_START(vt100_state::stp_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("stp", 0)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-ADDRESS_MAP_END
+void vt100_state::stp_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom().region("stp", 0);
+	map(0x2000, 0x27ff).ram();
+}
 
-ADDRESS_MAP_START(vt100_state::stp_io)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("stpusart0", i8251_device, data_r, data_w)
-	AM_RANGE(0x90, 0x90) AM_DEVREADWRITE("stpusart0", i8251_device, status_r, control_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("stpusart1", i8251_device, data_r, data_w)
-	AM_RANGE(0xb0, 0xb0) AM_DEVREADWRITE("stpusart1", i8251_device, status_r, control_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("stpusart2", i8251_device, data_r, data_w)
-	AM_RANGE(0xd0, 0xd0) AM_DEVREADWRITE("stpusart2", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+void vt100_state::stp_io(address_map &map)
+{
+	map(0x80, 0x80).rw("stpusart0", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x90, 0x90).rw("stpusart0", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xa0, 0xa0).rw("stpusart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xb0, 0xb0).rw("stpusart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xc0, 0xc0).rw("stpusart2", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xd0, 0xd0).rw("stpusart2", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 MACHINE_CONFIG_START(vt100_state::vt100ac)
 	vt100(config);

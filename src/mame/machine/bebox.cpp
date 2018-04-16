@@ -153,8 +153,8 @@ WRITE64_MEMBER(bebox_state::bebox_cpu0_imask_w )
 	{
 		if (LOG_CPUIMASK)
 		{
-			logerror("BeBox CPU #0 pc=0x%08X imask=0x%08x\n",
-				(unsigned) space.device().safe_pc( ), m_cpu_imask[0]);
+			logerror("%s BeBox CPU #0 imask=0x%08x\n",
+				machine().describe_context(), m_cpu_imask[0]);
 		}
 		bebox_update_interrupts();
 	}
@@ -170,8 +170,8 @@ WRITE64_MEMBER(bebox_state::bebox_cpu1_imask_w )
 	{
 		if (LOG_CPUIMASK)
 		{
-			logerror("BeBox CPU #1 pc=0x%08X imask=0x%08x\n",
-				(unsigned) space.device() .safe_pc( ), m_cpu_imask[1]);
+			logerror("%s BeBox CPU #1 imask=0x%08x\n",
+				machine().describe_context(), m_cpu_imask[1]);
 		}
 		bebox_update_interrupts();
 	}
