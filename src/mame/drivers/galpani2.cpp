@@ -143,9 +143,9 @@ void galpani2_state::machine_reset()
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
 }
 
-static void galpani2_write_kaneko(device_t *device)
+static void galpani2_write_kaneko(cpu_device *cpu)
 {
-	address_space &dstspace = device->memory().space(AS_PROGRAM);
+	address_space &dstspace = cpu->space(AS_PROGRAM);
 	int i,x,tpattidx;
 	unsigned char testpattern[] = {0xFF,0x55,0xAA,0xDD,0xBB,0x99};
 

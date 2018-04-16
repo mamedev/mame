@@ -4709,7 +4709,8 @@ void i386_device::x87_fstsw_m2byte(uint8_t modrm)
 void i386_device::x87_invalid(uint8_t modrm)
 {
 	// TODO
-	fatalerror("x87 invalid instruction (PC:%.4x)\n", m_pc);
+	report_invalid_opcode();
+	i386_trap(6, 0, 0);
 }
 
 

@@ -60,7 +60,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 			res_x = x + xi;
 			res_y = y;
 
-			pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x20000)];
+			pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x40000)];
 
 			bitmap.pix32(res_y, res_x) = palette[pen + 0x20];
 		}

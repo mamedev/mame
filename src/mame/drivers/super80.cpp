@@ -685,6 +685,11 @@ WRITE8_MEMBER(super80_state::io_write_byte)
 	prog_space.write_byte(offset, data);
 }
 
+void super80_state::machine_start()
+{
+	m_cass_led.resolve();
+}
+
 static SLOT_INTERFACE_START( super80_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END

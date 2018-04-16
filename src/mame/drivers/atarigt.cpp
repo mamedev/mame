@@ -287,7 +287,7 @@ void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, uint1
         Read ($38488)
 */
 
-	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", space.device().safe_pcbase(), offset, data);
+	if (LOG_PROTECTION) logerror("%s:Protection W@%06X = %04X\n", machine().describe_context(), offset, data);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -302,7 +302,7 @@ void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, uint1
 
 void atarigt_state::tmek_protection_r(address_space &space, offs_t offset, uint16_t *data)
 {
-	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", space.device().safe_pcbase(), offset);
+	if (LOG_PROTECTION) logerror("%s:Protection R@%06X\n", machine().describe_context(), offset);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -368,7 +368,7 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 {
 	if (LOG_PROTECTION)
 	{
-	uint32_t pc = space.device().safe_pcbase();
+	uint32_t pc = m_maincpu->pcbase();
 	switch (pc)
 	{
 		/* protection code from 20f90 - 21000 */
@@ -401,7 +401,7 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection W@%06X = %04X\n", space.device().safe_pcbase(), offset, data);
+			logerror("%s:Unknown protection W@%06X = %04X\n", machine().describe_context(), offset, data);
 			break;
 	}
 	}
@@ -441,7 +441,7 @@ void atarigt_state::primrage_protection_r(address_space &space, offs_t offset, u
 
 if (LOG_PROTECTION)
 {
-	uint32_t pc = space.device().safe_pcbase();
+	uint32_t pc = m_maincpu->pcbase();
 	uint32_t p1, p2, a6;
 	switch (pc)
 	{
@@ -504,7 +504,7 @@ if (LOG_PROTECTION)
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection R@%06X\n", space.device().safe_pcbase(), offset);
+			logerror("%s:Unknown protection R@%06X\n", machine().describe_context(), offset);
 			break;
 	}
 }

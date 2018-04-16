@@ -28,10 +28,10 @@ class mw18w_state : public driver_device
 public:
 	mw18w_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
 	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
 	DECLARE_WRITE8_MEMBER(mw18w_lamps_w);
@@ -41,6 +41,10 @@ public:
 	void mw18w(machine_config &config);
 	void mw18w_map(address_map &map);
 	void mw18w_portmap(address_map &map);
+private:
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<10> m_digits;
 };
 
 
@@ -146,7 +150,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
 
 	// d4-7: 7442 (BCD to decimal) -> pick digit panel
 	if ((data & 0xf0) > 0x90) return;
-	output().set_digit_value(data >> 4, _7448_map[data & 0xf]);
+	m_digits[data >> 4] = _7448_map[data & 0xf];
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_irq0_clear_w)

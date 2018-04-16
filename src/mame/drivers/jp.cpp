@@ -41,7 +41,7 @@ public:
 		, m_msm(*this, "msm")
 		, m_adpcm_select(*this, "adpcm_select")
 		, m_adpcm_bank(*this, "adpcm_bank")
-		, m_main_displays(*this, "digit%u", 0U)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void jp(machine_config &config);
@@ -80,7 +80,7 @@ private:
 	optional_device<msm5205_device> m_msm;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_memory_bank m_adpcm_bank;
-	output_finder<32> m_main_displays;
+	output_finder<100> m_digits;
 };
 
 
@@ -169,7 +169,7 @@ static INPUT_PORTS_START( jp )
 	PORT_DIPSETTING(    0x04, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
 	PORT_DIPNAME( 0x08, 0x08, "SW D")
-	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPSETTING(    0x08, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -267,7 +267,7 @@ void jp_state::update_display()
 	if (t == 8)
 	{ // ball number
 		segment = m_disp_data >> 6;
-		output().set_digit_value(94, bitswap<8>(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff);
+		m_digits[94] = bitswap<8>(segment, 0, 1, 2, 3, 4, 5, 6, 7) ^ 0xff;
 	}
 	else if (t < 8)
 	{ // main displays
@@ -278,9 +278,9 @@ void jp_state::update_display()
 
 		for (int i = 0; i < 32; i++)
 			if (BIT(m_disp_data, i))
-				m_main_displays[i] = m_main_displays[i] & ~segment;
+				m_digits[i] = m_digits[i] & ~segment;
 			else
-				m_main_displays[i] = m_main_displays[i] | segment;
+				m_digits[i] = m_digits[i] | segment;
 	}
 }
 
@@ -316,7 +316,7 @@ void jp_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_main_displays.resolve();
+	m_digits.resolve();
 
 	if (m_adpcm_bank.found())
 		m_adpcm_bank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);
@@ -327,10 +327,10 @@ void jp_state::machine_reset()
 	genpin_class::machine_reset();
 
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	output().set_digit_value(96, 0x3f);
-	output().set_digit_value(97, 0x3f);
-	output().set_digit_value(98, 0x3f);
-	output().set_digit_value(99, 0x3f);
+	m_digits[96] = 0x3f;
+	m_digits[97] = 0x3f;
+	m_digits[98] = 0x3f;
+	m_digits[99] = 0x3f;
 }
 
 MACHINE_CONFIG_START(jp_state::jp)

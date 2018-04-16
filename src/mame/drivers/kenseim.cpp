@@ -271,7 +271,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 {
 	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 times, with the last write being some terminator?)
 
-//  printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context(), data);
+//  printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context().c_str(), data);
 
 	if (data & 0x08)
 	{
@@ -306,7 +306,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 
 WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 {
-	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
+	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context().c_str(), data);
 
 
 	for (int i = 0; i < 6; i++)
@@ -325,7 +325,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 
 WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 {
-	//if (data&0xc0) printf("%s mb8936 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
+	//if (data&0xc0) printf("%s mb8936 write %02x to port B (mole output 2?)\n", machine().describe_context().c_str(), data);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -344,7 +344,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 WRITE8_MEMBER(kenseim_state::mb8936_portf_w)
 {
 	// typically written when the 'moles' output is, maybe the 2 strobes?
-	//printf("%s mb8936 write %02x to port F (strobe?)\n", machine().describe_context(), data);
+	//printf("%s mb8936 write %02x to port F (strobe?)\n", machine().describe_context().c_str(), data);
 }
 
 

@@ -1415,8 +1415,8 @@ void seta_state::uPD71054_update_timer(device_t *cpu, int no)
 		uPD71054->timer[no]->adjust( period, no );
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
-		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
-				(cpu != nullptr) ? cpu->safe_pc() : -1, no );
+		logerror( "%s: uPD71054 error, timer %d duration is 0\n",
+				machine().describe_context(), no );
 	}
 }
 

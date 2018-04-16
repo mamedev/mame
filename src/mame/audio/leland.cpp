@@ -403,12 +403,12 @@ WRITE16_MEMBER(leland_80186_sound_device::peripheral_ctrl)
 			uint32_t temp = (m_peripheral & 0xffc0) << 4;
 			if (data & 0x0040)
 			{
-				m_audiocpu->device_t::memory().space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
+				m_audiocpu->space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
 			}
 			else
 			{
 				temp &= 0xffff;
-				m_audiocpu->device_t::memory().space(AS_IO).install_readwrite_handler(temp, temp + 0x2ff, read16_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
+				m_audiocpu->space(AS_IO).install_readwrite_handler(temp, temp + 0x2ff, read16_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
 			}
 			break;
 		}
@@ -434,7 +434,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
 
 	if (LOG_COMM)
 	{
-		logerror("%04X:80186 control = %02X", m_audiocpu->device_t::safe_pc(), data);
+		logerror("%s:80186 control = %02X", machine().describe_context(), data);
 		if (!(data & 0x80)) logerror("  /RESET");
 		if (!(data & 0x40)) logerror("  ZNMI");
 		if (!(data & 0x20)) logerror("  INT0");
@@ -444,8 +444,8 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
 	}
 
 	/* /RESET */
-	m_audiocpu->device_t::execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-	m_audiocpu->device_t::execute().set_input_line(INPUT_LINE_TEST, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_TEST, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
 /*  If the master CPU doesn't get a response by the time it's ready to send
@@ -486,7 +486,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_lo_w )
 
 WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_hi_w )
 {
-	if (LOG_COMM) logerror("%04X:Write sound command latch hi = %02X\n", m_audiocpu->device_t::safe_pc(), data);
+	if (LOG_COMM) logerror("%s:Write sound command latch hi = %02X\n", machine().describe_context(), data);
 	m_sound_command = (m_sound_command & 0x00ff) | (data << 8);
 }
 
@@ -527,7 +527,7 @@ void leland_80186_sound_device::delayed_response_r(void *ptr, int param)
 READ8_MEMBER( leland_80186_sound_device::leland_80186_response_r )
 {
 	cpu_device *master = machine().device<cpu_device>("master");
-	offs_t pc = master->device_t::safe_pcbase();
+	offs_t pc = master->pcbase();
 
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", pc, m_sound_response);
 
@@ -674,7 +674,7 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 		break;
 	}
 
-	logerror("%05X:Unexpected peripheral write %d/%02X = %02X\n", m_audiocpu->device_t::safe_pc(), 5, offset, data);
+	logerror("%s:Unexpected peripheral write %d/%02X = %02X\n", machine().describe_context(), 5, offset, data);
 }
 
 
@@ -705,7 +705,7 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 				return ((m_clock_active << 1) & 0x7e);
 
 		case 1:
-			if (LOG_COMM) logerror("%05X:Read sound command latch = %02X\n", m_audiocpu->device_t::safe_pc(), m_sound_command);
+			if (LOG_COMM) logerror("%s:Read sound command latch = %02X\n", machine().describe_context(), m_sound_command);
 			return m_sound_command;
 
 		case 2:
@@ -730,11 +730,11 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 					return m_pit2->read(space, offset & 3);
 			}
 			else
-				logerror("%05X:Unexpected peripheral read %d/%02X\n", m_audiocpu->device_t::safe_pc(), select, offset*2);
+				logerror("%s:Unexpected peripheral read %d/%02X\n", machine().describe_context(), select, offset*2);
 			break;
 
 		default:
-			logerror("%05X:Unexpected peripheral read %d/%02X\n", m_audiocpu->device_t::safe_pc(), select, offset*2);
+			logerror("%s:Unexpected peripheral read %d/%02X\n", machine().describe_context(), select, offset*2);
 			break;
 	}
 	return 0xffff;
@@ -749,7 +749,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 	switch (select)
 	{
 		case 1:
-			if (LOG_COMM) logerror("%05X:Write sound response latch = %02X\n", m_audiocpu->device_t::safe_pc(), data);
+			if (LOG_COMM) logerror("%s:Write sound response latch = %02X\n", machine().describe_context(), data);
 			m_sound_response = data;
 			break;
 
@@ -787,7 +787,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
 			break;
 
 		default:
-			logerror("%05X:Unexpected peripheral write %d/%02X = %02X\n", m_audiocpu->device_t::safe_pc(), select, offset, data);
+			logerror("%s:Unexpected peripheral write %d/%02X = %02X\n", machine().describe_context(), select, offset, data);
 			break;
 	}
 }

@@ -392,7 +392,7 @@ WRITE8_MEMBER(bzone_state::bzone_sounds_w)
 {
 	m_discrete->write(space, BZ_INPUT, data);
 
-	output().set_value("startled", (data >> 6) & 1);
+	m_startled = BIT(data, 6);
 	machine().sound().system_enable(data & 0x20);
 }
 

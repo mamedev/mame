@@ -410,7 +410,6 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
 	MCFG_CPU_PROGRAM_MAP(jokrwild_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jokrwild_state,  nmi_line_pulse)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -440,6 +439,7 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 

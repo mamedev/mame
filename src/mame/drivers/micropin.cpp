@@ -43,6 +43,7 @@ public:
 		, m_v2cpu(*this, "v2cpu")
 		, m_pia51(*this, "pia51")
 		, m_beep(*this, "beeper")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(pia51_r);
@@ -68,10 +69,12 @@ private:
 	uint8_t m_beep_time;
 	uint8_t m_led_time[8];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	optional_device<m6800_cpu_device> m_v1cpu;
 	optional_device<i8085a_cpu_device> m_v2cpu;
 	optional_device<pia6821_device> m_pia51;
 	optional_device<beep_device> m_beep;
+	output_finder<76> m_digits;
 };
 
 
@@ -203,8 +206,8 @@ WRITE8_MEMBER( micropin_state::p50a_w )
 	if (m_counter == 1)
 	{
 		static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
-		output().set_digit_value(m_row, patterns[data&15]);
-		output().set_digit_value(m_row+20, patterns[data>>4]);
+		m_digits[m_row] = patterns[data&15];
+		m_digits[m_row+20] = patterns[data>>4];
 	}
 }
 
@@ -214,8 +217,8 @@ WRITE8_MEMBER( micropin_state::p50b_w )
 	if (m_counter == 2)
 	{
 		static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7448
-		output().set_digit_value(m_row+40, patterns[data&15]);
-		output().set_digit_value(m_row+60, patterns[data>>4]);
+		m_digits[m_row+40] = patterns[data&15];
+		m_digits[m_row+60] = patterns[data>>4];
 	}
 }
 

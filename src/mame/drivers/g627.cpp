@@ -224,7 +224,7 @@ WRITE8_MEMBER( g627_state::portc_w )
 		m_digits[50 + data] = m_seg[5];
 	}
 	else
-	if ((!m_type) && (data))
+	if ((!m_type) && (data) && (data < 7))
 	{
 		data--;
 

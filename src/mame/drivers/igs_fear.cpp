@@ -82,8 +82,6 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 	MCFG_CPU_ADD("maincpu",ARM7, 50000000/2)
 	MCFG_CPU_PROGRAM_MAP(igs_igs_fear_map)
 
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", igs_fear_state,  igs_majhong_interrupt)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))

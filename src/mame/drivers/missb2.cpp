@@ -458,7 +458,7 @@ MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
 	m_oki->reset();
-	bublbobl_bankswitch_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
+	bublbobl_bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
 MACHINE_CONFIG_START(missb2_state::missb2)

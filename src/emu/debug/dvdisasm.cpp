@@ -159,7 +159,7 @@ void debug_view_disasm::view_char(int chval)
 		case DCH_HOME:              // set the active column to the PC
 		{
 			const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-			offs_t pc = source.device()->safe_pcbase() & source.m_space.logaddrmask();
+			offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
 
 			// figure out which row the pc is on
 			for(unsigned int curline = 0; curline < m_dasm.size(); curline++)
@@ -375,7 +375,7 @@ void debug_view_disasm::view_update()
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 	debug_disasm_buffer buffer(*source.device());
-	offs_t pc = source.device()->safe_pcbase() & source.m_space.logaddrmask();
+	offs_t pc = source.device()->state().pcbase() & source.m_space.logaddrmask();
 
 	generate_dasm(buffer, pc);
 

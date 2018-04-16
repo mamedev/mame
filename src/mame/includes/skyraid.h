@@ -18,7 +18,8 @@ public:
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_led(*this, "led")
 	{ }
 
 	void skyraid(machine_config &config);
@@ -28,6 +29,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(skyraid_range_w);
 	DECLARE_WRITE8_MEMBER(skyraid_offset_w);
 	DECLARE_WRITE8_MEMBER(skyraid_scroll_w);
+	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(skyraid);
 	uint32_t screen_update_skyraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -55,6 +57,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	output_finder<> m_led;
 };
 
 /*----------- defined in audio/skyraid.c -----------*/

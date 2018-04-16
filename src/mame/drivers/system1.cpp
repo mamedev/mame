@@ -15,6 +15,8 @@ DIP locations verified from manual for:
 
 TODO: - remove patch in nobb if possible and fully understand the
         ports involved in the protection
+      - different XTAL/divider configurations for some Star Jacker
+        cabinets? See you.tube/-a7srHVPb_U
 
 *******************************************************************************
 

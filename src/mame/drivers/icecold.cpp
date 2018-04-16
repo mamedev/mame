@@ -23,9 +23,17 @@ public:
 	icecold_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_ay8910_0(*this, "ay0"),
-			m_ay8910_1(*this, "ay1"),
-			m_pia1(*this, "pia1")
+			m_ay8910(*this, "ay%u", 0U),
+			m_pia1(*this, "pia1"),
+			m_digit_outputs(*this, "digit%u", 0U),
+			m_lamp_outputs(*this, "lamp%u", 1U),
+			m_lmotor_output(*this, "lmotor"),
+			m_rmotor_output(*this, "rmotor"),
+			m_in_play(*this, "in_play"),
+			m_good_game(*this, "good_game"),
+			m_game_over(*this, "game_over"),
+			m_tilt_output(*this, "tilt"),
+			m_start_output(*this, "start")
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
@@ -42,13 +50,24 @@ public:
 	DECLARE_WRITE8_MEMBER( motors_w );
 
 	// driver_device overrides
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<ay8910_device> m_ay8910_0;
-	required_device<ay8910_device> m_ay8910_1;
+	required_device_array<ay8910_device, 2> m_ay8910;
 	required_device<pia6821_device> m_pia1;
+
+	// outputs
+	output_finder<8> m_digit_outputs;
+	output_finder<10> m_lamp_outputs;
+	output_finder<> m_lmotor_output;
+	output_finder<> m_rmotor_output;
+	output_finder<> m_in_play;
+	output_finder<> m_good_game;
+	output_finder<> m_game_over;
+	output_finder<> m_tilt_output;
+	output_finder<> m_start_output;
 
 	uint8_t   m_digit;            // scanlines from i8279
 	uint8_t   m_sound_latch;      // sound bus latch
@@ -167,10 +186,23 @@ static INPUT_PORTS_START( icecold )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
+void icecold_state::machine_start()
+{
+	m_digit_outputs.resolve();
+	m_lamp_outputs.resolve();
+	m_lmotor_output.resolve();
+	m_rmotor_output.resolve();
+	m_in_play.resolve();
+	m_good_game.resolve();
+	m_game_over.resolve();
+	m_tilt_output.resolve();
+	m_start_output.resolve();
+}
+
 void icecold_state::machine_reset()
 {
 	// CH-C is used for generate a 30hz clock
-	m_ay8910_0->set_volume(2, 0);
+	m_ay8910[0]->set_volume(2, 0);
 
 	m_rmotor = m_lmotor = 10;
 	m_sint = 0;
@@ -202,12 +234,12 @@ WRITE8_MEMBER( icecold_state::motors_w )
 
 WRITE8_MEMBER( icecold_state::scanlines_w )
 {
-	m_digit = data;
+	m_digit = data & 7;
 }
 
 WRITE8_MEMBER( icecold_state::digit_w )
 {
-	output().set_digit_value(m_digit, data & 0x7f);
+	m_digit_outputs[m_digit] = data & 0x7f;
 }
 
 READ8_MEMBER( icecold_state::kbd_r )
@@ -230,9 +262,9 @@ READ8_MEMBER( icecold_state::kbd_r )
 WRITE8_MEMBER( icecold_state::snd_ctrl_w )
 {
 	if (m_ay_ctrl & ~data & 0x04)
-		m_ay8910_0->data_address_w(space, m_ay_ctrl & 0x01, m_sound_latch);
+		m_ay8910[0]->data_address_w(space, m_ay_ctrl & 0x01, m_sound_latch);
 	if (m_ay_ctrl & ~data & 0x20)
-		m_ay8910_1->data_address_w(space, (m_ay_ctrl>>3) & 0x01, m_sound_latch);
+		m_ay8910[1]->data_address_w(space, (m_ay_ctrl>>3) & 0x01, m_sound_latch);
 
 	m_ay_ctrl = data;
 }
@@ -245,34 +277,28 @@ WRITE8_MEMBER( icecold_state::ay_w )
 READ8_MEMBER( icecold_state::ay_r )
 {
 	if (m_ay_ctrl & 0x02)
-		return m_ay8910_0->data_r(space, 0);
+		return m_ay8910[0]->data_r(space, 0);
 	if (m_ay_ctrl & 0x10)
-		return m_ay8910_1->data_r(space, 0);
+		return m_ay8910[1]->data_r(space, 0);
 
 	return 0;
 }
 
 WRITE8_MEMBER( icecold_state::ay8910_0_b_w )
 {
-	output().set_lamp_value(1, BIT(data, 0));
-	output().set_lamp_value(2, BIT(data, 1));
-	output().set_lamp_value(3, BIT(data, 2));
-	output().set_lamp_value(4, BIT(data, 3));
-	output().set_lamp_value(5, BIT(data, 4));
-	output().set_value("in_play", BIT(data, 5));
-	output().set_value("good_game", BIT(data, 6));
+	for (int n = 0; n < 5; n++)
+		m_lamp_outputs[n] = BIT(data, n);
+	m_in_play = BIT(data, 5);
+	m_good_game = BIT(data, 6);
 	m_motenbl = BIT(data, 7);
 }
 
 WRITE8_MEMBER( icecold_state::ay8910_1_a_w )
 {
-	output().set_lamp_value(6, BIT(data, 0));
-	output().set_lamp_value(7, BIT(data, 1));
-	output().set_lamp_value(8, BIT(data, 2));
-	output().set_lamp_value(9, BIT(data, 3));
-	output().set_lamp_value(10, BIT(data, 4));
-	output().set_value("game_over", BIT(data, 5));
-	output().set_value("tilt", BIT(data, 6));
+	for (int n = 0; n < 5; n++)
+		m_lamp_outputs[n + 5] = BIT(data, n);
+	m_game_over = BIT(data, 5);
+	m_tilt_output = BIT(data, 6);
 	// BIT 7 watchdog reset
 }
 
@@ -280,7 +306,7 @@ WRITE8_MEMBER( icecold_state::ay8910_1_b_w )
 {
 	if (m_motenbl == 0)
 	{
-		output().set_value("start", BIT(data, 0));
+		m_start_output = BIT(data, 0);
 		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));     // hopper counter
 		machine().bookkeeping().coin_counter_w(2, BIT(data, 2));     // good game counter
 		machine().bookkeeping().coin_lockout_w(0, BIT(data, 3));     // not used ??
@@ -323,8 +349,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 
 		if (lmotor_dir != 0 || rmotor_dir != 0)
 		{
-			output().set_value("lmotor", m_lmotor);
-			output().set_value("rmotor", m_rmotor);
+			m_lmotor_output = m_lmotor;
+			m_rmotor_output = m_rmotor;
 
 			popmessage("Left Motor   Right Motor\n%-4s         %-4s\n%02d\\100       %02d\\100",
 						(lmotor_dir > 0) ? " up" : ((lmotor_dir < 0) ? "down" : "off"),

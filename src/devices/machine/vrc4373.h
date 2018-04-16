@@ -31,7 +31,7 @@ public:
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-	void postload(void);
+	virtual void device_post_load(void) override;
 
 	template <class Object> devcb_base &set_irq_cb(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
 	void set_cpu_tag(const char *tag) { cpu_tag = tag; }

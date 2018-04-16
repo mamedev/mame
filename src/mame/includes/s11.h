@@ -114,6 +114,7 @@ protected:
 	void set_segment2(uint32_t s) { m_segment2 = s; }
 	void set_timer(emu_timer* t) { m_irq_timer = t; }
 
+	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 private:
@@ -125,7 +126,6 @@ private:
 	uint32_t m_segment2;
 	emu_timer* m_irq_timer;
 	bool m_irq_active;
-	virtual void machine_start() override { m_digits.resolve(); }
 };
 
 #endif // MAME_INCLUDES_S11_H

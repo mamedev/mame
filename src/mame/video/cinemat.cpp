@@ -219,20 +219,20 @@ uint32_t cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb3
 
 uint32_t cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int sw_option = ioport("INPUTS")->read();
+	int sw_option = ~m_inputs->read();
 
 	screen_update_cinemat(screen, bitmap, cliprect);
 
 	/* set the state of the artwork */
-	output().set_value("pressed3", (~sw_option >> 0) & 1);
-	output().set_value("pressed8", (~sw_option >> 1) & 1);
-	output().set_value("pressed4", (~sw_option >> 2) & 1);
-	output().set_value("pressed9", (~sw_option >> 3) & 1);
-	output().set_value("pressed1", (~sw_option >> 4) & 1);
-	output().set_value("pressed6", (~sw_option >> 5) & 1);
-	output().set_value("pressed2", (~sw_option >> 6) & 1);
-	output().set_value("pressed7", (~sw_option >> 7) & 1);
-	output().set_value("pressed5", (~sw_option >> 10) & 1);
-	output().set_value("pressed0", (~sw_option >> 11) & 1);
+	m_pressed[3] = BIT(sw_option, 0);
+	m_pressed[8] = BIT(sw_option, 1);
+	m_pressed[4] = BIT(sw_option, 2);
+	m_pressed[9] = BIT(sw_option, 3);
+	m_pressed[1] = BIT(sw_option, 4);
+	m_pressed[6] = BIT(sw_option, 5);
+	m_pressed[2] = BIT(sw_option, 6);
+	m_pressed[7] = BIT(sw_option, 7);
+	m_pressed[5] = BIT(sw_option, 10);
+	m_pressed[0] = BIT(sw_option, 11);
 	return 0;
 }

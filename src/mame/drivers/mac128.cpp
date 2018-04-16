@@ -737,7 +737,7 @@ READ8_MEMBER(mac128_state::mac_via_in_b)
 
 	val |= m_rtc->data_r();
 
-//  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
+//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
 
 	return val;
 }
@@ -745,7 +745,7 @@ READ8_MEMBER(mac128_state::mac_via_in_b)
 WRITE8_MEMBER(mac128_state::mac_via_out_a)
 {
 	device_t *fdc = machine().device("fdc");
-//  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT A: %02x (PC %x)\n", machine().describe_context().c_str(), data);
 
 	//set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
@@ -767,7 +767,7 @@ WRITE8_MEMBER(mac128_state::mac_via_out_a)
 
 WRITE8_MEMBER(mac128_state::mac_via_out_b)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
 	m_snd_enable = ((data & 0x80) == 0) ? true : false;
 	update_volume();

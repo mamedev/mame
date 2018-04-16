@@ -78,12 +78,20 @@ Stephh's notes (based on the game Z80 code and some tests) :
 WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
 {
 	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x00);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pbaction_state::sound_trigger), this));
+}
+
+TIMER_CALLBACK_MEMBER(pbaction_state::sound_trigger)
+{
+	m_ctc->trg0(0);
+	m_ctc->trg0(1);
 }
 
 WRITE8_MEMBER(pbaction_state::nmi_mask_w)
 {
 	m_nmi_mask = data & 1;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void pbaction_state::pbaction_map(address_map &map)
@@ -111,18 +119,39 @@ void pbaction_state::decrypted_opcodes_map(address_map &map)
 	map(0x8000, 0xbfff).rom().region("maincpu", 0x8000);
 }
 
+
+READ8_MEMBER(pbaction_state::sound_data_r)
+{
+	if (!machine().side_effects_disabled())
+		m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return m_soundlatch->read(space, 0);
+}
+
+WRITE8_MEMBER(pbaction_state::sound_irq_ack_w)
+{
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	machine().scheduler().synchronize();
+}
+
 void pbaction_state::pbaction_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xffff, 0xffff).nopw();    /* watchdog? */
+	map(0x8000, 0x8000).r(this, FUNC(pbaction_state::sound_data_r));
+	map(0xffff, 0xffff).w(this, FUNC(pbaction_state::sound_irq_ack_w));
 }
 
+void pbaction_state::pbaction2_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 void pbaction_state::pbaction_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x11).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x20, 0x21).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x30, 0x31).w("ay3", FUNC(ay8910_device::address_data_w));
@@ -261,12 +290,6 @@ static GFXDECODE_START( pbaction )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(pbaction_state::pbaction_interrupt)
-{
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x02); /* the CPU is in Interrupt Mode 2 */
-}
-
-
 void pbaction_state::machine_start()
 {
 	save_item(NAME(m_nmi_mask));
@@ -277,27 +300,40 @@ void pbaction_state::machine_reset()
 {
 	m_nmi_mask = 0;
 	m_scroll = 0;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pbaction_state::vblank_irq)
+WRITE_LINE_MEMBER(pbaction_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
+
+WRITE_LINE_MEMBER(pbaction_state::sound_irq_clear)
+{
+	if (state)
+		m_audiocpu->set_input_line(0, CLEAR_LINE);
+}
+
+static const z80_daisy_config daisy_chain[] =
+{
+	{ "ctc" },
+	{ nullptr }
+};
 
 MACHINE_CONFIG_START(pbaction_state::pbaction)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(pbaction_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pbaction_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 3072000)
 	MCFG_CPU_PROGRAM_MAP(pbaction_sound_map)
 	MCFG_CPU_IO_MAP(pbaction_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pbaction_state, pbaction_interrupt, 2*60)  /* ??? */
-									/* IRQs are caused by the main CPU */
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
+	MCFG_DEVICE_ADD("ctc", Z80CTC, 3072000)
+	MCFG_Z80CTC_INTR_CB(ASSERTLINE("audiocpu", 0))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -307,6 +343,7 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pbaction_state, screen_update_pbaction)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pbaction_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbaction)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -327,11 +364,18 @@ MACHINE_CONFIG_START(pbaction_state::pbaction)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(pbaction_state::pbactionx)
+MACHINE_CONFIG_START(pbaction_state::pbaction2)
 	pbaction(config);
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(pbaction2_sound_map)
+	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(pbaction_state, sound_irq_clear))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(pbaction_state::pbactionx)
+	pbaction2(config);
 	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(pbaction_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pbaction_state,  vblank_irq)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
@@ -510,7 +554,7 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 
 
 GAME( 1985, pbaction,  0,        pbaction,  pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction2, pbaction, pbaction,  pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction2, pbaction, pbaction2, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 2)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, 0,        ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )

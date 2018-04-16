@@ -617,22 +617,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
 
 MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 
-	MCFG_CPU_ADD("master", Z80, 6000000)
+	MCFG_CPU_ADD("master", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(master_memory)
 	MCFG_CPU_IO_MAP(master_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hvyunit_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", Z80, 6000000)
+	MCFG_CPU_ADD("slave", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(slave_memory)
 	MCFG_CPU_IO_MAP(slave_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 6000000)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(sound_memory)
 	MCFG_CPU_IO_MAP(sound_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hvyunit_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("mermaid", I80C51, 6000000)
+	MCFG_CPU_ADD("mermaid", I80C51, XTAL(12'000'000)/2) /* 6MHz verified on PCB */
 	MCFG_MCS51_PORT_P0_IN_CB(READ8(hvyunit_state, mermaid_p0_r))
 	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(hvyunit_state, mermaid_p0_w))
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(hvyunit_state, mermaid_p1_r))
@@ -671,7 +671,7 @@ MACHINE_CONFIG_START(hvyunit_state::hvyunit)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4) /* 3MHz verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

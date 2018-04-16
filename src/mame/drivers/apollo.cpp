@@ -139,7 +139,7 @@ const char *apollo_cpu_context(device_t *cpu) {
 		int s = (t / osd_ticks_per_second()) % 3600;
 		int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
 
-		sprintf(statebuf, "%d.%03d %s pc=%08x", s, ms, cpu->tag(), cpu->safe_pcbase());
+		sprintf(statebuf, "%s %d.%03d", cpu->machine().describe_context().c_str(), s, ms);
 	} else {
 		strcpy(statebuf, "(no context)");
 	}

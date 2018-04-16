@@ -420,7 +420,7 @@ READ8_MEMBER(itech8_state::blitter_r)
 	int result = m_blitter_data[offset / 2];
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", space.device().safe_pcbase(), offset / 2);
+	if (FULL_LOGGING) logerror("%s:blitter_r(%02x)\n", machine().describe_context(), offset / 2);
 
 	/* low bit seems to be ignored */
 	offset /= 2;
