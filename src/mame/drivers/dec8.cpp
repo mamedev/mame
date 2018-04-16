@@ -2334,7 +2334,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
 
-	MCFG_INPUT_MERGER_ANY_LOW("coin")
+	MCFG_INPUT_MERGER_ANY_LOW("coin") // 1S1588 x3 (D1-D3) + RCDM-I5
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(dec8_state, oscar_coin_irq))
 
 	/* video hardware */
