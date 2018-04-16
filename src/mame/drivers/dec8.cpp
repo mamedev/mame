@@ -2321,7 +2321,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_CPU_ADD("sub", HD6309, XTAL(12'000'000)/2) /* PCB seen both HD6309 or MC6809, clock verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(oscar_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, XTAL(12'000'000)/8)
+	MCFG_CPU_ADD("audiocpu", DECO_222, XTAL(12'000'000)/8) // IC labeled "C10707-1"
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
