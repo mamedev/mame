@@ -23,13 +23,12 @@
 	   protected mode (PROT.EXE; incompatible with EMM386 or QEMM).
 
 	Hard disk space _required_ for temp.files by following sections:
-
 	1. .\AREPLAY.CFG (vital configuration file written by initial SETUP)
 
-    2. file viewer (even if only disk A or B are accessed) -> C:\ARVRAM.DSK 
+        2. file viewer (even if only disk A or B are accessed) -> C:\ARVRAM.DSK 
 
-    3. virtual memory managed by AROS, a complex but largely 
-       undocumented operating system (in flash ROM)	-> C:\ARVRAM.RAM
+        3. virtual memory managed by AROS, a complex but largely 
+           undocumented operating system (in flash ROM)	-> C:\ARVRAM.RAM
 
 	4. the possibility array of certain trainers 	-> C:\POSSIBIL.ITY 
 
@@ -43,11 +42,11 @@
 	  by (scratch RAM + offset $10) = (BIOS extension address + $3010);
 	  at least with 4.8 software release.
 
-	To debug freeze / unfreeze, set the DEBUG DIP switch.  'Offset' is 
+	To debug crashes in unfreeze, set the DEBUG DIP switch. 'Offset' is 
 	  the freezed location of Areplay.com. It must be the same as the 
 	  offset shown when the Areplay TSR is loaded into memory.
 
-    Always keep a 1:1 copy of CONFIG.SYS, AUTOEXEC.BAT and notes about 
+        Always keep a 1:1 copy of CONFIG.SYS, AUTOEXEC.BAT and notes about 
 	  DIPs + environment (a write protected boot disk would be ideal). 
 
 	HIMEM.SYS parameters matter. Mess 0.186 with 'ct486' liked:
@@ -56,33 +55,33 @@
 	  (check with Msd.exe supplied by DOS 6.x)
 
 	Software caches like DoubleSpace, Smartdrive are incompatible w.freeze
-      because of possible hard disk corruption (a flush is done though).
+          because of possible hard disk corruption (a flush is done though).
  ***************************************************************************
 	Hardware / logic
-    ----------------
+        ----------------
 	GAL/PAL logic is undumped. Yet well-documented C-64 * Replay 
 	  cartridges give an idea of some basic principles (similar 
-      ROM/RAM banking, flip-flops).  
+          ROM/RAM banking, flip-flops).  
 
-    There is no NMI on the ISA card and no attempt was made to
+        There is no NMI on the ISA card and no attempt was made to
 	  hide the card from evil minded programmers.
 
 	A constant Irq heartbeat is generated after the card is
 	  correctly initialized (when the Areplay.com driver loaded).
 
-    Cyclic led flashes (on the freezer extension outside the PC case)
+        Cyclic led flashes (on the freezer extension outside the PC case)
  	  indicate activity.
 
-	Byte watch, slow motion, key polling and most other functions are 
-      implemented in software (via interrupt hooks).
+        Byte watch, slow motion, key polling and most other functions are 
+          implemented in software (via interrupt hooks).
 
-	Bit 3 in the single read register indicates if the interrupt came 
-      from the card or originated elsewhere. The bit is used to 
+        Bit 3 in the single read register indicates if the interrupt came 
+          from the card or originated elsewhere. The bit is used to 
 	  decide whether to invoke Action Replay - or skip functionality 
 	  altogether. 
 	  Assumption: reset upon each read and set by external logic.
 
-	The BIOS extension segment comprises 16K from C8000 on:
+        The BIOS extension segment comprises 16K from C8000 on:
 	------------- ROM location set by DIP switches --------------------
 	8 K ROM segment (determined by write to port 1, usually $0280)
 	+ 4 K RAM bank (1-1F; determined by write to port 2, usually $0281)
@@ -100,16 +99,16 @@
 	  in before boot - just like any other BIOS extension. 
 
 	Datel drivers refuse to load if the BIOS area chosen is empty
-      or the API level of driver and internal (AR)OS do not match.
+          or the API level of driver and internal (AR)OS do not match.
 
 	As a rule of thumb, versions 4.1 - 4.8 of the TSR run on V4 hardware 
 
 	Driver revisions known are 
-      4.1 (outdated; described in German manual, about 1994),
+          4.1 (outdated; described in German manual, about 1994),
 	  4.8 (widely available, ca. 1995) and 5.0 (when released?)
 
 	Before distribution via mailbox, flash files (labeled VxxROM.ROM) 
-      were obfuscated by adding 4,3,2,1 to byte 0,1,2,3. 
+          were obfuscated by adding 4,3,2,1 to byte 0,1,2,3. 
 
 	This driver accepts encrypted or unencrypted VxxROM.ROM files.
 
@@ -121,10 +120,10 @@
 	- compatibility with * official * 5.0 binaries (if they exist)
 
 	- improve banking; add missing / secret bits.
-	Bit 7 in read register seems to be added in later V5 hardware.
+	  Bit 7 in read register seems to be added in later V5 hardware.
 
-    No 'magic bits' to disable ROM/RAM or cart were found. Bit 5
-      in first write register is set when freezer menu is active.
+          No 'magic bits' to disable ROM/RAM or cart were found. Bit 5
+          in first write register is set when freezer menu is active.
 *********************************************************************************/
 #include "emu.h"
 #include "areplay.h"
