@@ -683,7 +683,7 @@ void dec8_state::oscar_map(address_map &map)
 	map(0x3c80, 0x3c80).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w));   /* DMA */
 	map(0x3d00, 0x3d00).w(this, FUNC(dec8_state::dec8_bank_w));          /* BNKS */
 	map(0x3d80, 0x3d80).w(this, FUNC(dec8_state::dec8_sound_w));         /* SOUN */
-	map(0x3e00, 0x3e00).nopw();            /* COINCL */
+	map(0x3e00, 0x3e00).w(this, FUNC(dec8_state::oscar_coin_clear_w));   /* COINCL */
 	map(0x3e80, 0x3e83).w(this, FUNC(dec8_state::oscar_int_w));
 	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0xffff).rom();
@@ -1032,9 +1032,9 @@ static INPUT_PORTS_START( shackled )
 
 	PORT_START("I8751")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
@@ -1492,9 +1492,9 @@ static INPUT_PORTS_START( oscar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )           /* always adds 1 credit */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1874,30 +1874,21 @@ GFXDECODE_END
 /* Coins generate NMI's */
 WRITE_LINE_MEMBER(dec8_state::oscar_coin_irq)
 {
-	if (state)
-	{
-		uint8_t coins = ioport("IN2")->read() & 0x7;
-		if (coins == 0x7) m_latch = 1;
-		if (m_latch && coins != 0x7)
-		{
-			m_latch = 0;
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		}
-	}
+	if (state && !m_coin_state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_coin_state = bool(state);
+}
+
+WRITE8_MEMBER(dec8_state::oscar_coin_clear_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(dec8_state::shackled_coin_irq)
 {
-	if (state)
-	{
-		uint8_t coins = (ioport("I8751")->read() & 0xe0) >> 5;
-		if (coins == 0x7) m_latch = 1;
-		if (m_latch && coins != 0x7)
-		{
-			m_latch = 0;
-			m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-		}
-	}
+	if (state && !m_coin_state)
+		m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
+	m_coin_state = bool(state);
 }
 
 /******************************************************************************/
@@ -1912,6 +1903,7 @@ void dec8_state::machine_start()
 	save_item(NAME(m_secclr));
 	save_item(NAME(m_i8751_p2));
 	save_item(NAME(m_latch));
+	save_item(NAME(m_coin_state));
 	save_item(NAME(m_i8751_port0));
 	save_item(NAME(m_i8751_port1));
 	save_item(NAME(m_i8751_return));
@@ -2040,6 +2032,9 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // needs heavy sync, otherwise one of the two CPUs will miss an irq and makes the game to hang
 
+	MCFG_INPUT_MERGER_ANY_LOW("coin")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(dec8_state, shackled_coin_irq))
+
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
@@ -2055,7 +2050,6 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_shackled)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, shackled_coin_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
@@ -2340,6 +2334,8 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
 
+	MCFG_INPUT_MERGER_ANY_LOW("coin")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(dec8_state, oscar_coin_irq))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2360,7 +2356,6 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_oscar)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, oscar_coin_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oscar)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting

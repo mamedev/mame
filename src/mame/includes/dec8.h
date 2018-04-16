@@ -93,6 +93,7 @@ public:
 	int      m_cred2;
 	int      m_credits;
 	int      m_latch;
+	bool     m_coin_state;
 	int      m_snd;
 	int      m_msm5205next;
 	int      m_toggle;
@@ -171,6 +172,7 @@ public:
 	uint32_t screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dec8);
 	DECLARE_WRITE_LINE_MEMBER(oscar_coin_irq);
+	DECLARE_WRITE8_MEMBER(oscar_coin_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(shackled_coin_irq);
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
