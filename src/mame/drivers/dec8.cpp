@@ -17,17 +17,17 @@ Various Data East 8 bit games:
     Meikyuu Hunter G            (c) 1987 Data East Corporation (6809 + I8751)
     Captain Silver (World)      (c) 1987 Data East Corporation (2*6809 + I8751)
     Captain Silver (Japan)      (c) 1987 Data East Corporation (2*6809 + I8751)
-    Psycho-Nics Oscar (World)   (c) 1987 Data East Corporation (2*6809 + I8751)
-    Psycho-Nics Oscar (US)      (c) 1988 Data East USA (2*6809 + I8751)
-    Psycho-Nics Oscar (Japan)   (c) 1987 Data East Corporation (2*6809 + I8751)
+    Psycho-Nics Oscar (World)   (c) 1987 Data East Corporation (2*6809)
+    Psycho-Nics Oscar (US)      (c) 1988 Data East USA (2*6809)
+    Psycho-Nics Oscar (Japan)   (c) 1987 Data East Corporation (2*6809)
     Super Real Darwin (World)   (c) 1987 Data East Corporation (6809 + I8751)
     Super Real Darwin (Japan)   (c) 1987 Data East Corporation (6809 + I8751)
     Cobra Command (World)       (c) 1988 Data East Corporation (6809)
     Cobra Command (Japan)       (c) 1988 Data East Corporation (6809)
 
     All games use a 6502 for sound (some are encrypted), all games except Cobracom
-    use an Intel 8751 for protection & coinage. For the games without (fake) MCU,
-    the coinage dip switch (sometimes based on the manual) is simulated.
+    and Oscar use an Intel 8751 for protection & coinage. For the games without
+    (fake) MCU, the coinage dip switch (sometimes based on the manual) is simulated.
 
     Meikyuu Hunter G was formerly known as Mazehunter.
 
@@ -190,7 +190,7 @@ WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
 	{
 	case 0: /* High byte */
 		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		m_i8751_value = (m_i8751_value & 0xff00) | data;
@@ -259,7 +259,7 @@ WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 	{
 	case 0: /* High byte */
 		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		m_i8751_value = (m_i8751_value & 0xff00) | data;
@@ -370,7 +370,7 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
 WRITE8_MEMBER(dec8_state::dec8_sound_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE);
 	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
@@ -378,7 +378,7 @@ WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
-		m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
 
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
@@ -402,46 +402,34 @@ WRITE8_MEMBER(dec8_state::csilver_sound_bank_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::oscar_int_w)
+WRITE8_MEMBER(dec8_state::main_irq_on_w)
 {
-	/* Deal with interrupts, coins also generate NMI to CPU 0 */
-	switch (offset)
-	{
-	case 0: /* IRQ2 */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	case 1: /* IRC 1 */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	case 2: /* IRQ 1 */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	case 3: /* IRC 2 */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	}
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-/* Used by Shackled, Last Mission, Captain Silver */
-WRITE8_MEMBER(dec8_state::shackled_int_w)
+WRITE8_MEMBER(dec8_state::main_irq_off_w)
 {
-	switch (offset)
-	{
-	case 0: /* CPU 2 - IRQ acknowledge */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	case 1: /* CPU 1 - IRQ acknowledge */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	case 2: /* i8751 - FIRQ acknowledge */
-		return;
-	case 3: /* IRQ 1 */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	case 4: /* IRQ 2 */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	}
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(dec8_state::main_firq_off_w)
+{
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(dec8_state::sub_irq_on_w)
+{
+	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(dec8_state::sub_irq_off_w)
+{
+	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(dec8_state::sub_firq_off_w)
+{
+	m_subcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 /******************************************************************************/
@@ -455,12 +443,11 @@ void dec8_state::lastmisn_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0");
-	map(0x1801, 0x1801).portr("IN1");
-	map(0x1802, 0x1802).portr("IN2");
-	map(0x1803, 0x1803).portr("DSW0");   /* Dip 1 */
-	map(0x1804, 0x1804).portr("DSW1");   /* Dip 2 */
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN0").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(this, FUNC(dec8_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x1806, 0x1806).r(this, FUNC(dec8_state::i8751_h_r));
 	map(0x1807, 0x1807).rw(this, FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
@@ -482,12 +469,11 @@ void dec8_state::lastmisn_sub_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0");
-	map(0x1801, 0x1801).portr("IN1");
-	map(0x1802, 0x1802).portr("IN2");
-	map(0x1803, 0x1803).portr("DSW0");   /* Dip 1 */
-	map(0x1804, 0x1804).portr("DSW1");   /* Dip 2 */
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN0").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(this, FUNC(dec8_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x1807, 0x1807).w(this, FUNC(dec8_state::flip_screen_w));
 	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
@@ -503,12 +489,11 @@ void dec8_state::shackled_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0");
-	map(0x1801, 0x1801).portr("IN1");
-	map(0x1802, 0x1802).portr("IN2");
-	map(0x1803, 0x1803).portr("DSW0");
-	map(0x1804, 0x1804).portr("DSW1");
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN0").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(this, FUNC(dec8_state::sub_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x1807, 0x1807).w(this, FUNC(dec8_state::flip_screen_w));
 	map(0x1809, 0x1809).w(this, FUNC(dec8_state::lastmisn_scrollx_w)); /* Scroll LSB */
@@ -528,12 +513,11 @@ void dec8_state::shackled_sub_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0");
-	map(0x1801, 0x1801).portr("IN1");
-	map(0x1802, 0x1802).portr("IN2");
-	map(0x1803, 0x1803).portr("DSW0");
-	map(0x1804, 0x1804).portr("DSW1");
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN0").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(this, FUNC(dec8_state::sub_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x1806, 0x1806).r(this, FUNC(dec8_state::i8751_h_r));
 	map(0x1807, 0x1807).rw(this, FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
@@ -626,11 +610,11 @@ void dec8_state::csilver_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN1");
-	map(0x1801, 0x1801).portr("IN0");
-	map(0x1803, 0x1803).portr("IN2");
-	map(0x1804, 0x1804).portr("DSW1");   /* Dip 2 */
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN1").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN0").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(this, FUNC(dec8_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).portr("DSW0").w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
 	map(0x1807, 0x1807).w(this, FUNC(dec8_state::flip_screen_w));
 	map(0x1808, 0x180b).w(this, FUNC(dec8_state::dec8_scroll2_w));
@@ -652,9 +636,11 @@ void dec8_state::csilver_sub_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1803, 0x1803).portr("IN2");
-	map(0x1804, 0x1804).portr("DSW1");
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(this, FUNC(dec8_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).portr("DSW0").w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
 	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
@@ -682,9 +668,12 @@ void dec8_state::oscar_map(address_map &map)
 	map(0x3c10, 0x3c1f).w("tilegen1", FUNC(deco_bac06_device::pf_control1_8bit_w));
 	map(0x3c80, 0x3c80).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w));   /* DMA */
 	map(0x3d00, 0x3d00).w(this, FUNC(dec8_state::dec8_bank_w));          /* BNKS */
-	map(0x3d80, 0x3d80).w(this, FUNC(dec8_state::dec8_sound_w));         /* SOUN */
+	map(0x3d80, 0x3d80).w(m_soundlatch, FUNC(generic_latch_8_device::write));            /* SOUN */
 	map(0x3e00, 0x3e00).w(this, FUNC(dec8_state::oscar_coin_clear_w));   /* COINCL */
-	map(0x3e80, 0x3e83).w(this, FUNC(dec8_state::oscar_int_w));
+	map(0x3e80, 0x3e80).w(this, FUNC(dec8_state::sub_irq_on_w));         /* IRQ 2 */
+	map(0x3e81, 0x3e81).w(this, FUNC(dec8_state::main_irq_off_w));       /* IRC 1 */
+	map(0x3e82, 0x3e82).w(this, FUNC(dec8_state::main_irq_on_w));        /* IRQ 1 */
+	map(0x3e83, 0x3e83).w(this, FUNC(dec8_state::sub_irq_off_w));        /* IRC 2 */
 	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0xffff).rom();
 }
@@ -694,7 +683,10 @@ void dec8_state::oscar_sub_map(address_map &map)
 	map(0x0000, 0x0eff).ram().share("share1");
 	map(0x0f00, 0x0fff).ram();
 	map(0x1000, 0x1fff).ram().share("share2");
-	map(0x3e80, 0x3e83).w(this, FUNC(dec8_state::oscar_int_w));
+	map(0x3e80, 0x3e80).w(this, FUNC(dec8_state::sub_irq_on_w));         /* IRQ 2 */
+	map(0x3e81, 0x3e81).w(this, FUNC(dec8_state::main_irq_off_w));       /* IRC 1 */
+	map(0x3e82, 0x3e82).w(this, FUNC(dec8_state::main_irq_on_w));        /* IRQ 1 */
+	map(0x3e83, 0x3e83).w(this, FUNC(dec8_state::sub_irq_off_w));        /* IRC 2 */
 	map(0x4000, 0xffff).rom();
 }
 
@@ -860,7 +852,7 @@ WRITE8_MEMBER(dec8_state::shackled_mcu_to_main_w)
 
 	// P2 - IRQ to main CPU
 	if (BIT(data, 2) && !BIT(m_i8751_p2, 2))
-		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+		m_subcpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 
 	if (!BIT(data, 0))
 		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
@@ -896,7 +888,7 @@ WRITE8_MEMBER(dec8_state::srdarwin_mcu_to_main_w)
 
 	// guess, toggled after above.
 	if ((data&0x02)==0)
-		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 }
 
 /******************************************************************************/
@@ -2004,7 +1996,7 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2069,7 +2061,7 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2130,7 +2122,7 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2191,7 +2183,7 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2251,7 +2243,7 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2311,7 +2303,7 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
@@ -2367,6 +2359,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::NMI_LINE))
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2375,7 +2368,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2428,7 +2421,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2485,7 +2478,7 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2614,7 +2607,7 @@ ROM_START( shackled )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dk-07.5h", 0x08000, 0x08000, CRC(887e4bcc) SHA1(6427396080e9cd8647adff47c8ed04593a14268c) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU (based on 'breywood' with ID byte changed from 00 to 01) */
 	ROM_LOAD( "dk.18a", 0x0000, 0x1000, CRC(1af06149) SHA1(b9cb2a4986dbcfc78b0cbea2c1e2bdac1db479cd) BAD_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
@@ -3362,9 +3355,6 @@ ROM_START( oscar )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
-
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
 
@@ -3391,9 +3381,6 @@ ROM_START( oscaru )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000,  CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
-
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
@@ -3425,9 +3412,6 @@ ROM_START( oscarj1 )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
-
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
 
@@ -3457,9 +3441,6 @@ ROM_START( oscarj2 )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
-
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )

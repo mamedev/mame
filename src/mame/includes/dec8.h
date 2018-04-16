@@ -117,8 +117,12 @@ public:
 	DECLARE_WRITE8_MEMBER(dec8_sound_w);
 	DECLARE_WRITE8_MEMBER(csilver_adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(csilver_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(oscar_int_w);
-	DECLARE_WRITE8_MEMBER(shackled_int_w);
+	DECLARE_WRITE8_MEMBER(main_irq_on_w);
+	DECLARE_WRITE8_MEMBER(main_irq_off_w);
+	DECLARE_WRITE8_MEMBER(main_firq_off_w);
+	DECLARE_WRITE8_MEMBER(sub_irq_on_w);
+	DECLARE_WRITE8_MEMBER(sub_irq_off_w);
+	DECLARE_WRITE8_MEMBER(sub_firq_off_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_READ8_MEMBER(i8751_port0_r);
 	DECLARE_WRITE8_MEMBER(i8751_port0_w);
