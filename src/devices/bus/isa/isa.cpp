@@ -288,6 +288,11 @@ void isa8_device::unmap_bank(offs_t start, offs_t end)
 	m_memspace->unmap_readwrite(start, end);
 }
 
+void isa8_device::writeprotect_bank(offs_t start, offs_t end)
+{ 
+	m_memspace->unmap_write(start, end);
+}
+
 void isa8_device::install_rom(device_t *dev, offs_t start, offs_t end, const char *tag, const char *region)
 {
 	if (machine().root_device().memregion("isa")) {
