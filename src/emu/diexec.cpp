@@ -726,6 +726,7 @@ if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 		if (m_linenum == INPUT_LINE_RESET)
 		{
 			// if we're asserting the line, just halt the device
+			// FIXME: outputs of onboard peripherals also need to be deactivated at this time
 			if (m_curstate == ASSERT_LINE)
 				m_execute->suspend(SUSPEND_REASON_RESET, true);
 

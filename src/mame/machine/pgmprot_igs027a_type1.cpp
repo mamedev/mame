@@ -542,21 +542,21 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 			break;
 
 		case 0x67: // set high bits
-	//      printf("%s command %02x | %04x\n", machine().describe_context(), m_ddp3lastcommand, m_value0);
+	//      printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
 			m_curslots = (m_value0 & 0xff00)>>8;
 			m_slots[m_curslots] = (m_value0 & 0x00ff) << 16;
 			break;
 
 		case 0xe5: // set low bits for operation?
-		//  printf("%s command %02x | %04x\n", machine().describe_context(), m_ddp3lastcommand, m_value0);
+		//  printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
 			m_slots[m_curslots] |= (m_value0 & 0xffff);
 			break;
 
 
 		case 0x8e: // read back result of operations
-	//      printf("%s command %02x | %04x\n", machine().describe_context(), m_ddp3lastcommand, m_value0);
+	//      printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = m_slots[m_value0&0xff];
 			break;
 

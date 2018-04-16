@@ -221,8 +221,8 @@ static INPUT_PORTS_START( dominob )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* TILT in 'arkanoid' */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* COIN1 in 'arkanoid' */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* COIN2 in 'arkanoid' */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_CUSTOM )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )            /* also works in "demo mode" ! */

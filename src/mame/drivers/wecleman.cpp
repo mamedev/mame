@@ -755,7 +755,7 @@ static INPUT_PORTS_START( wecleman )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")  // right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   // from sound cpu ?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   // from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSWA")  /* $140015.b */
@@ -852,8 +852,8 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Right SW")   // right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // from sound cpu
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // from sound cpu
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, nullptr)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")  /* $140015.b */
@@ -1030,10 +1030,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-
-MACHINE_RESET_MEMBER(wecleman_state,wecleman)
+MACHINE_RESET_MEMBER(wecleman_state, wecleman)
 {
 	m_k007232[0]->set_bank( 0, 1 );
+}
+
+MACHINE_START_MEMBER(wecleman_state, wecleman)
+{
+	m_led.resolve();
 }
 
 MACHINE_CONFIG_START(wecleman_state::wecleman)
@@ -1052,7 +1056,8 @@ MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,wecleman)
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1093,7 +1098,12 @@ INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-MACHINE_RESET_MEMBER(wecleman_state,hotchase)
+MACHINE_START_MEMBER(wecleman_state, hotchase)
+{
+	m_led.resolve();
+}
+
+MACHINE_RESET_MEMBER(wecleman_state, hotchase)
 {
 	int i;
 
@@ -1123,7 +1133,8 @@ MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state,hotchase)
+	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
+	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

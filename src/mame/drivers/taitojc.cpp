@@ -655,8 +655,8 @@ WRITE8_MEMBER(taitojc_state::dendego_speedmeter_w)
 	if (m_speed_meter != dendego_odometer_table[data])
 	{
 		m_speed_meter = dendego_odometer_table[data];
-		output().set_value("counter2", m_speed_meter / 10);
-		output().set_value("counter3", m_speed_meter % 10);
+		m_counters[2] = m_speed_meter / 10;
+		m_counters[3] = m_speed_meter % 10;
 	}
 }
 
@@ -665,7 +665,7 @@ WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
 	if (m_brake_meter != dendego_pressure_table[data])
 	{
 		m_brake_meter = dendego_pressure_table[data];
-		output().set_value("counter4", m_brake_meter);
+		m_counters[4] = m_brake_meter;
 	}
 }
 
@@ -734,7 +734,7 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
     ?
 */
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, data >> i & 1);
+		m_lamps[i] = BIT(data, i);
 
 	m_mcu_output = data;
 }
@@ -896,7 +896,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x02, 0x02, "Dev Skip RAM Test" ) // skips mainram test on page 1 of POST
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1071,6 +1071,9 @@ void taitojc_state::machine_start()
 
 	save_item(NAME(m_speed_meter));
 	save_item(NAME(m_brake_meter));
+
+	m_lamps.resolve();
+	m_counters.resolve();
 }
 
 

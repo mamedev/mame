@@ -58,6 +58,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_switch(*this, "SWITCH.%u", 0)
 		, m_testipt(*this, "TEST.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(v115);
@@ -75,9 +76,11 @@ private:
 	uint8_t m_portc;
 	uint8_t m_motor;
 	bool m_type;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<7> m_switch;
 	required_ioport_array<6> m_testipt;
+	output_finder<56> m_digits;
 };
 
 
@@ -214,22 +217,22 @@ WRITE8_MEMBER( g627_state::portc_w )
 	m_portc = data;
 	if ((m_type) && (data < 6))
 	{
-		output().set_digit_value(data, m_seg[0]);
-		output().set_digit_value(10 + data, m_seg[1]);
-		output().set_digit_value(20 + data, m_seg[2]);
-		output().set_digit_value(30 + data, m_seg[3]);
-		output().set_digit_value(50 + data, m_seg[5]);
+		m_digits[data] = m_seg[0];
+		m_digits[10 + data] = m_seg[1];
+		m_digits[20 + data] = m_seg[2];
+		m_digits[30 + data] = m_seg[3];
+		m_digits[50 + data] = m_seg[5];
 	}
 	else
-	if ((!m_type) && (data))
+	if ((!m_type) && (data) && (data < 7))
 	{
 		data--;
 
-		output().set_digit_value(data, m_seg[0]);
-		output().set_digit_value(10 + data, m_seg[1]);
-		output().set_digit_value(20 + data, m_seg[2]);
-		output().set_digit_value(30 + data, m_seg[3]);
-		output().set_digit_value(50 + data, m_seg[5]);
+		m_digits[data] = m_seg[0];
+		m_digits[10 + data] = m_seg[1];
+		m_digits[20 + data] = m_seg[2];
+		m_digits[30 + data] = m_seg[3];
+		m_digits[50 + data] = m_seg[5];
 	}
 }
 

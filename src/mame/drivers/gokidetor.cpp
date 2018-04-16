@@ -269,4 +269,25 @@ ROM_START( gokidetor )
 	ROM_LOAD( "d33-06.pal20l8b.ic44.jed", 0x5000, 0xd01, CRC(a1400501) SHA1(0b86d09d3e12668eaaf2c4b5a2d2b676d2e599f7) )
 ROM_END
 
-GAME( 1992, gokidetor, 0, gokidetor, gokidetor, gokidetor_state, 0, ROT0, "Taito", "Gokidetor", MACHINE_IS_SKELETON_MECHANICAL )
+ROM_START( gokidetor2 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ic2.rom", 0, 0x20000, CRC(03bf24d1) SHA1(ef63a5be25d77ac20984402cc45137d292a9fa1d) )
+	// 8000-FFFF appears to be graphics; 10000-1FFFF is unused
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "ic34.rom", 0, 0x10000, CRC(fd06305d) SHA1(7889f0c360650bfd0fe593c522685a978879bfee) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "ic87.rom", 0, 0x40000, CRC(adb9fd16) SHA1(59aae5ac26cae30b961b30e17fd494094aa7aa15) )
+
+	ROM_REGION( 0x8000, "pals", 0 ) // unprotected
+	ROM_LOAD( "d33-01.pal16l8a.ic20.jed", 0x0000, 0xb01, CRC(7d614a54) SHA1(e79b6ac99f46ff69ea0565e89d6807667c9e0547) ) // PALs missing for this board, using the one from the parent.
+	ROM_LOAD( "d33-02.pal16l8b.ic62.jed", 0x1000, 0xb01, CRC(6653423f) SHA1(ac93acccf649b97a3252aedf398310be90fe5d2d) )
+	ROM_LOAD( "d33-03.pal16l8a.ic70.jed", 0x2000, 0xb01, CRC(abfd9a01) SHA1(c76cc16842231c2f688ddd46a17f3a6df92a9580) )
+	ROM_LOAD( "d33-04.pal16l8b.ic81.jed", 0x3000, 0xb01, CRC(bf17aa05) SHA1(0cbbb2ee49c31e94ed7ea3a25f85e3d33c6b68fb) )
+	ROM_LOAD( "d33-05.pal16l8b.ic93.jed", 0x4000, 0xb01, CRC(2df9105e) SHA1(d28fc48588727e4bd3ec2377b383160329c261c3) )
+	ROM_LOAD( "d33-06.pal20l8b.ic44.jed", 0x5000, 0xd01, CRC(a1400501) SHA1(0b86d09d3e12668eaaf2c4b5a2d2b676d2e599f7) )
+ROM_END
+
+GAME( 1992, gokidetor,          0, gokidetor, gokidetor, gokidetor_state, 0, ROT0, "Taito", "Gokidetor (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1992, gokidetor2, gokidetor, gokidetor, gokidetor, gokidetor_state, 0, ROT0, "Taito", "Gokidetor (set 2)", MACHINE_IS_SKELETON_MECHANICAL )

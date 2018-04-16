@@ -58,6 +58,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "nvram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(atla_ltd);
@@ -87,8 +88,10 @@ private:
 	uint8_t m_out_offs;
 	uint8_t m_port2;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<50> m_digits;
 };
 
 
@@ -329,21 +332,21 @@ WRITE8_MEMBER( ltd_state::port1_w )
 				if (m_clear)
 				{
 					if (row>7)
-						output().set_digit_value(row+2, segment); // P2
+						m_digits[row+2] = segment; // P2
 					else
-						output().set_digit_value(row, segment); // P1
+						m_digits[row] = segment; // P1
 				}
 				break;
 			case 8:
 				if (m_clear)
 				{
 					if (row>13)
-						output().set_digit_value(row+26, segment); // credits / ball
+						m_digits[row+26] = segment; // credits / ball
 					else
 					if (row>7)
-						output().set_digit_value(row+22, segment); // P4
+						m_digits[row+22] = segment; // P4
 					else
-						output().set_digit_value(row+20, segment); // P3
+						m_digits[row+20] = segment; // P3
 				}
 				break;
 		}
@@ -384,8 +387,6 @@ DRIVER_INIT_MEMBER( ltd_state, ltd )
 DRIVER_INIT_MEMBER( ltd_state, atla_ltd )
 {
 	m_game = 1;
-	output().set_digit_value(0, 0x3f);
-	output().set_digit_value(10, 0x3f);
 }
 
 DRIVER_INIT_MEMBER( ltd_state, bhol_ltd )
@@ -412,27 +413,29 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 		{
 			case 1: // atlantis (2-player, 5-digit)
 			{
+				m_digits[0] = 0x3f;
+				m_digits[10] = 0x3f;
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[1] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[2] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 1:
-						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[11] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[12] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 2:
-						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[3] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[4] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 3:
-						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[13] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[14] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 8:
-						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[41] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[40] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 				}
 				break;
@@ -442,32 +445,32 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output().set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[0] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[1] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 1:
-						output().set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[10] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[11] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 2:
-						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[2] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[3] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 3:
-						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[12] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[13] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 4:
-						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[4] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[5] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 5:
-						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[14] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[15] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 8:
-						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[41] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[40] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 				}
 				break;
@@ -477,49 +480,48 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output().set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[0] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[1] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 1:
-						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[2] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[3] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 2:
-						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[4] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[5] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 3:
-						output().set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[10] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[11] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 4:
-						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[12] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[13] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 5:
-						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[14] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[15] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 6:
-						output().set_digit_value(20, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(21, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[20] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[21] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 7:
-						output().set_digit_value(22, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(23, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[22] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[23] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 8:
-						output().set_digit_value(24, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(25, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[24] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[25] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 9:
-						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[40] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[41] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 				}
 				break;
 			}
-
 		}
 	}
 }

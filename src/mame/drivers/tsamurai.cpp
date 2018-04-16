@@ -79,9 +79,10 @@ WRITE_LINE_MEMBER(tsamurai_state::nmi_enable_w)
 	m_nmi_enabled = state;
 }
 
-INTERRUPT_GEN_MEMBER(tsamurai_state::interrupt)
+WRITE_LINE_MEMBER(tsamurai_state::vblank_irq)
 {
-	if (m_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(tsamurai_state::tsamurai_unknown_d803_r)
@@ -721,7 +722,6 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound1_map)
@@ -746,6 +746,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tsamurai_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
@@ -770,7 +771,6 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(vsgongf_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound_vsgongf_map)
@@ -794,6 +794,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update_vsgongf)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tsamurai_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
@@ -819,7 +820,6 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(m660_map)
 	MCFG_CPU_IO_MAP(z80_m660_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound1_m660_map)
@@ -830,7 +830,6 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	MCFG_CPU_ADD("audio3", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound3_m660_map)
 	MCFG_CPU_IO_MAP(sound3_m660_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  nmi_line_pulse)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,m660)
 
@@ -850,6 +849,8 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(tsamurai_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tsamurai_state, vblank_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audio3", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tsamurai)
 	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)

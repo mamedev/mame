@@ -1845,6 +1845,9 @@ void validity_checker::validate_inputs()
 				if (field.type() == IPT_INVALID)
 					osd_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
 
+				if (field.type() == IPT_SPECIAL)
+					osd_printf_error("Field has an invalid type IPT_SPECIAL\n");
+
 				// verify dip switches
 				if (field.type() == IPT_DIPSWITCH)
 				{

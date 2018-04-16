@@ -279,8 +279,8 @@ static INPUT_PORTS_START( clayshoo )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* doesn't appear to be used */
 
 	PORT_START("IN2")
-	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_SPECIAL )    /* amateur/expert/pro Player 2 */
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_SPECIAL )    /* amateur/expert/pro Player 1 */
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_CUSTOM )    /* amateur/expert/pro Player 2 */
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_CUSTOM )    /* amateur/expert/pro Player 1 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)

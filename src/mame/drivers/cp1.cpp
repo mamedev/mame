@@ -28,18 +28,18 @@ public:
 		m_i8155(*this, "i8155"),
 		m_i8155_cp3(*this, "i8155_cp3"),
 		m_cassette(*this, "cassette"),
-		m_io_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4"}),
-		m_io_config(*this, "CONFIG")
+		m_io_lines(*this, "LINE%u", 0U),
+		m_io_config(*this, "CONFIG"),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8155_device> m_i8155;
-	required_device<i8155_device> m_i8155_cp3;
-	required_device<cassette_image_device> m_cassette;
-	required_ioport_array<5> m_io_lines;
-	required_ioport m_io_config;
+	void cp1(machine_config &config);
+private:
+	void cp1_io(address_map &map);
 
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
 	DECLARE_READ8_MEMBER(port1_r);
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
@@ -53,9 +53,14 @@ public:
 	DECLARE_WRITE8_MEMBER(i8155_portb_w);
 	DECLARE_WRITE8_MEMBER(i8155_portc_w);
 
-	void cp1(machine_config &config);
-	void cp1_io(address_map &map);
-private:
+	required_device<cpu_device> m_maincpu;
+	required_device<i8155_device> m_i8155;
+	required_device<i8155_device> m_i8155_cp3;
+	required_device<cassette_image_device> m_cassette;
+	required_ioport_array<5> m_io_lines;
+	required_ioport m_io_config;
+	output_finder<6> m_digits;
+
 	uint8_t   m_7seg;
 	uint8_t   m_port2;
 	uint8_t   m_matrix;
@@ -151,12 +156,12 @@ WRITE8_MEMBER(cp1_state::i8155_porta_w)
 
 	if (m_7seg)
 	{
-		if (!(m_matrix & 0x01))     output().set_digit_value(5, data);
-		if (!(m_matrix & 0x02))     output().set_digit_value(4, data);
-		if (!(m_matrix & 0x04))     output().set_digit_value(3, data);
-		if (!(m_matrix & 0x08))     output().set_digit_value(2, data | 0x80);     // this digit has always the dot active
-		if (!(m_matrix & 0x10))     output().set_digit_value(1, data);
-		if (!(m_matrix & 0x20))     output().set_digit_value(0, data);
+		if (!(m_matrix & 0x01))     m_digits[5] = data;
+		if (!(m_matrix & 0x02))     m_digits[4] = data;
+		if (!(m_matrix & 0x04))     m_digits[3] = data;
+		if (!(m_matrix & 0x08))     m_digits[2] = data | 0x80;     // this digit has always the dot active
+		if (!(m_matrix & 0x10))     m_digits[1] = data;
+		if (!(m_matrix & 0x20))     m_digits[0] = data;
 	}
 
 	m_7seg ^= 0x01;
@@ -223,6 +228,11 @@ INPUT_PORTS_START( cp1 )
 	PORT_CONFSETTING( 0x00, DEF_STR( No ) )
 	PORT_CONFSETTING( 0x02, DEF_STR( Yes ) )
 INPUT_PORTS_END
+
+void cp1_state::machine_start()
+{
+	m_digits.resolve();
+}
 
 void cp1_state::machine_reset()
 {

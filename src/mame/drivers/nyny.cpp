@@ -383,7 +383,7 @@ WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
 {
 	/* not sure what this does */
 
-	/*logerror("%x PORT A write %x at  Y=%x X=%x\n", space.device().safe_pc(), data, m_screen->vpos(), m_screen->hpos());*/
+	/*logerror("%s PORT A write %x at  Y=%x X=%x\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());*/
 }
 
 /*************************************

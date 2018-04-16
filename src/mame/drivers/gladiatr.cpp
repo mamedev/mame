@@ -639,7 +639,7 @@ void ppking_state::ppking_cpu1_io(address_map &map)
 {
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	map(0xc000, 0xc007).w("mainlatch", FUNC(ls259_device::write_d0));
-//  AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
+//  map(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
 	map(0xc09e, 0xc09f).r(this, FUNC(ppking_state::ppking_qx0_r)).w(this, FUNC(ppking_state::ppking_qx0_w));
 	map(0xc0bf, 0xc0bf).noprw(); // watchdog
 	map(0xc0c0, 0xc0c1).r(this, FUNC(ppking_state::ppking_qxcomu_r)).w(this, FUNC(ppking_state::ppking_qxcomu_w));
@@ -671,10 +671,11 @@ void gladiatr_state::gladiatr_cpu1_map(address_map &map)
 	map(0xf000, 0xf7ff).ram().share("nvram"); /* battery backed RAM */
 }
 
-ADDRESS_MAP_START(gladiatr_state_base::cpu2_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM
-ADDRESS_MAP_END
+void gladiatr_state_base::cpu2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x83ff).ram();
+}
 
 void gladiatr_state::gladiatr_cpu3_map(address_map &map)
 {

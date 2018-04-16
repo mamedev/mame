@@ -938,13 +938,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dpoker )
 	PORT_START("ssio:IP0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mcr_dpoker_state, coin_in_hit, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) // see ip0_r
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) // see ip0_r
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) // "
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) // "
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin-drop")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) // "
 
 	PORT_START("ssio:IP1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
@@ -1000,7 +1000,7 @@ static INPUT_PORTS_START( dpoker )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) // only in test mode input test
 
 	PORT_START("P24")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) // Hopper Full (not implemented)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hopper Full (not implemented)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // Coin Return
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1185,11 +1185,11 @@ static INPUT_PORTS_START( kroozr )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("ssio:IP1")  /* J4 10-13,15-18 */
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* low 3 bits of spinner */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* sensor J1-10 */
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* sensor J1-9 */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* sensor J1-8 */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* upper 1 bit of spinner */
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* low 3 bits of spinner */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* sensor J1-10 */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* sensor J1-9 */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* sensor J1-8 */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* upper 1 bit of spinner */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_START("ssio:IP2")  /* J5 1-8 */
@@ -1613,7 +1613,7 @@ static INPUT_PORTS_START( nflfoot )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)     /* right select #4 play */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)     /* right select #5 play */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2)     /* select two player */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                    /* connects to IPU board */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                    /* connects to IPU board */
 
 	PORT_START("ssio:IP3")  /* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, "Coin Meters" )

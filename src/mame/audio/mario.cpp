@@ -418,7 +418,6 @@ void mario_state::set_ea(int ea)
 
 void mario_state::sound_start()
 {
-	device_t *audiocpu = machine().device("audiocpu");
 	uint8_t *SND = memregion("audiocpu")->base();
 
 #if USE_8039
@@ -426,11 +425,11 @@ void mario_state::sound_start()
 #endif
 
 	m_eabank = nullptr;
-	if (audiocpu != nullptr && audiocpu->type() != Z80)
+	if (m_audiocpu->type() != Z80)
 	{
 
 		m_eabank = "bank1";
-		audiocpu->memory().space(AS_PROGRAM).install_read_bank(0x000, 0x7ff, "bank1");
+		m_audiocpu->space(AS_PROGRAM).install_read_bank(0x000, 0x7ff, "bank1");
 		membank("bank1")->configure_entry(0, &SND[0]);
 		membank("bank1")->configure_entry(1, &SND[0x1000]);
 
@@ -448,7 +447,7 @@ void mario_state::sound_start()
 
 void mario_state::sound_reset()
 {
-	address_space &space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_audiocpu->space(AS_PROGRAM);
 
 #if USE_8039
 	set_ea(1);

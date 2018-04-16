@@ -429,7 +429,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 			{
 				vpage=LAYER_BG;
 /*
-                printf("bg -> %d %d   %d %d  %d %d @ %x\n",dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0,space.device().safe_pc());
+                printf("%s bg -> %d %d   %d %d  %d %d @ %x\n",machine().describe_context().c_str(), dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0);
 
                 for(int i=0;i<16;++i)
                 {
@@ -538,8 +538,8 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		//{uint16_t x = data & 0xf800; static int y = -1; if (x != y) { y = x; printf("%s wheelfir_7c0000_w %d%d%d%d%d\n", machine().describe_context(), BIT(data, 15), BIT(data, 14), BIT(data, 13), BIT(data, 12), BIT(data, 11)); }}
-		//{uint16_t x = data & 0x0700; static int y = -1; if (x != y) { y = x; printf("%s eeprom write %d%d%d\n", machine().describe_context(), BIT(data, 10), BIT(data, 9), BIT(data, 8)); }}
+		//{uint16_t x = data & 0xf800; static int y = -1; if (x != y) { y = x; printf("%s wheelfir_7c0000_w %d%d%d%d%d\n", machine().describe_context().c_str(), BIT(data, 15), BIT(data, 14), BIT(data, 13), BIT(data, 12), BIT(data, 11)); }}
+		//{uint16_t x = data & 0x0700; static int y = -1; if (x != y) { y = x; printf("%s eeprom write %d%d%d\n", machine().describe_context().c_str(), BIT(data, 10), BIT(data, 9), BIT(data, 8)); }}
 		m_eeprom->di_write(BIT(data, 9));
 		m_eeprom->clk_write(BIT(data, 8));
 		m_eeprom->cs_write(BIT(data, 10));
@@ -561,7 +561,7 @@ READ16_MEMBER(wheelfir_state::wheelfir_7c0000_r)
 	{
 		data |= (machine().rand() & 0x2000); // ?
 		data |= m_eeprom->do_read() << 15;
-		//printf("%s eeprom read %04x %04x\n", machine().describe_context(), data, mem_mask);
+		//printf("%s eeprom read %04x %04x\n", machine().describe_context().c_str(), data, mem_mask);
 	}
 
 	if (ACCESSING_BITS_0_7)

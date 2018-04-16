@@ -82,7 +82,10 @@ WRITE8_MEMBER(llc_state::llc1_port1_b_w)
 		count++;
 
 	if (count == 1)
-		output().set_digit_value(digit, data & 0x7f);
+	{
+		if (digit < 8)
+			m_digits[digit] = data & 0x7f;
+	}
 	else
 	if (count == 3)
 	{
@@ -103,6 +106,7 @@ MACHINE_RESET_MEMBER(llc_state,llc1)
 
 MACHINE_START_MEMBER(llc_state,llc1)
 {
+	m_digits.resolve();
 }
 
 /* Driver initialization */

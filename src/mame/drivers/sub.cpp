@@ -157,7 +157,7 @@ public:
 	DECLARE_PALETTE_INIT(sub);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(main_irq);
+	DECLARE_WRITE_LINE_MEMBER(main_irq);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void sub(machine_config &config);
 	void subm_io(address_map &map);
@@ -449,9 +449,9 @@ PALETTE_INIT_MEMBER(sub_state, sub)
 }
 
 
-INTERRUPT_GEN_MEMBER(sub_state::main_irq)
+WRITE_LINE_MEMBER(sub_state::main_irq)
 {
-	if (m_int_en)
+	if (state && m_int_en)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -467,7 +467,6 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(subm_map)
 	MCFG_CPU_IO_MAP(subm_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sub_state, main_irq)
 
 	MCFG_CPU_ADD("soundcpu", Z80,MASTER_CLOCK/6)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(subm_sound_map)
@@ -490,6 +489,7 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sub_state, main_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sub)
 	MCFG_PALETTE_ADD("palette", 0x400)

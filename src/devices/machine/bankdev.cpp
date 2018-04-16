@@ -14,7 +14,8 @@ address_map_bank_device::address_map_bank_device( const machine_config &mconfig,
 		m_addr_width(32),
 		m_stride(1),
 		m_program(nullptr),
-		m_offset(0)
+		m_offset(0),
+		m_shift(0)
 {
 }
 
@@ -48,17 +49,17 @@ WRITE8_MEMBER(address_map_bank_device::write8)
 
 WRITE16_MEMBER(address_map_bank_device::write16)
 {
-	m_program->write_word(m_offset + (offset * 2), data, mem_mask);
+	m_program->write_word(m_offset + (offset << (m_shift+1)), data, mem_mask);
 }
 
 WRITE32_MEMBER(address_map_bank_device::write32)
 {
-	m_program->write_dword(m_offset + (offset * 4), data, mem_mask);
+	m_program->write_dword(m_offset + (offset << (m_shift+2)), data, mem_mask);
 }
 
 WRITE64_MEMBER(address_map_bank_device::write64)
 {
-	m_program->write_qword(m_offset + (offset * 8), data, mem_mask);
+	m_program->write_qword(m_offset + (offset << (m_shift+3)), data, mem_mask);
 }
 
 READ8_MEMBER(address_map_bank_device::read8)
@@ -68,22 +69,22 @@ READ8_MEMBER(address_map_bank_device::read8)
 
 READ16_MEMBER(address_map_bank_device::read16)
 {
-	return m_program->read_word(m_offset + (offset * 2), mem_mask);
+	return m_program->read_word(m_offset + (offset << (m_shift+1)), mem_mask);
 }
 
 READ32_MEMBER(address_map_bank_device::read32)
 {
-	return m_program->read_dword(m_offset + (offset * 4), mem_mask);
+	return m_program->read_dword(m_offset + (offset << (m_shift+2)), mem_mask);
 }
 
 READ64_MEMBER(address_map_bank_device::read64)
 {
-	return m_program->read_qword(m_offset + (offset * 8), mem_mask);
+	return m_program->read_qword(m_offset + (offset << (m_shift+3)), mem_mask);
 }
 
 void address_map_bank_device::device_config_complete()
 {
-	m_program_config = address_space_config( "program", m_endianness, m_data_width, m_addr_width );
+	m_program_config = address_space_config( "program", m_endianness, m_data_width, m_addr_width, m_shift );
 }
 
 void address_map_bank_device::device_start()

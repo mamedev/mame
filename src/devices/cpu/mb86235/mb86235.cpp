@@ -263,6 +263,9 @@ mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, d
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, -3)
 	, m_dataa_config("data_a", ENDIANNESS_LITTLE, 32, 24, -2, address_map_constructor(FUNC(mb86235_device::internal_abus), this))
 	, m_datab_config("data_b", ENDIANNESS_LITTLE, 32, 10, -2, address_map_constructor(FUNC(mb86235_device::internal_bbus), this))
+	, m_fifoin(*this, finder_base::DUMMY_TAG)
+	, m_fifoout0(*this, finder_base::DUMMY_TAG)
+	, m_fifoout1(*this, finder_base::DUMMY_TAG)
 	, m_cache(CACHE_SIZE + sizeof(mb86235_internal_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
@@ -291,56 +294,4 @@ void mb86235_device::state_string_export(const device_state_entry &entry, std::s
 std::unique_ptr<util::disasm_interface> mb86235_device::create_disassembler()
 {
 	return std::make_unique<mb86235_disassembler>();
-}
-
-
-void mb86235_device::fifoin_w(uint32_t data)
-{
-	if (m_core->fifoin.num >= FIFOIN_SIZE)
-	{
-		fatalerror("fifoin_w: pushing to full fifo");
-	}
-
-	//printf("FIFOIN push %08X\n", data);
-
-	m_core->fifoin.data[m_core->fifoin.wpos] = data;
-
-	m_core->fifoin.wpos++;
-	m_core->fifoin.wpos &= FIFOIN_SIZE-1;
-	m_core->fifoin.num++;
-}
-
-bool mb86235_device::is_fifoin_empty()
-{
-	return m_core->fifoin.num == 0;
-}
-
-bool mb86235_device::is_fifoin_full()
-{
-	return m_core->fifoin.num >= FIFOIN_SIZE;
-}
-
-uint32_t mb86235_device::fifoout0_r()
-{
-	if (m_core->fifoout0.num == 0)
-	{
-		fatalerror("fifoout0_r: reading from empty fifo");
-	}
-
-	uint32_t data = m_core->fifoout0.data[m_core->fifoout0.rpos];
-
-	m_core->fifoout0.rpos++;
-	m_core->fifoout0.rpos &= FIFOOUT0_SIZE - 1;
-	m_core->fifoout0.num--;
-	return data;
-}
-
-bool mb86235_device::is_fifoout0_full()
-{
-	return m_core->fifoout0.num >= FIFOOUT0_SIZE;
-}
-
-bool mb86235_device::is_fifoout0_empty()
-{
-	return m_core->fifoout0.num == 0;
 }

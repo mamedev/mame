@@ -714,9 +714,10 @@ void equites_state::sound_portmap(address_map &map)
 }
 
 
-ADDRESS_MAP_START(equites_state::mcu_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("mcuram") /* main CPU shared RAM */
-ADDRESS_MAP_END
+void equites_state::mcu_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("mcuram"); /* main CPU shared RAM */
+}
 
 
 
@@ -793,7 +794,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gekisou_state, gekisou_unknown_bit_r, nullptr)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gekisou_state, gekisou_unknown_bit_r, nullptr)
 
 	/* this is actually a variable resistor */
 	PORT_START(FRQ_ADJUSTER_TAG)

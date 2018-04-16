@@ -186,27 +186,27 @@ void sh4_base_device::LDTLB(const uint16_t opcode)
 #if 0
 int sign_of(int n)
 {
-	return(m_fr[n] >> 31);
+	return(m_sh2_state->m_fr[n] >> 31);
 }
 
 void zero(int n, int sign)
 {
 	if (sign == 0)
-		m_fr[n] = 0x00000000;
+		m_sh2_state->m_fr[n] = 0x00000000;
 	else
-		m_fr[n] = 0x80000000;
-	if ((m_fpscr & PR) == 1)
-		m_fr[n + 1] = 0x00000000;
+		m_sh2_state->m_fr[n] = 0x80000000;
+	if ((m_sh2_state->m_fpscr & PR) == 1)
+		m_sh2_state->m_fr[n + 1] = 0x00000000;
 }
 
 int data_type_of(int n)
 {
 	uint32_t abs;
 
-	abs = m_fr[n] & 0x7fffffff;
-	if ((m_fpscr & PR) == 0) { /* Single-precision */
+	abs = m_sh2_state->m_fr[n] & 0x7fffffff;
+	if ((m_sh2_state->m_fpscr & PR) == 0) { /* Single-precision */
 		if (abs < 0x00800000) {
-			if (((m_fpscr & DN) == 1) || (abs == 0x00000000)) {
+			if (((m_sh2_state->m_fpscr & DN) == 1) || (abs == 0x00000000)) {
 				if (sign_of(n) == 0) {
 					zero(n, 0);
 					return(SH4_FPU_PZERO);
@@ -237,7 +237,7 @@ int data_type_of(int n)
 	}
 	else { /* Double-precision */
 		if (abs < 0x00100000) {
-			if (((m_fpscr & DN) == 1) || ((abs == 0x00000000) && (m_fr[n + 1] == 0x00000000))) {
+			if (((m_sh2_state->m_fpscr & DN) == 1) || ((abs == 0x00000000) && (m_sh2_state->m_fr[n + 1] == 0x00000000))) {
 				if (sign_of(n) == 0) {
 					zero(n, 0);
 					return(SH4_FPU_PZERO);
@@ -254,7 +254,7 @@ int data_type_of(int n)
 			if (abs < 0x7ff00000)
 				return(SH4_FPU_NORM);
 			else
-				if ((abs == 0x7ff00000) && (m_fr[n + 1] == 0x00000000)) {
+				if ((abs == 0x7ff00000) && (m_sh2_state->m_fr[n + 1] == 0x00000000)) {
 					if (sign_of(n) == 0)
 						return(SH4_FPU_PINF);
 					else
@@ -475,14 +475,14 @@ inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 /*  RTE */
 inline void sh34_base_device::RTE()
 {
-	m_sh2_state->m_delay = m_sh2_state->ea = m_spc;
+	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->m_spc;
 
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
-	if ((m_ssr & sRB) != (m_sh2_state->sr & sRB))
-		sh4_change_register_bank(m_ssr & sRB ? 1 : 0);
+	if ((m_sh2_state->m_ssr & sRB) != (m_sh2_state->sr & sRB))
+		sh4_change_register_bank(m_sh2_state->m_ssr & sRB ? 1 : 0);
 
-	m_sh2_state->sr = m_ssr;
+	m_sh2_state->sr = m_sh2_state->m_ssr;
 	m_sh2_state->icount--;
 	sh4_exception_recompute();
 }
@@ -501,10 +501,10 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 		m_sh3internal_upper[SH3_TRA_ADDR] = imm << 2;
 	}
 
-	m_ssr = m_sh2_state->sr;
-	m_spc = m_sh2_state->pc;
+	m_sh2_state->m_ssr = m_sh2_state->sr;
+	m_sh2_state->m_spc = m_sh2_state->pc;
 
-	m_sgr = m_sh2_state->r[15];
+	m_sh2_state->m_sgr = m_sh2_state->r[15];
 
 	m_sh2_state->sr |= MD;
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
@@ -534,7 +534,7 @@ inline void sh34_base_device::STCRBANK(const uint16_t opcode)
 {
 	uint32_t m = Rm;
 
-	m_sh2_state->r[Rn] = m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7];
+	m_sh2_state->r[Rn] = m_sh2_state->m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7];
 }
 
 /*  STCMRBANK   Rm_BANK,@-Rn */
@@ -544,7 +544,7 @@ inline void sh34_base_device::STCMRBANK(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7]);
+	WL(m_sh2_state->ea, m_sh2_state->m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7]);
 	m_sh2_state->icount--;
 }
 
@@ -555,7 +555,7 @@ inline void sh34_base_device::STCMSGR(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_sgr);
+	WL(m_sh2_state->ea, m_sh2_state->m_sgr);
 }
 
 /*  STS.L   FPUL,@-Rn */
@@ -565,7 +565,7 @@ inline void sh34_base_device::STSMFPUL(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_fpul);
+	WL(m_sh2_state->ea, m_sh2_state->m_fpul);
 }
 
 /*  STS.L   FPSCR,@-Rn */
@@ -575,7 +575,7 @@ inline void sh34_base_device::STSMFPSCR(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_fpscr & 0x003FFFFF);
+	WL(m_sh2_state->ea, m_sh2_state->m_fpscr & 0x003FFFFF);
 }
 
 /*  STC.L   DBR,@-Rn */
@@ -585,7 +585,7 @@ inline void sh34_base_device::STCMDBR(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_dbr);
+	WL(m_sh2_state->ea, m_sh2_state->m_dbr);
 }
 
 /*  STC.L   SSR,@-Rn */
@@ -595,7 +595,7 @@ inline void sh34_base_device::STCMSSR(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_ssr);
+	WL(m_sh2_state->ea, m_sh2_state->m_ssr);
 }
 
 /*  STC.L   SPC,@-Rn */
@@ -605,14 +605,14 @@ inline void sh34_base_device::STCMSPC(const uint16_t opcode)
 
 	m_sh2_state->r[n] -= 4;
 	m_sh2_state->ea = m_sh2_state->r[n];
-	WL(m_sh2_state->ea, m_spc);
+	WL(m_sh2_state->ea, m_sh2_state->m_spc);
 }
 
 /*  LDS.L   @Rm+,FPUL */
 inline void sh34_base_device::LDSMFPUL(const uint16_t opcode)
 {
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_fpul = RL(m_sh2_state->ea);
+	m_sh2_state->m_fpul = RL(m_sh2_state->ea);
 	m_sh2_state->r[Rn] += 4;
 }
 
@@ -621,26 +621,26 @@ inline void sh34_base_device::LDSMFPSCR(const uint16_t opcode)
 {
 	uint32_t s;
 
-	s = m_fpscr;
+	s = m_sh2_state->m_fpscr;
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_fpscr = RL(m_sh2_state->ea);
-	m_fpscr &= 0x003FFFFF;
+	m_sh2_state->m_fpscr = RL(m_sh2_state->ea);
+	m_sh2_state->m_fpscr &= 0x003FFFFF;
 	m_sh2_state->r[Rn] += 4;
-	if ((s & FR) != (m_fpscr & FR))
+	if ((s & FR) != (m_sh2_state->m_fpscr & FR))
 		sh4_swap_fp_registers();
 #ifdef LSB_FIRST
-	if ((s & PR) != (m_fpscr & PR))
+	if ((s & PR) != (m_sh2_state->m_fpscr & PR))
 		sh4_swap_fp_couples();
 #endif
-	m_fpu_sz = (m_fpscr & SZ) ? 1 : 0;
-	m_fpu_pr = (m_fpscr & PR) ? 1 : 0;
+	m_sh2_state->m_fpu_sz = (m_sh2_state->m_fpscr & SZ) ? 1 : 0;
+	m_sh2_state->m_fpu_pr = (m_sh2_state->m_fpscr & PR) ? 1 : 0;
 }
 
 /*  LDC.L   @Rm+,DBR */
 inline void sh34_base_device::LDCMDBR(const uint16_t opcode)
 {
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_dbr = RL(m_sh2_state->ea);
+	m_sh2_state->m_dbr = RL(m_sh2_state->ea);
 	m_sh2_state->r[Rn] += 4;
 }
 
@@ -650,7 +650,7 @@ inline void sh34_base_device::LDCMRBANK(const uint16_t opcode)
 	uint32_t m = Rm; uint32_t n = Rn;
 
 	m_sh2_state->ea = m_sh2_state->r[n];
-	m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7] = RL(m_sh2_state->ea);
+	m_sh2_state->m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7] = RL(m_sh2_state->ea);
 	m_sh2_state->r[n] += 4;
 }
 
@@ -658,7 +658,7 @@ inline void sh34_base_device::LDCMRBANK(const uint16_t opcode)
 inline void sh34_base_device::LDCMSSR(const uint16_t opcode)
 {
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_ssr = RL(m_sh2_state->ea);
+	m_sh2_state->m_ssr = RL(m_sh2_state->ea);
 	m_sh2_state->r[Rn] += 4;
 }
 
@@ -666,14 +666,14 @@ inline void sh34_base_device::LDCMSSR(const uint16_t opcode)
 inline void sh34_base_device::LDCMSPC(const uint16_t opcode)
 {
 	m_sh2_state->ea = m_sh2_state->r[Rn];
-	m_spc = RL(m_sh2_state->ea);
+	m_sh2_state->m_spc = RL(m_sh2_state->ea);
 	m_sh2_state->r[Rn] += 4;
 }
 
 /*  LDS     Rm,FPUL */
 inline void sh34_base_device::LDSFPUL(const uint16_t opcode)
 {
-	m_fpul = m_sh2_state->r[Rn];
+	m_sh2_state->m_fpul = m_sh2_state->r[Rn];
 }
 
 /*  LDS     Rm,FPSCR */
@@ -681,59 +681,59 @@ inline void sh34_base_device::LDSFPSCR(const uint16_t opcode)
 {
 	uint32_t s;
 
-	s = m_fpscr;
-	m_fpscr = m_sh2_state->r[Rn] & 0x003FFFFF;
-	if ((s & FR) != (m_fpscr & FR))
+	s = m_sh2_state->m_fpscr;
+	m_sh2_state->m_fpscr = m_sh2_state->r[Rn] & 0x003FFFFF;
+	if ((s & FR) != (m_sh2_state->m_fpscr & FR))
 		sh4_swap_fp_registers();
 #ifdef LSB_FIRST
-	if ((s & PR) != (m_fpscr & PR))
+	if ((s & PR) != (m_sh2_state->m_fpscr & PR))
 		sh4_swap_fp_couples();
 #endif
-	m_fpu_sz = (m_fpscr & SZ) ? 1 : 0;
-	m_fpu_pr = (m_fpscr & PR) ? 1 : 0;
+	m_sh2_state->m_fpu_sz = (m_sh2_state->m_fpscr & SZ) ? 1 : 0;
+	m_sh2_state->m_fpu_pr = (m_sh2_state->m_fpscr & PR) ? 1 : 0;
 }
 
 /*  LDC     Rm,DBR */
 inline void sh34_base_device::LDCDBR(const uint16_t opcode)
 {
-	m_dbr = m_sh2_state->r[Rn];
+	m_sh2_state->m_dbr = m_sh2_state->r[Rn];
 }
 
 
 /*  STC     SSR,Rn */
 inline void sh34_base_device::STCSSR(const uint16_t opcode)
 {
-	m_sh2_state->r[Rn] = m_ssr;
+	m_sh2_state->r[Rn] = m_sh2_state->m_ssr;
 }
 
 /*  STC     SPC,Rn */
 inline void sh34_base_device::STCSPC(const uint16_t opcode)
 {
-	m_sh2_state->r[Rn] = m_spc;
+	m_sh2_state->r[Rn] = m_sh2_state->m_spc;
 }
 
 /*  STC     SGR,Rn */
 inline void sh34_base_device::STCSGR(const uint16_t opcode)
 {
-	m_sh2_state->r[Rn] = m_sgr;
+	m_sh2_state->r[Rn] = m_sh2_state->m_sgr;
 }
 
 /*  STS     FPUL,Rn */
 inline void sh34_base_device::STSFPUL(const uint16_t opcode)
 {
-	m_sh2_state->r[Rn] = m_fpul;
+	m_sh2_state->r[Rn] = m_sh2_state->m_fpul;
 }
 
 /*  STS     FPSCR,Rn */
 inline void sh34_base_device::STSFPSCR(const uint16_t opcode)
 {
-	m_sh2_state->r[Rn] = m_fpscr & 0x003FFFFF;
+	m_sh2_state->r[Rn] = m_sh2_state->m_fpscr & 0x003FFFFF;
 }
 
 /*  STC     DBR,Rn */
 inline void sh34_base_device::STCDBR(const uint16_t opcode)
 {
-	m_sh2_state->r[Rn] = m_dbr;
+	m_sh2_state->r[Rn] = m_sh2_state->m_dbr;
 }
 
 /*  SHAD    Rm,Rn */
@@ -771,19 +771,19 @@ inline void sh34_base_device::LDCRBANK(const uint16_t opcode)
 {
 	uint32_t m = Rm;
 
-	m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7] = m_sh2_state->r[Rn];
+	m_sh2_state->m_rbnk[m_sh2_state->sr&sRB ? 0 : 1][m & 7] = m_sh2_state->r[Rn];
 }
 
 /*  LDC     Rm,SSR */
 inline void sh34_base_device::LDCSSR(const uint16_t opcode)
 {
-	m_ssr = m_sh2_state->r[Rn];
+	m_sh2_state->m_ssr = m_sh2_state->r[Rn];
 }
 
 /*  LDC     Rm,SPC */
 inline void sh34_base_device::LDCSPC(const uint16_t opcode)
 {
-	m_spc = m_sh2_state->r[Rn];
+	m_sh2_state->m_spc = m_sh2_state->r[Rn];
 }
 
 /*  PREF     @Rn */
@@ -855,35 +855,35 @@ inline void sh34_base_device::FMOVMRIFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz) { /* SZ = 1 */
+	if (m_sh2_state->m_fpu_sz) { /* SZ = 1 */
 		if (n & 1) {
 			n &= 14;
 #ifdef LSB_FIRST
-			n ^= m_fpu_pr;
+			n ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[m];
-			m_xf[n] = RL(m_sh2_state->ea);
+			m_sh2_state->m_xf[n] = RL(m_sh2_state->ea);
 			m_sh2_state->r[m] += 4;
-			m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
+			m_sh2_state->m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
 			m_sh2_state->r[m] += 4;
 		}
 		else {
 #ifdef LSB_FIRST
-			n ^= m_fpu_pr;
+			n ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[m];
-			m_fr[n] = RL(m_sh2_state->ea);
+			m_sh2_state->m_fr[n] = RL(m_sh2_state->ea);
 			m_sh2_state->r[m] += 4;
-			m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
+			m_sh2_state->m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
 			m_sh2_state->r[m] += 4;
 		}
 	}
 	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[m];
 #ifdef LSB_FIRST
-		n ^= m_fpu_pr;
+		n ^= m_sh2_state->m_fpu_pr;
 #endif
-		m_fr[n] = RL(m_sh2_state->ea);
+		m_sh2_state->m_fr[n] = RL(m_sh2_state->ea);
 		m_sh2_state->r[m] += 4;
 	}
 }
@@ -896,31 +896,31 @@ inline void sh34_base_device::FMOVFRMR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz) { /* SZ = 1 */
+	if (m_sh2_state->m_fpu_sz) { /* SZ = 1 */
 		if (m & 1) {
 			m &= 14;
 #ifdef LSB_FIRST
-			m ^= m_fpu_pr;
+			m ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[n];
-			WL(m_sh2_state->ea, m_xf[m]);
-			WL(m_sh2_state->ea + 4, m_xf[m ^ 1]);
+			WL(m_sh2_state->ea, m_sh2_state->m_xf[m]);
+			WL(m_sh2_state->ea + 4, m_sh2_state->m_xf[m ^ 1]);
 		}
 		else {
 #ifdef LSB_FIRST
-			m ^= m_fpu_pr;
+			m ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[n];
-			WL(m_sh2_state->ea, m_fr[m]);
-			WL(m_sh2_state->ea + 4, m_fr[m ^ 1]);
+			WL(m_sh2_state->ea, m_sh2_state->m_fr[m]);
+			WL(m_sh2_state->ea + 4, m_sh2_state->m_fr[m ^ 1]);
 		}
 	}
 	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[n];
 #ifdef LSB_FIRST
-		m ^= m_fpu_pr;
+		m ^= m_sh2_state->m_fpu_pr;
 #endif
-		WL(m_sh2_state->ea, m_fr[m]);
+		WL(m_sh2_state->ea, m_sh2_state->m_fr[m]);
 	}
 }
 
@@ -932,34 +932,34 @@ inline void sh34_base_device::FMOVFRMDR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz) { /* SZ = 1 */
+	if (m_sh2_state->m_fpu_sz) { /* SZ = 1 */
 		if (m & 1) {
 			m &= 14;
 #ifdef LSB_FIRST
-			m ^= m_fpu_pr;
+			m ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->r[n] -= 8;
 			m_sh2_state->ea = m_sh2_state->r[n];
-			WL(m_sh2_state->ea, m_xf[m]);
-			WL(m_sh2_state->ea + 4, m_xf[m ^ 1]);
+			WL(m_sh2_state->ea, m_sh2_state->m_xf[m]);
+			WL(m_sh2_state->ea + 4, m_sh2_state->m_xf[m ^ 1]);
 		}
 		else {
 #ifdef LSB_FIRST
-			m ^= m_fpu_pr;
+			m ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->r[n] -= 8;
 			m_sh2_state->ea = m_sh2_state->r[n];
-			WL(m_sh2_state->ea, m_fr[m]);
-			WL(m_sh2_state->ea + 4, m_fr[m ^ 1]);
+			WL(m_sh2_state->ea, m_sh2_state->m_fr[m]);
+			WL(m_sh2_state->ea + 4, m_sh2_state->m_fr[m ^ 1]);
 		}
 	}
 	else {              /* SZ = 0 */
 		m_sh2_state->r[n] -= 4;
 		m_sh2_state->ea = m_sh2_state->r[n];
 #ifdef LSB_FIRST
-		m ^= m_fpu_pr;
+		m ^= m_sh2_state->m_fpu_pr;
 #endif
-		WL(m_sh2_state->ea, m_fr[m]);
+		WL(m_sh2_state->ea, m_sh2_state->m_fr[m]);
 	}
 }
 
@@ -971,31 +971,31 @@ inline void sh34_base_device::FMOVFRS0(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz) { /* SZ = 1 */
+	if (m_sh2_state->m_fpu_sz) { /* SZ = 1 */
 		if (m & 1) {
 			m &= 14;
 #ifdef LSB_FIRST
-			m ^= m_fpu_pr;
+			m ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[n];
-			WL(m_sh2_state->ea, m_xf[m]);
-			WL(m_sh2_state->ea + 4, m_xf[m ^ 1]);
+			WL(m_sh2_state->ea, m_sh2_state->m_xf[m]);
+			WL(m_sh2_state->ea + 4, m_sh2_state->m_xf[m ^ 1]);
 		}
 		else {
 #ifdef LSB_FIRST
-			m ^= m_fpu_pr;
+			m ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[n];
-			WL(m_sh2_state->ea, m_fr[m]);
-			WL(m_sh2_state->ea + 4, m_fr[m ^ 1]);
+			WL(m_sh2_state->ea, m_sh2_state->m_fr[m]);
+			WL(m_sh2_state->ea + 4, m_sh2_state->m_fr[m ^ 1]);
 		}
 	}
 	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[n];
 #ifdef LSB_FIRST
-		m ^= m_fpu_pr;
+		m ^= m_sh2_state->m_fpu_pr;
 #endif
-		WL(m_sh2_state->ea, m_fr[m]);
+		WL(m_sh2_state->ea, m_sh2_state->m_fr[m]);
 	}
 }
 
@@ -1007,31 +1007,31 @@ inline void sh34_base_device::FMOVS0FR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz) { /* SZ = 1 */
+	if (m_sh2_state->m_fpu_sz) { /* SZ = 1 */
 		if (n & 1) {
 			n &= 14;
 #ifdef LSB_FIRST
-			n ^= m_fpu_pr;
+			n ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[m];
-			m_xf[n] = RL(m_sh2_state->ea);
-			m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
+			m_sh2_state->m_xf[n] = RL(m_sh2_state->ea);
+			m_sh2_state->m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
 		}
 		else {
 #ifdef LSB_FIRST
-			n ^= m_fpu_pr;
+			n ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[m];
-			m_fr[n] = RL(m_sh2_state->ea);
-			m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
+			m_sh2_state->m_fr[n] = RL(m_sh2_state->ea);
+			m_sh2_state->m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
 		}
 	}
 	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[0] + m_sh2_state->r[m];
 #ifdef LSB_FIRST
-		n ^= m_fpu_pr;
+		n ^= m_sh2_state->m_fpu_pr;
 #endif
-		m_fr[n] = RL(m_sh2_state->ea);
+		m_sh2_state->m_fr[n] = RL(m_sh2_state->ea);
 	}
 }
 
@@ -1044,31 +1044,31 @@ inline void sh34_base_device::FMOVMRFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz) { /* SZ = 1 */
+	if (m_sh2_state->m_fpu_sz) { /* SZ = 1 */
 		if (n & 1) {
 			n &= 14;
 #ifdef LSB_FIRST
-			n ^= m_fpu_pr;
+			n ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[m];
-			m_xf[n] = RL(m_sh2_state->ea);
-			m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
+			m_sh2_state->m_xf[n] = RL(m_sh2_state->ea);
+			m_sh2_state->m_xf[n ^ 1] = RL(m_sh2_state->ea + 4);
 		}
 		else {
 #ifdef LSB_FIRST
-			n ^= m_fpu_pr;
+			n ^= m_sh2_state->m_fpu_pr;
 #endif
 			m_sh2_state->ea = m_sh2_state->r[m];
-			m_fr[n] = RL(m_sh2_state->ea);
-			m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
+			m_sh2_state->m_fr[n] = RL(m_sh2_state->ea);
+			m_sh2_state->m_fr[n ^ 1] = RL(m_sh2_state->ea + 4);
 		}
 	}
 	else {              /* SZ = 0 */
 		m_sh2_state->ea = m_sh2_state->r[m];
 #ifdef LSB_FIRST
-		n ^= m_fpu_pr;
+		n ^= m_sh2_state->m_fpu_pr;
 #endif
-		m_fr[n] = RL(m_sh2_state->ea);
+		m_sh2_state->m_fr[n] = RL(m_sh2_state->ea);
 	}
 }
 
@@ -1081,32 +1081,32 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_sz == 0) {  /* SZ = 0 */
+	if (m_sh2_state->m_fpu_sz == 0) {  /* SZ = 0 */
 #ifdef LSB_FIRST
-		n ^= m_fpu_pr;
-		m ^= m_fpu_pr;
+		n ^= m_sh2_state->m_fpu_pr;
+		m ^= m_sh2_state->m_fpu_pr;
 #endif
-		m_fr[n] = m_fr[m];
+		m_sh2_state->m_fr[n] = m_sh2_state->m_fr[m];
 	}
 	else { /* SZ = 1 */
 		if (m & 1) {
 			if (n & 1) {
-				m_xf[n & 14] = m_xf[m & 14];
-				m_xf[n | 1] = m_xf[m | 1];
+				m_sh2_state->m_xf[n & 14] = m_sh2_state->m_xf[m & 14];
+				m_sh2_state->m_xf[n | 1] = m_sh2_state->m_xf[m | 1];
 			}
 			else {
-				m_fr[n] = m_xf[m & 14];
-				m_fr[n | 1] = m_xf[m | 1];
+				m_sh2_state->m_fr[n] = m_sh2_state->m_xf[m & 14];
+				m_sh2_state->m_fr[n | 1] = m_sh2_state->m_xf[m | 1];
 			}
 		}
 		else {
 			if (n & 1) {
-				m_xf[n & 14] = m_fr[m];
-				m_xf[n | 1] = m_fr[m | 1]; // (a&14)+1 -> a|1
+				m_sh2_state->m_xf[n & 14] = m_sh2_state->m_fr[m];
+				m_sh2_state->m_xf[n | 1] = m_sh2_state->m_fr[m | 1]; // (a&14)+1 -> a|1
 			}
 			else {
-				m_fr[n] = m_fr[m];
-				m_fr[n | 1] = m_fr[m | 1];
+				m_sh2_state->m_fr[n] = m_sh2_state->m_fr[m];
+				m_sh2_state->m_fr[n | 1] = m_sh2_state->m_fr[m | 1];
 			}
 		}
 	}
@@ -1116,9 +1116,9 @@ inline void sh34_base_device::FMOVFR(const uint16_t opcode)
 inline void sh34_base_device::FLDI1(const uint16_t opcode)
 {
 #ifdef LSB_FIRST
-	m_fr[Rn ^ m_fpu_pr] = 0x3F800000;
+	m_sh2_state->m_fr[Rn ^ m_sh2_state->m_fpu_pr] = 0x3F800000;
 #else
-	m_fr[Rn] = 0x3F800000;
+	m_sh2_state->m_fr[Rn] = 0x3F800000;
 #endif
 }
 
@@ -1126,9 +1126,9 @@ inline void sh34_base_device::FLDI1(const uint16_t opcode)
 inline void sh34_base_device::FLDI0(const uint16_t opcode)
 {
 #ifdef LSB_FIRST
-	m_fr[Rn ^ m_fpu_pr] = 0;
+	m_sh2_state->m_fr[Rn ^ m_sh2_state->m_fpu_pr] = 0;
 #else
-	m_fr[Rn] = 0;
+	m_sh2_state->m_fr[Rn] = 0;
 #endif
 }
 
@@ -1136,9 +1136,9 @@ inline void sh34_base_device::FLDI0(const uint16_t opcode)
 inline void sh34_base_device::FLDS(const uint16_t opcode)
 {
 #ifdef LSB_FIRST
-	m_fpul = m_fr[Rn ^ m_fpu_pr];
+	m_sh2_state->m_fpul = m_sh2_state->m_fr[Rn ^ m_sh2_state->m_fpu_pr];
 #else
-	m_fpul = m_fr[Rn];
+	m_sh2_state->m_fpul = m_sh2_state->m_fr[Rn];
 #endif
 }
 
@@ -1146,24 +1146,24 @@ inline void sh34_base_device::FLDS(const uint16_t opcode)
 inline void sh34_base_device::FSTS(const uint16_t opcode)
 {
 #ifdef LSB_FIRST
-	m_fr[Rn ^ m_fpu_pr] = m_fpul;
+	m_sh2_state->m_fr[Rn ^ m_sh2_state->m_fpu_pr] = m_sh2_state->m_fpul;
 #else
-	m_fr[Rn] = m_fpul;
+	m_sh2_state->m_fr[Rn] = m_sh2_state->m_fpul;
 #endif
 }
 
 /* FRCHG 1111101111111101 */
 void sh34_base_device::FRCHG()
 {
-	m_fpscr ^= FR;
+	m_sh2_state->m_fpscr ^= FR;
 	sh4_swap_fp_registers();
 }
 
 /* FSCHG 1111001111111101 */
 void sh34_base_device::FSCHG()
 {
-	m_fpscr ^= SZ;
-	m_fpu_sz = (m_fpscr & SZ) ? 1 : 0;
+	m_sh2_state->m_fpscr ^= SZ;
+	m_sh2_state->m_fpu_sz = (m_sh2_state->m_fpscr & SZ) ? 1 : 0;
 }
 
 /* FTRC FRm,FPUL PR=0 1111mmmm00111101 */
@@ -1172,16 +1172,16 @@ inline void sh34_base_device::FTRC(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		if (n & 1)
 			fatalerror("SH-4: FTRC opcode used with n %d", n);
 
 		n = n & 14;
-		*((int32_t *)&m_fpul) = (int32_t)FP_RFD(n);
+		*((int32_t *)&m_sh2_state->m_fpul) = (int32_t)FP_RFD(n);
 	}
 	else {              /* PR = 0 */
-	 /* read m_fr[n] as float -> truncate -> fpul(32) */
-		*((int32_t *)&m_fpul) = (int32_t)FP_RFS(n);
+	 /* read m_sh2_state->m_fr[n] as float -> truncate -> fpul(32) */
+		*((int32_t *)&m_sh2_state->m_fpul) = (int32_t)FP_RFS(n);
 	}
 }
 
@@ -1191,15 +1191,15 @@ inline void sh34_base_device::FLOAT(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		if (n & 1)
 			fatalerror("SH-4: FLOAT opcode used with n %d", n);
 
 		n = n & 14;
-		FP_RFD(n) = (double)*((int32_t *)&m_fpul);
+		FP_RFD(n) = (double)*((int32_t *)&m_sh2_state->m_fpul);
 	}
 	else {              /* PR = 0 */
-		FP_RFS(n) = (float)*((int32_t *)&m_fpul);
+		FP_RFS(n) = (float)*((int32_t *)&m_sh2_state->m_fpul);
 	}
 }
 
@@ -1209,7 +1209,7 @@ inline void sh34_base_device::FNEG(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		FP_RFD(n) = -FP_RFD(n);
 	}
 	else {              /* PR = 0 */
@@ -1223,17 +1223,17 @@ inline void sh34_base_device::FABS(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 #ifdef LSB_FIRST
 		n = n | 1; // n & 14 + 1
-		m_fr[n] = m_fr[n] & 0x7fffffff;
+		m_sh2_state->m_fr[n] = m_sh2_state->m_fr[n] & 0x7fffffff;
 #else
 		n = n & 14;
-		m_fr[n] = m_fr[n] & 0x7fffffff;
+		m_sh2_state->m_fr[n] = m_sh2_state->m_fr[n] & 0x7fffffff;
 #endif
 	}
 	else {              /* PR = 0 */
-		m_fr[n] = m_fr[n] & 0x7fffffff;
+		m_sh2_state->m_fr[n] = m_sh2_state->m_fr[n] & 0x7fffffff;
 	}
 }
 
@@ -1243,7 +1243,7 @@ inline void sh34_base_device::FCMP_EQ(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		m = m & 14;
 		if (FP_RFD(n) == FP_RFD(m))
@@ -1265,7 +1265,7 @@ inline void sh34_base_device::FCMP_GT(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		m = m & 14;
 		if (FP_RFD(n) > FP_RFD(m))
@@ -1286,11 +1286,11 @@ inline void sh34_base_device::FCNVDS(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
-		if (m_fpscr & RM)
-			m_fr[n | NATIVE_ENDIAN_VALUE_LE_BE(0, 1)] &= 0xe0000000; /* round toward zero*/
-		*((float *)&m_fpul) = (float)FP_RFD(n);
+		if (m_sh2_state->m_fpscr & RM)
+			m_sh2_state->m_fr[n | NATIVE_ENDIAN_VALUE_LE_BE(0, 1)] &= 0xe0000000; /* round toward zero*/
+		*((float *)&m_sh2_state->m_fpul) = (float)FP_RFD(n);
 	}
 }
 
@@ -1299,9 +1299,9 @@ inline void sh34_base_device::FCNVSD(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
-		FP_RFD(n) = (double)*((float *)&m_fpul);
+		FP_RFD(n) = (double)*((float *)&m_sh2_state->m_fpul);
 	}
 }
 
@@ -1311,7 +1311,7 @@ inline void sh34_base_device::FADD(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		m = m & 14;
 		FP_RFD(n) = FP_RFD(n) + FP_RFD(m);
@@ -1327,7 +1327,7 @@ inline void sh34_base_device::FSUB(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		m = m & 14;
 		FP_RFD(n) = FP_RFD(n) - FP_RFD(m);
@@ -1344,7 +1344,7 @@ inline void sh34_base_device::FMUL(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		m = m & 14;
 		FP_RFD(n) = FP_RFD(n) * FP_RFD(m);
@@ -1360,7 +1360,7 @@ inline void sh34_base_device::FDIV(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		m = m & 14;
 		if (FP_RFD(m) == 0)
@@ -1379,7 +1379,7 @@ inline void sh34_base_device::FMAC(const uint16_t opcode)
 {
 	uint32_t m = Rm; uint32_t n = Rn;
 
-	if (m_fpu_pr == 0) { /* PR = 0 */
+	if (m_sh2_state->m_fpu_pr == 0) { /* PR = 0 */
 		FP_RFS(n) = (FP_RFS(0) * FP_RFS(m)) + FP_RFS(n);
 	}
 }
@@ -1390,7 +1390,7 @@ inline void sh34_base_device::FSQRT(const uint16_t opcode)
 {
 	uint32_t n = Rn;
 
-	if (m_fpu_pr) { /* PR = 1 */
+	if (m_sh2_state->m_fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		if (FP_RFD(n) < 0)
 			return;
@@ -1420,7 +1420,7 @@ void sh34_base_device::FSSCA(const uint16_t opcode)
 
 	float angle;
 
-	angle = (((float)(m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * (float)M_PI;
+	angle = (((float)(m_sh2_state->m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * (float)M_PI;
 	FP_RFS(n) = sinf(angle);
 	FP_RFS(n + 1) = cosf(angle);
 }
@@ -1521,24 +1521,24 @@ inline void sh34_base_device::op1111_0x13(uint16_t opcode)
 
 void sh34_base_device::device_reset()
 {
-	m_spc = 0;
+	m_sh2_state->m_spc = 0;
 	m_sh2_state->pr = 0;
 	m_sh2_state->sr = 0;
-	m_ssr = 0;
+	m_sh2_state->m_ssr = 0;
 	m_sh2_state->gbr = 0;
 	m_sh2_state->vbr = 0;
 	m_sh2_state->mach = 0;
 	m_sh2_state->macl = 0;
 	memset(m_sh2_state->r, 0, sizeof(m_sh2_state->r));
-	memset(m_rbnk, 0, sizeof(m_rbnk));
-	m_sgr = 0;
-	memset(m_fr, 0, sizeof(m_fr));
-	memset(m_xf, 0, sizeof(m_xf));
+	memset(m_sh2_state->m_rbnk, 0, sizeof(m_sh2_state->m_rbnk));
+	m_sh2_state->m_sgr = 0;
+	memset(m_sh2_state->m_fr, 0, sizeof(m_sh2_state->m_fr));
+	memset(m_sh2_state->m_xf, 0, sizeof(m_sh2_state->m_xf));
 	m_sh2_state->ea = 0;
 	m_sh2_state->m_delay = 0;
-	m_cpu_off = 0;
-	m_pending_irq = 0;
-	m_test_irq = 0;
+	m_sh2_state->m_cpu_off = 0;
+	m_sh2_state->m_pending_irq = 0;
+	m_sh2_state->m_test_irq = 0;
 	memset(m_exception_priority, 0, sizeof(m_exception_priority));
 	memset(m_exception_requesting, 0, sizeof(m_exception_requesting));
 	memset(m_m, 0, sizeof(m_m));
@@ -1577,7 +1577,7 @@ void sh34_base_device::device_reset()
 	m_SH4_DMATCR3 = 0;
 	m_SH4_DMAOR = 0;
 	m_nmi_line_state = 0;
-	m_frt_input = 0;
+	m_sh2_state->m_frt_input = 0;
 	m_internal_irq_vector = 0;
 	m_refresh_timer_base = 0;
 	memset(m_dma_timer_active, 0, sizeof(m_dma_timer_active));
@@ -1598,14 +1598,14 @@ void sh34_base_device::device_reset()
 	m_rtc_timer->adjust(attotime::from_hz(128));
 
 	m_sh2_state->pc = 0xa0000000;
-	m_ppc = m_sh2_state->pc & SH34_AM;
+	m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
 	m_sh2_state->r[15] = RL(4);
 	m_sh2_state->sr = 0x700000f0;
-	m_fpscr = 0x00040001;
-	m_fpu_sz = (m_fpscr & SZ) ? 1 : 0;
-	m_fpu_pr = (m_fpscr & PR) ? 1 : 0;
-	m_fpul = 0;
-	m_dbr = 0;
+	m_sh2_state->m_fpscr = 0x00040001;
+	m_sh2_state->m_fpu_sz = (m_sh2_state->m_fpscr & SZ) ? 1 : 0;
+	m_sh2_state->m_fpu_pr = (m_sh2_state->m_fpscr & PR) ? 1 : 0;
+	m_sh2_state->m_fpul = 0;
+	m_sh2_state->m_dbr = 0;
 
 	m_internal_irq_level = -1;
 	m_irln = 15;
@@ -1871,7 +1871,7 @@ void sh34_base_device::execute_run()
 		return;
 	}
 
-	if (m_cpu_off)
+	if (m_sh2_state->m_cpu_off)
 	{
 		m_sh2_state->icount = 0;
 		return;
@@ -1879,7 +1879,7 @@ void sh34_base_device::execute_run()
 
 	do
 	{
-		m_ppc = m_sh2_state->pc & SH34_AM;
+		m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
 		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
 
 		uint16_t opcode;
@@ -1897,7 +1897,7 @@ void sh34_base_device::execute_run()
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_sh2_state->m_delay)
+		if (m_sh2_state->m_test_irq && !m_sh2_state->m_delay)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
@@ -1914,7 +1914,7 @@ void sh3be_device::execute_run()
 		return;
 	}
 
-	if (m_cpu_off)
+	if (m_sh2_state->m_cpu_off)
 	{
 		m_sh2_state->icount = 0;
 		return;
@@ -1922,7 +1922,7 @@ void sh3be_device::execute_run()
 
 	do
 	{
-		m_ppc = m_sh2_state->pc & SH34_AM;
+		m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
 		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
 
 		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
@@ -1937,7 +1937,7 @@ void sh3be_device::execute_run()
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_sh2_state->m_delay)
+		if (m_sh2_state->m_test_irq && !m_sh2_state->m_delay)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
@@ -1954,7 +1954,7 @@ void sh4be_device::execute_run()
 		return;
 	}
 
-	if (m_cpu_off)
+	if (m_sh2_state->m_cpu_off)
 	{
 		m_sh2_state->icount = 0;
 		return;
@@ -1962,7 +1962,7 @@ void sh4be_device::execute_run()
 
 	do
 	{
-		m_ppc = m_sh2_state->pc & SH34_AM;
+		m_sh2_state->m_ppc = m_sh2_state->pc & SH34_AM;
 		debugger_instruction_hook(m_sh2_state->pc & SH34_AM);
 
 		const uint16_t opcode = m_direct->read_word(m_sh2_state->pc & SH34_AM, WORD_XOR_LE(6));
@@ -1977,7 +1977,7 @@ void sh4be_device::execute_run()
 
 		execute_one(opcode);
 
-		if (m_test_irq && !m_sh2_state->m_delay)
+		if (m_sh2_state->m_test_irq && !m_sh2_state->m_delay)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
@@ -2059,22 +2059,22 @@ void sh34_base_device::device_start()
 	m_direct = m_program->direct<0>();
 	sh4_default_exception_priorities();
 	m_irln = 15;
-	m_test_irq = 0;
+	m_sh2_state->m_test_irq = 0;
 
 
-	save_item(NAME(m_spc));
-	save_item(NAME(m_ssr));
-	save_item(NAME(m_sgr));
-	save_item(NAME(m_fpscr));
-	save_item(NAME(m_rbnk));
-	save_item(NAME(m_fr));
-	save_item(NAME(m_xf));
+	save_item(NAME(m_sh2_state->m_spc));
+	save_item(NAME(m_sh2_state->m_ssr));
+	save_item(NAME(m_sh2_state->m_sgr));
+	save_item(NAME(m_sh2_state->m_fpscr));
+	save_item(NAME(m_sh2_state->m_rbnk));
+	save_item(NAME(m_sh2_state->m_fr));
+	save_item(NAME(m_sh2_state->m_xf));
 
-	save_item(NAME(m_cpu_off));
-	save_item(NAME(m_pending_irq));
-	save_item(NAME(m_test_irq));
-	save_item(NAME(m_fpul));
-	save_item(NAME(m_dbr));
+	save_item(NAME(m_sh2_state->m_cpu_off));
+	save_item(NAME(m_sh2_state->m_pending_irq));
+	save_item(NAME(m_sh2_state->m_test_irq));
+	save_item(NAME(m_sh2_state->m_fpul));
+	save_item(NAME(m_sh2_state->m_dbr));
 	save_item(NAME(m_exception_priority));
 	save_item(NAME(m_exception_requesting));
 	save_item(NAME(m_irq_line_state));
@@ -2108,7 +2108,7 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_SH4_DMAOR));
 	save_item(NAME(m_nmi_line_state));
 
-	save_item(NAME(m_frt_input));
+	save_item(NAME(m_sh2_state->m_frt_input));
 	save_item(NAME(m_irln));
 	save_item(NAME(m_internal_irq_level));
 	save_item(NAME(m_internal_irq_vector));
@@ -2123,8 +2123,8 @@ void sh34_base_device::device_start()
 	save_item(NAME(m_dma_mode));
 
 
-	save_item(NAME(m_fpu_sz));
-	save_item(NAME(m_fpu_pr));
+	save_item(NAME(m_sh2_state->m_fpu_sz));
+	save_item(NAME(m_sh2_state->m_fpu_pr));
 	save_item(NAME(m_ioport16_pullup));
 	save_item(NAME(m_ioport16_direction));
 	save_item(NAME(m_ioport4_pullup));
@@ -2136,29 +2136,29 @@ void sh34_base_device::device_start()
 	// Debugger state
 
 
-	state_add(SH4_DBR, "DBR", m_dbr).formatstr("%08X");
+	state_add(SH4_DBR, "DBR", m_sh2_state->m_dbr).formatstr("%08X");
 
-	state_add(SH4_R0_BK0, "R0 BK 0", m_rbnk[0][0]).formatstr("%08X");
-	state_add(SH4_R1_BK0, "R1 BK 0", m_rbnk[0][1]).formatstr("%08X");
-	state_add(SH4_R2_BK0, "R2 BK 0", m_rbnk[0][2]).formatstr("%08X");
-	state_add(SH4_R3_BK0, "R3 BK 0", m_rbnk[0][3]).formatstr("%08X");
-	state_add(SH4_R4_BK0, "R4 BK 0", m_rbnk[0][4]).formatstr("%08X");
-	state_add(SH4_R5_BK0, "R5 BK 0", m_rbnk[0][5]).formatstr("%08X");
-	state_add(SH4_R6_BK0, "R6 BK 0", m_rbnk[0][6]).formatstr("%08X");
-	state_add(SH4_R7_BK0, "R7 BK 0", m_rbnk[0][7]).formatstr("%08X");
-	state_add(SH4_R0_BK1, "R0 BK 1", m_rbnk[1][0]).formatstr("%08X");
-	state_add(SH4_R1_BK1, "R1 BK 1", m_rbnk[1][1]).formatstr("%08X");
-	state_add(SH4_R2_BK1, "R2 BK 1", m_rbnk[1][2]).formatstr("%08X");
-	state_add(SH4_R3_BK1, "R3 BK 1", m_rbnk[1][3]).formatstr("%08X");
-	state_add(SH4_R4_BK1, "R4 BK 1", m_rbnk[1][4]).formatstr("%08X");
-	state_add(SH4_R5_BK1, "R5 BK 1", m_rbnk[1][5]).formatstr("%08X");
-	state_add(SH4_R6_BK1, "R6 BK 1", m_rbnk[1][6]).formatstr("%08X");
-	state_add(SH4_R7_BK1, "R7 BK 1", m_rbnk[1][7]).formatstr("%08X");
-	state_add(SH4_SPC, "SPC", m_spc).formatstr("%08X");
-	state_add(SH4_SSR, "SSR", m_ssr).formatstr("%08X");
-	state_add(SH4_SGR, "SGR", m_sgr).formatstr("%08X");
-	state_add(SH4_FPSCR, "FPSCR", m_fpscr).formatstr("%08X");
-	state_add(SH4_FPUL, "FPUL", m_fpul).formatstr("%08X");
+	state_add(SH4_R0_BK0, "R0 BK 0", m_sh2_state->m_rbnk[0][0]).formatstr("%08X");
+	state_add(SH4_R1_BK0, "R1 BK 0", m_sh2_state->m_rbnk[0][1]).formatstr("%08X");
+	state_add(SH4_R2_BK0, "R2 BK 0", m_sh2_state->m_rbnk[0][2]).formatstr("%08X");
+	state_add(SH4_R3_BK0, "R3 BK 0", m_sh2_state->m_rbnk[0][3]).formatstr("%08X");
+	state_add(SH4_R4_BK0, "R4 BK 0", m_sh2_state->m_rbnk[0][4]).formatstr("%08X");
+	state_add(SH4_R5_BK0, "R5 BK 0", m_sh2_state->m_rbnk[0][5]).formatstr("%08X");
+	state_add(SH4_R6_BK0, "R6 BK 0", m_sh2_state->m_rbnk[0][6]).formatstr("%08X");
+	state_add(SH4_R7_BK0, "R7 BK 0", m_sh2_state->m_rbnk[0][7]).formatstr("%08X");
+	state_add(SH4_R0_BK1, "R0 BK 1", m_sh2_state->m_rbnk[1][0]).formatstr("%08X");
+	state_add(SH4_R1_BK1, "R1 BK 1", m_sh2_state->m_rbnk[1][1]).formatstr("%08X");
+	state_add(SH4_R2_BK1, "R2 BK 1", m_sh2_state->m_rbnk[1][2]).formatstr("%08X");
+	state_add(SH4_R3_BK1, "R3 BK 1", m_sh2_state->m_rbnk[1][3]).formatstr("%08X");
+	state_add(SH4_R4_BK1, "R4 BK 1", m_sh2_state->m_rbnk[1][4]).formatstr("%08X");
+	state_add(SH4_R5_BK1, "R5 BK 1", m_sh2_state->m_rbnk[1][5]).formatstr("%08X");
+	state_add(SH4_R6_BK1, "R6 BK 1", m_sh2_state->m_rbnk[1][6]).formatstr("%08X");
+	state_add(SH4_R7_BK1, "R7 BK 1", m_sh2_state->m_rbnk[1][7]).formatstr("%08X");
+	state_add(SH4_SPC, "SPC", m_sh2_state->m_spc).formatstr("%08X");
+	state_add(SH4_SSR, "SSR", m_sh2_state->m_ssr).formatstr("%08X");
+	state_add(SH4_SGR, "SGR", m_sh2_state->m_sgr).formatstr("%08X");
+	state_add(SH4_FPSCR, "FPSCR", m_sh2_state->m_fpscr).formatstr("%08X");
+	state_add(SH4_FPUL, "FPUL", m_sh2_state->m_fpul).formatstr("%08X");
 
 	state_add(SH4_FR0, "FR0", m_debugger_temp).callimport().formatstr("%25s");
 	state_add(SH4_FR1, "FR1", m_debugger_temp).callimport().formatstr("%25s");
@@ -2194,9 +2194,18 @@ void sh34_base_device::device_start()
 	state_add(SH4_XF15, "XF15", m_debugger_temp).callimport().formatstr("%25s");
 
 	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
-	//state_add(STATE_GENPCBASE, "CURPC", m_ppc).noshow();
+	//state_add(STATE_GENPCBASE, "CURPC", m_sh2_state->m_ppc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_sh2_state->pc ).callimport().noshow();
 
+	for (int regnum = 0; regnum < 16; regnum++)
+	{
+		m_fs_regmap[regnum] = uml::mem(((float *)(m_sh2_state->m_fr+(regnum))));
+	}
+
+	for (int regnum = 0; regnum < 16; regnum+=2)
+	{
+		m_fd_regmap[regnum] = uml::mem(((double *)(m_sh2_state->m_fr+(regnum))));
+	}
 
 	drc_start();
 }
@@ -2204,7 +2213,7 @@ void sh34_base_device::device_start()
 void sh34_base_device::state_import(const device_state_entry &entry)
 {
 #ifdef LSB_FIRST
-	uint8_t fpu_xor = m_fpu_pr;
+	uint8_t fpu_xor = m_sh2_state->m_fpu_pr;
 #else
 	uint8_t fpu_xor = 0;
 #endif
@@ -2223,131 +2232,131 @@ void sh34_base_device::state_import(const device_state_entry &entry)
 			break;
 
 		case SH4_FR0:
-			m_fr[0 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[0 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR1:
-			m_fr[1 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[1 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR2:
-			m_fr[2 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[2 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR3:
-			m_fr[3 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[3 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR4:
-			m_fr[4 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[4 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR5:
-			m_fr[5 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[5 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR6:
-			m_fr[6 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[6 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR7:
-			m_fr[7 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[7 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR8:
-			m_fr[8 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[8 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR9:
-			m_fr[9 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[9 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR10:
-			m_fr[10 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[10 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR11:
-			m_fr[11 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[11 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR12:
-			m_fr[12 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[12 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR13:
-			m_fr[13 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[13 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR14:
-			m_fr[14 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[14 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_FR15:
-			m_fr[15 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_fr[15 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF0:
-			m_xf[0 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[0 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF1:
-			m_xf[1 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[1 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF2:
-			m_xf[2 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[2 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF3:
-			m_xf[3 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[3 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF4:
-			m_xf[4 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[4 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF5:
-			m_xf[5 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[5 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF6:
-			m_xf[6 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[6 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF7:
-			m_xf[7 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[7 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF8:
-			m_xf[8 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[8 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF9:
-			m_xf[9 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[9 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF10:
-			m_xf[10 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[10 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF11:
-			m_xf[11 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[11 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF12:
-			m_xf[12 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[12 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF13:
-			m_xf[13 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[13 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF14:
-			m_xf[14 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[14 ^ fpu_xor] = m_debugger_temp;
 			break;
 
 		case SH4_XF15:
-			m_xf[15 ^ fpu_xor] = m_debugger_temp;
+			m_sh2_state->m_xf[15 ^ fpu_xor] = m_debugger_temp;
 			break;
 	}
 }
@@ -2365,7 +2374,7 @@ void sh34_base_device::state_export(const device_state_entry &entry)
 void sh34_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 #ifdef LSB_FIRST
-	uint8_t fpu_xor = m_fpu_pr;
+	uint8_t fpu_xor = m_sh2_state->m_fpu_pr;
 #else
 	uint8_t fpu_xor = 0;
 #endif
@@ -2386,131 +2395,131 @@ void sh34_base_device::state_string_export(const device_state_entry &entry, std:
 			break;
 
 		case SH4_FR0:
-			str = string_format("%08X %f", m_fr[0 ^ fpu_xor], (double)FP_RFS(0 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[0 ^ fpu_xor], (double)FP_RFS(0 ^ fpu_xor));
 			break;
 
 		case SH4_FR1:
-			str = string_format("%08X %f", m_fr[1 ^ fpu_xor], (double)FP_RFS(1 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[1 ^ fpu_xor], (double)FP_RFS(1 ^ fpu_xor));
 			break;
 
 		case SH4_FR2:
-			str = string_format("%08X %f", m_fr[2 ^ fpu_xor], (double)FP_RFS(2 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[2 ^ fpu_xor], (double)FP_RFS(2 ^ fpu_xor));
 			break;
 
 		case SH4_FR3:
-			str = string_format("%08X %f", m_fr[3 ^ fpu_xor], (double)FP_RFS(3 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[3 ^ fpu_xor], (double)FP_RFS(3 ^ fpu_xor));
 			break;
 
 		case SH4_FR4:
-			str = string_format("%08X %f", m_fr[4 ^ fpu_xor], (double)FP_RFS(4 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[4 ^ fpu_xor], (double)FP_RFS(4 ^ fpu_xor));
 			break;
 
 		case SH4_FR5:
-			str = string_format("%08X %f", m_fr[5 ^ fpu_xor], (double)FP_RFS(5 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[5 ^ fpu_xor], (double)FP_RFS(5 ^ fpu_xor));
 			break;
 
 		case SH4_FR6:
-			str = string_format("%08X %f", m_fr[6 ^ fpu_xor], (double)FP_RFS(6 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[6 ^ fpu_xor], (double)FP_RFS(6 ^ fpu_xor));
 			break;
 
 		case SH4_FR7:
-			str = string_format("%08X %f", m_fr[7 ^ fpu_xor], (double)FP_RFS(7 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[7 ^ fpu_xor], (double)FP_RFS(7 ^ fpu_xor));
 			break;
 
 		case SH4_FR8:
-			str = string_format("%08X %f", m_fr[8 ^ fpu_xor], (double)FP_RFS(8 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[8 ^ fpu_xor], (double)FP_RFS(8 ^ fpu_xor));
 			break;
 
 		case SH4_FR9:
-			str = string_format("%08X %f", m_fr[9 ^ fpu_xor], (double)FP_RFS(9 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[9 ^ fpu_xor], (double)FP_RFS(9 ^ fpu_xor));
 			break;
 
 		case SH4_FR10:
-			str = string_format("%08X %f", m_fr[10 ^ fpu_xor], (double)FP_RFS(10 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[10 ^ fpu_xor], (double)FP_RFS(10 ^ fpu_xor));
 			break;
 
 		case SH4_FR11:
-			str = string_format("%08X %f", m_fr[11 ^ fpu_xor], (double)FP_RFS(11 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[11 ^ fpu_xor], (double)FP_RFS(11 ^ fpu_xor));
 			break;
 
 		case SH4_FR12:
-			str = string_format("%08X %f", m_fr[12 ^ fpu_xor], (double)FP_RFS(12 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[12 ^ fpu_xor], (double)FP_RFS(12 ^ fpu_xor));
 			break;
 
 		case SH4_FR13:
-			str = string_format("%08X %f", m_fr[13 ^ fpu_xor], (double)FP_RFS(13 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[13 ^ fpu_xor], (double)FP_RFS(13 ^ fpu_xor));
 			break;
 
 		case SH4_FR14:
-			str = string_format("%08X %f", m_fr[14 ^ fpu_xor], (double)FP_RFS(14 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[14 ^ fpu_xor], (double)FP_RFS(14 ^ fpu_xor));
 			break;
 
 		case SH4_FR15:
-			str = string_format("%08X %f", m_fr[15 ^ fpu_xor], (double)FP_RFS(15 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_fr[15 ^ fpu_xor], (double)FP_RFS(15 ^ fpu_xor));
 			break;
 
 		case SH4_XF0:
-			str = string_format("%08X %f", m_xf[0 ^ fpu_xor], (double)FP_XFS(0 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[0 ^ fpu_xor], (double)FP_XFS(0 ^ fpu_xor));
 			break;
 
 		case SH4_XF1:
-			str = string_format("%08X %f", m_xf[1 ^ fpu_xor], (double)FP_XFS(1 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[1 ^ fpu_xor], (double)FP_XFS(1 ^ fpu_xor));
 			break;
 
 		case SH4_XF2:
-			str = string_format("%08X %f", m_xf[2 ^ fpu_xor], (double)FP_XFS(2 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[2 ^ fpu_xor], (double)FP_XFS(2 ^ fpu_xor));
 			break;
 
 		case SH4_XF3:
-			str = string_format("%08X %f", m_xf[3 ^ fpu_xor], (double)FP_XFS(3 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[3 ^ fpu_xor], (double)FP_XFS(3 ^ fpu_xor));
 			break;
 
 		case SH4_XF4:
-			str = string_format("%08X %f", m_xf[4 ^ fpu_xor], (double)FP_XFS(4 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[4 ^ fpu_xor], (double)FP_XFS(4 ^ fpu_xor));
 			break;
 
 		case SH4_XF5:
-			str = string_format("%08X %f", m_xf[5 ^ fpu_xor], (double)FP_XFS(5 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[5 ^ fpu_xor], (double)FP_XFS(5 ^ fpu_xor));
 			break;
 
 		case SH4_XF6:
-			str = string_format("%08X %f", m_xf[6 ^ fpu_xor], (double)FP_XFS(6 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[6 ^ fpu_xor], (double)FP_XFS(6 ^ fpu_xor));
 			break;
 
 		case SH4_XF7:
-			str = string_format("%08X %f", m_xf[7 ^ fpu_xor], (double)FP_XFS(7 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[7 ^ fpu_xor], (double)FP_XFS(7 ^ fpu_xor));
 			break;
 
 		case SH4_XF8:
-			str = string_format("%08X %f", m_xf[8 ^ fpu_xor], (double)FP_XFS(8 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[8 ^ fpu_xor], (double)FP_XFS(8 ^ fpu_xor));
 			break;
 
 		case SH4_XF9:
-			str = string_format("%08X %f", m_xf[9 ^ fpu_xor], (double)FP_XFS(9 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[9 ^ fpu_xor], (double)FP_XFS(9 ^ fpu_xor));
 			break;
 
 		case SH4_XF10:
-			str = string_format("%08X %f", m_xf[10 ^ fpu_xor], (double)FP_XFS(10 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[10 ^ fpu_xor], (double)FP_XFS(10 ^ fpu_xor));
 			break;
 
 		case SH4_XF11:
-			str = string_format("%08X %f", m_xf[11 ^ fpu_xor], (double)FP_XFS(11 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[11 ^ fpu_xor], (double)FP_XFS(11 ^ fpu_xor));
 			break;
 
 		case SH4_XF12:
-			str = string_format("%08X %f", m_xf[12 ^ fpu_xor], (double)FP_XFS(12 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[12 ^ fpu_xor], (double)FP_XFS(12 ^ fpu_xor));
 			break;
 
 		case SH4_XF13:
-			str = string_format("%08X %f", m_xf[13 ^ fpu_xor], (double)FP_XFS(13 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[13 ^ fpu_xor], (double)FP_XFS(13 ^ fpu_xor));
 			break;
 
 		case SH4_XF14:
-			str = string_format("%08X %f", m_xf[14 ^ fpu_xor], (double)FP_XFS(14 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[14 ^ fpu_xor], (double)FP_XFS(14 ^ fpu_xor));
 			break;
 
 		case SH4_XF15:
-			str = string_format("%08X %f", m_xf[15 ^ fpu_xor], (double)FP_XFS(15 ^ fpu_xor));
+			str = string_format("%08X %f", m_sh2_state->m_xf[15 ^ fpu_xor], (double)FP_XFS(15 ^ fpu_xor));
 			break;
 
 	}
@@ -2570,7 +2579,7 @@ void sh3_device::init_drc_frontend()
     an exception if out
 -------------------------------------------------*/
 
-void sh34_base_device::func_CHECKIRQ() { if (m_test_irq) sh4_check_pending_irq("mame_sh4_execute"); }
+void sh34_base_device::func_CHECKIRQ() { if (m_sh2_state->m_test_irq) sh4_check_pending_irq("mame_sh4_execute"); }
 static void cfunc_CHECKIRQ(void *param) { ((sh34_base_device *)param)->func_CHECKIRQ(); };
 
 void sh34_base_device::generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception)
@@ -2864,27 +2873,15 @@ bool sh34_base_device::generate_group_0_STCRBANK(drcuml_block &block, compiler_s
 	return true;
 }
 
-void sh34_base_device::func_STCSSR() { STCSSR(m_sh2_state->arg0); }
-static void cfunc_STCSSR(void *param) { ((sh34_base_device *)param)->func_STCSSR(); };
-
 bool sh34_base_device::generate_group_0_STCSSR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_STCSSR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, R32(Rn), mem(&m_sh2_state->m_ssr));
 	return true;
 }
 
-void sh34_base_device::func_STCSPC() { STCSPC(m_sh2_state->arg0); }
-static void cfunc_STCSPC(void *param) { ((sh34_base_device *)param)->func_STCSPC(); };
-
 bool sh34_base_device::generate_group_0_STCSPC(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_STCSPC, this);
-	load_fast_iregs(block);
+	UML_MOV(block, R32(Rn), mem(&m_sh2_state->m_spc));
 	return true;
 }
 
@@ -2900,15 +2897,12 @@ bool sh34_base_device::generate_group_0_PREFM(drcuml_block &block, compiler_stat
 	return true;
 }
 
-void sh34_base_device::func_MOVCAL() { MOVCAL(m_sh2_state->arg0); }
-static void cfunc_MOVCAL(void *param) { ((sh34_base_device *)param)->func_MOVCAL(); };
-
 bool sh34_base_device::generate_group_0_MOVCAL(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_MOVCAL, this);
-	load_fast_iregs(block);
+	UML_MOV(block, I0, R32(Rn))
+	SETEA(0);
+	UML_MOV(block, I1, R32(0));
+	UML_CALLH(block, *m_write32);
 	return true;
 }
 
@@ -2948,52 +2942,29 @@ bool sh34_base_device::generate_group_0_SETS(drcuml_block &block, compiler_state
 	return true;
 }
 
-void sh34_base_device::func_STCSGR() { STCSGR(m_sh2_state->arg0); }
-static void cfunc_STCSGR(void *param) { ((sh34_base_device *)param)->func_STCSGR(); };
-
 bool sh34_base_device::generate_group_0_STCSGR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_STCSGR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, R32(Rn), mem(&m_sh2_state->m_sgr));
 	return true;
 
 }
-
-void sh34_base_device::func_STSFPUL() { STSFPUL(m_sh2_state->arg0); }
-static void cfunc_STSFPUL(void *param) { ((sh34_base_device *)param)->func_STSFPUL(); };
 
 bool sh34_base_device::generate_group_0_STSFPUL(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_STSFPUL, this);
-	load_fast_iregs(block);
+	UML_MOV(block, R32(Rn), mem(&m_sh2_state->m_fpul));
 	return true;
 }
-
-void sh34_base_device::func_STSFPSCR() { STSFPSCR(m_sh2_state->arg0); }
-static void cfunc_STSFPSCR(void *param) { ((sh34_base_device *)param)->func_STSFPSCR(); };
 
 bool sh34_base_device::generate_group_0_STSFPSCR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_STSFPSCR, this);
-	load_fast_iregs(block);
+	UML_AND(block, I0, 0x003FFFFF, mem(&m_sh2_state->m_fpscr));
+	UML_MOV(block, R32(Rn), I0);
 	return true;
 }
 
-void sh34_base_device::func_STCDBR() { STCDBR(m_sh2_state->arg0); }
-static void cfunc_STCDBR(void *param) { ((sh34_base_device *)param)->func_STCDBR(); };
-
 bool sh34_base_device::generate_group_0_STCDBR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_STCDBR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, R32(Rn), mem(&m_sh2_state->m_dbr));
 	return true;
 }
 
@@ -3281,15 +3252,9 @@ bool sh34_base_device::generate_group_4_LDCMSSR(drcuml_block &block, compiler_st
 	return true;
 }
 
-void sh34_base_device::func_LDCSSR() { LDCSSR(m_sh2_state->arg0); }
-static void cfunc_LDCSSR(void *param) { ((sh34_base_device *)param)->func_LDCSSR(); };
-
 bool sh34_base_device::generate_group_4_LDCSSR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_LDCSSR, this);
-	load_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->m_ssr), R32(Rn));
 	return true;
 }
 
@@ -3317,15 +3282,9 @@ bool sh34_base_device::generate_group_4_LDCMSPC(drcuml_block &block, compiler_st
 	return true;
 }
 
-void sh34_base_device::func_LDCSPC() { LDCSPC(m_sh2_state->arg0); }
-static void cfunc_LDCSPC(void *param) { ((sh34_base_device *)param)->func_LDCSPC(); };
-
 bool sh34_base_device::generate_group_4_LDCSPC(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_LDCSPC, this);
-	load_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->m_spc), R32(Rn));
 	return true;
 }
 
@@ -3353,15 +3312,9 @@ bool sh34_base_device::generate_group_4_LDSMFPUL(drcuml_block &block, compiler_s
 	return true;
 }
 
-void sh34_base_device::func_LDSFPUL() { LDSFPUL(m_sh2_state->arg0); }
-static void cfunc_LDSFPUL(void *param) { ((sh34_base_device *)param)->func_LDSFPUL(); };
-
 bool sh34_base_device::generate_group_4_LDSFPUL(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_LDSFPUL, this);
-	load_fast_iregs(block);
+	UML_MOV(block, mem(&m_sh2_state->m_fpul), R32(Rn));
 	return true;
 }
 
@@ -3465,52 +3418,67 @@ bool sh34_base_device::generate_group_15(drcuml_block &block, compiler_state &co
 	}
 	return false;
 }
-
-void sh34_base_device::func_FADD() { FADD(m_sh2_state->arg0); }
-static void cfunc_FADD(void *param) { ((sh34_base_device *)param)->func_FADD(); };
-
 bool sh34_base_device::generate_group_15_FADD(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FADD, this);
-	load_fast_iregs(block);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+	UML_FDADD(block, FPD32(Rn), FPD32(Rn), FPD32(Rm));
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);	// labelnum:
+	UML_FSADD(block, FPS32(Rn), FPS32(Rn), FPS32(Rm));
+
+	UML_LABEL(block, compiler.labelnum++);	// labelnum+1:
+
 	return true;
 }
-
-void sh34_base_device::func_FSUB() { FSUB(m_sh2_state->arg0); }
-static void cfunc_FSUB(void *param) { ((sh34_base_device *)param)->func_FSUB(); };
 
 bool sh34_base_device::generate_group_15_FSUB(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FSUB, this);
-	load_fast_iregs(block);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+	UML_FDSUB(block, FPD32(Rn), FPD32(Rn), FPD32(Rm));
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);	// labelnum:
+	UML_FSSUB(block, FPS32(Rn), FPS32(Rn), FPS32(Rm));
+
+	UML_LABEL(block, compiler.labelnum++);	// labelnum+1:
+
 	return true;
 }
-
-void sh34_base_device::func_FMUL() { FMUL(m_sh2_state->arg0); }
-static void cfunc_FMUL(void *param) { ((sh34_base_device *)param)->func_FMUL(); };
 
 bool sh34_base_device::generate_group_15_FMUL(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FMUL, this);
-	load_fast_iregs(block);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+	UML_FDMUL(block, FPD32(Rn), FPD32(Rn), FPD32(Rm));
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);	// labelnum:
+	UML_FSMUL(block, FPS32(Rn), FPS32(Rn), FPS32(Rm));
+
+	UML_LABEL(block, compiler.labelnum++);	// labelnum+1:
+
 	return true;
 }
 
-void sh34_base_device::func_FDIV() { FDIV(m_sh2_state->arg0); }
-static void cfunc_FDIV(void *param) { ((sh34_base_device *)param)->func_FDIV(); };
-
 bool sh34_base_device::generate_group_15_FDIV(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FDIV, this);
-	load_fast_iregs(block);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_Z, compiler.labelnum);
+
+	UML_FDDIV(block, FPD32(Rn), FPD32(Rn), FPD32(Rm));
+	UML_JMP(block, compiler.labelnum+1);
+
+	UML_LABEL(block, compiler.labelnum++);	// labelnum:
+	UML_FSDIV(block, FPS32(Rn), FPS32(Rn), FPS32(Rm));
+
+	UML_LABEL(block, compiler.labelnum++);	// labelnum+1:
+
 	return true;
 }
 
@@ -3622,15 +3590,15 @@ bool sh34_base_device::generate_group_15_FMOVFR(drcuml_block &block, compiler_st
 	return true;
 }
 
-void sh34_base_device::func_FMAC() { FMAC(m_sh2_state->arg0); }
-static void cfunc_FMAC(void *param) { ((sh34_base_device *)param)->func_FMAC(); };
-
 bool sh34_base_device::generate_group_15_FMAC(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
-	UML_CALLC(block, cfunc_FMAC, this);
-	load_fast_iregs(block);
+	UML_TEST(block, mem(&m_sh2_state->m_fpu_pr), 0);
+	UML_JMPc(block, COND_NZ, compiler.labelnum);
+
+	UML_FSMUL(block, F0, FPS32(0), FPS32(Rm));
+	UML_FSADD(block, FPS32(Rn), F0, FPS32(Rn));
+
+	UML_LABEL(block, compiler.labelnum++);
 	return true;
 }
 

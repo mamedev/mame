@@ -111,9 +111,6 @@
 #include "machine/segag80.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "sound/samples.h"
-#include "machine/i8255.h"
 #include "machine/segacrpt_device.h"
 #include "speaker.h"
 
@@ -124,9 +121,9 @@
  *
  *************************************/
 
-#define CPU_CLOCK           8000000     /* not used when video board is connected */
-#define VIDEO_CLOCK         15468000
-#define SINDBADM_SOUND_CLOCK 8000000
+#define CPU_CLOCK           8_MHz_XTAL     /* not used when video board is connected */
+#define VIDEO_CLOCK         15.46848_MHz_XTAL
+#define SINDBADM_SOUND_CLOCK 8_MHz_XTAL
 
 #define PIXEL_CLOCK         (VIDEO_CLOCK/3)
 
@@ -299,17 +296,21 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::sindbadm_soundport_w)
+READ8_MEMBER(segag80r_state::sindbadm_sound_data_r)
 {
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+	uint8_t result = m_ppi->pa_r();
+	if (!machine().side_effects_disabled())
+	{
+		m_ppi->pc6_w(0);
+		m_ppi->pc6_w(1);
+	}
+	return result;
 }
-
 
 WRITE8_MEMBER(segag80r_state::sindbadm_misc_w)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 //  osd_printf_debug("Unknown = %02X\n", data);
 }
 
@@ -400,7 +401,7 @@ void segag80r_state::sindbadm_sound_map(address_map &map)
 	map(0x8000, 0x87ff).mirror(0x1800).ram();
 	map(0xa000, 0xa003).mirror(0x1ffc).w(this, FUNC(segag80r_state::sindbadm_sn1_SN76496_w));
 	map(0xc000, 0xc003).mirror(0x1ffc).w(this, FUNC(segag80r_state::sindbadm_sn2_SN76496_w));
-	map(0xe000, 0xe000).mirror(0x1fff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe000).mirror(0x1fff).r(this, FUNC(segag80r_state::sindbadm_sound_data_r));
 }
 
 
@@ -956,7 +957,6 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, sindbadm_soundport_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("FC"))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, sindbadm_misc_w))
 
@@ -971,13 +971,11 @@ MACHINE_CONFIG_START(segag80r_state::sindbadm)
 	MCFG_CPU_PROGRAM_MAP(sindbadm_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(segag80r_state, irq0_line_hold, 4*60)
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
 	/* sound hardware */
-	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/4)
+	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/2) /* matches PCB videos, correct? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/2)
+	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/4) /* matches PCB videos, correct? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

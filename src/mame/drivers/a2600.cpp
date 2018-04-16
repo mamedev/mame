@@ -29,16 +29,17 @@ TODO:
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
 
-ADDRESS_MAP_START(a2600_base_state::a2600_mem) // 6507 has 13-bit address space, 0x0000 - 0x1fff
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
+void a2600_base_state::a2600_mem(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
+{
+	map(0x0000, 0x007f).mirror(0x0f00).rw("tia_video", FUNC(tia_video_device::read), FUNC(tia_video_device::write));
+	map(0x0080, 0x00ff).mirror(0x0d00).ram().share("riot_ram");
 #if USE_NEW_RIOT
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVICE("riot", mos6532_t, io_map)
+	map(0x0280, 0x029f).mirror(0x0d00).m("riot", FUNC(mos6532_t::io_map));
 #else
-	AM_RANGE(0x0280, 0x029f) AM_MIRROR(0x0d00) AM_DEVREADWRITE("riot", riot6532_device, read, write)
+	map(0x0280, 0x029f).mirror(0x0d00).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 #endif
-	// AM_RANGE(0x1000, 0x1fff) is cart data and it is configured at reset time, depending on the mounted cart!
-ADDRESS_MAP_END
+	// map(0x1000, 0x1fff) is cart data and it is configured at reset time, depending on the mounted cart!
+}
 
 
 READ8_MEMBER(a2600_state::cart_over_all_r)

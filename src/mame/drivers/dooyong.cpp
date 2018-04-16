@@ -967,8 +967,8 @@ void popbingo_state::popbingo_map(address_map &map)
 	map(0x0c4000, 0x0c400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x0c4010, 0x0c401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x0c8000, 0x0c8fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	//AM_RANGE(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
-	//AM_RANGE(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
+	//map(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
+	//map(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
 	map(0x0dc000, 0x0dc01f).ram(); // registers of some kind?
 }
 
@@ -990,13 +990,14 @@ void dooyong_z80_ym2203_state::pollux_sound_map(address_map &map)
 	map(0xf804, 0xf805).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
 
-ADDRESS_MAP_START(dooyong_state::bluehawk_sound_map)
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void dooyong_state::bluehawk_sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xf808, 0xf809).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf80a, 0xf80a).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 /***************************************************************************
 

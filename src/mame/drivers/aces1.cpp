@@ -56,7 +56,9 @@ public:
 			m_reel1(*this, "reel1"),
 			m_reel2(*this, "reel2"),
 			m_reel3(*this, "reel3"),
-			m_io_ports(*this, {"IO1", "IO2", "IO3", "IO4", "IO5", "IO6", "IO7", "IO8"})
+			m_io_ports(*this, {"IO1", "IO2", "IO3", "IO4", "IO5", "IO6", "IO7", "IO8"}),
+			m_lamps(*this, "lamp%u", 0U),
+			m_digits(*this, "digit%u", 0U)
 	{ }
 	int m_input_strobe;
 	int m_lamp_strobe;
@@ -65,6 +67,7 @@ public:
 	int m_reel_phase[4];
 	int m_reel_count[4];
 	int m_optic_pattern;
+
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
 	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
 	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
@@ -110,24 +113,23 @@ public:
 	{
 		if (m_led_strobe != m_input_strobe)
 		{
-			output().set_digit_value(m_input_strobe,data);
+			m_digits[m_input_strobe] = data;
 			m_led_strobe = m_input_strobe;
 		}
 	}
 
 	DECLARE_WRITE8_MEMBER(ic24_write_b)
 	{
-	//cheating a bit here, need persistence
-	int i;
+		//cheating a bit here, need persistence
 		if (m_lamp_strobe != m_input_strobe)
 		{
 			// Because of the nature of the lamping circuit, there is an element of persistance where the lamp retains residual charge
 			// As a consequence, the lamp column data can change before the input strobe (effectively writing 0 to the previous strobe)
 			// without causing the relevant lamps to black out.
 
-			for (i = 0; i < 8; i++)
+			for (int i = 0; i < 8; i++)
 			{
-				output().set_lamp_value((8*m_input_strobe)+i, ((data  & (1 << i)) !=0));
+				m_lamps[8 * m_input_strobe + i] = BIT(data, i);
 			}
 			m_lamp_strobe = m_input_strobe;
 		}
@@ -223,6 +225,8 @@ public:
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
 	required_ioport_array<8> m_io_ports;
+	output_finder<128> m_lamps;
+	output_finder<16> m_digits;
 
 	DECLARE_DRIVER_INIT(aces1);
 	virtual void machine_start() override;
@@ -261,6 +265,8 @@ void aces1_state::machine_start()
 	}
 	m_aces1_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_irq_timer_callback),this), nullptr);
 	m_aces1_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aces1_state::m_aces1_nmi_timer_callback),this), nullptr);
+	m_digits.resolve();
+	m_lamps.resolve();
 }
 
 void aces1_state::machine_reset()

@@ -39,4 +39,15 @@
 		</part>
 	</software>
 
+	<software name="vfs">
+		<description>Video Filing System ROM Cartridge</description>
+		<year>1986</year>
+		<publisher>Acorn</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="uprom" size="16384">
+				<rom name="vfs170.rom" size="16384" crc="b124a0bb" sha1="ba31c757815cf470402d7829a70a0e1d3fb1355b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
