@@ -34,6 +34,7 @@
 #include "aha1542.h"
 #include "wd1002a_wx1.h"
 #include "mcd.h"
+#include "lbaenhancer.h"
 
 // sound
 #include "adlib.h"
