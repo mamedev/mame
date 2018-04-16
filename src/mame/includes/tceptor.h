@@ -21,7 +21,9 @@ public:
 		m_c45_road(*this, "c45_road"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_shutter(*this, "shutter")
+	{ }
 
 	uint8_t m_m6809_irq_enable;
 	uint8_t m_m68k_irq_enable;
@@ -72,6 +74,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	output_finder<> m_shutter;
 
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);

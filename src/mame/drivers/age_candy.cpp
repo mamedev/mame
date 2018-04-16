@@ -47,9 +47,10 @@ void age_candy_state::machine_reset()
 
 
 #ifdef UNUSED_DEFINITION
-ADDRESS_MAP_START(age_candy_state::age_candy_map)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x4000)
-ADDRESS_MAP_END
+void age_candy_state::age_candy_map(address_map &map)
+{
+	map(0xc000, 0xffff).rom().region("maincpu", 0x4000);
+}
 #endif
 
 MACHINE_CONFIG_START(age_candy_state::age_candy)

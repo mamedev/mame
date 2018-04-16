@@ -42,7 +42,12 @@ WRITE8_MEMBER(contra_state::contra_bankswitch_w)
 
 WRITE8_MEMBER(contra_state::contra_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(contra_state::sirq_clear_w)
+{
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(contra_state::contra_coin_counter_w)
@@ -97,7 +102,7 @@ void contra_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x0000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x4000, 0x4000).nopw(); /* read triggers irq reset and latch read (in the hardware only). */
+	map(0x4000, 0x4000).w(this, FUNC(contra_state::sirq_clear_w)); /* read triggers irq reset and latch read (in the hardware only). */
 	map(0x6000, 0x67ff).ram();
 	map(0x8000, 0xffff).rom();
 }
@@ -194,6 +199,11 @@ void contra_state::machine_start()
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
+}
+
+void contra_state::machine_reset()
+{
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 MACHINE_CONFIG_START(contra_state::contra)

@@ -326,6 +326,11 @@ device_memory_interface::space_config_vector clipper_device::memory_space_config
 	};
 }
 
+bool clipper_device::memory_translate(int spacenum, int intention, offs_t &address)
+{
+	return ((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_FETCH ? get_icammu() : get_dcammu()).memory_translate(m_ssw, spacenum, intention, address);
+}
+
 WRITE16_MEMBER(clipper_device::set_exception)
 {
 	LOGMASKED(LOG_EXCEPTION, "external exception 0x%04x triggered\n", data);
@@ -1495,6 +1500,8 @@ u32 clipper_device::intrap(const u16 vector, const u32 old_pc)
 	const u32 old_psw = m_psw;
 	u32 new_pc = 0, new_ssw = 0;
 
+	debugger_exception_hook(vector);
+
 	// clear ssw bits to enable supervisor memory access
 	m_ssw &= ~(SSW_U | SSW_K | SSW_UU | SSW_KU);
 
@@ -1577,6 +1584,8 @@ u32 clipper_c400_device::intrap(const u16 vector, const u32 old_pc)
 	const u32 old_ssw = m_ssw;
 	const u32 old_psw = m_psw;
 	u32 new_pc = 0, new_ssw = 0;
+
+	debugger_exception_hook(vector);
 
 	// clear ssw bits to enable supervisor memory access
 	m_ssw &= ~(SSW_U | SSW_K | SSW_UU | SSW_KU);

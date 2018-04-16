@@ -33,6 +33,7 @@ Lower board (MGP_01):
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+//#include "video/dp8350.h"
 #include "video/resnet.h"
 #include "screen.h"
 
@@ -55,7 +56,8 @@ public:
 		m_steering_wheel(*this, "WHEEL"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
-		m_dsw(*this, "DSW")
+		m_dsw(*this, "DSW"),
+		m_digits(*this, "digit%u%u", 0U, 0U)
 		{ }
 
 	DECLARE_READ8_MEMBER(port_r);
@@ -63,7 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port2_r);
-	virtual void video_start() override;
+	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick_timer);
 	DECLARE_PALETTE_INIT(monzagp);
 	uint32_t screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -80,6 +82,7 @@ public:
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_dsw;
+	output_finder<4, 7> m_digits;
 
 	void monzagp(machine_config &config);
 	void monzagp_io(address_map &map);
@@ -96,7 +99,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_score_ram;
 };
-
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(monzagp_state::time_tick_timer)
@@ -144,7 +146,7 @@ PALETTE_INIT_MEMBER(monzagp_state, monzagp)
 	}
 }
 
-void monzagp_state::video_start()
+void monzagp_state::machine_start()
 {
 	m_vram = std::make_unique<uint8_t[]>(0x800);
 	m_score_ram = std::make_unique<uint8_t[]>(0x100);
@@ -157,6 +159,8 @@ void monzagp_state::video_start()
 	save_pointer(NAME(m_score_ram.get()), 0x100);
 
 	m_nvram->set_base(m_score_ram.get(), 0x100);
+
+	m_digits.resolve();
 }
 
 uint32_t monzagp_state::screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -357,11 +361,11 @@ WRITE8_MEMBER(monzagp_state::port_w)
 		offs_t ram_offset = bitswap<8>(offset, 3,2,1,0,7,6,5,4);
 		m_score_ram[ram_offset] = data & 0x0f;
 
-		if ((ram_offset & 0x07) == 0)
+		if ((ram_offset & 0x07) == 0 && (ram_offset & 0x38) != 0x38)
 		{
 			// 74LS47 BCD-to-Seven-Segment Decoder
 			static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x49, 0x78, 0x00 };
-			output().set_digit_value(ram_offset >> 3, bcd2hex[data & 0x0f]);
+			m_digits[(ram_offset & 0xc0) >> 6][(ram_offset & 0x38) >> 3] = bcd2hex[data & 0x0f];
 		}
 	}
 	if (!(m_p1 & 0x80))
@@ -496,7 +500,6 @@ MACHINE_CONFIG_START(monzagp_state::monzagp)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(monzagp_state, port1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(monzagp_state, port2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(monzagp_state, port2_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", monzagp_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -506,6 +509,9 @@ MACHINE_CONFIG_START(monzagp_state::monzagp)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(monzagp_state, screen_update_monzagp)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", MCS48_INPUT_IRQ)) // inversion of DP8350 pin 2
+
+	//MCFG_DEVICE_ADD("crtc", DP8350, 10920000) // pins 21/22 connected to XTAL, 3 to GND, 5 to +5
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_INIT_OWNER(monzagp_state, monzagp)

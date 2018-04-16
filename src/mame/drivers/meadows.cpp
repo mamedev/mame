@@ -212,11 +212,14 @@ INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(meadows_state::meadows_interrupt)
+WRITE_LINE_MEMBER(meadows_state::meadows_vblank_irq)
 {
-	/* fake something toggling the sense input line of the S2650 */
-	m_main_sense_state ^= 1;
-	m_maincpu->set_input_line(S2650_SENSE_LINE, m_main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	if (state)
+	{
+		/* fake something toggling the sense input line of the S2650 */
+		m_main_sense_state ^= 1;
+		m_maincpu->set_input_line(S2650_SENSE_LINE, m_main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 
@@ -227,10 +230,13 @@ INTERRUPT_GEN_MEMBER(meadows_state::meadows_interrupt)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(meadows_state::minferno_interrupt)
+WRITE_LINE_MEMBER(meadows_state::minferno_vblank_irq)
 {
-	m_main_sense_state++;
-	device.execute().set_input_line(1, (m_main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	if (state)
+	{
+		m_main_sense_state++;
+		m_maincpu->set_input_line(1, (m_main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 
@@ -620,7 +626,6 @@ MACHINE_CONFIG_START(meadows_state::meadows)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
 	MCFG_CPU_PROGRAM_MAP(meadows_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  meadows_interrupt) /* one interrupt per frame!? */
 
 	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -635,6 +640,7 @@ MACHINE_CONFIG_START(meadows_state::meadows)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -658,7 +664,6 @@ MACHINE_CONFIG_START(meadows_state::minferno)
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
 	MCFG_CPU_PROGRAM_MAP(minferno_main_map)
 	MCFG_CPU_DATA_MAP(minferno_data_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  minferno_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -667,6 +672,7 @@ MACHINE_CONFIG_START(meadows_state::minferno)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meadows_state, minferno_vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", minferno)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -681,7 +687,6 @@ MACHINE_CONFIG_START(meadows_state::bowl3d)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
 	MCFG_CPU_PROGRAM_MAP(bowl3d_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", meadows_state,  meadows_interrupt) /* one interrupt per frame!? */
 
 	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -696,6 +701,7 @@ MACHINE_CONFIG_START(meadows_state::bowl3d)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")

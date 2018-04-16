@@ -263,7 +263,7 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( _88games_state::banking_callback )
 {
-	logerror("%04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
+	logerror("%s: bank select %02x\n", machine().describe_context(), data);
 
 	/* bits 0-2 select ROM bank for 0000-1fff */
 	/* bit 3: when 1, palette RAM at 1000-1fff */

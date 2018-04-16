@@ -421,7 +421,7 @@ WRITE32_MEMBER(crystal_state::IntAck_w)
 
 IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 {
-	address_space &space = device.memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint32_t IntPend = space.read_dword(0x01800c0c);
 	int i;
 

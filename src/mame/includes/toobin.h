@@ -23,14 +23,18 @@ public:
 		m_playfield_tilemap(*this, "playfield"),
 		m_alpha_tilemap(*this, "alpha"),
 		m_mob(*this, "mob"),
-		m_interrupt_scan(*this, "interrupt_scan")
+		m_interrupt_scan(*this, "interrupt_scan"),
+		m_sound_int_state(0)
 	{ }
 
 	void toobin(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void update_interrupts() override;
+
+	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 
 	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
 	DECLARE_WRITE16_MEMBER(paletteram_w);
@@ -56,6 +60,8 @@ private:
 
 	double          m_brightness;
 	bitmap_ind16 m_pfbitmap;
+
+	uint8_t               m_sound_int_state;
 
 	static const atari_motion_objects_config s_mob_config;
 };

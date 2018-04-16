@@ -2151,7 +2151,7 @@ void voodoo_device::stall_cpu(int state, attotime current_time)
 	if (!m_stall.isnull())
 		m_stall(true);
 	else
-		cpu->execute().spin_until_trigger(trigger);
+		cpu->spin_until_trigger(trigger);
 
 	/* set a timer to clear the stall */
 	pci.continue_timer->adjust(pci.op_end_time - current_time);
@@ -3939,7 +3939,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 			/* bit 31 is not used */
 
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) vd->cpu->eat_cycles(1000);
 			break;
 
 		/* bit 2 of the initEnable register maps this to dacRead */
@@ -3951,7 +3951,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 		/* return the current visible scanline */
 		case vRetrace:
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->execute().eat_cycles(10);
+			if (EAT_CYCLES) vd->cpu->eat_cycles(10);
 			// Return 0 if vblank is active
 			if (vd->fbi.vblank) {
 				result = 0;
@@ -3965,7 +3965,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 		/* return visible horizontal and vertical positions. Read by the Vegas startup sequence */
 		case hvRetrace:
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->execute().eat_cycles(10);
+			if (EAT_CYCLES) vd->cpu->eat_cycles(10);
 			//result = 0x200 << 16;   /* should be between 0x7b and 0x267 */
 			//result |= 0x80;         /* should be between 0x17 and 0x103 */
 			// Return 0 if vblank is active
@@ -3985,7 +3985,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 			result = vd->fbi.cmdfifo[0].rdptr;
 
 			/* eat some cycles since people like polling here */
-			if (EAT_CYCLES) vd->cpu->execute().eat_cycles(1000);
+			if (EAT_CYCLES) vd->cpu->eat_cycles(1000);
 			break;
 
 		case cmdFifoAMin:
@@ -4023,7 +4023,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 		/* don't log multiple identical status reads from the same address */
 		if (regnum == vdstatus)
 		{
-			offs_t pc = vd->cpu->safe_pc();
+			offs_t pc = vd->cpu->pc();
 			if (pc == vd->last_status_pc && result == vd->last_status_value)
 				logit = false;
 			vd->last_status_pc = pc;
@@ -5137,9 +5137,9 @@ void voodoo_device::device_start()
 				break;
 			index++;
 		}
-	screen = downcast<screen_device *>(machine().device(m_screen));
+	screen = machine().device<screen_device>(m_screen);
 	assert_always(screen != nullptr, "Unable to find screen attached to voodoo");
-	cpu = machine().device(m_cputag);
+	cpu = machine().device<cpu_device>(m_cputag);
 	assert_always(cpu != nullptr, "Unable to find CPU attached to voodoo");
 
 	if (m_tmumem1 != 0)

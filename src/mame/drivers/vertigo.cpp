@@ -76,10 +76,11 @@ void vertigo_state::exidy440_audio_map(address_map &map)
  *************************************/
 
 #if 0
-ADDRESS_MAP_START(vertigo_state::vertigo_motor)
-	AM_RANGE(0x010, 0x07f) AM_RAM
-	AM_RANGE(0x080, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void vertigo_state::vertigo_motor(address_map &map)
+{
+	map(0x010, 0x07f).ram();
+	map(0x080, 0x7ff).rom();
+}
 #endif
 
 

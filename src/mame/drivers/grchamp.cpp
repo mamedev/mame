@@ -95,6 +95,7 @@
 
 void grchamp_state::machine_start()
 {
+	m_digits.resolve();
 	m_soundlatch_data = 0x00;
 	m_soundlatch_flag = false;
 	save_item(NAME(m_cpu0_out));
@@ -245,7 +246,7 @@ WRITE8_MEMBER(grchamp_state::led_board_w)
 
 		case 0x0c:
 			m_ledram[m_ledaddr & 0x07] = m_ledlatch;
-			output().set_digit_value(m_ledaddr & 0x07, ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f]);
+			m_digits[m_ledaddr & 0x07] = ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f];
 			/*
 			    ledram[0] & 0x0f = score LSD
 			    ledram[1] & 0x0f = score

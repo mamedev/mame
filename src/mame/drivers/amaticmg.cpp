@@ -437,8 +437,20 @@ public:
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_lamps(*this, "lamp%u", 0U)
+	{
+	}
 
+	void amaticmg2(machine_config &config);
+	void amaticmg(machine_config &config);
+	void amaticmg4(machine_config &config);
+	DECLARE_DRIVER_INIT(ama8000_3_o);
+	DECLARE_DRIVER_INIT(ama8000_2_i);
+	DECLARE_DRIVER_INIT(ama8000_2_v);
+	DECLARE_DRIVER_INIT(ama8000_1_x);
+
+private:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
 
@@ -449,10 +461,6 @@ public:
 	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_WRITE8_MEMBER(out_c_w);
-	DECLARE_DRIVER_INIT(ama8000_3_o);
-	DECLARE_DRIVER_INIT(ama8000_2_i);
-	DECLARE_DRIVER_INIT(ama8000_2_v);
-	DECLARE_DRIVER_INIT(ama8000_1_x);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -463,16 +471,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(amaticmg2_irq);
 	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void amaticmg2(machine_config &config);
-	void amaticmg(machine_config &config);
-	void amaticmg4(machine_config &config);
+
 	void amaticmg2_portmap(address_map &map);
 	void amaticmg4_portmap(address_map &map);
 	void amaticmg_map(address_map &map);
 	void amaticmg_portmap(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<7> m_lamps;
 };
 
 
@@ -603,10 +611,10 @@ WRITE8_MEMBER(amaticmg_state::out_a_w)
     -x-- ----  HOLD4
 */
 
-	output().set_lamp_value(0, (data >> 3) & 1);  /* START */
-	output().set_lamp_value(1, (data >> 4) & 1);  /* BET */
-	output().set_lamp_value(2, (data >> 5) & 1);  /* HOLD3 */
-	output().set_lamp_value(3, (data >> 6) & 1);  /* HOLD4 */
+	m_lamps[0] = BIT(data, 3);  /* START */
+	m_lamps[1] = BIT(data, 4);  /* BET */
+	m_lamps[2] = BIT(data, 5);  /* HOLD3 */
+	m_lamps[3] = BIT(data, 6);  /* HOLD4 */
 
 	logerror("port A: %2X\n", data);
 }
@@ -624,9 +632,9 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
     x--- ----  Hopper motor
     --x- x---  (unknown)
 */
-	output().set_lamp_value(4, (data >> 1) & 1);  /* HOLD1 */
-	output().set_lamp_value(5, (data >> 4) & 1);  /* HOLD2 */
-	output().set_lamp_value(6, (data >> 6) & 1);  /* CANCEL */
+	m_lamps[4] = BIT(data, 1);  /* HOLD1 */
+	m_lamps[5] = BIT(data, 4);  /* HOLD2 */
+	m_lamps[6] = BIT(data, 6);  /* CANCEL */
 
 //  machine().bookkeeping().coin_counter_w(0, data & 0x04);  /* Coin In */
 //  machine().bookkeeping().coin_counter_w(1, data & 0x01);  /* Coin Out */
@@ -819,6 +827,8 @@ void amaticmg_state::machine_start()
 	uint8_t *rombank = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
+
+	m_lamps.resolve();
 }
 
 void amaticmg_state::machine_reset()

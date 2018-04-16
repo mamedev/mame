@@ -29,7 +29,7 @@ INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 {
 	if (data & 0xf8)
-		logerror("%04x: videobank = %02x\n",m_maincpu->pc(),data);
+		logerror("%s: videobank = %02x\n", machine().describe_context(), data);
 
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
@@ -164,7 +164,7 @@ void surpratk_state::machine_reset()
 
 WRITE8_MEMBER( surpratk_state::banking_callback )
 {
-//  logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
+//  logerror("%s: setlines %02x\n", machine().describe_context(), data);
 	membank("bank1")->set_entry(data & 0x1f);
 }
 

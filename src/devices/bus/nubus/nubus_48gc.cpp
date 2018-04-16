@@ -345,7 +345,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 
 READ32_MEMBER( jmfb_device::mac_48gc_r )
 {
-//  printf("48gc_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, m_maincpu->safe_pc());
+//  printf("%s 48gc_r: @ %x, mask %08x\n", machine().describe_context().c_str(), offset, mem_mask);
 
 	switch (offset)
 	{

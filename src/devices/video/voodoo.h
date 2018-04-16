@@ -1875,7 +1875,7 @@ protected:
 public:
 	uint8_t               index;                  /* index of board */
 	screen_device *screen;              /* the screen we are acting on */
-	device_t *cpu;                  /* the CPU we interact with */
+	cpu_device *cpu;                  /* the CPU we interact with */
 	const uint8_t         vd_type;                   /* type of system */
 	uint8_t               chipmask;               /* mask for which chips are available */
 	uint32_t              freq;                   /* operating frequency */

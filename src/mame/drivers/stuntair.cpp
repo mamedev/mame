@@ -136,7 +136,7 @@ public:
 	DECLARE_WRITE8_MEMBER(stuntair_coin_w);
 	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
-	INTERRUPT_GEN_MEMBER(stuntair_irq);
+	DECLARE_WRITE_LINE_MEMBER(stuntair_irq);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -490,9 +490,9 @@ WRITE8_MEMBER(stuntair_state::ay8910_portb_w)
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(stuntair_state::stuntair_irq)
+WRITE_LINE_MEMBER(stuntair_state::stuntair_irq)
 {
-	if(m_nmi_enable)
+	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -518,7 +518,6 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,  XTAL(18'432'000)/6)         /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(stuntair_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stuntair_state, stuntair_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,  XTAL(18'432'000)/6)         /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(stuntair_sound_map)
@@ -547,6 +546,7 @@ MACHINE_CONFIG_START(stuntair_state::stuntair)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(stuntair_state, screen_update_stuntair)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(stuntair_state, stuntair_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", stuntair)
 	MCFG_PALETTE_ADD("palette", 0x100+2)

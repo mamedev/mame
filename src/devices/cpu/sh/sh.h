@@ -139,6 +139,25 @@ public:
 		uint32_t  vbr;
 
 		uint32_t  m_delay;
+
+		// SH3/4 additional DRC "near" state
+		uint32_t  m_ppc;
+		uint32_t  m_spc;
+		uint32_t  m_ssr;
+		uint32_t  m_rbnk[2][8];
+		uint32_t  m_sgr;
+		uint32_t  m_fr[16];
+		uint32_t  m_xf[16];
+		uint32_t  m_cpu_off;
+		uint32_t  m_pending_irq;
+		uint32_t  m_test_irq;
+		uint32_t  m_fpscr;
+		uint32_t  m_fpul;
+		uint32_t  m_dbr;
+
+		int     m_frt_input;
+		int     m_fpu_sz;
+		int     m_fpu_pr;
 	};
 
 	internal_sh2_state *m_sh2_state;

@@ -100,8 +100,11 @@
 // CA2: SCSI interrupt     = 0x01
 // CB1: ASC interrupt      = 0x10
 
-INTERRUPT_GEN_MEMBER(mac_state::mac_rbv_vbl)
+WRITE_LINE_MEMBER(mac_state::mac_rbv_vbl)
 {
+	if (!state)
+		return;
+
 	m_rbv_regs[2] &= ~0x40; // set vblank signal
 	m_rbv_vbltime = 10;
 
@@ -260,7 +263,7 @@ READ8_MEMBER ( mac_state::mac_rbv_r )
 		{
 			data &= ~0x38;
 			data |= (m_montype.read_safe(2)<<3);
-//            printf("rbv_r montype: %02x (PC %x)\n", data, space.cpu->safe_pc());
+//            printf("%s rbv_r montype: %02x\n", machine().describe_context().c_str(), data);
 		}
 
 		// bit 7 of these registers always reads as 0 on RBV
@@ -1259,7 +1262,6 @@ MACHINE_CONFIG_START(mac_state::maclc)
 
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_MODIFY("palette")
@@ -1273,6 +1275,7 @@ MACHINE_CONFIG_START(mac_state::maclc)
 	MCFG_SCREEN_SIZE(1024,768)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macv8)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mac_state, mac_rbv_vbl))
 	MCFG_DEFAULT_LAYOUT(layout_mac)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1317,7 +1320,6 @@ MACHINE_CONFIG_START(mac_state::maclc2)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1344,7 +1346,6 @@ MACHINE_CONFIG_START(mac_state::maclc3)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
@@ -1387,7 +1388,6 @@ MACHINE_CONFIG_START(mac_state::maciivx)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
@@ -1424,7 +1424,6 @@ MACHINE_CONFIG_START(mac_state::maciivi)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
@@ -1752,7 +1751,6 @@ MACHINE_CONFIG_START(mac_state::macclas2)
 	maclc(config);
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_VIDEO_START_OVERRIDE(mac_state,macv8)
@@ -1783,7 +1781,6 @@ MACHINE_CONFIG_START(mac_state::maciici)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_MODIFY("palette")
@@ -1802,6 +1799,7 @@ MACHINE_CONFIG_START(mac_state::maciici)
 	MCFG_SCREEN_SIZE(640, 870)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mac_state, mac_rbv_vbl))
 	MCFG_DEFAULT_LAYOUT(layout_mac)
 
 	/* internal ram */
@@ -1815,7 +1813,6 @@ MACHINE_CONFIG_START(mac_state::maciisi)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
-	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 
 	MCFG_PALETTE_MODIFY("palette")
@@ -1837,6 +1834,7 @@ MACHINE_CONFIG_START(mac_state::maciisi)
 	MCFG_SCREEN_SIZE(640, 870)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mac_state, screen_update_macrbv)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mac_state, mac_rbv_vbl))
 	MCFG_DEFAULT_LAYOUT(layout_mac)
 
 	/* internal ram */

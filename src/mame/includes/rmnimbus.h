@@ -236,6 +236,9 @@ public:
 	void nimbus_iocpu_io(address_map &map);
 	void nimbus_iocpu_mem(address_map &map);
 	void nimbus_mem(address_map &map);
+	void decode_subbios(device_t *device, offs_t pc, uint8_t raw_flag);
+	void decode_dos21(device_t *device, offs_t pc);
+
 private:
 	void debug_command(int ref, const std::vector<std::string> &params);
 	void video_debug(int ref, const std::vector<std::string> &params);

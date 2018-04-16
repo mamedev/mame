@@ -31,6 +31,7 @@
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "machine/74259.h"
+#include "machine/adc0808.h"
 #include "machine/timekpr.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -52,14 +53,14 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_dsp(*this, "dsp"),
+		m_adc(*this, "adc"),
 		m_mainlatch(*this, "mainlatch")
 	{ }
 
 	void tomcat(machine_config &config);
 
 protected:
-	DECLARE_WRITE16_MEMBER(tomcat_adcon_w);
-	DECLARE_READ16_MEMBER(tomcat_adcread_r);
+	DECLARE_WRITE8_MEMBER(adcon_w);
 	DECLARE_READ16_MEMBER(tomcat_inputs_r);
 	DECLARE_WRITE16_MEMBER(main_latch_w);
 	DECLARE_WRITE_LINE_MEMBER(led1_w);
@@ -84,7 +85,6 @@ protected:
 
 private:
 	required_device<tms5220_device> m_tms;
-	int m_control_num;
 	required_shared_ptr<uint16_t> m_shared_ram;
 	uint8_t m_nvram[0x800];
 	int m_dsp_BIO;
@@ -92,24 +92,16 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
+	required_device<adc0808_device> m_adc;
 	required_device<ls259_device> m_mainlatch;
 };
 
 
 
-WRITE16_MEMBER(tomcat_state::tomcat_adcon_w)
+WRITE8_MEMBER(tomcat_state::adcon_w)
 {
-	m_control_num = data;
-}
-
-READ16_MEMBER(tomcat_state::tomcat_adcread_r)
-{
-	switch( m_control_num )
-	{
-	case 0: return ioport("STICKY")->read();
-	case 1: return ioport("STICKX")->read();
-	default: return 0x7f7f;
-	}
+	m_adc->address_w(space, 0, data & 7);
+	m_adc->start_w(BIT(data, 3));
 }
 
 READ16_MEMBER(tomcat_state::tomcat_inputs_r)
@@ -251,7 +243,7 @@ WRITE8_MEMBER(tomcat_state::tomcat_nvram_w)
 void tomcat_state::tomcat_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x402000, 0x402001).r(this, FUNC(tomcat_state::tomcat_adcread_r)).w(this, FUNC(tomcat_state::tomcat_adcon_w));
+	map(0x402001, 0x402001).r("adc", FUNC(adc0808_device::data_r)).w(this, FUNC(tomcat_state::adcon_w));
 	map(0x404000, 0x404001).r(this, FUNC(tomcat_state::tomcat_inputs_r)).w("avg", FUNC(avg_tomcat_device::go_word_w));
 	map(0x406000, 0x406001).w("avg", FUNC(avg_tomcat_device::reset_word_w));
 	map(0x408000, 0x408001).r(this, FUNC(tomcat_state::tomcat_inputs2_r)).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -299,7 +291,7 @@ void tomcat_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( tomcat )
 	PORT_START("IN0")   /* INPUTS */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_tomcat_device, done_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_tomcat_device, done_r, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED ) // SPARE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON5 ) // DIAGNOSTIC
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
@@ -325,7 +317,6 @@ void tomcat_state::machine_start()
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, 0x800);
 
 	save_item(NAME(m_nvram));
-	save_item(NAME(m_control_num));
 	save_item(NAME(m_dsp_BIO));
 	save_item(NAME(m_dsp_idle));
 
@@ -333,20 +324,24 @@ void tomcat_state::machine_start()
 }
 
 MACHINE_CONFIG_START(tomcat_state::tomcat)
-	MCFG_CPU_ADD("maincpu", M68010, 12_MHz_XTAL / 2)
+	MCFG_CPU_ADD("maincpu", M68010, 12.096_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(tomcat_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  5*60)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert,  (double)XTAL(12'000'000) / 16 / 16 / 16 / 12)
+	//MCFG_CPU_PERIODIC_INT_DRIVER(tomcat_state, irq1_line_assert, 12.096_MHz_XTAL / 16 / 16 / 16 / 12)
 
 	MCFG_CPU_ADD("dsp", TMS32010, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP( dsp_map)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(tomcat_state, dsp_BIO_r))
 
-	MCFG_CPU_ADD("soundcpu", M6502, XTAL(14'318'181) / 8 )
+	MCFG_CPU_ADD("soundcpu", M6502, 14.318181_MHz_XTAL / 8 )
 	MCFG_DEVICE_DISABLE()
 	MCFG_CPU_PROGRAM_MAP( sound_map)
 
-	MCFG_DEVICE_ADD("riot", RIOT6532, XTAL(14'318'181) / 8)
+	MCFG_DEVICE_ADD("adc", ADC0809, 12.096_MHz_XTAL / 16)
+	MCFG_ADC0808_IN0_CB(IOPORT("STICKY"))
+	MCFG_ADC0808_IN1_CB(IOPORT("STICKX"))
+
+	MCFG_DEVICE_ADD("riot", RIOT6532, 14.318181_MHz_XTAL / 8)
 	/*
 	 PA0 = /WS   OUTPUT  (TMS-5220 WRITE STROBE)
 	 PA1 = /RS   OUTPUT  (TMS-5220 READ STROBE)

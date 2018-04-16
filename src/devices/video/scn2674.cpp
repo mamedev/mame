@@ -978,7 +978,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			if (m_use_row_table)
 			{
 				if (m_double_ht_wd)
-					dw = m_dbl1;
+					dw = m_screen1_address >> 14;
 				if (!charrow)
 				{
 					uint16_t addr = m_screen2_address;

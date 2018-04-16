@@ -259,7 +259,7 @@ WRITE_LINE_MEMBER(cinemat_state::speedfrk_sound4_w)
 WRITE_LINE_MEMBER(cinemat_state::speedfrk_start_led_w)
 {
 	/* start LED is controlled by bit 0x02 */
-	output().set_led_value(0, !state);
+	m_led = !state;
 }
 
 MACHINE_CONFIG_START(cinemat_state::speedfrk_sound)
@@ -499,7 +499,7 @@ WRITE_LINE_MEMBER(cinemat_state::tailg_sound_w)
 			m_samples->start(5, 5);
 
 		/* LED */
-		output().set_led_value(0, m_current_shift & 0x40);
+		m_led = BIT(m_current_shift, 6);
 
 		/* remember the previous value */
 		m_last_shift = m_current_shift;

@@ -330,7 +330,7 @@ static INPUT_PORTS_START( tourvision )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) // games slot status in bits 3 to 7
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) // games slot status in bits 3 to 7
 INPUT_PORTS_END
 
 void tourvision_state::pce_mem(address_map &map)

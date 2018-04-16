@@ -124,15 +124,16 @@ void osborne1_state::osborne1_io(address_map &map)
 	map(0x00, 0x03).mirror(0xfc).w(this, FUNC(osborne1_state::bankswitch_w));
 }
 
-ADDRESS_MAP_START(osborne1_state::osborne1nv_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void osborne1_state::osborne1nv_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
 
-	AM_RANGE( 0x00, 0x03 ) AM_WRITE(bankswitch_w)
-	AM_RANGE( 0x04, 0x04 ) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE( 0x05, 0x05 ) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	map( 0x00, 0x03 ).w(this, FUNC(osborne1_state::bankswitch_w));
+	map( 0x04, 0x04 ).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map( 0x05, 0x05 ).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	// seems to be something at 0x06 as well, but no idea what - BIOS writes 0x07 on boot
-ADDRESS_MAP_END
+}
 
 
 static INPUT_PORTS_START( osborne1 )

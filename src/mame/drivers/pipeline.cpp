@@ -361,7 +361,6 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 
 	MCFG_CPU_ADD("maincpu", Z80, 7372800/2)
 	MCFG_CPU_PROGRAM_MAP(cpu0_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pipeline_state, nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 7372800/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
@@ -395,6 +394,7 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 16, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(pipeline_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pipeline)
 

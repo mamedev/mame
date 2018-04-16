@@ -101,7 +101,7 @@
 
 #include "emu.h"
 #include "includes/beathead.h"
-#include "machine/nvram.h"
+#include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
 
@@ -219,30 +219,6 @@ READ32_MEMBER( beathead_state::interrupt_control_r )
 
 /*************************************
  *
- *  EEPROM handling
- *
- *************************************/
-
-WRITE32_MEMBER( beathead_state::eeprom_data_w )
-{
-	if (m_eeprom_enabled)
-	{
-		mem_mask &= 0x000000ff;
-		COMBINE_DATA(m_nvram + offset);
-		m_eeprom_enabled = 0;
-	}
-}
-
-
-WRITE32_MEMBER( beathead_state::eeprom_enable_w )
-{
-	m_eeprom_enabled = 1;
-}
-
-
-
-/*************************************
- *
  *  Sound communication
  *
  *************************************/
@@ -278,7 +254,7 @@ void beathead_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).ram().share("ram_base");
 	map(0x01800000, 0x01bfffff).rom().region("user1", 0).share("rom_base");
-	map(0x40000000, 0x400007ff).ram().w(this, FUNC(beathead_state::eeprom_data_w)).share("nvram");
+	map(0x40000000, 0x400007ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0x000000ff);
 	map(0x41000000, 0x41000000).rw(m_jsa, FUNC(atari_jsa_iii_device::main_response_r), FUNC(atari_jsa_iii_device::main_command_w));
 	map(0x41000100, 0x41000103).r(this, FUNC(beathead_state::interrupt_control_r));
 	map(0x41000100, 0x4100011f).w(this, FUNC(beathead_state::interrupt_control_w));
@@ -289,7 +265,7 @@ void beathead_state::main_map(address_map &map)
 	map(0x41000300, 0x41000303).portr("IN2");
 	map(0x41000304, 0x41000307).portr("IN3");
 	map(0x41000400, 0x41000403).writeonly().share("palette_select");
-	map(0x41000500, 0x41000503).w(this, FUNC(beathead_state::eeprom_enable_w));
+	map(0x41000500, 0x41000500).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
 	map(0x41000600, 0x41000603).w(this, FUNC(beathead_state::finescroll_w));
 	map(0x41000700, 0x41000703).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
 	map(0x42000000, 0x4201ffff).rw(m_palette, FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
@@ -367,7 +343,8 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 	MCFG_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -389,7 +366,7 @@ MACHINE_CONFIG_START(beathead_state::beathead)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(beathead_state, sound_int_write_line))
+	MCFG_ATARI_JSA_III_ADD("jsa", NOOP)
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

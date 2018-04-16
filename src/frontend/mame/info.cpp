@@ -25,11 +25,12 @@
 #include "xmlfile.h"
 
 #include <ctype.h>
+#include <cstring>
 #include <map>
 
 
-#define XML_ROOT                "mame"
-#define XML_TOP                 "machine"
+#define XML_ROOT    "mame"
+#define XML_TOP     "machine"
 
 
 //**************************************************************************
@@ -1818,25 +1819,29 @@ void info_xml_creator::output_software_list(device_t &root)
 
 void info_xml_creator::output_ramoptions(device_t &root)
 {
-	for (const ram_device &ram : ram_device_iterator(root))
+	for (const ram_device &ram : ram_device_iterator(root, 1))
 	{
-		uint32_t const defsize(ram.default_size());
-		bool havedefault(false);
-		for (ram_device::extra_option const &option : ram.extra_options())
+		if (!std::strcmp(ram.tag(), ":" RAM_TAG))
 		{
-			if (defsize == option.second)
+			uint32_t const defsize(ram.default_size());
+			bool havedefault(false);
+			for (ram_device::extra_option const &option : ram.extra_options())
 			{
-				assert(!havedefault);
-				havedefault = true;
-				fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
+				if (defsize == option.second)
+				{
+					assert(!havedefault);
+					havedefault = true;
+					fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
+				}
+				else
+				{
+					fprintf(m_output, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
+				}
 			}
-			else
-			{
-				fprintf(m_output, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
-			}
+			if (!havedefault)
+				fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
+			break;
 		}
-		if (!havedefault)
-			fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
 	}
 }
 

@@ -61,13 +61,14 @@ class midcoin24cdjuke_state : public driver_device
 {
 public:
 	midcoin24cdjuke_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_io_row0(*this, "ROW0"),
-		m_io_row1(*this, "ROW1"),
-		m_io_row2(*this, "ROW2"),
-		m_io_row3(*this, "ROW3"),
-		m_charset(*this, "charset")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_io_row0(*this, "ROW0")
+		, m_io_row1(*this, "ROW1")
+		, m_io_row2(*this, "ROW2")
+		, m_io_row3(*this, "ROW3")
+		, m_charset(*this, "charset")
+		, m_digits(*this, "digit%u", 0U)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -76,6 +77,7 @@ public:
 	required_ioport m_io_row2;
 	required_ioport m_io_row3;
 	required_region_ptr<uint16_t> m_charset;
+	output_finder<16> m_digits;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -121,7 +123,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 
 	char_data = bitswap<16>(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 
-	output().set_digit_value(offset, char_data ^ 0xffff);
+	m_digits[offset] = char_data ^ 0xffff;
 }
 
 
@@ -271,6 +273,7 @@ INPUT_PORTS_END
 
 void midcoin24cdjuke_state::machine_start()
 {
+	m_digits.resolve();
 }
 
 void midcoin24cdjuke_state::machine_reset()

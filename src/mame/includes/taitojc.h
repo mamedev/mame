@@ -28,7 +28,9 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_analog_ports(*this, "AN.%u", 0),
-		m_tc0780fpa(*this, "tc0780fpa")
+		m_tc0780fpa(*this, "tc0780fpa"),
+		m_lamps(*this, "lamp%u", 0U),
+		m_counters(*this, "counter%u", 0U)
 	{
 		m_mcu_output = 0;
 		m_speed_meter = 0;
@@ -53,6 +55,9 @@ public:
 	optional_ioport_array<8> m_analog_ports;
 
 	required_device<tc0780fpa_device> m_tc0780fpa;
+
+	output_finder<8> m_lamps;
+	output_finder<5> m_counters;
 
 	uint32_t m_dsp_rom_pos;
 

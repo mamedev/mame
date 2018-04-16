@@ -270,9 +270,9 @@ static INPUT_PORTS_START( rastan )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin A gets locked if 0)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (coin B gets locked if 0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )                // from PC050 (above 2 bits not checked when 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )                // from PC050 (coin A gets locked if 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )                // from PC050 (coin B gets locked if 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM )                // from PC050 (above 2 bits not checked when 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* 0x390008 -> 0x10c018 ($18,A5) */

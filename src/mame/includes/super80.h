@@ -53,7 +53,10 @@ public:
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
+		, m_cass_led(*this, "cass_led")
 	{ }
+
+	void machine_start() override;
 
 	DECLARE_READ8_MEMBER(super80v_low_r);
 	DECLARE_READ8_MEMBER(super80v_high_r);
@@ -143,6 +146,7 @@ private:
 	optional_device<wd2793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
+	output_finder<> m_cass_led;
 };
 
 #endif // MAME_INCLUDES_SUPER80_H

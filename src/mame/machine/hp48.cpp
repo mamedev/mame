@@ -523,7 +523,7 @@ WRITE8_MEMBER(hp48_state::hp49_bank_w)
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
 	{
-		LOG(( "%05x %f hp49_bank_w: off=%03x\n", space.device().safe_pcbase(), machine().time().as_double(), offset ));
+		LOG(("%s %f hp49_bank_w: off=%03x\n", machine().describe_context(), machine().time().as_double(), offset));
 		m_bank_switch = offset;
 		apply_modules();
 	}

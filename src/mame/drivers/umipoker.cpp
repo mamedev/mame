@@ -9,7 +9,7 @@
     Additional work by Roberto Fresca.
 
     TODO:
-    - Fix clocks;
+    - Verify clocks (XTALs are 14.3181 and 2.000MHz)
 
     TMP68HC000-16 + z80 + YM3812 + OKI6295
 
@@ -33,26 +33,21 @@ class umipoker_state : public driver_device
 {
 public:
 	umipoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_vram_0(*this, "vra0"),
-		m_vram_1(*this, "vra1"),
-		m_vram_2(*this, "vra2"),
-		m_vram_3(*this, "vra3"),
-		m_z80_wram(*this, "z80_wram"),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_vram_0(*this, "vra0")
+		, m_vram_1(*this, "vra1")
+		, m_vram_2(*this, "vra2")
+		, m_vram_3(*this, "vra3")
+		, m_z80_wram(*this, "z80_wram")
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+	{
+	}
 
-	required_shared_ptr<uint16_t> m_vram_0;
-	required_shared_ptr<uint16_t> m_vram_1;
-	required_shared_ptr<uint16_t> m_vram_2;
-	required_shared_ptr<uint16_t> m_vram_3;
-	tilemap_t *m_tilemap_0;
-	tilemap_t *m_tilemap_1;
-	tilemap_t *m_tilemap_2;
-	tilemap_t *m_tilemap_3;
-	required_shared_ptr<uint8_t> m_z80_wram;
-	int m_umipoker_scrolly[4];
+	void umipoker(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(z80_rom_readback_r);
 	DECLARE_READ8_MEMBER(z80_shared_ram_r);
 	DECLARE_WRITE8_MEMBER(z80_shared_ram_w);
@@ -65,26 +60,54 @@ public:
 	DECLARE_WRITE16_MEMBER(umipoker_vram_1_w);
 	DECLARE_WRITE16_MEMBER(umipoker_vram_2_w);
 	DECLARE_WRITE16_MEMBER(umipoker_vram_3_w);
-	DECLARE_WRITE16_MEMBER(lamps_w);
 	DECLARE_WRITE16_MEMBER(umi_counters_w);
-	DECLARE_WRITE16_MEMBER(saiyu_counters_w);
-	DECLARE_DRIVER_INIT(umipoker);
-	DECLARE_DRIVER_INIT(saiyukip);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void umipoker(machine_config &config);
+
 	void umipoker_audio_io_map(address_map &map);
 	void umipoker_audio_map(address_map &map);
 	void umipoker_map(address_map &map);
+
+	required_shared_ptr<uint16_t> m_vram_0;
+	required_shared_ptr<uint16_t> m_vram_1;
+	required_shared_ptr<uint16_t> m_vram_2;
+	required_shared_ptr<uint16_t> m_vram_3;
+	tilemap_t *m_tilemap_0;
+	tilemap_t *m_tilemap_1;
+	tilemap_t *m_tilemap_2;
+	tilemap_t *m_tilemap_3;
+	required_shared_ptr<uint8_t> m_z80_wram;
+	int m_umipoker_scrolly[4];
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+};
+
+class saiyukip_state : public umipoker_state
+{
+public:
+	saiyukip_state(const machine_config &mconfig, device_type type, const char *tag)
+		: umipoker_state(mconfig, type, tag)
+		, m_lamps(*this, "lamp%u", 0U)
+	{
+	}
+
+	void saiyukip(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(lamps_w);
+	DECLARE_WRITE16_MEMBER(saiyu_counters_w);
+
+	virtual void machine_start() override;
+
+	void saiyukip_map(address_map &map);
+
+	output_finder<6> m_lamps;
 };
 
 TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
@@ -222,7 +245,7 @@ WRITE16_MEMBER(umipoker_state::umipoker_vram_3_w)
 	m_tilemap_3->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(umipoker_state::lamps_w)
+WRITE16_MEMBER(saiyukip_state::lamps_w)
 {
 /*
   Umipoker buttons layout:
@@ -263,12 +286,12 @@ WRITE16_MEMBER(umipoker_state::lamps_w)
   --x- ---- ---- ----  START lamp.
 
 */
-	output().set_lamp_value(0, (data >> 5) & 1);      /* Lamp 0 - RIGHT */
-	output().set_lamp_value(1, (data >> 9) & 1);      /* Lamp 1 - TAKE */
-	output().set_lamp_value(2, (data >> 10) & 1);     /* Lamp 2 - D-UP */
-	output().set_lamp_value(3, (data >> 11) & 1);     /* Lamp 3 - BET */
-	output().set_lamp_value(4, (data >> 12) & 1);     /* Lamp 4 - LEFT/STOP */
-	output().set_lamp_value(5, (data >> 13) & 1);     /* Lamp 5 - START */
+	m_lamps[0] = BIT(data, 5);      // Lamp 0 - RIGHT
+	m_lamps[1] = BIT(data, 9);      // Lamp 1 - TAKE
+	m_lamps[2] = BIT(data, 10);     // Lamp 2 - D-UP
+	m_lamps[3] = BIT(data, 11);     // Lamp 3 - BET
+	m_lamps[4] = BIT(data, 12);     // Lamp 4 - LEFT/STOP
+	m_lamps[5] = BIT(data, 13);     // Lamp 5 - START
 }
 
 WRITE16_MEMBER(umipoker_state::umi_counters_w)
@@ -287,12 +310,12 @@ WRITE16_MEMBER(umipoker_state::umi_counters_w)
   xxxx xxxx x--x xxx-  Unknown / Not used.
 
 */
-	machine().bookkeeping().coin_counter_w(0, data & 0x20);  /* COIN 1 */
-	machine().bookkeeping().coin_counter_w(1, data & 0x40);  /* COIN 2 */
-	machine().bookkeeping().coin_counter_w(2, data & 0x01);  /* PAYOUT */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));  // COIN 1
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 6));  // COIN 2
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 0));  // PAYOUT
 }
 
-WRITE16_MEMBER(umipoker_state::saiyu_counters_w)
+WRITE16_MEMBER(saiyukip_state::saiyu_counters_w)
 {
 /*
   0x0000 - Normal State (lamps off).
@@ -309,9 +332,9 @@ WRITE16_MEMBER(umipoker_state::saiyu_counters_w)
   x--x xxx- xxxx xxxx  Unknown / Not used.
 
 */
-	machine().bookkeeping().coin_counter_w(0, data & 0x2000);    /* COIN 1 */
-	machine().bookkeeping().coin_counter_w(1, data & 0x4000);    /* COIN 2 */
-	machine().bookkeeping().coin_counter_w(2, data & 0x0100);    /* PAYOUT */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 13));    // COIN 1
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 14));    // COIN 2
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 8));     // PAYOUT
 }
 
 
@@ -330,6 +353,7 @@ void umipoker_state::umipoker_map(address_map &map)
 	map(0xe00000, 0xe00001).portr("IN0");
 	map(0xe00004, 0xe00005).portr("IN1"); // unused?
 	map(0xe00008, 0xe00009).portr("IN2");
+	map(0xe00010, 0xe00011).w(this, FUNC(umipoker_state::umi_counters_w));
 //  AM_RANGE(0xe0000c, 0xe0000d) AM_WRITE(lamps_w) -----> lamps only for saiyukip.
 //  AM_RANGE(0xe00010, 0xe00011) AM_WRITE(counters_w) --> coin counters for both games.
 	map(0xe00014, 0xe00015).portr("DSW1-2");
@@ -340,6 +364,13 @@ void umipoker_state::umipoker_map(address_map &map)
 	map(0xe0002a, 0xe0002b).w(this, FUNC(umipoker_state::umipoker_scrolly_1_w));
 	map(0xe0002c, 0xe0002d).nopw(); // unknown meaning, bit 0 goes from 0 -> 1 on IRQ service routine
 	map(0xe0002e, 0xe0002f).w(this, FUNC(umipoker_state::umipoker_scrolly_3_w));
+}
+
+void saiyukip_state::saiyukip_map(address_map &map)
+{
+	umipoker_map(map);
+	map(0xe0000c, 0xe0000d).w(this, FUNC(saiyukip_state::lamps_w));
+	map(0xe00010, 0xe00011).w(this, FUNC(saiyukip_state::saiyu_counters_w));
 }
 
 void umipoker_state::umipoker_audio_map(address_map &map)
@@ -655,26 +686,21 @@ static GFXDECODE_START( umipoker )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,     0, 0x40)
 GFXDECODE_END
 
-void umipoker_state::machine_start()
+void saiyukip_state::machine_start()
 {
+	m_lamps.resolve();
 }
 
-void umipoker_state::machine_reset()
-{
-}
-
-// TODO: clocks
+// TODO: Verify clocks (XTALs are 14.3181 and 2.000MHz)
 MACHINE_CONFIG_START(umipoker_state::umipoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,16000000) // TMP68HC000-16
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(14'318'181)) // TMP68HC000-16
 	MCFG_CPU_PROGRAM_MAP(umipoker_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", umipoker_state,  irq6_line_assert)
 
-	MCFG_CPU_ADD("audiocpu",Z80,4000000)
+	MCFG_CPU_ADD("audiocpu",Z80, XTAL(14'318'181)/4) // 3.579545MHz
 	MCFG_CPU_PROGRAM_MAP(umipoker_audio_map)
 	MCFG_CPU_IO_MAP(umipoker_audio_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(umipoker_state, irq0_line_hold,  120)  // ? controls ym3812 music tempo
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -687,6 +713,7 @@ MACHINE_CONFIG_START(umipoker_state::umipoker)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(umipoker_state, screen_update_umipoker)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(ASSERTLINE("maincpu", 6))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", umipoker)
 
@@ -697,11 +724,19 @@ MACHINE_CONFIG_START(umipoker_state::umipoker)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym", YM3812, 4000000 / 2)
+	MCFG_SOUND_ADD("ym", YM3812, XTAL(14'318'181)/4) // 3.579545MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 2, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(2'000'000), PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(saiyukip_state::saiyukip)
+	umipoker(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(saiyukip_map)
 MACHINE_CONFIG_END
 
 
@@ -754,22 +789,11 @@ ROM_END
 *              Driver Init                *
 ******************************************/
 
-DRIVER_INIT_MEMBER(umipoker_state,umipoker)
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::umi_counters_w), this));
-}
-
-DRIVER_INIT_MEMBER(umipoker_state,saiyukip)
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::saiyu_counters_w), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000c, 0xe0000d, write16_delegate(FUNC(umipoker_state::lamps_w), this));
-}
-
 
 /******************************************
 *              Game Drivers               *
 ******************************************/
 
 //     YEAR  NAME       PARENT    MACHINE    INPUT     STATE            INIT      ROT   COMPANY                  FULLNAME                                  FLAGS   LAYOUT
-GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state,  umipoker, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
-GAMEL( 1998, saiyukip,  0,        umipoker,  saiyukip, umipoker_state,  saiyukip, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )
+GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state,  0,        ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
+GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state,  0,        ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )
