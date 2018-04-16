@@ -45,10 +45,8 @@ void eprom_state::update_interrupts()
 {
 	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
-	if (m_extra != nullptr)
+	if (m_extra.found())
 		m_extra->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-
-	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void eprom_state::machine_start()
@@ -427,7 +425,7 @@ MACHINE_CONFIG_START(eprom_state::eprom)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(eprom_state, sound_int_write_line))
+	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_REMOVE("jsa:pokey")
@@ -470,7 +468,7 @@ MACHINE_CONFIG_START(eprom_state::klaxp)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(eprom_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -518,7 +516,7 @@ MACHINE_CONFIG_START(eprom_state::guts)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(eprom_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

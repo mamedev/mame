@@ -341,14 +341,13 @@ WRITE16_MEMBER(pico_base_state::pico_68k_io_write )
 	}
 }
 
-ADDRESS_MAP_START(pico_base_state::pico_mem)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-
-	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(pico_68k_io_read, pico_68k_io_write)
-
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000)
-ADDRESS_MAP_END
+void pico_base_state::pico_mem(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x800000, 0x80001f).rw(this, FUNC(pico_base_state::pico_68k_io_read), FUNC(pico_base_state::pico_68k_io_write));
+	map(0xc00000, 0xc0001f).rw("gen_vdp", FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
+	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000);
+}
 
 
 static INPUT_PORTS_START( pico )

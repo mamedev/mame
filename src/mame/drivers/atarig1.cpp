@@ -37,7 +37,6 @@
 void atarig1_state::update_interrupts()
 {
 	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -437,7 +436,7 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarig1_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 14)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

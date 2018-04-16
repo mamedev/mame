@@ -223,7 +223,7 @@ void parodius_state::machine_reset()
 WRITE8_MEMBER( parodius_state::banking_callback )
 {
 	if (data & 0xf0)
-		logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
+		logerror("%s: setlines %02x\n", machine().describe_context(), data);
 
 	membank("bank1")->set_entry((data & 0x0f) ^ 0x0f);
 }

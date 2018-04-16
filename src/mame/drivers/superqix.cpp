@@ -291,7 +291,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::mcu_port3_w_cb)
 
 TIMER_CALLBACK_MEMBER(superqix_state::z80_ay1_sync_address_w_cb)
 {
-	m_ay1->address_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, param, 0xff);
+	m_ay1->address_w(m_maincpu->space(AS_PROGRAM), 0, param, 0xff);
 }
 
 
@@ -357,7 +357,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::bootleg_mcu_port1_w_cb)
 		//already after a synchronize, and doing another one would be redundant
 	}
 
-	mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff); // finally write to port 2, which will do another synchronize
+	mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff); // finally write to port 2, which will do another synchronize
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_mcu_port1_w)
@@ -957,7 +957,7 @@ MACHINE_RESET_MEMBER(superqix_state, superqix)
 		// the act of clearing this latch asserts the z80 reset, and the mcu must clear it itself by writing
 		// to the p2 latch with bit 5 set.
 		m_port2_raw = 0x01; // force the following function into latching a zero write by having bit 0 falling edge
-		mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xff);
+		mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, 0x00, 0xff);
 		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }

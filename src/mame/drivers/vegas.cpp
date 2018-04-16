@@ -559,7 +559,7 @@ WRITE32_MEMBER( vegas_state::timekeeper_w )
 		m_cmos_unlocked = 0;
 	}
 	else
-		logerror("%08X:timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", safe_pc(), offset, data, mem_mask);
+		logerror("%s: timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", machine().describe_context(), offset, data, mem_mask);
 }
 
 
@@ -679,7 +679,7 @@ READ8_MEMBER(vegas_state::sio_r)
 		result = m_sio_irq_enable;
 		if (LOG_SIO) {
 			std::string sioBitSel = sioIRQString(result);
-			logerror("%08X: sio_r: INTR ENABLE 0x%02x %s\n", machine().device("maincpu")->safe_pc(), result, sioBitSel);
+			logerror("%s: sio_r: INTR ENABLE 0x%02x %s\n", machine().describe_context(), result, sioBitSel);
 		}
 		break;
 	case 2:
@@ -687,7 +687,7 @@ READ8_MEMBER(vegas_state::sio_r)
 		result = m_sio_irq_state & m_sio_irq_enable;
 		if (LOG_SIO) {
 			std::string sioBitSel = sioIRQString(result);
-			logerror("%08X: sio_r: INTR CAUSE 0x%02x %s\n", machine().device("maincpu")->safe_pc(), result, sioBitSel);
+			logerror("%s: sio_r: INTR CAUSE 0x%02x %s\n", machine().describe_context(), result, sioBitSel);
 		}
 		//m_sio_irq_state &= ~0x02;
 		break;
@@ -696,7 +696,7 @@ READ8_MEMBER(vegas_state::sio_r)
 		result = m_sio_irq_state;
 		if (LOG_SIO) {
 			std::string sioBitSel = sioIRQString(result);
-			logerror("%08X: sio_r: INTR STATUS 0x%02x %s\n", machine().device("maincpu")->safe_pc(), result, sioBitSel);
+			logerror("%s: sio_r: INTR STATUS 0x%02x %s\n", machine().describe_context(), result, sioBitSel);
 		}
 		break;
 	case 4:
@@ -736,7 +736,7 @@ READ8_MEMBER(vegas_state::sio_r)
 	}
 	}
 	if (LOG_SIO && (index < 0x1 || index > 0x4))
-		logerror("%08X: sio_r: offset: %08x index: %d result: %02X\n", machine().device("maincpu")->safe_pc(), offset, index, result);
+		logerror("%s: sio_r: offset: %08x index: %d result: %02X\n", machine().describe_context(), offset, index, result);
 	return result;
 }
 
@@ -848,7 +848,7 @@ WRITE8_MEMBER(vegas_state::cpu_io_w)
 		}
 		if (LOG_SIO) {
 			popmessage("System LED: %C", digit);
-			//logerror("%08X: cpu_io_w System LED offset %X = %02X '%c'\n", machine().device("maincpu")->safe_pc(), offset, data, digit);
+			//logerror("%s: cpu_io_w System LED offset %X = %02X '%c'\n", machine().describe_context(), offset, data, digit);
 		}
 	}
 		break;
@@ -861,19 +861,19 @@ WRITE8_MEMBER(vegas_state::cpu_io_w)
 			reset_sio();
 		}
 		if (LOG_SIO)
-			logerror("%08X: cpu_io_w PLD Config offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+			logerror("%s: cpu_io_w PLD Config offset %X = %02X\n", machine().describe_context(), offset, data);
 		break;
 	case 2:
 		if (LOG_SIO && (m_cpuio_data[3] & 0x1))
-			logerror("%08X: cpu_io_w PLD Status / Jamma Serial Sense offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+			logerror("%s: cpu_io_w PLD Status / Jamma Serial Sense offset %X = %02X\n", machine().describe_context(), offset, data);
 		break;
 	case 3:
 		// Bit 0: Enable SIO, Bit 1: Enable SIO_R0/IDE, Bit 2: Enable PCI
 		if (LOG_SIO)
-			logerror("%08X: cpu_io_w System Reset offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+			logerror("%s: cpu_io_w System Reset offset %X = %02X\n", machine().describe_context(), offset, data);
 		break;
 	default:
-		logerror("%08X: cpu_io_w unknown offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+		logerror("%s: cpu_io_w unknown offset %X = %02X\n", machine().describe_context(), offset, data);
 		break;
 	}
 }
@@ -884,7 +884,7 @@ READ8_MEMBER( vegas_state::cpu_io_r )
 	if (offset < 4)
 		result = m_cpuio_data[offset];
 	if (LOG_SIO && !(!(m_cpuio_data[3] & 0x1)))
-		logerror("%08X:cpu_io_r offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, result);
+		logerror("%s:cpu_io_r offset %X = %02X\n", machine().describe_context(), offset, result);
 	return result;
 }
 
@@ -898,7 +898,7 @@ READ8_MEMBER( vegas_state::cpu_io_r )
 
 READ32_MEMBER( vegas_state::analog_port_r )
 {
-	//logerror("%08X: analog_port_r = %08X & %08X\n", machine().device("maincpu")->safe_pc(), m_pending_analog_read, mem_mask);
+	//logerror("%s: analog_port_r = %08X & %08X\n", machine().describe_context(), m_pending_analog_read, mem_mask);
 	// Clear interrupt
 	m_sio_irq_state &= ~0x02;
 	if (m_sio_irq_enable & 0x02) {
@@ -936,7 +936,7 @@ WRITE32_MEMBER( vegas_state::analog_port_w )
 		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
 	}
 	//logerror("analog_port_w: wheel_force: %i read: %i\n", m_wheel_force, m_pending_analog_read);
-	//logerror("%08X: analog_port_w = %08X & %08X index = %d\n", machine().device("maincpu")->safe_pc(), data, mem_mask, index);
+	//logerror("%s: analog_port_w = %08X & %08X index = %d\n", machine().describe_context(), data, mem_mask, index);
 	if (m_sio_irq_enable & 0x02) {
 		m_sio_irq_state |= 0x02;
 		update_sio_irqs();
@@ -997,13 +997,13 @@ READ32_MEMBER(vegas_state::unknown_r)
 READ8_MEMBER(vegas_state::parallel_r)
 {
 	uint8_t result = 0x7;
-	logerror("%06X: parallel_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, result);
+	logerror("%s: parallel_r %08x = %02x\n", machine().describe_context(), offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(vegas_state::parallel_w)
 {
-	logerror("%06X: parallel_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+	logerror("%s: parallel_w %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
 /*************************************
@@ -1011,7 +1011,7 @@ WRITE8_MEMBER(vegas_state::parallel_w)
 *************************************/
 WRITE8_MEMBER(vegas_state::mpsreset_w)
 {
-	logerror("%06X: mpsreset_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+	logerror("%s: mpsreset_w %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
 /*************************************
@@ -1061,11 +1061,11 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 		data = ~index & 0xf;
 		break;
 	default:
-		//logerror("%08X: i40_r: select: %x index: %d data: %x\n", machine().device("maincpu")->safe_pc(), m_i40_data, index, data);
+		//logerror("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context(), m_i40_data, index, data);
 		break;
 	}
 	//if (m_i40_data & 0x1000)
-	//  printf("%08X: i40_r: select: %x index: %d data: %x\n", machine().device("maincpu")->safe_pc(), m_i40_data, index, data);
+	//  printf("%s: i40_r: select: %x index: %d data: %x\n", machine().describe_context().c_str(), m_i40_data, index, data);
 	//m_i40_data &= ~0x1000;
 	return data;
 }

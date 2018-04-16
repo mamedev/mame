@@ -60,6 +60,7 @@ public:
 		, m_buttons(*this, "BUTTONS")
 		, m_maincpu(*this, "maincpu")
 		, m_bank(*this, "bank")
+		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "p%c%u", unsigned('a'), 0U)
 		, m_rxd(true)
 	{
@@ -70,7 +71,7 @@ public:
 	void sitcom(machine_config &config);
 
 protected:
-	template <unsigned D> DECLARE_WRITE16_MEMBER(update_ds) { output().set_digit_value((D << 2) | offset, data); }
+	template <unsigned D> DECLARE_WRITE16_MEMBER(update_ds) { m_digits[(D << 2) | offset] = data; }
 	DECLARE_WRITE_LINE_MEMBER(update_rxd)                   { m_rxd = bool(state); }
 	DECLARE_WRITE_LINE_MEMBER(sod_led)                      { output().set_value("sod_led", state); }
 	DECLARE_READ_LINE_MEMBER(sid_line)                      { return m_rxd ? 1 : 0; }
@@ -88,6 +89,7 @@ protected:
 	required_ioport                          m_buttons;
 	required_device<cpu_device>              m_maincpu;
 	required_device<address_map_bank_device> m_bank;
+	output_finder<15>                        m_digits;
 	output_finder<2, 8>                      m_leds;
 
 	bool m_rxd;
@@ -209,6 +211,7 @@ INPUT_PORTS_END
 
 void sitcom_state::machine_start()
 {
+	m_digits.resolve();
 	m_leds.resolve();
 
 	save_item(NAME(m_rxd));
@@ -336,11 +339,11 @@ void sitcom_timer_state::update_dac(uint8_t value)
 {
 	// supposed to be a DAC and an analog meter, but that's hard to do with internal layouts
 	constexpr u8 s_7seg[10] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f };
-	output().set_digit_value(12, s_7seg[value % 10]);
+	m_digits[12] = s_7seg[value % 10];
 	value /= 10;
-	output().set_digit_value(13, s_7seg[value % 10]);
+	m_digits[13] = s_7seg[value % 10];
 	value /= 10;
-	output().set_digit_value(14, s_7seg[value % 10] | 0x80);
+	m_digits[14] = s_7seg[value % 10] | 0x80;
 }
 
 

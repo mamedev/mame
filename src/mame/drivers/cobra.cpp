@@ -1169,19 +1169,7 @@ void cobra_fifo::push(const device_t *cpu, uint64_t data)
 {
 	if (m_verbose)
 	{
-		char accessor_location[50];
-		if (cpu != nullptr)
-		{
-			// cpu has a name and a PC
-			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
-		}
-		else
-		{
-			// non-cpu
-			sprintf(accessor_location, "(non-cpu)");
-		}
-
-		printf("%s: push %08X%08X (%d) at %s\n", m_name, (uint32_t)(data >> 32), (uint32_t)(data), m_num, accessor_location);
+		printf("%s %s: push %08X%08X (%d)\n", cpu->machine().describe_context().c_str(), m_name, (uint32_t)(data >> 32), (uint32_t)(data), m_num);
 	}
 
 	if (m_num == m_size)
@@ -1189,19 +1177,7 @@ void cobra_fifo::push(const device_t *cpu, uint64_t data)
 		if (m_verbose)
 		{
 			int i, j;
-			char accessor_location[50];
-			if (cpu != nullptr)
-			{
-				// cpu has a name and a PC
-				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
-			}
-			else
-			{
-				// non-cpu
-				sprintf(accessor_location, "(non-cpu)");
-			}
-
-			printf("%s overflow at %s\n", m_name, accessor_location);
+			printf("%s %s overflow\n", cpu->machine().describe_context().c_str(), m_name);
 			printf("%s dump:\n", m_name);
 
 			for (j=0; j < 128; j+=4)
@@ -1246,19 +1222,7 @@ bool cobra_fifo::pop(const device_t *cpu, uint64_t *result)
 	{
 		if (m_verbose)
 		{
-			char accessor_location[50];
-			if (cpu != nullptr)
-			{
-				// cpu has a name and a PC
-				sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
-			}
-			else
-			{
-				// non-cpu
-				sprintf(accessor_location, "(non-cpu)");
-			}
-
-			printf("%s underflow at %s\n", m_name, accessor_location);
+			printf("%s %s underflow\n", cpu->machine().describe_context().c_str(), m_name);
 		}
 		return false;
 	}
@@ -1267,19 +1231,7 @@ bool cobra_fifo::pop(const device_t *cpu, uint64_t *result)
 
 	if (m_verbose)
 	{
-		char accessor_location[50];
-		if (cpu != nullptr)
-		{
-			// cpu has a name and a PC
-			sprintf(accessor_location, "(%s) %08X", cpu->tag(), const_cast<device_t *>(cpu)->safe_pc());
-		}
-		else
-		{
-			// non-cpu
-			sprintf(accessor_location, "(non-cpu)");
-		}
-
-		printf("%s: pop %08X%08X (%d) at %s\n", m_name, (uint32_t)(r >> 32), (uint32_t)(r), m_num-1, accessor_location);
+		printf("%s %s: pop %08X%08X (%d)\n", cpu->machine().describe_context().c_str(), m_name, (uint32_t)(r >> 32), (uint32_t)(r), m_num-1);
 	}
 
 	m_rpos++;

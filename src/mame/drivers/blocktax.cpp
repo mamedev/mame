@@ -64,8 +64,10 @@ uint32_t blocktax_state::screen_update_blocktax(screen_device &screen, bitmap_in
 	return 0;
 }
 
-ADDRESS_MAP_START(blocktax_state::blocktax_map)
-ADDRESS_MAP_END
+//unused function
+void blocktax_state::blocktax_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( blocktax )
 INPUT_PORTS_END

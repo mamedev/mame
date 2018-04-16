@@ -220,7 +220,7 @@ READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 // but why not just use the V33/V53 XA mode??
 WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 {
-	logerror("%08x hng64_sound_bank_w? %02x %04x\n", space.device().safe_pc(), offset, data);
+	logerror("%s hng64_sound_bank_w? %02x %04x\n", machine().describe_context(), offset, data);
 	// buriki writes 0x3f to 0x200 before jumping to the low addresses..
 	// where it expects to find data from 0x1f0000
 
@@ -252,18 +252,18 @@ WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_000a_w)
 {
-	logerror("%08x: hng64_port hng64_sound_port_000a_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
+	logerror("%s: hng64_port hng64_sound_port_000a_w %04x mask (%04x)\n", machine().describe_context(), data, mem_mask);
 }
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_000c_w)
 {
-	logerror("%08x: hng64_port hng64_sound_port_000c_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
+	logerror("%s: hng64_port hng64_sound_port_000c_w %04x mask (%04x)\n", machine().describe_context(), data, mem_mask);
 }
 
 
 WRITE16_MEMBER(hng64_state::hng64_sound_port_0080_w)
 {
-	logerror("hng64_port 0x0080 %04x\n", data);
+	logerror("%s: hng64_port 0x0080 %04x\n", machine().describe_context(), data);
 }
 
 

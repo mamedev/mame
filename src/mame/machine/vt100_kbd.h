@@ -60,6 +60,11 @@ private:
 	required_device<ripple_counter_device> m_scan_counter;
 	required_ioport_array<16> m_key_row;
 
+	output_finder<> m_online_led;
+	output_finder<> m_local_led;
+	output_finder<> m_locked_led;
+	output_finder<4> m_ln_led;
+
 	bool m_signal_line;
 	attotime m_last_signal_change;
 	u8 m_last_scan;

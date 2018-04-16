@@ -282,11 +282,12 @@ void minitel_state::mem_prg(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-ADDRESS_MAP_START(minitel_state::mem_io)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dev_keyb_ser_r, dev_crtl_reg_w)
+void minitel_state::mem_io(address_map &map)
+{
+	map(0x2000, 0x3fff).rw(this, FUNC(minitel_state::dev_keyb_ser_r), FUNC(minitel_state::dev_crtl_reg_w));
 	/* ts9347 */
-	AM_RANGE(0x4000, 0x5ffF) AM_READWRITE(ts9347_io_r, ts9347_io_w)
-ADDRESS_MAP_END
+	map(0x4000, 0x5ffF).rw(this, FUNC(minitel_state::ts9347_io_r), FUNC(minitel_state::ts9347_io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( minitel2 )
@@ -400,6 +401,7 @@ MACHINE_CONFIG_START(minitel_state::minitel2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL(14'318'181)) //verified on pcb
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
+	MCFG_CPU_IO_MAP(mem_io)
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(minitel_state, port1_r))
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(minitel_state, port1_w))
 	MCFG_MCS51_PORT_P3_IN_CB(READ8(minitel_state, port3_r))

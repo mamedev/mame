@@ -392,7 +392,7 @@ void halleys_state::blit(int offset)
 
 #if HALLEYS_DEBUG
 if (0) {
-	logerror("%s:[%04x]", machine.describe_context(), offset);
+	logerror("%s:[%04x]", machine().describe_context(), offset);
 	for (ecx=0; ecx<16; ecx++) logerror(" %02x", param[ecx]);
 	logerror("\n");
 }

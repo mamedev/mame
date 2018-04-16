@@ -1185,11 +1185,11 @@ void mpu4vid_state::mpu4_68k_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rom();
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
-//  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
+//  map(0x810000, 0x81ffff) AM_RAM /* ? */
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(this, FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
@@ -1201,7 +1201,7 @@ void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 {
 	map(0x000000, 0x5fffff).rom(); //AM_WRITENOP
 	map(0x600000, 0x63ffff).ram(); /* The Mating Game has an extra 256kB RAM on the program card */
-//  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
+//  map(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
 	map(0x800000, 0x80ffff).ram().share("vid_mainram");
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
@@ -1214,7 +1214,7 @@ void mpu4vid_state::mpu4oki_68k_map(address_map &map)
 	map(0xffa040, 0xffa04f).w(this, FUNC(mpu4vid_state::ic3ss_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
 	map(0xffa060, 0xffa067).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);    // PIA6821 on sampled sound board
 	map(0xffd000, 0xffd00f).rw(this, FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
-//  AM_RANGE(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
+//  map(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
 }
 
 void mpu4vid_state::bwbvid_68k_map(address_map &map)
@@ -1225,13 +1225,13 @@ void mpu4vid_state::bwbvid_68k_map(address_map &map)
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
-//  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+//  map(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
+/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(this, FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
-	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	//map(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 }
 
 void mpu4vid_state::bwbvid5_68k_map(address_map &map)
@@ -1242,8 +1242,8 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
 	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
 	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
-	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	//map(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
+/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rw(this, FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
 	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
@@ -1255,21 +1255,22 @@ void mpu4vid_state::bwbvid5_68k_map(address_map &map)
 }
 
 /* TODO: Fix up MPU4 map*/
-ADDRESS_MAP_START(mpu4_state::mpu4_6809_map)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_device, read, write)
-	AM_RANGE(0x0880, 0x0881) AM_NOP //Read/write here
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0)  /* 64k EPROM on board, only this region read */
-ADDRESS_MAP_END
+void mpu4_state::mpu4_6809_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0801).rw("acia6850_0", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0880, 0x0881).noprw(); //Read/write here
+	map(0x0900, 0x0907).rw("ptm_ic2", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x0a00, 0x0a03).rw("pia_ic3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0b00, 0x0b03).rw("pia_ic4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c03).rw("pia_ic5", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0d00, 0x0d03).rw("pia_ic6", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0e00, 0x0e03).rw("pia_ic7", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0f00, 0x0f03).rw("pia_ic8", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4000, 0x7fff).ram();
+	map(0xbe00, 0xbfff).ram();
+	map(0xc000, 0xffff).rom().region("maincpu",0);  /* 64k EPROM on board, only this region read */
+}
 
 
 

@@ -53,9 +53,15 @@ tlc34076_device::tlc34076_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 void tlc34076_device::device_start()
 {
-	save_item(NAME(m_local_paletteram));
+	for (int i = 0; i < 3; i++)
+	{
+		m_local_paletteram[i] = std::make_unique<uint8_t[]>(0x100);
+		save_pointer(NAME(m_local_paletteram[i].get()), 0x100, i);
+	}
+	m_pens = std::make_unique<rgb_t[]>(0x100);
+
 	save_item(NAME(m_regs));
-	save_item(NAME(m_pens));
+	save_pointer(NAME(m_pens.get()), 0x100);
 
 	save_item(NAME(m_writeindex));
 	save_item(NAME(m_readindex));
@@ -97,9 +103,9 @@ const rgb_t *tlc34076_device::get_pens()
 
 		if ((i & m_regs[PIXEL_READ_MASK]) == i)
 		{
-			r = m_local_paletteram[3 * i + 0];
-			g = m_local_paletteram[3 * i + 1];
-			b = m_local_paletteram[3 * i + 2];
+			r = m_local_paletteram[0][i];
+			g = m_local_paletteram[1][i];
+			b = m_local_paletteram[2][i];
 
 			if (m_dacbits == 6)
 			{
@@ -118,7 +124,7 @@ const rgb_t *tlc34076_device::get_pens()
 		m_pens[i] = rgb_t(r, g, b);
 	}
 
-	return m_pens;
+	return m_pens.get();
 }
 
 
@@ -140,9 +146,8 @@ READ8_MEMBER( tlc34076_device::read )
 		case PALETTE_DATA:
 			if (m_readindex == 0)
 			{
-				m_palettedata[0] = m_local_paletteram[3 * m_regs[PALETTE_READ_ADDR] + 0];
-				m_palettedata[1] = m_local_paletteram[3 * m_regs[PALETTE_READ_ADDR] + 1];
-				m_palettedata[2] = m_local_paletteram[3 * m_regs[PALETTE_READ_ADDR] + 2];
+				for (int i = 0; i < 3; i++)
+					m_palettedata[i] = m_local_paletteram[i][m_regs[PALETTE_READ_ADDR]];
 			}
 			result = m_palettedata[m_readindex++];
 			if (m_readindex == 3)
@@ -181,9 +186,9 @@ WRITE8_MEMBER( tlc34076_device::write )
 			m_palettedata[m_writeindex++] = data;
 			if (m_writeindex == 3)
 			{
-				m_local_paletteram[3 * m_regs[PALETTE_WRITE_ADDR] + 0] = m_palettedata[0];
-				m_local_paletteram[3 * m_regs[PALETTE_WRITE_ADDR] + 1] = m_palettedata[1];
-				m_local_paletteram[3 * m_regs[PALETTE_WRITE_ADDR] + 2] = m_palettedata[2];
+				for (int i = 0; i < 3; i++)
+					m_local_paletteram[i][m_regs[PALETTE_WRITE_ADDR]] = m_palettedata[i];
+
 				m_writeindex = 0;
 				m_regs[PALETTE_WRITE_ADDR]++;
 			}

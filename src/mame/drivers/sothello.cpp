@@ -252,7 +252,7 @@ void sothello_state::unlock_shared_ram()
 	}
 	else
 	{
-		//logerror("Sub cpu active! @%x\n",device().safe_pc());
+		//logerror("%s Sub cpu active!\n",machine().describe_context());
 	}
 }
 

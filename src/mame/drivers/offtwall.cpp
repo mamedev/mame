@@ -31,20 +31,6 @@
 
 /*************************************
  *
- *  Interrupt handling
- *
- *************************************/
-
-void offtwall_state::update_interrupts()
-{
-	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-/*************************************
- *
  *  I/O handling
  *
  *************************************/
@@ -239,7 +225,7 @@ void offtwall_state::main_map(address_map &map)
 	map(0x260050, 0x260051).w(this, FUNC(offtwall_state::io_latch_w));
 	map(0x260060, 0x260061).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x2a0000, 0x2a0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x3e0000, 0x3e0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x3e0000, 0x3e0fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 	map(0x3f4000, 0x3f5eff).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_msb_w)).share("vad:playfield");
 	map(0x3f5f00, 0x3f5f7f).ram().share("vad:eof");
@@ -365,7 +351,7 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(offtwall_state, scanline_int_write_line))
+	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
 	MCFG_ATARI_VAD_PLAYFIELD(offtwall_state, "gfxdecode", get_playfield_tile_info)
 	MCFG_ATARI_VAD_MOB(offtwall_state::s_mob_config, "gfxdecode")
 
@@ -380,7 +366,7 @@ MACHINE_CONFIG_START(offtwall_state::offtwall)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_III_ADD("jsa", WRITELINE(offtwall_state, sound_int_write_line))
+	MCFG_ATARI_JSA_III_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_REMOVE("jsa:oki1")

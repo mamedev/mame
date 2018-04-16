@@ -52,7 +52,9 @@ public:
 		m_crt(*this, "crt"),
 		m_tty(*this, "tty"),
 		m_row(*this, "ROW-%u", 0),
-		m_wp(*this, "WP") { }
+		m_wp(*this, "WP"),
+		m_digits(*this, "digit%u", 0U)
+		{ }
 
 	required_shared_ptr<uint8_t> m_ram_1k;
 	required_shared_ptr<uint8_t> m_ram_2k;
@@ -64,6 +66,7 @@ public:
 	emu_timer *m_led_update;
 	DECLARE_DRIVER_INIT(sym1);
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_0_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_1_w);
@@ -87,6 +90,7 @@ protected:
 	required_device<rs232_port_device> m_tty;
 	required_ioport_array<4> m_row;
 	required_ioport m_wp;
+	output_finder<6> m_digits;
 };
 
 
@@ -103,7 +107,7 @@ WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_5_w ) { if (state) m_led_update
 
 TIMER_CALLBACK_MEMBER(sym1_state::led_refresh)
 {
-	output().set_digit_value(param, m_riot_port_a);
+	m_digits[param] = m_riot_port_a;
 }
 
 READ8_MEMBER(sym1_state::riot_a_r)
@@ -125,7 +129,7 @@ READ8_MEMBER(sym1_state::riot_a_r)
 
 READ8_MEMBER(sym1_state::riot_b_r)
 {
-	int data = 0xff;
+	int data = 0x3f;
 
 	// determine column
 	if ( ((m_riot_port_a ^ 0xff) & (m_row[1]->read() ^ 0xff)) & 0x7f )
@@ -138,10 +142,10 @@ READ8_MEMBER(sym1_state::riot_b_r)
 		data &= ~0x04;
 
 	// PB6 in from TTY keyboard
-	data &= m_tty->rxd_r() << 6;
+	data |= m_tty->rxd_r() << 6;
 
 	// PB7 in from RS-232 CRT
-	data &= m_crt->rxd_r() << 7;
+	data |= m_crt->rxd_r() << 7;
 
 	data &= ~0x80; // else hangs 8b02
 

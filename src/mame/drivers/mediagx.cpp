@@ -931,7 +931,7 @@ void mediagx_state::init_mediagx()
 
 uint32_t mediagx_state::generic_speedup(address_space &space, int idx)
 {
-	if (space.device().safe_pc() == m_speedup_table[idx].pc)
+	if (m_maincpu->pc() == m_speedup_table[idx].pc)
 	{
 		m_speedup_hits[idx]++;
 		space.device().execute().spin_until_interrupt();

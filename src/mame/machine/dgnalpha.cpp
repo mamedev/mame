@@ -355,12 +355,12 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
 		else
 		{
 			if (m_pia_2->ca2_output_z())
-				maincpu().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		}
 	}
 	else
 	{
-		maincpu().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 

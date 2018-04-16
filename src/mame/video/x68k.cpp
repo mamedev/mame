@@ -446,14 +446,14 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 		}
 		break;
 	}
-//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",m_maincpu->safe_pc(),data,offset);
+//  logerror("%s CRTC: Wrote %04x to CRTC register %i\n",machine().describe_context(),data,offset);
 }
 
 READ16_MEMBER(x68k_state::x68k_crtc_r )
 {
 	if(offset < 24)
 	{
-//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",m_maincpu->safe_pc(),m_crtc.reg[offset],offset);
+//      logerror("%s CRTC: Read %04x from CRTC register %i\n",machine().describe_context(),m_crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:

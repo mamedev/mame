@@ -27,8 +27,11 @@ TODO:
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
+#include "machine/clock.h"
 #include "sound/2203intf.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/jangou_blitter.h"
 #include "video/resnet.h"
 #include "screen.h"
@@ -43,6 +46,7 @@ public:
 	nightgal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_comms_ram(*this, "comms_ram"),
+		m_sound_ram(*this, "sound_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
@@ -71,6 +75,7 @@ public:
 	emu_timer *m_z80_wait_ack_timer;
 
 	required_shared_ptr<uint8_t> m_comms_ram;
+	optional_shared_ptr<uint8_t> m_sound_ram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -89,6 +94,8 @@ public:
 	DECLARE_READ8_MEMBER(input_1p_r);
 	DECLARE_READ8_MEMBER(input_2p_r);
 	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_READ8_MEMBER(sexygal_soundram_r);
+	DECLARE_READ8_MEMBER(sexygal_unknown_sound_r);
 	DECLARE_WRITE8_MEMBER(sexygal_audioff_w);
 	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);
 
@@ -377,25 +384,36 @@ void nightgal_state::common_nsc_map(address_map &map)
 * Sexy Gal
 ********************************/
 
+READ8_MEMBER(nightgal_state::sexygal_soundram_r)
+{
+	// bit 7 set = contention?
+	return BIT(m_sound_ram[offset], 7) ? 0x00 : 0x40;
+}
+
+READ8_MEMBER(nightgal_state::sexygal_unknown_sound_r)
+{
+	// value read here stored in (1-bit) shared RAM but not used?
+	return 0;
+}
+
 // flip flop from main to audio CPU
 WRITE8_MEMBER(nightgal_state::sexygal_audioff_w)
 {
 	// causes an irq
-	if(m_sexygal_audioff & 0x40 && (data & 0x40) == 0)
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-
-	// NMI, correct?
-	if(m_sexygal_audioff & 0x20 && (data & 0x20) == 0)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(0, BIT(data, 6) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 4 used, audio cpu reset line?
+	// bit 5 used only for access to shared RAM?
 
 	m_sexygal_audioff = data;
 }
 
 WRITE8_MEMBER(nightgal_state::sexygal_audionmi_w)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+
+	// doesn't seem to be any way around this blatant hack
+	m_audiocpu->reset();
 }
 
 
@@ -410,6 +428,7 @@ void nightgal_state::sweetgal_map(address_map &map)
 void nightgal_state::sexygal_map(address_map &map)
 {
 	sweetgal_map(map);
+	map(0x8000, 0x807f).r(this, FUNC(nightgal_state::sexygal_soundram_r));
 	map(0xa000, 0xa000).w(this, FUNC(nightgal_state::sexygal_audioff_w));
 }
 
@@ -434,8 +453,10 @@ void nightgal_state::sgaltrop_io(address_map &map)
 {
 	common_sexygal_io(map);
 
-	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::data_r));
-	map(0x02, 0x03).w("ymsnd", FUNC(ym2203_device::data_address_w));
+	// not actually a YM2203?
+	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::read_port_r));
+	map(0x02, 0x02).w("ymsnd", FUNC(ym2203_device::write_port_w));
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2203_device::control_port_w));
 }
 
 void nightgal_state::sexygal_nsc_map(address_map &map)
@@ -460,9 +481,11 @@ void nightgal_state::sgaltrop_nsc_map(address_map &map)
 void nightgal_state::sexygal_audio_map(address_map &map)
 {
 	map(0x0000, 0x007f).ram();
-
+	map(0x0080, 0x0080).r(this, FUNC(nightgal_state::sexygal_unknown_sound_r));
+	map(0x1000, 0x1000).w("dac", FUNC(dac_byte_interface::write));
 	map(0x2000, 0x207f).ram().share("sound_ram");
 	map(0x3000, 0x3000).w(this, FUNC(nightgal_state::sexygal_audionmi_w));
+	map(0x4000, 0xbfff).rom().region("samples", 0);
 	map(0xc000, 0xffff).rom().region("audiorom", 0);
 }
 
@@ -804,7 +827,6 @@ MACHINE_CONFIG_START(nightgal_state::sexygal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sexygal_map)
 	MCFG_CPU_IO_MAP(sexygal_io)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(nightgal_state, nmi_line_pulse, 60)//???
 
 	MCFG_CPU_MODIFY("sub")
 	MCFG_CPU_PROGRAM_MAP(sexygal_nsc_map)
@@ -812,6 +834,13 @@ MACHINE_CONFIG_START(nightgal_state::sexygal)
 
 	MCFG_CPU_ADD("audiocpu", NSC8105, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(sexygal_audio_map)
+
+	MCFG_DEVICE_ADD("sampleclk", CLOCK, 6000) // quite a wild guess
+	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_REMOVE("aysnd")
 
@@ -828,6 +857,7 @@ MACHINE_CONFIG_START(nightgal_state::sweetgal)
 
 	// doesn't have the extra NSC8105 (so how does this play samples?)
 	MCFG_DEVICE_REMOVE("audiocpu")
+	MCFG_DEVICE_REMOVE("sampleclk")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nightgal_state::ngalsumr)
@@ -847,6 +877,7 @@ MACHINE_CONFIG_START(nightgal_state::sgaltrop)
 	MCFG_CPU_PROGRAM_MAP(sgaltrop_nsc_map)
 
 	MCFG_DEVICE_REMOVE("audiocpu")
+	MCFG_DEVICE_REMOVE("sampleclk")
 MACHINE_CONFIG_END
 
 /*
@@ -1035,7 +1066,6 @@ ROM_START( sexygal )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10.3n",  0x00000, 0x04000, CRC(53425b74) SHA1(1239c0527d00d693313366b7e3da669565f99ffd) )
 	ROM_LOAD( "11.3pr", 0x04000, 0x04000, CRC(a3138b42) SHA1(1bf7f6e2c4020251379cc72fa731c17795f35e2e) )
-	ROM_LOAD( "12.s8b", 0x08000, 0x04000, CRC(7ac4a984) SHA1(7b41c522387938fe7625c9a6c62a385d6635cc5e) )
 
 	ROM_REGION( 0x4000, "subrom", 0 )
 	ROM_LOAD( "1.3a",   0x00000, 0x04000, CRC(f814cf27) SHA1(ceba1f14a202d926380039d7cb4669eb8be58539) ) // has a big (16 byte wide) ASCII 'Y.M' art, written in YMs (!)
@@ -1043,8 +1073,9 @@ ROM_START( sexygal )
 	ROM_REGION( 0x4000, "audiorom", 0)
 	ROM_LOAD( "14.s6b",  0x00000, 0x04000, CRC(b4a2497b) SHA1(7231f57b4548899c886625e883b9972c0f30e9f2) )
 
-	ROM_REGION( 0x4000, "samples", 0 )
-	ROM_LOAD( "13.s7b",  0x00000, 0x04000, CRC(5eb75f56) SHA1(b7d81d786d1ac8d65a6a122140954eb89d76e8b4) )
+	ROM_REGION( 0x8000, "samples", 0 )
+	ROM_LOAD( "12.s8b",  0x00000, 0x04000, CRC(7ac4a984) SHA1(7b41c522387938fe7625c9a6c62a385d6635cc5e) )
+	ROM_LOAD( "13.s7b",  0x04000, 0x04000, CRC(5eb75f56) SHA1(b7d81d786d1ac8d65a6a122140954eb89d76e8b4) )
 
 	ROM_REGION( 0x40000, "gfx", ROMREGION_ERASEFF )
 	ROM_LOAD( "2.3c",  0x00000, 0x04000, CRC(f719e09d) SHA1(c78411b4f974b3dd261d51e522e086fc30a96fcb) )
@@ -1174,7 +1205,7 @@ Sexy Gal Tropical
 XGトロピカル (main board)
 
 Chips/hybrid modules (all Nichibutsu silkscreen):
-    2P  GF 136027 (40-pin CPU?)
+    2P  GF 136027 (40-pin CPU or PSG?)
     4C  XG 1985-05 (40-pin)
     4P  XGZ 60-04 (40-pin)
     5D  NB 1984-06 (28-pin)

@@ -6,7 +6,7 @@
     Williams System 4
 
     Phoenix and Pokerino are listed as System 4 systems, but use System 3 roms.
-    They have been moved to s3.c, and are working there.
+    They have been moved to s3.cpp, and are working there.
 
     The "Shuffle" games consist of a flat board with an air-driven puck and 10
     bowling pins. You must push the puck as if it was a bowling ball, and score
@@ -56,6 +56,7 @@ public:
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
 		, m_pias(*this, "pias")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(sound_r);
@@ -94,6 +95,7 @@ private:
 	uint8_t m_kbdrow;
 	bool m_data_ok;
 	bool m_chimes;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pia22;
@@ -101,6 +103,7 @@ private:
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
 	optional_device<pia6821_device> m_pias;
+	output_finder<32> m_digits;
 };
 
 void s4_state::s4_main_map(address_map &map)
@@ -393,8 +396,8 @@ WRITE8_MEMBER( s4_state::dig1_w )
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
 	{
-		output().set_digit_value(m_strobe+16, patterns[data&15]);
-		output().set_digit_value(m_strobe, patterns[data>>4]);
+		m_digits[m_strobe+16] = patterns[data&15];
+		m_digits[m_strobe] = patterns[data>>4];
 	}
 	m_data_ok = false;
 }

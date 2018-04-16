@@ -832,10 +832,10 @@ int atari_slapstic_device::alt2_kludge(address_space &space, offs_t offset)
 	if (access_68k)
 	{
 		/* first verify that the prefetched PC matches the first alternate */
-		if (MATCHES_MASK_VALUE(space.device().safe_pc() >> 1, slapstic.alt1))
+		if (MATCHES_MASK_VALUE(space.device().state().pc() >> 1, slapstic.alt1))
 		{
 			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			uint16_t opcode = space.read_word(space.device().safe_pcbase() & 0xffffff);
+			uint16_t opcode = space.read_word(space.device().state().pcbase() & 0xffffff);
 			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
 			{
 				/* fetch the value of the register for the second operand, and see */

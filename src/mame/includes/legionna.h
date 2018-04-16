@@ -13,6 +13,7 @@ public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram"),
+			m_swappal(*this, "swappal"),
 			m_layer_disable(0),
 			m_back_gfx_bank(0),
 			m_fore_gfx_bank(0),
@@ -30,6 +31,7 @@ public:
 	}
 
 	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_swappal;
 	std::unique_ptr<uint16_t[]> m_back_data;
 	std::unique_ptr<uint16_t[]> m_fore_data;
 	std::unique_ptr<uint16_t[]> m_mid_data;
@@ -61,10 +63,12 @@ public:
 	DECLARE_WRITE16_MEMBER(legionna_foreground_w);
 	DECLARE_WRITE16_MEMBER(legionna_text_w);
 	DECLARE_READ8_MEMBER(denjinmk_sound_comms_r);
+	DECLARE_WRITE8_MEMBER(godzilla_oki_bank_w);
 	DECLARE_WRITE16_MEMBER(denjinmk_setgfxbank);
 	DECLARE_WRITE16_MEMBER(heatbrl_setgfxbank);
 	DECLARE_WRITE16_MEMBER(grainbow_layer_config_w);
-
+	DECLARE_WRITE16_MEMBER(palette_swap_w);
+	
 	DECLARE_DRIVER_INIT(legiongfx);
 	DECLARE_DRIVER_INIT(cupsoc_debug);
 	DECLARE_DRIVER_INIT(cupsoc);
@@ -106,12 +110,13 @@ public:
 	void legionna(machine_config &config);
 	void godzilla(machine_config &config);
 	void denjinmk(machine_config &config);
-	void cupsoc_mem(address_map &map);
-	void cupsocs_mem(address_map &map);
+	void cupsoc_map(address_map &map);
+	void cupsocs_map(address_map &map);
 	void denjinmk_map(address_map &map);
 	void godzilla_map(address_map &map);
 	void grainbow_map(address_map &map);
 	void heatbrl_map(address_map &map);
-	void legionna_cop_mem(address_map &map);
+	void legionna_cop_map(address_map &map);
 	void legionna_map(address_map &map);
+	void godzilla_sound_io_map(address_map &map);
 };

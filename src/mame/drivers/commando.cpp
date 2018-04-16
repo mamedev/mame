@@ -229,9 +229,10 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-INTERRUPT_GEN_MEMBER(commando_state::commando_interrupt)
+WRITE_LINE_MEMBER(commando_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); // RST 10h - VBLANK
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // RST 10h - VBLANK
 }
 
 /* Machine Driver */
@@ -257,7 +258,6 @@ MACHINE_CONFIG_START(commando_state::commando)
 	MCFG_CPU_ADD("maincpu", Z80, PHI_MAIN)  // ???
 	MCFG_CPU_PROGRAM_MAP(commando_map)
 	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", commando_state,  commando_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, PHI_B)    // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -272,6 +272,7 @@ MACHINE_CONFIG_START(commando_state::commando)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(commando_state, screen_update_commando)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(commando_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", commando)

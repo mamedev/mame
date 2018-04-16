@@ -155,6 +155,9 @@ public:
 			return false;
 	}
 
+	// address translation for debugger
+	bool memory_translate(const u32 ssw, const int spacenum, const int intention, offs_t &address);
+
 protected:
 	cammu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

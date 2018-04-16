@@ -351,7 +351,7 @@ READ32_MEMBER( zeus2_device::zeus2_r )
 	}
 
 	if (logit)
-		logerror("%08X:zeus2_r(%02X) = %08X\n", machine().device("maincpu")->safe_pc(), offset, result);
+		logerror("%s:zeus2_r(%02X) = %08X\n", machine().describe_context(), offset, result);
 
 	return result;
 }
@@ -374,7 +374,7 @@ WRITE32_MEMBER( zeus2_device::zeus2_w )
 		);
 	logit &= LOG_REGS;
 	if (logit)
-		logerror("%08X:zeus2_w", machine().device("maincpu")->safe_pc());
+		logerror("%s:zeus2_w", machine().describe_context());
 	zeus2_register32_w(offset, data, logit);
 }
 

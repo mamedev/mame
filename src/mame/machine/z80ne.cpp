@@ -87,7 +87,7 @@ DRIVER_INIT_MEMBER(z80ne_state,z80netb)
 {
 }
 
-DRIVER_INIT_MEMBER(z80ne_state,z80netf)
+DRIVER_INIT_MEMBER(z80netf_state,z80netf)
 {
 	/* first two entries point to rom on reset */
 	uint8_t *RAM = m_region_z80ne->base();
@@ -181,7 +181,7 @@ void z80ne_state::reset_lx382_banking()
 	m_timer_reset->adjust(m_maincpu->cycles_to_attotime(2));
 }
 
-void z80ne_state::reset_lx390_banking()
+void z80netf_state::reset_lx390_banking()
 {
 	switch (m_io_config->read() & 0x07)
 	{
@@ -307,7 +307,7 @@ MACHINE_RESET_MEMBER(z80ne_state,z80netb)
 	reset_lx387();
 }
 
-MACHINE_RESET_MEMBER(z80ne_state,z80netf)
+MACHINE_RESET_MEMBER(z80netf_state,z80netf)
 {
 	LOG("In machine_reset z80netf\n");
 	reset_lx390_banking();
@@ -344,6 +344,8 @@ MACHINE_START_MEMBER(z80ne_state,z80ne)
 	m_timer_nmi = timer_alloc(0);
 	m_timer_reset = timer_alloc(1);
 
+	m_lx383_digits.resolve();
+
 	m_lx385_ctrl = 0x1f;
 	save_item(NAME(m_lx383_scan_counter));
 	save_item(NAME(m_lx383_downsampler));
@@ -365,10 +367,12 @@ MACHINE_START_MEMBER(z80ne_state,z80netb)
 	LOG("In MACHINE_START z80netb\n");
 }
 
-MACHINE_START_MEMBER(z80ne_state,z80netf)
+MACHINE_START_MEMBER(z80netf_state,z80netf)
 {
 	MACHINE_START_CALL_MEMBER( z80net );
 	LOG("In MACHINE_START z80netf\n");
+
+	m_drv_led.resolve();
 }
 
 /******************************************************************************
@@ -426,7 +430,7 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
 	 */
 
 	if ( offset < 8 )
-		output().set_digit_value( offset, data ^ 0xff );
+		m_lx383_digits[offset] = data ^ 0xff;
 	else
 	{
 		// after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution
@@ -604,7 +608,7 @@ READ8_MEMBER(z80ne_state::lx388_read_field_sync)
  *
  */
 
-WRITE8_MEMBER(z80ne_state::lx390_motor_w)
+WRITE8_MEMBER(z80netf_state::lx390_motor_w)
 {
 	/* Selection of drive and parameters
 	 A write also causes the selected drive motor to turn on for about 3 seconds.
@@ -620,10 +624,9 @@ WRITE8_MEMBER(z80ne_state::lx390_motor_w)
 
 	floppy_image_device *floppy = nullptr;
 
-	if (BIT(data, 0)) floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) floppy = m_floppy1->get_device();
-	if (BIT(data, 2)) floppy = m_floppy2->get_device();
-	if (BIT(data, 3)) floppy = m_floppy3->get_device();
+	for (int f = 0; f < 4; f++)
+		if (BIT(data, f))
+			floppy = m_floppy[f]->get_device();
 
 	m_wd1771->set_floppy(floppy);
 
@@ -639,12 +642,12 @@ WRITE8_MEMBER(z80ne_state::lx390_motor_w)
 	/* no drive selected, turn off all leds */
 	if (!m_wd17xx_state.drive)
 	{
-		output().set_value("drv0", 0);
-		output().set_value("drv1", 0);
+		m_drv_led[0] = 0;
+		m_drv_led[1] = 0;
 	}
 }
 
-READ8_MEMBER(z80ne_state::lx390_reset_bank)
+READ8_MEMBER(z80netf_state::lx390_reset_bank)
 {
 	offs_t pc;
 
@@ -662,7 +665,7 @@ READ8_MEMBER(z80ne_state::lx390_reset_bank)
 	return 0xff;
 }
 
-READ8_MEMBER(z80ne_state::lx390_fdc_r)
+READ8_MEMBER(z80netf_state::lx390_fdc_r)
 {
 	uint8_t d;
 
@@ -698,7 +701,7 @@ READ8_MEMBER(z80ne_state::lx390_fdc_r)
 	return d;
 }
 
-WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
+WRITE8_MEMBER(z80netf_state::lx390_fdc_w)
 {
 	uint8_t d;
 
@@ -709,9 +712,9 @@ WRITE8_MEMBER(z80ne_state::lx390_fdc_w)
 		LOG("lx390_fdc_w, WD17xx command: %02x\n", d);
 		m_wd1771->cmd_w(space, offset, d ^ 0xff);
 		if (m_wd17xx_state.drive & 1)
-			output().set_value("drv0", 2);
+			m_drv_led[0] = 2;
 		else if (m_wd17xx_state.drive & 2)
-			output().set_value("drv1", 2);
+			m_drv_led[1] = 2;
 		break;
 	case 1:
 		LOG("lx390_fdc_w, WD17xx track:   %02x\n", d);

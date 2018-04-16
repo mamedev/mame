@@ -30,10 +30,9 @@ public:
 			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
 			m_ram(*this, RAM_TAG),
-			m_y0(*this, "Y0"),
-			m_y1(*this, "Y1"),
-			m_y2(*this, "Y2"),
-			m_y3(*this, "Y3")
+			m_y(*this, "Y%u", 0U),
+			m_digits(*this, "digit%u", 0U),
+			m_out_led(*this, "led0")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -41,10 +40,9 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
+	required_ioport_array<4> m_y;
+	output_finder<6> m_digits;
+	output_finder<> m_out_led;
 
 	virtual void machine_start() override;
 

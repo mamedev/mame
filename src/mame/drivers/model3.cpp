@@ -1254,7 +1254,7 @@ LSI53C810_DMA_CB(model3_state::real3d_dma_callback)
 		case 0x9c:      /* Unknown */
 			break;
 		default:
-			logerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, machine().device("maincpu")->safe_pc());
+			logerror("%s dma_callback: %08X, %08X, %d at %08X", machine().describe_context(), src, dst, length);
 			break;
 	}
 }
@@ -1517,7 +1517,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 						}
 						break;
 					default:
-						//osd_printf_debug("Lightgun: Unknown command %02X %s\n", (uint32_t)(data >> 24), machine().describe_context());
+						//osd_printf_debug("%s Lightgun: Unknown command %02X\n", machine().describe_context().c_str(), (uint32_t)(data >> 24));
 						break;
 				}
 			}
@@ -1544,7 +1544,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 
 READ64_MEMBER(model3_state::model3_sys_r)
 {
-//  printf("model3_sys_r: mask %llx @ %x %s\n", mem_mask, offset, machine().describe_context());
+//  printf("%s model3_sys_r: mask %llx @ %x\n", machine().describe_context().c_str(), mem_mask, offset);
 
 	switch (offset)
 	{
@@ -1569,7 +1569,7 @@ READ64_MEMBER(model3_state::model3_sys_r)
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (uint32_t)mem_mask);
 			break;
 		case 0x18/8:
-//          printf("read irq_state %x %s\n", m_irq_state, machine().describe_context());
+//          printf("%s read irq_state %x\n", machine().describe_context().c_str(), m_irq_state);
 			return (uint64_t)m_irq_state<<56 | 0xff000000;
 	}
 

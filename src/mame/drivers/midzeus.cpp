@@ -93,6 +93,8 @@ private:
 
 MACHINE_START_MEMBER(midzeus_state,midzeus)
 {
+	m_digits.resolve();
+
 	timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 
@@ -435,7 +437,7 @@ WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
 			/* selection bits 4-6 select the 3 7-segment LEDs */
 			for (bit = 4; bit < 7; bit++)
 				if ((crusnexo_leds_select & (1 << bit)) == 0)
-					output().set_digit_value(bit, ~data & 0xff);
+					m_digits[bit] = ~data & 0xff;
 
 			/* selection bits 0-2 select the tachometer LEDs */
 			for (bit = 0; bit < 3; bit++)

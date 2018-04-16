@@ -146,11 +146,14 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ8_MEMBER( adc0808_device::data_r )
 {
-	if (VERBOSE)
-		logerror("data_r: %02x\n", m_sar);
+	if (!machine().side_effects_disabled())
+	{
+		if (VERBOSE)
+			logerror("data_r: %02x\n", m_sar);
 
-	// oe connected to flip-flop clear
-	m_eoc_ff_cb(0);
+		// oe connected to flip-flop clear
+		m_eoc_ff_cb(0);
+	}
 
 	return m_sar;
 }

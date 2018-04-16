@@ -1931,7 +1931,7 @@ READ64_MEMBER(viper_state::e70000_r)
 		m_ds2430_bit_timer->reset();
 		m_ds2430_bit_timer->start_time();
 
-//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
+//      printf("%s e70000_r: %08X (mask %08X%08X)\n", machine().describe_context().c_str(), offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 
 	return 0;
@@ -1971,7 +1971,7 @@ WRITE64_MEMBER(viper_state::unk1a_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
+	//  printf("%s unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", machine().describe_context().c_str(), (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 }
 
@@ -1980,7 +1980,7 @@ WRITE64_MEMBER(viper_state::unk1b_w)
 	if (ACCESSING_BITS_56_63)
 	{
 		m_ds2430_unk_status = 0;
-	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
+	//  printf("%s unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", machine().describe_context().c_str(), (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask);
 	}
 }
 

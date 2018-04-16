@@ -40,9 +40,10 @@ class zac_1_state : public genpin_class
 {
 public:
 	zac_1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_p_ram(*this, "ram")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_ram(*this, "ram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(ctrl_r);
@@ -61,18 +62,15 @@ public:
 	void zac_1_data(address_map &map);
 	void zac_1_io(address_map &map);
 	void zac_1_map(address_map &map);
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_ram;
-
-	// driver_device overrides
-	virtual void machine_reset() override;
 private:
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
 	uint8_t m_input_line;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<78> m_digits;
 };
 
 
@@ -242,7 +240,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 	{
 		uint8_t display = (m_out_offs >> 3) & 7;
 		uint8_t digit = m_out_offs & 7;
-		output().set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
+		m_digits[display * 10 + digit] = patterns[m_p_ram[m_out_offs]&15];
 	}
 	else
 	if (m_out_offs == 0x4a) // outhole
