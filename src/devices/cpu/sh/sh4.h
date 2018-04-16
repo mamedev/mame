@@ -418,8 +418,6 @@ protected:
 	int     m_cpu_clock;
 	int     m_bus_clock;
 	int     m_pm_clock;
-	int     m_fpu_sz;
-	int     m_fpu_pr;
 	int     m_ioport16_pullup;
 	int     m_ioport16_direction;
 	int     m_ioport4_pullup;

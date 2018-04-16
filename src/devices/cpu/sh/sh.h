@@ -156,6 +156,8 @@ public:
 		uint32_t  m_dbr;
 
 		int     m_frt_input;
+		int     m_fpu_sz;
+		int     m_fpu_pr;
 	};
 
 	internal_sh2_state *m_sh2_state;
