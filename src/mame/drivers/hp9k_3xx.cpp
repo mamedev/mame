@@ -154,10 +154,10 @@ public:
 	void hp9k3xx_common(address_map &map);
 	void iocpu_map(address_map &map);
 private:
-	bool m_in_buserr;
 	bool m_hil_read;
 	uint8_t m_hil_data;
 	uint8_t m_latch_data;
+	uint32_t m_lastpc;
 };
 
 uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -294,53 +294,43 @@ INPUT_PORTS_END
 
 void hp9k3xx_state::machine_reset()
 {
-	m_in_buserr = false;
 }
 
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
-	}
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	m_lastpc = machine().device<cpu_device>("maincpu")->pc(); 
 	return 0;
 }
 
 WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
+	if (m_lastpc == machine().device<cpu_device>("maincpu")->pc()) {
+		logerror("%s: ignoring r-m-w double bus error\n", __FUNCTION__);
+		return;
 	}
+
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
 READ32_MEMBER(hp9k3xx_state::buserror_r)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
-	}
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	m_lastpc = machine().device<cpu_device>("maincpu")->pc();
 	return 0;
 }
 
 WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
+	if (m_lastpc == machine().device<cpu_device>("maincpu")->pc()) {
+		logerror("%s: ignoring r-m-w double bus error\n", __FUNCTION__);
+		return;
 	}
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(hp9k3xx_state::iocpu_port1_w)
