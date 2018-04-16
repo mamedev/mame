@@ -329,6 +329,7 @@ public:
 		m_uart1(*this, "uart1"),
 		m_uart2(*this, "uart2"),
 		m_io_analog(*this, "AN.%u", 0),
+		m_lamps(*this, "lamp%u", 0U),
 		m_a2d_shift(0)
 	{ }
 	static constexpr unsigned SYSTEM_CLOCK = 100000000;
@@ -343,6 +344,8 @@ public:
 	optional_device<ns16550_device> m_uart1;
 	optional_device<ns16550_device> m_uart2;
 	optional_ioport_array<8> m_io_analog;
+	output_finder<16> m_lamps;
+
 	int m_a2d_shift;
 	int8_t m_wheel_force;
 	int m_wheel_offset;
@@ -366,6 +369,7 @@ public:
 	DECLARE_DRIVER_INIT(cartfury);
 	DECLARE_DRIVER_INIT(tenthdeg);
 	DECLARE_DRIVER_INIT(nbashowt);
+	DECLARE_DRIVER_INIT(nbagold);
 	DECLARE_DRIVER_INIT(warfa);
 	DECLARE_DRIVER_INIT(roadburn);
 	DECLARE_DRIVER_INIT(sf2049te);
@@ -468,6 +472,8 @@ void vegas_state::machine_start()
 
 	/* set the fastest DRC options, but strict verification */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
+
+	m_lamps.resolve();
 
 	/* register for save states */
 	save_item(NAME(m_vblank_state));
@@ -758,6 +764,7 @@ WRITE8_MEMBER(vegas_state::sio_w)
 				m_dcs->reset_w(data & 0x01);
 			}
 			if ((data & (1 << 2)) && !(m_sio_reset_ctrl & (1 << 2))) {
+				logerror("sio_w: Ethernet reset\n");
 				m_ethernet->reset();
 			}
 			/* toggle bit 3 low to reset the VBLANK */
@@ -1094,10 +1101,10 @@ WRITE32_MEMBER(vegas_state::wheel_board_w)
 
 		case 0x1:
 			for (uint8_t bit = 0; bit < 8; bit++)
-				machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
+				m_lamps[bit] = BIT(arg, bit);
 
 			/* leader lamp bit is included in every write, for some reason. */
-			machine().output().set_lamp_value(8, (data >> 12) & 0x1);
+			m_lamps[8] = BIT(arg, 12);
 			break;
 
 		case 0x2:
@@ -1706,7 +1713,6 @@ ADDRESS_MAP_END
  *************************************/
 
 MACHINE_CONFIG_START(vegas_state::vegascore)
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R5000LE, vegas_state::SYSTEM_CLOCK*2)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
@@ -2382,6 +2388,10 @@ DRIVER_INIT_MEMBER(vegas_state,nbashowt)
 {
 }
 
+DRIVER_INIT_MEMBER(vegas_state,nbagold)
+{
+}
+
 
 DRIVER_INIT_MEMBER(vegas_state,nbanfl)
 {
@@ -2447,7 +2457,7 @@ GAME( 1999, roadburn1,  roadburn, roadburn, roadburn, vegas_state, roadburn, ROT
 /* Durango + DSIO? + Voodoo banshee */
 GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, nbanfl,     0,        nbanfl,   nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games",  "NBA Showtime / NFL Blitz 2000 (ver 2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, nbanfl,   ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, nbagold ,   0,        nbagold,  nbashowt, vegas_state, nbagold,  ROT0, "Midway Games",  "NBA Showtime Gold / NFL Blitz 2000 (ver 3.0) (Sports Station?)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 
 /* Durango + Denver SIO + Voodoo 3 */
