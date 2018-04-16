@@ -10782,20 +10782,34 @@ ROM_START( jkrmast )
 	ROM_LOAD( "pid-515.u5",  0x0000, 0x10000, CRC(73caf824) SHA1(b7a7bb6190465f7c3b40f2ef97f4f6beeb89ec41) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
+	
+	ROM_REGION( 0x20000, "gfx2", 0 )
 	ROM_LOAD( "2000a.u41", 0x00000,  0x20000, CRC(cb8b1563) SHA1(c8c3ae646a9f3a7482d83566e4b3e18441c5d67f) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s147a.u13", 0x0000, 0x0200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
 
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "n82s129.u28",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
-	ROM_LOAD( "n82s147a.u13", 0x0100, 0x0200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
-
-	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x100, "proms2", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( jkrmasta )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pid-513.u5",  0x0000, 0x10000, CRC(12fa7ea0) SHA1(71ee141fe01ae2ce9913620b52c54cf445fd0b00) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "2000b.u48", 0x00000,  0x20000, CRC(e7b406ec) SHA1(c0a10cf8bf5467ecfe3c90e6897db3ab9aae0127) )
+	
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "2000a.u41", 0x00000,  0x20000, CRC(cb8b1563) SHA1(c8c3ae646a9f3a7482d83566e4b3e18441c5d67f) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s147a.u13", 0x0000, 0x0200, CRC(da92f0ae) SHA1(1269a2029e689a5f111c57e80825b3756b50521e) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n82s129.u28",  0x0000, 0x0100, CRC(cfb152cf) SHA1(3166b9b21be4ce1d3b6fc8974c149b4ead03abac) )
+ROM_END
 
 ROM_START( pkrmast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -16336,7 +16350,8 @@ GAMEL( 1991, cmasterh,  cmaster,  cm,       cmasterb, cmaster_state,  cmv4,     
 GAMEL( 199?, super7,    cmaster,  cm,       cmaster,  cmaster_state,  super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb )
 
 GAMEL( 1991, tonypok,   0,        cm,       tonypok,  cmaster_state,  tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
-GAME(  199?, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, 0,         ROT0, "<unknown>",         "Joker Master",                                MACHINE_NOT_WORKING ) // encrypted?
+GAME(  199?, jkrmast,   0,        pkrmast,  pkrmast,  goldstar_state, 0,         ROT0, "<unknown>",         "Joker Master (V515)",                         MACHINE_NOT_WORKING ) // encrypted
+GAME(  199?, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, 0,         ROT0, "<unknown>",         "Joker Master (V512)",                         MACHINE_NOT_WORKING ) // encrypted
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, 0,         ROT0, "<unknown>",         "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, 0,         ROT0, "<unknown>",         "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // incomplete dump + encrypted?
 
