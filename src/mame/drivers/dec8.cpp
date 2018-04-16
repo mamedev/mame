@@ -245,37 +245,6 @@ WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
 	}
 }
 
-WRITE8_MEMBER(dec8_state::shackled_i8751_w)
-{
-	m_i8751_return = 0;
-
-	switch (offset)
-	{
-	case 0: /* High byte */
-		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* Signal sub cpu */
-		break;
-	case 1: /* Low byte */
-		m_i8751_value = (m_i8751_value & 0xff00) | data;
-		break;
-	}
-
-	/* Coins are controlled by the i8751 */
-	if (/*(ioport("IN2")->read() & 3) == 3*/!m_latch) { m_latch = 1; m_coin1 = m_coin2 = 0; }
-	if ((ioport("IN2")->read() & 1) != 1 && m_latch)  { m_coin1 = 1; m_latch = 0; }
-	if ((ioport("IN2")->read() & 2) != 2 && m_latch)  { m_coin2 = 1; m_latch = 0; }
-
-	if (m_i8751_value == 0x0102) m_i8751_return = 0;    /* ??? */
-	if (m_i8751_value == 0x0101) m_i8751_return = 0;    /* ??? */
-	if (m_i8751_value == 0x0400) m_i8751_return = 0;    /* ??? */
-
-	if (m_i8751_value == 0x0050) m_i8751_return = 0; /* Japanese version (Breywood) ID */
-	if (m_i8751_value == 0x0051) m_i8751_return = 0; /* US version (Shackled) ID */
-
-	if (m_i8751_value == 0x8101) m_i8751_return = ((((m_coin2 / 10) << 4) | (m_coin2 % 10)) << 0) |
-																((((m_coin1 / 10) << 4) | (m_coin1 % 10)) << 8);    /* Coins */
-}
-
 WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 {
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
@@ -572,7 +541,7 @@ void dec8_state::shackled_sub_map(address_map &map)
 	map(0x180b, 0x180b).w(this, FUNC(dec8_state::lastmisn_scrolly_w)); /* Scroll LSB */
 	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
 	map(0x180d, 0x180d).w(this, FUNC(dec8_state::shackled_control_w)); /* Bank switch + Scroll MSB */
-	map(0x180e, 0x180f).w(this, FUNC(dec8_state::shackled_i8751_w));
+	map(0x180e, 0x180f).w(this, FUNC(dec8_state::dec8_i8751_w));
 	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
@@ -877,6 +846,30 @@ WRITE8_MEMBER(dec8_state::gondo_mcu_to_main_w)
 	m_i8751_p2 = data;
 }
 
+WRITE8_MEMBER(dec8_state::shackled_mcu_to_main_w)
+{
+	// P2 - controls latches for main CPU communication
+	if ((data&0x10)==0)
+		m_i8751_port0 = m_i8751_value>>8;
+	if ((data&0x20)==0)
+		m_i8751_port1 = m_i8751_value&0xff;
+	if ((data&0x40)==0)
+		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
+	if ((data&0x80)==0)
+		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
+
+	// P2 - IRQ to main CPU
+	if (BIT(data, 2) && !BIT(m_i8751_p2, 2))
+		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+
+	if (!BIT(data, 0))
+		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+	if (!BIT(data, 1))
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+
+	m_i8751_p2 = data;
+}
+
 /*
     Super Real Darwin is similar but only appears to have a single port
 */
@@ -1028,14 +1021,20 @@ static INPUT_PORTS_START( shackled )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // coins read through MCU
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) // coins read through MCU
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // tested and discarded by vestigial code at start
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
+	PORT_START("I8751")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
@@ -1873,13 +1872,31 @@ GFXDECODE_END
 /******************************************************************************/
 
 /* Coins generate NMI's */
-INTERRUPT_GEN_MEMBER(dec8_state::oscar_interrupt)
+WRITE_LINE_MEMBER(dec8_state::oscar_coin_irq)
 {
-	if ((ioport("IN2")->read() & 0x7) == 0x7) m_latch = 1;
-	if (m_latch && (ioport("IN2")->read() & 0x7) != 0x7)
+	if (state)
 	{
-		m_latch = 0;
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		uint8_t coins = ioport("IN2")->read() & 0x7;
+		if (coins == 0x7) m_latch = 1;
+		if (m_latch && coins != 0x7)
+		{
+			m_latch = 0;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		}
+	}
+}
+
+WRITE_LINE_MEMBER(dec8_state::shackled_coin_irq)
+{
+	if (state)
+	{
+		uint8_t coins = (ioport("I8751")->read() & 0xe0) >> 5;
+		if (coins == 0x7) m_latch = 1;
+		if (m_latch && coins != 0x7)
+		{
+			m_latch = 0;
+			m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
+		}
 	}
 }
 
@@ -2012,6 +2029,14 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_CPU_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
 
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(dec8_state, i8751_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec8_state, i8751_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, shackled_mcu_to_main_w))
+	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // needs heavy sync, otherwise one of the two CPUs will miss an irq and makes the game to hang
 
@@ -2030,6 +2055,7 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_shackled)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, shackled_coin_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shackled)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
@@ -2305,7 +2331,6 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL(12'000'000)/2) /* PCB seen both HD6309 or MC6809, clock verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(oscar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  oscar_interrupt)
 
 	MCFG_CPU_ADD("sub", HD6309, XTAL(12'000'000)/2) /* PCB seen both HD6309 or MC6809, clock verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(oscar_sub_map)
@@ -2335,6 +2360,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_oscar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, oscar_coin_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", oscar)
 	MCFG_DEVICE_ADD("palette", DECO_RMC3, 0) // xxxxBBBBGGGGRRRR with custom weighting
@@ -2594,7 +2620,7 @@ ROM_START( shackled )
 	ROM_LOAD( "dk-07.5h", 0x08000, 0x08000, CRC(887e4bcc) SHA1(6427396080e9cd8647adff47c8ed04593a14268c) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "dk.18a", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "dk.18a", 0x0000, 0x1000, CRC(1af06149) SHA1(b9cb2a4986dbcfc78b0cbea2c1e2bdac1db479cd) BAD_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dk-00.2a", 0x00000, 0x08000, CRC(69b975aa) SHA1(38cb96768c79ff1aa1b4b190e08ec9155baf698a) )
@@ -2635,7 +2661,7 @@ ROM_START( breywood )
 	ROM_LOAD( "dj07-1.5h", 0x8000, 0x8000, CRC(4a471c38) SHA1(963ed7b6afeefdfc2cf0d65b0998f973330e6495) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "dj.18a", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "dj.18a", 0x0000, 0x1000, CRC(4cb20332) SHA1(e0bbba7be22e7bcff82fb0ae441410e559ec4566) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dj-00.2a",  0x00000, 0x08000, CRC(815a891a) SHA1(e557d6a35821a8589d9e3df0f42131b58b08c8ca) )
