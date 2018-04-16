@@ -1006,7 +1006,7 @@ static INPUT_PORTS_START( arkanoid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state, arkanoid_semaphore_input_r, nullptr) // Z80 and MCU Semaphores
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state, arkanoid_semaphore_input_r, nullptr) // Z80 and MCU Semaphores
 
 	PORT_START("SYSTEM2") // these are the secondary "RH" joystick ports for P1 and P2; the circuitry to read them is populated on the arkanoid PCB, but the game never actually reads these.
 	/*PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )
@@ -1029,7 +1029,7 @@ static INPUT_PORTS_START( arkanoid )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("MUX")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state,arkanoid_input_mux, "P1\0P2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, arkanoid_state,arkanoid_input_mux, "P1\0P2")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:8")
@@ -1094,8 +1094,8 @@ static INPUT_PORTS_START( arkatayt )
 	PORT_INCLUDE( arkanoidj )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )        /* Some bootlegs need it to be 1 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )       /* Some bootlegs need it to be 0 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )        /* Some bootlegs need it to be 1 */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )       /* Some bootlegs need it to be 0 */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( arkangc )

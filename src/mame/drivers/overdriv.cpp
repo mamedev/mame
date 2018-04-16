@@ -60,7 +60,7 @@ static const uint16_t overdriv_default_eeprom[64] =
 
 WRITE16_MEMBER(overdriv_state::eeprom_w)
 {
-//logerror("%s: write %04x to eeprom_w\n",machine.describe_context(),data);
+//logerror("%s: write %04x to eeprom_w\n",machine().describe_context(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -275,8 +275,8 @@ static INPUT_PORTS_START( overdriv )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -286,7 +286,7 @@ static INPUT_PORTS_START( overdriv )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   // motor busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // motor busy flag
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)

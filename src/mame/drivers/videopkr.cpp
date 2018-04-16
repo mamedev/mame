@@ -305,11 +305,13 @@ class videopkr_state : public driver_device
 {
 public:
 	videopkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_dac(*this, "dac"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_dac(*this, "dac")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	uint8_t m_data_ram[0x100];
 	uint8_t m_video_ram[0x0400];
@@ -379,6 +381,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
+	output_finder<28> m_digits;
 	void babypkr(machine_config &config);
 	void videodad(machine_config &config);
 	void videopkr(machine_config &config);
@@ -433,7 +436,7 @@ void videopkr_state::count_7dig(unsigned long data, uint8_t index)
 
 	for (i = 0; i < 7; i++)
 	{
-		output().set_digit_value(index+i, dec_7seg((strn[6 - i] | 0x10) - 0x30));
+		m_digits[index+i] = dec_7seg((strn[6 - i] | 0x10) - 0x30);
 	}
 }
 
@@ -1241,6 +1244,7 @@ GFXDECODE_END
 
 void videopkr_state::machine_start()
 {
+	m_digits.resolve();
 	m_vp_sound_p2 = 0xff;   /* default P2 latch value */
 	m_sound_latch = 0xff;   /* default sound data latch value */
 	m_p24_data = 0xff;

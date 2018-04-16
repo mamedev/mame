@@ -94,16 +94,17 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START( rz1_state::map )
-//  AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_REGION("program", 0)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(upd934g_c_w)
-	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(key_r, upd934g_b_w)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM // sample ram 1
-	AM_RANGE(0xc000, 0xdfff) AM_RAM // sample ram 2
-	AM_RANGE(0xe000, 0xe001) AM_WRITE(leds_w)
-ADDRESS_MAP_END
+void rz1_state::map(address_map &map)
+{
+//  map(0x0000, 0x0fff).rom().region("maincpu", 0);
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x7fff).rom().region("program", 0);
+	map(0x8000, 0x8fff).w(this, FUNC(rz1_state::upd934g_c_w));
+	map(0x9000, 0x9fff).rw(this, FUNC(rz1_state::key_r), FUNC(rz1_state::upd934g_b_w));
+	map(0xa000, 0xbfff).ram(); // sample ram 1
+	map(0xc000, 0xdfff).ram(); // sample ram 2
+	map(0xe000, 0xe001).w(this, FUNC(rz1_state::leds_w));
+}
 
 
 //**************************************************************************

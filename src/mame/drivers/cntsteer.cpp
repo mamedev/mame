@@ -115,7 +115,7 @@ public:
 	DECLARE_PALETTE_INIT(zerotrgt);
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(subcpu_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(subcpu_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -639,15 +639,17 @@ WRITE8_MEMBER(cntsteer_state::nmimask_w)
 	m_nmimask = data & 0x80;
 }
 
-INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
+WRITE_LINE_MEMBER(cntsteer_state::subcpu_vblank_irq)
 {
 	// TODO: hack for bus request: DP is enabled with 0xff only during POST, and disabled once that critical operations are performed.
 	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write
 	//       between these operations brings us to this.
 	//       Game currently returns error on MIX CPU RAM because halt-ing BACK CPU doesn't happen when it should of course ...
-//  uint8_t dp_r = (uint8_t)device.state().state_int(M6809_DP);
+//  uint8_t dp_r = (uint8_t)m_subcpu->state_int(M6809_DP);
 //  m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
-	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+
+	if (state)
+		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
@@ -921,12 +923,10 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)      /* MC68B09E */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_CPU_ADD("subcpu", MC6809E, 2000000)       /* MC68B09E */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
 //  MCFG_DEVICE_DISABLE()
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  subcpu_vblank_irq) /* ? */
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -943,6 +943,8 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_cntsteer)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // ?
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(cntsteer_state, subcpu_vblank_irq)) // ?
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_PERFECT_CPU("subcpu")

@@ -138,6 +138,8 @@ DIP locations verified for:
 WRITE_LINE_MEMBER(punchout_state::nmi_mask_w)
 {
 	m_nmi_mask = state;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void punchout_state::punchout_map(address_map &map)
@@ -324,7 +326,7 @@ static INPUT_PORTS_START( punchout )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )       /* Not documented, R18 resistor */
 	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") /* Not documented, R19 resistor */
@@ -555,7 +557,7 @@ bit 3210 5432  L  R  C
 	PORT_DIPSETTING(    0x0d, "1101" )
 	PORT_DIPSETTING(    0x0e, "1110" )
 	PORT_DIPSETTING(    0x0f, "1111" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
 	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") /* R18 resistor */
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -607,10 +609,10 @@ static GFXDECODE_START( armwrest )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(punchout_state::vblank_irq)
+WRITE_LINE_MEMBER(punchout_state::vblank_irq)
 {
-	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -626,11 +628,9 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(punchout_map)
 	MCFG_CPU_IO_MAP(punchout_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -656,6 +656,8 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_top)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(punchout_state, vblank_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

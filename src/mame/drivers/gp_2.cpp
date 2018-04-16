@@ -12,7 +12,7 @@ the first high score at which a free credit is awarded. Then press 9 to set the
 back to normal operation. If this setup is not done, each player will get 3 free
 games at the start of ball 1.
 
-All the Z80 "maincpu" code is copied from gp_1.c
+All the Z80 "maincpu" code is copied from gp_1.cpp
 Any bug fixes need to be applied both here and there.
 
 Sound boards: (each game has its own custom sounds)
@@ -58,6 +58,7 @@ public:
 		, m_io_x9(*this, "X9")
 		, m_io_xa(*this, "XA")
 		, m_io_xb(*this, "XB")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(gp_2);
@@ -73,6 +74,7 @@ private:
 	uint8_t m_digit;
 	uint8_t m_segment[16];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport m_io_dsw0;
@@ -84,6 +86,7 @@ private:
 	required_ioport m_io_x9;
 	required_ioport m_io_xa;
 	required_ioport m_io_xb;
+	output_finder<40> m_digits;
 };
 
 
@@ -543,11 +546,11 @@ WRITE8_MEMBER( gp_2_state::porta_w )
 	else
 	if (m_u14 == 7)
 	{
-		output().set_digit_value(m_digit, patterns[m_segment[7]]);
-		output().set_digit_value(m_digit+8, patterns[m_segment[8]]);
-		output().set_digit_value(m_digit+16, patterns[m_segment[9]]);
-		output().set_digit_value(m_digit+24, patterns[m_segment[10]]);
-		output().set_digit_value(m_digit+32, patterns[m_segment[11]]);
+		m_digits[m_digit] = patterns[m_segment[7]];
+		m_digits[m_digit+8] = patterns[m_segment[8]];
+		m_digits[m_digit+16] = patterns[m_segment[9]];
+		m_digits[m_digit+24] = patterns[m_segment[10]];
+		m_digits[m_digit+32] = patterns[m_segment[11]];
 	}
 }
 

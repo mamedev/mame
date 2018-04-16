@@ -23,7 +23,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", (unsigned) machine.device("maincpu")->safe_pc(), buf );
+		logerror( "%s: %s", machine.describe_context(), buf );
 	}
 }
 #endif

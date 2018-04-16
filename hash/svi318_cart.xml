@@ -75,7 +75,7 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 	</software>
 
 	<!-- http://www.pouet.net/prod.php?which=65911 -->
-	<!-- Requires Specravision 328 -->
+	<!-- Requires Spectravideo 328 -->
 	<software name="prerelea">
 		<description>Pre-Release</description>
 		<year>2015</year>
@@ -83,6 +83,32 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 		<part name="cart" interface="svi318_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="pre-release.rom" size="65536" crc="fa90692e" sha1="5b5fbc309ffe2608b2fed2a4fba8ef73ad68733d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- http://www.pouet.net/prod.php?which=67679 -->
+	<!-- Requires Spectravideo 328 -->
+	<software name="postrele">
+		<description>Postrelease</description>
+		<year>2016</year>
+		<publisher>Five Finger Punch</publisher>
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="postrelease.rom" size="65536" crc="bb467c8f" sha1="3ea09d322ec7a91b8acd7fc7b4688570b85ed5f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- http://www.pouet.net/prod.php?which=68112 -->
+	<!-- Requires Spectravideo 328 -->
+	<software name="oh">
+		<description>Oh</description>
+		<year>2016</year>
+		<publisher>Five Finger Punch</publisher>
+		<part name="cart" interface="svi318_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="oh.rom" size="65536" crc="4042f67d" sha1="abb9ad310e9bdf2b1fd0f3eb0fbb967bd1dcc614" offset="0" />
 			</dataarea>
 		</part>
 	</software>

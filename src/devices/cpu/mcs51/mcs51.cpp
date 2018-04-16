@@ -1858,6 +1858,7 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 	{
 		//External Interrupt 0
 		case MCS51_INT0_LINE:
+			SET_P3((P3 &~ 4) | (state << 2));
 			//Line Asserted?
 			if (state != CLEAR_LINE) {
 				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT0 active lo!
@@ -1866,7 +1867,9 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 						SET_IE0(1);
 				}
 				else
+				{
 					SET_IE0(1);     //Nope, just set it..
+				}
 			}
 			else
 			{
@@ -1878,7 +1881,7 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 
 		//External Interrupt 1
 		case MCS51_INT1_LINE:
-
+			SET_P3((P3 &~ 8) | (state << 3));
 			//Line Asserted?
 			if (state != CLEAR_LINE) {
 				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo!

@@ -529,7 +529,9 @@ public:
 
 		m_screen2(*this, "screen2"),
 		m_palette2(*this, "palette2"), // GDC-NEW
-		m_video_ram(*this, "vram")
+		m_video_ram(*this, "vram"),
+
+		m_digits(*this, "digit%u", 0U)
 	{
 	}
 
@@ -685,6 +687,8 @@ private:
 	required_device<screen_device> m_screen2;
 	required_device<palette_device> m_palette2;
 	required_shared_ptr<uint16_t> m_video_ram;
+
+	output_finder<2> m_digits;
 
 	void raise_8088_irq(int ref);
 	void lower_8088_irq(int ref);
@@ -873,6 +877,8 @@ void rainbow_state::machine_start()
 
 	switch_off_timer = timer_alloc(1);
 	switch_off_timer->adjust(attotime::from_msec(10));
+
+	m_digits.resolve();
 
 	m_SCREEN_BLANK = false;
 
@@ -2411,8 +2417,8 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 	// Print HEX track number
 	static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
 	// 0...9 ,A (0x77), b (0x7c), C (0x39) , d (0x5e), E (0x79), F (0x71)
-	output().set_digit_value(0, bcd2hex[(track >> 4) & 0x0f]);
-	output().set_digit_value(1, bcd2hex[ track & 0x0f]);
+	m_digits[0] = bcd2hex[(track >> 4) & 0x0f];
+	m_digits[1] = bcd2hex[track & 0x0f];
 
 	// D1: DS1 H: reflect status of bits 0 and 1 from disk.control reg.
 	// D0: DS0 H: "

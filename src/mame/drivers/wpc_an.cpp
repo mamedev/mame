@@ -22,12 +22,13 @@ class wpc_an_state : public driver_device
 {
 public:
 	wpc_an_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_bg(*this,"bg"),
-			m_wpcsnd(*this,"wpcsnd"),
-			m_cpubank(*this, "cpubank"),
-			m_wpc(*this,"wpc")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_bg(*this,"bg")
+		, m_wpcsnd(*this,"wpcsnd")
+		, m_cpubank(*this, "cpubank")
+		, m_wpc(*this,"wpc")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void wpc_an_dd(machine_config &config);
@@ -42,9 +43,11 @@ protected:
 	optional_device<wpcsnd_device> m_wpcsnd;
 	required_memory_bank m_cpubank;
 	required_device<wpc_device> m_wpc;
+	output_finder<32> m_digits;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
@@ -204,8 +207,8 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// update LED segments
 		for(x=0;x<16;x++)
 		{
-			output().set_digit_value(x,bitswap<16>(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-			output().set_digit_value(x+16,bitswap<16>(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			m_digits[x] = bitswap<16>(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+			m_digits[x+16] = bitswap<16>(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
 		}
 		m_wpc->reset_alphanumeric();
 		m_vblank_count++;

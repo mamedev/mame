@@ -67,6 +67,7 @@ public:
 		, m_pia(*this, "pia")
 		, m_votrax(*this, "votrax")
 		, m_p_ram(*this, "ram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(taito);
@@ -96,11 +97,13 @@ private:
 	uint8_t m_votrax_cmd;
 	uint8_t m_io[16];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
 	required_device<pia6821_device> m_pia;
 	optional_device<votrax_sc01_device> m_votrax;
 	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<32> m_digits;
 };
 
 
@@ -340,8 +343,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 	m_out_offs &= 15;
 
 	uint8_t digit = m_out_offs << 1;
-	output().set_digit_value(digit, patterns[m_p_ram[m_out_offs]>>4]);
-	output().set_digit_value(++digit, patterns[m_p_ram[m_out_offs++]&15]);
+	m_digits[digit] = patterns[m_p_ram[m_out_offs]>>4];
+	m_digits[++digit] = patterns[m_p_ram[m_out_offs++]&15];
 }
 
 MACHINE_CONFIG_START(taito_state::taito)

@@ -200,7 +200,7 @@ uint8_t calchase_state::mtxc_config_r(int function, int reg)
 
 void calchase_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 
 	/*
 	memory banking with North Bridge:
@@ -294,7 +294,7 @@ uint8_t calchase_state::piix4_config_r(int function, int reg)
 
 void calchase_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 

@@ -1117,14 +1117,14 @@ static INPUT_PORTS_START( rad_skat )
 
 
 	PORT_START("P3") // PAL/NTSC flag
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_skatp )
 	PORT_INCLUDE(rad_skat)
 
 	PORT_MODIFY("P3") // PAL/NTSC flag
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
 /* hold 'Console Down' while powering up to get the test menu, including input tests

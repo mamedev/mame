@@ -240,6 +240,8 @@ public:
 	void func_LDCMRBANK();
 	void func_PREFM();
 	void func_FADD();
+	void func_FADD_spre();
+	void func_FADD_spost();
 	void func_FSUB();
 	void func_FMUL();
 	void func_FDIV();
@@ -322,6 +324,9 @@ protected:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
+	uml::parameter m_fs_regmap[16];
+	uml::parameter m_fd_regmap[16];
+
 	int c_md2;
 	int c_md1;
 	int c_md0;
@@ -335,20 +340,6 @@ protected:
 
 	// hack 1 = Naomi hack, hack 2 = Work in Progress implementation
 	int m_mmuhack;
-
-	uint32_t  m_ppc;
-	uint32_t  m_spc;
-	uint32_t  m_ssr;
-	uint32_t  m_rbnk[2][8];
-	uint32_t  m_sgr;
-	uint32_t  m_fr[16];
-	uint32_t  m_xf[16];
-	uint32_t  m_cpu_off;
-	uint32_t  m_pending_irq;
-	uint32_t  m_test_irq;
-	uint32_t  m_fpscr;
-	uint32_t  m_fpul;
-	uint32_t  m_dbr;
 
 	uint32_t  m_exception_priority[128];
 	int     m_exception_requesting[128];
@@ -405,7 +396,6 @@ protected:
 
 	int8_t    m_nmi_line_state;
 
-	int     m_frt_input;
 	int     m_irln;
 	int     m_internal_irq_level;
 	int     m_internal_irq_vector;
@@ -428,8 +418,6 @@ protected:
 	int     m_cpu_clock;
 	int     m_bus_clock;
 	int     m_pm_clock;
-	int     m_fpu_sz;
-	int     m_fpu_pr;
 	int     m_ioport16_pullup;
 	int     m_ioport16_direction;
 	int     m_ioport4_pullup;

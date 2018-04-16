@@ -116,7 +116,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
 		device.logerror( "%s: %s", device.machine().describe_context(), buf );
-		//printf( "%s: %s", device.machine().describe_context(), buf );
+		//printf( "%s: %s", device.machine().describe_context().c_str(), buf );
 	}
 }
 

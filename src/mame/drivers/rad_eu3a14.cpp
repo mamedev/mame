@@ -860,4 +860,4 @@ ROM_END
 CONS( 2006, rad_gtg,  0,   0,  radica_eu3a14_adc,  rad_gtg,       radica_eu3a14_state, rad_gtg, "Radica (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
-CONS( 2006, rad_foot, 0,   0,  radica_eu3a14,      radica_eu3a14, radica_eu3a14_state, rad_foot, "Radica", "Connectv Football", MACHINE_NOT_WORKING ) 
+CONS( 2006, rad_foot, 0,   0,  radica_eu3a14,      radica_eu3a14, radica_eu3a14_state, rad_foot, "Radica", "Connectv Football", MACHINE_NOT_WORKING )

@@ -154,23 +154,25 @@ READ16_MEMBER(csplayh5_state::test_r)
 	return machine().rand();
 }
 
-ADDRESS_MAP_START(csplayh5_state::csplayh5_sub_map)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+void csplayh5_state::csplayh5_sub_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
 
-	AM_RANGE(0x02000a, 0x02000b) AM_READ(test_r)
-//  AM_RANGE(0x020008, 0x02000f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
+	map(0x02000a, 0x02000b).r(this, FUNC(csplayh5_state::test_r));
+//  map(0x020008, 0x02000f).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
 
-	AM_RANGE(0x040018, 0x040019) AM_READ(test_r)
-	AM_RANGE(0x040028, 0x04002f) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0) // correct?
-	AM_RANGE(0x040036, 0x040037) AM_READ(test_r)
+	map(0x040018, 0x040019).r(this, FUNC(csplayh5_state::test_r));
+	map(0x040028, 0x04002f).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0)); // correct?
+	map(0x040036, 0x040037).r(this, FUNC(csplayh5_state::test_r));
 
-	AM_RANGE(0x078000, 0x07ffff) AM_MIRROR(0xf80000) AM_RAM //AM_SHARE("nvram")
-ADDRESS_MAP_END
+	map(0x078000, 0x07ffff).mirror(0xf80000).ram(); //.share("nvram");
+}
 
 
-ADDRESS_MAP_START(csplayh5_state::csplayh5_sub_io_map)
-	AM_RANGE(0x0a, 0x0b) AM_READ(test_r)
-ADDRESS_MAP_END
+void csplayh5_state::csplayh5_sub_io_map(address_map &map)
+{
+	map(0x0a, 0x0b).r(this, FUNC(csplayh5_state::test_r));
+}
 #endif
 
 

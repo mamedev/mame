@@ -51,35 +51,6 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 #include "emu.h"
 #include "includes/cischeat.h"
 
-#ifdef MAME_DEBUG
-#define SHOW_READ_ERROR(_format_,_offset_)\
-{\
-	popmessage(_format_,_offset_);\
-	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
-	logerror(_format_ "\n",_offset_);\
-}
-#define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
-{\
-	popmessage(_format_,_offset_,_data_);\
-	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
-	logerror(_format_ "\n",_offset_,_data_); \
-}
-
-#else
-
-#define SHOW_READ_ERROR(_format_,_offset_)\
-{\
-	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
-	logerror(_format_ "\n",_offset_);\
-}
-#define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
-{\
-	logerror("CPU #0 PC %06X : Warning, ",space.device().safe_pc()); \
-	logerror(_format_ "\n",_offset_,_data_); \
-}
-
-#endif
-
 
 #define cischeat_tmap_DRAW(_n_) \
 	if ( (m_tmap[_n_]).found() && (active_layers1 & (1 << _n_) ) ) \

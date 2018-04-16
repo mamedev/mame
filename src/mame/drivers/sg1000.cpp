@@ -174,31 +174,33 @@ void sg1000_state::omv_io_map(address_map &map)
     ADDRESS_MAP( sc3000_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::sc3000_map)
-	AM_RANGE(0x0000, 0xbfff) AM_DEVREADWRITE(CARTSLOT_TAG, sega8_cart_slot_device, read_cart, write_cart)
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_RAM
-ADDRESS_MAP_END
+void sg1000_state::sc3000_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rw(CARTSLOT_TAG, FUNC(sega8_cart_slot_device::read_cart), FUNC(sega8_cart_slot_device::write_cart));
+	map(0xc000, 0xc7ff).mirror(0x3800).ram();
+}
 
 /*-------------------------------------------------
     ADDRESS_MAP( sc3000_io_map )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(sg1000_state::sc3000_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-	AM_RANGE(0xdc, 0xdf) AM_READWRITE(peripheral_r, peripheral_w)
-ADDRESS_MAP_END
+void sg1000_state::sc3000_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
+	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
+	map(0xdc, 0xdf).rw(this, FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
+}
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
 ADDRESS_MAP_START(sg1000_state::sc3000_io_map)
     ADDRESS_MAP_GLOBAL_MASK(0xff)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255_device, read, write)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-    AM_RANGE(0x00, 0x00) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-    AM_RANGE(0x01, 0x01) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-    AM_RANGE(0x60, 0x60) AM_MIRROR(0x9f) AM_READ(sc3000_r_r)
+    map(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255_device, read, write)
+    map(0x00, 0x00) AM_MIRROR(0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
+    map(0x00, 0x00) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
+    map(0x01, 0x01) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
+    map(0x60, 0x60) AM_MIRROR(0x9f) AM_READ(sc3000_r_r)
 ADDRESS_MAP_END
 */
 

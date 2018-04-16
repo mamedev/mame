@@ -1185,7 +1185,7 @@ void balsente_state::update_grudge_steering()
 
 READ8_MEMBER(balsente_state::grudge_steering_r)
 {
-	logerror("%04X:grudge_steering_r(@%d)\n", space.device().safe_pc(), m_screen->vpos());
+	logerror("%s:grudge_steering_r(@%d)\n", machine().describe_context(), m_screen->vpos());
 	m_grudge_steering_result |= 0x80;
 	return m_grudge_steering_result;
 }

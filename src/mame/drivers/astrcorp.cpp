@@ -390,7 +390,7 @@ static INPUT_PORTS_START( showhand )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON3   )   PORT_NAME("Look / Small")
 	PORT_SERVICE_NO_TOGGLE( 0x0020,   IP_ACTIVE_LOW )   // settings
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN   )   // ?
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_SPECIAL   )   // coin sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_CUSTOM   )   // coin sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON2   )   PORT_NAME("Yes / Big")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_BUTTON4   )   PORT_NAME("Hold1")  // HOLD1 in test mode
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON1   )   PORT_NAME("Select")
@@ -398,7 +398,7 @@ static INPUT_PORTS_START( showhand )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SERVICE1  )   PORT_NAME("Reset Settings") // when 1 in test mode: reset settings (must be 0 on startup)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN   )   // ?
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )   // key in
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SPECIAL   )   // coin sensor
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_CUSTOM   )   // coin sensor
 
 	PORT_START( "EEPROMIN" )
 	PORT_BIT( 0xfff7, IP_ACTIVE_LOW,  IPT_UNUSED )
@@ -425,7 +425,7 @@ static INPUT_PORTS_START( showhanc )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON4   )   PORT_NAME("Hold2")  // HOLD2 in test mode
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_BUTTON2   )   PORT_NAME("Yes / Big")  // HOLD4 in test mode
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SERVICE1  )   PORT_NAME("Reset Settings") // when 1 in test mode: reset settings (must be 0 on startup)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_SPECIAL   )   // must be 0 for inputs to work
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM   )   // must be 0 for inputs to work
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN2     )   PORT_IMPULSE(1) // key in (shows an error)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
 
@@ -453,9 +453,9 @@ static INPUT_PORTS_START( skilldrp )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN       )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_START2        )   PORT_NAME("Bet")
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // ticket sw
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r) // ticket sw
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_GAMBLE_BOOK   )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sw
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // hopper sw
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYIN  )
 
 	PORT_START( "EEPROMIN" )

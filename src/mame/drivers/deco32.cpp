@@ -415,7 +415,7 @@ void captaven_state::captaven_map(address_map &map)
 void fghthist_state::fghthist_map(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(pf1_data_w) // wtf??
+//  map(0x000000, 0x001fff) AM_ROM AM_WRITE(pf1_data_w) // wtf??
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x11ffff).ram();
 	map(0x120020, 0x120021).r(this, FUNC(fghthist_state::fghthist_in0_r));
@@ -478,7 +478,7 @@ void dragngun_state::dragngun_map(address_map &map)
 	map(0x0000000, 0x00fffff).rom();
 	map(0x0100000, 0x011ffff).ram();
 	map(0x0120000, 0x0127fff).rw(this, FUNC(dragngun_state::ioprot_r), FUNC(dragngun_state::ioprot_w)).umask32(0x0000ffff);
-//  AM_RANGE(0x01204c0, 0x01204c3) AM_WRITE(sound_w)
+//  map(0x01204c0, 0x01204c3) AM_WRITE(sound_w)
 	map(0x0128000, 0x012800f).m(m_deco_irq, FUNC(deco_irq_device::map)).umask32(0x000000ff);
 	map(0x0130000, 0x0131fff).ram().w(this, FUNC(dragngun_state::buffered_palette_w)).share("paletteram");
 	map(0x0138000, 0x0138003).noprw(); /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
@@ -654,10 +654,11 @@ void deco32_state::h6280_sound_map(address_map &map)
 	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
 }
 
-ADDRESS_MAP_START(deco32_state::h6280_sound_custom_latch_map)
-	AM_IMPORT_FROM(h6280_sound_map)
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void deco32_state::h6280_sound_custom_latch_map(address_map &map)
+{
+	h6280_sound_map(map);
+	map(0x140000, 0x140000).r("soundlatch", FUNC(generic_latch_8_device::read));
+}
 
 // Z80 based sound
 void deco32_state::z80_sound_map(address_map &map)
@@ -670,9 +671,10 @@ void deco32_state::z80_sound_map(address_map &map)
 	map(0xd000, 0xd000).r(m_ioprot, FUNC(deco_146_base_device::soundlatch_r));
 }
 
-ADDRESS_MAP_START(deco32_state::z80_sound_io)
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
-ADDRESS_MAP_END
+void deco32_state::z80_sound_io(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("audiocpu", 0);
+}
 
 // lockload needs hi bits of OKI2 bankswitching
 void dragngun_state::lockload_sound_map(address_map &map)

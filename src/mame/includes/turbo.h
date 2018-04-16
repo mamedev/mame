@@ -22,26 +22,28 @@ class turbo_state : public driver_device
 {
 public:
 	turbo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "subcpu"),
-		m_i8255_0(*this, "i8255_0"),
-		m_i8255_1(*this, "i8255_1"),
-		m_i8255_2(*this, "i8255_2"),
-		m_i8255_3(*this, "i8255_3"),
-		m_spriteroms(*this, "sprites"),
-		m_proms(*this, "proms"),
-		m_roadroms(*this, "road"),
-		m_bgcolorrom(*this, "bgcolor"),
-		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_sprite_position(*this, "spritepos"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes"),
-		m_samples(*this, "samples"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "subcpu")
+		, m_i8255_0(*this, "i8255_0")
+		, m_i8255_1(*this, "i8255_1")
+		, m_i8255_2(*this, "i8255_2")
+		, m_i8255_3(*this, "i8255_3")
+		, m_spriteroms(*this, "sprites")
+		, m_proms(*this, "proms")
+		, m_roadroms(*this, "road")
+		, m_bgcolorrom(*this, "bgcolor")
+		, m_videoram(*this, "videoram")
+		, m_spriteram(*this, "spriteram")
+		, m_sprite_position(*this, "spritepos")
+		, m_decrypted_opcodes(*this, "decrypted_opcodes")
+		, m_samples(*this, "samples")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+private:
 	/* device/memory pointers */
 	required_device<z80_device> m_maincpu;
 	optional_device<z80_device> m_subcpu;
@@ -64,8 +66,10 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	output_finder<32> m_digits;
 
 	std::unique_ptr<uint8_t[]>     m_buckrog_bitmap_ram;
+	virtual void machine_start() override { m_digits.resolve(); }
 
 	/* machine states */
 	uint8_t       m_i8279_scanlines;
@@ -125,6 +129,7 @@ public:
 		uint32_t  step[8];            /* stepping value */
 	};
 
+public:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(turbo_collision_r);

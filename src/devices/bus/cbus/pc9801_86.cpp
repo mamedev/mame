@@ -20,7 +20,6 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK_X1 XTAL(1'996'800)
 #define QUEUE_SIZE 32768
 
 //**************************************************************************
@@ -55,7 +54,7 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 
 MACHINE_CONFIG_START(pc9801_86_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
+	MCFG_SOUND_ADD("opna", YM2608, 7.987_MHz_XTAL)
 	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc9801_86_device, sound_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(pc9801_86_device, opn_porta_r))
 	//MCFG_AY8910_PORT_B_READ_CB(READ8(pc9801_state, opn_portb_r))
@@ -63,8 +62,8 @@ MACHINE_CONFIG_START(pc9801_86_device::device_add_mconfig)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pc9801_86_device, opn_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // burr brown pcm61p
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // burr brown pcm61p
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
@@ -252,7 +251,8 @@ READ8_MEMBER(pc9801_86_device::pcm_r)
 
 WRITE8_MEMBER(pc9801_86_device::pcm_w)
 {
-	const int rates[] = {44100, 33075, 22050, 16538, 11025, 8268, 5513, 4134};
+	const u32 rate = (25.4_MHz_XTAL).value() / 16;
+	const int divs[8] = {36, 48, 72, 96, 144, 192, 288, 384};
 	if((offset & 1) == 0)
 	{
 		switch(offset >> 1)
@@ -263,7 +263,7 @@ WRITE8_MEMBER(pc9801_86_device::pcm_w)
 			case 2:
 				m_pcm_ctrl = data & ~0x10;
 				if(data & 0x80)
-					m_dac_timer->adjust(attotime::from_hz(rates[data & 7]), 0, attotime::from_hz(rates[data & 7]));
+					m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
 				else
 					m_dac_timer->adjust(attotime::never);
 				if(data & 8)
@@ -332,21 +332,21 @@ void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int pa
 			m_rdac->write(queue_pop() << 8);
 			break;
 		case 0x30: // 16bit stereo
-			lsample = queue_pop();
-			lsample |= queue_pop() << 8;
-			rsample = queue_pop();
-			rsample |= queue_pop() << 8;
+			lsample = queue_pop() << 8;
+			lsample |= queue_pop();
+			rsample = queue_pop() << 8;
+			rsample |= queue_pop();
 			m_ldac->write(lsample);
 			m_rdac->write(rsample);
 			break;
 		case 0x20: // 16bit left only
-			lsample = queue_pop();
-			lsample |= queue_pop() << 8;
+			lsample = queue_pop() << 8;
+			lsample |= queue_pop();
 			m_ldac->write(lsample);
 			break;
 		case 0x10: // 16bit right only
-			rsample = queue_pop();
-			rsample |= queue_pop() << 8;
+			rsample = queue_pop() << 8;
+			rsample |= queue_pop();
 			m_rdac->write(rsample);
 			break;
 	}

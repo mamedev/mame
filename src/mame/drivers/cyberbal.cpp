@@ -41,12 +41,10 @@
 void cyberbal2p_state::update_interrupts()
 {
 	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(3, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void cyberbal_state::update_interrupts()
 {
-	m_maincpu->set_input_line(1, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 	m_extracpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -300,9 +298,9 @@ static INPUT_PORTS_START( cyberbal )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* output buffer full */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    /* input buffer full */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* self test */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* output buffer full */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    /* input buffer full */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* self test */
 INPUT_PORTS_END
 
 
@@ -454,7 +452,7 @@ MACHINE_CONFIG_START(cyberbal_state::cyberbal)
 	MCFG_SCREEN_PALETTE("rpalette")
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", WRITELINE(cyberbal_state, sound_int_write_line))
+	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_1))
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", ATARI_CLOCK_14MHz/4)
@@ -513,7 +511,7 @@ MACHINE_CONFIG_START(cyberbal2p_state::cyberbal2p)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(cyberbal2p_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_3))
 	MCFG_ATARI_JSA_TEST_PORT("IN2", 15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

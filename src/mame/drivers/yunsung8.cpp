@@ -257,7 +257,7 @@ static INPUT_PORTS_START( cannbalv )
 	PORT_INCLUDE(cannball)
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  ) // always activated, otherwise the game resets. a simple check for horizontal / vertical version of the game?
+	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_CUSTOM  ) // always activated, otherwise the game resets. a simple check for horizontal / vertical version of the game?
 INPUT_PORTS_END
 
 /***************************************************************************

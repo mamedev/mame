@@ -1149,9 +1149,8 @@ WRITE16_MEMBER(namcos21_state::pointram_control_w)
 
 	/* m_pointram_control&0x20 : bank for depthcue data */
 #if 0
-	logerror( "dsp_control_w:'%s':%x[%x]:=%04x ",
-		cpu->tag,
-		cpu->safe_pc(),
+	logerror( "%s dsp_control_w:[%x]:=%04x ",
+		machine().describe_context(),
 		offset,
 		m_pointram_control );
 
@@ -1751,11 +1750,11 @@ static INPUT_PORTS_START( driveyes )
 	PORT_INCLUDE(winrungp)
 
 	PORT_MODIFY("PORTB")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("gearbox", namcoio_gearbox_device, clutch_r )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("gearbox", namcoio_gearbox_device, clutch_r )
 	PORT_BIT( 0x37, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DIAL0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("gearbox", namcoio_gearbox_device, in_r, nullptr )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("gearbox", namcoio_gearbox_device, in_r, nullptr )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */

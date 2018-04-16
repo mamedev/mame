@@ -294,13 +294,13 @@ INPUT_PORTS_START( gottlieb_sound_r1 )
 	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )            PORT_DIPLOCATION("SB1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0x80, 0x80, IPT_CUSTOM )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( gottlieb_sound_r1_with_votrax )
 	PORT_INCLUDE(gottlieb_sound_r1)
 	PORT_MODIFY("SB1")
-	PORT_BIT( 0x80, 0x80, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("votrax", votrax_sc01_device, request)
+	PORT_BIT( 0x80, 0x80, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("votrax", votrax_sc01_device, request)
 INPUT_PORTS_END
 
 
@@ -649,7 +649,7 @@ INPUT_PORTS_START( gottlieb_sound_r2 )
 	PORT_DIPNAME( 0x40, 0x40, "Sound Test" )            PORT_DIPLOCATION("SB2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_sound_r2_device, speech_drq_custom_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_sound_r2_device, speech_drq_custom_r, nullptr)
 INPUT_PORTS_END
 
 

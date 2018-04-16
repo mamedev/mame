@@ -37,7 +37,10 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
+		, m_led(*this, "led%u", 0U)
 	{ }
+
+	// [RH] TODO: Make this less awful and put stuff behind protected and private wherever possible.
 
 	optional_shared_ptr<uint16_t> m_videostatus;
 	optional_shared_ptr<uint16_t> m_protection_ram;
@@ -75,6 +78,7 @@ public:
 	int m_sound_hw_type;
 	bool m_hotchase_sound_hs;
 	pen_t m_black_pen;
+
 	DECLARE_READ16_MEMBER(wecleman_protection_r);
 	DECLARE_WRITE16_MEMBER(wecleman_protection_w);
 	DECLARE_WRITE16_MEMBER(irqctrl_w);
@@ -98,10 +102,15 @@ public:
 	TILE_GET_INFO_MEMBER(wecleman_get_txt_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wecleman_get_fg_tile_info);
+
+	DECLARE_MACHINE_START(wecleman);
 	DECLARE_MACHINE_RESET(wecleman);
 	DECLARE_VIDEO_START(wecleman);
+
+	DECLARE_MACHINE_START(hotchase);
 	DECLARE_MACHINE_RESET(hotchase);
 	DECLARE_VIDEO_START(hotchase);
+
 	uint32_t screen_update_wecleman(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hotchase_sound_timer);
@@ -129,6 +138,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
+	output_finder<1> m_led;
+
 	void hotchase(machine_config &config);
 	void wecleman(machine_config &config);
 	void hotchase_map(address_map &map);
@@ -137,6 +148,8 @@ public:
 	void wecleman_map(address_map &map);
 	void wecleman_sound_map(address_map &map);
 	void wecleman_sub_map(address_map &map);
+
+
 private:
 	struct sprite_t
 	{

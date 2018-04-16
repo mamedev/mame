@@ -177,8 +177,6 @@ struct t_nimbus_brush
 
 
 static int instruction_hook(device_t &device, offs_t curpc);
-static void decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag);
-static void decode_dos21(device_t *device,offs_t pc);
 static void decode_dssi_generic(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag);
 static void decode_dssi_f_fill_area(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag);
 static void decode_dssi_f_plot_character_string(device_t *device,uint16_t  ds, uint16_t si, uint8_t raw_flag);
@@ -274,13 +272,13 @@ static int instruction_hook(device_t &device, offs_t curpc)
 		if(DEBUG_SET_STATE(DECODE_BIOS) && (addr_ptr[1]==0xF0))
 		{
 			if(DEBUG_SET_STATE(DECODE_BIOS_RAW))
-				decode_subbios(&device,curpc,1);
+				state->decode_subbios(&device,curpc,1);
 			else
-				decode_subbios(&device,curpc,0);
+				state->decode_subbios(&device,curpc,0);
 		}
 
 		if(DEBUG_SET_STATE(DECODE_DOS21) && (addr_ptr[1]==0x21))
-			decode_dos21(&device,curpc);
+			state->decode_dos21(&device,curpc);
 	}
 
 	return 0;
@@ -290,7 +288,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 #define set_drv(drv_name)       sprintf(drv_str,drv_name)
 #define set_func(func_name)     sprintf(func_str,func_name)
 
-static void decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag)
+void rmnimbus_state::decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag)
 {
 	char    type_str[80];
 	char    drv_str[80];
@@ -298,13 +296,11 @@ static void decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag)
 
 	void (*dump_dssi)(device_t *,uint16_t, uint16_t ,uint8_t) = nullptr;
 
-	device_t *cpu = device->machine().device(MAINCPU_TAG);
-
-	uint16_t  ax = cpu->state().state_int(I8086_AX);
-	uint16_t  bx = cpu->state().state_int(I8086_BX);
-	uint16_t  cx = cpu->state().state_int(I8086_CX);
-	uint16_t  ds = cpu->state().state_int(I8086_DS);
-	uint16_t  si = cpu->state().state_int(I8086_SI);
+	uint16_t  ax = m_maincpu->state_int(I8086_AX);
+	uint16_t  bx = m_maincpu->state_int(I8086_BX);
+	uint16_t  cx = m_maincpu->state_int(I8086_CX);
+	uint16_t  ds = m_maincpu->state_int(I8086_DS);
+	uint16_t  si = m_maincpu->state_int(I8086_SI);
 
 	// *** TEMP Don't show f_enquire_display_line calls !
 	if((cx==6) && (ax==43))
@@ -313,8 +309,8 @@ static void decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag)
 
 	if(!raw_flag)
 	{
-		device->logerror("=======================================================================\n");
-		device->logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
+		logerror("=======================================================================\n");
+		logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
 	}
 
 	set_type("invalid");
@@ -622,11 +618,11 @@ static void decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag)
 	}
 	else
 	{
-		device->logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
+		logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
 
 		if(dump_dssi!=nullptr)
 			dump_dssi(device,ds,si,raw_flag);
-		device->logerror("=======================================================================\n");
+		logerror("=======================================================================\n");
 	}
 }
 
@@ -794,29 +790,27 @@ static void decode_dssi_f_rw_sectors(device_t *device,uint16_t  ds, uint16_t si,
 	device->logerror("\n");
 }
 
-static void decode_dos21(device_t *device,offs_t pc)
+void rmnimbus_state::decode_dos21(device_t *device,offs_t pc)
 {
-	device_t *cpu = device->machine().device(MAINCPU_TAG);
+	uint16_t  ax = m_maincpu->state_int(I8086_AX);
+	uint16_t  bx = m_maincpu->state_int(I8086_BX);
+	uint16_t  cx = m_maincpu->state_int(I8086_CX);
+	uint16_t  dx = m_maincpu->state_int(I8086_DX);
+	uint16_t  cs = m_maincpu->state_int(I8086_CS);
+	uint16_t  ds = m_maincpu->state_int(I8086_DS);
+	uint16_t  es = m_maincpu->state_int(I8086_ES);
+	uint16_t  ss = m_maincpu->state_int(I8086_SS);
 
-	uint16_t  ax = cpu->state().state_int(I8086_AX);
-	uint16_t  bx = cpu->state().state_int(I8086_BX);
-	uint16_t  cx = cpu->state().state_int(I8086_CX);
-	uint16_t  dx = cpu->state().state_int(I8086_DX);
-	uint16_t  cs = cpu->state().state_int(I8086_CS);
-	uint16_t  ds = cpu->state().state_int(I8086_DS);
-	uint16_t  es = cpu->state().state_int(I8086_ES);
-	uint16_t  ss = cpu->state().state_int(I8086_SS);
+	uint16_t  si = m_maincpu->state_int(I8086_SI);
+	uint16_t  di = m_maincpu->state_int(I8086_DI);
+	uint16_t  bp = m_maincpu->state_int(I8086_BP);
 
-	uint16_t  si = cpu->state().state_int(I8086_SI);
-	uint16_t  di = cpu->state().state_int(I8086_DI);
-	uint16_t  bp = cpu->state().state_int(I8086_BP);
-
-	device->logerror("=======================================================================\n");
-	device->logerror("DOS Int 0x21 call at %05X\n",pc);
-	device->logerror("AX=%04X, BX=%04X, CX=%04X, DX=%04X\n",ax,bx,cx,dx);
-	device->logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
-	device->logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
-	device->logerror("=======================================================================\n");
+	logerror("=======================================================================\n");
+	logerror("DOS Int 0x21 call at %05X\n",pc);
+	logerror("AX=%04X, BX=%04X, CX=%04X, DX=%04X\n",ax,bx,cx,dx);
+	logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
+	logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
+	logerror("=======================================================================\n");
 }
 
 

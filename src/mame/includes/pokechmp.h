@@ -24,6 +24,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pokechmp_sound_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_videoram_w);
 	DECLARE_WRITE8_MEMBER(pokechmp_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_DRIVER_INIT(pokechmp);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;

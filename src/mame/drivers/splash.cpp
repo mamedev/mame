@@ -243,11 +243,12 @@ void funystrp_state::funystrp_map(address_map &map)
 	map(0xfe0000, 0xfeffff).ram().mirror(0x10000); /* there's fe0000 <-> ff0000 compare */                /* Work RAM */
 }
 
-ADDRESS_MAP_START(splash_state::funystrp_sound_map)
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
-ADDRESS_MAP_END
+void splash_state::funystrp_sound_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().bankr("sound_bank");
+}
 
 READ8_MEMBER(funystrp_state::int_source_r)
 {
@@ -437,7 +438,7 @@ static INPUT_PORTS_START( funystrp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_DIPNAME( 0x02, 0x02, "Clear EEPROM" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

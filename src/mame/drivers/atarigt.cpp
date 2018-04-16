@@ -71,7 +71,6 @@
 
 void atarigt_state::update_interrupts()
 {
-	m_maincpu->set_input_line(3, m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(4, m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -93,10 +92,7 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 
 WRITE8_MEMBER(atarigt_state::cage_irq_callback)
 {
-	if (data)
-		sound_int_gen(*m_maincpu);
-	else
-		sound_int_ack_w(space,0,0);
+	m_maincpu->set_input_line(M68K_IRQ_3, data != 0 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*************************************
@@ -291,7 +287,7 @@ void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, uint1
         Read ($38488)
 */
 
-	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", space.device().safe_pcbase(), offset, data);
+	if (LOG_PROTECTION) logerror("%s:Protection W@%06X = %04X\n", machine().describe_context(), offset, data);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -306,7 +302,7 @@ void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, uint1
 
 void atarigt_state::tmek_protection_r(address_space &space, offs_t offset, uint16_t *data)
 {
-	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", space.device().safe_pcbase(), offset);
+	if (LOG_PROTECTION) logerror("%s:Protection R@%06X\n", machine().describe_context(), offset);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -372,7 +368,7 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 {
 	if (LOG_PROTECTION)
 	{
-	uint32_t pc = space.device().safe_pcbase();
+	uint32_t pc = m_maincpu->pcbase();
 	switch (pc)
 	{
 		/* protection code from 20f90 - 21000 */
@@ -405,7 +401,7 @@ void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, u
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection W@%06X = %04X\n", space.device().safe_pcbase(), offset, data);
+			logerror("%s:Unknown protection W@%06X = %04X\n", machine().describe_context(), offset, data);
 			break;
 	}
 	}
@@ -445,7 +441,7 @@ void atarigt_state::primrage_protection_r(address_space &space, offs_t offset, u
 
 if (LOG_PROTECTION)
 {
-	uint32_t pc = space.device().safe_pcbase();
+	uint32_t pc = m_maincpu->pcbase();
 	uint32_t p1, p2, a6;
 	switch (pc)
 	{
@@ -508,7 +504,7 @@ if (LOG_PROTECTION)
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection R@%06X\n", space.device().safe_pcbase(), offset);
+			logerror("%s:Unknown protection R@%06X\n", machine().describe_context(), offset);
 			break;
 	}
 }
@@ -655,9 +651,9 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("SERVICE")       /* 68.STATUS (A2=0) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /A2DRDY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /A2DRDY */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_TILT )     /* TILT */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ23 */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XIRQ23 */
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )   /* A2D.EOC */
 	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )   /* NC */
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )           /* SELFTEST */
@@ -665,12 +661,12 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")          /* 68.STATUS (A2=1) */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /VBIRQ */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /4MSIRQ */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ0 */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /XIRQ1 */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SERVICER */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL )  /* /SER.L */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /VBIRQ */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /4MSIRQ */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XIRQ0 */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /XIRQ1 */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SERVICER */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM )  /* /SER.L */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN2 )    /* COINR */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )    /* COINL */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -687,7 +683,7 @@ static INPUT_PORTS_START( tmek )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 #else
 	PORT_MODIFY("SERVICE")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
 
 	PORT_START("AN1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)

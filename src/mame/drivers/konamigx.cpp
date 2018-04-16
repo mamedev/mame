@@ -1197,8 +1197,8 @@ static INPUT_PORTS_START( common )
 	//      excpuint stat, objdma stat, eeprom do
 
 	// note: racin' force expects bit 1 of the eeprom port to toggle
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x000000fe, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, konamigx_state, gx_rdport1_3_r, nullptr)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x000000fe, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, konamigx_state, gx_rdport1_3_r, nullptr)
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1281,7 +1281,7 @@ static INPUT_PORTS_START( racinfrc )
 	PORT_BIT( 0x4000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("adc0834", adc083x_device, cs_write)
 
 	PORT_START("ADC-RDPORT")
-	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("adc0834", adc083x_device, do_read)
+	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0834", adc083x_device, do_read)
 
 	PORT_START("AN0")   /* mask default type                     sens delta min max */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE

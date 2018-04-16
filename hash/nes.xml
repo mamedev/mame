@@ -63324,7 +63324,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="smary">
+	<software name="smary" cloneof="smb">
 		<description>Super Mary (Asia?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

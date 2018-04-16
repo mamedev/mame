@@ -215,9 +215,9 @@ static INPUT_PORTS_START( starwars )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	/* Bit 6 is VG_HALT */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_starwars_device, done_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_starwars_device, done_r, nullptr)
 	/* Bit 7 is MATH_RUN - see machine/starwars.c */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starwars_state,matrix_flag_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starwars_state,matrix_flag_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x02, "Starting Shields" )  PORT_DIPLOCATION("10D:1,2")
@@ -313,7 +313,7 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // custom designated as "157249-120"
+	MCFG_DEVICE_ADD("adc", ADC0809, MASTER_CLOCK / 16) // designated as "137243-001" on parts list and "157249-120" on schematics
 	MCFG_ADC0808_IN0_CB(IOPORT("STICKY")) // pitch
 	MCFG_ADC0808_IN1_CB(IOPORT("STICKX")) // yaw
 	MCFG_ADC0808_IN2_CB(GND) // thrust (unused)

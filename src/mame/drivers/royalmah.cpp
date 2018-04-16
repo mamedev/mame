@@ -1010,15 +1010,16 @@ WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
 
 void royalmah_state::janptr96_iomap(address_map &map)
 {
-	map(0x00, 0x00).mirror(0xff00).w(this, FUNC(royalmah_state::janptr96_rombank_w));    // BANK ROM Select
-	map(0x20, 0x20).mirror(0xff00).rw(this, FUNC(royalmah_state::janptr96_unknown_r), FUNC(royalmah_state::janptr96_rambank_w));
-	map(0x50, 0x50).mirror(0xff00).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
-	map(0x60, 0x6f).mirror(0xff00).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0x81, 0x81).mirror(0xff00).r(m_ay, FUNC(ay8910_device::data_r));
-	map(0x82, 0x83).mirror(0xff00).w(m_ay, FUNC(ay8910_device::data_address_w));
-	map(0x93, 0x93).mirror(0xff00).w(this, FUNC(royalmah_state::input_port_select_w));
-	map(0xd8, 0xd8).mirror(0xff00).w(this, FUNC(royalmah_state::janptr96_coin_counter_w));
-	map(0xd9, 0xd9).mirror(0xff00).portr("SYSTEM").nopw(); // second input select?
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(royalmah_state::janptr96_rombank_w));    // BANK ROM Select
+	map(0x20, 0x20).rw(this, FUNC(royalmah_state::janptr96_unknown_r), FUNC(royalmah_state::janptr96_rambank_w));
+	map(0x50, 0x50).w(this, FUNC(royalmah_state::mjderngr_palbank_w));
+	map(0x60, 0x6f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x81, 0x81).r(m_ay, FUNC(ay8910_device::data_r));
+	map(0x82, 0x83).w(m_ay, FUNC(ay8910_device::data_address_w));
+	map(0x93, 0x93).w(this, FUNC(royalmah_state::input_port_select_w));
+	map(0xd8, 0xd8).w(this, FUNC(royalmah_state::janptr96_coin_counter_w));
+	map(0xd9, 0xd9).portr("SYSTEM").nopw(); // second input select?
 }
 
 /****************************************************************************
