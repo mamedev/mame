@@ -21,6 +21,11 @@
       select type 47 for each LBA drive and set C,H,S (params) to '8', 
       then repartition and reformat (Fdisk and Format). Data is lost.
 
+	Other notes: the ROM bank should be excluded in EMM386.
+				 C8000 - CBFFF is sometimes occupied (by graphics). 
+
+				 Changes to the ROM location require a hard reset.
+				 
     Requirements:
       Compatible OS (DOS >= 6.22) and LBA capable drive(s).
 ***********************************************************************
@@ -57,22 +62,22 @@ J3, J2, J1 set BIOS (start) address to C800, CC00, D000, D400, D800 or DC00
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(LBA_GEN, lba_gen_device, "lba_gen", "VS Systems LBA Enhancer BIOS 1995")
+DEFINE_DEVICE_TYPE(ISA8_LBA_ENHANCER, lba_enhancer_device, "lba_enhancer", "VS Systems LBA Enhancer BIOS 1995")
 
 //-------------------------------------------------
-//  ROM( lba_gen )
+//  ROM( lba_enhancer )
 //-------------------------------------------------
 
 ROM_START( lbabios )
 	ROM_REGION( 0xc8000, "lbabios", 0 )
-	ROM_LOAD( "lbaenhancer.bin", 0x0000, LBA_GEN_ROMSIZE, CRC(39d4566d) SHA1(d275193a870250f212dc29768d4e68fb43770e95) )
+	ROM_LOAD( "lbaenhancer.bin", 0x0000, 0x04000, CRC(39d4566d) SHA1(d275193a870250f212dc29768d4e68fb43770e95) )
 ROM_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *lba_gen_device::device_rom_region() const
+const tiny_rom_entry *lba_enhancer_device::device_rom_region() const
 {
 	return ROM_NAME( lbabios );
 }
@@ -80,33 +85,32 @@ const tiny_rom_entry *lba_gen_device::device_rom_region() const
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START( lba_gen_device::device_add_mconfig )
-//	MCFG_DEVICE_ADD("lba_gen", LBA_GEN, 0)
+MACHINE_CONFIG_START( lba_enhancer_device::device_add_mconfig )
+//	MCFG_DEVICE_ADD("lba_enhancer", lba_enhancer, 0)
 MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
 //  dip switches  
 //-------------------------------------------------
-static INPUT_PORTS_START( lba_gen_dsw )
+static INPUT_PORTS_START( lba_enhancer_dsw )
 
 	PORT_START("ROM_ADDRESS")
-	PORT_DIPNAME( 0xff, 0x00, "16 K ROM bank (disable shadowing; exclude in EMM386)")
-	PORT_DIPSETTING(    0, "C8000 - CBFFF (sometimes occupied by graphics or hard disk controller)" )
-	PORT_DIPSETTING(    1, "CC000 - CFFFF" ) 
-	PORT_DIPSETTING(    2, "D0000 - D3FFF" ) 
-	PORT_DIPSETTING(    3, "D4000 - D7FFF" ) 
-	PORT_DIPSETTING(    4, "D8000 - DBFFF" ) 
-	PORT_DIPSETTING(    5, "DC000 - DFFFF" ) 
+	PORT_DIPNAME( 0x07, 0x00, "16 K ROM bank")
+	PORT_CONFSETTING(    0, "C8000 - CBFFF" )
+	PORT_CONFSETTING(    1, "CC000 - CFFFF" ) 
+	PORT_CONFSETTING(    2, "D0000 - D3FFF" ) 
+	PORT_CONFSETTING(    3, "D4000 - D7FFF" ) 
+	PORT_CONFSETTING(    4, "D8000 - DBFFF" ) 
+	PORT_CONFSETTING(    5, "DC000 - DFFFF" ) 
 INPUT_PORTS_END
-
 
 //-------------------------------------------------
 //  isa8_areplay_device - constructor
 //-------------------------------------------------
-ioport_constructor lba_gen_device::device_input_ports() const
+ioport_constructor lba_enhancer_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( lba_gen_dsw );
+	return INPUT_PORTS_NAME( lba_enhancer_dsw );
 }
 
 //-------------------------------------------------
@@ -114,7 +118,7 @@ ioport_constructor lba_gen_device::device_input_ports() const
 //-------------------------------------------------
 
 // Byte 3 in extra BIOS specifies 8 blocks of 512 byte (4K)
-void lba_gen_device::device_start()
+void lba_enhancer_device::device_start()
 {
 	set_isa_device();
 }
@@ -122,21 +126,28 @@ void lba_gen_device::device_start()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
-void lba_gen_device::device_reset()
+void lba_enhancer_device::device_reset()
 {
-	uint32_t current_rom_start = 0xc8000 + (ioport("ROM_ADDRESS")->read()* 0x4000);
-	uint32_t current_rom_end   = current_rom_start + LBA_GEN_ROMSIZE - 1;
-	m_isa->install_rom(this, current_rom_start, current_rom_end,  "lbabios",  "lbabios");
+	static bool already_installed;
 
-	logerror("\nLBA enhancer (for 28 bit LBA) located at BIOS address %x - %x", current_rom_start, current_rom_end);
+	uint32_t current_rom_start = 0xc8000 + (ioport("ROM_ADDRESS")->read()* 0x4000);
+	uint32_t current_rom_end   = current_rom_start + 0x04000 - 1;
+	
+	if(!already_installed)
+	{
+		already_installed = true;
+		m_isa->install_rom(this, current_rom_start, current_rom_end,  "lbabios",  "lbabios");
+		
+		logerror("LBA enhancer (for 28 bit LBA) located at BIOS address %x - %x\n", current_rom_start, current_rom_end);
+	}
 }
 
 //-------------------------------------------------
-//  lba_gen_device - constructor
+//  lba_enhancer_device - constructor
 //-------------------------------------------------
 
-lba_gen_device::lba_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LBA_GEN, tag, owner, clock)
+lba_enhancer_device::lba_enhancer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA8_LBA_ENHANCER, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 {
 }
