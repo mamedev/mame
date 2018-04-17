@@ -195,12 +195,6 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 
 	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
 	map(0x00478000, 0x0047ffff).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
-	map(0x00510000, 0x00510003).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
-	map(0x00538000, 0x00538003).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Graphics"
-	map(0x005c0000, 0x005c0003).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no add-on FP coprocessor
-
-	map(0x00600000, 0x007fffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // prevent reading invalid DIO slots
-	map(0x01000000, 0x1fffffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // prevent reading invalid DIO-II slots
 
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
 
