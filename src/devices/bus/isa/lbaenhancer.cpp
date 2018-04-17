@@ -134,7 +134,7 @@ void lba_enhancer_device::device_reset()
 
 		m_isa->install_rom(this, m_current_rom_start, current_rom_end,  "lbabios",  "lbabios");
 		
-		printf("LBA enhancer (for 28 bit LBA) located at BIOS address %x - %x\n", m_current_rom_start, current_rom_end);
+		logerror("LBA enhancer (for 28 bit LBA) located at BIOS address %x - %x\n", m_current_rom_start, current_rom_end);
 	}
 }
 
