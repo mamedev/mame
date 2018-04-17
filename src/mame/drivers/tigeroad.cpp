@@ -123,19 +123,18 @@ void tigeroad_state::main_map(address_map &map)
 
 READ8_MEMBER(f1dream_state::mcu_shared_r)
 {
-	uint8_t ret =  m_ram16[(0x3fe0/2) + offset];
+	uint8_t ret = m_ram16[(0x3fe0 / 2) + offset];
 	return ret;
 }
 
 WRITE8_MEMBER(f1dream_state::mcu_shared_w)
 {
-	 m_ram16[(0x3fe0/2) + offset] = (m_ram16[(0x3fe0/2) + offset] & 0xff00) | data;
+	m_ram16[(0x3fe0 / 2) + offset] = (m_ram16[(0x3fe0 / 2) + offset] & 0xff00) | data;
 }
 
 void f1dream_state::f1dream_map(address_map &map)
 {
 	main_map(map);
-
 	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(this, FUNC(f1dream_state::blktiger_to_mcu_w));
 }
 
