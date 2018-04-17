@@ -78,7 +78,6 @@ private:
 	uint8_t m_banked_flash[ (16 + 1) * SIZE_ROM_WINDOW];
 
 	uint8_t m_post_mortem_ram[ SIZE_RAM_BANK];
-	uint8_t m_tsr_ram[ SIZE_RAM_BANK];
 
 	uint8_t m_write_port1;
 

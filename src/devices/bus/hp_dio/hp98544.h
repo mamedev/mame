@@ -105,7 +105,6 @@ private:
 	uint8_t m_write_enable_plane;
 	uint8_t m_read_enable_plane;
 	uint8_t m_fb_write_enable;
-	uint8_t m_start_wmove;
 	uint8_t m_enable_blink_planes;
 	uint8_t m_enable_alt_frame;
 	uint8_t m_cursor_ctrl;
