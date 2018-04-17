@@ -369,7 +369,7 @@ Part No.: E192
 * Denotes unpopulated sockets
 
 Although this version of Maniac Square use the same PCB as Snow Board Championship, there are some minor
-omponent changes:
+component changes:
 
  Slower OSC clocks
    30.000MHz down from 34.000MHz
@@ -378,6 +378,15 @@ omponent changes:
 The CG-1V 366 has been upgraded to a CG-1V 427
 
 Game configuration is store in 93C66 EEPROM as this PCB doesn't have dipswitches
+
+This PCB has a large number of unpopulated ICs and connectors at the bottom left, apparently for extra
+digital and analog inputs not required by Maniac Square or Snow Board Championship:
+
+  1x 74LS14 (IC20)
+  3x 74LS245 (IC26, IC27, IC28)
+  4x TLC549 (IC9, IC10, IC21, IC22)
+  4x 6-pin headers (JP2, JP3, JP5, JP6)
+  2x 15-pin headers (JP4, JP7)
 
 */
 
