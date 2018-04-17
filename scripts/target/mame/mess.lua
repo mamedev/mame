@@ -1130,6 +1130,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"toshiba",
 		"trainer",
 		"trs",
+		"tvgames",
 		"ultimachine",
 		"ultratec",
 		"unicard",
@@ -3314,6 +3315,22 @@ files {
 	MAME_DIR .. "src/mame/drivers/vis.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "tvgames")
+files {
+	MAME_DIR .. "src/mame/drivers/rad_eu3a14.cpp",
+	MAME_DIR .. "src/mame/drivers/rad_eu3a05.cpp",
+	MAME_DIR .. "src/mame/audio/rad_eu3a05.cpp",
+	MAME_DIR .. "src/mame/audio/rad_eu3a05.h",
+	MAME_DIR .. "src/mame/machine/rad_eu3a05gpio.cpp",
+	MAME_DIR .. "src/mame/machine/rad_eu3a05gpio.h",
+	MAME_DIR .. "src/mame/drivers/tvgame.cpp",
+	MAME_DIR .. "src/mame/drivers/vii.cpp",
+	MAME_DIR .. "src/mame/drivers/xavix.cpp",
+	MAME_DIR .. "src/mame/video/xavix.cpp",
+	MAME_DIR .. "src/mame/machine/xavix.cpp",
+	MAME_DIR .. "src/mame/includes/xavix.h",
+}
+
 createMESSProjects(_target, _subtarget, "ultimachine")
 files {
 	MAME_DIR .. "src/mame/drivers/rambo.cpp",
@@ -3662,12 +3679,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/pv9234.cpp",
 	MAME_DIR .. "src/mame/drivers/qtsbc.cpp",
 	MAME_DIR .. "src/mame/drivers/rd100.cpp",
-	MAME_DIR .. "src/mame/drivers/rad_eu3a14.cpp",
-	MAME_DIR .. "src/mame/drivers/rad_eu3a05.cpp",
-	MAME_DIR .. "src/mame/audio/rad_eu3a05.cpp",
-	MAME_DIR .. "src/mame/audio/rad_eu3a05.h",
-	MAME_DIR .. "src/mame/machine/rad_eu3a05gpio.cpp",
-	MAME_DIR .. "src/mame/machine/rad_eu3a05gpio.h",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",
 	MAME_DIR .. "src/mame/drivers/sacstate.cpp",
 	MAME_DIR .. "src/mame/drivers/sartorius.cpp",
@@ -3695,12 +3706,10 @@ files {
 	MAME_DIR .. "src/mame/drivers/tsispch.cpp",
 	MAME_DIR .. "src/mame/includes/tsispch.h",
 	MAME_DIR .. "src/mame/drivers/tti.cpp",
-	MAME_DIR .. "src/mame/drivers/tvgame.cpp",
 	MAME_DIR .. "src/mame/drivers/unistar.cpp",
 	MAME_DIR .. "src/mame/drivers/v6809.cpp",
 	MAME_DIR .. "src/mame/drivers/vector4.cpp",
 	MAME_DIR .. "src/mame/drivers/vectrix.cpp",
-	MAME_DIR .. "src/mame/drivers/vii.cpp",
 	MAME_DIR .. "src/mame/drivers/vp60.cpp",
 	MAME_DIR .. "src/mame/drivers/vp122.cpp",
 	MAME_DIR .. "src/mame/drivers/vp415.cpp",
@@ -3709,7 +3718,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/wyse.cpp",
 	MAME_DIR .. "src/mame/drivers/xor100.cpp",
 	MAME_DIR .. "src/mame/includes/xor100.h",
-	MAME_DIR .. "src/mame/drivers/xavix.cpp",
 	MAME_DIR .. "src/mame/drivers/zms8085.cpp",
 	MAME_DIR .. "src/mame/drivers/zorba.cpp",
 	MAME_DIR .. "src/mame/includes/zorba.h",
