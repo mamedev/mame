@@ -190,6 +190,7 @@ uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bi
 // shared mappings for all 9000/3xx systems
 void hp9k3xx_state::hp9k3xx_common(address_map &map)
 {
+	map(0x00000000, 0xffffffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
 	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(this, FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 
 	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
@@ -202,6 +203,10 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 	map(0x01000000, 0x1fffffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // prevent reading invalid DIO-II slots
 
 	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
+
+	map(0x005f4000, 0x005f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
+	map(0x00474000, 0x00474fff).ram(); // unknown
+
 }
 
 // 9000/310 - has onboard video that the graphics card used in other 3xxes conflicts with
@@ -225,7 +230,12 @@ void hp9k3xx_state::hp9k320_map(address_map &map)
 {
 	hp9k3xx_common(map);
 
-	map(0xffe00000, 0xffefffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	// unknown, but bootrom crashes without
+	map(0x00510000, 0x00510fff).ram();
+	map(0x00516000, 0x00516fff).ram();
+	map(0x00440000, 0x0044ffff).ram();
+
+	// main memory
 	map(0xfff00000, 0xffffffff).ram();
 }
 
