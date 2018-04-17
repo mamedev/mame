@@ -1381,9 +1381,9 @@ JP4: 4 pin connector - Sound for cabinet 2
   2| Speaker (-)
   3| No Connection
   4| Audio GND
-JP2: 15 pin connector - Inputs for Player 2 / Cabinet 2
+JP2: 15 pin connector - Inputs for Cabinet 2
   1| Coin
-  2| Potentiometer VCC
+  2|
   3| Left
   4| Right
   5| Up
@@ -1393,11 +1393,14 @@ JP2: 15 pin connector - Inputs for Player 2 / Cabinet 2
   9| No Connection
  10| Start
  11| Service
- 12| Potentiometer Top
+ 12|
  13| Coin Counter
  14| GND
  15| GND
-JP3: 15 pin connector - pin out unknown - Players 3 & 4 controls
+JP3: 15 pin connector - pin out unknown - Players 3 & 4 controls?
+
+NOTE: It's unknown of Player 1 & Player 2 are connected through the JAMMA harnes and
+      controls for Player 3 & Player 4 are connected through JP2 & JP3
 
 Wires run to male JAMMA board with corresponding JP1, JP2, JP3 & JP4 connectors for cabinet 2 JAMMA harness
 */
