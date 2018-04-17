@@ -21,9 +21,9 @@
       select type 47 for each LBA drive and set C,H,S (params) to '8', 
       then repartition and reformat (Fdisk and Format). Data is lost.
 
-	Other notes: the ROM bank should be excluded in EMM386.
-                     C8000 - CBFFF is sometimes occupied (by graphics). 
-                     Changes to the ROM location require a hard reset!
+      Other notes: the ROM bank should be excluded in EMM386.
+                   C8000 - CBFFF is sometimes occupied (by graphics). 
+                   Changes to the ROM location require a hard reset!
 				 
     Requirements:
       Compatible OS (DOS >= 6.22) and LBA capable drive(s).
