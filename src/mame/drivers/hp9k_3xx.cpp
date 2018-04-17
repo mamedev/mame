@@ -55,6 +55,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "logmacro.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/6840ptm.h"
@@ -305,10 +306,12 @@ void hp9k3xx_state::machine_reset()
 
 WRITE8_MEMBER(hp9k3xx_state::gpib_w)
 {
+	LOG("%s: 0x%02x = 0x%02x\n", __FUNCTION__, offset ,data);
 }
 
 READ8_MEMBER(hp9k3xx_state::gpib_r)
 {
+	LOG("%s: 0x%02x\n", __FUNCTION__, offset);
 	return 0xff;
 }
 
