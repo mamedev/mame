@@ -40,7 +40,6 @@ public:
 		, m_dsbz80(*this, DSBZ80_TAG)
 		, m_tgp_copro(*this, "tgp_copro")
 		, m_screen(*this, "screen")
-		, m_io_timer(*this, "iotimer")
 		, m_copro_fifo_in(*this, "copro_fifo_in")
 		, m_copro_fifo_out(*this, "copro_fifo_out")
 		, m_poly_rom(*this, "polygons")
@@ -51,6 +50,7 @@ public:
 		, m_display_list0(*this, "display_list0")
 		, m_display_list1(*this, "display_list1")
 		, m_color_xlat(*this, "color_xlat")
+		, m_dpram(*this, "dpram")
 		, m_paletteram16(*this, "palette")
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
@@ -62,11 +62,8 @@ public:
 	DECLARE_MACHINE_START(model1);
 	DECLARE_MACHINE_RESET(model1);
 
-	DECLARE_READ16_MEMBER(network_ctl_r);
-	DECLARE_WRITE16_MEMBER(network_ctl_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(io_command_acknowledge);
-
-	DECLARE_WRITE16_MEMBER(drive_board_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
 
 	DECLARE_WRITE16_MEMBER(bank_w);
 
@@ -235,8 +232,6 @@ private:
 
 	int m_last_irq;
 
-	uint8_t m_io_command;
-
 	// Devices
 	required_device<v60_device> m_maincpu;          // V60
 	required_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
@@ -245,7 +240,6 @@ private:
 	optional_device<dsbz80_device> m_dsbz80;        // Digital Sound Board
 	optional_device<mb86233_device> m_tgp_copro;
 	required_device<screen_device> m_screen;
-	required_device<timer_device> m_io_timer;
 	required_device<generic_fifo_u32_device> m_copro_fifo_in, m_copro_fifo_out;
 
 	required_region_ptr<uint32_t> m_poly_rom;
@@ -257,6 +251,7 @@ private:
 	required_shared_ptr<uint16_t> m_display_list0;
 	required_shared_ptr<uint16_t> m_display_list1;
 	required_shared_ptr<uint16_t> m_color_xlat;
+	required_shared_ptr<uint16_t> m_dpram;
 
 	// Sound
 	int m_sound_irq;

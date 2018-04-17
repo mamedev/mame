@@ -382,7 +382,8 @@ class model2o_state : public model2_tgp_state
 {
 public:
 	model2o_state(const machine_config &mconfig, device_type type, const char *tag)
-		: model2_tgp_state(mconfig, type, tag)
+		: model2_tgp_state(mconfig, type, tag),
+		  m_dpram(*this, "dpram")
 	{}
 
 	DECLARE_MACHINE_RESET(model2o);
@@ -393,13 +394,18 @@ public:
 	void vcop(machine_config &config);
 
 protected:
-	DECLARE_READ32_MEMBER(daytona_unk_r);
+	DECLARE_READ32_MEMBER(dpram_r);
+	DECLARE_WRITE32_MEMBER(dpram_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ32_MEMBER(fifo_control_2o_r);
 	DECLARE_WRITE8_MEMBER(daytona_output_w);
 	DECLARE_WRITE8_MEMBER(desert_output_w);
 	DECLARE_WRITE8_MEMBER(vcop_output_w);
 
 	void model2o_mem(address_map &map);
+
+	required_shared_ptr<uint32_t> m_dpram;
 };
 
 /*****************************
