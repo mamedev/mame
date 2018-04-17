@@ -113,6 +113,9 @@ public:
 	DECLARE_READ8_MEMBER(iocpu_port1_r);
 	DECLARE_READ8_MEMBER(iocpu_test0_r);
 
+	DECLARE_READ8_MEMBER(gpib_r);
+	DECLARE_WRITE8_MEMBER(gpib_w);
+
 	DECLARE_WRITE32_MEMBER(led_w)
 	{
 		if (mem_mask != 0x000000ff)
@@ -190,7 +193,7 @@ void hp9k3xx_state::hp9k3xx_common(address_map &map)
 	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(this, FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 
 	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
-
+	map(0x00478000, 0x0047ffff).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 	map(0x00510000, 0x00510003).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
 	map(0x00538000, 0x00538003).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Graphics"
 	map(0x005c0000, 0x005c0003).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no add-on FP coprocessor
@@ -294,6 +297,15 @@ INPUT_PORTS_END
 
 void hp9k3xx_state::machine_reset()
 {
+}
+
+WRITE8_MEMBER(hp9k3xx_state::gpib_w)
+{
+}
+
+READ8_MEMBER(hp9k3xx_state::gpib_r)
+{
+	return 0xff;
 }
 
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
