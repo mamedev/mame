@@ -2276,12 +2276,21 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_sasi)
 	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pc9801_state, sasi_data_w))
 MACHINE_CONFIG_END
 
+void pc9801_state::cdrom_headphones(device_t *device)
+{
+	device = device->subdevice("cdda");
+	MCFG_SOUND_ROUTE(0, "^^^^lheadphone", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^rheadphone", 1.0)
+}
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
+	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide1_irq_w))
 	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide2_irq_w))
+	MCFG_DEVICE_MODIFY("ide2:0")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("pc9801_cd", cdrom_headphones)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pc98_cd")
 MACHINE_CONFIG_END
