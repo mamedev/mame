@@ -6,26 +6,23 @@
 
  **********************************************************************/
 
-#ifndef MAME_BUS_ISA_LBA_GEN_H
-#define MAME_BUS_ISA_LBA_GEN_H
+#ifndef MAME_BUS_ISA_LBA_ENHANCER_H
+#define MAME_BUS_ISA_LBA_ENHANCER_H
 
 #pragma once
 
 #include "isa.h"
 
-
-#define LBA_GEN_ROMSIZE 0x04000
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class lba_gen_device : public device_t,
+class lba_enhancer_device : public device_t,
 		       public device_isa8_card_interface
 {
 public:
 	// construction/destruction
-	lba_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	lba_enhancer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -41,6 +38,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(LBA_GEN, lba_gen_device)
+DECLARE_DEVICE_TYPE(ISA8_LBA_ENHANCER, lba_enhancer_device)
 
-#endif // MAME_BUS_ISA_LBA_GEN_H
+#endif // MAME_BUS_ISA_LBA_ENHANCER_H
