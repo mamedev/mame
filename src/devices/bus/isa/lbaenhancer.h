@@ -35,6 +35,7 @@ protected:
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 private:
+	uint32_t m_current_rom_start;
 };
 
 // device type definition
