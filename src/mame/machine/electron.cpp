@@ -437,15 +437,15 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.capslock_mode = ( data >> 7 ) & 0x01;
 		output().set_value("capslock_led", m_ula.capslock_mode);
 		break;
-	case 0x08: case 0x0A: case 0x0C: case 0x0E:
-		// video_update
-		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 1));
+	case 0x08: case 0x0a: case 0x0c: case 0x0e:
+		/* colour palette */
+		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 2));
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x01) | (((data & 0x40) >> 4) | ((data & 0x04) >> 1));
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x03) | ((data & 0x20) >> 3);
 		m_ula.current_pal[i] = (m_ula.current_pal[i] & 0x03) | ((data & 0x10) >> 2);
 		break;
-	case 0x09: case 0x0B: case 0x0D: case 0x0F:
-		// video_update
+	case 0x09: case 0x0b: case 0x0d: case 0x0f:
+		/* colour palette */
 		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
