@@ -127,17 +127,14 @@ void lba_enhancer_device::device_start()
 //-------------------------------------------------
 void lba_enhancer_device::device_reset()
 {
-	static bool already_installed;
-
-	uint32_t current_rom_start = 0xc8000 + (ioport("ROM_ADDRESS")->read()* 0x4000);
-	uint32_t current_rom_end   = current_rom_start + 0x04000 - 1;
-	
-	if(!already_installed)
+	if(m_current_rom_start == 0 )
 	{
-		already_installed = true;
-		m_isa->install_rom(this, current_rom_start, current_rom_end,  "lbabios",  "lbabios");
+		m_current_rom_start = 0xc8000 + (ioport("ROM_ADDRESS")->read()* 0x4000);
+		uint32_t current_rom_end   = m_current_rom_start + 0x04000 - 1;
+
+		m_isa->install_rom(this, m_current_rom_start, current_rom_end,  "lbabios",  "lbabios");
 		
-		logerror("LBA enhancer (for 28 bit LBA) located at BIOS address %x - %x\n", current_rom_start, current_rom_end);
+		printf("LBA enhancer (for 28 bit LBA) located at BIOS address %x - %x\n", m_current_rom_start, current_rom_end);
 	}
 }
 
@@ -149,4 +146,5 @@ lba_enhancer_device::lba_enhancer_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, ISA8_LBA_ENHANCER, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
 {
+	m_current_rom_start = 0;
 }
