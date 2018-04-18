@@ -101,7 +101,7 @@ protected:
 	required_device<generic_fifo_u32_device> m_copro_fifo_in;
 	required_device<generic_fifo_u32_device> m_copro_fifo_out;
 	optional_device<cpu_device> m_drivecpu;
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<scsp_device> m_scsp;

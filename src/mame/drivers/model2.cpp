@@ -2614,7 +2614,6 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2o_state,model2o)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
