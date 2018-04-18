@@ -34,8 +34,9 @@
 	TODO:
 	- Module W has a NEC D8041AHC which has not yet been dumped. A dump
 	  will be necessary to properly emulate the player.
-	- Driver currently fails the initial self-test with code 052. Per
-	  the service manual, code 52 means "no 2ppr pulse".
+	- Driver currently fails the initial self-test with code 053. Per
+	  the service manual, code 053 means "no lead-in code at start-up of
+	  player (diagnostics)".
 
 ***************************************************************************/
 
@@ -72,6 +73,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -119,6 +121,8 @@ public:
 	static const char* I8255_TAG;
 	static const char* CHARGEN_TAG;
 	static const char* SYNCGEN_TAG;
+
+	static const device_timer_id DRIVE_2PPR_ID;
 
 protected:
 	// CPU Board enums
@@ -263,6 +267,8 @@ protected:
 
 	uint8_t m_drive_rad_mir_dac;
 	uint8_t m_drive_i8255_pb;
+	emu_timer *m_drive_2ppr_timer;
+	uint8_t m_drive_2ppr;
 };
 
 /*static*/ const char* vp415_state::Z80CPU_TAG = "z80cpu";
@@ -281,6 +287,8 @@ protected:
 /*static*/ const char* vp415_state::I8255_TAG = "i8255";
 /*static*/ const char* vp415_state::CHARGEN_TAG = "mb88303";
 /*static*/ const char* vp415_state::SYNCGEN_TAG = "saa1043";
+
+/*static*/ const device_timer_id vp415_state::DRIVE_2PPR_ID = 0;
 
 void vp415_state::machine_reset()
 {
@@ -301,10 +309,27 @@ void vp415_state::machine_reset()
 	m_drive_pc_bits = I8255PC_DISC_REFLECTION | I8255PC_NOT_FOCUSED;
 
 	m_drive_rad_mir_dac = 0;
+
+	m_drive_2ppr = 0;
+	m_drive_2ppr_timer = timer_alloc(DRIVE_2PPR_ID);
+	m_drive_2ppr_timer->adjust(attotime::from_msec(10));
 }
 
 void vp415_state::machine_start()
 {
+}
+
+void vp415_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case DRIVE_2PPR_ID:
+			m_drive_2ppr ^= I8155PB_2PPR;
+			m_drive_2ppr_timer->adjust(attotime::from_msec(10));
+			break;
+		default:
+			break;
+	}
 }
 
 WRITE_LINE_MEMBER(vp415_state::refv_w)
@@ -510,7 +535,7 @@ void vp415_state::ctrlmcu_program_map(address_map &map)
 
 READ8_MEMBER(vp415_state::drive_i8155_pb_r)
 {
-	uint8_t ret = I8155PB_FRLOCK;
+	uint8_t ret = I8155PB_FRLOCK | m_drive_2ppr;
 	if (m_drive_rad_mir_dac >= 0x7e && m_drive_rad_mir_dac < 0x82 && BIT(m_drive_i8255_pb, I8255PB_RLS_N_BIT))
 		ret |= I8155PB_RAD_MIR;
 	logerror("%s: drive_i8155_pb_r: %02x\n", machine().describe_context(), ret);
