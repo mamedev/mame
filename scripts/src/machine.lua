@@ -155,6 +155,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ncr5385.h,MACHINES["NCR5385"] = true
+---------------------------------------------------
+
+if (MACHINES["NCR5385"]~=null) then
+	MACHINES["NSCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/ncr5385.cpp",
+		MAME_DIR .. "src/devices/machine/ncr5385.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/53c810.h,MACHINES["LSI53C810"] = true
 ---------------------------------------------------
 
