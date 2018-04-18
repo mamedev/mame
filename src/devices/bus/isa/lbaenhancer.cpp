@@ -90,12 +90,12 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  dip switches  
+//  jumpers  
 //-------------------------------------------------
 static INPUT_PORTS_START( lba_enhancer_dsw )
 
 	PORT_START("ROM_ADDRESS")
-	PORT_DIPNAME( 0x07, 0x00, "16 K ROM bank")
+	PORT_CONFNAME( 0x07, 0x00, "16 K ROM bank")
 	PORT_CONFSETTING(    0, "C8000 - CBFFF" )
 	PORT_CONFSETTING(    1, "CC000 - CFFFF" ) 
 	PORT_CONFSETTING(    2, "D0000 - D3FFF" ) 
