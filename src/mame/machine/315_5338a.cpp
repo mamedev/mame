@@ -95,6 +95,9 @@ READ8_MEMBER( sega_315_5338a_device::read )
 	// input port
 	case 0x06: data = m_in6_cb(0); break;
 
+	// serial data read back?
+	case 0x0a: data = m_serial_output; break;
+
 	// serial data input
 	case 0x0c: data = m_read_cb(m_address); break;
 
