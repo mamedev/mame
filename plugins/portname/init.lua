@@ -74,8 +74,11 @@ function portname.startplugin()
 				local labels = {}
 				ports[pname] = { labels = labels }
 				for fname, field in pairs(port.fields) do
-					if not labels[field.mask] then
-						labels[field.mask] = { name = fname, player = field.player }
+					local mask = tostring(field.mask)
+					if not labels[mask] then
+						labels[mask] = { name = fname, player = field.player }
+						setmetatable(labels[mask], { __tojson = function(v,s)
+							return json.stringify({ name = v.name, player = v.player }) end })
 					end
 				end
 			end
