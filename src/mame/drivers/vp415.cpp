@@ -32,15 +32,10 @@
 		Z - Deck Electronics
 
 	TODO:
-	- Module W and Module S both have a NEC D8041AHC which has not yet
-	  been dumped. Dumps will be necessary to properly emulate the
-	  player.
-	- Anyone who has information on the proper voltage with which to
-	  dump a mask-type 8041 manufactured by NEC circa 1987, please
-	  contact Ryan Holtz.
-	- Driver currently fails the initial self-test with code 025. Per
-	  the service manual, code 25 means "no REFV pulse at system
-	  start-up".
+	- Module W has a NEC D8041AHC which has not yet been dumped. A dump
+	  will be necessary to properly emulate the player.
+	- Driver currently fails the initial self-test with code 052. Per
+	  the service manual, code 52 means "no 2ppr pulse".
 
 ***************************************************************************/
 
