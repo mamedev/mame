@@ -19,15 +19,17 @@
 DEFINE_DEVICE_TYPE(I80130, i80130_device, "i80130", "I80130")
 
 
-ADDRESS_MAP_START(i80130_device::rom_map)
+void i80130_device::rom_map(address_map &map)
+{
 	//AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("rom", 0)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(i80130_device::io_map)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(io_r, io_w)
+void i80130_device::io_map(address_map &map)
+{
+	map(0x00, 0x0f).rw(this, FUNC(i80130_device::io_r), FUNC(i80130_device::io_w));
 	//AM_RANGE(0x00, 0x01) AM_MIRROR(0x2) AM_DEVREADWRITE8("pic", pic8259_device, read, write, 0x00ff)
 	//AM_RANGE(0x08, 0x0f) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+}
 
 READ16_MEMBER( i80130_device::io_r )
 {

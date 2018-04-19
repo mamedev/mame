@@ -90,23 +90,25 @@ ADDRESS_MAP_START(cammu_c4i_device::map)
 	AM_RANGE(0x0c0, 0x0c3) AM_READWRITE(test_address_r, test_address_w)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(cammu_c3_device::map)
-	AM_RANGE(0x000, 0x0ff) AM_NOP // tlb
-	AM_RANGE(0x104, 0x107) AM_READWRITE(s_pdo_r, s_pdo_w)
-	AM_RANGE(0x108, 0x10b) AM_READWRITE(u_pdo_r, u_pdo_w)
-	AM_RANGE(0x110, 0x113) AM_READWRITE(fault_r, fault_w)
-	AM_RANGE(0x140, 0x143) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x180, 0x183) AM_READWRITE(reset_r, reset_w)
-ADDRESS_MAP_END
+void cammu_c3_device::map(address_map &map)
+{
+	map(0x000, 0x0ff).noprw(); // tlb
+	map(0x104, 0x107).rw(this, FUNC(cammu_c3_device::s_pdo_r), FUNC(cammu_c3_device::s_pdo_w));
+	map(0x108, 0x10b).rw(this, FUNC(cammu_c3_device::u_pdo_r), FUNC(cammu_c3_device::u_pdo_w));
+	map(0x110, 0x113).rw(this, FUNC(cammu_c3_device::fault_r), FUNC(cammu_c3_device::fault_w));
+	map(0x140, 0x143).rw(this, FUNC(cammu_c3_device::control_r), FUNC(cammu_c3_device::control_w));
+	map(0x180, 0x183).rw(this, FUNC(cammu_c3_device::reset_r), FUNC(cammu_c3_device::reset_w));
+}
 
-ADDRESS_MAP_START(cammu_c3_device::map_global)
-	AM_RANGE(0x000, 0x0ff) AM_NOP // global tlb
-	AM_RANGE(0x104, 0x107) AM_WRITE(g_s_pdo_w)
-	AM_RANGE(0x108, 0x10b) AM_WRITE(g_u_pdo_w)
-	AM_RANGE(0x110, 0x113) AM_WRITE(g_fault_w)
-	AM_RANGE(0x140, 0x143) AM_WRITE(g_control_w)
-	AM_RANGE(0x180, 0x183) AM_WRITE(g_reset_w)
-ADDRESS_MAP_END
+void cammu_c3_device::map_global(address_map &map)
+{
+	map(0x000, 0x0ff).noprw(); // global tlb
+	map(0x104, 0x107).w(this, FUNC(cammu_c3_device::g_s_pdo_w));
+	map(0x108, 0x10b).w(this, FUNC(cammu_c3_device::g_u_pdo_w));
+	map(0x110, 0x113).w(this, FUNC(cammu_c3_device::g_fault_w));
+	map(0x140, 0x143).w(this, FUNC(cammu_c3_device::g_control_w));
+	map(0x180, 0x183).w(this, FUNC(cammu_c3_device::g_reset_w));
+}
 
 DEFINE_DEVICE_TYPE(CAMMU_C4T, cammu_c4t_device, "c4t", "C4E/C4T CAMMU")
 DEFINE_DEVICE_TYPE(CAMMU_C4I, cammu_c4i_device, "c4i", "C4I CAMMU")
