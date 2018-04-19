@@ -15,33 +15,34 @@
 
 DEFINE_DEVICE_TYPE(POWERVR2, powervr2_device, "powervr2", "PowerVR 2")
 
-ADDRESS_MAP_START(powervr2_device::ta_map)
-	AM_RANGE(0x0000, 0x0003) AM_READ(     id_r)
-	AM_RANGE(0x0004, 0x0007) AM_READ(     revision_r)
-	AM_RANGE(0x0008, 0x000b) AM_READWRITE(softreset_r,        softreset_w)
-	AM_RANGE(0x0014, 0x0017) AM_WRITE(    startrender_w)
+void powervr2_device::ta_map(address_map &map)
+{
+	map(0x0000, 0x0003).r(this, FUNC(powervr2_device::id_r));
+	map(0x0004, 0x0007).r(this, FUNC(powervr2_device::revision_r));
+	map(0x0008, 0x000b).rw(this, FUNC(powervr2_device::softreset_r), FUNC(powervr2_device::softreset_w));
+	map(0x0014, 0x0017).w(this, FUNC(powervr2_device::startrender_w));
 // 18 = test select
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE(param_base_r,       param_base_w)
-	AM_RANGE(0x002c, 0x002f) AM_READWRITE(region_base_r,      region_base_w)
+	map(0x0020, 0x0023).rw(this, FUNC(powervr2_device::param_base_r), FUNC(powervr2_device::param_base_w));
+	map(0x002c, 0x002f).rw(this, FUNC(powervr2_device::region_base_r), FUNC(powervr2_device::region_base_w));
 // 30 = span sort cfg
-	AM_RANGE(0x0040, 0x0043) AM_READWRITE(vo_border_col_r,    vo_border_col_w)
-	AM_RANGE(0x0044, 0x0047) AM_READWRITE(fb_r_ctrl_r,        fb_r_ctrl_w)
-	AM_RANGE(0x0048, 0x004b) AM_READWRITE(fb_w_ctrl_r,        fb_w_ctrl_w)
-	AM_RANGE(0x004c, 0x004f) AM_READWRITE(fb_w_linestride_r,  fb_w_linestride_w)
-	AM_RANGE(0x0050, 0x0053) AM_READWRITE(fb_r_sof1_r,        fb_r_sof1_w)
-	AM_RANGE(0x0054, 0x0057) AM_READWRITE(fb_r_sof2_r,        fb_r_sof2_w)
-	AM_RANGE(0x005c, 0x005f) AM_READWRITE(fb_r_size_r,        fb_r_size_w)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(fb_w_sof1_r,        fb_w_sof1_w)
-	AM_RANGE(0x0064, 0x0067) AM_READWRITE(fb_w_sof2_r,        fb_w_sof2_w)
-	AM_RANGE(0x0068, 0x006b) AM_READWRITE(fb_x_clip_r,        fb_x_clip_w)
-	AM_RANGE(0x006c, 0x006f) AM_READWRITE(fb_y_clip_r,        fb_y_clip_w)
+	map(0x0040, 0x0043).rw(this, FUNC(powervr2_device::vo_border_col_r), FUNC(powervr2_device::vo_border_col_w));
+	map(0x0044, 0x0047).rw(this, FUNC(powervr2_device::fb_r_ctrl_r), FUNC(powervr2_device::fb_r_ctrl_w));
+	map(0x0048, 0x004b).rw(this, FUNC(powervr2_device::fb_w_ctrl_r), FUNC(powervr2_device::fb_w_ctrl_w));
+	map(0x004c, 0x004f).rw(this, FUNC(powervr2_device::fb_w_linestride_r), FUNC(powervr2_device::fb_w_linestride_w));
+	map(0x0050, 0x0053).rw(this, FUNC(powervr2_device::fb_r_sof1_r), FUNC(powervr2_device::fb_r_sof1_w));
+	map(0x0054, 0x0057).rw(this, FUNC(powervr2_device::fb_r_sof2_r), FUNC(powervr2_device::fb_r_sof2_w));
+	map(0x005c, 0x005f).rw(this, FUNC(powervr2_device::fb_r_size_r), FUNC(powervr2_device::fb_r_size_w));
+	map(0x0060, 0x0063).rw(this, FUNC(powervr2_device::fb_w_sof1_r), FUNC(powervr2_device::fb_w_sof1_w));
+	map(0x0064, 0x0067).rw(this, FUNC(powervr2_device::fb_w_sof2_r), FUNC(powervr2_device::fb_w_sof2_w));
+	map(0x0068, 0x006b).rw(this, FUNC(powervr2_device::fb_x_clip_r), FUNC(powervr2_device::fb_x_clip_w));
+	map(0x006c, 0x006f).rw(this, FUNC(powervr2_device::fb_y_clip_r), FUNC(powervr2_device::fb_y_clip_w));
 // 74 = fpu_shad_scale
 // 78 = fpu_cull_val
-	AM_RANGE(0x007c, 0x007f) AM_READWRITE(fpu_param_cfg_r,    fpu_param_cfg_w)
+	map(0x007c, 0x007f).rw(this, FUNC(powervr2_device::fpu_param_cfg_r), FUNC(powervr2_device::fpu_param_cfg_w));
 // 80 = half_offset
 // 84 = fpu_perp_val
 // 88 = isp_backgnd_d
-	AM_RANGE(0x008c, 0x008f) AM_READWRITE(isp_backgnd_t_r,    isp_backgnd_t_w)
+	map(0x008c, 0x008f).rw(this, FUNC(powervr2_device::isp_backgnd_t_r), FUNC(powervr2_device::isp_backgnd_t_w));
 // 98 = isp_feed_cfg
 // a0 = sdram_refresh
 // a4 = sdram_arb_cfg
@@ -52,53 +53,54 @@ ADDRESS_MAP_START(powervr2_device::ta_map)
 // bc = fog_clamp_max
 // c0 = fog_clamp_min
 // c4 = spg_trigger_pos
-	AM_RANGE(0x00c8, 0x00cb) AM_READWRITE(spg_hblank_int_r,   spg_hblank_int_w)
-	AM_RANGE(0x00cc, 0x00cf) AM_READWRITE(spg_vblank_int_r,   spg_vblank_int_w)
-	AM_RANGE(0x00d0, 0x00d3) AM_READWRITE(spg_control_r,      spg_control_w)
-	AM_RANGE(0x00d4, 0x00d7) AM_READWRITE(spg_hblank_r,       spg_hblank_w)
-	AM_RANGE(0x00d8, 0x00db) AM_READWRITE(spg_load_r,         spg_load_w)
-	AM_RANGE(0x00dc, 0x00df) AM_READWRITE(spg_vblank_r,       spg_vblank_w)
-	AM_RANGE(0x00e0, 0x00e3) AM_READWRITE(spg_width_r,        spg_width_w)
-	AM_RANGE(0x00e4, 0x00e7) AM_READWRITE(text_control_r,     text_control_w)
-	AM_RANGE(0x00e8, 0x00eb) AM_READWRITE(vo_control_r,       vo_control_w)
-	AM_RANGE(0x00ec, 0x00ef) AM_READWRITE(vo_startx_r,        vo_startx_w)
-	AM_RANGE(0x00f0, 0x00f3) AM_READWRITE(vo_starty_r,        vo_starty_w)
+	map(0x00c8, 0x00cb).rw(this, FUNC(powervr2_device::spg_hblank_int_r), FUNC(powervr2_device::spg_hblank_int_w));
+	map(0x00cc, 0x00cf).rw(this, FUNC(powervr2_device::spg_vblank_int_r), FUNC(powervr2_device::spg_vblank_int_w));
+	map(0x00d0, 0x00d3).rw(this, FUNC(powervr2_device::spg_control_r), FUNC(powervr2_device::spg_control_w));
+	map(0x00d4, 0x00d7).rw(this, FUNC(powervr2_device::spg_hblank_r), FUNC(powervr2_device::spg_hblank_w));
+	map(0x00d8, 0x00db).rw(this, FUNC(powervr2_device::spg_load_r), FUNC(powervr2_device::spg_load_w));
+	map(0x00dc, 0x00df).rw(this, FUNC(powervr2_device::spg_vblank_r), FUNC(powervr2_device::spg_vblank_w));
+	map(0x00e0, 0x00e3).rw(this, FUNC(powervr2_device::spg_width_r), FUNC(powervr2_device::spg_width_w));
+	map(0x00e4, 0x00e7).rw(this, FUNC(powervr2_device::text_control_r), FUNC(powervr2_device::text_control_w));
+	map(0x00e8, 0x00eb).rw(this, FUNC(powervr2_device::vo_control_r), FUNC(powervr2_device::vo_control_w));
+	map(0x00ec, 0x00ef).rw(this, FUNC(powervr2_device::vo_startx_r), FUNC(powervr2_device::vo_startx_w));
+	map(0x00f0, 0x00f3).rw(this, FUNC(powervr2_device::vo_starty_r), FUNC(powervr2_device::vo_starty_w));
 // f4 = scaler_ctl
-	AM_RANGE(0x0108, 0x010b) AM_READWRITE(pal_ram_ctrl_r,     pal_ram_ctrl_w)
-	AM_RANGE(0x010c, 0x010f) AM_READ(     spg_status_r)
+	map(0x0108, 0x010b).rw(this, FUNC(powervr2_device::pal_ram_ctrl_r), FUNC(powervr2_device::pal_ram_ctrl_w));
+	map(0x010c, 0x010f).r(this, FUNC(powervr2_device::spg_status_r));
 // 110 = fb_burstctrl
 // 118 = y_coeff
 // 11c = pt_alpha_ref
 
-	AM_RANGE(0x0124, 0x0127) AM_READWRITE(ta_ol_base_r,       ta_ol_base_w)
-	AM_RANGE(0x0128, 0x012b) AM_READWRITE(ta_isp_base_r,      ta_isp_base_w)
-	AM_RANGE(0x012c, 0x012f) AM_READWRITE(ta_ol_limit_r,      ta_ol_limit_w)
-	AM_RANGE(0x0130, 0x0133) AM_READWRITE(ta_isp_limit_r,     ta_isp_limit_w)
-	AM_RANGE(0x0134, 0x0137) AM_READ(     ta_next_opb_r)
-	AM_RANGE(0x0138, 0x013b) AM_READ(     ta_itp_current_r)
+	map(0x0124, 0x0127).rw(this, FUNC(powervr2_device::ta_ol_base_r), FUNC(powervr2_device::ta_ol_base_w));
+	map(0x0128, 0x012b).rw(this, FUNC(powervr2_device::ta_isp_base_r), FUNC(powervr2_device::ta_isp_base_w));
+	map(0x012c, 0x012f).rw(this, FUNC(powervr2_device::ta_ol_limit_r), FUNC(powervr2_device::ta_ol_limit_w));
+	map(0x0130, 0x0133).rw(this, FUNC(powervr2_device::ta_isp_limit_r), FUNC(powervr2_device::ta_isp_limit_w));
+	map(0x0134, 0x0137).r(this, FUNC(powervr2_device::ta_next_opb_r));
+	map(0x0138, 0x013b).r(this, FUNC(powervr2_device::ta_itp_current_r));
 // 13c = ta_glob_tile_clip
-	AM_RANGE(0x0140, 0x0143) AM_READWRITE(ta_alloc_ctrl_r,    ta_alloc_ctrl_w)
-	AM_RANGE(0x0144, 0x0147) AM_READWRITE(ta_list_init_r,     ta_list_init_w)
-	AM_RANGE(0x0148, 0x014b) AM_READWRITE(ta_yuv_tex_base_r,  ta_yuv_tex_base_w)
-	AM_RANGE(0x014c, 0x014f) AM_READWRITE(ta_yuv_tex_ctrl_r,  ta_yuv_tex_ctrl_w)
-	AM_RANGE(0x0150, 0x0153) AM_READWRITE(ta_yuv_tex_cnt_r,   ta_yuv_tex_cnt_w)
-	AM_RANGE(0x0160, 0x0163) AM_WRITE(    ta_list_cont_w)
-	AM_RANGE(0x0164, 0x0167) AM_READWRITE(ta_next_opb_init_r, ta_next_opb_init_w)
+	map(0x0140, 0x0143).rw(this, FUNC(powervr2_device::ta_alloc_ctrl_r), FUNC(powervr2_device::ta_alloc_ctrl_w));
+	map(0x0144, 0x0147).rw(this, FUNC(powervr2_device::ta_list_init_r), FUNC(powervr2_device::ta_list_init_w));
+	map(0x0148, 0x014b).rw(this, FUNC(powervr2_device::ta_yuv_tex_base_r), FUNC(powervr2_device::ta_yuv_tex_base_w));
+	map(0x014c, 0x014f).rw(this, FUNC(powervr2_device::ta_yuv_tex_ctrl_r), FUNC(powervr2_device::ta_yuv_tex_ctrl_w));
+	map(0x0150, 0x0153).rw(this, FUNC(powervr2_device::ta_yuv_tex_cnt_r), FUNC(powervr2_device::ta_yuv_tex_cnt_w));
+	map(0x0160, 0x0163).w(this, FUNC(powervr2_device::ta_list_cont_w));
+	map(0x0164, 0x0167).rw(this, FUNC(powervr2_device::ta_next_opb_init_r), FUNC(powervr2_device::ta_next_opb_init_w));
 
-	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(fog_table_r,        fog_table_w)
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(palette_r,          palette_w)
-ADDRESS_MAP_END
+	map(0x0200, 0x03ff).rw(this, FUNC(powervr2_device::fog_table_r), FUNC(powervr2_device::fog_table_w));
+	map(0x1000, 0x1fff).rw(this, FUNC(powervr2_device::palette_r), FUNC(powervr2_device::palette_w));
+}
 
-ADDRESS_MAP_START(powervr2_device::pd_dma_map)
-	AM_RANGE(0x00,   0x03)   AM_READWRITE(sb_pdstap_r,        sb_pdstap_w)
-	AM_RANGE(0x04,   0x07)   AM_READWRITE(sb_pdstar_r,        sb_pdstar_w)
-	AM_RANGE(0x08,   0x0b)   AM_READWRITE(sb_pdlen_r,         sb_pdlen_w)
-	AM_RANGE(0x0c,   0x0f)   AM_READWRITE(sb_pddir_r,         sb_pddir_w)
-	AM_RANGE(0x10,   0x13)   AM_READWRITE(sb_pdtsel_r,        sb_pdtsel_w)
-	AM_RANGE(0x14,   0x17)   AM_READWRITE(sb_pden_r,          sb_pden_w)
-	AM_RANGE(0x18,   0x1b)   AM_READWRITE(sb_pdst_r,          sb_pdst_w)
-	AM_RANGE(0x80,   0x83)   AM_READWRITE(sb_pdapro_r,        sb_pdapro_w)
-ADDRESS_MAP_END
+void powervr2_device::pd_dma_map(address_map &map)
+{
+	map(0x00, 0x03).rw(this, FUNC(powervr2_device::sb_pdstap_r), FUNC(powervr2_device::sb_pdstap_w));
+	map(0x04, 0x07).rw(this, FUNC(powervr2_device::sb_pdstar_r), FUNC(powervr2_device::sb_pdstar_w));
+	map(0x08, 0x0b).rw(this, FUNC(powervr2_device::sb_pdlen_r), FUNC(powervr2_device::sb_pdlen_w));
+	map(0x0c, 0x0f).rw(this, FUNC(powervr2_device::sb_pddir_r), FUNC(powervr2_device::sb_pddir_w));
+	map(0x10, 0x13).rw(this, FUNC(powervr2_device::sb_pdtsel_r), FUNC(powervr2_device::sb_pdtsel_w));
+	map(0x14, 0x17).rw(this, FUNC(powervr2_device::sb_pden_r), FUNC(powervr2_device::sb_pden_w));
+	map(0x18, 0x1b).rw(this, FUNC(powervr2_device::sb_pdst_r), FUNC(powervr2_device::sb_pdst_w));
+	map(0x80, 0x83).rw(this, FUNC(powervr2_device::sb_pdapro_r), FUNC(powervr2_device::sb_pdapro_w));
+}
 
 const int powervr2_device::pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13,14,15,16,17,16,17,0,0,0,0,0,18,19,20,19,20,21,22,23,22,23};
 const int powervr2_device::pvr_wordsvertex[24]  = {8,8,8,8,8,16,16,8,8,8, 8, 8,8,8,8,8,16,16, 8,16,16,8,16,16};
