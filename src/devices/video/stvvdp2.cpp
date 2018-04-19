@@ -4505,7 +4505,7 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 			popmessage("Special Function Code Select enable %04x %04x, contact MAMEdev",STV_VDP2_SFSEL,STV_VDP2_SFCODE);
 
 		/* Albert Odyssey Gaiden 0x0001 */
-		/* Asuka 120% (doesn't make sense?) 0x0101 */
+		/* Asuka 120% 0x0101 */
 		/* Slam n Jam 96 0x0003 */
 		if(STV_VDP2_ZMCTL & 0x0200)
 			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
@@ -4775,6 +4775,9 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 				y = ys >> 16;
 
 				if ( x & clipxmask || y & clipymask ) continue;
+				if ( stv_vdp2_roz_window(hcnt, vcnt) == false )
+					continue;
+				
 				if ( stv2_current_tilemap.roz_mode3 == true )
 				{
 					if( stv_vdp2_roz_mode3_window(hcnt, vcnt, iRP-1) == false )
@@ -4934,7 +4937,30 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	}
 }
 
-bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
+inline bool saturn_state::stv_vdp2_roz_window(int x, int y)
+{
+	int s_x=0,e_x=0,s_y=0,e_y=0;
+	int w0_pix, w1_pix;
+	uint8_t logic = STV_VDP2_R0LOG;
+	uint8_t w0_enable = STV_VDP2_R0W0E;
+	uint8_t w1_enable = STV_VDP2_R0W1E;
+	uint8_t w0_area = STV_VDP2_R0W0A;
+	uint8_t w1_area = STV_VDP2_R0W1A;
+	
+	if (w0_enable == 0 &&
+		w1_enable == 0)
+		return true;
+
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+	w0_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
+
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+	w1_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
+
+	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix));
+}
+
+inline bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
 {
 	int s_x=0,e_x=0,s_y=0,e_y=0;
 	int w0_pix, w1_pix;
@@ -4949,15 +4975,15 @@ bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
 		return rot_parameter ^ 1;
 
 	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
-	w0_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
+	w0_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
 
 	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
-	w1_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
+	w1_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
 
 	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix)) ^ rot_parameter;
 }
 
-int saturn_state::get_roz_mode3_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable, uint8_t winarea)
+inline int saturn_state::get_roz_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable, uint8_t winarea)
 {
 	int res;
 
@@ -5381,7 +5407,7 @@ void saturn_state::stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cli
 
 void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP)
 {
-	rectangle roz_clip_rect, mycliprect;
+	rectangle roz_clip_rect;
 	int planesizex = 0, planesizey = 0;
 	int planerenderedsizex, planerenderedsizey;
 	uint8_t colour_calculation_enabled;
@@ -5484,13 +5510,32 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			//       which will be annoying to emulate with this video structure.
 			//       Let's see if anything will do it ...
 			if(STV_VDP2_RPW0E || STV_VDP2_RPW1E)
-				popmessage("ROZ Mode 3 enabled without zooming, contact MAMEdev!");
+				popmessage("ROZ Mode 3 window enabled without zooming, contact MAMEdev!");
 			
 			if(iRP == 2)
 				return;
 		}
 		
-		stv_vdp2_check_tilemap(bitmap,cliprect);
+		// TODO: legacy code, to be removed
+		stv2_current_tilemap.window_control.logic = STV_VDP2_R0LOG;
+		stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_R0W0E;
+		stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_R0W1E;
+//  	stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
+		stv2_current_tilemap.window_control.area[0] = STV_VDP2_R0W0A;
+		stv2_current_tilemap.window_control.area[1] = STV_VDP2_R0W1A;
+//  	stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
+		
+		rectangle mycliprect = cliprect;
+
+		if ( stv2_current_tilemap.window_control.enabled[0] || stv2_current_tilemap.window_control.enabled[1] )
+		{
+			//popmessage("Window control for RBG");
+			stv_vdp2_apply_window_on_layer(mycliprect);
+			stv2_current_tilemap.window_control.enabled[0] = 0;
+			stv2_current_tilemap.window_control.enabled[1] = 0;
+		}
+		
+		stv_vdp2_check_tilemap(bitmap,mycliprect);
 	}
 	else
 	{
@@ -5554,9 +5599,10 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			stv2_current_tilemap.transparency = STV_TRANSPARENCY_ALPHA;
 		}
 
+		#ifdef UNUSED_FUNCTION
+		// old reference code
 		mycliprect = cliprect;
 
-		/* TODO: remove me. */
 		if ( stv2_current_tilemap.window_control.enabled[0] || stv2_current_tilemap.window_control.enabled[1] )
 		{
 			//popmessage("Window control for RBG");
@@ -5564,11 +5610,12 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			stv2_current_tilemap.window_control.enabled[0] = 0;
 			stv2_current_tilemap.window_control.enabled[1] = 0;
 		}
+		#endif
 
 		stv2_current_tilemap.fade_control = fade_control;
 
 		g_profiler.start(PROFILER_USER2);
-		stv_vdp2_copy_roz_bitmap(bitmap, m_vdp2.roz_bitmap[iRP-1], mycliprect, iRP, planesizex, planesizey, planerenderedsizex, planerenderedsizey );
+		stv_vdp2_copy_roz_bitmap(bitmap, m_vdp2.roz_bitmap[iRP-1], cliprect, iRP, planesizex, planesizey, planerenderedsizex, planerenderedsizey );
 		g_profiler.stop();
 	}
 
@@ -5629,12 +5676,13 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_R0CAOS;
 	stv2_current_tilemap.fade_control = (STV_VDP2_R0COEN * 1) | (STV_VDP2_R0COSL * 2);
 	stv_vdp2_check_fade_control_for_layer();
-	stv2_current_tilemap.window_control.logic = STV_VDP2_R0LOG;
-	stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_R0W0E;
-	stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_R0W1E;
+	// disable these, we apply them in the roz routines (they were interfering with stv_vdp2_roz_window() ?)
+	stv2_current_tilemap.window_control.logic = 0; //STV_VDP2_R0LOG;
+	stv2_current_tilemap.window_control.enabled[0] = 0; //STV_VDP2_R0W0E;
+	stv2_current_tilemap.window_control.enabled[1] = 0; //STV_VDP2_R0W1E;
 //  stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
-	stv2_current_tilemap.window_control.area[0] = STV_VDP2_R0W0A;
-	stv2_current_tilemap.window_control.area[1] = STV_VDP2_R0W1A;
+	stv2_current_tilemap.window_control.area[0] = 0; //STV_VDP2_R0W0A;
+	stv2_current_tilemap.window_control.area[1] = 0; //STV_VDP2_R0W1A;
 //  stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
 
 	stv2_current_tilemap.scrollx = 0;
