@@ -233,17 +233,18 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::d104_move_w)
 }
 
 // anything that is read thru ROM range 0xc**** is replacement code, therefore on this HW they are latches.
-ADDRESS_MAP_START(seibu_cop_bootleg_device::seibucopbl_map)
-	AM_RANGE(0x01e, 0x01f) AM_RAM // angle step, PC=0xc0186
-	AM_RANGE(0x046, 0x049) AM_READWRITE(d104_move_r,d104_move_w)
-	AM_RANGE(0x070, 0x07f) AM_RAM // DMA registers, PC=0xc0034
-	AM_RANGE(0x0a0, 0x0af) AM_READWRITE(reg_hi_addr_r,reg_hi_addr_w)
-	AM_RANGE(0x0c0, 0x0cf) AM_READWRITE(reg_lo_addr_r,reg_lo_addr_w)
-	AM_RANGE(0x100, 0x105) AM_WRITE(cmd_trigger_w)
-	AM_RANGE(0x1b0, 0x1b1) AM_READ(status_r)
-	AM_RANGE(0x1b2, 0x1b3) AM_READ(dist_r)
-	AM_RANGE(0x1b4, 0x1b5) AM_READ(angle_r)
-ADDRESS_MAP_END
+void seibu_cop_bootleg_device::seibucopbl_map(address_map &map)
+{
+	map(0x01e, 0x01f).ram(); // angle step, PC=0xc0186
+	map(0x046, 0x049).rw(this, FUNC(seibu_cop_bootleg_device::d104_move_r), FUNC(seibu_cop_bootleg_device::d104_move_w));
+	map(0x070, 0x07f).ram(); // DMA registers, PC=0xc0034
+	map(0x0a0, 0x0af).rw(this, FUNC(seibu_cop_bootleg_device::reg_hi_addr_r), FUNC(seibu_cop_bootleg_device::reg_hi_addr_w));
+	map(0x0c0, 0x0cf).rw(this, FUNC(seibu_cop_bootleg_device::reg_lo_addr_r), FUNC(seibu_cop_bootleg_device::reg_lo_addr_w));
+	map(0x100, 0x105).w(this, FUNC(seibu_cop_bootleg_device::cmd_trigger_w));
+	map(0x1b0, 0x1b1).r(this, FUNC(seibu_cop_bootleg_device::status_r));
+	map(0x1b2, 0x1b3).r(this, FUNC(seibu_cop_bootleg_device::dist_r));
+	map(0x1b4, 0x1b5).r(this, FUNC(seibu_cop_bootleg_device::angle_r));
+}
 
 seibu_cop_bootleg_device::seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_COP_BOOTLEG, tag, owner, clock),

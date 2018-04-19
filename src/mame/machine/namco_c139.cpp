@@ -28,9 +28,10 @@ DEFINE_DEVICE_TYPE(NAMCO_C139, namco_c139_device, "namco_c139", "Namco C139 Seri
 //  LIVE DEVICE
 //**************************************************************************
 
-ADDRESS_MAP_START(namco_c139_device::data_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("sharedram")
-ADDRESS_MAP_END
+void namco_c139_device::data_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("sharedram");
+}
 
 void namco_c139_device::regs_map(address_map &map)
 {

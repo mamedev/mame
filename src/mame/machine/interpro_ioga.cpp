@@ -135,20 +135,22 @@ void interpro_ioga_device::map(address_map &map)
 	//c0, c4, c8 -ethernet address a,b,c?
 }
 
-ADDRESS_MAP_START(turquoise_ioga_device::map)
-	AM_IMPORT_FROM(interpro_ioga_device::map)
+void turquoise_ioga_device::map(address_map &map)
+{
+	interpro_ioga_device::map(map);
 
-	AM_RANGE(0x00, 0x03) AM_READWRITE(eth_base_r, eth_base_w)
-	AM_RANGE(0x04, 0x07) AM_READWRITE16(eth_control_r, eth_control_w, 0xffff)
-ADDRESS_MAP_END
+	map(0x00, 0x03).rw(this, FUNC(turquoise_ioga_device::eth_base_r), FUNC(turquoise_ioga_device::eth_base_w));
+	map(0x04, 0x05).rw(this, FUNC(turquoise_ioga_device::eth_control_r), FUNC(turquoise_ioga_device::eth_control_w));
+}
 
-ADDRESS_MAP_START(sapphire_ioga_device::map)
-	AM_IMPORT_FROM(interpro_ioga_device::map)
+void sapphire_ioga_device::map(address_map &map)
+{
+	interpro_ioga_device::map(map);
 
-	AM_RANGE(0x00, 0x03) AM_READWRITE(eth_remap_r, eth_remap_w)
-	AM_RANGE(0x04, 0x07) AM_READWRITE(eth_mappg_r, eth_mappg_w)
-	AM_RANGE(0x08, 0x0b) AM_READWRITE(eth_control_r, eth_control_w)
-ADDRESS_MAP_END
+	map(0x00, 0x03).rw(this, FUNC(sapphire_ioga_device::eth_remap_r), FUNC(sapphire_ioga_device::eth_remap_w));
+	map(0x04, 0x07).rw(this, FUNC(sapphire_ioga_device::eth_mappg_r), FUNC(sapphire_ioga_device::eth_mappg_w));
+	map(0x08, 0x0b).rw(this, FUNC(sapphire_ioga_device::eth_control_r), FUNC(sapphire_ioga_device::eth_control_w));
+}
 
 static INPUT_PORTS_START(interpro_mouse)
 	PORT_START("mouse_buttons")

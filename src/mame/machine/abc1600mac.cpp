@@ -63,8 +63,9 @@ void abc1600_mac_device::map(address_map &map)
 }
 
 
-ADDRESS_MAP_START(abc1600_mac_device::program_map)
-ADDRESS_MAP_END
+void abc1600_mac_device::program_map(address_map &map)
+{
+}
 
 
 MACHINE_CONFIG_START(abc1600_mac_device::device_add_mconfig)
