@@ -38,9 +38,10 @@
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
-#include "machine/keyboard.h"
 #include "machine/kr1601rr1.h"
 #include "machine/pit8253.h"
+#include "machine/ripple_counter.h"
+#include "machine/vt100_kbd.h"
 #include "video/i8275.h"
 
 #include "screen.h"
@@ -65,6 +66,7 @@ public:
 		, m_i8251(*this, "i8251")
 		, m_rs232(*this, "rs232")
 		, m_kbd_uart(*this, "589wa1")
+		, m_keyboard(*this, "keyboard")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_crtc1(*this, "i8275_1")
@@ -100,14 +102,10 @@ private:
 	DECLARE_READ8_MEMBER(crtc_r);
 	DECLARE_WRITE8_MEMBER(crtc_w);
 
-	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
-
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_READ8_MEMBER(kbd_get);
-	void kbd_put(u8 data);
-	bool m_kbd_ready;
-	uint8_t m_kbd_data;
+	DECLARE_READ8_MEMBER(misc_status_r);
 	u16 m_dmaaddr;
+
+	DECLARE_WRITE8_MEMBER(kbd_uart_clock_w);
 
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<i8080_cpu_device> m_maincpu;
@@ -117,6 +115,7 @@ private:
 	required_device<i8251_device> m_i8251;
 	required_device<rs232_port_device> m_rs232;
 	required_device<ay31015_device> m_kbd_uart;
+	required_device<vt100_keyboard_device> m_keyboard;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<i8275_device> m_crtc1;
@@ -139,12 +138,11 @@ void ms6102_state::ms6102_io(address_map &map)
 	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x10, 0x18).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x20, 0x23).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	//AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE("589wa1", ay31015_device, receive, transmit)
-	map(0x30, 0x3f).r(this, FUNC(ms6102_state::kbd_get)).nopw();
+	map(0x30, 0x30).mirror(0x0f).rw("589wa1", FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	map(0x40, 0x41).rw(this, FUNC(ms6102_state::crtc_r), FUNC(ms6102_state::crtc_w));
 	map(0x50, 0x5f).noprw(); // video disable?
 	map(0x60, 0x6f).w(this, FUNC(ms6102_state::pic_w));
-	map(0x70, 0x7f).r(this, FUNC(ms6102_state::misc_r));
+	map(0x70, 0x7f).r(this, FUNC(ms6102_state::misc_status_r));
 }
 
 static const gfx_layout ms6102_charlayout =
@@ -213,26 +211,23 @@ WRITE8_MEMBER(ms6102_state::crtc_w)
 	m_crtc2->write(space, offset, data);
 }
 
-READ8_MEMBER(ms6102_state::misc_r)
+READ8_MEMBER(ms6102_state::misc_status_r)
 {
-	//return m_kbd_uart->tbmt_r() << 6;
-	return m_kbd_ready << 6;
+	uint8_t status = 0;
+	if (!m_kbd_uart->tbmt_r())
+		status |= 1 << 6;
+	return status;
 }
 
-READ8_MEMBER(ms6102_state::kbd_get)
+WRITE8_MEMBER(ms6102_state::kbd_uart_clock_w)
 {
-	m_kbd_ready = false;
-	LOG("kbd_get %02x\n", m_kbd_data);
-	m_pic->r_w(1, 1);
-	return m_kbd_data;
-}
+	m_kbd_uart->write_tcp(BIT(data, 1));
+	m_kbd_uart->write_rcp(BIT(data, 1));
 
-void ms6102_state::kbd_put(u8 data)
-{
-	LOG("kbd_put %02x\n", data);
-	m_kbd_ready = true;
-	m_kbd_data = data;
-	m_pic->r_w(1, 0);
+	if (data == 0 || data == 3)
+		m_keyboard->signal_line_w(m_kbd_uart->so_r());
+	else
+		m_keyboard->signal_line_w(BIT(data, 0));
 }
 
 
@@ -257,17 +252,12 @@ IRQ_CALLBACK_MEMBER(ms6102_state::ms6102_int_ack)
 }
 
 
-WRITE_LINE_MEMBER(ms6102_state::write_line_clock)
-{
-	m_i8251->write_txc(state);
-	m_i8251->write_rxc(state);
-}
-
-
 void ms6102_state::machine_reset()
 {
-	m_kbd_ready = false;
+}
 
+void ms6102_state::machine_start()
+{
 	m_kbd_uart->write_eps(1);
 	m_kbd_uart->write_nb1(1);
 	m_kbd_uart->write_nb2(1);
@@ -275,11 +265,11 @@ void ms6102_state::machine_reset()
 	m_kbd_uart->write_np(1);
 	m_kbd_uart->write_cs(1);
 	m_kbd_uart->write_swe(0);
-}
 
-void ms6102_state::machine_start()
-{
+	m_i8251->write_cts(0);
+
 	m_pic->etlg_w(1);
+
 	// rearrange the chargen to be easier for us to access
 	int i,j;
 	for (i = 0; i < 0x100; i++)
@@ -350,12 +340,15 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 
 	// keyboard
 	MCFG_DEVICE_ADD("589wa1", AY31015, 0)
-	MCFG_AY31015_RX_CLOCK(XTAL(16'400'000) / 9 / 16)
-	MCFG_AY31015_TX_CLOCK(XTAL(16'400'000) / 9 / 16)
+	MCFG_AY31015_WRITE_DAV_CB(WRITELINE(ms6102_state, irq<1>))
 	MCFG_AY31015_AUTO_RDAV(true)
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(ms6102_state, kbd_put))
+	MCFG_DEVICE_ADD("ie5", RIPPLE_COUNTER, XTAL(16'400'000) / 30)
+	MCFG_RIPPLE_COUNTER_STAGES(2)
+	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(ms6102_state, kbd_uart_clock_w))
+
+	MCFG_DEVICE_ADD("keyboard", VT100_KEYBOARD, 0)
+	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(DEVWRITELINE("589wa1", ay31015_device, write_si))
 
 	// serial connection to host
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
@@ -391,4 +384,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT       COMPANY       FULLNAME       FLAGS */
-COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  0, "Elektronika", "MS 6102.02", MACHINE_NOT_WORKING|MACHINE_NO_SOUND_HW)
+COMP( 1984, ms6102,  0,      0,       ms6102,    0,       ms6102_state,  0, "Elektronika", "MS 6102.02", MACHINE_NOT_WORKING )
