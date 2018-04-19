@@ -1666,45 +1666,52 @@ INPUT_PORTS_END
 *  Memory maps
 *
 *************************************/
-ADDRESS_MAP_START(vegas_state::vegas_cs2_map)
-	AM_RANGE(0x00000000, 0x00007003) AM_READWRITE8(sio_r, sio_w, 0xffffffff)
-ADDRESS_MAP_END
+void vegas_state::vegas_cs2_map(address_map &map)
+{
+	map(0x00000000, 0x00007003).rw(this, FUNC(vegas_state::sio_r), FUNC(vegas_state::sio_w));
+}
 
-ADDRESS_MAP_START(vegas_state::vegas_cs3_map)
-	AM_RANGE(0x00000000, 0x00000003) AM_READWRITE(analog_port_r, analog_port_w)
+void vegas_state::vegas_cs3_map(address_map &map)
+{
+	map(0x00000000, 0x00000003).rw(this, FUNC(vegas_state::analog_port_r), FUNC(vegas_state::analog_port_w));
 	//AM_RANGE(0x00001000, 0x00001003) AM_READWRITE(lcd_r, lcd_w)
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(vegas_state::vegas_cs4_map)
-	AM_RANGE(0x00000000, 0x00007fff) AM_READWRITE(timekeeper_r, timekeeper_w)
-ADDRESS_MAP_END
+void vegas_state::vegas_cs4_map(address_map &map)
+{
+	map(0x00000000, 0x00007fff).rw(this, FUNC(vegas_state::timekeeper_r), FUNC(vegas_state::timekeeper_w));
+}
 
-ADDRESS_MAP_START(vegas_state::vegas_cs5_map)
-	AM_RANGE(0x00000000, 0x00000003) AM_READWRITE8(cpu_io_r, cpu_io_w, 0xffffffff)
-	AM_RANGE(0x00100000, 0x001fffff) AM_READ(unknown_r)
-ADDRESS_MAP_END
+void vegas_state::vegas_cs5_map(address_map &map)
+{
+	map(0x00000000, 0x00000003).rw(this, FUNC(vegas_state::cpu_io_r), FUNC(vegas_state::cpu_io_w));
+	map(0x00100000, 0x001fffff).r(this, FUNC(vegas_state::unknown_r));
+}
 
-ADDRESS_MAP_START(vegas_state::vegas_cs6_map)
-	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, packed_r, packed_w)
-	AM_RANGE(0x00001000, 0x00001003) AM_WRITE(asic_fifo_w)
-	AM_RANGE(0x00003000, 0x00003003) AM_WRITE(dcs3_fifo_full_w)  // if (m_dcs_idma_cs != 0)
-	AM_RANGE(0x00005000, 0x00005003) AM_DEVWRITE("dcs", dcs_audio_device, dsio_idma_addr_w) // if (m_dcs_idma_cs == 6)
-	AM_RANGE(0x00007000, 0x00007003) AM_DEVREADWRITE("dcs", dcs_audio_device, dsio_idma_data_r, dsio_idma_data_w) // if (m_dcs_idma_cs == 6)
-ADDRESS_MAP_END
+void vegas_state::vegas_cs6_map(address_map &map)
+{
+	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::packed_r), FUNC(midway_ioasic_device::packed_w));
+	map(0x00001000, 0x00001003).w(this, FUNC(vegas_state::asic_fifo_w));
+	map(0x00003000, 0x00003003).w(this, FUNC(vegas_state::dcs3_fifo_full_w));  // if (m_dcs_idma_cs != 0)
+	map(0x00005000, 0x00005003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w)); // if (m_dcs_idma_cs == 6)
+	map(0x00007000, 0x00007003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w)); // if (m_dcs_idma_cs == 6)
+}
 
-ADDRESS_MAP_START(vegas_state::vegas_cs7_map)
+void vegas_state::vegas_cs7_map(address_map &map)
+{
 	//AM_RANGE(0x00000000, 0x00000003) AM_READWRITE8(nss_r, nss_w, 0xffffffff)
-	AM_RANGE(0x00001000, 0x0000100f) AM_READWRITE(ethernet_r, ethernet_w)
-	AM_RANGE(0x00005000, 0x00005003) AM_DEVWRITE("dcs", dcs_audio_device, dsio_idma_addr_w) // if (m_dcs_idma_cs == 7)
-	AM_RANGE(0x00007000, 0x00007003) AM_DEVREADWRITE("dcs", dcs_audio_device, dsio_idma_data_r, dsio_idma_data_w) // if (m_dcs_idma_cs == 7)
-ADDRESS_MAP_END
+	map(0x00001000, 0x0000100f).rw(this, FUNC(vegas_state::ethernet_r), FUNC(vegas_state::ethernet_w));
+	map(0x00005000, 0x00005003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w)); // if (m_dcs_idma_cs == 7)
+	map(0x00007000, 0x00007003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w)); // if (m_dcs_idma_cs == 7)
+}
 
-ADDRESS_MAP_START(vegas_state::vegas_cs8_map)
-	AM_RANGE(0x01000000, 0x0100001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial ttyS01 (TL16C552 CS0)
-	AM_RANGE(0x01400000, 0x0140001f) AM_DEVREADWRITE8("uart2", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial ttyS02 (TL16C552 CS1)
-	AM_RANGE(0x01800000, 0x0180001f) AM_READWRITE8(parallel_r, parallel_w, 0xff) // Parallel UART (TL16C552 CS2)
-	AM_RANGE(0x01c00000, 0x01c00003) AM_WRITE8(mpsreset_w, 0xff) // MPS Reset
-ADDRESS_MAP_END
+void vegas_state::vegas_cs8_map(address_map &map)
+{
+	map(0x01000000, 0x0100001f).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial ttyS01 (TL16C552 CS0)
+	map(0x01400000, 0x0140001f).rw(m_uart2, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial ttyS02 (TL16C552 CS1)
+	map(0x01800000, 0x0180001f).rw(this, FUNC(vegas_state::parallel_r), FUNC(vegas_state::parallel_w)).umask32(0x000000ff); // Parallel UART (TL16C552 CS2)
+	map(0x01c00000, 0x01c00000).w(this, FUNC(vegas_state::mpsreset_w)); // MPS Reset
+}
 
 /*************************************
  *

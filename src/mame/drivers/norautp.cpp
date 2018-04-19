@@ -884,10 +884,11 @@ void norautp_state::norautx4_map(address_map &map)
 }
 
 #ifdef UNUSED_CODE
-ADDRESS_MAP_START(norautp_state::norautx8_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM /* need to be checked */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram") /* 6116 */
-ADDRESS_MAP_END
+void norautp_state::norautx8_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); /* need to be checked */
+	map(0xc000, 0xc7ff).ram().share("nvram"); /* 6116 */
+}
 #endif
 
 void norautp_state::kimble_map(address_map &map)
@@ -898,9 +899,10 @@ void norautp_state::kimble_map(address_map &map)
 }
 
 #ifdef UNUSED_CODE
-ADDRESS_MAP_START(norautp_state::norautxp_portmap)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void norautp_state::norautxp_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+}
 #endif
 
 void norautp_state::newhilop_map(address_map &map)
