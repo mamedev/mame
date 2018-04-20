@@ -76,28 +76,18 @@ Notes:
 
 WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 {
-	machine().output().set_value("lamp_p1_r", BIT(data,  0));
-	machine().output().set_value("lamp_p1_g", BIT(data,  1));
-	machine().output().set_value("lamp_p1_b", BIT(data,  2));
-	machine().output().set_value("lamp_p1_s", BIT(data,  3));
-
-	machine().output().set_value("lamp_p2_r", BIT(data,  4));
-	machine().output().set_value("lamp_p2_g", BIT(data,  5));
-	machine().output().set_value("lamp_p2_b", BIT(data,  6));
-	machine().output().set_value("lamp_p2_s", BIT(data,  7));
-
-	machine().output().set_value("lamp_p3_r", BIT(data,  8));
-	machine().output().set_value("lamp_p3_g", BIT(data,  9));
-	machine().output().set_value("lamp_p3_b", BIT(data, 10));
-	machine().output().set_value("lamp_p3_s", BIT(data, 11));
+	for (int p = 0; p < 3; p++)
+	{
+		m_lamp_r[p] = BIT(data, 4 * p);
+		m_lamp_g[p] = BIT(data, 4 * p + 1);
+		m_lamp_b[p] = BIT(data, 4 * p + 2);
+		m_lamp_s[p] = BIT(data, 4 * p + 3);
+	}
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
+WRITE8_MEMBER(gotcha_state::gotcha_oki_bank_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		m_oki->set_rom_bank((~data & 0x0100) >> 8);
-	}
+	m_oki->set_rom_bank(!BIT(data, 0));
 }
 
 
@@ -106,7 +96,7 @@ void gotcha_state::gotcha_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x100002, 0x100003).w(this, FUNC(gotcha_state::gotcha_lamps_w));
-	map(0x100004, 0x100005).w(this, FUNC(gotcha_state::gotcha_oki_bank_w));
+	map(0x100004, 0x100004).w(this, FUNC(gotcha_state::gotcha_oki_bank_w));
 	map(0x120000, 0x12ffff).ram();
 	map(0x140000, 0x1405ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram");
@@ -246,6 +236,11 @@ GFXDECODE_END
 
 void gotcha_state::machine_start()
 {
+	m_lamp_r.resolve();
+	m_lamp_g.resolve();
+	m_lamp_b.resolve();
+	m_lamp_s.resolve();
+
 	save_item(NAME(m_banksel));
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_scroll));
@@ -269,12 +264,9 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */
 	MCFG_CPU_PROGRAM_MAP(gotcha_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gotcha_state,  irq6_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,6000000)   /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gotcha_state,  nmi_line_pulse)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -284,6 +276,8 @@ MACHINE_CONFIG_START(gotcha_state::gotcha)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gotcha_state, screen_update_gotcha)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", M68K_IRQ_6))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI)) // ?
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gotcha)
 	MCFG_PALETTE_ADD("palette", 768)
