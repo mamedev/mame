@@ -4194,12 +4194,18 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		// store map information
 		stv_vdp2_layer_data_placement.map_offset_min = 0x7fffffff;
 		stv_vdp2_layer_data_placement.map_offset_max = 0x00000000;
+		
 		for (i = 0; i < stv2_current_tilemap.map_count; i++)
 		{
+			uint32_t max_base;
+			
 			if ( base[i] < stv_vdp2_layer_data_placement.map_offset_min )
 				stv_vdp2_layer_data_placement.map_offset_min = base[i];
-			if ( base[i] > stv_vdp2_layer_data_placement.map_offset_max )
-				stv_vdp2_layer_data_placement.map_offset_max = base[i];
+			
+			// Head On in Sega Memorial Collection 1 cares (uses RBG0 with all map regs equal to 0x20)
+			max_base = (base[i] + plsize_bytes/4);
+			if (  max_base > stv_vdp2_layer_data_placement.map_offset_max )
+				stv_vdp2_layer_data_placement.map_offset_max = max_base;
 		}
 
 
