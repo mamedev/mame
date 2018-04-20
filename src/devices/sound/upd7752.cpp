@@ -29,10 +29,11 @@ DEFINE_DEVICE_TYPE(UPD7752, upd7752_device, "upd7752", "NEC uPD7752")
 
 
 /* TODO: unknown exact size */
-ADDRESS_MAP_START(upd7752_device::upd7752_ram)
+void upd7752_device::upd7752_ram(address_map &map)
+{
 //  AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x0000, 0xffff).ram();
+}
 
 //**************************************************************************
 //  LIVE DEVICE
