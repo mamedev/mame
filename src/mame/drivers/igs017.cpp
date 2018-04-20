@@ -18,6 +18,7 @@ Year + Game                     PCB        CPU    Sound         Custom          
 97  Mj Super Da Man Guan II     NO-0147-6  68000  M6295         IGS031 8255           Battery
 97  Mj Tian Jiang Shen Bing     NO-0157-2  Z180   M6295 YM2413  IGS017 IGS025         Battery
 97  Mj Man Guan Daheng          NO-0252    68000  M6295         IGS031 IGS025 IGS???* Battery
+98? Genius 6                    NO-0131-4  Z180   M6295 YM2413  IGS017 8255           Battery
 98  Mj Long Hu Zhengba 2        NO-0206    68000  M6295         IGS031 IGS025 IGS022* Battery
 98  Mj Shuang Long Qiang Zhu 2  NO-0207    68000  M6295         IGS031 IGS025 IGS022  Battery
 98  Mj Man Guan Caishen         NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
@@ -78,6 +79,37 @@ public:
 		m_igs017_igs031(*this, "igs017_igs031")
 	{ }
 
+	void mgcs(machine_config &config);
+	void mgdha(machine_config &config);
+	void tjsb(machine_config &config);
+	void lhzb2a(machine_config &config);
+	void slqz2(machine_config &config);
+	void iqblocka(machine_config &config);
+	void lhzb2(machine_config &config);
+	void starzan(machine_config &config);
+	void spkrform(machine_config &config);
+	void sdmg2(machine_config &config);
+
+	DECLARE_DRIVER_INIT(iqblocka);
+	DECLARE_DRIVER_INIT(mgdh);
+	DECLARE_DRIVER_INIT(slqz2);
+	DECLARE_DRIVER_INIT(lhzb2);
+	DECLARE_DRIVER_INIT(starzan);
+	DECLARE_DRIVER_INIT(mgcs);
+	DECLARE_DRIVER_INIT(tjsb);
+	DECLARE_DRIVER_INIT(spkrform);
+	DECLARE_DRIVER_INIT(iqblockf);
+	DECLARE_DRIVER_INIT(sdmg2);
+	DECLARE_DRIVER_INIT(tarzan);
+	DECLARE_DRIVER_INIT(tarzana);
+	DECLARE_DRIVER_INIT(lhzb2a);
+	DECLARE_DRIVER_INIT(mgdha);
+
+protected:
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+
+private:
 	int m_input_addr;
 	required_device<cpu_device> m_maincpu;
 
@@ -90,10 +122,7 @@ public:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<igs017_igs031_device> m_igs017_igs031;
 
-
 	void igs025_to_igs022_callback( void );
-
-
 
 	uint8_t m_input_select;
 	uint8_t m_hopper;
@@ -153,23 +182,7 @@ public:
 	DECLARE_WRITE16_MEMBER(slqz2_magic_w);
 	DECLARE_READ16_MEMBER(slqz2_magic_r);
 	DECLARE_READ8_MEMBER(mgcs_keys_r);
-	DECLARE_DRIVER_INIT(iqblocka);
-	DECLARE_DRIVER_INIT(mgdh);
-	DECLARE_DRIVER_INIT(slqz2);
-	DECLARE_DRIVER_INIT(lhzb2);
-	DECLARE_DRIVER_INIT(starzan);
-	DECLARE_DRIVER_INIT(mgcs);
-	DECLARE_DRIVER_INIT(tjsb);
-	DECLARE_DRIVER_INIT(spkrform);
-	DECLARE_DRIVER_INIT(iqblockf);
-	DECLARE_DRIVER_INIT(sdmg2);
-	DECLARE_DRIVER_INIT(tarzan);
-	DECLARE_DRIVER_INIT(tarzana);
-	DECLARE_DRIVER_INIT(lhzb2a);
-	DECLARE_DRIVER_INIT(mgdha);
 
-	virtual void video_start() override;
-	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(iqblocka);
 	DECLARE_MACHINE_RESET(mgcs);
 	DECLARE_MACHINE_RESET(lhzb2a);
@@ -181,6 +194,7 @@ public:
 
 	void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0);
 	void iqblocka_patch_rom();
+	void iqblockf_patch_rom();
 	void tjsb_decrypt_sprites();
 	void mgcs_decrypt_program_rom();
 	void mgcs_decrypt_tiles();
@@ -197,16 +211,7 @@ public:
 	void slqz2_patch_rom();
 	void slqz2_decrypt_tiles();
 	void spkrform_decrypt_sprites();
-	void mgcs(machine_config &config);
-	void mgdha(machine_config &config);
-	void tjsb(machine_config &config);
-	void lhzb2a(machine_config &config);
-	void slqz2(machine_config &config);
-	void iqblocka(machine_config &config);
-	void lhzb2(machine_config &config);
-	void starzan(machine_config &config);
-	void spkrform(machine_config &config);
-	void sdmg2(machine_config &config);
+
 	void decrypted_opcodes_map(address_map &map);
 	void iqblocka_io(address_map &map);
 	void iqblocka_map(address_map &map);
@@ -367,10 +372,27 @@ DRIVER_INIT_MEMBER(igs017_state,iqblocka)
 
 // iqblockf
 
+void igs017_state::iqblockf_patch_rom() // very preliminary
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	rom[0x010d7] = 0x18;
+
+	rom[0x1182c] = 0x18;
+
+	rom[0x16887] = 0x18;
+
+	rom[0x181bd] = 0x18;
+
+	rom[0x2221b] = 0x18;
+
+	rom[0x23c90] = 0x18;
+}
+
 DRIVER_INIT_MEMBER(igs017_state,iqblockf)
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
-//  iqblockf_patch_rom();
+	iqblockf_patch_rom();
 }
 
 // tjsb
@@ -3767,6 +3789,20 @@ ROM_START( iqblockf )
 	ROM_LOAD( "sp.u17", 0x00000, 0x40000, CRC(71357845) SHA1(25f4f7aebdcc0706018f041d3696322df569b0a3) )
 ROM_END
 
+ROM_START( genius6 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "genius6_v110f.u18", 0x00000, 0x40000, CRC(2630ad44) SHA1(37002fa913ad60c59145f5a7692eef8862b9d6eb) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD( "genius6_cg.u7", 0x000000, 0x080000, CRC(1842d021) SHA1(78bfb5108741d39bd19b603cc97623fba7b2a31e) )   // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x80000, "tilemaps", 0 )
+	ROM_LOAD( "text.u8", 0x000000, 0x080000, CRC(48c4f4e6) SHA1(b1e1ca62cf6a99c11a5cc56705eef7e22a3b2740) ) // same as iqblocka
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "speech.u17", 0x00000, 0x40000, CRC(d9e3d39f) SHA1(bec85d1ac2dfca77453cbca0e7dd53fee8fb438b) ) // same as iqblocka
+ROM_END
+
 /***************************************************************************
 
 Mahjong Tian Jiang Shen Bing
@@ -4369,12 +4405,13 @@ ROM_START( spkrform )
 ROM_END
 
 
-GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Shuzi Leyuan (V127M)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",                      "Shuzi Leyuan (V113FR)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Shuzi Leyuan (V127M)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // hangs at game over
+GAME( 1997,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",                      "Shuzi Leyuan (V113FR)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // hangs at game over
 GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V125T1)",    0 )
 GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V123T1)",    0 )
 GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )
 GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998,  genius6,  0,        iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Genius 6 (V110F)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Caishen (V103CS)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
 GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 )
