@@ -1727,7 +1727,6 @@ MACHINE_START_MEMBER(model1_state,model1)
 {
 	m_digits.resolve();
 	m_copro_ram_data = std::make_unique<u32[]>(0x8000);
-	m_io_command = 0;
 
 	save_pointer(NAME(m_copro_ram_data.get()), 0x8000);
 	save_item(NAME(m_v60_copro_ram_adr));
@@ -1741,7 +1740,6 @@ MACHINE_START_MEMBER(model1_state,model1)
 	save_item(NAME(m_copro_hle_list_length));
 	save_item(NAME(m_copro_hle_active_list_length));
 	save_item(NAME(m_copro_hle_active_list_pos));
-	save_item(NAME(m_io_command));
 
 	if(m_tgp_copro) {
 		m_copro_fifo_in->setup(16,

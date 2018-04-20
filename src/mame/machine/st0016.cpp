@@ -9,23 +9,25 @@
 
 DEFINE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device, "st0016_cpu", "ST0016")
 
-ADDRESS_MAP_START(st0016_cpu_device::st0016_cpu_internal_map)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
-	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
-	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_device, st0016_snd_r, st0016_snd_w) /* sound regs 8 x $20 bytes, see notes */
-ADDRESS_MAP_END
+void st0016_cpu_device::st0016_cpu_internal_map(address_map &map)
+{
+	map(0xc000, 0xcfff).r(this, FUNC(st0016_cpu_device::st0016_sprite_ram_r)).w(this, FUNC(st0016_cpu_device::st0016_sprite_ram_w));
+	map(0xd000, 0xdfff).r(this, FUNC(st0016_cpu_device::st0016_sprite2_ram_r)).w(this, FUNC(st0016_cpu_device::st0016_sprite2_ram_w));
+	map(0xea00, 0xebff).r(this, FUNC(st0016_cpu_device::st0016_palette_ram_r)).w(this, FUNC(st0016_cpu_device::st0016_palette_ram_w));
+	map(0xec00, 0xec1f).r(this, FUNC(st0016_cpu_device::st0016_character_ram_r)).w(this, FUNC(st0016_cpu_device::st0016_character_ram_w));
+	map(0xe900, 0xe9ff).rw("stsnd", FUNC(st0016_device::st0016_snd_r), FUNC(st0016_device::st0016_snd_w)); /* sound regs 8 x $20 bytes, see notes */
+}
 
 
-ADDRESS_MAP_START(st0016_cpu_device::st0016_cpu_internal_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
-	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
-	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
-	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
-ADDRESS_MAP_END
+void st0016_cpu_device::st0016_cpu_internal_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xbf).r(this, FUNC(st0016_cpu_device::st0016_vregs_r)).w(this, FUNC(st0016_cpu_device::st0016_vregs_w)); /* video/crt regs ? */
+	map(0xe2, 0xe2).w(this, FUNC(st0016_cpu_device::st0016_sprite_bank_w));
+	map(0xe3, 0xe4).w(this, FUNC(st0016_cpu_device::st0016_character_bank_w));
+	map(0xe5, 0xe5).w(this, FUNC(st0016_cpu_device::st0016_palette_bank_w));
+	map(0xf0, 0xf0).r(this, FUNC(st0016_cpu_device::st0016_dma_r));
+}
 
 // note: a lot of bits are left uninitialized by the games, the default values are uncertain
 

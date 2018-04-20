@@ -17,17 +17,17 @@ Various Data East 8 bit games:
     Meikyuu Hunter G            (c) 1987 Data East Corporation (6809 + I8751)
     Captain Silver (World)      (c) 1987 Data East Corporation (2*6809 + I8751)
     Captain Silver (Japan)      (c) 1987 Data East Corporation (2*6809 + I8751)
-    Psycho-Nics Oscar (World)   (c) 1987 Data East Corporation (2*6809 + I8751)
-    Psycho-Nics Oscar (US)      (c) 1988 Data East USA (2*6809 + I8751)
-    Psycho-Nics Oscar (Japan)   (c) 1987 Data East Corporation (2*6809 + I8751)
+    Psycho-Nics Oscar (World)   (c) 1987 Data East Corporation (2*6809)
+    Psycho-Nics Oscar (US)      (c) 1988 Data East USA (2*6809)
+    Psycho-Nics Oscar (Japan)   (c) 1987 Data East Corporation (2*6809)
     Super Real Darwin (World)   (c) 1987 Data East Corporation (6809 + I8751)
     Super Real Darwin (Japan)   (c) 1987 Data East Corporation (6809 + I8751)
     Cobra Command (World)       (c) 1988 Data East Corporation (6809)
     Cobra Command (Japan)       (c) 1988 Data East Corporation (6809)
 
     All games use a 6502 for sound (some are encrypted), all games except Cobracom
-    use an Intel 8751 for protection & coinage. For the games without (fake) MCU,
-    the coinage dip switch (sometimes based on the manual) is simulated.
+    and Oscar use an Intel 8751 for protection & coinage. For the games without
+    (fake) MCU, the coinage dip switch (sometimes based on the manual) is simulated.
 
     Meikyuu Hunter G was formerly known as Mazehunter.
 
@@ -190,7 +190,7 @@ WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
 	{
 	case 0: /* High byte */
 		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		m_i8751_value = (m_i8751_value & 0xff00) | data;
@@ -245,37 +245,6 @@ WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
 	}
 }
 
-WRITE8_MEMBER(dec8_state::shackled_i8751_w)
-{
-	m_i8751_return = 0;
-
-	switch (offset)
-	{
-	case 0: /* High byte */
-		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* Signal sub cpu */
-		break;
-	case 1: /* Low byte */
-		m_i8751_value = (m_i8751_value & 0xff00) | data;
-		break;
-	}
-
-	/* Coins are controlled by the i8751 */
-	if (/*(ioport("IN2")->read() & 3) == 3*/!m_latch) { m_latch = 1; m_coin1 = m_coin2 = 0; }
-	if ((ioport("IN2")->read() & 1) != 1 && m_latch)  { m_coin1 = 1; m_latch = 0; }
-	if ((ioport("IN2")->read() & 2) != 2 && m_latch)  { m_coin2 = 1; m_latch = 0; }
-
-	if (m_i8751_value == 0x0102) m_i8751_return = 0;    /* ??? */
-	if (m_i8751_value == 0x0101) m_i8751_return = 0;    /* ??? */
-	if (m_i8751_value == 0x0400) m_i8751_return = 0;    /* ??? */
-
-	if (m_i8751_value == 0x0050) m_i8751_return = 0; /* Japanese version (Breywood) ID */
-	if (m_i8751_value == 0x0051) m_i8751_return = 0; /* US version (Shackled) ID */
-
-	if (m_i8751_value == 0x8101) m_i8751_return = ((((m_coin2 / 10) << 4) | (m_coin2 % 10)) << 0) |
-																((((m_coin1 / 10) << 4) | (m_coin1 % 10)) << 8);    /* Coins */
-}
-
 WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 {
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
@@ -290,7 +259,7 @@ WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 	{
 	case 0: /* High byte */
 		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
-		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		m_i8751_value = (m_i8751_value & 0xff00) | data;
@@ -401,7 +370,7 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
 WRITE8_MEMBER(dec8_state::dec8_sound_w)
 {
 	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(m6502_device::NMI_LINE, ASSERT_LINE);
 	m_m6502_timer->adjust(m_audiocpu->cycles_to_attotime(3));
 }
 
@@ -409,7 +378,7 @@ WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
-		m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		m_audiocpu->set_input_line(m6502_device::IRQ_LINE, HOLD_LINE);
 
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
@@ -433,46 +402,34 @@ WRITE8_MEMBER(dec8_state::csilver_sound_bank_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::oscar_int_w)
+WRITE8_MEMBER(dec8_state::main_irq_on_w)
 {
-	/* Deal with interrupts, coins also generate NMI to CPU 0 */
-	switch (offset)
-	{
-	case 0: /* IRQ2 */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	case 1: /* IRC 1 */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	case 2: /* IRQ 1 */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	case 3: /* IRC 2 */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	}
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-/* Used by Shackled, Last Mission, Captain Silver */
-WRITE8_MEMBER(dec8_state::shackled_int_w)
+WRITE8_MEMBER(dec8_state::main_irq_off_w)
 {
-	switch (offset)
-	{
-	case 0: /* CPU 2 - IRQ acknowledge */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	case 1: /* CPU 1 - IRQ acknowledge */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	case 2: /* i8751 - FIRQ acknowledge */
-		return;
-	case 3: /* IRQ 1 */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	case 4: /* IRQ 2 */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	}
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(dec8_state::main_firq_off_w)
+{
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(dec8_state::sub_irq_on_w)
+{
+	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+}
+
+WRITE8_MEMBER(dec8_state::sub_irq_off_w)
+{
+	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(dec8_state::sub_firq_off_w)
+{
+	m_subcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 /******************************************************************************/
@@ -486,12 +443,11 @@ void dec8_state::lastmisn_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0");
-	map(0x1801, 0x1801).portr("IN1");
-	map(0x1802, 0x1802).portr("IN2");
-	map(0x1803, 0x1803).portr("DSW0");   /* Dip 1 */
-	map(0x1804, 0x1804).portr("DSW1");   /* Dip 2 */
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN0").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(this, FUNC(dec8_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x1806, 0x1806).r(this, FUNC(dec8_state::i8751_h_r));
 	map(0x1807, 0x1807).rw(this, FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
@@ -513,12 +469,11 @@ void dec8_state::lastmisn_sub_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0");
-	map(0x1801, 0x1801).portr("IN1");
-	map(0x1802, 0x1802).portr("IN2");
-	map(0x1803, 0x1803).portr("DSW0");   /* Dip 1 */
-	map(0x1804, 0x1804).portr("DSW1");   /* Dip 2 */
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN0").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(this, FUNC(dec8_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x1807, 0x1807).w(this, FUNC(dec8_state::flip_screen_w));
 	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
@@ -534,12 +489,11 @@ void dec8_state::shackled_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0");
-	map(0x1801, 0x1801).portr("IN1");
-	map(0x1802, 0x1802).portr("IN2");
-	map(0x1803, 0x1803).portr("DSW0");
-	map(0x1804, 0x1804).portr("DSW1");
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN0").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(this, FUNC(dec8_state::sub_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x1807, 0x1807).w(this, FUNC(dec8_state::flip_screen_w));
 	map(0x1809, 0x1809).w(this, FUNC(dec8_state::lastmisn_scrollx_w)); /* Scroll LSB */
@@ -559,12 +513,11 @@ void dec8_state::shackled_sub_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN0");
-	map(0x1801, 0x1801).portr("IN1");
-	map(0x1802, 0x1802).portr("IN2");
-	map(0x1803, 0x1803).portr("DSW0");
-	map(0x1804, 0x1804).portr("DSW1");
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN0").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN1").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).portr("IN2").w(this, FUNC(dec8_state::sub_firq_off_w));
+	map(0x1803, 0x1803).portr("DSW0").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x1806, 0x1806).r(this, FUNC(dec8_state::i8751_h_r));
 	map(0x1807, 0x1807).rw(this, FUNC(dec8_state::i8751_l_r), FUNC(dec8_state::flip_screen_w));
@@ -572,7 +525,7 @@ void dec8_state::shackled_sub_map(address_map &map)
 	map(0x180b, 0x180b).w(this, FUNC(dec8_state::lastmisn_scrolly_w)); /* Scroll LSB */
 	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
 	map(0x180d, 0x180d).w(this, FUNC(dec8_state::shackled_control_w)); /* Bank switch + Scroll MSB */
-	map(0x180e, 0x180f).w(this, FUNC(dec8_state::shackled_i8751_w));
+	map(0x180e, 0x180f).w(this, FUNC(dec8_state::dec8_i8751_w));
 	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram().share("spriteram");
 	map(0x3000, 0x37ff).ram().share("share2");
@@ -657,11 +610,11 @@ void dec8_state::csilver_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1800, 0x1800).portr("IN1");
-	map(0x1801, 0x1801).portr("IN0");
-	map(0x1803, 0x1803).portr("IN2");
-	map(0x1804, 0x1804).portr("DSW1");   /* Dip 2 */
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).portr("IN1").w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).portr("IN0").w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(this, FUNC(dec8_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).portr("DSW0").w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* Dip 1, DMA */
 	map(0x1807, 0x1807).w(this, FUNC(dec8_state::flip_screen_w));
 	map(0x1808, 0x180b).w(this, FUNC(dec8_state::dec8_scroll2_w));
@@ -683,9 +636,11 @@ void dec8_state::csilver_sub_map(address_map &map)
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x13ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8)).share("palette");
 	map(0x1400, 0x17ff).ram().w(m_palette, FUNC(deco_rmc3_device::write8_ext)).share("palette_ext");
-	map(0x1803, 0x1803).portr("IN2");
-	map(0x1804, 0x1804).portr("DSW1");
-	map(0x1800, 0x1804).w(this, FUNC(dec8_state::shackled_int_w));
+	map(0x1800, 0x1800).w(this, FUNC(dec8_state::sub_irq_off_w));
+	map(0x1801, 0x1801).w(this, FUNC(dec8_state::main_irq_off_w));
+	map(0x1802, 0x1802).w(this, FUNC(dec8_state::main_firq_off_w));
+	map(0x1803, 0x1803).portr("IN2").w(this, FUNC(dec8_state::main_irq_on_w));
+	map(0x1804, 0x1804).portr("DSW1").w(this, FUNC(dec8_state::sub_irq_on_w));
 	map(0x1805, 0x1805).portr("DSW0").w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)); /* DMA */
 	map(0x180c, 0x180c).w(this, FUNC(dec8_state::dec8_sound_w));
 	map(0x2000, 0x27ff).ram().w(this, FUNC(dec8_state::dec8_videoram_w)).share("videoram");
@@ -713,9 +668,12 @@ void dec8_state::oscar_map(address_map &map)
 	map(0x3c10, 0x3c1f).w("tilegen1", FUNC(deco_bac06_device::pf_control1_8bit_w));
 	map(0x3c80, 0x3c80).w(this, FUNC(dec8_state::dec8_mxc06_karn_buffer_spriteram_w));   /* DMA */
 	map(0x3d00, 0x3d00).w(this, FUNC(dec8_state::dec8_bank_w));          /* BNKS */
-	map(0x3d80, 0x3d80).w(this, FUNC(dec8_state::dec8_sound_w));         /* SOUN */
-	map(0x3e00, 0x3e00).nopw();            /* COINCL */
-	map(0x3e80, 0x3e83).w(this, FUNC(dec8_state::oscar_int_w));
+	map(0x3d80, 0x3d80).w(m_soundlatch, FUNC(generic_latch_8_device::write));            /* SOUN */
+	map(0x3e00, 0x3e00).w(this, FUNC(dec8_state::oscar_coin_clear_w));   /* COINCL */
+	map(0x3e80, 0x3e80).w(this, FUNC(dec8_state::sub_irq_on_w));         /* IRQ 2 */
+	map(0x3e81, 0x3e81).w(this, FUNC(dec8_state::main_irq_off_w));       /* IRC 1 */
+	map(0x3e82, 0x3e82).w(this, FUNC(dec8_state::main_irq_on_w));        /* IRQ 1 */
+	map(0x3e83, 0x3e83).w(this, FUNC(dec8_state::sub_irq_off_w));        /* IRC 2 */
 	map(0x4000, 0x7fff).bankr("mainbank");
 	map(0x8000, 0xffff).rom();
 }
@@ -725,7 +683,10 @@ void dec8_state::oscar_sub_map(address_map &map)
 	map(0x0000, 0x0eff).ram().share("share1");
 	map(0x0f00, 0x0fff).ram();
 	map(0x1000, 0x1fff).ram().share("share2");
-	map(0x3e80, 0x3e83).w(this, FUNC(dec8_state::oscar_int_w));
+	map(0x3e80, 0x3e80).w(this, FUNC(dec8_state::sub_irq_on_w));         /* IRQ 2 */
+	map(0x3e81, 0x3e81).w(this, FUNC(dec8_state::main_irq_off_w));       /* IRC 1 */
+	map(0x3e82, 0x3e82).w(this, FUNC(dec8_state::main_irq_on_w));        /* IRQ 1 */
+	map(0x3e83, 0x3e83).w(this, FUNC(dec8_state::sub_irq_off_w));        /* IRC 2 */
 	map(0x4000, 0xffff).rom();
 }
 
@@ -877,6 +838,30 @@ WRITE8_MEMBER(dec8_state::gondo_mcu_to_main_w)
 	m_i8751_p2 = data;
 }
 
+WRITE8_MEMBER(dec8_state::shackled_mcu_to_main_w)
+{
+	// P2 - controls latches for main CPU communication
+	if ((data&0x10)==0)
+		m_i8751_port0 = m_i8751_value>>8;
+	if ((data&0x20)==0)
+		m_i8751_port1 = m_i8751_value&0xff;
+	if ((data&0x40)==0)
+		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
+	if ((data&0x80)==0)
+		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
+
+	// P2 - IRQ to main CPU
+	if (BIT(data, 2) && !BIT(m_i8751_p2, 2))
+		m_subcpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+
+	if (!BIT(data, 0))
+		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
+	if (!BIT(data, 1))
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+
+	m_i8751_p2 = data;
+}
+
 /*
     Super Real Darwin is similar but only appears to have a single port
 */
@@ -903,7 +888,7 @@ WRITE8_MEMBER(dec8_state::srdarwin_mcu_to_main_w)
 
 	// guess, toggled after above.
 	if ((data&0x02)==0)
-		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 }
 
 /******************************************************************************/
@@ -1028,14 +1013,20 @@ static INPUT_PORTS_START( shackled )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // coins read through MCU
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED ) // coins read through MCU
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) // tested and discarded by vestigial code at start
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+
+	PORT_START("I8751")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
@@ -1493,9 +1484,9 @@ static INPUT_PORTS_START( oscar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )           /* always adds 1 credit */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<0>)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<1>)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_WRITE_LINE_DEVICE_MEMBER("coin", input_merger_device, in_w<2>)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1873,14 +1864,23 @@ GFXDECODE_END
 /******************************************************************************/
 
 /* Coins generate NMI's */
-INTERRUPT_GEN_MEMBER(dec8_state::oscar_interrupt)
+WRITE_LINE_MEMBER(dec8_state::oscar_coin_irq)
 {
-	if ((ioport("IN2")->read() & 0x7) == 0x7) m_latch = 1;
-	if (m_latch && (ioport("IN2")->read() & 0x7) != 0x7)
-	{
-		m_latch = 0;
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	if (state && !m_coin_state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_coin_state = bool(state);
+}
+
+WRITE8_MEMBER(dec8_state::oscar_coin_clear_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(dec8_state::shackled_coin_irq)
+{
+	if (state && !m_coin_state)
+		m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
+	m_coin_state = bool(state);
 }
 
 /******************************************************************************/
@@ -1895,6 +1895,7 @@ void dec8_state::machine_start()
 	save_item(NAME(m_secclr));
 	save_item(NAME(m_i8751_p2));
 	save_item(NAME(m_latch));
+	save_item(NAME(m_coin_state));
 	save_item(NAME(m_i8751_port0));
 	save_item(NAME(m_i8751_port1));
 	save_item(NAME(m_i8751_return));
@@ -1995,7 +1996,7 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2012,8 +2013,19 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_CPU_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
 
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(dec8_state, i8751_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec8_state, i8751_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, shackled_mcu_to_main_w))
+	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
+
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // needs heavy sync, otherwise one of the two CPUs will miss an irq and makes the game to hang
+
+	MCFG_INPUT_MERGER_ANY_LOW("coin")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(dec8_state, shackled_coin_irq))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2049,7 +2061,7 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2110,7 +2122,7 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2171,7 +2183,7 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2231,7 +2243,7 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2291,7 +2303,7 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
@@ -2305,16 +2317,17 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, XTAL(12'000'000)/2) /* PCB seen both HD6309 or MC6809, clock verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(oscar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  oscar_interrupt)
 
 	MCFG_CPU_ADD("sub", HD6309, XTAL(12'000'000)/2) /* PCB seen both HD6309 or MC6809, clock verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(oscar_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, XTAL(12'000'000)/8)
+	MCFG_CPU_ADD("audiocpu", DECO_222, XTAL(12'000'000)/8) // IC labeled "C10707-1"
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
 
+	MCFG_INPUT_MERGER_ANY_LOW("coin") // 1S1588 x3 (D1-D3) + RCDM-I5
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(dec8_state, oscar_coin_irq))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2346,6 +2359,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::NMI_LINE))
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2354,7 +2368,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2407,7 +2421,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2464,7 +2478,7 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2593,8 +2607,8 @@ ROM_START( shackled )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dk-07.5h", 0x08000, 0x08000, CRC(887e4bcc) SHA1(6427396080e9cd8647adff47c8ed04593a14268c) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "dk.18a", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU (based on 'breywood' with ID byte changed from 00 to 01) */
+	ROM_LOAD( "dk.18a", 0x0000, 0x1000, CRC(1af06149) SHA1(b9cb2a4986dbcfc78b0cbea2c1e2bdac1db479cd) BAD_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dk-00.2a", 0x00000, 0x08000, CRC(69b975aa) SHA1(38cb96768c79ff1aa1b4b190e08ec9155baf698a) )
@@ -2635,7 +2649,7 @@ ROM_START( breywood )
 	ROM_LOAD( "dj07-1.5h", 0x8000, 0x8000, CRC(4a471c38) SHA1(963ed7b6afeefdfc2cf0d65b0998f973330e6495) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "dj.18a", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "dj.18a", 0x0000, 0x1000, CRC(4cb20332) SHA1(e0bbba7be22e7bcff82fb0ae441410e559ec4566) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dj-00.2a",  0x00000, 0x08000, CRC(815a891a) SHA1(e557d6a35821a8589d9e3df0f42131b58b08c8ca) )
@@ -3341,9 +3355,6 @@ ROM_START( oscar )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
-
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
 
@@ -3370,9 +3381,6 @@ ROM_START( oscaru )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000,  CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
-
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
@@ -3404,9 +3412,6 @@ ROM_START( oscarj1 )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
-
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )
 
@@ -3436,9 +3441,6 @@ ROM_START( oscarj2 )
 
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "ed12", 0x8000, 0x8000, CRC(432031c5) SHA1(af2deea48b98eb0f9e85a4fb1486021f999f9abd) )
-
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "ed08", 0x00000, 0x04000, CRC(308ac264) SHA1(fd1c4ec4e4f99c33e93cd15e178c4714251a9b7e) )

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Phil Stroffolino
+// copyright-holders:Phil Stroffolino, Bryan McPhail
 /***************************************************************************
 
 Tiger Road     (C) 1987 Capcom (licensed to Romstar)
@@ -12,9 +12,15 @@ Bouncing Balls (c) 1991 Comad
 Please contact Phil Stroffolino (phil@maya.com) if there are any questions
 regarding this driver.
 
-**************************************************************************
+TODO:
+- F1 Dream throws an address error if player wins all the races (i.e. when the 
+  game is supposed to give an ending):
+  010C68: 102E 001C      move.b  ($1c,A6), D0       ; reads 0xf from work RAM (misaligned)
+  010C6C: 207B 000E      movea.l ($e,PC,D0.w), A0   ; table from 0x10c7c onward
+  010C70: 4E90           jsr     (A0)               ; throws address error here
+  None of the available 5 vectors seems to fit here, btanb? 
 
-F1 Dream protection workaround by Eric Hustvedt
+**************************************************************************
 
 Memory Overview:
     0xfe0800    sprites
@@ -68,6 +74,41 @@ WRITE8_MEMBER(tigeroad_state::msm5205_w)
 }
 
 
+WRITE8_MEMBER(f1dream_state::out1_w)
+{
+	m_soundlatch->write(space,2,data);
+}
+
+WRITE8_MEMBER(f1dream_state::out3_w)
+{
+	if ((m_old_p3 & 0x20) != (data & 0x20))
+	{
+		// toggles at the start and end of interrupt
+	}
+
+	if ((m_old_p3 & 0x01) != (data & 0x01))
+	{
+		// toggles at the end of interrupt
+		if (!(data & 0x01))
+		{
+			m_maincpu->resume(SUSPEND_REASON_HALT);
+		}
+	}
+
+	m_old_p3 = data;
+}
+
+WRITE16_MEMBER(f1dream_state::blktiger_to_mcu_w)
+{
+	m_mcu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
+
+	/* after triggering this address there are one or two NOPs in the 68k code, then it expects the response to be ready
+	   the MCU isn't that fast, so either the CPU is suspended on write, or when bit 0x20 of MCU Port 3 toggles in the
+	   MCU interrupt code, however no combination of increasing the clock / boosting interleave etc. allows the MCU code
+	   to get there in time before the 68k is already expecting a result */
+	m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+}
+
 /***************************************************************************/
 
 void tigeroad_state::main_map(address_map &map)
@@ -86,6 +127,30 @@ void tigeroad_state::main_map(address_map &map)
 	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffc000, 0xffffff).ram().share("ram16");
 }
+
+
+READ8_MEMBER(f1dream_state::mcu_shared_r)
+{
+	uint8_t ret = m_ram16[(0x3fe0 / 2) + offset];
+	return ret;
+}
+
+WRITE8_MEMBER(f1dream_state::mcu_shared_w)
+{
+	m_ram16[(0x3fe0 / 2) + offset] = (m_ram16[(0x3fe0 / 2) + offset] & 0xff00) | data;
+}
+
+void f1dream_state::f1dream_map(address_map &map)
+{
+	main_map(map);
+	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(this, FUNC(f1dream_state::blktiger_to_mcu_w));
+}
+
+void f1dream_state::f1dream_mcu_io(address_map &map)
+{
+	map(0x7f0, 0x7ff).rw(this, FUNC(f1dream_state::mcu_shared_r), FUNC(f1dream_state::mcu_shared_w));
+}
+
 
 void pushman_state::pushman_map(address_map &map)
 {
@@ -630,6 +695,18 @@ MACHINE_CONFIG_START(tigeroad_state::tigeroad)
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_START(f1dream_state::f1dream)
+	tigeroad(config);
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(f1dream_map)
+
+	MCFG_CPU_ADD("mcu", I8751, XTAL(10'000'000)) /* ??? */
+	MCFG_CPU_IO_MAP(f1dream_mcu_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(f1dream_state, out1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(f1dream_state, out3_w))
+MACHINE_CONFIG_END
+
 /* same as above but with additional Z80 for samples playback */
 MACHINE_CONFIG_START(tigeroad_state::toramich)
 	tigeroad(config);
@@ -888,7 +965,7 @@ ROM_START( f1dream )
 	ROM_LOAD( "12k_04.bin",   0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "c8751h-88",     0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "8751.mcu",     0x0000, 0x1000, CRC(c8e6075c) SHA1(d98bd358d30d22a8009cd2728dde1871a8140c23) )
 
 	ROM_REGION( 0x008000, "text", 0 )
 	ROM_LOAD( "10d_01.bin",   0x00000, 0x08000, CRC(361caf00) SHA1(8a109e4e116d0c5eea86f9c57c05359754daa5b9) ) /* 8x8 text */
@@ -1182,10 +1259,6 @@ ROM_START( bballsa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tigeroad_state, f1dream)
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::f1dream_control_w),this));
-}
 
 /***************************************************************************/
 
@@ -1196,9 +1269,9 @@ GAME( 1987, toramich, tigeroad, toramich, toramich, tigeroad_state, 0,       ROT
 GAME( 1987, tigeroadb,tigeroad, tigeroad, tigeroad, tigeroad_state, 0,       ROT0, "bootleg", "Tiger Road (US bootleg)", 0 )
 
 /* F1 Dream has an Intel 8751 microcontroller for protection */
-GAME( 1988, f1dream,  0,        tigeroad, f1dream,  tigeroad_state, f1dream, ROT0, "Capcom (Romstar license)", "F-1 Dream", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // collisions are wrong
-GAME( 1988, f1dreamb, f1dream,  tigeroad, f1dream,  tigeroad_state, 0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
-GAME( 1988, f1dreamba,f1dream,  tigeroad, f1dream,  tigeroad_state, 0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
+GAME( 1988, f1dream,  0,        f1dream,      f1dream,  f1dream_state,  0,       ROT0, "Capcom (Romstar license)", "F-1 Dream", 0 )
+GAME( 1988, f1dreamb, f1dream,  tigeroad,     f1dream,  tigeroad_state, 0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 1)", 0 )
+GAME( 1988, f1dreamba,f1dream,  tigeroad,     f1dream,  tigeroad_state, 0,       ROT0, "bootleg", "F-1 Dream (bootleg, set 2)", 0 )
 
 /* This Comad hardware is based around the F1 Dream design */
 GAME( 1990, pushman,  0,        pushman, pushman,   pushman_state,  0,       ROT0, "Comad", "Pushman (Korea, set 1)", MACHINE_SUPPORTS_SAVE )

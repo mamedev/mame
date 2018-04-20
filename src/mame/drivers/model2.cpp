@@ -97,7 +97,7 @@
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
-#include "machine/m1io.h"
+#include "machine/model1io.h"
 #include "sound/2612intf.h"
 #include "video/segaic24.h"
 #include "speaker.h"
@@ -1176,11 +1176,6 @@ WRITE32_MEMBER(model2_state::geo_w)
 
 /*****************************************************************************/
 
-READ32_MEMBER(model2o_state::daytona_unk_r)
-{
-	return 0x00400000;
-}
-
 READ32_MEMBER(model2_state::irq_request_r)
 {
 	m_maincpu->i960_noburst();
@@ -1537,6 +1532,76 @@ WRITE8_MEMBER( model2o_state::vcop_output_w )
 	machine().bookkeeping().coin_counter_w(0, BIT(~data, 0));
 }
 
+
+//**************************************************************************
+//  I/O BOARD
+//**************************************************************************
+
+READ32_MEMBER( model2o_state::dpram_r )
+{
+	uint32_t data = m_dpram[offset] & mem_mask;
+
+	// intercept reads for the lightgun ports
+	// needs to be done because the vcop ioboard isn't emulated
+	// can be removed once that's done (837-11130 + 837-11131)
+
+	if (offset >= 0x100/4 && offset <= 0x10f/4)
+	{
+		if (ACCESSING_BITS_16_31)
+		{
+			data &= 0x0000ffff;
+			data |= (m_lightgun_ports[offset & 0x03].read_safe(0) >> 8) << 16;
+		}
+		if (ACCESSING_BITS_0_15)
+		{
+			data &= 0xffff0000;
+			data |= m_lightgun_ports[offset & 0x03].read_safe(0) & 0xff;
+		}
+	}
+
+	if (offset >= 0x110/4 && offset <= 0x113/4)
+	{
+		if (ACCESSING_BITS_0_15)
+		{
+			data &= 0xffff0000;
+			data |= lightgun_offscreen_r(space, 0);
+		}
+	}
+
+	return data;
+}
+
+WRITE32_MEMBER( model2o_state::dpram_w )
+{
+	COMBINE_DATA(&m_dpram[offset]);
+}
+
+// On the real system, another 315-5338A is acting as slave
+// and writes the data to the dual port RAM. This isn't
+// emulated yet, data just gets written to RAM.
+
+READ8_MEMBER( model2o_state::io_r )
+{
+	if ((offset & 1) == 0)
+		return m_dpram[offset >> 1];
+	else
+		return m_dpram[offset >> 1] >> 16;
+}
+
+WRITE8_MEMBER( model2o_state::io_w )
+{
+	if ((offset & 1) == 0)
+	{
+		m_dpram[offset >> 1] &= 0x00ff0000;
+		m_dpram[offset >> 1] |= data;
+	}
+	else
+	{
+		m_dpram[offset >> 1] &= 0x000000ff;
+		m_dpram[offset >> 1] |= data << 16;
+	}
+}
+
 /* model 2/2a common memory map */
 void model2_tgp_state::model2_tgp_mem(address_map &map)
 {
@@ -1562,12 +1627,7 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00200000, 0x0021ffff).ram();
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
-
-	map(0x01c00000, 0x01c0001f).rw("io", FUNC(m1io_device::read), FUNC(m1io_device::write)).umask32(0x00ff00ff);
-	map(0x01c00040, 0x01c00043).r(this, FUNC(model2o_state::daytona_unk_r));
-	map(0x01c00100, 0x01c0010f).r(this, FUNC(model2o_state::lightgun_coords_r)).umask32(0x00ff00ff);
-	map(0x01c00110, 0x01c00113).r(this, FUNC(model2o_state::lightgun_offscreen_r)).umask32(0x00ff00ff);
-	map(0x01c00200, 0x01c002ff).ram().share("backup2");
+	map(0x01c00000, 0x01c007ff).rw(this, FUNC(model2o_state::dpram_r), FUNC(model2o_state::dpram_w)).share("dpram"); // 2k*8-bit dual port ram
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
 }
 
@@ -2554,13 +2614,14 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 	MCFG_MACHINE_START_OVERRIDE(model2_tgp_state,model2_tgp)
 	MCFG_MACHINE_RESET_OVERRIDE(model2o_state,model2o)
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup1")
-	MCFG_NVRAM_ADD_1FILL("backup2")
 
-	MCFG_DEVICE_ADD("io", SEGA_M1IO, 0)
-	MCFG_M1IO_DI0_CB(IOPORT("IN0"))
-	MCFG_M1IO_DI1_CB(IOPORT("IN1"))
+	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
+	MCFG_DEVICE_BIOS("epr14869c");
+	MCFG_MODEL1IO_READ_CB(READ8(model2o_state, io_r))
+	MCFG_MODEL1IO_WRITE_CB(WRITE8(model2o_state, io_w))
+	MCFG_MODEL1IO_IN0_CB(IOPORT("IN0"))
+	MCFG_MODEL1IO_IN1_CB(IOPORT("IN1"))
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2629,11 +2690,11 @@ MACHINE_CONFIG_START(model2o_state::daytona)
 	model2o(config);
 	sj25_0207_01(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_AN0_CB(IOPORT("STEER"))
-	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_M1IO_DO_CB(WRITE8(model2o_state, daytona_output_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
+	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model2o_state, daytona_output_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_maxx_state::daytona_maxx)
@@ -2653,19 +2714,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model2o_state::desert)
 	model2o(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_AN0_CB(IOPORT("STEER"))
-	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_M1IO_DO_CB(WRITE8(model2o_state, desert_output_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_AN0_CB(IOPORT("STEER"))
+	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model2o_state, desert_output_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2o_state::vcop)
 	model2o(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_DI2_CB(IOPORT("IN2"))
-	MCFG_M1IO_DO_CB(WRITE8(model2o_state, vcop_output_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_IN2_CB(IOPORT("IN2"))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model2o_state, vcop_output_w))
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
@@ -5855,9 +5916,6 @@ ROM_START( daytona ) /* Daytona USA (Japan, Revision A), Original Model 2 w/Mode
 
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
-	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
-	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
-
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
 ROM_END
@@ -5919,9 +5977,6 @@ ROM_START( daytonase ) /* Daytona USA (Japan, Revision A), Original Model 2 w/Mo
 
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
-	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
-	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
-
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
 ROM_END
@@ -5981,9 +6036,6 @@ ROM_START( daytona93 ) /* Daytona USA (Deluxe cabinet, '93 version. There is sai
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
-
-	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
-	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, BAD_DUMP CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) ) // unconfirmed
@@ -6045,9 +6097,6 @@ ROM_START( daytonas ) /* Daytona USA (With Saturn Adverts) */
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
-
-	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
-	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, BAD_DUMP CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) ) // unconfirmed
@@ -6112,9 +6161,6 @@ ROM_START( daytonat )/* Daytona USA (Japan, Turbo hack) */
 
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
-	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
-	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
-
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
 ROM_END
@@ -6175,9 +6221,6 @@ ROM_START( daytonata )/* Daytona USA (Japan, Turbo hack) */
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
-
-	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
-	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
@@ -6251,9 +6294,6 @@ ROM_START( daytonam ) /* Daytona USA (Japan, To The MAXX) */
 
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
 
-	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
-	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
-
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
 
@@ -6321,9 +6361,6 @@ ROM_START( daytonagtx )
 	ROM_LOAD("mpr-16494.5", 0x200000, 0x200000, CRC(600e1d6c) SHA1(d4e246fc57a16ff562bbcbccf6a739b706f58696) )
 
 	MODEL2_CPU_BOARD /* Model 2 CPU board extra roms */
-
-	ROM_REGION( 0x10000, "iocpu", 0 ) // 837-10539 I/O board
-	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
 
 	ROM_REGION( 0x10000, "drivecpu", 0 ) // 838-10646 drive board
 	ROM_LOAD("epr-16488a.ic12", 0x000000, 0x010000, CRC(546c5d1a) SHA1(5533301fe7e3b499e6cee12230d2c656c3c667da) )
@@ -6536,7 +6573,7 @@ GAME( 1998, dyndeka2,  dynamcop,model2a_5881, model2,   model2a_state, 0,       
 GAME( 1998, pltkidsa,  pltkids, model2a_5881, model2,   model2a_state, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2B-CRX (SHARC, SCSP sound board)
-GAME( 1994, rchase2,   0,        rchase2,      rchase2,   model2b_state, rchase2,  ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, rchase2,   0,        rchase2,      rchase2,   model2b_state, rchase2,  ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
 GAME( 1994, vstriker,  0,        model2b,      vstriker,  model2b_state, 0,        ROT0, "Sega",   "Virtua Striker (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, vstrikero, vstriker, model2b,      vstriker,  model2b_state, 0,        ROT0, "Sega",   "Virtua Striker", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fvipers,   0,        model2b,      model2,    model2b_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

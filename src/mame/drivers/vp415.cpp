@@ -32,15 +32,11 @@
 		Z - Deck Electronics
 
 	TODO:
-	- Module W and Module S both have a NEC D8041AHC which has not yet
-	  been dumped. Dumps will be necessary to properly emulate the
-	  player.
-	- Anyone who has information on the proper voltage with which to
-	  dump a mask-type 8041 manufactured by NEC circa 1987, please
-	  contact Ryan Holtz.
-	- Driver currently fails the initial self-test with code 025. Per
-	  the service manual, code 25 means "no REFV pulse at system
-	  start-up".
+	- Module W has a NEC D8041AHC which has not yet been dumped. A dump
+	  will be necessary to properly emulate the player.
+	- Driver currently fails the initial self-test with code 053. Per
+	  the service manual, code 053 means "no lead-in code at start-up of
+	  player (diagnostics)".
 
 ***************************************************************************/
 
@@ -48,10 +44,12 @@
 #include "screen.h"
 
 #include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 
 #include "machine/i8155.h"
 #include "machine/i8255.h"
+#include "machine/ncr5385.h"
 #include "machine/saa1043.h"
 #include "video/mb88303.h"
 
@@ -60,8 +58,11 @@ class vp415_state : public driver_device
 public:
 	vp415_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, Z80CPU_TAG)
+		, m_datacpu(*this, Z80CPU_TAG)
+		, m_scsi(*this, SCSI_TAG)
 		, m_drivecpu(*this, DRIVECPU_TAG)
+		, m_ctrlcpu(*this, CTRLCPU_TAG)
+		, m_ctrlmcu(*this, CTRLMCU_TAG)
 		, m_chargen(*this, CHARGEN_TAG)
 		, m_mainram(*this, Z80RAM_TAG)
 		, m_ctrlram(*this, CTRLRAM_TAG)
@@ -72,11 +73,12 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(ncr5385_w);
-	DECLARE_READ8_MEMBER(ncr5385_r);
+	DECLARE_WRITE_LINE_MEMBER(cpu_int1_w);
+
 	DECLARE_WRITE8_MEMBER(sel34_w);
 	DECLARE_READ8_MEMBER(sel37_r);
 
@@ -87,6 +89,11 @@ public:
 	DECLARE_WRITE8_MEMBER(ctrl_cpu_port3_w);
 	DECLARE_READ8_MEMBER(ctrl_cpu_port3_r);
 
+	DECLARE_WRITE8_MEMBER(ctrl_mcu_port1_w);
+	DECLARE_READ8_MEMBER(ctrl_mcu_port1_r);
+	DECLARE_WRITE8_MEMBER(ctrl_mcu_port2_w);
+	DECLARE_READ8_MEMBER(ctrl_mcu_port2_r);
+
 	DECLARE_READ8_MEMBER(drive_i8155_pb_r);
 	DECLARE_READ8_MEMBER(drive_i8155_pc_r);
 
@@ -94,12 +101,15 @@ public:
 	DECLARE_WRITE8_MEMBER(drive_i8255_pb_w);
 	DECLARE_READ8_MEMBER(drive_i8255_pc_r);
 	DECLARE_WRITE8_MEMBER(drive_cpu_port1_w);
+	DECLARE_WRITE8_MEMBER(drive_cpu_port3_w);
 
 	DECLARE_WRITE_LINE_MEMBER(refv_w);
 
 	static const char* Z80CPU_TAG;
 	static const char* Z80RAM_TAG;
+	static const char* SCSI_TAG;
 	static const char* CTRLCPU_TAG;
+	static const char* CTRLMCU_TAG;
 	static const char* CTRLRAM_TAG;
 	static const char* DRIVECPU_TAG;
 	static const char* DESCRAMBLE_ROM_TAG;
@@ -112,7 +122,10 @@ public:
 	static const char* CHARGEN_TAG;
 	static const char* SYNCGEN_TAG;
 
+	static const device_timer_id DRIVE_2PPR_ID;
+
 protected:
+	// CPU Board enums
 	enum
 	{
 		SEL34_INTR_N = 0x01,
@@ -142,60 +155,19 @@ protected:
 		SEL37_SK1d_BIT  = 7,
 	};
 
+	// Control Board enums
 	enum
 	{
-		DIAG_TURN_MISCOMPARE_INITIAL = 0x08,
-		DIAG_TURN_MISCOMPARE_FINAL   = 0x10,
-		DIAG_TURN_GOOD_PARITY        = 0x18,
-		DIAG_TURN_BAD_PARITY         = 0x20,
-		DIAG_COMPLETE = 0x80,
+		CTRL_P3_INT1 = 0x08,
 
-		DIAG_COMPLETE_BIT = 7,
+		CTRL_P3_INT1_BIT = 3
 	};
 
-	enum
-	{
-		INT_FUNC_COMPLETE = 0x01,
-		INT_INVALID_CMD   = 0x40,
-
-		INT_FUNC_COMPLETE_BIT = 0,
-		INT_INVALID_CMD_BIT   = 6,
-	};
-
-	enum
-	{
-		AUX_STATUS_TC_ZERO    = 0x02,
-		AUX_STATUS_PAUSED     = 0x04,
-		AUX_STATUS_PARITY_ERR = 0x40,
-		AUX_STATUS_DATA_FULL  = 0x80,
-
-		AUX_STATUS_TC_ZERO_BIT    = 1,
-		AUX_STATUS_PAUSED_BIT     = 2,
-		AUX_STATUS_PARITY_ERR_BIT = 6,
-		AUX_STATUS_DATA_FULL_BIT  = 7,
-	};
-
-	enum
-	{
-		STATE_IDLE,
-		STATE_DIAGNOSTIC_GOOD_PARITY,
-		STATE_DIAGNOSTIC_BAD_PARITY,
-	};
-
-	enum
-	{
-		CTRL_SELECT   = 0x01,
-		CTRL_RESELECT = 0x02,
-		CTRL_PARITY   = 0x04,
-
-		CTRL_SELECT_BIT   = 0,
-		CTRL_RESELECT_BIT = 1,
-		CTRL_PARITY_BIT   = 2,
-	};
-
+	// Drive Board enums
 	enum
 	{
 		I8255PC_NOT_FOCUSED     = 0x02,
+		I8255PC_0RPM_N          = 0x08,
 		I8255PC_DISC_REFLECTION = 0x10,
 	};
 
@@ -220,22 +192,59 @@ protected:
 		I8255PB_STR1_BIT     = 7,
 	};
 
+	enum
+	{
+		I8155PB_2PPR    = 0x01,
+		I8155PB_RAD_MIR = 0x04,
+		I8155PB_FRLOCK  = 0x08,
+
+		I8155PB_2PPR_BIT    = 0,
+		I8155PB_RAD_MIR_BIT = 2,
+		I8155PB_FRLOCK_BIT  = 3,
+	};
+
+	enum
+	{
+		DRIVE_P1_CP1    = 0x01,
+		DRIVE_P1_CP2    = 0x02,
+		DRIVE_P1_LDI    = 0x04,
+		DRIVE_P1_ATN_N  = 0x08,
+		DRIVE_P1_TX     = 0x10,
+		DRIVE_P1_STB_N  = 0x20,
+		DRIVE_P1_STR0_N = 0x40,
+		DRIVE_P1_TP2    = 0x80,
+
+		DRIVE_P1_CP1_BIT    = 0,
+		DRIVE_P1_CP2_BIT    = 1,
+		DRIVE_P1_LDI_BIT    = 2,
+		DRIVE_P1_ATN_N_BIT  = 3,
+		DRIVE_P1_TX_BIT     = 4,
+		DRIVE_P1_STB_N_BIT  = 5,
+		DRIVE_P1_STR0_N_BIT = 6,
+		DRIVE_P1_TP2_BIT    = 7
+	};
+
 	virtual void video_start() override;
 
 	void z80_program_map(address_map &map);
 	void z80_io_map(address_map &map);
-	void set_intn_line(uint8_t line, uint8_t value);
+	void set_int_line(uint8_t line, uint8_t value);
+	void update_cpu_int();
 
 	void ctrl_program_map(address_map &map);
 	void ctrl_io_map(address_map &map);
+	void ctrlmcu_program_map(address_map &map);
 	void sd_w(uint8_t data);
 	uint8_t sd_r();
 
 	void drive_program_map(address_map &map);
 	void drive_io_map(address_map &map);
 
-	required_device<z80_device> m_maincpu;
+	required_device<z80_device> m_datacpu;
+	required_device<ncr5385_device> m_scsi;
 	required_device<i8031_device> m_drivecpu;
+	required_device<i8031_device> m_ctrlcpu;
+	required_device<i8041_device> m_ctrlmcu;
 	required_device<mb88303_device> m_chargen;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_ctrlram;
@@ -244,25 +253,29 @@ protected:
 	uint8_t m_sel34;
 	uint8_t m_sel37;
 
-	uint32_t m_state;
-	uint8_t m_ctrl_reg;
-	uint8_t m_int_reg;
-	uint8_t m_aux_status_reg;
-	uint8_t m_diag_status_reg;
-	uint8_t m_intn_lines[2];
+	uint8_t m_int_lines[2];
 
 	uint8_t m_refv;
 
-	uint8_t m_ctrl_p1;
-	uint8_t m_ctrl_p3;
+	uint8_t m_ctrl_cpu_p1;
+	uint8_t m_ctrl_cpu_p3;
+	uint8_t m_ctrl_mcu_p1;
+	uint8_t m_ctrl_mcu_p2;
 
 	uint8_t m_drive_p1;
 	uint8_t m_drive_pc_bits;
+
+	uint8_t m_drive_rad_mir_dac;
+	uint8_t m_drive_i8255_pb;
+	emu_timer *m_drive_2ppr_timer;
+	uint8_t m_drive_2ppr;
 };
 
 /*static*/ const char* vp415_state::Z80CPU_TAG = "z80cpu";
 /*static*/ const char* vp415_state::Z80RAM_TAG = "z80ram";
+/*static*/ const char* vp415_state::SCSI_TAG = "ncr5385";
 /*static*/ const char* vp415_state::CTRLCPU_TAG = "ctrlcpu";
+/*static*/ const char* vp415_state::CTRLMCU_TAG = "ctrlmcu";
 /*static*/ const char* vp415_state::CTRLRAM_TAG = "ctrlram";
 /*static*/ const char* vp415_state::DRIVECPU_TAG = "drivecpu";
 /*static*/ const char* vp415_state::DESCRAMBLE_ROM_TAG = "descramblerom";
@@ -275,29 +288,48 @@ protected:
 /*static*/ const char* vp415_state::CHARGEN_TAG = "mb88303";
 /*static*/ const char* vp415_state::SYNCGEN_TAG = "saa1043";
 
+/*static*/ const device_timer_id vp415_state::DRIVE_2PPR_ID = 0;
+
 void vp415_state::machine_reset()
 {
-	m_state = STATE_IDLE;
-	m_int_reg = 0;
-	m_ctrl_reg = 0;
-	m_aux_status_reg = AUX_STATUS_TC_ZERO;
-	m_diag_status_reg = DIAG_COMPLETE;
-
 	m_sel34 = 0;
 	m_sel37 = SEL37_BRD | SEL37_MON_N | SEL37_SK1c | SEL37_SK1d;
-	m_intn_lines[0] = 1;
-	m_intn_lines[1] = 1;
+	m_int_lines[0] = 0;
+	m_int_lines[1] = 0;
 
-	m_ctrl_p1 = 0;
-	m_ctrl_p3 = 0;
+	m_ctrl_cpu_p1 = 0;
+	m_ctrl_cpu_p3 = 0;
+
+	m_ctrl_mcu_p1 = 0;
+	m_ctrl_mcu_p2 = 0;
 
 	m_drive_p1 = 0;
+	m_drive_i8255_pb = 0;
 
 	m_drive_pc_bits = I8255PC_DISC_REFLECTION | I8255PC_NOT_FOCUSED;
+
+	m_drive_rad_mir_dac = 0;
+
+	m_drive_2ppr = 0;
+	m_drive_2ppr_timer = timer_alloc(DRIVE_2PPR_ID);
+	m_drive_2ppr_timer->adjust(attotime::from_msec(10));
 }
 
 void vp415_state::machine_start()
 {
+}
+
+void vp415_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case DRIVE_2PPR_ID:
+			m_drive_2ppr ^= I8155PB_2PPR;
+			m_drive_2ppr_timer->adjust(attotime::from_msec(10));
+			break;
+		default:
+			break;
+	}
 }
 
 WRITE_LINE_MEMBER(vp415_state::refv_w)
@@ -309,89 +341,9 @@ WRITE_LINE_MEMBER(vp415_state::refv_w)
 
 // CPU Datagrabber Module (W)
 
-WRITE8_MEMBER(vp415_state::ncr5385_w)
+WRITE_LINE_MEMBER(vp415_state::cpu_int1_w)
 {
-	switch (offset)
-	{
-		case 0x0: // Data Register
-			switch (m_state)
-			{
-				case STATE_DIAGNOSTIC_GOOD_PARITY:
-					m_aux_status_reg &= ~AUX_STATUS_PARITY_ERR;
-					m_aux_status_reg |= AUX_STATUS_DATA_FULL;
-					m_int_reg = INT_FUNC_COMPLETE;
-					m_diag_status_reg = DIAG_COMPLETE | DIAG_TURN_GOOD_PARITY;
-					m_state = STATE_IDLE;
-					set_intn_line(1, 0);
-					logerror("%s: ncr5385_w: data=%02x (diagnostic w/ good parity)\n", machine().describe_context(), data);
-					break;
-				case STATE_DIAGNOSTIC_BAD_PARITY:
-					m_aux_status_reg |= AUX_STATUS_PARITY_ERR | AUX_STATUS_DATA_FULL;
-					m_int_reg = INT_FUNC_COMPLETE;
-					m_diag_status_reg = DIAG_COMPLETE | DIAG_TURN_BAD_PARITY;
-					m_state = STATE_IDLE;
-					set_intn_line(1, 0);
-					logerror("%s: ncr5385_w: data=%02x (diagnostic w/ bad parity)\n", machine().describe_context(), data);
-					break;
-				default:
-					logerror("%s: ncr5385_w: data=%02x\n", machine().describe_context(), data);
-					break;
-			}
-			break;
-		case 0x1: // Command Register
-			switch (data & 0x3f)
-			{
-				case 0x00: // Chip Reset
-					logerror("%s: ncr5385_w: command: reset\n", machine().describe_context());
-					m_state = STATE_IDLE;
-					m_int_reg = 0;
-					m_aux_status_reg = AUX_STATUS_TC_ZERO;
-					m_diag_status_reg = DIAG_COMPLETE;
-					set_intn_line(1, 1);
-					break;
-				case 0x0b: // Diagnostic
-					logerror("%s: ncr5385_w: command: diagnostic (%s parity)\n", machine().describe_context(), BIT(data, 6) ? "bad" : "good");
-					if (BIT(data, 6))
-						m_state = STATE_DIAGNOSTIC_BAD_PARITY;
-					else
-						m_state = STATE_DIAGNOSTIC_GOOD_PARITY;
-					break;
-				default:
-					logerror("%s: ncr5385_w: command: %02x\n", machine().describe_context(), data);
-					break;
-			}
-			break;
-		case 0x2: // Control Register
-			m_ctrl_reg = data & 0x07;
-			logerror("%s: ncr5385_w: control: parity_en=%d, reselect_en=%d, select_en=%d\n", machine().describe_context(), BIT(data, CTRL_PARITY_BIT), BIT(data, CTRL_RESELECT_BIT), BIT(data, CTRL_SELECT_BIT));
-			break;
-		default:
-			logerror("%s: ncr5385_w: %x=%02x\n", machine().describe_context(), offset, data);
-			break;
-	}
-}
-
-READ8_MEMBER(vp415_state::ncr5385_r)
-{
-	switch (offset)
-	{
-		case 0x2:
-			logerror("%s: ncr5385_r: control (%02x)\n", machine().describe_context(), m_ctrl_reg);
-			return m_ctrl_reg;
-		case 0x4:
-			logerror("%s: ncr5385_r: aux status (%02x)\n", machine().describe_context(), m_aux_status_reg);
-			return m_aux_status_reg;
-		case 0x6:
-			logerror("%s: ncr5385_r: interrupt (%02x)\n", machine().describe_context(), m_int_reg);
-			set_intn_line(1, 1);
-			return m_int_reg;
-		case 0x9:
-			logerror("%s: ncr5385_r: diagnostic status (%02x)\n", machine().describe_context(), m_diag_status_reg);
-			return m_diag_status_reg;
-		default:
-			logerror("%s: ncr5385_r: %x (%02x)\n", machine().describe_context(), offset, 0);
-			return 0;
-	}
+	set_int_line(0, state);
 }
 
 WRITE8_MEMBER(vp415_state::sel34_w)
@@ -402,6 +354,7 @@ WRITE8_MEMBER(vp415_state::sel34_w)
 	if (!BIT(data, SEL34_INTR_N_BIT))
 	{
 		m_sel37 &= ~(SEL37_ID0 | SEL37_ID1);
+		update_cpu_int();
 	}
 }
 
@@ -411,22 +364,19 @@ READ8_MEMBER(vp415_state::sel37_r)
 	return m_sel37;
 }
 
-void vp415_state::set_intn_line(uint8_t line, uint8_t value)
+void vp415_state::set_int_line(uint8_t line, uint8_t value)
 {
-	if (value == 0)
+	if (value)
 	{
-		m_sel37 |= line ? SEL37_ID0 : SEL37_ID1;
+		m_sel37 |= line ? SEL37_ID1 : SEL37_ID0;
 	}
 
-	m_intn_lines[line] = value;
-	if (m_intn_lines[0] && m_intn_lines[1])
-	{
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-	}
+	update_cpu_int();
+}
+
+void vp415_state::update_cpu_int()
+{
+	m_datacpu->set_input_line(0, (m_sel37 & (SEL37_ID0 | SEL37_ID1)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void vp415_state::z80_program_map(address_map &map)
@@ -438,7 +388,7 @@ void vp415_state::z80_program_map(address_map &map)
 void vp415_state::z80_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x0f).rw(this, FUNC(vp415_state::ncr5385_r), FUNC(vp415_state::ncr5385_w));
+	map(0x00, 0x0f).rw(SCSI_TAG, FUNC(ncr5385_device::read), FUNC(ncr5385_device::write));
 	// 0x20, 0x21: Connected to A0 + D0..D7 of SLAVE i8041
 	map(0x34, 0x34).w(this, FUNC(vp415_state::sel34_w));
 	map(0x37, 0x37).r(this, FUNC(vp415_state::sel37_r));
@@ -458,7 +408,8 @@ WRITE8_MEMBER(vp415_state::ctrl_regs_w)
 			sd_w(data);
 			break;
 		case 1: // WR3
-			logerror("%s: ctrl_regs_w: WR3 (UPI-41, not yet dumped/implemented): %02x\n", machine().describe_context(), data);
+			logerror("%s: ctrl_regs_w: WR3 (UPI-41): %d=%02x\n", machine().describe_context(), (offset >> 9) & 1, data);
+			m_ctrlmcu->upi41_master_w(space, (offset >> 9) & 1, data);
 			break;
 		case 2:
 			logerror("%s: ctrl_regs_w: N.C. write %02x\n", machine().describe_context(), data);
@@ -479,10 +430,11 @@ READ8_MEMBER(vp415_state::ctrl_regs_r)
 			value = sd_r();
 			logerror("%s: ctrl_regs_r: RDEN: %02x\n", machine().describe_context(), value);
 			break;
-		case 1: // RD3
-			logerror("%s: ctrl_regs_r: RD3 (UPI-41, not yet dumped/implemented): %02x\n", machine().describe_context(), 0);
+		case 1: // /RD3
+			value = m_ctrlmcu->upi41_master_r(space, (offset >> 9) & 1);
+			logerror("%s: ctrl_regs_r: RD3 (UPI-41): %d (%02x)\n", machine().describe_context(), (offset >> 9) & 1, value);
 			break;
-		case 2: // RD2
+		case 2: // /RD2
 			logerror("%s: ctrl_regs_r: N.C. read\n", machine().describe_context());
 			break;
 		case 3:
@@ -495,10 +447,10 @@ READ8_MEMBER(vp415_state::ctrl_regs_r)
 
 WRITE8_MEMBER(vp415_state::ctrl_cpu_port1_w)
 {
-	uint8_t old = m_ctrl_p1;
-	m_ctrl_p1 = data;
+	uint8_t old = m_ctrl_cpu_p1;
+	m_ctrl_cpu_p1 = data;
 
-	if ((m_ctrl_p1 ^ old) & 0xdf) // Ignore petting the watchdog (bit 5)
+	if ((m_ctrl_cpu_p1 ^ old) & 0xdf) // Ignore petting the watchdog (bit 5)
 	{
 		logerror("%s: ctrl_cpu_port1_w: %02x\n", machine().describe_context(), data);
 	}
@@ -506,23 +458,52 @@ WRITE8_MEMBER(vp415_state::ctrl_cpu_port1_w)
 
 READ8_MEMBER(vp415_state::ctrl_cpu_port1_r)
 {
-	uint8_t ret = m_ctrl_p1;
-	m_ctrl_p1 ^= 0x10;
+	uint8_t ret = m_ctrl_cpu_p1;
+	m_ctrl_cpu_p1 ^= 0x10;
 	logerror("%s: ctrl_cpu_port1_r (%02x)\n", machine().describe_context(), ret);
-	return ret;// | (m_refv << 4);
+	return ret;
 }
 
 WRITE8_MEMBER(vp415_state::ctrl_cpu_port3_w)
 {
-	m_ctrl_p3 = data;
+	m_ctrl_cpu_p3 = ~data;
 	logerror("%s: ctrl_cpu_port3_w: %02x\n", machine().describe_context(), data);
 }
 
 READ8_MEMBER(vp415_state::ctrl_cpu_port3_r)
 {
-	uint8_t ret = m_ctrl_p3;
+	uint8_t ret = m_ctrl_cpu_p3;
 	logerror("%s: ctrl_cpu_port3_r (%02x)\n", machine().describe_context(), ret);
 	return ret;
+}
+
+WRITE8_MEMBER(vp415_state::ctrl_mcu_port1_w)
+{
+	m_ctrl_mcu_p1 = data;
+	logerror("%s: ctrl_mcu_port1_w: %02x\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(vp415_state::ctrl_mcu_port1_r)
+{
+	uint8_t value = m_ctrl_mcu_p1;
+	logerror("%s: ctrl_mcu_port1_r: %02x\n", machine().describe_context(), value);
+	return value;
+}
+
+WRITE8_MEMBER(vp415_state::ctrl_mcu_port2_w)
+{
+	m_ctrl_mcu_p2 = data;
+	if (BIT(data, 4))
+		m_ctrl_cpu_p3 &= CTRL_P3_INT1;
+	else
+		m_ctrl_cpu_p3 |= CTRL_P3_INT1;
+	logerror("%s: ctrl_mcu_port2_w: %02x\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(vp415_state::ctrl_mcu_port2_r)
+{
+	logerror("%s: ctrl_mcu_port2_r: %02x\n", machine().describe_context(), 0);
+	return 0;
 }
 
 uint8_t vp415_state::sd_r()
@@ -542,15 +523,23 @@ void vp415_state::ctrl_program_map(address_map &map)
 void vp415_state::ctrl_io_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share(CTRLRAM_TAG);
-	map(0xe000, 0xffff).rw(this, FUNC(vp415_state::ctrl_regs_r), FUNC(vp415_state::ctrl_regs_w)).mask(0x1c00);
+	map(0xe000, 0xffff).rw(this, FUNC(vp415_state::ctrl_regs_r), FUNC(vp415_state::ctrl_regs_w)).mask(0x1e00);
+}
+
+void vp415_state::ctrlmcu_program_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rom().region(CTRLMCU_TAG, 0);
 }
 
 // Drive Processor Module (R)
 
 READ8_MEMBER(vp415_state::drive_i8155_pb_r)
 {
-	logerror("%s: drive_i8155_pb_r: %02x\n", machine().describe_context(), 0);
-	return 0;
+	uint8_t ret = I8155PB_FRLOCK | m_drive_2ppr;
+	if (m_drive_rad_mir_dac >= 0x7e && m_drive_rad_mir_dac < 0x82 && BIT(m_drive_i8255_pb, I8255PB_RLS_N_BIT))
+		ret |= I8155PB_RAD_MIR;
+	logerror("%s: drive_i8155_pb_r: %02x\n", machine().describe_context(), ret);
+	return ret;
 }
 
 READ8_MEMBER(vp415_state::drive_i8155_pc_r)
@@ -561,11 +550,13 @@ READ8_MEMBER(vp415_state::drive_i8155_pc_r)
 
 WRITE8_MEMBER(vp415_state::drive_i8255_pa_w)
 {
-	logerror("%s: drive_i8255_pa_w: %02x\n", machine().describe_context(), data);
+	logerror("%s: drive_i8255_pa_w: radial mirror DAC = %02x\n", machine().describe_context(), data);
+	m_drive_rad_mir_dac = data;
 }
 
 WRITE8_MEMBER(vp415_state::drive_i8255_pb_w)
 {
+	m_drive_i8255_pb = data;
 	logerror("%s: drive_i8255_pb_w: COMM-1:%d, COMM-2:%d, COMM-3:%d, COMM-4:%d, /RLS:%d, SL-PWR:%d, /RAD-FS:%d, STR1:%d\n"
 		, machine().describe_context()
 		, BIT(data, I8255PB_COMM1_BIT)
@@ -578,12 +569,14 @@ WRITE8_MEMBER(vp415_state::drive_i8255_pb_w)
 		, BIT(data, I8255PB_STR1_BIT));
 	if (BIT(data, I8255PB_RLS_N_BIT))
 	{
+
 	}
 }
 
 READ8_MEMBER(vp415_state::drive_i8255_pc_r)
 {
 	static int focus_kludge = 250;
+	static int motor_kludge = 200;
 	logerror("%s: drive_i8255_pc_r: %02x\n", machine().describe_context(), m_drive_pc_bits);
 	if (focus_kludge > 0)
 	{
@@ -592,6 +585,14 @@ READ8_MEMBER(vp415_state::drive_i8255_pc_r)
 	else
 	{
 		m_drive_pc_bits &= ~I8255PC_NOT_FOCUSED;
+	}
+	if (motor_kludge > 0)
+	{
+		motor_kludge--;
+	}
+	else
+	{
+		m_drive_pc_bits |= I8255PC_0RPM_N;
 	}
 	return m_drive_pc_bits;
 }
@@ -602,9 +603,32 @@ WRITE8_MEMBER(vp415_state::drive_cpu_port1_w)
 	m_drive_p1 = data;
 	if ((m_drive_p1 ^ old) & 0xfb) // Ignore bit 2 when logging (LDI)
 	{
-		logerror("%s: drive_cpu_port1_w: %02x\n", machine().describe_context(), data);
+		logerror("%s: drive_cpu_port1_w: TP2:%d /STR0:%d /STB:%d TX:%d /ATN:%d LDI:%d CP2:%d CP1:%d\n", machine().describe_context()
+			, BIT(data, DRIVE_P1_TP2_BIT)
+			, BIT(data, DRIVE_P1_STR0_N_BIT)
+			, BIT(data, DRIVE_P1_STB_N_BIT)
+			, BIT(data, DRIVE_P1_TX_BIT)
+			, BIT(data, DRIVE_P1_ATN_N_BIT)
+			, BIT(data, DRIVE_P1_LDI_BIT)
+			, BIT(data, DRIVE_P1_CP2_BIT)
+			, BIT(data, DRIVE_P1_CP1_BIT));
 	}
 	m_chargen->ldi_w(BIT(data, 2));
+}
+
+//READ_LINE_MEMBER(vp415_state::drive_rxd_r)
+//{
+//	logerror("%s: drive_rxd_r: %d\n", machine().describe_context(), 0);
+//	return 0;
+//}
+
+//WRITE_LINE_MEMBER(vp415_state::drive_txd_w)
+//{
+//	logerror("%s: drive_txd_w: %d\n", machine().describe_context(), state);
+//}
+WRITE8_MEMBER(vp415_state::drive_cpu_port3_w)
+{
+	logerror("%s: drive_cpu_port3_w: %02x\n", machine().describe_context(), data);
 }
 
 void vp415_state::drive_program_map(address_map &map)
@@ -653,20 +677,34 @@ static INPUT_PORTS_START( vp415 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vp415_state::vp415)
+	// Module W: CPU Datagrabber
 	MCFG_CPU_ADD(Z80CPU_TAG, Z80, XTAL(8'000'000)/2) // 8MHz through a /2 flip-flop divider, per schematic
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
 
+	MCFG_DEVICE_ADD(SCSI_TAG, NCR5385, XTAL(8'000'000)/2) // Same clock signal as above, per schematic
+	MCFG_NCR5385_INT_CB(WRITELINE(vp415_state, cpu_int1_w))
+
+	// Module S: Control
 	MCFG_CPU_ADD(CTRLCPU_TAG, I8031, XTAL(11'059'200)) // 11.059MHz, per schematic
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(vp415_state, ctrl_cpu_port1_w));
 	MCFG_MCS51_PORT_P1_IN_CB(READ8(vp415_state, ctrl_cpu_port1_r));
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(vp415_state, ctrl_cpu_port1_w));
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(vp415_state, ctrl_cpu_port1_r));
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(vp415_state, ctrl_cpu_port3_w));
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(vp415_state, ctrl_cpu_port3_r));
 	MCFG_CPU_PROGRAM_MAP(ctrl_program_map)
 	MCFG_CPU_IO_MAP(ctrl_io_map)
 
+	// Module R: Drive
+	MCFG_CPU_ADD(CTRLMCU_TAG, I8041, XTAL(4'000'000))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(vp415_state, ctrl_mcu_port1_r));
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vp415_state, ctrl_mcu_port1_w));
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(vp415_state, ctrl_mcu_port2_r));
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vp415_state, ctrl_mcu_port2_w));
+	MCFG_CPU_PROGRAM_MAP(ctrlmcu_program_map)
+
 	MCFG_CPU_ADD(DRIVECPU_TAG, I8031, XTAL(12'000'000)) // 12MHz, per schematic
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(vp415_state, drive_cpu_port1_w));
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(vp415_state, drive_cpu_port3_w));
 	MCFG_CPU_PROGRAM_MAP(drive_program_map)
 	MCFG_CPU_IO_MAP(drive_io_map)
 
@@ -701,6 +739,9 @@ ROM_START(vp415)
 	/* Module S */
 	ROM_REGION(0x10000, vp415_state::CONTROL_ROM_TAG, 0) // Version 1.8
 	ROM_LOAD( "s.3104 103 6804.9_control.ic2", 0x0000, 0x10000, CRC(10564765) SHA1(8eb6cff7ca7cbfcb3db8b04b697cdd7e364be805) )
+
+	ROM_REGION(0x400, vp415_state::CTRLMCU_TAG, 0)
+	ROM_LOAD( "d8041ahc 152.ic11", 0x000, 0x400, CRC(02b6a9b2) SHA1(4123690c3fb4cc987c2ea2dd878e39c8bf0cb4ea) )
 
 	/* Module W */
 	ROM_REGION(0x8000, vp415_state::Z80CPU_TAG, 0)

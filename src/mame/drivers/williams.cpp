@@ -667,10 +667,11 @@ void williams2_state::williams2_d000_ram_map(address_map &map)
 
 
 /* tshoot and joust2: D000-DFFF is ROM */
-ADDRESS_MAP_START(williams2_state::williams2_d000_rom_map)
-	AM_IMPORT_FROM(williams2_common_map)
-	AM_RANGE(0xd000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void williams2_state::williams2_d000_rom_map(address_map &map)
+{
+	williams2_common_map(map);
+	map(0xd000, 0xffff).rom();
+}
 
 
 

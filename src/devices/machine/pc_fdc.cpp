@@ -23,13 +23,14 @@ ADDRESS_MAP_START(pc_fdc_family_device::map)
 ADDRESS_MAP_END
 
 // The schematics show address decoding is minimal
-ADDRESS_MAP_START(pc_fdc_xt_device::map)
-	AM_RANGE(0x0, 0x0) AM_DEVREAD("upd765", upd765a_device, msr_r) AM_WRITE(dor_w)
-	AM_RANGE(0x1, 0x1) AM_DEVREAD("upd765", upd765a_device, fifo_r) AM_WRITE(dor_fifo_w)
-	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
-	AM_RANGE(0x3, 0x3) AM_WRITE(dor_w)
-	AM_RANGE(0x4, 0x5) AM_DEVICE("upd765", upd765a_device, map)
-ADDRESS_MAP_END
+void pc_fdc_xt_device::map(address_map &map)
+{
+	map(0x0, 0x0).r("upd765", FUNC(upd765a_device::msr_r)).w(this, FUNC(pc_fdc_xt_device::dor_w));
+	map(0x1, 0x1).r("upd765", FUNC(upd765a_device::fifo_r)).w(this, FUNC(pc_fdc_xt_device::dor_fifo_w));
+	map(0x2, 0x2).w(this, FUNC(pc_fdc_xt_device::dor_w));
+	map(0x3, 0x3).w(this, FUNC(pc_fdc_xt_device::dor_w));
+	map(0x4, 0x5).m("upd765", FUNC(upd765a_device::map));
+}
 
 
 // Decoding is through a PAL, so presumably complete

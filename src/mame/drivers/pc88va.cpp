@@ -1334,10 +1334,11 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc8801fd_upd765_tc_to_zero)
 
 /* FDC subsytem CPU */
 #if TEST_SUBFDC
-ADDRESS_MAP_START(pc88va_state::pc88va_z80_map)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-ADDRESS_MAP_END
+void pc88va_state::pc88va_z80_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x7fff).ram();
+}
 
 READ8_MEMBER(pc88va_state::upd765_tc_r)
 {
@@ -1357,14 +1358,15 @@ WRITE8_MEMBER(pc88va_state::upd765_mc_w)
 	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!(data & 2));
 }
 
-ADDRESS_MAP_START(pc88va_state::pc88va_z80_io_map)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(fdc_irq_vector_w) // Interrupt Opcode Port
+void pc88va_state::pc88va_z80_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).w(this, FUNC(pc88va_state::fdc_irq_vector_w)); // Interrupt Opcode Port
 //  AM_RANGE(0xf4, 0xf4) // Drive Control Port
-	AM_RANGE(0xf8, 0xf8) AM_READWRITE(upd765_tc_r,upd765_mc_w) // (R) Terminal Count Port (W) Motor Control Port
-	AM_RANGE(0xfa, 0xfb) AM_DEVICE("upd765", upd765a_device, map )
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_2s", i8255_device, read, write)
-ADDRESS_MAP_END
+	map(0xf8, 0xf8).rw(this, FUNC(pc88va_state::upd765_tc_r), FUNC(pc88va_state::upd765_mc_w)); // (R) Terminal Count Port (W) Motor Control Port
+	map(0xfa, 0xfb).m(m_fdc, FUNC(upd765a_device::map));
+	map(0xfc, 0xff).rw("d8255_2s", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 #endif
 
 /* TODO: active low or active high? */

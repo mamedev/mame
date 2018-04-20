@@ -157,8 +157,11 @@
 #include "remote488.h"
 
 // Debugging
-#define VERBOSE 1
 #include "logmacro.h"
+#define LOG_PARSER_MASK	(LOG_GENERAL << 1)
+#define LOG_PARSER(...)	LOGMASKED(LOG_PARSER_MASK, __VA_ARGS__)
+#undef VERBOSE
+#define VERBOSE LOG_GENERAL
 
 // Bit manipulation
 namespace {
@@ -325,8 +328,8 @@ void remote488_device::process_input_msgs()
 			if (m_flush_bytes) {
 				LOG("Flushed\n");
 			} else {
-				recvd_data_byte(data , false);
 				m_poll_timer->reset();
+				recvd_data_byte(data , false);
 				return;
 			}
 			break;
@@ -336,8 +339,8 @@ void remote488_device::process_input_msgs()
 				LOG("Flushed\n");
 				m_flush_bytes = false;
 			} else {
-				recvd_data_byte(data , true);
 				m_poll_timer->reset();
+				recvd_data_byte(data , true);
 				return;
 			}
 			break;
@@ -586,7 +589,7 @@ char remote488_device::recv_update(uint8_t& data)
 		case REM_RX_WAIT_SEP:
 			if (is_terminator(c) || is_space(c)) {
 				m_rx_state = REM_RX_WAIT_CH;
-				LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
+				LOG_PARSER("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
 				data = m_rx_data;
 				return m_rx_ch;
 			} else {
@@ -604,7 +607,7 @@ char remote488_device::recv_update(uint8_t& data)
 			m_rx_state = REM_RX_WAIT_CH;
 			break;
 		}
-		LOG("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
+		LOG_PARSER("PARSE %02x %d->%d\n" , c , prev_state , m_rx_state);
 	}
 	return 0;
 }

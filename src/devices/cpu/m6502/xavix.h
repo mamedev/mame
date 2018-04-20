@@ -61,13 +61,11 @@ protected:
 		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
-	uint8_t m_farbank;
+	uint8_t m_databank;
+	uint8_t m_codebank;
 	uint32_t XPC;
 
-	uint8_t farbank_r() { return m_farbank; }
-	void farbank_w(uint8_t data) { m_farbank = data; }
-
-	uint32_t adr_with_bank(uint16_t adr) { return adr | (m_farbank << 16); }
+	uint32_t adr_with_codebank(uint16_t adr) { return adr | (get_codebank() << 16); }
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -75,6 +73,11 @@ protected:
 
 private:
 	xavix_interrupt_vector_delegate m_vector_callback;
+
+	void set_codebank(uint8_t bank);
+	uint8_t get_codebank();
+	void set_databank(uint8_t bank);
+	uint8_t get_databank();
 
 };
 

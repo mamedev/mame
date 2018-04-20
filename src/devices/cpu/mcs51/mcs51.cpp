@@ -1858,7 +1858,6 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 	{
 		//External Interrupt 0
 		case MCS51_INT0_LINE:
-			SET_P3((P3 &~ 4) | (state << 2));
 			//Line Asserted?
 			if (state != CLEAR_LINE) {
 				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT0 active lo!
@@ -1881,7 +1880,6 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 
 		//External Interrupt 1
 		case MCS51_INT1_LINE:
-			SET_P3((P3 &~ 8) | (state << 3));
 			//Line Asserted?
 			if (state != CLEAR_LINE) {
 				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo!
@@ -2071,7 +2069,9 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 		case ADDR_P0:   return RWM ? P0 : (P0 | m_forced_inputs[0]) & m_port_in_cb[0]();
 		case ADDR_P1:   return RWM ? P1 : (P1 | m_forced_inputs[1]) & m_port_in_cb[1]();
 		case ADDR_P2:   return RWM ? P2 : (P2 | m_forced_inputs[2]) & m_port_in_cb[2]();
-		case ADDR_P3:   return RWM ? P3 : (P3 | m_forced_inputs[3]) & m_port_in_cb[3]();
+		case ADDR_P3:   return RWM ? P3 : (P3 | m_forced_inputs[3]) & m_port_in_cb[3]()
+		                    & ~(GET_BIT(m_last_line_state, MCS51_INT0_LINE) ? 4 : 0)
+		                    & ~(GET_BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0);
 
 		case ADDR_PSW:
 		case ADDR_ACC:
