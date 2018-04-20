@@ -7228,8 +7228,9 @@
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<!-- Modified - file added with copy protection answers -->
 			<dataarea name="flop" size = "1474560">
-				<rom name="Alone in the Dark (France) (Disk 4).img" size="1474560" crc="8cd64cf1" sha1="1502555ba7fedabceb7e8fd859b77689c08bd214" offset="0"/>
+				<rom name="Alone in the Dark (France) (Disk 4).img" size="1474560" crc="8cd64cf1" sha1="1502555ba7fedabceb7e8fd859b77689c08bd214" offset="0" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9699,6 +9700,24 @@
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="One Must Fall 2097 (USA, Europe) (v1.1) (Disk 5).img" size="1474560" crc="2258ca74" sha1="6669ac792b3727e272656703ea0505af90208cae" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opstealth">
+		<description>Operation Stealth (Euro)</description>
+		<year>1990</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Delphine Software" />
+		<info name="usage" value="Mouse Required" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Operation Stealth [Interplay] [1990] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="1ac0fa73" sha1="236588de744c62fadcb5271d6a17516e429cf31d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Operation Stealth [Interplay] [1990] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="da712b27" sha1="bfeb9d003d89a19d868a1fca728462729a21de34" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

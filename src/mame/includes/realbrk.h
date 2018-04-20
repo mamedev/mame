@@ -75,7 +75,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void pkgnsh(machine_config &config);
 	void dai2kaku(machine_config &config);
 	void realbrk(machine_config &config);

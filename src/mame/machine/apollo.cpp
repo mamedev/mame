@@ -342,7 +342,7 @@ READ8_MEMBER(apollo_state::apollo_dma_2_r){
 	// (8237dma.c was always fast enough to omit these problems)
 	if (offset == 8)
 	{
-		switch (space.device().safe_pcbase())
+		switch (m_maincpu->pcbase())
 		{
 		case 0x00102e22: // DN3000
 		case 0x01002f3c: // DN3500

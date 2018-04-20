@@ -420,16 +420,11 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mermaid_state::vblank_irq)
-{
-}
-
 MACHINE_CONFIG_START(mermaid_state::mermaid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   // ???
 	MCFG_CPU_PROGRAM_MAP(mermaid_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mermaid_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("latch1", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mermaid_state, ay1_enable_w))

@@ -58,7 +58,7 @@ public:
 	int32_t   m_ioc220_port;
 
 	// ADPCM
-	required_memory_region<uint8_t> m_msm_rom;
+	required_region_ptr<uint8_t> m_msm_rom;
 	uint16_t  m_msm_pos[2];
 	uint8_t   m_msm_reset[2];
 	uint8_t   m_msm_nibble[2];

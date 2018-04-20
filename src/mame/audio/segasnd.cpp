@@ -393,7 +393,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( usb_sound_device::increment_t1_clock_timer_cb )
 
 READ8_MEMBER( usb_sound_device::status_r )
 {
-	LOG("%04X:usb_data_r = %02X\n", m_maincpu->safe_pc(), (m_out_latch & 0x81) | (m_in_latch & 0x7e));
+	LOG("%s:usb_data_r = %02X\n", machine().describe_context(), (m_out_latch & 0x81) | (m_in_latch & 0x7e));
 
 	m_maincpu->execute().adjust_icount(-200);
 
@@ -421,7 +421,7 @@ TIMER_CALLBACK_MEMBER( usb_sound_device::delayed_usb_data_w )
 
 WRITE8_MEMBER( usb_sound_device::data_w )
 {
-	LOG("%04X:usb_data_w = %02X\n", m_maincpu->safe_pc(), data);
+	LOG("%s:usb_data_w = %02X\n", machine().describe_context(), data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(usb_sound_device::delayed_usb_data_w), this), data);
 
 	/* boost the interleave so that sequences can be sent */
@@ -440,7 +440,7 @@ WRITE8_MEMBER( usb_sound_device::ram_w )
 	if (m_in_latch & 0x80)
 		m_program_ram[offset] = data;
 	else
-		LOG("%04X:sega_usb_ram_w(%03X) = %02X while /LOAD disabled\n", m_maincpu->safe_pc(), offset, data);
+		LOG("%s:sega_usb_ram_w(%03X) = %02X while /LOAD disabled\n", machine().describe_context(), offset, data);
 }
 
 
@@ -455,7 +455,7 @@ READ8_MEMBER( usb_sound_device::p1_r )
 {
 	/* bits 0-6 are inputs and map to bits 0-6 of the input latch */
 	if ((m_in_latch & 0x7f) != 0)
-		LOG("%03X: P1 read = %02X\n", m_maincpu->safe_pc(), m_in_latch & 0x7f);
+		LOG("%s: P1 read = %02X\n", machine().describe_context(), m_in_latch & 0x7f);
 	return m_in_latch & 0x7f;
 }
 
@@ -464,7 +464,7 @@ WRITE8_MEMBER( usb_sound_device::p1_w )
 {
 	/* bit 7 maps to bit 0 on the output latch */
 	m_out_latch = (m_out_latch & 0xfe) | (data >> 7);
-	LOG("%03X: P1 write = %02X\n", m_maincpu->safe_pc(), data);
+	LOG("%s: P1 write = %02X\n", machine().describe_context(), data);
 }
 
 
@@ -486,7 +486,7 @@ WRITE8_MEMBER( usb_sound_device::p2_w )
 	if ((old & 0x80) && !(data & 0x80))
 		m_t1_clock = 0;
 
-	LOG("%03X: P2 write -> bank=%d ready=%d clock=%d\n", m_maincpu->safe_pc(), data & 3, (data >> 6) & 1, (data >> 7) & 1);
+	LOG("%s: P2 write -> bank=%d ready=%d clock=%d\n", machine().describe_context(), data & 3, (data >> 6) & 1, (data >> 7) & 1);
 }
 
 

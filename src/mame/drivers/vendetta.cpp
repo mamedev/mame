@@ -422,7 +422,7 @@ void vendetta_state::machine_reset()
 WRITE8_MEMBER( vendetta_state::banking_callback )
 {
 	if (data >= 0x1c)
-		logerror("PC = %04x : Unknown bank selected %02x\n", machine().device("maincpu")->safe_pc(), data);
+		logerror("%s Unknown bank selected %02x\n", machine().describe_context(), data);
 	else
 		membank("bank1")->set_entry(data);
 }

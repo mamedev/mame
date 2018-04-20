@@ -1575,13 +1575,14 @@ void bfm_sc2_state::sc2_basemap(address_map &map)
 	map(0x8000, 0xFFFF).rom();
 }
 
-ADDRESS_MAP_START(bfm_sc2_novid_state::memmap_no_vid)
-	AM_IMPORT_FROM( sc2_basemap )
-	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
-	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
-	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
-	AM_RANGE(0x2200, 0x22FF) AM_WRITE(reel56_w)
-ADDRESS_MAP_END
+void bfm_sc2_novid_state::memmap_no_vid(address_map &map)
+{
+	sc2_basemap(map);
+	map(0x2000, 0x2000).r(this, FUNC(bfm_sc2_novid_state::vfd_status_r));
+	map(0x2000, 0x20FF).w(this, FUNC(bfm_sc2_novid_state::reel12_w));
+	map(0x2100, 0x21FF).w(this, FUNC(bfm_sc2_novid_state::reel34_w));
+	map(0x2200, 0x22FF).w(this, FUNC(bfm_sc2_novid_state::reel56_w));
+}
 
 // memory map for scorpion2 board video addon /////////////////////////////
 

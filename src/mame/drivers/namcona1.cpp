@@ -452,7 +452,7 @@ void namcona1_state::blit()
 	(void)src0;
 /*
     logerror( "%s: blt(%08x,%08x,numBytes=%04x);src=%04x %04x %04x; dst=%04x %04x %04x; gfx=%04x\n",
-        machine.describe_context(),
+        machine().describe_context(),
         dst_baseaddr,src_baseaddr,num_bytes,
         src0,src1,src2,
         dst0,dst1,dst2,

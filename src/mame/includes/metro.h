@@ -101,11 +101,11 @@ public:
 	DECLARE_VIDEO_START(blzntrnd);
 	DECLARE_VIDEO_START(gstrik2);
 	uint32_t screen_update_psac_vdp2_mix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(metro_vblank_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(metro_vblank_irq);
 	INTERRUPT_GEN_MEMBER(metro_periodic_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(bangball_scanline);
-	INTERRUPT_GEN_MEMBER(karatour_interrupt);
-	INTERRUPT_GEN_MEMBER(puzzlet_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(karatour_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(puzzlet_vblank_irq);
 	IRQ_CALLBACK_MEMBER(metro_irq_callback);
 	DECLARE_READ_LINE_MEMBER(metro_rxd_r);
 

@@ -697,7 +697,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER( thunderx_state::banking_callback )
 {
-	//logerror("thunderx %04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
+	//logerror("%s thunderx bank select %02x\n", machine().describe_context(), data);
 	m_rombank->set_entry(data & 0x0f);
 }
 

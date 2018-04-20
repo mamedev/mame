@@ -325,7 +325,7 @@ WRITE8_MEMBER( gts80_state::port2a_w )
 //d0-3 bcd data; d4-6 = centre segment; d7 = dipsw enable
 WRITE8_MEMBER( gts80_state::port2b_w )
 {
-	m_segment = data;//printf("%s:%X ",machine().describe_context(),data);
+	m_segment = data;//printf("%s:%X ",machine().describe_context().c_str(),data);
 }
 
 // solenoids

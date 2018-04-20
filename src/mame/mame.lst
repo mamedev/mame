@@ -12707,6 +12707,8 @@ feagv7                          //
 feagv7a                         //
 feagv9                          //
 fex68k                          //
+fex68ka                         //
+fex68kb                         //
 fex68km2                        //
 fex68km3                        //
 
@@ -13067,6 +13069,7 @@ touchgoe                        // (c) 1995 - Ref 950510-1
 touchgon                        // (c) 1995 - Ref 950906
 touchgok                        // (c) 1995 - Ref 950510-1
 wrally2                         // (c) 1995 - Ref 950510
+wrally2a                        // (c) 1995 - Ref 950510
 
 @source:gaelco3d.cpp
 footbpow                        // (c) 1999 - Ref 000208
@@ -14123,6 +14126,7 @@ cmv4a                           // (c) 1992 Dyna Electronics
 cmv801                          // (c) 198? Corsica
 cmwm                            // (c) 199? Dyna Electronics
 crazybon                        // (c) 199? Sang Ho
+crazybona                       // (c) 199? Sang Ho
 fb2010                          // (c) 2009 Amcoe
 fl7_3121                        // (c) 199? Cyberdyne Systems, Inc.
 fl7_50                          // (c) 199? Cyberdyne Systems, Inc.
@@ -14134,6 +14138,7 @@ goldfrui                        // bootleg
 goldstar                        // (c) 198? IGS
 goldstbl                        // (c) 198? IGS
 jkrmast                         // (c) 199? unknown
+jkrmasta                        // (c) 199? unknown
 kkotnoli                        // 198? south korean hack
 ladylinr                        // (c) 198? TAB Austria
 lucky8                          // (c) 1989 Wing Co. Ltd
@@ -36508,6 +36513,7 @@ fisco400                        // (c) 1977 Taito
 gunman                          // (c) 1977 Taito
 missilex                        // (c) 1977 Taito
 ttblock                         // (c) 1977 Taito
+ttsracec                        // (c) 1978 Taito
 zzblock                         // (c) 1979 Taito
 
 @source:taitotx.cpp
@@ -37982,6 +37988,7 @@ zone40                          // Zone 40
 zone60                          // Zone 60
 rad_skat                        //
 rad_skatp                       //
+rad_sktv                        //
 rad_crik                        //
 
 @source:vsmilepro.cpp
@@ -38082,6 +38089,9 @@ zoofari                         // (c) 2006 ICE/Play Mechanix
 
 @source:vp122.cpp
 vp122                           //
+
+@source:vp415.cpp
+vp415                           // (c) 1983 Philips
 
 @source:vp60.cpp
 vp60                            //

@@ -117,6 +117,7 @@ const double XTAL::known_xtals[] = {
 	  7'159'090, /* 7.15909_MHz_XTAL       Blood Bros (2x NTSC subcarrier) */
 	  7'372'800, /* 7.3728_MHz_XTAL        - */
 	  7'864'300, /* 7.8643_MHz_XTAL        Used on InterFlip games as video clock */
+	  7'987'000, /* 7.987_MHz_XTAL         PC9801-86 YM2608 clock */
 	  8'000'000, /* 8_MHz_XTAL             Extremely common, used on 100's of PCBs */
 	  8'200'000, /* 8.2_MHz_XTAL           Universal Mr. Do - Model 8021 PCB */
 	  8'388'000, /* 8.388_MHz_XTAL         Nintendo Game Boy Color */
@@ -255,6 +256,7 @@ const double XTAL::known_xtals[] = {
 	 25'174'800, /* 25.1748_MHz_XTAL       Sega System 16A/16B (1600x NTSC line rate) */
 	 25'200'000, /* 25.2_MHz_XTAL          Tektronix 4404 video clock */
 	 25'398'360, /* 25.39836_MHz_XTAL      Tandberg TDV 2324 */
+	 25'400'000, /* 25.4_MHz_XTAL          PC9801-86 PCM base clock */
 	 25'447'000, /* 25.447_MHz_XTAL        Namco EVA3A (Funcube2) */
 	 25'590'906, /* 25.590906_MHz_XTAL     Atari Jaguar NTSC */
 	 25'593'900, /* 25.5939_MHz_XTAL       Atari Jaguar PAL */
@@ -315,6 +317,7 @@ const double XTAL::known_xtals[] = {
 	 45'158'000, /* 45.158_MHz_XTAL        Sega Model 2A video board, Model 3 CPU board */
 	 45'619'200, /* 45.6192_MHz_XTAL       DEC VK100 */
 	 45'830'400, /* 45.8304_MHz_XTAL       Microterm 5510 */
+	 46'615'120, /* 46.61512_Mhz_XTAL      Soundblaster 16 PCM base clock */
 	 47'736'000, /* 47.736_MHz_XTAL        Visual 100 */
 	 48'000'000, /* 48_MHz_XTAL            Williams/Midway Y/Z-unit system / SSV board */
 	 48'384'000, /* 48.384_MHz_XTAL        Namco NB-1 */

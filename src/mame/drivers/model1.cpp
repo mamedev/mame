@@ -283,56 +283,6 @@ Notes:
       OPR-14748.16  - 1M SOP40 MASKROMs, tied to 315-5423 & 315-5424. Note both ROMs are identical.
 
 
-I/O PCB
--------
-
-837-8950-01 (C) SEGA 1992
-|-------------------------------------------|
-| CN6                           J3   J2     |
-|                                        CN5|
-|                      DSW3       LED1      |
-|                                           |
-| SW7    |---------|                        |
-|  32MHz |SEGA     |   DSW1                 |
-| SW6    |315-5338A|                        |
-|        |         |                        |
-| SW5    |---------|   DSW2                 |
-|                                        CN1|
-| SW4      MB8464                           |
-|          14869.25                         |
-|   3771                                    |
-|          Z80                              |
-|   93C45                                   |
-|                               PC910 PC910 |
-|   LED2                           J1       |
-|      M6253                                |
-| CN3              CN2          CN4     TL1 |
-|-------------------------------------------|
-Notes:
-      315-5338A - Sega Custom (QFP100)
-      Z80       - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40, clock 32 / 8)
-      14869.25  - ST Microelectronics M27C512 64k x8 EPROM (DIP28, labelled 'EPR-14869')
-                  There is an alternative revision B 'EPR-14869B' also
-      MB8464    - Fujitsu MB8464 8k x8 SRAM (DIP28)
-      93C45     - 128bytes x8 EEPROM (DIP8)
-      M6253     - OKI M6253 (DIP18)
-      3771      - Fujitsu MB3771 Master Reset IC (DIP8)
-      PC910     - Sharp PC910 opto-isolator (x2, DIP8)
-      DSW1/2/3  - 8-position Dip Switch (x3)
-      J1        - Jumper, set to 2-3
-      J2, J3    - Jumper, both set to 1-2
-      CN1       - 50 pin connector (joins to control panel assembly)
-      CN2       - 26 pin connector (joins to foot pedal assembly)
-      CN3       - 10 pin connector for power input
-      CN4       - 6 pin connector (joins to sound PCB -> CN2, used for sound communication from Main PCB to Sound PCB)
-      CN5       - 12 pin connector for input/output controls
-      CN6       - 12 pin connector (joins to Motor PCB)
-      TL1       - Connector for network optical cable link
-      SW7       - Push Button Service Switch
-      SW6       - Push Button Test Switch
-      SW5, SW4  - Push Button Switches (purpose unknown)
-
-
 Motor PCB
 ---------
 
@@ -635,11 +585,24 @@ Notes:
 
 #include "cpu/i386/i386.h"
 #include "machine/clock.h"
-#include "machine/nvram.h"
-#include "machine/m1io.h"
+#include "machine/model1io.h"
 #include "speaker.h"
 
 #include "vr.lh"
+
+// On the real system, another 315-5338A is acting as slave
+// and writes the data to the dual port RAM. This isn't
+// emulated yet, data just gets written to RAM.
+
+READ8_MEMBER( model1_state::io_r )
+{
+	return m_dpram[offset];
+}
+
+WRITE8_MEMBER( model1_state::io_w )
+{
+	m_dpram[offset] = data;
+}
 
 WRITE8_MEMBER( model1_state::vf_outputs_w )
 {
@@ -721,18 +684,6 @@ WRITE8_MEMBER( model1_state::netmerc_outputs_w )
 	// -------0  coin counter 1
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-}
-
-WRITE16_MEMBER( model1_state::drive_board_w )
-{
-	if (offset == 0x01)
-	{
-		// drive board commands
-		m_digits[0] = data;
-		return;
-	}
-
-	logerror("drive_board_w: %02x %02x\n", offset, data);
 }
 
 READ16_MEMBER(model1_state::fifoin_status_r)
@@ -823,31 +774,6 @@ MACHINE_RESET_MEMBER(model1_state,model1)
 	}
 }
 
-READ16_MEMBER(model1_state::network_ctl_r)
-{
-	if(offset)
-		return 0x40;
-	else
-		return m_io_command;
-}
-
-WRITE16_MEMBER(model1_state::network_ctl_w)
-{
-	if (offset == 0)
-	{
-		m_io_command = data & 0xff;
-
-		// totally made up; proper emulation of I/O board needed
-		// (command 3 is EEPROM write, so should take a lot longer)
-		m_io_timer->adjust(data == 3 ? attotime::from_msec(100) : attotime::from_usec(10));
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(model1_state::io_command_acknowledge)
-{
-	m_io_command = 0;
-}
-
 WRITE16_MEMBER(model1_state::md1_w)
 {
 	COMBINE_DATA(m_display_list1+offset);
@@ -930,12 +856,7 @@ void model1_state::model1_mem(address_map &map)
 	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
 	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	map(0xc00000, 0xc0001f).rw("io", FUNC(m1io_device::read), FUNC(m1io_device::write)).umask16(0x00ff);
-	map(0xc00020, 0xc0003f).w(this, FUNC(model1_state::drive_board_w));
-
-	map(0xc00040, 0xc00043).rw(this, FUNC(model1_state::network_ctl_r), FUNC(model1_state::network_ctl_w));
-
-	map(0xc00200, 0xc002ff).ram().share("nvram");
+	map(0xc00000, 0xc007ff).ram().share("dpram"); // 2k*8-bit dual port ram
 
 	map(0xc40000, 0xc40000).rw(m_m1uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc40002, 0xc40002).rw(m_m1uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -1258,13 +1179,8 @@ ROM_START( vr )
 	ROM_LOAD32_BYTE( "mpr-14900.41", 0x000002, 0x80000, CRC(aa7c017d) SHA1(0fa2b59a8bb5f5907b2b2567e69d11c73b398dc1) )
 	ROM_LOAD32_BYTE( "mpr-14901.42", 0x000003, 0x80000, CRC(175b7a9a) SHA1(c86602e771cd49bab425b4ba7926d2f44858bd39) )
 
-	ROM_REGION( 0x100, "nvram", 0 ) // default nvram
-	ROM_LOAD( "vr_defaults.nv", 0x000, 0x100, CRC(5ccdc835) SHA1(7e809de470f78fb897b938ca2aee2e12f1c8f3a4) )
-
-	ROM_REGION ( 0x10000, "io_board", 0)
-	ROM_LOAD("epr-14869.25",  0x00000, 0x10000, CRC(6187cd7a) SHA1(b65fdd0ad31794a565a0ca4dc67a3f16b329fd71) )
-//	ROM_LOAD("epr-14869b.25", 0x00000, 0x10000, BAD_DUMP CRC(b410f22b) SHA1(75c5009ca4d21ebb53d54d4e3fb8aa55a4c74a07) ) // stray FFs at xx49, xx5F, xxC9, xxDF
-	// there is also epr-14869c in model2 daytona
+	ROM_REGION16_LE(0x80, "ioboard:eeprom", 0)
+	ROM_LOAD("93c45.bin", 0x00, 0x80, CRC(65aac303) SHA1(17687fedf1578e977cae4e7c3f5c00cad4aa490d) )
 ROM_END
 
 ROM_START( vformula )
@@ -1645,7 +1561,6 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", model1_state, model1_interrupt, "screen", 0, 1)
-	MCFG_TIMER_DRIVER_ADD("iotimer", model1_state, io_command_acknowledge)
 
 #if 1
 	MCFG_CPU_ADD("tgp_copro", MB86233, 16000000)
@@ -1657,12 +1572,12 @@ MACHINE_CONFIG_START(model1_state::model1)
 
 	MCFG_MACHINE_START_OVERRIDE(model1_state,model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
-	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("io", SEGA_M1IO, 0)
-	MCFG_M1IO_DI0_CB(IOPORT("IN.0"))
-	MCFG_M1IO_DI1_CB(IOPORT("IN.1"))
-	MCFG_M1IO_DI2_CB(IOPORT("IN.2"))
+	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
+	MCFG_MODEL1IO_READ_CB(READ8(model1_state, io_r))
+	MCFG_MODEL1IO_WRITE_CB(WRITE8(model1_state, io_w))
+	MCFG_MODEL1IO_IN0_CB(IOPORT("IN.0"))
+	MCFG_MODEL1IO_IN1_CB(IOPORT("IN.1"))
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
@@ -1698,18 +1613,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model1_state::vf)
 	model1_hle(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_DO_CB(WRITE8(model1_state, vf_outputs_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_IN2_CB(IOPORT("IN.2"))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, vf_outputs_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model1_state::vr)
 	model1(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_AN0_CB(IOPORT("WHEEL"))
-	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_M1IO_DO_CB(WRITE8(model1_state, vr_outputs_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_AN0_CB(IOPORT("WHEEL"))
+	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, vr_outputs_w))
 
 	MCFG_M1COMM_ADD(M1COMM_TAG)
 	MCFG_DEVICE_BIOS("epr15112");
@@ -1718,11 +1634,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model1_state::vformula)
 	model1(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_AN0_CB(IOPORT("WHEEL"))
-	MCFG_M1IO_AN1_CB(IOPORT("ACCEL"))
-	MCFG_M1IO_AN2_CB(IOPORT("BRAKE"))
-	MCFG_M1IO_DO_CB(WRITE8(model1_state, vr_outputs_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_AN0_CB(IOPORT("WHEEL"))
+	MCFG_MODEL1IO_AN1_CB(IOPORT("ACCEL"))
+	MCFG_MODEL1IO_AN2_CB(IOPORT("BRAKE"))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, vr_outputs_w))
 
 	MCFG_M1COMM_ADD(M1COMM_TAG)
 	MCFG_DEVICE_BIOS("epr15624");
@@ -1731,14 +1647,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model1_state::swa)
 	model1_hle(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_AN0_CB(IOPORT("STICK1X"))
-	MCFG_M1IO_AN1_CB(IOPORT("STICK1Y"))
-	MCFG_M1IO_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_M1IO_AN3_CB(NOOP)
-	MCFG_M1IO_AN4_CB(IOPORT("STICK2X"))
-	MCFG_M1IO_AN5_CB(IOPORT("STICK2Y"))
-	MCFG_M1IO_DO_CB(WRITE8(model1_state, swa_outputs_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_AN0_CB(IOPORT("STICK1X"))
+	MCFG_MODEL1IO_AN1_CB(IOPORT("STICK1Y"))
+	MCFG_MODEL1IO_AN2_CB(IOPORT("THROTTLE"))
+	MCFG_MODEL1IO_AN4_CB(IOPORT("STICK2X"))
+	MCFG_MODEL1IO_AN5_CB(IOPORT("STICK2Y"))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, swa_outputs_w))
 
 	MCFG_SPEAKER_STANDARD_STEREO("dleft", "dright")
 	MCFG_DSBZ80_ADD(DSBZ80_TAG)
@@ -1757,11 +1672,11 @@ MACHINE_CONFIG_START(model1_state::wingwar)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(model1_comm_mem)
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_AN0_CB(IOPORT("STICKX"))
-	MCFG_M1IO_AN1_CB(IOPORT("STICKY"))
-	MCFG_M1IO_AN2_CB(IOPORT("THROTTLE"))
-	MCFG_M1IO_DO_CB(WRITE8(model1_state, wingwar_outputs_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_AN0_CB(IOPORT("STICKX"))
+	MCFG_MODEL1IO_AN1_CB(IOPORT("STICKY"))
+	MCFG_MODEL1IO_AN2_CB(IOPORT("THROTTLE"))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, wingwar_outputs_w))
 
 	MCFG_M1COMM_ADD(M1COMM_TAG)
 	MCFG_DEVICE_BIOS("epr15112");
@@ -1770,8 +1685,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(model1_state::wingwar360)
 	wingwar(config);
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_DO_CB(WRITE8(model1_state, wingwar360_outputs_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, wingwar360_outputs_w))
 MACHINE_CONFIG_END
 
 void model1_state::polhemus_map(address_map &map)
@@ -1786,14 +1701,14 @@ MACHINE_CONFIG_START(model1_state::netmerc)
 	MCFG_CPU_ADD("polhemus", I386SX, 16000000)
 	MCFG_CPU_PROGRAM_MAP(polhemus_map)
 
-	MCFG_DEVICE_MODIFY("io")
-	MCFG_M1IO_AN0_CB(IOPORT("STICKX"))
-	MCFG_M1IO_AN2_CB(IOPORT("STICKY"))
-	MCFG_M1IO_DO_CB(WRITE8(model1_state, netmerc_outputs_w))
+	MCFG_DEVICE_MODIFY("ioboard")
+	MCFG_MODEL1IO_AN0_CB(IOPORT("STICKX"))
+	MCFG_MODEL1IO_AN2_CB(IOPORT("STICKY"))
+	MCFG_MODEL1IO_OUTPUT_CB(WRITE8(model1_state, netmerc_outputs_w))
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(model1_state,wingwar360)
+DRIVER_INIT_MEMBER( model1_state, wingwar360 )
 {
 	// install r360 hack
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00014, 0xc00015, read16_delegate(FUNC(model1_state::r360_r),this));

@@ -1498,6 +1498,9 @@ ROM_START( luplup10 ) /* version 1.05 / 981214 */
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "gal22v10b.gal1",  0x0000, 0x02e5, CRC(776c5137) SHA1(f6ced83ef803549cc61c14c276f914f267e91ce6) ) /* GAL22V10B at GAL1 */
 ROM_END
 
 ROM_START( puzlbang ) /* version 2.9 / 990108 - Korea only, cannot select title, language and limited selection of background choices, EI: censored  */
