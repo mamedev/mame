@@ -22,14 +22,16 @@
 // device type definition
 DEFINE_DEVICE_TYPE(HUC6272, huc6272_device, "huc6272", "Hudson HuC6272 \"King\"")
 
-ADDRESS_MAP_START(huc6272_device::microprg_map)
-	AM_RANGE(0x00, 0x0f) AM_RAM AM_SHARE("microprg_ram")
-ADDRESS_MAP_END
+void huc6272_device::microprg_map(address_map &map)
+{
+	map(0x00, 0x0f).ram().share("microprg_ram");
+}
 
-ADDRESS_MAP_START(huc6272_device::kram_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("kram_page0")
-	AM_RANGE(0x100000, 0x1fffff) AM_RAM AM_SHARE("kram_page1")
-ADDRESS_MAP_END
+void huc6272_device::kram_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("kram_page0");
+	map(0x100000, 0x1fffff).ram().share("kram_page1");
+}
 
 
 //**************************************************************************
