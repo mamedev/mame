@@ -131,14 +131,14 @@ void sega_scu_device::regs_map(address_map &map)
 	map(0x008c, 0x008f).rw("scudsp", FUNC(scudsp_cpu_device::ram_address_r), FUNC(scudsp_cpu_device::ram_address_w));
 	map(0x0090, 0x0093).w(this, FUNC(sega_scu_device::t0_compare_w));
 	map(0x0094, 0x0097).w(this, FUNC(sega_scu_device::t1_setdata_w));
-	map(0x009b, 0x009a).w(this, FUNC(sega_scu_device::t1_mode_w));
+	map(0x009a, 0x009b).w(this, FUNC(sega_scu_device::t1_mode_w));
 	map(0x00a0, 0x00a3).rw(this, FUNC(sega_scu_device::irq_mask_r), FUNC(sega_scu_device::irq_mask_w));
 	map(0x00a4, 0x00a7).rw(this, FUNC(sega_scu_device::irq_status_r), FUNC(sega_scu_device::irq_status_w));
 //  AM_RANGE(0x00a8, 0x00ab) AM_WRITE(abus_irqack_w)
 //  AM_RANGE(0x00b0, 0x00b7) AM_READWRITE(abus_set_r,abus_set_w)
 //  AM_RANGE(0x00b8, 0x00bb) AM_READWRITE(abus_refresh_r,abus_refresh_w)
 //  AM_RANGE(0x00c4, 0x00c7) AM_READWRITE(sdram_r,sdram_w)
-	map(0x00c8, 0x00cb).r(this, FUNC(sega_scu_device::version_r)); // returns 4 for stock Saturn
+	map(0x00c8, 0x00cb).r(this, FUNC(sega_scu_device::version_r));
 }
 
 //-------------------------------------------------
