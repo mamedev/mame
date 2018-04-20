@@ -1295,8 +1295,8 @@ MACHINE_CONFIG_START(hp48_state::hp48gx)
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gx )
 
 	/* expansion ports */
-	MCFG_HP48_PORT_ADD ( "port1", 0, HP48_CE2,     128*1024 )
-	MCFG_HP48_PORT_ADD ( "port2", 1, HP48_NCE3, 4*1024*1024 )
+	MCFG_HP48_PORT_ADD ( "port1", HP48_CE2,     128*1024 )
+	MCFG_HP48_PORT_ADD ( "port2", HP48_NCE3, 4*1024*1024 )
 
 	/* serial I/O */
 	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
@@ -1330,8 +1330,8 @@ MACHINE_CONFIG_START(hp48_state::hp48sx)
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48sx )
 
 	/* expansion ports */
-	MCFG_HP48_PORT_ADD  ( "port1", 0, HP48_CE1, 128*1024)
-	MCFG_HP48_PORT_ADD  ( "port2", 1, HP48_CE2, 128*1024)
+	MCFG_HP48_PORT_ADD  ( "port1", HP48_CE1, 128*1024)
+	MCFG_HP48_PORT_ADD  ( "port2", HP48_CE2, 128*1024)
 
 	/* serial I/O */
 	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
