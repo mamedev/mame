@@ -120,24 +120,28 @@
 
 DEFINE_DEVICE_TYPE(VRC5074, vrc5074_device, "vrc5074", "NEC VRC5074 System Controller")
 
-ADDRESS_MAP_START(vrc5074_device::config_map)
-	AM_IMPORT_FROM(pci_bridge_device::config_map)
-	AM_RANGE(0x00000018, 0x00000027) AM_READWRITE(sdram_addr_r, sdram_addr_w)
-ADDRESS_MAP_END
+void vrc5074_device::config_map(address_map &map)
+{
+	pci_bridge_device::config_map(map);
+	map(0x00000018, 0x00000027).rw(this, FUNC(vrc5074_device::sdram_addr_r), FUNC(vrc5074_device::sdram_addr_w));
+}
 
 // cpu i/f map
-ADDRESS_MAP_START(vrc5074_device::cpu_map)
-	AM_RANGE(0x00000000, 0x000001ff) AM_READWRITE(cpu_reg_r, cpu_reg_w)
-ADDRESS_MAP_END
+void vrc5074_device::cpu_map(address_map &map)
+{
+	map(0x00000000, 0x000001ff).rw(this, FUNC(vrc5074_device::cpu_reg_r), FUNC(vrc5074_device::cpu_reg_w));
+}
 
-ADDRESS_MAP_START(vrc5074_device::serial_map)
-	AM_RANGE(0x00000000, 0x0000003f) AM_READWRITE(serial_r, serial_w)
-ADDRESS_MAP_END
+void vrc5074_device::serial_map(address_map &map)
+{
+	map(0x00000000, 0x0000003f).rw(this, FUNC(vrc5074_device::serial_r), FUNC(vrc5074_device::serial_w));
+}
 
 // Target Window 1 map
-ADDRESS_MAP_START(vrc5074_device::target1_map)
-	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(target1_r, target1_w)
-ADDRESS_MAP_END
+void vrc5074_device::target1_map(address_map &map)
+{
+	map(0x00000000, 0xFFFFFFFF).rw(this, FUNC(vrc5074_device::target1_r), FUNC(vrc5074_device::target1_w));
+}
 
 MACHINE_CONFIG_START(vrc5074_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("uart", NS16550, SYSTEM_CLOCK / 12)

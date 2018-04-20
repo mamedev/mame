@@ -34,9 +34,10 @@ WRITE8_MEMBER(m68307_cpu_device::m68307_internal_serial_w)
 
 
 
-ADDRESS_MAP_START(m68307_cpu_device::m68307_internal_map)
-	AM_RANGE(0x000000f0, 0x000000ff) AM_READWRITE(m68307_internal_base_r, m68307_internal_base_w)
-ADDRESS_MAP_END
+void m68307_cpu_device::m68307_internal_map(address_map &map)
+{
+	map(0x000000f0, 0x000000ff).rw(this, FUNC(m68307_cpu_device::m68307_internal_base_r), FUNC(m68307_cpu_device::m68307_internal_base_w));
+}
 
 
 MACHINE_CONFIG_START(m68307_cpu_device::device_add_mconfig)
