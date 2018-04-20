@@ -72,31 +72,35 @@ DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "Mitsubishi M37720S1")
 
 // M37702M2: 512 bytes internal RAM, 16K internal mask ROM
 // (M37702E2: same with EPROM instead of mask ROM)
-ADDRESS_MAP_START(m37702m2_device::map)
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION(M37710_INTERNAL_ROM_REGION, 0)
-ADDRESS_MAP_END
+void m37702m2_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(this, FUNC(m37702m2_device::m37710_internal_r), FUNC(m37702m2_device::m37710_internal_w));
+	map(0x000080, 0x00027f).ram();
+	map(0x00c000, 0x00ffff).rom().region(M37710_INTERNAL_ROM_REGION, 0);
+}
 
 
 // M37702S1: 512 bytes internal RAM, no internal ROM
-ADDRESS_MAP_START(m37702s1_device::map)
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-ADDRESS_MAP_END
+void m37702s1_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(this, FUNC(m37702s1_device::m37710_internal_r), FUNC(m37702s1_device::m37710_internal_w));
+	map(0x000080, 0x00027f).ram();
+}
 
 
 // M37710S4: 2048 bytes internal RAM, no internal ROM
-ADDRESS_MAP_START(m37710s4_device::map)
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00087f) AM_RAM
-ADDRESS_MAP_END
+void m37710s4_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(this, FUNC(m37710s4_device::m37710_internal_r), FUNC(m37710s4_device::m37710_internal_w));
+	map(0x000080, 0x00087f).ram();
+}
 
 // M37720S1: 512 bytes internal RAM, no internal ROM, built-in DMA
-ADDRESS_MAP_START(m37720s1_device::map)
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE8(m37710_internal_r, m37710_internal_w, 0xffff)
-	AM_RANGE(0x000080, 0x00027f) AM_RAM
-ADDRESS_MAP_END
+void m37720s1_device::map(address_map &map)
+{
+	map(0x000000, 0x00007f).rw(this, FUNC(m37720s1_device::m37710_internal_r), FUNC(m37720s1_device::m37710_internal_w));
+	map(0x000080, 0x00027f).ram();
+}
 
 // many other combinations of RAM and ROM size exist
 

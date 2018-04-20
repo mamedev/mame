@@ -242,23 +242,27 @@ DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "Dallas DS5002FP")
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(mcs51_cpu_device::program_12bit)
-	AM_RANGE(0x00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void mcs51_cpu_device::program_12bit(address_map &map)
+{
+	map(0x00, 0x0fff).rom();
+}
 
-ADDRESS_MAP_START(mcs51_cpu_device::program_13bit)
-	AM_RANGE(0x00, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void mcs51_cpu_device::program_13bit(address_map &map)
+{
+	map(0x00, 0x1fff).rom();
+}
 
-ADDRESS_MAP_START(mcs51_cpu_device::data_7bit)
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("scratchpad")
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
-ADDRESS_MAP_END
+void mcs51_cpu_device::data_7bit(address_map &map)
+{
+	map(0x0000, 0x007f).ram().share("scratchpad");
+	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
+}
 
-ADDRESS_MAP_START(mcs51_cpu_device::data_8bit)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("scratchpad")
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
-ADDRESS_MAP_END
+void mcs51_cpu_device::data_8bit(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("scratchpad");
+	map(0x0100, 0x01ff).ram().share("sfr_ram"); /* SFR */
+}
 
 
 

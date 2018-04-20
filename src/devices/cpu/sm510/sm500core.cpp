@@ -21,16 +21,18 @@ DEFINE_DEVICE_TYPE(SM500, sm500_device, "sm500", "Sharp SM500") // 1.2K ROM, 4x1
 
 
 // internal memory maps
-ADDRESS_MAP_START(sm500_device::program_1_2k)
-	AM_RANGE(0x000, 0x4bf) AM_ROM
-ADDRESS_MAP_END
+void sm500_device::program_1_2k(address_map &map)
+{
+	map(0x000, 0x4bf).rom();
+}
 
-ADDRESS_MAP_START(sm500_device::data_4x10x4)
-	AM_RANGE(0x00, 0x09) AM_RAM
-	AM_RANGE(0x10, 0x19) AM_RAM
-	AM_RANGE(0x20, 0x29) AM_RAM
-	AM_RANGE(0x30, 0x39) AM_RAM
-ADDRESS_MAP_END
+void sm500_device::data_4x10x4(address_map &map)
+{
+	map(0x00, 0x09).ram();
+	map(0x10, 0x19).ram();
+	map(0x20, 0x29).ram();
+	map(0x30, 0x39).ram();
+}
 
 
 // device definitions
