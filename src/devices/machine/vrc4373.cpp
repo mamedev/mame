@@ -161,10 +161,9 @@ void vrc4373_device::device_start()
 	save_item(NAME(m_pci_io_laddr));
 	save_item(NAME(m_target1_laddr));
 	save_item(NAME(m_target2_laddr));
-	machine().save().register_postload(save_prepost_delegate(FUNC(vrc4373_device::postload), this));
 }
 
-void vrc4373_device::postload()
+void vrc4373_device::device_post_load()
 {
 	map_cpu_space();
 	//remap_cb();

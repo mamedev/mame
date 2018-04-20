@@ -1018,39 +1018,44 @@ void a1000_state::a1000_mem(address_map &map)
 }
 
 // Gary/Super Gary/Gayle with 512KB chip RAM
-ADDRESS_MAP_START(amiga_state::overlay_512kb_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void amiga_state::overlay_512kb_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x07ffff).mirror(0x180000).ram().share("chip_ram");
+	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
+}
 
 // Gary/Super Gary/Gayle with 1MB chip RAM
-ADDRESS_MAP_START(amiga_state::overlay_1mb_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void amiga_state::overlay_1mb_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x0fffff).mirror(0x100000).ram().share("chip_ram");
+	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
+}
 
 // Gary/Super Gary/Gayle with 1MB chip RAM (32 bit system)
-ADDRESS_MAP_START(amiga_state::overlay_1mb_map32)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x0fffff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void amiga_state::overlay_1mb_map32(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x0fffff).mirror(0x100000).ram().share("chip_ram");
+	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
+}
 
 // Gary/Super Gary/Gayle with 2MB chip RAM (32 bit system)
-ADDRESS_MAP_START(amiga_state::overlay_2mb_map16)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void amiga_state::overlay_2mb_map16(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).ram().share("chip_ram");
+	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
+}
 
 // Gary/Super Gary/Gayle with 2MB chip RAM (32 bit system)
-ADDRESS_MAP_START(amiga_state::overlay_2mb_map32)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void amiga_state::overlay_2mb_map32(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).ram().share("chip_ram");
+	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
+}
 
 // 512KB chip RAM, 512KB slow RAM, RTC
 void a2000_state::a2000_mem(address_map &map)

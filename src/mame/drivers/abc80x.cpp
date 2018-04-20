@@ -514,47 +514,50 @@ void abc800c_state::abc800c_mem(address_map &map)
 //  ADDRESS_MAP( abc800c_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc800_state::abc800c_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c3_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c4_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(pling_r)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r) AM_WRITE(hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio2_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-ADDRESS_MAP_END
+void abc800_state::abc800c_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::inp_r), FUNC(abcbus_slot_device::out_w));
+	map(0x01, 0x01).mirror(0x18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::stat_r), FUNC(abcbus_slot_device::cs_w));
+	map(0x02, 0x02).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c1_w));
+	map(0x03, 0x03).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c2_w));
+	map(0x04, 0x04).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c3_w));
+	map(0x05, 0x05).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c4_w));
+	map(0x05, 0x05).mirror(0x18).r(this, FUNC(abc800_state::pling_r));
+	map(0x06, 0x06).mirror(0x18).w(this, FUNC(abc800_state::hrs_w));
+	map(0x07, 0x07).mirror(0x18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r)).w(this, FUNC(abc800_state::hrc_w));
+	map(0x20, 0x23).mirror(0x0c).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x40, 0x43).mirror(0x1c).rw(m_sio, FUNC(z80sio2_device::ba_cd_r), FUNC(z80sio2_device::ba_cd_w));
+	map(0x60, 0x63).mirror(0x1c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc800m_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc800_state::abc800m_mem)
+void abc800_state::abc800m_mem(address_map &map)
+{
 	map.unmap_value_high();
 	map(0x0000, 0x3fff).ram().share("video_ram");
 	map(0x4000, 0x77ff).rom();
 	map(0x7800, 0x7fff).ram().share("char_ram");
 	map(0x8000, 0xffff).ram();
-ADDRESS_MAP_END
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc800m_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc800_state::abc800m_io)
-	AM_IMPORT_FROM( abc800c_io )
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
-ADDRESS_MAP_END
+void abc800_state::abc800m_io(address_map &map)
+{
+	abc800c_io(map);
+	map(0x31, 0x31).mirror(0x06).r(MC6845_TAG, FUNC(mc6845_device::register_r));
+	map(0x38, 0x38).mirror(0x06).w(MC6845_TAG, FUNC(mc6845_device::address_w));
+	map(0x39, 0x39).mirror(0x06).w(MC6845_TAG, FUNC(mc6845_device::register_w));
+}
 
 
 //-------------------------------------------------

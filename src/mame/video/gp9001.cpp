@@ -165,13 +165,14 @@ WRITE16_MEMBER(gp9001vdp_device::tmap_w)
 }
 
 
-ADDRESS_MAP_START(gp9001vdp_device::map)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(tmap_w<0>) AM_SHARE("vram_0")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tmap_w<1>) AM_SHARE("vram_1")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(tmap_w<2>) AM_SHARE("vram_2")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") AM_MIRROR(0x0800)
-//  AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
-ADDRESS_MAP_END
+void gp9001vdp_device::map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().w(this, FUNC(gp9001vdp_device::tmap_w<0>)).share("vram_0");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(gp9001vdp_device::tmap_w<1>)).share("vram_1");
+	map(0x2000, 0x2fff).ram().w(this, FUNC(gp9001vdp_device::tmap_w<2>)).share("vram_2");
+	map(0x3000, 0x37ff).ram().share("spriteram").mirror(0x0800);
+//  map(0x3800, 0x3fff).ram(); // sprite mirror?
+}
 
 
 const gfx_layout gp9001vdp_device::tilelayout =

@@ -1062,6 +1062,19 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				case 4: /* Gouraud shading */
 					m_vdp1.framebuffer_draw_lines[y][x] = stv_vdp1_apply_gouraud_shading( x, y, pix );
 					break;
+				case 7: /* Gouraud-shading + half-transparent */
+					// Lupin the 3rd Pyramid no Kenja enemy shadows
+					// Death Crimson lives indicators
+					// TODO: latter looks really bad.
+					if ( m_vdp1.framebuffer_draw_lines[y][x] & 0x8000 )
+					{
+						m_vdp1.framebuffer_draw_lines[y][x] = stv_vdp1_apply_gouraud_shading( x, y, alpha_blend_r16( m_vdp1.framebuffer_draw_lines[y][x], pix, 0x80 ) | 0x8000 );
+					}
+					else
+					{
+						m_vdp1.framebuffer_draw_lines[y][x] = stv_vdp1_apply_gouraud_shading( x, y, pix );
+					}
+					break;
 				default:
 					// TODO: mode 5: prohibited, mode 6: gouraud shading + half-luminance, mode 7: gouraud-shading + half-transparent
 					popmessage("VDP1 PMOD = %02x, contact MAMEdev",stv2_current_sprite.CMDPMOD & 0x7);

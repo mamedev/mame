@@ -187,9 +187,6 @@
     - Steel Worker, Space Combat
         Holding down the coin button causes the credits to rapidly increase.
 
-    - Solfight
-        On the stage with rolling balls, lots of random dashes appear.
-
 
 *****************************************************************************/
 
@@ -1617,7 +1614,19 @@ void _8080bw_state::schasercv_io_map(address_map &map)
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::schasercv_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x05, 0x05).w(this, FUNC(_8080bw_state::schasercv_sh_port_2_w));
+	//map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
+
+void _8080bw_state::crashrd_io_map(address_map &map)
+{
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::crashrd_port03_w));
+	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::crashrd_port05_w));
+	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+}
+
 
 
 static INPUT_PORTS_START( schasercv )
@@ -1692,6 +1701,12 @@ MACHINE_CONFIG_START(_8080bw_state::schasercv)
 
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(_8080bw_state::crashrd)
+	schaser(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(crashrd_io_map)
 MACHINE_CONFIG_END
 
 
@@ -5207,7 +5222,7 @@ GAME( 1979, schaserb,   schaser,  schaser,   schaser,   _8080bw_state,  0,      
 GAME( 1979, schaserc,   schaser,  schaser,   schaser,   _8080bw_state,  0,        ROT270, "Taito", "Space Chaser (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 GAME( 1979, schasercv,  schaser,  schasercv, schasercv, _8080bw_state,  0,        ROT270, "Taito", "Space Chaser (CV version - set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 GAME( 1979, schaserm,   schaser,  schaser,   schaserm,  _8080bw_state,  0,        ROT270, "bootleg (Model Racing)", "Space Chaser (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE ) // on original Taito PCB, hacked to be harder?
-GAME( 1979, crashrd,    schaser,  schaser,   schaserm,  _8080bw_state,  0,        ROT270, "bootleg (Centromatic)", "Crash Road (bootleg of Space Chaser)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // PCB marked 'Imbader'; "Taito Corporation" on title screen replaced with a Spanish phone number
+GAME( 1979, crashrd,    schaser,  crashrd,   schaserm,  _8080bw_state,  0,        ROT270, "bootleg (Centromatic)", "Crash Road (bootleg of Space Chaser)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND  | MACHINE_NO_COCKTAIL ) // PCB marked 'Imbader'; "Taito Corporation" on title screen replaced with a Spanish phone number
 
 GAME( 1979, sflush,     0,        sflush,    sflush,    _8080bw_state,  0,        ROT270, "Taito", "Straight Flush", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL)
 

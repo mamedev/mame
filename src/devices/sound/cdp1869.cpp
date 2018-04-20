@@ -73,14 +73,16 @@ ADDRESS_MAP_START(cdp1869_device::io_map)
 ADDRESS_MAP_END
 
 // character RAM map
-ADDRESS_MAP_START(cdp1869_device::char_map)
-	AM_RANGE(0x000, 0x3ff) AM_READWRITE(char_ram_r, char_ram_w)
-ADDRESS_MAP_END
+void cdp1869_device::char_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw(this, FUNC(cdp1869_device::char_ram_r), FUNC(cdp1869_device::char_ram_w));
+}
 
 // page RAM map
-ADDRESS_MAP_START(cdp1869_device::page_map)
-	AM_RANGE(0x000, 0x7ff) AM_READWRITE(page_ram_r, page_ram_w)
-ADDRESS_MAP_END
+void cdp1869_device::page_map(address_map &map)
+{
+	map(0x000, 0x7ff).rw(this, FUNC(cdp1869_device::page_ram_r), FUNC(cdp1869_device::page_ram_w));
+}
 
 // default address map
 ADDRESS_MAP_START(cdp1869_device::cdp1869)

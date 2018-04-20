@@ -6,10 +6,11 @@
 
 DEFINE_DEVICE_TYPE(NAOMI_M1_BOARD, naomi_m1_board, "naomi_m1_board", "Sega NAOMI M1 Board")
 
-ADDRESS_MAP_START(naomi_m1_board::submap)
-	AM_IMPORT_FROM(naomi_board::submap)
-	AM_RANGE(0x0a, 0x0b) AM_READ(actel_id_r)
-ADDRESS_MAP_END
+void naomi_m1_board::submap(address_map &map)
+{
+	naomi_board::submap(map);
+	map(0x0a, 0x0b).r(this, FUNC(naomi_m1_board::actel_id_r));
+}
 
 naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: naomi_board(mconfig, NAOMI_M1_BOARD, tag, owner, clock)

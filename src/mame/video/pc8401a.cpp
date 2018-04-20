@@ -49,10 +49,11 @@ void pc8401a_state::pc8401a_lcdc(address_map &map)
 	map(0x0000, 0x1fff).ram();
 }
 
-ADDRESS_MAP_START(pc8401a_state::pc8500_lcdc)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void pc8401a_state::pc8500_lcdc(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).ram();
+}
 
 
 /* Machine Drivers */

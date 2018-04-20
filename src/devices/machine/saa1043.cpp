@@ -27,7 +27,7 @@ saa1043_device::saa1043_device(const machine_config &mconfig, const char *tag, d
 
 void saa1043_device::device_start()
 {
-	m_h = attotime::from_ticks(320, clock());
+	m_h = attotime::from_ticks(320, clock() * 2);
 	m_line_count = s_line_counts[m_type];
 
 	// resolve callbacks
@@ -57,6 +57,7 @@ void saa1043_device::device_reset()
 	{
 		m_outputs[i](CLEAR_LINE);
 	}
+	m_outputs[V2](ASSERT_LINE);
 }
 
 void saa1043_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -64,7 +65,7 @@ void saa1043_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	switch (id)
 	{
 		case V2:
-			m_outputs[id](1 - param);
+			m_outputs[V2](1 - param);
 			if (param)
 				m_timers[V2]->adjust(m_h * (m_line_count - 9), 0);
 			else

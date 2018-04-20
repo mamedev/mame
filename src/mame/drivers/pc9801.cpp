@@ -1493,6 +1493,7 @@ void pc9801_state::pc9821_io(address_map &map)
 //  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
+	map(0x2ed0, 0x2edf).r(read8_delegate([](address_space &s, offs_t o, u8 mm) { return 0xff; }, "pc9821_unkaudio")).umask32(0xffffffff); // unknown sound related
 	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
 	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
 	map(0x841c, 0x841f).rw(this, FUNC(pc9801_state::sdip_0_r), FUNC(pc9801_state::sdip_0_w));
@@ -2275,12 +2276,21 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_sasi)
 	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pc9801_state, sasi_data_w))
 MACHINE_CONFIG_END
 
+void pc9801_state::cdrom_headphones(device_t *device)
+{
+	device = device->subdevice("cdda");
+	MCFG_SOUND_ROUTE(0, "^^^^lheadphone", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^rheadphone", 1.0)
+}
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
+	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide1_irq_w))
 	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide2_irq_w))
+	MCFG_DEVICE_MODIFY("ide2:0")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("pc9801_cd", cdrom_headphones)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pc98_cd")
 MACHINE_CONFIG_END

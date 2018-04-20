@@ -184,6 +184,7 @@ public:
 	void vfive(machine_config &config);
 	void kbash2(machine_config &config);
 	void batrider_68k_mem(address_map &map);
+	void batrider_dma_mem(address_map &map);
 	void batrider_sound_z80_mem(address_map &map);
 	void batrider_sound_z80_port(address_map &map);
 	void batsugun_68k_mem(address_map &map);

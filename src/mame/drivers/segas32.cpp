@@ -1129,30 +1129,33 @@ void segas32_state::system32_sound_portmap(address_map &map)
 }
 
 
-ADDRESS_MAP_START(segas32_state::multi32_sound_map)
-	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0)
-	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("sega", multipcm_device, read, write)
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("z80_shared_ram")
-ADDRESS_MAP_END
+void segas32_state::multi32_sound_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom().region("soundcpu", 0);
+	map(0xa000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdfff).rw("sega", FUNC(multipcm_device::read), FUNC(multipcm_device::write));
+	map(0xe000, 0xffff).ram().share("z80_shared_ram");
+}
 
-ADDRESS_MAP_START(segas32_state::multi32_sound_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(multipcm_bank_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x04) AM_WRITE(sound_int_control_hi_w)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE(sound_dummy_r, sound_dummy_w)
-ADDRESS_MAP_END
+void segas32_state::multi32_sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x80, 0x83).mirror(0x0c).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
+	map(0xa0, 0xaf).w(this, FUNC(segas32_state::sound_bank_lo_w));
+	map(0xb0, 0xbf).w(this, FUNC(segas32_state::multipcm_bank_w));
+	map(0xc0, 0xcf).w(this, FUNC(segas32_state::sound_int_control_lo_w));
+	map(0xd0, 0xd3).mirror(0x04).w(this, FUNC(segas32_state::sound_int_control_hi_w));
+	map(0xf1, 0xf1).rw(this, FUNC(segas32_state::sound_dummy_r), FUNC(segas32_state::sound_dummy_w));
+}
 
 
-ADDRESS_MAP_START(segas32_state::multipcm_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("multipcmbanklo")
-	AM_RANGE(0x180000, 0x1fffff) AM_ROMBANK("multipcmbankhi")
-ADDRESS_MAP_END
+void segas32_state::multipcm_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x17ffff).bankr("multipcmbanklo");
+	map(0x180000, 0x1fffff).bankr("multipcmbankhi");
+}
 
 /*************************************
  *
@@ -1160,11 +1163,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(segas32_state::v25_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("mcu", 0)
-	AM_RANGE(0x10000, 0x1ffff) AM_DEVREADWRITE("dpram", mb8421_device, left_r, left_w)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("mcu", 0)
-ADDRESS_MAP_END
+void segas32_state::v25_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("mcu", 0);
+	map(0x10000, 0x1ffff).rw("dpram", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w));
+	map(0xf0000, 0xfffff).rom().region("mcu", 0);
+}
 
 
 /*************************************
@@ -1173,13 +1177,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-ADDRESS_MAP_START(segas32_state::upd7725_prg_map)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspprg", 0)
-ADDRESS_MAP_END
+void segas32_state::upd7725_prg_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().region("dspprg", 0);
+}
 
-ADDRESS_MAP_START(segas32_state::upd7725_data_map)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION("dspdata", 0)
-ADDRESS_MAP_END
+void segas32_state::upd7725_data_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rom().region("dspdata", 0);
+}
 
 
 /*************************************
@@ -2254,11 +2260,12 @@ segas32_regular_state::segas32_regular_state(const machine_config &mconfig, cons
 
 
 
-ADDRESS_MAP_START(segas32_state::system32_analog_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(system32_map)
-	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
-ADDRESS_MAP_END
+void segas32_state::system32_analog_map(address_map &map)
+{
+	map.unmap_value_high();
+	system32_map(map);
+	map(0xc00050, 0xc00057).mirror(0x0fff80).rw("adc", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::address_w)).umask16(0x00ff);
+}
 
 MACHINE_CONFIG_START(segas32_analog_state::device_add_mconfig)
 	segas32_state::device_add_mconfig(config);
@@ -2331,11 +2338,12 @@ segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, 
 
 
 
-ADDRESS_MAP_START(segas32_state::system32_4player_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(system32_map)
-	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void segas32_state::system32_4player_map(address_map &map)
+{
+	map.unmap_value_high();
+	system32_map(map);
+	map(0xc00060, 0xc00067).mirror(0x0fff80).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+}
 
 MACHINE_CONFIG_START(segas32_4player_state::device_add_mconfig)
 	segas32_state::device_add_mconfig(config);
@@ -2365,11 +2373,12 @@ segas32_4player_state::segas32_4player_state(const machine_config &mconfig, devi
 
 
 
-ADDRESS_MAP_START(segas32_state::ga2_main_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(system32_4player_map)
-	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0x00ff)
-ADDRESS_MAP_END
+void segas32_state::ga2_main_map(address_map &map)
+{
+	map.unmap_value_high();
+	system32_4player_map(map);
+	map(0xa00000, 0xa00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask16(0x00ff);
+}
 
 MACHINE_CONFIG_START(segas32_v25_state::device_add_mconfig)
 	segas32_4player_state::device_add_mconfig(config);
@@ -2442,16 +2451,17 @@ WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
 	printf("%02x DRQ\n",state);
 }
 
-ADDRESS_MAP_START(segas32_state::system32_cd_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_IMPORT_FROM(system32_map)
+void segas32_state::system32_cd_map(address_map &map)
+{
+	map.unmap_value_high();
+	system32_map(map);
 	#if S32_KOKOROJI_TEST_CD
-	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
+	map(0xc00040, 0xc0005f).mirror(0x0fff80).rw("mb89352", FUNC(mb89352_device::mb89352_r), FUNC(mb89352_device::mb89352_w)).umask16(0x00ff);
 	#else
-	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_NOP
+	map(0xc00040, 0xc0005f).mirror(0x0fff80).noprw();
 	#endif
-	AM_RANGE(0xc00060, 0xc0006f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("cxdio", cxd1095_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+	map(0xc00060, 0xc0006f).mirror(0x0fff80).rw("cxdio", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
+}
 
 void segas32_cd_state::cdrom_config(device_t *device)
 {
@@ -2623,12 +2633,13 @@ sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconf
 }
 
 
-ADDRESS_MAP_START(segas32_state::multi32_6player_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_IMPORT_FROM(multi32_map)
-	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff00ff)
-ADDRESS_MAP_END
+void segas32_state::multi32_6player_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xffffff);
+	multi32_map(map);
+	map(0xc00060, 0xc00067).mirror(0x07ff80).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
+}
 
 MACHINE_CONFIG_START(sega_multi32_6player_state::device_add_mconfig)
 	sega_multi32_state::device_add_mconfig(config);
