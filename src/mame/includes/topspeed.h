@@ -32,7 +32,7 @@ public:
 		, m_filter3(*this, "filter3")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_steer(*this, "STEER")
-		, m_msm_rom(*this, "adpcm")
+		, m_msm_rom(*this, "adpcm_%u", 0U)
 	{ }
 
 	required_shared_ptr<uint16_t> m_spritemap;
@@ -58,7 +58,7 @@ public:
 	int32_t   m_ioc220_port;
 
 	// ADPCM
-	required_region_ptr<uint8_t> m_msm_rom;
+	required_region_ptr_array<uint8_t, 2> m_msm_rom;
 	uint16_t  m_msm_pos[2];
 	uint8_t   m_msm_reset[2];
 	uint8_t   m_msm_nibble[2];
