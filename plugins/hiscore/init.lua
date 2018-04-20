@@ -63,8 +63,7 @@ function hiscore.startplugin()
 		local cputag, space, offs, len, chk_st, chk_ed, fill = string.match(line, '^@([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),?(%x?%x?)');
 		cpu = manager:machine().devices[cputag];
 		if not cpu then
-		  emu.print_verbose("hiscore: " .. cputag .. " device not found")
-		  return nil
+		  error(cputag .. " device not found")
 		end
 		local rgnname, rgntype = space:match("([^/]*)/?([^/]*)")
 		if rgntype == "share" then
@@ -73,8 +72,7 @@ function hiscore.startplugin()
 			mem = cpu.spaces[space]
 		end
 		if not mem then
-		  emu.print_verbose("hiscore: " .. space .. " space not found")
-		  return nil;
+		  error(space .. " space not found")
 		end
 		_table[ #_table + 1 ] = {
 		  mem = mem,
@@ -278,9 +276,9 @@ function hiscore.startplugin()
 		local dat = read_hiscore_dat()
 		if dat and dat ~= "" then
 			emu.print_verbose( "hiscore: found hiscore.dat entry for " .. emu.romname() );
-			positions = parse_table( dat );
-			if not positions then
-				emu.print_error("hiscore: hiscore.dat parse error");
+			res, positions = pcall(parse_table, dat);
+			if not res then
+				emu.print_error("hiscore: hiscore.dat parse error " .. positions);
 				return;
 			end
 			for i, row in pairs(positions) do

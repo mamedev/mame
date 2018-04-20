@@ -2596,7 +2596,7 @@ bigrun:
 
 ;(scud hammer) (by GeoMan)
 scudhamm:
-@:cpu1,program,fd1ea,3c,00,01
+@:maincpu,program,fd1ea,3c,00,01
 
 
 ;(cisco heat)
@@ -4606,7 +4606,7 @@ diverboy:
 djboy:
 djboya:
 djboyj:
-@:maincpu,program,b16a,2d,01,12
+@:mastercpu,program,b16a,2d,01,12
 
 
 ;@s:dkong.cpp
@@ -5515,12 +5515,11 @@ mx5000:
 
 ;@s:flower.cpp
 
-;***  flower / flower j not working - hiscore.dat parse error ???????     ***
 flower:
 flowerj:
-@:maincpu,program,d060,37,00,20
-@:maincpu,program,c00f,3,00,00
-@:maincpu,program,c010,1,30,30
+@:mastercpu,program,d060,37,00,20
+@:mastercpu,program,c00f,3,00,00
+@:mastercpu,program,c010,1,30,30
 
 
 ;@s:flstory.cpp
