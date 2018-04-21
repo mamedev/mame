@@ -77,7 +77,6 @@ void i6300esb_lpc_device::config_map(address_map &map)
 
 void i6300esb_lpc_device::internal_io_map(address_map &map)
 {
-	;
 	if(lpc_en & 0x2000) {
 		map(0x004e, 0x004e).rw(this, FUNC(i6300esb_lpc_device::siu_config_port_r), FUNC(i6300esb_lpc_device::siu_config_port_w));
 		map(0x004f, 0x004f).rw(this, FUNC(i6300esb_lpc_device::siu_data_port_r), FUNC(i6300esb_lpc_device::siu_data_port_w));
