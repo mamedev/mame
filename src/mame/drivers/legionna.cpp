@@ -270,8 +270,8 @@ void legionna_state::godzilla_map(address_map &map)
 	map(0x106800, 0x106fff).ram();
 	map(0x107000, 0x107fff).ram(); /*Ani-DSP ram*/
 	map(0x108000, 0x11ffff).ram();
-//  map(0xff0000, 0xffffff).ram(); // game reads here at Biollante stage in story mode (i.e. when Super X starts shooting). 
-							       // Development leftover/coding bug? Game doesn't seem to care at all anyway.
+//  map(0xff0000, 0xffffff).ram(); // game reads here at Biollante stage in story mode (i.e. when Super X starts shooting).
+								   // Development leftover/coding bug? Game doesn't seem to care at all anyway.
 }
 
 // additional z80 i/o port, present only in Godzilla (512KB OKI ROM vs 256KB)
@@ -290,7 +290,7 @@ void legionna_state::godzilla_sound_io_map(address_map &map)
 	map(0x00, 0x00).w(this, FUNC(legionna_state::godzilla_oki_bank_w));
 }
 
-// Denjin Makai: Looks like they specifically swapped address line A1 in this range? 
+// Denjin Makai: Looks like they specifically swapped address line A1 in this range?
 // Initially thought it was a palette DMA mode 4 but it doesn't apply for Godzilla, causing color bugs in the background tilemap.
 WRITE16_MEMBER(legionna_state::palette_swap_w)
 {

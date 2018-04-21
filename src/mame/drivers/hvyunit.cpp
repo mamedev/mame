@@ -111,7 +111,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mermaidlatch;
 	required_device<generic_latch_8_device> m_slavelatch;
-	
+
 	required_memory_bank m_masterbank;
 	required_memory_bank m_slavebank;
 	required_memory_bank m_soundbank;

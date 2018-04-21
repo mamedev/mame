@@ -59,7 +59,7 @@ void korgm1_state::korgm1_map(address_map &map)
 	map(0x00000, 0x0ffff).ram(); // 64 KB
 //  map(0x50000, 0x57fff).ram(); // memory card 32 KB
 	map(0xe0000, 0xfffff).rom().region("ipl", 0);
-}		
+}
 
 void korgm1_state::korgm1_io(address_map &map)
 {

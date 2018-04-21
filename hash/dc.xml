@@ -4169,14 +4169,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!--
 	<software name="cavstory">
 
-		<description>Cave Story (World)</description>
-		<year>2013</year>
-		<publisher>histat</publisher>
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="cave story (world)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Cave Story (World)</description>
+	    <year>2013</year>
+	    <publisher>histat</publisher>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="cave story (world)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -7870,16 +7870,16 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!-- This was released on the Internet as an unofficial conversion patch to be applied on the Windows version. -->
 	<!--
 	<software name="dividead">
-		<description>Divi-Dead (World)</description>
-		<year>2008</year>
-		<publisher>Tales Translations</publisher>
-		<info name="release" value="20081022" />
-		<info name="alt_title" value="ディヴァイデッド" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="divi-dead (world)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Divi-Dead (World)</description>
+	    <year>2008</year>
+	    <publisher>Tales Translations</publisher>
+	    <info name="release" value="20081022" />
+	    <info name="alt_title" value="ディヴァイデッド" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="divi-dead (world)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -9424,16 +9424,16 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="jcode" cloneof="drmpass2">
-		<description>J-Code Passport (Jpn)</description>
-		<year>????</year>
-		<publisher>J-Data</publisher>
-		<info name="serial" value="T-43601M"/>
-		<info name="alt_title" value="J・コード パスポート" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="j-code passport (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>J-Code Passport (Jpn)</description>
+	    <year>????</year>
+	    <publisher>J-Data</publisher>
+	    <info name="serial" value="T-43601M"/>
+	    <info name="alt_title" value="J・コード パスポート" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="j-code passport (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -13777,14 +13777,14 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="gauntlegd" cloneof="gauntleg">
-		<description>Gauntlet Legends - Demo CD (USA)</description>
-		<year>2000</year>
-		<publisher>Midway</publisher>
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="gauntlet legends - demo cd (usa)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Gauntlet Legends - Demo CD (USA)</description>
+	    <year>2000</year>
+	    <publisher>Midway</publisher>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="gauntlet legends - demo cd (usa)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -16225,41 +16225,41 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="idoljan">
-		<description>Idol Janshi wo Tsukucchaou (Jpn)</description>
-		<year>1999</year>
-		<publisher>Jaleco</publisher>
-		<info name="serial" value="T-5703M"/>
-		<info name="release" value="19990923" />
-		<info name="alt_title" value="アイドル雀士をつくっちゃおう♡" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="idol janshi wo tsukucchaou (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Idol Janshi wo Tsukucchaou (Jpn)</description>
+	    <year>1999</year>
+	    <publisher>Jaleco</publisher>
+	    <info name="serial" value="T-5703M"/>
+	    <info name="release" value="19990923" />
+	    <info name="alt_title" value="アイドル雀士をつくっちゃおう♡" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="idol janshi wo tsukucchaou (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!-- The Limited Edition (T-5702M) comes in a double-CD case and includes an audio CD. -->
 	<!--
 	<software name="idoljansg" cloneof="idoljan">
-		<description>Idol Janshi wo Tsukucchaou - Shokai Genteiban (Jpn)</description>
-		<year>1999</year>
-		<publisher>Jaleco</publisher>
-		<info name="serial" value="T-5702M"/>
-		<info name="release" value="19990923" />
-		<info name="alt_title" value="アイドル雀士をつくっちゃおう♡ 初回限定版" />
-		<part interface="cdrom" name="cdrom1">
-			<feature name="part_id" value="Idol Janshi wo Tsukucchaou"/>
-			<diskarea name="cdrom">
-				<disk name="idol janshi wo tsukucchaou - shokai genteiban (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
-		<part interface="cdrom" name="cdrom2">
-			<feature name="part_id" value="Suchie-Pai Radio Station Dream"/>
-			<diskarea name="cdrom">
-				<disk name="idol janshi wo tsukucchaou - shokai genteiban (jpn) (suchie-pai radio station dream)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Idol Janshi wo Tsukucchaou - Shokai Genteiban (Jpn)</description>
+	    <year>1999</year>
+	    <publisher>Jaleco</publisher>
+	    <info name="serial" value="T-5702M"/>
+	    <info name="release" value="19990923" />
+	    <info name="alt_title" value="アイドル雀士をつくっちゃおう♡ 初回限定版" />
+	    <part interface="cdrom" name="cdrom1">
+	        <feature name="part_id" value="Idol Janshi wo Tsukucchaou"/>
+	        <diskarea name="cdrom">
+	            <disk name="idol janshi wo tsukucchaou - shokai genteiban (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
+	    <part interface="cdrom" name="cdrom2">
+	        <feature name="part_id" value="Suchie-Pai Radio Station Dream"/>
+	        <diskarea name="cdrom">
+	            <disk name="idol janshi wo tsukucchaou - shokai genteiban (jpn) (suchie-pai radio station dream)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -16304,49 +16304,49 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="illbleedj" cloneof="illbleed">
-		<description>Illbleed (Jpn)</description>
-		<year>2001</year>
-		<publisher>Crazy Games</publisher>
-		<info name="serial" value="T-45601M"/>
-		<info name="release" value="20010329" />
-		<info name="alt_title" value="イルブリード" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="illbleed (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Illbleed (Jpn)</description>
+	    <year>2001</year>
+	    <publisher>Crazy Games</publisher>
+	    <info name="serial" value="T-45601M"/>
+	    <info name="release" value="20010329" />
+	    <info name="alt_title" value="イルブリード" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="illbleed (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="illbleedtw" cloneof="illbleed">
-		<description>Illbleed (Twn)</description>
-		<year>2002</year>
-		<publisher>Mr.Game</publisher>
-		<info name="serial" value="T-45601"/>
-		<info name="alt_title" value="勇闖鬼界" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="illbleed (twn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Illbleed (Twn)</description>
+	    <year>2002</year>
+	    <publisher>Mr.Game</publisher>
+	    <info name="serial" value="T-45601"/>
+	    <info name="alt_title" value="勇闖鬼界" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="illbleed (twn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!-- Bundled with the Mars 16th, 2001 issue of "Famitsu DC". -->
 	<!--
 	<software name="specialgd">
-		<description>Imakoso!! Dreamcast with SPECIAL GD!! (Jpn)</description>
-		<year>2001</year>
-		<publisher>Enterbrain</publisher>
-		<info name="serial" value="610-7993"/>
-		<info name="release" value="20010316" />
-		<info name="alt_title" value="いまこそ!! Dreamcast with SPECIAL GD!!" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="imakoso dreamcast with special gd (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Imakoso!! Dreamcast with SPECIAL GD!! (Jpn)</description>
+	    <year>2001</year>
+	    <publisher>Enterbrain</publisher>
+	    <info name="serial" value="610-7993"/>
+	    <info name="release" value="20010316" />
+	    <info name="alt_title" value="いまこそ!! Dreamcast with SPECIAL GD!!" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="imakoso dreamcast with special gd (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -16512,166 +16512,166 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="espionagetdm" cloneof="induspy">
-		<description>Espion-Age-Nts: Industrial Agents for Active Espionage - Tentouyou Demonstration Movie (Jpn)</description>
-		<year>1999</year>
-		<publisher>NEC Home Electronics</publisher>
-		<info name="serial" value="610-7185"/>
-		<info name="alt_title" value="エスピオネージェンツ 店頭用デモンストレーションムービー" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="espion-age-nts industrial agents for active espionage - tentouyou demonstration movie (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Espion-Age-Nts: Industrial Agents for Active Espionage - Tentouyou Demonstration Movie (Jpn)</description>
+	    <year>1999</year>
+	    <publisher>NEC Home Electronics</publisher>
+	    <info name="serial" value="610-7185"/>
+	    <info name="alt_title" value="エスピオネージェンツ 店頭用デモンストレーションムービー" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="espion-age-nts industrial agents for active espionage - tentouyou demonstration movie (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="inhabit">
-		<description>Inhabitants (World)</description>
-		<year>2005</year>
-		<publisher>GOAT Store Publishing</publisher>
-		<info name="release" value="20050119" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="inhabitants (world)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Inhabitants (World)</description>
+	    <year>2005</year>
+	    <publisher>GOAT Store Publishing</publisher>
+	    <info name="release" value="20050119" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="inhabitants (world)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="irlast">
-		<description>Inoue Ryouko: Last Scene (Jpn)</description>
-		<year>2001</year>
-		<publisher>Datam Polystar</publisher>
-		<info name="serial" value="T-19506M"/>
-		<info name="release" value="20011108" />
-		<info name="alt_title" value="井上涼子 〜ラストシーン〜" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="inoue ryouko last scene (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Inoue Ryouko: Last Scene (Jpn)</description>
+	    <year>2001</year>
+	    <publisher>Datam Polystar</publisher>
+	    <info name="serial" value="T-19506M"/>
+	    <info name="release" value="20011108" />
+	    <info name="alt_title" value="井上涼子 〜ラストシーン〜" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="inoue ryouko last scene (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
 	<software name="irroommt">
-		<description>Inoue Ryouko: Roommate (Jpn)</description>
-		<year>2001</year>
-		<publisher>Datam Polystar</publisher>
-		<info name="serial" value="T-19505M"/>
-		<info name="release" value="20010705" />
-		<info name="alt_title" value="井上涼子 〜ルームメイト〜" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="inoue ryouko roommate (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Inoue Ryouko: Roommate (Jpn)</description>
+	    <year>2001</year>
+	    <publisher>Datam Polystar</publisher>
+	    <info name="serial" value="T-19505M"/>
+	    <info name="release" value="20010705" />
+	    <info name="alt_title" value="井上涼子 〜ルームメイト〜" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="inoue ryouko roommate (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!-- Also released as a Dorikore version, which is identical to retail. -->
 	<!--
 	<software name="intrlude">
-		<description>Interlude (Jpn)</description>
-		<year>2003</year>
-		<publisher>NEC Interchannel</publisher>
-		<info name="serial" value="T-20127M"/>
-		<info name="release" value="20030424" />
-		<info name="alt_title" value="インタールード" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="interlude (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Interlude (Jpn)</description>
+	    <year>2003</year>
+	    <publisher>NEC Interchannel</publisher>
+	    <info name="serial" value="T-20127M"/>
+	    <info name="release" value="20030424" />
+	    <info name="alt_title" value="インタールード" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="interlude (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!-- The Limited Edition (T-20117M) comes in a double-CD case and includes an audio CD. -->
 	<!--
 	<software name="intrludesg" cloneof="intrlude">
-		<description>Interlude - Shokai Genteiban (Jpn)</description>
-		<year>2003</year>
-		<publisher>NEC Interchannel</publisher>
-		<info name="serial" value="T-20117M"/>
-		<info name="release" value="20030313" />
-		<info name="alt_title" value="インタールード 初回限定版" />
-		<part interface="cdrom" name="cdrom1">
-			<feature name="part_id" value="Interlude"/>
-			<diskarea name="cdrom">
-				<disk name="interlude - shokai genteiban (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
-		<part interface="cdrom" name="cdrom2">
-			<feature name="part_id" value="Sound Track"/>
-			<diskarea name="cdrom">
-				<disk name="interlude - shokai genteiban (jpn) (sound track)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Interlude - Shokai Genteiban (Jpn)</description>
+	    <year>2003</year>
+	    <publisher>NEC Interchannel</publisher>
+	    <info name="serial" value="T-20117M"/>
+	    <info name="release" value="20030313" />
+	    <info name="alt_title" value="インタールード 初回限定版" />
+	    <part interface="cdrom" name="cdrom1">
+	        <feature name="part_id" value="Interlude"/>
+	        <diskarea name="cdrom">
+	            <disk name="interlude - shokai genteiban (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
+	    <part interface="cdrom" name="cdrom2">
+	        <feature name="part_id" value="Sound Track"/>
+	        <diskarea name="cdrom">
+	            <disk name="interlude - shokai genteiban (jpn) (sound track)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="irides">
-		<description>Irides: Master of Blocks (World)</description>
-		<year>2009</year>
-		<publisher>GOAT Store Publishing</publisher>
-		<info name="release" value="20091212" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="irides master of blocks (world)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Irides: Master of Blocks (World)</description>
+	    <year>2009</year>
+	    <publisher>GOAT Store Publishing</publisher>
+	    <info name="release" value="20091212" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="irides master of blocks (world)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!-- The Limited Edition includes an expanded instruction manual, a poster, and collector's coin. -->
 	<!--
 	<software name="iridesle" cloneof="irides">
-		<description>Irides: Master of Blocks - Limited Edition (World)</description>
-		<year>2009</year>
-		<publisher>GOAT Store Publishing</publisher>
-		<info name="release" value="20091212" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="irides master of blocks - limited edition (world)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Irides: Master of Blocks - Limited Edition (World)</description>
+	    <year>2009</year>
+	    <publisher>GOAT Store Publishing</publisher>
+	    <info name="release" value="20091212" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="irides master of blocks - limited edition (world)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="iris">
-		<description>Iris (Jpn)</description>
-		<year>2003</year>
-		<publisher>KID</publisher>
-		<info name="serial" value="T-19722M"/>
-		<info name="release" value="20030807" />
-		<info name="alt_title" value="イリス" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="iris (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Iris (Jpn)</description>
+	    <year>2003</year>
+	    <publisher>KID</publisher>
+	    <info name="serial" value="T-19722M"/>
+	    <info name="release" value="20030807" />
+	    <info name="alt_title" value="イリス" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="iris (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!-- The Limited Edition (T-19721M) comes in a larger cardboard case and includes a hand puppet. -->
 	<!--
 	<software name="irissg" cloneof="iris">
-		<description>Iris - Shokai Genteiban (Jpn)</description>
-		<year>2003</year>
-		<publisher>KID</publisher>
-		<info name="serial" value="T-19721M"/>
-		<info name="release" value="20030807" />
-		<info name="alt_title" value="イリス 初回限定版" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="iris - shokai genteiban (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Iris - Shokai Genteiban (Jpn)</description>
+	    <year>2003</year>
+	    <publisher>KID</publisher>
+	    <info name="serial" value="T-19721M"/>
+	    <info name="release" value="20030807" />
+	    <info name="alt_title" value="イリス 初回限定版" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="iris - shokai genteiban (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -16756,33 +16756,33 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="jltsuk">
-		<description>J.League Pro Soccer Club o Tsukurou! (Jpn)</description>
-		<year>1999</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="HDR-0028"/>
-		<info name="release" value="19990930" />
-		<info name="alt_title" value="J.LEAGUE プロサッカークラブをつくろう!" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="j.league pro soccer club o tsukurou (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>J.League Pro Soccer Club o Tsukurou! (Jpn)</description>
+	    <year>1999</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="HDR-0028"/>
+	    <info name="release" value="19990930" />
+	    <info name="alt_title" value="J.LEAGUE プロサッカークラブをつくろう!" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="j.league pro soccer club o tsukurou (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="jahmong">
-		<description>Jahmong (Jpn)</description>
-		<year>2000</year>
-		<publisher>Visit</publisher>
-		<info name="serial" value="T-43401M"/>
-		<info name="release" value="20000831" />
-		<info name="alt_title" value="ジャーマン" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jahmong (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Jahmong (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>Visit</publisher>
+	    <info name="serial" value="T-43401M"/>
+	    <info name="release" value="20000831" />
+	    <info name="alt_title" value="ジャーマン" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jahmong (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -16812,7 +16812,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	The English (T-8114D-05), German (T-8114D-18), French/German (T-8114D-56) and Spanish/Italian (T-8114D-60)
 	releases all share the same disc (T-8114D-50).
 
- 	A promo version exists (950-0094-50 952-0088-50), it is most likely the same as retail.
+	A promo version exists (950-0094-50 952-0088-50), it is most likely the same as retail.
 	-->
 	<software name="jmg2ke" cloneof="jmg2k">
 		<!--
@@ -16843,31 +16843,31 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 	<!--
 	<software name="jmg2kp" cloneof="jmg2k">
-		<description>Jeremy McGrath Supercross 2000 (World, Prototype 20000515)</description>
-		<year>2000</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<info name="release" value="20000515" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jeremy mcgrath supercross 2000 (world, prototype 20000515)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Jeremy McGrath Supercross 2000 (World, Prototype 20000515)</description>
+	    <year>2000</year>
+	    <publisher>Acclaim Entertainment</publisher>
+	    <info name="release" value="20000515" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jeremy mcgrath supercross 2000 (world, prototype 20000515)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="jcd2">
-		<description>Jet Coaster Dream 2 (Jpn)</description>
-		<year>2000</year>
-		<publisher>Bimboosoft</publisher>
-		<info name="serial" value="T-41201M"/>
-		<info name="release" value="20001102" />
-		<info name="alt_title" value="ジェットコースタードリーム2" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jet coaster dream 2 (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Jet Coaster Dream 2 (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>Bimboosoft</publisher>
+	    <info name="serial" value="T-41201M"/>
+	    <info name="release" value="20001102" />
+	    <info name="alt_title" value="ジェットコースタードリーム2" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jet coaster dream 2 (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -16913,17 +16913,17 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="jetsetrj" cloneof="jetgrind">
-		<description>Jet Set Radio (Jpn)</description>
-		<year>2000</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="HDR-0078"/>
-		<info name="release" value="20000629" />
-		<info name="alt_title" value="ジェット セット ラジオ" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jet set radio (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Jet Set Radio (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="HDR-0078"/>
+	    <info name="release" value="20000629" />
+	    <info name="alt_title" value="ジェット セット ラジオ" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jet set radio (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -16951,46 +16951,46 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	<!-- The Sega Direct version (HDR-0128) comes in a larger cardboard box and includes a t-shirt. -->
 	<!--
 	<software name="dljetsetrsd" cloneof="jetgrind">
-		<description>Jet Set Radio (Jpn, Sega Direct)</description>
-		<year>2001</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="HDR-0128"/>
-		<info name="release" value="20010101" />
-		<info name="alt_title" value="デ・ラ・ジェット セット ラジオ" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jet set radio (jpn, sega direct)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Jet Set Radio (Jpn, Sega Direct)</description>
+	    <year>2001</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="HDR-0128"/>
+	    <info name="release" value="20010101" />
+	    <info name="alt_title" value="デ・ラ・ジェット セット ラジオ" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jet set radio (jpn, sega direct)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="jetgrindb" cloneof="jetgrind">
-		<description>Jet Grind Radio (Bra)</description>
-		<year>200?</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="197093"/>
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jet grind radio (bra)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Jet Grind Radio (Bra)</description>
+	    <year>200?</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="197093"/>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jet grind radio (bra)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="jetsetrt" cloneof="jetgrind">
-		<description>Jet Set Radio - Taikenban (Jpn)</description>
-		<year>2000</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="610-7888"/>
-		<info name="alt_title" value="ジェット セット ラジオ 体験版" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jet set radio - taikenban (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Jet Set Radio - Taikenban (Jpn)</description>
+	    <year>2000</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="610-7888"/>
+	    <info name="alt_title" value="ジェット セット ラジオ 体験版" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jet set radio - taikenban (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -17191,72 +17191,72 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 
 	<!--
 	<software name="jojobatt" cloneof="jojoba">
-		<description>Jojo no Kimyou na Bouken: Mirai e no Isan - Tentou-you Taikenban (Jpn)</description>
-		<year>1999</year>
-		<publisher>Capcom</publisher>
-		<info name="serial" value="610-7357"/>
-		<info name="alt_title" value="ジョジョの奇妙な冒険 未来への遺産 店頭用体験版" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jojo no kimyou na bouken mirai e no isan - tentou-you taikenban (jpn)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Jojo no Kimyou na Bouken: Mirai e no Isan - Tentou-you Taikenban (Jpn)</description>
+	    <year>1999</year>
+	    <publisher>Capcom</publisher>
+	    <info name="serial" value="610-7357"/>
+	    <info name="alt_title" value="ジョジョの奇妙な冒険 未来への遺産 店頭用体験版" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jojo no kimyou na bouken mirai e no isan - tentou-you taikenban (jpn)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="jrapatv40l10" cloneof="jrapat">
-		<description>JRA PAT for Dreamcast (Jpn, V40L10)</description>
-		<year>2000</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="T-42501M"/>
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jra pat for dreamcast (jpn, v40l10)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>JRA PAT for Dreamcast (Jpn, V40L10)</description>
+	    <year>2000</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="T-42501M"/>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jra pat for dreamcast (jpn, v40l10)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="jrapatv40l11" cloneof="jrapat">
-		<description>JRA PAT for Dreamcast (Jpn, V40L11)</description>
-		<year>2000</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="T-42501M"/>
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jra pat for dreamcast (jpn, v40l11)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>JRA PAT for Dreamcast (Jpn, V40L11)</description>
+	    <year>2000</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="T-42501M"/>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jra pat for dreamcast (jpn, v40l11)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="jrapatv40l12" cloneof="jrapat">
-		<description>JRA PAT for Dreamcast (Jpn, V40L12)</description>
-		<year>2000</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="T-42501M"/>
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jra pat for dreamcast (jpn, v40l12)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>JRA PAT for Dreamcast (Jpn, V40L12)</description>
+	    <year>2000</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="T-42501M"/>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jra pat for dreamcast (jpn, v40l12)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
 	<!--
 	<software name="jrapat">
-		<description>JRA PAT for Dreamcast (Jpn, V50L10)</description>
-		<year>2000</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="HDR-0204"/>
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jra pat for dreamcast (jpn, v50l10)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>JRA PAT for Dreamcast (Jpn, V50L10)</description>
+	    <year>2000</year>
+	    <publisher>Sega</publisher>
+	    <info name="serial" value="HDR-0204"/>
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jra pat for dreamcast (jpn, v50l10)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -17309,15 +17309,15 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	-->
 	<!--
 	<software name="jumpblob">
-		<description>Jump'n Blob (World)</description>
-		<year>2011</year>
-		<publisher>2D-Retroperspectives</publisher>
-		<info name="release" value="20110104" />
-		<part interface="cdrom" name="cdrom">
-			<diskarea name="cdrom">
-				<disk name="jump'n blob (world)" status="nodump"/>
-			</diskarea>
-		</part>
+	    <description>Jump'n Blob (World)</description>
+	    <year>2011</year>
+	    <publisher>2D-Retroperspectives</publisher>
+	    <info name="release" value="20110104" />
+	    <part interface="cdrom" name="cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="jump'n blob (world)" status="nodump"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 </softwarelist>

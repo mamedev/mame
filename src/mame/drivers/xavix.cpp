@@ -631,7 +631,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(xavix_state, xavix)
 {
-    m_rgnlen = memregion("bios")->bytes();
+	m_rgnlen = memregion("bios")->bytes();
 	m_rgn = memregion("bios")->base();
 }
 

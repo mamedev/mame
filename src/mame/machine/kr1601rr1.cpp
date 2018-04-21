@@ -6,9 +6,9 @@
 
     Same geometry as GI ER2401, but not pin-compatible.
 
-	To do:
-	- realistic timing esp. for ERASE_ALL
-	- alternate wirings
+    To do:
+    - realistic timing esp. for ERASE_ALL
+    - alternate wirings
 
 ***************************************************************************/
 

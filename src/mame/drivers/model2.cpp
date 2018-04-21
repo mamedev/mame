@@ -2955,12 +2955,12 @@ OPR-14747    /  Linked to 315-5679B
 // TODO: roms 58/59 and 62/63 aren't really used so far, actually they should be 32_word loaded too?
 // the 'a' versions have the atan table fixed compared to model 1
 #define MODEL2_CPU_BOARD \
-	ROM_REGION32_LE( 0x40000, "copro_tgp_tables", 0 )							\
+	ROM_REGION32_LE( 0x40000, "copro_tgp_tables", 0 )                           \
 	ROM_LOAD32_WORD("opr-14742a.45",  0x000000,  0x20000, CRC(90c6b117) SHA1(f46429fffcee17d056f56d5fe035a33f1fd6c27e) ) \
 	ROM_LOAD32_WORD("opr-14743a.46",  0x000002,  0x20000, CRC(ae7f446b) SHA1(5b9f1fc47caf21e061e930c0d72804e4ec8c7bca) ) \
-    \
+	\
 	ROM_REGION32_LE( 0x80000, "other_data", 0 ) \
-	/* 1/x table */	\
+	/* 1/x table */ \
 	ROM_LOAD32_WORD("opr-14744.58",   0x000000,  0x20000, CRC(730ea9e0) SHA1(651f1db4089a400d073b19ada299b4b08b08f372) ) \
 	ROM_LOAD32_WORD("opr-14745.59",   0x000002,  0x20000, CRC(4c934d96) SHA1(e3349ece0e47f684d61ad11bfea4a90602287350) ) \
 	/* 1/sqrt(x) table */ \

@@ -4777,7 +4777,7 @@ GAME( 1994,  twineag2,  0,        twineag2, twineag2, ssv_state, twineag2, ROT27
 
 GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     ssv_state, gdfs,     ROT0,   "Banpresto",          "Mobil Suit Gundam Final Shooting (Japan)",                               MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-// Ultra X Weapon: "developed by Seta" in ending screen 
+// Ultra X Weapon: "developed by Seta" in ending screen
 GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
 GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
 

@@ -44,7 +44,7 @@ public:
 
 	/* ROM banking */
 	uint8_t       m_bankxor;
-	
+
 	required_memory_bank m_masterbank;
 	required_memory_bank m_slavebank;
 	required_memory_bank m_soundbank;

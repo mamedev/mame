@@ -319,7 +319,7 @@ READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	m_lastpc = machine().device<cpu_device>("maincpu")->pc(); 
+	m_lastpc = machine().device<cpu_device>("maincpu")->pc();
 	return 0;
 }
 

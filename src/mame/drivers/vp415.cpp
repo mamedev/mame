@@ -4,39 +4,39 @@
 
     Skeleton driver for Philips VP415 LV ROM Player
 
-	List of Modules:
-		A - Audio Processor
-		B - RGB
-		C - Video Processor
-		D - Ref Source
-		E - Slide Drive
-		F - Motor+Sequence
-		G - Gen Lock
-		H - ETBC B
-		I - ETBC C
-		J - Focus
-		K - HF Processor
-		L - Video Dropout Correction
-		M - Radial
-		N - Display Keyboard
-		P - Front Loader
-		Q - RC5 Mirror
-		R - Drive Processor
-		S - Control
-		T - Supply
-		U - Analog I/O
-		V - Module Carrier
-		W - CPU Datagrabber
-		X - LV ROM
-		Y - Vid Mix
-		Z - Deck Electronics
+    List of Modules:
+        A - Audio Processor
+        B - RGB
+        C - Video Processor
+        D - Ref Source
+        E - Slide Drive
+        F - Motor+Sequence
+        G - Gen Lock
+        H - ETBC B
+        I - ETBC C
+        J - Focus
+        K - HF Processor
+        L - Video Dropout Correction
+        M - Radial
+        N - Display Keyboard
+        P - Front Loader
+        Q - RC5 Mirror
+        R - Drive Processor
+        S - Control
+        T - Supply
+        U - Analog I/O
+        V - Module Carrier
+        W - CPU Datagrabber
+        X - LV ROM
+        Y - Vid Mix
+        Z - Deck Electronics
 
-	TODO:
-	- Module W has a NEC D8041AHC which has not yet been dumped. A dump
-	  will be necessary to properly emulate the player.
-	- Driver currently fails the initial self-test with code 053. Per
-	  the service manual, code 053 means "no lead-in code at start-up of
-	  player (diagnostics)".
+    TODO:
+    - Module W has a NEC D8041AHC which has not yet been dumped. A dump
+      will be necessary to properly emulate the player.
+    - Driver currently fails the initial self-test with code 053. Per
+      the service manual, code 053 means "no lead-in code at start-up of
+      player (diagnostics)".
 
 ***************************************************************************/
 
@@ -618,13 +618,13 @@ WRITE8_MEMBER(vp415_state::drive_cpu_port1_w)
 
 //READ_LINE_MEMBER(vp415_state::drive_rxd_r)
 //{
-//	logerror("%s: drive_rxd_r: %d\n", machine().describe_context(), 0);
-//	return 0;
+//  logerror("%s: drive_rxd_r: %d\n", machine().describe_context(), 0);
+//  return 0;
 //}
 
 //WRITE_LINE_MEMBER(vp415_state::drive_txd_w)
 //{
-//	logerror("%s: drive_txd_w: %d\n", machine().describe_context(), state);
+//  logerror("%s: drive_txd_w: %d\n", machine().describe_context(), state);
 //}
 WRITE8_MEMBER(vp415_state::drive_cpu_port3_w)
 {

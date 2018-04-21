@@ -20,7 +20,7 @@ template<typename T> generic_fifo_device_base<T>::generic_fifo_device_base(const
 	m_size(0),
 	m_empty_triggered(false),
 	m_full_triggered(false)
-{	
+{
 }
 
 template<typename T> void generic_fifo_device_base<T>::clear()
@@ -147,7 +147,7 @@ template<typename T> T generic_fifo_device_base<T>::pop()
 
 		// We did a pop
 		m_on_pop();
-		return std::move(t);		
+		return std::move(t);
 	}
 }
 

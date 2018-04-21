@@ -133,7 +133,7 @@ private:
 	required_device<x2212_device> m_nvram_1d;
 
 	required_memory_bank m_mainbank;
-	
+
 	output_finder<4> m_leds;
 
 	int m_n_disc_lock;

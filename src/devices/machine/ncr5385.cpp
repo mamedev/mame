@@ -4,8 +4,8 @@
 
     NCR 5385E SCSI Controller
 
-	TOOD:
-	- Everything.
+    TOOD:
+    - Everything.
 
 ***********************************************************************/
 

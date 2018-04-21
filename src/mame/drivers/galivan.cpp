@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(dangarj_state::dangarj)
 	galivan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(dangarj_io_map)
-	
+
 	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)) // divided by 2 maybe
 MACHINE_CONFIG_END
 
@@ -1209,7 +1209,7 @@ GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state, 0,      ROT27
 GAME( 1986, dangara,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (12/1/1986)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  dangarj_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND ) // wrong BGM in game, no SFXs
 GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986, bootleg set 1)", MACHINE_SUPPORTS_SAVE ) // checks protection like dangarj but check readback is patched at 0x9d58 (also checks i/o port 0xc0?)
-GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state, 0,      ROT270, "bootleg",      "Ufo Robo Dangar (9/26/1986, bootleg set 2)", MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44 
+GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state, 0,      ROT270, "bootleg",      "Ufo Robo Dangar (9/26/1986, bootleg set 2)", MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Ninja Emaki (US)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan, alt)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )

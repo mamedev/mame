@@ -16,7 +16,7 @@ do
 		db = sql.open(dbpath .. "/history.db")
 		if not db then
 			emu.print_error("Unable to create history.db\n")
-			return false 
+			return false
 		end
 		check_db("opening database")
 	end
@@ -38,4 +38,4 @@ end
 local dbtable = { prepare = function(...) return db:prepare(...) end,
 		  exec = function(...) return db:exec(...) end, ROW = sql.ROW, check = check_db }
 
-return db and dbtable or false 
+return db and dbtable or false

@@ -100,7 +100,7 @@ private:
 	DECLARE_WRITE8_MEMBER(xavix_7a01_w);
 	DECLARE_WRITE8_MEMBER(xavix_7a02_w);
 	DECLARE_WRITE8_MEMBER(xavix_7a03_w);
-	
+
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(irq_vector0_lo_w);
 	DECLARE_WRITE8_MEMBER(irq_vector0_hi_w);

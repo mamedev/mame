@@ -1031,57 +1031,57 @@ void debugger_commands::execute_observe(int ref, const std::vector<std::string> 
 
 void debugger_commands::execute_suspend(int ref, const std::vector<std::string> &params)
 {
-    /* if there are no parameters, dump the ignore list */
-    if (params.empty())
-    {
-        std::string buffer;
+	/* if there are no parameters, dump the ignore list */
+	if (params.empty())
+	{
+		std::string buffer;
 
-        /* loop over all executable devices */
-        for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+		/* loop over all executable devices */
+		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
 
-            /* build up a comma-separated list */
-            if (exec.device().debug()->suspended())
-            {
-                if (buffer.empty())
-                    buffer = string_format("Currently suspended device '%s'", exec.device().tag());
-                else
-                    buffer.append(string_format(", '%s'", exec.device().tag()));
-            }
+			/* build up a comma-separated list */
+			if (exec.device().debug()->suspended())
+			{
+				if (buffer.empty())
+					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				else
+					buffer.append(string_format(", '%s'", exec.device().tag()));
+			}
 
-        /* special message for none */
-        if (buffer.empty())
-            buffer = string_format("No currently suspended devices");
-        m_console.printf("%s\n", buffer.c_str());
-    }
-    else
-    {
-        device_t *devicelist[MAX_COMMAND_PARAMS];
+		/* special message for none */
+		if (buffer.empty())
+			buffer = string_format("No currently suspended devices");
+		m_console.printf("%s\n", buffer.c_str());
+	}
+	else
+	{
+		device_t *devicelist[MAX_COMMAND_PARAMS];
 
-        /* validate parameters */
-        for (int paramnum = 0; paramnum < params.size(); paramnum++)
-            if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
-                return;
+		/* validate parameters */
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+			if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
+				return;
 
-        for (int paramnum = 0; paramnum < params.size(); paramnum++)
-        {
-            /* make sure this isn't the last live CPU */
-            bool gotone = false;
-            for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
-                if (&exec.device() != devicelist[paramnum] && !exec.device().debug()->suspended())
-                {
-                    gotone = true;
-                    break;
-                }
-            if (!gotone)
-            {
-                m_console.printf("Can't suspend all devices!\n");
-                return;
-            }
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+		{
+			/* make sure this isn't the last live CPU */
+			bool gotone = false;
+			for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+				if (&exec.device() != devicelist[paramnum] && !exec.device().debug()->suspended())
+				{
+					gotone = true;
+					break;
+				}
+			if (!gotone)
+			{
+				m_console.printf("Can't suspend all devices!\n");
+				return;
+			}
 
-            devicelist[paramnum]->debug()->suspend(true);
-            m_console.printf("Suspended device '%s'\n", devicelist[paramnum]->tag());
-        }
-    }
+			devicelist[paramnum]->debug()->suspend(true);
+			m_console.printf("Suspended device '%s'\n", devicelist[paramnum]->tag());
+		}
+	}
 }
 
 /*-------------------------------------------------
@@ -1090,43 +1090,43 @@ void debugger_commands::execute_suspend(int ref, const std::vector<std::string> 
 
 void debugger_commands::execute_resume(int ref, const std::vector<std::string> &params)
 {
-    /* if there are no parameters, dump the ignore list */
-    if (params.empty())
-    {
-        std::string buffer;
+	/* if there are no parameters, dump the ignore list */
+	if (params.empty())
+	{
+		std::string buffer;
 
-        /* loop over all executable devices */
-        for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
+		/* loop over all executable devices */
+		for (device_execute_interface &exec : execute_interface_iterator(m_machine.root_device()))
 
-            /* build up a comma-separated list */
-            if (exec.device().debug()->suspended())
-            {
-                if (buffer.empty())
-                    buffer = string_format("Currently suspended device '%s'", exec.device().tag());
-                else
-                    buffer.append(string_format(", '%s'", exec.device().tag()));
-            }
+			/* build up a comma-separated list */
+			if (exec.device().debug()->suspended())
+			{
+				if (buffer.empty())
+					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				else
+					buffer.append(string_format(", '%s'", exec.device().tag()));
+			}
 
-        /* special message for none */
-        if (buffer.empty())
-            buffer = string_format("No currently suspended devices");
-        m_console.printf("%s\n", buffer.c_str());
-    }
-    else
-    {
-        device_t *devicelist[MAX_COMMAND_PARAMS];
+		/* special message for none */
+		if (buffer.empty())
+			buffer = string_format("No currently suspended devices");
+		m_console.printf("%s\n", buffer.c_str());
+	}
+	else
+	{
+		device_t *devicelist[MAX_COMMAND_PARAMS];
 
-        /* validate parameters */
-        for (int paramnum = 0; paramnum < params.size(); paramnum++)
-            if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
-                return;
+		/* validate parameters */
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+			if (!validate_cpu_parameter(params[paramnum].c_str(), devicelist[paramnum]))
+				return;
 
-        for (int paramnum = 0; paramnum < params.size(); paramnum++)
-        {
-            devicelist[paramnum]->debug()->suspend(false);
-            m_console.printf("Resumed device '%s'\n", devicelist[paramnum]->tag());
-        }
-    }
+		for (int paramnum = 0; paramnum < params.size(); paramnum++)
+		{
+			devicelist[paramnum]->debug()->suspend(false);
+			m_console.printf("Resumed device '%s'\n", devicelist[paramnum]->tag());
+		}
+	}
 }
 
 /*-------------------------------------------------

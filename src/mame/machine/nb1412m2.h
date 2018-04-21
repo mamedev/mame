@@ -40,11 +40,11 @@ public:
 
 protected:
 	// device-level overrides
-//	virtual void device_validity_check(validity_checker &valid) const override;
-//	virtual void device_add_mconfig(machine_config &config) override;
+//  virtual void device_validity_check(validity_checker &valid) const override;
+//  virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	uint8_t m_command;
 	uint16_t m_rom_address;

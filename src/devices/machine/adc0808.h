@@ -22,12 +22,12 @@
        DND  13 |       | 16  VREF-
         D6  14 |_______| 15  D5
 
-	Notes:
-	* The difference between the two devices is the total adjusted
-	  error: ADC0808 ±½ LSB, ADC0809 ±1 LSB
-	* MM74C949 and M58990P are equivalent to ADC0808
-	* MM74C949-1 and M58990P-1 are equivalent to ADC0809
-	* ADC0816 and ADC0817 are 16 channel equivalents
+    Notes:
+    * The difference between the two devices is the total adjusted
+      error: ADC0808 ±½ LSB, ADC0809 ±1 LSB
+    * MM74C949 and M58990P are equivalent to ADC0808
+    * MM74C949-1 and M58990P-1 are equivalent to ADC0809
+    * ADC0816 and ADC0817 are 16 channel equivalents
 
 ***************************************************************************/
 

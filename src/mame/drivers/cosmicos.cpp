@@ -360,9 +360,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::digit_tick)
 {
 // commented this out because (a) m_digit isn't initialised anywhere,
 // and (b) writing to a negative digit is not a good idea.
-//	m_digit = !m_digit;
+//  m_digit = !m_digit;
 
-//	m_digits[m_digit] = m_segment;
+//  m_digits[m_digit] = m_segment;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)
