@@ -74,7 +74,7 @@ Known games listed by part-no, (*) denotes undumped:
 | 500-12738-A |GER| Ratatouille                                               | LEAPSTER       |
 | 500-12799-A |FRA| Oui-Oui - Aventures Au Pays Des Jouet                     | LEAPSTER       |
 | 500-12800-A |FRA| Lapin Malin - Danse Avec Les Mots                         | LEAPSTER       |
-| 500-12824-A |SPA| Perrito Club - I Adopta Un Nuevo Amiguito Y Aprende!      | LEAPSTER       |
+| 500-12824-A |SPA| Perrito Club - ¡Adopta Un Nuevo Amiguito Y Aprende!       | LEAPSTER       |
 | 500-12830-A |SPA| The Batman - El Poder De Los Números                      | LEAPSTER       |
 | 500-13272-A |ENG| Wall-E                                                    | LEAPSTER       |
 | 500-13273-A |GER| Spongebob Schwammkopf - Zeitreise durch das Wurmloch      | LEAPSTER       |
@@ -738,7 +738,7 @@ Known games listed by part-no, (*) denotes undumped:
 	</software>
 
 	<software name="petpalss" cloneof="petpals" supported="no">
-		<description>Perrito Club - I Adopta Un Nuevo Amiguito Y Aprende! (Spa)</description>
+		<description>Perrito Club - ¡Adopta Un Nuevo Amiguito Y Aprende! (Spa)</description>
 		<year>2007</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12824-A" />
