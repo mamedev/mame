@@ -2912,9 +2912,9 @@ files {
 	MAME_DIR .. "src/mame/audio/wiping.h",
 	MAME_DIR .. "src/mame/video/wiping.cpp",
 	MAME_DIR .. "src/mame/machine/nb1413m3.cpp",
-	MAME_DIR .. "src/mame/includes/nb1413m3.h",
+	MAME_DIR .. "src/mame/machine/nb1413m3.h",
 	MAME_DIR .. "src/mame/machine/nb1414m4.cpp",
-	MAME_DIR .. "src/mame/includes/nb1414m4.h",
+	MAME_DIR .. "src/mame/machine/nb1414m4.h",
 }
 
 createMAMEProjects(_target, _subtarget, "nintendo")
