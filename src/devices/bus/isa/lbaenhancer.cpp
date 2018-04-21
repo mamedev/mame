@@ -127,7 +127,7 @@ void lba_enhancer_device::device_start()
 //-------------------------------------------------
 void lba_enhancer_device::device_reset()
 {
-	if(m_current_rom_start == 0 )
+	if(m_current_rom_start == 0)
 	{
 		m_current_rom_start = 0xc8000 + (ioport("ROM_ADDRESS")->read()* 0x4000);
 		uint32_t current_rom_end   = m_current_rom_start + 0x04000 - 1;
