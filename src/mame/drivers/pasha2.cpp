@@ -96,6 +96,7 @@ public:
 		                   "lamp_p2_r", "lamp_p2_g", "lamp_p2_b",
 		                   "lamp_p3_r", "lamp_p3_g", "lamp_p3_b"})
 		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
 		, m_oki(*this, "oki%u", 1U)
 		, m_palette(*this, "palette")
 	{ }
@@ -129,6 +130,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<i80c52_device> m_audiocpu;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_device<palette_device> m_palette;
 	void pasha2(machine_config &config);
