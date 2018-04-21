@@ -319,7 +319,7 @@ void nb1414m4_device::exec(uint16_t mcu_cmd, uint8_t *vram, uint16_t &scrollx, u
 		case 0x8000: break; //Ninja Emaki, attract mode
 		case 0xff00: break; //Ninja Emaki POST, presumably invalid
 		default:
-			popmessage("NB 1414M4 executes %04x command, contact MAMEdev\n",mcu_cmd);
+			popmessage("NB 1414M4 executes %04x command, contact MAMEdev",mcu_cmd);
 			break;
 	}
 

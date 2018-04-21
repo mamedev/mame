@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/nb1412m2.h"
 #include "machine/nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
@@ -42,10 +43,6 @@ public:
 	DECLARE_WRITE8_MEMBER(galivan_sound_command_w);
 	DECLARE_READ8_MEMBER(soundlatch_clear_r);
 	DECLARE_READ8_MEMBER(IO_port_c0_r);
-	DECLARE_WRITE8_MEMBER(prot_address_w);
-	DECLARE_WRITE8_MEMBER(prot_data_w);
-	DECLARE_READ8_MEMBER(prot_data_r);
-
 	DECLARE_WRITE8_MEMBER(blit_trigger_w);
 	DECLARE_WRITE8_MEMBER(youmab_extra_bank_w);
 	DECLARE_READ8_MEMBER(youmab_8a_r);
@@ -78,19 +75,27 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	void galivan(machine_config &config);
-	void dangarj(machine_config &config);
 	void ninjemak(machine_config &config);
 	void youmab(machine_config &config);
 	void galivan_map(address_map &map);
 	void io_map(address_map &map);
-	void dangarj_io_map(address_map &map);
 	void ninjemak_io_map(address_map &map);
 	void ninjemak_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
+};
+
+class dangarj_state : public galivan_state
+{
+public:
+	dangarj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galivan_state(mconfig, type, tag),
+		m_prot(*this, "prot_chip")
+		{}
+	void dangarj(machine_config &config);
+
 private:
-    // dangarj specific (to be removed from here)
-	uint8_t m_prot_command;
-	uint8_t m_prot_reg[6];
-	uint8_t test;
+	required_device<nb1412m2_device> m_prot;
+
+	void dangarj_io_map(address_map &map);
 };
