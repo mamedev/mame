@@ -814,7 +814,9 @@ ROM_START( dangarj ) /* all rom labels are simply numbers, with the owl logo and
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu code */
 	ROM_LOAD( "21.14b", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
-	ROM_LOAD( "22.15b", 0x4000, 0x4000, CRC(1d484f68) SHA1(7de13d6c6850280fed011c1d1b211cdc5ea9f935) )
+	// following is most likely half size dumped, so we load parent set rom here.
+	ROM_LOAD( "22.15b", 0x4000, 0x4000, BAD_DUMP CRC(1d484f68) SHA1(7de13d6c6850280fed011c1d1b211cdc5ea9f935) )
+	ROM_LOAD( "14.b15", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "11.13d",  0x00000, 0x4000, CRC(e804ffe1) SHA1(22f16c23b9a82f104dda24bc8fccc08f3f69cf97) )   /* chars */
