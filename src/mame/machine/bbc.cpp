@@ -233,16 +233,13 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp6_w)
 
 READ8_MEMBER(bbc_state::bbcm_fetch_r)
 {
-	if (offset >= 0xc000 && offset <= 0xdfff)
+	if (m_acccon_x || (m_acccon_e && offset >= 0xc000 && offset <= 0xdfff))
 	{
-		if (m_acccon_e)
-		{
-			m_bank2->set_base(m_region_maincpu->base() + 0xb000);
-		}
-		else
-		{
-			m_bank2->set_base(m_region_maincpu->base() + 0x3000);
-		}
+		m_bank2->set_base(m_region_maincpu->base() + 0xb000);
+	}
+	else
+	{
+		m_bank2->set_base(m_region_maincpu->base() + 0x3000);
 	}
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
@@ -330,18 +327,6 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 	{
 		m_bank4->set_entry(m_swrbank);
 		m_bank5->set_entry(m_swrbank);
-	}
-}
-
-WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
-{
-	if (m_acccon_x || (m_acccon_e && m_vdusel))
-	{
-		m_region_maincpu->base()[offset + 0xb000] = data;
-	}
-	else
-	{
-		m_region_maincpu->base()[offset + 0x3000] = data;
 	}
 }
 
@@ -1477,7 +1462,7 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
 	{
 		uint32_t filesize = image.length();
 
-		if (filesize != 0x8000)
+		if (filesize > 0x8000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return image_init_result::FAIL;
@@ -1492,7 +1477,7 @@ image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, gener
 		uint32_t size_lo = image.get_software_region_length("lorom");
 		uint32_t size_hi = image.get_software_region_length("uprom");
 
-		if (size_lo + size_hi != 0x8000)
+		if (size_lo + size_hi > 0x8000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return image_init_result::FAIL;
