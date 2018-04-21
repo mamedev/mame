@@ -31,14 +31,16 @@ DEFINE_DEVICE_TYPE(TMS1980, tms1980_cpu_device, "tms1980", "Texas Instruments TM
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms0980_cpu_device::program_11bit_9)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void tms0980_cpu_device::program_11bit_9(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(tms0980_cpu_device::data_144x4)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0x8f) AM_RAM AM_MIRROR(0x70) // DAM
-ADDRESS_MAP_END
+void tms0980_cpu_device::data_144x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+	map(0x80, 0x8f).ram().mirror(0x70); // DAM
+}
 
 
 // device definitions

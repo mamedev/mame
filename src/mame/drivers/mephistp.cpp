@@ -131,10 +131,11 @@ void mephisto_pinball_state::mephisto_8051_io(address_map &map)
 }
 
 #ifdef UNUSED_DEFINITION
-ADDRESS_MAP_START(mephisto_pinball_state::sport2k_8051_io)
-	AM_IMPORT_FROM(mephisto_8051_data)
-	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
-ADDRESS_MAP_END
+void mephisto_pinball_state::sport2k_8051_io(address_map &map)
+{
+	mephisto_8051_data(map);
+	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+}
 #endif
 
 static INPUT_PORTS_START( mephisto )

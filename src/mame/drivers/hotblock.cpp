@@ -212,16 +212,13 @@ MACHINE_CONFIG_START(hotblock_state::hotblock)
 	MCFG_CPU_ADD("maincpu", I8088, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hotblock_map)
 	MCFG_CPU_IO_MAP(hotblock_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hotblock_state, nmi_line_pulse) /* right? */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024,1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
 	MCFG_SCREEN_UPDATE_DRIVER(hotblock_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // right?
 
 	MCFG_PALETTE_ADD("palette", 256)
 

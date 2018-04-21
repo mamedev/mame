@@ -2440,7 +2440,7 @@ SH2_DMA_KLUDGE_CB(cps3_state::dma_callback)
 	}
 	else
 	{
-		//printf("%s :src %08x, dst %08x, returning %08x\n", machine().describe_context(), src, dst, data);
+		//printf("%s :src %08x, dst %08x, returning %08x\n", machine().describe_context().c_str(), src, dst, data);
 	}
 
 	/* I doubt this is endian safe.. needs checking / fixing */

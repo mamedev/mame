@@ -102,7 +102,7 @@ void artmagic_state::execute_blit()
 	static FILE *f;
 
 	logerror("%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-				machine.describe_context(), offset, x, y, w, h,
+				machine().describe_context(), offset, x, y, w, h,
 				m_blitter_data[0], m_blitter_data[1],
 				m_blitter_data[2], m_blitter_data[3],
 				m_blitter_data[4], m_blitter_data[5],
@@ -120,7 +120,7 @@ void artmagic_state::execute_blit()
 
 		fprintf(f, "----------------------\n"
 					"%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
-					machine.describe_context(), offset, x, y, w, h,
+					machine().describe_context(), offset, x, y, w, h,
 					m_blitter_data[0], m_blitter_data[1],
 					m_blitter_data[2], m_blitter_data[3],
 					m_blitter_data[4], m_blitter_data[5],

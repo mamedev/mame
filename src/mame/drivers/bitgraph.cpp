@@ -433,9 +433,10 @@ WRITE8_MEMBER(bitgraph_state::ppu_write)
 }
 
 #ifdef UNUSED_FUNCTION
-ADDRESS_MAP_START(bitgraph_state::ppu_io)
-//  AM_RANGE(0x00, 0x00) AM_READ(ppu_irq)
-ADDRESS_MAP_END
+void bitgraph_state::ppu_io(address_map &map)
+{
+//  map(0x00, 0x00).r(this, FUNC(bitgraph_state::ppu_irq));
+}
 #endif
 
 /*

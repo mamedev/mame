@@ -19,29 +19,31 @@
 
 DEFINE_DEVICE_TYPE(SIS85C496, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
 
-ADDRESS_MAP_START(sis85c496_host_device::config_map)
-	AM_IMPORT_FROM(pci_host_device::config_map)
-	AM_RANGE(0x40, 0x43) AM_READWRITE8(dram_config_r, dram_config_w, 0x000000ff)
-	AM_RANGE(0x44, 0x47) AM_READWRITE16(shadow_config_r, shadow_config_w, 0x0000ffff)
-	AM_RANGE(0x58, 0x5b) AM_READWRITE8(smram_ctrl_r, smram_ctrl_w, 0x00ff0000)
-	AM_RANGE(0xc8, 0xcb) AM_READWRITE(mailbox_r, mailbox_w)
-	AM_RANGE(0xd0, 0xd3) AM_READWRITE8(bios_config_r, bios_config_w, 0x000000ff)
-	AM_RANGE(0xd0, 0xd3) AM_READWRITE8(isa_decoder_r, isa_decoder_w, 0x0000ff00)
-ADDRESS_MAP_END
+void sis85c496_host_device::config_map(address_map &map)
+{
+	pci_host_device::config_map(map);
+	map(0x40, 0x40).rw(this, FUNC(sis85c496_host_device::dram_config_r), FUNC(sis85c496_host_device::dram_config_w));
+	map(0x44, 0x45).rw(this, FUNC(sis85c496_host_device::shadow_config_r), FUNC(sis85c496_host_device::shadow_config_w));
+	map(0x5a, 0x5a).rw(this, FUNC(sis85c496_host_device::smram_ctrl_r), FUNC(sis85c496_host_device::smram_ctrl_w));
+	map(0xc8, 0xcb).rw(this, FUNC(sis85c496_host_device::mailbox_r), FUNC(sis85c496_host_device::mailbox_w));
+	map(0xd0, 0xd0).rw(this, FUNC(sis85c496_host_device::bios_config_r), FUNC(sis85c496_host_device::bios_config_w));
+	map(0xd1, 0xd1).rw(this, FUNC(sis85c496_host_device::isa_decoder_r), FUNC(sis85c496_host_device::isa_decoder_w));
+}
 
-ADDRESS_MAP_START(sis85c496_host_device::internal_io_map)
-	AM_IMPORT_FROM(pci_host_device::io_configuration_access_map)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254",   pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffffffff);
-	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffffffff);
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", ds12885_device, read, write, 0xffffffff);
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff);
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff);
-	AM_RANGE(0x00e0, 0x00ef) AM_NOP
-ADDRESS_MAP_END
+void sis85c496_host_device::internal_io_map(address_map &map)
+{
+	pci_host_device::io_configuration_access_map(map);
+	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0060, 0x0063).rw(this, FUNC(sis85c496_host_device::at_keybc_r), FUNC(sis85c496_host_device::at_keybc_w));
+	map(0x0064, 0x0067).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
+	map(0x0070, 0x007f).rw("rtc", FUNC(ds12885_device::read), FUNC(ds12885_device::write));
+	map(0x0080, 0x009f).rw(this, FUNC(sis85c496_host_device::at_page8_r), FUNC(sis85c496_host_device::at_page8_w));
+	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00c0, 0x00df).rw(this, FUNC(sis85c496_host_device::at_dma8237_2_r), FUNC(sis85c496_host_device::at_dma8237_2_w));
+	map(0x00e0, 0x00ef).noprw();
+}
 
 MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("pit8254", PIT8254, 0)

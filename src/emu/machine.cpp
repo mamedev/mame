@@ -1318,9 +1318,10 @@ WRITE8_MEMBER(dummy_space_device::write)
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
 
-ADDRESS_MAP_START(dummy_space_device::dummy)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void dummy_space_device::dummy(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(dummy_space_device::read), FUNC(dummy_space_device::write));
+}
 
 DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space")
 

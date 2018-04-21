@@ -75,46 +75,47 @@
 
 DEFINE_DEVICE_TYPE(TMP87PH40AN, tmp87ph40an_device, "tmp87ph40an", "Toshiba TMP87PH40AN")
 
-ADDRESS_MAP_START(tlcs870_device::tmp87ph40an_mem)
+void tlcs870_device::tmp87ph40an_mem(address_map &map)
+{
 #if 0
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(port0_r,port0_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(port1_r,port1_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(port2_r,port2_w)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(port3_r,port3_w)
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(port4_r,port4_w)
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(port5_r,port5_w)
-	AM_RANGE(0x0006, 0x0006) AM_READWRITE(port6_r,port6_w)
-	AM_RANGE(0x0007, 0x0007) AM_READWRITE(port7_r,port7_w)
+	map(0x0000, 0x0000).rw(this, FUNC(tlcs870_device::port0_r), FUNC(tlcs870_device::port0_w));
+	map(0x0001, 0x0001).rw(this, FUNC(tlcs870_device::port1_r), FUNC(tlcs870_device::port1_w));
+	map(0x0002, 0x0002).rw(this, FUNC(tlcs870_device::port2_r), FUNC(tlcs870_device::port2_w));
+	map(0x0003, 0x0003).rw(this, FUNC(tlcs870_device::port3_r), FUNC(tlcs870_device::port3_w));
+	map(0x0004, 0x0004).rw(this, FUNC(tlcs870_device::port4_r), FUNC(tlcs870_device::port4_w));
+	map(0x0005, 0x0005).rw(this, FUNC(tlcs870_device::port5_r), FUNC(tlcs870_device::port5_w));
+	map(0x0006, 0x0006).rw(this, FUNC(tlcs870_device::port6_r), FUNC(tlcs870_device::port6_w));
+	map(0x0007, 0x0007).rw(this, FUNC(tlcs870_device::port7_r), FUNC(tlcs870_device::port7_w));
 	// 0x8 reserved
 	// 0x9 reserved
-	AM_RANGE(0x000a, 0x000a) AM_WRITE(p0cr_w) // Port 0 I/O control
-	AM_RANGE(0x000b, 0x000b) AM_WRITE(p1cr_w) // Port 1 I/O control
-	AM_RANGE(0x000c, 0x000c) AM_WRITE(p6cr_w) // Port 6 I/O control
-	AM_RANGE(0x000d, 0x000d) AM_WRITE(p7cr_w) // Port 7 I/O control
-	AM_RANGE(0x000e, 0x000e) AM_READWRITE(adccr_r,adccr_w) // A/D converter control
-	AM_RANGE(0x000f, 0x000f) AM_READ(adcdr_r) // A/D converter result
+	map(0x000a, 0x000a).w(this, FUNC(tlcs870_device::p0cr_w)); // Port 0 I/O control
+	map(0x000b, 0x000b).w(this, FUNC(tlcs870_device::p1cr_w)); // Port 1 I/O control
+	map(0x000c, 0x000c).w(this, FUNC(tlcs870_device::p6cr_w)); // Port 6 I/O control
+	map(0x000d, 0x000d).w(this, FUNC(tlcs870_device::p7cr_w)); // Port 7 I/O control
+	map(0x000e, 0x000e).rw(this, FUNC(tlcs870_device::adccr_r), FUNC(tlcs870_device::adccr_w)); // A/D converter control
+	map(0x000f, 0x000f).r(this, FUNC(tlcs870_device::adcdr_r)); // A/D converter result
 
-	AM_RANGE(0x0010, 0x0010) AM_WRITE(treg1a_l_w) // Timer register 1A
-	AM_RANGE(0x0011, 0x0011) AM_WRITE(treg1a_h_w) //
-	AM_RANGE(0x0012, 0x0012) AM_READWRITE(treg1b_l_r, treg1b_l_w) // Timer register 1B
-	AM_RANGE(0x0013, 0x0013) AM_READWRITE(treg1b_h_r, treg1b_h_w) //
-	AM_RANGE(0x0014, 0x0014) AM_WRITE(tc1cr_w) // TC1 control
-	AM_RANGE(0x0015, 0x0015) AM_WRITE(tc2cr_w) // TC2 control
-	AM_RANGE(0x0016, 0x0016) AM_WRITE(treg2_l_w) // Timer register 2
-	AM_RANGE(0x0017, 0x0017) AM_WRITE(treg2_h_w) //
-	AM_RANGE(0x0018, 0x0018) AM_READWRITE(treg3a_r, treg3a_w) // Timer register 3A
-	AM_RANGE(0x0019, 0x0019) AM_READ(treg3b_r) // Timer register 3B
-	AM_RANGE(0x001a, 0x001a) AM_WRITE(tc3cr_w) // TC3 control
-	AM_RANGE(0x001b, 0x001b) AM_READ(treg4_r) // Timer register 4
-	AM_RANGE(0x001c, 0x001c) AM_WRITE(tc4cr_w) // TC4 control
+	map(0x0010, 0x0010).w(this, FUNC(tlcs870_device::treg1a_l_w)); // Timer register 1A
+	map(0x0011, 0x0011).w(this, FUNC(tlcs870_device::treg1a_h_w)); //
+	map(0x0012, 0x0012).rw(this, FUNC(tlcs870_device::treg1b_l_r), FUNC(tlcs870_device::treg1b_l_w)); // Timer register 1B
+	map(0x0013, 0x0013).rw(this, FUNC(tlcs870_device::treg1b_h_r), FUNC(tlcs870_device::treg1b_h_w)); //
+	map(0x0014, 0x0014).w(this, FUNC(tlcs870_device::tc1cr_w)); // TC1 control
+	map(0x0015, 0x0015).w(this, FUNC(tlcs870_device::tc2cr_w)); // TC2 control
+	map(0x0016, 0x0016).w(this, FUNC(tlcs870_device::treg2_l_w)); // Timer register 2
+	map(0x0017, 0x0017).w(this, FUNC(tlcs870_device::treg2_h_w)); //
+	map(0x0018, 0x0018).rw(this, FUNC(tlcs870_device::treg3a_r), FUNC(tlcs870_device::treg3a_w)); // Timer register 3A
+	map(0x0019, 0x0019).r(this, FUNC(tlcs870_device::treg3b_r)); // Timer register 3B
+	map(0x001a, 0x001a).w(this, FUNC(tlcs870_device::tc3cr_w)); // TC3 control
+	map(0x001b, 0x001b).r(this, FUNC(tlcs870_device::treg4_r)); // Timer register 4
+	map(0x001c, 0x001c).w(this, FUNC(tlcs870_device::tc4cr_w)); // TC4 control
 	// 0x1d reserved
 	// 0x1e reserved
 	// 0x1f reserved
 
-	AM_RANGE(0x0020, 0x0020) AM_READWRITE(sio1sr_r, sio1cr1_w) // SIO1 status / SIO1 control
-	AM_RANGE(0x0021, 0x0021) AM_WRITE(sio1cr2_w) // SIO1 control
-	AM_RANGE(0x0022, 0x0022) AM_READWRITE(sio2sr_r, sio2cr1_w) // SIO2 status / SIO2 control
-	AM_RANGE(0x0023, 0x0023) AM_WRITE(sio2cr2_w) // SIO2 control
+	map(0x0020, 0x0020).rw(this, FUNC(tlcs870_device::sio1sr_r), FUNC(tlcs870_device::sio1cr1_w)); // SIO1 status / SIO1 control
+	map(0x0021, 0x0021).w(this, FUNC(tlcs870_device::sio1cr2_w)); // SIO1 control
+	map(0x0022, 0x0022).rw(this, FUNC(tlcs870_device::sio2sr_r), FUNC(tlcs870_device::sio2cr1_w)); // SIO2 status / SIO2 control
+	map(0x0023, 0x0023).w(this, FUNC(tlcs870_device::sio2cr2_w)); // SIO2 control
 	// 0x24 reserved
 	// 0x25 reserved
 	// 0x26 reserved
@@ -132,28 +133,28 @@ ADDRESS_MAP_START(tlcs870_device::tmp87ph40an_mem)
 	// 0x31 reserved
 	// 0x32 reserved
 	// 0x33 reserved
-	AM_RANGE(0x0034, 0x0034) AM_WRITE(wdtcr1_w) // WDT control
-	AM_RANGE(0x0035, 0x0035) AM_WRITE(wdtcr2_w) //
+	map(0x0034, 0x0034).w(this, FUNC(tlcs870_device::wdtcr1_w)); // WDT control
+	map(0x0035, 0x0035).w(this, FUNC(tlcs870_device::wdtcr2_w)); //
 
-	AM_RANGE(0x0036, 0x0036) AM_READWRITE(tbtcr_r, tbtcr_w) // TBT / TG / DVO control
-	AM_RANGE(0x0037, 0x0037) AM_READWRITE(eintcr_r, eintcr_w) // External interrupt control
+	map(0x0036, 0x0036).rw(this, FUNC(tlcs870_device::tbtcr_r), FUNC(tlcs870_device::tbtcr_w)); // TBT / TG / DVO control
+	map(0x0037, 0x0037).rw(this, FUNC(tlcs870_device::eintcr_r), FUNC(tlcs870_device::eintcr_w)); // External interrupt control
 
-	AM_RANGE(0x0038, 0x0038) AM_READWRITE(syscr1_r, syscr1_w) // System Control
-	AM_RANGE(0x0039, 0x0039) AM_READWRITE(syscr2_r, syscr2_w) //
+	map(0x0038, 0x0038).rw(this, FUNC(tlcs870_device::syscr1_r), FUNC(tlcs870_device::syscr1_w)); // System Control
+	map(0x0039, 0x0039).rw(this, FUNC(tlcs870_device::syscr2_r), FUNC(tlcs870_device::syscr2_w)); //
 
-	AM_RANGE(0x003a, 0x003a) AM_READWRITE(eir_l_r, eir_l_w) // Interrupt enable register
-	AM_RANGE(0x003b, 0x003b) AM_READWRITE(eir_h_r, eir_h_w) //
+	map(0x003a, 0x003a).rw(this, FUNC(tlcs870_device::eir_l_r), FUNC(tlcs870_device::eir_l_w)); // Interrupt enable register
+	map(0x003b, 0x003b).rw(this, FUNC(tlcs870_device::eir_h_r), FUNC(tlcs870_device::eir_h_w)); //
 
-	AM_RANGE(0x003c, 0x003c) AM_READWRITE(il_l_r, il_l_w) // Interrupt latch
-	AM_RANGE(0x003d, 0x003d) AM_READWRITE(il_h_r, il_h_w) //
+	map(0x003c, 0x003c).rw(this, FUNC(tlcs870_device::il_l_r), FUNC(tlcs870_device::il_l_w)); // Interrupt latch
+	map(0x003d, 0x003d).rw(this, FUNC(tlcs870_device::il_h_r), FUNC(tlcs870_device::il_h_w)); //
 	// 0x3e reserved
-	AM_RANGE(0x003f, 0x003f) AM_READWRITE(psw_r, rbs_w) // Program status word / Register bank selector
+	map(0x003f, 0x003f).rw(this, FUNC(tlcs870_device::psw_r), FUNC(tlcs870_device::rbs_w)); // Program status word / Register bank selector
 #endif
 
-	AM_RANGE(0x0040, 0x023f) AM_RAM AM_SHARE("intram") // register banks + internal RAM, not, code execution NOT allowed here
-	AM_RANGE(0x0f80, 0x0fff) AM_RAM // DBR
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x0040, 0x023f).ram().share("intram"); // register banks + internal RAM, not, code execution NOT allowed here
+	map(0x0f80, 0x0fff).ram(); // DBR
+	map(0xc000, 0xffff).rom();
+}
 
 
 tlcs870_device::tlcs870_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program_map)

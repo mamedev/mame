@@ -245,7 +245,7 @@ d7 = read from bank 4 */
 
 	m_bankdata = data;
 	data ^= 0x31; // make all lines active high
-//printf("%s:%X\n", machine().describe_context(), data);
+//printf("%s:%X\n", machine().describe_context().c_str(), data);
 	// do writes
 	m_wbyte = (data & 0x0f) | ((m_port80 & 0x0c) << 3);
 	// do reads
@@ -371,7 +371,7 @@ d0 = read from bank 4 */
 	uint8_t rbyte = bitswap<8>(data, 0, 0, 0, 0, 0, 1, 2, 3) & 0x0f; // rearrange to 0,1,2,4
 	if (BIT(rbyte, 1))
 		rbyte &= 0x07; // remove 4 if 1 selected (AND gate in IC82)
-//printf("%s:%X:%X:%X\n", machine().describe_context(), data, rbyte, m_wbyte);
+//printf("%s:%X:%X:%X\n", machine().describe_context().c_str(), data, rbyte, m_wbyte);
 	switch (rbyte)
 	{
 		case 0x00:

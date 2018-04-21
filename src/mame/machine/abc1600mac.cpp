@@ -57,13 +57,15 @@
 DEFINE_DEVICE_TYPE(ABC1600_MAC, abc1600_mac_device, "abc1600mac", "ABC 1600 MAC")
 
 
-ADDRESS_MAP_START(abc1600_mac_device::map)
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void abc1600_mac_device::map(address_map &map)
+{
+	map(0x00000, 0xfffff).rw(this, FUNC(abc1600_mac_device::read), FUNC(abc1600_mac_device::write));
+}
 
 
-ADDRESS_MAP_START(abc1600_mac_device::program_map)
-ADDRESS_MAP_END
+void abc1600_mac_device::program_map(address_map &map)
+{
+}
 
 
 MACHINE_CONFIG_START(abc1600_mac_device::device_add_mconfig)

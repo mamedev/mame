@@ -31,6 +31,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_r0_sound(*this, "r0sound")
 		, m_r1_sound(*this, "r1sound")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(gts80b);
@@ -57,9 +58,11 @@ private:
 	bool m_in_cmd_mode[2];
 	uint8_t m_digit[2];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
+	output_finder<40> m_digits;
 };
 
 void gts80b_state::gts80b_map(address_map &map)
@@ -347,7 +350,7 @@ WRITE8_MEMBER( gts80b_state::port2b_w )
 			{ // display a character
 				segment = patterns[m_dispcmd & 0x7f]; // ignore blank/inverse bit
 				segment = bitswap<16>(segment, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 3, 2, 1, 0, 0);
-				output().set_digit_value(m_digit[i]+i*20, segment);
+				m_digits[m_digit[i]+i*20] = segment;
 				m_digit[i]++; // auto-increment pointer
 				if (m_digit[i] > 19) m_digit[i] = 0; // check for overflow
 			}

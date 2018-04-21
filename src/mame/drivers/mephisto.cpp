@@ -94,6 +94,7 @@ public:
 		, m_key2_5(*this, "KEY2_5")
 		, m_key2_6(*this, "KEY2_6")
 		, m_key2_7(*this, "KEY2_7")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	required_device<m65c02_device> m_maincpu;
@@ -140,14 +141,15 @@ protected:
 	required_ioport m_key2_5;
 	required_ioport m_key2_6;
 	required_ioport m_key2_7;
+	output_finder<4> m_digits;
 };
 
 
 WRITE8_MEMBER( mephisto_state::write_lcd )
 {
-	if (m_led7 == 0) output().set_digit_value(m_lcd_shift_counter,data);  // 0x109 MM IV // 0x040 MM V
+	if (m_led7 == 0) m_digits[m_lcd_shift_counter] = data;  // 0x109 MM IV // 0x040 MM V
 
-	//output().set_digit_value(m_lcd_shift_counter,data ^ m_p_ram[0x165]);    // 0x109 MM IV // 0x040 MM V
+	//m_digits[m_lcd_shift_counter] = data ^ m_p_ram[0x165];    // 0x109 MM IV // 0x040 MM V
 	m_lcd_shift_counter--;
 	m_lcd_shift_counter &= 3;
 }
@@ -327,12 +329,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_irq)//only mm2
 
 void mephisto_state::machine_start()
 {
+	m_digits.resolve();
 	m_lcd_shift_counter = 3;
 	m_allowNMI = 1;
 }
 
 MACHINE_START_MEMBER(mephisto_state,mm2)
 {
+	m_digits.resolve();
 	m_lcd_shift_counter = 3;
 	m_led7=0xff;
 }

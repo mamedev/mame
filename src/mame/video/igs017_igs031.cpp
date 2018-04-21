@@ -28,22 +28,23 @@ all the known IGS017 / IGS031 games use the following memory map, is the IGS017 
 
 
 
-ADDRESS_MAP_START(igs017_igs031_device::map)
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
+void igs017_igs031_device::map(address_map &map)
+{
+	map(0x1000, 0x17ff).ram().share("spriteram");
 //  AM_RANGE( 0x1800, 0x1bff ) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(palram_w) AM_SHARE("palram")
-	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
+	map(0x1800, 0x1bff).ram().w(this, FUNC(igs017_igs031_device::palram_w)).share("palram");
+	map(0x1c00, 0x1fff).ram();
 
-	AM_RANGE( 0x2010, 0x2013 ) AM_READ(i8255_r)
-	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
+	map(0x2010, 0x2013).r(this, FUNC(igs017_igs031_device::i8255_r));
+	map(0x2012, 0x2012).w(this, FUNC(igs017_igs031_device::video_disable_w));
 
-	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
-	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE(irq_enable_w )
+	map(0x2014, 0x2014).w(this, FUNC(igs017_igs031_device::nmi_enable_w));
+	map(0x2015, 0x2015).w(this, FUNC(igs017_igs031_device::irq_enable_w));
 
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE(fg_w ) AM_SHARE("fg_videoram")
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE(bg_w ) AM_SHARE("bg_videoram")
+	map(0x4000, 0x5fff).ram().w(this, FUNC(igs017_igs031_device::fg_w)).share("fg_videoram");
+	map(0x6000, 0x7fff).ram().w(this, FUNC(igs017_igs031_device::bg_w)).share("bg_videoram");
 
-ADDRESS_MAP_END
+}
 
 READ8_MEMBER(igs017_igs031_device::i8255_r)
 {

@@ -680,13 +680,15 @@ DEFINE_DEVICE_TYPE(MOS6561,            mos6561_device,            "mos6561",    
 DEFINE_DEVICE_TYPE(MOS656X_ATTACK_UFO, mos656x_attack_ufo_device, "mos656x_attack_ufo", "MOS 656X VIC (Attack UFO)")
 
 // default address maps
-ADDRESS_MAP_START(mos6560_device::mos6560_videoram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void mos6560_device::mos6560_videoram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+}
 
-ADDRESS_MAP_START(mos6560_device::mos6560_colorram_map)
-	AM_RANGE(0x000, 0x3ff) AM_RAM
-ADDRESS_MAP_END
+void mos6560_device::mos6560_colorram_map(address_map &map)
+{
+	map(0x000, 0x3ff).ram();
+}
 
 mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
 	: device_t(mconfig, type, tag, owner, clock),

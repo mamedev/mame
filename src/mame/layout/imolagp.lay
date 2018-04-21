@@ -286,16 +286,16 @@
 			<bounds x="22" y="-115" width="69" height="27" />
 		</bezel>
 
-		<bezel name="digit0" element="digit">
+		<bezel name="digit00" element="digit">
 			<bounds x="26.5" y="-113" width="15" height="23" />
 		</bezel>
-		<bezel name="digit1" element="digit">
+		<bezel name="digit01" element="digit">
 			<bounds x="41.5" y="-113" width="15" height="23" />
 		</bezel>
-		<bezel name="digit2" element="digit">
+		<bezel name="digit02" element="digit">
 			<bounds x="56.5" y="-113" width="15" height="23" />
 		</bezel>
-		<bezel name="digit3" element="digit">
+		<bezel name="digit03" element="digit">
 			<bounds x="71.5" y="-113" width="15" height="23" />
 		</bezel>
 
@@ -322,17 +322,17 @@
 			<bounds x="38" y="-55" width="53" height="39" />
 		</bezel>
 
-		<bezel name="digit10" element="digit">
+		<bezel name="digit12" element="digit">
 			<bounds x="42" y="-53" width="10" height="15" />
 		</bezel>
-		<bezel name="digit11" element="digit">
+		<bezel name="digit13" element="digit">
 			<bounds x="52" y="-53" width="10" height="15" />
 		</bezel>
 
-		<bezel name="digit12" element="digit">
+		<bezel name="digit14" element="digit">
 			<bounds x="42" y="-33" width="10" height="15" />
 		</bezel>
-		<bezel name="digit13" element="digit">
+		<bezel name="digit15" element="digit">
 			<bounds x="52" y="-33" width="10" height="15" />
 		</bezel>
 
@@ -365,10 +365,10 @@
 			<bounds x="129" y="-60" width="42" height="15" />
 		</bezel>
 
-		<bezel name="digit4" element="digit">
+		<bezel name="digit04" element="digit">
 			<bounds x="135" y="-41" width="15" height="23" />
 		</bezel>
-		<bezel name="digit5" element="digit">
+		<bezel name="digit05" element="digit">
 			<bounds x="150" y="-41" width="15" height="23" />
 		</bezel>
 
@@ -388,16 +388,16 @@
 		<bezel element="text_st">
 			<bounds x="222.5" y="-114" width="10" height="10" />
 		</bezel>
-		<bezel name="digit32" element="digit">
+		<bezel name="digit40" element="digit">
 			<bounds x="234" y="-113" width="10" height="15" />
 		</bezel>
-		<bezel name="digit33" element="digit">
+		<bezel name="digit41" element="digit">
 			<bounds x="244" y="-113" width="10" height="15" />
 		</bezel>
-		<bezel name="digit34" element="digit">
+		<bezel name="digit42" element="digit">
 			<bounds x="254" y="-113" width="10" height="15" />
 		</bezel>
-		<bezel name="digit35" element="digit">
+		<bezel name="digit43" element="digit">
 			<bounds x="264" y="-113" width="10" height="15" />
 		</bezel>
 
@@ -407,16 +407,16 @@
 		<bezel element="text_nd">
 			<bounds x="222.5" y="-94" width="10" height="10" />
 		</bezel>
-		<bezel name="digit36" element="digit">
+		<bezel name="digit44" element="digit">
 			<bounds x="234" y="-93" width="10" height="15" />
 		</bezel>
-		<bezel name="digit37" element="digit">
+		<bezel name="digit45" element="digit">
 			<bounds x="244" y="-93" width="10" height="15" />
 		</bezel>
-		<bezel name="digit24" element="digit">
+		<bezel name="digit30" element="digit">
 			<bounds x="254" y="-93" width="10" height="15" />
 		</bezel>
-		<bezel name="digit25" element="digit">
+		<bezel name="digit31" element="digit">
 			<bounds x="264" y="-93" width="10" height="15" />
 		</bezel>
 
@@ -426,16 +426,16 @@
 		<bezel element="text_rd">
 			<bounds x="222.5" y="-74" width="10" height="10" />
 		</bezel>
-		<bezel name="digit26" element="digit">
+		<bezel name="digit32" element="digit">
 			<bounds x="234" y="-73" width="10" height="15" />
 		</bezel>
-		<bezel name="digit27" element="digit">
+		<bezel name="digit33" element="digit">
 			<bounds x="244" y="-73" width="10" height="15" />
 		</bezel>
-		<bezel name="digit28" element="digit">
+		<bezel name="digit34" element="digit">
 			<bounds x="254" y="-73" width="10" height="15" />
 		</bezel>
-		<bezel name="digit29" element="digit">
+		<bezel name="digit35" element="digit">
 			<bounds x="264" y="-73" width="10" height="15" />
 		</bezel>
 
@@ -445,16 +445,16 @@
 		<bezel element="text_th">
 			<bounds x="222.5" y="-54" width="10" height="10" />
 		</bezel>
-		<bezel name="digit16" element="digit">
+		<bezel name="digit20" element="digit">
 			<bounds x="234" y="-53" width="10" height="15" />
 		</bezel>
-		<bezel name="digit17" element="digit">
+		<bezel name="digit21" element="digit">
 			<bounds x="244" y="-53" width="10" height="15" />
 		</bezel>
-		<bezel name="digit18" element="digit">
+		<bezel name="digit22" element="digit">
 			<bounds x="254" y="-53" width="10" height="15" />
 		</bezel>
-		<bezel name="digit19" element="digit">
+		<bezel name="digit23" element="digit">
 			<bounds x="264" y="-53" width="10" height="15" />
 		</bezel>
 
@@ -464,16 +464,16 @@
 		<bezel element="text_th">
 			<bounds x="222.5" y="-34" width="10" height="10" />
 		</bezel>
-		<bezel name="digit20" element="digit">
+		<bezel name="digit24" element="digit">
 			<bounds x="234" y="-33" width="10" height="15" />
 		</bezel>
-		<bezel name="digit21" element="digit">
+		<bezel name="digit25" element="digit">
 			<bounds x="244" y="-33" width="10" height="15" />
 		</bezel>
-		<bezel name="digit8" element="digit">
+		<bezel name="digit10" element="digit">
 			<bounds x="254" y="-33" width="10" height="15" />
 		</bezel>
-		<bezel name="digit9" element="digit">
+		<bezel name="digit11" element="digit">
 			<bounds x="264" y="-33" width="10" height="15" />
 		</bezel>
 

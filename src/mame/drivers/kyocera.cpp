@@ -599,10 +599,11 @@ void kc85_state::kc85_io(address_map &map)
 	map(0xf0, 0xf1).mirror(0x0e).rw(this, FUNC(kc85_state::lcd_r), FUNC(kc85_state::lcd_w));
 }
 
-ADDRESS_MAP_START(kc85_state::trsm100_io)
-	AM_IMPORT_FROM(kc85_io)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(modem_w)
-ADDRESS_MAP_END
+void kc85_state::trsm100_io(address_map &map)
+{
+	kc85_io(map);
+	map(0xa0, 0xa0).mirror(0x0f).w(this, FUNC(kc85_state::modem_w));
+}
 
 void pc8201_state::pc8201_io(address_map &map)
 {

@@ -56,24 +56,26 @@ enum
 
 DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "Analog Devices ADSP21062 \"SHARC\"")
 
-ADDRESS_MAP_START(adsp21062_device::internal_pgm)
-	AM_RANGE(0x20000, 0x24fff) AM_READWRITE(pm0_r, pm0_w)
-	AM_RANGE(0x28000, 0x2cfff) AM_READWRITE(pm1_r, pm1_w)
-	AM_RANGE(0x30000, 0x34fff) AM_READWRITE(pm1_r, pm1_w)
-	AM_RANGE(0x38000, 0x3cfff) AM_READWRITE(pm1_r, pm1_w)
-ADDRESS_MAP_END
+void adsp21062_device::internal_pgm(address_map &map)
+{
+	map(0x20000, 0x24fff).rw(this, FUNC(adsp21062_device::pm0_r), FUNC(adsp21062_device::pm0_w));
+	map(0x28000, 0x2cfff).rw(this, FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+	map(0x30000, 0x34fff).rw(this, FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+	map(0x38000, 0x3cfff).rw(this, FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+}
 
-ADDRESS_MAP_START(adsp21062_device::internal_data)
-	AM_RANGE(0x00000, 0x000ff) AM_READWRITE(iop_r, iop_w)
-	AM_RANGE(0x20000, 0x27fff) AM_RAM AM_SHARE("block0")
-	AM_RANGE(0x28000, 0x2ffff) AM_RAM AM_SHARE("block1")
-	AM_RANGE(0x30000, 0x37fff) AM_RAM AM_SHARE("block1")
-	AM_RANGE(0x38000, 0x3ffff) AM_RAM AM_SHARE("block1")
-	AM_RANGE(0x40000, 0x4ffff) AM_READWRITE(dmw0_r, dmw0_w)
-	AM_RANGE(0x50000, 0x5ffff) AM_READWRITE(dmw1_r, dmw1_w)
-	AM_RANGE(0x60000, 0x6ffff) AM_READWRITE(dmw1_r, dmw1_w)
-	AM_RANGE(0x70000, 0x7ffff) AM_READWRITE(dmw1_r, dmw1_w)
-ADDRESS_MAP_END
+void adsp21062_device::internal_data(address_map &map)
+{
+	map(0x00000, 0x000ff).rw(this, FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
+	map(0x20000, 0x27fff).ram().share("block0");
+	map(0x28000, 0x2ffff).ram().share("block1");
+	map(0x30000, 0x37fff).ram().share("block1");
+	map(0x38000, 0x3ffff).ram().share("block1");
+	map(0x40000, 0x4ffff).rw(this, FUNC(adsp21062_device::dmw0_r), FUNC(adsp21062_device::dmw0_w));
+	map(0x50000, 0x5ffff).rw(this, FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+	map(0x60000, 0x6ffff).rw(this, FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+	map(0x70000, 0x7ffff).rw(this, FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+}
 
 adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, ADSP21062, tag, owner, clock)

@@ -243,11 +243,12 @@ void funystrp_state::funystrp_map(address_map &map)
 	map(0xfe0000, 0xfeffff).ram().mirror(0x10000); /* there's fe0000 <-> ff0000 compare */                /* Work RAM */
 }
 
-ADDRESS_MAP_START(splash_state::funystrp_sound_map)
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
-ADDRESS_MAP_END
+void splash_state::funystrp_sound_map(address_map &map)
+{
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().bankr("sound_bank");
+}
 
 READ8_MEMBER(funystrp_state::int_source_r)
 {

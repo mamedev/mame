@@ -837,10 +837,10 @@ MACHINE_RESET_MEMBER(fantland_state,fantland)
 	m_nmi_enable = 0;
 }
 
-INTERRUPT_GEN_MEMBER(fantland_state::fantland_irq)
+WRITE_LINE_MEMBER(fantland_state::fantland_irq)
 {
-	if (m_nmi_enable & 8)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && BIT(m_nmi_enable, 3))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
@@ -853,7 +853,6 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)        // ?
 	MCFG_CPU_PROGRAM_MAP(fantland_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
 	MCFG_CPU_ADD("audiocpu", I8088, 8000000)        // ?
 	MCFG_CPU_PROGRAM_MAP(fantland_sound_map)
@@ -874,6 +873,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -904,7 +904,6 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)        // ?
 	MCFG_CPU_PROGRAM_MAP(galaxygn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
 	MCFG_CPU_ADD("audiocpu", I8088, 8000000)        // ?
 	MCFG_CPU_PROGRAM_MAP(fantland_sound_map)
@@ -922,6 +921,7 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -986,7 +986,6 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
 	MCFG_CPU_PROGRAM_MAP(borntofi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
 	MCFG_CPU_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	MCFG_CPU_PROGRAM_MAP(borntofi_sound_map)
@@ -1002,6 +1001,7 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -1040,7 +1040,6 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, XTAL(18'000'000)/2)      // D701080C-8 (V20)
 	MCFG_CPU_PROGRAM_MAP(wheelrun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/2)     // Z8400BB1 (Z80B)
 	MCFG_CPU_PROGRAM_MAP(wheelrun_sound_map)
@@ -1057,6 +1056,7 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)

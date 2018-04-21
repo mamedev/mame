@@ -6,15 +6,19 @@
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_TX      (1U << 1)
-#define LOG_RX      (1U << 2)
-#define LOG_PORT    (1U << 3)
+#define LOG_TXTICK  (1U << 2)
+#define LOG_RX      (1U << 3)
+#define LOG_RXTICK  (1U << 4)
+#define LOG_PORT    (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL | LOG_TX | LOG_RS | LOG_PORT)
+//#define VERBOSE (LOG_GENERAL | LOG_TX | LOG_RX | LOG_PORT)
 //#define LOG_OUTPUT_STREAM std::cerr
 #include "logmacro.h"
 
 #define LOGTX(...)      LOGMASKED(LOG_TX, __VA_ARGS__)
+#define LOGTXTICK(...)  LOGMASKED(LOG_TXTICK, __VA_ARGS__)
 #define LOGRX(...)      LOGMASKED(LOG_RX, __VA_ARGS__)
+#define LOGRXTICK(...)  LOGMASKED(LOG_RXTICK, __VA_ARGS__)
 #define LOGPORT(...)    LOGMASKED(LOG_PORT, __VA_ARGS__)
 
 
@@ -250,11 +254,12 @@ const m6800_cpu_device::op_func m6801_cpu_device::hd63701_insn[0x100] = {
 };
 
 
-ADDRESS_MAP_START(m6801_cpu_device::m6803_mem)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0020, 0x007f) AM_NOP        /* unused */
-	AM_RANGE(0x0080, 0x00ff) AM_RAM        /* 6803 internal RAM */
-ADDRESS_MAP_END
+void m6801_cpu_device::m6803_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(this, FUNC(m6801_cpu_device::m6801_io_r), FUNC(m6801_cpu_device::m6801_io_w));
+	map(0x0020, 0x007f).noprw();        /* unused */
+	map(0x0080, 0x00ff).ram();        /* 6803 internal RAM */
+}
 
 
 DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "Motorola M6801")
@@ -443,7 +448,7 @@ int m6801_cpu_device::m6800_rx()
 
 void m6801_cpu_device::serial_transmit()
 {
-	LOGTX("Tx Tick\n");
+	LOGTXTICK("Tx Tick\n");
 
 	if (m_trcsr & M6801_TRCSR_TE)
 	{
@@ -525,7 +530,7 @@ void m6801_cpu_device::serial_transmit()
 
 void m6801_cpu_device::serial_receive()
 {
-	LOGRX("Rx Tick TRCSR %02x bits %u check %02x\n", m_trcsr, m_rxbits, m_trcsr & M6801_TRCSR_RE);
+	LOGRXTICK("Rx Tick TRCSR %02x bits %u check %02x\n", m_trcsr, m_rxbits, m_trcsr & M6801_TRCSR_RE);
 
 	if (m_trcsr & M6801_TRCSR_RE)
 	{
@@ -646,9 +651,9 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 	switch (irqline)
 	{
 	case M6801_SC1_LINE:
-		if (!m_port3_latched && (m_p3csr & M6801_P3CSR_LE))
+		if (!m_sc1_state && (CLEAR_LINE != state))
 		{
-			if (!m_sc1_state && (CLEAR_LINE != state))
+			if (!m_port3_latched && (m_p3csr & M6801_P3CSR_LE))
 			{
 				// latch input data to port 3
 				m_port3_data = (m_io->read_byte(M6801_PORT3) & (m_port3_ddr ^ 0xff)) | (m_port3_data & m_port3_ddr);
@@ -658,8 +663,14 @@ void m6801_cpu_device::execute_set_input(int irqline, int state)
 				// set IS3 flag bit
 				m_p3csr |= M6801_P3CSR_IS3_FLAG;
 			}
+			else
+			{
+				LOGPORT("Not latching Port 3 Data:%s%s", m_port3_latched ? " already latched" : "", (m_p3csr & M6801_P3CSR_LE) ? "" : " LE clear");
+			}
 		}
 		m_sc1_state = ASSERT_LINE == state;
+		if (CLEAR_LINE != state)
+			standard_irq_callback(M6801_SC1_LINE); // re-entrant - do it after setting m_sc1_state
 		break;
 
 	case M6801_TIN_LINE:
@@ -711,10 +722,7 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_port2_data));
 	save_item(NAME(m_port3_data));
 	save_item(NAME(m_port4_data));
-	save_item(NAME(m_port2_written));
-	save_item(NAME(m_port3_latched));
 	save_item(NAME(m_p3csr));
-	save_item(NAME(m_p3csr_is3_flag_read));
 	save_item(NAME(m_tcsr));
 	save_item(NAME(m_pending_tcsr));
 	save_item(NAME(m_irq2));
@@ -723,8 +731,9 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_counter.d));
 	save_item(NAME(m_output_compare.d));
 	save_item(NAME(m_input_capture));
-	save_item(NAME(m_timer_over.d));
-	save_item(NAME(m_timer_next));
+	save_item(NAME(m_p3csr_is3_flag_read));
+	save_item(NAME(m_port3_latched));
+	save_item(NAME(m_port2_written));
 
 	save_item(NAME(m_trcsr));
 	save_item(NAME(m_rmcr));
@@ -739,6 +748,14 @@ void m6801_cpu_device::device_start()
 	save_item(NAME(m_trcsr_read_orfe));
 	save_item(NAME(m_trcsr_read_rdrf));
 	save_item(NAME(m_tx));
+	save_item(NAME(m_ext_serclock));
+	save_item(NAME(m_use_ext_serclock));
+
+	save_item(NAME(m_latch09));
+
+	save_item(NAME(m_timer_over.d));
+
+	save_item(NAME(m_timer_next));
 
 	save_item(NAME(m_sc1_state));
 }

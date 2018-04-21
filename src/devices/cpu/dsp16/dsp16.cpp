@@ -441,6 +441,8 @@ void dsp16_device_base::execute_set_input(int inputnum, int state)
 			}
 			m_ick_in = (ASSERT_LINE == state) ? 1U : 0U;
 		}
+		if (CLEAR_LINE != state)
+			standard_irq_callback(DSP16_ICK_LINE);
 		break;
 	case DSP16_ILD_LINE:
 		if (sio_ild_active())
@@ -461,6 +463,8 @@ void dsp16_device_base::execute_set_input(int inputnum, int state)
 			}
 			m_ock_in = (ASSERT_LINE == state) ? 1U : 0U;
 		}
+		if (CLEAR_LINE != state)
+			standard_irq_callback(DSP16_OCK_LINE);
 		break;
 	case DSP16_OLD_LINE:
 		if (sio_old_active())

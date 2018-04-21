@@ -685,7 +685,7 @@ WRITE8_MEMBER(dkong_state::s2650_data_w)
 WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
 {
 #if DEBUG_PROTECTION
-	logerror("write : pc = %04x, FO = %02x\n",space.device().safe_pc(), data);
+	logerror("%s write : FO = %02x\n", machine().describe_context(), data);
 #endif
 
 	m_main_fo = state;

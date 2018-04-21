@@ -65,8 +65,7 @@ WRITE_LINE_MEMBER(stactics_state::motor_w)
 CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
 {
 	// if the motor is self-centering, but not centered yet
-	return (!m_motor_on &&
-			(m_horiz_pos != 0 || m_vert_pos != 0));
+	return (!m_motor_on && (m_horiz_pos != 0 || m_vert_pos != 0));
 }
 
 
@@ -87,23 +86,23 @@ void stactics_state::move_motor()
 	// monitor motor under joystick control
 	if (m_motor_on)
 	{
-		int ip3 = ioport("IN3")->read();
-		int ip4 = ioport("FAKE")->read();
+		const int in3 = m_in3->read();
+		const int in4 = m_fake->read();
 
 		/* up */
-		if (((ip4 & 0x01) == 0) && (m_vert_pos > -128))
+		if (!(in4 & 0x01) && m_vert_pos > -128)
 			m_vert_pos--;
 
 		/* down */
-		if (((ip4 & 0x02) == 0) && (m_vert_pos < 127))
+		if (!(in4 & 0x02) && m_vert_pos < 127)
 			m_vert_pos++;
 
 		/* left */
-		if (((ip3 & 0x20) == 0) && (m_horiz_pos < 127))
+		if (!(in3 & 0x20)  && m_horiz_pos < 127)
 			m_horiz_pos++;
 
 		/* right */
-		if (((ip3 & 0x40) == 0) && (m_horiz_pos > -128))
+		if (!(in3 & 0x40) && m_horiz_pos > -128)
 			m_horiz_pos--;
 	}
 

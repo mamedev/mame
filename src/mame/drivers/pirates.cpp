@@ -130,7 +130,7 @@ CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
 	   602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	pc = machine().device("main")->safe_pc();
+	pc = m_maincpu->pc();
 	if (pc == 0x6134)
 	{
 		bit = prot & 1;

@@ -77,33 +77,40 @@ DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "Fujitsu MB8844")
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(mb88_cpu_device::program_9bit)
-	AM_RANGE(0x000, 0x1ff) AM_ROM
-ADDRESS_MAP_END
+void mb88_cpu_device::program_9bit(address_map &map)
+{
+	map(0x000, 0x1ff).rom();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::program_10bit)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void mb88_cpu_device::program_10bit(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::program_11bit)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void mb88_cpu_device::program_11bit(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::data_4bit)
-	AM_RANGE(0x00, 0x0f) AM_RAM
-ADDRESS_MAP_END
+void mb88_cpu_device::data_4bit(address_map &map)
+{
+	map(0x00, 0x0f).ram();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::data_5bit)
-	AM_RANGE(0x00, 0x1f) AM_RAM
-ADDRESS_MAP_END
+void mb88_cpu_device::data_5bit(address_map &map)
+{
+	map(0x00, 0x1f).ram();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::data_6bit)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void mb88_cpu_device::data_6bit(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(mb88_cpu_device::data_7bit)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void mb88_cpu_device::data_7bit(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
 
 mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width)

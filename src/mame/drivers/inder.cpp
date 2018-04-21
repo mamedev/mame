@@ -57,6 +57,7 @@ public:
 		, m_9b(*this, "9b")
 		, m_13(*this, "13")
 		, m_switches(*this, "SW.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(ppic_r);
@@ -104,6 +105,7 @@ private:
 	uint32_t m_sound_addr;
 	uint8_t *m_p_speech;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<sn76489_device> m_sn;
@@ -113,6 +115,7 @@ private:
 	optional_device<ttl7474_device> m_9b;
 	optional_device<hct157_device> m_13;
 	required_ioport_array<11> m_switches;
+	output_finder<50> m_digits;
 };
 
 void inder_state::brvteam_map(address_map &map)
@@ -1211,7 +1214,7 @@ WRITE8_MEMBER( inder_state::disp_w )
 	{
 		offset = (offset >> 3) & 7;
 		for (i = 0; i < 5; i++)
-			output().set_digit_value(i*10+offset, m_segment[i]);
+			m_digits[i*10+offset] = m_segment[i];
 	}
 }
 
@@ -1243,7 +1246,7 @@ WRITE8_MEMBER( inder_state::ppi64c_w )
 		{
 			if ((m_game==1) && (i == 4))  // mundial,clown,250cc,atleta have credit and ball displays swapped
 				data ^= 4;
-			output().set_digit_value(i*10+data, m_segment[i]);
+			m_digits[i*10+data] = m_segment[i];
 		}
 	}
 }

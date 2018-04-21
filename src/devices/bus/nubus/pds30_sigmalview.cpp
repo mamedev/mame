@@ -163,7 +163,7 @@ READ32_MEMBER( nubus_lview_device::lview_r )
 {
 	uint32_t rv = 0;
 
-//    printf("prot_r: @ %x, mask %08x [PC=%x  state %d]\n", offset, mem_mask, machine().device("maincpu")->safe_pc(), m_protstate);
+//    printf("%s prot_r: @ %x, mask %08x [state %d]\n", machine().describe_context().c_str(), offset, mem_mask, m_protstate);
 
 	if ((m_protstate == 1) || (m_protstate == 10) || (machine().device<cpu_device>("maincpu")->pc() == 0x5aac))
 	{

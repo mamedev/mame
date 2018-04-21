@@ -110,10 +110,11 @@ void pcvideo_pcjr_device::device_start()
 
 ***************************************************************************/
 
-ADDRESS_MAP_START(pc_t1t_device::vram_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x20000, 0x3ffff) AM_NOP
-ADDRESS_MAP_END
+void pc_t1t_device::vram_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x20000, 0x3ffff).noprw();
+}
 
 MACHINE_CONFIG_START(pcvideo_t1000_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(T1000_SCREEN_NAME, RASTER)

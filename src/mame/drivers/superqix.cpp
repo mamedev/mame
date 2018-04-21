@@ -291,7 +291,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::mcu_port3_w_cb)
 
 TIMER_CALLBACK_MEMBER(superqix_state::z80_ay1_sync_address_w_cb)
 {
-	m_ay1->address_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, param, 0xff);
+	m_ay1->address_w(m_maincpu->space(AS_PROGRAM), 0, param, 0xff);
 }
 
 
@@ -357,7 +357,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::bootleg_mcu_port1_w_cb)
 		//already after a synchronize, and doing another one would be redundant
 	}
 
-	mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff); // finally write to port 2, which will do another synchronize
+	mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, m_bl_fake_port2, 0xff); // finally write to port 2, which will do another synchronize
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_mcu_port1_w)
@@ -957,7 +957,7 @@ MACHINE_RESET_MEMBER(superqix_state, superqix)
 		// the act of clearing this latch asserts the z80 reset, and the mcu must clear it itself by writing
 		// to the p2 latch with bit 5 set.
 		m_port2_raw = 0x01; // force the following function into latching a zero write by having bit 0 falling edge
-		mcu_port2_w(m_mcu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xff);
+		mcu_port2_w(m_mcu->space(AS_PROGRAM), 0, 0x00, 0xff);
 		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
@@ -979,15 +979,16 @@ MACHINE_START_MEMBER(hotsmash_state, pbillian)
 }
 
 
-ADDRESS_MAP_START(superqix_state_base::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+void superqix_state_base::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
 	// the following four ranges are part of a single 6264 64Kibit SRAM chip, called 'VRAM' in POST
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe100, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(superqix_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe000, 0xe0ff).ram().share("spriteram");
+	map(0xe100, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().w(this, FUNC(superqix_state_base::superqix_videoram_w)).share("videoram");
+	map(0xf000, 0xffff).ram();
+}
 
 void hotsmash_state::pbillian_port_map(address_map &map)
 { // used by both pbillian and hotsmash

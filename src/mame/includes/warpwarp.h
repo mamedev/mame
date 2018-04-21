@@ -17,12 +17,14 @@ public:
 		m_geebee_sound(*this, "geebee_custom"),
 		m_geebee_videoram(*this, "geebee_videoram"),
 		m_videoram(*this, "videoram"),
+		m_palette(*this, "palette"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
 		m_dsw1(*this, "DSW1"),
 		m_volin1(*this, "VOLIN1"),
 		m_volin2(*this, "VOLIN2"),
+		m_in_config(*this, "CONFIG"),
 		m_ports(*this, { { "SW0", "SW1", "DSW2", "PLACEHOLDER" } }) // "IN1" & "IN2" are read separately when offset==3
 	{ }
 
@@ -33,12 +35,14 @@ public:
 	optional_device<geebee_sound_device> m_geebee_sound;
 	optional_shared_ptr<uint8_t> m_geebee_videoram;
 	optional_shared_ptr<uint8_t> m_videoram;
+	optional_device<palette_device> m_palette;
 	optional_ioport m_in0;
 	optional_ioport m_in1;
 	optional_ioport m_in2;
 	optional_ioport m_dsw1;
 	optional_ioport m_volin1;
 	optional_ioport m_volin2;
+	optional_ioport m_in_config;
 	optional_ioport_array<4> m_ports;
 
 	int m_geebee_bgw;
@@ -73,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
 
 	virtual void machine_start() override;
+	DECLARE_MACHINE_RESET(kaitei);
 	DECLARE_DRIVER_INIT(navarone);
 	DECLARE_DRIVER_INIT(geebee);
 	DECLARE_DRIVER_INIT(kaitein);
@@ -100,6 +105,7 @@ public:
 	void warpwarp(machine_config &config);
 	void geebee(machine_config &config);
 	void navarone(machine_config &config);
+	void kaitei(machine_config &config);
 	void bombbee(machine_config &config);
 	void geebeeb(machine_config &config);
 	void bombbee_map(address_map &map);

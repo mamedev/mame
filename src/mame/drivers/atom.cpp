@@ -256,10 +256,10 @@ void atom_state::atom_mem(address_map &map)
 	map(0x0a05, 0x7fff).ram();
 	map(0x8000, 0x97ff).ram().share("video_ram");
 	map(0x9800, 0x9fff).ram();
-//  AM_RANGE(0xa000, 0xafff)        // mapped by the cartslot
+//  map(0xa000, 0xafff)        // mapped by the cartslot
 	map(0xb000, 0xb003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-//  AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
-//  AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
+//  map(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_device, read, write)
+//  map(0xb404, 0xb404) AM_READ_PORT("ECONET")
 	map(0xb800, 0xb80f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
 }
@@ -284,7 +284,6 @@ void atom_state::atombb_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
 	map(0x4000, 0x57ff).ram().share("video_ram");
-
 	map(0x7000, 0x7003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x7800, 0x780f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
 	map(0x8000, 0xbfff).rom().region("basic", 0);
@@ -295,16 +294,17 @@ void atom_state::atombb_mem(address_map &map)
     ADDRESS_MAP( prophet_mem )
 -------------------------------------------------*/
 
-ADDRESS_MAP_START(atom_state::prophet_mem)
-	AM_RANGE(0x0000, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("ic24", 0)
-	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
-	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
-ADDRESS_MAP_END
+void atom_state::prophet_mem(address_map &map)
+{
+	map(0x0000, 0x09ff).ram();
+	map(0x0a00, 0x7fff).ram();
+	map(0x8000, 0x97ff).ram().share("video_ram");
+	map(0x9800, 0x9fff).ram();
+	map(0xa000, 0xafff).rom().region("ic24", 0);
+	map(0xb000, 0xb003).mirror(0x3fc).rw(INS8255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb800, 0xb80f).mirror(0x3f0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xc000, 0xffff).rom().region(SY6502_TAG, 0);
+}
 
 /***************************************************************************
     INPUT PORTS

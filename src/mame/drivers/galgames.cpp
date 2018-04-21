@@ -559,12 +559,13 @@ WRITE_LINE_MEMBER(galgames_cart_device::eeprom_cs_write)
 
 // SLOT implementation
 
-ADDRESS_MAP_START(galgames_slot_device::slot_map)
-	AM_RANGE( 0x000000, 0x1fffff ) AM_READ(rom0_r)
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(rom0_or_ram_r, ram_w) AM_SHARE("ram")
-	AM_RANGE( 0x200000, 0x3fffff ) AM_READ(rom_r)
-	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(rom_or_ram_r, ram_w)
-ADDRESS_MAP_END
+void galgames_slot_device::slot_map(address_map &map)
+{
+	map( 0x000000, 0x1fffff ).r(this, FUNC(galgames_slot_device::rom0_r));
+	map( 0x000000, 0x03ffff ).rw(this, FUNC(galgames_slot_device::rom0_or_ram_r), FUNC(galgames_slot_device::ram_w)).share("ram");
+	map( 0x200000, 0x3fffff ).r(this, FUNC(galgames_slot_device::rom_r));
+	map( 0x200000, 0x23ffff ).rw(this, FUNC(galgames_slot_device::rom_or_ram_r), FUNC(galgames_slot_device::ram_w));
+}
 
 galgames_slot_device::galgames_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GALGAMES_SLOT, tag, owner, clock),
