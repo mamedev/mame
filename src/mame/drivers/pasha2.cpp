@@ -211,7 +211,7 @@ WRITE16_MEMBER(pasha2_state::oki_bank_w)
 
 WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 {
-	for (int p = 0; p < 3; i++)
+	for (int p = 0; p < 3; p++)
 	{
 		m_lamps_r[i] = BIT(data, 4 * p);
 		m_lamps_g[i] = BIT(data, 4 * p + 1);
