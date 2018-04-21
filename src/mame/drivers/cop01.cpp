@@ -228,7 +228,7 @@ WRITE8_MEMBER(cop01_state::prot_address_w)
 
 WRITE8_MEMBER(cop01_state::prot_data_w)
 {
-	if( m_prot_command>=0x32 && m_prot_command<=0x37 )
+	if( m_prot_command >=0x32 && m_prot_command <=0x37 )
 	{
 		m_prot_reg[m_prot_command-0x32] = data;
 
