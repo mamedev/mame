@@ -766,7 +766,7 @@ ROM_START( repulse )
 	ROM_LOAD( "b.1j",         0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) /* blue */
 	ROM_LOAD( "g.1h",         0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) /* green */
 	ROM_LOAD( "r.1f",         0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) /* red */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM or it wasn't dumped */
 	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 ROM_END
 
@@ -802,8 +802,12 @@ ROM_START( 99lstwar )
 	ROM_LOAD( "b.1j",         0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) /* blue */
 	ROM_LOAD( "g.1h",         0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) /* green */
 	ROM_LOAD( "r.1f",         0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) /* red */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	ROM_LOAD( "n82s123n.5j",  0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) /* char lookup table */
 	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "pal12l6.4m",   0x000, 0x117, CRC(b52fbcc0) SHA1(68d9cb70fb5945fc7002f4e506efa82944dfa6d8) )
+	ROM_LOAD( "pal12l6.5n",   0x200, 0x117, CRC(453ce64a) SHA1(abce1251b66befcb53b574e5c3a8b14335c0977f) )
 ROM_END
 
 ROM_START( 99lstwara )
@@ -838,8 +842,12 @@ ROM_START( 99lstwara )
 	ROM_LOAD( "b.1j",         0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) /* blue */
 	ROM_LOAD( "g.1h",         0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) /* green */
 	ROM_LOAD( "r.1f",         0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) /* red */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	ROM_LOAD( "n82s123n.5j",  0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) /* char lookup table */
 	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "pal12l6.4m",   0x000, 0x117, CRC(b52fbcc0) SHA1(68d9cb70fb5945fc7002f4e506efa82944dfa6d8) )
+	ROM_LOAD( "pal12l6.5n",   0x200, 0x117, CRC(453ce64a) SHA1(abce1251b66befcb53b574e5c3a8b14335c0977f) )
 ROM_END
 
 ROM_START( 99lstwark )
@@ -872,14 +880,18 @@ ROM_START( 99lstwark )
 	ROM_LOAD( "96.11a",       0x14000, 0x4000, CRC(8fdc713c) SHA1(c8933d1c45c886c22ee89d02b8941bbbb963d7b1) ) /* sprites - plane 2 */
 
 	ROM_REGION( 0x0340, "proms", 0 )
-	ROM_LOAD( "b.1j",   0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) /* blue */
-	ROM_LOAD( "g.1h",   0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) /* green */
-	ROM_LOAD( "r.1f",   0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) /* red */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
-	ROM_LOAD( "m1.2c",  0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+	ROM_LOAD( "b.1j",         0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) /* blue */
+	ROM_LOAD( "g.1h",         0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) /* green */
+	ROM_LOAD( "r.1f",         0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) /* red */
+	ROM_LOAD( "n82s123n.5j",  0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) /* char lookup table */
+	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 
 	ROM_REGION( 0x0800, "user1", 0 )
 	ROM_LOAD( "1999-00.rom",  0x0000, 0x0800, CRC(0c0c449f) SHA1(efa4a8ac4c341ca5cdc3b5d2803eda43daf1bc93) ) /* unknown */
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "pal12l6.4m",   0x000, 0x117, CRC(b52fbcc0) SHA1(68d9cb70fb5945fc7002f4e506efa82944dfa6d8) )
+	ROM_LOAD( "pal12l6.5n",   0x200, 0x117, CRC(453ce64a) SHA1(abce1251b66befcb53b574e5c3a8b14335c0977f) )
 ROM_END
 
 ROM_START( 99lstwarb ) // copyright blanked, seems based on 99lstwara, given it has a second shot type instead of the shields.
@@ -914,8 +926,12 @@ ROM_START( 99lstwarb ) // copyright blanked, seems based on 99lstwara, given it 
 	ROM_LOAD( "b.1j",         0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) /* blue */
 	ROM_LOAD( "g.1h",         0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) /* green */
 	ROM_LOAD( "r.1f",         0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) /* red */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	ROM_LOAD( "n82s123n.5j",  0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) /* char lookup table */
 	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "pal12l6.4m",   0x000, 0x117, CRC(b52fbcc0) SHA1(68d9cb70fb5945fc7002f4e506efa82944dfa6d8) )
+	ROM_LOAD( "pal12l6.5n",   0x200, 0x117, CRC(453ce64a) SHA1(abce1251b66befcb53b574e5c3a8b14335c0977f) )
 ROM_END
 
 ROM_START( sonofphx )
@@ -950,7 +966,7 @@ ROM_START( sonofphx )
 	ROM_LOAD( "b.1j",   0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) /* blue */
 	ROM_LOAD( "g.1h",   0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) /* green */
 	ROM_LOAD( "r.1f",   0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) /* red */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM or it wasn't dumped */
 	ROM_LOAD( "m1.2c",  0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
 ROM_END
 
@@ -989,6 +1005,10 @@ ROM_START( flashgal )
 	ROM_LOAD( "7159.1f",      0x0200, 0x0100, CRC(1e0a1cd3) SHA1(cc120d8fba3e4fb5e18d789981ece77e589ee5a2) ) /* blue */
 	ROM_LOAD( "7162.5j",      0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) /* char lookup table */
 	ROM_LOAD( "bpr.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "pal12l6.4m",   0x000, 0x117, CRC(b52fbcc0) SHA1(68d9cb70fb5945fc7002f4e506efa82944dfa6d8) )
+	ROM_LOAD( "pal12l6.5n",   0x200, 0x117, CRC(453ce64a) SHA1(abce1251b66befcb53b574e5c3a8b14335c0977f) )
 ROM_END
 
 ROM_START( flashgalk )
@@ -1026,6 +1046,10 @@ ROM_START( flashgalk )
 	ROM_LOAD( "7159.1f",      0x0200, 0x0100, CRC(1e0a1cd3) SHA1(cc120d8fba3e4fb5e18d789981ece77e589ee5a2) ) /* blue */
 	ROM_LOAD( "7162.5j",      0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) /* char lookup table */
 	ROM_LOAD( "bpr.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "pal12l6.4m",   0x000, 0x117, CRC(b52fbcc0) SHA1(68d9cb70fb5945fc7002f4e506efa82944dfa6d8) )
+	ROM_LOAD( "pal12l6.5n",   0x200, 0x117, CRC(453ce64a) SHA1(abce1251b66befcb53b574e5c3a8b14335c0977f) )
 ROM_END
 
 ROM_START( flashgala )
@@ -1063,6 +1087,10 @@ ROM_START( flashgala )
 	ROM_LOAD( "7159.1f",      0x0200, 0x0100, CRC(1e0a1cd3) SHA1(cc120d8fba3e4fb5e18d789981ece77e589ee5a2) ) /* blue */
 	ROM_LOAD( "7162.5j",      0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) /* char lookup table */
 	ROM_LOAD( "bpr.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "pal12l6.4m",   0x000, 0x117, CRC(b52fbcc0) SHA1(68d9cb70fb5945fc7002f4e506efa82944dfa6d8) )
+	ROM_LOAD( "pal12l6.5n",   0x200, 0x117, CRC(453ce64a) SHA1(abce1251b66befcb53b574e5c3a8b14335c0977f) )
 ROM_END
 
 ROM_START( srdmissn )
@@ -1129,6 +1157,11 @@ ROM_START( fx )
 	ROM_LOAD( "mb.1f",  0x0200, 0x0100, CRC(a342890c) SHA1(6f2223ed68392b15a8751dba9bb28b85fd1d8dc0) ) /* blue */
 	ROM_LOAD( "m2.5j",  0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* char lookup table */
 	ROM_LOAD( "m1.2c",  0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16l8.1", 0x0000, 0x0104, NO_DUMP ) // protected
+	ROM_LOAD( "pal16l8.2", 0x0200, 0x0104, NO_DUMP ) // protected
+	ROM_LOAD( "pal16l8.3", 0x0400, 0x0104, NO_DUMP ) // protected
 ROM_END
 
 ROM_START( airwolf )
@@ -1164,7 +1197,7 @@ ROM_START( airwolf )
 	ROM_LOAD( "01j.bin",     0x0000, 0x0100, CRC(6a94b2a3) SHA1(b1f9bd97aa26c9fb6377ef32d5dd125583361f48) ) /* red */
 	ROM_LOAD( "01h.bin",     0x0100, 0x0100, CRC(ec0923d3) SHA1(26f9eda4260a8b767893b8dea42819f192ef0b20) ) /* green */
 	ROM_LOAD( "01f.bin",     0x0200, 0x0100, CRC(ade97052) SHA1(cc1b4cd57d7bc55ce44de6b89a322ff08eabb1a0) ) /* blue */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	ROM_LOAD( "74s288-2.bin",     0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* blank lookup prom */
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -1206,7 +1239,7 @@ ROM_START( airwolfa )
 	ROM_LOAD( "01j.bin",     0x0000, 0x0100, CRC(6a94b2a3) SHA1(b1f9bd97aa26c9fb6377ef32d5dd125583361f48) ) /* red */
 	ROM_LOAD( "01h.bin",     0x0100, 0x0100, CRC(ec0923d3) SHA1(26f9eda4260a8b767893b8dea42819f192ef0b20) ) /* green */
 	ROM_LOAD( "01f.bin",     0x0200, 0x0100, CRC(ade97052) SHA1(cc1b4cd57d7bc55ce44de6b89a322ff08eabb1a0) ) /* blue */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	ROM_LOAD( "74s288-2.bin",     0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* blank lookup prom */
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -1244,7 +1277,7 @@ ROM_START( skywolf )
 	ROM_LOAD( "01j.bin",     0x0000, 0x0100, CRC(6a94b2a3) SHA1(b1f9bd97aa26c9fb6377ef32d5dd125583361f48) ) /* red */
 	ROM_LOAD( "01h.bin",     0x0100, 0x0100, CRC(ec0923d3) SHA1(26f9eda4260a8b767893b8dea42819f192ef0b20) ) /* green */
 	ROM_LOAD( "01f.bin",     0x0200, 0x0100, CRC(ade97052) SHA1(cc1b4cd57d7bc55ce44de6b89a322ff08eabb1a0) ) /* blue */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	ROM_LOAD( "74s288-2.bin",     0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* blank lookup prom */
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 ROM_END
 
@@ -1276,7 +1309,7 @@ ROM_START( skywolf2 )
 	ROM_LOAD( "01j.bin",     0x0000, 0x0100, CRC(6a94b2a3) SHA1(b1f9bd97aa26c9fb6377ef32d5dd125583361f48) ) /* red */
 	ROM_LOAD( "01h.bin",     0x0100, 0x0100, CRC(ec0923d3) SHA1(26f9eda4260a8b767893b8dea42819f192ef0b20) ) /* green */
 	ROM_LOAD( "01f.bin",     0x0200, 0x0100, CRC(ade97052) SHA1(cc1b4cd57d7bc55ce44de6b89a322ff08eabb1a0) ) /* blue */
-	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	ROM_LOAD( "74s288-2.bin",     0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* blank lookup prom */
 	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
 ROM_END
 
@@ -1349,6 +1382,11 @@ ROM_START( skywolf3 )
 	ROM_LOAD( "82s129-3.bin",     0x0200, 0x0100, CRC(ade97052) SHA1(cc1b4cd57d7bc55ce44de6b89a322ff08eabb1a0) ) /* blue */
 	ROM_LOAD( "74s288-2.bin",     0x0300, 0x0020, CRC(190a55ad) SHA1(de8a847bff8c343d69b853a215e6ee775ef2ef96) ) /* blank lookup prom */
 	ROM_LOAD( "74s288-1.bin",     0x0320, 0x0020, CRC(5ddb2d15) SHA1(422663566ebc7ea8cbc3089d806b0868e006fe0c) ) /* timing? not used */
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16l8nc.1", 0x0000, 0x0104, NO_DUMP ) // protected
+	ROM_LOAD( "pal16l8nc.2", 0x0200, 0x0104, NO_DUMP ) // protected
+	ROM_LOAD( "pal16l8nc.3", 0x0400, 0x0104, NO_DUMP ) // protected
 ROM_END
 
 ROM_START( legend )

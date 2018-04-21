@@ -7,17 +7,8 @@
 
 what's the difference between IGS017 and IGS031? encryption?
 
-all the known IGS017 / IGS031 games use the following memory map, is the IGS017 / IGS031 providing the interface to the 8255, or is it coincidence?
-
-    AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_SHARE("spriteram")
-    AM_RANGE( 0x1800, 0x1bff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-    AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
-    AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD("ppi8255", i8255_device, read)
-    AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
-    AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
-    AM_RANGE( 0x2015, 0x2015 ) AM_WRITE(irq_enable_w )
-    AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE(fg_w ) AM_SHARE("fg_videoram")
-    AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE(bg_w ) AM_SHARE("bg_videoram")
+all the known IGS017 / IGS031 games use same memory map, is the IGS017 / IGS031
+providing the interface to the 8255, or is it coincidence?
 
 */
 
@@ -31,7 +22,7 @@ all the known IGS017 / IGS031 games use the following memory map, is the IGS017 
 void igs017_igs031_device::map(address_map &map)
 {
 	map(0x1000, 0x17ff).ram().share("spriteram");
-//  AM_RANGE( 0x1800, 0x1bff ) AM_RAM //_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+//  map(0x1800, 0x1bff).ram() //.w("palette", FUNC(palette_device::write).share("palette");
 	map(0x1800, 0x1bff).ram().w(this, FUNC(igs017_igs031_device::palram_w)).share("palram");
 	map(0x1c00, 0x1fff).ram();
 

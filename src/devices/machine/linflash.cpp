@@ -42,17 +42,18 @@ WRITE16_MEMBER( linear_flash_pccard_device::write_memory )
 }
 
 
-ADDRESS_MAP_START(linear_flash_pccard_16mb_device::linear_flash_pccard_16mb)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x00400000, 0x007fffff) AM_DEVREADWRITE8("2l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00400000, 0x007fffff) AM_DEVREADWRITE8("2u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x00800000, 0x00bfffff) AM_DEVREADWRITE8("3l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00800000, 0x00bfffff) AM_DEVREADWRITE8("3u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x00c00000, 0x00ffffff) AM_DEVREADWRITE8("4l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00c00000, 0x00ffffff) AM_DEVREADWRITE8("4u", intelfsh8_device, read, write, 0xff00)
-ADDRESS_MAP_END
+void linear_flash_pccard_16mb_device::linear_flash_pccard_16mb(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x003fffff).rw("1l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00000000, 0x003fffff).rw("1u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x00400000, 0x007fffff).rw("2l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00400000, 0x007fffff).rw("2u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x00800000, 0x00bfffff).rw("3l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00800000, 0x00bfffff).rw("3u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x00c00000, 0x00ffffff).rw("4l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00c00000, 0x00ffffff).rw("4u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+}
 
 linear_flash_pccard_16mb_device::linear_flash_pccard_16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_16MB, tag, owner, clock)
@@ -72,25 +73,26 @@ MACHINE_CONFIG_START(linear_flash_pccard_16mb_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-ADDRESS_MAP_START(linear_flash_pccard_32mb_device::linear_flash_pccard_32mb)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x00400000, 0x007fffff) AM_DEVREADWRITE8("2l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00400000, 0x007fffff) AM_DEVREADWRITE8("2u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x00800000, 0x00bfffff) AM_DEVREADWRITE8("3l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00800000, 0x00bfffff) AM_DEVREADWRITE8("3u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x00c00000, 0x00ffffff) AM_DEVREADWRITE8("4l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00c00000, 0x00ffffff) AM_DEVREADWRITE8("4u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x01000000, 0x013fffff) AM_DEVREADWRITE8("5l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x01000000, 0x013fffff) AM_DEVREADWRITE8("5u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x01400000, 0x017fffff) AM_DEVREADWRITE8("6l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x01400000, 0x017fffff) AM_DEVREADWRITE8("6u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x01800000, 0x01bfffff) AM_DEVREADWRITE8("7l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x01800000, 0x01bfffff) AM_DEVREADWRITE8("7u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x01c00000, 0x01ffffff) AM_DEVREADWRITE8("8l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x01c00000, 0x01ffffff) AM_DEVREADWRITE8("8u", intelfsh8_device, read, write, 0xff00)
-ADDRESS_MAP_END
+void linear_flash_pccard_32mb_device::linear_flash_pccard_32mb(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x003fffff).rw("1l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00000000, 0x003fffff).rw("1u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x00400000, 0x007fffff).rw("2l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00400000, 0x007fffff).rw("2u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x00800000, 0x00bfffff).rw("3l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00800000, 0x00bfffff).rw("3u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x00c00000, 0x00ffffff).rw("4l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00c00000, 0x00ffffff).rw("4u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x01000000, 0x013fffff).rw("5l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x01000000, 0x013fffff).rw("5u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x01400000, 0x017fffff).rw("6l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x01400000, 0x017fffff).rw("6u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x01800000, 0x01bfffff).rw("7l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x01800000, 0x01bfffff).rw("7u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x01c00000, 0x01ffffff).rw("8l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x01c00000, 0x01ffffff).rw("8u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+}
 
 linear_flash_pccard_32mb_device::linear_flash_pccard_32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_32MB, tag, owner, clock)
@@ -118,41 +120,42 @@ MACHINE_CONFIG_START(linear_flash_pccard_32mb_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-ADDRESS_MAP_START(linear_flash_pccard_64mb_device::linear_flash_pccard_64mb)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00000000, 0x003fffff) AM_DEVREADWRITE8("1u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x00400000, 0x007fffff) AM_DEVREADWRITE8("2l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00400000, 0x007fffff) AM_DEVREADWRITE8("2u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x00800000, 0x00bfffff) AM_DEVREADWRITE8("3l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00800000, 0x00bfffff) AM_DEVREADWRITE8("3u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x00c00000, 0x00ffffff) AM_DEVREADWRITE8("4l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x00c00000, 0x00ffffff) AM_DEVREADWRITE8("4u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x01000000, 0x013fffff) AM_DEVREADWRITE8("5l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x01000000, 0x013fffff) AM_DEVREADWRITE8("5u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x01400000, 0x017fffff) AM_DEVREADWRITE8("6l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x01400000, 0x017fffff) AM_DEVREADWRITE8("6u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x01800000, 0x01bfffff) AM_DEVREADWRITE8("7l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x01800000, 0x01bfffff) AM_DEVREADWRITE8("7u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x01c00000, 0x01ffffff) AM_DEVREADWRITE8("8l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x01c00000, 0x01ffffff) AM_DEVREADWRITE8("8u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x02000000, 0x023fffff) AM_DEVREADWRITE8("9l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x02000000, 0x023fffff) AM_DEVREADWRITE8("9u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x02400000, 0x027fffff) AM_DEVREADWRITE8("10l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x02400000, 0x027fffff) AM_DEVREADWRITE8("10u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x02800000, 0x02bfffff) AM_DEVREADWRITE8("11l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x02800000, 0x02bfffff) AM_DEVREADWRITE8("11u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x02c00000, 0x02ffffff) AM_DEVREADWRITE8("12l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x02c00000, 0x02ffffff) AM_DEVREADWRITE8("12u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x03000000, 0x033fffff) AM_DEVREADWRITE8("13l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x03000000, 0x033fffff) AM_DEVREADWRITE8("13u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x03400000, 0x037fffff) AM_DEVREADWRITE8("14l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x03400000, 0x037fffff) AM_DEVREADWRITE8("14u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x03800000, 0x03bfffff) AM_DEVREADWRITE8("15l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x03800000, 0x03bfffff) AM_DEVREADWRITE8("15u", intelfsh8_device, read, write, 0xff00)
-	AM_RANGE(0x03c00000, 0x03ffffff) AM_DEVREADWRITE8("16l", intelfsh8_device, read, write, 0x00ff)
-	AM_RANGE(0x03c00000, 0x03ffffff) AM_DEVREADWRITE8("16u", intelfsh8_device, read, write, 0xff00)
-ADDRESS_MAP_END
+void linear_flash_pccard_64mb_device::linear_flash_pccard_64mb(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x003fffff).rw("1l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00000000, 0x003fffff).rw("1u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x00400000, 0x007fffff).rw("2l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00400000, 0x007fffff).rw("2u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x00800000, 0x00bfffff).rw("3l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00800000, 0x00bfffff).rw("3u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x00c00000, 0x00ffffff).rw("4l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x00c00000, 0x00ffffff).rw("4u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x01000000, 0x013fffff).rw("5l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x01000000, 0x013fffff).rw("5u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x01400000, 0x017fffff).rw("6l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x01400000, 0x017fffff).rw("6u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x01800000, 0x01bfffff).rw("7l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x01800000, 0x01bfffff).rw("7u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x01c00000, 0x01ffffff).rw("8l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x01c00000, 0x01ffffff).rw("8u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x02000000, 0x023fffff).rw("9l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x02000000, 0x023fffff).rw("9u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x02400000, 0x027fffff).rw("10l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x02400000, 0x027fffff).rw("10u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x02800000, 0x02bfffff).rw("11l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x02800000, 0x02bfffff).rw("11u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x02c00000, 0x02ffffff).rw("12l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x02c00000, 0x02ffffff).rw("12u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x03000000, 0x033fffff).rw("13l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x03000000, 0x033fffff).rw("13u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x03400000, 0x037fffff).rw("14l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x03400000, 0x037fffff).rw("14u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x03800000, 0x03bfffff).rw("15l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x03800000, 0x03bfffff).rw("15u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x03c00000, 0x03ffffff).rw("16l", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+	map(0x03c00000, 0x03ffffff).rw("16u", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+}
 
 linear_flash_pccard_64mb_device::linear_flash_pccard_64mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	linear_flash_pccard_device(mconfig, LINEAR_FLASH_PCCARD_64MB, tag, owner, clock)

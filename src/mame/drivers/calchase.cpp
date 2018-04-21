@@ -100,7 +100,7 @@ Grull Osgo - Improvements
 
 -Changes about BIOS memory management so ROM Shadow now works properly.
  The changes are:
-    Rom Memory Map remmapped to 128K size AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
+    Rom Memory Map remmapped to 128K size map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 
 -Changes in mtxc write handler and bios_ram write handler. Now The internal register access are
 compatible with chipset VIA.
@@ -393,7 +393,7 @@ void calchase_state::calchase_map(address_map &map)
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
 	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
 	map(0x000c8000, 0x000cffff).noprw();
-	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
+	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
 	map(0x000d0004, 0x000d0005).r(this, FUNC(calchase_state::calchase_iocard1_r));
 	map(0x000d000c, 0x000d000d).r(this, FUNC(calchase_state::calchase_iocard2_r));
 	map(0x000d0032, 0x000d0033).r(this, FUNC(calchase_state::calchase_iocard3_r));
@@ -403,30 +403,27 @@ void calchase_state::calchase_map(address_map &map)
 	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::write));
 	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::write));
 	map(0x000d0800, 0x000d0fff).rom().region("nvram", 0); //
-//  AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+//  map(0x000d0800, 0x000d0fff).ram();  // GAME_CMOS
 
-	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
-	//GRULL AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	map(0x000e0000, 0x000effff).bankr("bios_ext").w(this, FUNC(calchase_state::bios_ext_ram_w));
 	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(this, FUNC(calchase_state::bios_ram_w));
 	map(0x00100000, 0x03ffffff).ram();  // 64MB
 	map(0x04000000, 0x28ffffff).noprw();
-	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
-	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
-	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
-	//AM_RANGE(0x10000000, 0x100001ff) AM_RAM
-	//AM_RANGE(0x14000000, 0x140001ff) AM_RAM
-	//AM_RANGE(0x18000000, 0x180001ff) AM_RAM
-	//AM_RANGE(0x20000000, 0x200001ff) AM_RAM
-	//AM_RANGE(0x28000000, 0x280001ff) AM_RAM
+	//map(0x04000000, 0x040001ff).ram();
+	//map(0x08000000, 0x080001ff).ram();
+	//map(0x0c000000, 0x0c0001ff).ram();
+	//map(0x10000000, 0x100001ff).ram();
+	//map(0x14000000, 0x140001ff).ram();
+	//map(0x18000000, 0x180001ff).ram();
+	//map(0x20000000, 0x200001ff).ram();
+	//map(0x28000000, 0x280001ff).ram();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
 void calchase_state::calchase_io(address_map &map)
 {
 	pcat32_io_common(map);
-	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
+	//map(0x00e8, 0x00eb).noprw();
 	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
 	map(0x0170, 0x0177).noprw(); //To debug
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
@@ -445,8 +442,8 @@ void calchase_state::calchase_io(address_map &map)
 	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
 	map(0x03e0, 0x03ef).noprw(); //To debug
 	map(0x0378, 0x037f).noprw(); //To debug
-	// AM_RANGE(0x0300, 0x03af) AM_NOP
-	// AM_RANGE(0x03b0, 0x03df) AM_NOP
+	// map(0x0300, 0x03af).noprw();
+	// map(0x03b0, 0x03df).noprw();
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
 	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
 	map(0x0a78, 0x0a7b).nopw();//AM_WRITE(pnp_data_w)

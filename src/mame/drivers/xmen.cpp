@@ -128,39 +128,39 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x10a006, 0x10a007).portr("P5_P6");
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r)); /* sprites */
 	map(0x110000, 0x113fff).ram();     /* main RAM */
-/*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_device, lsb_w) AM_SHARE("tilemapleft") */
+/*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:lsb_w)).share("tilemapleft"); */
 	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
 	map(0x18fa00, 0x18fa01).w(this, FUNC(xmen_state::xmen_18fa00_w));
 /*
-    AM_RANGE(0x1ac000, 0x1af7ff) AM_READONLY
-    AM_RANGE(0x1ac000, 0x1af7ff) AM_WRITEONLY
+    map(0x1ac000, 0x1af7ff).readonly();
+    map(0x1ac000, 0x1af7ff).writeonly();
 
-    AM_RANGE(0x1b0000, 0x1b37ff) AM_READONLY
-    AM_RANGE(0x1b0000, 0x1b37ff) AM_WRITEONLY
+    map(0x1b0000, 0x1b37ff).readonly();
+    map(0x1b0000, 0x1b37ff).writeonly();
 
-    AM_RANGE(0x1b4000, 0x1b77ff) AM_READONLY
-    AM_RANGE(0x1b4000, 0x1b77ff) AM_WRITEONLY
+    map(0x1b4000, 0x1b77ff).readonly();
+    map(0x1b4000, 0x1b77ff).writeonly();
 */
 	map(0x1ac000, 0x1b7fff).ram().share("tilemapright"); /* right tilemap */
 
 	/* what are the regions below buffers? (used by hw or software?) */
 /*
-    AM_RANGE(0x1cc000, 0x1cf7ff) AM_READONLY
-    AM_RANGE(0x1cc000, 0x1cf7ff) AM_WRITEONLY
+    map(0x1cc000, 0x1cf7ff).readonly();
+    map(0x1cc000, 0x1cf7ff).writeonly();
 
-    AM_RANGE(0x1d0000, 0x1d37ff) AM_READONLY
-    AM_RANGE(0x1d0000, 0x1d37ff) AM_WRITEONLY
+    map(0x1d0000, 0x1d37ff).readonly();
+    map(0x1d0000, 0x1d37ff).writeonly();
 */
 	map(0x1cc000, 0x1d7fff).ram(); /* tilemap ? */
 
 	/* whats the stuff below, buffers? */
 /*
-    AM_RANGE(0x1ec000, 0x1ef7ff) AM_READONLY
-    AM_RANGE(0x1ec000, 0x1ef7ff) AM_WRITEONLY
-    AM_RANGE(0x1f0000, 0x1f37ff) AM_READONLY
-    AM_RANGE(0x1f0000, 0x1f37ff) AM_WRITEONLY
-    AM_RANGE(0x1f4000, 0x1f77ff) AM_READONLY
-    AM_RANGE(0x1f4000, 0x1f77ff) AM_WRITEONLY
+    map(0x1ec000, 0x1ef7ff).readonly();
+    map(0x1ec000, 0x1ef7ff).writeonly();
+    map(0x1f0000, 0x1f37ff).readonly();
+    map(0x1f0000, 0x1f37ff).writeonly();
+    map(0x1f4000, 0x1f77ff).readonly();
+    map(0x1f4000, 0x1f77ff).writeonly();
 */
 	map(0x1ec000, 0x1f7fff).ram(); /* tilemap ? */
 }

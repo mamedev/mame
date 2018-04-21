@@ -513,27 +513,29 @@ void c1541_device_base::c1541_mem(address_map &map)
 //  ADDRESS_MAP( c1541dd_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c1541_device_base::c1541dd_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x2000)
-ADDRESS_MAP_END
+void c1541_device_base::c1541dd_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x6000).ram();
+	map(0x1800, 0x180f).mirror(0x63f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1c00, 0x1c0f).mirror(0x63f0).rw(M6522_1_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xffff).rom().region(M6502_TAG, 0x2000);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( c1541pd_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c1541_device_base::c1541pd_mem)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION(M6502_TAG, 0x4000)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x0000)
-ADDRESS_MAP_END
+void c1541_device_base::c1541pd_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x6000).ram();
+	map(0x1800, 0x180f).mirror(0x63f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1c00, 0x1c0f).mirror(0x63f0).rw(M6522_1_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x9fff).rom().region(M6502_TAG, 0x4000);
+	map(0xa000, 0xbfff).ram();
+	map(0xc000, 0xffff).rom().region(M6502_TAG, 0x0000);
+}
 
 
 //-------------------------------------------------

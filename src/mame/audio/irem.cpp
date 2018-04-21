@@ -358,32 +358,36 @@ DISCRETE_SOUND_END
 
 /* complete address map verified from Moon Patrol/10 Yard Fight schematics */
 /* large map uses 8k ROMs, small map uses 4k ROMs; this is selected via a jumper */
-ADDRESS_MAP_START(irem_audio_device::m52_small_sound_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(m52_adpcm_w)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x2000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void irem_audio_device::m52_small_sound_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x0fff).w(this, FUNC(irem_audio_device::m52_adpcm_w));
+	map(0x1000, 0x1fff).w(this, FUNC(irem_audio_device::sound_irq_ack_w));
+	map(0x2000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(irem_audio_device::m52_large_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(m52_adpcm_w)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void irem_audio_device::m52_large_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).w(this, FUNC(irem_audio_device::m52_adpcm_w));
+	map(0x2000, 0x3fff).w(this, FUNC(irem_audio_device::sound_irq_ack_w));
+	map(0x4000, 0xffff).rom();
+}
 
 
 /* complete address map verified from Kid Niki schematics */
-ADDRESS_MAP_START(irem_audio_device::m62_sound_map)
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_WRITE(m62_adpcm_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void irem_audio_device::m62_sound_map(address_map &map)
+{
+	map(0x0800, 0x0800).mirror(0xf7fc).w(this, FUNC(irem_audio_device::sound_irq_ack_w));
+	map(0x0801, 0x0802).mirror(0xf7fc).w(this, FUNC(irem_audio_device::m62_adpcm_w));
+	map(0x4000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(irem_audio_device::irem_sound_portmap)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(m6803_port1_r, m6803_port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
-ADDRESS_MAP_END
+void irem_audio_device::irem_sound_portmap(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(irem_audio_device::m6803_port1_r), FUNC(irem_audio_device::m6803_port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(irem_audio_device::m6803_port2_r), FUNC(irem_audio_device::m6803_port2_w));
+}
 
 /*
  * Original recordings:

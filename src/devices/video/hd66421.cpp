@@ -72,9 +72,10 @@ DEFINE_DEVICE_TYPE(HD66421, hd66421_device, "hd66421", "Hitachi HD66421 LCD Cont
 
 
 // default address map
-ADDRESS_MAP_START(hd66421_device::hd66421)
-	AM_RANGE(0x0000, HD66421_RAM_SIZE) AM_RAM
-ADDRESS_MAP_END
+void hd66421_device::hd66421(address_map &map)
+{
+	map(0x0000, HD66421_RAM_SIZE).ram();
+}
 
 //-------------------------------------------------
 //  memory_space_config - return a description of

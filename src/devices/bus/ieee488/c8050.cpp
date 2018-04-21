@@ -220,34 +220,36 @@ void c8050_device::c8050_fdc_mem(address_map &map)
 //  ADDRESS_MAP( c8250lp_fdc_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c8050_device::c8250lp_fdc_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_DEVICE(M6530_TAG, mos6530_new_device, ram_map)
-	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVICE(M6522_TAG, via6522_device, map)
-	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVICE(M6530_TAG, mos6530_new_device, io_map)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
-ADDRESS_MAP_END
+void c8050_device::c8250lp_fdc_mem(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x003f).mirror(0x0300).m(M6530_TAG, FUNC(mos6530_new_device::ram_map));
+	map(0x0040, 0x004f).mirror(0x0330).m(M6522_TAG, FUNC(via6522_device::map));
+	map(0x0080, 0x008f).mirror(0x0330).m(M6530_TAG, FUNC(mos6530_new_device::io_map));
+	map(0x0400, 0x07ff).ram().share("share1");
+	map(0x0800, 0x0bff).ram().share("share2");
+	map(0x0c00, 0x0fff).ram().share("share3");
+	map(0x1000, 0x13ff).ram().share("share4");
+	map(0x1800, 0x1fff).rom().region(M6504_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( sfd1001_fdc_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c8050_device::sfd1001_fdc_mem)
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_DEVICE(M6530_TAG, mos6530_new_device, ram_map)
-	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVICE(M6522_TAG, via6522_device, map)
-	AM_RANGE(0x0080, 0x008f) AM_MIRROR(0x0330) AM_DEVICE(M6530_TAG, mos6530_new_device, io_map)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
-ADDRESS_MAP_END
+void c8050_device::sfd1001_fdc_mem(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x003f).mirror(0x0300).m(M6530_TAG, FUNC(mos6530_new_device::ram_map));
+	map(0x0040, 0x004f).mirror(0x0330).m(M6522_TAG, FUNC(via6522_device::map));
+	map(0x0080, 0x008f).mirror(0x0330).m(M6530_TAG, FUNC(mos6530_new_device::io_map));
+	map(0x0400, 0x07ff).ram().share("share1");
+	map(0x0800, 0x0bff).ram().share("share2");
+	map(0x0c00, 0x0fff).ram().share("share3");
+	map(0x1000, 0x13ff).ram().share("share4");
+	map(0x1800, 0x1fff).rom().region(M6504_TAG, 0);
+}
 
 
 //-------------------------------------------------

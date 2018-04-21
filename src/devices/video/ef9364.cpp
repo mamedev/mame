@@ -33,9 +33,10 @@ DEFINE_DEVICE_TYPE(EF9364, ef9364_device, "ef9364", "Thomson EF9364")
 //-------------------------------------------------
 // default address map
 //-------------------------------------------------
-ADDRESS_MAP_START(ef9364_device::ef9364)
-	AM_RANGE(0x00000, ( ( ef9364_device::TXTPLANE_MAX_SIZE * ef9364_device::MAX_TXTPLANES ) - 1 ) ) AM_RAM
-ADDRESS_MAP_END
+void ef9364_device::ef9364(address_map &map)
+{
+	map(0x00000, ef9364_device::TXTPLANE_MAX_SIZE * ef9364_device::MAX_TXTPLANES - 1).ram();
+}
 
 //-------------------------------------------------
 //  memory_space_config - return a description of

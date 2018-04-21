@@ -149,13 +149,15 @@ const tiny_rom_entry *isa16_sad8852_device::device_rom_region() const
 //-------------------------------------------------
 //  ADDRESS maps
 //-------------------------------------------------
-ADDRESS_MAP_START(isa16_sad8852_device::sad8852_mem)
-	AM_RANGE(0x00000, 0x80000) AM_RAM
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(I80188_TAG, 0)
-ADDRESS_MAP_END
+void isa16_sad8852_device::sad8852_mem(address_map &map)
+{
+	map(0x00000, 0x80000).ram();
+	map(0xfc000, 0xfffff).rom().region(I80188_TAG, 0);
+}
 
-ADDRESS_MAP_START(isa16_sad8852_device::sad8852_io)
-ADDRESS_MAP_END
+void isa16_sad8852_device::sad8852_io(address_map &map)
+{
+}
 
 //----------------------------------------------------------
 //  UI I/O

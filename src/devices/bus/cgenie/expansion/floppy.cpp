@@ -30,13 +30,14 @@
 
 DEFINE_DEVICE_TYPE(CGENIE_FDC, cgenie_fdc_device, "cgenie_fdc", "Colour Genie FDC")
 
-ADDRESS_MAP_START(cgenie_fdc_device::mmio)
-	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x10) AM_READWRITE(irq_r, select_w)
-	AM_RANGE(0xec, 0xec) AM_MIRROR(0x10) AM_DEVREAD("fd1793", fd1793_device, status_r) AM_WRITE(command_w)
-	AM_RANGE(0xed, 0xed) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, track_r, track_w)
-	AM_RANGE(0xee, 0xee) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, sector_r, sector_w)
-	AM_RANGE(0xef, 0xef) AM_MIRROR(0x10) AM_DEVREADWRITE("fd1793", fd1793_device, data_r, data_w)
-ADDRESS_MAP_END
+void cgenie_fdc_device::mmio(address_map &map)
+{
+	map(0xe0, 0xe3).mirror(0x10).rw(this, FUNC(cgenie_fdc_device::irq_r), FUNC(cgenie_fdc_device::select_w));
+	map(0xec, 0xec).mirror(0x10).r("fd1793", FUNC(fd1793_device::status_r)).w(this, FUNC(cgenie_fdc_device::command_w));
+	map(0xed, 0xed).mirror(0x10).rw("fd1793", FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
+	map(0xee, 0xee).mirror(0x10).rw("fd1793", FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
+	map(0xef, 0xef).mirror(0x10).rw("fd1793", FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+}
 
 FLOPPY_FORMATS_MEMBER( cgenie_fdc_device::floppy_formats )
 	FLOPPY_CGENIE_FORMAT

@@ -26,17 +26,18 @@
 
 DEFINE_DEVICE_TYPE(PCI9050, pci9050_device, "pci9050", "PLX PCI9050 PCI to Local Bus Bridge")
 
-ADDRESS_MAP_START(pci9050_device::map)
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(lasrr_r,   lasrr_w  )
-	AM_RANGE(0x10, 0x13) AM_READWRITE(eromrr_r,  eromrr_w )
-	AM_RANGE(0x14, 0x23) AM_READWRITE(lasba_r,   lasba_w  )
-	AM_RANGE(0x24, 0x27) AM_READWRITE(eromba_r,  eromba_w )
-	AM_RANGE(0x28, 0x37) AM_READWRITE(lasbrd_r,  lasbrd_w )
-	AM_RANGE(0x38, 0x3b) AM_READWRITE(erombrd_r, erombrd_w)
-	AM_RANGE(0x3c, 0x4b) AM_READWRITE(csbase_r,  csbase_w )
-	AM_RANGE(0x4c, 0x4f) AM_READWRITE(intcsr_r,  intcsr_w )
-	AM_RANGE(0x50, 0x53) AM_READWRITE(cntrl_r,   cntrl_w  )
-ADDRESS_MAP_END
+void pci9050_device::map(address_map &map)
+{
+	map(0x00, 0x0f).rw(this, FUNC(pci9050_device::lasrr_r), FUNC(pci9050_device::lasrr_w));
+	map(0x10, 0x13).rw(this, FUNC(pci9050_device::eromrr_r), FUNC(pci9050_device::eromrr_w));
+	map(0x14, 0x23).rw(this, FUNC(pci9050_device::lasba_r), FUNC(pci9050_device::lasba_w));
+	map(0x24, 0x27).rw(this, FUNC(pci9050_device::eromba_r), FUNC(pci9050_device::eromba_w));
+	map(0x28, 0x37).rw(this, FUNC(pci9050_device::lasbrd_r), FUNC(pci9050_device::lasbrd_w));
+	map(0x38, 0x3b).rw(this, FUNC(pci9050_device::erombrd_r), FUNC(pci9050_device::erombrd_w));
+	map(0x3c, 0x4b).rw(this, FUNC(pci9050_device::csbase_r), FUNC(pci9050_device::csbase_w));
+	map(0x4c, 0x4f).rw(this, FUNC(pci9050_device::intcsr_r), FUNC(pci9050_device::intcsr_w));
+	map(0x50, 0x53).rw(this, FUNC(pci9050_device::cntrl_r), FUNC(pci9050_device::cntrl_w));
+}
 
 pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, PCI9050, tag, owner, clock),

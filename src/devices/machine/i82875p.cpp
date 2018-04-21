@@ -7,39 +7,41 @@ DEFINE_DEVICE_TYPE(I82875P_HOST,     i82875p_host_device,     "i82875p_host",   
 DEFINE_DEVICE_TYPE(I82875P_AGP,      i82875p_agp_device,      "i82875p_agp",      "Intel 82875P AGP Bridge")
 DEFINE_DEVICE_TYPE(I82875P_OVERFLOW, i82875p_overflow_device, "i82875p_overflow", "Intel 82875P Configuration Overflow")
 
-ADDRESS_MAP_START(i82875p_host_device::agp_translation_map)
-ADDRESS_MAP_END
+void i82875p_host_device::agp_translation_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(i82875p_host_device::config_map)
-	AM_IMPORT_FROM(pci_host_device::config_map)
-	AM_RANGE(0x50, 0x53) AM_READWRITE8 (agpm_r,     agpm_w,     0x0000ff00)
-	AM_RANGE(0x50, 0x53) AM_READ8      (gc_r,                   0x00ff0000)
-	AM_RANGE(0x50, 0x53) AM_READ8      (csabcont_r,             0xff000000)
-	AM_RANGE(0x58, 0x5b) AM_READ       (eap_r)
-	AM_RANGE(0x5c, 0x5f) AM_READ8      (derrsyn_r,              0x000000ff)
-	AM_RANGE(0x5c, 0x5f) AM_READ8      (des_r,                  0x0000ff00)
-	AM_RANGE(0x60, 0x63) AM_READWRITE8 (fpllcont_r, fpllcont_w, 0x000000ff)
-	AM_RANGE(0x90, 0x97) AM_READWRITE8 (pam_r,      pam_w,      0xffffffff)
-	AM_RANGE(0x9c, 0x9f) AM_READWRITE8 (smram_r,    smram_w,    0x0000ff00)
-	AM_RANGE(0x9c, 0x9f) AM_READWRITE8 (esmramc_r,  esmramc_w,  0x00ff0000)
-	AM_RANGE(0xa0, 0xa3) AM_READ       (acapid_r)
-	AM_RANGE(0xa4, 0xa7) AM_READ       (agpstat_r)
-	AM_RANGE(0xa8, 0xab) AM_READ       (agpcmd_r)
-	AM_RANGE(0xb0, 0xb3) AM_READWRITE  (agpctrl_r,  agpctrl_w)
-	AM_RANGE(0xb4, 0xb7) AM_READWRITE8 (apsize_r,   apsize_w,   0x000000ff)
-	AM_RANGE(0xb8, 0xbb) AM_READWRITE  (attbase_r,  attbase_w)
-	AM_RANGE(0xbc, 0xbf) AM_READWRITE8 (amtt_r,     amtt_w,     0x000000ff)
-	AM_RANGE(0xbc, 0xbf) AM_READWRITE8 (lptt_r,     lptt_w,     0x0000ff00)
-	AM_RANGE(0xc4, 0xc7) AM_READWRITE16(toud_r,     toud_w,     0x0000ffff)
-	AM_RANGE(0xc4, 0xc7) AM_READWRITE16(mchcfg_r,   mchcfg_w,   0xffff0000)
-	AM_RANGE(0xc8, 0xcb) AM_READ16     (errsts_r,               0x0000ffff)
-	AM_RANGE(0xc8, 0xcb) AM_READWRITE16(errcmd_r,   errcmd_w,   0xffff0000)
-	AM_RANGE(0xcc, 0xcf) AM_READWRITE16(smicmd_r,   smicmd_w,   0x0000ffff)
-	AM_RANGE(0xcc, 0xcf) AM_READWRITE16(scicmd_r,   scicmd_w,   0xffff0000)
-	AM_RANGE(0xdc, 0xdf) AM_READWRITE16(skpd_r,     skpd_w,     0xffff0000)
-	AM_RANGE(0xe4, 0xe7) AM_READ       (capreg1_r)
-	AM_RANGE(0xe8, 0xeb) AM_READ8      (capreg2_r,              0x000000ff)
-ADDRESS_MAP_END
+void i82875p_host_device::config_map(address_map &map)
+{
+	pci_host_device::config_map(map);
+	map(0x51, 0x51).rw(this, FUNC(i82875p_host_device::agpm_r), FUNC(i82875p_host_device::agpm_w));
+	map(0x52, 0x52).r(this, FUNC(i82875p_host_device::gc_r));
+	map(0x53, 0x53).r(this, FUNC(i82875p_host_device::csabcont_r));
+	map(0x58, 0x5b).r(this, FUNC(i82875p_host_device::eap_r));
+	map(0x5c, 0x5c).r(this, FUNC(i82875p_host_device::derrsyn_r));
+	map(0x5d, 0x5d).r(this, FUNC(i82875p_host_device::des_r));
+	map(0x60, 0x60).rw(this, FUNC(i82875p_host_device::fpllcont_r), FUNC(i82875p_host_device::fpllcont_w));
+	map(0x90, 0x97).rw(this, FUNC(i82875p_host_device::pam_r), FUNC(i82875p_host_device::pam_w));
+	map(0x9d, 0x9d).rw(this, FUNC(i82875p_host_device::smram_r), FUNC(i82875p_host_device::smram_w));
+	map(0x9e, 0x9e).rw(this, FUNC(i82875p_host_device::esmramc_r), FUNC(i82875p_host_device::esmramc_w));
+	map(0xa0, 0xa3).r(this, FUNC(i82875p_host_device::acapid_r));
+	map(0xa4, 0xa7).r(this, FUNC(i82875p_host_device::agpstat_r));
+	map(0xa8, 0xab).r(this, FUNC(i82875p_host_device::agpcmd_r));
+	map(0xb0, 0xb3).rw(this, FUNC(i82875p_host_device::agpctrl_r), FUNC(i82875p_host_device::agpctrl_w));
+	map(0xb4, 0xb4).rw(this, FUNC(i82875p_host_device::apsize_r), FUNC(i82875p_host_device::apsize_w));
+	map(0xb8, 0xbb).rw(this, FUNC(i82875p_host_device::attbase_r), FUNC(i82875p_host_device::attbase_w));
+	map(0xbc, 0xbc).rw(this, FUNC(i82875p_host_device::amtt_r), FUNC(i82875p_host_device::amtt_w));
+	map(0xbd, 0xbd).rw(this, FUNC(i82875p_host_device::lptt_r), FUNC(i82875p_host_device::lptt_w));
+	map(0xc4, 0xc5).rw(this, FUNC(i82875p_host_device::toud_r), FUNC(i82875p_host_device::toud_w));
+	map(0xc6, 0xc7).rw(this, FUNC(i82875p_host_device::mchcfg_r), FUNC(i82875p_host_device::mchcfg_w));
+	map(0xc8, 0xc9).r(this, FUNC(i82875p_host_device::errsts_r));
+	map(0xca, 0xcb).rw(this, FUNC(i82875p_host_device::errcmd_r), FUNC(i82875p_host_device::errcmd_w));
+	map(0xcc, 0xcd).rw(this, FUNC(i82875p_host_device::smicmd_r), FUNC(i82875p_host_device::smicmd_w));
+	map(0xce, 0xcf).rw(this, FUNC(i82875p_host_device::scicmd_r), FUNC(i82875p_host_device::scicmd_w));
+	map(0xde, 0xdf).rw(this, FUNC(i82875p_host_device::skpd_r), FUNC(i82875p_host_device::skpd_w));
+	map(0xe4, 0xe7).r(this, FUNC(i82875p_host_device::capreg1_r));
+	map(0xe8, 0xe8).r(this, FUNC(i82875p_host_device::capreg2_r));
+}
 
 i82875p_host_device::i82875p_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, I82875P_HOST, tag, owner, clock)
@@ -441,12 +443,13 @@ void i82875p_agp_device::device_reset()
 	agp_bridge_device::device_reset();
 }
 
-ADDRESS_MAP_START(i82875p_overflow_device::overflow_map)
-	AM_RANGE(0x000, 0x007) AM_READWRITE8(dram_row_boundary_r,    dram_row_boundary_w,  0xffffffff)
-	AM_RANGE(0x010, 0x013) AM_READWRITE8(dram_row_attribute_r,   dram_row_attribute_w, 0xffffffff)
-	AM_RANGE(0x060, 0x064) AM_READWRITE (dram_timing_r,          dram_timing_w)
-	AM_RANGE(0x068, 0x06b) AM_READWRITE (dram_controller_mode_r, dram_controller_mode_w)
-ADDRESS_MAP_END
+void i82875p_overflow_device::overflow_map(address_map &map)
+{
+	map(0x000, 0x007).rw(this, FUNC(i82875p_overflow_device::dram_row_boundary_r), FUNC(i82875p_overflow_device::dram_row_boundary_w));
+	map(0x010, 0x013).rw(this, FUNC(i82875p_overflow_device::dram_row_attribute_r), FUNC(i82875p_overflow_device::dram_row_attribute_w));
+	map(0x060, 0x064).rw(this, FUNC(i82875p_overflow_device::dram_timing_r), FUNC(i82875p_overflow_device::dram_timing_w));
+	map(0x068, 0x06b).rw(this, FUNC(i82875p_overflow_device::dram_controller_mode_r), FUNC(i82875p_overflow_device::dram_controller_mode_w));
+}
 
 
 i82875p_overflow_device::i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
