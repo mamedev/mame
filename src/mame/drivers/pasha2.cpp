@@ -213,9 +213,9 @@ WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 {
 	for (int p = 0; p < 3; p++)
 	{
-		m_lamps_r[i] = BIT(data, 4 * p);
-		m_lamps_g[i] = BIT(data, 4 * p + 1);
-		m_lamps_b[i] = BIT(data, 4 * p + 2);
+		m_lamps_r[p] = BIT(data, (p << 2) | 0);
+		m_lamps_g[p] = BIT(data, (p << 2) | 1);
+		m_lamps_b[p] = BIT(data, (p << 2) | 2);
 	}
 }
 
