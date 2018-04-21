@@ -92,9 +92,9 @@ public:
 		, m_wram(*this, "wram")
 		, m_paletteram(*this, "paletteram")
 		, m_mainbank(*this, "mainbank")
-		, m_lamps(*this, { "lamp_p1_r", "lamp_p1_g", "lamp_p1_b",
-		                   "lamp_p2_r", "lamp_p2_g", "lamp_p2_b",
-		                   "lamp_p3_r", "lamp_p3_g", "lamp_p3_b"})
+		, m_lamps_r(*this, "lamp_p%u_r", 1U)
+		, m_lamps_g(*this, "lamp_p%u_g", 1U)
+		, m_lamps_b(*this, "lamp_p%u_b", 1U)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_oki(*this, "oki%u", 1U)
@@ -107,7 +107,9 @@ public:
 
 	required_memory_bank m_mainbank;
 
-	output_finder<9> m_lamps;
+	output_finder<3> m_lamps_r;
+	output_finder<3> m_lamps_g;
+	output_finder<3> m_lamps_b;
 
 	/* video-related */
 	int m_vbuffer;
@@ -209,11 +211,11 @@ WRITE16_MEMBER(pasha2_state::oki_bank_w)
 
 WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 {
-	for (int i = 0; i < 3; i++)
+	for (int p = 0; p < 3; i++)
 	{
-		m_lamps[i] = BIT(data, i);
-		m_lamps[i+3] = BIT(data, i+4);
-		m_lamps[i+6] = BIT(data, i+8);
+		m_lamps_r[i] = BIT(data, 4 * p);
+		m_lamps_g[i] = BIT(data, 4 * p + 1);
+		m_lamps_b[i] = BIT(data, 4 * p + 2);
 	}
 }
 
@@ -381,7 +383,9 @@ uint32_t pasha2_state::screen_update_pasha2(screen_device &screen, bitmap_ind16 
 
 void pasha2_state::machine_start()
 {
-	m_lamps.resolve();
+	m_lamps_r.resolve();
+	m_lamps_g.resolve();
+	m_lamps_b.resolve();
 	save_item(NAME(m_vbuffer));
 }
 
