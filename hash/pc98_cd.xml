@@ -3992,7 +3992,7 @@
 		<year>1995</year>
 		<publisher>ビング (Ving)</publisher>
 		<info name="serial" value="VHMD-129" />
-		<info name="alt_title" value="スーパーリアル麻雀 ＰIＶ ファイナル" />
+		<info name="alt_title" value="スーパーリアル麻雀 ＰＩＶ ファイナル" />
 		<info name="release" value="19950216" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
