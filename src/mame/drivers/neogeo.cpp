@@ -946,6 +946,14 @@ WRITE8_MEMBER(mvs_state::io_control_w)
 }
 
 
+WRITE8_MEMBER(neogeo_base_state::audio_command_w)
+{
+	// glitches in s1945p without the boost_interleave here
+	m_soundlatch->write(space, offset, data, mem_mask);
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+}
+
+
 /*************************************
  *
  *  Unmapped memory access
@@ -1665,7 +1673,7 @@ READ16_MEMBER(neogeo_base_state::banked_vectors_r)
 
 void neogeo_base_state::base_main_map(address_map &map)
 {
-	map(0x320000, 0x320000).mirror(0x01fffe).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x320000, 0x320000).mirror(0x01fffe).w(this, FUNC(neogeo_base_state::audio_command_w));
 	map(0x360000, 0x37ffff).r(this, FUNC(neogeo_base_state::unmapped_r));
 	map(0x380000, 0x3800ff).mirror(0x01ff00).w(this, FUNC(neogeo_base_state::io_control_w)).umask16(0x00ff);
 	map(0x3a0000, 0x3a001f).mirror(0x01ffe0).r(this, FUNC(neogeo_base_state::unmapped_r));
