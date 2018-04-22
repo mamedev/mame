@@ -55,6 +55,7 @@ public:
 	DECLARE_READ8_MEMBER(mhavoc_gamma_r);
 	DECLARE_WRITE8_MEMBER(mhavoc_ram_banksel_w);
 	DECLARE_WRITE8_MEMBER(mhavoc_rom_banksel_w);
+	DECLARE_WRITE8_MEMBER(mhavocpe_rom_banksel_w);
 	DECLARE_WRITE8_MEMBER(mhavoc_out_0_w);
 	DECLARE_WRITE8_MEMBER(alphaone_out_0_w);
 	DECLARE_WRITE8_MEMBER(mhavoc_out_1_w);
@@ -76,8 +77,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
 	void alphaone(machine_config &config);
 	void mhavoc(machine_config &config);
+	void mhavocpe(machine_config &config);
 	void mhavocrv(machine_config &config);
+	void alphape_map(address_map &map);
 	void alpha_map(address_map &map);
 	void alphaone_map(address_map &map);
 	void gamma_map(address_map &map);
+	void gammape_map(address_map &map);
 };

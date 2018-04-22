@@ -32,7 +32,7 @@ public:
 	TIMER_CALLBACK_MEMBER(vg_set_halt_callback);
 	TIMER_CALLBACK_MEMBER(run_state_machine);
 protected:
-	static constexpr unsigned MAXVECT = 10000;
+	static constexpr unsigned MAXVECT = 20000;
 
 	struct vgvector
 	{

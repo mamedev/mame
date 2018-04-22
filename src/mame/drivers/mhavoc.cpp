@@ -6,11 +6,14 @@
 
     driver by Mike Appolo
 
+	Modified 3/18/2017 by Jess M. Askey for Expanded ROM space for Major Havoc - The Promised End
+	
     Modified 10/08/2006 by Jess M. Askey to include support for Speech which was not stuffed on production
     Major Havoc PCB's. However, the hardware if stuffed is functional. Speech is used in Major Havoc Return
-    to Vaxx.
+    to Vaxx and in Major Havoc - The Promised End
 
     Games supported:
+	    * Major Havoc - The Promised End
         * Alpha One
         * Major Havoc
         * Major Havoc: Return to Vax (including speech) - This version is a hack that includes 3 new levels
@@ -277,30 +280,52 @@ WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
  *
  *************************************/
 
-void mhavoc_state::alpha_map(address_map &map)
-{
-	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x07ff).bankrw("bank1").share("zram0");
-	map(0x0800, 0x09ff).ram();
-	map(0x0a00, 0x0fff).bankrw("bank1").share("zram1");
-	map(0x1000, 0x1000).r(this, FUNC(mhavoc_state::mhavoc_gamma_r));            /* Gamma Read Port */
-	map(0x1200, 0x1200).portr("IN0").nopw();    /* Alpha Input Port 0 */
-	map(0x1400, 0x141f).ram().share("colorram");    /* ColorRAM */
-	map(0x1600, 0x1600).w(this, FUNC(mhavoc_state::mhavoc_out_0_w));           /* Control Signals */
-	map(0x1640, 0x1640).w("avg", FUNC(avg_mhavoc_device::go_w));               /* Vector Generator GO */
-	map(0x1680, 0x1680).w("watchdog", FUNC(watchdog_timer_device::reset_w));         /* Watchdog Clear */
-	map(0x16c0, 0x16c0).w("avg", FUNC(avg_mhavoc_device::reset_w));            /* Vector Generator Reset */
-	map(0x1700, 0x1700).w(this, FUNC(mhavoc_state::mhavoc_alpha_irq_ack_w));   /* IRQ ack */
-	map(0x1740, 0x1740).w(this, FUNC(mhavoc_state::mhavoc_rom_banksel_w));     /* Program ROM Page Select */
-	map(0x1780, 0x1780).w(this, FUNC(mhavoc_state::mhavoc_ram_banksel_w));     /* Program RAM Page Select */
-	map(0x17c0, 0x17c0).w(this, FUNC(mhavoc_state::mhavoc_gamma_w));           /* Gamma Communication Write Port */
-	map(0x1800, 0x1fff).ram();                             /* Shared Beta Ram */
-	map(0x2000, 0x3fff).bankr("bank2");                        /* Paged Program ROM (32K) */
-	map(0x4000, 0x4fff).ram().share("vectorram").region("alpha", 0x4000);    /* Vector Generator RAM */
-	map(0x5000, 0x7fff).rom();                             /* Vector ROM */
-	map(0x8000, 0xffff).rom();                 /* Program ROM (32K) */
-}
+ADDRESS_MAP_START(mhavoc_state::alpha_map)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_SHARE("zram0")
+	AM_RANGE(0x0800, 0x09ff) AM_RAM
+	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK("bank1") AM_SHARE("zram1")
+	AM_RANGE(0x1000, 0x1000) AM_READ(mhavoc_gamma_r)            /* Gamma Read Port */
+	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("IN0") AM_WRITENOP    /* Alpha Input Port 0 */
+	AM_RANGE(0x1400, 0x141f) AM_RAM AM_SHARE("colorram")    /* ColorRAM */
+	AM_RANGE(0x1600, 0x1600) AM_WRITE(mhavoc_out_0_w)           /* Control Signals */
+	AM_RANGE(0x1640, 0x1640) AM_DEVWRITE("avg", avg_mhavoc_device, go_w)               /* Vector Generator GO */
+	AM_RANGE(0x1680, 0x1680) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)         /* Watchdog Clear */
+	AM_RANGE(0x16c0, 0x16c0) AM_DEVWRITE("avg", avg_mhavoc_device, reset_w)            /* Vector Generator Reset */
+	AM_RANGE(0x1700, 0x1700) AM_WRITE(mhavoc_alpha_irq_ack_w)   /* IRQ ack */
+	AM_RANGE(0x1740, 0x1740) AM_WRITE(mhavoc_rom_banksel_w)     /* Program ROM Page Select */
+	AM_RANGE(0x1780, 0x1780) AM_WRITE(mhavoc_ram_banksel_w)     /* Program RAM Page Select */   
+	AM_RANGE(0x17c0, 0x17c0) AM_WRITE(mhavoc_gamma_w)           /* Gamma Communication Write Port */
+	AM_RANGE(0x1800, 0x1fff) AM_RAM                             /* Shared Beta Ram */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2")                        /* Paged Program ROM (32K) */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("vectorram") AM_REGION("alpha", 0x4000)    /* Vector Generator RAM */
+	AM_RANGE(0x5000, 0x7fff) AM_ROM                             /* Vector ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM                 /* Program ROM (32K) */
+ADDRESS_MAP_END
 
+
+ADDRESS_MAP_START(mhavoc_state::alphape_map)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_SHARE("zram0")
+	AM_RANGE(0x0800, 0x09ff) AM_RAM
+	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK("bank1") AM_SHARE("zram1")
+	AM_RANGE(0x1000, 0x1000) AM_READ(mhavoc_gamma_r)            /* Gamma Read Port */
+	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("IN0") AM_WRITENOP    /* Alpha Input Port 0 */
+	AM_RANGE(0x1400, 0x141f) AM_RAM AM_SHARE("colorram")        /* ColorRAM */
+	AM_RANGE(0x1600, 0x1600) AM_WRITE(mhavoc_out_0_w)           /* Control Signals */
+	AM_RANGE(0x1640, 0x1640) AM_DEVWRITE("avg", avg_mhavoc_device, go_w)               /* Vector Generator GO */
+	AM_RANGE(0x1680, 0x1680) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)         /* Watchdog Clear */
+	AM_RANGE(0x16c0, 0x16c0) AM_DEVWRITE("avg", avg_mhavoc_device, reset_w)            /* Vector Generator Reset */
+	AM_RANGE(0x1700, 0x1700) AM_WRITE(mhavoc_alpha_irq_ack_w)   /* IRQ ack */
+	AM_RANGE(0x1740, 0x1740) AM_WRITE(mhavocpe_rom_banksel_w)     /* Program ROM Page Select */
+	AM_RANGE(0x1780, 0x1780) AM_WRITE(mhavoc_ram_banksel_w)     /* Program RAM Page Select */
+	AM_RANGE(0x17c0, 0x17c0) AM_WRITE(mhavoc_gamma_w)           /* Gamma Communication Write Port */
+	AM_RANGE(0x1800, 0x1fff) AM_RAM                             /* Shared Beta Ram */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2")                /* Paged Program ROM (64K) */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("vectorram") AM_REGION("alpha", 0x4000)    /* Vector Generator RAM */
+	AM_RANGE(0x5000, 0x7fff) AM_ROM                             /* Vector ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* Program ROM (32K) */
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -330,21 +355,36 @@ a15 a14 a13 a12 a11 a10 a09 a08 a07 a06 a05 a04 a03 a02 a01 a00
 1   x   *   *   *   *   *   *   *   *   *   *   *   *   *   *      R  ROM 27128 @9S
 */
 
-void mhavoc_state::gamma_map(address_map &map)
-{
-	map(0x0000, 0x07ff).ram().mirror(0x1800);                   /* Program RAM (2K) */
-	map(0x2000, 0x203f).rw(this, FUNC(mhavoc_state::quad_pokeyn_r), FUNC(mhavoc_state::quad_pokeyn_w)).mirror(0x07C0); /* Quad Pokey read/write  */
-	map(0x2800, 0x2800).portr("IN1").mirror(0x07ff);      /* Gamma Input Port */
-	map(0x3000, 0x3000).r(this, FUNC(mhavoc_state::mhavoc_alpha_r)).mirror(0x07ff);  /* Alpha Comm. Read Port */
-	map(0x3800, 0x3803).portr("DIAL").mirror(0x07fc);     /* Roller Controller Input */
-	map(0x4000, 0x4000).portr("DSW2").w(this, FUNC(mhavoc_state::mhavoc_gamma_irq_ack_w)).mirror(0x07ff); /* DSW at 8S, IRQ Acknowledge */
-	map(0x4800, 0x4800).w(this, FUNC(mhavoc_state::mhavoc_out_1_w)).mirror(0x07ff); /* Coin Counters    */
-	map(0x5000, 0x5000).w(this, FUNC(mhavoc_state::mhavoc_alpha_w)).mirror(0x07ff); /* Alpha Comm. Write Port */
+ADDRESS_MAP_START(mhavoc_state::gamma_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)                   /* Program RAM (2K) */
+	AM_RANGE(0x2000, 0x203f) AM_READWRITE(quad_pokeyn_r, quad_pokeyn_w) AM_MIRROR(0x07C0) /* Quad Pokey read/write  */
+	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("IN1") AM_MIRROR(0x07ff)      /* Gamma Input Port */
+	AM_RANGE(0x3000, 0x3000) AM_READ(mhavoc_alpha_r) AM_MIRROR(0x07ff)  /* Alpha Comm. Read Port */
+	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("DIAL") AM_MIRROR(0x07fc)     /* Roller Controller Input */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW2") AM_WRITE(mhavoc_gamma_irq_ack_w) AM_MIRROR(0x07ff) /* DSW at 8S, IRQ Acknowledge */
+	AM_RANGE(0x4800, 0x4800) AM_WRITE(mhavoc_out_1_w) AM_MIRROR(0x07ff) /* Coin Counters    */
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(mhavoc_alpha_w) AM_MIRROR(0x07ff) /* Alpha Comm. Write Port */
 	//AM_RANGE(0x5800, 0x5800) AM_WRITE(mhavocrv_speech_data_w) AM_MIRROR(0x06ff) /* TMS5220 data write */
 	//AM_RANGE(0x5900, 0x5900) AM_WRITE(mhavocrv_speech_strobe_w) AM_MIRROR(0x06ff) /* TMS5220 /WS strobe write */
-	map(0x6000, 0x61ff).ram().share("nvram").mirror(0x1e00); /* EEROM */
-	map(0x8000, 0xbfff).rom().mirror(0x4000);                   /* Program ROM (16K) */
-}
+	AM_RANGE(0x6000, 0x61ff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x1e00) /* EEROM */
+	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_MIRROR(0x4000)                   /* Program ROM (16K) */
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START(mhavoc_state::gammape_map)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)                   /* Program RAM (2K) */
+	AM_RANGE(0x2000, 0x203f) AM_READWRITE(quad_pokeyn_r, quad_pokeyn_w) AM_MIRROR(0x07C0) /* Quad Pokey read/write  */
+	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("IN1") AM_MIRROR(0x07ff)      /* Gamma Input Port */
+	AM_RANGE(0x3000, 0x3000) AM_READ(mhavoc_alpha_r) AM_MIRROR(0x07ff)  /* Alpha Comm. Read Port */
+	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("DIAL") AM_MIRROR(0x07fc)     /* Roller Controller Input */
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW2") AM_WRITE(mhavoc_gamma_irq_ack_w) AM_MIRROR(0x07ff) /* DSW at 8S, IRQ Acknowledge */
+	AM_RANGE(0x4800, 0x4800) AM_WRITE(mhavoc_out_1_w) AM_MIRROR(0x07ff) /* Coin Counters    */
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(mhavoc_alpha_w) AM_MIRROR(0x07ff) /* Alpha Comm. Write Port */
+																		//AM_RANGE(0x5800, 0x5800) AM_WRITE(mhavocrv_speech_data_w) AM_MIRROR(0x06ff) /* TMS5220 data write */
+																		//AM_RANGE(0x5900, 0x5900) AM_WRITE(mhavocrv_speech_strobe_w) AM_MIRROR(0x06ff) /* TMS5220 /WS strobe write */
+	AM_RANGE(0x6000, 0x61ff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x1e00) /* EEROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM                  /* Program ROM (32K) */
+ADDRESS_MAP_END
 
 
 
@@ -355,30 +395,29 @@ void mhavoc_state::gamma_map(address_map &map)
  *
  *************************************/
 
-void mhavoc_state::alphaone_map(address_map &map)
-{
-	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x07ff).bankrw("bank1").share("zram0");
-	map(0x0800, 0x09ff).ram();
-	map(0x0a00, 0x0fff).bankrw("bank1").share("zram1");
-	map(0x1020, 0x103f).rw(this, FUNC(mhavoc_state::dual_pokey_r), FUNC(mhavoc_state::dual_pokey_w));
-	map(0x1040, 0x1040).portr("IN0").nopw();    /* Alpha Input Port 0 */
-	map(0x1060, 0x1060).portr("IN1");                /* Gamma Input Port */
-	map(0x1080, 0x1080).portr("DIAL");               /* Roller Controller Input*/
-	map(0x10a0, 0x10a0).w(this, FUNC(mhavoc_state::alphaone_out_0_w));         /* Control Signals */
-	map(0x10a4, 0x10a4).w("avg", FUNC(avg_mhavoc_device::go_w));               /* Vector Generator GO */
-	map(0x10a8, 0x10a8).w("watchdog", FUNC(watchdog_timer_device::reset_w));         /* Watchdog Clear */
-	map(0x10ac, 0x10ac).w("avg", FUNC(avg_mhavoc_device::reset_w));            /* Vector Generator Reset */
-	map(0x10b0, 0x10b0).w(this, FUNC(mhavoc_state::mhavoc_alpha_irq_ack_w));   /* IRQ ack */
-	map(0x10b4, 0x10b4).w(this, FUNC(mhavoc_state::mhavoc_rom_banksel_w));
-	map(0x10b8, 0x10b8).w(this, FUNC(mhavoc_state::mhavoc_ram_banksel_w));
-	map(0x10e0, 0x10ff).writeonly().share("colorram");  /* ColorRAM */
-	map(0x1800, 0x18ff).ram().share("nvram");   /* EEROM */
-	map(0x2000, 0x3fff).bankr("bank2");                        /* Paged Program ROM (32K) */
-	map(0x4000, 0x4fff).ram().share("vectorram").region("alpha", 0x4000); /* Vector Generator RAM */
-	map(0x5000, 0x7fff).rom();                             /* Vector ROM */
-	map(0x8000, 0xffff).rom();                             /* Program ROM (32K) */
-}
+ADDRESS_MAP_START(mhavoc_state::alphaone_map)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_SHARE("zram0")
+	AM_RANGE(0x0800, 0x09ff) AM_RAM
+	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK("bank1") AM_SHARE("zram1")
+	AM_RANGE(0x1020, 0x103f) AM_READWRITE(dual_pokey_r, dual_pokey_w)
+	AM_RANGE(0x1040, 0x1040) AM_READ_PORT("IN0") AM_WRITENOP    /* Alpha Input Port 0 */
+	AM_RANGE(0x1060, 0x1060) AM_READ_PORT("IN1")                /* Gamma Input Port */
+	AM_RANGE(0x1080, 0x1080) AM_READ_PORT("DIAL")               /* Roller Controller Input*/
+	AM_RANGE(0x10a0, 0x10a0) AM_WRITE(alphaone_out_0_w)         /* Control Signals */
+	AM_RANGE(0x10a4, 0x10a4) AM_DEVWRITE("avg", avg_mhavoc_device, go_w)               /* Vector Generator GO */
+	AM_RANGE(0x10a8, 0x10a8) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)         /* Watchdog Clear */
+	AM_RANGE(0x10ac, 0x10ac) AM_DEVWRITE("avg", avg_mhavoc_device, reset_w)            /* Vector Generator Reset */
+	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(mhavoc_alpha_irq_ack_w)   /* IRQ ack */
+	AM_RANGE(0x10b4, 0x10b4) AM_WRITE(mhavoc_rom_banksel_w)
+	AM_RANGE(0x10b8, 0x10b8) AM_WRITE(mhavoc_ram_banksel_w)
+	AM_RANGE(0x10e0, 0x10ff) AM_WRITEONLY AM_SHARE("colorram")  /* ColorRAM */
+	AM_RANGE(0x1800, 0x18ff) AM_RAM AM_SHARE("nvram")   /* EEROM */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank2")                        /* Paged Program ROM (32K) */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("vectorram") AM_REGION("alpha", 0x4000) /* Vector Generator RAM */
+	AM_RANGE(0x5000, 0x7fff) AM_ROM                             /* Vector ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* Program ROM (32K) */
+ADDRESS_MAP_END
 
 
 
@@ -407,20 +446,20 @@ static INPUT_PORTS_START( mhavoc )
 	/* Bit 2 = Gamma xmtd flag */
 	/* Bit 1 = 2.4kHz (divide 2.5MHz by 1024) */
 	/* Bit 0 = Vector generator halt flag */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, nullptr)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_xmtd_r, nullptr)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_rcvd_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_xmtd_r, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,gamma_rcvd_r, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diag Step/Coin C") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,mhavoc_bit67_r, "COIN\0SERVICE")
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,mhavoc_bit67_r, "COIN\0SERVICE")
 
 	PORT_START("IN1")   /* gamma */
 	/* Bits 7-2 = input switches */
 	/* Bit 1 = Alpha rcvd flag */
 	/* Bit 0 = Alpha xmtd flag */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,alpha_xmtd_r, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,alpha_rcvd_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,alpha_xmtd_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,alpha_rcvd_r, nullptr)
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -489,7 +528,7 @@ static INPUT_PORTS_START( mhavocrv )
 	PORT_INCLUDE( mhavoc )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,tms5220_r, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,tms5220_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -506,8 +545,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( alphaone )
 	PORT_START("IN0")   /* alpha (player_1 = 0) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_mhavoc_device, done_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mhavoc_state,clock_r, nullptr)
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
@@ -583,6 +622,64 @@ MACHINE_CONFIG_START(mhavoc_state::mhavoc)
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_START(mhavoc_state::mhavocpe)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)     /* 2.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(alphape_map)
+
+	MCFG_CPU_ADD("gamma", M6502, MHAVOC_CLOCK_1_25M)    /* 1.25 MHz */
+	MCFG_CPU_PROGRAM_MAP(gammape_map)
+
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("5k_timer", mhavoc_state, mhavoc_cpu_irq_clock, attotime::from_hz(MHAVOC_CLOCK_5K))
+
+	MCFG_WATCHDOG_ADD("watchdog")
+
+	/* video hardware */
+	MCFG_VECTOR_ADD("vector")
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 300, 0, 260)
+	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+
+	MCFG_DEVICE_ADD("avg", AVG_MHAVOC, 0)
+	MCFG_AVGDVG_VECTOR("vector")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	/* FIXME: Outputs 1,2,3 are tied together
+	* This signal and Output 4 are processed separately.
+	* Later they are mixed together again.
+	* ==> DISCRETE emulation, below is just an approximation.
+	*/
+
+	MCFG_SOUND_ADD("pokey1", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_SOUND_ADD("pokey2", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_SOUND_ADD("pokey3", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_SOUND_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
+	MCFG_POKEY_OUTPUT_OPAMP(RES_K(1), CAP_U(0.001), 5.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_SOUND_ADD("tms", TMS5220, MHAVOC_CLOCK / 2 / 9)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+MACHINE_CONFIG_END
+
+
 MACHINE_CONFIG_START(mhavoc_state::mhavocrv)
 	mhavoc(config);
 
@@ -629,11 +726,12 @@ MACHINE_CONFIG_END
  * are supported as "mhavocrv".
  * Prototype is supported as "mhavocp"
  * Alpha one is a single-board prototype
+ * "The Promised End" - version released by Owen Rubin and Jess Askey in 2018 it is "mhavocpe"
  */
 
 ROM_START( mhavoc )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )   /* 152KB for ROMs */
+	ROM_REGION( 0x28000, "alpha", 0 )   /* 152KB for ROMs */
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.210",   0x05000, 0x2000, CRC(c67284ca) SHA1(d9adad80c266d36429444f483cac4ebcf1fec7b8) )
 
@@ -646,8 +744,8 @@ ROM_START( mhavoc )
 	ROM_LOAD( "136025.318",   0x14000, 0x4000, CRC(ba935067) SHA1(05ad81e7a1982b9d8fddb48502546f48b5dc21b7) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
-	ROM_LOAD( "136025.107",   0x1c000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
+	ROM_LOAD( "136025.106",   0x20000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "136025.107",   0x24000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
 	/* Gamma Processor ROM */
 	ROM_REGION( 0x10000, "gamma", 0 )
@@ -661,7 +759,7 @@ ROM_END
 
 ROM_START( mhavoc2 )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x28000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.110",   0x05000, 0x2000, CRC(16eef583) SHA1(277252bd716dd96d5b98ec5e33a3a6a3bc1a9abf) )
 
@@ -674,8 +772,8 @@ ROM_START( mhavoc2 )
 	ROM_LOAD( "136025.109",   0x14000, 0x4000, CRC(4d766827) SHA1(7697bf6f92bff0e62850ed75ff66008a08583ef7) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
-	ROM_LOAD( "136025.107",   0x1c000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
+	ROM_LOAD( "136025.106",   0x20000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "136025.107",   0x24000, 0x4000, CRC(5f81c5f3) SHA1(be4055727a2d4536e37ec20150deffdb5af5b01f) ) /* page 2+3 */
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -691,7 +789,7 @@ ROM_END
 
 ROM_START( mhavocrv )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )   /* 152KB for ROMs */
+	ROM_REGION( 0x28000, "alpha", 0 )   /* 152KB for ROMs */
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.210",   0x05000, 0x2000, CRC(c67284ca) SHA1(d9adad80c266d36429444f483cac4ebcf1fec7b8) )
 
@@ -704,8 +802,8 @@ ROM_START( mhavocrv )
 	ROM_LOAD( "136025.918",   0x14000, 0x4000, CRC(84735445) SHA1(21aacd862ce8911d257c6f48ead119ee5bb0b60d) ) /* page 2+3 */
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.106",   0x18000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
-	ROM_LOAD( "136025.907",   0x1c000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
+	ROM_LOAD( "136025.106",   0x20000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "136025.907",   0x24000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -721,7 +819,7 @@ ROM_END
 
 ROM_START( mhavocp )
 	/* Alpha Processor ROMs */
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x28000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "136025.010",   0x05000, 0x2000, CRC(3050c0e6) SHA1(f19a9538996d949cdca7e6abd4f04e8ff6e0e2c1) )
 
@@ -734,8 +832,8 @@ ROM_START( mhavocp )
 	ROM_LOAD( "136025.018",   0x14000, 0x4000, CRC(a8c35ccd) SHA1(c243a5407557390a64c6560d857f5031f839973f) )
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "136025.006",   0x18000, 0x4000, CRC(e272ed41) SHA1(0de395d1c4300a64da7f45746d7b550779e36a21) )
-	ROM_LOAD( "136025.007",   0x1c000, 0x4000, CRC(e152c9d8) SHA1(79d0938fa9ad262c7f28c5a8ad21004a4dec9ed8) )
+	ROM_LOAD( "136025.006",   0x20000, 0x4000, CRC(e272ed41) SHA1(0de395d1c4300a64da7f45746d7b550779e36a21) )
+	ROM_LOAD( "136025.007",   0x24000, 0x4000, CRC(e152c9d8) SHA1(79d0938fa9ad262c7f28c5a8ad21004a4dec9ed8) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -750,7 +848,7 @@ ROM_END
 
 
 ROM_START( alphaone )
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x28000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "vec5000.tw",   0x05000, 0x1000, CRC(2a4c149f) SHA1(b60a0b29958bee9b5f7c1d88163680b626bb76dd) )
 
@@ -765,8 +863,8 @@ ROM_START( alphaone )
 	ROM_LOAD( "page01.tw",    0x10000, 0x4000, CRC(cbf3b05a) SHA1(1dfaf9300a252c9c921f06167160a59cdf329726) )
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "vec_pg01.tw",  0x18000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
-	ROM_LOAD( "vec_pg23.tw",  0x1c000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
+	ROM_LOAD( "vec_pg01.tw",  0x20000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
+	ROM_LOAD( "vec_pg23.tw",  0x24000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -777,7 +875,7 @@ ROM_END
 
 
 ROM_START( alphaonea )
-	ROM_REGION( 0x20000, "alpha", 0 )
+	ROM_REGION( 0x28000, "alpha", 0 )
 	/* Vector Generator ROM */
 	ROM_LOAD( "vec5000.tw",   0x05000, 0x1000, CRC(2a4c149f) SHA1(b60a0b29958bee9b5f7c1d88163680b626bb76dd) )
 
@@ -792,8 +890,8 @@ ROM_START( alphaonea )
 	ROM_LOAD( "page01.tw",    0x10000, 0x4000, CRC(cbf3b05a) SHA1(1dfaf9300a252c9c921f06167160a59cdf329726) )
 
 	/* Paged Vector Generator ROM */
-	ROM_LOAD( "vec_pg01.tw",  0x18000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
-	ROM_LOAD( "vec_pg23.tw",  0x1c000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
+	ROM_LOAD( "vec_pg01.tw",  0x20000, 0x4000, CRC(e392a94d) SHA1(b5843da97d7aa5767c87c29660115efc5ad9ad54) )
+	ROM_LOAD( "vec_pg23.tw",  0x24000, 0x4000, CRC(1ff74292) SHA1(90e61c48544c62d905e207bba5c67ae7694e86a5) )
 
 	/* the last 0x1000 is used for the 2 RAM pages */
 
@@ -802,7 +900,33 @@ ROM_START( alphaonea )
 	ROM_LOAD( "136002-125.6c",   0x0000, 0x0100, BAD_DUMP CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 ROM_END
 
+ROM_START( mhavocpe )
+	/* Alpha Processor ROMs */
+	ROM_REGION( 0x28000, "alpha", 0 )   /* 152KB for ROMs */
+	/* Vector Generator ROM */
+	ROM_LOAD( "mhpe.105",   0x05000, 0x2000, CRC(c67284ca) SHA1(d9adad80c266d36429444f483cac4ebcf1fec7b8) )
 
+	/* Program ROM */
+	ROM_LOAD( "mhpe.102",   0x08000, 0x4000, CRC(1255bd7f) SHA1(e277fe7b23ce8cf1294b6bfa5548b24a6c8952ce) )
+	ROM_LOAD( "mhpe.101",   0x0c000, 0x4000, CRC(21889079) SHA1(d1ad6d9fa1432912e376bca50ceeefac2bfd6ac3) )
+    
+    /* Paged Program ROM */
+	ROM_LOAD( "mhpe.104",   0x10000, 0x8000, CRC(4c7235dc) SHA1(67cafc2ce438ec389550efb46c554a7fe7b45efc) ) /* page 0+1+4+5 */
+	ROM_LOAD( "mhpe.103",   0x18000, 0x8000, CRC(84735445) SHA1(21aacd862ce8911d257c6f48ead119ee5bb0b60d) ) /* page 2+3+6+7 */
+
+	/* Paged Vector Generator ROM */
+	ROM_LOAD( "mhpe.107",   0x20000, 0x4000, CRC(2ca83c76) SHA1(cc1adca32f70af30c4590e9fd6b056b051ccdb38) ) /* page 0+1 */
+	ROM_LOAD( "mhpe.106",   0x24000, 0x4000, CRC(4deea2c9) SHA1(c4107581748a3f2d2084de2a4f120abd67a52189) ) /* page 2+3 */
+	/* the last 0x1000 is used for the 2 RAM pages */
+
+	/* Gamma Processor ROM */
+	ROM_REGION( 0x10000, "gamma", 0 )
+	ROM_LOAD( "mhpe.108",   0x08000, 0x8000, CRC(c52ec664) SHA1(08120a385f71b17ec02a3c2ef856ff835a91773e) ) /* 32K Here */
+
+	/* AVG PROM */
+	ROM_REGION( 0x100, "user1", 0 )
+	ROM_LOAD( "036408-01.b1",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+ROM_END
 
 /*************************************
  *
@@ -816,3 +940,4 @@ GAME( 2006, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavoc_state, mhavocrv, ROT0, 
 GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  mhavoc_state, 0,        ROT0, "Atari",         "Major Havoc (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, alphaone, mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 3 lives)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, alphaonea,mhavoc, alphaone, alphaone, mhavoc_state, 0,        ROT0, "Atari",         "Alpha One (prototype, 5 lives)", MACHINE_SUPPORTS_SAVE )
+GAME( 2018, mhavocpe, mhavoc, mhavocpe, mhavocrv, mhavoc_state, mhavocrv, ROT0, "HaxRus",        "Major Havoc (The Promised End)", MACHINE_SUPPORTS_SAVE )

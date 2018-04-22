@@ -49,7 +49,7 @@
 
 #define VECTOR_WIDTH_DENOM 512
 
-#define MAX_POINTS 10000
+#define MAX_POINTS 20000
 
 float vector_options::s_flicker = 0.0f;
 float vector_options::s_beam_width_min = 0.0f;
