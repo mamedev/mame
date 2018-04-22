@@ -81,8 +81,8 @@
 		<info name="author" value="Kieran Connell" />
 		<info name="format" value="DFS" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="204800">
-				<rom name="pop-beeb.ssd" size="204800" crc="4fcebaca" sha1="1b317c72a8fac9b2bcd0fcb5d8eab2bbbf7d035d" offset="0" />
+			<dataarea name="flop" size="201472">
+				<rom name="pop-beeb.ssd" size="201472" crc="4fcebaca" sha1="1b317c72a8fac9b2bcd0fcb5d8eab2bbbf7d035d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
