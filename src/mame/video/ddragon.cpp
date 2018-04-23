@@ -60,27 +60,30 @@ TILEMAP_MAPPER_MEMBER(ddragon_state::background_scan)
 
 TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 {
-	uint8_t attr = m_bgvideoram[2 * tile_index];
+	tile_index <<= 1;
+	uint8_t attr = m_bgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(2,
-			m_bgvideoram[2 * tile_index+1] + ((attr & 0x07) << 8),
+			m_bgvideoram[tile_index | 1] + ((attr & 0x07) << 8),
 			(attr >> 3) & 0x07,
 			TILE_FLIPYX((attr & 0xc0) >> 6));
 }
 
 TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 {
-	uint8_t attr = m_fgvideoram[2 * tile_index];
+	tile_index <<= 1;
+	uint8_t attr = m_fgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
-			m_fgvideoram[2 * tile_index + 1] + ((attr & 0x07) << 8),
+			m_fgvideoram[tile_index | 1] + ((attr & 0x07) << 8),
 			attr >> 5,
 			0);
 }
 
 TILE_GET_INFO_MEMBER(ddragon_state::get_fg_16color_tile_info)
 {
-	uint8_t attr = m_fgvideoram[2 * tile_index];
+	tile_index <<= 1;
+	uint8_t attr = m_fgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
-			m_fgvideoram[2 * tile_index+1] + ((attr & 0x0f) << 8),
+			m_fgvideoram[tile_index | 1] + ((attr & 0x0f) << 8),
 			attr >> 4,
 			0);
 }
@@ -158,7 +161,7 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 			if (m_technos_video_hw == 2)     /* Double Dragon 2 */
 			{
 				color = src[i + 2] >> 5;
-				which = src[i + 3] + ((src[i + 2] & 0x1f) << 8);
+				which = src[i + 3] | ((src[i + 2] & 0x1f) << 8);
 			}
 			else
 			{
@@ -168,7 +171,7 @@ void ddragon_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 					if ((sy < -7) && (sy > -16)) sy += 256; /* fix sprite clip */
 				}
 				color = src[i + 2] >> 4;
-				which = src[i + 3] + ((src[i + 2] & 0x0f) << 8);
+				which = src[i + 3] | ((src[i + 2] & 0x0f) << 8);
 			}
 
 			if (flip_screen())
