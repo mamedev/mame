@@ -993,6 +993,7 @@ WRITE_LINE_MEMBER(toaplan1_rallybik_state::screen_vblank_rallybik)
 	if (state)
 	{
 		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
+		toaplan1_interrupt();
 	}
 }
 
@@ -1003,6 +1004,7 @@ WRITE_LINE_MEMBER(toaplan1_state::screen_vblank_toaplan1)
 	{
 		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 		memcpy(m_buffered_spritesizeram16.get(), m_spritesizeram16.get(), TOAPLAN1_SPRITESIZERAM_SIZE);
+		toaplan1_interrupt();
 	}
 }
 
@@ -1013,6 +1015,7 @@ WRITE_LINE_MEMBER(toaplan1_state::screen_vblank_samesame)
 	{
 		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 		memcpy(m_buffered_spritesizeram16.get(), m_spritesizeram16.get(), TOAPLAN1_SPRITESIZERAM_SIZE);
+		toaplan1_interrupt();
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   /* Frame done */
 	}
 }

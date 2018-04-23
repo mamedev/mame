@@ -54,4 +54,7 @@ public:
 	void setbank(int num, int bank);
 	void quiz18k(machine_config &config);
 	void welltris(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_port_map(address_map &map);
 };

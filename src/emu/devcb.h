@@ -244,7 +244,7 @@ class devcb_read_base : public devcb_base
 {
 protected:
 	// construction/destruction
-	devcb_read_base(device_t &device, u64 defmask);
+	devcb_read_base(device_t &device, u64 defmask, bool chained = false);
 
 public:
 	// callback configuration
@@ -259,6 +259,9 @@ public:
 	// resolution
 	void resolve();
 	void resolve_safe(u64 none_constant_value);
+
+	// validity checking
+	void validity_check(validity_checker &valid) const;
 
 protected:
 	// internal helpers
@@ -297,7 +300,7 @@ class devcb_write_base : public devcb_base
 {
 protected:
 	// construction/destruction
-	devcb_write_base(device_t &device, u64 defmask);
+	devcb_write_base(device_t &device, u64 defmask, bool chained = false);
 
 public:
 	// callback configuration
@@ -316,6 +319,9 @@ public:
 	// resolution
 	void resolve();
 	void resolve_safe();
+
+	// validity checking
+	void validity_check(validity_checker &valid) const;
 
 protected:
 	// internal helpers

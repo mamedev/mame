@@ -41,4 +41,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void merlinmm(machine_config &config);
 	void pingpong(machine_config &config);
+	void merlinmm_map(address_map &map);
+	void pingpong_map(address_map &map);
 };

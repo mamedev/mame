@@ -45,7 +45,6 @@ private:
 
 
 // device type definition
-extern const device_type DIAG264_CASSETTE_LOOPBACK;
 DECLARE_DEVICE_TYPE(DIAG264_CASSETTE_LOOPBACK, diag264_cassette_loopback_device)
 
 #endif // MAME_BUS_PET_DIAG264_LB_TAPE_H

@@ -16,6 +16,7 @@
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0808.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
 #include "speaker.h"
@@ -147,64 +148,69 @@ WRITE16_MEMBER(lockon_state::emres_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_v30, AS_PROGRAM, 16, lockon_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x04003) AM_READWRITE(lockon_crtc_r, lockon_crtc_w)
-	AM_RANGE(0x06000, 0x06001) AM_READ_PORT("DSW")
-	AM_RANGE(0x08000, 0x081ff) AM_RAM AM_SHARE("hud_ram")
-	AM_RANGE(0x09000, 0x09fff) AM_RAM_WRITE(lockon_char_w) AM_SHARE("char_ram")
-	AM_RANGE(0x0a000, 0x0a001) AM_WRITE(adrst_w)
-	AM_RANGE(0x0b000, 0x0bfff) AM_WRITE(lockon_rotate_w)
-	AM_RANGE(0x0c000, 0x0cfff) AM_WRITE(lockon_fb_clut_w)
-	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(inten_w)
-	AM_RANGE(0x0f000, 0x0f001) AM_WRITE(emres_w)
-	AM_RANGE(0x10000, 0x1ffff) AM_READNOP AM_WRITE(tst_w)
-	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(main_z80_r, main_z80_w)
-	AM_RANGE(0x30000, 0x3ffff) AM_READWRITE(main_gnd_r, main_gnd_w)
-	AM_RANGE(0x40000, 0x4ffff) AM_READWRITE(main_obj_r, main_obj_w)
-	AM_RANGE(0x50000, 0x5ffff) AM_MIRROR(0x80000) AM_ROM
-	AM_RANGE(0x60000, 0x6ffff) AM_MIRROR(0x80000) AM_ROM
-	AM_RANGE(0x70000, 0x7ffff) AM_MIRROR(0x80000) AM_ROM
-ADDRESS_MAP_END
+void lockon_state::main_v30(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x03fff).ram();
+	map(0x04000, 0x04003).rw(this, FUNC(lockon_state::lockon_crtc_r), FUNC(lockon_state::lockon_crtc_w));
+	map(0x06000, 0x06001).portr("DSW");
+	map(0x08000, 0x081ff).ram().share("hud_ram");
+	map(0x09000, 0x09fff).ram().w(this, FUNC(lockon_state::lockon_char_w)).share("char_ram");
+	map(0x0a000, 0x0a001).w(this, FUNC(lockon_state::adrst_w));
+	map(0x0b000, 0x0bfff).w(this, FUNC(lockon_state::lockon_rotate_w));
+	map(0x0c000, 0x0cfff).w(this, FUNC(lockon_state::lockon_fb_clut_w));
+	map(0x0e000, 0x0e001).w(this, FUNC(lockon_state::inten_w));
+	map(0x0f000, 0x0f001).w(this, FUNC(lockon_state::emres_w));
+	map(0x10000, 0x1ffff).nopr().w(this, FUNC(lockon_state::tst_w));
+	map(0x20000, 0x2ffff).rw(this, FUNC(lockon_state::main_z80_r), FUNC(lockon_state::main_z80_w));
+	map(0x30000, 0x3ffff).rw(this, FUNC(lockon_state::main_gnd_r), FUNC(lockon_state::main_gnd_w));
+	map(0x40000, 0x4ffff).rw(this, FUNC(lockon_state::main_obj_r), FUNC(lockon_state::main_obj_w));
+	map(0x50000, 0x5ffff).mirror(0x80000).rom();
+	map(0x60000, 0x6ffff).mirror(0x80000).rom();
+	map(0x70000, 0x7ffff).mirror(0x80000).rom();
+}
 
 
-static ADDRESS_MAP_START( ground_v30, AS_PROGRAM, 16, lockon_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("scene_ram")
-	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("ground_ram")
-	AM_RANGE(0x0C000, 0x0C001) AM_WRITE(lockon_scene_h_scr_w)
-	AM_RANGE(0x0C002, 0x0C003) AM_WRITE(lockon_scene_v_scr_w)
-	AM_RANGE(0x0C004, 0x0C005) AM_WRITE(lockon_ground_ctrl_w)
-	AM_RANGE(0x20000, 0x2ffff) AM_MIRROR(0xc0000) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_MIRROR(0xc0000) AM_ROM
-ADDRESS_MAP_END
+void lockon_state::ground_v30(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x03fff).ram();
+	map(0x04000, 0x04fff).ram().share("scene_ram");
+	map(0x08000, 0x08fff).ram().share("ground_ram");
+	map(0x0C000, 0x0C001).w(this, FUNC(lockon_state::lockon_scene_h_scr_w));
+	map(0x0C002, 0x0C003).w(this, FUNC(lockon_state::lockon_scene_v_scr_w));
+	map(0x0C004, 0x0C005).w(this, FUNC(lockon_state::lockon_ground_ctrl_w));
+	map(0x20000, 0x2ffff).mirror(0xc0000).rom();
+	map(0x30000, 0x3ffff).mirror(0xc0000).rom();
+}
 
 
-static ADDRESS_MAP_START( object_v30, AS_PROGRAM, 16, lockon_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x04001) AM_READWRITE(lockon_obj_4000_r, lockon_obj_4000_w)
-	AM_RANGE(0x08000, 0x08fff) AM_WRITE(lockon_tza112_w)
-	AM_RANGE(0x0c000, 0x0c1ff) AM_RAM AM_SHARE("object_ram")
-	AM_RANGE(0x30000, 0x3ffff) AM_MIRROR(0xc0000) AM_ROM
-ADDRESS_MAP_END
+void lockon_state::object_v30(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x03fff).ram();
+	map(0x04000, 0x04001).rw(this, FUNC(lockon_state::lockon_obj_4000_r), FUNC(lockon_state::lockon_obj_4000_w));
+	map(0x08000, 0x08fff).w(this, FUNC(lockon_state::lockon_tza112_w));
+	map(0x0c000, 0x0c1ff).ram().share("object_ram");
+	map(0x30000, 0x3ffff).mirror(0xc0000).rom();
+}
 
 
-static ADDRESS_MAP_START( sound_prg, AS_PROGRAM, 8, lockon_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(sound_vol)
-	AM_RANGE(0x7400, 0x7403) AM_READ(adc_r) AM_WRITENOP
-	AM_RANGE(0x7800, 0x7fff) AM_MIRROR(0x8000) AM_RAM
-ADDRESS_MAP_END
+void lockon_state::sound_prg(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x6fff).rom();
+	map(0x7000, 0x7000).w(this, FUNC(lockon_state::sound_vol));
+	map(0x7400, 0x7407).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
+	map(0x7800, 0x7fff).mirror(0x8000).ram();
+}
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, lockon_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x02, 0x02) AM_NOP
-ADDRESS_MAP_END
+void lockon_state::sound_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x02, 0x02).noprw();
+}
 
 
 /*************************************
@@ -325,24 +331,6 @@ static INPUT_PORTS_START( lockone )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On )  )
 INPUT_PORTS_END
 
-
-/*************************************
- *
- *  M58990P ADC
- *
- *************************************/
-
-READ8_MEMBER(lockon_state::adc_r)
-{
-	switch (offset)
-	{
-		case 0:  return ioport("ADC_BANK")->read();
-		case 1:  return ioport("ADC_PITCH")->read();
-		case 2:  return ioport("ADC_MISSILE")->read();
-		case 3:  return ioport("ADC_HOVER")->read();
-		default: return 0;
-	}
-}
 
 /*************************************
  *
@@ -482,16 +470,16 @@ void lockon_state::machine_reset()
 
 MACHINE_CONFIG_START(lockon_state::lockon)
 
-	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000) / 2)
+	MCFG_CPU_ADD("maincpu", V30, 16_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(main_v30)
 
-	MCFG_CPU_ADD("ground", V30, XTAL(16'000'000) / 2)
+	MCFG_CPU_ADD("ground", V30, 16_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(ground_v30)
 
-	MCFG_CPU_ADD("object", V30, XTAL(16'000'000) / 2)
+	MCFG_CPU_ADD("object", V30, 16_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(object_v30)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)
 	MCFG_CPU_PROGRAM_MAP(sound_prg)
 	MCFG_CPU_IO_MAP(sound_io)
 
@@ -499,6 +487,11 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_DEVICE_ADD("adc", M58990, 16_MHz_XTAL / 16)
+	MCFG_ADC0808_IN0_CB(IOPORT("ADC_BANK"))
+	MCFG_ADC0808_IN1_CB(IOPORT("ADC_PITCH"))
+	MCFG_ADC0808_IN2_CB(IOPORT("ADC_MISSILE"))
+	MCFG_ADC0808_IN3_CB(IOPORT("ADC_HOVER"))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -513,7 +506,7 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(16'000'000) / 4)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lockon_state, ym2203_irq))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2203"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lockon_state, ym2203_out_b))

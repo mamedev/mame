@@ -4,13 +4,14 @@ class speedbal_state : public driver_device
 {
 public:
 	speedbal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_spriteram(*this, "spriteram"),
-		m_background_videoram(*this, "bg_videoram"),
-		m_foreground_videoram(*this, "fg_videoram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spriteram(*this, "spriteram")
+		, m_background_videoram(*this, "bg_videoram")
+		, m_foreground_videoram(*this, "fg_videoram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -20,6 +21,7 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_background_videoram;
 	required_shared_ptr<uint8_t> m_foreground_videoram;
+	output_finder<73> m_digits;
 
 	bool m_leds_start;
 	uint32_t m_leds_shiftreg;
@@ -45,4 +47,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void speedbal(machine_config &config);
+	void main_cpu_io_map(address_map &map);
+	void main_cpu_map(address_map &map);
+	void sound_cpu_io_map(address_map &map);
+	void sound_cpu_map(address_map &map);
 };

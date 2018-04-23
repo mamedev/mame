@@ -51,6 +51,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	void tonton(machine_config &config);
+	void tonton_io(address_map &map);
+	void tonton_map(address_map &map);
 };
 
 #define MAIN_CLOCK      XTAL(21'477'272)
@@ -86,24 +88,26 @@ WRITE8_MEMBER(tonton_state::hopper_w)
 *                  Memory Map                    *
 *************************************************/
 
-static ADDRESS_MAP_START( tonton_map, AS_PROGRAM, 8, tonton_state )
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void tonton_state::tonton_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe3ff).ram().share("nvram");
+	map(0xf000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( tonton_io, AS_IO, 8, tonton_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x00, 0x00) AM_WRITE(tonton_outport_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x01, 0x01) AM_WRITE(hopper_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_device, data_r)
-ADDRESS_MAP_END
+void tonton_state::tonton_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x00, 0x00).w(this, FUNC(tonton_state::tonton_outport_w));
+	map(0x01, 0x01).portr("IN1");
+	map(0x01, 0x01).w(this, FUNC(tonton_state::hopper_w));
+	map(0x02, 0x02).portr("DSW1");
+	map(0x03, 0x03).portr("DSW2");
+	map(0x88, 0x8b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r));
+}
 
 
 /*************************************************
@@ -128,7 +132,7 @@ static INPUT_PORTS_START( tonton )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Unknown A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)    // hopper feedback
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("DSW1")

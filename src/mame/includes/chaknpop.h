@@ -60,4 +60,5 @@ public:
 
 	void mcu_update_seed(uint8_t data);
 	void chaknpop(machine_config &config);
+	void chaknpop_map(address_map &map);
 };

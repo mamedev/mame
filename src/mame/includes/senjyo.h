@@ -111,6 +111,12 @@ public:
 	void senjyo(machine_config &config);
 	void starforb(machine_config &config);
 	void senjyox_a(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void senjyo_map(address_map &map);
+	void senjyo_sound_io_map(address_map &map);
+	void senjyo_sound_map(address_map &map);
+	void starforb_map(address_map &map);
+	void starforb_sound_map(address_map &map);
 };
 
 /*----------- defined in audio/senjyo.c -----------*/

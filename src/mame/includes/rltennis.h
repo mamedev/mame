@@ -49,4 +49,6 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(sample_player);
 	void rltennis(machine_config &config);
+	void ramdac_map(address_map &map);
+	void rltennis_main(address_map &map);
 };

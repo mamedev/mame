@@ -43,14 +43,14 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 	MCFG_DEVICE_REPLACE(_tag, _type, _clock)
 
 #define MCFG_SOUND_ROUTE(_output, _target, _gain) \
-	device_sound_interface::static_add_route(*device, _output, _target, _gain);
+	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain);
 #define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
-	device_sound_interface::static_add_route(*device, _output, _target, _gain, _input);
+	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain, _input);
 #define MCFG_SOUND_ROUTES_RESET() \
-	device_sound_interface::static_reset_routes(*device);
+	dynamic_cast<device_sound_interface &>(*device).reset_routes();
 
 #define MCFG_MIXER_ROUTE(_output, _target, _gain, _mixoutput) \
-	device_sound_interface::static_add_route(*device, _output, _target, _gain, AUTO_ALLOC_INPUT, _mixoutput);
+	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain, AUTO_ALLOC_INPUT, _mixoutput);
 
 
 //**************************************************************************
@@ -84,9 +84,12 @@ public:
 	// configuration access
 	const std::vector<std::unique_ptr<sound_route>> &routes() const { return m_route_list; }
 
-	// static inline configuration helpers
-	static void static_add_route(device_t &device, u32 output, const char *target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
-	static void static_reset_routes(device_t &device);
+	// inline configuration helpers
+	void add_route(u32 output, const char *target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0)
+	{
+		m_route_list.push_back(std::make_unique<sound_route>(output, input, gain, target, mixoutput));
+	}
+	void reset_routes() { m_route_list.clear(); }
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;

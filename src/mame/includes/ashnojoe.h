@@ -88,4 +88,7 @@ public:
 	uint32_t screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ashnojoe_vclk_cb);
 	void ashnojoe(machine_config &config);
+	void ashnojoe_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };

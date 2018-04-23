@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef __MSX_H__
-#define __MSX_H__
+#ifndef MAME_INCLUDES_MSX_H
+#define MAME_INCLUDES_MSX_H
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -477,6 +477,10 @@ public:
 	void msx_2_35_dd_drive(machine_config &config);
 	void msx_ym2413(machine_config &config);
 	void msx2_64kb_vram(machine_config &config);
+	void msx2_io_map(address_map &map);
+	void msx2p_io_map(address_map &map);
+	void msx_io_map(address_map &map);
+	void msx_memory_map(address_map &map);
 private:
 	required_device<z80_device> m_maincpu;
 	optional_device<v9938_device> m_v9938;
@@ -520,4 +524,4 @@ private:
 };
 
 
-#endif /* __MSX_H__ */
+#endif // MAME_INCLUDES_MSX_H

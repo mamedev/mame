@@ -126,9 +126,10 @@ function xml.conv_cheat(data)
 		data = data:gsub("%f[%w]lshift%f[%W]", "<<")
 		data = data:gsub("(%w-)%+%+", "%1 = %1 + 1")
 		data = data:gsub("%f[%w](%x+)%f[%W]", "0x%1")
-		data = data:gsub("([%w_:]-)%.(p?)([pmrodi3])([bwdq])@(%w+) *(=*)", convert_memref)
+		-- 0?x? avoids an issue where db (data region byte) is interepeted as a hex number
+		data = data:gsub("([%w_:]-)%.(p?)0?x?([pmrodi3])([bwdq])@(%w+) *(=*)", convert_memref)
 		repeat
-			data, count = data:gsub("([%w_:]-)%.(p?)([pmrodi3])([bwdq])@(%b()) *(=*)", convert_memref)
+			data, count = data:gsub("([%w_:]-)%.(p?)0?x?([pmrodi3])([bwdq])@(%b()) *(=*)", convert_memref)
 		until count == 0
 		if write then
 			data = data .. ")"

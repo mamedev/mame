@@ -30,13 +30,13 @@
 //**************************************************************************
 
 #define MCFG_74157_A_IN_CB(_devcb) \
-	devcb = &ls157_device::set_a_in_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ls157_device &>(*device).set_a_in_callback(DEVCB_##_devcb);
 
 #define MCFG_74157_B_IN_CB(_devcb) \
-	devcb = &ls157_device::set_b_in_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ls157_device &>(*device).set_b_in_callback(DEVCB_##_devcb);
 
 #define MCFG_74157_OUT_CB(_devcb) \
-	devcb = &ls157_device::set_out_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<ls157_device &>(*device).set_out_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -52,9 +52,9 @@ public:
 	ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration
-	template <class Object> static devcb_base &set_a_in_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_a_in_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_b_in_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_b_in_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_callback(device_t &device, Object &&cb) { return downcast<ls157_device &>(device).m_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_a_in_callback(Object &&cb) { return m_a_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_b_in_callback(Object &&cb) { return m_b_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_callback(Object &&cb) { return m_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	// data writes
 	DECLARE_WRITE8_MEMBER(a_w);

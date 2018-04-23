@@ -38,7 +38,7 @@ wpset
 |
 | Set a watchpoint that will halt execution whenever a write occurs in the address range 23456-2345f AND the data written is equal to 1.
 |
-|  wp 3456,20,r,1,{printf "Read @ %08X\n",wpaddr; g}
+|  wp 3456,20,r,1,{printf "Read @ %08X\\n",wpaddr; g}
 |
 | Set a watchpoint that will halt execution whenever a read occurs in the address range 3456-3475. When this happens, print Read @ <wpaddr> and continue executing.
 |

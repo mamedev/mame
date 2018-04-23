@@ -24,14 +24,16 @@ public:
 	uint32_t screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void dct11em(machine_config &config);
+	void dct11em_mem(address_map &map);
 };
 
-static ADDRESS_MAP_START( dct11em_mem, AS_PROGRAM, 16, dct11em_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAM  // RAM
-	AM_RANGE( 0x2000, 0x2fff ) AM_RAM  // Optional RAM
-	AM_RANGE( 0xa000, 0xdfff ) AM_ROM  // RAM
-ADDRESS_MAP_END
+void dct11em_state::dct11em_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram();  // RAM
+	map(0x2000, 0x2fff).ram();  // Optional RAM
+	map(0xa000, 0xdfff).rom();  // RAM
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dct11em )

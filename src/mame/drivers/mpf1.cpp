@@ -58,54 +58,61 @@
 
 /* Address Maps */
 
-static ADDRESS_MAP_START( mpf1_map, AS_PROGRAM, 8, mpf1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void mpf1_state::mpf1_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1800, 0x1fff).ram();
+}
 
-static ADDRESS_MAP_START( mpf1_step, AS_OPCODES, 8, mpf1_state )
-	AM_RANGE(0x0000, 0xffff) AM_READ(step_r)
-ADDRESS_MAP_END
+void mpf1_state::mpf1_step(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(mpf1_state::step_r));
+}
 
-static ADDRESS_MAP_START( mpf1b_map, AS_PROGRAM, 8, mpf1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x5000, 0x6fff) AM_ROM
-ADDRESS_MAP_END
+void mpf1_state::mpf1b_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1800, 0x1fff).ram();
+	map(0x2000, 0x2fff).rom();
+	map(0x5000, 0x6fff).rom();
+}
 
-static ADDRESS_MAP_START( mpf1p_map, AS_PROGRAM, 8, mpf1_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void mpf1_state::mpf1p_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x6000, 0x6fff).rom();
+	map(0xf000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( mpf1_io_map, AS_IO, 8, mpf1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-ADDRESS_MAP_END
+void mpf1_state::mpf1_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x3c).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).mirror(0x3c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83).mirror(0x3c).rw(Z80PIO_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
-static ADDRESS_MAP_START( mpf1b_io_map, AS_IO, 8, mpf1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0x01) AM_DEVREADWRITE(TMS5220_TAG, tms5220_device, status_r, data_w)
-ADDRESS_MAP_END
+void mpf1_state::mpf1b_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x3c).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).mirror(0x3c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83).mirror(0x3c).rw(Z80PIO_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0xfe, 0xfe).mirror(0x01).rw(TMS5220_TAG, FUNC(tms5220_device::status_r), FUNC(tms5220_device::data_w));
+}
 
-static ADDRESS_MAP_START( mpf1p_io_map, AS_IO, 8, mpf1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-ADDRESS_MAP_END
+void mpf1_state::mpf1p_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x03).mirror(0x3c).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).mirror(0x3c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x80, 0x83).mirror(0x3c).rw(Z80PIO_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+}
 
 /* Input Ports */
 
@@ -244,12 +251,9 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 {
-	if (BIT(m_lednum, 5)) output().set_digit_value(0, param);
-	if (BIT(m_lednum, 4)) output().set_digit_value(1, param);
-	if (BIT(m_lednum, 3)) output().set_digit_value(2, param);
-	if (BIT(m_lednum, 2)) output().set_digit_value(3, param);
-	if (BIT(m_lednum, 1)) output().set_digit_value(4, param);
-	if (BIT(m_lednum, 0)) output().set_digit_value(5, param);
+	for (int digit = 0; digit < 6; digit++)
+		if (BIT(m_lednum, 5 - digit))
+			m_digits[digit] = param;
 }
 
 READ8_MEMBER( mpf1_state::ppi_pa_r )
@@ -257,12 +261,9 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	uint8_t data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
-	if (!BIT(m_lednum, 0)) data &= m_pc0->read();
-	if (!BIT(m_lednum, 1)) data &= m_pc1->read();
-	if (!BIT(m_lednum, 2)) data &= m_pc2->read();
-	if (!BIT(m_lednum, 3)) data &= m_pc3->read();
-	if (!BIT(m_lednum, 4)) data &= m_pc4->read();
-	if (!BIT(m_lednum, 5)) data &= m_pc5->read();
+	for (int row = 0; row < 6; row++)
+		if (!BIT(m_lednum, row))
+			data &= m_pc[row]->read();
 
 	/* bit 6, user key */
 	data &= m_special->read() & 1 ? 0xff : 0xbf;
@@ -298,7 +299,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pc_w )
 	}
 
 	/* bit 7, tape output, tone and led */
-	output().set_led_value(0, !BIT(data, 7));
+	m_leds[0] = !BIT(data, 7);
 	m_speaker->level_w(BIT(data, 7));
 	m_cassette->output( BIT(data, 7) ? 1.0 : -1.0);
 }
@@ -332,12 +333,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
 	int64_t led_halt = m_maincpu->state_int(Z80_HALT);
-	output().set_led_value(1, led_halt);
+	m_leds[1] = led_halt;
 }
 
 void mpf1_state::machine_start()
 {
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpf1_state::led_refresh),this));
+	m_digits.resolve();
+	m_leds.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_break));
@@ -357,7 +360,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(mpf1_step)
+	MCFG_CPU_OPCODES_MAP(mpf1_step)
 	MCFG_CPU_IO_MAP(mpf1_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
@@ -391,7 +394,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1b)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(3'579'545)/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1b_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(mpf1_step)
+	MCFG_CPU_OPCODES_MAP(mpf1_step)
 	MCFG_CPU_IO_MAP(mpf1b_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
@@ -428,7 +431,7 @@ MACHINE_CONFIG_START(mpf1_state::mpf1p)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(mpf1p_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(mpf1_step)
+	MCFG_CPU_OPCODES_MAP(mpf1_step)
 	MCFG_CPU_IO_MAP(mpf1p_io_map)
 	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 

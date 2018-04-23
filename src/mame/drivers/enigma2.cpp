@@ -111,6 +111,10 @@ public:
 	void start_interrupt_timers(  );
 	void enigma2(machine_config &config);
 	void enigma2a(machine_config &config);
+	void enigma2_audio_cpu_map(address_map &map);
+	void enigma2_main_cpu_map(address_map &map);
+	void enigma2a_main_cpu_io_map(address_map &map);
+	void enigma2a_main_cpu_map(address_map &map);
 };
 
 
@@ -233,7 +237,7 @@ uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb3
 			/* the schematics shows it like this, but it doesn't work as this would
 			   produce no stars, due to the contents of the PROM -- maybe there is
 			   a star disabled bit somewhere that's connected here instead of flip_screen() */
-			/* star_map_address = (y >> 4 << 6) | (engima2_flip_screen_get() << 5) | (x >> 3); */
+			/* star_map_address = (y >> 4 << 6) | (enigma2_flip_screen_get() << 5) | (x >> 3); */
 			offs_t star_map_address = (y >> 4 << 6) | 0x20 | (x >> 3);
 			if (m_blink_count & 0x08)
 				star_map_address |= 0x400;
@@ -434,52 +438,56 @@ CUSTOM_INPUT_MEMBER(enigma2_state::p2_controls_r)
 		return ioport("P1CONTROLS")->read();
 }
 
-static ADDRESS_MAP_START( engima2_main_cpu_map, AS_PROGRAM, 8, enigma2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x5000, 0x57ff) AM_READ(dip_switch_r) AM_WRITENOP
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_NOP
-	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_READ_PORT("IN0") AM_WRITENOP
-	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_READ_PORT("IN1") AM_WRITENOP
-	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_READNOP AM_WRITE(sound_data_w)
-	AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_NOP
-	AM_RANGE(0x5805, 0x5805) AM_MIRROR(0x07f8) AM_READNOP AM_WRITE(enigma2_flip_screen_w)
-	AM_RANGE(0x5806, 0x5807) AM_MIRROR(0x07f8) AM_NOP
-ADDRESS_MAP_END
+void enigma2_state::enigma2_main_cpu_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x1fff).rom().nopw();
+	map(0x2000, 0x3fff).mirror(0x4000).ram().share("videoram");
+	map(0x4000, 0x4fff).rom().nopw();
+	map(0x5000, 0x57ff).r(this, FUNC(enigma2_state::dip_switch_r)).nopw();
+	map(0x5800, 0x5800).mirror(0x07f8).noprw();
+	map(0x5801, 0x5801).mirror(0x07f8).portr("IN0").nopw();
+	map(0x5802, 0x5802).mirror(0x07f8).portr("IN1").nopw();
+	map(0x5803, 0x5803).mirror(0x07f8).nopr().w(this, FUNC(enigma2_state::sound_data_w));
+	map(0x5804, 0x5804).mirror(0x07f8).noprw();
+	map(0x5805, 0x5805).mirror(0x07f8).nopr().w(this, FUNC(enigma2_state::enigma2_flip_screen_w));
+	map(0x5806, 0x5807).mirror(0x07f8).noprw();
+}
 
 
-static ADDRESS_MAP_START( engima2a_main_cpu_map, AS_PROGRAM, 8, enigma2_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x4fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x5000, 0x57ff) AM_READ(dip_switch_r) AM_WRITENOP
-	AM_RANGE(0x5800, 0x5fff) AM_NOP
-ADDRESS_MAP_END
+void enigma2_state::enigma2a_main_cpu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().nopw();
+	map(0x2000, 0x3fff).mirror(0x4000).ram().share("videoram");
+	map(0x4000, 0x4fff).rom().nopw();
+	map(0x5000, 0x57ff).r(this, FUNC(enigma2_state::dip_switch_r)).nopw();
+	map(0x5800, 0x5fff).noprw();
+}
 
 
-static ADDRESS_MAP_START( engima2a_main_cpu_io_map, AS_IO, 8, enigma2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_NOP
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITENOP
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITENOP
-	AM_RANGE(0x03, 0x03) AM_READNOP AM_WRITE(sound_data_w)
-	AM_RANGE(0x04, 0x04) AM_NOP
-	AM_RANGE(0x05, 0x05) AM_READNOP AM_WRITE(enigma2_flip_screen_w)
-	AM_RANGE(0x06, 0x07) AM_NOP
-ADDRESS_MAP_END
+void enigma2_state::enigma2a_main_cpu_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).noprw();
+	map(0x01, 0x01).portr("IN0").nopw();
+	map(0x02, 0x02).portr("IN1").nopw();
+	map(0x03, 0x03).nopr().w(this, FUNC(enigma2_state::sound_data_w));
+	map(0x04, 0x04).noprw();
+	map(0x05, 0x05).nopr().w(this, FUNC(enigma2_state::enigma2_flip_screen_w));
+	map(0x06, 0x07).noprw();
+}
 
 
-static ADDRESS_MAP_START( engima2_audio_cpu_map, AS_PROGRAM, 8, enigma2_state )
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ffc) AM_NOP
-	AM_RANGE(0xc000, 0xffff) AM_NOP
-ADDRESS_MAP_END
+void enigma2_state::enigma2_audio_cpu_map(address_map &map)
+{
+	map(0x0000, 0x0fff).mirror(0x1000).rom().nopw();
+	map(0x2000, 0x7fff).noprw();
+	map(0x8000, 0x83ff).mirror(0x1c00).ram();
+	map(0xa000, 0xa001).mirror(0x1ffc).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xa002, 0xa002).mirror(0x1ffc).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xa003, 0xa003).mirror(0x1ffc).noprw();
+	map(0xc000, 0xffff).noprw();
+}
 
 
 
@@ -488,14 +496,14 @@ static INPUT_PORTS_START( enigma2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p1_controls_r, nullptr)
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p1_controls_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p2_controls_r, nullptr)
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p2_controls_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -543,7 +551,7 @@ static INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p1_controls_r, nullptr)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p1_controls_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -551,7 +559,7 @@ static INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p2_controls_r, nullptr)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p2_controls_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -595,10 +603,10 @@ MACHINE_CONFIG_START(enigma2_state::enigma2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(engima2_main_cpu_map)
+	MCFG_CPU_PROGRAM_MAP(enigma2_main_cpu_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
+	MCFG_CPU_PROGRAM_MAP(enigma2_audio_cpu_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 
@@ -623,11 +631,11 @@ MACHINE_CONFIG_START(enigma2_state::enigma2a)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(engima2a_main_cpu_map)
-	MCFG_CPU_IO_MAP(engima2a_main_cpu_io_map)
+	MCFG_CPU_PROGRAM_MAP(enigma2a_main_cpu_map)
+	MCFG_CPU_IO_MAP(enigma2a_main_cpu_io_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(engima2_audio_cpu_map)
+	MCFG_CPU_PROGRAM_MAP(enigma2_audio_cpu_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 

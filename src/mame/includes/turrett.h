@@ -85,6 +85,8 @@ public:
 	uint8_t   m_adc;
 
 	void turrett(machine_config &config);
+	void cpu_map(address_map &map);
+	void turrett_sound_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;

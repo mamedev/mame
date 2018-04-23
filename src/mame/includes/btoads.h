@@ -67,6 +67,9 @@ public:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
 	void btoads(machine_config &config);
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	// device overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -114,6 +117,6 @@ protected:
 	uint16_t m_sprite_dest_offs;
 	uint16_t m_misc_control;
 	int m_xcount;
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34020_device> m_maincpu;
 	required_device<screen_device> m_screen;
 };

@@ -25,19 +25,23 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void extrema(machine_config &config);
+	void extrema_map(address_map &map);
+	void extrema_portmap(address_map &map);
 };
 
 
 
 
-static ADDRESS_MAP_START( extrema_map, AS_PROGRAM, 8, extrema_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void extrema_state::extrema_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 
-static ADDRESS_MAP_START( extrema_portmap, AS_IO, 8, extrema_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void extrema_state::extrema_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 
 static INPUT_PORTS_START( extrema )

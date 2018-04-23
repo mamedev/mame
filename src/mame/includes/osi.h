@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder, Robbbert, Wilbert Pol
 #pragma once
 
-#ifndef __OSI__
-#define __OSI__
+#ifndef MAME_INCLUDES_OSI_H
+#define MAME_INCLUDES_OSI_H
 
 
 #include "cpu/m6502/m6502.h"
@@ -42,7 +42,6 @@ public:
 		, m_io_keyboard(*this, "ROW%u", 0)
 		, m_io_sound(*this, "Sound")
 		, m_io_reset(*this, "Reset")
-		, m_beeper(*this, "beeper")
 		{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -59,15 +58,10 @@ public:
 	void osi600(machine_config &config);
 	void osi600_video(machine_config &config);
 	void osi630_video(machine_config &config);
+	void osi600_mem(address_map &map);
 protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-
-	enum
-	{
-		TIMER_SETUP_BEEP
-	};
 
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia_0;
@@ -80,7 +74,6 @@ protected:
 	required_ioport_array<8> m_io_keyboard;
 	required_ioport m_io_sound;
 	required_ioport m_io_reset;
-	optional_device<beep_device> m_beeper;
 
 	/* floppy state */
 	int m_fdc_index;
@@ -96,19 +89,26 @@ protected:
 class c1p_state : public sb2m600_state
 {
 public:
+	enum
+	{
+		TIMER_SETUP_BEEP
+	};
+
 	c1p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sb2m600_state(mconfig, type, tag)
-		, m_beep(*this, "beeper")
+		, m_beeper(*this, "beeper")
 	{ }
 
-	required_device<beep_device> m_beep;
-
 	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	required_device<beep_device> m_beeper;
 
 	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
 	DECLARE_WRITE8_MEMBER( osi630_sound_w );
 	DECLARE_DRIVER_INIT(c1p);
 	void c1p(machine_config &config);
+	void c1p_mem(address_map &map);
 };
 
 class c1pmf_state : public c1p_state
@@ -126,6 +126,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
 
 	void c1pmf(machine_config &config);
+	void c1pmf_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -146,6 +147,7 @@ public:
 	DECLARE_WRITE8_MEMBER( keyboard_w );
 	void uk101(machine_config &config);
 	void uk101_video(machine_config &config);
+	void uk101_mem(address_map &map);
 };
 
 #endif

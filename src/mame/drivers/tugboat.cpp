@@ -79,6 +79,7 @@ public:
 		int addr,int gfx0,int gfx1,int transparency);
 
 		void tugboat(machine_config &config);
+		void main_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -232,19 +233,20 @@ void tugboat_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tugboat_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(hd46505_0_w)  /* scrolling is performed changing the start_addr register (0C/0D) */
-	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(hd46505_1_w)
-	AM_RANGE(0x11e4, 0x11e7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x11e8, 0x11eb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+void tugboat_state::main_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x01ff).ram().share("ram");
+	map(0x1060, 0x1061).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x10a0, 0x10a1).w(this, FUNC(tugboat_state::hd46505_0_w));  /* scrolling is performed changing the start_addr register (0C/0D) */
+	map(0x10c0, 0x10c1).w(this, FUNC(tugboat_state::hd46505_1_w));
+	map(0x11e4, 0x11e7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x11e8, 0x11eb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	//AM_RANGE(0x1700, 0x1fff) AM_RAM
-	AM_RANGE(0x18e0, 0x18ef) AM_WRITE(score_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM /* tilemap RAM */
-	AM_RANGE(0x4000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+	map(0x18e0, 0x18ef).w(this, FUNC(tugboat_state::score_w));
+	map(0x2000, 0x2fff).ram(); /* tilemap RAM */
+	map(0x4000, 0x7fff).rom();
+}
 
 
 static INPUT_PORTS_START( tugboat )
@@ -362,7 +364,6 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_CPU_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tugboat_state,  nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(tugboat_state,input_r))
@@ -377,6 +378,7 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	MCFG_SCREEN_VISIBLE_AREA(1*8,31*8-1,2*8,30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tugboat_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tugboat)
 	MCFG_PALETTE_ADD("palette", 256)

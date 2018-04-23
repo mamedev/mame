@@ -89,6 +89,8 @@ public:
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void megaplay(machine_config &config);
+	void megaplay_bios_io_map(address_map &map);
+	void megaplay_bios_map(address_map &map);
 private:
 
 	uint32_t m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
@@ -137,10 +139,10 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_MODIFY("PAD1") // P1 Start input processed through BIOS
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start1_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start1_r)
 
 	PORT_MODIFY("PAD2") // P2 Start input processed through BIOS
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start2_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, mplay_state, start2_r)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -585,18 +587,18 @@ WRITE8_MEMBER(mplay_state::game_w)
 	logerror("BIOS bank addr = %X\n", m_bios_bank_addr);
 }
 
-static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(game_w)
-	AM_RANGE(0x6200, 0x6207) AM_DEVREADWRITE("io1", cxd1095_device, read, write)
-	AM_RANGE(0x6400, 0x6407) AM_DEVREADWRITE("io2", cxd1095_device, read, write)
-	AM_RANGE(0x6600, 0x6600) AM_READWRITE(bios_6600_r, bios_6600_w)
-	AM_RANGE(0x6001, 0x67ff) AM_WRITEONLY
-	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_SHARE("ic3_ram")
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(bank_r, bank_w)
-ADDRESS_MAP_END
+void mplay_state::megaplay_bios_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x4fff).ram();
+	map(0x5000, 0x5fff).ram();
+	map(0x6000, 0x6000).w(this, FUNC(mplay_state::game_w));
+	map(0x6200, 0x6207).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
+	map(0x6400, 0x6407).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
+	map(0x6600, 0x6600).rw(this, FUNC(mplay_state::bios_6600_r), FUNC(mplay_state::bios_6600_w));
+	map(0x6800, 0x77ff).ram().share("ic3_ram");
+	map(0x8000, 0xffff).rw(this, FUNC(mplay_state::bank_r), FUNC(mplay_state::bank_w));
+}
 
 
 
@@ -609,14 +611,15 @@ READ8_MEMBER(mplay_state::vdp1_count_r)
 		return m_vdp1->vcount_read(prg, offset);
 }
 
-static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_device, write)
+void mplay_state::megaplay_bios_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::write));
 
-	AM_RANGE(0x40, 0x41) AM_MIRROR(0x3e) AM_READ(vdp1_count_r)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, register_read, register_write)
-ADDRESS_MAP_END
+	map(0x40, 0x41).mirror(0x3e).r(this, FUNC(mplay_state::vdp1_count_r));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
+}
 
 
 uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -660,7 +663,7 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 
 MACHINE_CONFIG_START(mplay_state::megaplay)
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
 	   which includes an SN76496 for sound */

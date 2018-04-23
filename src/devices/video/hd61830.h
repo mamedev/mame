@@ -19,7 +19,7 @@
 //**************************************************************************
 
 #define MCFG_HD61830_RD_CALLBACK(_read) \
-	devcb = &hd61830_device::set_rd_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<hd61830_device &>(*device).set_rd_rd_callback(DEVCB_##_read);
 
 
 
@@ -37,7 +37,7 @@ public:
 	// construction/destruction
 	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_rd_rd_callback(device_t &device, Object &&cb) { return downcast<hd61830_device &>(device).m_read_rd.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_rd_rd_callback(Object &&cb) { return m_read_rd.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( control_w );
@@ -84,6 +84,8 @@ private:
 	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t ma, int x, int y, uint8_t md);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void hd61830(address_map &map);
 
 	devcb_read8 m_read_rd;
 

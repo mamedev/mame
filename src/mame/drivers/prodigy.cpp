@@ -81,9 +81,9 @@
 #include <zlib.h>
 #include <iostream>
 #include <fstream>
-#include "rapidjson/include/rapidjson/document.h"
-#include "rapidjson/include/rapidjson/stringbuffer.h"
-#include "rapidjson/include/rapidjson/writer.h"
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 #endif
 
 // Generated artwork includes
@@ -137,6 +137,7 @@ public:
 		, m_cb2(*this, "bcd:cb2")
 		, m_digit(0.0)
 		, m_io_line(*this, "LINE%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 #if HTTPUI
 		, m_connection(NULL)
 		, m_web_line0(0)
@@ -165,6 +166,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 
 	void prodigy(machine_config &config);
+	void maincpu_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_74145;
@@ -179,6 +181,7 @@ private:
 
 	virtual void device_start() override;
 	required_ioport_array<5> m_io_line;
+	output_finder<4> m_digits;
 	uint16_t m_line[5];
 
 #if HTTPUI
@@ -211,6 +214,7 @@ NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit7_cb) { if (data != 0) m_digi
 
 void prodigy_state::device_start()
 {
+	m_digits.resolve();
 	memset(m_line, 0, sizeof(m_line));
 #if HTTPUI
 	m_server =  machine().manager().http();
@@ -553,22 +557,27 @@ void prodigy_state::update_bcd()
 		LOGBCD(" - segments: %02x -> ", m_digit);
 		m_segments = m_digit;
 		LOGBCD("%02x\n", m_segments);
-		if (m_digit_cache[digit_nbr] != m_segments)
+
+		if (digit_nbr < 4)
 		{
-			output().set_digit_value( digit_nbr, m_segments);
-			m_digit_cache[digit_nbr] = m_segments;
+			if (m_digit_cache[digit_nbr] != m_segments)
+			{
+				m_digits[digit_nbr] = m_segments;
+				m_digit_cache[digit_nbr] = m_segments;
 #if HTTPUI
-			update_web_bcd(digit_nbr, m_segments);
+				update_web_bcd(digit_nbr, m_segments);
 #endif
+			}
 		}
 	}
 }
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, prodigy_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("via", via6522_device, read, write)
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("roms", 0x0000) AM_MIRROR(0x8000)
-ADDRESS_MAP_END
+void prodigy_state::maincpu_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x2000, 0x200f).rw("via", FUNC(via6522_device::read),FUNC(via6522_device::write));
+	map(0x6000, 0x7fff).rom().region("roms", 0).mirror(0x8000);
+}
 
 /*
  * The keypad was modelled after the physical appearance but altered after finding out how it was working so

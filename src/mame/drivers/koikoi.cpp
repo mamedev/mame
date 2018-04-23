@@ -83,6 +83,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void koikoi(machine_config &config);
+	void koikoi_io_map(address_map &map);
+	void koikoi_map(address_map &map);
 };
 
 
@@ -230,20 +232,22 @@ WRITE8_MEMBER(koikoi_state::io_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( koikoi_map, AS_PROGRAM, 8, koikoi_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW")
-	AM_RANGE(0x9000, 0x9007) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void koikoi_state::koikoi_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x6000, 0x67ff).ram();
+	map(0x7000, 0x77ff).ram().w(this, FUNC(koikoi_state::vram_w)).share("videoram");
+	map(0x8000, 0x8000).portr("DSW");
+	map(0x9000, 0x9007).rw(this, FUNC(koikoi_state::io_r), FUNC(koikoi_state::io_w));
+}
 
-static ADDRESS_MAP_START( koikoi_io_map, AS_IO, 8, koikoi_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITENOP //watchdog
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void koikoi_state::koikoi_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x02).nopw(); //watchdog
+	map(0x03, 0x03).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x06, 0x07).w("aysnd", FUNC(ay8910_device::data_address_w));
+}
 
 /*************************************
  *
@@ -354,7 +358,6 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
 	MCFG_CPU_PROGRAM_MAP(koikoi_map)
 	MCFG_CPU_IO_MAP(koikoi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", koikoi_state,  nmi_line_pulse)
 
 
 	/* video hardware */
@@ -365,6 +368,7 @@ MACHINE_CONFIG_START(koikoi_state::koikoi)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(koikoi_state, screen_update_koikoi)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koikoi)
 	MCFG_PALETTE_ADD("palette", 8*32)

@@ -46,6 +46,13 @@ public:
 	void shanghai(machine_config &config);
 	void shangha2(machine_config &config);
 	void kothello(machine_config &config);
+	void hd63484_map(address_map &map);
+	void kothello_map(address_map &map);
+	void kothello_sound_map(address_map &map);
+	void shangha2_map(address_map &map);
+	void shangha2_portmap(address_map &map);
+	void shanghai_map(address_map &map);
+	void shanghai_portmap(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -93,71 +100,77 @@ WRITE8_MEMBER(shanghai_state::shanghai_coin_w)
 	machine().bookkeeping().coin_counter_w(1,data & 2);
 }
 
-static ADDRESS_MAP_START( shanghai_map, AS_PROGRAM, 16, shanghai_state )
-	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x80000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void shanghai_state::shanghai_map(address_map &map)
+{
+	map(0x00000, 0x03fff).ram();
+	map(0x80000, 0xfffff).rom();
+}
 
 
-static ADDRESS_MAP_START( shangha2_map, AS_PROGRAM, 16, shanghai_state )
-	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x041ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x80000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void shanghai_state::shangha2_map(address_map &map)
+{
+	map(0x00000, 0x03fff).ram();
+	map(0x04000, 0x041ff).w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x80000, 0xfffff).rom();
+}
 
 
-static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16, shanghai_state )
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
-	AM_RANGE(0x40, 0x41) AM_READ_PORT("P1")
-	AM_RANGE(0x44, 0x45) AM_READ_PORT("P2")
-	AM_RANGE(0x48, 0x49) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x4c, 0x4d) AM_WRITE8(shanghai_coin_w,0x00ff)
-ADDRESS_MAP_END
+void shanghai_state::shanghai_portmap(address_map &map)
+{
+	map(0x00, 0x01).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x02, 0x03).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x20, 0x23).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
+	map(0x40, 0x41).portr("P1");
+	map(0x44, 0x45).portr("P2");
+	map(0x48, 0x49).portr("SYSTEM");
+	map(0x4c, 0x4c).w(this, FUNC(shanghai_state::shanghai_coin_w));
+}
 
 
-static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16, shanghai_state )
-	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1")
-	AM_RANGE(0x10, 0x11) AM_READ_PORT("P2")
-	AM_RANGE(0x20, 0x21) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x32, 0x33) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
-	AM_RANGE(0x50, 0x51) AM_WRITE8(shanghai_coin_w,0x00ff)
-ADDRESS_MAP_END
+void shanghai_state::shangha2_portmap(address_map &map)
+{
+	map(0x00, 0x01).portr("P1");
+	map(0x10, 0x11).portr("P2");
+	map(0x20, 0x21).portr("SYSTEM");
+	map(0x30, 0x31).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x32, 0x33).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x40, 0x43).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
+	map(0x50, 0x50).w(this, FUNC(shanghai_state::shanghai_coin_w));
+}
 
-static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
-	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08010, 0x08011) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
-	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
-	AM_RANGE(0x09010, 0x09011) AM_READ_PORT("P1")
-	AM_RANGE(0x09012, 0x09013) AM_READ_PORT("P2")
-	AM_RANGE(0x09014, 0x09015) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x09016, 0x0901f) AM_WRITENOP // 0x9016 is set to 0 at the boot
-	AM_RANGE(0x0a000, 0x0a1ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0b010, 0x0b01f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
-	AM_RANGE(0x80000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void shanghai_state::kothello_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+	map(0x08010, 0x08011).rw("hd63484", FUNC(hd63484_device::status16_r), FUNC(hd63484_device::address16_w));
+	map(0x08012, 0x08013).rw("hd63484", FUNC(hd63484_device::data16_r), FUNC(hd63484_device::data16_w));
+	map(0x09010, 0x09011).portr("P1");
+	map(0x09012, 0x09013).portr("P2");
+	map(0x09014, 0x09015).portr("SYSTEM");
+	map(0x09016, 0x0901f).nopw(); // 0x9016 is set to 0 at the boot
+	map(0x0a000, 0x0a1ff).w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x0b010, 0x0b01f).rw("seibu_sound", FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
+	map(0x80000, 0xfffff).rom();
+}
 
-static ADDRESS_MAP_START( kothello_sound_map, AS_PROGRAM, 8, shanghai_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
-	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
-	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
-ADDRESS_MAP_END
+void shanghai_state::kothello_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x27ff).ram();
+	map(0x4000, 0x4000).w("seibu_sound", FUNC(seibu_sound_device::pending_w));
+	map(0x4001, 0x4001).w("seibu_sound", FUNC(seibu_sound_device::irq_clear_w));
+	map(0x4002, 0x4002).w("seibu_sound", FUNC(seibu_sound_device::rst10_ack_w));
+	map(0x4003, 0x4003).w("seibu_sound", FUNC(seibu_sound_device::rst18_ack_w));
+	map(0x4005, 0x4006).w("adpcm", FUNC(seibu_adpcm_device::adr_w));
+	map(0x4007, 0x4007).w("seibu_sound", FUNC(seibu_sound_device::bank_w));
+	map(0x4008, 0x4009).rw("seibu_sound", FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
+	map(0x4010, 0x4011).r("seibu_sound", FUNC(seibu_sound_device::soundlatch_r));
+	map(0x4012, 0x4012).r("seibu_sound", FUNC(seibu_sound_device::main_data_pending_r));
+	map(0x4013, 0x4013).portr("COIN");
+	map(0x4018, 0x4019).w("seibu_sound", FUNC(seibu_sound_device::main_data_w));
+	map(0x401a, 0x401a).w("adpcm", FUNC(seibu_adpcm_device::ctl_w));
+	map(0x401b, 0x401b).w("seibu_sound", FUNC(seibu_sound_device::coin_w));
+	map(0x8000, 0xffff).bankr("seibu_bank1");
+}
 
 static INPUT_PORTS_START( kothello )
 	SEIBU_COIN_INPUTS   /* coin inputs read through sound cpu */
@@ -377,9 +390,10 @@ static INPUT_PORTS_START( shangha2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( hd63484_map, 0, 16, shanghai_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+void shanghai_state::hd63484_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
 
 MACHINE_CONFIG_START(shanghai_state::shanghai)
 
@@ -477,6 +491,7 @@ MACHINE_CONFIG_START(shanghai_state::kothello)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
+	MCFG_HD63484_EXTERNAL_SKEW(2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

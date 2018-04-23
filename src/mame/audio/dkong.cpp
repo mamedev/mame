@@ -1241,7 +1241,7 @@ READ8_MEMBER(dkong_state::dkong_tune_r)
 	}
 	else
 	{
-		/* printf("%s:rom access\n",machine().describe_context()); */
+		/* printf("%s:rom access\n",machine().describe_context().c_str()); */
 		return (m_snd_rom[0x1000 + (page & 7) * 256 + offset]);
 	}
 }
@@ -1273,35 +1273,41 @@ WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( dkong_sound_map, AS_PROGRAM, 8, dkong_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void dkong_state::dkong_sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
-static ADDRESS_MAP_START( dkong_sound_io_map, AS_IO, 8, dkong_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(dkong_tune_r, dkong_voice_w)
-ADDRESS_MAP_END
+void dkong_state::dkong_sound_io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(dkong_state::dkong_tune_r), FUNC(dkong_state::dkong_voice_w));
+}
 
-static ADDRESS_MAP_START( dkongjr_sound_io_map, AS_IO, 8, dkong_state )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("ls174.3d", latch8_device, read)
-ADDRESS_MAP_END
+void dkong_state::dkongjr_sound_io_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).r("ls174.3d", FUNC(latch8_device::read));
+}
 
-static ADDRESS_MAP_START( radarscp1_sound_io_map, AS_IO, 8, dkong_state )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD("ls175.3d", latch8_device, read)
-	AM_RANGE(0x00, 0xff) AM_WRITE(dkong_p1_w) /* DAC here */
-ADDRESS_MAP_END
+void dkong_state::radarscp1_sound_io_map(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).r("ls175.3d", FUNC(latch8_device::read));
+	map(0x00, 0xff).w(this, FUNC(dkong_state::dkong_p1_w)); /* DAC here */
+}
 
-static ADDRESS_MAP_START( dkong3_sound1_map, AS_PROGRAM, 8, dkong_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("latch1", latch8_device, read)       /* overwrite default */
-	AM_RANGE(0x4017, 0x4017) AM_DEVREAD("latch2", latch8_device, read)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dkong_state::dkong3_sound1_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x4016, 0x4016).r("latch1", FUNC(latch8_device::read));       /* overwrite default */
+	map(0x4017, 0x4017).r("latch2", FUNC(latch8_device::read));
+	map(0xe000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( dkong3_sound2_map, AS_PROGRAM, 8, dkong_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("latch3", latch8_device, read)       /* overwrite default */
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void dkong_state::dkong3_sound2_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x4016, 0x4016).r("latch3", FUNC(latch8_device::read));       /* overwrite default */
+	map(0xe000, 0xffff).rom();
+}
 
 /*************************************
  *
@@ -1351,14 +1357,16 @@ MACHINE_CONFIG_START(dkong_state::dkong2b_audio)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp_audio, dkong2b_audio)
+MACHINE_CONFIG_START(dkong_state::radarscp_audio)
+	dkong2b_audio(config);
 
 	MCFG_DISCRETE_REPLACE("discrete", 0, radarscp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(dkong_state::radarscp1_audio, radarscp_audio)
+MACHINE_CONFIG_START(dkong_state::radarscp1_audio)
+	radarscp_audio(config);
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(radarscp1_sound_io_map)
@@ -1427,11 +1435,9 @@ MACHINE_CONFIG_START(dkong_state::dkong3_audio)
 
 	MCFG_CPU_ADD("n2a03a", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong3_sound1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, nmi_line_pulse)
 
 	MCFG_CPU_ADD("n2a03b", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dkong3_sound2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, nmi_line_pulse)
 
 	/* sound latches */
 	MCFG_LATCH8_ADD( "latch1")

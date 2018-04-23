@@ -113,6 +113,8 @@ public:
 	void galaxi(machine_config &config);
 	void lastfour(machine_config &config);
 	void magjoker(machine_config &config);
+	void galaxi_map(address_map &map);
+	void lastfour_map(address_map &map);
 };
 
 
@@ -300,53 +302,55 @@ CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
                             Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void galaxi_state::galaxi_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg1_w) AM_SHARE("bg1_ram")
-	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE(galaxi_bg2_w) AM_SHARE("bg2_ram")
-	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE(galaxi_bg3_w) AM_SHARE("bg3_ram")
-	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE(galaxi_bg4_w) AM_SHARE("bg4_ram")
+	map(0x100000, 0x1003ff).ram().w(this, FUNC(galaxi_state::galaxi_bg1_w)).share("bg1_ram");
+	map(0x100400, 0x1007ff).ram().w(this, FUNC(galaxi_state::galaxi_bg2_w)).share("bg2_ram");
+	map(0x100800, 0x100bff).ram().w(this, FUNC(galaxi_state::galaxi_bg3_w)).share("bg3_ram");
+	map(0x100c00, 0x100fff).ram().w(this, FUNC(galaxi_state::galaxi_bg4_w)).share("bg4_ram");
 
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
-	AM_RANGE(0x102000, 0x107fff) AM_READNOP // unknown
+	map(0x101000, 0x101fff).ram().w(this, FUNC(galaxi_state::galaxi_fg_w)).share("fg_ram");
+	map(0x102000, 0x107fff).nopr(); // unknown
 
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x300000, 0x3007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(galaxi_500000_w)
-	AM_RANGE(0x500002, 0x500003) AM_WRITE(galaxi_500002_w)
-	AM_RANGE(0x500004, 0x500005) AM_WRITE(galaxi_500004_w)
+	map(0x500000, 0x500001).portr("INPUTS");
+	map(0x500000, 0x500001).w(this, FUNC(galaxi_state::galaxi_500000_w));
+	map(0x500002, 0x500003).w(this, FUNC(galaxi_state::galaxi_500002_w));
+	map(0x500004, 0x500005).w(this, FUNC(galaxi_state::galaxi_500004_w));
 
-	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("nvram")   // 2x DS1230Y (non volatile SRAM)
-ADDRESS_MAP_END
+	map(0x600000, 0x607fff).ram().share("nvram");   // 2x DS1230Y (non volatile SRAM)
+}
 
 
-static ADDRESS_MAP_START( lastfour_map, AS_PROGRAM, 16, galaxi_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void galaxi_state::lastfour_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
 	// bg3+4 / 1+2 seem to be swapped, order, palettes, scroll register etc. all suggest this
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg3_w) AM_SHARE("bg3_ram")
-	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE(galaxi_bg4_w) AM_SHARE("bg4_ram")
-	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE(galaxi_bg1_w) AM_SHARE("bg1_ram")
-	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE(galaxi_bg2_w) AM_SHARE("bg2_ram")
+	map(0x100000, 0x1003ff).ram().w(this, FUNC(galaxi_state::galaxi_bg3_w)).share("bg3_ram");
+	map(0x100400, 0x1007ff).ram().w(this, FUNC(galaxi_state::galaxi_bg4_w)).share("bg4_ram");
+	map(0x100800, 0x100bff).ram().w(this, FUNC(galaxi_state::galaxi_bg1_w)).share("bg1_ram");
+	map(0x100c00, 0x100fff).ram().w(this, FUNC(galaxi_state::galaxi_bg2_w)).share("bg2_ram");
 
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(galaxi_fg_w ) AM_SHARE("fg_ram")
-	AM_RANGE(0x102000, 0x107fff) AM_READNOP // unknown
+	map(0x101000, 0x101fff).ram().w(this, FUNC(galaxi_state::galaxi_fg_w)).share("fg_ram");
+	map(0x102000, 0x107fff).nopr(); // unknown
 
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0x300000, 0x3007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(galaxi_500000_w)
-	AM_RANGE(0x500002, 0x500003) AM_WRITE(galaxi_500002_w)
-	AM_RANGE(0x500004, 0x500005) AM_WRITE(galaxi_500004_w)
+	map(0x500000, 0x500001).portr("INPUTS");
+	map(0x500000, 0x500001).w(this, FUNC(galaxi_state::galaxi_500000_w));
+	map(0x500002, 0x500003).w(this, FUNC(galaxi_state::galaxi_500002_w));
+	map(0x500004, 0x500005).w(this, FUNC(galaxi_state::galaxi_500004_w));
 
-	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("nvram")   // 2x DS1230Y (non volatile SRAM)
-ADDRESS_MAP_END
+	map(0x600000, 0x607fff).ram().share("nvram");   // 2x DS1230Y (non volatile SRAM)
+}
 
 
 /***************************************************************************
@@ -362,15 +366,15 @@ static INPUT_PORTS_START( galaxi )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_COIN3 )   // pin 25LC
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // hopper out (pin 14LS)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // (pin 26LC)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // (pin 15LS)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // (pin 26LC)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // (pin 15LS)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( magjoker )
@@ -382,15 +386,15 @@ static INPUT_PORTS_START( magjoker )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, hopper_r, nullptr)   // hopper sensor
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(5)   // coin a
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(5)   // coin b (token)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // hopper out (pin 14LS)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, galaxi_state, ticket_r, nullptr)  // ticket sensor
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // hopper out (pin 14LS)
 	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )    // test
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )   // (pin 26LC)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // (pin 15LS)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) // (pin 15LS)
 INPUT_PORTS_END
 
 
@@ -478,7 +482,8 @@ MACHINE_CONFIG_START(galaxi_state::galaxi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxi_state::magjoker, galaxi)
+MACHINE_CONFIG_START(galaxi_state::magjoker)
+	galaxi(config);
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("oki")
@@ -489,7 +494,8 @@ MACHINE_CONFIG_DERIVED(galaxi_state::magjoker, galaxi)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(galaxi_state::lastfour, galaxi)
+MACHINE_CONFIG_START(galaxi_state::lastfour)
+	galaxi(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

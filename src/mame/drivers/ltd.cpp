@@ -58,6 +58,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "nvram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(atla_ltd);
@@ -75,6 +76,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
 	void ltd4(machine_config &config);
 	void ltd3(machine_config &config);
+	void ltd3_map(address_map &map);
+	void ltd4_io(address_map &map);
+	void ltd4_map(address_map &map);
 private:
 	bool m_timer_r;
 	bool m_clear;
@@ -84,37 +88,42 @@ private:
 	uint8_t m_out_offs;
 	uint8_t m_port2;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<50> m_digits;
 };
 
 
-static ADDRESS_MAP_START( ltd3_map, AS_PROGRAM, 8, ltd_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("nvram") // internal to the cpu
-	AM_RANGE(0x0080, 0x0087) AM_MIRROR(0x78) AM_READ(io_r)
-	AM_RANGE(0x0800, 0x2fff) AM_WRITE(io_w)
-	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_MIRROR(0x3000) AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void ltd_state::ltd3_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram().share("nvram"); // internal to the cpu
+	map(0x0080, 0x0087).mirror(0x78).r(this, FUNC(ltd_state::io_r));
+	map(0x0800, 0x2fff).w(this, FUNC(ltd_state::io_w));
+	map(0xc000, 0xcfff).rom().mirror(0x3000).region("roms", 0);
+}
 
-static ADDRESS_MAP_START( ltd4_map, AS_PROGRAM, 8, ltd_state )
-	AM_RANGE(0x0000, 0x001f) AM_RAM // internal to the cpu
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(count_reset_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE("aysnd_1", ay8910_device, reset_w)
-	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("aysnd_0", ay8910_device, address_w)
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("aysnd_0", ay8910_device, reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("aysnd_1", ay8910_device, address_w)
+void ltd_state::ltd4_map(address_map &map)
+{
+	map(0x0000, 0x001f).ram(); // internal to the cpu
+	map(0x0080, 0x00ff).ram();
+	map(0x0100, 0x01ff).ram().share("nvram");
+	map(0x0800, 0x0800).w(this, FUNC(ltd_state::count_reset_w));
+	map(0x0c00, 0x0c00).w("aysnd_1", FUNC(ay8910_device::reset_w));
+	map(0x1000, 0x1000).w("aysnd_0", FUNC(ay8910_device::address_w));
+	map(0x1400, 0x1400).w("aysnd_0", FUNC(ay8910_device::reset_w));
+	map(0x1800, 0x1800).w("aysnd_1", FUNC(ay8910_device::address_w));
 	//AM_RANGE(0x2800, 0x2800) AM_WRITE(auxlamps_w)
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("aysnd_0", ay8910_device, data_w)
-	AM_RANGE(0x3800, 0x3800) AM_DEVWRITE("aysnd_1", ay8910_device, data_w)
-	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_MIRROR(0x2000) AM_REGION("roms", 0)
-ADDRESS_MAP_END
+	map(0x3000, 0x3000).w("aysnd_0", FUNC(ay8910_device::data_w));
+	map(0x3800, 0x3800).w("aysnd_1", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xdfff).rom().mirror(0x2000).region("roms", 0);
+}
 
-static ADDRESS_MAP_START( ltd4_io, AS_IO, 8, ltd_state )
-	AM_RANGE(0x0100, 0x0100) AM_READWRITE(port1_r,port1_w)
-	AM_RANGE(0x0101, 0x0101) AM_READWRITE(port2_r,port2_w)
-ADDRESS_MAP_END
+void ltd_state::ltd4_io(address_map &map)
+{
+	map(0x0100, 0x0100).rw(this, FUNC(ltd_state::port1_r), FUNC(ltd_state::port1_w));
+	map(0x0101, 0x0101).rw(this, FUNC(ltd_state::port2_r), FUNC(ltd_state::port2_w));
+}
 
 // bits 6,7 not connected to data bus
 // 1=does something in Atlantis; 2=does something in Black Hole; note that sometimes pressing G or H will reboot the machine.
@@ -323,21 +332,21 @@ WRITE8_MEMBER( ltd_state::port1_w )
 				if (m_clear)
 				{
 					if (row>7)
-						output().set_digit_value(row+2, segment); // P2
+						m_digits[row+2] = segment; // P2
 					else
-						output().set_digit_value(row, segment); // P1
+						m_digits[row] = segment; // P1
 				}
 				break;
 			case 8:
 				if (m_clear)
 				{
 					if (row>13)
-						output().set_digit_value(row+26, segment); // credits / ball
+						m_digits[row+26] = segment; // credits / ball
 					else
 					if (row>7)
-						output().set_digit_value(row+22, segment); // P4
+						m_digits[row+22] = segment; // P4
 					else
-						output().set_digit_value(row+20, segment); // P3
+						m_digits[row+20] = segment; // P3
 				}
 				break;
 		}
@@ -378,8 +387,6 @@ DRIVER_INIT_MEMBER( ltd_state, ltd )
 DRIVER_INIT_MEMBER( ltd_state, atla_ltd )
 {
 	m_game = 1;
-	output().set_digit_value(0, 0x3f);
-	output().set_digit_value(10, 0x3f);
 }
 
 DRIVER_INIT_MEMBER( ltd_state, bhol_ltd )
@@ -406,27 +413,29 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 		{
 			case 1: // atlantis (2-player, 5-digit)
 			{
+				m_digits[0] = 0x3f;
+				m_digits[10] = 0x3f;
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[1] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[2] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 1:
-						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[11] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[12] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 2:
-						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[3] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[4] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 3:
-						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[13] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[14] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 8:
-						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[41] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[40] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 				}
 				break;
@@ -436,32 +445,32 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output().set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[0] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[1] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 1:
-						output().set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[10] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[11] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 2:
-						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[2] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[3] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 3:
-						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[12] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[13] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 4:
-						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[4] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[5] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 5:
-						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[14] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[15] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 8:
-						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[41] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[40] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 				}
 				break;
@@ -471,49 +480,48 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 				switch(m_out_offs-0x60)
 				{
 					case 0:
-						output().set_digit_value(0, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(1, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[0] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[1] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 1:
-						output().set_digit_value(2, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(3, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[2] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[3] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 2:
-						output().set_digit_value(4, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(5, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[4] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[5] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 3:
-						output().set_digit_value(10, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(11, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[10] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[11] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 4:
-						output().set_digit_value(12, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(13, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[12] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[13] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 5:
-						output().set_digit_value(14, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(15, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[14] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[15] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 6:
-						output().set_digit_value(20, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(21, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[20] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[21] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 7:
-						output().set_digit_value(22, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(23, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[22] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[23] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 8:
-						output().set_digit_value(24, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(25, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[24] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[25] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 					case 9:
-						output().set_digit_value(40, patterns[m_p_ram[m_out_offs]&15]);
-						output().set_digit_value(41, patterns[m_p_ram[m_out_offs]>>4]);
+						m_digits[40] = patterns[m_p_ram[m_out_offs]&15];
+						m_digits[41] = patterns[m_p_ram[m_out_offs]>>4];
 						break;
 				}
 				break;
 			}
-
 		}
 	}
 }
@@ -529,7 +537,7 @@ MACHINE_CONFIG_START(ltd_state::ltd3)
 	MCFG_DEFAULT_LAYOUT(layout_ltd)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_r", ltd_state, timer_r, attotime::from_hz(500))
 MACHINE_CONFIG_END
@@ -546,7 +554,7 @@ MACHINE_CONFIG_START(ltd_state::ltd4)
 	MCFG_DEFAULT_LAYOUT(layout_ltd)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */

@@ -164,47 +164,50 @@ void electron_plus1_device::device_start()
 
 uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
 {
-	if (offset >= 0x8000 && offset < 0xc000)
+	switch (offset >> 12)
 	{
+	case 0x8:
+	case 0x9:
+	case 0xa:
+	case 0xb:
 		switch (m_romsel)
 		{
 		case 0:
 		case 1:
-			if (m_cart_sk2->exists())
-			{
-				data = m_cart_sk2->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
-			}
+			data = m_cart_sk2->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
 			break;
 		case 2:
 		case 3:
-			if (m_cart_sk1->exists())
-			{
-				data = m_cart_sk1->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
-			}
+			data = m_cart_sk1->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
 			break;
 		case 12:
 			data = m_exp_rom->base()[offset & 0x1fff];
 			break;
 		}
-	}
-	else if ((offset & 0xfc00) == 0xfc00)
-	{
-		data &= m_cart_sk1->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
-		data &= m_cart_sk2->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+		break;
 
-		if (offset == 0xfc70)
+	case 0xf:
+		switch (offset >> 8)
 		{
-			data &= m_adc->read(space, offset);
+		case 0xfc:
+			data &= m_cart_sk1->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+			data &= m_cart_sk2->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+
+			if (offset == 0xfc70)
+			{
+				data &= m_adc->read(space, offset);
+			}
+			else if (offset == 0xfc72)
+			{
+				data &= status_r(space, offset);
+			}
+			break;
+
+		case 0xfd:
+			data &= m_cart_sk1->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
+			data &= m_cart_sk2->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
+			break;
 		}
-		else if (offset == 0xfc72)
-		{
-			data &= status_r(space, offset);
-		}
-	}
-	else if ((offset & 0xfd00) == 0xfd00)
-	{
-		data &= m_cart_sk1->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
-		data &= m_cart_sk2->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
 	}
 
 	return data;
@@ -217,48 +220,54 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset, uin
 
 void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
 {
-	if (offset >= 0x8000 && offset < 0xc000)
+	switch (offset >> 12)
 	{
+	case 0x8:
+	case 0x9:
+	case 0xa:
+	case 0xb:
 		switch (m_romsel)
 		{
 		case 0:
 		case 1:
-			if (m_cart_sk2->exists())
-			{
-				m_cart_sk2->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
-			}
+			m_cart_sk2->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
 			break;
 		case 2:
 		case 3:
-			if (m_cart_sk1->exists())
+			m_cart_sk1->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			break;
+		}
+		break;
+
+	case 0xf:
+		switch (offset >> 8)
+		{
+		case 0xfc:
+			m_cart_sk1->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+			m_cart_sk2->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+
+			if (offset == 0xfc70)
 			{
-				m_cart_sk1->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+				m_adc->write(space, offset, data);
+			}
+			else if (offset == 0xfc71)
+			{
+				m_cent_data_out->write(data);
+			}
+			break;
+
+		case 0xfd:
+			m_cart_sk1->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
+			m_cart_sk2->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
+			break;
+
+		case 0xfe:
+			if (offset == 0xfe05)
+			{
+				m_romsel = data & 0x0f;
 			}
 			break;
 		}
-	}
-	else if ((offset & 0xfc00) == 0xfc00)
-	{
-		m_cart_sk1->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
-		m_cart_sk2->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
-
-		if (offset == 0xfc70)
-		{
-			m_adc->write(space, offset, data);
-		}
-		else if (offset == 0xfc71)
-		{
-			m_cent_data_out->write(data);
-		}
-		else if (offset == 0xfe05)
-		{
-			m_romsel = data & 0x0f;
-		}
-	}
-	else if ((offset & 0xfd00) == 0xfd00)
-	{
-		m_cart_sk1->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
-		m_cart_sk2->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
 	}
 }
 

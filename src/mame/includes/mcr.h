@@ -84,6 +84,12 @@ public:
 	void mcr_90010_tt(machine_config &config);
 	void mcr_91475(machine_config &config);
 	void mcr_90010(machine_config &config);
+	void cpu_90009_map(address_map &map);
+	void cpu_90009_portmap(address_map &map);
+	void cpu_90010_map(address_map &map);
+	void cpu_90010_portmap(address_map &map);
+	void cpu_91490_map(address_map &map);
+	void cpu_91490_portmap(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -182,6 +188,8 @@ public:
 	DECLARE_DRIVER_INIT(nflfoot);
 
 	void mcr_91490_ipu(machine_config &config);
+	void ipu_91695_map(address_map &map);
+	void ipu_91695_portmap(address_map &map);
 protected:
 	virtual void machine_start() override;
 

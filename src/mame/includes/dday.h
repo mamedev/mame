@@ -68,4 +68,5 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<ay8910_device> m_ay1;
 	void dday(machine_config &config);
+	void dday_map(address_map &map);
 };

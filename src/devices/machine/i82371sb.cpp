@@ -14,44 +14,45 @@
 
 DEFINE_DEVICE_TYPE(I82371SB_ISA, i82371sb_isa_device, "i82371sb_isa", "Intel 82371 southbridge ISA bridge")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, i82371sb_isa_device)
-	AM_RANGE(0x4c, 0x4f) AM_READWRITE8 (iort_r,    iort_w,    0x000000ff)
-	AM_RANGE(0x4c, 0x4f) AM_READWRITE16(xbcs_r,    xbcs_w,    0xffff0000)
-	AM_RANGE(0x60, 0x63) AM_READWRITE8 (pirqrc_r,  pirqrc_w,  0xffffffff)
-	AM_RANGE(0x68, 0x6b) AM_READWRITE8 (tom_r,     tom_w,     0x000000ff)
-	AM_RANGE(0x68, 0x6b) AM_READWRITE16(mstat_r,   mstat_w,   0xffff0000)
-	AM_RANGE(0x70, 0x73) AM_READWRITE8 (mbirq0_r,  mbirq0_w,  0x000000ff)
-	AM_RANGE(0x74, 0x77) AM_READWRITE8 (mbdma_r,   mbdma_w,   0xffff0000)
-	AM_RANGE(0x80, 0x83) AM_READWRITE8 (dlc_r,     dlc_w,     0x00ff0000)
-	AM_RANGE(0xa0, 0xa3) AM_READWRITE8 (smicntl_r, smicntl_w, 0x000000ff)
-	AM_RANGE(0xa0, 0xa3) AM_READWRITE16(smien_r,   smien_w,   0xffff0000)
-	AM_RANGE(0xa4, 0xa7) AM_READWRITE  (see_r,     see_w)
-	AM_RANGE(0xa8, 0xab) AM_READWRITE8 (ftmr_r,    ftmr_w,    0x000000ff)
-	AM_RANGE(0xa8, 0xab) AM_READWRITE16(smireq_r,  smireq_w,  0xffff0000)
-	AM_RANGE(0xac, 0xaf) AM_READWRITE8 (ctltmr_r,  ctltmr_w,  0x000000ff)
-	AM_RANGE(0xac, 0xaf) AM_READWRITE8 (cthtmr_r,  cthtmr_w,  0x00ff0000)
+void i82371sb_isa_device::config_map(address_map &map)
+{
+	pci_device::config_map(map);
+	map(0x4c, 0x4c).rw(this, FUNC(i82371sb_isa_device::iort_r), FUNC(i82371sb_isa_device::iort_w));
+	map(0x4e, 0x4f).rw(this, FUNC(i82371sb_isa_device::xbcs_r), FUNC(i82371sb_isa_device::xbcs_w));
+	map(0x60, 0x63).rw(this, FUNC(i82371sb_isa_device::pirqrc_r), FUNC(i82371sb_isa_device::pirqrc_w));
+	map(0x68, 0x68).rw(this, FUNC(i82371sb_isa_device::tom_r), FUNC(i82371sb_isa_device::tom_w));
+	map(0x6a, 0x6b).rw(this, FUNC(i82371sb_isa_device::mstat_r), FUNC(i82371sb_isa_device::mstat_w));
+	map(0x70, 0x70).rw(this, FUNC(i82371sb_isa_device::mbirq0_r), FUNC(i82371sb_isa_device::mbirq0_w));
+	map(0x76, 0x77).rw(this, FUNC(i82371sb_isa_device::mbdma_r), FUNC(i82371sb_isa_device::mbdma_w));
+	map(0x82, 0x82).rw(this, FUNC(i82371sb_isa_device::dlc_r), FUNC(i82371sb_isa_device::dlc_w));
+	map(0xa0, 0xa0).rw(this, FUNC(i82371sb_isa_device::smicntl_r), FUNC(i82371sb_isa_device::smicntl_w));
+	map(0xa2, 0xa3).rw(this, FUNC(i82371sb_isa_device::smien_r), FUNC(i82371sb_isa_device::smien_w));
+	map(0xa4, 0xa7).rw(this, FUNC(i82371sb_isa_device::see_r), FUNC(i82371sb_isa_device::see_w));
+	map(0xa8, 0xa8).rw(this, FUNC(i82371sb_isa_device::ftmr_r), FUNC(i82371sb_isa_device::ftmr_w));
+	map(0xaa, 0xab).rw(this, FUNC(i82371sb_isa_device::smireq_r), FUNC(i82371sb_isa_device::smireq_w));
+	map(0xac, 0xac).rw(this, FUNC(i82371sb_isa_device::ctltmr_r), FUNC(i82371sb_isa_device::ctltmr_w));
+	map(0xae, 0xae).rw(this, FUNC(i82371sb_isa_device::cthtmr_r), FUNC(i82371sb_isa_device::cthtmr_w));
+}
 
-	AM_INHERIT_FROM(pci_device::config_map)
-ADDRESS_MAP_END
-
-DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i82371sb_isa_device)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254",   pit8254_device, read, write, 0xffffffff)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffffffff);
-	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffffffff);
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", ds12885_device, read, write, 0xffffffff);
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff);
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff);
-	AM_RANGE(0x00e0, 0x00ef) AM_NOP
+void i82371sb_isa_device::internal_io_map(address_map &map)
+{
+	map(0x0000, 0x001f).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0020, 0x003f).rw("pic8259_master", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x005f).rw("pit8254", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0060, 0x0063).rw(this, FUNC(i82371sb_isa_device::at_keybc_r), FUNC(i82371sb_isa_device::at_keybc_w));
+	map(0x0064, 0x0067).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
+	map(0x0070, 0x007f).rw("rtc", FUNC(ds12885_device::read), FUNC(ds12885_device::write));
+	map(0x0080, 0x009f).rw(this, FUNC(i82371sb_isa_device::at_page8_r), FUNC(i82371sb_isa_device::at_page8_w));
+	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x00c0, 0x00df).rw(this, FUNC(i82371sb_isa_device::at_dma8237_2_r), FUNC(i82371sb_isa_device::at_dma8237_2_w));
+	map(0x00e0, 0x00ef).noprw();
 
 	// VGA-HACK
-	AM_RANGE(0x3b0, 0x3bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff);
-	AM_RANGE(0x3c0, 0x3cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff);
-	AM_RANGE(0x3d0, 0x3df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff);
+	map(0x3b0, 0x3bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x3c0, 0x3cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x3d0, 0x3df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
 	// end-VGA-HACK
-ADDRESS_MAP_END
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -165,8 +166,8 @@ MACHINE_CONFIG_START(i82371sb_isa_device::device_add_mconfig)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
 
-	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", VGA, 0)
+	MCFG_VIDEO_SET_SCREEN("screen")
 	// end-VGA-HACK
 MACHINE_CONFIG_END
 

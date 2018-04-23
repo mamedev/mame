@@ -39,7 +39,7 @@ enum {
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::lightpen_trigger)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::lightpen_trigger)
 {
 	if (m_lightpen_port & 1)
 	{
@@ -73,12 +73,12 @@ TIMER_CALLBACK_MEMBER(vectrex_state::lightpen_trigger)
 
 *********************************************************************/
 
-READ8_MEMBER(vectrex_state::vectrex_via_r)
+READ8_MEMBER(vectrex_base_state::vectrex_via_r)
 {
 	return m_via6522_0->read(space, offset);
 }
 
-WRITE8_MEMBER(vectrex_state::vectrex_via_w)
+WRITE8_MEMBER(vectrex_base_state::vectrex_via_w)
 {
 	attotime period;
 
@@ -112,7 +112,7 @@ WRITE8_MEMBER(vectrex_state::vectrex_via_w)
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_refresh)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_refresh)
 {
 	/* Refresh only marks the range of vectors which will be drawn
 	 * during the next screen_update. */
@@ -121,7 +121,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_refresh)
 }
 
 
-uint32_t vectrex_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vectrex_base_state::screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -153,7 +153,7 @@ uint32_t vectrex_state::screen_update_vectrex(screen_device &screen, bitmap_rgb3
 
 *********************************************************************/
 
-void vectrex_state::vectrex_add_point(int x, int y, rgb_t color, int intensity)
+void vectrex_base_state::vectrex_add_point(int x, int y, rgb_t color, int intensity)
 {
 	vectrex_point *newpoint;
 
@@ -167,7 +167,7 @@ void vectrex_state::vectrex_add_point(int x, int y, rgb_t color, int intensity)
 }
 
 
-void vectrex_state::vectrex_add_point_stereo(int x, int y, rgb_t color, int intensity)
+void vectrex_base_state::vectrex_add_point_stereo(int x, int y, rgb_t color, int intensity)
 {
 	if (m_imager_status == 2) /* left = 1, right = 2 */
 		vectrex_add_point((int)(y * M_SQRT1_2)+ m_x_center,
@@ -182,7 +182,7 @@ void vectrex_state::vectrex_add_point_stereo(int x, int y, rgb_t color, int inte
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_zero_integrators)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_zero_integrators)
 {
 	m_x_int = m_x_center + (m_analog[A_ZR] * INT_PER_CLOCK);
 	m_y_int = m_y_center + (m_analog[A_ZR] * INT_PER_CLOCK);
@@ -200,7 +200,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_zero_integrators)
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::update_signal)
+TIMER_CALLBACK_MEMBER(vectrex_base_state::update_signal)
 {
 	int length;
 
@@ -233,7 +233,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::update_signal)
 
 *********************************************************************/
 
-void vectrex_state::video_start()
+void vectrex_base_state::video_start()
 {
 	const rectangle &visarea = m_screen->visible_area();
 
@@ -242,15 +242,21 @@ void vectrex_state::video_start()
 	m_x_max = visarea.max_x << 16;
 	m_y_max = visarea.max_y << 16;
 
+	vector_add_point_function = &vectrex_base_state::vectrex_add_point;
+
+	m_refresh = timer_alloc(TIMER_VECTREX_REFRESH);
+}
+
+void vectrex_state::video_start()
+{
+	vectrex_base_state::video_start();
+
 	m_imager_freq = 1;
 
-	vector_add_point_function = &vectrex_state::vectrex_add_point;
 	m_imager_timer = timer_alloc(TIMER_VECTREX_IMAGER_EYE);
 	m_imager_timer->adjust(attotime::from_hz(m_imager_freq), 2, attotime::from_hz(m_imager_freq));
 
 	m_lp_t = timer_alloc(TIMER_LIGHTPEN_TRIGGER);
-
-	m_refresh = timer_alloc(TIMER_VECTREX_REFRESH);
 }
 
 
@@ -260,7 +266,7 @@ void vectrex_state::video_start()
 
 *********************************************************************/
 
-void vectrex_state::vectrex_multiplexer(int mux)
+void vectrex_base_state::vectrex_multiplexer(int mux)
 {
 	timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_UPDATE_SIGNAL, m_via_out[PORTA], &m_analog[mux]);
 
@@ -269,7 +275,7 @@ void vectrex_state::vectrex_multiplexer(int mux)
 }
 
 
-WRITE8_MEMBER(vectrex_state::v_via_pb_w)
+WRITE8_MEMBER(vectrex_base_state::v_via_pb_w)
 {
 	if (!(data & 0x80))
 	{
@@ -352,7 +358,7 @@ WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 }
 
 
-WRITE8_MEMBER(vectrex_state::v_via_pa_w)
+WRITE8_MEMBER(vectrex_base_state::v_via_pa_w)
 {
 	/* DAC output always goes to Y integrator */
 	m_via_out[PORTA] = data;
@@ -363,14 +369,14 @@ WRITE8_MEMBER(vectrex_state::v_via_pa_w)
 }
 
 
-WRITE_LINE_MEMBER(vectrex_state::v_via_ca2_w)
+WRITE_LINE_MEMBER(vectrex_base_state::v_via_ca2_w)
 {
 	if (state == 0)
 		timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_VECTREX_ZERO_INTEGRATORS);
 }
 
 
-WRITE_LINE_MEMBER(vectrex_state::v_via_cb2_w)
+WRITE_LINE_MEMBER(vectrex_base_state::v_via_cb2_w)
 {
 	int dx, dy;
 
@@ -405,23 +411,9 @@ WRITE_LINE_MEMBER(vectrex_state::v_via_cb2_w)
 
 *****************************************************************/
 
-WRITE8_MEMBER(vectrex_state::raaspec_led_w)
+WRITE8_MEMBER(raaspec_state::raaspec_led_w)
 {
 	logerror("Spectrum I+ LED: %i%i%i%i%i%i%i%i\n",
 				(data>>7)&0x1, (data>>6)&0x1, (data>>5)&0x1, (data>>4)&0x1,
 				(data>>3)&0x1, (data>>2)&0x1, (data>>1)&0x1, data&0x1);
-}
-
-
-VIDEO_START_MEMBER(vectrex_state,raaspec)
-{
-	const rectangle &visarea = m_screen->visible_area();
-
-	m_x_center=(visarea.width() / 2) << 16;
-	m_y_center=(visarea.height() / 2) << 16;
-	m_x_max = visarea.max_x << 16;
-	m_y_max = visarea.max_y << 16;
-
-	vector_add_point_function = &vectrex_state::vectrex_add_point;
-	m_refresh = timer_alloc(TIMER_VECTREX_REFRESH);
 }

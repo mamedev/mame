@@ -154,7 +154,7 @@ enum
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "HuC6280")
+DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "Hudson Soft HuC6280")
 
 //-------------------------------------------------
 //  h6280_device - constructor
@@ -269,7 +269,7 @@ void h6280_device::device_start()
 	save_item(NAME(m_io_buffer));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_icount = 0;
 
 	/* clear pending interrupts */
@@ -2225,9 +2225,9 @@ void h6280_device::state_string_export(const device_state_entry &entry, std::str
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *h6280_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> h6280_device::create_disassembler()
 {
-	return new h6280_disassembler;
+	return std::make_unique<h6280_disassembler>();
 }
 
 
@@ -2406,7 +2406,7 @@ void h6280_device::execute_run()
 	{
 		m_ppc = m_pc;
 
-		debugger_instruction_hook(this, PCW);
+		debugger_instruction_hook(PCW);
 
 		/* Execute 1 instruction */
 		in = read_opcode();

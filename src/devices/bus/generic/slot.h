@@ -86,10 +86,10 @@ enum
 	static_cast<generic_slot_device *>(device)->set_extensions(_ext);
 
 #define MCFG_GENERIC_LOAD(_class, _method)                                \
-	generic_slot_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), this));
+	downcast<generic_slot_device &>(*device).set_device_load(device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), this));
 
 #define MCFG_GENERIC_UNLOAD(_class, _method)                            \
-	generic_slot_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), this));
+	downcast<generic_slot_device &>(*device).set_device_unload(device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), this));
 
 
 
@@ -104,8 +104,8 @@ public:
 	generic_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~generic_slot_device();
 
-	static void static_set_device_load(device_t &device, device_image_load_delegate callback) { downcast<generic_slot_device &>(device).m_device_image_load = callback; }
-	static void static_set_device_unload(device_t &device, device_image_func_delegate callback) { downcast<generic_slot_device &>(device).m_device_image_unload = callback; }
+	template <typename Object> void set_device_load(Object &&cb) { m_device_image_load = std::forward<Object>(cb); }
+	template <typename Object> void set_device_unload(Object &&cb) { m_device_image_unload = std::forward<Object>(cb); }
 
 	void set_interface(const char * interface) { m_interface = interface; }
 	void set_default_card(const char * def) { m_default_card = def; }

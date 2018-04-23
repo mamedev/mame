@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __ABC800__
-#define __ABC800__
+#ifndef MAME_INCLUDES_ABC800_H
+#define MAME_INCLUDES_ABC800_H
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/rs232/rs232.h"
@@ -117,6 +117,7 @@ public:
 	void bankswitch();
 	void clock_cassette(int state);
 
+	virtual DECLARE_READ8_MEMBER( m1_r );
 	DECLARE_READ8_MEMBER( pling_r );
 	DECLARE_WRITE8_MEMBER( hrs_w );
 	DECLARE_WRITE8_MEMBER( hrc_w );
@@ -128,7 +129,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
 
 	// memory state
-	int m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
+	bool m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)
+	uint16_t m_char_ram_start;
+	uint16_t m_char_ram_mask;
 
 	// sound state
 	int m_pling;
@@ -150,6 +153,10 @@ public:
 	// timers
 	emu_timer *m_ctc_timer;
 	emu_timer *m_cassette_timer;
+	void abc800_m1(address_map &map);
+	void abc800c_io(address_map &map);
+	void abc800m_io(address_map &map);
+	void abc800m_mem(address_map &map);
 };
 
 
@@ -202,10 +209,12 @@ public:
 	offs_t translate_trom_offset(offs_t offset);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	DECLARE_READ8_MEMBER( m1_r ) override;
 	DECLARE_READ8_MEMBER( char_ram_r );
 	DECLARE_PALETTE_INIT( abc800c );
 	void abc800c(machine_config &config);
 	void abc800c_video(machine_config &config);
+	void abc800c_mem(address_map &map);
 };
 
 
@@ -235,6 +244,7 @@ public:
 
 	void bankswitch();
 
+	DECLARE_READ8_MEMBER( m1_r ) override;
 	DECLARE_READ8_MEMBER( pling_r );
 	DECLARE_WRITE_LINE_MEMBER( lrs_w );
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
@@ -251,6 +261,8 @@ public:
 
 	void abc802(machine_config &config);
 	void abc802_video(machine_config &config);
+	void abc802_io(address_map &map);
+	void abc802_mem(address_map &map);
 };
 
 
@@ -326,6 +338,8 @@ public:
 
 	void abc806(machine_config &config);
 	void abc806_video(machine_config &config);
+	void abc806_io(address_map &map);
+	void abc806_mem(address_map &map);
 };
 
 #endif

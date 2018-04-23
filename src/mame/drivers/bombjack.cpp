@@ -111,7 +111,7 @@ READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
 	// An extra flip-flop is used to clear the LS273 after reading it through a LS245
 	// (this flip-flop is then cleared in sync with the sound CPU clock)
 	uint8_t res = m_soundlatch->read(space, 0);
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_soundlatch->clear_w(space, 0, 0);
 	return res;
 }
@@ -125,42 +125,47 @@ READ8_MEMBER(bombjack_state::soundlatch_read_and_clear)
 
 WRITE8_MEMBER(bombjack_state::irq_mask_w)
 {
-	m_nmi_mask = data & 1;
+	m_nmi_mask = BIT(data, 0);
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bombjack_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
-	AM_RANGE(0x9c00, 0x9cff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(irq_mask_w)
-	AM_RANGE(0xb001, 0xb001) AM_READ_PORT("P2")
-	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb003, 0xb003) AM_READNOP /* watchdog reset? */
-	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("DSW1")
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(bombjack_flipscreen_w)
-	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("DSW2")
-	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-ADDRESS_MAP_END
+void bombjack_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x93ff).ram().w(this, FUNC(bombjack_state::bombjack_videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(this, FUNC(bombjack_state::bombjack_colorram_w)).share("colorram");
+	map(0x9820, 0x987f).writeonly().share("spriteram");
+	map(0x9a00, 0x9a00).nopw();
+	map(0x9c00, 0x9cff).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x9e00, 0x9e00).w(this, FUNC(bombjack_state::bombjack_background_w));
+	map(0xb000, 0xb000).portr("P1");
+	map(0xb000, 0xb000).w(this, FUNC(bombjack_state::irq_mask_w));
+	map(0xb001, 0xb001).portr("P2");
+	map(0xb002, 0xb002).portr("SYSTEM");
+	map(0xb003, 0xb003).nopr(); /* watchdog reset? */
+	map(0xb004, 0xb004).portr("DSW1");
+	map(0xb004, 0xb004).w(this, FUNC(bombjack_state::bombjack_flipscreen_w));
+	map(0xb005, 0xb005).portr("DSW2");
+	map(0xb800, 0xb800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xc000, 0xdfff).rom();
+}
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, bombjack_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_read_and_clear)
-ADDRESS_MAP_END
+void bombjack_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x6000, 0x6000).r(this, FUNC(bombjack_state::soundlatch_read_and_clear));
+}
 
-static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, bombjack_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void bombjack_state::audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
+	map(0x10, 0x11).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x80, 0x81).w("ay3", FUNC(ay8910_device::address_data_w));
+}
 
 
 /*************************************
@@ -327,19 +332,21 @@ GFXDECODE_END
 void bombjack_state::machine_start()
 {
 	save_item(NAME(m_background_image));
+	save_item(NAME(m_nmi_mask));
 }
 
 
 void bombjack_state::machine_reset()
 {
 	m_background_image = 0;
+	m_nmi_mask = false;
 }
 
 
-INTERRUPT_GEN_MEMBER(bombjack_state::vblank_irq)
+WRITE_LINE_MEMBER(bombjack_state::vblank_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_START(bombjack_state::bombjack)
@@ -347,12 +354,10 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))     /* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bombjack_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bombjack_state,  nmi_line_pulse)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
@@ -364,6 +369,8 @@ MACHINE_CONFIG_START(bombjack_state::bombjack)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(bombjack_state, screen_update_bombjack)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bombjack_state, vblank_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombjack)
 	MCFG_PALETTE_ADD("palette", 128)

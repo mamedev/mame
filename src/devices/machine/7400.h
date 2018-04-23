@@ -35,16 +35,16 @@
 
 
 #define MCFG_7400_Y1_CB(_devcb) \
-	devcb = &ttl7400_device::set_y1_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7400_device &>(*device).set_y1_cb(DEVCB_##_devcb);
 
 #define MCFG_7400_Y2_CB(_devcb) \
-	devcb = &ttl7400_device::set_y2_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7400_device &>(*device).set_y2_cb(DEVCB_##_devcb);
 
 #define MCFG_7400_Y3_CB(_devcb) \
-	devcb = &ttl7400_device::set_y3_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7400_device &>(*device).set_y3_cb(DEVCB_##_devcb);
 
 #define MCFG_7400_Y4_CB(_devcb) \
-	devcb = &ttl7400_device::set_y4_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ttl7400_device &>(*device).set_y4_cb(DEVCB_##_devcb);
 
 #define MCFG_7400_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TTL7400, 0)
@@ -56,10 +56,10 @@ public:
 	ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template <class Object> static devcb_base &set_y1_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y1_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y2_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y2_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y3_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y3_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_y4_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y4_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_y1_cb(Object &&cb) { return m_y1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_y2_cb(Object &&cb) { return m_y2_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_y3_cb(Object &&cb) { return m_y3_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_y4_cb(Object &&cb) { return m_y4_func.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	DECLARE_WRITE_LINE_MEMBER( a1_w );

@@ -32,4 +32,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bg_disable_w);
 	void dzigzag(machine_config &config);
 	void digdug(machine_config &config);
+	void digdug_map(address_map &map);
 };

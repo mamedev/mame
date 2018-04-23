@@ -113,6 +113,18 @@ public:
 	void roylcrdn(machine_config &config);
 	void cntrygrl(machine_config &config);
 	void jangou(machine_config &config);
+	void cntrygrl_cpu0_io(address_map &map);
+	void cntrygrl_cpu0_map(address_map &map);
+	void cpu0_io(address_map &map);
+	void cpu0_map(address_map &map);
+	void cpu1_io(address_map &map);
+	void cpu1_map(address_map &map);
+	void jngolady_cpu0_map(address_map &map);
+	void jngolady_cpu1_io(address_map &map);
+	void jngolady_cpu1_map(address_map &map);
+	void nsc_map(address_map &map);
+	void roylcrdn_cpu0_io(address_map &map);
+	void roylcrdn_cpu0_map(address_map &map);
 };
 
 
@@ -326,34 +338,38 @@ WRITE8_MEMBER(jangou_state::slave_com_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8, jangou_state )
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-ADDRESS_MAP_END
+void jangou_state::cpu0_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xc000, 0xc7ff).ram();
+}
 
-static ADDRESS_MAP_START( cpu0_io, AS_IO, 8, jangou_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") AM_WRITE(output_w) //dsw + blitter busy flag
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_DEVICE("blitter",jangou_blitter_device, blit_v1_regs)
-	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
-	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
-	AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
-ADDRESS_MAP_END
+void jangou_state::cpu0_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW").w(this, FUNC(jangou_state::output_w)); //dsw + blitter busy flag
+	map(0x11, 0x11).w(this, FUNC(jangou_state::mux_w));
+	map(0x12, 0x17).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
+	map(0x20, 0x2f).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
+	map(0x30, 0x30).nopw(); //? polls 0x03 continuously
+	map(0x31, 0x31).w(this, FUNC(jangou_state::sound_latch_w));
+}
 
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, jangou_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
-ADDRESS_MAP_END
+void jangou_state::cpu1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().nopw();
+}
 
-static ADDRESS_MAP_START( cpu1_io, AS_IO, 8, jangou_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x01,0x01) AM_WRITE(cvsd_w)
-	AM_RANGE(0x02,0x02) AM_WRITENOP // Echoes sound command - acknowledge?
-ADDRESS_MAP_END
+void jangou_state::cpu1_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(jangou_state::sound_latch_r));
+	map(0x01, 0x01).w(this, FUNC(jangou_state::cvsd_w));
+	map(0x02, 0x02).nopw(); // Echoes sound command - acknowledge?
+}
 
 
 /*************************************
@@ -362,32 +378,36 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( jngolady_cpu0_map, AS_PROGRAM, 8, jangou_state )
-	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(master_com_r,master_com_w)
-ADDRESS_MAP_END
+void jangou_state::jngolady_cpu0_map(address_map &map)
+{
+	map(0x0000, 0x9fff).rom();
+	map(0xc000, 0xc7ff).ram().share("share1");
+	map(0xe000, 0xe000).rw(this, FUNC(jangou_state::master_com_r), FUNC(jangou_state::master_com_w));
+}
 
 
-static ADDRESS_MAP_START( jngolady_cpu1_map, AS_PROGRAM, 8, jangou_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
-ADDRESS_MAP_END
+void jangou_state::jngolady_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().nopw();
+}
 
-static ADDRESS_MAP_START( jngolady_cpu1_io, AS_IO, 8, jangou_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x01,0x01) AM_WRITE(adpcm_w)
-	AM_RANGE(0x02,0x02) AM_WRITENOP
-ADDRESS_MAP_END
+void jangou_state::jngolady_cpu1_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(jangou_state::sound_latch_r));
+	map(0x01, 0x01).w(this, FUNC(jangou_state::adpcm_w));
+	map(0x02, 0x02).nopw();
+}
 
 
-static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, jangou_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM //internal ram for irq etc.
-	AM_RANGE(0x8000, 0x8000) AM_WRITENOP //write-only,irq related?
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(slave_com_r,slave_com_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void jangou_state::nsc_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram(); //internal ram for irq etc.
+	map(0x8000, 0x8000).nopw(); //write-only,irq related?
+	map(0x9000, 0x9000).rw(this, FUNC(jangou_state::slave_com_r), FUNC(jangou_state::slave_com_w));
+	map(0xc000, 0xc7ff).ram().share("share1");
+	map(0xf000, 0xffff).rom();
+}
 
 /*************************************
  *
@@ -395,24 +415,26 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cntrygrl_cpu0_map, AS_PROGRAM, 8, jangou_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+void jangou_state::cntrygrl_cpu0_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
 //  AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe000, 0xefff).ram();
+}
 
-static ADDRESS_MAP_START( cntrygrl_cpu0_io, AS_IO, 8, jangou_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
-	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_DEVICE("blitter",jangou_blitter_device, blit_v1_regs)
-	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
-	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
+void jangou_state::cntrygrl_cpu0_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW"); //dsw + blitter busy flag
+	map(0x10, 0x10).w(this, FUNC(jangou_state::output_w));
+	map(0x11, 0x11).w(this, FUNC(jangou_state::mux_w));
+	map(0x12, 0x17).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
+	map(0x20, 0x2f).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
+	map(0x30, 0x30).nopw(); //? polls 0x03 continuously
 //  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
-ADDRESS_MAP_END
+}
 
 /*************************************
  *
@@ -420,23 +442,25 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( roylcrdn_cpu0_map, AS_PROGRAM, 8, jangou_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("nvram")   /* MK48Z02B-15 ZEROPOWER RAM */
-ADDRESS_MAP_END
+void jangou_state::roylcrdn_cpu0_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom();
+	map(0x7000, 0x77ff).ram().share("nvram");   /* MK48Z02B-15 ZEROPOWER RAM */
+}
 
-static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8, jangou_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
-	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW")         /* DSW + blitter busy flag */
-	AM_RANGE(0x10,0x10) AM_WRITENOP                 /* Writes continuosly 0's in attract mode, and 1's in game */
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x13,0x13) AM_READNOP                  /* Often reads bit7 with unknown purposes */
-	AM_RANGE(0x12,0x17) AM_DEVICE("blitter",jangou_blitter_device, blit_v1_regs)
-	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
-	AM_RANGE(0x30,0x30) AM_WRITENOP                 /* Seems to write 0x10 on each sound event */
-ADDRESS_MAP_END
+void jangou_state::roylcrdn_cpu0_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x02, 0x03).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x10, 0x10).portr("DSW");         /* DSW + blitter busy flag */
+	map(0x10, 0x10).nopw();                 /* Writes continuosly 0's in attract mode, and 1's in game */
+	map(0x11, 0x11).w(this, FUNC(jangou_state::mux_w));
+	map(0x12, 0x17).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
+	map(0x13, 0x13).nopr();                  /* Often reads bit7 with unknown purposes */
+	map(0x20, 0x2f).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
+	map(0x30, 0x30).nopw();                 /* Seems to write 0x10 on each sound event */
+}
 
 
 /*************************************
@@ -532,7 +556,7 @@ static INPUT_PORTS_START( jangou )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( macha )
@@ -593,7 +617,7 @@ static INPUT_PORTS_START( macha )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") // guess
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 
@@ -678,7 +702,7 @@ static INPUT_PORTS_START( cntrygrl )
 	PORT_DIPNAME( 0x40, 0x40, "Coin B setting"  )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin / 10 Credits"  )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 
 	PORT_START("IN_NOMUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -718,7 +742,7 @@ static INPUT_PORTS_START( jngolady )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( roylcrdn )
@@ -778,7 +802,7 @@ static INPUT_PORTS_START( roylcrdn )
 
 	PORT_START("DSW")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("blitter", jangou_blitter_device, status_r)
 
 	PORT_START("IN_NOMUX")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -879,7 +903,8 @@ MACHINE_CONFIG_START(jangou_state::jangou)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jangou_state::jngolady, jangou)
+MACHINE_CONFIG_START(jangou_state::jngolady)
+	jangou(config);
 
 	/* basic machine hardware */
 
@@ -905,7 +930,8 @@ MACHINE_CONFIG_DERIVED(jangou_state::jngolady, jangou)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jangou_state::cntrygrl, jangou)
+MACHINE_CONFIG_START(jangou_state::cntrygrl)
+	jangou(config);
 
 	/* basic machine hardware */
 
@@ -923,7 +949,8 @@ MACHINE_CONFIG_DERIVED(jangou_state::cntrygrl, jangou)
 	MCFG_DEVICE_REMOVE("soundlatch")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jangou_state::roylcrdn, jangou)
+MACHINE_CONFIG_START(jangou_state::roylcrdn)
+	jangou(config);
 
 	/* basic machine hardware */
 

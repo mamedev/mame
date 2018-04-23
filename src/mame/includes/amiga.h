@@ -499,6 +499,11 @@ public:
 	void amiga_base(machine_config &config);
 	void pal_video(machine_config &config);
 	void ntsc_video(machine_config &config);
+	void overlay_1mb_map(address_map &map);
+	void overlay_1mb_map32(address_map &map);
+	void overlay_2mb_map16(address_map &map);
+	void overlay_2mb_map32(address_map &map);
+	void overlay_512kb_map(address_map &map);
 protected:
 	// A bit of a trick here: some registers are 32-bit. In order to efficiently
 	// read them on both big-endian and little-endian systems, we store the custom

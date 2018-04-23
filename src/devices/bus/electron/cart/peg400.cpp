@@ -4,6 +4,9 @@
 
     Slogger Pegasus 400 disk interface
 
+    TODO:
+    - add spare ROM slot
+
 **********************************************************************/
 
 
@@ -84,9 +87,6 @@ uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int in
 	{
 		switch (offset & 0xff)
 		{
-		case 0xc0:
-			data = m_drive_control;
-			break;
 		case 0xc4:
 		case 0xc5:
 		case 0xc6:
@@ -98,14 +98,21 @@ uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int in
 
 	if (!infc && !infd)
 	{
-		if (offset >= 0x0000 && offset < 0x4000)
+		switch (romqa)
 		{
+		case 0:
+			if (offset < 0x3800)
+			{
+				data = m_rom[(offset & 0x3fff) + (romqa * 0x4000)];
+			}
+			else
+			{
+				data = m_ram[offset & 0x07ff];
+			}
+			break;
+		case 1:
 			data = m_rom[(offset & 0x3fff) + (romqa * 0x4000)];
-		}
-
-		if (romqa == 0 && offset >= 0x3800 && offset < 0x4000)
-		{
-			data = m_ram[offset & 0x07ff];
+			break;
 		}
 	}
 
@@ -136,7 +143,7 @@ void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t 
 
 	if (!infc && !infd)
 	{
-		if (offset >= 0x3800 && offset < 0x4000)
+		if (romqa == 0 && offset >= 0x3800)
 		{
 			m_ram[offset & 0x07ff] = data;
 		}
@@ -151,8 +158,6 @@ void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t 
 WRITE8_MEMBER(electron_peg400_device::wd1770_control_w)
 {
 	floppy_image_device *floppy = nullptr;
-
-	m_drive_control = data;
 
 	// bit 0, 1: drive select
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();

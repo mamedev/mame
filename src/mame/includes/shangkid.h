@@ -73,4 +73,15 @@ public:
 	void dynamski(machine_config &config);
 	void chinhero(machine_config &config);
 	void shangkid(machine_config &config);
+	void chinhero_bbx_map(address_map &map);
+	void chinhero_bbx_portmap(address_map &map);
+	void chinhero_main_map(address_map &map);
+	void chinhero_sound_map(address_map &map);
+	void dynamski_map(address_map &map);
+	void dynamski_portmap(address_map &map);
+	void shangkid_bbx_map(address_map &map);
+	void shangkid_bbx_portmap(address_map &map);
+	void shangkid_main_map(address_map &map);
+	void shangkid_sound_map(address_map &map);
+	void sound_portmap(address_map &map);
 };

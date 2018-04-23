@@ -17,32 +17,33 @@
 
 DEFINE_DEVICE_TYPE(LPC2103, lpc210x_device, "lpc2103", "NXP LPC2103")
 
-static ADDRESS_MAP_START( lpc2103_map, AS_PROGRAM, 32, lpc210x_device )
-	AM_RANGE(0x00000000, 0x00007fff) AM_READWRITE(flash_r, flash_w) // 32kb internal FLASH rom
+void lpc210x_device::lpc2103_map(address_map &map)
+{
+	map(0x00000000, 0x00007fff).rw(this, FUNC(lpc210x_device::flash_r), FUNC(lpc210x_device::flash_w)); // 32kb internal FLASH rom
 
-	AM_RANGE(0x3FFFC000, 0x3FFFC01f) AM_READWRITE( fio_r, fio_w ) // GPIO
+	map(0x3FFFC000, 0x3FFFC01f).rw(this, FUNC(lpc210x_device::fio_r), FUNC(lpc210x_device::fio_w)); // GPIO
 
 
-	AM_RANGE(0x40000000, 0x40001fff) AM_RAM // 8kb internal SROM (writes should actually latch - see docs)
+	map(0x40000000, 0x40001fff).ram(); // 8kb internal SROM (writes should actually latch - see docs)
 
-	AM_RANGE(0xE0004000, 0xE000407f) AM_READWRITE( timer0_r, timer0_w)
+	map(0xE0004000, 0xE000407f).rw(this, FUNC(lpc210x_device::timer0_r), FUNC(lpc210x_device::timer0_w));
 
-	AM_RANGE(0xE0008000, 0xE000807f) AM_READWRITE( timer1_r, timer1_w)
+	map(0xE0008000, 0xE000807f).rw(this, FUNC(lpc210x_device::timer1_r), FUNC(lpc210x_device::timer1_w));
 
-	AM_RANGE(0xE002C000, 0xE002C007) AM_READWRITE( pin_r, pin_w )
+	map(0xE002C000, 0xE002C007).rw(this, FUNC(lpc210x_device::pin_r), FUNC(lpc210x_device::pin_w));
 
-	AM_RANGE(0xE01FC000, 0xE01FC007) AM_READWRITE( mam_r, mam_w )
-	AM_RANGE(0xE01FC080, 0xE01FC08f) AM_READWRITE( pll_r, pll_w ) // phase locked loop
-	AM_RANGE(0xE01FC100, 0xE01FC103) AM_READWRITE( apbdiv_r, apbdiv_w )
-	AM_RANGE(0xE01FC1a0, 0xE01FC1a3) AM_READWRITE( scs_r, scs_w )
+	map(0xE01FC000, 0xE01FC007).rw(this, FUNC(lpc210x_device::mam_r), FUNC(lpc210x_device::mam_w));
+	map(0xE01FC080, 0xE01FC08f).rw(this, FUNC(lpc210x_device::pll_r), FUNC(lpc210x_device::pll_w)); // phase locked loop
+	map(0xE01FC100, 0xE01FC103).rw(this, FUNC(lpc210x_device::apbdiv_r), FUNC(lpc210x_device::apbdiv_w));
+	map(0xE01FC1a0, 0xE01FC1a3).rw(this, FUNC(lpc210x_device::scs_r), FUNC(lpc210x_device::scs_w));
 
-	AM_RANGE(0xFFFFF000, 0xFFFFF2ff) AM_READWRITE( vic_r, vic_w ) // interrupt controller
-ADDRESS_MAP_END
+	map(0xFFFFF000, 0xFFFFF2ff).rw(this, FUNC(lpc210x_device::vic_r), FUNC(lpc210x_device::vic_w)); // interrupt controller
+}
 
 
 lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, LPC2103, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, ADDRESS_MAP_NAME(lpc2103_map))
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(lpc210x_device::lpc2103_map), this))
 {
 }
 

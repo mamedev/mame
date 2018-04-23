@@ -108,8 +108,8 @@ public:
 	DECLARE_MACHINE_RESET(twincobr);
 	DECLARE_VIDEO_START(toaplan0);
 	uint32_t screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
-	INTERRUPT_GEN_MEMBER(wardner_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(twincobr_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(wardner_vblank_irq);
 	void twincobr_restore_dsp();
 	void twincobr_create_tilemaps();
 	DECLARE_WRITE_LINE_MEMBER(display_on_w);
@@ -127,4 +127,10 @@ public:
 	void twincobr(machine_config &config);
 	void fsharkbt(machine_config &config);
 	void fshark(machine_config &config);
+	void DSP_io_map(address_map &map);
+	void DSP_program_map(address_map &map);
+	void fsharkbt_i8741_io_map(address_map &map);
+	void main_program_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_program_map(address_map &map);
 };

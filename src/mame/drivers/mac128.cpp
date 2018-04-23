@@ -262,6 +262,8 @@ public:
 	void mac512ke(machine_config &config);
 	void mac128k(machine_config &config);
 	void macplus(machine_config &config);
+	void mac512ke_map(address_map &map);
+	void macplus_map(address_map &map);
 private:
 	// wait states for accessing the VIA
 	int m_via_cycles;
@@ -723,11 +725,8 @@ READ8_MEMBER(mac128_state::mac_via_in_b)
 {
 	int val = 0;
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (machine().first_screen())
-	{
-		if (machine().first_screen()->vpos() >= MAC_V_VIS)
-			val |= 0x40;
-	}
+	if (m_screen->vpos() >= MAC_V_VIS)
+		val |= 0x40;
 
 	if (m_mouse_bit_y)  /* Mouse Y2 */
 		val |= 0x20;
@@ -738,7 +737,7 @@ READ8_MEMBER(mac128_state::mac_via_in_b)
 
 	val |= m_rtc->data_r();
 
-//  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
+//  printf("%s VIA1 IN_B = %02x\n", machine().describe_context().c_str(), val);
 
 	return val;
 }
@@ -746,7 +745,7 @@ READ8_MEMBER(mac128_state::mac_via_in_b)
 WRITE8_MEMBER(mac128_state::mac_via_out_a)
 {
 	device_t *fdc = machine().device("fdc");
-//  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT A: %02x (PC %x)\n", machine().describe_context().c_str(), data);
 
 	//set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
@@ -768,7 +767,7 @@ WRITE8_MEMBER(mac128_state::mac_via_out_a)
 
 WRITE8_MEMBER(mac128_state::mac_via_out_b)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
 	m_snd_enable = ((data & 0x80) == 0) ? true : false;
 	update_volume();
@@ -1276,27 +1275,29 @@ MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac128_state )
-	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x100000)
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ram_600000_r, ram_600000_w)
-	AM_RANGE(0x800000, 0x9fffff) AM_DEVREAD8(SCC_TAG, z80scc_device, cd_ab_r, 0xff00)
-	AM_RANGE(0xa00000, 0xbfffff) AM_DEVWRITE8(SCC_TAG, z80scc_device, cd_ab_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
-	AM_RANGE(0xe80000, 0xefffff) AM_READWRITE(mac_via_r, mac_via_w)
-	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
-ADDRESS_MAP_END
+void mac128_state::mac512ke_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rw(this, FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
+	map(0x400000, 0x4fffff).rom().region("bootrom", 0).mirror(0x100000);
+	map(0x600000, 0x6fffff).rw(this, FUNC(mac128_state::ram_600000_r), FUNC(mac128_state::ram_600000_w));
+	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::cd_ab_r)).umask16(0xff00);
+	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0xc00000, 0xdfffff).rw(this, FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
+	map(0xe80000, 0xefffff).rw(this, FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xfffff0, 0xffffff).rw(this, FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
+}
 
-static ADDRESS_MAP_START(macplus_map, AS_PROGRAM, 16, mac128_state )
-	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("bootrom", 0)
-	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
-	AM_RANGE(0x800000, 0x9fffff) AM_DEVREAD8(SCC_TAG, z80scc_device, cd_ab_r, 0xff00)
-	AM_RANGE(0xa00000, 0xbfffff) AM_DEVWRITE8(SCC_TAG, z80scc_device, cd_ab_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
-	AM_RANGE(0xe80000, 0xefffff) AM_READWRITE(mac_via_r, mac_via_w)
-	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
-ADDRESS_MAP_END
+void mac128_state::macplus_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rw(this, FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
+	map(0x400000, 0x4fffff).rom().region("bootrom", 0);
+	map(0x580000, 0x5fffff).rw(this, FUNC(mac128_state::macplus_scsi_r), FUNC(mac128_state::macplus_scsi_w));
+	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::cd_ab_r)).umask16(0xff00);
+	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0xc00000, 0xdfffff).rw(this, FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
+	map(0xe80000, 0xefffff).rw(this, FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xfffff0, 0xffffff).rw(this, FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
+}
 
 /***************************************************************************
     DEVICE CONFIG
@@ -1379,7 +1380,8 @@ MACHINE_CONFIG_START(mac128_state::mac512ke)
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mac128_state::mac128k, mac512ke)
+MACHINE_CONFIG_START(mac128_state::mac128k)
+	mac512ke(config);
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1387,7 +1389,8 @@ MACHINE_CONFIG_DERIVED(mac128_state::mac128k, mac512ke)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mac128_state::macplus, mac512ke)
+MACHINE_CONFIG_START(mac128_state::macplus)
+	mac512ke(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 

@@ -72,4 +72,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void hcastle(machine_config &config);
+	void hcastle_map(address_map &map);
+	void sound_map(address_map &map);
 };

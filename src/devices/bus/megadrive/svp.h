@@ -19,6 +19,16 @@ public:
 	// construction/destruction
 	md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) override;
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
 	virtual DECLARE_WRITE16_MEMBER(write) override;
@@ -45,17 +55,8 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_pmc);
 	virtual DECLARE_WRITE16_MEMBER(write_al);
 
-protected:
-	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void device_start() override;
-
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) override;
-
-	required_device<device_t> m_svp;
+private:
+	required_device<cpu_device> m_svp;
 	required_ioport m_test_ipt;
 
 	uint32_t pm_io(int reg, int write, uint32_t d);
@@ -68,6 +69,9 @@ protected:
 	uint16_t m_xst2;      // status of XST (bit1 set when 68k writes to XST)
 	uint8_t m_iram[0x800]; // IRAM (0-0x7ff)
 	uint8_t m_dram[0x20000]; // [0x20000];
+
+	void md_svp_ext_map(address_map &map);
+	void md_svp_ssp_map(address_map &map);
 };
 
 

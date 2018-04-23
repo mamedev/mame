@@ -111,10 +111,10 @@ enum
 
 
 #define MCFG_SLAPSTIC_NUM(_chipnum) \
-	atari_slapstic_device::static_set_chipnum(*device, _chipnum);
+	downcast<atari_slapstic_device &>(*device).set_chipnum(_chipnum);
 
 #define MCFG_SLAPSTIC_68K_ACCESS(_type) \
-	atari_slapstic_device::static_set_access68k(*device, _type);
+	downcast<atari_slapstic_device &>(*device).set_access68k(_type);
 
 
 
@@ -132,17 +132,9 @@ public:
 
 	int alt2_kludge(address_space &space, offs_t offset);
 
-	static void static_set_access68k(device_t &device, int type)
-	{
-		atari_slapstic_device &dev = downcast<atari_slapstic_device &>(device);
-		dev.access_68k = type;
-	}
+	void set_access68k(int type) { access_68k = type; }
 
-	static void static_set_chipnum(device_t &device, int chipnum)
-	{
-		atari_slapstic_device &dev = downcast<atari_slapstic_device &>(device);
-		dev.m_chipnum = chipnum;
-	}
+	void set_chipnum(int chipnum) { m_chipnum = chipnum; }
 
 	int m_chipnum;
 

@@ -26,7 +26,7 @@ private:
 	class debug_data_buffer : public util::disasm_interface::data_buffer
 	{
 	public:
-		debug_data_buffer(util::disasm_interface *intf);
+		debug_data_buffer(util::disasm_interface const &intf);
 		~debug_data_buffer() = default;
 
 		virtual u8  r8 (offs_t pc) const override;
@@ -44,7 +44,7 @@ private:
 		void data_get(offs_t pc, offs_t size, std::vector<u8> &data) const;
 
 	private:
-		util::disasm_interface *m_intf;
+		util::disasm_interface const &m_intf;
 
 		std::function<offs_t (offs_t)> m_pc_delta_to_bytes;
 		std::function<void (offs_t, offs_t)> m_do_fill;
@@ -77,15 +77,15 @@ private:
 
 	};
 
-	util::disasm_interface *m_dintf;
-	device_memory_interface *m_mintf;
+	util::disasm_interface &m_dintf;
+	device_memory_interface *const m_mintf;
 
 	std::function<offs_t (offs_t, offs_t)> m_next_pc;
 	std::function<offs_t (offs_t, offs_t)> m_next_pc_wrap;
 	std::function<std::string (offs_t)> m_pc_to_string;
 
 	debug_data_buffer m_buf_raw, m_buf_opcodes, m_buf_params;
-	u32 m_flags;
+	u32 const m_flags;
 	offs_t m_page_mask, m_pc_mask;
 };
 

@@ -42,20 +42,24 @@ public:
 	{ }
 
 	void picno(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, picno_state )
-	AM_RANGE(0x00000, 0x07fff) AM_ROM AM_REGION("roms", 0) // 32kb internal rom
-	AM_RANGE(0x0fb80, 0x0ff7f) AM_RAM // internal ram
-	AM_RANGE(0x0ff80, 0x0ffff) // internal controls
-	AM_RANGE(0x10000, 0x8ffff) AM_ROM AM_REGION("roms", 0x8000) // guess
-ADDRESS_MAP_END
+void picno_state::mem_map(address_map &map)
+{
+	map(0x00000, 0x07fff).rom().region("roms", 0); // 32kb internal rom
+	map(0x0fb80, 0x0ff7f).ram(); // internal ram
+	map(0x0ff80, 0x0ffff); // internal controls
+	map(0x10000, 0x8ffff).rom().region("roms", 0x8000); // guess
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, picno_state )
+void picno_state::io_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( picno )
 INPUT_PORTS_END

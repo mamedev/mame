@@ -149,6 +149,9 @@ public:
 	void ntsc(machine_config &config);
 	void pal(machine_config &config);
 	void vic20(machine_config &config);
+	void vic20_mem(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
 };
 
 
@@ -356,27 +359,30 @@ READ8_MEMBER( vic20_state::vic_videoram_r )
 //  ADDRESS_MAP( vic20_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic20_mem, AS_PROGRAM, 8, vic20_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void vic20_state::vic20_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(vic20_state::read), FUNC(vic20_state::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, vic20_state )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
-ADDRESS_MAP_END
+void vic20_state::vic_videoram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(this, FUNC(vic20_state::vic_videoram_r));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, vic20_state )
-	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("color_ram")
-ADDRESS_MAP_END
+void vic20_state::vic_colorram_map(address_map &map)
+{
+	map(0x000, 0x3ff).ram().share("color_ram");
+}
 
 
 
@@ -834,7 +840,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(vic20_state::ntsc, vic20)
+MACHINE_CONFIG_START(vic20_state::ntsc)
+	vic20(config);
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
@@ -881,7 +888,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(vic20_state::pal, vic20)
+MACHINE_CONFIG_START(vic20_state::pal)
+	vic20(config);
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)

@@ -69,4 +69,8 @@ public:
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void watrball(machine_config &config);
 	void blmbycar(machine_config &config);
+	void blmbycar_map(address_map &map);
+	void blmbycar_oki_map(address_map &map);
+	void common_map(address_map &map);
+	void watrball_map(address_map &map);
 };

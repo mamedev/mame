@@ -64,6 +64,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void phunsy(machine_config &config);
+	void phunsy_data(address_map &map);
+	void phunsy_io(address_map &map);
+	void phunsy_mem(address_map &map);
 private:
 	uint8_t       m_data_out;
 	uint8_t       m_keyboard_input;
@@ -86,24 +89,27 @@ READ_LINE_MEMBER(phunsy_state::cass_r)
 	return (m_cass->input() > 0.03) ? 0 : 1;
 }
 
-static ADDRESS_MAP_START( phunsy_mem, AS_PROGRAM, 8, phunsy_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram") // Video RAM
-	AM_RANGE(0x1800, 0x1fff) AM_READ_BANK("bankru") AM_WRITE_BANK("bankwu") // Banked RAM/ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bankq") // Banked RAM
-ADDRESS_MAP_END
+void phunsy_state::phunsy_mem(address_map &map)
+{
+	map(0x0000, 0x07ff).rom().region("roms", 0);
+	map(0x0800, 0x0fff).ram();
+	map(0x1000, 0x17ff).ram().share("videoram"); // Video RAM
+	map(0x1800, 0x1fff).bankr("bankru").bankw("bankwu"); // Banked RAM/ROM
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x7fff).bankrw("bankq"); // Banked RAM
+}
 
-static ADDRESS_MAP_START( phunsy_io, AS_IO, 8, phunsy_state )
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void phunsy_state::phunsy_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-static ADDRESS_MAP_START( phunsy_data, AS_DATA, 8, phunsy_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_WRITE(phunsy_ctrl_w)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(phunsy_data_r, phunsy_data_w)
-ADDRESS_MAP_END
+void phunsy_state::phunsy_data(address_map &map)
+{
+	map.unmap_value_high();
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).w(this, FUNC(phunsy_state::phunsy_ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(phunsy_state::phunsy_data_r), FUNC(phunsy_state::phunsy_data_w));
+}
 
 
 WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )

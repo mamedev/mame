@@ -28,10 +28,10 @@ class mw18w_state : public driver_device
 public:
 	mw18w_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
 	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
 	DECLARE_WRITE8_MEMBER(mw18w_lamps_w);
@@ -39,6 +39,12 @@ public:
 	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
 	void mw18w(machine_config &config);
+	void mw18w_map(address_map &map);
+	void mw18w_portmap(address_map &map);
+private:
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<10> m_digits;
 };
 
 
@@ -144,7 +150,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
 
 	// d4-7: 7442 (BCD to decimal) -> pick digit panel
 	if ((data & 0xf0) > 0x90) return;
-	output().set_digit_value(data >> 4, _7448_map[data & 0xf]);
+	m_digits[data >> 4] = _7448_map[data & 0xf];
 }
 
 WRITE8_MEMBER(mw18w_state::mw18w_irq0_clear_w)
@@ -160,22 +166,24 @@ CUSTOM_INPUT_MEMBER(mw18w_state::mw18w_sensors_r)
 }
 
 
-static ADDRESS_MAP_START( mw18w_map, AS_PROGRAM, 8, mw18w_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-ADDRESS_MAP_END
+void mw18w_state::mw18w_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
 
-static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8, mw18w_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mw18w_sound0_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(mw18w_sound1_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(mw18w_lamps_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(mw18w_led_display_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4")
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(mw18w_irq0_clear_w)
-ADDRESS_MAP_END
+void mw18w_state::mw18w_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(mw18w_state::mw18w_sound0_w));
+	map(0x01, 0x01).portr("IN1").w(this, FUNC(mw18w_state::mw18w_sound1_w));
+	map(0x02, 0x02).portr("IN2").w(this, FUNC(mw18w_state::mw18w_lamps_w));
+	map(0x03, 0x03).portr("DSW").w(this, FUNC(mw18w_state::mw18w_led_display_w));
+	map(0x04, 0x04).portr("IN4");
+	map(0x06, 0x06).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x07, 0x07).w(this, FUNC(mw18w_state::mw18w_irq0_clear_w));
+}
 
 
 
@@ -206,7 +214,7 @@ static INPUT_PORTS_START( mw18w )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // left/right sw.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw18w_state, mw18w_sensors_r, nullptr)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw18w_state, mw18w_sensors_r, nullptr)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_REMAP_TABLE(mw18w_controller_table + 0x20) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("Gas Pedal")

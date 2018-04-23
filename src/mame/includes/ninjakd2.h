@@ -116,7 +116,6 @@ public:
 	uint32_t screen_update_robokid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_omegaf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_ninjakd2);
-	INTERRUPT_GEN_MEMBER(ninjakd2_interrupt);
 	void robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const uint8_t* const videoram);
 	void bg_ctrl(int offset, int data, tilemap_t* tilemap);
 	void draw_sprites( bitmap_ind16 &bitmap);
@@ -131,4 +130,12 @@ public:
 	void mnight(machine_config &config);
 	void ninjakd2(machine_config &config);
 	void ninjakd2_core(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void mnight_main_cpu(address_map &map);
+	void ninjakd2_main_cpu(address_map &map);
+	void ninjakd2_sound_cpu(address_map &map);
+	void ninjakd2_sound_io(address_map &map);
+	void ninjakid_nopcm_sound_cpu(address_map &map);
+	void omegaf_main_cpu(address_map &map);
+	void robokid_main_cpu(address_map &map);
 };

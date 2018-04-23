@@ -139,9 +139,9 @@ Note that they are interchangeable, eg. you can use a French module on a US Spea
 
     French:
     - No.1: Les Mots de Base: VSM: 16KB CD2353 (1st release was called "Module No. 1 de Jacques Capelovici")
-    - No.2: Les Mots Difficilies: VSM: 16KB? CD62177*
+    - No.2: Les Mots Difficiles (aka Les Mots de Base): VSM: 16KB CD62177A
     - No.3: Les Animaux Familiers: VSM: 16KB? CD62047*
-    - No.4: Les Magasins De La Rue: VSM: 16KB CD62048
+    - No.4: Les Magasins de la Rue: VSM: 16KB CD62048
     - No.5: Les Extra-Terrestres: VSM: 16KB? CD62178*
 
     Italian:
@@ -191,9 +191,9 @@ Speak & Read modules:
     - Who's Who at the Zoo: VSM: 16KB CD2397
     - A Dog on a Log: VSM: 16KB CD3534(rev.A)
     - The Seal That Could Fly: VSM: 16KB CD3535
-    - A Ghost in the House: VSM: 16KB CD3536*
+    - A Ghost in the House: VSM: 16KB CD3536
     - On the Track: VSM: 16KB CD3538
-    - The Third Circle: VSM: 16KB CD3539*
+    - The Third Circle: VSM: 16KB CD3539
     - The Millionth Knight: VSM: 16KB CD3540
 
 
@@ -429,19 +429,37 @@ K28 modules:
 class tispeak_state : public hh_tms1k_state
 {
 public:
-	tispeak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	tispeak_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_tms5100(*this, "tms5100"),
 		m_tms6100(*this, "tms6100"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_ol_out(*this, "ol%u", 1U)
 	{ }
 
-	// devices
-	required_device<tms5110_device> m_tms5100;
-	required_device<tms6100_device> m_tms6100;
-	optional_device<generic_slot_device> m_cart;
-
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
+
+	DECLARE_DRIVER_INIT(snspell);
+	DECLARE_DRIVER_INIT(tntell);
+	DECLARE_DRIVER_INIT(lantutor);
+
+	// machine configs
+	void tms5110_route(machine_config &config);
+	void sns_tmc0281(machine_config &config);
+	void sns_tmc0281d(machine_config &config);
+	void sns_cd2801(machine_config &config);
+	void snspellit(machine_config &config);
+	void snspellsp(machine_config &config);
+	void snspellc(machine_config &config);
+	void snspellcuk(machine_config &config);
+	void snmath(machine_config &config);
+	void snread(machine_config &config);
+	void tntell(machine_config &config);
+	void vocaid(machine_config &config);
+	void lantutor(machine_config &config);
+	void k28m2(machine_config &config);
+
+protected:
 	virtual void power_off() override;
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
@@ -462,42 +480,35 @@ public:
 	DECLARE_WRITE16_MEMBER(k28_write_o);
 	DECLARE_WRITE16_MEMBER(k28_write_r);
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
+
+	void init_cartridge();
+
+	virtual void machine_start() override;
+
+private:
+	// devices
+	required_device<tms5110_device> m_tms5100;
+	required_device<tms6100_device> m_tms6100;
+	optional_device<generic_slot_device> m_cart;
+
+	output_finder<5> m_ol_out;
+
 	// cartridge
 	u32 m_cart_max_size;
 	u8* m_cart_base;
-	void init_cartridge();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
-	DECLARE_DRIVER_INIT(snspell);
-	DECLARE_DRIVER_INIT(tntell);
-	DECLARE_DRIVER_INIT(lantutor);
 
 	u8 m_overlay;
-	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
-
-	// machine configs
-	void tms5110_route(machine_config &config);
-	void sns_tmc0281(machine_config &config);
-	void sns_tmc0281d(machine_config &config);
-	void sns_cd2801(machine_config &config);
-	void snspellit(machine_config &config);
-	void snspellsp(machine_config &config);
-	void snspellc(machine_config &config);
-	void snspellcuk(machine_config &config);
-	void snmath(machine_config &config);
-	void snread(machine_config &config);
-	void tntell(machine_config &config);
-	void vocaid(machine_config &config);
-	void lantutor(machine_config &config);
-	void k28m2(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
 };
 
 
 void tispeak_state::machine_start()
 {
 	hh_tms1k_state::machine_start();
+
+	m_ol_out.resolve();
 
 	init_cartridge();
 }
@@ -689,7 +700,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 		m_overlay = m_inp_matrix[10]->read();
 
 	for (int i = 0; i < 5; i++)
-		output().set_indexed_value("ol", i+1, m_overlay >> i & 1);
+		m_ol_out[i] = BIT(m_overlay, i);
 }
 
 
@@ -1084,7 +1095,7 @@ static INPUT_PORTS_START( snspellc )
 	PORT_START("IN.9") // Vss!
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spell/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // speech chip data
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") // -> auto_power_off
 INPUT_PORTS_END
 
@@ -1131,7 +1142,7 @@ static INPUT_PORTS_START( tntell )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Grid 5-6")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Grid 6-5")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Grid 5-5")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // overlay code
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) // overlay code
 
 	PORT_START("IN.6") // R6
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("Grid 3-5")
@@ -1154,7 +1165,7 @@ static INPUT_PORTS_START( tntell )
 	PORT_START("IN.9") // Vss!
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Grid 6-6 (On)") PORT_CHANGED_MEMBER(DEVICE_SELF, tispeak_state, power_button, (void *)true)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // speech chip data
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // speech chip data
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN.10")
@@ -1290,11 +1301,12 @@ MACHINE_CONFIG_START(tispeak_state::snmath)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", CD2801, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tispeak_state::sns_cd2801, snmath)
+MACHINE_CONFIG_START(tispeak_state::sns_cd2801)
+	snmath(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1310,34 +1322,39 @@ MACHINE_CONFIG_DERIVED(tispeak_state::sns_cd2801, snmath)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::snspellit, sns_cd2801)
+MACHINE_CONFIG_START(tispeak_state::snspellit)
+	sns_cd2801(config);
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_snmath)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::sns_tmc0281, sns_cd2801)
+MACHINE_CONFIG_START(tispeak_state::sns_tmc0281)
+	sns_cd2801(config);
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms5100", TMC0281, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::snspellsp, sns_tmc0281)
+MACHINE_CONFIG_START(tispeak_state::snspellsp)
+	sns_tmc0281(config);
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_snspellsp)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::sns_tmc0281d, sns_cd2801)
+MACHINE_CONFIG_START(tispeak_state::sns_tmc0281d)
+	sns_cd2801(config);
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms5100", TMC0281D, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tispeak_state::snread, snmath)
+MACHINE_CONFIG_START(tispeak_state::snread)
+	snmath(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1354,7 +1371,8 @@ MACHINE_CONFIG_DERIVED(tispeak_state::snread, snmath)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tispeak_state::lantutor, snmath)
+MACHINE_CONFIG_START(tispeak_state::lantutor)
+	snmath(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1388,7 +1406,7 @@ MACHINE_CONFIG_START(tispeak_state::snspellc)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", TMC0281D, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "snspell")
@@ -1398,11 +1416,12 @@ MACHINE_CONFIG_START(tispeak_state::snspellc)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "snspell")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::snspellcuk, snspellc)
+MACHINE_CONFIG_START(tispeak_state::snspellcuk)
+	snspellc(config);
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("tms5100", CD2801, MASTER_CLOCK) // CD2801A!
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
 
@@ -1423,10 +1442,11 @@ MACHINE_CONFIG_START(tispeak_state::vocaid)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", CD2802, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tispeak_state::tntell, vocaid)
+MACHINE_CONFIG_START(tispeak_state::tntell)
+	vocaid(config);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "tntell")
@@ -1453,7 +1473,7 @@ MACHINE_CONFIG_START(tispeak_state::k28m2)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5100", TMS5110A, MASTER_CLOCK)
-	MCFG_FRAGMENT_ADD(tms5110_route)
+	tms5110_route(config);
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "k28m2")

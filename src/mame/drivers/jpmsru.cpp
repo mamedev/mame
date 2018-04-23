@@ -32,6 +32,9 @@ public:
 
 	void jpmsru(machine_config &config);
 	void jpmsru_4(machine_config &config);
+	void jpmsru_4_map(address_map &map);
+	void jpmsru_io(address_map &map);
+	void jpmsru_map(address_map &map);
 protected:
 
 	// devices
@@ -45,21 +48,24 @@ public:
 
 /* System with RAM at 0x0c00 */
 
-static ADDRESS_MAP_START( jpmsru_map, AS_PROGRAM, 8, jpmsru_state )
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM
-ADDRESS_MAP_END
+void jpmsru_state::jpmsru_map(address_map &map)
+{
+	map(0x0000, 0x0bff).rom();
+	map(0x0c00, 0x0eff).ram();
+}
 
 /* System with RAM at 0x0e00 */
 
-static ADDRESS_MAP_START( jpmsru_4_map, AS_PROGRAM, 8, jpmsru_state )
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM
-	AM_RANGE(0x0f00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void jpmsru_state::jpmsru_4_map(address_map &map)
+{
+	map(0x0000, 0x0bff).rom();
+	map(0x0c00, 0x0eff).ram();
+	map(0x0f00, 0x0fff).rom();
+}
 
-static ADDRESS_MAP_START( jpmsru_io, AS_IO, 8, jpmsru_state )
-ADDRESS_MAP_END
+void jpmsru_state::jpmsru_io(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( jpmsru )

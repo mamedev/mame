@@ -66,4 +66,9 @@ public:
 	void no_nvram(machine_config &config);
 	void friskytb(machine_config &config);
 	void nvram(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void mcu_no_nvram_map(address_map &map);
+	void mcu_nvram_map(address_map &map);
 };

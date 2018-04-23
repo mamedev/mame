@@ -138,54 +138,60 @@ DIP locations verified for:
 WRITE_LINE_MEMBER(punchout_state::nmi_mask_w)
 {
 	m_nmi_mask = state;
+	if (!m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_SHARE("bg_top_videoram")
-	AM_RANGE(0xdff0, 0xdff7) AM_SHARE("spr1_ctrlram")
-	AM_RANGE(0xdff8, 0xdffc) AM_SHARE("spr2_ctrlram")
-	AM_RANGE(0xdffd, 0xdffd) AM_SHARE("palettebank")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_SHARE("spr1_videoram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_SHARE("spr2_videoram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_SHARE("bg_bot_videoram")   // also contains scroll RAM
-ADDRESS_MAP_END
+void punchout_state::punchout_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).ram().share("nvram");
+	map(0xd000, 0xd7ff).ram();
+	map(0xd800, 0xdfff).ram().w(this, FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
+	map(0xdff0, 0xdff7).share("spr1_ctrlram");
+	map(0xdff8, 0xdffc).share("spr2_ctrlram");
+	map(0xdffd, 0xdffd).share("palettebank");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
+	map(0xf000, 0xffff).ram().w(this, FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");   // also contains scroll RAM
+}
 
 
-static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8, punchout_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_SHARE("armwrest_fgram")
-	AM_RANGE(0xdff0, 0xdff7) AM_SHARE("spr1_ctrlram")
-	AM_RANGE(0xdff8, 0xdffc) AM_SHARE("spr2_ctrlram")
-	AM_RANGE(0xdffd, 0xdffd) AM_SHARE("palettebank")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_SHARE("spr1_videoram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_SHARE("spr2_videoram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_SHARE("bg_bot_videoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_SHARE("bg_top_videoram")
-ADDRESS_MAP_END
+void punchout_state::armwrest_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).ram().share("nvram");
+	map(0xd000, 0xd7ff).ram();
+	map(0xd800, 0xdfff).ram().w(this, FUNC(punchout_state::armwrest_fg_videoram_w)).share("armwrest_fgram");
+	map(0xdff0, 0xdff7).share("spr1_ctrlram");
+	map(0xdff8, 0xdffc).share("spr2_ctrlram");
+	map(0xdffd, 0xdffd).share("palettebank");
+	map(0xe000, 0xe7ff).ram().w(this, FUNC(punchout_state::punchout_spr1_videoram_w)).share("spr1_videoram");
+	map(0xe800, 0xefff).ram().w(this, FUNC(punchout_state::punchout_spr2_videoram_w)).share("spr2_videoram");
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(punchout_state::punchout_bg_bot_videoram_w)).share("bg_bot_videoram");
+	map(0xf800, 0xffff).ram().w(this, FUNC(punchout_state::punchout_bg_top_videoram_w)).share("bg_top_videoram");
+}
 
 
-static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x01) AM_WRITENOP // the 2A03 #1 is not present
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_device, data_w)
-	AM_RANGE(0x05, 0x07) AM_WRITENOP // spunchout protection
-	AM_RANGE(0x08, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void punchout_state::punchout_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x00, 0x01).nopw(); // the 2A03 #1 is not present
+	map(0x02, 0x02).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x03, 0x03).portr("DSW1").w("soundlatch2", FUNC(generic_latch_8_device::write));
+	map(0x04, 0x04).w(m_vlm, FUNC(vlm5030_device::data_w));
+	map(0x05, 0x07).nopw(); // spunchout protection
+	map(0x08, 0x0f).w("mainlatch", FUNC(ls259_device::write_d0));
+}
 
 
-static ADDRESS_MAP_START( punchout_vlm_map, 0, 8, punchout_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void punchout_state::punchout_vlm_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).rom();
+}
 
 
 // Super Punch-Out!! comes with an extra security PCB that plugs into the Z80 socket
@@ -235,21 +241,23 @@ WRITE8_MEMBER(punchout_state::spunchout_rp5h01_clock_w)
 	m_rp5h01->test_w(data & 1);
 }
 
-static ADDRESS_MAP_START( spnchout_io_map, AS_IO, 8, punchout_state )
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_reset_w)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_clock_w)
-	AM_RANGE(0x07, 0x07) AM_SELECT(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w) // protection ports
-	AM_IMPORT_FROM( punchout_io_map )
-ADDRESS_MAP_END
+void punchout_state::spnchout_io_map(address_map &map)
+{
+	punchout_io_map(map);
+	map(0x05, 0x05).mirror(0xf0).w(this, FUNC(punchout_state::spunchout_rp5h01_reset_w));
+	map(0x06, 0x06).mirror(0xf0).w(this, FUNC(punchout_state::spunchout_rp5h01_clock_w));
+	map(0x07, 0x07).select(0xf0).rw(this, FUNC(punchout_state::spunchout_exp_r), FUNC(punchout_state::spunchout_exp_w)); // protection ports
+}
 
 // 2A03 (sound)
 
-static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x4017, 0x4017) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void punchout_state::punchout_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x4016, 0x4016).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x4017, 0x4017).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xffff).rom();
+}
 
 
 
@@ -318,7 +326,7 @@ static INPUT_PORTS_START( punchout )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )       /* Not documented, R18 resistor */
 	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") /* Not documented, R19 resistor */
@@ -549,7 +557,7 @@ bit 3210 5432  L  R  C
 	PORT_DIPSETTING(    0x0d, "1101" )
 	PORT_DIPSETTING(    0x0e, "1110" )
 	PORT_DIPSETTING(    0x0f, "1111" )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", vlm5030_device, bsy) /* VLM5030 busy signal */
 	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") /* R18 resistor */
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -601,10 +609,10 @@ static GFXDECODE_START( armwrest )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(punchout_state::vblank_irq)
+WRITE_LINE_MEMBER(punchout_state::vblank_irq)
 {
-	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -620,11 +628,9 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(punchout_map)
 	MCFG_CPU_IO_MAP(punchout_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -650,6 +656,8 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(punchout_state, screen_update_punchout_top)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(punchout_state, vblank_irq))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -671,7 +679,8 @@ MACHINE_CONFIG_START(punchout_state::punchout)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(punchout_state::spnchout, punchout)
+MACHINE_CONFIG_START(punchout_state::spnchout)
+	punchout(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -685,7 +694,8 @@ MACHINE_CONFIG_DERIVED(punchout_state::spnchout, punchout)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(punchout_state::armwrest, punchout)
+MACHINE_CONFIG_START(punchout_state::armwrest)
+	punchout(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

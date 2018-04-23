@@ -28,17 +28,21 @@ public:
 	void pccga(machine_config &config);
 	void pcherc(machine_config &config);
 	void pcmda(machine_config &config);
+	void pc8_io(address_map &map);
+	void pc8_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, genpc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void genpc_state::pc8_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xfe000, 0xfffff).rom().region("bios", 0);
+}
 
-static ADDRESS_MAP_START(pc8_io, AS_IO, 8, genpc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-ADDRESS_MAP_END
+void genpc_state::pc8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+}
 
 static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
@@ -77,13 +81,15 @@ MACHINE_CONFIG_START(genpc_state::pcmda)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(genpc_state::pcherc, pcmda)
+MACHINE_CONFIG_START(genpc_state::pcherc)
+	pcmda(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "hercules", false)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(genpc_state::pccga, pcmda)
+MACHINE_CONFIG_START(genpc_state::pccga)
+	pcmda(config);
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(cga)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -91,7 +97,8 @@ MACHINE_CONFIG_DERIVED(genpc_state::pccga, pcmda)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(genpc_state::pcega, pccga)
+MACHINE_CONFIG_START(genpc_state::pcega)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "ega", false)
 	MCFG_DEVICE_MODIFY("mb")
@@ -99,7 +106,8 @@ MACHINE_CONFIG_DERIVED(genpc_state::pcega, pccga)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(genpc_state::pcvga, pcega)
+MACHINE_CONFIG_START(genpc_state::pcvga)
+	pcega(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "vga", false)
 MACHINE_CONFIG_END

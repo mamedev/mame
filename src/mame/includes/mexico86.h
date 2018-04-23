@@ -72,4 +72,7 @@ public:
 	void knightb(machine_config &config);
 	void mexico86(machine_config &config);
 	void kikikai(machine_config &config);
+	void mexico86_map(address_map &map);
+	void mexico86_sound_map(address_map &map);
+	void mexico86_sub_cpu_map(address_map &map);
 };

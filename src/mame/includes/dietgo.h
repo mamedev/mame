@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "cpu/h6280/h6280.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
 #include "machine/deco104.h"
@@ -35,7 +36,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<h6280_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 	DECLARE_DRIVER_INIT(dietgo);
@@ -46,4 +47,7 @@ public:
 	DECLARE_READ16_MEMBER( dietgo_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( dietgo_protection_region_0_104_w );
 	void dietgo(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void dietgo_map(address_map &map);
+	void sound_map(address_map &map);
 };

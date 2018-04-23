@@ -272,6 +272,12 @@ public:
 	void sun3_60(machine_config &config);
 	void sun3200(machine_config &config);
 	void sun3_50(machine_config &config);
+	void sun3_mem(address_map &map);
+	void vmetype0space_map(address_map &map);
+	void vmetype0space_novram_map(address_map &map);
+	void vmetype1space_map(address_map &map);
+	void vmetype2space_map(address_map &map);
+	void vmetype3space_map(address_map &map);
 private:
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -398,7 +404,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	if ((fc == 3) && !machine().side_effect_disabled())
+	if ((fc == 3) && !machine().side_effects_disabled())
 	{
 		int page;
 
@@ -464,7 +470,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	}
 
 	// debugger hack
-	if (machine().side_effect_disabled() && (offset >= (0xfef0000>>2)) && (offset <= (0xfefffff>>2)))
+	if (machine().side_effects_disabled() && (offset >= (0xfef0000>>2)) && (offset <= (0xfefffff>>2)))
 	{
 		return m_rom_ptr[offset & 0x3fff];
 	}
@@ -493,7 +499,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 
 		//printf("pmeg %d, entry %d = %08x, virt %08x => tmp %08x\n", pmeg, entry, m_pagemap[entry], offset << 2, tmp);
 
-	//  if (!machine().side_effect_disabled())
+	//  if (!machine().side_effects_disabled())
 		//printf("sun3: Translated addr: %08x, type %d (page %d page entry %08x, orig virt %08x, FC %d)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, entry, m_pagemap[entry], offset<<2, fc);
 
 		switch ((m_pagemap[entry] >> 26) & 3)
@@ -518,7 +524,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	}
 	else
 	{
-//      if (!machine().side_effect_disabled()) printf("sun3: pagemap entry not valid! (PC=%x)\n", m_maincpu->pc());
+//      if (!machine().side_effects_disabled()) printf("sun3: pagemap entry not valid! (PC=%x)\n", m_maincpu->pc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		m_buserr = BE_INVALID;
@@ -526,7 +532,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 		return 0xffffffff;
 	}
 
-	if (!machine().side_effect_disabled()) logerror("sun3: Unmapped read @ %08x (FC %d, mask %08x, PC=%x, seg %x)\n", offset<<2, fc, mem_mask, m_maincpu->pc(), offset>>15);
+	if (!machine().side_effects_disabled()) logerror("sun3: Unmapped read @ %08x (FC %d, mask %08x, PC=%x, seg %x)\n", offset<<2, fc, mem_mask, m_maincpu->pc(), offset>>15);
 
 	return 0xffffffff;
 }
@@ -644,7 +650,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 		uint32_t tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 		tmp |= (offset & 0x7ff);
 
-		//if (!machine().side_effect_disabled()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
+		//if (!machine().side_effects_disabled()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
 
 		switch ((m_pagemap[entry] >> 26) & 3)
 		{
@@ -668,7 +674,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 	}
 	else
 	{
-		//if (!machine().side_effect_disabled()) printf("sun3: pagemap entry not valid!\n");
+		//if (!machine().side_effects_disabled()) printf("sun3: pagemap entry not valid!\n");
 		m_buserr = BE_INVALID;
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
@@ -713,41 +719,47 @@ WRITE32_MEMBER(sun3_state::parity_w)
 	}
 }
 
-static ADDRESS_MAP_START(sun3_mem, AS_PROGRAM, 32, sun3_state)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( tl_mmu_r, tl_mmu_w )
-ADDRESS_MAP_END
+void sun3_state::sun3_mem(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(sun3_state::tl_mmu_r), FUNC(sun3_state::tl_mmu_w));
+}
 
 // type 0 device space
-static ADDRESS_MAP_START(vmetype0space_map, AS_PROGRAM, 32, sun3_state)
-	AM_RANGE(0x00000000, 0x08ffffff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM // not sure what's going on here (3/110)
-	AM_RANGE(0xff000000, 0xff03ffff) AM_RAM AM_SHARE("bw2_vram")
-ADDRESS_MAP_END
+void sun3_state::vmetype0space_map(address_map &map)
+{
+	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+	map(0xfe400000, 0xfe41ffff).ram(); // not sure what's going on here (3/110)
+	map(0xff000000, 0xff03ffff).ram().share("bw2_vram");
+}
 
 // type 0 without VRAM (3/50)
-static ADDRESS_MAP_START(vmetype0space_novram_map, AS_PROGRAM, 32, sun3_state)
-	AM_RANGE(0x00000000, 0x08ffffff) AM_READWRITE(ram_r, ram_w)
-ADDRESS_MAP_END
+void sun3_state::vmetype0space_novram_map(address_map &map)
+{
+	map(0x00000000, 0x08ffffff).rw(this, FUNC(sun3_state::ram_r), FUNC(sun3_state::ram_w));
+}
 
 // type 1 device space
-static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 32, sun3_state)
-	AM_RANGE(0x00000000, 0x0000000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
-	AM_RANGE(0x00020000, 0x0002000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
-	AM_RANGE(0x00040000, 0x000407ff) AM_RAM AM_SHARE("nvram")   // type 2816 parallel EEPROM
-	AM_RANGE(0x00060000, 0x0006ffff) AM_READWRITE8(rtc7170_r, rtc7170_w, 0xffffffff)
-	AM_RANGE(0x00080000, 0x0008000f) AM_READWRITE(parity_r, parity_w)
-	AM_RANGE(0x000a0000, 0x000a0003) AM_READWRITE(irqctrl_r, irqctrl_w)
-	AM_RANGE(0x00100000, 0x0010ffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x001e0000, 0x001e00ff) AM_READWRITE(ecc_r, ecc_w)
-ADDRESS_MAP_END
+void sun3_state::vmetype1space_map(address_map &map)
+{
+	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x00020000, 0x0002000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x00040000, 0x000407ff).ram().share("nvram");   // type 2816 parallel EEPROM
+	map(0x00060000, 0x0006ffff).rw(this, FUNC(sun3_state::rtc7170_r), FUNC(sun3_state::rtc7170_w));
+	map(0x00080000, 0x0008000f).rw(this, FUNC(sun3_state::parity_r), FUNC(sun3_state::parity_w));
+	map(0x000a0000, 0x000a0003).rw(this, FUNC(sun3_state::irqctrl_r), FUNC(sun3_state::irqctrl_w));
+	map(0x00100000, 0x0010ffff).rom().region("user1", 0);
+	map(0x001e0000, 0x001e00ff).rw(this, FUNC(sun3_state::ecc_r), FUNC(sun3_state::ecc_w));
+}
 
 // type 2 device space
-static ADDRESS_MAP_START(vmetype2space_map, AS_PROGRAM, 32, sun3_state)
-ADDRESS_MAP_END
+void sun3_state::vmetype2space_map(address_map &map)
+{
+}
 
 // type 3 device space
-static ADDRESS_MAP_START(vmetype3space_map, AS_PROGRAM, 32, sun3_state)
-ADDRESS_MAP_END
+void sun3_state::vmetype3space_map(address_map &map)
+{
+}
 
 READ32_MEMBER(sun3_state::irqctrl_r)
 {
@@ -1026,7 +1038,8 @@ MACHINE_CONFIG_START(sun3_state::sun3)
 MACHINE_CONFIG_END
 
 // Sun 3/60
-MACHINE_CONFIG_DERIVED(sun3_state::sun3_60, sun3)
+MACHINE_CONFIG_START(sun3_state::sun3_60)
+	sun3(config);
 	MCFG_CPU_REPLACE("maincpu", M68020, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 
@@ -1038,13 +1051,15 @@ MACHINE_CONFIG_DERIVED(sun3_state::sun3_60, sun3)
 MACHINE_CONFIG_END
 
 // Sun 3/E
-MACHINE_CONFIG_DERIVED(sun3_state::sun3e, sun3)
+MACHINE_CONFIG_START(sun3_state::sun3e)
+	sun3(config);
 	MCFG_CPU_REPLACE("maincpu", M68020, 20000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 MACHINE_CONFIG_END
 
 // 3/260 and 3/280 (the Sun 3200 board)
-MACHINE_CONFIG_DERIVED(sun3_state::sun3200, sun3)
+MACHINE_CONFIG_START(sun3_state::sun3200)
+	sun3(config);
 	MCFG_CPU_REPLACE("maincpu", M68020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(sun3_mem)
 

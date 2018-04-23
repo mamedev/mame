@@ -671,6 +671,16 @@ if not _OPTIONS["with-system-flac"]~=nil then
 	}
 end
 
+if not _OPTIONS["with-system-pugixml"] then
+	defines {
+		"PUGIXML_HEADER_ONLY",
+	}
+else
+	links {
+		ext_lib("pugixml"),
+	}
+end
+
 if _OPTIONS["NOASM"]=="1" then
 	defines {
 		"MAME_NOASM"
@@ -763,7 +773,7 @@ if (_OPTIONS["SHADOW_CHECK"]=="1") then
 end
 
 -- only show deprecation warnings when enabled
-if _OPTIONS["DEPRECATED"]~="1" then
+if _OPTIONS["DEPRECATED"]=="0" then
 	buildoptions {
 		"-Wno-deprecated-declarations"
 	}
@@ -933,6 +943,7 @@ end
 		"-Wwrite-strings",
 		"-Wno-sign-compare",
 		"-Wno-conversion",
+		"-Wno-error=deprecated-declarations",
 	}
 -- warnings only applicable to C compiles
 	buildoptions_c {
@@ -1073,6 +1084,9 @@ configuration { "asmjs" }
 	buildoptions_cpp {
 		"-x c++",
 		"-std=c++14",
+	}
+	linkoptions {
+		"-Wl,--start-group",
 	}
 	archivesplit_size "20"
 

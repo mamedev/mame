@@ -65,19 +65,22 @@ WRITE8_MEMBER( vcs80_state::pio_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vcs80_bd_mem, AS_PROGRAM, 8, vcs80_state )
-	AM_RANGE(0x0000, 0x01ff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM
-ADDRESS_MAP_END
+void vcs80_state::vcs80_bd_mem(address_map &map)
+{
+	map(0x0000, 0x01ff).rom().region(Z80_TAG, 0);
+	map(0x0400, 0x07ff).ram();
+}
 
-static ADDRESS_MAP_START( vcs80_mem, AS_PROGRAM, 8, vcs80_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mem_r, mem_w)
-ADDRESS_MAP_END
+void vcs80_state::vcs80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(vcs80_state::mem_r), FUNC(vcs80_state::mem_w));
+}
 
-static ADDRESS_MAP_START( vcs80_io, AS_IO, 8, vcs80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void vcs80_state::vcs80_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(vcs80_state::io_r), FUNC(vcs80_state::io_w));
+}
 
 /* Input Ports */
 
@@ -178,13 +181,12 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 
 	*/
 
-	uint8_t led_data = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = m_keylatch;
 
 	/* skip middle digit */
 	if (digit > 3) digit++;
 
-	output().set_digit_value(8 - digit, led_data);
+	m_digits[8 - digit] = bitswap<8>(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 }
 
 /* Z80 Daisy Chain */
@@ -199,6 +201,8 @@ static const z80_daisy_config vcs80_daisy_chain[] =
 
 void vcs80_state::machine_start()
 {
+	m_digits.resolve();
+
 	m_pio->strobe_a(1);
 	m_pio->strobe_b(1);
 

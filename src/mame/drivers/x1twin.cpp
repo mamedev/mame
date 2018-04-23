@@ -35,6 +35,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 	void x1twin(machine_config &config);
+	void pce_io(address_map &map);
+	void pce_mem(address_map &map);
+	void x1_io(address_map &map);
+	void x1_mem(address_map &map);
 };
 
 
@@ -48,31 +52,35 @@ uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-static ADDRESS_MAP_START( x1_mem, AS_PROGRAM, 8, x1twin_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_mem_r,x1_mem_w)
-ADDRESS_MAP_END
+void x1twin_state::x1_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(x1twin_state::x1_mem_r), FUNC(x1twin_state::x1_mem_w));
+}
 
-static ADDRESS_MAP_START( x1_io, AS_IO, 8, x1twin_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_io_r, x1_io_w)
-ADDRESS_MAP_END
+void x1twin_state::x1_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).m(m_iobank, FUNC(address_map_bank_device::amap8));
+}
 
 #if 0
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, x1twin_state )
-	AM_RANGE( 0x000000, 0x09FFFF) AM_ROM
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000)
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_r, vdc_w )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( "c6280", c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE( "maincpu", h6280_device, irq_status_r, irq_status_w )
-ADDRESS_MAP_END
+void x1twin_state::pce_mem(address_map &map)
+{
+	map(0x000000, 0x09FFFF).rom();
+	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
+	map(0x1FE000, 0x1FE3FF).rw(this, FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
+	map(0x1FE400, 0x1FE7FF).rw(this, FUNC(x1twin_state::vce_r), FUNC(x1twin_state::vce_w));
+	map(0x1FE800, 0x1FEBFF).rw("c6280", FUNC(c6280_device::c6280_r), FUNC(c6280_device::c6280_w));
+	map(0x1FEC00, 0x1FEFFF).rw(this, FUNC(x1twin_state::h6280_timer_r), FUNC(x1twin_state::h6280_timer_w));
+	map(0x1FF000, 0x1FF3FF).rw(this, FUNC(x1twin_state::pce_joystick_r), FUNC(x1twin_state::pce_joystick_w));
+	map(0x1FF400, 0x1FF7FF).rw("maincpu", FUNC(h6280_device::irq_status_r), FUNC(h6280_device::irq_status_w));
+}
 
-static ADDRESS_MAP_START( pce_io, AS_IO, 8, x1twin_state )
-	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_r, vdc_w )
-ADDRESS_MAP_END
+void x1twin_state::pce_io(address_map &map)
+{
+	map(0x00, 0x03).rw(this, FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
+}
 #endif
 
 /*************************************
@@ -408,6 +416,13 @@ MACHINE_CONFIG_START(x1twin_state::x1twin)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
 	MCFG_CPU_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
+
+	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(x1_io_banks)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))

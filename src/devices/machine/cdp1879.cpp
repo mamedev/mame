@@ -116,7 +116,7 @@ void cdp1879_device::update_rtc()
 
 READ8_MEMBER(cdp1879_device::read)
 {
-	if (offset == R_CTL_IRQSTATUS && !machine().side_effect_disabled())
+	if (offset == R_CTL_IRQSTATUS && !machine().side_effects_disabled())
 	{
 		// reading the IRQ status clears IRQ line and IRQ status
 		uint8_t data = m_regs[offset];

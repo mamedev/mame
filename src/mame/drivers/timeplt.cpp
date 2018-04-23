@@ -53,7 +53,6 @@
 #include "audio/timeplt.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 
@@ -65,10 +64,10 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(timeplt_state::interrupt)
+WRITE_LINE_MEMBER(timeplt_state::vblank_irq)
 {
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -130,32 +129,38 @@ CUSTOM_INPUT_MEMBER(timeplt_state::chkun_hopper_status_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( timeplt_main_map, AS_PROGRAM, 8, timeplt_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ(scanline_r) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sound_data_w)
-	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
-	AM_RANGE(0xc300, 0xc30f) AM_MIRROR(0x0cf0) AM_DEVWRITE_MOD("mainlatch", ls259_device, write_d0, rshift<1>)
-	AM_RANGE(0xc320, 0xc320) AM_MIRROR(0x0c9f) AM_READ_PORT("IN1")
-	AM_RANGE(0xc340, 0xc340) AM_MIRROR(0x0c9f) AM_READ_PORT("IN2")
-	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")
-ADDRESS_MAP_END
+void timeplt_state::timeplt_main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x5fff).rom();
+	map(0xa000, 0xa3ff).ram().w(this, FUNC(timeplt_state::colorram_w)).share("colorram");
+	map(0xa400, 0xa7ff).ram().w(this, FUNC(timeplt_state::videoram_w)).share("videoram");
+	map(0xa800, 0xafff).ram();
+	map(0xb000, 0xb0ff).mirror(0x0b00).ram().share("spriteram");
+	map(0xb400, 0xb4ff).mirror(0x0b00).ram().share("spriteram2");
+	map(0xc000, 0xc000).mirror(0x0cff).r(this, FUNC(timeplt_state::scanline_r)).w("timeplt_audio", FUNC(timeplt_audio_device::sound_data_w));
+	map(0xc200, 0xc200).mirror(0x0cff).portr("DSW1").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc300, 0xc300).mirror(0x0c9f).portr("IN0");
+	map(0xc300, 0xc30f).lw8("mainlatch_w",
+							[this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
+								m_mainlatch->write_d0(space, offset >> 1, data, mem_mask);
+							});
+	map(0xc320, 0xc320).mirror(0x0c9f).portr("IN1");
+	map(0xc340, 0xc340).mirror(0x0c9f).portr("IN2");
+	map(0xc360, 0xc360).mirror(0x0c9f).portr("DSW0");
+}
 
-static ADDRESS_MAP_START( psurge_main_map, AS_PROGRAM, 8, timeplt_state )
-	AM_IMPORT_FROM(timeplt_main_map)
-	AM_RANGE(0x6004, 0x6004) AM_READ(psurge_protection_r)
-ADDRESS_MAP_END
+void timeplt_state::psurge_main_map(address_map &map)
+{
+	timeplt_main_map(map);
+	map(0x6004, 0x6004).r(this, FUNC(timeplt_state::psurge_protection_r));
+}
 
-static ADDRESS_MAP_START( chkun_main_map, AS_PROGRAM, 8, timeplt_state )
-	AM_IMPORT_FROM(timeplt_main_map)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM
-ADDRESS_MAP_END
+void timeplt_state::chkun_main_map(address_map &map)
+{
+	timeplt_main_map(map);
+	map(0x6000, 0x67ff).ram();
+}
 
 
 
@@ -270,7 +275,7 @@ static INPUT_PORTS_START( chkun )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Bet 3B")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bet 1B")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Bet 2B")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -319,7 +324,7 @@ static INPUT_PORTS_START( bikkuric )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, timeplt_state, chkun_hopper_status_r, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -425,7 +430,6 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* not confirmed, but common for Konami games of the era */
 	MCFG_CPU_PROGRAM_MAP(timeplt_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  interrupt)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B3
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(timeplt_state, nmi_enable_w))
@@ -447,6 +451,7 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(timeplt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(timeplt_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", timeplt)
 	MCFG_PALETTE_ADD("palette", 32*4+64*4)
@@ -459,12 +464,15 @@ MACHINE_CONFIG_START(timeplt_state::timeplt)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(timeplt_state::psurge, timeplt)
+MACHINE_CONFIG_START(timeplt_state::psurge)
+	timeplt(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(psurge_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", timeplt_state,  nmi_line_pulse)
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP)
@@ -475,7 +483,8 @@ MACHINE_CONFIG_DERIVED(timeplt_state::psurge, timeplt)
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,psurge)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(timeplt_state::bikkuric, timeplt)
+MACHINE_CONFIG_START(timeplt_state::bikkuric)
+	timeplt(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 
@@ -486,7 +495,8 @@ MACHINE_CONFIG_DERIVED(timeplt_state::bikkuric, timeplt)
 	MCFG_VIDEO_START_OVERRIDE(timeplt_state,chkun)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(timeplt_state::chkun, bikkuric)
+MACHINE_CONFIG_START(timeplt_state::chkun)
+	bikkuric(config);
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chkun)
 

@@ -150,37 +150,46 @@ WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
 */
 
 
-READ8_MEMBER(dec0_state::dec0_mcu_port_r)
+READ8_MEMBER(dec0_state::dec0_mcu_port0_r)
 {
 	uint8_t result = 0xff;
 
 	// P0 connected to latches
-	if (offset == 0)
-	{
-		if (!BIT(m_i8751_ports[2], 4))
-			result &= m_i8751_command >> 8;
-		if (!BIT(m_i8751_ports[2], 5))
-			result &= m_i8751_command & 0x00ff;
-	}
+	if (!BIT(m_i8751_ports[2], 4))
+		result &= m_i8751_command >> 8;
+	if (!BIT(m_i8751_ports[2], 5))
+		result &= m_i8751_command & 0x00ff;
 
 	return result;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port_w)
+WRITE8_MEMBER(dec0_state::dec0_mcu_port0_w)
 {
-	if (offset == 2)
-	{
-		if (!BIT(data, 2) && BIT(m_i8751_ports[2], 2))
-			m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
-		if (!BIT(data, 3))
-			m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
-		if (BIT(data, 6) && !BIT(m_i8751_ports[2], 6))
-			m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_ports[0];
-		if (BIT(data, 7) && !BIT(m_i8751_ports[2], 7))
-			m_i8751_return = (m_i8751_return & 0x00ff) | (m_i8751_ports[0] << 8);
-	}
+	m_i8751_ports[0] = data;
+}
 
-	m_i8751_ports[offset] = data;
+WRITE8_MEMBER(dec0_state::dec0_mcu_port1_w)
+{
+	m_i8751_ports[1] = data;
+}
+
+WRITE8_MEMBER(dec0_state::dec0_mcu_port2_w)
+{
+	if (!BIT(data, 2) && BIT(m_i8751_ports[2], 2))
+		m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
+	if (!BIT(data, 3))
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+	if (BIT(data, 6) && !BIT(m_i8751_ports[2], 6))
+		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_ports[0];
+	if (BIT(data, 7) && !BIT(m_i8751_ports[2], 7))
+		m_i8751_return = (m_i8751_return & 0x00ff) | (m_i8751_ports[0] << 8);
+
+	m_i8751_ports[2] = data;
+}
+
+WRITE8_MEMBER(dec0_state::dec0_mcu_port3_w)
+{
+	m_i8751_ports[3] = data;
 }
 
 void dec0_state::baddudes_i8751_write(int data)

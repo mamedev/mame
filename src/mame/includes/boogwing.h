@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "cpu/h6280/h6280.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/deco_ace.h"
@@ -40,7 +41,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<h6280_device> m_audiocpu;
 	optional_device<deco104_device> m_deco104;
 	required_device<deco_ace_device> m_deco_ace;
 	required_device<deco16ic_device> m_deco_tilegen1;
@@ -74,4 +75,7 @@ public:
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_callback2);
 	void boogwing(machine_config &config);
+	void audio_map(address_map &map);
+	void boogwing_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
 };

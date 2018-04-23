@@ -15,14 +15,14 @@
 #define MCFG_K1GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K1GE, _clock ) \
 	MCFG_VIDEO_SET_SCREEN( _screen ) \
-	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB_##_vblank ); \
-	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB_##_hblank );
+	devcb = &downcast<k1ge_device &>(*device).set_vblank_callback(DEVCB_##_vblank ); \
+	devcb = &downcast<k1ge_device &>(*device).set_hblank_callback(DEVCB_##_hblank );
 
 #define MCFG_K2GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
 	MCFG_DEVICE_ADD( _tag, K2GE, _clock ) \
 	MCFG_VIDEO_SET_SCREEN( _screen ) \
-	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB_##_vblank ); \
-	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB_##_hblank );
+	devcb = &downcast<k1ge_device &>(*device).set_vblank_callback(DEVCB_##_vblank ); \
+	devcb = &downcast<k1ge_device &>(*device).set_hblank_callback(DEVCB_##_hblank );
 
 
 class k1ge_device : public device_t, public device_video_interface
@@ -36,8 +36,8 @@ public:
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	// Static methods
-	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb) { return downcast<k1ge_device &>(device).m_vblank_pin_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_hblank_callback(device_t &device, Object &&cb) { return downcast<k1ge_device &>(device).m_hblank_pin_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank_pin_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_hblank_callback(Object &&cb) { return m_hblank_pin_w.set_callback(std::forward<Object>(cb)); }
 
 	static const int K1GE_SCREEN_HEIGHT = 199;
 

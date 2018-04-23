@@ -59,17 +59,19 @@ const tiny_rom_entry *s100_djdma_device::device_rom_region() const
 //  ADDRESS_MAP( djdma_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( djdma_mem, AS_PROGRAM, 8, s100_djdma_device )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("14a", 0)
-ADDRESS_MAP_END
+void s100_djdma_device::djdma_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("14a", 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( djdma_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( djdma_io, AS_IO, 8, s100_djdma_device )
-ADDRESS_MAP_END
+void s100_djdma_device::djdma_io(address_map &map)
+{
+}
 
 
 //-------------------------------------------------

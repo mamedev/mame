@@ -302,6 +302,11 @@ public:
 	void crmaze(machine_config &config);
 	void bwbvid5(machine_config &config);
 	void mating(machine_config &config);
+	void bwbvid5_68k_map(address_map &map);
+	void bwbvid_68k_map(address_map &map);
+	void mpu4_68k_map(address_map &map);
+	void mpu4_vram(address_map &map);
+	void mpu4oki_68k_map(address_map &map);
 };
 
 /*************************************
@@ -398,9 +403,10 @@ READ8_MEMBER(mpu4vid_state::vram_r)
 	return m_vid_mainram[offset];
 }
 
-static ADDRESS_MAP_START( mpu4_vram, 0, 8, mpu4vid_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void mpu4vid_state::mpu4_vram(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(this, FUNC(mpu4vid_state::vram_r), FUNC(mpu4vid_state::vram_w));
+}
 
 SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 {
@@ -647,20 +653,20 @@ static INPUT_PORTS_START( crmaze )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL)//XA
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL)//YA
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL)//XB
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL)//YB
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM)//XA
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM)//YA
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM)//XB
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM)//YB
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")
@@ -766,20 +772,20 @@ static INPUT_PORTS_START( mating )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SPECIAL)//XA
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SPECIAL)//YA
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SPECIAL)//XB
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL)//YB
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM)//XA
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM)//YA
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM)//XB
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM)//YB
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")
@@ -898,10 +904,10 @@ static INPUT_PORTS_START( skiltrek )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
@@ -1012,10 +1018,10 @@ static INPUT_PORTS_START( turnover )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
@@ -1126,10 +1132,10 @@ static INPUT_PORTS_START( adders )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("AUX2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_CUSTOM)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
@@ -1175,91 +1181,96 @@ MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
 	m_chr_value     = 0;
 }
 
-static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4vid_state )
-	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-//  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE8(vidcharacteriser_r, vidcharacteriser_w,0x00ff)
-ADDRESS_MAP_END
+void mpu4vid_state::mpu4_68k_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rom();
+	map(0x800000, 0x80ffff).ram().share("vid_mainram");
+//  map(0x810000, 0x81ffff) AM_RAM /* ? */
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0xc00000, 0xc1ffff).rw(this, FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
+	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0xff9000, 0xff900f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0xffd000, 0xffd00f).rw(this, FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
+}
 
-static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
-	AM_RANGE(0x000000, 0x5fffff) AM_ROM //AM_WRITENOP
-	AM_RANGE(0x600000, 0x63ffff) AM_RAM /* The Mating Game has an extra 256kB RAM on the program card */
-//  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xff8000, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0xffa040, 0xffa04f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0x00ff)  // 6840PTM on sampled sound board
-	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8(ic3ss_w,0x00ff)  // 6840PTM on sampled sound board
-	AM_RANGE(0xffa060, 0xffa067) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write,0x00ff)    // PIA6821 on sampled sound board
-	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE8(vidcharacteriser_r, vidcharacteriser_w, 0x00ff)
-//  AM_RANGE(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
-ADDRESS_MAP_END
+void mpu4vid_state::mpu4oki_68k_map(address_map &map)
+{
+	map(0x000000, 0x5fffff).rom(); //AM_WRITENOP
+	map(0x600000, 0x63ffff).ram(); /* The Mating Game has an extra 256kB RAM on the program card */
+//  map(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
+	map(0x800000, 0x80ffff).ram().share("vid_mainram");
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0xc00000, 0xc1ffff).rw(this, FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
+	map(0xff8000, 0xff8003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0xff9000, 0xff900f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0xffa040, 0xffa04f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0x00ff);  // 6840PTM on sampled sound board
+	map(0xffa040, 0xffa04f).w(this, FUNC(mpu4vid_state::ic3ss_w)).umask16(0x00ff);  // 6840PTM on sampled sound board
+	map(0xffa060, 0xffa067).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);    // PIA6821 on sampled sound board
+	map(0xffd000, 0xffd00f).rw(this, FUNC(mpu4vid_state::vidcharacteriser_r), FUNC(mpu4vid_state::vidcharacteriser_w)).umask16(0x00ff);
+//  map(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
+}
 
-static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4vid_state )
-	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-//  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
-ADDRESS_MAP_END
+void mpu4vid_state::bwbvid_68k_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rom();
+	map(0x800000, 0x80ffff).ram().share("vid_mainram");
+	map(0x810000, 0x81ffff).ram(); /* ? */
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+//  map(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
+/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0xc00000, 0xc1ffff).rw(this, FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
+	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	//map(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+}
 
-static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
-	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
-	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
-	AM_RANGE(0xe00000, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
-	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write, 0xff00) //Seems odd...
-	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff00)  // 6840PTM on sampled sound board
-	AM_RANGE(0xe03000, 0xe0300f) AM_WRITE8(ic3ss_w,0xff00)  // 6840PTM on sampled sound board
-	AM_RANGE(0xe04000, 0xe0400f) AM_READWRITE8(bwb_characteriser_r, bwb_characteriser_w, 0x00ff)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
-ADDRESS_MAP_END
+void mpu4vid_state::bwbvid5_68k_map(address_map &map)
+{
+	map(0x000000, 0x7fffff).rom();
+	map(0x800000, 0x80ffff).ram().share("vid_mainram");
+	map(0x810000, 0x81ffff).ram(); /* ? */
+	map(0x900000, 0x900003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00001, 0xa00001).rw("ef9369", FUNC(ef9369_device::data_r), FUNC(ef9369_device::data_w));
+	map(0xa00003, 0xa00003).w("ef9369", FUNC(ef9369_device::address_w));
+	//map(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
+/*  map(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	map(0xb00000, 0xb0000f).rw(m_scn2674, FUNC(scn2674_device::read), FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0xc00000, 0xc1ffff).rw(this, FUNC(mpu4vid_state::mpu4_vid_vidram_r), FUNC(mpu4vid_state::mpu4_vid_vidram_w)).share("vid_vidram");
+	map(0xe00000, 0xe00003).rw(m_acia_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+	map(0xe01000, 0xe0100f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0xe02000, 0xe02007).rw("pia_ic4ss", FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00); //Seems odd...
+	map(0xe03000, 0xe0300f).r("ptm_ic3ss", FUNC(ptm6840_device::read)).umask16(0xff00);  // 6840PTM on sampled sound board
+	map(0xe03000, 0xe0300f).w(this, FUNC(mpu4vid_state::ic3ss_w)).umask16(0xff00);  // 6840PTM on sampled sound board
+	map(0xe04000, 0xe0400f).rw(this, FUNC(mpu4vid_state::bwb_characteriser_r), FUNC(mpu4vid_state::bwb_characteriser_w)).umask16(0x00ff);//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+}
 
 /* TODO: Fix up MPU4 map*/
-static ADDRESS_MAP_START( mpu4_6809_map, AS_PROGRAM, 8, mpu4_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_device, read, write)
-	AM_RANGE(0x0880, 0x0881) AM_NOP //Read/write here
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0)  /* 64k EPROM on board, only this region read */
-ADDRESS_MAP_END
+void mpu4_state::mpu4_6809_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0801).rw("acia6850_0", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0880, 0x0881).noprw(); //Read/write here
+	map(0x0900, 0x0907).rw("ptm_ic2", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x0a00, 0x0a03).rw("pia_ic3", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0b00, 0x0b03).rw("pia_ic4", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c03).rw("pia_ic5", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0d00, 0x0d03).rw("pia_ic6", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0e00, 0x0e03).rw("pia_ic7", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0f00, 0x0f03).rw("pia_ic8", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4000, 0x7fff).ram();
+	map(0xbe00, 0xbfff).ram();
+	map(0xc000, 0xffff).rom().region("maincpu",0);  /* 64k EPROM on board, only this region read */
+}
 
 
 
@@ -1269,7 +1280,7 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")               /* confirm */
 
-	MCFG_FRAGMENT_ADD(mpu4_common)
+	mpu4_common(config);
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1283,8 +1294,7 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 
 	MCFG_DEVICE_ADD("scn2674_vid", SCN2674, 0)
 	MCFG_SCN2674_INTR_CALLBACK(INPUTLINE("video", M68K_IRQ_3))
-	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
-	MCFG_SCN2674_GFX_CHARACTER_WIDTH(8)
+	MCFG_SCN2674_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(mpu4vid_state, display_pixels)
 	MCFG_DEVICE_ADDRESS_MAP(0, mpu4_vram)
 
@@ -1305,9 +1315,9 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 
 	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
-	MCFG_PTM6840_OUT1_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
+	MCFG_PTM6840_O2_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
+	MCFG_PTM6840_O3_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4vid_state, cpu1_ptm_irq))
 	/* Present on all video cards */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1326,34 +1336,38 @@ MACHINE_CONFIG_START(mpu4vid_state::mpu4_vid)
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(mpu4vid_state, m68k_acia_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4vid_state::crmaze, mpu4_vid)
+MACHINE_CONFIG_START(mpu4vid_state::crmaze)
+	mpu4_vid(config);
 	MCFG_DEVICE_MODIFY("pia_ic5")
 	MCFG_PIA_READPA_HANDLER(READ8(mpu4vid_state, pia_ic5_porta_track_r))
 	MCFG_PIA_WRITEPA_HANDLER(NOOP)
 	MCFG_PIA_WRITEPB_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4vid_state::mating, crmaze)
+MACHINE_CONFIG_START(mpu4vid_state::mating)
+	crmaze(config);
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(mpu4oki_68k_map)
 
-	MCFG_FRAGMENT_ADD(mpu4_common2)
+	mpu4_common2(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4vid_state::bwbvid, mpu4_vid)
+MACHINE_CONFIG_START(mpu4vid_state::bwbvid)
+	mpu4_vid(config);
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(bwbvid_68k_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mpu4vid_state::bwbvid5, bwbvid)
+MACHINE_CONFIG_START(mpu4vid_state::bwbvid5)
+	bwbvid(config);
 	MCFG_CPU_MODIFY("video")
 	MCFG_CPU_PROGRAM_MAP(bwbvid5_68k_map)
 
-	MCFG_FRAGMENT_ADD(mpu4_common2)
+	mpu4_common2(config);
 
 	MCFG_SOUND_ADD("msm6376", OKIM6376, 128000) //?
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
@@ -2669,12 +2683,12 @@ ROM_START( v4wizea )
 	VID_BIOS
 
 	ROM_REGION( 0x800000, "video", 0 )
-	ROM_LOAD16_BYTE( "wzm1&2p1", 0x000000, 0x010000, CRC(629e38d0) SHA1(bbc2688635c4cb9a1712a0a0d28017d1867417a4) )
-	ROM_LOAD16_BYTE( "wzm1&2p2", 0x000001, 0x010000, CRC(96b9c484) SHA1(b02595ba5a5c7d673bdc7675708a4d8f6d907779) )
-	ROM_LOAD16_BYTE( "wzm1&2p3", 0x020000, 0x010000, CRC(e545fac0) SHA1(4a3f9e5522bd666d5a1e9ac7878d3d78f3756762) )
-	ROM_LOAD16_BYTE( "wzm1&2p4", 0x020001, 0x010000, CRC(df7d4dba) SHA1(b892cfb807421c99ba98bfd9b34d717e17345d83) )
-	ROM_LOAD16_BYTE( "wzm1&2p5", 0x040000, 0x010000, NO_DUMP )
-	ROM_LOAD16_BYTE( "wzm1&2p6", 0x040001, 0x010000, CRC(3eecbdf8) SHA1(9ecc4fe25e1c1e167aaa413eaf601b55e1a432fb) )
+	ROM_LOAD16_BYTE( "wzm1+2p1", 0x000000, 0x010000, CRC(629e38d0) SHA1(bbc2688635c4cb9a1712a0a0d28017d1867417a4) )
+	ROM_LOAD16_BYTE( "wzm1+2p2", 0x000001, 0x010000, CRC(96b9c484) SHA1(b02595ba5a5c7d673bdc7675708a4d8f6d907779) )
+	ROM_LOAD16_BYTE( "wzm1+2p3", 0x020000, 0x010000, CRC(e545fac0) SHA1(4a3f9e5522bd666d5a1e9ac7878d3d78f3756762) )
+	ROM_LOAD16_BYTE( "wzm1+2p4", 0x020001, 0x010000, CRC(df7d4dba) SHA1(b892cfb807421c99ba98bfd9b34d717e17345d83) )
+	ROM_LOAD16_BYTE( "wzm1+2p5", 0x040000, 0x010000, NO_DUMP )
+	ROM_LOAD16_BYTE( "wzm1+2p6", 0x040001, 0x010000, CRC(3eecbdf8) SHA1(9ecc4fe25e1c1e167aaa413eaf601b55e1a432fb) )
 
 	ROM_LOAD( "wizemove_questions",  0x080000, 0x020000,  NO_DUMP ) // no dumps of question ROMs for this game..
 
@@ -3224,7 +3238,7 @@ ROM_START( v4monte )
 	// Monte Carlo Or Bust Release D (c)1996
 	ROM_LOAD( "mcob2025", 0x0000, 0x010000, CRC(0fe6ec1e) SHA1(de5b7edb40b9ab3fc9111eb83061d55ce569afdd) )
 	ROM_LOAD( "mcob5vd", 0x0000, 0x010000, CRC(44967b33) SHA1(92d35d1b0edcc2eef1062468722c80ef8208b437) )
-	ROM_LOAD( "mcobvd~1", 0x0000, 0x010000, CRC(e0b4bbab) SHA1(bd806a286464d36ff0cbff214ed60ccf81fd2db9) )
+	ROM_LOAD( "mcobvd-1", 0x0000, 0x010000, CRC(e0b4bbab) SHA1(bd806a286464d36ff0cbff214ed60ccf81fd2db9) )
 	ROM_LOAD( "mcovd10", 0x0000, 0x010000, CRC(3f5adbd5) SHA1(f1876afd345e8398c1dc00b63be7d5a91f57519f) )
 	ROM_LOAD( "mn_xes__.d_0", 0x0000, 0x010000, CRC(25ee14a5) SHA1(2eba1b5b68a9f7ad6aacbdf6b93f6b4569164258) )
 	ROM_LOAD( "mnixes__.d_0", 0x0000, 0x010000, CRC(44967b33) SHA1(92d35d1b0edcc2eef1062468722c80ef8208b437) )

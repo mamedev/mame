@@ -41,6 +41,7 @@ public:
 	void kbd_put(u8 data);
 
 	void ms9540(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -50,13 +51,14 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, ms9540_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x010000, 0x013fff) AM_ROM AM_REGION("9540", 0)
-	AM_RANGE(0x018000, 0x018fff) AM_RAM
-ADDRESS_MAP_END
+void ms9540_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xffffff);
+	map(0x000000, 0x00ffff).ram().share("rambase");
+	map(0x010000, 0x013fff).rom().region("9540", 0);
+	map(0x018000, 0x018fff).ram();
+}
 
 
 /* Input ports */

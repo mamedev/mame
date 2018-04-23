@@ -571,7 +571,7 @@ READ8_MEMBER( mc68901_device::read )
 	case REGISTER_RSR:
 		{
 			uint8_t rsr = m_rsr;
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				m_rsr &= ~RSR_OVERRUN_ERROR;
 			return rsr;
 		}
@@ -580,13 +580,13 @@ READ8_MEMBER( mc68901_device::read )
 		{
 			/* clear UE bit (in reality, this won't be cleared until one full clock cycle of the transmitter has passed since the bit was set) */
 			uint8_t tsr = m_tsr;
-			if (!machine().side_effect_disabled())
+			if (!machine().side_effects_disabled())
 				m_tsr &= ~TSR_UNDERRUN_ERROR;
 			return tsr;
 		}
 
 	case REGISTER_UDR:
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_rsr &= ~RSR_BUFFER_FULL;
 			if (m_overrun_pending)

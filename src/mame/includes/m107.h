@@ -83,4 +83,10 @@ public:
 	void wpksoc(machine_config &config);
 	void firebarr(machine_config &config);
 	void dsoccr94(machine_config &config);
+	void dsoccr94_io_map(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void sound_map(address_map &map);
+	void wpksoc_io_map(address_map &map);
+	void wpksoc_map(address_map &map);
 };

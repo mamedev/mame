@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef WPC_FLIP1_H_
-#define WPC_FLIP1_H_
+#ifndef MAME_INCLUDES_WPC_FLIP1_H
+#define MAME_INCLUDES_WPC_FLIP1_H
 
 #include "includes/wpc_dot.h"
 
@@ -19,6 +19,7 @@ public:
 public:
 	DECLARE_DRIVER_INIT(wpc_flip1);
 	void wpc_flip1(machine_config &config);
+	void wpc_flip1_map(address_map &map);
 };
 
-#endif /* WPC_FLIP1_H_ */
+#endif // MAME_INCLUDES_WPC_FLIP1_H

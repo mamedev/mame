@@ -142,7 +142,8 @@ public:
 	uint32_t screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(generate_nmi);
+	DECLARE_WRITE_LINE_MEMBER(generate_nmi);
+	DECLARE_WRITE_LINE_MEMBER(ninclown_irq);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_CALLBACK_MEMBER(behind_the_beam_update);
 	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
@@ -203,6 +204,16 @@ public:
 	void stratab_lo(machine_config &config);
 	void slikshot_hi(machine_config &config);
 	void hstennis_hi(machine_config &config);
+	void gtg2_map(address_map &map);
+	void ninclown_map(address_map &map);
+	void slikz80_io_map(address_map &map);
+	void slikz80_mem_map(address_map &map);
+	void sound2203_map(address_map &map);
+	void sound2608b_map(address_map &map);
+	void sound3812_external_map(address_map &map);
+	void sound3812_map(address_map &map);
+	void tmshi_map(address_map &map);
+	void tmslo_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

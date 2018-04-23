@@ -55,7 +55,7 @@ public:
 	void    set_interrupt(int state);
 	void    pulse_clock();
 
-	template <class Object> static devcb_base &static_set_int_callback(device_t &device, Object &&cb) { return downcast<joyport_device &>(device).m_interrupt.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_interrupt.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	void device_start() override;
@@ -75,7 +75,7 @@ SLOT_INTERFACE_EXTERN(ti99_joystick_port_gen);
 DECLARE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device)
 
 #define MCFG_JOYPORT_INT_HANDLER( _intcallb ) \
-	devcb = &bus::ti99::joyport::joyport_device::static_set_int_callback( *device, DEVCB_##_intcallb );
+	devcb = &downcast<bus::ti99::joyport::joyport_device &>(*device).set_int_callback(DEVCB_##_intcallb);
 
 #define MCFG_GENEVE_JOYPORT_ADD( _tag )  \
 	MCFG_DEVICE_ADD(_tag, TI99_JOYPORT, 0) \

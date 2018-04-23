@@ -73,16 +73,6 @@ i82730_device::i82730_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  set_cpu_tag - set cpu we are attached to
-//-------------------------------------------------
-
-void i82730_device::set_cpu_tag(device_t &device, device_t *owner, const char *tag)
-{
-	i82730_device &dev = dynamic_cast<i82730_device &>(device);
-	dev.m_cpu_tag = tag;
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

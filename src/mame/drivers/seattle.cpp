@@ -280,7 +280,9 @@ public:
 		m_dcs(*this, "dcs"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "AN%u", 0)
+		m_io_analog(*this, "AN%u", 0),
+		m_lamps(*this, "lamp%u", 0U),
+		m_leds(*this, "led%u", 0U)
 		{}
 
 	required_device<nvram_device> m_nvram;
@@ -290,6 +292,8 @@ public:
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
+	output_finder<16> m_lamps;
+	output_finder<24> m_leds;
 
 	widget_data m_widget;
 	uint32_t m_interrupt_enable;
@@ -305,7 +309,7 @@ public:
 	uint8_t m_pending_analog_read;
 	uint8_t m_status_leds;
 	uint32_t m_cmos_write_enabled;
-	uint32_t m_output;
+	uint16_t m_output_last;
 	uint8_t m_output_mode;
 	uint32_t m_gear;
 	int8_t m_wheel_force;
@@ -388,6 +392,11 @@ public:
 	void mace(machine_config &config);
 	void vaportrx(machine_config &config);
 	void sfrushrk(machine_config &config);
+	void seattle_cs0_map(address_map &map);
+	void seattle_cs1_map(address_map &map);
+	void seattle_cs2_map(address_map &map);
+	void seattle_cs3_map(address_map &map);
+	void seattle_flagstaff_cs3_map(address_map &map);
 };
 
 
@@ -421,10 +430,13 @@ void seattle_state::machine_start()
 	save_item(NAME(m_pending_analog_read));
 	save_item(NAME(m_status_leds));
 	save_item(NAME(m_cmos_write_enabled));
-	save_item(NAME(m_output));
+	save_item(NAME(m_output_last));
 	save_item(NAME(m_output_mode));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
+
+	m_lamps.resolve();
+	m_leds.resolve();
 }
 
 
@@ -666,33 +678,28 @@ WRITE32_MEMBER(seattle_state::analog_port_w)
 *************************************/
 WRITE32_MEMBER(seattle_state::wheel_board_w)
 {
-	//logerror("wheel_board_w: data = %08x\n", data);
-	/* two writes in pairs. flag off first, on second. arg remains the same. */
-	bool flag = (data & (1 << 11));
-	uint8_t op = (data >> 8) & 0x7;
-	uint8_t arg = data & 0xff;
+	//logerror("wheel_board_w: data = %08X\n", data);
+	uint8_t arg = data & 0xFF;
 
-	if (flag)
+	if (!BIT(m_output_last, 11) && BIT(data, 11)) // output latch
 	{
-		switch (op)
+		if (BIT(data, 10))
 		{
-		case 0x0:
-			machine().output().set_value("wheel", arg); // target wheel angle. signed byte.
+			uint8_t base = BIT(data, 8) << 3;
+			for (uint8_t bit = 0; bit < 8; bit++)
+				m_lamps[base | bit] = BIT(arg, bit);
+		}
+		else if (BIT(data, 9) || BIT(data, 8))
+		{
+			logerror("%08X:wheel_board_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
+		}
+		else
+		{
+			output().set_value("wheel", arg); // target wheel angle. signed byte.
 			m_wheel_force = int8_t(arg);
-			//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
-			break;
-
-		case 0x4:
-			for (uint8_t bit = 0; bit < 8; bit++)
-				machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
-			break;
-
-		case 0x5:
-			for (uint8_t bit = 0; bit < 8; bit++)
-				machine().output().set_lamp_value(8 + bit, (arg >> bit) & 0x1);
-			break;
 		}
 	}
+	m_output_last = data;
 }
 
 /*************************************
@@ -824,61 +831,57 @@ void seattle_state::update_widget_irq()
 
 READ32_MEMBER(seattle_state::output_r)
 {
-	return m_output;
+	logerror("%08X:output_r(%d)\n", m_maincpu->pc(), offset);
+	return 0;
 }
 
 
 WRITE32_MEMBER(seattle_state::output_w)
 {
-	uint8_t op = (data >> 8) & 0xF;
 	uint8_t arg = data & 0xFF;
 
-	switch (op)
+	if (!BIT(m_output_last, 11) && BIT(data, 11))
+		m_output_mode = arg;
+	m_output_last = data;
+
+	if (!BIT(data, 10))
 	{
-		default:
-			logerror("Unknown output (%02X) = %02X\n", op, arg);
-			break;
+		switch (m_output_mode)
+		{
+			default:
+				logerror("%08X:output_w(%d) = %04X\n", m_maincpu->pc(), m_output_mode, data);
+				break;
 
-		case 0xF: break; // sync/security wrapper commands. arg matches the wrapped command.
+			case 0x04:
+				output().set_value("wheel", arg); // wheel motor delta. signed byte.
+				m_wheel_force = int8_t(~arg);
+				//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
+				break;
 
-		case 0x7:
-			m_output_mode = arg;
-			break;
+			case 0x05:
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_lamps[bit] = BIT(arg, bit);
+				break;
 
-		case 0xB:
-			switch (m_output_mode)
-			{
-				default:
-					logerror("Unknown output with mode (%02X) = %02X\n", m_output_mode, arg);
-					break;
+			case 0x06: // Hyperdrive LEDs 0-7
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_leds[bit] = BIT(arg, bit);
+				break;
 
-				case 0x04:
-					output().set_value("wheel", arg); // wheel motor delta. signed byte.
-					m_wheel_force = int8_t(~arg);
-					//logerror("wheel_board_w: data = %08x op: %02x arg: %02x\n", data, op, arg);
-					break;
+			case 0x07: // Hyperdrive LEDs 8-15
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_leds[8 | bit] = BIT(arg, bit);
+				break;
 
-				case 0x05:
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_lamp_value(bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x06: // Hyperdrive LEDs 0-7
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_led_value(bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x07: // Hyperdrive LEDs 8-15
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_led_value(8 + bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x08: // Hyperdrive LEDs 16-23 (Only uses up to 19)
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_led_value(16 + bit, (arg >> bit) & 0x1);
-					break;
-			}
-			break;
+			case 0x08: // Hyperdrive LEDs 16-23 (Only uses up to 19)
+				for (uint8_t bit = 0; bit < 8; bit++)
+					m_leds[16 | bit] = BIT(arg, bit);
+				break;
+		}
+	}
+	else if (!BIT(data, 9) || !BIT(data, 8))
+	{
+		logerror("%08X:output_w = %04X\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -1100,50 +1103,55 @@ PCI Mem  = 08000000-09FFFFFF
 
 */
 
-static ADDRESS_MAP_START(seattle_cs0_map, AS_PROGRAM, 32, seattle_state)
-ADDRESS_MAP_END
+void seattle_state::seattle_cs0_map(address_map &map)
+{
+}
 
-static ADDRESS_MAP_START(seattle_cs1_map, AS_PROGRAM, 32, seattle_state)
-	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(asic_fifo_w)
-ADDRESS_MAP_END
+void seattle_state::seattle_cs1_map(address_map &map)
+{
+	map(0x01000000, 0x01000003).w(this, FUNC(seattle_state::asic_fifo_w));
+}
 
-static ADDRESS_MAP_START(seattle_cs2_map, AS_PROGRAM, 32, seattle_state)
-	AM_RANGE(0x00000000, 0x00000003) AM_READWRITE(analog_port_r, analog_port_w)  // Flagstaff only
-ADDRESS_MAP_END
+void seattle_state::seattle_cs2_map(address_map &map)
+{
+	map(0x00000000, 0x00000003).rw(this, FUNC(seattle_state::analog_port_r), FUNC(seattle_state::analog_port_w));  // Flagstaff only
+}
 
 // This map shares the PHOENIX, SEATTLE, and SEATTLE_WIDGET calls
-static ADDRESS_MAP_START(seattle_cs3_map, AS_PROGRAM, 32, seattle_state)
-	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x00100000, 0x0011ffff) AM_READWRITE(cmos_r, cmos_w)
-	AM_RANGE(0x00800000, 0x0080001f) AM_READWRITE(carnevil_gun_r, carnevil_gun_w) // Carnevil driver only
-	AM_RANGE(0x00c00000, 0x00c0001f) AM_READWRITE(widget_r, widget_w); // Seattle widget only
-	AM_RANGE(0x01000000, 0x01000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
-	AM_RANGE(0x01100000, 0x01100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x01300000, 0x01300003) AM_READWRITE(seattle_interrupt_enable_r, seattle_interrupt_enable_w)
-	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(interrupt_config_r, interrupt_config_w)
-	AM_RANGE(0x01500000, 0x01500003) AM_READ(interrupt_state_r)
-	AM_RANGE(0x01600000, 0x01600003) AM_READ(interrupt_state2_r)
-	AM_RANGE(0x01700000, 0x01700003) AM_WRITE(vblank_clear_w)
-	AM_RANGE(0x01800000, 0x01800003) AM_NOP
-	AM_RANGE(0x01900000, 0x01900003) AM_READWRITE(status_leds_r, status_leds_w)
-	AM_RANGE(0x01f00000, 0x01f00003) AM_READWRITE(asic_reset_r, asic_reset_w)
-ADDRESS_MAP_END
+void seattle_state::seattle_cs3_map(address_map &map)
+{
+	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00800000, 0x0080001f).rw(this, FUNC(seattle_state::carnevil_gun_r), FUNC(seattle_state::carnevil_gun_w)); // Carnevil driver only
+	map(0x00c00000, 0x00c0001f).rw(this, FUNC(seattle_state::widget_r), FUNC(seattle_state::widget_w)); // Seattle widget only
+	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x01800000, 0x01800003).noprw();
+	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+}
 
-static ADDRESS_MAP_START(seattle_flagstaff_cs3_map, AS_PROGRAM, 32, seattle_state)
-	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x00100000, 0x0011ffff) AM_READWRITE(cmos_r, cmos_w)
-	AM_RANGE(0x00c00000, 0x00c0003f) AM_READWRITE(ethernet_r, ethernet_w);
-	AM_RANGE(0x01000000, 0x01000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
-	AM_RANGE(0x01100000, 0x01100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x01300000, 0x01300003) AM_READWRITE(seattle_interrupt_enable_r, seattle_interrupt_enable_w)
-	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(interrupt_config_r, interrupt_config_w)
-	AM_RANGE(0x01500000, 0x01500003) AM_READ(interrupt_state_r)
-	AM_RANGE(0x01600000, 0x01600003) AM_READ(interrupt_state2_r)
-	AM_RANGE(0x01700000, 0x01700003) AM_WRITE(vblank_clear_w)
-	AM_RANGE(0x01800000, 0x01800003) AM_NOP
-	AM_RANGE(0x01900000, 0x01900003) AM_READWRITE(status_leds_r, status_leds_w)
-	AM_RANGE(0x01f00000, 0x01f00003) AM_READWRITE(asic_reset_r, asic_reset_w)
-ADDRESS_MAP_END
+void seattle_state::seattle_flagstaff_cs3_map(address_map &map)
+{
+	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00c00000, 0x00c0003f).rw(this, FUNC(seattle_state::ethernet_r), FUNC(seattle_state::ethernet_w));
+	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x01800000, 0x01800003).noprw();
+	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+}
 
 /*************************************
  *
@@ -1316,9 +1324,9 @@ static INPUT_PORTS_START( sfrush )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Track 2") PORT_PLAYER(1) /* track 2 */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Track 3") PORT_PLAYER(1) /* track 3 */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Track 4") PORT_PLAYER(1) /* track 4 */
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1332,16 +1340,16 @@ static INPUT_PORTS_START( sfrush )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN1")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN2")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN4")   /* Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_PLAYER(1)
@@ -1401,7 +1409,7 @@ static INPUT_PORTS_START( calspeed )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") PORT_PLAYER(1)   /* tailgate cam */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") PORT_PLAYER(1)   /* sky cam */
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
 
 	PORT_START("GEAR")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1st Gear") PORT_PLAYER(1) /* 1st gear */
@@ -1422,19 +1430,19 @@ static INPUT_PORTS_START( calspeed )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
 	PORT_START("AN3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -1472,7 +1480,7 @@ static INPUT_PORTS_START( vaportrx )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1481,19 +1489,19 @@ static INPUT_PORTS_START( vaportrx )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("AN3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -1833,20 +1841,20 @@ static INPUT_PORTS_START( hyprdriv )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
 
 	PORT_START("AN4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	/* 2008-06 FP: is this ever read?? */
 	PORT_START("AN8")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -1872,10 +1880,10 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 	MCFG_PCI_ROOT_ADD(":pci")
 
 	MCFG_GT64010_ADD(PCI_ID_GALILEO, ":maincpu", SYSTEM_CLOCK, GALILEO_IRQ_NUM)
-	MCFG_GT64XXX_SET_CS(0, seattle_cs0_map)
-	MCFG_GT64XXX_SET_CS(1, seattle_cs1_map)
-	MCFG_GT64XXX_SET_CS(2, seattle_cs2_map)
-	MCFG_GT64XXX_SET_CS(3, seattle_cs3_map)
+	MCFG_GT64XXX_SET_CS(0, seattle_state::seattle_cs0_map)
+	MCFG_GT64XXX_SET_CS(1, seattle_state::seattle_cs1_map)
+	MCFG_GT64XXX_SET_CS(2, seattle_state::seattle_cs2_map)
+	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_cs3_map)
 	MCFG_GT64XX_SET_SIMM0(0x00800000)
 
 	MCFG_IDE_PCI_ADD(PCI_ID_IDE, 0x100b0002, 0x01, 0x0)
@@ -1902,7 +1910,8 @@ MACHINE_CONFIG_START(seattle_state::seattle_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::phoenixsa, seattle_common)
+MACHINE_CONFIG_START(seattle_state::phoenixsa)
+	seattle_common(config);
 	MCFG_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1914,7 +1923,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::phoenixsa, seattle_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::seattle150, seattle_common)
+MACHINE_CONFIG_START(seattle_state::seattle150)
+	seattle_common(config);
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1922,13 +1932,15 @@ MACHINE_CONFIG_DERIVED(seattle_state::seattle150, seattle_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::seattle150_widget, seattle150)
+MACHINE_CONFIG_START(seattle_state::seattle150_widget)
+	seattle150(config);
 	MCFG_SMC91C94_ADD("ethernet")
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::seattle200, seattle_common)
+MACHINE_CONFIG_START(seattle_state::seattle200)
+	seattle_common(config);
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1936,19 +1948,21 @@ MACHINE_CONFIG_DERIVED(seattle_state::seattle200, seattle_common)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::seattle200_widget, seattle200)
+MACHINE_CONFIG_START(seattle_state::seattle200_widget)
+	seattle200(config);
 	MCFG_SMC91C94_ADD("ethernet")
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::flagstaff, seattle_common)
+MACHINE_CONFIG_START(seattle_state::flagstaff)
+	seattle_common(config);
 	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(SYSTEM_CLOCK)
 
 	MCFG_DEVICE_MODIFY(PCI_ID_GALILEO)
-	MCFG_GT64XXX_SET_CS(3, seattle_flagstaff_cs3_map)
+	MCFG_GT64XXX_SET_CS(3, seattle_state::seattle_flagstaff_cs3_map)
 
 	MCFG_SMC91C94_ADD("ethernet")
 	MCFG_SMC91C94_IRQ_CALLBACK(WRITELINE(seattle_state, ethernet_interrupt))
@@ -1960,7 +1974,8 @@ MACHINE_CONFIG_END
 
 // Per game configurations
 
-MACHINE_CONFIG_DERIVED(seattle_state::wg3dh, phoenixsa)
+MACHINE_CONFIG_START(seattle_state::wg3dh)
+	phoenixsa(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
@@ -1973,7 +1988,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::wg3dh, phoenixsa)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(seattle_state::mace, seattle150)
+MACHINE_CONFIG_START(seattle_state::mace)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
@@ -1985,7 +2001,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::mace, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::sfrush, flagstaff)
+MACHINE_CONFIG_START(seattle_state::sfrush)
+	flagstaff(config);
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x5236)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
@@ -1998,7 +2015,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::sfrush, flagstaff)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::sfrushrk, flagstaff)
+MACHINE_CONFIG_START(seattle_state::sfrushrk)
+	flagstaff(config);
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE_SEATTLE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x5329)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(DEVWRITE8("ioasic",midway_ioasic_device,cage_irq_handler))
@@ -2011,12 +2029,14 @@ MACHINE_CONFIG_DERIVED(seattle_state::sfrushrk, flagstaff)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(seattle_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::sfrushrkw, sfrushrk)
+MACHINE_CONFIG_START(seattle_state::sfrushrkw)
+	sfrushrk(config);
 	MCFG_DEVICE_MODIFY("ioasic")
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::calspeed, seattle150_widget)
+MACHINE_CONFIG_START(seattle_state::calspeed)
+	seattle150_widget(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c0)
@@ -2029,7 +2049,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::calspeed, seattle150_widget)
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::vaportrx, seattle200_widget)
+MACHINE_CONFIG_START(seattle_state::vaportrx)
+	seattle200_widget(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
@@ -2041,7 +2062,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::vaportrx, seattle200_widget)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::biofreak, seattle150)
+MACHINE_CONFIG_START(seattle_state::biofreak)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3835)
@@ -2053,7 +2075,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::biofreak, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::blitz, seattle150)
+MACHINE_CONFIG_START(seattle_state::blitz)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x39c2)
@@ -2065,7 +2088,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::blitz, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::blitz99, seattle150)
+MACHINE_CONFIG_START(seattle_state::blitz99)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
@@ -2077,7 +2101,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::blitz99, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::blitz2k, seattle150)
+MACHINE_CONFIG_START(seattle_state::blitz2k)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -2089,7 +2114,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::blitz2k, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::carnevil, seattle150)
+MACHINE_CONFIG_START(seattle_state::carnevil)
+	seattle150(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
@@ -2101,7 +2127,8 @@ MACHINE_CONFIG_DERIVED(seattle_state::carnevil, seattle150)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(seattle_state, ioasic_irq))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(seattle_state::hyprdriv, seattle200_widget)
+MACHINE_CONFIG_START(seattle_state::hyprdriv)
+	seattle200_widget(config);
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0af7)
@@ -2182,7 +2209,7 @@ ROM_END
 
 ROM_START( sfrusha )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )  /* Boot Code Version L1.06A */
-	ROM_LOAD( "HDBOOTV1_06A.bin", 0x000000, 0x80000, CRC(f247ba60) SHA1(850f97002eb1e362c3df870d7b6a1b5524ab983d) )
+	ROM_LOAD( "hdbootv1_06a.bin", 0x000000, 0x80000, CRC(f247ba60) SHA1(850f97002eb1e362c3df870d7b6a1b5524ab983d) )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
@@ -2277,17 +2304,17 @@ ROM_START( calspeeda )
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
 	// it actually asks you to replace this with the original rom after the upgrade is complete, which is weird because this is a perfectly valid newer revision of the boot code, but probably explains why the parent set was still on 1.2
-	ROM_LOAD( "Cal speed update  U32 boot ver, 1,4 5EF6", 0x000000, 0x80000, CRC(fd627637) SHA1(b0c2847cbecfc00344e402386d13240d55a0814e) ) // boot code 1.4 Apr 17 1998 21:18:31
+	ROM_LOAD( "cal speed update  u32 boot ver, 1,4 5ef6", 0x000000, 0x80000, CRC(fd627637) SHA1(b0c2847cbecfc00344e402386d13240d55a0814e) ) // boot code 1.4 Apr 17 1998 21:18:31
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "noupdate",       "No Update Rom" )
 
 	ROM_SYSTEM_BIOS( 1, "up16_1",       "Disk Update 1.0x to 2.1a (1.25) Step 1 of 3" )
-	ROMX_LOAD("eprom #1 2.1A 90A7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(2))
+	ROMX_LOAD("eprom @1 2.1a 90a7", 0x000000, 0x100000, CRC(bc0f373e) SHA1(bf53f1953ccab8da9ce784e4d20dd2ec0d0eff6a), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "up16_2",       "Disk Update 1.0x to 2.1a (1.25) Step 2 of 3" )
-	ROMX_LOAD("eprom #2 2.1A 9F84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(3))
+	ROMX_LOAD("eprom @2 2.1a 9f84", 0x000000, 0x100000, CRC(5782da30) SHA1(eaeea3655bc9c1cedefdfb0088d4716584788669), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "up16_3",       "Disk Update 1.0x to 2.1a (1.25) Step 3 of 3" )
-	ROMX_LOAD("eprom #3 2.1A 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
+	ROMX_LOAD("eprom @3 2.1a 3286", 0x000000, 0x100000, CRC(e7d8c88f) SHA1(06c11241ac439527b361826784aef4c58689892e), ROM_BIOS(4))
 
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )    /* Release version 1.0r8a (4/10/98) (Guts 4/10/98, Main 4/10/98) */
@@ -2656,9 +2683,9 @@ GAME(  1996, mace,       0,        mace,      mace,     seattle_state, mace,    
 GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
 GAMEL( 1996, sfrusha,    sfrush,   sfrush,    sfrush,   seattle_state, sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.06A)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1996, sfrushrk,   0,        sfrushrk,  sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (boot rom L 1.0, GUTS Oct 6 1997 / MAIN Oct 16 1997)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1996, sfrushrkw,  sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 19 1997 / MAIN Aug 19 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
-GAMEL( 1996, sfrushrkwo, sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 6 1997 / MAIN Aug 5 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1997, sfrushrk,   0,        sfrushrk,  sfrushrk, seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (boot rom L 1.0, GUTS Oct 6 1997 / MAIN Oct 16 1997)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1997, sfrushrkw,  sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 19 1997 / MAIN Aug 19 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
+GAMEL( 1997, sfrushrkwo, sfrushrk, sfrushrkw, sfrush,   seattle_state, sfrushrk, ROT0, "Atari Games",  "San Francisco Rush: The Rock (Wavenet, boot rom L 1.38, GUTS Aug 6 1997 / MAIN Aug 5 1997)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_sfrush )
 GAMEL( 1998, calspeed,   0,        calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 2.1a Apr 17 1998, GUTS 1.25 Apr 17 1998 / MAIN Apr 17 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 GAMEL( 1998, calspeeda,  calspeed, calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r8 Mar 10 1998, GUTS Mar 10 1998 / MAIN Mar 10 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )
 GAMEL( 1998, calspeedb,  calspeed, calspeed,  calspeed, seattle_state, calspeed, ROT0, "Atari Games",  "California Speed (Version 1.0r7a Mar 4 1998, GUTS Mar 3 1998 / MAIN Jan 19 1998)", MACHINE_SUPPORTS_SAVE, layout_calspeed )

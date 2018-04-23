@@ -49,6 +49,7 @@ public:
 	uint32_t  m_rom_size;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
 	void pockchalv1(machine_config &config);
+	void pockchalv1_map(address_map &map);
 };
 
 
@@ -70,9 +71,10 @@ uint32_t pockchalv1_state::screen_update_pockchalv1(screen_device &screen, bitma
 }
 
 
-static ADDRESS_MAP_START( pockchalv1_map, AS_PROGRAM, 8, pockchalv1_state )
-	AM_RANGE(0xc000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void pockchalv1_state::pockchalv1_map(address_map &map)
+{
+	map(0xc000, 0xffff).ram();
+}
 
 
 static INPUT_PORTS_START( pockchalv1 )

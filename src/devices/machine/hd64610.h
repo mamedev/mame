@@ -35,10 +35,10 @@
 //**************************************************************************
 
 #define MCFG_HD64610_OUT_IRQ_CB(_devcb) \
-	devcb = &hd64610_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd64610_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_HD64610_OUT_1HZ_CB(_devcb) \
-	devcb = &hd64610_device::set_out_1hz_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<hd64610_device &>(*device).set_out_1hz_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -55,8 +55,8 @@ public:
 	// construction/destruction
 	hd64610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<hd64610_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_1hz_callback(device_t &device, Object &&cb) { return downcast<hd64610_device &>(device).m_out_1hz_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_1hz_callback(Object &&cb) { return m_out_1hz_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

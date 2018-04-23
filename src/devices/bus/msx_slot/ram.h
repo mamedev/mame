@@ -9,7 +9,7 @@
 	MCFG_MSX_INTERNAL_SLOT_ADD(_tag, MSX_SLOT_RAM, _startpage, _numpages)
 
 #define MCFG_MSX_SLOT_RAM_8KB \
-	msx_slot_ram_device::force_start_address(*device, 0xe000);
+	downcast<msx_slot_ram_device &>(*device).force_start_address(0xe000);
 
 
 class msx_slot_ram_device : public device_t,
@@ -18,7 +18,7 @@ class msx_slot_ram_device : public device_t,
 public:
 	msx_slot_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void force_start_address(device_t &device, uint16_t start) { downcast<msx_slot_ram_device &>(device).m_start_address = start; }
+	void force_start_address(uint16_t start) { m_start_address = start; }
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;

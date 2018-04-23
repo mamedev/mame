@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
 SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
 {
 	// Do not allow setaddress for debugger
-	if (machine().side_effect_disabled()) return;
+	if (machine().side_effects_disabled()) return;
 
 	// Selection login in the PAL and some circuits on the board
 
@@ -219,7 +219,7 @@ void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
 */
 READ8Z_MEMBER(snug_bwg_device::readz)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_read(offset, value);
 		return;
@@ -289,7 +289,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 */
 WRITE8_MEMBER(snug_bwg_device::write)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 	{
 		debug_write(offset, data);
 		return;

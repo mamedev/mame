@@ -40,6 +40,7 @@ public:
 
 	void bishi(machine_config &config);
 	void dobouchn(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

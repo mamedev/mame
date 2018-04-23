@@ -691,7 +691,7 @@ DISCRETE_SOUND_END
 WRITE_LINE_MEMBER(copsnrob_state::one_start_w)
 {
 	/* One Start */
-	output().set_led_value(0, !state);
+	m_led = !state;
 }
 
 

@@ -556,7 +556,8 @@ MACHINE_CONFIG_START(ti1250_state::ti1250)
 	/* no sound! */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ti1250_state::ti1270, ti1250)
+MACHINE_CONFIG_START(ti1250_state::ti1270)
+	ti1250(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", TMS0970, 250000) // approximation

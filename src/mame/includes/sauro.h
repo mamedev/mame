@@ -75,4 +75,9 @@ public:
 	void tecfri(machine_config &config);
 	void sauro(machine_config &config);
 	void saurob(machine_config &config);
+	void sauro_io_map(address_map &map);
+	void sauro_map(address_map &map);
+	void sauro_sound_map(address_map &map);
+	void saurob_sound_map(address_map &map);
+	void trckydoc_map(address_map &map);
 };

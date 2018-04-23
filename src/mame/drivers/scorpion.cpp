@@ -36,6 +36,9 @@ public:
 	void scorpion(machine_config &config);
 	void profi(machine_config &config);
 	void quorum(machine_config &config);
+	void scorpion_io(address_map &map);
+	void scorpion_mem(address_map &map);
+	void scorpion_switch(address_map &map);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -173,32 +176,35 @@ READ8_MEMBER(scorpion_state::beta_disable_r)
 	return m_program->read_byte(offset + 0x4000);
 }
 
-static ADDRESS_MAP_START( scorpion_mem, AS_PROGRAM, 8, scorpion_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1") AM_WRITE(scorpion_0000_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void scorpion_state::scorpion_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1").w(this, FUNC(scorpion_state::scorpion_0000_w));
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xff00)
-	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x4021, 0x4021) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3fdc)
-	AM_RANGE(0x8021, 0x8021) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3fdc)
-	AM_RANGE(0xc021, 0xc021) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3fdc)
-	AM_RANGE(0x0021, 0x0021) AM_WRITE(scorpion_port_1ffd_w) AM_MIRROR(0x3fdc)
-ADDRESS_MAP_END
+void scorpion_state::scorpion_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x001f, 0x001f).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w)).mirror(0xff00);
+	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
+	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
+	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
+	map(0x00fe, 0x00fe).rw(this, FUNC(scorpion_state::spectrum_port_fe_r), FUNC(scorpion_state::spectrum_port_fe_w)).select(0xff00);
+	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
+	map(0x4021, 0x4021).w(this, FUNC(scorpion_state::scorpion_port_7ffd_w)).mirror(0x3fdc);
+	map(0x8021, 0x8021).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3fdc);
+	map(0xc021, 0xc021).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3fdc);
+	map(0x0021, 0x0021).w(this, FUNC(scorpion_state::scorpion_port_1ffd_w)).mirror(0x3fdc);
+}
 
-static ADDRESS_MAP_START (scorpion_switch, AS_OPCODES, 8, scorpion_state)
-	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
-	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
-ADDRESS_MAP_END
+void scorpion_state::scorpion_switch(address_map &map)
+{
+	map(0x0000, 0x3fff).r(this, FUNC(scorpion_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
+	map(0x3d00, 0x3dff).r(this, FUNC(scorpion_state::beta_enable_r));
+	map(0x4000, 0xffff).r(this, FUNC(scorpion_state::beta_disable_r));
+}
 
 MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 {
@@ -283,11 +289,12 @@ static GFXDECODE_START( quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_DERIVED(scorpion_state::scorpion, spectrum_128)
+MACHINE_CONFIG_START(scorpion_state::scorpion)
+	spectrum_128(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(scorpion_mem)
 	MCFG_CPU_IO_MAP(scorpion_io)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(scorpion_switch)
+	MCFG_CPU_OPCODES_MAP(scorpion_switch)
 
 	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
@@ -304,11 +311,13 @@ MACHINE_CONFIG_DERIVED(scorpion_state::scorpion, spectrum_128)
 	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scorpion_state::profi, scorpion)
+MACHINE_CONFIG_START(scorpion_state::profi)
+	scorpion(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", profi)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(scorpion_state::quorum, scorpion)
+MACHINE_CONFIG_START(scorpion_state::quorum)
+	scorpion(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", quorum)
 MACHINE_CONFIG_END
 

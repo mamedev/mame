@@ -108,6 +108,11 @@ public:
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void babypac(machine_config &config);
 	void granny(machine_config &config);
+	void granny_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void video_map(address_map &map);
 private:
 	uint8_t m_mpu_to_vid;
 	uint8_t m_vid_to_mpu;
@@ -144,49 +149,54 @@ private:
 };
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, by133_state ) // U9 MPU
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM // 128x8 in MC6810 U7 MPU
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write) // PIA U10 MPU
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write) // PIA U11 MPU
-	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_SHARE("nvram") // 256x4 in 5101L U8 MPU, battery backed (D4-7 are data, A4-8 are address)
-	AM_RANGE(0x1000, 0x17ff) AM_ROM AM_REGION("roms", 0x0000)
-	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("roms", 0x1000)
-	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("roms", 0x0800)
-	AM_RANGE(0x5800, 0x5fff) AM_ROM AM_REGION("roms", 0x1800)
-	AM_RANGE(0x7000, 0x7fff) AM_ROM AM_REGION("roms", 0x1000)
-ADDRESS_MAP_END
+void by133_state::main_map(address_map &map)
+{ // U9 MPU
+	map.global_mask(0x7fff);
+	map(0x0000, 0x007f).ram(); // 128x8 in MC6810 U7 MPU
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // PIA U10 MPU
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // PIA U11 MPU
+	map(0x0200, 0x03ff).ram().share("nvram"); // 256x4 in 5101L U8 MPU, battery backed (D4-7 are data, A4-8 are address)
+	map(0x1000, 0x17ff).rom().region("roms", 0x0000);
+	map(0x1800, 0x1fff).rom().region("roms", 0x1000);
+	map(0x5000, 0x57ff).rom().region("roms", 0x0800);
+	map(0x5800, 0x5fff).rom().region("roms", 0x1800);
+	map(0x7000, 0x7fff).rom().region("roms", 0x1000);
+}
 
-static ADDRESS_MAP_START( video_map, AS_PROGRAM, 8, by133_state ) // U8 Vidiot
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(sound_data_r,sound_data_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia_u7", pia6821_device, read, write) // PIA U7 Vidiot
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("crtc", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("crtc", tms9928a_device, register_read, register_write)
-	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void by133_state::video_map(address_map &map)
+{ // U8 Vidiot
+	map(0x0000, 0x1fff).rw(this, FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
+	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pia_u7, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // PIA U7 Vidiot
+	map(0x4000, 0x4000).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0x4001, 0x4001).mirror(0x0ffe).rw(m_crtc, FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x6000, 0x63ff).mirror(0x1c00).ram();
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( granny_map, AS_PROGRAM, 8, by133_state )
-	AM_RANGE(0x0000, 0x0001) AM_READWRITE(sound_data_r,sound_data_w)
-	AM_RANGE(0x0002, 0x0002) AM_DEVREADWRITE("crtc", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x0003, 0x0003) AM_DEVREADWRITE("crtc", tms9928a_device, register_read, register_write)
-	AM_RANGE(0x0004, 0x0004) AM_DEVREADWRITE("crtc2", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x0005, 0x0005) AM_DEVREADWRITE("crtc2", tms9928a_device, register_read, register_write)
-	AM_RANGE(0x0006, 0x0007) AM_WRITE(granny_crtc_w) // can write to both at once
-	AM_RANGE(0x0008, 0x000b) AM_DEVREADWRITE("pia_u7", pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x2801, 0x2801) AM_READNOP // The '9' test reads this location constantly and throws away the result
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void by133_state::granny_map(address_map &map)
+{
+	map(0x0000, 0x0001).rw(this, FUNC(by133_state::sound_data_r), FUNC(by133_state::sound_data_w));
+	map(0x0002, 0x0002).rw(m_crtc, FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0x0003, 0x0003).rw(m_crtc, FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x0004, 0x0004).rw(m_crtc2, FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0x0005, 0x0005).rw(m_crtc2, FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0x0006, 0x0007).w(this, FUNC(by133_state::granny_crtc_w)); // can write to both at once
+	map(0x0008, 0x000b).rw(m_pia_u7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2000, 0x27ff).ram();
+	map(0x2801, 0x2801).nopr(); // The '9' test reads this location constantly and throws away the result
+	map(0x4000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, by133_state ) // U27 Vidiot
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void by133_state::sound_map(address_map &map)
+{ // U27 Vidiot
+	map(0xc000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, by133_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVWRITE("dac", dac_byte_interface, write) // P10-P17
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w) // P20-P24 sound command in
-ADDRESS_MAP_END
+void by133_state::sound_portmap(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).w("dac", FUNC(dac_byte_interface::write)); // P10-P17
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(by133_state::m6803_port2_r), FUNC(by133_state::m6803_port2_w)); // P20-P24 sound command in
+}
 
 
 INPUT_CHANGED_MEMBER( by133_state::video_test )
@@ -807,7 +817,8 @@ MACHINE_CONFIG_START(by133_state::babypac)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(by133_state::granny, babypac)
+MACHINE_CONFIG_START(by133_state::granny)
+	babypac(config);
 	MCFG_DEVICE_REMOVE("videocpu")
 	MCFG_CPU_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
 	MCFG_CPU_PROGRAM_MAP(granny_map)

@@ -38,6 +38,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void stratos(machine_config &config);
+	void stratos_mem(address_map &map);
 private:
 	std::unique_ptr<uint8_t[]> nvram_data;
 	uint8_t control, led_latch_control;
@@ -329,17 +330,18 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 	}
 }
 
-static ADDRESS_MAP_START( stratos_mem, AS_PROGRAM, 8, stratos_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(p2000_w)
-	AM_RANGE(0x2200, 0x2200) AM_READWRITE(p2200_r, p2200_w)
-	AM_RANGE(0x2400, 0x2400) AM_WRITE(p2400_w)
-	AM_RANGE(0x2600, 0x2600) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x2800, 0x37ff) AM_RAMBANK("nvram_bank")
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE(lcd_r, lcd_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank_4000")
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank_8000")
-ADDRESS_MAP_END
+void stratos_state::stratos_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2000).w(this, FUNC(stratos_state::p2000_w));
+	map(0x2200, 0x2200).rw(this, FUNC(stratos_state::p2200_r), FUNC(stratos_state::p2200_w));
+	map(0x2400, 0x2400).w(this, FUNC(stratos_state::p2400_w));
+	map(0x2600, 0x2600).rw(this, FUNC(stratos_state::control_r), FUNC(stratos_state::control_w));
+	map(0x2800, 0x37ff).bankrw("nvram_bank");
+	map(0x3800, 0x3800).rw(this, FUNC(stratos_state::lcd_r), FUNC(stratos_state::lcd_w));
+	map(0x4000, 0x7fff).bankr("bank_4000");
+	map(0x8000, 0xffff).bankr("bank_8000");
+}
 
 static INPUT_PORTS_START( stratos )
 INPUT_PORTS_END

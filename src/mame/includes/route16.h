@@ -41,6 +41,14 @@ public:
 	void speakres(machine_config &config);
 	void stratvox(machine_config &config);
 	void route16(machine_config &config);
+	void cpu1_io_map(address_map &map);
+	void route16_cpu1_map(address_map &map);
+	void route16_cpu2_map(address_map &map);
+	void routex_cpu1_map(address_map &map);
+	void speakres_cpu1_map(address_map &map);
+	void stratvox_cpu1_map(address_map &map);
+	void stratvox_cpu2_map(address_map &map);
+	void ttmahjng_cpu1_map(address_map &map);
 private:
 	required_device<cpu_device> m_cpu1;
 	required_device<cpu_device> m_cpu2;

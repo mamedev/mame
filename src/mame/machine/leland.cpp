@@ -109,7 +109,7 @@ WRITE8_MEMBER(leland_state::alleymas_joystick_kludge)
 {
 	/* catch the case where they clear this memory location at PC $1827 and change */
 	/* the value written to be a 1 */
-	if (space.device().safe_pcbase() == 0x1827)
+	if (m_master->pcbase() == 0x1827)
 		*m_alleymas_kludge_mem = 1;
 	else
 		*m_alleymas_kludge_mem = data;
@@ -1128,7 +1128,7 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 
 		case 0x11:  /* /GIN1 */
 			result = ioport("IN3")->read();
-			if (LOG_EEPROM) logerror("%04X:EE read\n", space.device().safe_pc());
+			if (LOG_EEPROM) logerror("%s:EE read\n", machine().describe_context());
 			break;
 
 		default:
@@ -1149,7 +1149,7 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 			m_slave->set_input_line(INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			m_slave->set_input_line(0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
-			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", space.device().safe_pc(),
+			if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 			m_eeprom->di_write ((data & 0x10) >> 4);
 			m_eeprom->clk_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);

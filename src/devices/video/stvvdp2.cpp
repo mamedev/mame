@@ -111,8 +111,6 @@ In other words,the first three types uses the offset and not the color allocated
 #include "emu.h"
 #include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
 
-#include "screen.h"
-
 
 #define DEBUG_MODE 0
 #define TEST_FUNCTIONS 0
@@ -4196,12 +4194,18 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		// store map information
 		stv_vdp2_layer_data_placement.map_offset_min = 0x7fffffff;
 		stv_vdp2_layer_data_placement.map_offset_max = 0x00000000;
+
 		for (i = 0; i < stv2_current_tilemap.map_count; i++)
 		{
+			uint32_t max_base;
+
 			if ( base[i] < stv_vdp2_layer_data_placement.map_offset_min )
 				stv_vdp2_layer_data_placement.map_offset_min = base[i];
-			if ( base[i] > stv_vdp2_layer_data_placement.map_offset_max )
-				stv_vdp2_layer_data_placement.map_offset_max = base[i];
+
+			// Head On in Sega Memorial Collection 1 cares (uses RBG0 with all map regs equal to 0x20)
+			max_base = (base[i] + plsize_bytes/4);
+			if (  max_base > stv_vdp2_layer_data_placement.map_offset_max )
+				stv_vdp2_layer_data_placement.map_offset_max = max_base;
 		}
 
 
@@ -4507,7 +4511,7 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 			popmessage("Special Function Code Select enable %04x %04x, contact MAMEdev",STV_VDP2_SFSEL,STV_VDP2_SFCODE);
 
 		/* Albert Odyssey Gaiden 0x0001 */
-		/* Asuka 120% (doesn't make sense?) 0x0101 */
+		/* Asuka 120% 0x0101 */
 		/* Slam n Jam 96 0x0003 */
 		if(STV_VDP2_ZMCTL & 0x0200)
 			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
@@ -4777,6 +4781,9 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 				y = ys >> 16;
 
 				if ( x & clipxmask || y & clipymask ) continue;
+				if ( stv_vdp2_roz_window(hcnt, vcnt) == false )
+					continue;
+
 				if ( stv2_current_tilemap.roz_mode3 == true )
 				{
 					if( stv_vdp2_roz_mode3_window(hcnt, vcnt, iRP-1) == false )
@@ -4936,7 +4943,30 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 	}
 }
 
-bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
+inline bool saturn_state::stv_vdp2_roz_window(int x, int y)
+{
+	int s_x=0,e_x=0,s_y=0,e_y=0;
+	int w0_pix, w1_pix;
+	uint8_t logic = STV_VDP2_R0LOG;
+	uint8_t w0_enable = STV_VDP2_R0W0E;
+	uint8_t w1_enable = STV_VDP2_R0W1E;
+	uint8_t w0_area = STV_VDP2_R0W0A;
+	uint8_t w1_area = STV_VDP2_R0W1A;
+
+	if (w0_enable == 0 &&
+		w1_enable == 0)
+		return true;
+
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+	w0_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
+
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+	w1_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
+
+	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix));
+}
+
+inline bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
 {
 	int s_x=0,e_x=0,s_y=0,e_y=0;
 	int w0_pix, w1_pix;
@@ -4951,15 +4981,15 @@ bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
 		return rot_parameter ^ 1;
 
 	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
-	w0_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
+	w0_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
 
 	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
-	w1_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
+	w1_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
 
 	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix)) ^ rot_parameter;
 }
 
-int saturn_state::get_roz_mode3_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable, uint8_t winarea)
+inline int saturn_state::get_roz_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable, uint8_t winarea)
 {
 	int res;
 
@@ -5383,7 +5413,7 @@ void saturn_state::stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cli
 
 void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP)
 {
-	rectangle roz_clip_rect, mycliprect;
+	rectangle roz_clip_rect;
 	int planesizex = 0, planesizey = 0;
 	int planerenderedsizex, planerenderedsizey;
 	uint8_t colour_calculation_enabled;
@@ -5479,7 +5509,39 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 		stv2_current_tilemap.scrollx = stv_current_rotation_parameter_table.mx >> 16;
 		stv2_current_tilemap.scrolly = stv_current_rotation_parameter_table.my >> 16;
 
-		stv_vdp2_check_tilemap(bitmap,cliprect);
+		if(stv2_current_tilemap.roz_mode3 == true)
+		{
+			// TODO: Cotton 2 enables mode 3 without an actual RP window enabled
+			//       Technically you could use split screen effect without rotation applied,
+			//       which will be annoying to emulate with this video structure.
+			//       Let's see if anything will do it ...
+			if(STV_VDP2_RPW0E || STV_VDP2_RPW1E)
+				popmessage("ROZ Mode 3 window enabled without zooming, contact MAMEdev!");
+
+			if(iRP == 2)
+				return;
+		}
+
+		// TODO: legacy code, to be removed
+		stv2_current_tilemap.window_control.logic = STV_VDP2_R0LOG;
+		stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_R0W0E;
+		stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_R0W1E;
+//      stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
+		stv2_current_tilemap.window_control.area[0] = STV_VDP2_R0W0A;
+		stv2_current_tilemap.window_control.area[1] = STV_VDP2_R0W1A;
+//      stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
+
+		rectangle mycliprect = cliprect;
+
+		if ( stv2_current_tilemap.window_control.enabled[0] || stv2_current_tilemap.window_control.enabled[1] )
+		{
+			//popmessage("Window control for RBG");
+			stv_vdp2_apply_window_on_layer(mycliprect);
+			stv2_current_tilemap.window_control.enabled[0] = 0;
+			stv2_current_tilemap.window_control.enabled[1] = 0;
+		}
+
+		stv_vdp2_check_tilemap(bitmap,mycliprect);
 	}
 	else
 	{
@@ -5543,9 +5605,10 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			stv2_current_tilemap.transparency = STV_TRANSPARENCY_ALPHA;
 		}
 
+		#ifdef UNUSED_FUNCTION
+		// old reference code
 		mycliprect = cliprect;
 
-		/* TODO: remove me. */
 		if ( stv2_current_tilemap.window_control.enabled[0] || stv2_current_tilemap.window_control.enabled[1] )
 		{
 			//popmessage("Window control for RBG");
@@ -5553,11 +5616,12 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			stv2_current_tilemap.window_control.enabled[0] = 0;
 			stv2_current_tilemap.window_control.enabled[1] = 0;
 		}
+		#endif
 
 		stv2_current_tilemap.fade_control = fade_control;
 
 		g_profiler.start(PROFILER_USER2);
-		stv_vdp2_copy_roz_bitmap(bitmap, m_vdp2.roz_bitmap[iRP-1], mycliprect, iRP, planesizex, planesizey, planerenderedsizex, planerenderedsizey );
+		stv_vdp2_copy_roz_bitmap(bitmap, m_vdp2.roz_bitmap[iRP-1], cliprect, iRP, planesizex, planesizey, planerenderedsizex, planerenderedsizey );
 		g_profiler.stop();
 	}
 
@@ -5618,12 +5682,13 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_R0CAOS;
 	stv2_current_tilemap.fade_control = (STV_VDP2_R0COEN * 1) | (STV_VDP2_R0COSL * 2);
 	stv_vdp2_check_fade_control_for_layer();
-	stv2_current_tilemap.window_control.logic = STV_VDP2_R0LOG;
-	stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_R0W0E;
-	stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_R0W1E;
+	// disable these, we apply them in the roz routines (they were interfering with stv_vdp2_roz_window() ?)
+	stv2_current_tilemap.window_control.logic = 0; //STV_VDP2_R0LOG;
+	stv2_current_tilemap.window_control.enabled[0] = 0; //STV_VDP2_R0W0E;
+	stv2_current_tilemap.window_control.enabled[1] = 0; //STV_VDP2_R0W1E;
 //  stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
-	stv2_current_tilemap.window_control.area[0] = STV_VDP2_R0W0A;
-	stv2_current_tilemap.window_control.area[1] = STV_VDP2_R0W1A;
+	stv2_current_tilemap.window_control.area[0] = 0; //STV_VDP2_R0W0A;
+	stv2_current_tilemap.window_control.area[1] = 0; //STV_VDP2_R0W1A;
 //  stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
 
 	stv2_current_tilemap.scrollx = 0;
@@ -5780,7 +5845,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 			/* latch h/v signals through HV latch*/
 			if(!STV_VDP2_EXLTEN)
 			{
-				if(!machine().side_effect_disabled())
+				if(!machine().side_effects_disabled())
 				{
 					m_vdp2.h_count = get_hcounter();
 					m_vdp2.v_count = get_vcounter();
@@ -5807,7 +5872,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 				m_vdp2_regs[offset] |= 1 << 3;
 
 			/* HV latches clears if this register is read */
-			if(!machine().side_effect_disabled())
+			if(!machine().side_effects_disabled())
 			{
 				m_vdp2.exltfg &= ~1;
 				m_vdp2.exsyfg &= ~1;
@@ -5821,7 +5886,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 
 			/* Games basically r/w the entire VDP2 register area when this is tripped. (example: Silhouette Mirage)
 			   Disable log for the time being. */
-			//if(!machine().side_effect_disabled())
+			//if(!machine().side_effects_disabled())
 			//  printf("Warning: VDP2 version read\n");
 			break;
 		}
@@ -5841,7 +5906,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 		}
 
 		default:
-			//if(!machine().side_effect_disabled())
+			//if(!machine().side_effects_disabled())
 			//  printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
 			break;
 	}
@@ -6037,8 +6102,8 @@ int saturn_state::get_pixel_clock( void )
 /* TODO: hblank position and hblank firing doesn't really match HW behaviour. */
 uint8_t saturn_state::get_hblank( void )
 {
-	const rectangle &visarea = machine().first_screen()->visible_area();
-	int cur_h = machine().first_screen()->hpos();
+	const rectangle &visarea = m_screen->visible_area();
+	int cur_h = m_screen->hpos();
 
 	if (cur_h > visarea.max_x) //TODO
 		return 1;
@@ -6049,7 +6114,7 @@ uint8_t saturn_state::get_hblank( void )
 uint8_t saturn_state::get_vblank( void )
 {
 	int cur_v,vblank;
-	cur_v = machine().first_screen()->vpos();
+	cur_v = m_screen->vpos();
 
 	vblank = get_vblank_start_position() * get_ystep_count();
 
@@ -6068,7 +6133,7 @@ uint8_t saturn_state::get_odd_bit( void )
 //       But the documentation claims that "non-interlaced" mode is always 1.
 //       grdforce tests this bit to be 1 from title screen to gameplay, ditto for finlarch/sasissu/magzun.
 //       Assume documentation is wrong and actually always flip this bit.
-	return m_vdp2.odd;//machine().first_screen()->frame_number() & 1;
+	return m_vdp2.odd;//m_screen->frame_number() & 1;
 }
 
 int saturn_state::get_vblank_start_position( void )
@@ -6088,7 +6153,7 @@ int saturn_state::get_vblank_start_position( void )
 
 int saturn_state::get_ystep_count( void )
 {
-	int max_y = machine().first_screen()->height();
+	int max_y = m_screen->height();
 	int y_step;
 
 	y_step = 2;
@@ -6104,7 +6169,7 @@ int saturn_state::get_hcounter( void )
 {
 	int hcount;
 
-	hcount = machine().first_screen()->hpos();
+	hcount = m_screen->hpos();
 
 	switch(STV_VDP2_HRES & 6)
 	{
@@ -6135,7 +6200,7 @@ int saturn_state::get_vcounter( void )
 {
 	int vcount;
 
-	vcount = machine().first_screen()->vpos();
+	vcount = m_screen->vpos();
 
 	/* Exclusive Monitor */
 	if(STV_VDP2_HRES & 4)
@@ -6143,7 +6208,7 @@ int saturn_state::get_vcounter( void )
 
 	/* Double Density Interlace */
 	if((STV_VDP2_LSMD & 3) == 3)
-		return (vcount & ~1) | (machine().first_screen()->frame_number() & 1);
+		return (vcount & ~1) | (m_screen->frame_number() & 1);
 
 	/* docs says << 1, but according to HW tests it's a typo. */
 	assert((vcount & 0x1ff) < ARRAY_LENGTH(true_vcount));
@@ -6220,7 +6285,7 @@ int saturn_state::stv_vdp2_start ( void )
 VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 {
 	int i;
-	machine().first_screen()->register_screen_bitmap(m_tmpbitmap);
+	m_screen->register_screen_bitmap(m_tmpbitmap);
 	stv_vdp2_start();
 	stv_vdp1_start();
 	m_vdpdebug_roz = 0;
@@ -6287,9 +6352,9 @@ void saturn_state::stv_vdp2_dynamic_res_change( void )
 		refresh  = HZ_TO_ATTOSECONDS(get_pixel_clock()) * (hblank_period) * vblank_period;
 		//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
 
-		machine().first_screen()->configure(hblank_period, vblank_period, visarea, refresh );
+		m_screen->configure(hblank_period, vblank_period, visarea, refresh );
 	}
-//  machine().first_screen()->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
+//  m_screen->set_visible_area(0*8, horz_res-1,0*8, vert_res-1);
 }
 
 /*This is for calculating the rgb brightness*/

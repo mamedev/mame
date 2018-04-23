@@ -94,6 +94,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
 	void bw2(machine_config &config);
+	void bw2_io(address_map &map);
+	void bw2_mem(address_map &map);
+	void lcdc_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_BW2_H

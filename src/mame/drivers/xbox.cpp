@@ -36,6 +36,8 @@ public:
 	{ }
 
 	void xbox(machine_config &config);
+	void xbox_map(address_map &map);
+	void xbox_map_io(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -53,14 +55,16 @@ void xbox_state::video_start()
 {
 }
 
-static ADDRESS_MAP_START(xbox_map, AS_PROGRAM, 32, xbox_state)
-	AM_IMPORT_FROM(xbox_base_map)
-	AM_RANGE(0xff000000, 0xff0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f00000)
-ADDRESS_MAP_END
+void xbox_state::xbox_map(address_map &map)
+{
+	xbox_base_map(map);
+	map(0xff000000, 0xff0fffff).rom().region("bios", 0).mirror(0x00f00000);
+}
 
-static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, xbox_state)
-	AM_IMPORT_FROM(xbox_base_map_io)
-ADDRESS_MAP_END
+void xbox_state::xbox_map_io(address_map &map)
+{
+	xbox_base_map_io(map);
+}
 
 static INPUT_PORTS_START( xbox )
 	/* dummy active high structure */
@@ -163,7 +167,8 @@ SLOT_INTERFACE_START(xbox_ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
 SLOT_INTERFACE_END
 
-MACHINE_CONFIG_DERIVED(xbox_state::xbox, xbox_base)
+MACHINE_CONFIG_START(xbox_state::xbox)
+	xbox_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xbox_map)
 	MCFG_CPU_IO_MAP(xbox_map_io)

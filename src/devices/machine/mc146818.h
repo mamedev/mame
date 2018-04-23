@@ -25,7 +25,7 @@
 	MCFG_DEVICE_ADD(_tag, MC146818, _xtal)
 
 #define MCFG_MC146818_IRQ_HANDLER(_irq) \
-	devcb = &mc146818_device::set_irq_callback(*device, DEVCB_##_irq);
+	devcb = &downcast<mc146818_device &>(*device).set_irq_callback(DEVCB_##_irq);
 
 // The MC146818 doesn't have century support, but when syncing the date & time at startup we can optionally store the century.
 #define MCFG_MC146818_CENTURY_INDEX(_century_index) \
@@ -61,7 +61,7 @@ public:
 	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> static devcb_base &set_irq_callback(device_t &device, Object &&cb) { return downcast<mc146818_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
 	void set_century_index(int century_index) { m_century_index = century_index; }
 	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
 	void set_binary(bool binary) { m_binary = binary; }

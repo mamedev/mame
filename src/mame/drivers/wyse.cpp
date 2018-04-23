@@ -40,17 +40,21 @@ public:
 	{ }
 
 void wyse(machine_config &config);
+void io_map(address_map &map);
+void mem_map(address_map &map);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, wyse_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void wyse_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0xc000, 0xffff).ram().share("videoram");
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, wyse_state )
-ADDRESS_MAP_END
+void wyse_state::io_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( wyse )
 INPUT_PORTS_END
@@ -63,9 +67,9 @@ MACHINE_CONFIG_END
 
 ROM_START( wy50 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2301_E.u6",         0x0000, 0x2000, CRC(2a62ea25) SHA1(f69c596aab307ef1872df29d353b5a61ff77bb74) )
+	ROM_LOAD( "2301_e.u6",         0x0000, 0x2000, CRC(2a62ea25) SHA1(f69c596aab307ef1872df29d353b5a61ff77bb74) )
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "2201_B.u16",        0x0000, 0x1000, CRC(ee318814) SHA1(0ac64b60ff978e607a087e9e6f4d547811c015c5) )
+	ROM_LOAD( "2201_b.u16",        0x0000, 0x1000, CRC(ee318814) SHA1(0ac64b60ff978e607a087e9e6f4d547811c015c5) )
 ROM_END
 
 ROM_START( wy30p )
@@ -87,7 +91,7 @@ ROM_END
 
 ROM_START( wy85 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "250151-04_revA.5e", 0x0000, 0x4000, CRC(8fcb9f43) SHA1(6c7e1d27fa6014870c29ab2b8b856ae412bfc411) )
+	ROM_LOAD( "250151-04_reva.5e", 0x0000, 0x4000, CRC(8fcb9f43) SHA1(6c7e1d27fa6014870c29ab2b8b856ae412bfc411) )
 	ROM_REGION( 0x2000, "user1", 0 )
 	ROM_LOAD( "am9265.1h",         0x0000, 0x2000, CRC(5ee65b55) SHA1(a0b38a38838f262aaea22d212351e7441e4b07e8) )
 ROM_END

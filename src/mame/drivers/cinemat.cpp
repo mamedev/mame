@@ -58,6 +58,8 @@ void cinemat_state::machine_start()
 	save_item(NAME(m_coin_detected));
 	save_item(NAME(m_coin_last_reset));
 	save_item(NAME(m_mux_select));
+	m_led.resolve();
+	m_pressed.resolve();
 }
 
 
@@ -81,14 +83,14 @@ void cinemat_state::machine_reset()
 
 READ8_MEMBER(cinemat_state::inputs_r)
 {
-	return (ioport("INPUTS")->read() >> offset) & 1;
+	return (m_inputs->read() >> offset) & 1;
 }
 
 
 READ8_MEMBER(cinemat_state::switches_r)
 {
 	static const uint8_t switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
-	return (ioport("SWITCHES")->read() >> switch_shuffle[offset]) & 1;
+	return (m_switches->read() >> switch_shuffle[offset]) & 1;
 }
 
 
@@ -166,7 +168,7 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 	int delta_wheel;
 
 	/* the shift register is cleared once per 'frame' */
-	delta_wheel = int8_t(ioport("WHEEL")->read()) / 8;
+	delta_wheel = int8_t(m_wheel->read()) / 8;
 	if (delta_wheel > 3)
 		delta_wheel = 3;
 	else if (delta_wheel < -3)
@@ -178,14 +180,14 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 
 READ8_MEMBER(cinemat_state::speedfrk_gear_r)
 {
-	int gearval = ioport("GEAR")->read();
+	int gearval = m_gear_input->read();
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
 		m_gear = gearval & 0x0f;
 
 	/* add the start key into the mix -- note that it overlaps 4th gear */
-	if (!(ioport("INPUTS")->read() & 0x80))
+	if (!(m_inputs->read() & 0x80))
 		m_gear &= ~0x08;
 
 	return (m_gear >> offset) & 1;
@@ -233,7 +235,7 @@ READ8_MEMBER(cinemat_state::sundance_inputs_r)
 	if (sundance_port_map[offset].portname)
 		return (ioport(sundance_port_map[offset].portname)->read() & sundance_port_map[offset].bitmask) ? 0 : 1;
 	else
-		return (ioport("INPUTS")->read() >> offset) & 1;
+		return (m_inputs->read() >> offset) & 1;
 }
 
 
@@ -283,52 +285,60 @@ WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( program_map_4k, AS_PROGRAM, 8, cinemat_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xfff)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void cinemat_state::program_map_4k(address_map &map)
+{
+	map.global_mask(0xfff);
+	map(0x0000, 0x0fff).rom();
+}
 
-static ADDRESS_MAP_START( program_map_8k, AS_PROGRAM, 8, cinemat_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM
-	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("maincpu", 0x1000)
-ADDRESS_MAP_END
+void cinemat_state::program_map_8k(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).mirror(0x1000).rom();
+	map(0x2000, 0x2fff).mirror(0x1000).rom().region("maincpu", 0x1000);
+}
 
-static ADDRESS_MAP_START( program_map_16k, AS_PROGRAM, 8, cinemat_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void cinemat_state::program_map_16k(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).rom();
+}
 
-static ADDRESS_MAP_START( program_map_32k, AS_PROGRAM, 8, cinemat_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( data_map, AS_DATA, 16, cinemat_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( data_map_qb3, AS_DATA, 16, cinemat_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_SHARE("rambase")
-ADDRESS_MAP_END
+void cinemat_state::program_map_32k(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7fff).rom();
+}
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
-	AM_RANGE(0x00, 0x0f) AM_READ(inputs_r)
-	AM_RANGE(0x10, 0x16) AM_READ(switches_r)
-	AM_RANGE(0x17, 0x17) AM_READ(coin_input_r)
+void cinemat_state::data_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+}
 
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-ADDRESS_MAP_END
+void cinemat_state::data_map_qb3(address_map &map)
+{
+	map(0x0000, 0x03ff).bankrw("bank1").share("rambase");
+}
 
-static ADDRESS_MAP_START( io_map_qb3, AS_IO, 8, cinemat_state )
+
+void cinemat_state::io_map(address_map &map)
+{
+	map(0x00, 0x0f).r(this, FUNC(cinemat_state::inputs_r));
+	map(0x10, 0x16).r(this, FUNC(cinemat_state::switches_r));
+	map(0x17, 0x17).r(this, FUNC(cinemat_state::coin_input_r));
+
+	map(0x00, 0x07).w(m_outlatch, FUNC(ls259_device::write_d0));
+}
+
+void cinemat_state::io_map_qb3(address_map &map)
+{
+	io_map(map);
 	// Some of the outputs here are definitely not mapped through the LS259, since they use multiple bits of data
-	AM_RANGE(0x00, 0x00) AM_WRITE(qb3_ram_bank_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(qb3_sound_fifo_w)
-	AM_RANGE(0x0f, 0x0f) AM_READ(qb3_frame_r)
-	AM_IMPORT_FROM(io_map)
-ADDRESS_MAP_END
+	map(0x00, 0x00).w(this, FUNC(cinemat_state::qb3_ram_bank_w));
+	map(0x04, 0x04).w(this, FUNC(cinemat_state::qb3_sound_fifo_w));
+	map(0x0f, 0x0f).r(this, FUNC(cinemat_state::qb3_frame_r));
+}
 
 
 
@@ -436,8 +446,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( speedfrk )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_SPECIAL ) /* steering wheel, fake below */
-	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_SPECIAL ) /* gear shift, fake below */
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) /* steering wheel, fake below */
+	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_CUSTOM ) /* gear shift, fake below */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* gas */
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -514,7 +524,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sundance )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P1 Pad */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
@@ -522,14 +532,14 @@ static INPUT_PORTS_START( sundance )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Toggle Grid") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4 Suns") PORT_CODE(KEYCODE_SLASH)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P2 Pad */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P1 Pad */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P2 Pad */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2 Suns") PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P1 Pad */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P2 Pad */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P1 Pad */
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL ) /* P2 Pad */
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P1 Pad */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* P2 Pad */
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x02, "Time" )
@@ -800,7 +810,7 @@ static INPUT_PORTS_START( boxingb )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0fc0, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* dial */
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM ) /* dial */
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
@@ -930,7 +940,7 @@ static INPUT_PORTS_START( qb3 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_JOYSTICKLEFT_LEFT )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON1 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_SPECIAL )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_CUSTOM )
 
 	PORT_START("SWITCHES")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
@@ -987,32 +997,37 @@ MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_4k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_4k, cinemat_nojmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_4k)
+	cinemat_nojmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CCPU_VECTOR_FUNC(ccpu_cpu_device::vector_delegate(FUNC(cinemat_state::cinemat_vector_callback), this))
 	MCFG_CCPU_EXTERNAL_FUNC(DEVREAD8("maincpu",ccpu_cpu_device,read_jmi))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_nojmi_8k, cinemat_nojmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_nojmi_8k)
+	cinemat_nojmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_8k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_8k, cinemat_jmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_8k)
+	cinemat_jmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_8k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_16k, cinemat_jmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_16k)
+	cinemat_jmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_16k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::cinemat_jmi_32k, cinemat_jmi_4k)
+MACHINE_CONFIG_START(cinemat_state::cinemat_jmi_32k)
+	cinemat_jmi_4k(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(program_map_32k)
 MACHINE_CONFIG_END
@@ -1026,70 +1041,82 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_DERIVED(cinemat_state::spacewar, cinemat_nojmi_4k)
-	MCFG_FRAGMENT_ADD(spacewar_sound)
+MACHINE_CONFIG_START(cinemat_state::spacewar)
+	cinemat_nojmi_4k(config);
+	spacewar_sound(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(cinemat_state, screen_update_spacewar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::barrier, cinemat_jmi_4k)
-	MCFG_FRAGMENT_ADD(barrier_sound)
+MACHINE_CONFIG_START(cinemat_state::barrier)
+	cinemat_jmi_4k(config);
+	barrier_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::speedfrk, cinemat_nojmi_8k)
-	MCFG_FRAGMENT_ADD(speedfrk_sound)
+MACHINE_CONFIG_START(cinemat_state::speedfrk)
+	cinemat_nojmi_8k(config);
+	speedfrk_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::starhawk, cinemat_jmi_4k)
-	MCFG_FRAGMENT_ADD(starhawk_sound)
+MACHINE_CONFIG_START(cinemat_state::starhawk)
+	cinemat_jmi_4k(config);
+	starhawk_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::sundance, cinemat_jmi_8k)
-	MCFG_FRAGMENT_ADD(sundance_sound)
+MACHINE_CONFIG_START(cinemat_state::sundance)
+	cinemat_jmi_8k(config);
+	sundance_sound(config);
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_16level)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::tailg, cinemat_nojmi_8k)
-	MCFG_FRAGMENT_ADD(tailg_sound)
+MACHINE_CONFIG_START(cinemat_state::tailg)
+	cinemat_nojmi_8k(config);
+	tailg_sound(config);
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cinemat_state, mux_select_w))
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::warrior, cinemat_jmi_8k)
-	MCFG_FRAGMENT_ADD(warrior_sound)
+MACHINE_CONFIG_START(cinemat_state::warrior)
+	cinemat_jmi_8k(config);
+	warrior_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::armora, cinemat_jmi_16k)
-	MCFG_FRAGMENT_ADD(armora_sound)
+MACHINE_CONFIG_START(cinemat_state::armora)
+	cinemat_jmi_16k(config);
+	armora_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::ripoff, cinemat_jmi_8k)
-	MCFG_FRAGMENT_ADD(ripoff_sound)
+MACHINE_CONFIG_START(cinemat_state::ripoff)
+	cinemat_jmi_8k(config);
+	ripoff_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::starcas, cinemat_jmi_8k)
-	MCFG_FRAGMENT_ADD(starcas_sound)
+MACHINE_CONFIG_START(cinemat_state::starcas)
+	cinemat_jmi_8k(config);
+	starcas_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::solarq, cinemat_jmi_16k)
-	MCFG_FRAGMENT_ADD(solarq_sound)
+MACHINE_CONFIG_START(cinemat_state::solarq)
+	cinemat_jmi_16k(config);
+	solarq_sound(config);
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_64level)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::boxingb, cinemat_jmi_32k)
-	MCFG_FRAGMENT_ADD(boxingb_sound)
+MACHINE_CONFIG_START(cinemat_state::boxingb)
+	cinemat_jmi_32k(config);
+	boxingb_sound(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
@@ -1099,28 +1126,32 @@ MACHINE_CONFIG_DERIVED(cinemat_state::boxingb, cinemat_jmi_32k)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::wotw, cinemat_jmi_16k)
+MACHINE_CONFIG_START(cinemat_state::wotw)
+	cinemat_jmi_16k(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120, 0, 767)
-	MCFG_FRAGMENT_ADD(wotw_sound)
+	wotw_sound(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::wotwc, cinemat_jmi_16k)
-	MCFG_FRAGMENT_ADD(wotw_sound)
+MACHINE_CONFIG_START(cinemat_state::wotwc)
+	cinemat_jmi_16k(config);
+	wotw_sound(config);
 	MCFG_VIDEO_START_OVERRIDE(cinemat_state,cinemat_color)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::demon, cinemat_jmi_16k)
-	MCFG_FRAGMENT_ADD(demon_sound)
+MACHINE_CONFIG_START(cinemat_state::demon)
+	cinemat_jmi_16k(config);
+	demon_sound(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 1024, 0, 805)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(cinemat_state::qb3, cinemat_jmi_32k)
-	MCFG_FRAGMENT_ADD(qb3_sound)
+MACHINE_CONFIG_START(cinemat_state::qb3)
+	cinemat_jmi_32k(config);
+	qb3_sound(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DATA_MAP(data_map_qb3)
 	MCFG_CPU_IO_MAP(io_map_qb3)

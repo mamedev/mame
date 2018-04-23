@@ -40,9 +40,10 @@ class zac_1_state : public genpin_class
 {
 public:
 	zac_1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_p_ram(*this, "ram")
+		: genpin_class(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_ram(*this, "ram")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(ctrl_r);
@@ -55,37 +56,43 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
 	void locomotp(machine_config &config);
 	void zac_1(machine_config &config);
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_ram;
-
-	// driver_device overrides
-	virtual void machine_reset() override;
+	void locomotp_data(address_map &map);
+	void locomotp_io(address_map &map);
+	void locomotp_map(address_map &map);
+	void zac_1_data(address_map &map);
+	void zac_1_io(address_map &map);
+	void zac_1_map(address_map &map);
 private:
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
 	uint8_t m_input_line;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_ram;
+	output_finder<78> m_digits;
 };
 
 
-static ADDRESS_MAP_START( zac_1_map, AS_PROGRAM, 8, zac_1_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(reset_int_w)
-	AM_RANGE(0x1800, 0x18ff) AM_MIRROR(0x300) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void zac_1_state::zac_1_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x13ff).rom();
+	map(0x1400, 0x17ff).w(this, FUNC(zac_1_state::reset_int_w));
+	map(0x1800, 0x18ff).mirror(0x300).ram().share("ram");
+	map(0x1c00, 0x1fff).rom();
+}
 
-static ADDRESS_MAP_START( zac_1_io, AS_IO, 8, zac_1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void zac_1_state::zac_1_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-static ADDRESS_MAP_START( zac_1_data, AS_DATA, 8, zac_1_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
-ADDRESS_MAP_END
+void zac_1_state::zac_1_data(address_map &map)
+{
+	map.unmap_value_high();
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
+}
 
 static INPUT_PORTS_START( zac_1 )
 	PORT_START("TEST")
@@ -233,7 +240,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 	{
 		uint8_t display = (m_out_offs >> 3) & 7;
 		uint8_t digit = m_out_offs & 7;
-		output().set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
+		m_digits[display * 10 + digit] = patterns[m_p_ram[m_out_offs]&15];
 	}
 	else
 	if (m_out_offs == 0x4a) // outhole
@@ -266,26 +273,29 @@ MACHINE_CONFIG_START(zac_1_state::zac_1)
 	MCFG_DEFAULT_LAYOUT(layout_zac_1)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 MACHINE_CONFIG_END
 
 /*************************** LOCOMOTION ********************************/
 
-static ADDRESS_MAP_START( locomotp_map, AS_PROGRAM, 8, zac_1_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x18ff) AM_MIRROR(0x300) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void zac_1_state::locomotp_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x17ff).rom();
+	map(0x1800, 0x18ff).mirror(0x300).ram().share("ram");
+	map(0x1c00, 0x1fff).rom();
+}
 
-static ADDRESS_MAP_START( locomotp_io, AS_IO, 8, zac_1_state)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void zac_1_state::locomotp_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-static ADDRESS_MAP_START( locomotp_data, AS_DATA, 8, zac_1_state)
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(reset_int_r)
-ADDRESS_MAP_END
+void zac_1_state::locomotp_data(address_map &map)
+{
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(zac_1_state::ctrl_r), FUNC(zac_1_state::ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(zac_1_state::reset_int_r));
+}
 
 READ8_MEMBER( zac_1_state::reset_int_r )
 {
@@ -293,7 +303,8 @@ READ8_MEMBER( zac_1_state::reset_int_r )
 	return 0;
 }
 
-MACHINE_CONFIG_DERIVED(zac_1_state::locomotp, zac_1)
+MACHINE_CONFIG_START(zac_1_state::locomotp)
+	zac_1(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(locomotp_map)

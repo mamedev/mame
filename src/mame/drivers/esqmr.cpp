@@ -227,18 +227,20 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 	void mr(machine_config &config);
+	void mr_map(address_map &map);
 };
 
 void esqmr_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( mr_map, AS_PROGRAM, 32, esqmr_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0)
+void esqmr_state::mr_map(address_map &map)
+{
+	map(0x00000000, 0x000fffff).rom().region("maincpu", 0);
 //  AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0xffffffff)
 //  AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)
 //    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
-ADDRESS_MAP_END
+}
 
 WRITE_LINE_MEMBER(esqmr_state::esq5506_otto_irq)
 {

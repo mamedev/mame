@@ -52,25 +52,29 @@ public:
 	{ }
 
 	void zsbc3(machine_config &config);
+	void zsbc3_io(address_map &map);
+	void zsbc3_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
 
-static ADDRESS_MAP_START(zsbc3_mem, AS_PROGRAM, 8, zsbc3_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
-	AM_RANGE( 0x0800, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void zsbc3_state::zsbc3_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START(zsbc3_io, AS_IO, 8, zsbc3_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x0b) //AM_DEVREADWRITE("pio", z80pio_device, read, write) // the control bytes appear to be for a PIO
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x38, 0x38) // unknown device, init byte = C3
-ADDRESS_MAP_END
+void zsbc3_state::zsbc3_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x08, 0x0b); //AM_DEVREADWRITE("pio", z80pio_device, read, write) // the control bytes appear to be for a PIO
+	map(0x28, 0x2b).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x30, 0x33).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x38, 0x38); // unknown device, init byte = C3
+}
 
 /* Input ports */
 static INPUT_PORTS_START( zsbc3 )

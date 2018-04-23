@@ -56,9 +56,11 @@ class namco_30test_state : public driver_device
 {
 public:
 	namco_30test_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
 	uint8_t m_mux_data;
 	uint8_t m_oki_bank;
@@ -75,6 +77,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	void _30test(machine_config &config);
+	void namco_30test_io(address_map &map);
+	void namco_30test_map(address_map &map);
+	output_finder<72> m_digits;
 };
 
 
@@ -83,14 +88,17 @@ static const uint8_t led_map[16] =
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_led_w)
 {
-	output().set_digit_value(0 + offset * 2, led_map[(data & 0xf0) >> 4]);
-	output().set_digit_value(1 + offset * 2, led_map[(data & 0x0f) >> 0]);
+	m_digits[offset * 2] = led_map[data >> 4];
+	m_digits[1 + offset * 2] =  led_map[data & 0x0f];
 }
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_led_rank_w)
 {
-	output().set_digit_value(64 + offset * 2, led_map[(data & 0xf0) >> 4]);
-	output().set_digit_value(65 + offset * 2, led_map[(data & 0x0f) >> 0]);
+	if (offset < 4)
+	{
+		m_digits[64 + offset * 2] = led_map[data >> 4];
+		m_digits[65 + offset * 2] = led_map[data & 0x0f];
+	}
 }
 
 WRITE8_MEMBER(namco_30test_state::namco_30test_lamps_w)
@@ -137,31 +145,33 @@ WRITE8_MEMBER(namco_30test_state::hc11_okibank_w)
 }
 
 
-static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8, namco_30test_state )
-	AM_RANGE(0x0000, 0x003f) AM_RAM // internal I/O
-	AM_RANGE(0x007c, 0x007c) AM_READWRITE(hc11_mux_r,hc11_mux_w)
-	AM_RANGE(0x007e, 0x007e) AM_READWRITE(hc11_okibank_r,hc11_okibank_w)
-	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
-	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
-	AM_RANGE(0x0d80, 0x0dbf) AM_RAM // EEPROM read-back data goes there
-	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+void namco_30test_state::namco_30test_map(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // internal I/O
+	map(0x0040, 0x007f).ram(); // more internal I/O, HC11 change pending
+	map(0x007c, 0x007c).rw(this, FUNC(namco_30test_state::hc11_mux_r), FUNC(namco_30test_state::hc11_mux_w));
+	map(0x007e, 0x007e).rw(this, FUNC(namco_30test_state::hc11_okibank_r), FUNC(namco_30test_state::hc11_okibank_w));
+	map(0x0080, 0x037f).ram(); // internal RAM
+	map(0x0d80, 0x0dbf).ram(); // EEPROM read-back data goes there
+	map(0x2000, 0x2000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	/* 0x401e-0x401f: time */
-	AM_RANGE(0x4000, 0x401f) AM_WRITE(namco_30test_led_w) // 7-seg leds
+	map(0x4000, 0x401f).w(this, FUNC(namco_30test_state::namco_30test_led_w)); // 7-seg leds
 	/* 0x6000: 1st place 7-seg led */
 	/* 0x6001: 2nd place 7-seg led */
 	/* 0x6002: 3rd place 7-seg led */
 	/* 0x6003: current / last play score */
 	/* 0x6004: lamps */
-	AM_RANGE(0x6000, 0x6003) AM_WRITE(namco_30test_led_rank_w)
-	AM_RANGE(0x6004, 0x6004) AM_WRITE(namco_30test_lamps_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x6000, 0x6003).w(this, FUNC(namco_30test_state::namco_30test_led_rank_w));
+	map(0x6004, 0x6004).w(this, FUNC(namco_30test_state::namco_30test_lamps_w));
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8, namco_30test_state )
-	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
+void namco_30test_state::namco_30test_io(address_map &map)
+{
+	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).r(this, FUNC(namco_30test_state::namco_30test_mux_r));
 //  AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
-	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
+	map(MC68HC11_IO_PORTE, MC68HC11_IO_PORTE).portr("SYSTEM");
+}
 
 
 static INPUT_PORTS_START( 30test )
@@ -229,6 +239,7 @@ INPUT_PORTS_END
 
 void namco_30test_state::machine_start()
 {
+	m_digits.resolve();
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_oki_bank));
 }

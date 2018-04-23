@@ -67,6 +67,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void dotrikun(machine_config &config);
+	void dotrikun_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(dotrikun_state::interrupt)
@@ -140,16 +142,18 @@ uint32_t dotrikun_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-static ADDRESS_MAP_START( dotrikun_map, AS_PROGRAM, 8, dotrikun_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x85ff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
-	AM_RANGE(0x8600, 0x87ff) AM_RAM
-ADDRESS_MAP_END
+void dotrikun_state::dotrikun_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x85ff).ram().w(this, FUNC(dotrikun_state::vram_w)).share("vram");
+	map(0x8600, 0x87ff).ram();
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, dotrikun_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_PORT("INPUTS") AM_WRITE(color_w)
-ADDRESS_MAP_END
+void dotrikun_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0xff).portr("INPUTS").w(this, FUNC(dotrikun_state::color_w));
+}
 
 
 /*************************************

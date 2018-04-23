@@ -53,7 +53,10 @@ public:
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
+		, m_cass_led(*this, "cass_led")
 	{ }
+
+	void machine_start() override;
 
 	DECLARE_READ8_MEMBER(super80v_low_r);
 	DECLARE_READ8_MEMBER(super80v_high_r);
@@ -99,6 +102,13 @@ public:
 	void super80e(machine_config &config);
 	void super80d(machine_config &config);
 	void super80v(machine_config &config);
+	void super80_io(address_map &map);
+	void super80_map(address_map &map);
+	void super80e_io(address_map &map);
+	void super80m_map(address_map &map);
+	void super80r_io(address_map &map);
+	void super80v_io(address_map &map);
+	void super80v_map(address_map &map);
 private:
 	uint8_t m_s_options;
 	uint8_t m_portf0;
@@ -136,6 +146,7 @@ private:
 	optional_device<wd2793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
+	output_finder<> m_cass_led;
 };
 
 #endif // MAME_INCLUDES_SUPER80_H

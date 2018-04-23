@@ -27,10 +27,10 @@
 
 *******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(primo_state::primo_vblank_interrupt)
+WRITE_LINE_MEMBER(primo_state::vblank_irq)
 {
-	if (m_nmi)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*******************************************************************************
@@ -78,7 +78,7 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 	// bit 7, 6 - not used
 
 	// bit 5 - VBLANK
-	data |= (machine().first_screen()->vblank()) ? 0x20 : 0x00;
+	data |= m_screen->vblank() ? 0x20 : 0x00;
 
 	// bit 4 - I4 (external bus)
 

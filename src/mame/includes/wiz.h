@@ -86,4 +86,10 @@ public:
 	void kungfut(machine_config &config);
 	void scion(machine_config &config);
 	void stinger(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void kungfut_main_map(address_map &map);
+	void kungfut_sound_map(address_map &map);
+	void stinger_main_map(address_map &map);
+	void stinger_sound_map(address_map &map);
+	void wiz_main_map(address_map &map);
 };

@@ -246,8 +246,7 @@ public:
 		m_s7000_ram(*this, "s7000_ram"),
 		m_sb000_ram(*this, "sb000_ram"),
 		m_sd000_ram(*this, "sd000_ram"),
-		m_sf000_ram(*this, "sf000_ram"),
-		m_io_port(*this, "io_port")
+		m_sf000_ram(*this, "sf000_ram")
 	{
 	}
 
@@ -276,7 +275,6 @@ public:
 	required_shared_ptr<uint8_t> m_sb000_ram;
 	required_shared_ptr<uint8_t> m_sd000_ram;
 	required_shared_ptr<uint8_t> m_sf000_ram;
-	required_shared_ptr<uint8_t> m_io_port;
 
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_wingboard;
@@ -305,8 +303,12 @@ public:
 	uint8_t m_bv_data_bit;
 	uint8_t m_bv_loop_count;
 	uint16_t id023_data;
+	uint8_t m_paldata;
+	uint8_t m_paldata2;
 
 	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
+	DECLARE_WRITE8_MEMBER(paldata_w);
+	DECLARE_WRITE8_MEMBER(paldata2_w);
 	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
 	DECLARE_WRITE8_MEMBER(peplus_duart_w);
 	DECLARE_WRITE8_MEMBER(peplus_cmos_w);
@@ -338,6 +340,8 @@ public:
 	void handle_lightpen();
 
 	void peplus(machine_config &config);
+	void peplus_iomap(address_map &map);
+	void peplus_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -444,11 +448,21 @@ WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 	handle_lightpen();
 }
 
+WRITE8_MEMBER(peplus_state::paldata_w)
+{
+	m_paldata = data;
+}
+
+WRITE8_MEMBER(peplus_state::paldata2_w)
+{
+	m_paldata2 = data;
+}
+
 WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 {
 	m_videoram[m_vid_address] = data;
-	m_palette_ram[m_vid_address] = m_io_port[1];
-	m_palette_ram2[m_vid_address] = m_io_port[3];
+	m_palette_ram[m_vid_address] = m_paldata;
+	m_palette_ram2[m_vid_address] = m_paldata2;
 
 	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
@@ -997,66 +1011,65 @@ GFXDECODE_END
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( peplus_map, AS_PROGRAM, 8, peplus_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
-ADDRESS_MAP_END
+void peplus_state::peplus_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share("prograram");
+}
 
-static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
+void peplus_state::peplus_iomap(address_map &map)
+{
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(peplus_cmos_w) AM_SHARE("cmos")
+	map(0x0000, 0x1fff).ram().w(this, FUNC(peplus_state::peplus_cmos_w)).share("cmos");
 
 	// CRT Controller
-	AM_RANGE(0x2008, 0x2008) AM_WRITE(peplus_crtc_mode_w)
-	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2083, 0x2083) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(peplus_crtc_display_w)
+	map(0x2008, 0x2008).w(this, FUNC(peplus_state::peplus_crtc_mode_w));
+	map(0x2080, 0x2080).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x2081, 0x2081).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2083, 0x2083).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(peplus_state::peplus_crtc_display_w));
 
 	// Superboard Data
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("s3000_ram")
+	map(0x3000, 0x3fff).ram().share("s3000_ram");
 
 	// Sound and Dipswitches
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	map(0x4000, 0x4000).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x4004, 0x4004).portr("SW1") /* likely ay8910 input port, not direct */ .w("aysnd", FUNC(ay8910_device::data_w));
 
 	// Superboard Data
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("s5000_ram")
+	map(0x5000, 0x5fff).ram().share("s5000_ram");
 
 	// Background Color Latch
-	AM_RANGE(0x6000, 0x6000) AM_READ(peplus_bgcolor_r) AM_WRITE(peplus_bgcolor_w)
+	map(0x6000, 0x6000).r(this, FUNC(peplus_state::peplus_bgcolor_r)).w(this, FUNC(peplus_state::peplus_bgcolor_w));
 
 	// Bogus Location for Video RAM
-	AM_RANGE(0x06001, 0x06400) AM_RAM AM_SHARE("videoram")
+	map(0x06001, 0x06400).ram().share("videoram");
 
 	// Superboard Data
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("s7000_ram")
+	map(0x7000, 0x7fff).ram().share("s7000_ram");
 
 	// Input Bank A, Output Bank C
-	AM_RANGE(0x8000, 0x8000) AM_READ(peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
+	map(0x8000, 0x8000).r(this, FUNC(peplus_state::peplus_input_bank_a_r)).w(this, FUNC(peplus_state::peplus_output_bank_c_w));
 
 	// Drop Door, I2C EEPROM Writes
-	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_WRITE(i2c_nvram_w)
+	map(0x9000, 0x9000).r(this, FUNC(peplus_state::peplus_dropdoor_r)).w(this, FUNC(peplus_state::i2c_nvram_w));
 
 	// Input Banks B & C, Output Bank B
-	AM_RANGE(0xa000, 0xa000) AM_READ(peplus_input0_r) AM_WRITE(peplus_output_bank_b_w)
+	map(0xa000, 0xa000).r(this, FUNC(peplus_state::peplus_input0_r)).w(this, FUNC(peplus_state::peplus_output_bank_b_w));
 
 	// Superboard Data
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_SHARE("sb000_ram")
+	map(0xb000, 0xbfff).ram().share("sb000_ram");
 
 	// Output Bank A
-	AM_RANGE(0xc000, 0xc000) AM_READ(peplus_watchdog_r) AM_WRITE(peplus_output_bank_a_w)
+	map(0xc000, 0xc000).r(this, FUNC(peplus_state::peplus_watchdog_r)).w(this, FUNC(peplus_state::peplus_output_bank_a_w));
 
 	// Superboard Data
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("sd000_ram")
+	map(0xd000, 0xdfff).ram().share("sd000_ram");
 
 	// DUART
-	AM_RANGE(0xe000, 0xe00f) AM_READWRITE(peplus_duart_r, peplus_duart_w)
+	map(0xe000, 0xe00f).rw(this, FUNC(peplus_state::peplus_duart_r), FUNC(peplus_state::peplus_duart_w));
 
 	// Superboard Data
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sf000_ram")
-
-	/* Ports start here */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_RAM AM_SHARE("io_port")
-ADDRESS_MAP_END
+	map(0xf000, 0xffff).ram().share("sf000_ram");
+}
 
 
 /*************************
@@ -1140,9 +1153,9 @@ static INPUT_PORTS_START( peplus_schip )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1168,9 +1181,9 @@ static INPUT_PORTS_START( nonplus_poker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 
 	PORT_MODIFY("SW1")
@@ -1218,9 +1231,9 @@ static INPUT_PORTS_START( peplus_poker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1246,9 +1259,9 @@ static INPUT_PORTS_START( peplus_bjack )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1279,9 +1292,9 @@ static INPUT_PORTS_START( peplus_keno )
 	PORT_BIT( 0xffff, 0x200, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 1024) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1307,9 +1320,9 @@ static INPUT_PORTS_START( peplus_slots )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) // Bill Acceptor
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Card Cage") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
@@ -1331,6 +1344,8 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	MCFG_CPU_ADD("maincpu", I80C32, XTAL(20'000'000)/2) /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(peplus_map)
 	MCFG_CPU_IO_MAP(peplus_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(peplus_state, paldata_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(peplus_state, paldata2_w))
 
 	MCFG_NVRAM_ADD_0FILL("cmos")
 
@@ -8322,6 +8337,20 @@ ROM_START( peps0239 ) /* Normal board : Jackpot Jewels Slots (PS0239) - Payout 9
 	ROM_LOAD( "cap1151.u50", 0x0000, 0x0100, CRC(f8079ea2) SHA1(92dc104a76b3e5fa272f2f769a328b238c1702ed) )
 ROM_END
 
+ROM_START( peps0280 ) /* Normal board : 4th of July Slots (PS0280) - Payout 90.04% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ps0280_560-957.u68",   0x00000, 0x10000, CRC(91bd2522) SHA1(9449802726e12fa462656a41a1acea455319f5cd) ) /* 3 Coins Max / 1 Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1225.u72",   0x00000, 0x8000, CRC(49fe4fff) SHA1(f886791668427f9d7d42da07cea94c024413a983) )
+	ROM_LOAD( "mgo-cg1225.u73",   0x08000, 0x8000, CRC(b6982a78) SHA1(d3853f14d4a4fad9633f482bdd24756d4416d9eb) )
+	ROM_LOAD( "mbo-cg1225.u74",   0x10000, 0x8000, CRC(1363c0bd) SHA1(70d11a201b228b8d51d8a0b16e0ef8d799f8e346) )
+	ROM_LOAD( "mxo-cg1225.u75",   0x18000, 0x8000, CRC(a3ba92d9) SHA1(43285157ed30a93dd2e96468fa1086eab069a58b) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1225.u50", 0x0000, 0x0100, CRC(3fa46756) SHA1(a7f3fd6aaa64f3c3ed5e83068b42b39a6dc7f00d) )
+ROM_END
+
 ROM_START( peps0296 ) /* Normal board : Haywire Slots (PS0296) - Payout 90.00% */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0296_561-959.u68",   0x00000, 0x10000, CRC(da871550) SHA1(99e7a4fc77731b185751622ba2e08a44ad8eb7f9) ) /* 3 Coins Max / 1 Line */
@@ -14440,6 +14469,7 @@ GAMEL(1996, peps0092, peps0047, peplus, peplus_slots,   peplus_state, peplus,   
 GAMEL(1996, peps0206, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0206) Red White & Blue Slots",           0, layout_pe_slots )
 GAMEL(1996, peps0207, peps0021, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0207) Red White & Blue Slots",           0, layout_pe_slots )
 GAMEL(1996, peps0239, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0239) Jackpot Jewels Slots",             0, layout_pe_slots )
+GAMEL(1996, peps0280, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0280) 4th of July Slots",                0, layout_pe_slots )
 GAMEL(1996, peps0296, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0296) Haywire Slots",                    0, layout_pe_slots )
 GAMEL(1996, peps0298, peps0042, peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0298) Double Diamond Slots",             0, layout_pe_slots )
 GAMEL(1996, peps0308, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0308) Double Jackpot Slots",             0, layout_pe_slots )

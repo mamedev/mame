@@ -7,15 +7,14 @@
     Interface file for Reality Signal Processor (RSP) vector extensions.
 
 ***************************************************************************/
+#ifndef MAME_CPU_RSP_RSPCP2_H
+#define MAME_CPU_RSP_RSPCP2_H
 
 #pragma once
 
-#ifndef __RSPCP2_H__
-#define __RSPCP2_H__
-
-#include "cpu/drcuml.h"
 #include "rsp.h"
 #include "rspdiv.h"
+#include "cpu/drcuml.h"
 
 #define SIMD_OFF        (1)
 
@@ -74,25 +73,25 @@ union ACCUMULATOR_REG
 
 struct compiler_state;
 
-class rsp_cop2
+class rsp_device::cop2
 {
 	friend class rsp_device;
 
 public:
-	rsp_cop2(rsp_device &rsp, running_machine &machine);
+	cop2(rsp_device &rsp, running_machine &machine);
 
 protected:
 	virtual void init();
 	virtual void start();
 
-	virtual bool generate_cop2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return true; }
-	virtual bool generate_lwc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return true; }
-	virtual bool generate_swc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return true; }
+	virtual bool generate_cop2(drcuml_block &block, rsp_device::compiler_state &compiler, const opcode_desc *desc) { return true; }
+	virtual bool generate_lwc2(drcuml_block &block, rsp_device::compiler_state &compiler, const opcode_desc *desc) { return true; }
+	virtual bool generate_swc2(drcuml_block &block, rsp_device::compiler_state &compiler, const opcode_desc *desc) { return true; }
 
 	virtual void state_string_export(const int index, std::string &str) const;
 
 public:
-	virtual ~rsp_cop2();
+	virtual ~cop2();
 
 	virtual void lbv() { }
 	virtual void lsv() { }
@@ -172,7 +171,7 @@ public:
 	void            dump_dmem();
 
 protected:
-	virtual bool     generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return true; }
+	virtual bool     generate_vector_opcode(drcuml_block &block, rsp_device::compiler_state &compiler, const opcode_desc *desc) { return true; }
 
 	uint16_t          SATURATE_ACCUM(int accum, int slice, uint16_t negative, uint16_t positive);
 
@@ -393,4 +392,4 @@ private:
 	uint32_t          m_div_out;
 };
 
-#endif /* __RSPCP2_H__ */
+#endif // MAME_CPU_RSP_RSPCP2_H

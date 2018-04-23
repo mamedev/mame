@@ -44,7 +44,6 @@ protected:
 };
 
 // device type definition
-extern const device_type A2BUS_ECHOII;
 DECLARE_DEVICE_TYPE(A2BUS_ECHOII, a2bus_echoii_device)
 
 #endif // MAME_BUS_A2BUS_A2ECHOII_H

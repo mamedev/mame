@@ -19,9 +19,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map1, 32);
-	DECLARE_ADDRESS_MAP(map2, 32);
-	DECLARE_ADDRESS_MAP(map3, 32);
+	void map1(address_map &map);
+	void map2(address_map &map);
+	void map3(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(GEFORCE_7600GS, geforce_7600gs_device)

@@ -25,6 +25,8 @@ public:
 	{ }
 
 	void summit(machine_config &config);
+	void sumt_map(address_map &map);
+	void sumt_portmap(address_map &map);
 protected:
 
 	// devices
@@ -32,13 +34,15 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( sumt_map, AS_PROGRAM, 8, sumt8035_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void sumt8035_state::sumt_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
-static ADDRESS_MAP_START( sumt_portmap, AS_IO, 8, sumt8035_state )
-ADDRESS_MAP_END
+void sumt8035_state::sumt_portmap(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( summit )

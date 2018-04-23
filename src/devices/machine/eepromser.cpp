@@ -178,40 +178,6 @@ eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconf
 
 
 //-------------------------------------------------
-//  static_set_address_bits - configuration helper
-//  to set the number of address bits in the
-//  serial commands
-//-------------------------------------------------
-
-void eeprom_serial_base_device::static_set_address_bits(device_t &device, int addrbits)
-{
-	downcast<eeprom_serial_base_device &>(device).m_command_address_bits = addrbits;
-}
-
-
-//-------------------------------------------------
-//  static_enable_streaming - configuration helper
-//  to enable streaming data
-//-------------------------------------------------
-
-void eeprom_serial_base_device::static_enable_streaming(device_t &device)
-{
-	downcast<eeprom_serial_base_device &>(device).m_streaming_enabled = true;
-}
-
-
-//-----------------------------------------------------------------
-//  static_enable_output_on_falling_clock - configuration helper
-//  to enable updating the output on the falling edge of the clock
-//-----------------------------------------------------------------
-
-void eeprom_serial_base_device::static_enable_output_on_falling_clock(device_t &device)
-{
-	downcast<eeprom_serial_base_device &>(device).m_output_on_falling_clock_enabled = true;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -1160,8 +1126,8 @@ WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::di_write) { base_di_write(state);
 eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) \
 	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, tag, owner) \
 { \
-	static_set_size(*this, _cells, _bits); \
-	static_set_address_bits(*this, _addrbits); \
+	set_size(_cells, _bits); \
+	set_address_bits(_addrbits); \
 } \
 DEFINE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device, #_lowercase "_" #_bits, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")")
 

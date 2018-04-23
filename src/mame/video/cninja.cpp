@@ -127,6 +127,7 @@ uint32_t cninja_state::screen_update_cninja(screen_device &screen, bitmap_ind16 
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -184,6 +185,7 @@ uint32_t cninja_state::screen_update_edrandy(screen_device &screen, bitmap_ind16
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -219,6 +221,7 @@ uint32_t cninja_state::screen_update_robocop2(screen_device &screen, bitmap_ind1
 
 	/* Update playfields */
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -260,8 +263,11 @@ uint32_t cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	uint16_t priority = m_priority;
 
-
+	// sprites are flipped relative to tilemaps
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen1->set_flip_screen(!BIT(flip, 7));
+	m_sprgen2->set_flip_screen(!BIT(flip, 7));
+
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -270,8 +276,8 @@ uint32_t cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32
 
 	m_sprgen1->set_alt_format(true);
 	m_sprgen2->set_alt_format(true);
-	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 
 
 	/* There is no priority prom on this board, but there is a

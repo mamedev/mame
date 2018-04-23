@@ -54,23 +54,27 @@ public:
 	DECLARE_READ8_MEMBER( pc1500_kb_r );
 	DECLARE_PALETTE_INIT(pc1500);
 	void pc1500(machine_config &config);
+	void pc1500_mem(address_map &map);
+	void pc1500_mem_io(address_map &map);
 };
 
-static ADDRESS_MAP_START( pc1500_mem , AS_PROGRAM, 8, pc1500_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff) AM_ROM    //module ROM/RAM
-	AM_RANGE( 0x4000, 0x47ff) AM_RAM    //user RAM
-	AM_RANGE( 0x4800, 0x6fff) AM_RAM    //expansion RAM
-	AM_RANGE( 0x7000, 0x71ff) AM_RAM    AM_MIRROR(0x0600)   AM_SHARE("lcd_data")
-	AM_RANGE( 0x7800, 0x7bff) AM_RAM    AM_REGION("maincpu", 0x7800)    AM_MIRROR(0x0400)
-	AM_RANGE( 0xa000, 0xbfff) AM_ROM    //expansion ROM
-	AM_RANGE( 0xc000, 0xffff) AM_ROM    //system ROM
-ADDRESS_MAP_END
+void pc1500_state::pc1500_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom();    //module ROM/RAM
+	map(0x4000, 0x47ff).ram();    //user RAM
+	map(0x4800, 0x6fff).ram();    //expansion RAM
+	map(0x7000, 0x71ff).ram().mirror(0x0600).share("lcd_data");
+	map(0x7800, 0x7bff).ram().region("maincpu", 0x7800).mirror(0x0400);
+	map(0xa000, 0xbfff).rom();    //expansion ROM
+	map(0xc000, 0xffff).rom();    //system ROM
+}
 
-static ADDRESS_MAP_START( pc1500_mem_io , AS_IO, 8, pc1500_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0xf000, 0xf00f) AM_DEVREADWRITE("lh5810", lh5810_device, data_r, data_w)
-ADDRESS_MAP_END
+void pc1500_state::pc1500_mem_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf000, 0xf00f).rw("lh5810", FUNC(lh5810_device::data_r), FUNC(lh5810_device::data_w));
+}
 
 READ8_MEMBER( pc1500_state::pc1500_kb_r )
 {

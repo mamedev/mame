@@ -53,6 +53,7 @@ public:
 	DECLARE_PALETTE_INIT(sealy);
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sealy(machine_config &config);
+	void sealy_map(address_map &map);
 };
 
 
@@ -69,9 +70,10 @@ uint32_t sealy_state::screen_update_sealy(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-static ADDRESS_MAP_START( sealy_map, AS_PROGRAM, 16, sealy_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-ADDRESS_MAP_END
+void sealy_state::sealy_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).rom();
+}
 
 
 static INPUT_PORTS_START( sealy )

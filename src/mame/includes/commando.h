@@ -54,11 +54,14 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_commando(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(commando_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void commando(machine_config &config);
+	void commando_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
 };

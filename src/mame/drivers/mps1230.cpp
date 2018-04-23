@@ -99,6 +99,7 @@ public:
 
 	void mps1000(machine_config &config);
 	void mps1230(machine_config &config);
+	void mps1230_map(address_map &map);
 private:
 };
 
@@ -122,11 +123,12 @@ void mps1230_state::machine_reset()
     ADDRESS MAP
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mps1230_map, AS_PROGRAM, 8, mps1230_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM // as per the service manual
-	AM_RANGE(0xff80, 0xffff) AM_RAM // internal in cpu
-ADDRESS_MAP_END
+void mps1230_state::mps1230_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0xc000, 0xdfff).ram(); // as per the service manual
+	map(0xff80, 0xffff).ram(); // internal in cpu
+}
 
 /***************************************************************************
     INPUT PORTS

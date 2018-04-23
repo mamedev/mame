@@ -60,11 +60,13 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	void aceex2814(machine_config &config);
+	void aceex2814_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( aceex2814_map, AS_PROGRAM, 8, aceex2814_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void aceex2814_state::aceex2814_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
 static INPUT_PORTS_START( aceex2814 )
 INPUT_PORTS_END

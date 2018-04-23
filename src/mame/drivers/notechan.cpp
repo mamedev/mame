@@ -315,6 +315,8 @@ public:
 	DECLARE_WRITE8_MEMBER(out_fa_w);
 	DECLARE_WRITE8_MEMBER(out_ff_w);
 	void notechan(machine_config &config);
+	void notechan_map(address_map &map);
+	void notechan_port_map(address_map &map);
 };
 
 
@@ -322,20 +324,22 @@ public:
 *           Memory Map Definition            *
 *********************************************/
 
-static ADDRESS_MAP_START( notechan_map, AS_PROGRAM, 8, notechan_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-ADDRESS_MAP_END
+void notechan_state::notechan_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xa000, 0xbfff).ram();
+}
 
-static ADDRESS_MAP_START( notechan_port_map, AS_IO, 8, notechan_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN0") AM_WRITE(out_f8_w)
-	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN1") AM_WRITE(out_f9_w)
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN2") AM_WRITE(out_fa_w)
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")
-	AM_RANGE(0xff, 0xff) AM_WRITE(out_ff_w)  // watchdog reset? (written immediately upon reset, INT and NMI)
-ADDRESS_MAP_END
+void notechan_state::notechan_port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xf8, 0xf8).portr("IN0").w(this, FUNC(notechan_state::out_f8_w));
+	map(0xf9, 0xf9).portr("IN1").w(this, FUNC(notechan_state::out_f9_w));
+	map(0xfa, 0xfa).portr("IN2").w(this, FUNC(notechan_state::out_fa_w));
+	map(0xfb, 0xfb).portr("IN3");
+	map(0xff, 0xff).w(this, FUNC(notechan_state::out_ff_w));  // watchdog reset? (written immediately upon reset, INT and NMI)
+}
 
 
 /*********************************************

@@ -10,8 +10,8 @@
  *
  ****************************************************************************/
 
-#ifndef GAMECOM_H_
-#define GAMECOM_H_
+#ifndef MAME_INCLUDES_GAMECOM_H
+#define MAME_INCLUDES_GAMECOM_H
 
 #include "cpu/sm8500/sm8500.h"
 #include "sound/dac.h"
@@ -216,6 +216,7 @@ public:
 		, m_p_videoram(*this,"videoram")
 		, m_p_nvram(*this,"nvram")
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_dac(*this, "dac")
 		, m_dac0(*this, "dac0")
 		, m_dac1(*this, "dac1")
@@ -251,6 +252,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gamecom(machine_config &config);
+	void gamecom_mem_map(address_map &map);
 private:
 	uint8_t *m_p_ram;
 	uint8_t *m_cart_ptr;
@@ -281,6 +283,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_nvram;
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<dac_byte_interface> m_dac;
 	required_device<dac_byte_interface> m_dac0;
 	required_device<dac_byte_interface> m_dac1;
@@ -298,4 +301,4 @@ private:
 	required_ioport_array<13> m_io_grid;
 };
 
-#endif /* GAMECOM_H_ */
+#endif // MAME_INCLUDES_GAMECOM_H

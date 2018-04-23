@@ -53,7 +53,7 @@ public:
 		m_vram(*this, "vram"),
 		m_control(*this, "control") { }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<tms34010_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<tlc34076_device> m_tlc34076;
@@ -95,6 +95,10 @@ public:
 	void ghoshunt(machine_config &config);
 	void tickee(machine_config &config);
 	void mouseatk(machine_config &config);
+	void ghoshunt_map(address_map &map);
+	void mouseatk_map(address_map &map);
+	void rapidfir_map(address_map &map);
+	void tickee_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -436,79 +440,83 @@ WRITE16_MEMBER(tickee_state::sound_bank_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16, tickee_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8("ym1", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x04200000, 0x0420001f) AM_DEVWRITE8("ym1", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREAD8("ym2", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x04200100, 0x0420011f) AM_DEVWRITE8("ym2", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
-	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP        /* seems to be a bug in their code */
-	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void tickee_state::tickee_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("vram");
+	map(0x02000000, 0x02ffffff).rom().region("user1", 0);
+	map(0x04000000, 0x04003fff).ram().share("nvram");
+	map(0x04100000, 0x041000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x04200000, 0x0420000f).r("ym1", FUNC(ay8910_device::data_r)).umask16(0x00ff);
+	map(0x04200000, 0x0420001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x04200100, 0x0420010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
+	map(0x04200100, 0x0420011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x04400000, 0x0440007f).w(this, FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04400040, 0x0440004f).portr("IN2");
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
+	map(0xff000000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 /* addreses in the 04x range shifted slightly...*/
-static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16, tickee_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x04100000, 0x04103fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04200000, 0x042000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0x04300000, 0x0430000f) AM_DEVREAD8("ym1", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x04300000, 0x0430001f) AM_DEVWRITE8("ym1", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0x04300100, 0x0430010f) AM_DEVREAD8("ym2", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x04300100, 0x0430011f) AM_DEVWRITE8("ym2", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0x04500000, 0x0450007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP        /* seems to be a bug in their code */
-	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void tickee_state::ghoshunt_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("vram");
+	map(0x02000000, 0x02ffffff).rom().region("user1", 0);
+	map(0x04100000, 0x04103fff).ram().share("nvram");
+	map(0x04200000, 0x042000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x04300000, 0x0430000f).r("ym1", FUNC(ay8910_device::data_r)).umask16(0x00ff);
+	map(0x04300000, 0x0430001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x04300100, 0x0430010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
+	map(0x04300100, 0x0430011f).w("ym2", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x04500000, 0x0450007f).w(this, FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
+	map(0xff000000, 0xffffffff).rom().region("user1", 0);
+}
 
 
-static ADDRESS_MAP_START( mouseatk_map, AS_PROGRAM, 16, tickee_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8("ym", ay8910_device, data_r, 0x00ff)
-	AM_RANGE(0x04200000, 0x0420000f) AM_DEVWRITE8("ym", ay8910_device, address_data_w, 0x00ff)
-	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
-	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2") // ?
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP        /* seems to be a bug in their code */
-	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void tickee_state::mouseatk_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("vram");
+	map(0x02000000, 0x02ffffff).rom().region("user1", 0);
+	map(0x04000000, 0x04003fff).ram().share("nvram");
+	map(0x04100000, 0x041000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x04200000, 0x0420000f).r("ym", FUNC(ay8910_device::data_r)).umask16(0x00ff);
+	map(0x04200000, 0x0420000f).w("ym", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x04200100, 0x0420010f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x04400000, 0x0440007f).w(this, FUNC(tickee_state::tickee_control_w)).share("control");
+	map(0x04400040, 0x0440004f).portr("IN2"); // ?
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xc0000240, 0xc000025f).nopw();        /* seems to be a bug in their code */
+	map(0xff000000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 /* newer hardware */
-static ADDRESS_MAP_START( rapidfir_map, AS_PROGRAM, 16, tickee_state )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x02000000, 0x027fffff) AM_READWRITE(rapidfir_transparent_r, rapidfir_transparent_w)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xfc000000, 0xfc00000f) AM_READ(rapidfir_gun1_r)
-	AM_RANGE(0xfc000100, 0xfc00010f) AM_READ(rapidfir_gun2_r)
-	AM_RANGE(0xfc000400, 0xfc00040f) AM_READ(ffff_r)
-	AM_RANGE(0xfc000500, 0xfc00050f) AM_NOP
-	AM_RANGE(0xfc000600, 0xfc00060f) AM_WRITE(rapidfir_control_w)
-	AM_RANGE(0xfc000700, 0xfc00070f) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xfc000800, 0xfc00080f) AM_READ_PORT("IN0")
-	AM_RANGE(0xfc000900, 0xfc00090f) AM_READ_PORT("IN1")
-	AM_RANGE(0xfc000a00, 0xfc000a0f) AM_READ_PORT("IN2")
-	AM_RANGE(0xfc000b00, 0xfc000b0f) AM_READ_PORT("DSW0")
-	AM_RANGE(0xfc000c00, 0xfc000c1f) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc000e00, 0xfc000e1f) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0xfc100000, 0xfc1000ff) AM_MIRROR(0x80000) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
-	AM_RANGE(0xfc200000, 0xfc207fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xfc300000, 0xfc30000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xfc400010, 0xfc40001f) AM_READWRITE(ff7f_r, ff7f_w)
-	AM_RANGE(0xfe000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void tickee_state::rapidfir_map(address_map &map)
+{
+	map(0x00000000, 0x007fffff).ram().share("vram");
+	map(0x02000000, 0x027fffff).rw(this, FUNC(tickee_state::rapidfir_transparent_r), FUNC(tickee_state::rapidfir_transparent_w));
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xfc000000, 0xfc00000f).r(this, FUNC(tickee_state::rapidfir_gun1_r));
+	map(0xfc000100, 0xfc00010f).r(this, FUNC(tickee_state::rapidfir_gun2_r));
+	map(0xfc000400, 0xfc00040f).r(this, FUNC(tickee_state::ffff_r));
+	map(0xfc000500, 0xfc00050f).noprw();
+	map(0xfc000600, 0xfc00060f).w(this, FUNC(tickee_state::rapidfir_control_w));
+	map(0xfc000700, 0xfc00070f).w(this, FUNC(tickee_state::sound_bank_w));
+	map(0xfc000800, 0xfc00080f).portr("IN0");
+	map(0xfc000900, 0xfc00090f).portr("IN1");
+	map(0xfc000a00, 0xfc000a0f).portr("IN2");
+	map(0xfc000b00, 0xfc000b0f).portr("DSW0");
+	map(0xfc000c00, 0xfc000c1f).portr("DSW1");
+	map(0xfc000e00, 0xfc000e1f).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
+	map(0xfc100000, 0xfc1000ff).mirror(0x80000).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0xfc200000, 0xfc207fff).ram().share("nvram");
+	map(0xfc300000, 0xfc30000f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0xfc400010, 0xfc40001f).rw(this, FUNC(tickee_state::ff7f_r), FUNC(tickee_state::ff7f_w));
+	map(0xfe000000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 
@@ -544,8 +552,8 @@ static INPUT_PORTS_START( tickee )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r) /* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r) /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -602,8 +610,8 @@ static INPUT_PORTS_START( ghoshunt )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)  /* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)  /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -618,8 +626,8 @@ static INPUT_PORTS_START( ghoshunt )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)  /* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)  /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -663,8 +671,8 @@ static INPUT_PORTS_START( mouseatk )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r) /* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r) /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)  /* left ticket status */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -788,7 +796,8 @@ MACHINE_CONFIG_START(tickee_state::tickee)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(tickee_state::ghoshunt, tickee)
+MACHINE_CONFIG_START(tickee_state::ghoshunt)
+	tickee(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

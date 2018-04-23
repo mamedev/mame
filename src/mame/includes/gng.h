@@ -56,4 +56,7 @@ public:
 	required_device<palette_device> m_palette;
 	void gng(machine_config &config);
 	void diamond(machine_config &config);
+	void diamond_map(address_map &map);
+	void gng_map(address_map &map);
+	void sound_map(address_map &map);
 };

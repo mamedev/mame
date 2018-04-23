@@ -58,40 +58,53 @@ void marineb_state::machine_reset()
 
 void marineb_state::machine_start()
 {
+	save_item(NAME(m_irq_mask));
 }
 
 WRITE_LINE_MEMBER(marineb_state::irq_mask_w)
 {
 	m_irq_mask = state;
+	if (!m_irq_mask)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( marineb_map, AS_PROGRAM, 8, marineb_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(marineb_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8c00, 0x8c3f) AM_RAM AM_SHARE("spriteram")  /* Hoccer only */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(marineb_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(marineb_column_scroll_w)
-	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(marineb_palette_bank_0_w)
-	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(marineb_palette_bank_1_w)
-	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("outlatch", ls259_device, write_d0)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM") AM_WRITENOP     /* also watchdog */
-ADDRESS_MAP_END
+WRITE_LINE_MEMBER(marineb_state::nmi_mask_w)
+{
+	m_irq_mask = state;
+	if (!m_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+void marineb_state::marineb_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8bff).ram().w(this, FUNC(marineb_state::marineb_videoram_w)).share("videoram");
+	map(0x8c00, 0x8c3f).ram().share("spriteram");  /* Hoccer only */
+	map(0x9000, 0x93ff).ram().w(this, FUNC(marineb_state::marineb_colorram_w)).share("colorram");
+	map(0x9800, 0x9800).w(this, FUNC(marineb_state::marineb_column_scroll_w));
+	map(0x9a00, 0x9a00).w(this, FUNC(marineb_state::marineb_palette_bank_0_w));
+	map(0x9c00, 0x9c00).w(this, FUNC(marineb_state::marineb_palette_bank_1_w));
+	map(0xa000, 0xa007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xa000, 0xa000).portr("P2");
+	map(0xa800, 0xa800).portr("P1");
+	map(0xb000, 0xb000).portr("DSW");
+	map(0xb800, 0xb800).portr("SYSTEM").nopw();     /* also watchdog */
+}
 
 
-static ADDRESS_MAP_START( marineb_io_map, AS_IO, 8, marineb_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void marineb_state::marineb_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x09).w("ay1", FUNC(ay8910_device::address_data_w));
+}
 
-static ADDRESS_MAP_START( wanted_io_map, AS_IO, 8, marineb_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
-ADDRESS_MAP_END
+void marineb_state::wanted_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8912_device::address_data_w));
+	map(0x02, 0x03).w("ay2", FUNC(ay8912_device::address_data_w));
+}
 
 
 static INPUT_PORTS_START( marineb )
@@ -513,16 +526,16 @@ static GFXDECODE_START( hopprobo )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(marineb_state::marineb_vblank_irq)
+WRITE_LINE_MEMBER(marineb_state::marineb_vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(marineb_state::wanted_vblank_irq)
+WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -532,10 +545,9 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)   /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(marineb_map)
 	MCFG_CPU_IO_MAP(marineb_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", marineb_state,  marineb_vblank_irq)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(marineb_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(marineb_state, nmi_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(marineb_state, flipscreen_y_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(marineb_state, flipscreen_x_w))
 
@@ -547,6 +559,7 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_marineb)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(marineb_state, marineb_vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", marineb)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -559,7 +572,8 @@ MACHINE_CONFIG_START(marineb_state::marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::changes, marineb)
+MACHINE_CONFIG_START(marineb_state::changes)
+	marineb(config);
 
 	/* basic machine hardware */
 
@@ -570,7 +584,8 @@ MACHINE_CONFIG_DERIVED(marineb_state::changes, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::springer, marineb)
+MACHINE_CONFIG_START(marineb_state::springer)
+	marineb(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")
@@ -583,7 +598,8 @@ MACHINE_CONFIG_DERIVED(marineb_state::springer, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::hoccer, marineb)
+MACHINE_CONFIG_START(marineb_state::hoccer)
+	marineb(config);
 
 	/* basic machine hardware */
 
@@ -594,17 +610,21 @@ MACHINE_CONFIG_DERIVED(marineb_state::hoccer, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::wanted, marineb)
+MACHINE_CONFIG_START(marineb_state::wanted)
+	marineb(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(wanted_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", marineb_state,  wanted_vblank_irq)
+
+	MCFG_DEVICE_MODIFY("outlatch")
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(marineb_state, irq_mask_w))
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", wanted)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(marineb_state, wanted_vblank_irq))
 
 	// sound hardware (PSG type verified only for bcruzm12)
 	MCFG_SOUND_REPLACE("ay1", AY8912, SOUND_CLOCK)
@@ -615,7 +635,8 @@ MACHINE_CONFIG_DERIVED(marineb_state::wanted, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::hopprobo, marineb)
+MACHINE_CONFIG_START(marineb_state::hopprobo)
+	marineb(config);
 
 	/* basic machine hardware */
 
@@ -626,7 +647,8 @@ MACHINE_CONFIG_DERIVED(marineb_state::hopprobo, marineb)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(marineb_state::bcruzm12, wanted)
+MACHINE_CONFIG_START(marineb_state::bcruzm12)
+	wanted(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")

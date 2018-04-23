@@ -121,20 +121,22 @@ WRITE8_MEMBER( tmc600_state::printer_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tmc600_map, AS_PROGRAM, 8, tmc600_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0xf400, 0xf7ff) AM_DEVICE(CDP1869_TAG, cdp1869_device, char_map)
-	AM_RANGE(0xf800, 0xffff) AM_DEVICE(CDP1869_TAG, cdp1869_device, page_map)
-ADDRESS_MAP_END
+void tmc600_state::tmc600_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x7fff).ram();
+	map(0xf400, 0xf7ff).m(m_vis, FUNC(cdp1869_device::char_map));
+	map(0xf800, 0xffff).m(m_vis, FUNC(cdp1869_device::page_map));
+}
 
-static ADDRESS_MAP_START( tmc600_io_map, AS_IO, 8, tmc600_state )
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1852_KB_TAG, cdp1852_device, write)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(CDP1852_TMC700_TAG, cdp1852_device, write)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(rtc_r, vismac_data_w)
+void tmc600_state::tmc600_io_map(address_map &map)
+{
+	map(0x03, 0x03).w(m_bwio, FUNC(cdp1852_device::write));
+	map(0x04, 0x04).w(CDP1852_TMC700_TAG, FUNC(cdp1852_device::write));
+	map(0x05, 0x05).rw(this, FUNC(tmc600_state::rtc_r), FUNC(tmc600_state::vismac_data_w));
 //  AM_RANGE(0x06, 0x06) AM_WRITE(floppy_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(vismac_register_w)
-ADDRESS_MAP_END
+	map(0x07, 0x07).w(this, FUNC(tmc600_state::vismac_register_w));
+}
 
 /* Input Ports */
 
@@ -263,7 +265,7 @@ MACHINE_CONFIG_START(tmc600_state::tmc600)
 	MCFG_COSMAC_SC_CALLBACK(WRITE8(tmc600_state, sc_w))
 
 	// sound and video hardware
-	MCFG_FRAGMENT_ADD(tmc600_video)
+	tmc600_video(config);
 
 	// keyboard output latch
 	MCFG_DEVICE_ADD(CDP1852_KB_TAG, CDP1852, XTAL(3'570'000)/8) // clock is CDP1802 TPB

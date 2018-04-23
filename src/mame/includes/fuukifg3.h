@@ -89,6 +89,9 @@ public:
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 
 	void fuuki32(machine_config &config);
+	void fuuki32_map(address_map &map);
+	void fuuki32_sound_io_map(address_map &map);
+	void fuuki32_sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

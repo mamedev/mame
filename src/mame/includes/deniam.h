@@ -82,4 +82,8 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	void deniam16c(machine_config &config);
 	void deniam16b(machine_config &config);
+	void deniam16b_map(address_map &map);
+	void deniam16c_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 };

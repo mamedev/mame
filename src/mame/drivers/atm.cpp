@@ -37,6 +37,9 @@ public:
 
 	void atm(machine_config &config);
 	void atmtb2(machine_config &config);
+	void atm_io(address_map &map);
+	void atm_mem(address_map &map);
+	void atm_switch(address_map &map);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -108,31 +111,34 @@ READ8_MEMBER(atm_state::beta_disable_r)
 	return m_program->read_byte(offset + 0x4000);
 }
 
-static ADDRESS_MAP_START(atm_mem, AS_PROGRAM, 8, atm_state)
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void atm_state::atm_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankrw("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, status_r, command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xff00)
-	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(atm_port_7ffd_w)  AM_MIRROR(0x3ffd)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
-ADDRESS_MAP_END
+void atm_state::atm_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x001f, 0x001f).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w)).mirror(0xff00);
+	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
+	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
+	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
+	map(0x00fe, 0x00fe).rw(this, FUNC(atm_state::spectrum_port_fe_r), FUNC(atm_state::spectrum_port_fe_w)).select(0xff00);
+	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
+	map(0x4000, 0x4000).w(this, FUNC(atm_state::atm_port_7ffd_w)).mirror(0x3ffd);
+	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
+	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
+}
 
-static ADDRESS_MAP_START (atm_switch, AS_OPCODES, 8, atm_state)
-	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
-	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
-ADDRESS_MAP_END
+void atm_state::atm_switch(address_map &map)
+{
+	map(0x0000, 0x3fff).r(this, FUNC(atm_state::beta_neutral_r)); // Overlap with previous because we want real addresses on the 3e00-3fff range
+	map(0x3d00, 0x3dff).r(this, FUNC(atm_state::beta_enable_r));
+	map(0x4000, 0xffff).r(this, FUNC(atm_state::beta_disable_r));
+}
 
 MACHINE_RESET_MEMBER(atm_state,atm)
 {
@@ -180,11 +186,12 @@ static GFXDECODE_START( atmtb2 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_DERIVED(atm_state::atm, spectrum_128)
+MACHINE_CONFIG_START(atm_state::atm)
+	spectrum_128(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atm_mem)
 	MCFG_CPU_IO_MAP(atm_io)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(atm_switch)
+	MCFG_CPU_OPCODES_MAP(atm_switch)
 	MCFG_MACHINE_RESET_OVERRIDE(atm_state, atm )
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
@@ -194,7 +201,8 @@ MACHINE_CONFIG_DERIVED(atm_state::atm, spectrum_128)
 	MCFG_DEVICE_REMOVE("exp")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(atm_state::atmtb2, atm)
+MACHINE_CONFIG_START(atm_state::atmtb2)
+	atm(config);
 	MCFG_GFXDECODE_MODIFY("gfxdecode", atmtb2)
 MACHINE_CONFIG_END
 

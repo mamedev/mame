@@ -17,22 +17,22 @@
 //*************************************************************************
 
 #define MCFG_LH5810_PORTA_R_CB(_devcb) \
-	devcb = &lh5810_device::set_porta_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<lh5810_device &>(*device).set_porta_r_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTA_W_CB(_devcb) \
-	devcb = &lh5810_device::set_porta_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<lh5810_device &>(*device).set_porta_w_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTB_R_CB(_devcb) \
-	devcb = &lh5810_device::set_portb_r_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<lh5810_device &>(*device).set_portb_r_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTB_W_CB(_devcb) \
-	devcb = &lh5810_device::set_portb_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<lh5810_device &>(*device).set_portb_w_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_PORTC_W_CB(_devcb) \
-	devcb = &lh5810_device::set_portc_w_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<lh5810_device &>(*device).set_portc_w_callback(DEVCB_##_devcb);
 
 #define MCFG_LH5810_OUT_INT_CB(_devcb) \
-	devcb = &lh5810_device::set_out_int_callback(*device, DEVCB_##_devcb); //currently unused
+	devcb = &downcast<lh5810_device &>(*device).set_out_int_callback(DEVCB_##_devcb); //currently unused
 
 
 
@@ -48,12 +48,12 @@ public:
 	// construction/destruction
 	lh5810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_porta_r_callback(device_t &device, Object &&cb) { return downcast<lh5810_device &>(device).m_porta_r_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_porta_w_callback(device_t &device, Object &&cb) { return downcast<lh5810_device &>(device).m_porta_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portb_r_callback(device_t &device, Object &&cb) { return downcast<lh5810_device &>(device).m_portb_r_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portb_w_callback(device_t &device, Object &&cb) { return downcast<lh5810_device &>(device).m_portb_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_portc_w_callback(device_t &device, Object &&cb) { return downcast<lh5810_device &>(device).m_portc_w_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<lh5810_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_r_callback(Object &&cb) { return m_porta_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_porta_w_callback(Object &&cb) { return m_porta_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_r_callback(Object &&cb) { return m_portb_r_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portb_w_callback(Object &&cb) { return m_portb_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_portc_w_callback(Object &&cb) { return m_portc_w_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );

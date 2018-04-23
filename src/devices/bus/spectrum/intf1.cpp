@@ -108,7 +108,7 @@ READ8_MEMBER(spectrum_intf1_device::mreq_r)
 	uint8_t temp;
 	uint8_t data = 0xff;
 
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		if (offset == 0x0008 || offset == 0x1708)
 			m_romcs = 1;

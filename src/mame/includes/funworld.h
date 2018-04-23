@@ -61,4 +61,14 @@ public:
 	void rcdino4(machine_config &config);
 	void intrgmes(machine_config &config);
 	void witchryl(machine_config &config);
+	void chinatow_map(address_map &map);
+	void cuoreuno_map(address_map &map);
+	void funquiz_map(address_map &map);
+	void funworld_map(address_map &map);
+	void fw_a7_11_map(address_map &map);
+	void intergames_map(address_map &map);
+	void lunapark_map(address_map &map);
+	void magicrd2_map(address_map &map);
+	void saloon_map(address_map &map);
+	void witchryl_map(address_map &map);
 };

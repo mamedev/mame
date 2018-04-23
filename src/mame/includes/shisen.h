@@ -37,4 +37,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void shisen(machine_config &config);
+	void shisen_io_map(address_map &map);
+	void shisen_map(address_map &map);
+	void shisen_sound_io_map(address_map &map);
+	void shisen_sound_map(address_map &map);
 };

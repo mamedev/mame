@@ -28,21 +28,12 @@ public:
 	jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_ADDRESS_MAP(blit_v1_regs, 8);
-	DECLARE_ADDRESS_MAP(blit_v2_regs, 8);
+	void blit_v1_regs(address_map &map);
+	void blit_v2_regs(address_map &map);
 
 	DECLARE_WRITE8_MEMBER( vregs_w );
 	DECLARE_WRITE8_MEMBER( bltflip_w );
 	DECLARE_READ_LINE_MEMBER( status_r );
-
-	// blitter write accessors
-	DECLARE_WRITE8_MEMBER( x_w );
-	DECLARE_WRITE8_MEMBER( y_w );
-	DECLARE_WRITE8_MEMBER( height_and_trigger_w );
-	DECLARE_WRITE8_MEMBER( width_w );
-	DECLARE_WRITE8_MEMBER( src_lo_address_w );
-	DECLARE_WRITE8_MEMBER( src_md_address_w );
-	DECLARE_WRITE8_MEMBER( src_hi_address_w );
 
 	const uint8_t &blit_buffer(unsigned y, unsigned x) const { return m_blit_buffer[(256 * y) + x]; }
 
@@ -64,6 +55,15 @@ private:
 	uint8_t *m_gfxrom;
 	uint32_t m_gfxrommask;
 	bool m_bltflip;
+
+	// blitter write accessors
+	DECLARE_WRITE8_MEMBER( x_w );
+	DECLARE_WRITE8_MEMBER( y_w );
+	DECLARE_WRITE8_MEMBER( height_and_trigger_w );
+	DECLARE_WRITE8_MEMBER( width_w );
+	DECLARE_WRITE8_MEMBER( src_lo_address_w );
+	DECLARE_WRITE8_MEMBER( src_md_address_w );
+	DECLARE_WRITE8_MEMBER( src_hi_address_w );
 };
 
 

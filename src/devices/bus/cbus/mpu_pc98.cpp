@@ -61,9 +61,10 @@ mpu_pc98_device::mpu_pc98_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, mpu_pc98_device)
-	AM_RANGE(0, 3) AM_DEVREADWRITE8(MPU_CORE_TAG, mpu401_device, mpu_r, mpu_w, 0xff)
-ADDRESS_MAP_END
+void mpu_pc98_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(MPU_CORE_TAG, FUNC(mpu401_device::mpu_r), FUNC(mpu401_device::mpu_w));
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -72,7 +73,7 @@ ADDRESS_MAP_END
 void mpu_pc98_device::device_start()
 {
 	address_space &iospace = m_bus->io_space();
-	iospace.install_device(0xe0d0, 0xe0d3, *this, &mpu_pc98_device::map, 16, 0xffffffffffffffffU >> (64 - iospace.data_width()));
+	iospace.install_device(0xe0d0, 0xe0d3, *this, &mpu_pc98_device::map);
 }
 
 //-------------------------------------------------

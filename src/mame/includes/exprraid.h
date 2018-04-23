@@ -75,4 +75,7 @@ public:
 	void exprraid_gfx_expand();
 	void exprraid(machine_config &config);
 	void exprboot(machine_config &config);
+	void master_io_map(address_map &map);
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
 };

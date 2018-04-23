@@ -87,7 +87,7 @@ protected:
 		EXR_I  = 0x07
 	};
 
-	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_delegate map_delegate);
+	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_constructor map_delegate);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -108,7 +108,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config program_config, io_config;
 	address_space *program, *io;

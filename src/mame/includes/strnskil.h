@@ -50,4 +50,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void strnskil(machine_config &config);
 	void banbam(machine_config &config);
+	void strnskil_map1(address_map &map);
+	void strnskil_map2(address_map &map);
 };

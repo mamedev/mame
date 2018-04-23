@@ -30,15 +30,6 @@ public:
 	// construction/destruction
 	epson_ex800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(devsel_r);
-	DECLARE_WRITE8_MEMBER(devsel_w);
-	DECLARE_READ8_MEMBER(gate5a_r);
-	DECLARE_WRITE8_MEMBER(gate5a_w);
-	DECLARE_READ8_MEMBER(iosel_r);
-	DECLARE_WRITE8_MEMBER(iosel_w);
-	DECLARE_READ8_MEMBER(gate7a_r);
-	DECLARE_WRITE8_MEMBER(gate7a_w);
-
 	DECLARE_INPUT_CHANGED_MEMBER(online_switch);
 
 protected:
@@ -58,6 +49,16 @@ private:
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
+	DECLARE_READ8_MEMBER(devsel_r);
+	DECLARE_WRITE8_MEMBER(devsel_w);
+	DECLARE_READ8_MEMBER(gate5a_r);
+	DECLARE_WRITE8_MEMBER(gate5a_w);
+	DECLARE_READ8_MEMBER(iosel_r);
+	DECLARE_WRITE8_MEMBER(iosel_w);
+	DECLARE_READ8_MEMBER(gate7a_r);
+	DECLARE_WRITE8_MEMBER(gate7a_w);
+
+	void ex800_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;

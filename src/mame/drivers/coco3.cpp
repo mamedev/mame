@@ -30,29 +30,30 @@
 //  ADDRESS_MAP( coco3_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( coco3_mem, AS_PROGRAM, 8, coco3_state )
-	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("rbank0") AM_WRITE_BANK("wbank0")
-	AM_RANGE(0x2000, 0x3FFF) AM_READ_BANK("rbank1") AM_WRITE_BANK("wbank1")
-	AM_RANGE(0x4000, 0x5FFF) AM_READ_BANK("rbank2") AM_WRITE_BANK("wbank2")
-	AM_RANGE(0x6000, 0x7FFF) AM_READ_BANK("rbank3") AM_WRITE_BANK("wbank3")
-	AM_RANGE(0x8000, 0x9FFF) AM_READ_BANK("rbank4") AM_WRITE_BANK("wbank4")
-	AM_RANGE(0xA000, 0xBFFF) AM_READ_BANK("rbank5") AM_WRITE_BANK("wbank5")
-	AM_RANGE(0xC000, 0xDFFF) AM_READ_BANK("rbank6") AM_WRITE_BANK("wbank6")
-	AM_RANGE(0xE000, 0xFDFF) AM_READ_BANK("rbank7") AM_WRITE_BANK("wbank7")
-	AM_RANGE(0xFE00, 0xFEFF) AM_READ_BANK("rbank8") AM_WRITE_BANK("wbank8")
-	AM_RANGE(0xFF00, 0xFF1F) AM_READWRITE(ff00_read, ff00_write)
-	AM_RANGE(0xFF20, 0xFF3F) AM_READWRITE(ff20_read, ff20_write)
-	AM_RANGE(0xFF40, 0xFF5F) AM_READWRITE(ff40_read, ff40_write)
-	AM_RANGE(0xFF60, 0xFF8F) AM_READWRITE(ff60_read, ff60_write)
-	AM_RANGE(0xFF90, 0xFFDF) AM_DEVREADWRITE(GIME_TAG, gime_device, read, write)
+void coco3_state::coco3_mem(address_map &map)
+{
+	map(0x0000, 0x1FFF).bankr("rbank0").bankw("wbank0");
+	map(0x2000, 0x3FFF).bankr("rbank1").bankw("wbank1");
+	map(0x4000, 0x5FFF).bankr("rbank2").bankw("wbank2");
+	map(0x6000, 0x7FFF).bankr("rbank3").bankw("wbank3");
+	map(0x8000, 0x9FFF).bankr("rbank4").bankw("wbank4");
+	map(0xA000, 0xBFFF).bankr("rbank5").bankw("wbank5");
+	map(0xC000, 0xDFFF).bankr("rbank6").bankw("wbank6");
+	map(0xE000, 0xFDFF).bankr("rbank7").bankw("wbank7");
+	map(0xFE00, 0xFEFF).bankr("rbank8").bankw("wbank8");
+	map(0xFF00, 0xFF1F).rw(this, FUNC(coco3_state::ff00_read), FUNC(coco3_state::ff00_write));
+	map(0xFF20, 0xFF3F).rw(this, FUNC(coco3_state::ff20_read), FUNC(coco3_state::ff20_write));
+	map(0xFF40, 0xFF5F).rw(this, FUNC(coco3_state::ff40_read), FUNC(coco3_state::ff40_write));
+	map(0xFF60, 0xFF8F).rw(this, FUNC(coco3_state::ff60_read), FUNC(coco3_state::ff60_write));
+	map(0xFF90, 0xFFDF).rw(m_gime, FUNC(gime_device::read), FUNC(gime_device::write));
 
 	// While Tepolt and other sources say that the interrupt vectors are mapped to
 	// the same memory accessed at $BFFx, William Astle offered evidence that this
 	// memory on a CoCo 3 is not the same.
 	//
 	// http://lost.l-w.ca/0x05/coco3-and-interrupt-vectors/
-	AM_RANGE(0xFFE0, 0xFFFF) AM_ROM AM_REGION(MAINCPU_TAG, 0x7FE0)
-ADDRESS_MAP_END
+	map(0xFFE0, 0xFFFF).rom().region(MAINCPU_TAG, 0x7FE0);
+}
 
 
 
@@ -318,7 +319,7 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_SCREEN_VBLANK_TIME(0)
 
 	// sound hardware
-	MCFG_FRAGMENT_ADD( coco_sound )
+	coco_sound(config);
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -326,7 +327,7 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_RAM_EXTRA_OPTIONS("128K,2M,8M")
 
 	// floating space
-	MCFG_FRAGMENT_ADD(coco_floating)
+	coco_floating(config);
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list","coco_cart")
@@ -336,7 +337,8 @@ MACHINE_CONFIG_START(coco3_state::coco3)
 	MCFG_SOFTWARE_LIST_FILTER("flop_list","COCO3")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coco3_state::coco3p, coco3)
+MACHINE_CONFIG_START(coco3_state::coco3p)
+	coco3(config);
 	MCFG_DEVICE_MODIFY(":")
 	MCFG_DEVICE_CLOCK(XTAL(28'475'000) / 32)
 
@@ -352,12 +354,14 @@ MACHINE_CONFIG_DERIVED(coco3_state::coco3p, coco3)
 	MCFG_GIME_FLOATING_BUS_CALLBACK(READ8(coco_state, floating_bus_read))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coco3_state::coco3h, coco3)
+MACHINE_CONFIG_START(coco3_state::coco3h)
+	coco3(config);
 	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(coco3_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coco3_state::coco3dw1, coco3)
+MACHINE_CONFIG_START(coco3_state::coco3dw1)
+	coco3(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "cc3hdb1")
 MACHINE_CONFIG_END

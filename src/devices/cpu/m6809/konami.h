@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_KONAMICPU_LINE_CB(_devcb) \
-	devcb = &konami_cpu_device::set_line_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<konami_cpu_device &>(*device).set_line_callback(DEVCB_##_devcb);
 
 
 // device type definition
@@ -36,7 +36,7 @@ public:
 	konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template<class _Object> static devcb_base &set_line_callback(device_t &device, _Object object) { return downcast<konami_cpu_device &>(device).m_set_lines.set_callback(object); }
+	template<class Object> devcb_base &set_line_callback(Object &&cb) { return m_set_lines.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -46,7 +46,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	typedef m6809_base_device super;

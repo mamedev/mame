@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "cpu/h6280/h6280.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
@@ -39,7 +40,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<h6280_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
@@ -74,4 +75,7 @@ public:
 	void mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask, uint16_t penbase, uint8_t alpha);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	void dassault(machine_config &config);
+	void dassault_map(address_map &map);
+	void dassault_sub_map(address_map &map);
+	void sound_map(address_map &map);
 };

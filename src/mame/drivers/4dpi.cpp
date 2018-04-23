@@ -50,6 +50,7 @@ public:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
 	void sgi_ip6(machine_config &config);
+	void sgi_ip6_map(address_map &map);
 };
 
 
@@ -67,7 +68,7 @@ inline void ATTR_PRINTF(3,4) sgi_ip6_state::verboselog( int n_level, const char 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", machine().device("maincpu")->safe_pc(), buf);
+		logerror("%s: %s", machine().describe_context(), buf);
 	}
 #endif
 }
@@ -217,12 +218,13 @@ void sgi_ip6_state::machine_reset()
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( sgi_ip6_map, AS_PROGRAM, 32, sgi_ip6_state )
-	AM_RANGE( 0x1f880000, 0x1f880003 ) AM_READWRITE(ip6_unk1_r, ip6_unk1_w)
-	AM_RANGE( 0x1fb00000, 0x1fb00003 ) AM_READWRITE(ip6_unk3_r, ip6_unk3_w)
-	AM_RANGE( 0x1fbc004c, 0x1fbc004f ) AM_READWRITE(ip6_unk2_r, ip6_unk2_w)
-	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_REGION( "user1", 0 )
-ADDRESS_MAP_END
+void sgi_ip6_state::sgi_ip6_map(address_map &map)
+{
+	map(0x1f880000, 0x1f880003).rw(this, FUNC(sgi_ip6_state::ip6_unk1_r), FUNC(sgi_ip6_state::ip6_unk1_w));
+	map(0x1fb00000, 0x1fb00003).rw(this, FUNC(sgi_ip6_state::ip6_unk3_r), FUNC(sgi_ip6_state::ip6_unk3_w));
+	map(0x1fbc004c, 0x1fbc004f).rw(this, FUNC(sgi_ip6_state::ip6_unk2_r), FUNC(sgi_ip6_state::ip6_unk2_w));
+	map(0x1fc00000, 0x1fc3ffff).rom().region("user1", 0);
+}
 
 /***************************************************************************
     MACHINE DRIVERS

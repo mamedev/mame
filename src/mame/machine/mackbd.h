@@ -21,10 +21,10 @@
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_MACKBD_CLKOUT_HANDLER(_devcb) \
-	devcb = &mackbd_device::set_clkout_handler(*device, DEVCB_##_devcb);
+	devcb = downcast<mackbd_device &>(*device).set_clkout_handler(DEVCB_##_devcb);
 
 #define MCFG_MACKBD_DATAOUT_HANDLER(_devcb) \
-	devcb = &mackbd_device::set_dataout_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<mackbd_device &>(*device).set_dataout_handler(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -35,9 +35,9 @@
 class mackbd_device :  public device_t
 {
 public:
-	// static config helper
-	template<class _Object> static devcb_base &set_clkout_handler(device_t &device, _Object object) { return downcast<mackbd_device &>(device).m_clkout_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_dataout_handler(device_t &device, _Object object) { return downcast<mackbd_device &>(device).m_dataout_handler.set_callback(object); }
+	// config helper
+	template <class Object> devcb_base &set_clkout_handler(Object &&cb) { return m_clkout_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dataout_handler(Object &&cb) { return m_dataout_handler.set_callback(std::forward<Object>(cb)); }
 
 	// construction/destruction
 	mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

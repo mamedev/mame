@@ -383,18 +383,6 @@ kaneko_toybox_device::kaneko_toybox_device(const machine_config &mconfig, const 
 	m_mcu_com[0] = m_mcu_com[1] = m_mcu_com[2] = m_mcu_com[3] = 0;
 }
 
-void kaneko_toybox_device::set_table(device_t &device, int tabletype)
-{
-	kaneko_toybox_device &dev = downcast<kaneko_toybox_device &>(device);
-	dev.m_tabletype = tabletype;
-}
-
-void kaneko_toybox_device::set_game_type(device_t &device, int gametype)
-{
-	kaneko_toybox_device &dev = downcast<kaneko_toybox_device &>(device);
-	dev.m_gametype = gametype;
-}
-
 void kaneko_toybox_device::device_start()
 {
 	memset(m_mcu_com, 0, 4 * sizeof( uint16_t) );
@@ -479,7 +467,7 @@ WRITE16_MEMBER(kaneko_toybox_device::mcu_com3_w){ mcu_com_w(offset, data, mem_ma
 */
 READ16_MEMBER(kaneko_toybox_device::mcu_status_r)
 {
-	logerror("CPU %s (PC=%06X) : read MCU status\n", space.device().tag(), space.device().safe_pcbase());
+	logerror("%s : read MCU status\n", machine().describe_context());
 	return 0; // most games test bit 0 for failure
 }
 

@@ -192,14 +192,15 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crbaloon_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff) /* A15 is not decoded */
-	AM_RANGE(0x0000, 0x3fff) AM_ROM     /* not fully populated */
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x5800, 0x7fff) AM_NOP
-ADDRESS_MAP_END
+void crbaloon_state::main_map(address_map &map)
+{
+	map.global_mask(0x7fff); /* A15 is not decoded */
+	map(0x0000, 0x3fff).rom();     /* not fully populated */
+	map(0x4000, 0x43ff).mirror(0x0400).ram();
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(this, FUNC(crbaloon_state::crbaloon_videoram_w)).share("videoram");
+	map(0x5000, 0x53ff).mirror(0x0400).ram().w(this, FUNC(crbaloon_state::crbaloon_colorram_w)).share("colorram");
+	map(0x5800, 0x7fff).noprw();
+}
 
 
 
@@ -209,23 +210,24 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, crbaloon_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xf)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("DSW0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_SELECT(0x0c) AM_READ(pc3259_r)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
+void crbaloon_state::main_io_map(address_map &map)
+{
+	map.global_mask(0xf);
+	map(0x00, 0x00).mirror(0x0c).portr("DSW0");
+	map(0x01, 0x01).mirror(0x0c).portr("IN0");
+	map(0x02, 0x02).select(0x0c).r(this, FUNC(crbaloon_state::pc3259_r));
+	map(0x03, 0x03).mirror(0x0c).portr("IN1");
 
-	AM_RANGE(0x00, 0x00) AM_WRITENOP    /* not connected */
-	AM_RANGE(0x01, 0x01) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x05, 0x05) AM_WRITE(crbaloon_audio_set_music_freq)
-	AM_RANGE(0x06, 0x06) AM_WRITE(port_sound_w)
-	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_SHARE("pc3092_data")
-	AM_RANGE(0x0c, 0x0c) AM_WRITENOP /* MSK - to PC3259 */
-	AM_RANGE(0x0d, 0x0d) AM_WRITENOP /* schematics has it in a box marked "NOT USE" */
-	AM_RANGE(0x0e, 0x0f) AM_WRITENOP
-ADDRESS_MAP_END
+	map(0x00, 0x00).nopw();    /* not connected */
+	map(0x01, 0x01).nopw(); /* watchdog */
+	map(0x02, 0x04).writeonly().share("spriteram");
+	map(0x05, 0x05).w(this, FUNC(crbaloon_state::crbaloon_audio_set_music_freq));
+	map(0x06, 0x06).w(this, FUNC(crbaloon_state::port_sound_w));
+	map(0x07, 0x0b).w(this, FUNC(crbaloon_state::pc3092_w)).share("pc3092_data");
+	map(0x0c, 0x0c).nopw(); /* MSK - to PC3259 */
+	map(0x0d, 0x0d).nopw(); /* schematics has it in a box marked "NOT USE" */
+	map(0x0e, 0x0f).nopw();
+}
 
 
 
@@ -272,7 +274,7 @@ static INPUT_PORTS_START( crbaloon )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DSW1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* PC3259 */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* PC3259 */
 	PORT_DIPNAME( 0x10, 0x10, "Invulnerability") PORT_DIPLOCATION("SW B:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -293,7 +295,7 @@ static INPUT_PORTS_START( crbaloon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Name Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, crbaloon_state,pc3092_r, nullptr)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, crbaloon_state,pc3092_r, nullptr)
 
 	PORT_START("PC3092")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -383,7 +385,7 @@ MACHINE_CONFIG_START(crbaloon_state::crbaloon)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(crbaloon_audio)
+	crbaloon_audio(config);
 
 MACHINE_CONFIG_END
 

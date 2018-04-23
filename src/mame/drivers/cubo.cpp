@@ -358,6 +358,8 @@ public:
 	uint16_t m_potgo_value;
 
 	void cubo(machine_config &config);
+	void cubo_mem(address_map &map);
+	void overlay_2mb_map32(address_map &map);
 protected:
 	virtual void rs232_tx(int state) override;
 	virtual void potgo_w(uint16_t data) override;
@@ -414,24 +416,27 @@ WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 
 
 
-static ADDRESS_MAP_START( overlay_2mb_map32, AS_PROGRAM, 32, cubo_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chip_ram")
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void cubo_state::overlay_2mb_map32(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).ram().share("chip_ram");
+	map(0x200000, 0x27ffff).rom().region("kickstart", 0);
+}
 
-static ADDRESS_MAP_START( cubo_mem, AS_PROGRAM, 32, cubo_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
-	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("DIPSW1")
-	AM_RANGE(0x800010, 0x800013) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE("akiko", akiko_device, read, write)
-	AM_RANGE(0xbf0000, 0xbfffff) AM_READWRITE16(cia_r, gayle_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(custom_chip_r, custom_chip_w, 0xffffffff)
-	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("kickstart", 0x80000)
-	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
-ADDRESS_MAP_END
+void cubo_state::cubo_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap32));
+	map(0x800000, 0x800003).portr("DIPSW1");
+	map(0x800010, 0x800013).portr("DIPSW2");
+	map(0xa80000, 0xb7ffff).noprw();
+	map(0xb80000, 0xb8003f).rw("akiko", FUNC(akiko_device::read), FUNC(akiko_device::write));
+	map(0xbf0000, 0xbfffff).rw(this, FUNC(cubo_state::cia_r), FUNC(cubo_state::gayle_cia_w));
+	map(0xc00000, 0xdfffff).rw(this, FUNC(cubo_state::custom_chip_r), FUNC(cubo_state::custom_chip_w));
+	map(0xe00000, 0xe7ffff).rom().region("kickstart", 0x80000);
+	map(0xe80000, 0xf7ffff).noprw();
+	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
+}
 
 
 /*************************************
@@ -539,24 +544,24 @@ CUSTOM_INPUT_MEMBER( cubo_state::cd32_sel_mirror_input )
 
 static INPUT_PORTS_START( cubo )
 	PORT_START("CIA0PORTA")
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_CUSTOM )
 	/* this is the regular port for reading a single button joystick on the Amiga, many CD32 games require this to mirror the pad start button! */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cd32_sel_mirror_input, (void *)0)
 
 	PORT_START("CIA0PORTB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("joy_0_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)1)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)1)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("joy_1_dat")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)0)
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state, amiga_joystick_convert, (void *)0)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cubo_input, nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cubo_input, nullptr)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
@@ -1051,7 +1056,7 @@ MACHINE_CONFIG_START(cubo_state::cubo)
 	MCFG_AKIKO_SDA_WRITE_HANDLER(DEVWRITELINE("i2cmem", i2cmem_device, write_sda))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(pal_video)
+	pal_video(config);
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga_aga)
 	MCFG_SCREEN_NO_PALETTE

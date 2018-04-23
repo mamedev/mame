@@ -33,9 +33,10 @@ DEFINE_DEVICE_TYPE(EF9345, ef9345_device, "ef9345", "EF9345")
 DEFINE_DEVICE_TYPE(TS9347, ts9347_device, "ts9347", "TS9347")
 
 // default address map
-static ADDRESS_MAP_START( ef9345, 0, 8, ef9345_device )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void ef9345_device::ef9345(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+}
 
 //-------------------------------------------------
 //  memory_space_config - return a description of
@@ -112,7 +113,7 @@ ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, co
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, nullptr, *ADDRESS_MAP_NAME(ef9345)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(ef9345_device::ef9345), this)),
 	m_charset(*this, DEVICE_SELF),
 	m_variant(variant),
 	m_palette(*this, finder_base::DUMMY_TAG)
@@ -122,16 +123,6 @@ ef9345_device::ef9345_device(const machine_config &mconfig, device_type type, co
 ts9347_device::ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ef9345_device(mconfig, TS9347, tag, owner, clock, EF9345_MODE::TYPE_TS9347)
 {
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void ef9345_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<ef9345_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------

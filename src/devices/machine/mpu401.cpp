@@ -57,18 +57,20 @@
 #define STAT_TX_FULL  (0x40)    // indicates the PC has written a new byte we haven't read yet
 #define STAT_RX_EMPTY (0x80)    // indicates we've written a new byte the PC hasn't read yet
 
-static ADDRESS_MAP_START( mpu401_map, AS_PROGRAM, 8, mpu401_device )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(regs_mode2_r, regs_mode2_w)
-	AM_RANGE(0x0020, 0x0021) AM_READWRITE(asic_r, asic_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM // on-chip RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM // external RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(ROM_TAG, 0)
-ADDRESS_MAP_END
+void mpu401_device::mpu401_map(address_map &map)
+{
+	map(0x0000, 0x001f).rw(this, FUNC(mpu401_device::regs_mode2_r), FUNC(mpu401_device::regs_mode2_w));
+	map(0x0020, 0x0021).rw(this, FUNC(mpu401_device::asic_r), FUNC(mpu401_device::asic_w));
+	map(0x0080, 0x00ff).ram(); // on-chip RAM
+	map(0x0800, 0x0fff).ram(); // external RAM
+	map(0xf000, 0xffff).rom().region(ROM_TAG, 0);
+}
 
-static ADDRESS_MAP_START( mpu401_io_map, AS_IO, 8, mpu401_device )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(port1_r, port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w)
-ADDRESS_MAP_END
+void mpu401_device::mpu401_io_map(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(mpu401_device::port1_r), FUNC(mpu401_device::port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(mpu401_device::port2_r), FUNC(mpu401_device::port2_w));
+}
 
 ROM_START( mpu401 )
 	ROM_REGION(0x1000, ROM_TAG, 0)
@@ -202,7 +204,7 @@ WRITE8_MEMBER(mpu401_device::port1_w)
 
 READ8_MEMBER(mpu401_device::port2_r)
 {
-//  printf("Read P2 %s\n", machine().describe_context());
+//  printf("%s Read P2\n", machine().describe_context().c_str());
 	return m_port2;
 }
 

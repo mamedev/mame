@@ -74,28 +74,32 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void carrera(machine_config &config);
+	void carrera_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( carrera_map, AS_PROGRAM, 8, carrera_state )
-	AM_RANGE(0x0000, 0x4fff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xe801, 0xe801) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("tileram")
-ADDRESS_MAP_END
+void carrera_state::carrera_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
+	map(0xe000, 0xe7ff).ram();
+	map(0xe800, 0xe800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xe801, 0xe801).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xf000, 0xffff).ram().share("tileram");
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, carrera_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN3")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5")
-	AM_RANGE(0x06, 0x06) AM_WRITENOP // ?
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void carrera_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).portr("IN3");
+	map(0x04, 0x04).portr("IN4");
+	map(0x05, 0x05).portr("IN5");
+	map(0x06, 0x06).nopw(); // ?
+	map(0x08, 0x09).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 static INPUT_PORTS_START( carrera )
 	PORT_START("IN0")   /* Port 0 */
@@ -314,7 +318,6 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
 	MCFG_CPU_PROGRAM_MAP(carrera_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", carrera_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -328,6 +331,7 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carrera)
 	MCFG_PALETTE_ADD("palette", 32)

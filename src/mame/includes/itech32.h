@@ -3,7 +3,7 @@
 /*************************************************************************
 
     Incredible Technologies/Strata system
-    (8-bit blitter variant)
+    (32-bit blitter variant)
 
 **************************************************************************/
 
@@ -184,7 +184,7 @@ public:
 	void init_gt_common();
 
 	uint32_t screen_update_itech32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(generate_int1);
+	WRITE_LINE_MEMBER(generate_int1);
 	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	inline offs_t compute_safe_address(int x, int y);
@@ -207,4 +207,12 @@ public:
 	void drivedge(machine_config &config);
 	void bloodstm(machine_config &config);
 	void timekill(machine_config &config);
+	void bloodstm_map(address_map &map);
+	void drivedge_map(address_map &map);
+	void drivedge_tms1_map(address_map &map);
+	void drivedge_tms2_map(address_map &map);
+	void itech020_map(address_map &map);
+	void sound_020_map(address_map &map);
+	void sound_map(address_map &map);
+	void timekill_map(address_map &map);
 };

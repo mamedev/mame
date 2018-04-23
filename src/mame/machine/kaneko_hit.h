@@ -9,12 +9,16 @@
 #include "machine/watchdog.h"
 
 
+#define MCFG_KANEKO_HIT_TYPE(_type) \
+	downcast<kaneko_hit_device &>(*device).set_type(_type);
+
+
 class kaneko_hit_device : public device_t
 {
 public:
 	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_type(device_t &device, int hittype);
+	void set_type(int hittype) { m_hittype = hittype; }
 
 	int m_hittype;
 

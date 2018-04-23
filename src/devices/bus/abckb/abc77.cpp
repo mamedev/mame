@@ -89,19 +89,21 @@ const tiny_rom_entry *abc77_device::device_rom_region() const
 //  ADDRESS_MAP( abc77_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc77_map, AS_PROGRAM, 8, abc77_device )
-	AM_RANGE(0x000, 0xfff) AM_ROM AM_REGION("z16", 0)
-ADDRESS_MAP_END
+void abc77_device::abc77_map(address_map &map)
+{
+	map(0x000, 0xfff).rom().region("z16", 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc77_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc77_io, AS_IO, 8, abc77_device )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_WRITE(j3_w)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+void abc77_device::abc77_io(address_map &map)
+{
+	map(0x00, 0x00).mirror(0xff).w(this, FUNC(abc77_device::j3_w));
+	map(0x00, 0x00).mirror(0xff).portr("DSW");
+}
 
 
 //-------------------------------------------------
@@ -305,7 +307,7 @@ INPUT_PORTS_START( abc55 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("SW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc77_device, keyboard_reset, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc77_device, keyboard_reset, nullptr)
 INPUT_PORTS_END
 
 
@@ -423,7 +425,7 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 	m_dsw(*this, "DSW"),
 	m_txd(1), m_keylatch(0),
 	m_keydown(1),
-	m_clock(0), m_hys(0), m_reset(0),
+	m_clock(0), m_hys(0),
 	m_stb(1), m_j3(0), m_serial_timer(nullptr), m_reset_timer(nullptr)
 {
 }

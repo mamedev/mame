@@ -93,6 +93,7 @@ public:
 	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	void mirage(machine_config &config);
+	void mirage_map(address_map &map);
 };
 
 void miragemj_state::video_start()
@@ -106,6 +107,7 @@ uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb3
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 
@@ -156,29 +158,30 @@ WRITE16_MEMBER(miragemj_state::okim0_rombank_w)
 	m_oki_bgm->set_rom_bank(data & 0x7);
 }
 
-static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16, miragemj_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void miragemj_state::mirage_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 	/* tilemaps */
-	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w) // 0x100000 - 0x101fff tested
-	AM_RANGE(0x102000, 0x103fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w) // 0x102000 - 0x102fff tested
+	map(0x100000, 0x101fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w)); // 0x100000 - 0x101fff tested
+	map(0x102000, 0x103fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w)); // 0x102000 - 0x102fff tested
 	/* linescroll */
-	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_SHARE("pf2_rowscroll")
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x1307ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8("oki_sfx", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8("oki_bgm", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x160000, 0x160001) AM_WRITENOP
-	AM_RANGE(0x168000, 0x16800f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x16a000, 0x16a001) AM_WRITENOP
-	AM_RANGE(0x16c000, 0x16c001) AM_WRITE(okim1_rombank_w)
-	AM_RANGE(0x16c002, 0x16c003) AM_WRITE(okim0_rombank_w)
-	AM_RANGE(0x16c004, 0x16c005) AM_WRITE(mjmux_w)
-	AM_RANGE(0x16c006, 0x16c007) AM_READ(mjmux_r)
-	AM_RANGE(0x16e000, 0x16e001) AM_WRITENOP
-	AM_RANGE(0x16e002, 0x16e003) AM_READ_PORT("SYSTEM_IN")
-	AM_RANGE(0x170000, 0x173fff) AM_RAM
-ADDRESS_MAP_END
+	map(0x110000, 0x110bff).ram().share("pf1_rowscroll");
+	map(0x112000, 0x112bff).ram().share("pf2_rowscroll");
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x130000, 0x1307ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x140000, 0x14000f).rw(m_oki_sfx, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x150000, 0x15000f).rw(m_oki_bgm, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x160000, 0x160001).nopw();
+	map(0x168000, 0x16800f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x16a000, 0x16a001).nopw();
+	map(0x16c000, 0x16c001).w(this, FUNC(miragemj_state::okim1_rombank_w));
+	map(0x16c002, 0x16c003).w(this, FUNC(miragemj_state::okim0_rombank_w));
+	map(0x16c004, 0x16c005).w(this, FUNC(miragemj_state::mjmux_w));
+	map(0x16c006, 0x16c007).r(this, FUNC(miragemj_state::mjmux_r));
+	map(0x16e000, 0x16e001).nopw();
+	map(0x16e002, 0x16e003).portr("SYSTEM_IN");
+	map(0x170000, 0x173fff).ram();
+}
 
 
 static INPUT_PORTS_START( mirage )
@@ -188,7 +191,7 @@ static INPUT_PORTS_START( mirage )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY0")

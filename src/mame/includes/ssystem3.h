@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef SSYSTEM3_H_
-#define SSYSTEM3_H_
+#ifndef MAME_INCLUDES_SSYSTEM3_H
+#define MAME_INCLUDES_SSYSTEM3_H
 
 #include "machine/6522via.h"
 
@@ -68,6 +68,7 @@ public:
 	void ssystem3_playfield_read(int *on, int *ready);
 
 	void ssystem3(machine_config &config);
+	void ssystem3_map(address_map &map);
 private:
 	uint8_t m_porta;
 	std::unique_ptr<uint8_t[]> m_videoram;
@@ -82,4 +83,4 @@ private:
 };
 
 
-#endif /* SSYSTEM3_H_ */
+#endif // MAME_INCLUDES_SSYSTEM3_H

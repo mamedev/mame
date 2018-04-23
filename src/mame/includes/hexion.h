@@ -49,4 +49,6 @@ public:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *ram);
 	void hexion(machine_config &config);
 	void hexionb(machine_config &config);
+	void hexion_map(address_map &map);
+	void hexionb_map(address_map &map);
 };

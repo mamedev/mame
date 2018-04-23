@@ -402,6 +402,7 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 			switch (reg)
 			{
 				case 0x5:   m_core->pcstkp = data; break;     /* PCSTKP */
+				case 0x7:   m_core->curlcntr = data; break;   /* CURLCNTR (Zero Gunner 2B) */
 				case 0x8:   m_core->lcntr = data; break;      /* LCNTR */
 				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
@@ -471,9 +472,9 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		case 0x00:      /* LSHIFT Rx BY <data8>*/
 		{
 			if(shift < 0) {
-				REG(rn) = (shift > -32 ) ? (REG(rx) >> -shift) : 0;
+				REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
 			} else {
-				REG(rn) = (shift < 32) ? (REG(rx) << shift) : 0;
+				REG(rn) = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
 				if (shift > 0)
 				{
 					m_core->astat |= SV;
@@ -523,14 +524,15 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		{
 			uint32_t r = 0;
 			if(shift < 0) {
-				r = (shift > -32 ) ? (REG(rx) >> -shift) : 0;
+				r = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
 			} else {
-				r = (shift < 32) ? (REG(rx) << shift) : 0;
+				r = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
 				if (shift > 0)
 				{
 					m_core->astat |= SV;
 				}
 			}
+
 			SET_FLAG_SZ(r);
 
 			REG(rn) = REG(rn) | r;
@@ -550,8 +552,19 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 			break;
 		}
 
-		case 0x11: /* TODO */
+		case 0x11:      /* Rn = Rn FDEP Rx BY <bit6>:<len6> */
+		{
+			uint32_t ext = REG(rx) & MAKE_EXTRACT_MASK(0, len);
+
+			REG(rn) = ext << bit;
+
+			SET_FLAG_SZ(REG(rn));
+			if (bit+len > 32)
+			{
+				m_core->astat |= SV;
+			}
 			break;
+		}
 
 		case 0x12:      /* FEXT Rx BY <bit6>:<len6> (Sign Extended) */
 		{
@@ -728,9 +741,17 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 				break;
 			}
 
-			case 0x1c: /* TODO! fmul_avg */
+			// TODO: verify this (last bronx)
+			case 0x1c:
 			{
 				compute_fmul_avg(fm, fxm, fym, fa, fxa, fya);
+				break;
+			}
+
+			// TODO: verify this (Gunblade NY Score Attack Remix mode)
+			case 0x1d:
+			{
+				compute_fmul_abs(fm, fxm, fym, fa, fxa, fya);
 				break;
 			}
 
@@ -867,11 +888,11 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						int shift = REG(ry);
 						if(shift < 0)
 						{
-							REG(rn) = (shift > -32 ) ? (REG(rx) >> -shift) : 0;
+							REG(rn) = (shift > -32 ) ? ((uint32_t)REG(rx) >> -shift) : 0;
 						}
 						else
 						{
-							REG(rn) = (shift < 32) ? (REG(rx) << shift) : 0;
+							REG(rn) = (shift < 32) ? ((uint32_t)REG(rx) << shift) : 0;
 							if (shift > 0)
 							{
 								m_core->astat |= SV;

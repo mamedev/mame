@@ -48,6 +48,7 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(st_mp200);
@@ -70,6 +71,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	void st_mp201(machine_config &config);
 	void st_mp200(machine_config &config);
+	void st_mp200_map(address_map &map);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -100,19 +102,21 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
+	output_finder<47> m_digits;
 };
 
 
-static ADDRESS_MAP_START( st_mp200_map, AS_PROGRAM, 8, st_mp200_state )
+void st_mp200_state::st_mp200_map(address_map &map)
+{
 	//ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x00a0, 0x00a7) AM_WRITENOP // to sound board
-	AM_RANGE(0x00c0, 0x00c7) // to sound board
-	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x1000, 0xffff) AM_ROM //AM_REGION("roms", 0 )
-ADDRESS_MAP_END
+	map(0x0000, 0x007f).ram(); // internal to the cpu
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x00a0, 0x00a7).nopw(); // to sound board
+	map(0x00c0, 0x00c7); // to sound board
+	map(0x0200, 0x02ff).ram().share("nvram");
+	map(0x1000, 0xffff).rom(); //AM_REGION("roms", 0 )
+}
 
 static INPUT_PORTS_START( mp200 )
 	PORT_START("TEST")
@@ -463,11 +467,11 @@ WRITE8_MEMBER( st_mp200_state::u11_a_w )
 		if (BIT(data, 0) && (m_counter > 8))
 		{
 			static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-			output().set_digit_value(m_digit, patterns[m_segment[0]]);
-			output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
-			output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
-			output().set_digit_value(30+m_digit, patterns[m_segment[3]]);
-			output().set_digit_value(40+m_digit, patterns[m_segment[4]]);
+			m_digits[m_digit] = patterns[m_segment[0]];
+			m_digits[10+m_digit] = patterns[m_segment[1]];
+			m_digits[20+m_digit] = patterns[m_segment[2]];
+			m_digits[30+m_digit] = patterns[m_segment[3]];
+			m_digits[40+m_digit] = patterns[m_segment[4]];
 		}
 	}
 }
@@ -529,6 +533,7 @@ WRITE8_MEMBER( st_mp200_state::u11_b_w )
 
 void st_mp200_state::machine_start()
 {
+	m_digits.resolve();
 }
 
 void st_mp200_state::machine_reset()
@@ -580,7 +585,7 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	MCFG_DEFAULT_LAYOUT(layout_st_mp200)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
@@ -605,7 +610,8 @@ MACHINE_CONFIG_START(st_mp200_state::st_mp200)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_d", st_mp200_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(st_mp200_state::st_mp201, st_mp200)
+MACHINE_CONFIG_START(st_mp200_state::st_mp201)
+	st_mp200(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -617,19 +623,19 @@ MACHINE_CONFIG_END
 /-------------------------------*/
 ROM_START(meteorp)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "25AROM_P21A.U1", 0x1000, 0x0800, CRC(9ee33909) SHA1(5f58e4e72af47047c8f060f98706ed9607720705))
-	ROM_LOAD( "25AROM_P23.U5",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
-	ROM_LOAD( "25AROM_P22.U2",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
-	ROM_LOAD( "25AROM_P24.U6",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
+	ROM_LOAD( "25arom_p21a.u1", 0x1000, 0x0800, CRC(9ee33909) SHA1(5f58e4e72af47047c8f060f98706ed9607720705))
+	ROM_LOAD( "25arom_p23.u5",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
+	ROM_LOAD( "25arom_p22.u2",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
+	ROM_LOAD( "25arom_p24.u6",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
 ROM_START(meteorpo)   // Original release has the bonus countdown bug when the thread engine gets overloaded with scoring
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "25AROM_P21.U1",  0x1000, 0x0800, CRC(e0fd8452) SHA1(a13215378a678e26a565742d81fdadd2e161ba7a))
-	ROM_LOAD( "25AROM_P23.U5",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
-	ROM_LOAD( "25AROM_P22.U2",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
-	ROM_LOAD( "25AROM_P24.U6",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
+	ROM_LOAD( "25arom_p21.u1",  0x1000, 0x0800, CRC(e0fd8452) SHA1(a13215378a678e26a565742d81fdadd2e161ba7a))
+	ROM_LOAD( "25arom_p23.u5",  0x1800, 0x0800, CRC(43a46997) SHA1(2c74ca10cf9091db10542960f499f39f3da277ee))
+	ROM_LOAD( "25arom_p22.u2",  0x5000, 0x0800, CRC(fd396792) SHA1(b5d051a7ce7e7c2f9c4a0d900cef4f9ef2089476))
+	ROM_LOAD( "25arom_p24.u6",  0x5800, 0x0800, CRC(03fa346c) SHA1(51c04123cb433e90920c241e2d1f89db4643427b))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
@@ -650,19 +656,19 @@ ROM_END
 /-------------------------------*/
 ROM_START(cheetah)
 	ROM_REGION(0x10000, "maincpu", 0)   // Black cabinet version
-	ROM_LOAD( "CHEETAH__R_B20.U1", 0x1000, 0x0800, CRC(6a845d94) SHA1(c272d5895edf2270f5f06fc33345bb4911abbee4))   // 25A-E1B exists is there an E1A and/or E1 version?
-	ROM_LOAD( "CHEETAH__R_B20.U5", 0x1800, 0x0800, CRC(e7bdbe6c) SHA1(8b213c2271dbd5157e0d34a33672130b935d76be))   // 25A-E5
-	ROM_LOAD( "CHEETAH__R_B20.U2", 0x5000, 0x0800, CRC(a827a1a1) SHA1(723ebf193b5ce7b19df70e83caa9bb80f2e3fa66))   // 25A-E2
-	ROM_LOAD( "CHEETAH__R_B20.U6", 0x5800, 0x0800, CRC(ed33c227) SHA1(a96ba2814cef7663728bb5fdea2dc6ecfa219038))   // 25A-E6
+	ROM_LOAD( "cheetah__r_b20.u1", 0x1000, 0x0800, CRC(6a845d94) SHA1(c272d5895edf2270f5f06fc33345bb4911abbee4))   // 25A-E1B exists is there an E1A and/or E1 version?
+	ROM_LOAD( "cheetah__r_b20.u5", 0x1800, 0x0800, CRC(e7bdbe6c) SHA1(8b213c2271dbd5157e0d34a33672130b935d76be))   // 25A-E5
+	ROM_LOAD( "cheetah__r_b20.u2", 0x5000, 0x0800, CRC(a827a1a1) SHA1(723ebf193b5ce7b19df70e83caa9bb80f2e3fa66))   // 25A-E2
+	ROM_LOAD( "cheetah__r_b20.u6", 0x5800, 0x0800, CRC(ed33c227) SHA1(a96ba2814cef7663728bb5fdea2dc6ecfa219038))   // 25A-E6
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 
 ROM_START(cheetahb)
 	ROM_REGION(0x10000, "maincpu", 0)   // Blue cabinet version - has different sound effects to the black cabinet version
-	ROM_LOAD( "CHEETAH__X_B16.U1", 0x1000, 0x0800, CRC(2f736A0A) SHA1(e0dc14215d90145881ac1b407fbe057770696122))
-	ROM_LOAD( "CHEETAH__X_B16.U5", 0x1800, 0x0800, CRC(168f0650) SHA1(5b3294bf64f06cc9d193bb14891b2acfbb5c06d4))
-	ROM_LOAD( "CHEETAH__X_B16.U2", 0x5000, 0x0800, CRC(f6bd41bc) SHA1(ac94f4ba17c31dfe10ab7efab63d98aa3401e4ae))
-	ROM_LOAD( "CHEETAH__X_B16.U6", 0x5800, 0x0800, CRC(c7eba210) SHA1(ced377e53f30b371e74c26527e5f8bebcc10ee59))
+	ROM_LOAD( "cheetah__x_b16.u1", 0x1000, 0x0800, CRC(2f736A0A) SHA1(e0dc14215d90145881ac1b407fbe057770696122))
+	ROM_LOAD( "cheetah__x_b16.u5", 0x1800, 0x0800, CRC(168f0650) SHA1(5b3294bf64f06cc9d193bb14891b2acfbb5c06d4))
+	ROM_LOAD( "cheetah__x_b16.u2", 0x5000, 0x0800, CRC(f6bd41bc) SHA1(ac94f4ba17c31dfe10ab7efab63d98aa3401e4ae))
+	ROM_LOAD( "cheetah__x_b16.u6", 0x5800, 0x0800, CRC(c7eba210) SHA1(ced377e53f30b371e74c26527e5f8bebcc10ee59))
 	ROM_RELOAD( 0xf800, 0x0800)
 ROM_END
 

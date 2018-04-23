@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
 #include "screen.h"
 
 class hyhoo_state : public driver_device
@@ -49,6 +49,8 @@ public:
 
 	void hyhoo(machine_config &config);
 	void hyhoo2(machine_config &config);
+	void hyhoo_io_map(address_map &map);
+	void hyhoo_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -282,54 +282,58 @@ READ8_MEMBER(xain_state::mcu_comm_reset_r)
 }
 
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, xain_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(bgram1_w) AM_SHARE("bgram1")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(bgram0_w) AM_SHARE("bgram0")
-	AM_RANGE(0x3800, 0x397f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("P1")
-	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(scrollxP1_w)
-	AM_RANGE(0x3a01, 0x3a01) AM_READ_PORT("P2")
-	AM_RANGE(0x3a02, 0x3a02) AM_READ_PORT("DSW0")
-	AM_RANGE(0x3a02, 0x3a03) AM_WRITE(scrollyP1_w)
-	AM_RANGE(0x3a03, 0x3a03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(scrollxP0_w)
-	AM_RANGE(0x3a05, 0x3a05) AM_READ_PORT("VBLANK")
-	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(scrollyP0_w)
-	AM_RANGE(0x3a08, 0x3a08) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(main_irq_w)
-	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(cpuA_bankswitch_w)
-	AM_RANGE(0x3c00, 0x3dff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x3e00, 0x3fff) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void xain_state::bootleg_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("share1");
+	map(0x2000, 0x27ff).ram().w(this, FUNC(xain_state::charram_w)).share("charram");
+	map(0x2800, 0x2fff).ram().w(this, FUNC(xain_state::bgram1_w)).share("bgram1");
+	map(0x3000, 0x37ff).ram().w(this, FUNC(xain_state::bgram0_w)).share("bgram0");
+	map(0x3800, 0x397f).ram().share("spriteram");
+	map(0x3a00, 0x3a00).portr("P1");
+	map(0x3a00, 0x3a01).w(this, FUNC(xain_state::scrollxP1_w));
+	map(0x3a01, 0x3a01).portr("P2");
+	map(0x3a02, 0x3a02).portr("DSW0");
+	map(0x3a02, 0x3a03).w(this, FUNC(xain_state::scrollyP1_w));
+	map(0x3a03, 0x3a03).portr("DSW1");
+	map(0x3a04, 0x3a05).w(this, FUNC(xain_state::scrollxP0_w));
+	map(0x3a05, 0x3a05).portr("VBLANK");
+	map(0x3a06, 0x3a07).w(this, FUNC(xain_state::scrollyP0_w));
+	map(0x3a08, 0x3a08).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x3a09, 0x3a0c).w(this, FUNC(xain_state::main_irq_w));
+	map(0x3a0d, 0x3a0d).w(this, FUNC(xain_state::flipscreen_w));
+	map(0x3a0f, 0x3a0f).w(this, FUNC(xain_state::cpuA_bankswitch_w));
+	map(0x3c00, 0x3dff).w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x3e00, 0x3fff).w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
-	AM_IMPORT_FROM(bootleg_map)
-	AM_RANGE(0x3a04, 0x3a04) AM_DEVREAD("mcu", taito68705_mcu_device, data_r)
-	AM_RANGE(0x3a06, 0x3a06) AM_READ(mcu_comm_reset_r)
-	AM_RANGE(0x3a0e, 0x3a0e) AM_DEVWRITE("mcu", taito68705_mcu_device, data_w)
-ADDRESS_MAP_END
+void xain_state::main_map(address_map &map)
+{
+	bootleg_map(map);
+	map(0x3a04, 0x3a04).r(m_mcu, FUNC(taito68705_mcu_device::data_r));
+	map(0x3a06, 0x3a06).r(this, FUNC(xain_state::mcu_comm_reset_r));
+	map(0x3a0e, 0x3a0e).w(m_mcu, FUNC(taito68705_mcu_device::data_w));
+}
 
-static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(irqA_assert_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(irqB_clear_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(cpuB_bankswitch_w)
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void xain_state::cpu_map_B(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("share1");
+	map(0x2000, 0x2000).w(this, FUNC(xain_state::irqA_assert_w));
+	map(0x2800, 0x2800).w(this, FUNC(xain_state::irqB_clear_w));
+	map(0x3000, 0x3000).w(this, FUNC(xain_state::cpuB_bankswitch_w));
+	map(0x4000, 0x7fff).bankr("bank2");
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xain_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE("ym2", ym2203_device, write)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void xain_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x1000, 0x1000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x2800, 0x2801).w("ym1", FUNC(ym2203_device::write));
+	map(0x3000, 0x3001).w("ym2", FUNC(ym2203_device::write));
+	map(0x4000, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( xsleena )
@@ -402,8 +406,8 @@ static INPUT_PORTS_START( xsleena )
 	PORT_START("VBLANK")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3 )
-	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state, mcu_status_r, nullptr)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state, vblank_r, nullptr)   /* VBLANK */
+	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state, mcu_status_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xain_state, vblank_r, nullptr)   /* VBLANK */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -496,7 +500,8 @@ MACHINE_CONFIG_START(xain_state::xsleena)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(xain_state::xsleenab, xsleena)
+MACHINE_CONFIG_START(xain_state::xsleenab)
+	xsleena(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

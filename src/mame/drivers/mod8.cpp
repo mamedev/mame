@@ -73,6 +73,8 @@ public:
 	DECLARE_READ8_MEMBER(tty_r);
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
 	void mod8(machine_config &config);
+	void mod8_io(address_map &map);
+	void mod8_mem(address_map &map);
 private:
 	uint16_t m_tty_data;
 	uint8_t m_tty_key_data;
@@ -108,19 +110,21 @@ READ8_MEMBER( mod8_state::tty_r )
 	return d;
 }
 
-static ADDRESS_MAP_START(mod8_mem, AS_PROGRAM, 8, mod8_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000,0x6ff) AM_ROM
-	AM_RANGE(0x700,0xfff) AM_RAM
-ADDRESS_MAP_END
+void mod8_state::mod8_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x000, 0x6ff).rom();
+	map(0x700, 0xfff).ram();
+}
 
-static ADDRESS_MAP_START(mod8_io, AS_IO, 8, mod8_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READ(tty_r)
-	AM_RANGE(0x0a,0x0a) AM_WRITE(out_w)
-	AM_RANGE(0x0b,0x0b) AM_WRITE(tty_w)
-ADDRESS_MAP_END
+void mod8_state::mod8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(mod8_state::tty_r));
+	map(0x0a, 0x0a).w(this, FUNC(mod8_state::out_w));
+	map(0x0b, 0x0b).w(this, FUNC(mod8_state::tty_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mod8 )

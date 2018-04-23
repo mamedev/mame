@@ -253,7 +253,7 @@ void tms9980a_device::acquire_instruction()
 	{
 		decode(m_current_value);
 		if (TRACE_OP) logerror("tms9980a: ===== Next operation %04x (%s) at %04x =====\n", IR, opname[m_command], PC);
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 		PC = (PC + 2) & 0xfffe & m_prgaddr_mask;
 	}
 	// IAQ will be cleared in the main loop
@@ -284,9 +284,9 @@ uint32_t tms9980a_device::execute_input_lines() const
 
 // device_disasm_interface overrides
 
-util::disasm_interface *tms9980a_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms9980a_device::create_disassembler()
 {
-	return new tms9900_disassembler(TMS9980_ID);
+	return std::make_unique<tms9900_disassembler>(TMS9980_ID);
 }
 
-DEFINE_DEVICE_TYPE(TMS9980A, tms9980a_device, "tms9980a", "TMS9980A")
+DEFINE_DEVICE_TYPE(TMS9980A, tms9980a_device, "tms9980a", "Texas Instruments TMS9980A")

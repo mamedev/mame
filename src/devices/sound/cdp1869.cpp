@@ -64,28 +64,32 @@ constexpr XTAL cdp1869_device::CPU_CLK_PAL;
 DEFINE_DEVICE_TYPE(CDP1869, cdp1869_device, "cdp1869", "RCA CDP1869 VIS")
 
 // I/O map
-DEVICE_ADDRESS_MAP_START( io_map, 8, cdp1869_device )
-	AM_RANGE(0x03, 0x03) AM_WRITE(out3_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(out4_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(out5_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(out6_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(out7_w)
-ADDRESS_MAP_END
+void cdp1869_device::io_map(address_map &map)
+{
+	map(0x03, 0x03).w(this, FUNC(cdp1869_device::out3_w));
+	map(0x04, 0x04).w(this, FUNC(cdp1869_device::out4_w));
+	map(0x05, 0x05).w(this, FUNC(cdp1869_device::out5_w));
+	map(0x06, 0x06).w(this, FUNC(cdp1869_device::out6_w));
+	map(0x07, 0x07).w(this, FUNC(cdp1869_device::out7_w));
+}
 
 // character RAM map
-DEVICE_ADDRESS_MAP_START( char_map, 8, cdp1869_device )
-	AM_RANGE(0x000, 0x3ff) AM_READWRITE(char_ram_r, char_ram_w)
-ADDRESS_MAP_END
+void cdp1869_device::char_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw(this, FUNC(cdp1869_device::char_ram_r), FUNC(cdp1869_device::char_ram_w));
+}
 
 // page RAM map
-DEVICE_ADDRESS_MAP_START( page_map, 8, cdp1869_device )
-	AM_RANGE(0x000, 0x7ff) AM_READWRITE(page_ram_r, page_ram_w)
-ADDRESS_MAP_END
+void cdp1869_device::page_map(address_map &map)
+{
+	map(0x000, 0x7ff).rw(this, FUNC(cdp1869_device::page_ram_r), FUNC(cdp1869_device::page_ram_w));
+}
 
 // default address map
-static ADDRESS_MAP_START( cdp1869, 0, 8, cdp1869_device )
-	AM_RANGE(0x000, 0x7ff) AM_RAM
-ADDRESS_MAP_END
+void cdp1869_device::cdp1869(address_map &map)
+{
+	map(0x000, 0x7ff).ram();
+}
 
 
 
@@ -355,7 +359,7 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 	m_color_clock(0),
 	m_stream(nullptr),
 	m_palette(*this, "palette"),
-	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, nullptr, *ADDRESS_MAP_NAME(cdp1869))
+	m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, address_map_constructor(), address_map_constructor(FUNC(cdp1869_device::cdp1869), this))
 {
 }
 

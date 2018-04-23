@@ -3,6 +3,9 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "cpu/m6809/m6809.h"
+#include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
 
 
 class gladiatr_state_base : public driver_device
@@ -19,6 +22,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
+	void cpu2_map(address_map &map);
 protected:
 	gladiatr_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
@@ -54,13 +58,13 @@ protected:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<cpu_device>             m_maincpu;
-	required_device<cpu_device>             m_subcpu;
-	required_device<cpu_device>             m_audiocpu;
-	optional_device<cpu_device>             m_cctl;
-	optional_device<cpu_device>             m_ccpu;
-	optional_device<cpu_device>             m_ucpu;
-	optional_device<cpu_device>             m_csnd;
+	required_device<z80_device>             m_maincpu;
+	required_device<z80_device>             m_subcpu;
+	required_device<mc6809_device>          m_audiocpu;
+	optional_device<upi41_cpu_device>       m_cctl;
+	optional_device<upi41_cpu_device>       m_ccpu;
+	optional_device<upi41_cpu_device>       m_ucpu;
+	optional_device<upi41_cpu_device>       m_csnd;
 	required_device<gfxdecode_device>       m_gfxdecode;
 	required_device<palette_device>         m_palette;
 	required_device<msm5205_device>         m_msm;
@@ -140,6 +144,10 @@ public:
 	void swap_block(uint8_t *src1,uint8_t *src2,int len);
 
 	void gladiatr(machine_config &config);
+	void gladiatr_cpu1_io(address_map &map);
+	void gladiatr_cpu1_map(address_map &map);
+	void gladiatr_cpu2_io(address_map &map);
+	void gladiatr_cpu3_map(address_map &map);
 private:
 	required_ioport m_dsw1, m_dsw2;
 	required_ioport m_in0, m_in1, m_in2;
@@ -185,6 +193,10 @@ public:
 	uint32_t screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ppking(machine_config &config);
+	void ppking_cpu1_io(address_map &map);
+	void ppking_cpu1_map(address_map &map);
+	void ppking_cpu2_io(address_map &map);
+	void ppking_cpu3_map(address_map &map);
 private:
 	required_shared_ptr<uint8_t>    m_nvram;
 	required_device<generic_latch_8_device> m_soundlatch2;

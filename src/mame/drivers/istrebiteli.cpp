@@ -169,6 +169,8 @@ public:
 	uint8_t m_spr_xy[8];
 	uint8_t m_tileram[16];
 	void istreb(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 };
 
 void istrebiteli_state::machine_start()
@@ -298,19 +300,21 @@ WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
 	m_spr_xy[offset ^ 7] = data;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, istrebiteli_state)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void istrebiteli_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, istrebiteli_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(tileram_w)
-	AM_RANGE(0xc0, 0xc3) AM_READWRITE(ppi0_r, ppi0_w)
-	AM_RANGE(0xc4, 0xc7) AM_READWRITE(ppi1_r, ppi1_w)
-	AM_RANGE(0xc8, 0xcf) AM_WRITE(spr_xy_w)
-ADDRESS_MAP_END
+void istrebiteli_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xb0, 0xbf).w(this, FUNC(istrebiteli_state::tileram_w));
+	map(0xc0, 0xc3).rw(this, FUNC(istrebiteli_state::ppi0_r), FUNC(istrebiteli_state::ppi0_w));
+	map(0xc4, 0xc7).rw(this, FUNC(istrebiteli_state::ppi1_r), FUNC(istrebiteli_state::ppi1_w));
+	map(0xc8, 0xcf).w(this, FUNC(istrebiteli_state::spr_xy_w));
+}
 
 CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
 {
@@ -349,7 +353,7 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
@@ -359,14 +363,14 @@ static INPUT_PORTS_START( istreb )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 0)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, collision_r, 0)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2)
-	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, coin_r, nullptr)
+	PORT_BIT(0x3c, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, istrebiteli_state, coin_r, nullptr)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_HBLANK("screen")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 

@@ -427,6 +427,8 @@ public:
 	void send_through_panel(uint8_t data);
 	void esq1(machine_config &config);
 	void sq80(machine_config &config);
+	void esq1_map(address_map &map);
+	void sq80_map(address_map &map);
 };
 
 
@@ -501,28 +503,30 @@ WRITE8_MEMBER(esq1_state::seqdosram_w)
 	}
 }
 
-static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM                 // OSRAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)  // OS "high" ROM is always mapped here
-ADDRESS_MAP_END
+void esq1_state::esq1_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();                 // OSRAM
+	map(0x4000, 0x5fff).ram();                 // SEQRAM
+	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
+	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x6800, 0x68ff).w(this, FUNC(esq1_state::analog_w));
+	map(0x7000, 0x7fff).bankr("osbank");
+	map(0x8000, 0xffff).rom().region("osrom", 0x8000);  // OS "high" ROM is always mapped here
+}
 
-static ADDRESS_MAP_START( sq80_map, AS_PROGRAM, 8, esq1_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM                 // OSRAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
+void esq1_state::sq80_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();                 // OSRAM
+	map(0x4000, 0x5fff).ram();                 // SEQRAM
 //  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", scn2681_device, read, write)
-	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
-	AM_RANGE(0x6c00, 0x6dff) AM_WRITE(mapper_w)
-	AM_RANGE(0x6e00, 0x6fff) AM_READWRITE(wd1772_r, wd1772_w)
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)  // OS "high" ROM is always mapped here
-ADDRESS_MAP_END
+	map(0x6000, 0x63ff).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
+	map(0x6400, 0x640f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x6800, 0x68ff).w(this, FUNC(esq1_state::analog_w));
+	map(0x6c00, 0x6dff).w(this, FUNC(esq1_state::mapper_w));
+	map(0x6e00, 0x6fff).rw(this, FUNC(esq1_state::wd1772_r), FUNC(esq1_state::wd1772_w));
+	map(0x7000, 0x7fff).bankr("osbank");
+	map(0x8000, 0xffff).rom().region("osrom", 0x8000);  // OS "high" ROM is always mapped here
+}
 
 // from the schematics:
 //
@@ -543,7 +547,7 @@ WRITE8_MEMBER(esq1_state::duart_output)
 {
 	int bank = ((data >> 1) & 0x7);
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);
-//  printf("[%02x] bank %d => offset %x (PC=%x)\n", data, bank, bank * 0x1000, m_maincpu->safe_pc());
+//  printf("%s [%02x] bank %d => offset %x\n", machine().describe_context().c_str(), data, bank, bank * 0x1000);
 	membank("osbank")->set_base(memregion("osrom")->base() + (bank * 0x1000) );
 
 	m_seq_bank = (data & 0x8) ? 0x8000 : 0x0000;
@@ -621,7 +625,8 @@ MACHINE_CONFIG_START(esq1_state::esq1)
 	MCFG_SOUND_ROUTE_EX(7, "filters", 1.0, 7)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq1_state::sq80, esq1)
+MACHINE_CONFIG_START(esq1_state::sq80)
+	esq1(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sq80_map)
 

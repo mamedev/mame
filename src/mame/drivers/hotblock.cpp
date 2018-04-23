@@ -78,6 +78,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hotblock(machine_config &config);
+	void hotblock_io(address_map &map);
+	void hotblock_map(address_map &map);
 };
 
 
@@ -128,18 +130,20 @@ WRITE8_MEMBER(hotblock_state::video_write)
 	}
 }
 
-static ADDRESS_MAP_START( hotblock_map, AS_PROGRAM, 8, hotblock_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(video_read, video_write) AM_SHARE("vram")
-	AM_RANGE(0x20000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void hotblock_state::hotblock_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0x10000, 0x1ffff).rw(this, FUNC(hotblock_state::video_read), FUNC(hotblock_state::video_write)).share("vram");
+	map(0x20000, 0xfffff).rom();
+}
 
-static ADDRESS_MAP_START( hotblock_io, AS_IO, 8, hotblock_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(port0_w)
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(port4_r, port4_w)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("aysnd", ym2149_device, data_r)
-ADDRESS_MAP_END
+void hotblock_state::hotblock_io(address_map &map)
+{
+	map(0x0000, 0x0000).w(this, FUNC(hotblock_state::port0_w));
+	map(0x0004, 0x0004).rw(this, FUNC(hotblock_state::port4_r), FUNC(hotblock_state::port4_w));
+	map(0x8000, 0x8001).w("aysnd", FUNC(ym2149_device::address_data_w));
+	map(0x8001, 0x8001).r("aysnd", FUNC(ym2149_device::data_r));
+}
 
 
 
@@ -208,16 +212,13 @@ MACHINE_CONFIG_START(hotblock_state::hotblock)
 	MCFG_CPU_ADD("maincpu", I8088, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hotblock_map)
 	MCFG_CPU_IO_MAP(hotblock_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hotblock_state, nmi_line_pulse) /* right? */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024,1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(8000000, 512, 0, 320, 312, 0, 200) // 15.625 kHz horizontal???
 	MCFG_SCREEN_UPDATE_DRIVER(hotblock_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // right?
 
 	MCFG_PALETTE_ADD("palette", 256)
 

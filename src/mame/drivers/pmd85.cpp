@@ -220,77 +220,85 @@ uint32_t pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &b
 
 /* I/O ports */
 
-static ADDRESS_MAP_START( pmd85_io_map, AS_IO, 8, pmd85_state )
-	AM_RANGE( 0x00, 0xff) AM_READWRITE(pmd85_io_r, pmd85_io_w )
-ADDRESS_MAP_END
+void pmd85_state::pmd85_io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(pmd85_state::pmd85_io_r), FUNC(pmd85_state::pmd85_io_w));
+}
 
-static ADDRESS_MAP_START( mato_io_map, AS_IO, 8, pmd85_state )
-	AM_RANGE( 0x00, 0xff) AM_READWRITE(mato_io_r, mato_io_w )
-ADDRESS_MAP_END
+void pmd85_state::mato_io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(pmd85_state::mato_io_r), FUNC(pmd85_state::mato_io_w));
+}
 
 /* memory w/r functions */
 
-static ADDRESS_MAP_START( pmd85_mem , AS_PROGRAM, 8, pmd85_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank5")
-	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bank6")
-	AM_RANGE(0x9000, 0x9fff) AM_NOP
-	AM_RANGE(0xa000, 0xafff) AM_READ_BANK("bank7")
-	AM_RANGE(0xb000, 0xbfff) AM_NOP
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank8")
-ADDRESS_MAP_END
+void pmd85_state::pmd85_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1");
+	map(0x1000, 0x1fff).bankrw("bank2");
+	map(0x2000, 0x2fff).bankrw("bank3");
+	map(0x3000, 0x3fff).bankrw("bank4");
+	map(0x4000, 0x7fff).bankrw("bank5");
+	map(0x8000, 0x8fff).bankr("bank6");
+	map(0x9000, 0x9fff).noprw();
+	map(0xa000, 0xafff).bankr("bank7");
+	map(0xb000, 0xbfff).noprw();
+	map(0xc000, 0xffff).bankrw("bank8");
+}
 
-static ADDRESS_MAP_START( pmd852a_mem , AS_PROGRAM, 8, pmd85_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank5")
-	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bank6")
-	AM_RANGE(0x9000, 0x9fff) AM_RAMBANK("bank7")
-	AM_RANGE(0xa000, 0xafff) AM_READ_BANK("bank8")
-	AM_RANGE(0xb000, 0xbfff) AM_RAMBANK("bank9")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank10")
-ADDRESS_MAP_END
+void pmd85_state::pmd852a_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1");
+	map(0x1000, 0x1fff).bankrw("bank2");
+	map(0x2000, 0x2fff).bankrw("bank3");
+	map(0x3000, 0x3fff).bankrw("bank4");
+	map(0x4000, 0x7fff).bankrw("bank5");
+	map(0x8000, 0x8fff).bankr("bank6");
+	map(0x9000, 0x9fff).bankrw("bank7");
+	map(0xa000, 0xafff).bankr("bank8");
+	map(0xb000, 0xbfff).bankrw("bank9");
+	map(0xc000, 0xffff).bankrw("bank10");
+}
 
-static ADDRESS_MAP_START( pmd853_mem , AS_PROGRAM, 8, pmd85_state )
-	AM_RANGE(0x0000, 0x1fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
-	AM_RANGE(0x2000, 0x3fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
-	AM_RANGE(0x4000, 0x5fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
-	AM_RANGE(0x6000, 0x7fff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank12")
-	AM_RANGE(0x8000, 0x9fff) AM_READ_BANK("bank5") AM_WRITE_BANK("bank13")
-	AM_RANGE(0xa000, 0xbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank14")
-	AM_RANGE(0xc000, 0xdfff) AM_READ_BANK("bank7") AM_WRITE_BANK("bank15")
-	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank8") AM_WRITE_BANK("bank16")
-ADDRESS_MAP_END
+void pmd85_state::pmd853_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank1").bankw("bank9");
+	map(0x2000, 0x3fff).bankr("bank2").bankw("bank10");
+	map(0x4000, 0x5fff).bankr("bank3").bankw("bank11");
+	map(0x6000, 0x7fff).bankr("bank4").bankw("bank12");
+	map(0x8000, 0x9fff).bankr("bank5").bankw("bank13");
+	map(0xa000, 0xbfff).bankr("bank6").bankw("bank14");
+	map(0xc000, 0xdfff).bankr("bank7").bankw("bank15");
+	map(0xe000, 0xffff).bankr("bank8").bankw("bank16");
+}
 
-static ADDRESS_MAP_START( alfa_mem , AS_PROGRAM, 8, pmd85_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x1000, 0x33ff) AM_RAMBANK("bank2")
-	AM_RANGE(0x3400, 0x3fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bank5")
-	AM_RANGE(0x9000, 0xb3ff) AM_READ_BANK("bank6")
-	AM_RANGE(0xb400, 0xbfff) AM_NOP
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank7")
-ADDRESS_MAP_END
+void pmd85_state::alfa_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1");
+	map(0x1000, 0x33ff).bankrw("bank2");
+	map(0x3400, 0x3fff).bankrw("bank3");
+	map(0x4000, 0x7fff).bankrw("bank4");
+	map(0x8000, 0x8fff).bankr("bank5");
+	map(0x9000, 0xb3ff).bankr("bank6");
+	map(0xb400, 0xbfff).noprw();
+	map(0xc000, 0xffff).bankrw("bank7");
+}
 
-static ADDRESS_MAP_START( mato_mem , AS_PROGRAM, 8, pmd85_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void pmd85_state::mato_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
-static ADDRESS_MAP_START( c2717_mem , AS_PROGRAM, 8, pmd85_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3")
-	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void pmd85_state::c2717_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0x7fff).bankrw("bank2");
+	map(0x8000, 0xbfff).bankr("bank3");
+	map(0xc000, 0xffff).bankrw("bank4");
+}
 
 /* keyboard input */
 
@@ -640,7 +648,8 @@ MACHINE_CONFIG_START(pmd85_state::pmd85)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pmd85_state::pmd851, pmd85)
+MACHINE_CONFIG_START(pmd85_state::pmd851)
+	pmd85(config);
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_0_porta_r))
@@ -675,17 +684,20 @@ MACHINE_CONFIG_DERIVED(pmd85_state::pmd851, pmd85)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_3_portc_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pmd85_state::pmd852a, pmd851)
+MACHINE_CONFIG_START(pmd85_state::pmd852a)
+	pmd851(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pmd852a_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pmd85_state::pmd853, pmd851)
+MACHINE_CONFIG_START(pmd85_state::pmd853)
+	pmd851(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pmd853_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pmd85_state::alfa, pmd85)
+MACHINE_CONFIG_START(pmd85_state::alfa)
+	pmd85(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alfa_mem)
 
@@ -714,7 +726,8 @@ MACHINE_CONFIG_DERIVED(pmd85_state::alfa, pmd85)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_2_portc_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pmd85_state::mato, pmd85)
+MACHINE_CONFIG_START(pmd85_state::mato)
+	pmd85(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mato_mem)
 	MCFG_CPU_IO_MAP(mato_io_map)
@@ -731,7 +744,8 @@ MACHINE_CONFIG_DERIVED(pmd85_state::mato, pmd85)
 	MCFG_DEVICE_REMOVE("uart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pmd85_state::c2717, pmd851)
+MACHINE_CONFIG_START(pmd85_state::c2717)
+	pmd851(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(c2717_mem)
 MACHINE_CONFIG_END

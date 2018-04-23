@@ -63,6 +63,10 @@ public:
 	required_device<palette_device> m_palette;
 	void kot(machine_config &config);
 	void tiamc1(machine_config &config);
+	void kotrybolov_io_map(address_map &map);
+	void kotrybolov_map(address_map &map);
+	void tiamc1_io_map(address_map &map);
+	void tiamc1_map(address_map &map);
 private:
 	optional_device<speaker_sound_device> m_speaker;
 	void update_bg_palette();

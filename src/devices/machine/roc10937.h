@@ -17,7 +17,7 @@
 		MCFG_ROC10937_PORT(_val)
 
 #define MCFG_ROC10937_PORT(_val) \
-		roc10937_device::static_set_value(*device, _val);
+		downcast<roc10937_device &>(*device).set_port_value(_val);
 #define MCFG_ROC10937_REMOVE(_tag) \
 		MCFG_DEVICE_REMOVE(_tag)
 
@@ -26,16 +26,16 @@
 		MCFG_ROC10957_PORT(_val)
 
 #define MCFG_ROC10957_PORT(_val) \
-		roc10957_device::static_set_value(*device, _val);
+		downcast<roc10957_device &>(*device).set_port_value(_val);
 #define MCFG_ROC10957_REMOVE(_tag) \
 		MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_MSC1937_ADD(_tag,_val) \
-		MCFG_DEVICE_ADD(_tag, ROC10937,60)\
+		MCFG_DEVICE_ADD(_tag, MSC1937,60)\
 		MCFG_MSC1937_PORT(_val)
 
 #define MCFG_MSC1937_PORT(_val) \
-		MCFG_ROC10937_PORT(_val)
+		downcast<msc1937_device &>(*device).set_port_value(_val);
 
 #define MCFG_MSC1937_REMOVE(_tag) \
 		MCFG_DEVICE_REMOVE(_tag)
@@ -45,7 +45,7 @@
 		MCFG_MIC10937_PORT(_val)
 
 #define MCFG_MIC10937_PORT(_val) \
-		MCFG_ROC10937_PORT(_val)
+		downcast<mic10937_device &>(*device).set_port_value(_val);
 
 #define MCFG_MIC10937_REMOVE(_tag) \
 		MCFG_DEVICE_REMOVE(_tag)
@@ -55,16 +55,17 @@
 		MCFG_S16LF01_PORT(_val)
 
 #define MCFG_S16LF01_PORT(_val) \
-		MCFG_ROC10937_PORT(_val)
+		downcast<s16lf01_device &>(*device).set_port_value(_val);
 
-class rocvfd_device : public device_t {
+class rocvfd_device : public device_t
+{
 public:
 	// inline configuration helpers
-	static void static_set_value(device_t &device, int val);
+	void set_port_value(uint8_t val) { m_port_val = val; }
+
 	virtual void update_display();
 	void shift_clock(int data);
 	void write_char(int data);
-	uint32_t set_display(uint32_t segin);
 	DECLARE_WRITE_LINE_MEMBER( sclk );
 	DECLARE_WRITE_LINE_MEMBER( data );
 	DECLARE_WRITE_LINE_MEMBER( por );
@@ -73,9 +74,10 @@ public:
 protected:
 	rocvfd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t m_port_val;
+	std::unique_ptr<output_finder<16> > m_outputs;
+
 	int m_cursor_pos;
-	int m_window_size;      // window  size
+	int m_window_size;
 	int m_shift_count;
 	int m_shift_data;
 	int m_pcursor_pos;
@@ -87,11 +89,15 @@ protected:
 	int m_sclk;
 	uint8_t m_cursor;
 	uint32_t m_chars[16];
-	uint32_t m_outputs[16];
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
+
+private:
+	static uint32_t set_display(uint32_t segin);
+
+	uint8_t m_port_val;
 };
 
 

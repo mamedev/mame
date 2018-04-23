@@ -6,8 +6,8 @@
 class tetrisp2_state : public driver_device
 {
 public:
-	tetrisp2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tetrisp2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_spriteram(*this, "spriteram"),
@@ -143,30 +143,72 @@ public:
 	void nndmseal(machine_config &config);
 	void rocknms(machine_config &config);
 	void rockn(machine_config &config);
+	void nndmseal_map(address_map &map);
+	void rockn1_map(address_map &map);
+	void rockn2_map(address_map &map);
+	void rocknms_main_map(address_map &map);
+	void rocknms_sub_map(address_map &map);
+	void tetrisp2_map(address_map &map);
 };
 
 class stepstag_state : public tetrisp2_state
 {
 public:
-	stepstag_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tetrisp2_state(mconfig, type, tag),
-			m_spriteram3(*this, "spriteram3"),
-			m_soundlatch(*this, "soundlatch") { }
+	stepstag_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tetrisp2_state(mconfig, type, tag),
+		m_spriteram1(*this, "spriteram1"),
+		m_spriteram3(*this, "spriteram3"),
+		m_vj_gfxdecode_l(*this, "gfxdecode_l"),
+		m_vj_gfxdecode_m(*this, "gfxdecode_m"),
+		m_vj_gfxdecode_r(*this, "gfxdecode_r"),
+		m_vj_palette_l(*this, "lpalette"),
+		m_vj_palette_m(*this, "mpalette"),
+		m_vj_palette_r(*this, "rpalette"),
+		m_vj_paletteram_l(*this, "paletteram1"),
+		m_vj_paletteram_m(*this, "paletteram2"),
+		m_vj_paletteram_r(*this, "paletteram3"),
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
-	required_shared_ptr<uint16_t> m_spriteram3;
-	required_device<generic_latch_16_device> m_soundlatch;
 	DECLARE_READ16_MEMBER(stepstag_coins_r);
+	uint16_t vj_upload_idx;
+	bool vj_upload_fini;
+	DECLARE_WRITE16_MEMBER(stepstag_b00000_w);
+	DECLARE_WRITE16_MEMBER(stepstag_b20000_w);
+	DECLARE_WRITE16_MEMBER(stepstag_main2pc_w);
 	DECLARE_READ16_MEMBER(unknown_read_0xc00000);
 	DECLARE_READ16_MEMBER(unknown_read_0xffff00);
-	DECLARE_READ16_MEMBER(unk_a42000_r);
+	DECLARE_READ16_MEMBER(stepstag_pc2main_r);
 	DECLARE_WRITE16_MEMBER(stepstag_soundlatch_word_w);
-	DECLARE_WRITE16_MEMBER(stepstag_leds_w);
+	DECLARE_WRITE16_MEMBER(stepstag_neon_w);
+	DECLARE_WRITE16_MEMBER(stepstag_step_leds_w);
+	DECLARE_WRITE16_MEMBER(stepstag_button_leds_w);
 	DECLARE_WRITE16_MEMBER( stepstag_palette_w );
 	DECLARE_DRIVER_INIT(stepstag);
 	DECLARE_VIDEO_START(stepstag);
-	uint32_t screen_update_stepstag_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_stepstag_mid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int mypal(int x);
+
 	void stepstag(machine_config &config);
+	void vjdash(machine_config &config);
+
+	void stepstag_map(address_map &map);
+	void stepstag_sub_map(address_map &map);
+	void vjdash_map(address_map &map);
+private:
+	required_shared_ptr<uint16_t> m_spriteram1;
+	required_shared_ptr<uint16_t> m_spriteram3;
+	optional_device<gfxdecode_device> m_vj_gfxdecode_l;
+	optional_device<gfxdecode_device> m_vj_gfxdecode_m;
+	optional_device<gfxdecode_device> m_vj_gfxdecode_r;
+	optional_device<palette_device> m_vj_palette_l;
+	optional_device<palette_device> m_vj_palette_m;
+	optional_device<palette_device> m_vj_palette_r;
+	optional_shared_ptr<uint16_t> m_vj_paletteram_l;
+	optional_shared_ptr<uint16_t> m_vj_paletteram_m;
+	optional_shared_ptr<uint16_t> m_vj_paletteram_r;
+	required_device<generic_latch_16_device> m_soundlatch;
 };

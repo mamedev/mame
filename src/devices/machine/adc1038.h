@@ -32,8 +32,8 @@ public:
 
 	adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_input_callback(device_t &device, input_delegate &&callback) { downcast<adc1038_device &>(device).m_input_cb = std::move(callback); }
-	static void set_gti_club_hack(device_t &device, int hack) { downcast<adc1038_device &>(device).m_gticlub_hack = hack; }
+	template <typename Object> void set_input_callback(Object &&cb) { m_input_cb = std::forward<Object>(cb); }
+	void set_gti_club_hack(int hack) { m_gticlub_hack = hack; }
 
 	DECLARE_READ_LINE_MEMBER( do_read );
 	DECLARE_READ_LINE_MEMBER( sars_read );
@@ -63,9 +63,9 @@ DECLARE_DEVICE_TYPE(ADC1038, adc1038_device)
 
 
 #define MCFG_ADC1038_INPUT_CB(_class, _method) \
-	adc1038_device::set_input_callback(*device, adc1038_device::input_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<adc1038_device &>(*device).set_input_callback(adc1038_device::input_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_ADC1038_GTIHACK(_hack) \
-	adc1038_device::set_gti_club_hack(*device, _hack);
+	downcast<adc1038_device &>(*device).set_gti_club_hack(_hack);
 
 #endif // MAME_MACHINE_ADC1038_H

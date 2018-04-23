@@ -43,16 +43,6 @@
  *
  *************************************/
 
-void avgdvg_device::set_flip_x(int flip)
-{
-	flip_x = flip;
-}
-
-void avgdvg_device::set_flip_y(int flip)
-{
-	flip_y = flip;
-}
-
 void avgdvg_device::apply_flipping(int *x, int *y)
 {
 	if (flip_x)
@@ -1402,7 +1392,7 @@ void avg_device::device_start()
 	if(!m_vector->started())
 		throw device_missing_dependencies();
 
-	const rectangle &visarea = machine().first_screen()->visible_area();
+	const rectangle &visarea = m_vector->screen().visible_area();
 
 	avgdvg_vectorram = reinterpret_cast<uint8_t *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
@@ -1442,7 +1432,7 @@ void dvg_device::device_start()
 	if(!m_vector->started())
 		throw device_missing_dependencies();
 
-	const rectangle &visarea = machine().first_screen()->visible_area();
+	const rectangle &visarea = m_vector->screen().visible_area();
 
 	avgdvg_vectorram = reinterpret_cast<uint8_t *>(machine().root_device().memshare("vectorram")->ptr());
 	avgdvg_vectorram_size = machine().root_device().memshare("vectorram")->bytes();
@@ -1460,11 +1450,6 @@ void dvg_device::device_start()
 	vg_run_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(avgdvg_device::run_state_machine),this));
 
 	register_state();
-}
-
-void avgdvg_device::static_set_vector_tag(device_t &device, const char *tag)
-{
-	downcast<avgdvg_device &>(device).m_vector.set_tag(tag);
 }
 
 avgdvg_device::avgdvg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)

@@ -52,7 +52,9 @@ public:
 		m_crt(*this, "crt"),
 		m_tty(*this, "tty"),
 		m_row(*this, "ROW-%u", 0),
-		m_wp(*this, "WP") { }
+		m_wp(*this, "WP"),
+		m_digits(*this, "digit%u", 0U)
+		{ }
 
 	required_shared_ptr<uint8_t> m_ram_1k;
 	required_shared_ptr<uint8_t> m_ram_2k;
@@ -64,6 +66,7 @@ public:
 	emu_timer *m_led_update;
 	DECLARE_DRIVER_INIT(sym1);
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_0_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_1_w);
@@ -78,6 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(via3_a_w);
 
 	void sym1(machine_config &config);
+	void sym1_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -86,6 +90,7 @@ protected:
 	required_device<rs232_port_device> m_tty;
 	required_ioport_array<4> m_row;
 	required_ioport m_wp;
+	output_finder<6> m_digits;
 };
 
 
@@ -102,7 +107,7 @@ WRITE_LINE_MEMBER( sym1_state::sym1_74145_output_5_w ) { if (state) m_led_update
 
 TIMER_CALLBACK_MEMBER(sym1_state::led_refresh)
 {
-	output().set_digit_value(param, m_riot_port_a);
+	m_digits[param] = m_riot_port_a;
 }
 
 READ8_MEMBER(sym1_state::riot_a_r)
@@ -124,7 +129,7 @@ READ8_MEMBER(sym1_state::riot_a_r)
 
 READ8_MEMBER(sym1_state::riot_b_r)
 {
-	int data = 0xff;
+	int data = 0x3f;
 
 	// determine column
 	if ( ((m_riot_port_a ^ 0xff) & (m_row[1]->read() ^ 0xff)) & 0x7f )
@@ -137,10 +142,10 @@ READ8_MEMBER(sym1_state::riot_b_r)
 		data &= ~0x04;
 
 	// PB6 in from TTY keyboard
-	data &= m_tty->rxd_r() << 6;
+	data |= m_tty->rxd_r() << 6;
 
 	// PB7 in from RS-232 CRT
-	data &= m_crt->rxd_r() << 7;
+	data |= m_crt->rxd_r() << 7;
 
 	data &= ~0x80; // else hangs 8b02
 
@@ -299,19 +304,20 @@ void sym1_state::machine_reset()
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sym1_map, AS_PROGRAM, 8, sym1_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM // U12/U13 RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAMBANK("bank2") AM_SHARE("ram_1k")
-	AM_RANGE(0x0800, 0x0bff) AM_RAMBANK("bank3") AM_SHARE("ram_2k")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK("bank4") AM_SHARE("ram_3k")
-	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_SHARE("monitor") // U20 Monitor ROM
-	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("via1", via6522_device, read, write)  // U25 VIA #1
-	AM_RANGE(0xa400, 0xa41f) AM_DEVICE("riot", mos6532_new_device, io_map)  // U27 RIOT
-	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_SHARE("riot_ram")   // U27 RIOT RAM
-	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via2", via6522_device, read, write)  // U28 VIA #2
-	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via3", via6522_device, read, write)  // U29 VIA #3
-	AM_RANGE(0xb000, 0xefff) AM_ROM
-ADDRESS_MAP_END
+void sym1_state::sym1_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram(); // U12/U13 RAM
+	map(0x0400, 0x07ff).bankrw("bank2").share("ram_1k");
+	map(0x0800, 0x0bff).bankrw("bank3").share("ram_2k");
+	map(0x0c00, 0x0fff).bankrw("bank4").share("ram_3k");
+	map(0x8000, 0x8fff).rom().share("monitor"); // U20 Monitor ROM
+	map(0xa000, 0xa00f).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U25 VIA #1
+	map(0xa400, 0xa41f).m("riot", FUNC(mos6532_new_device::io_map));  // U27 RIOT
+	map(0xa600, 0xa67f).bankrw("bank5").share("riot_ram");   // U27 RIOT RAM
+	map(0xa800, 0xa80f).rw("via2", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U28 VIA #2
+	map(0xac00, 0xac0f).rw("via3", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U29 VIA #3
+	map(0xb000, 0xefff).rom();
+}
 
 
 //**************************************************************************

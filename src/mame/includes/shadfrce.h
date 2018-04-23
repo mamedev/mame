@@ -91,4 +91,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void shadfrce(machine_config &config);
+	void shadfrce_map(address_map &map);
+	void shadfrce_sound_map(address_map &map);
 };

@@ -51,10 +51,10 @@
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_ESQPANEL_TX_CALLBACK(_write) \
-	devcb = &esqpanel_device::set_tx_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<esqpanel_device &>(*device).set_tx_wr_callback(DEVCB_##_write);
 
 #define MCFG_ESQPANEL_ANALOG_CALLBACK(_write) \
-	devcb = &esqpanel_device::set_analog_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<esqpanel_device &>(*device).set_analog_wr_callback(DEVCB_##_write);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -69,15 +69,9 @@ namespace esqpanel {
 class esqpanel_device : public device_t, public device_serial_interface
 {
 public:
-	template <class Object>
-	static devcb_base &set_tx_wr_callback(device_t &device, Object &&cb) {
-		return downcast<esqpanel_device &>(device).m_write_tx.set_callback(std::forward<Object>(cb));
-	}
+	template <class Object> devcb_base &set_tx_wr_callback(Object &&cb) { return m_write_tx.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object>
-	static devcb_base &set_analog_wr_callback(device_t &device, Object &&cb) {
-		return downcast<esqpanel_device &>(device).m_write_analog.set_callback(std::forward<Object>(cb));
-	}
+	template <class Object> devcb_base &set_analog_wr_callback(Object &&cb) { return m_write_analog.set_callback(std::forward<Object>(cb)); }
 
 	void xmit_char(uint8_t data);
 	void set_analog_value(offs_t offset, uint16_t value);

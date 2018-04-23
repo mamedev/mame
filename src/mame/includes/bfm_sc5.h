@@ -12,6 +12,7 @@ public:
 	{ }
 
 	void bfm_sc5(machine_config &config);
+	void sc5_map(address_map &map);
 protected:
 
 

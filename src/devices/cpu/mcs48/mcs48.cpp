@@ -141,22 +141,22 @@
 
 
 
-DEFINE_DEVICE_TYPE(I8021,  i8021_device,  "i8021",  "I8021")
-DEFINE_DEVICE_TYPE(I8022,  i8022_device,  "i8022",  "I8022")
-DEFINE_DEVICE_TYPE(I8035,  i8035_device,  "i8035",  "I8035")
-DEFINE_DEVICE_TYPE(I8048,  i8048_device,  "i8048",  "I8048")
-DEFINE_DEVICE_TYPE(I8648,  i8648_device,  "i8648",  "I8648")
-DEFINE_DEVICE_TYPE(I8748,  i8748_device,  "i8748",  "I8748")
-DEFINE_DEVICE_TYPE(I8039,  i8039_device,  "i8039",  "I8039")
-DEFINE_DEVICE_TYPE(I8049,  i8049_device,  "i8049",  "I8049")
-DEFINE_DEVICE_TYPE(I8749,  i8749_device,  "i8749",  "I8749")
-DEFINE_DEVICE_TYPE(I8040,  i8040_device,  "i8040",  "I8040")
-DEFINE_DEVICE_TYPE(I8050,  i8050_device,  "i8050",  "I8050")
-DEFINE_DEVICE_TYPE(I8041,  i8041_device,  "i8041",  "I8041")
-DEFINE_DEVICE_TYPE(I8741,  i8741_device,  "i8741",  "I8741")
-DEFINE_DEVICE_TYPE(I8042,  i8042_device,  "i8042",  "I8042")
-DEFINE_DEVICE_TYPE(I8242,  i8242_device,  "i8242",  "I8242")
-DEFINE_DEVICE_TYPE(I8742,  i8742_device,  "i8742",  "I8742")
+DEFINE_DEVICE_TYPE(I8021,  i8021_device,  "i8021",  "Intel I8021")
+DEFINE_DEVICE_TYPE(I8022,  i8022_device,  "i8022",  "Intel I8022")
+DEFINE_DEVICE_TYPE(I8035,  i8035_device,  "i8035",  "Intel I8035")
+DEFINE_DEVICE_TYPE(I8048,  i8048_device,  "i8048",  "Intel I8048")
+DEFINE_DEVICE_TYPE(I8648,  i8648_device,  "i8648",  "Intel I8648")
+DEFINE_DEVICE_TYPE(I8748,  i8748_device,  "i8748",  "Intel I8748")
+DEFINE_DEVICE_TYPE(I8039,  i8039_device,  "i8039",  "Intel I8039")
+DEFINE_DEVICE_TYPE(I8049,  i8049_device,  "i8049",  "Intel I8049")
+DEFINE_DEVICE_TYPE(I8749,  i8749_device,  "i8749",  "Intel I8749")
+DEFINE_DEVICE_TYPE(I8040,  i8040_device,  "i8040",  "Intel I8040")
+DEFINE_DEVICE_TYPE(I8050,  i8050_device,  "i8050",  "Intel I8050")
+DEFINE_DEVICE_TYPE(I8041,  i8041_device,  "i8041",  "Intel I8041")
+DEFINE_DEVICE_TYPE(I8741,  i8741_device,  "i8741",  "Intel I8741")
+DEFINE_DEVICE_TYPE(I8042,  i8042_device,  "i8042",  "Intel I8042")
+DEFINE_DEVICE_TYPE(I8242,  i8242_device,  "i8242",  "Intel I8242")
+DEFINE_DEVICE_TYPE(I8742,  i8742_device,  "i8742",  "Intel I8742")
 DEFINE_DEVICE_TYPE(MB8884, mb8884_device, "mb8884", "MB8884")
 DEFINE_DEVICE_TYPE(N7751,  n7751_device,  "n7751",  "N7751")
 DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
@@ -167,37 +167,43 @@ DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
 ***************************************************************************/
 
 /* FIXME: the memory maps should probably support rom banking for EA */
-static ADDRESS_MAP_START(program_10bit, AS_PROGRAM, 8, mcs48_cpu_device)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_10bit(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-static ADDRESS_MAP_START(program_11bit, AS_PROGRAM, 8, mcs48_cpu_device)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_11bit(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8, mcs48_cpu_device)
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_12bit(address_map &map)
+{
+	map(0x000, 0xfff).rom();
+}
 
-static ADDRESS_MAP_START(data_6bit, AS_DATA, 8, mcs48_cpu_device)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_6bit(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, mcs48_cpu_device)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_7bit(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
-static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs48_cpu_device)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_8bit(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 
 mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, (feature_mask & MB_FEATURE) != 0 ? 12 : 11, 0
-		, (rom_size == 1024) ? ADDRESS_MAP_NAME(program_10bit) : (rom_size == 2048) ? ADDRESS_MAP_NAME(program_11bit) : (rom_size == 4096) ? ADDRESS_MAP_NAME(program_12bit) : nullptr)
+					   , (rom_size == 1024) ? address_map_constructor(FUNC(mcs48_cpu_device::program_10bit), this) : (rom_size == 2048) ? address_map_constructor(FUNC(mcs48_cpu_device::program_11bit), this) : (rom_size == 4096) ? address_map_constructor(FUNC(mcs48_cpu_device::program_12bit), this) : address_map_constructor())
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, ( ( ram_size == 64 ) ? 6 : ( ( ram_size == 128 ) ? 7 : 8 ) ), 0
-		, (ram_size == 64) ? ADDRESS_MAP_NAME(data_6bit) : (ram_size == 128) ? ADDRESS_MAP_NAME(data_7bit) : ADDRESS_MAP_NAME(data_8bit))
+					, (ram_size == 64) ? address_map_constructor(FUNC(mcs48_cpu_device::data_6bit), this) : (ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) : address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	, m_port_in_cb{{*this}, {*this}}
 	, m_port_out_cb{{*this}, {*this}}
@@ -338,9 +344,9 @@ device_memory_interface::space_config_vector mcs48_cpu_device::memory_space_conf
 		};
 }
 
-util::disasm_interface *mcs48_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> mcs48_cpu_device::create_disassembler()
 {
-	return new mcs48_disassembler((m_feature_mask & UPI41_FEATURE) != 0, (m_feature_mask & I802X_FEATURE) != 0);
+	return std::make_unique<mcs48_disassembler>((m_feature_mask & UPI41_FEATURE) != 0, (m_feature_mask & I802X_FEATURE) != 0);
 }
 
 /***************************************************************************
@@ -1149,7 +1155,7 @@ void mcs48_cpu_device::device_start()
 
 	save_item(NAME(m_a11));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -1293,7 +1299,7 @@ void mcs48_cpu_device::execute_run()
 
 		/* fetch next opcode */
 		m_prevpc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 		opcode = opcode_fetch();
 
 		/* process opcode and count cycles */

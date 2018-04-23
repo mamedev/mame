@@ -22,17 +22,19 @@ class wpc_an_state : public driver_device
 {
 public:
 	wpc_an_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_bg(*this,"bg"),
-			m_wpcsnd(*this,"wpcsnd"),
-			m_cpubank(*this, "cpubank"),
-			m_wpc(*this,"wpc")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_bg(*this,"bg")
+		, m_wpcsnd(*this,"wpcsnd")
+		, m_cpubank(*this, "cpubank")
+		, m_wpc(*this,"wpc")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void wpc_an_dd(machine_config &config);
 	void wpc_an(machine_config &config);
 	void wpc_an_base(machine_config &config);
+	void wpc_an_map(address_map &map);
 protected:
 
 	// devices
@@ -41,9 +43,11 @@ protected:
 	optional_device<wpcsnd_device> m_wpcsnd;
 	required_memory_bank m_cpubank;
 	required_device<wpc_device> m_wpc;
+	output_finder<32> m_digits;
 
 	// driver_device overrides
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_VBLANK = 0;
 	static const device_timer_id TIMER_IRQ = 1;
@@ -70,13 +74,14 @@ private:
 };
 
 
-static ADDRESS_MAP_START( wpc_an_map, AS_PROGRAM, 8, wpc_an_state )
-	AM_RANGE(0x0000, 0x2fff) AM_READWRITE(ram_r,ram_w)
-	AM_RANGE(0x3000, 0x3faf) AM_RAM
-	AM_RANGE(0x3fb0, 0x3fff) AM_DEVREADWRITE("wpc",wpc_device,read,write) // WPC device
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("cpubank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("fixed",0)
-ADDRESS_MAP_END
+void wpc_an_state::wpc_an_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rw(this, FUNC(wpc_an_state::ram_r), FUNC(wpc_an_state::ram_w));
+	map(0x3000, 0x3faf).ram();
+	map(0x3fb0, 0x3fff).rw(m_wpc, FUNC(wpc_device::read), FUNC(wpc_device::write)); // WPC device
+	map(0x4000, 0x7fff).bankr("cpubank");
+	map(0x8000, 0xffff).rom().region("fixed", 0);
+}
 
 static INPUT_PORTS_START( wpc_an )
 	PORT_START("INP0")
@@ -202,8 +207,8 @@ void wpc_an_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// update LED segments
 		for(x=0;x<16;x++)
 		{
-			output().set_digit_value(x,bitswap<16>(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-			output().set_digit_value(x+16,bitswap<16>(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+			m_digits[x] = bitswap<16>(m_wpc->get_alphanumeric(x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
+			m_digits[x+16] = bitswap<16>(m_wpc->get_alphanumeric(20+x), 15, 7, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
 		}
 		m_wpc->reset_alphanumeric();
 		m_vblank_count++;
@@ -335,7 +340,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an)
-	MCFG_FRAGMENT_ADD(wpc_an_base)
+	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
@@ -345,7 +350,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
-	MCFG_FRAGMENT_ADD(wpc_an_base)
+	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("bg", S11C_BG, 0)

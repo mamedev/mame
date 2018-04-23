@@ -88,4 +88,6 @@ public:
 			void psikyo3v1(machine_config &config);
 			void psikyo5(machine_config &config);
 			void psikyo5_240(machine_config &config);
+			void ps3v1_map(address_map &map);
+			void ps5_map(address_map &map);
 };

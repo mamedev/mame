@@ -78,7 +78,7 @@ const atari_motion_objects_config toobin_state::s_mob_config =
 	0                   /* resulting value to indicate "special" */
 };
 
-VIDEO_START_MEMBER(toobin_state,toobin)
+void toobin_state::video_start()
 {
 	/* allocate a playfield bitmap for rendering */
 	m_screen->register_screen_bitmap(m_pfbitmap);

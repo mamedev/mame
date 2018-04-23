@@ -115,34 +115,37 @@ CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( battlex_map, AS_PROGRAM, 8, battlex_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(battlex_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM
-	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(battlex_palette_w)
-ADDRESS_MAP_END
+void battlex_state::battlex_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x8000, 0x8fff).ram().w(this, FUNC(battlex_state::battlex_videoram_w)).share("videoram");
+	map(0x9000, 0x91ff).ram().share("spriteram");
+	map(0xa000, 0xa3ff).ram();
+	map(0xe000, 0xe03f).ram().w(this, FUNC(battlex_state::battlex_palette_w));
+}
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, battlex_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x10, 0x10) AM_WRITE(battlex_flipscreen_w)
+void battlex_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("DSW1");
+	map(0x01, 0x01).portr("SYSTEM");
+	map(0x02, 0x02).portr("INPUTS");
+	map(0x03, 0x03).portr("DSW2");
+	map(0x10, 0x10).w(this, FUNC(battlex_state::battlex_flipscreen_w));
 
 	/* verify all of these */
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(battlex_scroll_starfield_w)
-	AM_RANGE(0x32, 0x32) AM_WRITE(battlex_scroll_x_lsb_w)
-	AM_RANGE(0x33, 0x33) AM_WRITE(battlex_scroll_x_msb_w)
-ADDRESS_MAP_END
+	map(0x22, 0x23).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x30, 0x30).w(this, FUNC(battlex_state::battlex_scroll_starfield_w));
+	map(0x32, 0x32).w(this, FUNC(battlex_state::battlex_scroll_x_lsb_w));
+	map(0x33, 0x33).w(this, FUNC(battlex_state::battlex_scroll_x_msb_w));
+}
 
-static ADDRESS_MAP_START( dodgeman_io_map, AS_IO, 8, battlex_state )
-	AM_IMPORT_FROM(io_map)
-	AM_RANGE(0x26, 0x27) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-ADDRESS_MAP_END
+void battlex_state::dodgeman_io_map(address_map &map)
+{
+	io_map(map);
+	map(0x26, 0x27).w("ay2", FUNC(ay8910_device::data_address_w));
+}
 
 /*************************************
  *
@@ -163,7 +166,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, battlex_state,battlex_in0_b4_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, battlex_state,battlex_in0_b4_r, nullptr)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -315,7 +318,8 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(battlex_state::dodgeman, battlex)
+MACHINE_CONFIG_START(battlex_state::dodgeman)
+	battlex(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(dodgeman_io_map)

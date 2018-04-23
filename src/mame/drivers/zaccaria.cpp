@@ -145,21 +145,22 @@ WRITE_LINE_MEMBER(zaccaria_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_READONLY
-	AM_RANGE(0x6400, 0x6407) AM_READ(prot1_r)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(videoram_w) AM_SHARE("videoram") /* 6400-67ff is 4 bits wide */
-	AM_RANGE(0x6800, 0x683f) AM_WRITE(attributes_w) AM_SHARE("attributesram")
-	AM_RANGE(0x6840, 0x685f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x6c00, 0x6c07) AM_MIRROR(0x81f8) AM_READ(prot2_r) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x6e00, 0x6e00) AM_MIRROR(0x81f8) AM_READ(dsw_r) AM_DEVWRITE("audiopcb", zac1b11142_audio_device, hs_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x7c00, 0x7c00) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8000, 0xdfff) AM_ROM
-ADDRESS_MAP_END
+void zaccaria_state::main_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x63ff).readonly();
+	map(0x6400, 0x6407).r(this, FUNC(zaccaria_state::prot1_r));
+	map(0x6000, 0x67ff).w(this, FUNC(zaccaria_state::videoram_w)).share("videoram"); /* 6400-67ff is 4 bits wide */
+	map(0x6800, 0x683f).w(this, FUNC(zaccaria_state::attributes_w)).share("attributesram");
+	map(0x6840, 0x685f).ram().share("spriteram");
+	map(0x6881, 0x68c0).ram().share("spriteram2");
+	map(0x6c00, 0x6c07).mirror(0x81f8).r(this, FUNC(zaccaria_state::prot2_r)).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x6e00, 0x6e00).mirror(0x81f8).r(this, FUNC(zaccaria_state::dsw_r)).w(m_audiopcb, FUNC(zac1b11142_audio_device::hs_w));
+	map(0x7000, 0x77ff).ram();
+	map(0x7800, 0x7803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x7c00, 0x7c00).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8000, 0xdfff).rom();
+}
 
 
 static INPUT_PORTS_START( monymony )
@@ -267,7 +268,7 @@ static INPUT_PORTS_START( monymony )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("audiopcb", zac1b11142_audio_device, acs_r)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("audiopcb", zac1b11142_audio_device, acs_r)
 	/* other bits come from a protection device */
 INPUT_PORTS_END
 
@@ -323,10 +324,10 @@ static GFXDECODE_START( zaccaria )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
+WRITE_LINE_MEMBER(zaccaria_state::vblank_irq)
 {
-	if (m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -335,7 +336,7 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL(18'432'000)/6)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaccaria_state,  vblank_irq)
+
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -361,6 +362,7 @@ MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(zaccaria_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(zaccaria_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zaccaria)
 	MCFG_PALETTE_ADD("palette", 32*8+32*8)

@@ -205,6 +205,15 @@ public:
 	void hec2mdhrx(machine_config &config);
 	void hec2hr(machine_config &config);
 	void hector_audio(machine_config &config);
+	void hec2hrp_io(address_map &map);
+	void hec2hrp_mem(address_map &map);
+	void hec2hrx_io(address_map &map);
+	void hec2hrx_mem(address_map &map);
+	void hec2mdhrx_io(address_map &map);
+	void hec2mx40_io(address_map &map);
+	void hec2mx80_io(address_map &map);
+	void hecdisc2_io(address_map &map);
+	void hecdisc2_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_HEC2HRP_H

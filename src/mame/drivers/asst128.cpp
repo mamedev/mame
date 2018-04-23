@@ -22,16 +22,17 @@ public:
 	{
 	}
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 };
 
-DEVICE_ADDRESS_MAP_START( map, 8, asst128_mb_device )
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
-	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x0080, 0x008f) AM_WRITE(pc_page_w)
-	AM_RANGE(0x00a0, 0x00a1) AM_WRITE(nmi_enable_w)
-ADDRESS_MAP_END
+void asst128_mb_device::map(address_map &map)
+{
+	map(0x0020, 0x002f).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x0040, 0x004f).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x0060, 0x006f).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0080, 0x008f).w(this, FUNC(asst128_mb_device::pc_page_w));
+	map(0x00a0, 0x00a1).w(this, FUNC(asst128_mb_device::nmi_enable_w));
+}
 
 DEFINE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device, "asst128_mb", "ASST128_MOTHERBOARD")
 
@@ -53,6 +54,8 @@ public:
 
 	void machine_start() override;
 	void asst128(machine_config &config);
+	void asst128_io(address_map &map);
+	void asst128_map(address_map &map);
 };
 
 void asst128_state::machine_start()
@@ -68,18 +71,20 @@ WRITE8_MEMBER(asst128_state::asst128_fdc_dor_w)
 	m_fdc->dor_w(space, offset, data, mem_mask);
 }
 
-static ADDRESS_MAP_START( asst128_map, AS_PROGRAM, 16, asst128_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void asst128_state::asst128_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-static ADDRESS_MAP_START(asst128_io, AS_IO, 16, asst128_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", asst128_mb_device, map, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("pc_joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
-	AM_RANGE(0x03f2, 0x03f3) AM_WRITE8(asst128_fdc_dor_w, 0xffff)
-	AM_RANGE(0x03f4, 0x03f5) AM_DEVICE8("fdc:upd765", upd765a_device, map, 0xffff)
-ADDRESS_MAP_END
+void asst128_state::asst128_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(asst128_mb_device::map));
+	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
+	map(0x03f2, 0x03f3).w(this, FUNC(asst128_state::asst128_fdc_dor_w));
+	map(0x03f4, 0x03f5).m("fdc:upd765", FUNC(upd765a_device::map));
+}
 
 static SLOT_INTERFACE_START( asst128_floppies )
 	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
@@ -100,7 +105,7 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", ASST128_MOTHERBOARD, 0)
-	asst128_mb_device::static_set_cputag(*device, "^maincpu");
+	downcast<asst128_mb_device &>(*device).set_cputag("^maincpu");
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
 	MCFG_DEVICE_MODIFY("mb:cassette")

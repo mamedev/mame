@@ -6,6 +6,7 @@ local extlibs = {
 --      3rdparty       system        3rdparty
 --      lib name:      lib name,     include dir
 --
+	asio       = { "asio",      "3rdparty/asio/include" },
 	expat      = { "expat",     "3rdparty/expat/lib" },
 	zlib       = { "z",         "3rdparty/zlib" },
 	jpeg       = { "jpeg",      "3rdparty/libjpeg" },
@@ -15,9 +16,17 @@ local extlibs = {
 	portaudio  = { "portaudio", "3rdparty/portaudio/include" },
 	lua        = { "lua",       "3rdparty/lua/src" },
 	utf8proc   = { "utf8proc",  "3rdparty/utf8proc" },
+	glm        = { "glm",       "3rdparty/glm" },
+	rapidjson  = { "rapidjson", "3rdparty/rapidjson/include" },
+	pugixml    = { "pugixml",   "3rdparty/pugixml/src" },
 }
 
 -- system lib options
+newoption {
+	trigger = 'with-system-asio',
+	description = 'Use system Asio library',
+}
+
 newoption {
 	trigger = 'with-system-expat',
 	description = 'Use system Expat library',
@@ -61,6 +70,21 @@ newoption {
 newoption {
 	trigger = "with-system-utf8proc",
 	description = "Use system utf8proc library",
+}
+
+newoption {
+	trigger = "with-system-glm",
+	description = "Use system glm library",
+}
+
+newoption {
+	trigger = "with-system-rapidjson",
+	description = "Use system rapidjson library",
+}
+
+newoption {
+	trigger = "with-system-pugixml",
+	description = "Use system pugixml library",
 }
 
 -- build helpers

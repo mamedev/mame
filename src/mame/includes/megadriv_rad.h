@@ -26,6 +26,7 @@ public:
 	void megadriv_radica_3button_ntsc(machine_config &config);
 	void megadriv_radica_3button_pal(machine_config &config);
 
+	void megadriv_radica_map(address_map &map);
 private:
 	int m_bank;
 	required_region_ptr<uint16_t> m_rom;

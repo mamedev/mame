@@ -481,7 +481,7 @@ inline uint8_t z80_device::rop()
 	PC++;
 	uint8_t res = m_decrypted_opcodes_direct->read_byte(pc);
 	m_icount -= 2;
-	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f));
+	m_refresh_cb((m_i << 8) | (m_r2 & 0x80) | ((m_r-1) & 0x7f), 0x00, 0xff);
 	m_icount += 2;
 	return res;
 }
@@ -3446,7 +3446,7 @@ void z80_device::device_start()
 	state_add(Z80_HALT,        "HALT",      m_halt).mask(0x1);
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	/* setup cycle tables */
 	m_cc_op = cc_op;
@@ -3517,7 +3517,7 @@ void z80_device::execute_run()
 		m_after_ldair = false;
 
 		PRVPC = PCD;
-		debugger_instruction_hook(this, PCD);
+		debugger_instruction_hook(PCD);
 		m_r++;
 		EXEC(op,rop());
 	} while (m_icount > 0);
@@ -3546,7 +3546,7 @@ void nsc800_device::execute_run()
 		m_after_ldair = false;
 
 		PRVPC = PCD;
-		debugger_instruction_hook(this, PCD);
+		debugger_instruction_hook(PCD);
 		m_r++;
 		EXEC(op,rop());
 	} while (m_icount > 0);
@@ -3672,9 +3672,9 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *z80_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> z80_device::create_disassembler()
 {
-	return new z80_disassembler;
+	return std::make_unique<z80_disassembler>();
 }
 
 
@@ -3725,11 +3725,11 @@ device_memory_interface::space_config_vector z80_device::memory_space_config() c
 		};
 }
 
-DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Z80")
+DEFINE_DEVICE_TYPE(Z80, z80_device, "z80", "Zilog Z80")
 
 nsc800_device::nsc800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80_device(mconfig, NSC800, tag, owner, clock)
 {
 }
 
-DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "NSC800")
+DEFINE_DEVICE_TYPE(NSC800, nsc800_device, "nsc800", "National Semiconductor NSC800")

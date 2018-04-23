@@ -44,4 +44,6 @@ public:
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, const uint8_t *source );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void portrait(machine_config &config);
+	void portrait_map(address_map &map);
+	void portrait_sound_map(address_map &map);
 };

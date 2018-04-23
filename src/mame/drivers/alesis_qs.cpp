@@ -25,6 +25,7 @@ public:
 	{ }
 
 	void qs7(machine_config &config);
+	void qs7_prog_map(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 };
@@ -42,10 +43,11 @@ static INPUT_PORTS_START( qs7 )
 //        PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?") PORT_CODE(KEYCODE_)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( qs7_prog_map, AS_PROGRAM, 16, qs_state )
+void qs_state::qs7_prog_map(address_map &map)
+{
 	//ADDRESS_MAP_GLOBAL_MASK(0x3ffff)
-	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x00000, 0x3ffff).rom();
+}
 
 MACHINE_CONFIG_START(qs_state::qs7)
 	/* basic machine hardware */

@@ -43,21 +43,6 @@ device_video_interface::~device_video_interface()
 
 
 //-------------------------------------------------
-//  static_add_route - configuration helper to add
-//  a new route to the device
-//-------------------------------------------------
-
-void device_video_interface::static_set_screen(device_t &device, const char *tag)
-{
-	// find our video interface
-	device_video_interface *video;
-	if (!device.interface(video))
-		throw emu_fatalerror("MCFG_VIDEO_SET_SCREEN called on device '%s' with no video interface", device.tag());
-	video->m_screen_tag = tag;
-}
-
-
-//-------------------------------------------------
 //  interface_validity_check - validation for a
 //  device after the configuration has been
 //  constructed

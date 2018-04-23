@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "machine/timer.h"
+#include "machine/74259.h"
 #include "sound/cem3394.h"
 #include "screen.h"
 
@@ -52,6 +53,7 @@ public:
 		m_68k(*this, "68k"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_outlatch(*this, "outlatch"),
 		m_generic_paletteram_8(*this, "paletteram") { }
 
 	required_device<timer_device> m_scanline_timer;
@@ -242,9 +244,14 @@ public:
 	optional_device<cpu_device> m_68k;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ls259_device> m_outlatch;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 	void shrike(machine_config &config);
 	void balsente(machine_config &config);
+	void cpu1_map(address_map &map);
+	void cpu2_io_map(address_map &map);
+	void cpu2_map(address_map &map);
+	void shrike68k_map(address_map &map);
 };
 
 

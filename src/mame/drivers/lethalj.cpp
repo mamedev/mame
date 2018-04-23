@@ -209,22 +209,23 @@ WRITE16_MEMBER(lethalj_state::cclownz_control_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16, lethalj_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x04000000, 0x0400000f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x04100000, 0x0410000f) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x00ff)
+void lethalj_state::lethalj_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram();
+	map(0x04000000, 0x0400000f).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x04000010, 0x0400001f).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
+	map(0x04100000, 0x0410000f).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 //  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
-	AM_RANGE(0x04200000, 0x0420001f) AM_WRITENOP    /* clocks bits through here */
-	AM_RANGE(0x04300000, 0x0430007f) AM_READ(lethalj_gun_r)
-	AM_RANGE(0x04400000, 0x0440000f) AM_WRITENOP    /* clocks bits through here */
-	AM_RANGE(0x04500010, 0x0450001f) AM_READ_PORT("IN0")
-	AM_RANGE(0x04600000, 0x0460000f) AM_READ_PORT("IN1")
-	AM_RANGE(0x04700000, 0x0470007f) AM_WRITE(lethalj_blitter_w)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_DEVREADWRITE("maincpu", tms34010_device, io_register_r, io_register_w)
-	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP    /* seems to be a bug in their code, one of many. */
-	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+	map(0x04200000, 0x0420001f).nopw();    /* clocks bits through here */
+	map(0x04300000, 0x0430007f).r(this, FUNC(lethalj_state::lethalj_gun_r));
+	map(0x04400000, 0x0440000f).nopw();    /* clocks bits through here */
+	map(0x04500010, 0x0450001f).portr("IN0");
+	map(0x04600000, 0x0460000f).portr("IN1");
+	map(0x04700000, 0x0470007f).w(this, FUNC(lethalj_state::lethalj_blitter_w));
+	map(0xc0000000, 0xc00001ff).rw(m_maincpu, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0xc0000240, 0xc000025f).nopw();    /* seems to be a bug in their code, one of many. */
+	map(0xff800000, 0xffffffff).rom().region("user1", 0);
+}
 
 
 
@@ -375,7 +376,7 @@ static INPUT_PORTS_START( ripribit )
 	PORT_START("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -462,7 +463,7 @@ static INPUT_PORTS_START( cfarm )
 	PORT_DIPSETTING(      0x0000, "10" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0006, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -513,8 +514,8 @@ static INPUT_PORTS_START( cclownz )
 	PORT_DIPSETTING(      0x0000, "3000" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, nullptr)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, nullptr)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -663,7 +664,8 @@ MACHINE_CONFIG_START(lethalj_state::gameroom)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(lethalj_state::lethalj, gameroom)
+MACHINE_CONFIG_START(lethalj_state::lethalj)
+	gameroom(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */

@@ -100,6 +100,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void roul(machine_config &config);
+	void roul_cpu_io_map(address_map &map);
+	void roul_map(address_map &map);
+	void sound_cpu_io_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 
@@ -200,32 +204,36 @@ WRITE8_MEMBER(roul_state::ball_w)
 	m_lamp_old = lamp;
 }
 
-static ADDRESS_MAP_START( roul_map, AS_PROGRAM, 8, roul_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void roul_state::roul_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram().share("nvram");
+}
 
-static ADDRESS_MAP_START( roul_cpu_io_map, AS_IO, 8, roul_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf4) AM_WRITE(blitter_cmd_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
-	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
-	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
-	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-ADDRESS_MAP_END
+void roul_state::roul_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf0, 0xf4).w(this, FUNC(roul_state::blitter_cmd_w));
+	map(0xf5, 0xf5).r(this, FUNC(roul_state::blitter_status_r));
+	map(0xf8, 0xf8).portr("DSW");
+	map(0xf9, 0xf9).w(this, FUNC(roul_state::ball_w));
+	map(0xfa, 0xfa).portr("IN0");
+	map(0xfd, 0xfd).portr("IN1");
+	map(0xfe, 0xfe).w(this, FUNC(roul_state::sound_latch_w));
+}
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, roul_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-ADDRESS_MAP_END
+void roul_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0x13ff).ram();
+}
 
-static ADDRESS_MAP_START( sound_cpu_io_map, AS_IO, 8, roul_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-ADDRESS_MAP_END
+void roul_state::sound_cpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
 
 void roul_state::video_start()
 {
@@ -300,7 +308,6 @@ MACHINE_CONFIG_START(roul_state::roul)
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(roul_map)
 	MCFG_CPU_IO_MAP(roul_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", roul_state, nmi_line_pulse)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -317,6 +324,7 @@ MACHINE_CONFIG_START(roul_state::roul)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(roul_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(roul_state, roul)

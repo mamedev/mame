@@ -35,6 +35,7 @@ public:
 	uint32_t screen_update_orao(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void orao(machine_config &config);
+	void orao_mem(address_map &map);
 private:
 	required_shared_ptr<uint8_t> m_memory;
 	required_shared_ptr<uint8_t> m_video_ram;

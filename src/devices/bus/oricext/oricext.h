@@ -17,7 +17,7 @@
 	MCFG_DEVICE_ADD(_tag, ORICEXT_CONNECTOR, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
 	downcast<oricext_connector *>(device)->set_cputag(_cputag); \
-	devcb = &oricext_connector::set_irq_handler(*device, DEVCB_##_irq);
+	devcb = &downcast<oricext_connector &>(*device).set_irq_handler(DEVCB_##_irq);
 
 
 class oricext_device;
@@ -29,7 +29,7 @@ public:
 	virtual ~oricext_connector();
 
 	void set_cputag(const char *tag);
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<oricext_connector &>(device).irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return irq_handler.set_callback(std::forward<Object>(cb)); }
 	void irq_w(int state);
 
 protected:

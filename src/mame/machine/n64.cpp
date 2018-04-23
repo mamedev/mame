@@ -2674,7 +2674,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 
 READ32_MEMBER( n64_periphs::pif_ram_r )
 {
-	if(!machine().side_effect_disabled())
+	if(!machine().side_effects_disabled())
 	{
 		if( offset == ( 0x24 / 4 ) )
 		{

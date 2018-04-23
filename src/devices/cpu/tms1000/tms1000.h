@@ -22,10 +22,15 @@ public:
 protected:
 	tms1000_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
+	void program_10bit_8(address_map &map);
+	void data_64x4(address_map &map);
+	void program_9bit_8(address_map &map);
+	void data_32x4(address_map &map);
+
 	// overrides
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual u32 decode_micro(u8 sel);
 };

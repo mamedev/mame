@@ -532,29 +532,31 @@ WRITE8_MEMBER( mpz80_state::disp_col_w )
 //  ADDRESS_MAP( mpz80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
+void mpz80_state::mpz80_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(mpz80_state::mmu_r), FUNC(mpz80_state::mmu_w));
 /*
     Task 0 Segment 0 map:
 
-    AM_RANGE(0x0000, 0x03ff) AM_RAM
-    AM_RANGE(0x0400, 0x0400) AM_READWRITE(trap_addr_r, disp_seg_w)
-    AM_RANGE(0x0401, 0x0401) AM_READWRITE(keyboard_r, disp_col_w)
-    AM_RANGE(0x0402, 0x0402) AM_READWRITE(switch_r, task_w)
-    AM_RANGE(0x0403, 0x0403) AM_READWRITE(status_r, mask_w)
-    AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("map_ram")
-    AM_RANGE(0x0800, 0x0bff) AM_ROM AM_REGION(Z80_TAG, 0)
-    AM_RANGE(0x0c00, 0x0c00) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
+    map(0x0000, 0x03ff).ram();
+    map(0x0400, 0x0400).rw(this, FUNC(mpz80_state::trap_addr_r), FUNC(mpz80_state::disp_seg_w));
+    map(0x0401, 0x0401).rw(this, FUNC(mpz80_state::keyboard_r), FUNC(mpz80_state::disp_col_w));
+    map(0x0402, 0x0402).rw(this, FUNC(mpz80_state::switch_r), FUNC(mpz80_state::task_w));
+    map(0x0403, 0x0403).rw(this, FUNC(mpz80_state::status_r), FUNC(mpz80_state::mask_w));
+    map(0x0600, 0x07ff).ram().share("map_ram");
+    map(0x0800, 0x0bff).rom().region(Z80_TAG, 0);
+    map(0x0c00, 0x0c00).rw(AM9512_TAG, FUNC(am9512_device::read), FUNC(am9512_device::write));
 */
-ADDRESS_MAP_END
+}
 
 //-------------------------------------------------
 //  ADDRESS_MAP( mpz80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mpz80_io, AS_IO, 8, mpz80_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_io_r, mmu_io_w)
-ADDRESS_MAP_END
+void mpz80_state::mpz80_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(mpz80_state::mmu_io_r), FUNC(mpz80_state::mmu_io_w));
+}
 
 
 

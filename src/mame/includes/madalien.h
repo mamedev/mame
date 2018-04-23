@@ -85,6 +85,8 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch2;
 	void madalien(machine_config &config);
 	void madalien_video(machine_config &config);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 /*----------- defined in audio/madalien.c -----------*/

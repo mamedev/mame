@@ -22,10 +22,13 @@ public:
 protected:
 	tms1100_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 o_pins, u8 r_pins, u8 pc_bits, u8 byte_bits, u8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
+	void program_11bit_8(address_map &map);
+	void data_128x4(address_map &map);
+
 	// overrides
 	virtual void device_reset() override;
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void op_setr() override;
 	virtual void op_rstr() override;

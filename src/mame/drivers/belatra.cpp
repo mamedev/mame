@@ -55,15 +55,17 @@ public:
 	{ }
 
 	void belatra(machine_config &config);
+	void belatra_map(address_map &map);
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START( belatra_map, AS_PROGRAM, 32, belatra_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
-ADDRESS_MAP_END
+void belatra_state::belatra_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).rom();
+}
 
 static INPUT_PORTS_START( belatra )
 INPUT_PORTS_END

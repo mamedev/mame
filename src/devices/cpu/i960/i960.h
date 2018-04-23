@@ -73,7 +73,11 @@ public:
 	// on the real hardware (e.g. Model 2's interrupt control registers)
 	void i960_noburst() { m_bursting = 0; }
 
-	void i960_stall() { m_IP = m_PIP; }
+	void i960_stall()
+	{
+		m_stalled = true;
+		m_IP = m_PIP;
+	}
 
 protected:
 	enum { I960_RCACHE_SIZE = 4 };
@@ -97,9 +101,19 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	void burst_stall_save(uint32_t t1, uint32_t t2, int index, int size, bool iswriteop);
+
+	struct {
+		uint32_t t1,t2;
+		int index,size;
+		bool burst_mode;
+		bool iswriteop;
+	}m_stall_state;
+	bool m_stalled;
+
 	address_space_config m_program_config;
 
 	uint32_t m_r[0x20];
@@ -161,6 +175,7 @@ private:
 	void fxx(uint32_t opcode, int mask);
 	void test(uint32_t opcode, int mask);
 	void execute_op(uint32_t opcode);
+	void execute_burst_stall_op(uint32_t opcode);
 	void take_interrupt(int vector, int lvl);
 	void check_irqs();
 	void do_call(uint32_t adr, int type, uint32_t stack);

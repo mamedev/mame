@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE16_MEMBER(vfd_w);
 
 	void globalfr(machine_config &config);
+	void globalfr_map(address_map &map);
 };
 
 /******************************************************************************/
@@ -51,12 +52,13 @@ WRITE16_MEMBER(globalfr_state::vfd_w)
 	}
 }
 
-static ADDRESS_MAP_START( globalfr_map, AS_PROGRAM, 16, globalfr_state )
-	AM_RANGE(0x002000, 0x002fff) AM_RAM
-	AM_RANGE(0x008000, 0x07ffff) AM_ROM AM_REGION("maincpu", 0x8000)
-	AM_RANGE(0x0a0000, 0x0a01ff) AM_RAM
-	AM_RANGE(0x7e0040, 0x7e0041) AM_WRITE(vfd_w)
-ADDRESS_MAP_END
+void globalfr_state::globalfr_map(address_map &map)
+{
+	map(0x002000, 0x002fff).ram();
+	map(0x008000, 0x07ffff).rom().region("maincpu", 0x8000);
+	map(0x0a0000, 0x0a01ff).ram();
+	map(0x7e0040, 0x7e0041).w(this, FUNC(globalfr_state::vfd_w));
+}
 
 static INPUT_PORTS_START( globalfr )
 INPUT_PORTS_END

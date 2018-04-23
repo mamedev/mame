@@ -26,16 +26,17 @@ WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
 	m_ppu->spriteram_dma(space, data);
 }
 
-static ADDRESS_MAP_START( nes_map, AS_PROGRAM, 8, nes_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800)                   /* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)        /* PPU registers */
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(nes_vh_sprite_dma_w)              /* stupid address space hole */
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)         /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r)                         /* IN1 - input port 2 */
+void nes_state::nes_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().mirror(0x1800);                   /* RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
+	map(0x4014, 0x4014).w(this, FUNC(nes_state::nes_vh_sprite_dma_w));              /* stupid address space hole */
+	map(0x4016, 0x4016).rw(this, FUNC(nes_state::nes_in0_r), FUNC(nes_state::nes_in0_w));         /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(this, FUNC(nes_state::nes_in1_r));                         /* IN1 - input port 2 */
 	// 0x4100-0x5fff -> LOW HANDLER defined on a pcb base
 	// 0x6000-0x7fff -> MID HANDLER defined on a pcb base
 	// 0x8000-0xffff -> HIGH HANDLER defined on a pcb base
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( nes )
 	// input devices go through slot options
@@ -96,7 +97,8 @@ MACHINE_CONFIG_START(nes_state::nes)
 	MCFG_SOFTWARE_LIST_ADD("datach_list", "nes_datach")   // Bandai Datach Joint ROM System mini-carts
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_state::nespal, nes)
+MACHINE_CONFIG_START(nes_state::nespal)
+	nes(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(PAL_APU_CLOCK)
@@ -115,7 +117,8 @@ MACHINE_CONFIG_DERIVED(nes_state::nespal, nes)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_state::famicom, nes)
+MACHINE_CONFIG_START(nes_state::famicom)
+	nes(config);
 	MCFG_DEVICE_REMOVE("ctrl1")
 	MCFG_DEVICE_REMOVE("ctrl2")
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", fc_control_port1_devices, "joypad")
@@ -127,7 +130,8 @@ MACHINE_CONFIG_DERIVED(nes_state::famicom, nes)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_state::nespalc, nespal)
+MACHINE_CONFIG_START(nes_state::nespalc)
+	nespal(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK(PALC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nes_map)
@@ -144,7 +148,8 @@ MACHINE_CONFIG_DERIVED(nes_state::nespalc, nespal)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC+1+2)))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_state::famipalc, nespalc)
+MACHINE_CONFIG_START(nes_state::famipalc)
+	nespalc(config);
 	MCFG_DEVICE_REMOVE("ctrl1")
 	MCFG_DEVICE_REMOVE("ctrl2")
 	MCFG_NES_CONTROL_PORT_ADD("ctrl1", fc_control_port1_devices, "joypad")
@@ -155,7 +160,8 @@ MACHINE_CONFIG_DERIVED(nes_state::famipalc, nespalc)
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "famicom_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(nes_state::suborkbd, famipalc)
+MACHINE_CONFIG_START(nes_state::suborkbd)
+	famipalc(config);
 	/* TODO: emulate the parallel port bus! */
 	MCFG_DEVICE_MODIFY("exp")
 	MCFG_SLOT_DEFAULT_OPTION("subor_keyboard")
@@ -211,7 +217,8 @@ MACHINE_RESET_MEMBER( nes_state, fds )
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_DERIVED(nes_state::fds, famicom)
+MACHINE_CONFIG_START(nes_state::fds)
+	famicom(config);
 	MCFG_MACHINE_START_OVERRIDE( nes_state, fds )
 	MCFG_MACHINE_RESET_OVERRIDE( nes_state, fds )
 
@@ -255,7 +262,8 @@ MACHINE_RESET_MEMBER( nes_state, famitwin )
 	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_DERIVED(nes_state::famitwin, famicom)
+MACHINE_CONFIG_START(nes_state::famitwin)
+	famicom(config);
 
 	MCFG_MACHINE_START_OVERRIDE( nes_state, famitwin )
 	MCFG_MACHINE_RESET_OVERRIDE( nes_state, famitwin )

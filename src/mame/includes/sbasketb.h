@@ -58,8 +58,10 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sbasketb);
 	uint32_t screen_update_sbasketb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void sbasketb(machine_config &config);
 	void sbasketbu(machine_config &config);
+	void sbasketb_map(address_map &map);
+	void sbasketb_sound_map(address_map &map);
 };

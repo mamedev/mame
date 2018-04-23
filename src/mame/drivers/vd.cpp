@@ -31,6 +31,7 @@ public:
 	vd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(ack_r);
@@ -40,16 +41,16 @@ public:
 	DECLARE_WRITE8_MEMBER(sol_w) { };
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	void vd(machine_config &config);
-protected:
+	void vd_io(address_map &map);
+	void vd_map(address_map &map);
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset() override;
 private:
 	uint8_t m_t_c;
 	uint8_t segment[5];
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<60> m_digits;
 };
 
 
@@ -59,32 +60,34 @@ READ8_MEMBER(vd_state::ack_r)
 	return 0; // this value is not used
 }
 
-static ADDRESS_MAP_START( vd_map, AS_PROGRAM, 8, vd_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x62ff) AM_RAM
-	AM_RANGE(0x6700, 0x67ff) AM_RAM
-ADDRESS_MAP_END
+void vd_state::vd_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x62ff).ram();
+	map(0x6700, 0x67ff).ram();
+}
 
-static ADDRESS_MAP_START( vd_io, AS_IO, 8, vd_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("X0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("X1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("X2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("X3")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("X4")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("X5")
-	AM_RANGE(0x20, 0x27) AM_WRITE(lamp_w)
-	AM_RANGE(0x28, 0x28) AM_WRITE(sol_w)
-	AM_RANGE(0x40, 0x44) AM_WRITE(disp_w)
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0x62, 0x62) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("ay2", ay8910_device, data_r) // probably never read
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0, 0xa0) AM_READ(ack_r)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(col_w)
-ADDRESS_MAP_END
+void vd_state::vd_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("X0");
+	map(0x01, 0x01).portr("X1");
+	map(0x02, 0x02).portr("X2");
+	map(0x03, 0x03).portr("X3");
+	map(0x04, 0x04).portr("X4");
+	map(0x05, 0x05).portr("X5");
+	map(0x20, 0x27).w(this, FUNC(vd_state::lamp_w));
+	map(0x28, 0x28).w(this, FUNC(vd_state::sol_w));
+	map(0x40, 0x44).w(this, FUNC(vd_state::disp_w));
+	map(0x60, 0x60).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x61, 0x61).r("ay1", FUNC(ay8910_device::data_r));
+	map(0x62, 0x62).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x81, 0x81).r("ay2", FUNC(ay8910_device::data_r)); // probably never read
+	map(0x82, 0x82).w("ay2", FUNC(ay8910_device::data_w));
+	map(0xa0, 0xa0).r(this, FUNC(vd_state::ack_r));
+	map(0xc0, 0xc0).w(this, FUNC(vd_state::col_w));
+}
 
 static INPUT_PORTS_START( break86 )
 	PORT_START("DSW1") // "Micro Swicher Nº 1"
@@ -169,11 +172,11 @@ WRITE8_MEMBER( vd_state::col_w )
 	if (data != 0x3f)
 	{
 		data &= 7;
-		output().set_digit_value(data + 11, segment[0]);
-		output().set_digit_value(data + 21, segment[1]);
-		output().set_digit_value(data + 31, segment[2]);
-		output().set_digit_value(data + 41, segment[3]);
-		output().set_digit_value(data + 51, segment[4]);
+		m_digits[data + 11] = segment[0];
+		m_digits[data + 21] = segment[1];
+		m_digits[data + 31] = segment[2];
+		m_digits[data + 41] = segment[3];
+		m_digits[data + 51] = segment[4];
 	}
 }
 
@@ -190,7 +193,7 @@ MACHINE_CONFIG_START(vd_state::vd)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", vd_state, irq, attotime::from_hz(484))
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33/3)

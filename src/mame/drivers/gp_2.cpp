@@ -12,7 +12,7 @@ the first high score at which a free credit is awarded. Then press 9 to set the
 back to normal operation. If this setup is not done, each player will get 3 free
 games at the start of ball 1.
 
-All the Z80 "maincpu" code is copied from gp_1.c
+All the Z80 "maincpu" code is copied from gp_1.cpp
 Any bug fixes need to be applied both here and there.
 
 Sound boards: (each game has its own custom sounds)
@@ -58,6 +58,7 @@ public:
 		, m_io_x9(*this, "X9")
 		, m_io_xa(*this, "XA")
 		, m_io_xb(*this, "XB")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(gp_2);
@@ -66,11 +67,14 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
 	void gp_2(machine_config &config);
+	void gp_2_io(address_map &map);
+	void gp_2_map(address_map &map);
 private:
 	uint8_t m_u14;
 	uint8_t m_digit;
 	uint8_t m_segment[16];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport m_io_dsw0;
@@ -82,19 +86,22 @@ private:
 	required_ioport m_io_x9;
 	required_ioport m_io_xa;
 	required_ioport m_io_xb;
+	output_finder<40> m_digits;
 };
 
 
-static ADDRESS_MAP_START( gp_2_map, AS_PROGRAM, 8, gp_2_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x8c00, 0x8dff) AM_RAM AM_SHARE("nvram")
-ADDRESS_MAP_END
+void gp_2_state::gp_2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().region("roms", 0);
+	map(0x8c00, 0x8dff).ram().share("nvram");
+}
 
-static ADDRESS_MAP_START( gp_2_io, AS_IO, 8, gp_2_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-ADDRESS_MAP_END
+void gp_2_state::gp_2_io(address_map &map)
+{
+	map.global_mask(0x0f);
+	map(0x04, 0x07).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 static INPUT_PORTS_START( gp_1 )
 	PORT_START("DSW0")
@@ -539,11 +546,11 @@ WRITE8_MEMBER( gp_2_state::porta_w )
 	else
 	if (m_u14 == 7)
 	{
-		output().set_digit_value(m_digit, patterns[m_segment[7]]);
-		output().set_digit_value(m_digit+8, patterns[m_segment[8]]);
-		output().set_digit_value(m_digit+16, patterns[m_segment[9]]);
-		output().set_digit_value(m_digit+24, patterns[m_segment[10]]);
-		output().set_digit_value(m_digit+32, patterns[m_segment[11]]);
+		m_digits[m_digit] = patterns[m_segment[7]];
+		m_digits[m_digit+8] = patterns[m_segment[8]];
+		m_digits[m_digit+16] = patterns[m_segment[9]];
+		m_digits[m_digit+24] = patterns[m_segment[10]];
+		m_digits[m_digit+32] = patterns[m_segment[11]];
 	}
 }
 
@@ -585,7 +592,7 @@ MACHINE_CONFIG_START(gp_2_state::gp_2)
 	MCFG_DEFAULT_LAYOUT(layout_gp_2)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )

@@ -77,6 +77,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void thedealr(machine_config &config);
+	void thedealr(address_map &map);
+	void thedealr_sub(address_map &map);
 };
 
 /***************************************************************************
@@ -271,33 +273,34 @@ WRITE8_MEMBER(thedealr_state::unk_w)
 //  popmessage("UNK %02x", data);
 }
 
-static ADDRESS_MAP_START( thedealr, AS_PROGRAM, 8, thedealr_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+void thedealr_state::thedealr(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
 
-	AM_RANGE(0x2000, 0x2000) AM_RAM // w ff at boot (after clearing commram)
+	map(0x2000, 0x2000).ram(); // w ff at boot (after clearing commram)
 
-	AM_RANGE(0x2400, 0x2400) AM_READ(irq_ack_r) // r = irq ack.
-	AM_RANGE(0x2400, 0x2400) AM_WRITE(unk_w)    // w = ?
+	map(0x2400, 0x2400).r(this, FUNC(thedealr_state::irq_ack_r)); // r = irq ack.
+	map(0x2400, 0x2400).w(this, FUNC(thedealr_state::unk_w));    // w = ?
 
-	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("COINS") AM_WRITENOP  // rw
+	map(0x2800, 0x2800).portr("COINS").nopw();  // rw
 
-	AM_RANGE(0x2801, 0x2801) AM_READ_PORT("DSW4")
-	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("DSW3")
+	map(0x2801, 0x2801).portr("DSW4");
+	map(0x2c00, 0x2c00).portr("DSW3");
 
-	AM_RANGE(0x3400, 0x3400) AM_READWRITE(iox_r, iox_w)
-	AM_RANGE(0x3401, 0x3401) AM_READ(iox_status_r)
+	map(0x3400, 0x3400).rw(this, FUNC(thedealr_state::iox_r), FUNC(thedealr_state::iox_w));
+	map(0x3401, 0x3401).r(this, FUNC(thedealr_state::iox_status_r));
 
-	AM_RANGE(0x3000, 0x3000) AM_RAM // rw, comm in test mode
-	AM_RANGE(0x3001, 0x3001) AM_RAM // rw, ""
+	map(0x3000, 0x3000).ram(); // rw, comm in test mode
+	map(0x3001, 0x3001).ram(); // rw, ""
 
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("commram")
+	map(0x3800, 0x3bff).ram().share("commram");
 
-	AM_RANGE(0x3c00, 0x3c00) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_w)
-	AM_RANGE(0x3c01, 0x3c01) AM_DEVWRITE    ("aysnd", ay8910_device, data_w)
+	map(0x3c00, 0x3c00).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x3c01, 0x3c01).w("aysnd", FUNC(ay8910_device::data_w));
 
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
-ADDRESS_MAP_END
+	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x8000, 0xffff).rom().region("maincpu", 0);
+}
 
 /***************************************************************************
 
@@ -305,25 +308,26 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( thedealr_sub, AS_PROGRAM, 8, thedealr_state )
+void thedealr_state::thedealr_sub(address_map &map)
+{
 	// Work RAM
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM
+	map(0x0000, 0x00ff).ram();
+	map(0x0100, 0x01ff).ram();
 
 	// Sprites
-	AM_RANGE(0x0800, 0x27ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
-	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0x4300, 0x4303) AM_DEVWRITE("spritegen", seta001_device, spritectrl_w8)
-	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE("spritegen", seta001_device, spritebgflag_w8)   // enable / disable background transparency
+	map(0x0800, 0x27ff).ram().rw(m_seta001, FUNC(seta001_device::spritecodelow_r8), FUNC(seta001_device::spritecodelow_w8));
+	map(0x2800, 0x3fff).ram().rw(m_seta001, FUNC(seta001_device::spritecodehigh_r8), FUNC(seta001_device::spritecodehigh_w8));
+	map(0x4000, 0x42ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r8), FUNC(seta001_device::spriteylow_w8));
+	map(0x4300, 0x4303).w(m_seta001, FUNC(seta001_device::spritectrl_w8));
+	map(0x4800, 0x4800).w(m_seta001, FUNC(seta001_device::spritebgflag_w8));   // enable / disable background transparency
 
 	// Comm RAM
-	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_SHARE("commram")
+	map(0x5800, 0x5bff).ram().share("commram");
 
 	// ROM
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("subcpu", 0x0000)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("subcpu", 0x8000)
-ADDRESS_MAP_END
+	map(0x6000, 0x7fff).rom().region("subcpu", 0x0000);
+	map(0x8000, 0xffff).rom().region("subcpu", 0x8000);
+}
 
 /***************************************************************************
 
@@ -356,7 +360,7 @@ static INPUT_PORTS_START( thedealr )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_NAME("Attendant Clear?") // !ACL (reset jackpots, only if there are no credits)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // A.P (attendant payout? clears credits, port 0 = ef)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT          ) // TLT (tilt)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL       ) // HOV (hopper?)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM       ) // HOV (hopper?)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN  ) // CPN (coupon, port 3 = fb)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2         ) PORT_IMPULSE(5) // CS2
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1         ) PORT_IMPULSE(5) // CS1 (coin1, port 3 = fd)
@@ -534,7 +538,6 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	MCFG_CPU_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
 	MCFG_CPU_PROGRAM_MAP(thedealr_sub)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedealr_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -554,6 +557,7 @@ MACHINE_CONFIG_START(thedealr_state::thedealr)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0+30, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(thedealr_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(thedealr_state, screen_vblank))
+	MCFG_DEVCB_CHAIN_OUTPUT(INPUTLINE("subcpu", INPUT_LINE_NMI))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", thedealr)

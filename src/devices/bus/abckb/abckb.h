@@ -23,13 +23,13 @@
 	MCFG_DEVICE_SLOT_INTERFACE(abc_keyboard_devices, _def_slot, false)
 
 #define MCFG_ABC_KEYBOARD_OUT_RX_HANDLER(_devcb) \
-	devcb = &abc_keyboard_port_device::set_out_rx_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<abc_keyboard_port_device &>(*device).set_out_rx_handler(DEVCB_##_devcb);
 
 #define MCFG_ABC_KEYBOARD_OUT_TRXC_HANDLER(_devcb) \
-	devcb = &abc_keyboard_port_device::set_out_trxc_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<abc_keyboard_port_device &>(*device).set_out_trxc_handler(DEVCB_##_devcb);
 
 #define MCFG_ABC_KEYBOARD_OUT_KEYDOWN_HANDLER(_devcb) \
-	devcb = &abc_keyboard_port_device::set_out_keydown_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<abc_keyboard_port_device &>(*device).set_out_keydown_handler(DEVCB_##_devcb);
 
 
 
@@ -45,9 +45,9 @@ public:
 	// construction/destruction
 	abc_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_rx_handler(device_t &device, Object &&cb) { return downcast<abc_keyboard_port_device &>(device).m_out_rx_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_trxc_handler(device_t &device, Object &&cb) { return downcast<abc_keyboard_port_device &>(device).m_out_trxc_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_keydown_handler(device_t &device, Object &&cb) { return downcast<abc_keyboard_port_device &>(device).m_out_keydown_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_rx_handler(Object &&cb) { return m_out_rx_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_trxc_handler(Object &&cb) { return m_out_trxc_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_keydown_handler(Object &&cb) { return m_out_keydown_handler.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	DECLARE_WRITE_LINE_MEMBER( txd_w );

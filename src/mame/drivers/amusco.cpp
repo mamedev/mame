@@ -110,8 +110,9 @@ public:
 		m_rtc(*this, "rtc"),
 		m_crtc(*this, "crtc"),
 		m_screen(*this, "screen"),
-		m_hopper(*this, "hopper")
-		{ }
+		m_hopper(*this, "hopper"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_WRITE_LINE_MEMBER(coin_irq);
@@ -127,12 +128,18 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_PALETTE_INIT(amusco);
+
 	void amusco(machine_config &config);
 	void draw88pkr(machine_config &config);
+
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
+
 private:
+	void amusco_mem_map(address_map &map);
+	void amusco_io_map(address_map &map);
+
 	std::unique_ptr<uint8_t []> m_videoram;
 	tilemap_t *m_bg_tilemap;
 
@@ -144,6 +151,8 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
 	required_device<ticket_dispenser_device> m_hopper;
+	output_finder<8> m_lamps;
+
 	uint8_t m_mc6845_address;
 	uint16_t m_video_update_address;
 	bool m_blink_state;
@@ -190,6 +199,7 @@ void amusco_state::video_start()
 
 void amusco_state::machine_start()
 {
+	m_lamps.resolve();
 }
 
 
@@ -197,10 +207,11 @@ void amusco_state::machine_start()
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 8, amusco_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void amusco_state::amusco_mem_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram();
+	map(0xf8000, 0xfffff).rom();
+}
 
 READ8_MEMBER( amusco_state::mc6845_r)
 {
@@ -241,12 +252,8 @@ WRITE8_MEMBER(amusco_state::output_a_w)
   xx-- ----  Unknown.
 
 */
-	output().set_lamp_value(0, (data) & 1);         // Lamp 0 (Bet)
-	output().set_lamp_value(1, (data >> 1) & 1);    // Lamp 1 (Hold/Disc 5)
-	output().set_lamp_value(2, (data >> 2) & 1);    // Lamp 2 (Hold/Disc 3)
-	output().set_lamp_value(3, (data >> 3) & 1);    // Lamp 3 (Hold/Disc 1)
-	output().set_lamp_value(4, (data >> 4) & 1);    // Lamp 4 (Hold/Disc 2)
-	output().set_lamp_value(5, (data >> 5) & 1);    // Lamp 5 (Hold/Disc 4)
+	for (int i = 0; i < 6; i++)
+		m_lamps[i] = BIT(data, i);
 
 //  logerror("Writing %02Xh to PPI output A\n", data);
 }
@@ -265,8 +272,8 @@ WRITE8_MEMBER(amusco_state::output_b_w)
   x--- ----  Special: NMI enable (cleared and set along with CPU interrupt flag).
 
 */
-	output().set_lamp_value(6, (data >> 2) & 1);    // Lamp 6 (Start/Draw)
-	output().set_lamp_value(7, (data >> 1) & 1);    // Lamp 7 (Unknown)
+	m_lamps[6] = BIT(data, 2); // Lamp 6 (Start/Draw)
+	m_lamps[7] = BIT(data, 1); // Lamp 7 (Unknown)
 
 	m_pit->write_gate0(!BIT(data, 4));
 
@@ -356,17 +363,18 @@ WRITE8_MEMBER(amusco_state::rtc_control_w)
 	m_rtc->read_w(BIT(data, 4));
 }
 
-static ADDRESS_MAP_START( amusco_io_map, AS_IO, 8, amusco_state )
-	AM_RANGE(0x0000, 0x0001) AM_READWRITE(mc6845_r, mc6845_w)
-	AM_RANGE(0x0010, 0x0011) AM_DEVWRITE("pic8259", pic8259_device, write)
-	AM_RANGE(0x0020, 0x0023) AM_DEVWRITE("pit8253", pit8253_device, write)
-	AM_RANGE(0x0030, 0x0033) AM_DEVREADWRITE("ppi_outputs", i8255_device, read, write)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("ppi_inputs", i8255_device, read, write)
-	AM_RANGE(0x0060, 0x0060) AM_DEVWRITE("sn", sn76489a_device, write)
-	AM_RANGE(0x0070, 0x0071) AM_WRITE(vram_w)
-	AM_RANGE(0x0280, 0x0283) AM_DEVREADWRITE("lpt_interface", i8155_device, io_r, io_w)
-	AM_RANGE(0x0380, 0x0383) AM_DEVREADWRITE("rtc_interface", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+void amusco_state::amusco_io_map(address_map &map)
+{
+	map(0x0000, 0x0001).rw(this, FUNC(amusco_state::mc6845_r), FUNC(amusco_state::mc6845_w));
+	map(0x0010, 0x0011).w(m_pic, FUNC(pic8259_device::write));
+	map(0x0020, 0x0023).w(m_pit, FUNC(pit8253_device::write));
+	map(0x0030, 0x0033).rw("ppi_outputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0040, 0x0043).rw("ppi_inputs", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x0060, 0x0060).w("sn", FUNC(sn76489a_device::write));
+	map(0x0070, 0x0071).w(this, FUNC(amusco_state::vram_w));
+	map(0x0280, 0x0283).rw("lpt_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x0380, 0x0383).rw("rtc_interface", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 /* I/O byte R/W
 
@@ -589,7 +597,8 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(amusco_state::draw88pkr, amusco)
+MACHINE_CONFIG_START(amusco_state::draw88pkr)
+	amusco(config);
 	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
 MACHINE_CONFIG_END
 

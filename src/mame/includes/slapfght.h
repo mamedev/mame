@@ -114,7 +114,7 @@ public:
 	uint32_t screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void tigerhb2(machine_config &config);
 	void tigerhb1(machine_config &config);
@@ -125,4 +125,20 @@ public:
 	void perfrman(machine_config &config);
 	void slapfigh(machine_config &config);
 	void slapfighb1(machine_config &config);
+	void getstar_map(address_map &map);
+	void getstarb1_io_map(address_map &map);
+	void getstarb2_io_map(address_map &map);
+	void io_map_mcu(address_map &map);
+	void io_map_nomcu(address_map &map);
+	void perfrman_map(address_map &map);
+	void perfrman_sound_map(address_map &map);
+	void slapfigh_map(address_map &map);
+	void slapfigh_map_mcu(address_map &map);
+	void slapfighb1_map(address_map &map);
+	void slapfighb2_map(address_map &map);
+	void tigerh_map(address_map &map);
+	void tigerh_map_mcu(address_map &map);
+	void tigerh_sound_map(address_map &map);
+	void tigerhb1_map(address_map &map);
+	void tigerhb2_map(address_map &map);
 };

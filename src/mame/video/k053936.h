@@ -23,13 +23,12 @@ public:
 	k053936_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k053936_device() {}
 
-	// static configuration
-	static void set_wrap(device_t &device, int wrap) { downcast<k053936_device &>(device).m_wrap = wrap; }
-	static void set_offsets(device_t &device, int x_offset, int y_offset)
+	// configuration
+	void set_wrap(int wrap) { m_wrap = wrap; }
+	void set_offsets(int x_offset, int y_offset)
 	{
-		k053936_device &dev = downcast<k053936_device &>(device);
-		dev.m_xoff = x_offset;
-		dev.m_yoff = y_offset;
+		m_xoff = x_offset;
+		m_yoff = y_offset;
 	}
 
 	DECLARE_WRITE16_MEMBER( ctrl_w );
@@ -55,9 +54,9 @@ private:
 DECLARE_DEVICE_TYPE(K053936, k053936_device)
 
 #define MCFG_K053936_WRAP(_wrap) \
-	k053936_device::set_wrap(*device, _wrap);
+	downcast<k053936_device &>(*device).set_wrap(_wrap);
 
 #define MCFG_K053936_OFFSETS(_xoffs, _yoffs) \
-	k053936_device::set_offsets(*device, _xoffs, _yoffs);
+	downcast<k053936_device &>(*device).set_offsets(_xoffs, _yoffs);
 
 #endif // MAME_VIDEO_K053936_H

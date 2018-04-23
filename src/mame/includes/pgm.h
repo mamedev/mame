@@ -24,20 +24,22 @@ class pgm_state : public driver_device
 {
 public:
 	pgm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_videoregs(*this, "videoregs"),
-			m_videoram(*this, "videoram"),
-			m_z80_mainram(*this, "z80_mainram"),
-			m_mainram(*this, "sram"),
-			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_soundlatch(*this, "soundlatch"),
-			m_soundlatch3(*this, "soundlatch3")
-		{
-			m_irq4_disabled = 0;
-		}
+		: driver_device(mconfig, type, tag)
+		, m_videoregs(*this, "videoregs")
+		, m_videoram(*this, "videoram")
+		, m_z80_mainram(*this, "z80_mainram")
+		, m_mainram(*this, "sram")
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_soundlatch(*this, "soundlatch")
+		, m_soundlatch3(*this, "soundlatch3")
+		, m_ics(*this, "ics")
+		, m_bdata(*this, "sprmask")
+	{
+		m_irq4_disabled = 0;
+	}
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_videoregs;
@@ -52,10 +54,8 @@ public:
 	std::unique_ptr<uint16_t[]>     m_spritebufferram; // buffered spriteram
 
 	/* video-related */
-	tilemap_t       *m_bg_tilemap;
+	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_tx_tilemap;
-	uint16_t        *m_sprite_temp_render;
-	bitmap_rgb32      m_tmppgmbitmap;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -64,11 +64,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch3;
-	device_t *m_ics;
+	required_device<ics2115_device> m_ics;
 
 	/* used by rendering */
-	uint8_t *m_bdata;
-	size_t  m_bdatasize;
+	required_region_ptr<uint8_t> m_bdata;
 	int m_aoffset;
 	int m_boffset;
 
@@ -117,6 +116,11 @@ public:
 	void pgm_basic_init( bool set_bank = true);
 	void pgm(machine_config &config);
 	void pgmbase(machine_config &config);
+	void pgm_base_mem(address_map &map);
+	void pgm_basic_mem(address_map &map);
+	void pgm_mem(address_map &map);
+	void pgm_z80_io(address_map &map);
+	void pgm_z80_mem(address_map &map);
 };
 
 
@@ -126,12 +130,5 @@ public:
 INPUT_PORTS_EXTERN( pgm );
 
 GFXDECODE_EXTERN( pgm );
-
-ADDRESS_MAP_EXTERN( pgm_z80_mem, 8 );
-ADDRESS_MAP_EXTERN( pgm_z80_io, 8 );
-
-ADDRESS_MAP_EXTERN( pgm_mem, 16 );
-ADDRESS_MAP_EXTERN( pgm_basic_mem, 16 );
-ADDRESS_MAP_EXTERN( pgm_base_mem, 16 );
 
 #endif // MAME_INCLUDES_PGM_H

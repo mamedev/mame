@@ -59,7 +59,6 @@ private:
 
 
 // device type definition
-extern const device_type UPD4992;
 DECLARE_DEVICE_TYPE(UPD4992, upd4992_device)
 
 #endif // MAME_MACHINE_UPD4992_H

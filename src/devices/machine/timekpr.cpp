@@ -179,7 +179,7 @@ mk48t08_device::mk48t08_device(const machine_config &mconfig, const char *tag, d
 }
 
 mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: timekeeper_device(mconfig, MK48T12, tag, owner, clock, 0x2000)
+	: timekeeper_device(mconfig, MK48T12, tag, owner, clock, 0x800)
 {
 	m_offset_watchdog = -1;
 	m_offset_control = 0x7f8;

@@ -16,7 +16,7 @@
 #include "h8_dtc.h"
 #include "h8d.h"
 
-h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_delegate map_delegate) :
+h8_device::h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_constructor map_delegate) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	program_config("program", ENDIANNESS_BIG, 16, mode_a16 ? 16 : 24, 0, map_delegate),
 	io_config("io", ENDIANNESS_BIG, 16, 16, -1), program(nullptr), io(nullptr), direct(nullptr), PPC(0), NPC(0), PC(0), PIR(0), EXR(0), CCR(0), MAC(0), MACF(0),
@@ -100,7 +100,7 @@ void h8_device::device_start()
 	save_item(NAME(taken_irq_level));
 	save_item(NAME(irq_nmi));
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	PC = 0;
 	PPC = 0;
@@ -208,7 +208,7 @@ void h8_device::execute_run()
 			if(inst_state < 0x10000) {
 				PPC = NPC;
 				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-					debugger_instruction_hook(this, NPC);
+					debugger_instruction_hook(NPC);
 			}
 			do_exec_full();
 		}
@@ -1343,9 +1343,9 @@ void h8_device::set_nz32(uint32_t v)
 		CCR |= F_N;
 }
 
-util::disasm_interface *h8_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> h8_device::create_disassembler()
 {
-	return new h8_disassembler;
+	return std::make_unique<h8_disassembler>();
 }
 
 #include "cpu/h8/h8.hxx"

@@ -81,8 +81,6 @@ void nubus_vikbw_device::device_start()
 {
 	uint32_t slotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, VIKBW_ROM_REGION, true);
 
 	slotspace = get_slotspace();
@@ -93,8 +91,8 @@ void nubus_vikbw_device::device_start()
 	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, "bank_vikbw", &m_vram[0]);
 	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, "bank_vikbw2", &m_vram[0]);
 
-	m_nubus->install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_vikbw_device::viking_enable_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_disable_w), this));
-	m_nubus->install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(FUNC(nubus_vikbw_device::viking_ack_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_ack_w), this));
+	nubus().install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_vikbw_device::viking_enable_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_disable_w), this));
+	nubus().install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(FUNC(nubus_vikbw_device::viking_ack_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_ack_w), this));
 }
 
 //-------------------------------------------------

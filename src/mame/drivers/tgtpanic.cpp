@@ -38,6 +38,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tgtpanic(machine_config &config);
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
 };
 
 
@@ -100,16 +102,18 @@ WRITE8_MEMBER(tgtpanic_state::color_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, tgtpanic_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void tgtpanic_state::prg_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).ram().share("ram");
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, tgtpanic_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(color_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
+void tgtpanic_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(tgtpanic_state::color_w));
+	map(0x01, 0x01).portr("IN1");
+}
 
 
 /*************************************

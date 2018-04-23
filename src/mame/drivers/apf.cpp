@@ -123,6 +123,8 @@ public:
 
 	void apfm1000(machine_config &config);
 	void apfimag(machine_config &config);
+	void apfimag_map(address_map &map);
+	void apfm1000_map(address_map &map);
 private:
 	uint8_t m_latch;
 	uint8_t m_keyboard_data;
@@ -312,25 +314,27 @@ WRITE8_MEMBER( apf_state::serial_w)
 	logerror("serial w %04x %04x\n",offset,data);
 }
 
-static ADDRESS_MAP_START( apfm1000_map, AS_PROGRAM, 8, apf_state )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x6800, 0x7fff) AM_NOP // BASIC accesses ROM here too, but this is installed at machine_start
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREAD("cartslot", apf_cart_slot_device, read_rom)
-	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void apf_state::apfm1000_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x1c00).ram().share("videoram");
+	map(0x2000, 0x2003).mirror(0x1ffc).rw(m_pia0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4000, 0x4fff).mirror(0x1000).rom().region("roms", 0);
+	map(0x6800, 0x7fff).noprw(); // BASIC accesses ROM here too, but this is installed at machine_start
+	map(0x8000, 0x9fff).r(m_cart, FUNC(apf_cart_slot_device::read_rom));
+	map(0xe000, 0xefff).mirror(0x1000).rom().region("roms", 0);
+}
 
-static ADDRESS_MAP_START( apfimag_map, AS_PROGRAM, 8, apf_state )
-	AM_IMPORT_FROM(apfm1000_map)
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+void apf_state::apfimag_map(address_map &map)
+{
+	apfm1000_map(map);
+	map(0x6000, 0x6003).mirror(0x03fc).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	// These need to be confirmed, disk does not work
-	AM_RANGE(0x6400, 0x64ff) AM_READWRITE(serial_r, serial_w)
-	AM_RANGE(0x6500, 0x6503) AM_DEVREADWRITE("fdc", fd1771_device, read, write)
-	AM_RANGE(0x6600, 0x6600) AM_WRITE(apf_dischw_w)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM // standard
-	AM_RANGE(0xc000, 0xdfff) AM_RAM // expansion
-ADDRESS_MAP_END
+	map(0x6400, 0x64ff).rw(this, FUNC(apf_state::serial_r), FUNC(apf_state::serial_w));
+	map(0x6500, 0x6503).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
+	map(0x6600, 0x6600).w(this, FUNC(apf_state::apf_dischw_w));
+	map(0xa000, 0xbfff).ram(); // standard
+	map(0xc000, 0xdfff).ram(); // expansion
+}
 
 
 /* Each controller has these features:
@@ -546,7 +550,8 @@ MACHINE_CONFIG_START(apf_state::apfm1000)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "apfm1000")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(apf_state::apfimag, apfm1000)
+MACHINE_CONFIG_START(apf_state::apfimag)
+	apfm1000(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( apfimag_map)
 

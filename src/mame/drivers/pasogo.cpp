@@ -175,6 +175,9 @@ public:
 	uint8_t m_ems_index;
 	uint16_t m_ems_bank[28];
 	void pasogo(machine_config &config);
+	void emsbank_map(address_map &map);
+	void pasogo_io(address_map &map);
+	void pasogo_mem(address_map &map);
 };
 
 
@@ -439,24 +442,27 @@ WRITE16_MEMBER( pasogo_state::emsram_w )
 	m_ems->write16(space, offset & 0x1fff, data, mem_mask);
 }
 
-static ADDRESS_MAP_START(emsbank_map, AS_PROGRAM, 16, pasogo_state)
-	AM_RANGE(0x04080000, 0x040fffff) AM_RAM
-	AM_RANGE(0x08000000, 0x080fffff) AM_ROMBANK("bank27")
-	AM_RANGE(0x10000000, 0x1000ffff) AM_RAM // cart ram?
-ADDRESS_MAP_END
+void pasogo_state::emsbank_map(address_map &map)
+{
+	map(0x04080000, 0x040fffff).ram();
+	map(0x08000000, 0x080fffff).bankr("bank27");
+	map(0x10000000, 0x1000ffff).ram(); // cart ram?
+}
 
-static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 16, pasogo_state)
-	AM_RANGE(0xb8000, 0xbffff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x80000, 0xeffff) AM_READWRITE(emsram_r, emsram_w)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
-ADDRESS_MAP_END
+void pasogo_state::pasogo_mem(address_map &map)
+{
+	map(0x80000, 0xeffff).rw(this, FUNC(pasogo_state::emsram_r), FUNC(pasogo_state::emsram_w));
+	map(0xb8000, 0xbffff).ram().share("vram");
+	map(0xf0000, 0xfffff).bankr("bank27");
+}
 
 
-static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
-	AM_RANGE(0x0026, 0x0027) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff)
-	AM_RANGE(0x006c, 0x006f) AM_READWRITE(ems_r, ems_w)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
-ADDRESS_MAP_END
+void pasogo_state::pasogo_io(address_map &map)
+{
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x0026, 0x0027).rw(this, FUNC(pasogo_state::vg230_io_r), FUNC(pasogo_state::vg230_io_w));
+	map(0x006c, 0x006f).rw(this, FUNC(pasogo_state::ems_r), FUNC(pasogo_state::ems_w));
+}
 
 
 static INPUT_PORTS_START( pasogo )

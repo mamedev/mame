@@ -58,4 +58,7 @@ public:
 	void shootouj(machine_config &config);
 	void shootouk(machine_config &config);
 	void shootout(machine_config &config);
+	void shootouj_map(address_map &map);
+	void shootout_map(address_map &map);
+	void shootout_sound_map(address_map &map);
 };

@@ -155,6 +155,11 @@ public:
 	void magic10(machine_config &config);
 	void hotslot(machine_config &config);
 	void sgsafari(machine_config &config);
+	void hotslot_map(address_map &map);
+	void magic102_map(address_map &map);
+	void magic10_map(address_map &map);
+	void magic10a_map(address_map &map);
+	void sgsafari_map(address_map &map);
 };
 
 
@@ -311,90 +316,95 @@ WRITE16_MEMBER(magic10_state::magic10_out_w)
 *       Memory Maps        *
 ***************************/
 
-static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16, magic10_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSW")
-	AM_RANGE(0x400008, 0x400009) AM_WRITE(magic10_out_w)
-	AM_RANGE(0x40000a, 0x40000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x40000e, 0x40000f) AM_WRITENOP
-	AM_RANGE(0x400080, 0x400087) AM_RAM AM_SHARE("vregs")
-	AM_RANGE(0x600000, 0x603fff) AM_RAM
-ADDRESS_MAP_END
+void magic10_state::magic10_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x200000, 0x2007ff).ram().share("nvram");
+	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x400001).portr("INPUTS");
+	map(0x400002, 0x400003).portr("DSW");
+	map(0x400008, 0x400009).w(this, FUNC(magic10_state::magic10_out_w));
+	map(0x40000b, 0x40000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x40000e, 0x40000f).nopw();
+	map(0x400080, 0x400087).ram().share("vregs");
+	map(0x600000, 0x603fff).ram();
+}
 
-static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW")
-	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
-	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x50000e, 0x50000f) AM_WRITENOP
-	AM_RANGE(0x500080, 0x500087) AM_RAM AM_SHARE("vregs")   // video registers?
-	AM_RANGE(0x600000, 0x603fff) AM_RAM
-ADDRESS_MAP_END
+void magic10_state::magic10a_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x200000, 0x2007ff).ram().share("nvram");
+	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x500001).portr("INPUTS");
+	map(0x500002, 0x500003).portr("DSW");
+	map(0x500008, 0x500009).w(this, FUNC(magic10_state::magic10_out_w));
+	map(0x50000b, 0x50000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x50000e, 0x50000f).nopw();
+	map(0x500080, 0x500087).ram().share("vregs");   // video registers?
+	map(0x600000, 0x603fff).ram();
+}
 
-static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x4001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x500000, 0x500001) AM_READ(magic102_r)
-	AM_RANGE(0x500004, 0x500005) AM_READNOP // gives credits
-	AM_RANGE(0x500006, 0x500007) AM_READNOP // gives credits
-	AM_RANGE(0x50001a, 0x50001b) AM_READ_PORT("IN0")
-	AM_RANGE(0x50001c, 0x50001d) AM_READ_PORT("IN1")
-	AM_RANGE(0x500002, 0x50001f) AM_READNOP
-	AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
-	AM_RANGE(0x600000, 0x603fff) AM_RAM
-	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700080, 0x700087) AM_RAM AM_SHARE("vregs")   // video registers?
-ADDRESS_MAP_END
+void magic10_state::magic102_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x200000, 0x2007ff).ram().share("nvram");
+	map(0x400000, 0x4001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500000, 0x500001).r(this, FUNC(magic10_state::magic102_r));
+	map(0x500004, 0x500005).nopr(); // gives credits
+	map(0x500006, 0x500007).nopr(); // gives credits
+	map(0x50001a, 0x50001b).portr("IN0");
+	map(0x50001c, 0x50001d).portr("IN1");
+//  AM_RANGE(0x500002, 0x50001f) AM_READNOP
+//  AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
+	map(0x600000, 0x603fff).ram();
+	map(0x700001, 0x700001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x700080, 0x700087).ram().share("vregs");   // video registers?
+}
 
-static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x4001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x500004, 0x500005) AM_READWRITE(hotslot_copro_r, hotslot_copro_w) // copro comm
-	AM_RANGE(0x500006, 0x500011) AM_RAM
-	AM_RANGE(0x500012, 0x500013) AM_READ_PORT("IN0")
-	AM_RANGE(0x500014, 0x500015) AM_READ_PORT("IN1")
-	AM_RANGE(0x500016, 0x500017) AM_READ_PORT("IN2")
-	AM_RANGE(0x500018, 0x500019) AM_READ_PORT("DSW1")
-	AM_RANGE(0x50001a, 0x50001d) AM_WRITENOP
-	AM_RANGE(0x600000, 0x603fff) AM_RAM
-	AM_RANGE(0x70000a, 0x70000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700080, 0x700087) AM_RAM AM_SHARE("vregs")
-ADDRESS_MAP_END
+void magic10_state::hotslot_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x200000, 0x2007ff).ram().share("nvram");
+	map(0x400000, 0x4001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500004, 0x500005).rw(this, FUNC(magic10_state::hotslot_copro_r), FUNC(magic10_state::hotslot_copro_w)); // copro comm
+	map(0x500006, 0x500011).ram();
+	map(0x500012, 0x500013).portr("IN0");
+	map(0x500014, 0x500015).portr("IN1");
+	map(0x500016, 0x500017).portr("IN2");
+	map(0x500018, 0x500019).portr("DSW1");
+	map(0x50001a, 0x50001d).nopw();
+	map(0x600000, 0x603fff).ram();
+	map(0x70000b, 0x70000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x700080, 0x700087).ram().share("vregs");
+}
 
-static ADDRESS_MAP_START( sgsafari_map, AS_PROGRAM, 16, magic10_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_SHARE("layer1_videoram")
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_SHARE("layer0_videoram")
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_SHARE("layer2_videoram")
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_out_w)
-	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x50000e, 0x50000f) AM_READ_PORT("IN0")
-	AM_RANGE(0x500080, 0x500087) AM_RAM AM_SHARE("vregs")   // video registers?
-	AM_RANGE(0x600000, 0x603fff) AM_RAM
-ADDRESS_MAP_END
+void magic10_state::sgsafari_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100fff).ram().w(this, FUNC(magic10_state::layer1_videoram_w)).share("layer1_videoram");
+	map(0x101000, 0x101fff).ram().w(this, FUNC(magic10_state::layer0_videoram_w)).share("layer0_videoram");
+	map(0x102000, 0x103fff).ram().w(this, FUNC(magic10_state::layer2_videoram_w)).share("layer2_videoram");
+	map(0x200000, 0x203fff).ram().share("nvram");
+	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500002, 0x500003).portr("DSW1");
+	map(0x500008, 0x500009).w(this, FUNC(magic10_state::magic10_out_w));
+	map(0x50000b, 0x50000b).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x50000e, 0x50000f).portr("IN0");
+	map(0x500080, 0x500087).ram().share("vregs");   // video registers?
+	map(0x600000, 0x603fff).ram();
+}
 /*
 
   SGSafari unimplemented writes:
@@ -434,7 +444,7 @@ static INPUT_PORTS_START( magic10 )
 	PORT_DIPNAME( 0x0001, 0x0001, "Display Logo" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Yes ) )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) // empty dispenser
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) // empty dispenser
 	PORT_DIPNAME( 0x00ee, 0x00ee, "Disable Free Play" )
 	PORT_DIPSETTING(      0x00ee, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -498,64 +508,6 @@ static INPUT_PORTS_START( magic102 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-/*
-    credits inputs
-
-    PORT_START("CRED1")
-    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x40, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( On ) )
-    PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-    PORT_START("CRED2")
-    PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x01, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x02, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x04, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x40, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( On ) )
-    PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
-*/
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( musicsrt )
@@ -674,6 +626,7 @@ static INPUT_PORTS_START( sgsafari )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout / Super Game")
 
 	PORT_START("DSW1")
+	// TODO: defaults are hardwired with aforementioned startup code, is it intentional?
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x0300,   0x0000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(        0x0300, DEF_STR( Easy ) )
@@ -748,7 +701,8 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 	MCFG_CPU_PROGRAM_MAP(magic10_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magic10_state, irq1_line_hold)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	// 1FILL is required by vanilla magic10 at least (otherwise gameplay won't work properly)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -770,7 +724,8 @@ MACHINE_CONFIG_START(magic10_state::magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::magic10a, magic10)
+MACHINE_CONFIG_START(magic10_state::magic10a)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -778,7 +733,8 @@ MACHINE_CONFIG_DERIVED(magic10_state::magic10a, magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::magic102, magic10)
+MACHINE_CONFIG_START(magic10_state::magic102)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -789,7 +745,8 @@ MACHINE_CONFIG_DERIVED(magic10_state::magic102, magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::hotslot, magic10)
+MACHINE_CONFIG_START(magic10_state::hotslot)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -800,7 +757,8 @@ MACHINE_CONFIG_DERIVED(magic10_state::hotslot, magic10)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(magic10_state::sgsafari, magic10)
+MACHINE_CONFIG_START(magic10_state::sgsafari)
+	magic10(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

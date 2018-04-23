@@ -87,10 +87,12 @@ void tp84_state::machine_start()
 }
 
 
-INTERRUPT_GEN_MEMBER(tp84_state::main_vblank_irq)
+WRITE_LINE_MEMBER(tp84_state::vblank_irq)
 {
-	if (m_irq_enable)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_irq_enable)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	if (state && m_sub_irq_mask)
+		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -170,75 +172,81 @@ WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
 
 
 
-static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8, tp84_state )
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_SHARE("palette_bank")
-	AM_RANGE(0x2820, 0x2820) AM_READ_PORT("P1")
-	AM_RANGE(0x2840, 0x2840) AM_READ_PORT("P2")
-	AM_RANGE(0x2860, 0x2860) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3000, 0x3007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(tp84_sh_irqtrigger_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITEONLY AM_SHARE("scroll_x")
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITEONLY AM_SHARE("scroll_y")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("bg_videoram")
-	AM_RANGE(0x4400, 0x47ff) AM_RAM AM_SHARE("fg_videoram")
-	AM_RANGE(0x4800, 0x4bff) AM_RAM AM_SHARE("bg_colorram")
-	AM_RANGE(0x4c00, 0x4fff) AM_RAM AM_SHARE("fg_colorram")
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tp84_state::tp84_cpu1_map(address_map &map)
+{
+	map(0x2000, 0x2000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x2800, 0x2800).portr("SYSTEM").writeonly().share("palette_bank");
+	map(0x2820, 0x2820).portr("P1");
+	map(0x2840, 0x2840).portr("P2");
+	map(0x2860, 0x2860).portr("DSW1");
+	map(0x3000, 0x3000).portr("DSW2");
+	map(0x3000, 0x3007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x3800, 0x3800).w(this, FUNC(tp84_state::tp84_sh_irqtrigger_w));
+	map(0x3a00, 0x3a00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x3c00, 0x3c00).writeonly().share("scroll_x");
+	map(0x3e00, 0x3e00).writeonly().share("scroll_y");
+	map(0x4000, 0x43ff).ram().share("bg_videoram");
+	map(0x4400, 0x47ff).ram().share("fg_videoram");
+	map(0x4800, 0x4bff).ram().share("bg_colorram");
+	map(0x4c00, 0x4fff).ram().share("fg_colorram");
+	map(0x5000, 0x57ff).ram().share("share1");
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8, tp84_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("bg_videoram")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("fg_videoram")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("bg_colorram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("fg_colorram")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_SHARE("palette_bank")
-	AM_RANGE(0x1a20, 0x1a20) AM_READ_PORT("P1")
-	AM_RANGE(0x1a40, 0x1a40) AM_READ_PORT("P2")
-	AM_RANGE(0x1a60, 0x1a60) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1c00, 0x1c07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(tp84_sh_irqtrigger_w)
-	AM_RANGE(0x1e80, 0x1e80) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1f00, 0x1f00) AM_WRITEONLY AM_SHARE("scroll_x")
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITEONLY AM_SHARE("scroll_y")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tp84_state::tp84b_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("bg_videoram");
+	map(0x0400, 0x07ff).ram().share("fg_videoram");
+	map(0x0800, 0x0bff).ram().share("bg_colorram");
+	map(0x0c00, 0x0fff).ram().share("fg_colorram");
+	map(0x1000, 0x17ff).ram().share("share1");
+	map(0x1800, 0x1800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1a00, 0x1a00).portr("SYSTEM").writeonly().share("palette_bank");
+	map(0x1a20, 0x1a20).portr("P1");
+	map(0x1a40, 0x1a40).portr("P2");
+	map(0x1a60, 0x1a60).portr("DSW1");
+	map(0x1c00, 0x1c00).portr("DSW2");
+	map(0x1c00, 0x1c07).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x1e00, 0x1e00).w(this, FUNC(tp84_state::tp84_sh_irqtrigger_w));
+	map(0x1e80, 0x1e80).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x1f00, 0x1f00).writeonly().share("scroll_x");
+	map(0x1f80, 0x1f80).writeonly().share("scroll_y");
+	map(0x8000, 0xffff).rom();
+}
 
 
 WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 {
 	m_sub_irq_mask = data & 1;
+	if (!m_sub_irq_mask)
+		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, tp84_state )
+void tp84_state::cpu2_map(address_map &map)
+{
 //  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
-	AM_RANGE(0x2000, 0x2000) AM_READ(tp84_scanline_r) /* beam position */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irq_mask_w)
-	AM_RANGE(0x6000, 0x679f) AM_RAM
-	AM_RANGE(0x67a0, 0x67ff) AM_RAM_WRITE(tp84_spriteram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x2000, 0x2000).r(this, FUNC(tp84_state::tp84_scanline_r)); /* beam position */
+	map(0x4000, 0x4000).w(this, FUNC(tp84_state::sub_irq_mask_w));
+	map(0x6000, 0x679f).ram();
+	map(0x67a0, 0x67ff).ram().w(this, FUNC(tp84_state::tp84_spriteram_w)).share("spriteram");
+	map(0x8000, 0x87ff).ram().share("share1");
+	map(0xe000, 0xffff).rom();
+}
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, tp84_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8000) AM_READ(tp84_sh_timer_r)
-	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(tp84_filter_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITENOP
-	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE("y2404_1", y2404_device, write)
-	AM_RANGE(0xc003, 0xc003) AM_DEVWRITE("y2404_2", y2404_device, write)
-	AM_RANGE(0xc004, 0xc004) AM_DEVWRITE("y2404_3", y2404_device, write)
-ADDRESS_MAP_END
+void tp84_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x6000, 0x6000).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x8000, 0x8000).r(this, FUNC(tp84_state::tp84_sh_timer_r));
+	map(0xa000, 0xa1ff).w(this, FUNC(tp84_state::tp84_filter_w));
+	map(0xc000, 0xc000).nopw();
+	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::write));
+	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::write));
+	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::write));
+}
 
 
 
@@ -321,23 +329,15 @@ static GFXDECODE_START( tp84 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4*8, 16*8 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
-{
-	if(m_sub_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
-}
-
 
 MACHINE_CONFIG_START(tp84_state::tp84)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(18'432'000)/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tp84_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("sub", MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tp84_state,  sub_vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
@@ -362,6 +362,7 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(tp84_state, screen_update_tp84)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tp84_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tp84)
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -390,7 +391,8 @@ MACHINE_CONFIG_START(tp84_state::tp84)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(tp84_state::tp84b, tp84)
+MACHINE_CONFIG_START(tp84_state::tp84b)
+	tp84(config);
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(tp84b_cpu1_map)
 MACHINE_CONFIG_END

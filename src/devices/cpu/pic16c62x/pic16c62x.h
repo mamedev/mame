@@ -79,7 +79,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -194,6 +194,12 @@ private:
 	void pic16c62x_update_watchdog(int counts);
 	void pic16c62x_update_timer(int counts);
 
+	void pic16c620_ram(address_map &map);
+	void pic16c622_ram(address_map &map);
+	void pic16c62x_rom_10(address_map &map);
+	void pic16c62x_rom_11(address_map &map);
+	void pic16c62x_rom_9(address_map &map);
+	void pic16c62xa_ram(address_map &map);
 };
 
 

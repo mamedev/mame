@@ -4,7 +4,7 @@
 
     Babbage-2nd skeleton driver (19/OCT/2011)
 
-    http://homepage3.nifty.com/takeda-toshiya/babbage/index.html
+    http://takeda-toshiya.my.coocan.jp/babbage/index.html
 
     Pasting:
         0-F : as is
@@ -42,8 +42,12 @@ public:
 		, m_pio_2(*this, "z80pio_2")
 		, m_ctc(*this, "z80ctc")
 		, m_keyboard(*this, "X%u", 0)
-		{ }
+		, m_digits(*this, "digit%u", 0U)
+	{ }
 
+	void babbage(machine_config &config);
+
+protected:
 	DECLARE_READ8_MEMBER(pio2_a_r);
 	DECLARE_WRITE8_MEMBER(pio1_b_w);
 	DECLARE_WRITE8_MEMBER(pio2_b_w);
@@ -52,17 +56,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
-	void babbage(machine_config &config);
+	void babbage_io(address_map &map);
+	void babbage_map(address_map &map);
+
 private:
 	uint8_t m_segment;
 	uint8_t m_key;
 	uint8_t m_prev_key;
 	bool m_step;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio_1;
 	required_device<z80pio_device> m_pio_2;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport_array<4> m_keyboard;
+	output_finder<33> m_digits;
 };
 
 
@@ -73,18 +81,20 @@ private:
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( babbage_map, AS_PROGRAM, 8, babbage_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM
-ADDRESS_MAP_END
+void babbage_state::babbage_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x1000, 0x17ff).ram();
+}
 
-static ADDRESS_MAP_START( babbage_io, AS_IO, 8, babbage_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("z80pio_2", z80pio_device, read_alt, write_alt)
-ADDRESS_MAP_END
+void babbage_state::babbage_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x10, 0x13).rw(m_pio_1, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x20, 0x23).rw(m_pio_2, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+}
 
 
 
@@ -162,15 +172,18 @@ READ8_MEMBER( babbage_state::pio2_a_r )
 WRITE8_MEMBER( babbage_state::pio2_b_w )
 {
 	if (BIT(data, 7))
+	{
 		m_step = false;
-	else
-	if (!m_step)
+	}
+	else if (!m_step)
 	{
 		m_segment = data;
 		m_step = true;
 	}
 	else
-		output().set_digit_value(data, m_segment);
+	{
+		m_digits[data] = m_segment;
+	}
 }
 
 static const z80_daisy_config babbage_daisy_chain[] =

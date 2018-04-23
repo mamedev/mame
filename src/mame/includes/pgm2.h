@@ -109,6 +109,10 @@ public:
 	void pgm2_lores(machine_config &config);
 	void pgm2(machine_config &config);
 	void pgm2_hires(machine_config &config);
+	void pgm2_map(address_map &map);
+	void pgm2_module_rom_map(address_map &map);
+	void pgm2_ram_rom_map(address_map &map);
+	void pgm2_rom_map(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

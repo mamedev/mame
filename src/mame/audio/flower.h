@@ -28,8 +28,8 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( lower_write );
 	DECLARE_WRITE8_MEMBER( upper_write );
-//  virtual DECLARE_ADDRESS_MAP(lower_map, 8);
-//  virtual DECLARE_ADDRESS_MAP(upper_map, 8);
+//  virtual void lower_map(address_map &map);
+//  virtual void upper_map(address_map &map);
 	DECLARE_WRITE8_MEMBER( frequency_w );
 	DECLARE_WRITE8_MEMBER( repeat_w );
 	DECLARE_WRITE8_MEMBER( unk_w );
@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER( start_address_w );
 	DECLARE_WRITE8_MEMBER( sample_trigger_w );
 
+	void regs_map(address_map &map);
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;

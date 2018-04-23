@@ -31,15 +31,33 @@
 #include "phi.h"
 
 // Debugging
-#define VERBOSE 1
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-#define VERBOSE_0 0
-#define LOG_0(x)  do { if (VERBOSE_0) logerror x; } while (0)
+#include "logmacro.h"
+#define LOG_NOISY_MASK  (LOG_GENERAL << 1)
+#define LOG_NOISY(...)  LOGMASKED(LOG_NOISY_MASK, __VA_ARGS__)
+#define LOG_REG_MASK    (LOG_NOISY_MASK << 1)
+#define LOG_REG(...)    LOGMASKED(LOG_REG_MASK, __VA_ARGS__)
+#define LOG_INT_MASK    (LOG_REG_MASK << 1)
+#define LOG_INT(...)    LOGMASKED(LOG_INT_MASK, __VA_ARGS__)
+#undef VERBOSE
+#define VERBOSE LOG_GENERAL
 
-// Macros to clear/set single bits
-#define BIT_MASK(n) (1U << (n))
-#define BIT_CLR(w , n)  ((w) &= ~BIT_MASK(n))
-#define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
+// Bit manipulation
+namespace {
+	template<typename T> constexpr T BIT_MASK(unsigned n)
+	{
+		return (T)1U << n;
+	}
+
+	template<typename T> void BIT_CLR(T& w , unsigned n)
+	{
+		w &= ~BIT_MASK<T>(n);
+	}
+
+	template<typename T> void BIT_SET(T& w , unsigned n)
+	{
+		w |= BIT_MASK<T>(n);
+	}
+}
 
 // Timers
 enum {
@@ -68,103 +86,102 @@ enum {
 };
 
 // All valid bits in registers
-#define REG_ALL_MASK    0xc0ff
+constexpr uint16_t REG_ALL_MASK = 0xc0ff;
 
 // D0 & D1 bits
-#define REG_D0D1_MASK   0xc000  // Mask of D0/D1 bits
-#define REG_D0D1_SHIFT  14      // Position of D0/D1 bits
+constexpr uint16_t REG_D0D1_MASK    = 0xc000;   // Mask of D0/D1 bits
+constexpr unsigned REG_D0D1_SHIFT   = 14;   // Position of D0/D1 bits
 
 // D8-D15 bits
-#define REG_D08D15_MASK 0xff    // Mask of D8:D15 bits
+constexpr uint16_t REG_D08D15_MASK  = 0xff; // Mask of D8:D15 bits
 
 // Bits in INT_COND & INT_MASK
-#define REG_INT_DEV_CLEAR_BIT   0   // Device clear
-#define REG_INT_FIFO_IDLE_BIT   1   // FIFO idle
-#define REG_INT_FIFO_AV_BIT     2   // FIFO bytes available
-#define REG_INT_FIFO_ROOM_BIT   3   // FIFO room available
-#define REG_INT_SRQ_BIT         4   // Service request
-#define REG_INT_PP_RESPONSE_BIT 5   // PP response
-#define REG_INT_PROC_ABORT_BIT  6   // Processor handshake abort
-#define REG_INT_STATUS_CH_BIT   7   // Status change
-#define REG_INT_PARITY_ERR_BIT  14  // Parity error
-#define REG_INT_PENDING_BIT     15  // Interrupt pending
-#define REG_INT_CLEARABLE_MASK  0x40c1  // Mask of clearable bits
-#define REG_INT_STATE_MASK      0x803e  // Mask of "state" bits
+constexpr unsigned REG_INT_DEV_CLEAR_BIT    = 0;    // Device clear
+constexpr unsigned REG_INT_FIFO_IDLE_BIT    = 1;    // FIFO idle
+constexpr unsigned REG_INT_FIFO_AV_BIT      = 2;    // FIFO bytes available
+constexpr unsigned REG_INT_FIFO_ROOM_BIT    = 3;    // FIFO room available
+constexpr unsigned REG_INT_SRQ_BIT          = 4;    // Service request
+constexpr unsigned REG_INT_PP_RESPONSE_BIT  = 5;    // PP response
+constexpr unsigned REG_INT_PROC_ABORT_BIT   = 6;    // Processor handshake abort
+constexpr unsigned REG_INT_STATUS_CH_BIT    = 7;    // Status change
+constexpr unsigned REG_INT_PARITY_ERR_BIT   = 14;   // Parity error
+constexpr unsigned REG_INT_PENDING_BIT      = 15;   // Interrupt pending
+constexpr uint16_t REG_INT_CLEARABLE_MASK   = 0x40c1;   // Mask of clearable bits
+constexpr uint16_t REG_INT_STATE_MASK       = 0x803e;   // Mask of "state" bits
 
 // Bits in inbound FIFO
-#define REG_IFIFO_NORMAL_MASK   0x0000  // Mask of D0/D1 bits for "normal" bytes
-#define REG_IFIFO_CNT_EXP_MASK  0x8000  // Mask for a byte that caused byte count to expire
-#define REG_IFIFO_LAST_MASK     0xc000  // Mask for last byte in a record
-#define REG_IFIFO_2_ADDR_MASK   0x4000  // Mask for secondary addresses
-#define REG_IFIFO_TALK_BIT      5       // Bit of "talk" flag
+//constexpr uint16_t REG_IFIFO_NORMAL_MASK  = 0x0000;   // Mask of D0/D1 bits for "normal" bytes
+constexpr uint16_t REG_IFIFO_CNT_EXP_MASK   = 0x8000;   // Mask for a byte that caused byte count to expire
+constexpr uint16_t REG_IFIFO_LAST_MASK      = 0xc000;   // Mask for last byte in a record
+constexpr uint16_t REG_IFIFO_2_ADDR_MASK    = 0x4000;   // Mask for secondary addresses
+constexpr unsigned REG_IFIFO_TALK_BIT       = 5;        // Bit of "talk" flag
 
 // Bits in outbound FIFO
-#define REG_OFIFO_SPECIAL_BIT   14      // Bit to discriminate between normal bytes and the rest
-#define REG_OFIFO_END_BIT       15      // Bit of EOI
-#define REG_OFIFO_IFCMD_MASK    0x4000  // Mask of interface commands
-#define REG_OFIFO_UNCNT_MASK    0xc000  // Mask of uncounted transfer enable
-#define REG_OFIFO_XFER_EN_MASK  0x0000  // Mask of byte transfer enable
-#define REG_OFIFO_LF_INH_BIT    15      // Bit of LF detection inhibit
+constexpr unsigned REG_OFIFO_SPECIAL_BIT    = 14;   // Bit to discriminate between normal bytes and the rest
+constexpr unsigned REG_OFIFO_END_BIT        = 15;   // Bit of EOI
+constexpr uint16_t REG_OFIFO_IFCMD_MASK     = 0x4000;   // Mask of interface commands
+constexpr uint16_t REG_OFIFO_UNCNT_MASK     = 0xc000;   // Mask of uncounted transfer enable
+constexpr unsigned REG_OFIFO_LF_INH_BIT     = 15;   // Bit of LF detection inhibit
 
 // Bits in status register
-#define REG_STATUS_DATA_FREEZE_BIT  0   // Outbound data freeze
-#define REG_STATUS_LISTEN_BIT       1   // Addressed to listen
-#define REG_STATUS_TALK_BIT         2   // Addressed to talk or identify
-#define REG_STATUS_SYS_CTRL_BIT     3   // System controller
-#define REG_STATUS_CONTROLLER_BIT   4   // Current controller
-#define REG_STATUS_REMOTE_BIT       5   // Remote state
-#define REG_STATUS_D0D1_BIT         6   // D0/D1 bit access
-#define REG_STATUS_STATE_MASK       0x3e    // Mask of "state" bits
+constexpr unsigned REG_STATUS_DATA_FREEZE_BIT   = 0;    // Outbound data freeze
+constexpr unsigned REG_STATUS_LISTEN_BIT        = 1;    // Addressed to listen
+constexpr unsigned REG_STATUS_TALK_BIT          = 2;    // Addressed to talk or identify
+constexpr unsigned REG_STATUS_SYS_CTRL_BIT      = 3;    // System controller
+constexpr unsigned REG_STATUS_CONTROLLER_BIT    = 4;    // Current controller
+constexpr unsigned REG_STATUS_REMOTE_BIT        = 5;    // Remote state
+constexpr unsigned REG_STATUS_D0D1_BIT          = 6;    // D0/D1 bit access
+constexpr uint16_t REG_STATUS_STATE_MASK        = 0x3e; // Mask of "state" bits
 
 // Bits in control register
-#define REG_CTRL_INIT_OFIFO_BIT     0   // Initialize outbound FIFO
-#define REG_CTRL_DMA_FIFO_BIT       1   // DMA FIFO selection
-#define REG_CTRL_SERVICE_REQ_BIT    2   // Request service
-#define REG_CTRL_PP_RESPONSE_BIT    3   // Respond to PP
-#define REG_CTRL_IFC_BIT            4   // IFC value
-#define REG_CTRL_REN_BIT            5   // REN value
-#define REG_CTRL_PAR_FREEZE_BIT     6   // Parity freeze
-#define REG_CTRL_8BIT_PROC_BIT      7   // 8-bit processor
+constexpr unsigned REG_CTRL_INIT_OFIFO_BIT  = 0;    // Initialize outbound FIFO
+constexpr unsigned REG_CTRL_DMA_FIFO_BIT    = 1;    // DMA FIFO selection
+constexpr unsigned REG_CTRL_SERVICE_REQ_BIT = 2;    // Request service
+constexpr unsigned REG_CTRL_PP_RESPONSE_BIT = 3;    // Respond to PP
+constexpr unsigned REG_CTRL_IFC_BIT         = 4;    // IFC value
+constexpr unsigned REG_CTRL_REN_BIT         = 5;    // REN value
+constexpr unsigned REG_CTRL_PAR_FREEZE_BIT  = 6;    // Parity freeze
+constexpr unsigned REG_CTRL_8BIT_PROC_BIT   = 7;    // 8-bit processor
 
 // Bits in address register
-#define REG_ADDR_HPIB_ADDR_BIT      0   // HPIB address
-#define REG_ADDR_LA_BIT             5   // Listen always
-#define REG_ADDR_TA_BIT             6   // Talk always
-#define REG_ADDR_ONLINE_BIT         7   // Online
+constexpr unsigned REG_ADDR_HPIB_ADDR_BIT   = 0;    // HPIB address LSB
+constexpr unsigned REG_ADDR_LA_BIT          = 5;    // Listen always
+constexpr unsigned REG_ADDR_TA_BIT          = 6;    // Talk always
+constexpr unsigned REG_ADDR_ONLINE_BIT      = 7;    // Online
 
 // Interface commands
-#define IFCMD_MASK              0x7f    // Mask of interface commands
-#define IFCMD_DCL               0x14    // Device clear
-#define IFCMD_GET               0x08    // Group execute trigger
-#define IFCMD_GTL               0x01    // Go to local
-#define IFCMD_LLO               0x11    // Local lock-out
-#define IFCMD_AG_MASK           0x60    // Mask of bits identifying address group commands
-#define IFCMD_ADDR_MASK         0x1f    // Mask of address in AG commands
-#define IFCMD_LAG_VALUE         0x20    // Value of LAG commands
-#define IFCMD_TAG_VALUE         0x40    // Value of TAG commands
-#define IFCMD_SCG_VALUE         0x60    // Value of SCG commands
-#define IFCMD_PPC               0x05    // Parallel poll configure
-#define IFCMD_PPX_MASK          0x70    // Mask of PPE/PPD commands
-#define IFCMD_PPE_VALUE         0x60    // Parallel poll enable
-#define IFCMD_PPE_S_BIT         3       // Position of "S" bit in PPE
-#define IFCMD_PPE_PPR_MASK      7       // Mask in PPE of PPR msg no.
-#define IFCMD_PPD_VALUE         0x70    // Parallel poll disable
-#define IFCMD_PPU               0x15    // Parallel poll unconfigure
-#define IFCMD_SDC               0x04    // Selected device clear
-#define IFCMD_SPD               0x19    // Serial poll disable
-#define IFCMD_SPE               0x18    // Serial poll enable
-#define IFCMD_TCT               0x09    // Take control
-#define IFCMD_UNL               0x3f    // Unlisten
-#define IFCMD_UNT               0x5f    // Untalk
+constexpr uint8_t  IFCMD_MASK           = 0x7f; // Mask of interface commands
+constexpr uint8_t  IFCMD_DCL            = 0x14; // Device clear
+constexpr uint8_t  IFCMD_GET            = 0x08; // Group execute trigger
+constexpr uint8_t  IFCMD_GTL            = 0x01; // Go to local
+constexpr uint8_t  IFCMD_LLO            = 0x11; // Local lock-out
+constexpr uint8_t  IFCMD_AG_MASK        = 0x60; // Mask of bits identifying address group commands
+constexpr uint8_t  IFCMD_ADDR_MASK      = 0x1f; // Mask of address in AG commands
+constexpr uint8_t  IFCMD_LAG_VALUE      = 0x20; // Value of LAG commands
+constexpr uint8_t  IFCMD_TAG_VALUE      = 0x40; // Value of TAG commands
+constexpr uint8_t  IFCMD_SCG_VALUE      = 0x60; // Value of SCG commands
+constexpr uint8_t  IFCMD_PPC            = 0x05; // Parallel poll configure
+constexpr uint8_t  IFCMD_PPX_MASK       = 0x70; // Mask of PPE/PPD commands
+constexpr uint8_t  IFCMD_PPE_VALUE      = 0x60; // Parallel poll enable
+constexpr unsigned IFCMD_PPE_S_BIT      = 3;    // Position of "S" bit in PPE
+constexpr uint8_t  IFCMD_PPE_PPR_MASK   = 7;    // Mask in PPE of PPR msg no.
+constexpr uint8_t  IFCMD_PPD_VALUE      = 0x70; // Parallel poll disable
+constexpr uint8_t  IFCMD_PPU            = 0x15; // Parallel poll unconfigure
+constexpr uint8_t  IFCMD_SDC            = 0x04; // Selected device clear
+constexpr uint8_t  IFCMD_SPD            = 0x19; // Serial poll disable
+constexpr uint8_t  IFCMD_SPE            = 0x18; // Serial poll enable
+constexpr uint8_t  IFCMD_TCT            = 0x09; // Take control
+constexpr uint8_t  IFCMD_UNL            = 0x3f; // Unlisten
+constexpr uint8_t  IFCMD_UNT            = 0x5f; // Untalk
 
 // Delays
-#define DELAY_T1    2000    // T1: 2 us
-#define DELAY_T7    500     // T7: 0.5 us
-#define DELAY_T9    1500    // T9: 1.5 us
-#define DELAY_T10   1500    // T10: 1.5 us
+constexpr unsigned DELAY_T1     = 2000; // T1: 2 us
+constexpr unsigned DELAY_T7     = 500;  // T7: 0.5 us
+constexpr unsigned DELAY_T9     = 1500; // T9: 1.5 us
+constexpr unsigned DELAY_T10    = 1500; // T10: 1.5 us
 
 // Controller address
-#define CONTROLLER_ADDR         0x1e    // PHI always has this address when it's a controller
+constexpr uint8_t CONTROLLER_ADDR   = 0x1e; // PHI always has this address when it's a system controller
 
 // Device type definition
 DEFINE_DEVICE_TYPE(PHI, phi_device, "hp_phi", "HP Processor-to-HPIB Interface")
@@ -184,7 +201,8 @@ phi_device::phi_device(const machine_config &mconfig, device_type type, const ch
 		  devcb_write_line(*this),
 		  devcb_write_line(*this) },
 	  m_int_write_func(*this),
-	  m_dmarq_write_func(*this)
+	  m_dmarq_write_func(*this),
+	  m_sys_cntrl_read_func(*this)
 {
 }
 
@@ -233,21 +251,25 @@ WRITE_LINE_MEMBER(phi_device::ren_w)
 	set_ext_signal(PHI_488_REN , state);
 }
 
+WRITE8_MEMBER(phi_device::bus_dio_w)
+{
+	update_pp();
+}
 
 void phi_device::set_ext_signal(phi_488_signal_t signal , int state)
 {
 	state = !state;
 	if (m_ext_signals[ signal ] != state) {
 		m_ext_signals[ signal ] = state;
-		LOG_0(("EXT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
-			 m_ext_signals[ PHI_488_EOI ] ,
-			 m_ext_signals[ PHI_488_DAV ] ,
-			 m_ext_signals[ PHI_488_NRFD ] ,
-			 m_ext_signals[ PHI_488_NDAC ] ,
-			 m_ext_signals[ PHI_488_IFC ] ,
-			 m_ext_signals[ PHI_488_SRQ ] ,
-			 m_ext_signals[ PHI_488_ATN ] ,
-			 m_ext_signals[ PHI_488_REN ]));
+		LOG_NOISY("EXT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
+				  m_ext_signals[ PHI_488_EOI ] ,
+				  m_ext_signals[ PHI_488_DAV ] ,
+				  m_ext_signals[ PHI_488_NRFD ] ,
+				  m_ext_signals[ PHI_488_NDAC ] ,
+				  m_ext_signals[ PHI_488_IFC ] ,
+				  m_ext_signals[ PHI_488_SRQ ] ,
+				  m_ext_signals[ PHI_488_ATN ] ,
+				  m_ext_signals[ PHI_488_REN ]);
 		update_fsm();
 	}
 }
@@ -271,10 +293,13 @@ READ16_MEMBER(phi_device::reg16_r)
 		break;
 
 	case REG_R_INBOUND_FIFO:
-		// TODO: read from PP response
 		if (m_fifo_in.empty()) {
-			BIT_SET(m_reg_int_cond, REG_INT_PROC_ABORT_BIT);
-			res = 0;
+			if (m_c_state == PHI_C_CPPS) {
+				res = get_pp_response();
+			} else {
+				BIT_SET(m_reg_int_cond, REG_INT_PROC_ABORT_BIT);
+				res = 0;
+			}
 		} else {
 			res = m_fifo_in.dequeue();
 		}
@@ -303,7 +328,7 @@ READ16_MEMBER(phi_device::reg16_r)
 
 	default:
 		res = 0;
-		LOG(("Reading from unmapped address (%u)\n", offset));
+		LOG("Reading from unmapped address (%u)\n", offset);
 		break;
 	};
 
@@ -313,7 +338,7 @@ READ16_MEMBER(phi_device::reg16_r)
 			((res & REG_D0D1_MASK) >> (REG_D0D1_SHIFT - REG_STATUS_D0D1_BIT));
 	}
 
-	//LOG(("R %u=%04x\n" , offset , res));
+	LOG_REG("R %u=%04x\n" , offset , res);
 	return res;
 }
 
@@ -341,11 +366,12 @@ void phi_device::device_start()
 	save_item(NAME(m_t_spms));
 	save_item(NAME(m_l_state));
 	save_item(NAME(m_sr_state));
+	save_item(NAME(m_rl_rems));
 	save_item(NAME(m_pp_state));
-	save_item(NAME(m_pp_pacs));
 	save_item(NAME(m_ppr_msg));
 	save_item(NAME(m_s_sense));
 	save_item(NAME(m_c_state));
+	save_item(NAME(m_sa_state));
 	save_item(NAME(m_be_counter));
 	save_item(NAME(m_reg_status));
 	save_item(NAME(m_reg_int_cond));
@@ -363,6 +389,7 @@ void phi_device::device_start()
 	}
 	m_int_write_func.resolve_safe();
 	m_dmarq_write_func.resolve_safe();
+	m_sys_cntrl_read_func.resolve_safe(0);
 
 	m_sh_dly_timer = timer_alloc(SH_DELAY_TMR_ID);
 	m_c_dly_timer = timer_alloc(C_DELAY_TMR_ID);
@@ -391,6 +418,10 @@ void phi_device::device_reset()
 	m_reg_address = 0;
 	m_fifo_in.clear();
 	m_fifo_out.clear();
+	m_int_line = false;
+	m_int_write_func(false);
+	m_dmarq_line = false;
+	m_dmarq_write_func(false);
 
 	pon_msg();
 	update_488();
@@ -398,7 +429,7 @@ void phi_device::device_reset()
 
 void phi_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	LOG_0(("tmr %d enabled %d\n" , id , timer.enabled()));
+	LOG_NOISY("tmr %d enabled %d\n" , id , timer.enabled());
 	update_fsm();
 }
 
@@ -409,7 +440,7 @@ void phi_device::int_reg_w(offs_t offset , uint16_t data)
 		data = (data & REG_D08D15_MASK) | ((m_reg_status << (REG_D0D1_SHIFT - REG_STATUS_D0D1_BIT)) & REG_D0D1_MASK);
 	}
 
-	//LOG(("W %u=%04x\n" , offset , data));
+	LOG_REG("W %u=%04x\n" , offset , data);
 
 	switch (offset) {
 	case REG_W_INT_COND:
@@ -447,6 +478,11 @@ void phi_device::int_reg_w(offs_t offset , uint16_t data)
 		m_reg_control = data & 0xfe;
 		if (BIT(data , REG_CTRL_INIT_OFIFO_BIT)) {
 			m_fifo_out.clear();
+			if (m_c_state == PHI_C_CSBS) {
+				// Take control asynchronously
+				m_c_state = PHI_C_CSWS;
+				m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T7));
+			}
 		}
 		if (m_loopback) {
 			// TODO: better?
@@ -462,8 +498,7 @@ void phi_device::int_reg_w(offs_t offset , uint16_t data)
 			bool prev_ol = BIT(m_reg_address , REG_ADDR_ONLINE_BIT);
 			m_reg_address = data;
 			bool current_ol = BIT(m_reg_address , REG_ADDR_ONLINE_BIT);
-			// TODO: consider SYS CNTRL input, too
-			m_sys_controller = !current_ol;
+			m_sys_controller = !current_ol || m_sys_cntrl_read_func();
 			m_loopback = !current_ol;
 			if (!current_ol) {
 				// IDENTIFY is enabled by PP_RESPONSE bit in control register
@@ -473,6 +508,7 @@ void phi_device::int_reg_w(offs_t offset , uint16_t data)
 				pon_msg();
 				m_id_enabled = BIT(m_reg_control , REG_CTRL_PP_RESPONSE_BIT);
 			}
+			configure_pp_response();
 			if (prev_ol != current_ol) {
 				update_488();
 			}
@@ -493,7 +529,7 @@ void phi_device::int_reg_w(offs_t offset , uint16_t data)
 		break;
 
 	default:
-		LOG(("Writing to unmapped address (%u)\n", offset));
+		LOG("Writing to unmapped address (%u)\n", offset);
 		break;
 	}
 }
@@ -510,7 +546,7 @@ uint8_t phi_device::get_dio(void)
 void phi_device::set_dio(uint8_t data)
 {
 	if (data != m_dio) {
-		LOG_0(("DIO=%02x\n" , data));
+		LOG_NOISY("DIO=%02x\n" , data);
 		m_dio = data;
 		if (!m_loopback) {
 			m_dio_write_func(~data);
@@ -531,15 +567,15 @@ void phi_device::set_signal(phi_488_signal_t signal , bool state)
 {
 	if (state != m_signals[ signal ]) {
 		m_signals[ signal ] = state;
-		LOG_0(("INT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
-			 m_signals[ PHI_488_EOI ] ,
-			 m_signals[ PHI_488_DAV ] ,
-			 m_signals[ PHI_488_NRFD ] ,
-			 m_signals[ PHI_488_NDAC ] ,
-			 m_signals[ PHI_488_IFC ] ,
-			 m_signals[ PHI_488_SRQ ] ,
-			 m_signals[ PHI_488_ATN ] ,
-			 m_signals[ PHI_488_REN ]));
+		LOG_NOISY("INT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
+				  m_signals[ PHI_488_EOI ] ,
+				  m_signals[ PHI_488_DAV ] ,
+				  m_signals[ PHI_488_NRFD ] ,
+				  m_signals[ PHI_488_NDAC ] ,
+				  m_signals[ PHI_488_IFC ] ,
+				  m_signals[ PHI_488_SRQ ] ,
+				  m_signals[ PHI_488_ATN ] ,
+				  m_signals[ PHI_488_REN ]);
 		if (!m_loopback) {
 			m_signal_wr_fns[ signal ](!state);
 		}
@@ -554,18 +590,10 @@ void phi_device::pon_msg(void)
 	m_t_spms = false;
 	m_l_state = PHI_L_LIDS;
 	m_sr_state = PHI_SR_NPRS;
-	m_pp_pacs = false;
-	uint8_t addr = my_address();
-	if (addr <= 7) {
-		// If address <= 7, PP is automatically enabled and configured for PPR = ~address
-		m_ppr_msg = addr ^ 7;
-		m_pp_state = PHI_PP_PPSS;
-	} else {
-		m_ppr_msg = 0;
-		m_pp_state = PHI_PP_PPIS;
-	}
-	m_s_sense = true;
+	m_rl_rems = false;
+	m_pp_state = PHI_PP_PPIS;
 	m_c_state = PHI_C_CIDS;
+	m_sa_state = PHI_SA_NONE;
 	m_be_counter = 0;
 	m_nba_origin = NBA_NONE;
 }
@@ -597,26 +625,30 @@ void phi_device::update_fsm(void)
 	set_signal(PHI_488_IFC , m_sys_controller && BIT(m_reg_control , REG_CTRL_IFC_BIT));
 	set_signal(PHI_488_REN , m_sys_controller && BIT(m_reg_control , REG_CTRL_REN_BIT));
 
+	// TODO: improve (see SR FSM)
+	// This is not entirely correct but it works for now (on HP64K, the only system
+	// where it's relevant)
+	set_signal(PHI_488_SRQ , BIT(m_reg_control , REG_CTRL_SERVICE_REQ_BIT));
+
 	bool changed = true;
 	int prev_state;
 	uint8_t new_byte = 0;
 	bool new_eoi = false;
 	bool prev_cic = controller_in_charge();
 	// TODO: SR FSM
-	// TODO: RL FSM
 	// Loop until all changes settle
 	while (changed) {
-		LOG_0(("SH %d AH %d T %d SPMS %d L %d SR %d PP %d PACS %d PPR %u S %d C %d\n" ,
-			 m_sh_state , m_ah_state , m_t_state , m_t_spms , m_l_state , m_sr_state ,
-			 m_pp_state , m_pp_pacs , m_ppr_msg , m_s_sense , m_c_state));
-		LOG_0(("O E/F=%d/%d I E/F=%d/%d\n" , m_fifo_out.empty() , m_fifo_out.full() , m_fifo_in.empty() , m_fifo_in.full()));
+		LOG_NOISY("SH %d AH %d T %d SPMS %d L %d SR %d PP %d PPR %u S %d C %d SA %d\n" ,
+				  m_sh_state , m_ah_state , m_t_state , m_t_spms , m_l_state , m_sr_state ,
+				  m_pp_state , m_ppr_msg , m_s_sense , m_c_state , m_sa_state);
+		LOG_NOISY("O E/F=%d/%d I E/F=%d/%d\n" , m_fifo_out.empty() , m_fifo_out.full() , m_fifo_in.empty() , m_fifo_in.full());
 		changed = false;
 
 		// SH FSM
 		prev_state = m_sh_state;
 		bool sh_reset =
 			(get_signal(PHI_488_ATN) && !(m_c_state == PHI_C_CACS || m_c_state == PHI_C_CTRS)) ||
-			(!get_signal(PHI_488_ATN) && !(m_t_state == PHI_T_TACS || m_t_state == PHI_T_SPAS || m_t_state == PHI_T_ID3 || m_t_state == PHI_T_ID5));
+			(!get_signal(PHI_488_ATN) && !(m_t_state == PHI_T_TACS || m_t_state == PHI_T_SPAS || m_t_state == PHI_T_ID2 || m_t_state == PHI_T_ID4));
 
 		if (sh_reset) {
 			m_sh_state = PHI_SH_SIDS;
@@ -626,8 +658,8 @@ void phi_device::update_fsm(void)
 			case PHI_SH_SIDS:
 				if (m_t_state == PHI_T_TACS ||
 					m_t_state == PHI_T_SPAS ||
-					m_t_state == PHI_T_ID3 ||
-					m_t_state == PHI_T_ID5 ||
+					m_t_state == PHI_T_ID2 ||
+					m_t_state == PHI_T_ID4 ||
 					m_c_state == PHI_C_CACS) {
 					m_sh_state = PHI_SH_SGNS;
 				}
@@ -637,7 +669,7 @@ void phi_device::update_fsm(void)
 				if ((m_nba_origin = nba_msg(new_byte , new_eoi)) != NBA_NONE) {
 					m_sh_state = PHI_SH_SDYS;
 					m_sh_dly_timer->adjust(attotime::from_nsec(DELAY_T1));
-					LOG_0(("SH DLY enabled %d\n" , m_sh_dly_timer->enabled()));
+					LOG_NOISY("SH DLY enabled %d\n" , m_sh_dly_timer->enabled());
 				}
 				break;
 
@@ -649,7 +681,7 @@ void phi_device::update_fsm(void)
 
 			case PHI_SH_STRS:
 				if (!get_signal(PHI_488_NDAC)) {
-					LOG(("TX %02x/%d\n" , m_dio , m_signals[ PHI_488_EOI ]));
+					LOG("%.6f TX %02x/%d\n" , machine().time().as_double() , m_dio , m_signals[ PHI_488_EOI ]);
 					m_sh_state = PHI_SH_SGNS;
 					clear_nba((nba_origin_t)m_nba_origin);
 				}
@@ -779,33 +811,30 @@ void phi_device::update_fsm(void)
 				break;
 
 			case PHI_T_ID1:
-				break;
-
-			case PHI_T_ID2:
 				if (!get_signal(PHI_488_ATN)) {
-					m_t_state = PHI_T_ID3;
-				}
-				break;
-
-			case PHI_T_ID3:
-				if (get_signal(PHI_488_ATN)) {
 					m_t_state = PHI_T_ID2;
 				}
 				break;
 
-			case PHI_T_ID4:
-				if (!get_signal(PHI_488_ATN)) {
-					m_t_state = PHI_T_ID5;
+			case PHI_T_ID2:
+				if (get_signal(PHI_488_ATN)) {
+					m_t_state = PHI_T_ID1;
 				}
 				break;
 
-			case PHI_T_ID5:
-				if (get_signal(PHI_488_ATN)) {
+			case PHI_T_ID3:
+				if (!get_signal(PHI_488_ATN)) {
 					m_t_state = PHI_T_ID4;
 				}
 				break;
 
-			case PHI_T_ID6:
+			case PHI_T_ID4:
+				if (get_signal(PHI_488_ATN)) {
+					m_t_state = PHI_T_ID3;
+				}
+				break;
+
+			case PHI_T_ID5:
 				break;
 
 			default:
@@ -852,6 +881,13 @@ void phi_device::update_fsm(void)
 		}
 		// No direct L outputs
 
+		// RL FSM
+		if (!get_signal(PHI_488_REN) && m_rl_rems) {
+			m_rl_rems = false;
+			changed = true;
+		}
+		// No direct RL outputs
+
 		// PP FSM
 		prev_state = m_pp_state;
 		switch (m_pp_state) {
@@ -879,8 +915,8 @@ void phi_device::update_fsm(void)
 		}
 		// PP outputs
 		if (m_pp_state == PHI_PP_PPAS && m_s_sense == !!BIT(m_reg_control , REG_CTRL_PP_RESPONSE_BIT)) {
-			LOG(("PP %u\n" , m_ppr_msg));
-			dio_byte |= (1U << m_ppr_msg);
+			LOG("%.6f PP %u\n" , machine().time().as_double() , m_ppr_msg);
+			dio_byte |= BIT_MASK<uint8_t>(m_ppr_msg);
 		}
 
 		// C FSM
@@ -918,19 +954,17 @@ void phi_device::update_fsm(void)
 						m_be_counter = 0;
 					} else if (rpp_msg()) {
 						// Start parallel polling
-						m_c_state = PHI_C_CPWS;
+						m_c_state = PHI_C_CPPS;
 					}
-					// It's not clear what PHI does when it's controller-in-charge
-					// and it's nothing to do. Here we park it in CACS.
+					// There's no third case: rpp_msg() is true when m_fifo_out.empty() is true
 				}
 				break;
 
-			case PHI_C_CPWS:
-				// TODO:
-				break;
-
 			case PHI_C_CPPS:
-				// TODO:
+				if (!rpp_msg()) {
+					m_c_state = PHI_C_CAWS;
+					m_c_dly_timer->adjust(attotime::from_nsec(DELAY_T9));
+				}
 				break;
 
 			case PHI_C_CSBS:
@@ -950,7 +984,7 @@ void phi_device::update_fsm(void)
 
 			case PHI_C_CAWS:
 				if (rpp_msg()) {
-					m_c_state = PHI_C_CPWS;
+					m_c_state = PHI_C_CPPS;
 					m_c_dly_timer->reset();
 				} else if (!m_c_dly_timer->enabled()) {
 					m_c_state = PHI_C_CACS;
@@ -979,10 +1013,10 @@ void phi_device::update_fsm(void)
 			changed = true;
 		}
 		// C outputs
-		set_signal(PHI_488_ATN , m_c_state == PHI_C_CACS || m_c_state == PHI_C_CPWS ||
+		set_signal(PHI_488_ATN , m_c_state == PHI_C_CACS ||
 				   m_c_state == PHI_C_CPPS || m_c_state == PHI_C_CSWS ||
 				   m_c_state == PHI_C_CAWS || m_c_state == PHI_C_CTRS);
-		eoi_signal = eoi_signal || m_c_state == PHI_C_CPWS || m_c_state == PHI_C_CPPS;
+		eoi_signal = eoi_signal || m_c_state == PHI_C_CPPS;
 		set_signal(PHI_488_EOI , eoi_signal);
 		set_dio(dio_byte);
 	}
@@ -992,7 +1026,7 @@ void phi_device::update_fsm(void)
 	if (m_l_state != PHI_L_LIDS) {
 		BIT_SET(m_reg_status, REG_STATUS_LISTEN_BIT);
 	}
-	if (m_t_state != PHI_T_TIDS && m_t_state != PHI_T_ID1) {
+	if (m_t_state != PHI_T_TIDS) {
 		BIT_SET(m_reg_status, REG_STATUS_TALK_BIT);
 	}
 	if (m_sys_controller) {
@@ -1001,7 +1035,9 @@ void phi_device::update_fsm(void)
 	if (controller_in_charge()) {
 		BIT_SET(m_reg_status, REG_STATUS_CONTROLLER_BIT);
 	}
-	// TODO: REG_STATUS_REMOTE_BIT
+	if (m_rl_rems) {
+		BIT_SET(m_reg_status, REG_STATUS_REMOTE_BIT);
+	}
 
 	// Update interrupting condition register and INT signal
 	if (prev_cic != controller_in_charge()) {
@@ -1020,28 +1056,16 @@ void phi_device::update_fsm(void)
 	if (controller_in_charge() && get_signal(PHI_488_SRQ)) {
 		BIT_SET(m_reg_int_cond, REG_INT_SRQ_BIT);
 	}
-	// TODO: REG_INT_PP_RESPONSE_BIT
-	bool int_pending = (m_reg_int_cond & m_reg_int_mask) != 0;
-	bool int_line = false;
-	if (int_pending) {
-		BIT_SET(m_reg_int_cond, REG_INT_PENDING_BIT);
-		if (BIT(m_reg_int_mask , REG_INT_PENDING_BIT)) {
-			int_line = true;
-		}
-	}
-	if (int_line != m_int_line) {
-		m_int_line = int_line;
-		m_int_write_func(m_int_line);
-	}
+	update_pp();
+	update_interrupt();
+	update_dmarq();
 
-	(void)m_dmarq_line; // TODO: update DMARQ
 	m_no_recursion = false;
 }
 
 phi_device::nba_origin_t phi_device::nba_msg(uint8_t& new_byte , bool& new_eoi) const
 {
-	// TODO: consider CIC
-	if (!m_fifo_out.empty()) {
+	if (controller_in_charge() && m_c_state == PHI_C_CACS && !m_fifo_out.empty()) {
 		uint16_t word = m_fifo_out.peek();
 		if ((word & REG_D0D1_MASK) == REG_OFIFO_IFCMD_MASK) {
 			// Controller sends an interface command
@@ -1071,21 +1095,22 @@ phi_device::nba_origin_t phi_device::nba_msg(uint8_t& new_byte , bool& new_eoi) 
 
 	case PHI_T_SPAS:
 		// Reply to serial poll: STB & RQS
+		// TODO: check
 		new_byte = m_sr_state == PHI_SR_NPRS ? 0x80 : 0x40;
 		new_eoi = false;
 		return NBA_FROM_SPAS;
 
-	case PHI_T_ID3:
+	case PHI_T_ID2:
 		// 1st byte of ID
 		new_byte = (uint8_t)m_reg_1st_id;
 		new_eoi = false;
-		return NBA_FROM_ID3;
+		return NBA_FROM_ID2;
 
-	case PHI_T_ID5:
+	case PHI_T_ID4:
 		// 2nd byte of ID
 		new_byte = (uint8_t)m_reg_2nd_id;
 		new_eoi = true;
-		return NBA_FROM_ID5;
+		return NBA_FROM_ID4;
 
 	default:
 		break;
@@ -1101,12 +1126,12 @@ void phi_device::clear_nba(nba_origin_t origin)
 		m_fifo_out.dequeue();
 		break;
 
-	case NBA_FROM_ID3:
-		m_t_state = PHI_T_ID4;
+	case NBA_FROM_ID2:
+		m_t_state = PHI_T_ID3;
 		break;
 
-	case NBA_FROM_ID5:
-		m_t_state = PHI_T_ID6;
+	case NBA_FROM_ID4:
+		m_t_state = PHI_T_ID5;
 		break;
 
 	default:
@@ -1116,20 +1141,23 @@ void phi_device::clear_nba(nba_origin_t origin)
 
 bool phi_device::if_cmd_received(uint8_t byte)
 {
-	LOG(("RX cmd: %02x\n" , byte));
+	LOG("%.6f RX cmd: %02x\n" , machine().time().as_double() , byte);
 
 	bool accepted = true;
 
-	if ((byte & IFCMD_AG_MASK) != IFCMD_SCG_VALUE && byte != IFCMD_PPC) {
-		// PACS -> PUCS when receiving a PCG command that is not PPC
-		m_pp_pacs = false;
+	if ((byte & IFCMD_AG_MASK) != IFCMD_SCG_VALUE) {
+		// Any PCG clears sec. address recognition
+		// Exceptions are intercepted below
+		m_sa_state = PHI_SA_NONE;
 	}
 
 	// TODO: IFC & non-reflection into controller
 	switch (byte) {
 	case IFCMD_GTL:
 		// Go to local
-		// TODO:
+		if (m_l_state == PHI_L_LADS) {
+			m_rl_rems = false;
+		}
 		break;
 
 	case IFCMD_SDC:
@@ -1142,7 +1170,7 @@ bool phi_device::if_cmd_received(uint8_t byte)
 	case IFCMD_PPC:
 		// Parallel poll configure
 		if (m_l_state == PHI_L_LADS) {
-			m_pp_pacs = true;
+			m_sa_state = PHI_SA_PACS;
 		}
 		break;
 
@@ -1165,7 +1193,7 @@ bool phi_device::if_cmd_received(uint8_t byte)
 
 	case IFCMD_LLO:
 		// Local lock-out
-		// TODO:
+		// Ignored
 		break;
 
 	case IFCMD_DCL:
@@ -1194,19 +1222,20 @@ bool phi_device::if_cmd_received(uint8_t byte)
 
 	case IFCMD_UNL:
 		// Unlisten
-		if (m_l_state == PHI_L_LADS && !lon_msg()) {
+		if (!lon_msg()) {
 			m_l_state = PHI_L_LIDS;
 		}
 		break;
 
 	case IFCMD_UNT:
 		// Untalk
-		if (!ton_msg()) {
-			if (m_id_enabled) {
-				m_t_state = PHI_T_ID1;
-			} else {
-				m_t_state = PHI_T_TIDS;
-			}
+		if (ton_msg()) {
+			m_t_state = PHI_T_TADS;
+		} else {
+			m_t_state = PHI_T_TIDS;
+		}
+		if (m_id_enabled) {
+			m_sa_state = PHI_SA_UNT;
 		}
 		break;
 
@@ -1218,51 +1247,65 @@ bool phi_device::if_cmd_received(uint8_t byte)
 
 			if (ag == IFCMD_LAG_VALUE) {
 				// LAG
-				if (!lon_msg() && m_l_state == PHI_L_LIDS && my_addr) {
+				if (my_addr) {
+					// MLA
 					m_l_state = PHI_L_LADS;
+					if (get_signal(PHI_488_REN)) {
+						m_rl_rems = true;
+					}
+					m_sa_state = PHI_SA_LPAS;
 				}
 			} else if (ag == IFCMD_TAG_VALUE) {
 				// TAG
-				if (!ton_msg()) {
-					if (my_addr) {
-						// MTA
-						m_t_state = PHI_T_TADS;
-					} else {
-						// OTA
-						m_t_state = PHI_T_TIDS;
-					}
+				if (my_addr) {
+					// MTA
+					m_t_state = PHI_T_TADS;
+					m_sa_state = PHI_SA_TPAS;
+				} else if (!ton_msg()) {
+					// OTA
+					m_t_state = PHI_T_TIDS;
 				}
 			} else if (ag == IFCMD_SCG_VALUE) {
 				// SCG
-				if (m_pp_pacs) {
+				switch (m_sa_state) {
+				case PHI_SA_NONE:
+					break;
+
+				case PHI_SA_PACS:
 					if ((byte & IFCMD_PPX_MASK) == IFCMD_PPE_VALUE && m_pp_state == PHI_PP_PPIS) {
 						// PPE
 						m_s_sense = BIT(byte , IFCMD_PPE_S_BIT);
 						m_ppr_msg = byte & IFCMD_PPE_PPR_MASK;
+						LOG("PPE s=%d ppr=%u\n" , m_s_sense , m_ppr_msg);
 						m_pp_state = PHI_PP_PPSS;
 					} else if ((byte & IFCMD_PPX_MASK) == IFCMD_PPD_VALUE && m_pp_state == PHI_PP_PPSS) {
 						// PPD
 						m_pp_state = PHI_PP_PPIS;
 					}
-				} else {
-					// command is a secondary address
-					if (m_t_state == PHI_T_ID1 && (m_l_state == PHI_L_LADS) == !!lon_msg() && my_addr) {
-						// Start IDENTIFY sequence
-						m_t_state = PHI_T_ID2;
-					} else if (m_t_state >= PHI_T_ID2 && m_t_state <= PHI_T_ID6 && !my_addr) {
-						// Unaddressed by OSA
-						m_t_state = PHI_T_ID1;
-					} else if (m_t_state == PHI_T_TADS || m_l_state == PHI_L_LADS) {
-						if (m_fifo_in.full() || BIT(m_reg_int_cond , REG_INT_DEV_CLEAR_BIT)) {
-							// No room for secondary address in FIFO, stall handshake
-							accepted = false;
-						} else {
-							uint16_t word = REG_IFIFO_2_ADDR_MASK | address;
-							if (m_t_state == PHI_T_TADS) {
-								BIT_SET(word, REG_IFIFO_TALK_BIT);
-							}
-							rx_n_data_freeze(word);
+					break;
+
+				case PHI_SA_TPAS:
+				case PHI_SA_LPAS:
+					// command is a secondary address after MTA or MLA
+					if (m_fifo_in.full() || BIT(m_reg_int_cond , REG_INT_DEV_CLEAR_BIT)) {
+						// No room for secondary address in FIFO, stall handshake
+						accepted = false;
+					} else {
+						uint16_t word = REG_IFIFO_2_ADDR_MASK | address;
+						if (m_sa_state == PHI_SA_TPAS) {
+							BIT_SET(word, REG_IFIFO_TALK_BIT);
 						}
+						rx_n_data_freeze(word);
+					}
+					break;
+
+				case PHI_SA_UNT:
+					if (my_addr) {
+						// Start IDENTIFY sequence
+						m_t_state = PHI_T_ID1;
+					} else {
+						// Unaddressed by OSA (== UNT)
+						if_cmd_received(IFCMD_UNT);
 					}
 				}
 			}
@@ -1299,20 +1342,20 @@ bool phi_device::byte_received(uint8_t byte , bool eoi)
 		}
 	}
 
-	LOG(("RX word:%04x\n" , word));
+	LOG("%.6f RX word:%04x\n" , machine().time().as_double() , word);
 
 	if (m_l_state == PHI_L_LACS) {
 		if (m_fifo_in.full() || BIT(m_reg_int_cond , REG_INT_DEV_CLEAR_BIT)) {
 			// No room for received byte, stall handshake
-			LOG_0(("..stalled\n"));
+			LOG_NOISY("..stalled\n");
 			return false;
 		} else {
-			LOG_0(("..OK\n"));
+			LOG_NOISY("..OK\n");
 			rx_n_data_freeze(word);
 		}
 	}
 	if (end_of_transfer) {
-		LOG_0(("End of byte transfer enable\n"));
+		LOG_NOISY("End of byte transfer enable\n");
 		m_fifo_out.dequeue();
 		m_be_counter = 0;
 	} else {
@@ -1325,7 +1368,7 @@ bool phi_device::byte_received(uint8_t byte , bool eoi)
 void phi_device::rx_n_data_freeze(uint16_t word)
 {
 	m_fifo_in.enqueue(word);
-	if (m_sh_state != PHI_SH_STRS) {
+	if (!controller_in_charge() && m_sh_state != PHI_SH_STRS) {
 		// If PHI didn't send this byte to itself, set data freeze
 		BIT_SET(m_reg_status, REG_STATUS_DATA_FREEZE_BIT);
 	}
@@ -1364,22 +1407,84 @@ bool phi_device::tcs_msg(void) const
 	bool new_eoi;
 
 	// When the CIC takes back control synchronously:
-	// * Nothing in OFIFO
-	// * Request to start parallel poll is pending
+	// * Request to start parallel poll is pending (i.e. OFIFO is empty)
 	// * There's an interface command to be sent at head of OFIFO
 	return (m_c_state == PHI_C_CSBS || m_c_state == PHI_C_CSHS || m_c_state == PHI_C_CSWS) &&
-		(m_fifo_out.empty() ||
-		 rpp_msg() ||
+		(rpp_msg() ||
 		 nba_msg(new_byte , new_eoi) == NBA_CMD_FROM_OFIFO);
 }
 
 bool phi_device::rpp_msg(void) const
 {
-	// TODO:
-	return false;
+	return m_fifo_out.empty();
+}
+
+uint8_t phi_device::get_pp_response()
+{
+	return (get_dio() ^ m_reg_2nd_id) & m_reg_1st_id;
 }
 
 bool phi_device::controller_in_charge(void) const
 {
 	return m_c_state != PHI_C_CIDS;
+}
+
+void phi_device::configure_pp_response()
+{
+	uint8_t addr = (m_reg_address >> REG_ADDR_HPIB_ADDR_BIT) & 0x1f;
+	if (addr <= 7) {
+		// If address <= 7, PP is automatically enabled and configured for PPR = ~address
+		m_ppr_msg = addr ^ 7;
+		m_pp_state = PHI_PP_PPSS;
+	} else {
+		m_ppr_msg = 0;
+		m_pp_state = PHI_PP_PPIS;
+	}
+	m_s_sense = true;
+}
+
+void phi_device::update_pp()
+{
+	if (m_c_state == PHI_C_CPPS) {
+		if (m_fifo_in.empty() && get_pp_response()) {
+			BIT_SET(m_reg_int_cond , REG_INT_PP_RESPONSE_BIT);
+		} else {
+			BIT_CLR(m_reg_int_cond , REG_INT_PP_RESPONSE_BIT);
+		}
+		update_interrupt();
+	}
+}
+
+void phi_device::update_interrupt()
+{
+	bool int_pending = (m_reg_int_cond & m_reg_int_mask) != 0;
+	bool int_line = false;
+	if (int_pending) {
+		BIT_SET(m_reg_int_cond, REG_INT_PENDING_BIT);
+		if (BIT(m_reg_int_mask , REG_INT_PENDING_BIT)) {
+			int_line = true;
+		}
+	} else {
+		BIT_CLR(m_reg_int_cond, REG_INT_PENDING_BIT);
+	}
+	if (int_line != m_int_line) {
+		m_int_line = int_line;
+		LOG_INT("INT %d\n" , m_int_line);
+		m_int_write_func(m_int_line);
+	}
+}
+
+void phi_device::update_dmarq()
+{
+	bool new_dmarq_line;
+	if (BIT(m_reg_control , REG_CTRL_DMA_FIFO_BIT)) {
+		new_dmarq_line = BIT(m_reg_int_cond , REG_INT_FIFO_ROOM_BIT);
+	} else {
+		new_dmarq_line = BIT(m_reg_int_cond , REG_INT_FIFO_AV_BIT);
+	}
+	if (new_dmarq_line != m_dmarq_line) {
+		m_dmarq_line = new_dmarq_line;
+		LOG_INT("DRQ %d\n" , m_dmarq_line);
+		m_dmarq_write_func(m_dmarq_line);
+	}
 }

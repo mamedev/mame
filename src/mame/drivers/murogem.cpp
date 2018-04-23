@@ -138,6 +138,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void murogem(machine_config &config);
+	void murogem_map(address_map &map);
 };
 
 
@@ -154,16 +155,17 @@ WRITE8_MEMBER(murogem_state::outport_w)
 }
 
 
-static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8, murogem_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("IN1")
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(outport_w)    /* output port */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void murogem_state::murogem_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();
+	map(0x4000, 0x4000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x4001, 0x4001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x5000, 0x5000).portr("IN0");
+	map(0x5800, 0x5800).portr("IN1");
+	map(0x7000, 0x7000).w(this, FUNC(murogem_state::outport_w));    /* output port */
+	map(0x8000, 0x87ff).ram().share("videoram");
+	map(0xf000, 0xffff).rom();
+}
 
 
 static INPUT_PORTS_START( murogem )

@@ -78,10 +78,13 @@ TODO:
 #include "speaker.h"
 
 
-INTERRUPT_GEN_MEMBER(galaxia_state::galaxia_interrupt)
+WRITE_LINE_MEMBER(galaxia_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
-	cvs_scroll_stars();
+	if (state)
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03);
+		cvs_scroll_stars();
+	}
 }
 
 
@@ -131,41 +134,45 @@ READ8_MEMBER(galaxia_state::galaxia_collision_clear)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( galaxia_mem_map, AS_PROGRAM, 8, galaxia_state )
-	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("bullet_ram")
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, read_data, write_data)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, read_data, write_data)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_device, read_data, write_data)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE(galaxia_video_w) AM_SHARE("video_ram")
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x2000, 0x33ff) AM_ROM
-	AM_RANGE(0x7214, 0x7214) AM_READ_PORT("IN0")
-ADDRESS_MAP_END
+void galaxia_state::galaxia_mem_map(address_map &map)
+{
+	map(0x0000, 0x13ff).rom();
+	map(0x1400, 0x14ff).mirror(0x6000).ram().share("bullet_ram");
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(m_s2636_1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(m_s2636_2, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1800, 0x1bff).mirror(0x6000).r(this, FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(this, FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
+	map(0x1c00, 0x1fff).mirror(0x6000).ram();
+	map(0x2000, 0x33ff).rom();
+	map(0x7214, 0x7214).portr("IN0");
+}
 
-static ADDRESS_MAP_START( astrowar_mem_map, AS_PROGRAM, 8, galaxia_state )
-	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, read_data, write_data)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE(galaxia_video_w)  AM_SHARE("video_ram")
-	AM_RANGE(0x1c00, 0x1cff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("bullet_ram")
-	AM_RANGE(0x2000, 0x33ff) AM_ROM
-ADDRESS_MAP_END
+void galaxia_state::astrowar_mem_map(address_map &map)
+{
+	map(0x0000, 0x13ff).rom();
+	map(0x1400, 0x14ff).mirror(0x6000).ram();
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1800, 0x1bff).mirror(0x6000).r(this, FUNC(galaxia_state::cvs_video_or_color_ram_r)).w(this, FUNC(galaxia_state::galaxia_video_w)).share("video_ram");
+	map(0x1c00, 0x1cff).mirror(0x6000).ram().share("bullet_ram");
+	map(0x2000, 0x33ff).rom();
+}
 
-static ADDRESS_MAP_START( galaxia_io_map, AS_IO, 8, galaxia_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_WRITE(galaxia_scroll_w) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
-	AM_RANGE(0x05, 0x05) AM_READNOP
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW0")
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("DSW1")
-	AM_RANGE(0xac, 0xac) AM_READNOP
-ADDRESS_MAP_END
+void galaxia_state::galaxia_io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).w(this, FUNC(galaxia_state::galaxia_scroll_w)).portr("IN0");
+	map(0x02, 0x02).portr("IN1");
+	map(0x05, 0x05).nopr();
+	map(0x06, 0x06).portr("DSW0");
+	map(0x07, 0x07).portr("DSW1");
+	map(0xac, 0xac).nopr();
+}
 
-static ADDRESS_MAP_START( galaxia_data_map, AS_DATA, 8, galaxia_state )
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(galaxia_collision_r, galaxia_ctrlport_w)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(galaxia_collision_clear, galaxia_dataport_w)
-ADDRESS_MAP_END
+void galaxia_state::galaxia_data_map(address_map &map)
+{
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(galaxia_state::galaxia_collision_r), FUNC(galaxia_state::galaxia_ctrlport_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(galaxia_state::galaxia_collision_clear), FUNC(galaxia_state::galaxia_dataport_w));
+}
 
 
 /***************************************************************************
@@ -291,7 +298,6 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_CPU_PROGRAM_MAP(galaxia_mem_map)
 	MCFG_CPU_IO_MAP(galaxia_io_map)
 	MCFG_CPU_DATA_MAP(galaxia_data_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state, galaxia_interrupt)
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
 
@@ -304,6 +310,7 @@ MACHINE_CONFIG_START(galaxia_state::galaxia)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_galaxia)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galaxia_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxia)
 	MCFG_PALETTE_ADD("palette", 0x18+2)
@@ -335,7 +342,6 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_CPU_PROGRAM_MAP(astrowar_mem_map)
 	MCFG_CPU_IO_MAP(galaxia_io_map)
 	MCFG_CPU_DATA_MAP(galaxia_data_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", galaxia_state, galaxia_interrupt)
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
 
@@ -348,6 +354,7 @@ MACHINE_CONFIG_START(galaxia_state::astrowar)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(galaxia_state, screen_update_astrowar)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(galaxia_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", astrowar)
 	MCFG_PALETTE_ADD("palette", 0x18+2)

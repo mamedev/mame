@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
 #include "screen.h"
 
 class nbmj8900_state : public driver_device
@@ -72,6 +72,9 @@ public:
 
 	void ohpaipee(machine_config &config);
 	void togenkyo(machine_config &config);
+	void ohpaipee_io_map(address_map &map);
+	void ohpaipee_map(address_map &map);
+	void togenkyo_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -109,6 +109,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void mos7360_videoram_map(address_map &map);
 protected:
 	enum
 	{

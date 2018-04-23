@@ -55,6 +55,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
 	void dmax8000(machine_config &config);
+	void dmax8000_io(address_map &map);
+	void dmax8000_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<fd1793_device> m_fdc;
@@ -96,27 +98,29 @@ WRITE8_MEMBER( dmax8000_state::port40_w )
 	membank("bankr0")->set_entry(BIT(data, 0));
 }
 
-static ADDRESS_MAP_START(dmax8000_mem, AS_PROGRAM, 8, dmax8000_state)
-	AM_RANGE(0x0000, 0x0fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x1000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void dmax8000_state::dmax8000_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankr("bankr0").bankw("bankw0");
+	map(0x1000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START(dmax8000_io, AS_IO, 8, dmax8000_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("pio1", z80pio_device, read, write) // fdd controls
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("pio2", z80pio_device, read, write) // centronics & parallel ports
-	AM_RANGE(0x14, 0x17) AM_WRITE(port14_w) // control lines for the centronics & parallel ports
+void dmax8000_state::dmax8000_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x04, 0x07).rw("dart1", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x08, 0x0b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x0c, 0x0f).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // fdd controls
+	map(0x10, 0x13).rw("pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // centronics & parallel ports
+	map(0x14, 0x17).w(this, FUNC(dmax8000_state::port14_w)); // control lines for the centronics & parallel ports
 	//AM_RANGE(0x18, 0x19) AM_MIRROR(2) AM_DEVREADWRITE("am9511", am9512_device, read, write) // optional numeric coprocessor
 	//AM_RANGE(0x1c, 0x1d) AM_MIRROR(2)  // optional hard disk controller (1C=status, 1D=data)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("dart2", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w) // memory bank control
+	map(0x20, 0x23).rw("dart2", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x40, 0x40).w(this, FUNC(dmax8000_state::port40_w)); // memory bank control
 	//AM_RANGE(0x60, 0x67) // optional IEEE488 GPIB
-	AM_RANGE(0x70, 0x7f) AM_DEVREADWRITE("rtc", mm58274c_device, read, write) // optional RTC
-ADDRESS_MAP_END
+	map(0x70, 0x7f).rw("rtc", FUNC(mm58274c_device::read), FUNC(mm58274c_device::write)); // optional RTC
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dmax8000 )

@@ -76,21 +76,24 @@
 DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "NICK")
 
 
-DEVICE_ADDRESS_MAP_START( vram_map, 8, nick_device )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(vram_r, vram_w)
-ADDRESS_MAP_END
+void nick_device::vram_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(nick_device::vram_r), FUNC(nick_device::vram_w));
+}
 
-DEVICE_ADDRESS_MAP_START( vio_map, 8, nick_device )
-	AM_RANGE(0x00, 0x00) AM_WRITE(fixbias_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(border_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(lpl_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(lph_w)
-ADDRESS_MAP_END
+void nick_device::vio_map(address_map &map)
+{
+	map(0x00, 0x00).w(this, FUNC(nick_device::fixbias_w));
+	map(0x01, 0x01).w(this, FUNC(nick_device::border_w));
+	map(0x02, 0x02).w(this, FUNC(nick_device::lpl_w));
+	map(0x03, 0x03).w(this, FUNC(nick_device::lph_w));
+}
 
 
-static ADDRESS_MAP_START( nick_map, 0, 8, nick_device )
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void nick_device::nick_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
 
@@ -106,7 +109,7 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, NICK, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
-		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, *ADDRESS_MAP_NAME(nick_map)),
+		m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(nick_device::nick_map), this)),
 		m_write_virq(*this),
 		m_scanline_count(0),
 		m_FIXBIAS(0),

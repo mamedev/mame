@@ -27,6 +27,7 @@ public:
 	{ }
 
 	void pm68k(machine_config &config);
+	void pm68k_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
@@ -34,14 +35,15 @@ private:
 };
 
 
-static ADDRESS_MAP_START(pm68k_mem, AS_PROGRAM, 16, pm68k_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x200000, 0x205fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("mpsc", i8274_new_device, ba_cd_r, ba_cd_w, 0xff00)
-	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE("stc", am9513_device, read16, write16)
-ADDRESS_MAP_END
+void pm68k_state::pm68k_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xffffff);
+	map(0x000000, 0x1fffff).ram().share("rambase");
+	map(0x200000, 0x205fff).rom().region("roms", 0);
+	map(0x600000, 0x600007).rw("mpsc", FUNC(i8274_new_device::ba_cd_r), FUNC(i8274_new_device::ba_cd_w)).umask16(0xff00);
+	map(0x800000, 0x800003).rw("stc", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
+}
 
 
 /* Input ports */

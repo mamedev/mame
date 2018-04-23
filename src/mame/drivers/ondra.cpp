@@ -22,19 +22,21 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START(ondra_mem, AS_PROGRAM, 8, ondra_state )
-	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x4000, 0xdfff) AM_RAMBANK("bank2")
-	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank3")
-ADDRESS_MAP_END
+void ondra_state::ondra_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).bankrw("bank1");
+	map(0x4000, 0xdfff).bankrw("bank2");
+	map(0xe000, 0xffff).bankrw("bank3");
+}
 
-static ADDRESS_MAP_START( ondra_io, AS_IO, 8, ondra_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0b)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x03, 0x03) AM_WRITE(ondra_port_03_w)
+void ondra_state::ondra_io(address_map &map)
+{
+	map.global_mask(0x0b);
+	map.unmap_value_high();
+	map(0x03, 0x03).w(this, FUNC(ondra_state::ondra_port_03_w));
 	//AM_RANGE(0x09, 0x09) AM_WRITE(ondra_port_09_w)
 	//AM_RANGE(0x0a, 0x0a) AM_WRITE(ondra_port_0a_w)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ondra )
@@ -112,9 +114,10 @@ static INPUT_PORTS_START( ondra )
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(ondra_state::ondra_interrupt)
+WRITE_LINE_MEMBER(ondra_state::vblank_irq)
 {
-	device.execute().set_input_line(0, HOLD_LINE);
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 /* Machine driver */
@@ -123,8 +126,6 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ondra_mem)
 	MCFG_CPU_IO_MAP(ondra_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ondra_state,  ondra_interrupt)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -134,6 +135,7 @@ MACHINE_CONFIG_START(ondra_state::ondra)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ondra_state, screen_update_ondra)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ondra_state, vblank_irq))
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

@@ -67,4 +67,9 @@ public:
 	void intrepid(machine_config &config);
 	void thepit(machine_config &config);
 	void fitter(machine_config &config);
+	void audio_io_map(address_map &map);
+	void audio_map(address_map &map);
+	void desertdan_main_map(address_map &map);
+	void intrepid_main_map(address_map &map);
+	void thepit_main_map(address_map &map);
 };

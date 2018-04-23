@@ -347,105 +347,110 @@ CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( sasuke_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x4000, 0x8fff) AM_ROM
-	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE("snk6502", snk6502_sound_device, sasuke_sound_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)  /* flip screen & irq enable */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
-	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
-	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("IN1")
-	AM_RANGE(0xb006, 0xb006) AM_READ_PORT("DSW")
-	AM_RANGE(0xb007, 0xb007) AM_READ_PORT("IN2")
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void snk6502_state::sasuke_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(this, FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(this, FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x4000, 0x8fff).rom();
+	map(0xb000, 0xb001).w(m_sound, FUNC(snk6502_sound_device::sasuke_sound_w));
+	map(0xb002, 0xb002).w(this, FUNC(snk6502_state::satansat_b002_w));  /* flip screen & irq enable */
+	map(0xb003, 0xb003).w(this, FUNC(snk6502_state::satansat_backcolor_w));
+	map(0xb004, 0xb004).portr("IN0");
+	map(0xb005, 0xb005).portr("IN1");
+	map(0xb006, 0xb006).portr("DSW");
+	map(0xb007, 0xb007).portr("IN2");
+	map(0xf800, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( satansat_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x4000, 0x9fff) AM_ROM
-	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE("snk6502", snk6502_sound_device, satansat_sound_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(satansat_b002_w)  /* flip screen & irq enable */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(satansat_backcolor_w)
-	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("IN0")
-	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("IN1")
-	AM_RANGE(0xb006, 0xb006) AM_READ_PORT("DSW")
-	AM_RANGE(0xb007, 0xb007) AM_READ_PORT("IN2")
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void snk6502_state::satansat_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(this, FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(this, FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x4000, 0x9fff).rom();
+	map(0xb000, 0xb001).w(m_sound, FUNC(snk6502_sound_device::satansat_sound_w));
+	map(0xb002, 0xb002).w(this, FUNC(snk6502_state::satansat_b002_w));  /* flip screen & irq enable */
+	map(0xb003, 0xb003).w(this, FUNC(snk6502_state::satansat_backcolor_w));
+	map(0xb004, 0xb004).portr("IN0");
+	map(0xb005, 0xb005).portr("IN1");
+	map(0xb006, 0xb006).portr("DSW");
+	map(0xb007, 0xb007).portr("IN2");
+	map(0xf800, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( vanguard_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x3100, 0x3102) AM_DEVWRITE("snk6502", snk6502_sound_device, vanguard_sound_w)
-	AM_RANGE(0x3103, 0x3103) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x3104, 0x3104) AM_READ_PORT("IN0")
-	AM_RANGE(0x3105, 0x3105) AM_READ_PORT("IN1")
-	AM_RANGE(0x3106, 0x3106) AM_READ_PORT("DSW")
-	AM_RANGE(0x3107, 0x3107) AM_READ_PORT("IN2")
-	AM_RANGE(0x3200, 0x3200) AM_WRITE(scrollx_w)
-	AM_RANGE(0x3300, 0x3300) AM_WRITE(scrolly_w)
-	AM_RANGE(0x3400, 0x3400) AM_DEVWRITE("snk6502", snk6502_sound_device, vanguard_speech_w) // speech
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
-ADDRESS_MAP_END
+void snk6502_state::vanguard_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(this, FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(this, FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x3100, 0x3102).w(m_sound, FUNC(snk6502_sound_device::vanguard_sound_w));
+	map(0x3103, 0x3103).w(this, FUNC(snk6502_state::flipscreen_w));
+	map(0x3104, 0x3104).portr("IN0");
+	map(0x3105, 0x3105).portr("IN1");
+	map(0x3106, 0x3106).portr("DSW");
+	map(0x3107, 0x3107).portr("IN2");
+	map(0x3200, 0x3200).w(this, FUNC(snk6502_state::scrollx_w));
+	map(0x3300, 0x3300).w(this, FUNC(snk6502_state::scrolly_w));
+	map(0x3400, 0x3400).w(m_sound, FUNC(snk6502_sound_device::vanguard_speech_w)); // speech
+	map(0x4000, 0xbfff).rom();
+	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
+}
 
-static ADDRESS_MAP_START( fantasy_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x2100, 0x2102) AM_DEVWRITE("snk6502", snk6502_sound_device, fantasy_sound_w)
-	AM_RANGE(0x2103, 0x2103) AM_WRITE(fantasy_flipscreen_w) // affects both video and sound
-	AM_RANGE(0x2104, 0x2104) AM_READ_PORT("IN0")
-	AM_RANGE(0x2105, 0x2105) AM_READ_PORT("IN1")
-	AM_RANGE(0x2106, 0x2106) AM_READ_PORT("DSW")
-	AM_RANGE(0x2107, 0x2107) AM_READ_PORT("IN2")
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(scrollx_w)
-	AM_RANGE(0x2300, 0x2300) AM_WRITE(scrolly_w)
-	AM_RANGE(0x2400, 0x2400) AM_DEVWRITE("snk6502", snk6502_sound_device, fantasy_speech_w)  // speech
-	AM_RANGE(0x3000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void snk6502_state::fantasy_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(this, FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(this, FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x2000, 0x2000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2001, 0x2001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x2100, 0x2102).w(m_sound, FUNC(snk6502_sound_device::fantasy_sound_w));
+	map(0x2103, 0x2103).w(this, FUNC(snk6502_state::fantasy_flipscreen_w)); // affects both video and sound
+	map(0x2104, 0x2104).portr("IN0");
+	map(0x2105, 0x2105).portr("IN1");
+	map(0x2106, 0x2106).portr("DSW");
+	map(0x2107, 0x2107).portr("IN2");
+	map(0x2200, 0x2200).w(this, FUNC(snk6502_state::scrollx_w));
+	map(0x2300, 0x2300).w(this, FUNC(snk6502_state::scrolly_w));
+	map(0x2400, 0x2400).w(m_sound, FUNC(snk6502_sound_device::fantasy_speech_w));  // speech
+	map(0x3000, 0xbfff).rom();
+	map(0xf000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( pballoon_map, AS_PROGRAM, 8, snk6502_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(charram_w) AM_SHARE("charram")
-	AM_RANGE(0x3000, 0x9fff) AM_ROM
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xb100, 0xb102) AM_DEVWRITE("snk6502", snk6502_sound_device, fantasy_sound_w)
-	AM_RANGE(0xb103, 0xb103) AM_WRITE(fantasy_flipscreen_w) // affects both video and sound
-	AM_RANGE(0xb104, 0xb104) AM_READ_PORT("IN0")
-	AM_RANGE(0xb105, 0xb105) AM_READ_PORT("IN1")
-	AM_RANGE(0xb106, 0xb106) AM_READ_PORT("DSW")
-	AM_RANGE(0xb107, 0xb107) AM_READ_PORT("IN2")
-	AM_RANGE(0xb200, 0xb200) AM_WRITE(scrollx_w)
-	AM_RANGE(0xb300, 0xb300) AM_WRITE(scrolly_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void snk6502_state::pballoon_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0400, 0x07ff).ram().w(this, FUNC(snk6502_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(this, FUNC(snk6502_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(this, FUNC(snk6502_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x3000, 0x9fff).rom();
+	map(0xb000, 0xb000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xb001, 0xb001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xb100, 0xb102).w(m_sound, FUNC(snk6502_sound_device::fantasy_sound_w));
+	map(0xb103, 0xb103).w(this, FUNC(snk6502_state::fantasy_flipscreen_w)); // affects both video and sound
+	map(0xb104, 0xb104).portr("IN0");
+	map(0xb105, 0xb105).portr("IN1");
+	map(0xb106, 0xb106).portr("DSW");
+	map(0xb107, 0xb107).portr("IN2");
+	map(0xb200, 0xb200).w(this, FUNC(snk6502_state::scrollx_w));
+	map(0xb300, 0xb300).w(this, FUNC(snk6502_state::scrolly_w));
+	map(0xf000, 0xffff).rom();
+}
 
 
 /*************************************
@@ -529,12 +534,12 @@ static INPUT_PORTS_START( satansat )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,snk6502_music0_r, nullptr)     /* music0 playing */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,snk6502_music0_r, nullptr)     /* music0 playing */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, snk6502_state,coin_inserted, 0)
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                         /* NC */
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,sasuke_count_r, nullptr)       /* connected to a binary counter */
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,sasuke_count_r, nullptr)       /* connected to a binary counter */
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!1")
@@ -594,7 +599,7 @@ static INPUT_PORTS_START( vanguard )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL  /* fire left */
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,snk6502_music0_r, nullptr)     /* music0 playing */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk6502_state,snk6502_music0_r, nullptr)     /* music0 playing */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fantasy )
@@ -923,7 +928,8 @@ MACHINE_CONFIG_START(snk6502_state::sasuke)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk6502_state::satansat, sasuke)
+MACHINE_CONFIG_START(snk6502_state::satansat)
+	sasuke(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(satansat_map)
@@ -1036,7 +1042,8 @@ MACHINE_CONFIG_START(snk6502_state::vanguard)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk6502_state::fantasy, vanguard)
+MACHINE_CONFIG_START(snk6502_state::fantasy)
+	vanguard(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantasy_map)
@@ -1073,13 +1080,15 @@ MACHINE_CONFIG_DERIVED(snk6502_state::fantasy, vanguard)
 	MCFG_DEVICE_REMOVE("sn76477.2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk6502_state::nibbler, fantasy)
+MACHINE_CONFIG_START(snk6502_state::nibbler)
+	fantasy(config);
 
 	// sound hardware
 	MCFG_DEVICE_REMOVE("samples")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(snk6502_state::pballoon, nibbler)
+MACHINE_CONFIG_START(snk6502_state::pballoon)
+	nibbler(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pballoon_map)

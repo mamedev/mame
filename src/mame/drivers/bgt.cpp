@@ -22,6 +22,8 @@ public:
 	{ }
 
 	void bgt(machine_config &config);
+	void bgt_io(address_map &map);
+	void bgt_map(address_map &map);
 protected:
 
 	// devices
@@ -29,15 +31,17 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( bgt_map, AS_PROGRAM, 16, bgt_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void bgt_state::bgt_map(address_map &map)
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0xf8000, 0xfffff).rom();
+}
 
 
 
-static ADDRESS_MAP_START( bgt_io, AS_IO, 16, bgt_state )
-ADDRESS_MAP_END
+void bgt_state::bgt_io(address_map &map)
+{
+}
 
 
 

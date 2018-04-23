@@ -107,6 +107,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void progolfa(machine_config &config);
 	void progolf(machine_config &config);
+	void main_cpu(address_map &map);
+	void sound_cpu(address_map &map);
 };
 
 
@@ -259,31 +261,33 @@ WRITE8_MEMBER(progolf_state::videoram_w)
 	m_videoram[offset] = data;
 }
 
-static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, progolf_state )
-	AM_RANGE(0x0000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(charram_w) AM_SHARE("fbram")
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(videoram_r, videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2") AM_WRITE(char_vregs_w)
-	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1") AM_WRITE(scrollx_hi_w) //p1 inputs
-	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2") AM_WRITE(scrollx_lo_w) //p2 inputs
-	AM_RANGE(0x9600, 0x9600) AM_READ_PORT("IN0") AM_WRITE(flip_screen_w)   /* VBLANK */
-	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+void progolf_state::main_cpu(address_map &map)
+{
+	map(0x0000, 0x5fff).ram();
+	map(0x6000, 0x7fff).ram().w(this, FUNC(progolf_state::charram_w)).share("fbram");
+	map(0x8000, 0x8fff).rw(this, FUNC(progolf_state::videoram_r), FUNC(progolf_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9000).portr("IN2").w(this, FUNC(progolf_state::char_vregs_w));
+	map(0x9200, 0x9200).portr("P1").w(this, FUNC(progolf_state::scrollx_hi_w)); //p1 inputs
+	map(0x9400, 0x9400).portr("P2").w(this, FUNC(progolf_state::scrollx_lo_w)); //p2 inputs
+	map(0x9600, 0x9600).portr("IN0").w(this, FUNC(progolf_state::flip_screen_w));   /* VBLANK */
+	map(0x9800, 0x9800).portr("DSW1");
+	map(0x9800, 0x9800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x9801, 0x9801).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x9a00, 0x9a00).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
 //  AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
-	AM_RANGE(0xb000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xb000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, progolf_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x4000, 0x4fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void progolf_state::sound_cpu(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x4000, 0x4fff).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x5000, 0x5fff).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6fff).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x7000, 0x7fff).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8fff).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0xf000, 0xffff).rom();
+}
 
 
 INPUT_CHANGED_MEMBER(progolf_state::coin_inserted)
@@ -452,7 +456,8 @@ MACHINE_CONFIG_START(progolf_state::progolf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(progolf_state::progolfa, progolf)
+MACHINE_CONFIG_START(progolf_state::progolfa)
+	progolf(config);
 	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
 	MCFG_CPU_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)

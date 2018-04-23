@@ -60,19 +60,19 @@
 //**************************************************************************
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_irq_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_nmi_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_RESET_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_reset_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_reset_callback(DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_romdis_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_romdis_callback(DEVCB_##_devcb);
 
 #define MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(_devcb) \
-	devcb = &cpc_expansion_slot_device::set_out_rom_select_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<cpc_expansion_slot_device &>(*device).set_out_rom_select_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -121,11 +121,11 @@ public:
 	cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cpc_expansion_slot_device();
 
-	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_reset_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_reset_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_romdis_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_romdis_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_rom_select_callback(device_t &device, Object &&cb) { return downcast<cpc_expansion_slot_device &>(device).m_out_rom_select.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_reset_callback(Object &&cb) { return m_out_reset_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_romdis_callback(Object &&cb) { return m_out_romdis_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_rom_select_callback(Object &&cb) { return m_out_rom_select.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );

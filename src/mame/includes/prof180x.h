@@ -46,6 +46,8 @@ public:
 	int m_mm0;
 	int m_mm1;
 	void prof180x(machine_config &config);
+	void prof180x_io(address_map &map);
+	void prof180x_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PROF180X_H

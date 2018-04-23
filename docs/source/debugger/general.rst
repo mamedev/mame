@@ -16,7 +16,7 @@ You can also type **help <command>** for further details on each command in the 
 | :ref:`debugger-command-tracelog` -- outputs one or more <item>s to the trace file using <format>
 | :ref:`debugger-command-tracesym` -- outputs one or more <item>s to the trace file
 | history -- outputs a brief history of visited opcodes (**to fix: help missing for this command**)
-| :ref:`debugger-command-trackpc` -- visually track visited opcodes [boolean to turn on and off, for the given cpu, clear]
+| :ref:`debugger-command-trackpc` -- visually track visited opcodes [boolean to turn on and off, for the given CPU, clear]
 | :ref:`debugger-command-trackmem` -- record which PC writes to each memory address [boolean to turn on and off, clear]
 | :ref:`debugger-command-pcatmem` -- query which PC wrote to a given memory address for the current CPU
 | :ref:`debugger-command-rewind` -- go back in time by loading the most recent rewind state
@@ -144,7 +144,7 @@ printf
 |
 | Prints PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.
 |
-|  printf "A=%d, B=%d\nC=%d",a,b,a+b
+|  printf "A=%d, B=%d\\nC=%d",a,b,a+b
 |
 | Prints A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.
 |
@@ -171,7 +171,7 @@ logerror
 |
 | Logs PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.
 |
-|  logerror "A=%d, B=%d\nC=%d",a,b,a+b
+|  logerror "A=%d, B=%d\\nC=%d",a,b,a+b
 |
 | Logs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.
 |
@@ -193,7 +193,7 @@ tracelog
 |
 | Outputs PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.
 |
-|  printf "A=%d, B=%d\nC=%d",a,b,a+b
+|  printf "A=%d, B=%d\\nC=%d",a,b,a+b
 |
 | Outputs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.
 |
@@ -215,10 +215,6 @@ tracesym
 |
 | Outputs PC=<pcval> where <pcval> is displayed in the default format.
 |
-|  printf a,b
-|
-| Outputs A=<aval>, B=<bval> on one line.
-|
 | Back to :ref:`debugger-general-list`
 
 
@@ -229,17 +225,17 @@ trackpc
 
 |  **trackpc [<bool>,<cpu>,<bool>]**
 |
-| The trackpc command displays which program counters have already been visited in all disassembler windows. The first boolean argument toggles the process on and off. The second argument is a cpu selector; if no cpu is specified, the current cpu is automatically selected. The third argument is a boolean denoting if the existing data should be cleared or not.
+| The trackpc command displays which program counters have already been visited in all disassembler windows. The first boolean argument toggles the process on and off. The second argument is a CPU selector; if no CPU is specified, the current CPU is automatically selected. The third argument is a boolean denoting if the existing data should be cleared or not.
 |
 | Examples:
 |
 |  trackpc 1
 |
-| Begin tracking the current cpu's pc.
+| Begin tracking the current CPU's pc.
 |
 |  trackpc 1, 0, 1
 |
-| Continue tracking pc on cpu 0, but clear existing track info.
+| Continue tracking pc on CPU 0, but clear existing track info.
 |
 | Back to :ref:`debugger-general-list`
 
@@ -251,7 +247,7 @@ trackmem
 
 |  **trackmem [<bool>,<cpu>,<bool>]**
 |
-| The trackmem command logs the PC at each time a memory address is written to. The first boolean argument toggles the process on and off. The second argument is a cpu selector; if no cpu is specified, the current cpu is automatically selected. The third argument is a boolean denoting if the existing data should be cleared or not. Please refer to the pcatmem command for information on how to retrieve this data. Also, right clicking in a memory window will display the logged PC for the given address.
+| The trackmem command logs the PC at each time a memory address is written to. The first boolean argument toggles the process on and off. The second argument is a CPU selector; if no CPU is specified, the current CPU is automatically selected. The third argument is a boolean denoting if the existing data should be cleared or not. Please refer to the pcatmem command for information on how to retrieve this data. Also, right clicking in a memory window will display the logged PC for the given address.
 |
 | Examples:
 |
@@ -261,7 +257,7 @@ trackmem
 |
 |  trackmem 1, 0, 1
 |
-| Continue tracking memory writes on cpu 0, but clear existing track info.
+| Continue tracking memory writes on CPU 0, but clear existing track info.
 |
 | Back to :ref:`debugger-general-list`
 
@@ -277,7 +273,7 @@ pcatmem
 | **pcatmemd <address>[,<cpu>]** -- query which PC wrote to a given data memory address for the current CPU
 | **pcatmemi <address>[,<cpu>]** -- query which PC wrote to a given I/O memory address for the current CPU (you can also query this info by right clicking in a memory window)
 |
-| The pcatmem command returns which PC wrote to a given memory address for the current CPU. The first argument is the requested address. The second argument is a cpu selector; if no cpu is specified, the current cpu is automatically selected. Right clicking in a memory window will also display the logged PC for the given address.
+| The pcatmem command returns which PC wrote to a given memory address for the current CPU. The first argument is the requested address. The second argument is a CPU selector; if no CPU is specified, the current CPU is automatically selected. Right clicking in a memory window will also display the logged PC for the given address.
 |
 | Examples:
 |

@@ -22,10 +22,10 @@
 
 // optional enable for streaming reads
 #define MCFG_EEPROM_SERIAL_ENABLE_STREAMING() \
-	eeprom_serial_base_device::static_enable_streaming(*device);
+	downcast<eeprom_serial_base_device &>(*device).enable_streaming(true);
 // optional enable for output on falling clock
 #define MCFG_EEPROM_SERIAL_ENABLE_OUTPUT_ON_FALLING_CLOCK() \
-	eeprom_serial_base_device::static_enable_output_on_falling_clock(*device);
+	downcast<eeprom_serial_base_device &>(*device).enable_output_on_falling_clock(true);
 
 // standard 93CX6 class of 16-bit EEPROMs
 #define MCFG_EEPROM_SERIAL_93C06_ADD(_tag) \
@@ -92,7 +92,7 @@
 #define MCFG_EEPROM_SERIAL_DEFAULT_VALUE MCFG_EEPROM_DEFAULT_VALUE
 
 #define MCFG_EEPROM_SERIAL_DO_CALLBACK(_devcb) \
-	devcb = &eeprom_serial_base_device::static_set_do_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<eeprom_serial_base_device &>(*device).set_do_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -106,13 +106,10 @@ class eeprom_serial_base_device : public eeprom_base_device
 {
 public:
 	// inline configuration helpers
-	static void static_set_address_bits(device_t &device, int addrbits);
-	static void static_enable_streaming(device_t &device);
-	static void static_enable_output_on_falling_clock(device_t &device);
-	template<class Object> static devcb_base &static_set_do_callback(device_t &device, Object &&object)
-	{
-		return downcast<eeprom_serial_base_device &>(device).m_do_cb.set_callback(std::forward<Object>(object));
-	}
+	void set_address_bits(int addrbits) { m_command_address_bits = addrbits; }
+	void enable_streaming(bool enable) { m_streaming_enabled = enable; }
+	void enable_output_on_falling_clock(bool enable) { m_output_on_falling_clock_enabled = enable; }
+	template<class Object> devcb_base &set_do_callback(Object &&cb) { return m_do_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// construction/destruction

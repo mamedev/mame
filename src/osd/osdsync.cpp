@@ -87,8 +87,13 @@ static void spin_while_not(const volatile _AtomType * volatile atom, const _Main
 
 int osd_get_num_processors(void)
 {
+#if defined(SDLMAME_EMSCRIPTEN)
+	// multithreading is not supported at this time
+	return 1;
+#else
 	// max out at 4 for now since scaling above that seems to do poorly
 	return std::min(std::thread::hardware_concurrency(), 4U);
+#endif
 }
 
 //============================================================

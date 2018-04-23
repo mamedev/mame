@@ -117,8 +117,10 @@ public:
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_DRIVER_INIT(jrpacman);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void jrpacman(machine_config &config);
+	void main_map(address_map &map);
+	void port_map(address_map &map);
 };
 
 
@@ -140,28 +142,30 @@ WRITE_LINE_MEMBER(jrpacman_state::irq_mask_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jrpacman_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fef) AM_RAM
-	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")
-	AM_RANGE(0x5000, 0x5007) AM_DEVWRITE("latch1", ls259_device, write_d0)
-	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("P2")
-	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
-	AM_RANGE(0x5060, 0x506f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_RANGE(0x5070, 0x5077) AM_DEVWRITE("latch2", ls259_device, write_d0)
-	AM_RANGE(0x5080, 0x50bf) AM_READ_PORT("DSW")
-	AM_RANGE(0x5080, 0x5080) AM_WRITE(jrpacman_scroll_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8000, 0xdfff) AM_ROM
-ADDRESS_MAP_END
+void jrpacman_state::main_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram().w(this, FUNC(jrpacman_state::jrpacman_videoram_w)).share("videoram");
+	map(0x4800, 0x4fef).ram();
+	map(0x4ff0, 0x4fff).ram().share("spriteram");
+	map(0x5000, 0x503f).portr("P1");
+	map(0x5000, 0x5007).w("latch1", FUNC(ls259_device::write_d0));
+	map(0x5040, 0x507f).portr("P2");
+	map(0x5040, 0x505f).w(m_namco_sound, FUNC(namco_device::pacman_sound_w));
+	map(0x5060, 0x506f).writeonly().share("spriteram2");
+	map(0x5070, 0x5077).w("latch2", FUNC(ls259_device::write_d0));
+	map(0x5080, 0x50bf).portr("DSW");
+	map(0x5080, 0x5080).w(this, FUNC(jrpacman_state::jrpacman_scroll_w));
+	map(0x50c0, 0x50c0).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+	map(0x8000, 0xdfff).rom();
+}
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8, jrpacman_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0, 0) AM_WRITE(jrpacman_interrupt_vector_w)
-ADDRESS_MAP_END
+void jrpacman_state::port_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0, 0).w(this, FUNC(jrpacman_state::jrpacman_interrupt_vector_w));
+}
 
 
 
@@ -265,10 +269,10 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(jrpacman_state::vblank_irq)
+WRITE_LINE_MEMBER(jrpacman_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 MACHINE_CONFIG_START(jrpacman_state::jrpacman)
@@ -277,7 +281,6 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jrpacman_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("latch1", LS259, 0) // 5P
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jrpacman_state, irq_mask_w))
@@ -302,6 +305,7 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jrpacman_state, screen_update_pacman)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jrpacman_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jrpacman)
 	MCFG_PALETTE_ADD("palette", 128*4)

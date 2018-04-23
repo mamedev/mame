@@ -34,13 +34,6 @@ dio16_slot_device::dio16_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void dio16_slot_device::static_set_dio16_slot(device_t &device, device_t *owner, const char *dio_tag)
-{
-	dio16_slot_device &dio_card = dynamic_cast<dio16_slot_device &>(device);
-	dio_card.m_owner = owner;
-	dio_card.m_dio_tag = dio_tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -55,7 +48,7 @@ void dio16_slot_device::device_start()
 		fatalerror("DIO32 device in DIO16 slot\n");
 	}
 
-	if (dev) device_dio16_card_interface::static_set_diobus(*dev,m_owner->subdevice(m_dio_tag));
+	if (dev) dev->set_diobus(m_owner->subdevice(m_dio_tag));
 }
 
 
@@ -78,13 +71,6 @@ dio32_slot_device::dio32_slot_device(const machine_config &mconfig, const char *
 {
 }
 
-void dio32_slot_device::static_set_dio32_slot(device_t &device, device_t *owner, const char *dio_tag)
-{
-	dio32_slot_device &dio_card = dynamic_cast<dio32_slot_device &>(device);
-	dio_card.m_owner = owner;
-	dio_card.m_dio_tag = dio_tag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -92,7 +78,7 @@ void dio32_slot_device::static_set_dio32_slot(device_t &device, device_t *owner,
 void dio32_slot_device::device_start()
 {
 	device_dio16_card_interface *dev = dynamic_cast<device_dio16_card_interface *>(get_card_device());
-	if (dev) device_dio16_card_interface::static_set_diobus(*dev,m_owner->subdevice(m_dio_tag));
+	if (dev) dev->set_diobus(m_owner->subdevice(m_dio_tag));
 }
 
 
@@ -101,12 +87,6 @@ void dio32_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(DIO16, dio16_device, "dio16", "16-bit DIO bus")
-
-void dio16_device::static_set_cputag(device_t &device, const char *tag)
-{
-	dio16_device &dio = downcast<dio16_device &>(device);
-	dio.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -228,12 +208,6 @@ device_dio16_card_interface::device_dio16_card_interface(const machine_config &m
 
 device_dio16_card_interface::~device_dio16_card_interface()
 {
-}
-
-void device_dio16_card_interface::static_set_diobus(device_t &device, device_t *dio_device)
-{
-	device_dio16_card_interface &dio_card = dynamic_cast<device_dio16_card_interface &>(device);
-	dio_card.m_dio_dev = dio_device;
 }
 
 void device_dio16_card_interface::set_dio_device()

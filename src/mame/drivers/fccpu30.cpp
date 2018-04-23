@@ -302,6 +302,7 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	void cpu33(machine_config &config);
 	void cpu30lite8(machine_config &config);
 	void cpu30be16(machine_config &config);
+	void cpu30_mem(address_map &map);
 protected:
 
 private:
@@ -327,29 +328,30 @@ private:
 	uint8_t m_board_id;
 };
 
-static ADDRESS_MAP_START (cpu30_mem, AS_PROGRAM, 32, cpu30_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)   /* ROM mirror just during reset */
-	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)   /* After first write we act as RAM */
+void cpu30_state::cpu30_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x00000007).ram().w(this, FUNC(cpu30_state::bootvect_w));   /* After first write we act as RAM */
+	map(0x00000000, 0x00000007).rom().r(this, FUNC(cpu30_state::bootvect_r));   /* ROM mirror just during reset */
 //  AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
-	AM_RANGE (0xff000000, 0xff7fffff) AM_ROM AM_REGION("roms", 0x000000)
-	AM_RANGE (0xff800c00, 0xff800dff) AM_DEVREADWRITE8("pit1", pit68230_device, read, write, 0xffffffff)
-	AM_RANGE (0xff800e00, 0xff800fff) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xffffffff)
-	AM_RANGE (0xff802000, 0xff8021ff) AM_DEVREADWRITE8("duscc", duscc68562_device, read, write, 0xffffffff) /* Port 1&2 - Dual serial port DUSCC   */
-	AM_RANGE (0xff802200, 0xff8023ff) AM_DEVREADWRITE8("duscc2", duscc68562_device, read, write, 0xffffffff) /* Port 3&4 - Dual serial port DUSCC   */
-	AM_RANGE (0xff803000, 0xff8031ff) AM_DEVREADWRITE8("rtc", rtc72423_device, read, write, 0xffffffff)
+	map(0xff000000, 0xff7fffff).rom().region("roms", 0x000000);
+	map(0xff800c00, 0xff800dff).rw(m_pit1, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
+	map(0xff800e00, 0xff800fff).rw(m_pit2, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
+	map(0xff802000, 0xff8021ff).rw(m_dusccterm, FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)); /* Port 1&2 - Dual serial port DUSCC   */
+	map(0xff802200, 0xff8023ff).rw("duscc2", FUNC(duscc68562_device::read), FUNC(duscc68562_device::write)); /* Port 3&4 - Dual serial port DUSCC   */
+	map(0xff803000, 0xff8031ff).rw(m_rtc, FUNC(rtc72423_device::read), FUNC(rtc72423_device::write));
 //  AM_RANGE (0xff803400, 0xff8035ff) AM_DEVREADWRITE8("scsi", mb87033_device, read, write, 0xffffffff) /* TODO: implement MB87344 SCSI device */
-	AM_RANGE (0xff803400, 0xff8035ff) AM_READWRITE8(scsi_r, scsi_w, 0x000000ff) /* mock driver to log calls to device */
+	map(0xff803400, 0xff8035ff).rw(this, FUNC(cpu30_state::scsi_r), FUNC(cpu30_state::scsi_w)).umask32(0x000000ff); /* mock driver to log calls to device */
 //  AM_RANGE (0xff803800, 0xff80397f) AM_DEVREADWRITE8("fdc", wd37c65c_device, read, write, 0xffffffff) /* TODO: implement WD3/C65C fdc controller */
-	AM_RANGE (0xff803800, 0xff80397f) AM_READWRITE8(fdc_r, fdc_w, 0x000000ff) /* mock driver to log calls to device */
-	AM_RANGE (0xff803980, 0xff8039ff) AM_READ8(slot1_status_r, 0x000000ff)
-	AM_RANGE (0xffc00000, 0xffcfffff) AM_RAM AM_SHARE ("nvram") /* On-board SRAM with battery backup (nvram) */
-	AM_RANGE (0xffd00000, 0xffdfffff) AM_DEVREADWRITE8("fga002", fga002_device, read, write, 0xffffffff)  /* FGA-002 Force Gate Array */
-	AM_RANGE (0xffe00000, 0xffefffff) AM_ROM AM_REGION("roms", 0x800000)
+	map(0xff803800, 0xff80397f).rw(this, FUNC(cpu30_state::fdc_r), FUNC(cpu30_state::fdc_w)).umask32(0x000000ff); /* mock driver to log calls to device */
+	map(0xff803980, 0xff8039ff).r(this, FUNC(cpu30_state::slot1_status_r)).umask32(0x000000ff);
+	map(0xffc00000, 0xffcfffff).ram().share("nvram"); /* On-board SRAM with battery backup (nvram) */
+	map(0xffd00000, 0xffdfffff).rw(m_fga002, FUNC(fga002_device::read), FUNC(fga002_device::write));  /* FGA-002 Force Gate Array */
+	map(0xffe00000, 0xffefffff).rom().region("roms", 0x800000);
 
 	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START (cpu30)
@@ -758,7 +760,8 @@ MACHINE_CONFIG_START(cpu30_state::cpu30)
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30X Part No.1 01300: 16.7 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. */
-MACHINE_CONFIG_DERIVED(cpu30_state::cpu30x, cpu30)
+MACHINE_CONFIG_START(cpu30_state::cpu30x)
+	cpu30(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(16'777'216)) /* 16.7 MHz  from description, crystal needs verification */
 
@@ -771,13 +774,15 @@ MACHINE_CONFIG_DERIVED(cpu30_state::cpu30x, cpu30)
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30XA Part No.1 01301: 20.0 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. Documentation included.*/
-MACHINE_CONFIG_DERIVED(cpu30_state::cpu30xa, cpu30x)
+MACHINE_CONFIG_START(cpu30_state::cpu30xa)
+	cpu30x(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(20'000'000)) /* 20.0 MHz  from description, crystal needs verification */
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30ZA Part No.1 01302: 20.0 MHz 68030 based CPU board with 68882 FPCP, DMAC, 4 Mbyte Dual Ported RAM capacity and VMEPROM. Documentation included.*/
-MACHINE_CONFIG_DERIVED(cpu30_state::cpu30za, cpu30xa)
+MACHINE_CONFIG_START(cpu30_state::cpu30za)
+	cpu30xa(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(20'000'000)) /* 20.0 MHz  from description, crystal needs verification */
 
@@ -788,7 +793,8 @@ MACHINE_CONFIG_DERIVED(cpu30_state::cpu30za, cpu30xa)
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30ZBE 68030/68882 CPU, 25 MHz,  4 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface */
-MACHINE_CONFIG_DERIVED(cpu30_state::cpu30zbe, cpu30za)
+MACHINE_CONFIG_START(cpu30_state::cpu30zbe)
+	cpu30za(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
 
@@ -799,7 +805,8 @@ MACHINE_CONFIG_DERIVED(cpu30_state::cpu30zbe, cpu30za)
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-33 */
-MACHINE_CONFIG_DERIVED(cpu30_state::cpu33, cpu30zbe)
+MACHINE_CONFIG_START(cpu30_state::cpu33)
+	cpu30zbe(config);
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
 
@@ -810,7 +817,8 @@ MACHINE_CONFIG_DERIVED(cpu30_state::cpu33, cpu30zbe)
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30BE/8 68030/68882 CPU, 25 MHz,  8 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface, VMEPROM firmware*/
-MACHINE_CONFIG_DERIVED(cpu30_state::cpu30be8, cpu30zbe)
+MACHINE_CONFIG_START(cpu30_state::cpu30be8)
+	cpu30zbe(config);
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8M")
@@ -818,7 +826,8 @@ MACHINE_CONFIG_DERIVED(cpu30_state::cpu30be8, cpu30zbe)
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30BE/16 68030/68882 CPU, 25 MHz, 16 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface, VMEPROM firmware*/
-MACHINE_CONFIG_DERIVED(cpu30_state::cpu30be16, cpu30zbe)
+MACHINE_CONFIG_START(cpu30_state::cpu30be16)
+	cpu30zbe(config);
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16M")
@@ -826,7 +835,8 @@ MACHINE_CONFIG_DERIVED(cpu30_state::cpu30be16, cpu30zbe)
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30Lite/4 68030 CPU, 25 MHz, 4 Mbyte shared DRAM, 4 Mbyte Flash, 4 serial ports, 32-bit VMEbus interface, VMEPROM firmware. */
-MACHINE_CONFIG_DERIVED(cpu30_state::cpu30lite4, cpu30zbe)
+MACHINE_CONFIG_START(cpu30_state::cpu30lite4)
+	cpu30zbe(config);
 // Enable these when added to main config
 //  MCFG_DEVICE_REMOVE("fpu")
 //  MCFG_DEVICE_REMOVE("scsi")
@@ -839,7 +849,8 @@ MACHINE_CONFIG_DERIVED(cpu30_state::cpu30lite4, cpu30zbe)
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30Lite/8 68030 CPU, 25 MHz, 4 Mbyte shared DRAM, 8 Mbyte Flash, 4 serial ports, 32-bit VMEbus interface, VMEPROM firmware. */
-MACHINE_CONFIG_DERIVED(cpu30_state::cpu30lite8, cpu30lite4)
+MACHINE_CONFIG_START(cpu30_state::cpu30lite8)
+	cpu30lite4(config);
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8M")

@@ -20,38 +20,34 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tc0140syt(*this, "tc0140syt"),
-		m_tc0100scn_1(*this, "tc0100scn_1"),
-		m_tc0100scn_2(*this, "tc0100scn_2"),
-		m_tc0110pcr_1(*this, "tc0110pcr_1"),
-		m_tc0110pcr_2(*this, "tc0110pcr_2"),
+		m_tc0100scn(*this, "tc0100scn_%u", 1),
+		m_tc0110pcr(*this, "tc0110pcr_%u", 1),
 		m_tc0220ioc(*this, "tc0220ioc"),
 		m_tc0510nio(*this, "tc0510nio"),
-		m_2610_1l(*this, "2610.1.l"),
-		m_2610_1r(*this, "2610.1.r"),
-		m_2610_2l(*this, "2610.2.l"),
-		m_2610_2r(*this, "2610.2.r"),
+		m_2610_l(*this, "2610.%u.l", 1),
+		m_2610_r(*this, "2610.%u.r", 1),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_spriteram(*this, "spriteram") { }
+		m_spriteram(*this, "spriteram"),
+		m_z80bank(*this, "z80bank") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<tc0140syt_device> m_tc0140syt;
-	required_device<tc0100scn_device> m_tc0100scn_1;
-	required_device<tc0100scn_device> m_tc0100scn_2;
-	required_device<tc0110pcr_device> m_tc0110pcr_1;
-	required_device<tc0110pcr_device> m_tc0110pcr_2;
+	required_device_array<tc0100scn_device, 2> m_tc0100scn;
+	required_device_array<tc0110pcr_device, 2> m_tc0110pcr;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
-	required_device<filter_volume_device> m_2610_1l;
-	required_device<filter_volume_device> m_2610_1r;
-	required_device<filter_volume_device> m_2610_2l;
-	required_device<filter_volume_device> m_2610_2r;
+	required_device_array<filter_volume_device, 2> m_2610_l;
+	required_device_array<filter_volume_device, 2> m_2610_r;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
+
+	/* memory regions */
+	required_memory_bank m_z80bank;
 
 	/* misc */
 	int        m_pandata[4];
@@ -60,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(pancontrol);
+	DECLARE_WRITE8_MEMBER(pancontrol_w);
 	DECLARE_WRITE16_MEMBER(tc0100scn_dual_screen_w);
 
 	virtual void machine_start() override;
@@ -69,7 +65,10 @@ public:
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs );
-	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn);
+	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, int chip);
 	void warriorb(machine_config &config);
 	void darius2d(machine_config &config);
+	void darius2d_map(address_map &map);
+	void warriorb_map(address_map &map);
+	void z80_sound_map(address_map &map);
 };

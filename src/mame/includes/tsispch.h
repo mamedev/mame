@@ -42,6 +42,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p1_w);
 
 	void prose2k(machine_config &config);
+	void dsp_data_map(address_map &map);
+	void dsp_prg_map(address_map &map);
+	void i8086_io(address_map &map);
+	void i8086_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 

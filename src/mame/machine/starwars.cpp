@@ -14,11 +14,6 @@
 #include "machine/x2212.h"
 
 
-/* Control select values for ADC_R */
-#define kPitch      0
-#define kYaw        1
-#define kThrust     2
-
 /* Constants for matrix processor operations */
 #define NOP         0x00
 #define LAC         0x01
@@ -103,35 +98,6 @@ CUSTOM_INPUT_MEMBER(starwars_state::matrix_flag_r)
 {
 	/* set the matrix processor flag */
 	return m_math_run ? 1 : 0;
-}
-
-
-
-/*************************************
- *
- *  ADC input and control
- *
- *************************************/
-
-READ8_MEMBER(starwars_state::starwars_adc_r)
-{
-	/* pitch */
-	if (m_control_num == kPitch)
-		return ioport("STICKY")->read();
-
-	/* yaw */
-	else if (m_control_num == kYaw)
-		return ioport("STICKX")->read();
-
-	/* default to unused thrust */
-	else
-		return 0;
-}
-
-
-WRITE8_MEMBER(starwars_state::starwars_adc_select_w)
-{
-	m_control_num = offset;
 }
 
 

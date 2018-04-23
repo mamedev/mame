@@ -273,99 +273,109 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram")
-ADDRESS_MAP_END
+void slapfght_state::perfrman_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8fff).ram().share("share1");
+	map(0x9000, 0x97ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0x9800, 0x9fff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xa000, 0xa7ff).ram().share("spriteram");
+}
 
 
-static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(scrollx_lo_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(scrollx_hi_w)
-	AM_RANGE(0xe802, 0xe802) AM_WRITE(scrolly_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixvideoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
-ADDRESS_MAP_END
+void slapfght_state::tigerh_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcfff).ram().share("share1");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xe000, 0xe7ff).ram().share("spriteram");
+	map(0xe800, 0xe800).w(this, FUNC(slapfght_state::scrollx_lo_w));
+	map(0xe801, 0xe801).w(this, FUNC(slapfght_state::scrollx_hi_w));
+	map(0xe802, 0xe802).w(this, FUNC(slapfght_state::scrolly_w));
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(slapfght_state::fixram_w)).share("fixvideoram");
+	map(0xf800, 0xffff).ram().w(this, FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
+}
 
-static ADDRESS_MAP_START( tigerh_map_mcu, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_IMPORT_FROM( tigerh_map )
-ADDRESS_MAP_END
+void slapfght_state::tigerh_map_mcu(address_map &map)
+{
+	tigerh_map(map);
+	map(0xe803, 0xe803).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+}
 
-static ADDRESS_MAP_START( tigerhb1_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_READWRITE(tigerhb1_prot_r, tigerhb1_prot_w)
-	AM_IMPORT_FROM( tigerh_map )
-ADDRESS_MAP_END
+void slapfght_state::tigerhb1_map(address_map &map)
+{
+	tigerh_map(map);
+	map(0xe803, 0xe803).rw(this, FUNC(slapfght_state::tigerhb1_prot_r), FUNC(slapfght_state::tigerhb1_prot_w));
+}
 
-static ADDRESS_MAP_START( tigerhb2_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_NOP // no MCU
-	AM_IMPORT_FROM( tigerh_map )
-ADDRESS_MAP_END
+void slapfght_state::tigerhb2_map(address_map &map)
+{
+	tigerh_map(map);
+	map(0xe803, 0xe803).noprw(); // no MCU
+}
 
 
-static ADDRESS_MAP_START( slapfigh_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(scrollx_lo_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(scrollx_hi_w)
-	AM_RANGE(0xe802, 0xe802) AM_WRITE(scrolly_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixvideoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
-ADDRESS_MAP_END
+void slapfght_state::slapfigh_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcfff).ram().share("share1");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xe000, 0xe7ff).ram().share("spriteram");
+	map(0xe800, 0xe800).w(this, FUNC(slapfght_state::scrollx_lo_w));
+	map(0xe801, 0xe801).w(this, FUNC(slapfght_state::scrollx_hi_w));
+	map(0xe802, 0xe802).w(this, FUNC(slapfght_state::scrolly_w));
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(slapfght_state::fixram_w)).share("fixvideoram");
+	map(0xf800, 0xffff).ram().w(this, FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
+}
 
-static ADDRESS_MAP_START( slapfigh_map_mcu, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
-	AM_IMPORT_FROM( slapfigh_map )
-ADDRESS_MAP_END
+void slapfght_state::slapfigh_map_mcu(address_map &map)
+{
+	slapfigh_map(map);
+	map(0xe803, 0xe803).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+}
 
-static ADDRESS_MAP_START( slapfighb1_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_NOP // no MCU
-	AM_IMPORT_FROM( slapfigh_map )
-ADDRESS_MAP_END
+void slapfght_state::slapfighb1_map(address_map &map)
+{
+	slapfigh_map(map);
+	map(0xe803, 0xe803).noprw(); // no MCU
+}
 
-static ADDRESS_MAP_START( getstar_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0xe803, 0xe803) AM_READWRITE(getstar_mcusim_r, getstar_mcusim_w)
-	AM_IMPORT_FROM( slapfigh_map )
-ADDRESS_MAP_END
+void slapfght_state::getstar_map(address_map &map)
+{
+	slapfigh_map(map);
+	map(0xe803, 0xe803).rw(this, FUNC(slapfght_state::getstar_mcusim_r), FUNC(slapfght_state::getstar_mcusim_w));
+}
 
-static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(scrollx_hi_w)
-	AM_RANGE(0xe802, 0xe802) AM_WRITE(scrolly_w)
-	AM_RANGE(0xe803, 0xe803) AM_WRITE(scrollx_lo_w)
-	AM_RANGE(0xec00, 0xefff) AM_ROM // it reads a copy of the logo from here!
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixvideoram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
-ADDRESS_MAP_END
+void slapfght_state::slapfighb2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram();
+	map(0xc800, 0xcfff).ram().share("share1");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(slapfght_state::videoram_w)).share("videoram");
+	map(0xd800, 0xdfff).ram().w(this, FUNC(slapfght_state::colorram_w)).share("colorram");
+	map(0xe000, 0xe7ff).ram().share("spriteram");
+	map(0xe800, 0xe800).w(this, FUNC(slapfght_state::scrollx_hi_w));
+	map(0xe802, 0xe802).w(this, FUNC(slapfght_state::scrolly_w));
+	map(0xe803, 0xe803).w(this, FUNC(slapfght_state::scrollx_lo_w));
+	map(0xec00, 0xefff).rom(); // it reads a copy of the logo from here!
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(slapfght_state::fixram_w)).share("fixvideoram");
+	map(0xf800, 0xffff).ram().w(this, FUNC(slapfght_state::fixcol_w)).share("fixcolorram");
+}
 
 
 /**************************************************************************/
 
-INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
+WRITE_LINE_MEMBER(slapfght_state::vblank_irq)
 {
-	if (m_main_irq_enabled)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_main_irq_enabled)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(slapfght_state::irq_enable_w)
@@ -389,29 +399,33 @@ READ8_MEMBER(slapfght_state::vblank_r)
 	return m_screen->vblank() ? 1 : 0;
 }
 
-static ADDRESS_MAP_START( io_map_nomcu, AS_IO, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(vblank_r)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
-ADDRESS_MAP_END
+void slapfght_state::io_map_nomcu(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(slapfght_state::vblank_r));
+	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
+}
 
-static ADDRESS_MAP_START( io_map_mcu, AS_IO, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(tigerh_mcu_status_r)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
-ADDRESS_MAP_END
+void slapfght_state::io_map_mcu(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(slapfght_state::tigerh_mcu_status_r));
+	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
+}
 
-static ADDRESS_MAP_START( getstarb1_io_map, AS_IO, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(getstarb1_prot_r)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
-ADDRESS_MAP_END
+void slapfght_state::getstarb1_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(slapfght_state::getstarb1_prot_r));
+	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
+}
 
-static ADDRESS_MAP_START( getstarb2_io_map, AS_IO, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(getstar_mcusim_status_r)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_a0)
-ADDRESS_MAP_END
+void slapfght_state::getstarb2_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(slapfght_state::getstar_mcusim_status_r));
+	map(0x00, 0x0f).w("mainlatch", FUNC(ls259_device::write_a0));
+}
 
 
 
@@ -432,30 +446,32 @@ WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)
 	m_sound_nmi_enabled = offset ? false : true;
 }
 
-static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_SELECT(0x0010) AM_WRITE(sound_nmi_enable_w)
-ADDRESS_MAP_END
+void slapfght_state::perfrman_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x8800, 0x8fff).ram().share("share1");
+	map(0xa080, 0xa080).w("ay1", FUNC(ay8910_device::address_w));
+	map(0xa081, 0xa081).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xa082, 0xa082).w("ay1", FUNC(ay8910_device::data_w));
+	map(0xa090, 0xa090).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xa091, 0xa091).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xa092, 0xa092).w("ay2", FUNC(ay8910_device::data_w));
+	map(0xa0e0, 0xa0e0).select(0x0010).w(this, FUNC(slapfght_state::sound_nmi_enable_w));
+}
 
-static ADDRESS_MAP_START( tigerh_sound_map, AS_PROGRAM, 8, slapfght_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_device, data_r)
-	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
-	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_SELECT(0x0010) AM_WRITE(sound_nmi_enable_w)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void slapfght_state::tigerh_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0xa080, 0xa080).w("ay1", FUNC(ay8910_device::address_w));
+	map(0xa081, 0xa081).r("ay1", FUNC(ay8910_device::data_r));
+	map(0xa082, 0xa082).w("ay1", FUNC(ay8910_device::data_w));
+	map(0xa090, 0xa090).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xa091, 0xa091).r("ay2", FUNC(ay8910_device::data_r));
+	map(0xa092, 0xa092).w("ay2", FUNC(ay8910_device::data_w));
+	map(0xa0e0, 0xa0e0).select(0x0010).w(this, FUNC(slapfght_state::sound_nmi_enable_w));
+	map(0xc800, 0xcfff).ram().share("share1");
+	map(0xd000, 0xffff).ram();
+}
 
 
 
@@ -879,7 +895,6 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4) // 4MHz? XTAL is known, divider is guessed
 	MCFG_CPU_PROGRAM_MAP(perfrman_map)
 	MCFG_CPU_IO_MAP(io_map_nomcu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(slapfght_state, sound_reset_w))
@@ -903,6 +918,7 @@ MACHINE_CONFIG_START(slapfght_state::perfrman)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_perfrman)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", perfrman)
@@ -930,7 +946,6 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(36'000'000)/6) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(tigerh_map_mcu)
 	MCFG_CPU_IO_MAP(io_map_mcu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(slapfght_state, sound_reset_w))
@@ -955,6 +970,7 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
@@ -975,7 +991,8 @@ MACHINE_CONFIG_START(slapfght_state::tigerh)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb1, tigerh)
+MACHINE_CONFIG_START(slapfght_state::tigerhb1)
+	tigerh(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -985,7 +1002,8 @@ MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb1, tigerh)
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb2, tigerhb1)
+MACHINE_CONFIG_START(slapfght_state::tigerhb2)
+	tigerhb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -999,7 +1017,6 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_CPU_ADD("maincpu",Z80, XTAL(36'000'000)/6) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(slapfigh_map_mcu)
 	MCFG_CPU_IO_MAP(io_map_mcu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(slapfght_state, sound_reset_w))
@@ -1026,6 +1043,7 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8-1, 32*8-1-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapfght_state, screen_update_slapfight)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(slapfght_state, vblank_irq))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapfght)
@@ -1046,7 +1064,8 @@ MACHINE_CONFIG_START(slapfght_state::slapfigh)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb1, slapfigh)
+MACHINE_CONFIG_START(slapfght_state::slapfighb1)
+	slapfigh(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1056,21 +1075,24 @@ MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb1, slapfigh)
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb2, slapfighb1)
+MACHINE_CONFIG_START(slapfght_state::slapfighb2)
+	slapfighb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::getstarb1, slapfighb1)
+MACHINE_CONFIG_START(slapfght_state::getstarb1)
+	slapfighb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(getstarb1_io_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(slapfght_state::getstarb2, slapfighb1)
+MACHINE_CONFIG_START(slapfght_state::getstarb2)
+	slapfighb1(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

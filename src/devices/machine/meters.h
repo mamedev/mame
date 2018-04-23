@@ -16,7 +16,7 @@
 
 
 #define MCFG_METERS_NUMBER(_number) \
-	meters_device::static_set_number_meters(*device, _number);
+	downcast<meters_device &>(*device).set_number_meters(_number);
 
 class meters_device : public device_t
 {
@@ -27,7 +27,7 @@ public:
 
 	meters_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_number_meters(device_t &device, int number) { downcast<meters_device &>(device).m_number_mtr = number; }
+	void set_number_meters(int number) { m_number_mtr = number; }
 
 	int update(int id, int state);
 	int GetActivity(int id);

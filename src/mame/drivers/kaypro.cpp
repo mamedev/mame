@@ -64,51 +64,54 @@ READ8_MEMBER( kaypro_state::kaypro484_87_r ) { return 0x7f; }    /* to bypass un
 
 ************************************************************/
 
-static ADDRESS_MAP_START( kaypro_map, AS_PROGRAM, 8, kaypro_state )
-	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
-	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank3")
-	AM_RANGE(0x4000, 0xffff) AM_RAM AM_REGION("rambank", 0x4000)
-ADDRESS_MAP_END
+void kaypro_state::kaypro_map(address_map &map)
+{
+	map(0x0000, 0x2fff).bankr("bankr0").bankw("bankw0");
+	map(0x3000, 0x3fff).bankrw("bank3");
+	map(0x4000, 0xffff).ram().region("rambank", 0x4000);
+}
 
-static ADDRESS_MAP_START( kayproii_io, AS_IO, 8, kaypro_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, stt_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x0c, 0x0f) AM_DEVWRITE("brg", com8116_device, str_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", z80pio_device, read_alt, write_alt)
-ADDRESS_MAP_END
+void kaypro_state::kayproii_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).w("brg", FUNC(com8116_device::stt_w));
+	map(0x04, 0x07).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x08, 0x0b).rw(m_pio_g, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x0c, 0x0f).w("brg", FUNC(com8116_device::str_w));
+	map(0x10, 0x13).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x1c, 0x1f).rw(m_pio_s, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+}
 
-static ADDRESS_MAP_START( kaypro484_io, AS_IO, 8, kaypro_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE("brg", com8116_device, str_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio_1", z80sio_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("brg", com8116_device, stt_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("sio_2", z80sio_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
-	AM_RANGE(0x14, 0x17) AM_READWRITE(kaypro484_system_port_r,kaypro484_system_port_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x1c, 0x1c) AM_READWRITE(kaypro484_status_r,kaypro484_index_w)
-	AM_RANGE(0x1d, 0x1d) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(kaypro484_register_w)
-	AM_RANGE(0x1f, 0x1f) AM_READWRITE(kaypro484_videoram_r,kaypro484_videoram_w)
+void kaypro_state::kaypro484_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0x00, 0x03).w("brg", FUNC(com8116_device::str_w));
+	map(0x04, 0x07).rw("sio_1", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
+	map(0x08, 0x0b).w("brg", FUNC(com8116_device::stt_w));
+	map(0x0c, 0x0f).rw("sio_2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0x10, 0x13).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
+	map(0x14, 0x17).rw(this, FUNC(kaypro_state::kaypro484_system_port_r), FUNC(kaypro_state::kaypro484_system_port_w));
+	map(0x18, 0x1b).w("cent_data_out", FUNC(output_latch_device::write));
+	map(0x1c, 0x1c).rw(this, FUNC(kaypro_state::kaypro484_status_r), FUNC(kaypro_state::kaypro484_index_w));
+	map(0x1d, 0x1d).r(m_crtc, FUNC(mc6845_device::register_r)).w(this, FUNC(kaypro_state::kaypro484_register_w));
+	map(0x1f, 0x1f).rw(this, FUNC(kaypro_state::kaypro484_videoram_r), FUNC(kaypro_state::kaypro484_videoram_w));
 
 	/* The below are not emulated */
-/*  AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("z80pio", kaypro484_pio_r, kaypro484_pio_w) - for RTC and Modem
-    AM_RANGE(0x24, 0x27) communicate with MM58167A RTC. Modem uses TMS99531 and TMS99532 chips.
-    AM_RANGE(0x80, 0x80) Hard drive controller card I/O port - 10MB hard drive only fitted to the Kaypro 10
-    AM_RANGE(0x81, 0x81) Hard Drive READ error register, WRITE precomp
-    AM_RANGE(0x82, 0x82) Hard Drive Sector register count I/O
-    AM_RANGE(0x83, 0x83) Hard Drive Sector register number I/O
-    AM_RANGE(0x84, 0x84) Hard Drive Cylinder low register I/O
-    AM_RANGE(0x85, 0x85) Hard Drive Cylinder high register I/O
-    AM_RANGE(0x86, 0x86) Hard Drive Size / Drive / Head register I/O
-    AM_RANGE(0x87, 0x87) Hard Drive READ status register, WRITE command register */
-	AM_RANGE(0x20, 0x86) AM_NOP
-	AM_RANGE(0x87, 0x87) AM_READ(kaypro484_87_r)
-ADDRESS_MAP_END
+/*  map(0x20, 0x23).rw("z80pio", FUNC(z80pio_device::kaypro484_pio_r), FUNC(z80pio_device::kaypro484_pio_w)) - for RTC and Modem
+    map(0x24, 0x27) communicate with MM58167A RTC. Modem uses TMS99531 and TMS99532 chips.
+    map(0x80, 0x80) Hard drive controller card I/O port - 10MB hard drive only fitted to the Kaypro 10
+    map(0x81, 0x81) Hard Drive READ error register, WRITE precomp
+    map(0x82, 0x82) Hard Drive Sector register count I/O
+    map(0x83, 0x83) Hard Drive Sector register number I/O
+    map(0x84, 0x84) Hard Drive Cylinder low register I/O
+    map(0x85, 0x85) Hard Drive Cylinder high register I/O
+    map(0x86, 0x86) Hard Drive Size / Drive / Head register I/O
+    map(0x87, 0x87) Hard Drive READ status register, WRITE command register */
+	map(0x20, 0x86).noprw();
+	map(0x87, 0x87).r(this, FUNC(kaypro_state::kaypro484_87_r));
+}
 
 
 static INPUT_PORTS_START(kaypro)
@@ -233,14 +236,14 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 
 	MCFG_RS232_PORT_ADD("serial", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, synca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, synca_w)) // TODO: confirm this is connected
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcda_w))
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800)) // WD1943, SMC8116
-	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("sio", z80sio_device, rxca_w))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
-	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 
 	MCFG_DEVICE_ADD("z80pio_g", Z80PIO, 20_MHz_XTAL / 8)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -269,7 +272,8 @@ MACHINE_CONFIG_START(kaypro_state::kayproii)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","kayproii")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::kayproiv, kayproii)
+MACHINE_CONFIG_START(kaypro_state::kayproiv)
+	kayproii(config);
 	MCFG_DEVICE_REMOVE("z80pio_s")
 	MCFG_DEVICE_ADD("z80pio_s", Z80PIO, 2500000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -367,16 +371,19 @@ MACHINE_CONFIG_START(kaypro_state::kaypro484)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::kaypro10, kaypro484)
+MACHINE_CONFIG_START(kaypro_state::kaypro10)
+	kaypro484(config);
 	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
 	// need to add hard drive & controller
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::kaypronew2, kaypro484)
+MACHINE_CONFIG_START(kaypro_state::kaypronew2)
+	kaypro484(config);
 	MCFG_DEVICE_REMOVE("fdc:1")  // only has 1 floppy drive
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::kaypro284, kaypro484)
+MACHINE_CONFIG_START(kaypro_state::kaypro284)
+	kaypro484(config);
 	MCFG_DEVICE_REMOVE("fdc:0")
 	MCFG_DEVICE_REMOVE("fdc:1")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
@@ -385,7 +392,8 @@ MACHINE_CONFIG_DERIVED(kaypro_state::kaypro284, kaypro484)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(kaypro_state::omni2, kayproiv)
+MACHINE_CONFIG_START(kaypro_state::omni2)
+	kayproiv(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(kaypro_state, screen_update_omni2)
 MACHINE_CONFIG_END

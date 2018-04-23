@@ -85,6 +85,8 @@ private:
 	uint8_t m_data;
 
 	int m_variant;
+	void d9060_hdc_mem(address_map &map);
+	void d9060_main_mem(address_map &map);
 };
 
 

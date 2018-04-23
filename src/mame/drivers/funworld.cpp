@@ -302,7 +302,7 @@
   The game resolution seems to change 'on the fly' when entering the input test mode.
   There aren't any writes to the m6845 registers to manage these changes.
 
-  Regarding the CPU, it seems to be a custom one, or a daughterboard with a 65c02 + PLDs/TTLs.
+  Regarding the CPU, it's a Mexican Rockwell R65C02 with some mods respect the regular/stock 65C02.
   Some CPU instructions seems to be changed. The following piece of code at $C1A8 is very clear:
 
   C1A8: A0 00         ldy  #$00       ; clear Y register to use as counter.
@@ -1066,20 +1066,21 @@ WRITE_LINE_MEMBER(funworld_state::pia1_ca2_w)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( funworld_map, AS_PROGRAM, 8, funworld_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4000, 0x4000) AM_READNOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::funworld_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x4000).nopr();
+	map(0x8000, 0xbfff).rom();
+	map(0xc000, 0xffff).rom();
+}
 
 static uint8_t funquiz_question_bank = 0x80;
 
@@ -1100,55 +1101,58 @@ WRITE8_MEMBER(funworld_state::question_bank_w)
 	funquiz_question_bank = data;
 }
 
-static ADDRESS_MAP_START( funquiz_map, AS_PROGRAM, 8, funworld_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+void funworld_state::funquiz_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(question_bank_w)
+	map(0x1800, 0x1800).w(this, FUNC(funworld_state::question_bank_w));
 
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4000, 0x7fff) AM_READ(questions_r)
+	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x7fff).r(this, FUNC(funworld_state::questions_r));
 
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xc000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( magicrd2_map, AS_PROGRAM, 8, funworld_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2c00, 0x2cff) AM_RAM /* range for protection */
-	AM_RANGE(0x3600, 0x36ff) AM_RAM /* some games use $3603-05 range for protection */
-	AM_RANGE(0x3c00, 0x3cff) AM_RAM /* range for protection */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::magicrd2_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2c00, 0x2cff).ram(); /* range for protection */
+	map(0x3600, 0x36ff).ram(); /* some games use $3603-05 range for protection */
+	map(0x3c00, 0x3cff).ram(); /* range for protection */
+	map(0x4000, 0x4fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8, funworld_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads */
-	AM_RANGE(0x3e00, 0x3fff) AM_RAM /* some games use $3e03-05 range for protection */
-	AM_RANGE(0x4000, 0x5fff) AM_ROM /* used by rcdino4 (dino4 hw ) */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::cuoreuno_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2000).nopr(); /* some unknown reads */
+	map(0x3e00, 0x3fff).ram(); /* some games use $3e03-05 range for protection */
+	map(0x4000, 0x5fff).rom(); /* used by rcdino4 (dino4 hw ) */
+	map(0x6000, 0x6fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
 
 READ8_MEMBER(funworld_state::chinatow_r_32f0)
@@ -1162,51 +1166,54 @@ READ8_MEMBER(funworld_state::chinatow_r_32f0)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( chinatow_map, AS_PROGRAM, 8, funworld_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads */
-	AM_RANGE(0x32f0, 0x32ff) AM_READ(chinatow_r_32f0)
-	AM_RANGE(0x4000, 0x5fff) AM_ROM /* used by rcdino4 (dino4 hw ) */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::chinatow_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2000).nopr(); /* some unknown reads */
+	map(0x32f0, 0x32ff).r(this, FUNC(funworld_state::chinatow_r_32f0));
+	map(0x4000, 0x5fff).rom(); /* used by rcdino4 (dino4 hw ) */
+	map(0x6000, 0x6fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( lunapark_map, AS_PROGRAM, 8, funworld_state ) // mirrored video RAM 4000/5000 to 6000/7000
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x2000)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram") AM_MIRROR(0x2000)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void funworld_state::lunapark_map(address_map &map)
+{ // mirrored video RAM 4000/5000 to 6000/7000
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x4fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram").mirror(0x2000);
+	map(0x5000, 0x5fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram").mirror(0x2000);
+	map(0x8000, 0xffff).bankr("bank1");
+}
 
-static ADDRESS_MAP_START( saloon_map, AS_PROGRAM, 8, funworld_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
-	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("IN3") // maybe
-	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("IN4") // maybe
-	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("IN1")
-	AM_RANGE(0x081c, 0x081c) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x081d, 0x081d) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN2")
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
+void funworld_state::saloon_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0800).portr("IN0");
+	map(0x0808, 0x0808).portr("IN3"); // maybe
+	map(0x0802, 0x0802).portr("IN4"); // maybe
+	map(0x0a01, 0x0a01).portr("IN1");
+	map(0x081c, 0x081c).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x081d, 0x081d).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x1000, 0x1000).portr("IN2");
+	map(0x1800, 0x1800).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x1800, 0x1801).w("ay8910", FUNC(ay8910_device::address_data_w));
 //  AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads... maybe a DSW */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x6000, 0x6fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
 /*
     Unknown R/W
@@ -1221,47 +1228,50 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( witchryl_map, AS_PROGRAM, 8, funworld_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::witchryl_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x4fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x5000, 0x5fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0x6000).portr("DSW2");
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( intergames_map, AS_PROGRAM, 8, funworld_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)           // WRONG. just a placeholder...
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)  // WRONG. just a placeholder...
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x3001, 0x3001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia0", pia6821_device, read, write)  // the bookkeeping mode requests a byte from $3400 to advance pages...
-	AM_RANGE(0x3800, 0x3803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)  // WRONG. just a placeholder...
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::intergames_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));           // WRONG. just a placeholder...
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));  // WRONG. just a placeholder...
+	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x3001, 0x3001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x3400, 0x3403).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // the bookkeeping mode requests a byte from $3400 to advance pages...
+	map(0x3800, 0x3803).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));  // WRONG. just a placeholder...
+	map(0x7000, 0x7fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( fw_a7_11_map, AS_PROGRAM, 8, funworld_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4000, 0x4000) AM_READNOP
-	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void funworld_state::fw_a7_11_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0a00, 0x0a03).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
+	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
+	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2000, 0x2fff).ram().w(this, FUNC(funworld_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(this, FUNC(funworld_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x4000).nopr();
+	map(0x8000, 0xbfff).ram();
+	map(0xc000, 0xffff).rom();
+}
 
 
 /*************************
@@ -3058,7 +3068,6 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, CPU_CLOCK)    /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -3090,6 +3099,7 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 2MHz, veryfied on jollycrd & royalcrd */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -3101,20 +3111,20 @@ MACHINE_CONFIG_START(funworld_state::fw1stpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::fw2ndpal, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::fw2ndpal)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
 MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::funquiz, fw1stpal)
-//  MCFG_FRAGMENT_ADD(fw2ndpal)
+MACHINE_CONFIG_START(funworld_state::funquiz)
+	fw1stpal(config);
+//  fw2ndpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funquiz_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_SOUND_REPLACE("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(funworld_state, funquiz_ay8910_a_r)) /* portA in  */
 	MCFG_AY8910_PORT_B_READ_CB(READ8(funworld_state, funquiz_ay8910_b_r)) /* portB in  */
@@ -3124,10 +3134,10 @@ MACHINE_CONFIG_DERIVED(funworld_state::funquiz, fw1stpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::magicrd2, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::magicrd2)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, magicrd2)
 
 	MCFG_DEVICE_REMOVE("crtc")
@@ -3135,6 +3145,7 @@ MACHINE_CONFIG_DERIVED(funworld_state::magicrd2, fw1stpal)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_VISAREA_ADJUST(0, -56, 0, 0)
 	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_REPLACE("ay8910", AY8910, SND_CLOCK)    /* 2MHz */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(funworld_state, funworld_lamp_a_w))  /* portA out */
@@ -3143,77 +3154,77 @@ MACHINE_CONFIG_DERIVED(funworld_state::magicrd2, fw1stpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::royalcd1, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::royalcd1)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* (G65SC02P in pro version) 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::royalcd2, fw2ndpal)
+MACHINE_CONFIG_START(funworld_state::royalcd2)
+	fw2ndpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::cuoreuno, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::cuoreuno)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(cuoreuno_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::saloon, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::saloon)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(saloon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::witchryl, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::witchryl)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(witchryl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::lunapark, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::lunapark)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(lunapark_map)  // mirrored video RAM (4000/5000 to 6000/7000).
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_MACHINE_START_OVERRIDE(funworld_state, lunapark)
 	MCFG_MACHINE_RESET_OVERRIDE(funworld_state, lunapark)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::chinatow, fw2ndpal)
+MACHINE_CONFIG_START(funworld_state::chinatow)
+	fw2ndpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chinatow_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(funworld_state::rcdino4, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::rcdino4)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chinatow_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::intrgmes, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::intrgmes)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(intergames_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(funworld_state::fw_a7_11, fw1stpal)
+MACHINE_CONFIG_START(funworld_state::fw_a7_11)
+	fw1stpal(config);
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(fw_a7_11_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 //  MCFG_GFXDECODE_MODIFY("gfxdecode", fw2ndpal)
 MACHINE_CONFIG_END
 
@@ -3790,6 +3801,26 @@ ROM_START( jolycdig )
 	ROM_LOAD( "27s29pc.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
 ROM_END
 
+ROM_START( jolycdih )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(3b2c237c) SHA1(08f646399c17747d6b9b8e86bb549dde87d26ba4) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "3.bin", 0x0000, 0x8000, CRC(a4452751) SHA1(a0b32a8801ebaee7ede7873b244f1a424433fe94) )
+	ROM_CONTINUE( 0x0000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+	ROM_LOAD( "2.bin", 0x8000, 0x8000, CRC(8b64d4c6) SHA1(8106cba31cd3fbda0855e6070182d248e3d52495) )
+	ROM_CONTINUE( 0x8000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "dm74s472n.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+
+	ROM_REGION( 0xb000, "plds", 0 )
+	ROM_LOAD( "ep910.bin",           0x0000, 0x0884, CRC(aa62207e) SHA1(a2e51cf3617d07ff1ce42ee1d56e1c17b6fe71de) )
+	ROM_LOAD( "pal16v8h-25pc-4.bin", 0x0900, 0x0117, CRC(df5be97d) SHA1(8cd63d49ab7020cdec07c1198413dc7d93e90d35) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
+	ROM_LOAD( "jolycdih_nvram.bin", 0x0000, 0x0800, CRC(02b3b335) SHA1(207a1289e4298d942e4806adf8ffb87e0b9b4e58) )
+ROM_END
 
 ROM_START( sjcd2kx3 )   /* Super Joly 2000 3x */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5063,7 +5094,7 @@ ROM_START( royaljp )
 	ROM_LOAD( "01.bin", 0x8000, 0x8000, CRC(3ced6423) SHA1(2309a856226404789fd219cf77ba2f378a90eee7) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "rj_d27hc65d-2_(82s147).bin",  0x0000, 0x0200, CRC(d6570420) SHA1(90b6c126b485db823acffbfd195964a6282e60ea) )
+	ROM_LOAD( "rj_d27hc65d-2,82s147.bin",  0x0000, 0x0200, CRC(d6570420) SHA1(90b6c126b485db823acffbfd195964a6282e60ea) )
 
 	ROM_REGION( 0x0800, "nvram", 0 )
 	ROM_LOAD( "royaljp_nvram.bin",  0x0000, 0x0800, CRC(48e51e2a) SHA1(b81a1741eef299384d4fa98a534099b2c0332074) )
@@ -5445,7 +5476,7 @@ ROM_END
 */
 ROM_START( jolyjokrc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "b&g_jj1.bin", 0x8000, 0x8000, BAD_DUMP CRC(2fd585a7) SHA1(d517141ef17da9b61ddf3e6e8c41f5173de980c3) )
+	ROM_LOAD( "b+g_jj1.bin", 0x8000, 0x8000, BAD_DUMP CRC(2fd585a7) SHA1(d517141ef17da9b61ddf3e6e8c41f5173de980c3) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "jje.bin", 0x0000, 0x8000, CRC(d9da6e74) SHA1(2a966e2d7849aed9d952a9d94c99955ba651d14d) )
@@ -7107,6 +7138,7 @@ GAMEL( 1990, jolycdid,  jollycrd, cuoreuno, jolycdcr,  funworld_state, 0,       
 GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB.
 GAMEL( 1990, jolycdif,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 1)",            0,                       layout_jollycrd ) // italian, CPLD. doesn't need nvram init.
 GAME ( 1993, jolycdig,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 2)",            MACHINE_NOT_WORKING )
+GAMEL( 1990, jolycdih,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 3)",            0,                       layout_jollycrd )
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  funworld_state, 0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background

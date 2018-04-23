@@ -52,8 +52,8 @@ public:
 	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~snes_control_port_device();
 
-	static void set_onscreen_callback(device_t &device, snesctrl_onscreen_delegate callback) { downcast<snes_control_port_device &>(device).m_onscreen_cb = callback; }
-	static void set_gunlatch_callback(device_t &device, snesctrl_gunlatch_delegate callback) { downcast<snes_control_port_device &>(device).m_gunlatch_cb = callback; }
+	template <typename Object> void set_onscreen_callback(Object &&cb) { m_onscreen_cb = std::forward<Object>(cb); }
+	template <typename Object> void set_gunlatch_callback(Object &&cb) { m_gunlatch_cb = std::forward<Object>(cb); }
 
 	uint8_t read_pin4();
 	uint8_t read_pin5();
@@ -88,10 +88,10 @@ DECLARE_DEVICE_TYPE(SNES_CONTROL_PORT, snes_control_port_device)
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_SNESCTRL_ONSCREEN_CB(_class, _method) \
-	snes_control_port_device::set_onscreen_callback(*device, snesctrl_onscreen_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<snes_control_port_device &>(*device).set_onscreen_callback(snesctrl_onscreen_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_SNESCTRL_GUNLATCH_CB(_class, _method) \
-	snes_control_port_device::set_gunlatch_callback(*device, snesctrl_gunlatch_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<snes_control_port_device &>(*device).set_gunlatch_callback(snesctrl_gunlatch_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 SLOT_INTERFACE_EXTERN( snes_control_port_devices );

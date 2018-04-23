@@ -38,14 +38,16 @@ public:
 	uint32_t screen_update_mk85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void mk85(machine_config &config);
+	void mk85_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(mk85_mem, AS_PROGRAM, 16, mk85_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROM AM_MIRROR(0x4000)
-	AM_RANGE( 0x8000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void mk85_state::mk85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).rom().mirror(0x4000);
+	map(0x8000, 0xffff).ram();
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mk85 )

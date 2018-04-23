@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
 #include "screen.h"
 
 class nbmj8891_state : public driver_device
@@ -127,6 +127,30 @@ public:
 	void gionbana(machine_config &config);
 	void mgmen89(machine_config &config);
 	void scandalm(machine_config &config);
+	void bananadr_io_map(address_map &map);
+	void club90s_map(address_map &map);
+	void gionbana_io_map(address_map &map);
+	void gionbana_map(address_map &map);
+	void hanamomo_io_map(address_map &map);
+	void hanamomo_map(address_map &map);
+	void hanaoji_map(address_map &map);
+	void hnageman_map(address_map &map);
+	void hnxmasev_map(address_map &map);
+	void lovehous_io_map(address_map &map);
+	void lovehous_map(address_map &map);
+	void maiko_io_map(address_map &map);
+	void maiko_map(address_map &map);
+	void mgion_io_map(address_map &map);
+	void mgion_map(address_map &map);
+	void mmaiko_map(address_map &map);
+	void msjiken_io_map(address_map &map);
+	void omotesnd_io_map(address_map &map);
+	void omotesnd_map(address_map &map);
+	void scandal_io_map(address_map &map);
+	void scandalm_io_map(address_map &map);
+	void scandalm_map(address_map &map);
+	void taiwanmb_io_map(address_map &map);
+	void taiwanmb_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

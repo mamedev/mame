@@ -178,6 +178,24 @@ WRITE_LINE_MEMBER(docastle_state::docastle_tint)
 	}
 }
 
+WRITE_LINE_MEMBER(docastle_state::stx_on_w)
+{
+	if (state)
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_cpu3->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER(docastle_state::stx_off_w)
+{
+	if (!state)
+	{
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		m_cpu3->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
 WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 {
 	if (m_adpcm_pos >= memregion("adpcm")->bytes())
@@ -220,79 +238,86 @@ WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
 }
 
 /* Memory Maps */
-static ADDRESS_MAP_START( docastle_map, AS_PROGRAM, 8, docastle_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
-	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
-ADDRESS_MAP_END
+void docastle_state::docastle_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x97ff).ram();
+	map(0x9800, 0x99ff).ram().share("spriteram");
+	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
+	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_videoram_w)).share("videoram");
+	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_colorram_w)).share("colorram");
+	map(0xe000, 0xe000).w(this, FUNC(docastle_state::docastle_nmitrigger_w));
+}
 
-static ADDRESS_MAP_START( docastle_map2, AS_PROGRAM, 8, docastle_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
-	AM_RANGE(0xc000, 0xc007) AM_SELECT(0x0080) AM_READWRITE(inputs_flipscreen_r, flipscreen_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("sn3", sn76489a_device, write)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("sn4", sn76489a_device, write)
-ADDRESS_MAP_END
+void docastle_state::docastle_map2(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
+	map(0xc000, 0xc007).select(0x0080).rw(this, FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
+	map(0xe000, 0xe000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xe400, 0xe400).w("sn2", FUNC(sn76489a_device::write));
+	map(0xe800, 0xe800).w("sn3", FUNC(sn76489a_device::write));
+	map(0xec00, 0xec00).w("sn4", FUNC(sn76489a_device::write));
+}
 
-static ADDRESS_MAP_START( docastle_map3, AS_PROGRAM, 8, docastle_state )
-	AM_RANGE(0x0000, 0x00ff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8008) AM_READ(docastle_shared1_r)    // ???
-	AM_RANGE(0xc003, 0xc003) AM_NOP // EP according to schematics
-	AM_RANGE(0xc432, 0xc435) AM_NOP // ???
-ADDRESS_MAP_END
+void docastle_state::docastle_map3(address_map &map)
+{
+	map(0x0000, 0x00ff).rom();
+	map(0x4000, 0x47ff).ram();
+	map(0x8000, 0x8008).r(this, FUNC(docastle_state::docastle_shared1_r));    // ???
+	map(0xc003, 0xc003).noprw(); // EP according to schematics
+	map(0xc432, 0xc435).noprw(); // ???
+}
 
-static ADDRESS_MAP_START( docastle_io_map, AS_IO, 8, docastle_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_device, register_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( dorunrun_map, AS_PROGRAM, 8, docastle_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x4000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
-	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(docastle_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb400, 0xb7ff) AM_RAM_WRITE(docastle_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(docastle_nmitrigger_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dorunrun_map2, AS_PROGRAM, 8, docastle_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn1", sn76489a_device, write)
-	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("sn2", sn76489a_device, write)
-	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("sn3", sn76489a_device, write)
-	AM_RANGE(0xac00, 0xac00) AM_DEVWRITE("sn4", sn76489a_device, write)
-	AM_RANGE(0xc000, 0xc007) AM_SELECT(0x0080) AM_READWRITE(inputs_flipscreen_r, flipscreen_w)
-	AM_RANGE(0xe000, 0xe008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
-ADDRESS_MAP_END
+void docastle_state::docastle_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x02, 0x02).w(m_crtc, FUNC(mc6845_device::register_w));
+}
 
 
-static ADDRESS_MAP_START( idsoccer_map, AS_PROGRAM, 8, docastle_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x6000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
-	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(idsoccer_adpcm_status_r, idsoccer_adpcm_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
-ADDRESS_MAP_END
+void docastle_state::dorunrun_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x37ff).ram();
+	map(0x3800, 0x39ff).ram().share("spriteram");
+	map(0x4000, 0x9fff).rom();
+	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
+	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xb000, 0xb3ff).ram().w(this, FUNC(docastle_state::docastle_videoram_w)).share("videoram");
+	map(0xb400, 0xb7ff).ram().w(this, FUNC(docastle_state::docastle_colorram_w)).share("colorram");
+	map(0xb800, 0xb800).w(this, FUNC(docastle_state::docastle_nmitrigger_w));
+}
+
+void docastle_state::dorunrun_map2(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa000).w("sn1", FUNC(sn76489a_device::write));
+	map(0xa400, 0xa400).w("sn2", FUNC(sn76489a_device::write));
+	map(0xa800, 0xa800).w("sn3", FUNC(sn76489a_device::write));
+	map(0xac00, 0xac00).w("sn4", FUNC(sn76489a_device::write));
+	map(0xc000, 0xc007).select(0x0080).rw(this, FUNC(docastle_state::inputs_flipscreen_r), FUNC(docastle_state::flipscreen_w));
+	map(0xe000, 0xe008).rw(this, FUNC(docastle_state::docastle_shared1_r), FUNC(docastle_state::docastle_shared0_w));
+}
+
+
+void docastle_state::idsoccer_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x57ff).ram();
+	map(0x5800, 0x59ff).ram().share("spriteram");
+	map(0x6000, 0x9fff).rom();
+	map(0xa000, 0xa008).rw(this, FUNC(docastle_state::docastle_shared0_r), FUNC(docastle_state::docastle_shared1_w));
+	map(0xa800, 0xa800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xb000, 0xb3ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_videoram_w)).share("videoram");
+	map(0xb400, 0xb7ff).mirror(0x0800).ram().w(this, FUNC(docastle_state::docastle_colorram_w)).share("colorram");
+	map(0xc000, 0xc000).rw(this, FUNC(docastle_state::idsoccer_adpcm_status_r), FUNC(docastle_state::idsoccer_adpcm_w));
+	map(0xe000, 0xe000).w(this, FUNC(docastle_state::docastle_nmitrigger_w));
+}
 
 /* Input Ports */
 
@@ -577,14 +602,12 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(docastle_map)
 	MCFG_CPU_IO_MAP(docastle_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, irq0_line_hold)
 
 	MCFG_CPU_ADD("slave", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(docastle_map2)
 
 	MCFG_CPU_ADD("cpu3", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(docastle_map3)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
 	MCFG_DEVICE_ADD("inp1", TMS1025, 0)
 	MCFG_TMS1025_READ_PORT_CB(PORT1, IOPORT("DSW2"))
@@ -614,6 +637,8 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_MC6845_VISAREA_ADJUST(8,-8,0,0)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(docastle_state, docastle_tint))
+	MCFG_MC6845_OUT_CUR_CB(WRITELINE(docastle_state, stx_on_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(docastle_state, stx_off_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
@@ -640,7 +665,8 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(docastle_state::dorunrun, docastle)
+MACHINE_CONFIG_START(docastle_state::dorunrun)
+	docastle(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -653,7 +679,8 @@ MACHINE_CONFIG_DERIVED(docastle_state::dorunrun, docastle)
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(docastle_state::idsoccer, docastle)
+MACHINE_CONFIG_START(docastle_state::idsoccer)
+	docastle(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

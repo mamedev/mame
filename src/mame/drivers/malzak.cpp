@@ -99,45 +99,47 @@ READ8_MEMBER(malzak_state::s2636_portA_r)
 	}
 }
 
-static ADDRESS_MAP_START( malzak_map, AS_PROGRAM, 8, malzak_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1100, 0x11ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, read_data, write_data)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, read_data, write_data)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_ROM
-ADDRESS_MAP_END
+void malzak_state::malzak_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x0bff).rom();
+	map(0x0c00, 0x0fff).bankr("bank1");
+	map(0x1000, 0x10ff).mirror(0x6000).ram();
+	map(0x1100, 0x11ff).mirror(0x6000).ram();
+	map(0x1200, 0x12ff).mirror(0x6000).ram();
+	map(0x1300, 0x13ff).mirror(0x6000).ram();
+	map(0x1400, 0x14ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x14cb, 0x14cb).mirror(0x6000).r(this, FUNC(malzak_state::fake_VRLE_r));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1600, 0x16ff).mirror(0x6000).ram().w(this, FUNC(malzak_state::malzak_playfield_w));
+	map(0x1700, 0x17ff).mirror(0x6000).ram();
+	map(0x1800, 0x1fff).mirror(0x6000).ram().share("videoram");
+	map(0x2000, 0x2fff).rom();
+	map(0x4000, 0x4fff).rom();
+	map(0x6000, 0x6fff).rom();
+}
 
 
-static ADDRESS_MAP_START( malzak2_map, AS_PROGRAM, 8, malzak_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1100, 0x11ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
-	AM_RANGE(0x14cc, 0x14cc) AM_MIRROR(0x6000) AM_READ(s2636_portA_r)
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_device, read_data, write_data)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_device, read_data, write_data)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM_WRITE(malzak_playfield_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_ROM
-ADDRESS_MAP_END
+void malzak_state::malzak2_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x0bff).rom();
+	map(0x0c00, 0x0fff).bankr("bank1");
+	map(0x1000, 0x10ff).mirror(0x6000).ram();
+	map(0x1100, 0x11ff).mirror(0x6000).ram();
+	map(0x1200, 0x12ff).mirror(0x6000).ram();
+	map(0x1300, 0x13ff).mirror(0x6000).ram();
+	map(0x1400, 0x14ff).mirror(0x6000).rw(m_s2636_0, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x14cb, 0x14cb).mirror(0x6000).r(this, FUNC(malzak_state::fake_VRLE_r));
+	map(0x14cc, 0x14cc).mirror(0x6000).r(this, FUNC(malzak_state::s2636_portA_r));
+	map(0x1500, 0x15ff).mirror(0x6000).rw(m_s2636_1, FUNC(s2636_device::read_data), FUNC(s2636_device::write_data));
+	map(0x1600, 0x16ff).mirror(0x6000).ram().w(this, FUNC(malzak_state::malzak_playfield_w));
+	map(0x1700, 0x17ff).mirror(0x6000).ram().share("nvram");
+	map(0x1800, 0x1fff).mirror(0x6000).ram().share("videoram");
+	map(0x2000, 0x2fff).rom();
+	map(0x4000, 0x4fff).rom();
+	map(0x6000, 0x6fff).rom();
+}
 
 
 READ8_MEMBER(malzak_state::s2650_data_r)
@@ -154,7 +156,7 @@ WRITE8_MEMBER(malzak_state::port40_w)
 //  Bits 1-3 are all set high upon death, until the game continues
 //  Bit 6 is used only in Malzak II, and is set high after checking
 //        the selected version
-//  logerror("S2650 [0x%04x]: port 0x40 write: 0x%02x\n", m_maincpu->safe_pc(), data);
+//  logerror("%s S2650: port 0x40 write: 0x%02x\n", machine().describe_context(), data);
 	membank("bank1")->set_entry((data & 0x40) >> 6);
 }
 
@@ -180,18 +182,20 @@ READ8_MEMBER(malzak_state::collision_r)
 	return 0xd0 + m_collision_counter;
 }
 
-static ADDRESS_MAP_START( malzak_io_map, AS_IO, 8, malzak_state )
-	AM_RANGE(0x00, 0x00) AM_READ(collision_r) // returns where a collision can occur.
-	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)  // possibly sound codes for dual SN76477s
-	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)  // possibly playfield scroll X offset
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")  //controls
-	AM_RANGE(0xa0, 0xa0) AM_WRITENOP  // echoes I/O port read from port 0x80
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(portc0_w)  // possibly playfield row selection for writing and/or collisions
-ADDRESS_MAP_END
+void malzak_state::malzak_io_map(address_map &map)
+{
+	map(0x00, 0x00).r(this, FUNC(malzak_state::collision_r)); // returns where a collision can occur.
+	map(0x40, 0x40).w(this, FUNC(malzak_state::port40_w));  // possibly sound codes for dual SN76477s
+	map(0x60, 0x60).w(this, FUNC(malzak_state::port60_w));  // possibly playfield scroll X offset
+	map(0x80, 0x80).portr("IN0");  //controls
+	map(0xa0, 0xa0).nopw();  // echoes I/O port read from port 0x80
+	map(0xc0, 0xc0).w(this, FUNC(malzak_state::portc0_w));  // possibly playfield row selection for writing and/or collisions
+}
 
-static ADDRESS_MAP_START( malzak_data_map, AS_DATA, 8, malzak_state )
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(s2650_data_r)  // read upon death
-ADDRESS_MAP_END
+void malzak_state::malzak_data_map(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(malzak_state::s2650_data_r));  // read upon death
+}
 
 
 static INPUT_PORTS_START( malzak )
@@ -365,7 +369,8 @@ MACHINE_CONFIG_START(malzak_state::malzak)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(malzak_state::malzak2, malzak)
+MACHINE_CONFIG_START(malzak_state::malzak2)
+	malzak(config);
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(malzak2_map)

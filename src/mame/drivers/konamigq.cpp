@@ -126,6 +126,10 @@ public:
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void konamigq(machine_config &config);
+	void konamigq_dasp_map(address_map &map);
+	void konamigq_k054539_map(address_map &map);
+	void konamigq_map(address_map &map);
+	void konamigq_sound_map(address_map &map);
 };
 
 /* EEPROM */
@@ -163,25 +167,26 @@ READ8_MEMBER(konamigq_state::pcmram_r)
 
 /* Video */
 
-static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
-	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("am53cf96", am53cf96_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f100000, 0x1f10001f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0x00ff00ff)
-	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE16(eeprom_w, 0x0000ffff)
-	AM_RANGE(0x1f198000, 0x1f198003) AM_WRITENOP            /* cabinet lamps? */
-	AM_RANGE(0x1f1a0000, 0x1f1a0003) AM_WRITENOP            /* indicates gun trigger */
-	AM_RANGE(0x1f200000, 0x1f200003) AM_READ_PORT("GUNX1")
-	AM_RANGE(0x1f208000, 0x1f208003) AM_READ_PORT("GUNY1")
-	AM_RANGE(0x1f210000, 0x1f210003) AM_READ_PORT("GUNX2")
-	AM_RANGE(0x1f218000, 0x1f218003) AM_READ_PORT("GUNY2")
-	AM_RANGE(0x1f220000, 0x1f220003) AM_READ_PORT("GUNX3")
-	AM_RANGE(0x1f228000, 0x1f228003) AM_READ_PORT("GUNY3")
-	AM_RANGE(0x1f230000, 0x1f230003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x1f230004, 0x1f230007) AM_READ_PORT("P3_SERVICE")
-	AM_RANGE(0x1f238000, 0x1f238003) AM_READ_PORT("DSW")
-	AM_RANGE(0x1f300000, 0x1f5fffff) AM_READWRITE8(pcmram_r, pcmram_w, 0x00ff00ff)
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_DEVREADWRITE8("mb89371", mb89371_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
-ADDRESS_MAP_END
+void konamigq_state::konamigq_map(address_map &map)
+{
+	map(0x1f000000, 0x1f00001f).rw(m_am53cf96, FUNC(am53cf96_device::read), FUNC(am53cf96_device::write)).umask32(0x00ff00ff);
+	map(0x1f100000, 0x1f10001f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w)).umask32(0x00ff00ff);
+	map(0x1f180000, 0x1f180001).w(this, FUNC(konamigq_state::eeprom_w));
+	map(0x1f198000, 0x1f198003).nopw();            /* cabinet lamps? */
+	map(0x1f1a0000, 0x1f1a0003).nopw();            /* indicates gun trigger */
+	map(0x1f200000, 0x1f200003).portr("GUNX1");
+	map(0x1f208000, 0x1f208003).portr("GUNY1");
+	map(0x1f210000, 0x1f210003).portr("GUNX2");
+	map(0x1f218000, 0x1f218003).portr("GUNY2");
+	map(0x1f220000, 0x1f220003).portr("GUNX3");
+	map(0x1f228000, 0x1f228003).portr("GUNY3");
+	map(0x1f230000, 0x1f230003).portr("P1_P2");
+	map(0x1f230004, 0x1f230007).portr("P3_SERVICE");
+	map(0x1f238000, 0x1f238003).portr("DSW");
+	map(0x1f300000, 0x1f5fffff).rw(this, FUNC(konamigq_state::pcmram_r), FUNC(konamigq_state::pcmram_w)).umask32(0x00ff00ff);
+	map(0x1f680000, 0x1f68001f).rw("mb89371", FUNC(mb89371_device::read), FUNC(mb89371_device::write)).umask32(0x00ff00ff);
+	map(0x1f780000, 0x1f780003).nopw(); /* watchdog? */
+}
 
 /* SOUND CPU */
 
@@ -226,29 +231,32 @@ WRITE16_MEMBER(konamigq_state::tms57002_control_word_w)
 }
 
 /* 68000 memory handling - near identical to Konami GX */
-static ADDRESS_MAP_START( konamigq_sound_map, AS_PROGRAM, 16, konamigq_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00)
-	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_2", k054539_device, read, write, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r,tms57002_data_word_w)
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0x00ff)
-	AM_RANGE(0x500000, 0x500001) AM_READWRITE(tms57002_status_word_r,tms57002_control_word_w)
-	AM_RANGE(0x580000, 0x580001) AM_WRITENOP // 'NRES' - D2: K056602 /RESET
-ADDRESS_MAP_END
+void konamigq_state::konamigq_sound_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x100000, 0x10ffff).ram();
+	map(0x200000, 0x2004ff).rw("k054539_1", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0xff00);
+	map(0x200000, 0x2004ff).rw("k054539_2", FUNC(k054539_device::read), FUNC(k054539_device::write)).umask16(0x00ff);
+	map(0x300000, 0x300001).rw(this, FUNC(konamigq_state::tms57002_data_word_r), FUNC(konamigq_state::tms57002_data_word_w));
+	map(0x400000, 0x40001f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w)).umask16(0x00ff);
+	map(0x500000, 0x500001).rw(this, FUNC(konamigq_state::tms57002_status_word_r), FUNC(konamigq_state::tms57002_control_word_w));
+	map(0x580000, 0x580001).nopw(); // 'NRES' - D2: K056602 /RESET
+}
 
 
 /* TMS57002 memory handling */
-static ADDRESS_MAP_START( konamigq_dasp_map, AS_DATA, 8, konamigq_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-ADDRESS_MAP_END
+void konamigq_state::konamigq_dasp_map(address_map &map)
+{
+	map(0x00000, 0x3ffff).ram();
+}
 
 
 /* K058141 memory handling */
-static ADDRESS_MAP_START( konamigq_k054539_map, 0, 8, konamigq_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("k054539", 0)
-	AM_RANGE(0x080000, 0x3fffff) AM_RAM AM_SHARE("pcmram")
-ADDRESS_MAP_END
+void konamigq_state::konamigq_k054539_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("k054539", 0);
+	map(0x080000, 0x3fffff).ram().share("pcmram");
+}
 
 
 /* 058141 */
@@ -448,7 +456,7 @@ static INPUT_PORTS_START( konamigq )
 	PORT_DIPSETTING(    0x00, "Independent" )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)

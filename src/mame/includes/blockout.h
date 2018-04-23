@@ -57,4 +57,7 @@ public:
 	void update_pixels( int x, int y );
 	void blockout(machine_config &config);
 	void agress(machine_config &config);
+	void agress_map(address_map &map);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
 };

@@ -283,4 +283,6 @@ public:
 	TIMER_CALLBACK_MEMBER(beep_stop);
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_timer);
 	void x07(machine_config &config);
+	void x07_io(address_map &map);
+	void x07_mem(address_map &map);
 };

@@ -23,7 +23,6 @@ public:
 
 	void vck_callback( int st );
 	void hyprolyb_adpcm(machine_config &config);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -42,7 +41,6 @@ protected:
 	uint8_t    m_vck_ready;
 };
 
-extern const device_type HYPROLYB_ADPCM;
 DECLARE_DEVICE_TYPE(HYPROLYB_ADPCM, hyprolyb_adpcm_device)
 
 #endif // MAME_AUDIO_HYPROLYB_H

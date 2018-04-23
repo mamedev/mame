@@ -98,18 +98,6 @@ okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag,
 
 
 //-------------------------------------------------
-//  static_set_pin7 - configuration helper to set
-//  the pin 7 state
-//-------------------------------------------------
-
-void okim6295_device::static_set_pin7(device_t &device, int pin7)
-{
-	okim6295_device &okim6295 = downcast<okim6295_device &>(device);
-	okim6295.m_pin7_state = pin7;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

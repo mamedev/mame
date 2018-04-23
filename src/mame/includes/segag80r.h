@@ -14,13 +14,13 @@
 #include "machine/segag80.h"
 #include "sound/sn76496.h"
 #include "audio/segasnd.h"
-#include "machine/gen_latch.h"
+#include "machine/i8255.h"
 #include "screen.h"
 
 
 class sega005_sound_device;
 
-class segag80r_state : public driver_device
+class segag80r_state : public segag80snd_common
 {
 public:
 	enum
@@ -29,7 +29,7 @@ public:
 	};
 
 	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: segag80snd_common(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
 		m_sn1(*this, "sn1"),
@@ -43,7 +43,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
+		m_ppi(*this, "ppi8255"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_shared_ptr<uint8_t> m_mainram;
@@ -60,7 +60,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	std::vector<uint8_t> m_paletteram;
@@ -125,7 +125,7 @@ public:
 	DECLARE_READ8_MEMBER(n7751_command_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
-	DECLARE_WRITE8_MEMBER(sindbadm_soundport_w);
+	DECLARE_READ8_MEMBER(sindbadm_sound_data_r);
 	DECLARE_WRITE8_MEMBER(sindbadm_misc_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn1_SN76496_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn2_SN76496_w);
@@ -177,7 +177,13 @@ public:
 	void sega005_sound_board(machine_config &config);
 	void spaceod_sound_board(machine_config &config);
 	void monsterb_sound_board(machine_config &config);
-	void sega_speech_board(machine_config &config);
+	void g80r_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void main_ppi8255_portmap(address_map &map);
+	void sega_315_opcodes_map(address_map &map);
+	void sindbadm_portmap(address_map &map);
+	void sindbadm_sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer *m_vblank_latch_clear_timer;

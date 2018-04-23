@@ -110,9 +110,10 @@ WRITE32_MEMBER( m68340_cpu_device::m68340_internal_base_w )
 
 }
 
-static ADDRESS_MAP_START( m68340_internal_map, AS_PROGRAM, 32, m68340_cpu_device )
-	AM_RANGE(0x0003ff00, 0x0003ff03) AM_READWRITE( m68340_internal_base_r, m68340_internal_base_w)
-ADDRESS_MAP_END
+void m68340_cpu_device::m68340_internal_map(address_map &map)
+{
+	map(0x0003ff00, 0x0003ff03).rw(this, FUNC(m68340_cpu_device::m68340_internal_base_r), FUNC(m68340_cpu_device::m68340_internal_base_w));
+}
 
 
 //-------------------------------------------------
@@ -131,7 +132,7 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: fscpu32_device(mconfig, tag, owner, clock, M68340, 32,32, ADDRESS_MAP_NAME(m68340_internal_map))
+	: fscpu32_device(mconfig, tag, owner, clock, M68340, 32,32, address_map_constructor(FUNC(m68340_cpu_device::m68340_internal_map), this))
 	, m_serial(*this, "serial")
 	, m_timer1(*this, "timer1")
 	, m_timer2(*this, "timer2")

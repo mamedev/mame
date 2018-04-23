@@ -53,4 +53,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void compgolf(machine_config &config);
+	void compgolf_map(address_map &map);
 };

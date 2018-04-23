@@ -16,7 +16,7 @@
 ***************************************************************************/
 
 #define MCFG_GAELCO_SERIAL_IRQ_HANDLER(_devcb) \
-	devcb = &gaelco_serial_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<gaelco_serial_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 
 
@@ -33,7 +33,7 @@ public:
 
 	gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<gaelco_serial_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(data_w);

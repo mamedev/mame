@@ -47,18 +47,22 @@ class barata_state : public driver_device
 {
 public:
 	barata_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
+
 	DECLARE_WRITE8_MEMBER(fpga_w);
 	DECLARE_WRITE8_MEMBER(port0_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_READ8_MEMBER(port2_r);
-	void fpga_send(unsigned char cmd);
-
-	required_device<cpu_device> m_maincpu;
 	void barata(machine_config &config);
 private:
 	unsigned char row_selection;
+	void fpga_send(unsigned char cmd);
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<4> m_digits;
 };
 
 /************************
@@ -185,7 +189,8 @@ void barata_state::fpga_send(unsigned char cmd)
 	bool state, erase_all;
 	char lamp_index;
 	if (mode == FPGA_LAMP){
-		switch (byte){
+		switch (byte)
+		{
 			case 1:
 				lamp_data = cmd;
 				break;
@@ -195,12 +200,15 @@ void barata_state::fpga_send(unsigned char cmd)
 				erase_all = BIT(lamp_data,4);
 				lamp_index = lamp_data & 0x0F;
 
-				if (erase_all){
+				if (erase_all)
+				{
 //                  logerror("LED: ERASE ALL\n");
 					for (int i=0; i<16; i++){
 						output().set_led_value(i, 1);
 					}
-				} else {
+				}
+				else
+				{
 					output().set_led_value(lamp_index, state ? 0 : 1);
 				}
 			default:
@@ -228,12 +236,15 @@ void barata_state::fpga_send(unsigned char cmd)
 			case 3:
 				counter_data = (counter_data << 3) | cmd;
 
-				if (counter_state){
-					output().set_digit_value(2*counter_bank, 0);
-					output().set_digit_value(2*counter_bank+1, 0);
-				} else {
-					output().set_digit_value(2*counter_bank, dec_7seg(counter_data/10));
-					output().set_digit_value(2*counter_bank+1, dec_7seg(counter_data%10));
+				if (counter_state)
+				{
+					m_digits[2*counter_bank] = 0;
+					m_digits[2*counter_bank+1] = 0;
+				}
+				else
+				{
+					m_digits[2*counter_bank] = dec_7seg(counter_data/10);
+					m_digits[2*counter_bank+1] = dec_7seg(counter_data%10);
 				}
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;
@@ -290,17 +301,6 @@ READ8_MEMBER(barata_state::port2_r)
 	return 0;
 }
 
-/*************************
-* Memory Map Information *
-*************************/
-
-static ADDRESS_MAP_START( i8051_io_port, AS_IO, 8, barata_state )
-	AM_RANGE(MCS51_PORT_P0,   MCS51_PORT_P0  ) AM_WRITE(port0_w)
-	AM_RANGE(MCS51_PORT_P1,   MCS51_PORT_P1  ) AM_READ_PORT("PORT1")
-	AM_RANGE(MCS51_PORT_P2,   MCS51_PORT_P2  ) AM_READWRITE(port2_r, port2_w)
-	AM_RANGE(MCS51_PORT_P3,   MCS51_PORT_P3  ) AM_WRITE(fpga_w)
-ADDRESS_MAP_END
-
 /************************
 *    Machine Drivers    *
 ************************/
@@ -308,7 +308,11 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(barata_state::barata)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, CPU_CLOCK)
-	MCFG_CPU_IO_MAP(i8051_io_port)
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(barata_state, port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("PORT1"))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(barata_state, port2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(barata_state, port2_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(barata_state, fpga_w))
 
 	MCFG_DEFAULT_LAYOUT( layout_barata )
 

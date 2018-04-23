@@ -209,6 +209,23 @@ public:
 	void wow(machine_config &config);
 	void tenpindx(machine_config &config);
 	void demndrgn(machine_config &config);
+	void bank4000_map(address_map &map);
+	void demndrgn_map(address_map &map);
+	void ebases_map(address_map &map);
+	void port_map(address_map &map);
+	void port_map_16col_pattern(address_map &map);
+	void port_map_16col_pattern_nosound(address_map &map);
+	void port_map_16col_pattern_tenpindx(address_map &map);
+	void port_map_mono_pattern(address_map &map);
+	void port_map_stereo_pattern(address_map &map);
+	void profpac_bank4000_map(address_map &map);
+	void profpac_map(address_map &map);
+	void robby_map(address_map &map);
+	void seawolf2_map(address_map &map);
+	void spacezap_map(address_map &map);
+	void tenpin_sub_io_map(address_map &map);
+	void tenpin_sub_map(address_map &map);
+	void wow_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

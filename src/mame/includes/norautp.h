@@ -55,6 +55,21 @@ public:
 	void dphla(machine_config &config);
 	void drhl(machine_config &config);
 	void norautxp(machine_config &config);
+	void dphl_map(address_map &map);
+	void dphla_map(address_map &map);
+	void dphltest_map(address_map &map);
+	void drhl_map(address_map &map);
+	void kimbldhl_map(address_map &map);
+	void kimble_map(address_map &map);
+	void newhilop_map(address_map &map);
+	void norautp_map(address_map &map);
+	void norautp_portmap(address_map &map);
+	void norautx4_map(address_map &map);
+	void norautx8_map(address_map &map);
+	void norautxp_map(address_map &map);
+	void norautxp_portmap(address_map &map);
+	void nortest1_map(address_map &map);
+	void ssjkrpkr_map(address_map &map);
 };
 
 /*----------- defined in audio/norautp.c -----------*/

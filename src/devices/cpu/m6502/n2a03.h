@@ -19,7 +19,7 @@ class n2a03_device : public m6502_device {
 public:
 	n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
@@ -32,6 +32,7 @@ public:
 
 	required_device<nesapu_device> m_apu; // public for vgmplay
 
+	void n2a03_map(address_map &map);
 protected:
 	virtual void device_start() override;
 

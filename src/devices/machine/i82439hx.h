@@ -21,6 +21,27 @@ public:
 	void set_cpu_tag(const char *tag);
 	void set_ram_size(int ram_size);
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void reset_all_mappings() override;
+
+	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	virtual void config_map(address_map &map) override;
+
+private:
+	const char *cpu_tag;
+	int ram_size;
+	cpu_device *cpu;
+	std::vector<uint32_t> ram;
+
+	uint8_t pcon, cc, dramec, dramc, dramt;
+	uint8_t pam[7], drb[8];
+	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
+
 	DECLARE_READ8_MEMBER (pcon_r);
 	DECLARE_WRITE8_MEMBER(pcon_w);
 	DECLARE_READ8_MEMBER (cc_r);
@@ -46,27 +67,6 @@ public:
 	DECLARE_READ8_MEMBER (errsts_r);
 	DECLARE_WRITE8_MEMBER(errsts_w);
 	DECLARE_READ8_MEMBER (errsyn_r);
-
-	virtual void reset_all_mappings() override;
-
-	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
-
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	const char *cpu_tag;
-	int ram_size;
-	cpu_device *cpu;
-	std::vector<uint32_t> ram;
-
-	uint8_t pcon, cc, dramec, dramc, dramt;
-	uint8_t pam[7], drb[8];
-	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 };
 
 DECLARE_DEVICE_TYPE(I82439HX, i82439hx_host_device)

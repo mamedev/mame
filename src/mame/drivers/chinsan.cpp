@@ -68,6 +68,10 @@ public:
 
 	void chinsan(machine_config &config);
 	void mayumi(machine_config &config);
+	void chinsan_io_map(address_map &map);
+	void chinsan_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void mayumi_io_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -101,33 +105,37 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8, chinsan_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("color_ram")
-ADDRESS_MAP_END
+void chinsan_state::chinsan_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xdfff).ram().share("nvram");
+	map(0xe000, 0xefff).ram().share("video_ram");
+	map(0xf000, 0xf7ff).ram().share("color_ram");
+}
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, chinsan_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-ADDRESS_MAP_END
+void chinsan_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+}
 
-static ADDRESS_MAP_START( chinsan_io_map, AS_IO, 8, chinsan_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x20, 0x20) AM_WRITE(adpcm_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)
-ADDRESS_MAP_END
+void chinsan_state::chinsan_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x10, 0x11).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x20, 0x20).w(this, FUNC(chinsan_state::adpcm_w));
+	map(0x30, 0x30).w(this, FUNC(chinsan_state::ctrl_w));
+}
 
-static ADDRESS_MAP_START( mayumi_io_map, AS_IO, 8, chinsan_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("extra") AM_WRITE(ctrl_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi", i8255_device, read, write)
-	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void chinsan_state::mayumi_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x30, 0x30).portr("extra").w(this, FUNC(chinsan_state::ctrl_w));
+	map(0xc0, 0xc3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xd0, 0xd1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 //**************************************************************************
@@ -501,7 +509,7 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_CPU_ADD("maincpu", MC8123, XTAL(10'000'000)/2) // 317-5012
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -540,7 +548,8 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(chinsan_state::mayumi, chinsan)
+MACHINE_CONFIG_START(chinsan_state::mayumi)
+	chinsan(config);
 	// standard Z80 instead of MC-8123
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/2)

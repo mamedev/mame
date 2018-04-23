@@ -24,7 +24,9 @@ public:
 		m_m48t35(*this, "m48t35"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_digits(*this, "digit%u", 0U)
+		{ }
 
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_ram_base;
@@ -35,7 +37,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-
+	output_finder<7> m_digits;
 	emu_timer *m_display_irq_off_timer;
 
 	DECLARE_WRITE32_MEMBER(cmos_w);
@@ -76,9 +78,9 @@ public:
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
 	void midzeus(machine_config &config);
-	void midzeus2(machine_config &config);
 	void invasn(machine_config &config);
 	void mk4(machine_config &config);
+	void zeus_map(address_map &map);
 private:
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);

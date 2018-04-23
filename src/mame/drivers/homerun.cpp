@@ -103,25 +103,27 @@ WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
 		m_d7756->port_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xb000, 0xb03f) AM_RAM_WRITE(homerun_color_w) AM_SHARE("colorram")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-ADDRESS_MAP_END
+void homerun_state::homerun_memmap(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0x9fff).ram().w(this, FUNC(homerun_state::homerun_videoram_w)).share("videoram");
+	map(0xa000, 0xa0ff).ram().share("spriteram");
+	map(0xb000, 0xb03f).ram().w(this, FUNC(homerun_state::homerun_color_w)).share("colorram");
+	map(0xc000, 0xdfff).ram();
+}
 
-static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(homerun_d7756_sample_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(homerun_control_w)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
-	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("IN1")
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-ADDRESS_MAP_END
+void homerun_state::homerun_iomap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).w(this, FUNC(homerun_state::homerun_d7756_sample_w));
+	map(0x20, 0x20).w(this, FUNC(homerun_state::homerun_control_w));
+	map(0x30, 0x33).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x40).portr("IN0");
+	map(0x50, 0x50).portr("IN2");
+	map(0x60, 0x60).portr("IN1");
+	map(0x70, 0x71).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
 
 
 CUSTOM_INPUT_MEMBER(homerun_state::homerun_d7756_busy_r)
@@ -150,8 +152,8 @@ CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, nullptr)
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -187,7 +189,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // doesn't have d7756
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -225,8 +227,8 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, nullptr)
 	PORT_BIT( 0x36, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -234,7 +236,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_NAME("P1 Down / Paper")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Right / Scissors")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) // unused?
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_hopper_status_r, nullptr)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_hopper_status_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -382,7 +384,8 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(homerun_state::homerun, dynashot)
+MACHINE_CONFIG_START(homerun_state::homerun)
+	dynashot(config);
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("d7756", UPD7756, UPD7759_STANDARD_CLOCK)
@@ -394,7 +397,8 @@ MACHINE_CONFIG_DERIVED(homerun_state::homerun, dynashot)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(homerun_state::ganjaja, dynashot)
+MACHINE_CONFIG_START(homerun_state::ganjaja)
+	dynashot(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

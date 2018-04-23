@@ -44,7 +44,7 @@
 //**************************************************************************
 
 #define MCFG_F3853_EXT_INPUT_CB(_class, _method) \
-	f3853_device::set_interrupt_req_callback(*device, f3853_device::interrupt_req_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<f3853_device &>(*device).set_interrupt_req_callback(f3853_device::interrupt_req_delegate(&_class::_method, #_class "::" #_method, this));
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -63,7 +63,7 @@ public:
 	// construction/destruction
 	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_interrupt_req_callback(device_t &device, interrupt_req_delegate &&callback) { downcast<f3853_device &>(device).m_interrupt_req_cb = std::move(callback); }
+	template <typename Object> void set_interrupt_req_callback(Object &&cb) { m_interrupt_req_cb = std::forward<Object>(cb); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

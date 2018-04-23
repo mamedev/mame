@@ -31,8 +31,8 @@ public:
 	// construction/destruction
 	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_set_bits(device_t &device, tlc34076_bits bits);
+	// configuration helpers
+	void set_bits(tlc34076_bits bits) { m_dacbits = bits; }
 
 	// public interface
 	const rgb_t *get_pens();
@@ -46,13 +46,13 @@ protected:
 
 private:
 	// internal state
-	uint8_t m_local_paletteram[0x300];
+	std::unique_ptr<uint8_t[]> m_local_paletteram[3];
 	uint8_t m_regs[0x10];
 	uint8_t m_palettedata[3];
 	uint8_t m_writeindex;
 	uint8_t m_readindex;
 	uint8_t m_dacbits;
-	rgb_t m_pens[0x100];
+	std::unique_ptr<rgb_t[]> m_pens;
 };
 
 
@@ -62,7 +62,7 @@ private:
 
 #define MCFG_TLC34076_ADD(tag, bits) \
 	MCFG_DEVICE_ADD((tag), TLC34076, 0) \
-	tlc34076_device::static_set_bits(*device, (tlc34076_device::bits));
+	downcast<tlc34076_device &>(*device).set_bits((tlc34076_device::bits));
 
 
 DECLARE_DEVICE_TYPE(TLC34076, tlc34076_device)

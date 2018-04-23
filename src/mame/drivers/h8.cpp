@@ -69,6 +69,7 @@ public:
 		, m_uart(*this, "uart")
 		, m_cass(*this, "cassette")
 		, m_beep(*this, "beeper")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(portf0_r);
@@ -82,6 +83,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
 
 	void h8(machine_config &config);
+	void h8_io(address_map &map);
+	void h8_mem(address_map &map);
 private:
 	uint8_t m_digit;
 	uint8_t m_segment;
@@ -91,10 +94,12 @@ private:
 	bool m_cass_state;
 	bool m_cassold;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
+	output_finder<16> m_digits;
 };
 
 
@@ -149,7 +154,7 @@ WRITE8_MEMBER( h8_state::portf0_w )
 	// d7 = beeper enable
 
 	m_digit = data & 15;
-	if (m_digit) output().set_digit_value(m_digit, m_segment);
+	if (m_digit) m_digits[m_digit] = m_segment;
 
 	output().set_value("mon_led", !BIT(data, 5));
 	m_beep->set_state(!BIT(data, 7));
@@ -172,28 +177,30 @@ WRITE8_MEMBER( h8_state::portf1_w )
 	//d0 segment g
 
 	m_segment = 0xff ^ bitswap<8>(data, 7, 0, 6, 5, 4, 3, 2, 1);
-	if (m_digit) output().set_digit_value(m_digit, m_segment);
+	if (m_digit) m_digits[m_digit] = m_segment;
 }
 
-static ADDRESS_MAP_START(h8_mem, AS_PROGRAM, 8, h8_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM // main rom
-	AM_RANGE(0x1400, 0x17ff) AM_RAM // fdc ram
-	AM_RANGE(0x1800, 0x1fff) AM_ROM // fdc rom
-	AM_RANGE(0x2000, 0x9fff) AM_RAM // main ram
-ADDRESS_MAP_END
+void h8_state::h8_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom(); // main rom
+	map(0x1400, 0x17ff).ram(); // fdc ram
+	map(0x1800, 0x1fff).rom(); // fdc rom
+	map(0x2000, 0x9fff).ram(); // main ram
+}
 
-static ADDRESS_MAP_START( h8_io, AS_IO, 8, h8_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(portf0_r,portf0_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(portf1_w)
-	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
-	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
+void h8_state::h8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0xf0, 0xf0).rw(this, FUNC(h8_state::portf0_r), FUNC(h8_state::portf0_w));
+	map(0xf1, 0xf1).w(this, FUNC(h8_state::portf1_w));
+	map(0xf8, 0xf8).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xf9, 0xf9).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	// optional connection to a serial terminal @ 600 baud
 	//AM_RANGE(0xfa, 0xfa) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
 	//AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-ADDRESS_MAP_END
+}
 
 /* Input ports */
 static INPUT_PORTS_START( h8 )

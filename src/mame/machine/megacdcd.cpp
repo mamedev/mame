@@ -161,36 +161,6 @@ void lc89510_temp_device::dummy_interrupt_callback(void)
 {
 }
 
-void lc89510_temp_device::set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.segacd_dma_callback = new_segacd_dma_callback;
-}
-
-void lc89510_temp_device::set_type1_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.type1_interrupt_callback = interrupt_callback;
-}
-
-void lc89510_temp_device::set_type2_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.type2_interrupt_callback = interrupt_callback;
-}
-
-void lc89510_temp_device::set_type3_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.type3_interrupt_callback = interrupt_callback;
-}
-
-void lc89510_temp_device::set_is_neoCD(device_t &device, bool is_neoCD)
-{
-	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
-	dev.is_neoCD = is_neoCD;
-}
-
 // HACK for DMA handling, this gets replaced
 void lc89510_temp_device::Fake_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, uint16_t &dma_addrc, uint16_t &destination )
 {

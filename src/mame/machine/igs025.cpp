@@ -29,14 +29,6 @@ void igs025_device::no_callback_setup()
 
 
 
-void igs025_device::set_external_cb(device_t &device,igs025_execute_external newcb)
-{
-	//printf("set_external_cb\n");
-	igs025_device &dev = downcast<igs025_device &>(device);
-	dev.m_execute_external = newcb;
-}
-
-
 void igs025_device::device_start()
 {
 	// Reset IGS025 stuff

@@ -73,7 +73,7 @@ public:
 	DECLARE_VIDEO_START(karnov);
 	DECLARE_VIDEO_START(wndrplnt);
 	uint32_t screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(karnov_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vbint_w);
 	void karnov_flipscreen_w( int data );
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void karnov_i8751_w( int data );
@@ -83,6 +83,11 @@ public:
 	void karnov(machine_config &config);
 	void wndrplnt(machine_config &config);
 	void karnovjbl(machine_config &config);
+	void base_sound_map(address_map &map);
+	void chelnovjbl_mcu_map(address_map &map);
+	void karnov_map(address_map &map);
+	void karnov_sound_map(address_map &map);
+	void karnovjbl_sound_map(address_map &map);
 };
 
 enum {

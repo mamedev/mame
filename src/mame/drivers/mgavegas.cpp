@@ -144,6 +144,7 @@ public:
 
 
 	void mgavegas(machine_config &config);
+	void mgavegas_map(address_map &map);
 protected:
 
 	// devices
@@ -421,16 +422,17 @@ READ8_MEMBER(mgavegas_state::ay8910_b_r)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( mgavegas_map, AS_PROGRAM, 8, mgavegas_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa003) AM_READWRITE(r_a0,w_a0)            // AY-3-8910
-	AM_RANGE(0xc000, 0xc001) AM_WRITE(cso1_w)                   // /CSout1
-	AM_RANGE(0xc400, 0xc401) AM_WRITE(cso2_w)                   // /CSout2
-	AM_RANGE(0xc800, 0xc801) AM_READWRITE(csoki_r,csoki_w)      // /CSoki
+void mgavegas_state::mgavegas_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram().share("nvram");
+	map(0xa000, 0xa003).rw(this, FUNC(mgavegas_state::r_a0), FUNC(mgavegas_state::w_a0));            // AY-3-8910
+	map(0xc000, 0xc001).w(this, FUNC(mgavegas_state::cso1_w));                   // /CSout1
+	map(0xc400, 0xc401).w(this, FUNC(mgavegas_state::cso2_w));                   // /CSout2
+	map(0xc800, 0xc801).rw(this, FUNC(mgavegas_state::csoki_r), FUNC(mgavegas_state::csoki_w));      // /CSoki
 	//AM_RANGE(0xcc00, 0xcc01) AM_READWRITE(cso3_r,cso3_w)      // /CSout3 unused
 	//AM_RANGE(0xe000, 0xe003) AM_READWRITE(r_e0,w_e0)          // /CSaux unused
-ADDRESS_MAP_END
+}
 
 
 
@@ -446,7 +448,7 @@ static INPUT_PORTS_START( mgavegas )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) //25 ptas in to play
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) //100ptas in for change with 4 25 ptas coins
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("25 ptas level")     //"hack" hopper always full
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("Door")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("Channel")

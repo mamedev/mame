@@ -22,9 +22,10 @@ const tiny_rom_entry *pcd_keyboard_device::device_rom_region() const
 	return ROM_NAME( pcd_keyboard );
 }
 
-static ADDRESS_MAP_START( pcd_keyboard_map, AS_PROGRAM, 8, pcd_keyboard_device )
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void pcd_keyboard_device::pcd_keyboard_map(address_map &map)
+{
+	map(0x000, 0xfff).rom();
+}
 
 MACHINE_CONFIG_START(pcd_keyboard_device::device_add_mconfig)
 	MCFG_CPU_ADD("mcu", I8035, 5760000*2) // FIXME: the mc2661 baud rate calculation

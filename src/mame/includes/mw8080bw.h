@@ -252,6 +252,28 @@ public:
 	void tornbase_audio(machine_config &config);
 	void zzzap(machine_config &config);
 	void zzzap_audio(machine_config &config);
+	void blueshrk_io_map(address_map &map);
+	void boothill_io_map(address_map &map);
+	void bowler_io_map(address_map &map);
+	void checkmat_io_map(address_map &map);
+	void clowns_io_map(address_map &map);
+	void desertgu_io_map(address_map &map);
+	void dogpatch_io_map(address_map &map);
+	void dplay_io_map(address_map &map);
+	void gmissile_io_map(address_map &map);
+	void gunfight_io_map(address_map &map);
+	void invad2ct_io_map(address_map &map);
+	void invaders_io_map(address_map &map);
+	void m4_io_map(address_map &map);
+	void main_map(address_map &map);
+	void maze_io_map(address_map &map);
+	void phantom2_io_map(address_map &map);
+	void seawolf_io_map(address_map &map);
+	void shuffle_io_map(address_map &map);
+	void spacwalk_io_map(address_map &map);
+	void spcenctr_io_map(address_map &map);
+	void tornbase_io_map(address_map &map);
+	void zzzap_io_map(address_map &map);
 };
 
 

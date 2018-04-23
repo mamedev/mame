@@ -221,5 +221,5 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(pgm_asic3_state::pgm_asic3)
-	MCFG_FRAGMENT_ADD(pgmbase)
+	pgmbase(config);
 MACHINE_CONFIG_END

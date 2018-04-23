@@ -99,6 +99,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(cass_r);
@@ -108,15 +109,19 @@ public:
 	DECLARE_WRITE8_MEMBER(port06_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
 	void dauphin(machine_config &config);
+	void dauphin_io(address_map &map);
+	void dauphin_mem(address_map &map);
 private:
 	uint8_t m_cass_data;
 	uint8_t m_last_key;
 	bool m_cass_state;
 	bool m_cassold;
 	bool m_speaker_state;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
+	output_finder<4> m_digits;
 };
 
 READ_LINE_MEMBER( dauphin_state::cass_r )
@@ -131,7 +136,7 @@ WRITE_LINE_MEMBER( dauphin_state::cass_w )
 
 WRITE8_MEMBER( dauphin_state::port00_w )
 {
-	output().set_digit_value(offset, data);
+	m_digits[offset] = data;
 }
 
 WRITE8_MEMBER( dauphin_state::port06_w )
@@ -182,19 +187,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::dauphin_c)
 		m_cass->output(BIT(m_cass_data, 0) ? -1.0 : +1.0); // 2000Hz
 }
 
-static ADDRESS_MAP_START( dauphin_mem, AS_PROGRAM, 8, dauphin_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x01ff) AM_ROM
-	AM_RANGE( 0x0200, 0x02ff) AM_RAM
-	AM_RANGE( 0x0c00, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void dauphin_state::dauphin_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x01ff).rom();
+	map(0x0200, 0x02ff).ram();
+	map(0x0c00, 0x0fff).rom();
+}
 
-static ADDRESS_MAP_START( dauphin_io, AS_IO, 8, dauphin_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_WRITE(port00_w) // 4-led display
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)  // speaker (NOT a keyclick)
-	AM_RANGE(0x07, 0x07) AM_READ(port07_r) // pushbuttons
-ADDRESS_MAP_END
+void dauphin_state::dauphin_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x03).w(this, FUNC(dauphin_state::port00_w)); // 4-led display
+	map(0x06, 0x06).w(this, FUNC(dauphin_state::port06_w));  // speaker (NOT a keyclick)
+	map(0x07, 0x07).r(this, FUNC(dauphin_state::port07_r)); // pushbuttons
+}
 
 /* Input ports */
 static INPUT_PORTS_START( dauphin )

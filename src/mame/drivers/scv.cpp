@@ -23,6 +23,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this,"videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_upd1771c(*this, "upd1771c"),
 		m_cart(*this, "cartslot"),
 		m_pa(*this, "PA.%u", 0),
@@ -45,6 +46,7 @@ public:
 
 	void scv(machine_config &config);
 	void scv_pal(machine_config &config);
+	void scv_mem(address_map &map);
 protected:
 	enum
 	{
@@ -52,6 +54,7 @@ protected:
 	};
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<upd1771c_device> m_upd1771c;
 	required_device<scv_cart_slot_device> m_cart;
 	required_ioport_array<8> m_pa;
@@ -69,15 +72,16 @@ protected:
 };
 
 
-static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM   // BIOS
+void scv_state::scv_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();   // BIOS
 
-	AM_RANGE( 0x2000, 0x3403 ) AM_RAM AM_SHARE("videoram")  // VRAM + 4 registers
-	AM_RANGE( 0x3600, 0x3600 ) AM_DEVWRITE("upd1771c", upd1771c_device, write)
+	map(0x2000, 0x3403).ram().share("videoram");  // VRAM + 4 registers
+	map(0x3600, 0x3600).w(m_upd1771c, FUNC(upd1771c_device::write));
 
-	AM_RANGE( 0x8000, 0xff7f ) AM_DEVREADWRITE("cartslot", scv_cart_slot_device, read_cart, write_cart) // cartridge
-	AM_RANGE( 0xff80, 0xffff ) AM_RAM   // upd7801 internal RAM
-ADDRESS_MAP_END
+	map(0x8000, 0xff7f).rw(m_cart, FUNC(scv_cart_slot_device::read_cart), FUNC(scv_cart_slot_device::write_cart)); // cartridge
+	map(0xff80, 0xffff).ram();   // upd7801 internal RAM
+}
 
 
 static INPUT_PORTS_START( scv )
@@ -263,7 +267,7 @@ void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	{
 		case TIMER_VB:
 			{
-				int vpos = machine().first_screen()->vpos();
+				int vpos = m_screen->vpos();
 
 				switch( vpos )
 				{
@@ -275,7 +279,7 @@ void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 					break;
 				}
 
-				m_vb_timer->adjust(machine().first_screen()->time_until_pos((vpos + 1) % 262, 0));
+				m_vb_timer->adjust(m_screen->time_until_pos((vpos + 1) % 262, 0));
 			}
 			break;
 
@@ -620,7 +624,7 @@ void scv_state::machine_start()
 
 void scv_state::machine_reset()
 {
-	m_vb_timer->adjust(machine().first_screen()->time_until_pos(0, 0));
+	m_vb_timer->adjust(m_screen->time_until_pos(0, 0));
 }
 
 
@@ -685,7 +689,8 @@ MACHINE_CONFIG_START(scv_state::scv)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(scv_state::scv_pal, scv)
+MACHINE_CONFIG_START(scv_state::scv_pal)
+	scv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( 3780000 )
 

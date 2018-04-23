@@ -28,16 +28,13 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 
 	void postload(void);
 	void set_cpu_tag(const char *tag);
 	static void set_type(const int type) {m_type = type;}
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
 	void set_tmumem(const int tmumem0, const int tmumem1) {m_tmumem0 = tmumem0; m_tmumem1 = tmumem1;}
-
-	DECLARE_READ32_MEMBER(pcictrl_r);
-	DECLARE_WRITE32_MEMBER(pcictrl_w);
 
 	DECLARE_READ32_MEMBER(vga_r);
 	DECLARE_WRITE32_MEMBER(vga_w);
@@ -54,10 +51,13 @@ private:
 	const char *m_cpu_tag;
 
 	uint32_t m_pcictrl_reg[0x20];
-	DECLARE_ADDRESS_MAP(voodoo_reg_map, 32);
-	DECLARE_ADDRESS_MAP(banshee_reg_map, 32);
-	DECLARE_ADDRESS_MAP(lfb_map, 32);
-	DECLARE_ADDRESS_MAP(io_map, 32);
+	void voodoo_reg_map(address_map &map);
+	void banshee_reg_map(address_map &map);
+	void lfb_map(address_map &map);
+	void io_map(address_map &map);
+
+	DECLARE_READ32_MEMBER(pcictrl_r);
+	DECLARE_WRITE32_MEMBER(pcictrl_w);
 };
 
 DECLARE_DEVICE_TYPE(VOODOO_PCI, voodoo_pci_device)

@@ -144,6 +144,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
 	void kc85(machine_config &config);
 	void kc85_video(machine_config &config);
+	void kc85_io(address_map &map);
+	void kc85_mem(address_map &map);
+	void trsm100_io(address_map &map);
 };
 
 class trsm100_state : public kc85_state
@@ -187,6 +190,8 @@ public:
 	int m_iosel;                /* serial interface select */
 	void pc8300(machine_config &config);
 	void pc8201(machine_config &config);
+	void pc8201_io(address_map &map);
+	void pc8201_mem(address_map &map);
 };
 
 class tandy200_state : public driver_device
@@ -260,6 +265,9 @@ public:
 	int m_centronics_select;
 	void tandy200(machine_config &config);
 	void tandy200_video(machine_config &config);
+	void tandy200_io(address_map &map);
+	void tandy200_lcdc(address_map &map);
+	void tandy200_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_KYOCERA_H

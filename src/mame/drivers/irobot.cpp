@@ -82,12 +82,12 @@
 #include "emu.h"
 #include "includes/irobot.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/pokey.h"
+#include "machine/adc0808.h"
 #include "machine/nvram.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK      XTAL(12'096'000)
-#define VIDEO_CLOCK     XTAL(20'000'000)
+#define MAIN_CLOCK      12.096_MHz_XTAL
+#define VIDEO_CLOCK     20_MHz_XTAL
 
 /*************************************
  *
@@ -122,24 +122,20 @@ WRITE8_MEMBER(irobot_state::irobot_clearfirq_w)
 
 READ8_MEMBER(irobot_state::quad_pokeyn_r)
 {
-	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
-	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
 
-	return pokey->read(pokey_reg);
+	return m_pokey[pokey_num]->read(pokey_reg);
 }
 
 WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
 {
-	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
-	pokey_device *pokey = machine().device<pokey_device>(devname[pokey_num]);
 
-	pokey->write(pokey_reg, data);
+	m_pokey[pokey_num]->write(pokey_reg, data);
 }
 
 
@@ -149,29 +145,30 @@ WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( irobot_map, AS_PROGRAM, 8, irobot_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x1000, 0x103f) AM_READ_PORT("IN0")
-	AM_RANGE(0x1040, 0x1040) AM_READ_PORT("IN1")
-	AM_RANGE(0x1080, 0x1080) AM_READ(irobot_status_r)
-	AM_RANGE(0x10c0, 0x10c0) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1100, 0x1100) AM_WRITE(irobot_clearirq_w)
-	AM_RANGE(0x1140, 0x1140) AM_WRITE(irobot_statwr_w)
-	AM_RANGE(0x1180, 0x1180) AM_WRITE(irobot_out0_w)
-	AM_RANGE(0x11c0, 0x11c0) AM_WRITE(irobot_rom_banksel_w)
-	AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x1300, 0x13ff) AM_READ(irobot_control_r)
-	AM_RANGE(0x1400, 0x143f) AM_READWRITE(quad_pokeyn_r, quad_pokeyn_w)
-	AM_RANGE(0x1800, 0x18ff) AM_WRITE(irobot_paletteram_w)
-	AM_RANGE(0x1900, 0x19ff) AM_WRITEONLY            /* Watchdog reset */
-	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(irobot_clearfirq_w)
-	AM_RANGE(0x1b00, 0x1bff) AM_WRITE(irobot_control_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(irobot_sharedmem_r, irobot_sharedmem_w)
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x6000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void irobot_state::irobot_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x0800, 0x0fff).bankrw("bank2");
+	map(0x1000, 0x103f).portr("IN0");
+	map(0x1040, 0x1040).portr("IN1");
+	map(0x1080, 0x1080).r(this, FUNC(irobot_state::irobot_status_r));
+	map(0x10c0, 0x10c0).portr("DSW1");
+	map(0x1100, 0x1100).w(this, FUNC(irobot_state::irobot_clearirq_w));
+	map(0x1140, 0x1140).w(this, FUNC(irobot_state::irobot_statwr_w));
+	map(0x1180, 0x1180).w(this, FUNC(irobot_state::irobot_out0_w));
+	map(0x11c0, 0x11c0).w(this, FUNC(irobot_state::irobot_rom_banksel_w));
+	map(0x1200, 0x12ff).ram().w(this, FUNC(irobot_state::irobot_nvram_w)).share("nvram");
+	map(0x1300, 0x1300).mirror(0xff).r("adc", FUNC(adc0809_device::data_r));
+	map(0x1400, 0x143f).rw(this, FUNC(irobot_state::quad_pokeyn_r), FUNC(irobot_state::quad_pokeyn_w));
+	map(0x1800, 0x18ff).w(this, FUNC(irobot_state::irobot_paletteram_w));
+	map(0x1900, 0x19ff).writeonly();            /* Watchdog reset */
+	map(0x1a00, 0x1a00).w(this, FUNC(irobot_state::irobot_clearfirq_w));
+	map(0x1b00, 0x1b03).mirror(0xfc).w("adc", FUNC(adc0809_device::address_offset_start_w));
+	map(0x1c00, 0x1fff).ram().share("videoram");
+	map(0x2000, 0x3fff).rw(this, FUNC(irobot_state::irobot_sharedmem_r), FUNC(irobot_state::irobot_sharedmem_w));
+	map(0x4000, 0x5fff).bankr("bank1");
+	map(0x6000, 0xffff).rom();
+}
 
 
 
@@ -301,8 +298,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(irobot_state::irobot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK/8)
+	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(irobot_map)
+
+	MCFG_DEVICE_ADD("adc", ADC0809, MAIN_CLOCK / 16)
+	MCFG_ADC0808_IN0_CB(IOPORT("AN0"))
+	MCFG_ADC0808_IN1_CB(IOPORT("AN1"))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -328,17 +329,17 @@ MACHINE_CONFIG_START(irobot_state::irobot)
 	/* FIXME: I-Robot has all channels of the quad-pokey tied together
 	 *        This needs to be taken into account in the design.
 	 */
-	MCFG_SOUND_ADD("pokey1", POKEY, MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey1", POKEY, MAIN_CLOCK / 8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey2", POKEY, MAIN_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey3", POKEY, MAIN_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MAIN_CLOCK/8)
+	MCFG_SOUND_ADD("pokey4", POKEY, MAIN_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

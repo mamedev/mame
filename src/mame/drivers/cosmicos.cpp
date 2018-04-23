@@ -163,7 +163,7 @@ WRITE8_MEMBER( cosmicos_state::segment_w )
 
 	if ((m_counter > 0) && (m_counter < 9))
 	{
-		output().set_digit_value(10 - m_counter, data);
+		m_digits[10 - m_counter] = data;
 	}
 }
 
@@ -179,20 +179,22 @@ WRITE8_MEMBER( cosmicos_state::display_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( cosmicos_mem, AS_PROGRAM, 8, cosmicos_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void cosmicos_state::cosmicos_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(cosmicos_state::read), FUNC(cosmicos_state::write));
+}
 
-static ADDRESS_MAP_START( cosmicos_io, AS_IO, 8, cosmicos_state )
+void cosmicos_state::cosmicos_io(address_map &map)
+{
 //  AM_RANGE(0x00, 0x00)
-	AM_RANGE(0x01, 0x01) AM_READ(video_on_r)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(video_off_r, audio_latch_w)
+	map(0x01, 0x01).r(this, FUNC(cosmicos_state::video_on_r));
+	map(0x02, 0x02).rw(this, FUNC(cosmicos_state::video_off_r), FUNC(cosmicos_state::audio_latch_w));
 //  AM_RANGE(0x03, 0x03)
 //  AM_RANGE(0x04, 0x04)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(hex_keyboard_r, hex_keylatch_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(reset_counter_r, segment_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(data_r, display_w)
-ADDRESS_MAP_END
+	map(0x05, 0x05).rw(this, FUNC(cosmicos_state::hex_keyboard_r), FUNC(cosmicos_state::hex_keylatch_w));
+	map(0x06, 0x06).rw(this, FUNC(cosmicos_state::reset_counter_r), FUNC(cosmicos_state::segment_w));
+	map(0x07, 0x07).rw(this, FUNC(cosmicos_state::data_r), FUNC(cosmicos_state::display_w));
+}
 
 /* Input Ports */
 
@@ -206,7 +208,7 @@ INPUT_CHANGED_MEMBER( cosmicos_state::data )
 		if (!BIT(data, i))
 		{
 			m_data |= (1 << i);
-			output().set_led_value(LED_D0 - i, 1);
+			m_leds[LED_D0 - i] = 1;
 		}
 	}
 }
@@ -226,29 +228,29 @@ INPUT_CHANGED_MEMBER( cosmicos_state::single_step )
 
 void cosmicos_state::set_cdp1802_mode(int mode)
 {
-	output().set_led_value(LED_RUN, 0);
-	output().set_led_value(LED_LOAD, 0);
-	output().set_led_value(LED_PAUSE, 0);
-	output().set_led_value(LED_RESET, 0);
+	m_leds[LED_RUN] = 0;
+	m_leds[LED_LOAD] = 0;
+	m_leds[LED_PAUSE] = 0;
+	m_leds[LED_RESET] = 0;
 
 	switch (mode)
 	{
 	case MODE_RUN:
-		output().set_led_value(LED_RUN, 1);
+		m_leds[LED_RUN] = 1;
 
 		m_wait = 1;
 		m_clear = 1;
 		break;
 
 	case MODE_LOAD:
-		output().set_led_value(LED_LOAD, 1);
+		m_leds[LED_LOAD] = 1;
 
 		m_wait = 0;
 		m_clear = 0;
 		break;
 
 	case MODE_PAUSE:
-		output().set_led_value(LED_PAUSE, 1);
+		m_leds[LED_PAUSE] = 1;
 
 		m_wait = 1;
 		m_clear = 0;
@@ -262,7 +264,7 @@ void cosmicos_state::set_cdp1802_mode(int mode)
 		m_clear = 0;
 		m_boot = 1;
 
-		output().set_led_value(LED_RESET, 1);
+		m_leds[LED_RESET] = 1;
 		break;
 	}
 }
@@ -280,7 +282,7 @@ void cosmicos_state::clear_input_data()
 
 	for (i = 0; i < 8; i++)
 	{
-		output().set_led_value(LED_D0 - i, 0);
+		m_leds[LED_D0 - i] = 0;
 	}
 }
 
@@ -356,9 +358,11 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::digit_tick)
 {
-	m_digit = !m_digit;
+// commented this out because (a) m_digit isn't initialised anywhere,
+// and (b) writing to a negative digit is not a good idea.
+//  m_digit = !m_digit;
 
-	output().set_digit_value(m_digit, m_segment);
+//  m_digits[m_digit] = m_segment;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)
@@ -400,7 +404,7 @@ READ_LINE_MEMBER( cosmicos_state::ef2_r )
 	uint8_t special = m_special->read();
 	int casin = (m_cassette)->input() < 0.0;
 
-	output().set_led_value(LED_CASSETTE, casin);
+	m_leds[LED_CASSETTE] = casin;
 
 	return BIT(special, 1) | BIT(special, 3) | casin;
 }
@@ -458,6 +462,9 @@ WRITE8_MEMBER( cosmicos_state::sc_w )
 
 void cosmicos_state::machine_start()
 {
+	m_digits.resolve();
+	m_leds.resolve();
+
 	/* initialize LED display */
 	m_led->rbi_w(1);
 

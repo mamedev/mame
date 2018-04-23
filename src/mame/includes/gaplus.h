@@ -93,10 +93,8 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	INTERRUPT_GEN_MEMBER(vblank_main_irq);
-	INTERRUPT_GEN_MEMBER(gapluso_vblank_main_irq);
-	INTERRUPT_GEN_MEMBER(vblank_sub_irq);
-	INTERRUPT_GEN_MEMBER(vblank_sub2_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(gapluso_vblank_irq);
 	TIMER_CALLBACK_MEMBER(namcoio0_run);
 	TIMER_CALLBACK_MEMBER(namcoio1_run);
 
@@ -109,6 +107,9 @@ public:
 	void gapluso(machine_config &config);
 	void gaplusd(machine_config &config);
 	void gaplus(machine_config &config);
+	void cpu1_map(address_map &map);
+	void cpu2_map(address_map &map);
+	void cpu3_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

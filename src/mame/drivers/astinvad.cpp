@@ -95,6 +95,10 @@ public:
 	void spcking2(machine_config &config);
 	void spaceint(machine_config &config);
 	void kamikaze(machine_config &config);
+	void kamikaze_map(address_map &map);
+	void kamikaze_portmap(address_map &map);
+	void spaceint_map(address_map &map);
+	void spaceint_portmap(address_map &map);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
@@ -471,35 +475,39 @@ WRITE8_MEMBER(astinvad_state::spaceint_sound2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( kamikaze_map, AS_PROGRAM, 8, astinvad_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
-ADDRESS_MAP_END
+void astinvad_state::kamikaze_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x1bff).rom();
+	map(0x1c00, 0x1fff).ram();
+	map(0x2000, 0x3fff).ram().share("videoram");
+}
 
 
-static ADDRESS_MAP_START( spaceint_map, AS_PROGRAM, 8, astinvad_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void astinvad_state::spaceint_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+	map(0x4000, 0x5fff).ram().w(this, FUNC(astinvad_state::spaceint_videoram_w)).share("videoram");
+}
 
 
-static ADDRESS_MAP_START( kamikaze_portmap, AS_IO, 8, astinvad_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(kamikaze_ppi_r, kamikaze_ppi_w)
-ADDRESS_MAP_END
+void astinvad_state::kamikaze_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(astinvad_state::kamikaze_ppi_r), FUNC(astinvad_state::kamikaze_ppi_w));
+}
 
 
-static ADDRESS_MAP_START( spaceint_portmap, AS_IO, 8, astinvad_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_WRITE(spaceint_sound1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(color_latch_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(spaceint_sound2_w)
-ADDRESS_MAP_END
+void astinvad_state::spaceint_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).w(this, FUNC(astinvad_state::spaceint_sound1_w));
+	map(0x03, 0x03).w(this, FUNC(astinvad_state::color_latch_w));
+	map(0x04, 0x04).w(this, FUNC(astinvad_state::spaceint_sound2_w));
+}
 
 
 
@@ -691,7 +699,8 @@ MACHINE_CONFIG_START(astinvad_state::kamikaze)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(astinvad_state::spcking2, kamikaze)
+MACHINE_CONFIG_START(astinvad_state::spcking2)
+	kamikaze(config);
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("ppi8255_1")

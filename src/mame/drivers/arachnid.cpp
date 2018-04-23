@@ -110,6 +110,7 @@ public:
 
 	uint8_t read_keyboard(int pa);
 	void arachnid(machine_config &config);
+	void arachnid_map(address_map &map);
 };
 
 /***************************************************************************
@@ -120,15 +121,16 @@ public:
     ADDRESS_MAP( arachnid_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( arachnid_map, AS_PROGRAM, 8, arachnid_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE(PTM6840_TAG, ptm6840_device, read, write)
-	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE(PIA6821_U4_TAG, pia6821_device, read, write)
-	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE(PIA6821_U17_TAG, pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(TMS9118_TAG, tms9928a_device, vram_write)
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE(TMS9118_TAG, tms9928a_device, register_write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6809_TAG, 0)
-ADDRESS_MAP_END
+void arachnid_state::arachnid_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2000, 0x2007).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0x4004, 0x4007).rw(m_pia_u4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4008, 0x400b).rw(m_pia_u17, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x6000).w(TMS9118_TAG, FUNC(tms9928a_device::vram_write));
+	map(0x6002, 0x6002).w(TMS9118_TAG, FUNC(tms9928a_device::register_write));
+	map(0x8000, 0xffff).rom().region(M6809_TAG, 0);
+}
 
 /***************************************************************************
     INPUT PORTS
@@ -454,7 +456,7 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL(8'000'000) / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITELINE(arachnid_state, ptm_o1_callback))
+	MCFG_PTM6840_O1_CB(WRITELINE(arachnid_state, ptm_o1_callback))
 MACHINE_CONFIG_END
 
 /***************************************************************************

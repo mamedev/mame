@@ -95,6 +95,9 @@ public:
 	void svi318(machine_config &config);
 	void svi318n(machine_config &config);
 	void svi328(machine_config &config);
+	void svi3x8_io(address_map &map);
+	void svi3x8_io_bank(address_map &map);
+	void svi3x8_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -130,29 +133,32 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( svi3x8_mem, AS_PROGRAM, 8, svi3x8_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
-ADDRESS_MAP_END
+void svi3x8_state::svi3x8_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(svi3x8_state::mreq_r), FUNC(svi3x8_state::mreq_w));
+}
 
-static ADDRESS_MAP_START( svi3x8_io, AS_IO, 8, svi3x8_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_DEVICE("io", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void svi3x8_state::svi3x8_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).m(m_io, FUNC(address_map_bank_device::amap8));
+}
 
-static ADDRESS_MAP_START( svi3x8_io_bank, AS_PROGRAM, 8, svi3x8_state )
-	AM_RANGE(0x000, 0x0ff) AM_DEVREADWRITE("exp", svi_expander_device, iorq_r, iorq_w)
-	AM_RANGE(0x100, 0x17f) AM_DEVREADWRITE("exp", svi_expander_device, iorq_r, iorq_w)
-	AM_RANGE(0x180, 0x180) AM_MIRROR(0x22) AM_DEVWRITE("vdp", tms9928a_device, vram_write)
-	AM_RANGE(0x181, 0x181) AM_MIRROR(0x22) AM_DEVWRITE("vdp", tms9928a_device, register_write)
-	AM_RANGE(0x184, 0x184) AM_MIRROR(0x22) AM_DEVREAD("vdp", tms9928a_device, vram_read)
-	AM_RANGE(0x185, 0x185) AM_MIRROR(0x22) AM_DEVREAD("vdp", tms9928a_device, register_read)
-	AM_RANGE(0x188, 0x188) AM_MIRROR(0x23) AM_DEVWRITE("psg", ay8910_device, address_w)
-	AM_RANGE(0x18c, 0x18c) AM_MIRROR(0x23) AM_DEVWRITE("psg", ay8910_device, data_w)
-	AM_RANGE(0x190, 0x190) AM_MIRROR(0x23) AM_DEVREAD("psg", ay8910_device, data_r)
-	AM_RANGE(0x194, 0x197) AM_DEVWRITE("ppi", i8255_device, write)
-	AM_RANGE(0x198, 0x19a) AM_DEVREAD("ppi", i8255_device, read)
-ADDRESS_MAP_END
+void svi3x8_state::svi3x8_io_bank(address_map &map)
+{
+	map(0x000, 0x0ff).rw(m_expander, FUNC(svi_expander_device::iorq_r), FUNC(svi_expander_device::iorq_w));
+	map(0x100, 0x17f).rw(m_expander, FUNC(svi_expander_device::iorq_r), FUNC(svi_expander_device::iorq_w));
+	map(0x180, 0x180).mirror(0x22).w(m_vdp, FUNC(tms9928a_device::vram_write));
+	map(0x181, 0x181).mirror(0x22).w(m_vdp, FUNC(tms9928a_device::register_write));
+	map(0x184, 0x184).mirror(0x22).r(m_vdp, FUNC(tms9928a_device::vram_read));
+	map(0x185, 0x185).mirror(0x22).r(m_vdp, FUNC(tms9928a_device::register_read));
+	map(0x188, 0x188).mirror(0x23).w("psg", FUNC(ay8910_device::address_w));
+	map(0x18c, 0x18c).mirror(0x23).w("psg", FUNC(ay8910_device::data_w));
+	map(0x190, 0x190).mirror(0x23).r("psg", FUNC(ay8910_device::data_r));
+	map(0x194, 0x197).w("ppi", FUNC(i8255_device::write));
+	map(0x198, 0x19a).r("ppi", FUNC(i8255_device::read));
+}
 
 
 //**************************************************************************
@@ -583,7 +589,8 @@ MACHINE_CONFIG_START(svi3x8_state::svi318)
 	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(svi3x8_state, excs_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(svi3x8_state::svi318n, svi318)
+MACHINE_CONFIG_START(svi3x8_state::svi318n)
+	svi318(config);
 	MCFG_DEVICE_REMOVE("vdp")
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_DEVICE_ADD("vdp", TMS9928A, XTAL(10'738'635) / 2)
@@ -593,13 +600,15 @@ MACHINE_CONFIG_DERIVED(svi3x8_state::svi318n, svi318)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(svi3x8_state::svi328, svi318)
+MACHINE_CONFIG_START(svi3x8_state::svi328)
+	svi318(config);
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(svi3x8_state::svi328n, svi318n)
+MACHINE_CONFIG_START(svi3x8_state::svi328n)
+	svi318n(config);
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

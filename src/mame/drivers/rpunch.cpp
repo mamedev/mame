@@ -202,24 +202,25 @@ WRITE8_MEMBER(rpunch_state::upd_data_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("bitmapram")
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
-	AM_RANGE(0x0c0008, 0x0c0009) AM_SELECT(0x20) AM_WRITE8(rpunch_gga_w, 0x00ff)
-	AM_RANGE(0x0c000c, 0x0c000d) AM_WRITE(rpunch_videoreg_w)
-	AM_RANGE(0x0c000e, 0x0c000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x0c0010, 0x0c0013) AM_WRITE(rpunch_ins_w)
-	AM_RANGE(0x0c0018, 0x0c0019) AM_READ_PORT("P1")
-	AM_RANGE(0x0c001a, 0x0c001b) AM_READ_PORT("P2")
-	AM_RANGE(0x0c001c, 0x0c001d) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c001e, 0x0c001f) AM_READ(sound_busy_r)
-	AM_RANGE(0x0fc000, 0x0fffff) AM_RAM
-ADDRESS_MAP_END
+void rpunch_state::main_map(address_map &map)
+{
+	map.global_mask(0xfffff);
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x04ffff).ram().share("bitmapram");
+	map(0x060000, 0x060fff).ram().share("spriteram");
+	map(0x080000, 0x083fff).ram().w(this, FUNC(rpunch_state::rpunch_videoram_w)).share("videoram");
+	map(0x0a0000, 0x0a07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0c0000, 0x0c0007).w(this, FUNC(rpunch_state::rpunch_scrollreg_w));
+	map(0x0c0009, 0x0c0009).select(0x20).w(this, FUNC(rpunch_state::rpunch_gga_w));
+	map(0x0c000c, 0x0c000d).w(this, FUNC(rpunch_state::rpunch_videoreg_w));
+	map(0x0c000f, 0x0c000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0c0010, 0x0c0013).w(this, FUNC(rpunch_state::rpunch_ins_w));
+	map(0x0c0018, 0x0c0019).portr("P1");
+	map(0x0c001a, 0x0c001b).portr("P2");
+	map(0x0c001c, 0x0c001d).portr("DSW");
+	map(0x0c001e, 0x0c001f).r(this, FUNC(rpunch_state::sound_busy_r));
+	map(0x0fc000, 0x0fffff).ram();
+}
 
 
 
@@ -229,14 +230,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, rpunch_state )
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf200, 0xf200) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(upd_control_w)
-	AM_RANGE(0xf600, 0xf600) AM_WRITE(upd_data_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void rpunch_state::sound_map(address_map &map)
+{
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xf200, 0xf200).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xf400, 0xf400).w(this, FUNC(rpunch_state::upd_control_w));
+	map(0xf600, 0xf600).w(this, FUNC(rpunch_state::upd_data_w));
+	map(0xf800, 0xffff).ram();
+}
 
 
 
@@ -255,7 +257,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, nullptr)
 
 	PORT_START("P2")    /* c001a lower 8 bits */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -265,7 +267,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, nullptr)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, nullptr)
 
 	PORT_START("SERVICE")   /* c0018/c001a upper 8 bits */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -499,7 +501,8 @@ MACHINE_CONFIG_START(rpunch_state::rpunch)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(rpunch_state::svolley, rpunch)
+MACHINE_CONFIG_START(rpunch_state::svolley)
+	rpunch(config);
 	MCFG_VIDEO_START_OVERRIDE(rpunch_state,svolley)
 MACHINE_CONFIG_END
 

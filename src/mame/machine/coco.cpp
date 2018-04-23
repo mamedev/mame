@@ -89,6 +89,7 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_dac(*this, "dac"),
 	m_sbs(*this, "sbs"),
 	m_wave(*this, WAVE_TAG),
+	m_screen(*this, SCREEN_TAG),
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),
 	m_cassette(*this, "cassette"),
@@ -273,17 +274,17 @@ uint8_t coco_state::floating_bus_read()
 		uint16_t pc = m_maincpu->pc();
 
 		// get the byte; and skip over header bytes
-		uint8_t byte = cpu_address_space().read_byte(prev_pc);
+		uint8_t byte = m_maincpu->space().read_byte(prev_pc);
 		if ((byte == 0x10) || (byte == 0x11))
-			byte = cpu_address_space().read_byte(++prev_pc);
+			byte = m_maincpu->space().read_byte(++prev_pc);
 
 		// check to see if the opcode specifies the indexed addressing mode, and the secondary byte
 		// specifies no-offset
 		bool is_nooffset_indexed = (((byte & 0xF0) == 0x60) || ((byte & 0xF0) == 0xA0) || ((byte & 0xF0) == 0xE0))
-			&& ((cpu_address_space().read_byte(prev_pc + 1) & 0xBF) == 0x84);
+			&& ((m_maincpu->space().read_byte(prev_pc + 1) & 0xBF) == 0x84);
 
 		// finally read the byte
-		result = cpu_address_space().read_byte(is_nooffset_indexed ? pc : 0xFFFF);
+		result = m_maincpu->space().read_byte(is_nooffset_indexed ? pc : 0xFFFF);
 
 		// we're done reading
 		m_in_floating_bus_read = false;
@@ -619,7 +620,7 @@ void coco_state::recalculate_irq(void)
 	bool line = irq_get_line();
 	if (LOG_INTERRUPTS)
 		logerror("recalculate_irq():  line=%d\n", line ? 1 : 0);
-	maincpu().set_input_line(M6809_IRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -645,7 +646,7 @@ void coco_state::recalculate_firq(void)
 	bool line = firq_get_line();
 	if (LOG_INTERRUPTS)
 		logerror("recalculate_firq():  line=%d\n", line ? 1 : 0);
-	maincpu().set_input_line(M6809_FIRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, line ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -837,7 +838,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			/* get the vertical position of the lightgun */
 			dclg_vpos = analog->input(joystick, 1);
 
-			if (machine().first_screen()->vpos() == dclg_vpos)
+			if (m_screen->vpos() == dclg_vpos)
 			{
 				/* if gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
 				m_dclg_output_h |= 0x02;
@@ -849,7 +850,7 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 			if (m_dclg_state == 7)
 			{
 				/* while in state 7, prepare to check next video frame for a hit */
-				attotime dclg_time = machine().first_screen()->time_until_pos(dclg_vpos, 0);
+				attotime dclg_time = m_screen->time_until_pos(dclg_vpos, 0);
 				m_diecom_lightgun_timer->adjust(dclg_time);
 			}
 			break;
@@ -1108,7 +1109,7 @@ void coco_state::poll_hires_joystick(void)
 			double value = m_joystick.input(joystick_index, axis) / 255.0;
 			value *= is_cocomax3 ? 2500.0 : 4160.0;
 			value += is_cocomax3 ? 400.0 : 592.0;
-			attotime duration = maincpu().clocks_to_attotime((uint64_t) value) * 2;
+			attotime duration = m_maincpu->clocks_to_attotime((uint64_t) value) * 2;
 			m_hiresjoy_transition_timer[axis]->adjust(duration);
 		}
 		else if (!m_hiresjoy_ca && newvalue)

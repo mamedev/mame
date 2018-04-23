@@ -35,19 +35,21 @@ public:
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mpu4plasma(machine_config &config);
+	void mpu4plasma_map(address_map &map);
 };
 
 INPUT_PORTS_EXTERN( mpu4 );
 
-static ADDRESS_MAP_START( mpu4plasma_map, AS_PROGRAM, 16, mpu4plasma_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+void mpu4plasma_state::mpu4plasma_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
 
 	// why does it test this much ram, just sloppy code expecting mirroring?
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_SHARE("plasmaram")
+	map(0x400000, 0x4fffff).ram().share("plasmaram");
 	// comms?
-	AM_RANGE(0xffff00, 0xffff01) AM_READ( mpu4plasma_unk_r )
-	AM_RANGE(0xffff04, 0xffff05) AM_WRITE( mpu4plasma_unk_w )
-ADDRESS_MAP_END
+	map(0xffff00, 0xffff01).r(this, FUNC(mpu4plasma_state::mpu4plasma_unk_r));
+	map(0xffff04, 0xffff05).w(this, FUNC(mpu4plasma_state::mpu4plasma_unk_w));
+}
 
 uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -84,7 +86,8 @@ uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitma
 }
 
 
-MACHINE_CONFIG_DERIVED(mpu4plasma_state::mpu4plasma, mod2)
+MACHINE_CONFIG_START(mpu4plasma_state::mpu4plasma)
+	mod2(config);
 	MCFG_CPU_ADD("plasmacpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(mpu4plasma_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mpu4plasma_state,  irq4_line_hold)

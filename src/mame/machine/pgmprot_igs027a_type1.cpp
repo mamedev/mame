@@ -165,39 +165,43 @@ WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_shareram_w )
 /* 55857E? */
 /* Knights of Valor, Photo Y2k */
 /*  no execute only space? */
-static ADDRESS_MAP_START( kov_map, AS_PROGRAM, 16, pgm_arm_type1_state )
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x4f0000, 0x4f003f) AM_READWRITE(pgm_arm7_type1_ram_r, pgm_arm7_type1_ram_w) /* ARM7 Shared RAM */
-	AM_RANGE(0x500000, 0x500005) AM_READWRITE(pgm_arm7_type1_68k_protlatch_r, pgm_arm7_type1_68k_protlatch_w) /* ARM7 Latch */
-ADDRESS_MAP_END
+void pgm_arm_type1_state::kov_map(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x4effff).bankr("bank1"); /* Game ROM */
+	map(0x4f0000, 0x4f003f).rw(this, FUNC(pgm_arm_type1_state::pgm_arm7_type1_ram_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_ram_w)); /* ARM7 Shared RAM */
+	map(0x500000, 0x500005).rw(this, FUNC(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_w)); /* ARM7 Latch */
+}
 
-static ADDRESS_MAP_START( 55857E_arm7_map, AS_PROGRAM, 32, pgm_arm_type1_state )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-	AM_RANGE(0x08100000, 0x083fffff) AM_READ(pgm_arm7_type1_exrom_r) // unpopulated, returns 0 to keep checksum happy
-	AM_RANGE(0x10000000, 0x100003ff) AM_RAM // internal ram for asic
-	AM_RANGE(0x40000000, 0x40000003) AM_READWRITE(pgm_arm7_type1_protlatch_r, pgm_arm7_type1_protlatch_w)
-	AM_RANGE(0x40000008, 0x4000000b) AM_WRITENOP // ?
-	AM_RANGE(0x4000000c, 0x4000000f) AM_READ(pgm_arm7_type1_unk_r)
-	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE(pgm_arm7_type1_shareram_r, pgm_arm7_type1_shareram_w) AM_SHARE("arm7_shareram")
-	AM_RANGE(0x50000000, 0x500003ff) AM_RAM // uploads xor table to decrypt 68k rom here
-ADDRESS_MAP_END
+void pgm_arm_type1_state::_55857E_arm7_map(address_map &map)
+{
+	map(0x00000000, 0x00003fff).rom();
+	map(0x08100000, 0x083fffff).r(this, FUNC(pgm_arm_type1_state::pgm_arm7_type1_exrom_r)); // unpopulated, returns 0 to keep checksum happy
+	map(0x10000000, 0x100003ff).ram(); // internal ram for asic
+	map(0x40000000, 0x40000003).rw(this, FUNC(pgm_arm_type1_state::pgm_arm7_type1_protlatch_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_protlatch_w));
+	map(0x40000008, 0x4000000b).nopw(); // ?
+	map(0x4000000c, 0x4000000f).r(this, FUNC(pgm_arm_type1_state::pgm_arm7_type1_unk_r));
+	map(0x50800000, 0x5080003f).rw(this, FUNC(pgm_arm_type1_state::pgm_arm7_type1_shareram_r), FUNC(pgm_arm_type1_state::pgm_arm7_type1_shareram_w)).share("arm7_shareram");
+	map(0x50000000, 0x500003ff).ram(); // uploads xor table to decrypt 68k rom here
+}
 
 
 
 
 /**************************** SIMULATIONS *****************************/
 
-static ADDRESS_MAP_START( kov_sim_map, AS_PROGRAM, 16, pgm_arm_type1_state )
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK("bank1") /* Game ROM */
-ADDRESS_MAP_END
+void pgm_arm_type1_state::kov_sim_map(address_map &map)
+{
+	pgm_mem(map);
+	map(0x100000, 0x4effff).bankr("bank1"); /* Game ROM */
+}
 
-static ADDRESS_MAP_START( cavepgm_mem, AS_PROGRAM, 16, pgm_arm_type1_state )
-	AM_IMPORT_FROM(pgm_base_mem)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+void pgm_arm_type1_state::cavepgm_mem(address_map &map)
+{
+	pgm_base_mem(map);
+	map(0x000000, 0x3fffff).rom();
 	/* protection devices installed (simulated) later */
-ADDRESS_MAP_END
+}
 
 
 MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
@@ -212,7 +216,7 @@ MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
 }
 
 MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
-	MCFG_FRAGMENT_ADD(pgmbase)
+	pgmbase(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
@@ -223,23 +227,25 @@ MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
 	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pgm_arm_type1_state::pgm_arm_type1_sim, pgm_arm_type1_cave)
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_sim)
+	pgm_arm_type1_cave(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kov_sim_map)
 
 	/* protection CPU */
 	MCFG_CPU_ADD("prot", ARM7, 20000000 )   // 55857E?
-	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
+	MCFG_CPU_PROGRAM_MAP(_55857E_arm7_map)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pgm_arm_type1_state::pgm_arm_type1, pgm_arm_type1_cave)
+MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1)
+	pgm_arm_type1_cave(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kov_map)
 
 	/* protection CPU */
 	MCFG_CPU_ADD("prot", ARM7, 20000000)    // 55857E?
-	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
+	MCFG_CPU_PROGRAM_MAP(_55857E_arm7_map)
 MACHINE_CONFIG_END
 
 void pgm_arm_type1_state::pgm_arm7_type1_latch_init()
@@ -536,21 +542,21 @@ void pgm_arm_type1_state::command_handler_ddp3(int pc)
 			break;
 
 		case 0x67: // set high bits
-	//      printf("%s command %02x | %04x\n", machine().describe_context(), m_ddp3lastcommand, m_value0);
+	//      printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
 			m_curslots = (m_value0 & 0xff00)>>8;
 			m_slots[m_curslots] = (m_value0 & 0x00ff) << 16;
 			break;
 
 		case 0xe5: // set low bits for operation?
-		//  printf("%s command %02x | %04x\n", machine().describe_context(), m_ddp3lastcommand, m_value0);
+		//  printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = 0x880000;
 			m_slots[m_curslots] |= (m_value0 & 0xffff);
 			break;
 
 
 		case 0x8e: // read back result of operations
-	//      printf("%s command %02x | %04x\n", machine().describe_context(), m_ddp3lastcommand, m_value0);
+	//      printf("%s command %02x | %04x\n", machine().describe_context().c_str(), m_ddp3lastcommand, m_value0);
 			m_valueresponse = m_slots[m_value0&0xff];
 			break;
 

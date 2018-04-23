@@ -110,16 +110,18 @@ public:
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
 	void maygayew(machine_config &config);
+	void maygayew_map(address_map &map);
 };
 
 
 
-static ADDRESS_MAP_START( maygayew_map, AS_PROGRAM, 16, maygayew_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("mainrom",0)
-	AM_RANGE(0x100000, 0x13ffff) AM_ROM AM_REGION("mainrom",0)
-	AM_RANGE(0x200000, 0x23ffff) AM_ROM AM_REGION("mainrom",0)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void maygayew_state::maygayew_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().region("mainrom", 0);
+	map(0x100000, 0x13ffff).rom().region("mainrom", 0);
+	map(0x200000, 0x23ffff).rom().region("mainrom", 0);
+	map(0xff0000, 0xffffff).ram();
+}
 
 
 static INPUT_PORTS_START( maygayew )

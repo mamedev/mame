@@ -11,6 +11,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_textram(*this, "textram"),
 		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu"),
 		m_cus30(*this, "namco"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
@@ -21,6 +22,7 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_textram;
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -56,4 +58,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	void set_scroll(int layer);
 	void baraduke(machine_config &config);
+	void baraduke_map(address_map &map);
+	void mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
 };

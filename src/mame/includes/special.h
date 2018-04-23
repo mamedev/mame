@@ -109,6 +109,11 @@ public:
 	void specimx(machine_config &config);
 	void specialp(machine_config &config);
 	void specialm(machine_config &config);
+	void erik_io_map(address_map &map);
+	void erik_mem(address_map &map);
+	void specialist_mem(address_map &map);
+	void specialp_mem(address_map &map);
+	void specimx_mem(address_map &map);
 private:
 	void specimx_set_bank(offs_t i, uint8_t data);
 	void erik_set_bank();

@@ -26,6 +26,8 @@ public:
 	MC6845_UPDATE_ROW( t1000_gfx_2bpp_tga_update_row );
 	MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row );
 
+	void vram_map(address_map &map);
+
 protected:
 	// used in tandy1000hx; used in pcjr???
 	struct reg
@@ -96,7 +98,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( disable_w );
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

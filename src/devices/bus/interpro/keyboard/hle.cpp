@@ -11,8 +11,8 @@
  * function keys in groups of 9, 36 and 12 from left to right.
  *
  * The following describes the key labels and positions according to the
- * standard US English keyboard layout. It's unknown what other variations
- * existed at this point.
+ * standard US English keyboard layout. At least a German keyboard variant is
+ * known to have existed.
  *
  * Upper bank keys indicated here with asterisks are printed in white, as are
  * all the A*, B* and C* keys; all the others are printed in brown.
@@ -68,23 +68,30 @@
  *
  *    From Host       Purpose      Expected Response
  *    ---------       -------      -----------------
- *    <esc> D         Diagnostic   0xff <status>, where status bits are set to
+ *    0x1b 0x42 <xx>  probably controls several functions:
+ *
+ *              0x01  sound bell?
+ *              0x04  keyclick on
+ *              0x08  membrane click on
+ *              0x20  bell tone loud/soft/none? (seems only loud/none)
+ *
+ *    0x1b 0x44       reset/diag   0xff <status>, where status bits are set to
  *                                 indicate diagnostic failure source: 0x8=EPROM
  *                                 checksum, 0x10=RAM error, 0x20=ROM checksum
  *
- *    <esc> B (       Bell On      None
- *
- *    <esc> B )       Bell Off     None
- *
- *    <esc> B <byte>  Unknown      None
+ *    0x1b 0x55       activate scan code keyup/down mode?
  *
  * The keyboard has a keyboard click function, and the LED indicators described
  * earlier, meaning that there are additional commands to enable and disable
  * these functions.
  *
- * The keyboard transmits ASCII codes corresponding to the keycap labels for
- * keys which map to the ASCII character set. Modifiers are applied by the
- * keyboard itself, and do not generate make/break codes of their own.
+ * The keyboard has at least two operating modes: a simple ASCII mode which is
+ * active after reset, and a scancode mode generating make/break codes with
+ * full support for all the qualifiers and other non-ASCII keys.
+ *
+ * In ASCII mode, the keyboard transmits ASCII codes corresponding to the key
+ * labels for keys which map to the ASCII character set. Modifiers are applied
+ * by the keyboard itself, and do not generate make/break codes of their own.
  *
  * The following non-ASCII sequences are recognised in the system software,
  * and likely correspond to specific keyboard keys or buttons:
@@ -101,6 +108,7 @@
  *   - auto-repeat
  *   - key click and LED commands
  *   - alternative layouts
+ *   - scancode make/break mode
  *
  */
 #include "emu.h"
@@ -389,39 +397,43 @@ void hle_device_base::received_byte(u8 byte)
 
 	switch (m_rx_state)
 	{
-	case RX_ESC:
+	case RX_COMMAND:
 		switch (byte)
 		{
-		case 'B': // bell
-			m_rx_state = RX_BELL;
+		case 0x42: // configure flags
+			m_rx_state = RX_FLAGS;
 			break;
 
-		case 'D': // diagnostic
+		case 0x44: // reset/diagnostic
 			transmit_byte(0xff);
 			transmit_byte(0x00);
 
 			m_rx_state = RX_IDLE;
 			break;
+
+		case 0x55:
+			break;
 		}
 		break;
 
-	case RX_BELL:
+	case RX_FLAGS:
+		// FIXME: this logic is wrong (should decode the various fields), but
+		// generates bell sounds at the right time for now
 		switch (byte)
 		{
-		case '(':
+		case 0x28:
 			LOG("bell on\n");
 			m_beeper_state |= u8(BEEPER_BELL);
 			m_beeper->set_state(m_beeper_state ? 1 : 0);
 			break;
 
-		case ')':
+		case 0x29:
 			LOG("bell off\n");
 			m_beeper_state &= ~u8(BEEPER_BELL);
 			m_beeper->set_state(m_beeper_state ? 1 : 0);
 			break;
 
 		default:
-			// FIXME: boot code sends 0x8, unknown meaning
 			break;
 		}
 		m_rx_state = RX_IDLE;
@@ -429,7 +441,7 @@ void hle_device_base::received_byte(u8 byte)
 
 	case RX_IDLE:
 		if (byte == 0x1b)
-			m_rx_state = RX_ESC;
+			m_rx_state = RX_COMMAND;
 		break;
 	}
 }

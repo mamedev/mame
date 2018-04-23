@@ -128,4 +128,9 @@ public:
 	void helifire_sound(machine_config &config);
 	void spacefev(machine_config &config);
 	void spacefev_sound(machine_config &config);
+	void helifire_main_cpu_map(address_map &map);
+	void helifire_sound_io_map(address_map &map);
+	void main_cpu_map(address_map &map);
+	void main_io_map(address_map &map);
+	void n8080_sound_cpu_map(address_map &map);
 };

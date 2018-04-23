@@ -22,6 +22,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
 		, m_row(*this, "ROW.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(ctrl_r);
@@ -30,43 +31,46 @@ public:
 	DECLARE_WRITE8_MEMBER(data_w);
 	DECLARE_READ_LINE_MEMBER(serial_r);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
-	uint8_t m_t_c;
-	uint8_t m_out_offs;
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_p_ram;
-	required_ioport_array<6> m_row;
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
 	void zac_2(machine_config &config);
-protected:
-
-	// devices
-
-	// driver_device overrides
-	virtual void machine_reset() override;
+	void zac_2_data(address_map &map);
+	void zac_2_io(address_map &map);
+	void zac_2_map(address_map &map);
 private:
 	uint8_t m_input_line;
+	uint8_t m_t_c;
+	uint8_t m_out_offs;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_ram;
+	required_ioport_array<6> m_row;
+	output_finder<78> m_digits;
 };
 
 
-static ADDRESS_MAP_START( zac_2_map, AS_PROGRAM, 8, zac_2_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x17ff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6400) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x2000, 0x27ff) AM_ROM
-	AM_RANGE(0x2800, 0x37ff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_ROM
-ADDRESS_MAP_END
+void zac_2_state::zac_2_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x17ff).mirror(0x4000).rom();
+	map(0x1800, 0x1bff).mirror(0x6400).ram().share("ram");
+	map(0x2000, 0x27ff).rom();
+	map(0x2800, 0x37ff).mirror(0x4000).rom();
+	map(0x4000, 0x47ff).rom();
+	map(0x6000, 0x67ff).rom();
+}
 
-static ADDRESS_MAP_START(zac_2_io, AS_IO, 8, zac_2_state)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void zac_2_state::zac_2_io(address_map &map)
+{
+	map.unmap_value_high();
+}
 
-static ADDRESS_MAP_START(zac_2_data, AS_DATA, 8, zac_2_state)
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(ctrl_r,ctrl_w)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(data_r,data_w)
-ADDRESS_MAP_END
+void zac_2_state::zac_2_data(address_map &map)
+{
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(zac_2_state::ctrl_r), FUNC(zac_2_state::ctrl_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(zac_2_state::data_r), FUNC(zac_2_state::data_w));
+}
 
 static INPUT_PORTS_START( zac_2 )
 	PORT_START("DSW")
@@ -201,7 +205,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 	{
 		uint8_t display = (m_out_offs >> 3) & 7;
 		uint8_t digit = m_out_offs & 7;
-		output().set_digit_value(display * 10 + digit, patterns[m_p_ram[m_out_offs]&15]);
+		m_digits[display * 10 + digit] = patterns[m_p_ram[m_out_offs]&15];
 	}
 }
 

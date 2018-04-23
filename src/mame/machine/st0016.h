@@ -15,7 +15,7 @@ typedef device_delegate<uint8_t (void)> st0016_dma_offs_delegate;
 #define ST0016_DMA_OFFS_CB(name)  uint8_t name(void)
 
 #define MCFG_ST0016_DMA_OFFS_CB(_class, _method) \
-	st0016_cpu_device::set_dma_offs_callback(*device, st0016_dma_offs_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<st0016_cpu_device &>(*device).set_dma_offs_callback(st0016_dma_offs_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class st0016_cpu_device : public z80_device, public device_gfx_interface
@@ -23,7 +23,7 @@ class st0016_cpu_device : public z80_device, public device_gfx_interface
 public:
 	st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-	static void set_dma_offs_callback(device_t &device, st0016_dma_offs_delegate callback) { downcast<st0016_cpu_device &>(device).m_dma_offs_cb = callback; }
+	template <typename Object> void set_dma_offs_callback(Object &&callback) { m_dma_offs_cb = std::forward<Object>(callback); }
 
 	DECLARE_WRITE8_MEMBER(st0016_sprite_bank_w);
 	DECLARE_WRITE8_MEMBER(st0016_palette_bank_w);
@@ -61,6 +61,8 @@ public:
 	int st0016_ramgfx;
 	std::unique_ptr<uint8_t[]> m_charram;
 
+	void st0016_cpu_internal_io_map(address_map &map);
+	void st0016_cpu_internal_map(address_map &map);
 protected:
 	bool ismacs() const { return m_game_flag & 0x80; }
 	bool ismacs1() const { return (m_game_flag & 0x180) == 0x180; }
@@ -94,6 +96,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	required_device<screen_device> m_screen;
+	required_memory_region m_rom;
 
 private:
 	uint8_t m_dma_offset;

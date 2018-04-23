@@ -251,6 +251,8 @@ public:
 	int mole_state_b[6];
 
 	void kenseim(machine_config &config);
+	void kenseim_io_map(address_map &map);
+	void kenseim_map(address_map &map);
 };
 
 
@@ -269,7 +271,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 {
 	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 times, with the last write being some terminator?)
 
-//  printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context(), data);
+//  printf("%s mb8936 write %02x to port C but no handler assigned (serial data?)\n", machine().describe_context().c_str(), data);
 
 	if (data & 0x08)
 	{
@@ -304,7 +306,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 
 WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 {
-	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
+	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context().c_str(), data);
 
 
 	for (int i = 0; i < 6; i++)
@@ -323,7 +325,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 
 WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 {
-	//if (data&0xc0) printf("%s mb8936 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
+	//if (data&0xc0) printf("%s mb8936 write %02x to port B (mole output 2?)\n", machine().describe_context().c_str(), data);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -342,7 +344,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 WRITE8_MEMBER(kenseim_state::mb8936_portf_w)
 {
 	// typically written when the 'moles' output is, maybe the 2 strobes?
-	//printf("%s mb8936 write %02x to port F (strobe?)\n", machine().describe_context(), data);
+	//printf("%s mb8936 write %02x to port F (strobe?)\n", machine().describe_context().c_str(), data);
 }
 
 
@@ -454,14 +456,16 @@ WRITE8_MEMBER(kenseim_state::cpu_porte_w)
 
 
 
-static ADDRESS_MAP_START( kenseim_map, AS_PROGRAM, 8, kenseim_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void kenseim_state::kenseim_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
-	AM_RANGE(0x20, 0x27) AM_MIRROR(0xff00) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
-ADDRESS_MAP_END
+void kenseim_state::kenseim_io_map(address_map &map)
+{
+	map(0x20, 0x27).mirror(0xff00).rw("mb89363b", FUNC(mb89363b_device::read), FUNC(mb89363b_device::write));
+}
 
 
 
@@ -471,7 +475,8 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_DERIVED(kenseim_state::kenseim, cps1_12MHz)
+MACHINE_CONFIG_START(kenseim_state::kenseim)
+	cps1_12MHz(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8
@@ -504,10 +509,10 @@ static INPUT_PORTS_START( kenseim )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN1*/ ) // n/c
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN2*/ ) // n/c
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, nullptr) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, nullptr) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, nullptr) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, nullptr) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, nullptr) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, nullptr) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) n/c
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 
@@ -516,7 +521,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // D6
 //  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // D7
 //  PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // D8
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_5678_r, nullptr)
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_5678_r, nullptr)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON1*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON2*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON3*/ ) /*PORT_PLAYER(1)*/ // n/c
@@ -526,7 +531,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // D2
 //  PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // D3
 //  PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // D4
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_1234_r, nullptr)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_1234_r, nullptr)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON1*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON2*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON3*/ ) /*PORT_PLAYER(2)*/ // n/c

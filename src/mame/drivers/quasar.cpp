@@ -110,28 +110,31 @@ READ_LINE_MEMBER(quasar_state::audio_t1_r)
 
 // memory map taken from the manual
 
-static ADDRESS_MAP_START( quasar, AS_PROGRAM, 8, quasar_state )
-	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READ(cvs_bullet_ram_or_palette_r) AM_WRITE(quasar_bullet_w) AM_SHARE("bullet_ram")
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE(quasar_video_w) AM_SHARE("video_ram")
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
-	AM_RANGE(0x2000, 0x33ff) AM_ROM
-	AM_RANGE(0x4000, 0x53ff) AM_ROM
-	AM_RANGE(0x6000, 0x73ff) AM_ROM
-ADDRESS_MAP_END
+void quasar_state::quasar(address_map &map)
+{
+	map(0x0000, 0x13ff).rom();
+	map(0x1400, 0x14ff).mirror(0x6000).r(this, FUNC(quasar_state::cvs_bullet_ram_or_palette_r)).w(this, FUNC(quasar_state::quasar_bullet_w)).share("bullet_ram");
+	map(0x1500, 0x15ff).mirror(0x6000).rw(this, FUNC(quasar_state::cvs_s2636_0_or_character_ram_r), FUNC(quasar_state::cvs_s2636_0_or_character_ram_w));
+	map(0x1600, 0x16ff).mirror(0x6000).rw(this, FUNC(quasar_state::cvs_s2636_1_or_character_ram_r), FUNC(quasar_state::cvs_s2636_1_or_character_ram_w));
+	map(0x1700, 0x17ff).mirror(0x6000).rw(this, FUNC(quasar_state::cvs_s2636_2_or_character_ram_r), FUNC(quasar_state::cvs_s2636_2_or_character_ram_w));
+	map(0x1800, 0x1bff).mirror(0x6000).r(this, FUNC(quasar_state::cvs_video_or_color_ram_r)).w(this, FUNC(quasar_state::quasar_video_w)).share("video_ram");
+	map(0x1c00, 0x1fff).mirror(0x6000).ram();
+	map(0x2000, 0x33ff).rom();
+	map(0x4000, 0x53ff).rom();
+	map(0x6000, 0x73ff).rom();
+}
 
-static ADDRESS_MAP_START( quasar_io, AS_IO, 8, quasar_state )
-	AM_RANGE(0x00, 0x03) AM_READWRITE(quasar_IO_r, video_page_select_w)
-	AM_RANGE(0x08, 0x0b) AM_WRITE(io_page_select_w)
-ADDRESS_MAP_END
+void quasar_state::quasar_io(address_map &map)
+{
+	map(0x00, 0x03).rw(this, FUNC(quasar_state::quasar_IO_r), FUNC(quasar_state::video_page_select_w));
+	map(0x08, 0x0b).w(this, FUNC(quasar_state::io_page_select_w));
+}
 
-static ADDRESS_MAP_START( quasar_data, AS_DATA, 8, quasar_state )
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITENOP
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, quasar_sh_command_w)
-ADDRESS_MAP_END
+void quasar_state::quasar_data(address_map &map)
+{
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).r(this, FUNC(quasar_state::cvs_collision_r)).nopw();
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(quasar_state::cvs_collision_clear), FUNC(quasar_state::quasar_sh_command_w));
+}
 
 /*************************************
  *
@@ -139,14 +142,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, quasar_state )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void quasar_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, quasar_state )
-	AM_RANGE(0x00, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0x80) AM_READ(quasar_sh_command_r)
-ADDRESS_MAP_END
+void quasar_state::sound_portmap(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+	map(0x80, 0x80).r(this, FUNC(quasar_state::quasar_sh_command_r));
+}
 
 /************************************************************************
 

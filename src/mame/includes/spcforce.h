@@ -58,4 +58,6 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void meteors(machine_config &config);
 	void spcforce(machine_config &config);
+	void spcforce_map(address_map &map);
+	void spcforce_sound_map(address_map &map);
 };

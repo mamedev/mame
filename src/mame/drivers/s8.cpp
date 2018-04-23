@@ -68,6 +68,7 @@ public:
 		, m_pia24(*this, "pia24")
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(sound_r);
@@ -92,6 +93,8 @@ public:
 	DECLARE_MACHINE_RESET(s8);
 	DECLARE_DRIVER_INIT(s8);
 	void s8(machine_config &config);
+	void s8_audio_map(address_map &map);
+	void s8_main_map(address_map &map);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -100,6 +103,7 @@ private:
 	emu_timer* m_irq_timer;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pias;
@@ -107,24 +111,27 @@ private:
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
+	output_finder<61> m_digits;
 };
 
-static ADDRESS_MAP_START( s8_main_map, AS_PROGRAM, 8, s8_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(sol3_w) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x5000, 0x7fff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void s8_state::s8_main_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x2100, 0x2103).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
+	map(0x2200, 0x2200).w(this, FUNC(s8_state::sol3_w)); // solenoids
+	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
+	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
+	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
+	map(0x5000, 0x7fff).rom().region("roms", 0);
+}
 
-static ADDRESS_MAP_START( s8_audio_map, AS_PROGRAM, 8, s8_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("pias", pia6821_device, read, write)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("audioroms", 0)
-ADDRESS_MAP_END
+void s8_state::s8_audio_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x4000, 0x4003).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xc000, 0xffff).rom().region("audioroms", 0);
+}
 
 static INPUT_PORTS_START( s8 )
 	PORT_START("X0")
@@ -226,7 +233,7 @@ WRITE8_MEMBER( s8_state::dig0_w )
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_data_ok = true;
-	output().set_digit_value(60, patterns[data>>4]); // diag digit
+	m_digits[60] = patterns[data>>4]; // diag digit
 }
 
 WRITE8_MEMBER( s8_state::dig1_w )
@@ -234,8 +241,8 @@ WRITE8_MEMBER( s8_state::dig1_w )
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
-		output().set_digit_value(m_strobe+16, patterns[data&15]);
-		output().set_digit_value(m_strobe, patterns[data>>4]);
+		m_digits[m_strobe+16] = patterns[data&15];
+		m_digits[m_strobe] = patterns[data>>4];
 	}
 	m_data_ok = false;
 }
@@ -315,7 +322,7 @@ MACHINE_CONFIG_START(s8_state::s8)
 	MCFG_DEFAULT_LAYOUT(layout_s8)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)

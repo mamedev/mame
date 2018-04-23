@@ -69,7 +69,7 @@ public:
 	DECLARE_MACHINE_START(borntofi);
 	DECLARE_MACHINE_RESET(borntofi);
 	uint32_t screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(fantland_irq);
+	DECLARE_WRITE_LINE_MEMBER(fantland_irq);
 	INTERRUPT_GEN_MEMBER(fantland_sound_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_0);
@@ -83,4 +83,13 @@ public:
 	void wheelrun(machine_config &config);
 	void borntofi(machine_config &config);
 	void galaxygn(machine_config &config);
+	void borntofi_map(address_map &map);
+	void borntofi_sound_map(address_map &map);
+	void fantland_map(address_map &map);
+	void fantland_sound_iomap(address_map &map);
+	void fantland_sound_map(address_map &map);
+	void galaxygn_map(address_map &map);
+	void galaxygn_sound_iomap(address_map &map);
+	void wheelrun_map(address_map &map);
+	void wheelrun_sound_map(address_map &map);
 };

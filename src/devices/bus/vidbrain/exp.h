@@ -60,7 +60,7 @@
 
 
 #define MCFG_VIDEOBRAIN_EXPANSION_SLOT_EXTRES_CALLBACK(_write) \
-	devcb = &videobrain_expansion_slot_device::set_extres_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<videobrain_expansion_slot_device &>(*device).set_extres_wr_callback(DEVCB_##_write);
 
 
 
@@ -112,7 +112,7 @@ public:
 	// construction/destruction
 	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_extres_wr_callback(device_t &device, Object &&cb) { return downcast<videobrain_expansion_slot_device &>(device).m_write_extres.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_extres_wr_callback(Object &&cb) { return m_write_extres.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t bo_r(address_space &space, offs_t offset, int cs1, int cs2);

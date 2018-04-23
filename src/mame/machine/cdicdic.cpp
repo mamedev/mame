@@ -1051,25 +1051,20 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 			uint32_t count = state->m_scc->dma().channel[0].transfer_counter;
 			uint32_t index = 0;
 			uint32_t device_index = (data & 0x3fff) >> 1;
-			uint16_t *memory = state->m_planea;
+			address_space &memory_space = state->m_maincpu->space(AS_PROGRAM);
 			verboselog(*this, 0, "memory address counter: %08x\n", state->m_scc->dma().channel[0].memory_address_counter);
 			verboselog(*this, 0, "cdic_w: DMA Control Register = %04x & %04x\n", data, mem_mask);
 			verboselog(*this, 0, "Doing copy, transferring %04x bytes\n", count * 2 );
 			////printf("Doing copy, transferring %04x bytes\n", count * 2 );
-			if((start & 0x00f00000) == 0x00200000)
-			{
-				start -= 0x00200000;
-				memory = state->m_planeb;
-			}
 			for(index = start / 2; index < (start / 2 + count); index++)
 			{
 				if(state->m_scc->dma().channel[0].operation_control & OCR_D)
 				{
-					memory[index] = m_ram[device_index++];
+					memory_space.write_word(index * 2, m_ram[device_index++]);
 				}
 				else
 				{
-					m_ram[device_index++] = memory[index];
+					m_ram[device_index++] = memory_space.read_word(index * 2);
 				}
 			}
 			state->m_scc->dma().channel[0].memory_address_counter += state->m_scc->dma().channel[0].transfer_counter * 2;

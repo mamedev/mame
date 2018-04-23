@@ -20,10 +20,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(ss50_##_slot_intf, _def_slot, false)
 
 #define MCFG_SS50_INTERFACE_IRQ_CALLBACK(_devcb) \
-	devcb = &ss50_interface_port_device::set_irq_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ss50_interface_port_device &>(*device).set_irq_cb(DEVCB_##_devcb);
 
 #define MCFG_SS50_INTERFACE_FIRQ_CALLBACK(_devcb) \
-	devcb = &ss50_interface_port_device::set_firq_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<ss50_interface_port_device &>(*device).set_firq_cb(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,8 +43,8 @@ public:
 	ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// static configuration
-	template<class Object> static devcb_base &set_irq_cb(device_t &device, Object &&object) { return downcast<ss50_interface_port_device &>(device).m_irq_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> static devcb_base &set_firq_cb(device_t &device, Object &&object) { return downcast<ss50_interface_port_device &>(device).m_firq_cb.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_irq_cb(Object &&object) { return m_irq_cb.set_callback(std::forward<Object>(object)); }
+	template<class Object> devcb_base &set_firq_cb(Object &&object) { return m_firq_cb.set_callback(std::forward<Object>(object)); }
 
 	// memory accesses
 	DECLARE_READ8_MEMBER(read);

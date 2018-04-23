@@ -97,12 +97,19 @@ class symbol_table;
 // declared in debugger.h
 class debugger_manager;
 
+// declared in devcb.h
+class devcb_read_base;
+class devcb_write_base;
+
 // declared in devfind.h
 class finder_base;
 
 // declared in device.h
 class device_interface;
 class device_t;
+
+// declared in didisasm.h
+class device_disasm_interface;
 
 // declared in diexec.h
 class device_execute_interface;

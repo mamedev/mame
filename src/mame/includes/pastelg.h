@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
 #include "screen.h"
 
 class pastelg_state : public driver_device
@@ -64,6 +64,9 @@ public:
 
 	void threeds(machine_config &config);
 	void pastelg(machine_config &config);
+	void pastelg_io_map(address_map &map);
+	void pastelg_map(address_map &map);
+	void threeds_io_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

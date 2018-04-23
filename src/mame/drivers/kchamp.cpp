@@ -104,42 +104,47 @@ WRITE8_MEMBER(kchamp_state::sound_control_w)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xd900, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void kchamp_state::kchampvs_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xcfff).ram();
+	map(0xd000, 0xd3ff).ram().w(this, FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(this, FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
+	map(0xd800, 0xd8ff).ram().share("spriteram");
+	map(0xd900, 0xdfff).ram();
+	map(0xe000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, kchamp_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
-ADDRESS_MAP_END
+void kchamp_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
+}
 
-static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8, kchamp_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+void kchamp_state::kchampvs_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1");
+	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x40, 0x40).portr("P2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x80, 0x80).portr("SYSTEM");
+	map(0xc0, 0xc0).portr("DSW");
+}
 
-static ADDRESS_MAP_START( kchampvs_sound_map, AS_PROGRAM, 8, kchamp_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void kchamp_state::kchampvs_sound_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( kchampvs_sound_io_map, AS_IO, 8, kchamp_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("adpcm_select", ls157_device, ab_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(sound_control_w)
-ADDRESS_MAP_END
+void kchamp_state::kchampvs_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x04).w(m_adpcm_select, FUNC(ls157_device::ab_w));
+	map(0x05, 0x05).w(this, FUNC(kchamp_state::sound_control_w));
+}
 
 
 /********************
@@ -163,38 +168,42 @@ WRITE8_MEMBER(kchamp_state::kc_sound_control_w)
 		m_dac->set_output_gain(0, BIT(data,0) ? 1.0 : 0);
 }
 
-static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8, kchamp_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(kchamp_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xea00, 0xeaff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xeb00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void kchamp_state::kchamp_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
+	map(0xe400, 0xe7ff).ram().w(this, FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
+	map(0xea00, 0xeaff).ram().share("spriteram");
+	map(0xeb00, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8, kchamp_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW")
-	AM_RANGE(0x80, 0x87) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("P1")
-	AM_RANGE(0x98, 0x98) AM_READ_PORT("P2")
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa8, 0xa8) AM_READ(sound_reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-ADDRESS_MAP_END
+void kchamp_state::kchamp_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x80).portr("DSW");
+	map(0x80, 0x87).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x90, 0x90).portr("P1");
+	map(0x98, 0x98).portr("P2");
+	map(0xa0, 0xa0).portr("SYSTEM");
+	map(0xa8, 0xa8).r(this, FUNC(kchamp_state::sound_reset_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+}
 
-static ADDRESS_MAP_START( kchamp_sound_map, AS_PROGRAM, 8, kchamp_state )
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe2ff) AM_RAM
-ADDRESS_MAP_END
+void kchamp_state::kchamp_sound_map(address_map &map)
+{
+	map(0x0000, 0xdfff).rom();
+	map(0xe000, 0xe2ff).ram();
+}
 
-static ADDRESS_MAP_START( kchamp_sound_io_map, AS_IO, 8, kchamp_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void kchamp_state::kchamp_sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x04, 0x04).w(m_dac, FUNC(dac_byte_interface::write));
+	map(0x05, 0x05).w(this, FUNC(kchamp_state::kc_sound_control_w));
+	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 static INPUT_PORTS_START( kchampvs )
 	PORT_START("P1")
@@ -346,10 +355,10 @@ GFXDECODE_END
 
 
 
-INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
+WRITE_LINE_MEMBER(kchamp_state::vblank_irq)
 {
-	if (m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(kchamp_state::msmint)
@@ -400,8 +409,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_map)
 	MCFG_CPU_IO_MAP(kchampvs_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kchampvs_sound_map)
@@ -423,6 +431,7 @@ MACHINE_CONFIG_START(kchamp_state::kchampvs)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchampvs)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(kchamp_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -460,7 +469,6 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_map)
 	MCFG_CPU_IO_MAP(kchamp_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kchamp_state,  kc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 12MHz / 4 = 3.0 MHz */
 	MCFG_CPU_PROGRAM_MAP(kchamp_sound_map)
@@ -483,6 +491,7 @@ MACHINE_CONFIG_START(kchamp_state::kchamp)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchamp)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(kchamp_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
 	MCFG_PALETTE_ADD("palette", 256)

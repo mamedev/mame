@@ -31,11 +31,6 @@ public:
 	// construction/destruction
 	epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// not really public
-	DECLARE_READ8_MEMBER( rom_disable_r );
-	DECLARE_READ8_MEMBER( upd765_tc_r );
-	DECLARE_WRITE8_MEMBER( fdc_control_w );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -59,6 +54,13 @@ private:
 	// from sio output
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( pinc_w );
+
+	DECLARE_READ8_MEMBER( rom_disable_r );
+	DECLARE_READ8_MEMBER( upd765_tc_r );
+	DECLARE_WRITE8_MEMBER( fdc_control_w );
+
+	void cpu_io(address_map &map);
+	void cpu_mem(address_map &map);
 
 	required_device<cpu_device> m_cpu;
 	required_device<ram_device> m_ram;

@@ -110,6 +110,27 @@ public:
 	void mimonscr(machine_config &config);
 	void ckongs(machine_config &config);
 	void mrkougb(machine_config &config);
+	void ad2083_map(address_map &map);
+	void ad2083_sound_io_map(address_map &map);
+	void ad2083_sound_map(address_map &map);
+	void ckongs_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void harem_map(address_map &map);
+	void harem_sound_io_map(address_map &map);
+	void harem_sound_map(address_map &map);
+	void hotshock_map(address_map &map);
+	void hotshock_sound_io_map(address_map &map);
+	void hunchbks_map(address_map &map);
+	void hunchbks_readport(address_map &map);
+	void mars_map(address_map &map);
+	void mimonscr_map(address_map &map);
+	void mrkougar_map(address_map &map);
+	void newsin7_map(address_map &map);
+	void scramble_map(address_map &map);
+	void scramble_sound_io_map(address_map &map);
+	void scramble_sound_map(address_map &map);
+	void triplep_io_map(address_map &map);
+	void triplep_map(address_map &map);
 private:
 	void cavelon_banksw();
 	inline int bit(int i,int n);

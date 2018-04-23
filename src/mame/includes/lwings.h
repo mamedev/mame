@@ -91,4 +91,14 @@ public:
 	void fball(machine_config &config);
 	void avengers(machine_config &config);
 	void avengersb(machine_config &config);
+	void avengers_adpcm_io_map(address_map &map);
+	void avengers_map(address_map &map);
+	void fball_map(address_map &map);
+	void fball_oki_map(address_map &map);
+	void fball_sound_map(address_map &map);
+	void lwings_map(address_map &map);
+	void lwings_sound_map(address_map &map);
+	void trojan_adpcm_io_map(address_map &map);
+	void trojan_adpcm_map(address_map &map);
+	void trojan_map(address_map &map);
 };

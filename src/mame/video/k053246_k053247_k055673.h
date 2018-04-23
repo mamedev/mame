@@ -17,16 +17,16 @@ typedef device_delegate<void (int *code, int *color, int *priority_mask)> k05324
 #define K055673_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
 
 #define MCFG_K053246_CB(_class, _method) \
-	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<k053247_device &>(*device).set_k053247_callback(k053247_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K053246_CONFIG(_gfx_reg, _order, _dx, _dy) \
-	k053247_device::set_config(*device, _gfx_reg, _order, _dx, _dy);
+	downcast<k053247_device &>(*device).set_config(_gfx_reg, _order, _dx, _dy);
 
 #define MCFG_K055673_CB(_class, _method) \
-	k053247_device::set_k053247_callback(*device, k053247_cb_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<k053247_device &>(*device).set_k053247_callback(k053247_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K055673_CONFIG(_gfx_reg, _order, _dx, _dy) \
-	k053247_device::set_config(*device, _gfx_reg, _order, _dx, _dy);
+	downcast<k053247_device &>(*device).set_config(_gfx_reg, _order, _dx, _dy);
 
 
 /**  Konami 053246 / 053247 / 055673  **/
@@ -66,15 +66,14 @@ class k053247_device : public device_t,
 public:
 	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void set_k053247_callback(device_t &device, k053247_cb_delegate callback) { downcast<k053247_device &>(device).m_k053247_cb = callback; }
-	static void set_config(device_t &device, const char *gfx_reg, int bpp, int dx, int dy)
+	// configuration
+	void set_k053247_callback(k053247_cb_delegate callback) { m_k053247_cb = callback; }
+	void set_config(const char *gfx_reg, int bpp, int dx, int dy)
 	{
-		k053247_device &dev = downcast<k053247_device &>(device);
-		dev.m_memory_region = gfx_reg;
-		dev.m_bpp = bpp;
-		dev.m_dx = dx;
-		dev.m_dy = dy;
+		m_memory_region = gfx_reg;
+		m_bpp = bpp;
+		m_dx = dx;
+		m_dy = dy;
 	}
 
 	void clear_all();

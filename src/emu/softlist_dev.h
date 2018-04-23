@@ -44,7 +44,7 @@ enum software_compatibility
 //**************************************************************************
 
 #define MCFG_SOFTWARE_LIST_CONFIG(_list,_list_type) \
-	software_list_device::static_set_type(*device, _list, _list_type);
+	downcast<software_list_device &>(*device).set_type(_list, _list_type);
 
 #define MCFG_SOFTWARE_LIST_ADD( _tag, _list ) \
 	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 ) \
@@ -64,7 +64,7 @@ enum software_compatibility
 
 #define MCFG_SOFTWARE_LIST_FILTER( _tag, _filter ) \
 	MCFG_DEVICE_MODIFY( _tag ) \
-	software_list_device::static_set_filter(*device, _filter);
+	downcast<software_list_device &>(*device).set_filter(_filter);
 
 #define MCFG_SOFTWARE_LIST_REMOVE( _tag ) \
 	MCFG_DEVICE_REMOVE( _tag )
@@ -135,8 +135,8 @@ public:
 	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// inline configuration helpers
-	static void static_set_type(device_t &device, const char *list, softlist_type list_type);
-	static void static_set_filter(device_t &device, const char *filter);
+	void set_type(const char *list, softlist_type list_type) { m_list_name.assign(list); m_list_type = list_type; }
+	void set_filter(const char *filter) { m_filter = filter; }
 
 	// getters
 	const std::string &list_name() const { return m_list_name; }

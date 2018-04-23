@@ -5,22 +5,6 @@ This section contains configuration options that are specific to the native (non
 
 
 
-Debugging options
------------------
-
-.. _mame-wcommandline-debuggerfont:
-
-**-debugger_font** *<fontname>* / **-dfont** *<fontname>*
-
-	Specifies the name of the font to use for debugger windows. By default,	the font is Lucida Console.
-
-.. _mame-wcommandline-debuggerfontsize:
-
-**-debugger_font_size** *<points>* / **-dfontsize** *<points>*
-
-	Specifies the size of the font to use for debugger windows, in points. By default, this is set to 9pt.
-
-
 Performance options
 -------------------
 

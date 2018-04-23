@@ -34,7 +34,7 @@
 
 
 #define MCFG_ADAM_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	devcb = &adam_expansion_slot_device::set_irq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<adam_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 
 
@@ -55,7 +55,7 @@ public:
 	adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~adam_expansion_slot_device() { }
 
-	template <class Object> static devcb_base &set_irq_wr_callback(device_t &device, Object &&cb) { return downcast<adam_expansion_slot_device &>(device).m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);

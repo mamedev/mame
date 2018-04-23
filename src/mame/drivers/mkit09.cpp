@@ -49,6 +49,7 @@ public:
 		, m_pia(*this, "pia")
 		, m_cass(*this, "cassette")
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(pa_r);
@@ -59,33 +60,35 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 	void mkit09a(machine_config &config);
 	void mkit09(machine_config &config);
+	void mkit09_mem(address_map &map);
+	void mkit09a_mem(address_map &map);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<pia6821_device> m_pia;
 	required_device<cassette_image_device> m_cass;
 	required_device<cpu_device> m_maincpu;
+	output_finder<10> m_digits;
 };
 
 
-static ADDRESS_MAP_START(mkit09_mem, AS_PROGRAM, 8, mkit09_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa004,0xa007) AM_MIRROR(0x1ff8) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xe000,0xe7ff) AM_MIRROR(0x1800) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void mkit09_state::mkit09_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).mirror(0x1800).ram();
+	map(0xa004, 0xa007).mirror(0x1ff8).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xe000, 0xe7ff).mirror(0x1800).rom().region("roms", 0);
+}
 
-static ADDRESS_MAP_START(mkit09a_mem, AS_PROGRAM, 8, mkit09_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000,0x07ff) AM_RAM
-	AM_RANGE(0xe600,0xe603) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xee00,0xefff) AM_RAM
-	AM_RANGE(0xf000,0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mkit09_io, AS_IO, 8, mkit09_state)
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
+void mkit09_state::mkit09a_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram();
+	map(0xe600, 0xe603).rw(m_pia, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xee00, 0xefff).ram();
+	map(0xf000, 0xffff).rom().region("roms", 0);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( mkit09 )
@@ -175,7 +178,8 @@ WRITE8_MEMBER( mkit09_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output().set_digit_value(m_keydata, bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3));
+		if (m_keydata < 10)
+			m_digits[m_keydata] = bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3);
 		m_keydata = 0;
 	}
 
@@ -195,7 +199,6 @@ MACHINE_CONFIG_START(mkit09_state::mkit09)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
-	MCFG_CPU_IO_MAP(mkit09_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)
@@ -221,7 +224,6 @@ MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09a_mem)
-	MCFG_CPU_IO_MAP(mkit09_io)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mkit09)

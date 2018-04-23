@@ -48,6 +48,11 @@ public:
 
 	void farwest(machine_config &config);
 	void ironhors(machine_config &config);
+	void farwest_master_map(address_map &map);
+	void farwest_slave_map(address_map &map);
+	void master_map(address_map &map);
+	void slave_io_map(address_map &map);
+	void slave_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

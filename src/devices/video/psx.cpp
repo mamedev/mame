@@ -27,10 +27,8 @@ DEFINE_DEVICE_TYPE(CXD8654Q,  cxd8654q_device,  "cxd8654q",  "CXD8654Q GPU")
 
 psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 	, m_vblank_handler(*this)
-#if PSXGPU_DEBUG_VIEWER
-	, m_screen(*this, "screen")
-#endif
 {
 }
 
@@ -38,7 +36,7 @@ void psxgpu_device::device_start()
 {
 	m_vblank_handler.resolve_safe();
 
-	if( m_type == CXD8538Q )
+	if (type() == CXD8538Q)
 	{
 		psx_gpu_init( 1 );
 	}
@@ -445,7 +443,7 @@ void psxgpu_device::updatevisiblearea()
 #endif
 
 	visarea.set(0, n_screenwidth - 1, 0, n_screenheight - 1);
-	machine().first_screen()->configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
+	screen().configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 void psxgpu_device::psx_gpu_init( int n_gputype )

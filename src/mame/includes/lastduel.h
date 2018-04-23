@@ -76,4 +76,8 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	void lastduel(machine_config &config);
 	void madgear(machine_config &config);
+	void lastduel_map(address_map &map);
+	void madgear_map(address_map &map);
+	void madgear_sound_map(address_map &map);
+	void sound_map(address_map &map);
 };

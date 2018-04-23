@@ -29,7 +29,7 @@
 //**************************************************************************
 
 #define MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(_write) \
-	devcb = &trs80m2_keyboard_device::set_clock_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<trs80m2_keyboard_device &>(*device).set_clock_wr_callback(DEVCB_##_write);
 
 
 
@@ -45,7 +45,7 @@ public:
 	// construction/destruction
 	trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_clock_wr_callback(device_t &device, Object &&cb) { return downcast<trs80m2_keyboard_device &>(device).m_write_clock.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_clock_wr_callback(Object &&cb) { return m_write_clock.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_READ_LINE_MEMBER( data_r );

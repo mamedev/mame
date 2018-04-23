@@ -195,6 +195,26 @@ public:
 	void tmnt(machine_config &config);
 	void mia(machine_config &config);
 	void punkshot(machine_config &config);
+	void blswhstl_main_map(address_map &map);
+	void cuebrick_main_map(address_map &map);
+	void glfgreat_audio_map(address_map &map);
+	void glfgreat_main_map(address_map &map);
+	void lgtnfght_audio_map(address_map &map);
+	void lgtnfght_main_map(address_map &map);
+	void mia_audio_map(address_map &map);
+	void mia_main_map(address_map &map);
+	void prmrsocr_audio_map(address_map &map);
+	void prmrsocr_main_map(address_map &map);
+	void punkshot_audio_map(address_map &map);
+	void punkshot_main_map(address_map &map);
+	void ssriders_audio_map(address_map &map);
+	void ssriders_main_map(address_map &map);
+	void sunsetbl_main_map(address_map &map);
+	void thndrx2_audio_map(address_map &map);
+	void thndrx2_main_map(address_map &map);
+	void tmnt2_main_map(address_map &map);
+	void tmnt_audio_map(address_map &map);
+	void tmnt_main_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

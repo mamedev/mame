@@ -154,6 +154,9 @@ public:
 	void firetrk(machine_config &config);
 	void montecar(machine_config &config);
 	void superbug(machine_config &config);
+	void firetrk_map(address_map &map);
+	void montecar_map(address_map &map);
+	void superbug_map(address_map &map);
 };
 
 

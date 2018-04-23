@@ -68,30 +68,35 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_miot(*this, "miot")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<mos6530_device> m_miot;
 	DECLARE_READ8_MEMBER(mk2_read_a);
 	DECLARE_WRITE8_MEMBER(mk2_write_a);
 	DECLARE_READ8_MEMBER(mk2_read_b);
 	DECLARE_WRITE8_MEMBER(mk2_write_b);
-	uint8_t m_led[5];
-	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
 	void mk2(machine_config &config);
+	void mk2_mem(address_map &map);
+private:
+	uint8_t m_led[5];
+	virtual void machine_start() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<mos6530_device> m_miot;
+	output_finder<6> m_digits;
 };
 
 
 // only lower 12 address bits on bus!
-static ADDRESS_MAP_START(mk2_mem , AS_PROGRAM, 8, mk2_state)
-	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
-	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", mos6530_device, read, write)
-	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram
-	AM_RANGE( 0x0c00, 0x0fff) AM_ROM // rriot rom
-	AM_RANGE( 0x1000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void mk2_state::mk2_mem(address_map &map)
+{
+	map(0x0000, 0x01ff).ram(); // 2 2111, should be mirrored
+	map(0x0b00, 0x0b0f).rw(m_miot, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x0b80, 0x0bbf).ram(); // rriot ram
+	map(0x0c00, 0x0fff).rom(); // rriot rom
+	map(0x1000, 0x1fff).rom();
+}
 
 static INPUT_PORTS_START( mk2 )
 	PORT_START("EXTRA")
@@ -124,7 +129,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk2_state::update_leds)
 	int i;
 
 	for (i=0; i<4; i++)
-		output().set_digit_value(i, m_led[i]);
+		m_digits[i] = m_led[i];
 
 	output().set_led_value(0, BIT(m_led[4], 3));
 	output().set_led_value(1, BIT(m_led[4], 5));
@@ -136,6 +141,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mk2_state::update_leds)
 
 void mk2_state::machine_start()
 {
+	m_digits.resolve();
 }
 
 READ8_MEMBER( mk2_state::mk2_read_a )

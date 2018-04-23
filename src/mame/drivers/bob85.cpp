@@ -31,28 +31,34 @@ class bob85_state : public driver_device
 {
 public:
 	bob85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_cass(*this, "cassette"),
-		m_line0(*this, "LINE0"),
-		m_line1(*this, "LINE1"),
-		m_line2(*this, "LINE2") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_line0(*this, "LINE0")
+		, m_line1(*this, "LINE1")
+		, m_line2(*this, "LINE2")
+		, m_digits(*this, "digit%u", 0U)
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass;
+	void bob85(machine_config &config);
+	void bob85_io(address_map &map);
+	void bob85_mem(address_map &map);
 	DECLARE_READ8_MEMBER(bob85_keyboard_r);
 	DECLARE_WRITE8_MEMBER(bob85_7seg_w);
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
+
+private:
 	uint8_t m_prev_key;
 	uint8_t m_count_key;
 	virtual void machine_reset() override;
-
-	void bob85(machine_config &config);
-protected:
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;
 	required_ioport m_line1;
 	required_ioport m_line2;
+	output_finder<6> m_digits;
 };
 
 
@@ -138,20 +144,22 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 
 WRITE8_MEMBER(bob85_state::bob85_7seg_w)
 {
-	output().set_digit_value(offset, bitswap<8>( data,3,2,1,0,7,6,5,4 ));
+	m_digits[offset] = bitswap<8>( data,3,2,1,0,7,6,5,4 );
 }
 
-static ADDRESS_MAP_START( bob85_mem, AS_PROGRAM, 8, bob85_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x02ff) AM_ROM
-	AM_RANGE(0x0600, 0x09ff) AM_RAM
-ADDRESS_MAP_END
+void bob85_state::bob85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x02ff).rom();
+	map(0x0600, 0x09ff).ram();
+}
 
-static ADDRESS_MAP_START( bob85_io, AS_IO, 8, bob85_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0a, 0x0a) AM_READ(bob85_keyboard_r)
-	AM_RANGE(0x0a, 0x0f) AM_WRITE(bob85_7seg_w)
-ADDRESS_MAP_END
+void bob85_state::bob85_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0a, 0x0a).r(this, FUNC(bob85_state::bob85_keyboard_r));
+	map(0x0a, 0x0f).w(this, FUNC(bob85_state::bob85_7seg_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( bob85 )

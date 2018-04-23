@@ -102,6 +102,7 @@ public:
 		, m_pia_u(*this, "pia_u")
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
@@ -115,6 +116,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
 
 	void mekd2(machine_config &config);
+	void mekd2_mem(address_map &map);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_cass_data[4];
@@ -123,11 +125,13 @@ private:
 	uint8_t m_keydata;
 	bool m_cass_state;
 	bool m_cassold;
+	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_s;
 	required_device<pia6821_device> m_pia_u;
 	required_device<acia6850_device> m_acia;
 	required_device<cassette_image_device> m_cass;
+	output_finder<6> m_digits;
 };
 
 
@@ -138,14 +142,15 @@ private:
 
 ************************************************************/
 
-static ADDRESS_MAP_START( mekd2_mem , AS_PROGRAM, 8, mekd2_state)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM // user ram
-	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x8020, 0x8023) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
-	AM_RANGE(0xa000, 0xa07f) AM_RAM // system ram
-	AM_RANGE(0xe000, 0xe3ff) AM_ROM AM_MIRROR(0x1c00)   /* JBUG ROM */
-ADDRESS_MAP_END
+void mekd2_state::mekd2_mem(address_map &map)
+{
+	map(0x0000, 0x00ff).ram(); // user ram
+	map(0x8004, 0x8007).rw(m_pia_u, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8008, 0x8009).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x8020, 0x8023).rw(m_pia_s, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xa000, 0xa07f).ram(); // system ram
+	map(0xe000, 0xe3ff).rom().mirror(0x1c00);   /* JBUG ROM */
+}
 
 /***********************************************************
 
@@ -283,7 +288,7 @@ WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 		for (i = 0; i < 6; i++)
 		{
 			if (BIT(data, i))
-				output().set_digit_value(i, ~m_segment & 0x7f);
+				m_digits[i] = ~m_segment & 0x7f;
 		}
 	}
 	m_digit = data;
@@ -355,6 +360,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 		m_acia->write_rxd((m_cass_data[1] < 12) ? 1 : 0);
 		m_cass_data[1] = 0;
 	}
+}
+
+void mekd2_state::machine_start()
+{
+	m_digits.resolve();
 }
 
 /***********************************************************

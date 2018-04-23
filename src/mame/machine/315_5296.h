@@ -19,47 +19,47 @@
 
 // A to H 8-bit input ports
 #define MCFG_315_5296_IN_PORTA_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_in_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_in_pa_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_IN_PORTB_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_in_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_in_pb_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_IN_PORTC_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_in_pc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_in_pc_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_IN_PORTD_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_in_pd_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_in_pd_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_IN_PORTE_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_in_pe_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_in_pe_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_IN_PORTF_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_in_pf_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_in_pf_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_IN_PORTG_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_in_pg_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_in_pg_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_IN_PORTH_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_in_ph_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_in_ph_callback(DEVCB_##_devcb);
 
 // A to H 8-bit output ports
 #define MCFG_315_5296_OUT_PORTA_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_pa_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_pa_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_OUT_PORTB_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_pb_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_pb_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_OUT_PORTC_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_pc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_pc_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_OUT_PORTD_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_pd_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_pd_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_OUT_PORTE_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_pe_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_pe_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_OUT_PORTF_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_pf_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_pf_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_OUT_PORTG_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_pg_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_pg_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_OUT_PORTH_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_ph_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_ph_callback(DEVCB_##_devcb);
 
 // CNT output pins
 #define MCFG_315_5296_OUT_CNT0_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_cnt0_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_cnt0_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_OUT_CNT1_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_cnt1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_cnt1_callback(DEVCB_##_devcb);
 #define MCFG_315_5296_OUT_CNT2_CB(_devcb) \
-	devcb = &sega_315_5296_device::set_out_cnt2_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<sega_315_5296_device &>(*device).set_out_cnt2_callback(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -73,28 +73,28 @@ class sega_315_5296_device : public device_t
 public:
 	sega_315_5296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_in_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_in_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pc_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_in_pc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pd_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_in_pd_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pe_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_in_pe_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pf_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_in_pf_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pg_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_in_pg_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_ph_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_in_ph_cb.set_callback(object); }
+	// configuration helpers
+	template <class Object> devcb_base &set_in_pa_callback(Object &&cb) { return m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pb_callback(Object &&cb) { return m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pc_callback(Object &&cb) { return m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pd_callback(Object &&cb) { return m_in_pd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pe_callback(Object &&cb) { return m_in_pe_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pf_callback(Object &&cb) { return m_in_pf_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_pg_callback(Object &&cb) { return m_in_pg_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_in_ph_callback(Object &&cb) { return m_in_ph_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pc_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_pc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pd_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_pd_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pe_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_pe_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pf_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_pf_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pg_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_pg_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_ph_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_ph_cb.set_callback(object); }
+	template <class Object> devcb_base &set_out_pa_callback(Object &&cb) { return m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pb_callback(Object &&cb) { return m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pc_callback(Object &&cb) { return m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pd_callback(Object &&cb) { return m_out_pd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pe_callback(Object &&cb) { return m_out_pe_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pf_callback(Object &&cb) { return m_out_pf_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_pg_callback(Object &&cb) { return m_out_pg_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_ph_callback(Object &&cb) { return m_out_ph_cb.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_out_cnt0_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_cnt0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_cnt1_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_cnt1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_cnt2_callback(device_t &device, _Object object) { return downcast<sega_315_5296_device &>(device).m_out_cnt2_cb.set_callback(object); }
+	template <class Object> devcb_base &set_out_cnt0_callback(Object &&cb) { return m_out_cnt0_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_cnt1_callback(Object &&cb) { return m_out_cnt1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_cnt2_callback(Object &&cb) { return m_out_cnt2_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );

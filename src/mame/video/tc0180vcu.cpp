@@ -28,16 +28,6 @@ tc0180vcu_device::tc0180vcu_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void tc0180vcu_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<tc0180vcu_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

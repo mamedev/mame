@@ -315,70 +315,76 @@ WRITE8_MEMBER(mitchell_state::input_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8, mitchell_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_DEVWRITE("palette", palette_device, write8)   /* palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_SHARE("videoram") /* char RAM */
-	AM_RANGE(0xe000, 0xefff) AM_RAM /* Work RAM */
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r, mgakuen_objram_w)   /* OBJ RAM */
-ADDRESS_MAP_END
+void mitchell_state::mgakuen_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8));   /* palette RAM */
+	map(0xc800, 0xcfff).rw(this, FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram"); /* Attribute RAM */
+	map(0xd000, 0xdfff).rw(this, FUNC(mitchell_state::mgakuen_videoram_r), FUNC(mitchell_state::mgakuen_videoram_w)).share("videoram"); /* char RAM */
+	map(0xe000, 0xefff).ram(); /* Work RAM */
+	map(0xf000, 0xffff).rw(this, FUNC(mitchell_state::mgakuen_objram_r), FUNC(mitchell_state::mgakuen_objram_w));   /* OBJ RAM */
+}
 
-static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8, mitchell_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_SHARE("videoram")/* Banked char / OBJ RAM */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram") /* Work RAM */
-ADDRESS_MAP_END
+void mitchell_state::mitchell_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xc000, 0xc7ff).rw(this, FUNC(mitchell_state::pang_paletteram_r), FUNC(mitchell_state::pang_paletteram_w)); /* Banked palette RAM */
+	map(0xc800, 0xcfff).rw(this, FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram"); /* Attribute RAM */
+	map(0xd000, 0xdfff).rw(this, FUNC(mitchell_state::pang_videoram_r), FUNC(mitchell_state::pang_videoram_w)).share("videoram");/* Banked char / OBJ RAM */
+	map(0xe000, 0xffff).ram().share("nvram"); /* Work RAM */
+}
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, mitchell_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram") /* Work RAM */
-ADDRESS_MAP_END
+void mitchell_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankr("bank0d");
+	map(0x8000, 0xbfff).bankr("bank1d");
+	map(0xe000, 0xffff).ram().share("nvram"); /* Work RAM */
+}
 
-static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)   /* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x00, 0x02) AM_READ(input_r)           /* The Mahjong games and Block Block need special input treatment */
-	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)    /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_device, data_port_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_device, register_port_w)
-	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0x06, 0x06) AM_NOP                     /* watchdog? IRQ ack? video buffering? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)    /* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
-ADDRESS_MAP_END
+void mitchell_state::mitchell_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(this, FUNC(mitchell_state::pang_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
+	map(0x00, 0x02).r(this, FUNC(mitchell_state::input_r));           /* The Mahjong games and Block Block need special input treatment */
+	map(0x01, 0x01).w(this, FUNC(mitchell_state::input_w));
+	map(0x02, 0x02).w(this, FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_port_w));
+	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::register_port_w));
+	map(0x05, 0x05).r(this, FUNC(mitchell_state::pang_port5_r)).w(m_oki, FUNC(okim6295_device::write));
+	map(0x06, 0x06).noprw();                     /* watchdog? IRQ ack? video buffering? */
+	map(0x07, 0x07).w(this, FUNC(mitchell_state::pang_video_bank_w));    /* Video RAM bank register */
+	map(0x08, 0x08).w(this, FUNC(mitchell_state::eeprom_cs_w));
+	map(0x10, 0x10).w(this, FUNC(mitchell_state::eeprom_clock_w));
+	map(0x18, 0x18).w(this, FUNC(mitchell_state::eeprom_serial_w));
+}
 
 /* spangbl */
-static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w) /* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_SHARE("colorram")/* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w) AM_SHARE("videoram") /* Banked char / OBJ RAM */
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")     /* Work RAM */
-ADDRESS_MAP_END
+void mitchell_state::spangbl_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1").nopw();
+	map(0xc000, 0xc7ff).rw(this, FUNC(mitchell_state::pang_paletteram_r), FUNC(mitchell_state::pang_paletteram_w)); /* Banked palette RAM */
+	map(0xc800, 0xcfff).rw(this, FUNC(mitchell_state::pang_colorram_r), FUNC(mitchell_state::pang_colorram_w)).share("colorram");/* Attribute RAM */
+	map(0xd000, 0xdfff).rw(this, FUNC(mitchell_state::pang_videoram_r), FUNC(mitchell_state::pang_videoram_w)).share("videoram"); /* Banked char / OBJ RAM */
+	map(0xe000, 0xffff).ram().share("nvram");     /* Work RAM */
+}
 
-static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x02) AM_READ(input_r)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")
-	AM_RANGE(0x06, 0x06) AM_WRITENOP    /* watchdog? irq ack? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
-ADDRESS_MAP_END
+void mitchell_state::spangbl_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x02).r(this, FUNC(mitchell_state::input_r));
+	map(0x00, 0x00).w(this, FUNC(mitchell_state::pangbl_gfxctrl_w));    /* Palette bank, layer enable, coin counters, more */
+	map(0x02, 0x02).w(this, FUNC(mitchell_state::pang_bankswitch_w));      /* Code bank register */
+	map(0x03, 0x03).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x05, 0x05).portr("SYS0");
+	map(0x06, 0x06).nopw();    /* watchdog? irq ack? */
+	map(0x07, 0x07).w(this, FUNC(mitchell_state::pang_video_bank_w));      /* Video RAM bank register */
+	map(0x08, 0x08).w(this, FUNC(mitchell_state::eeprom_cs_w));
+	map(0x10, 0x10).w(this, FUNC(mitchell_state::eeprom_clock_w));
+	map(0x18, 0x18).w(this, FUNC(mitchell_state::eeprom_serial_w));
+}
 
 WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
 {
@@ -387,25 +393,27 @@ WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
 	m_soundbank->set_entry(data & 7);
 }
 
-static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0xf000, 0xf4ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void mitchell_state::spangbl_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");
+	map(0xe000, 0xe000).w(this, FUNC(mitchell_state::sound_bankswitch_w));
+	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
+	map(0xec00, 0xec01).w("ymsnd", FUNC(ym2413_device::write));
+	map(0xf000, 0xf4ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
-static ADDRESS_MAP_START( pangba_sound_map, AS_PROGRAM, 8, mitchell_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xf000, 0xf4ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void mitchell_state::pangba_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("soundbank");
+	map(0xe000, 0xe000).w(this, FUNC(mitchell_state::sound_bankswitch_w));
+	map(0xe400, 0xe400).w(m_adpcm_select, FUNC(ls157_device::ba_w));
+	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xf000, 0xf4ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /**** Monsters World ****/
@@ -414,13 +422,14 @@ WRITE8_MEMBER(mitchell_state::oki_banking_w)
 	m_oki->set_rom_bank(data & 3);
 }
 
-static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void mitchell_state::mstworld_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x9000, 0x9000).w(this, FUNC(mitchell_state::oki_banking_w));
+	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 {
@@ -428,18 +437,19 @@ WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8, mitchell_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)   /* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(pang_bankswitch_w)    /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(mstworld_sound_w)    /* write to sound cpu */
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")   /* dips? */
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")   /* special? */
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")   /* dips? */
-	AM_RANGE(0x06, 0x06) AM_WRITENOP        /* watchdog? irq ack? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(mstworld_video_bank_w)    /* Video RAM bank register */
-ADDRESS_MAP_END
+void mitchell_state::mstworld_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0").w(this, FUNC(mitchell_state::mstworld_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2").w(this, FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
+	map(0x03, 0x03).portr("DSW0").w(this, FUNC(mitchell_state::mstworld_sound_w));    /* write to sound cpu */
+	map(0x04, 0x04).portr("DSW1");   /* dips? */
+	map(0x05, 0x05).portr("SYS0");   /* special? */
+	map(0x06, 0x06).portr("DSW2");   /* dips? */
+	map(0x06, 0x06).nopw();        /* watchdog? irq ack? */
+	map(0x07, 0x07).w(this, FUNC(mitchell_state::mstworld_video_bank_w));    /* Video RAM bank register */
+}
 
 
 /*************************************
@@ -455,7 +465,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -714,7 +724,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -881,7 +891,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    /* same as the service mode farther down */
@@ -921,7 +931,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -937,7 +947,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )    /* dial direction */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    /* dial direction */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
@@ -945,7 +955,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )    /* dial direction */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    /* dial direction */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
@@ -963,7 +973,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -979,7 +989,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )    /* dial direction */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    /* dial direction */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -989,7 +999,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )    /* dial direction */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    /* dial direction */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1197,7 +1207,7 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_MACHINE_START_OVERRIDE(mitchell_state,mitchell)
@@ -1231,7 +1241,8 @@ MACHINE_CONFIG_START(mitchell_state::pang)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mitchell_state::pangnv, pang)
+MACHINE_CONFIG_START(mitchell_state::pangnv)
+	pang(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
@@ -1266,12 +1277,13 @@ WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 }
 
 
-MACHINE_CONFIG_DERIVED(mitchell_state::spangbl, pangnv)
+MACHINE_CONFIG_START(mitchell_state::spangbl)
+	pangnv(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spangbl_map)
 	MCFG_CPU_IO_MAP(spangbl_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
 	MCFG_DEVICE_REMOVE("scantimer")
@@ -1294,7 +1306,8 @@ MACHINE_CONFIG_DERIVED(mitchell_state::spangbl, pangnv)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(mitchell_state::pangba, spangbl)
+MACHINE_CONFIG_START(mitchell_state::pangba)
+	spangbl(config);
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
 
@@ -1311,7 +1324,7 @@ MACHINE_CONFIG_START(mitchell_state::mstworld)
 	MCFG_CPU_ADD("maincpu", Z80, 6000000*4)
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mstworld_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80,6000000)        /* 6 MHz? */
@@ -1352,7 +1365,7 @@ MACHINE_CONFIG_START(mitchell_state::marukin)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -1407,7 +1420,7 @@ MACHINE_CONFIG_START(mitchell_state::pkladiesbl)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(mitchell_map)
 	MCFG_CPU_IO_MAP(mitchell_io_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mitchell_state, mitchell_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

@@ -39,7 +39,7 @@
 
 
 
-DEFINE_DEVICE_TYPE(SATURN, saturn_device, "saturn_cpu", "HP Saturn")
+DEFINE_DEVICE_TYPE(SATURN, saturn_device, "saturn_cpu", "Hewlett-Packard Saturn")
 
 
 saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -71,9 +71,9 @@ bool saturn_device::get_nonstandard_mnemonics_mode() const
 }
 
 
-util::disasm_interface *saturn_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> saturn_device::create_disassembler()
 {
-	return new saturn_disassembler(this);
+	return std::make_unique<saturn_disassembler>(this);
 }
 
 
@@ -179,7 +179,7 @@ void saturn_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%2s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void saturn_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -349,7 +349,7 @@ void saturn_device::execute_run()
 	{
 		m_oldpc = m_pc;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if ( m_sleeping )
 		{

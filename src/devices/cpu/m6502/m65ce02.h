@@ -18,7 +18,7 @@ class m65ce02_device : public m65c02_device {
 public:
 	m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
@@ -33,7 +33,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	inline void dec_SP_ce() { if(P & F_E) SP = set_l(SP, SP-1); else SP--; }

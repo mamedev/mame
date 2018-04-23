@@ -11,13 +11,13 @@
 	MCFG_DEVICE_ADD(_tag, ES5503, _clock)
 
 #define MCFG_ES5503_OUTPUT_CHANNELS(_channels) \
-	es5503_device::static_set_channels(*device, _channels);
+	downcast<es5503_device &>(*device).set_channels(_channels);
 
 #define MCFG_ES5503_IRQ_FUNC(_write) \
-	devcb = &es5503_device::static_set_irqf(*device, DEVCB_##_write);
+	devcb = &downcast<es5503_device &>(*device).set_irqf(DEVCB_##_write);
 
 #define MCFG_ES5503_ADC_FUNC(_read) \
-	devcb = &es5503_device::static_set_adcf(*device, DEVCB_##_read);
+	devcb = &downcast<es5503_device &>(*device).set_adcf(DEVCB_##_read);
 
 // ======================> es5503_device
 
@@ -29,10 +29,10 @@ public:
 	// construction/destruction
 	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_channels(device_t &device, int channels);
+	void set_channels(int channels) { output_channels = channels; }
 
-	template <class Object> static devcb_base &static_set_irqf(device_t &device, Object &&cb) { return downcast<es5503_device &>(device).m_irq_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &static_set_adcf(device_t &device, Object &&cb) { return downcast<es5503_device &>(device).m_adc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irqf(Object &&cb) { return m_irq_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_adcf(Object &&cb) { return m_adc_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

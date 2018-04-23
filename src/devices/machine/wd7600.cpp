@@ -77,30 +77,6 @@ MACHINE_CONFIG_START(wd7600_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-void wd7600_device::static_set_cputag(device_t &device, const char *tag)
-{
-	wd7600_device &chip = downcast<wd7600_device &>(device);
-	chip.m_cputag = tag;
-}
-
-void wd7600_device::static_set_isatag(device_t &device, const char *tag)
-{
-	wd7600_device &chip = downcast<wd7600_device &>(device);
-	chip.m_isatag = tag;
-}
-
-void wd7600_device::static_set_biostag(device_t &device, const char *tag)
-{
-	wd7600_device &chip = downcast<wd7600_device &>(device);
-	chip.m_biostag = tag;
-}
-
-void wd7600_device::static_set_keybctag(device_t &device, const char *tag)
-{
-	wd7600_device &chip = downcast<wd7600_device &>(device);
-	chip.m_keybctag = tag;
-}
-
 wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WD7600, tag, owner, clock),
 	m_read_ior(*this),

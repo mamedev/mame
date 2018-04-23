@@ -48,4 +48,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void ssrj(machine_config &config);
+	void ssrj_map(address_map &map);
 };

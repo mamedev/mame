@@ -199,7 +199,7 @@ void wswan_state::machine_start()
 	m_system_type = TYPE_WSWAN;
 }
 
-MACHINE_START_MEMBER(wswan_state, wscolor)
+void wscolor_state::machine_start()
 {
 	common_start();
 	m_system_type = TYPE_WSC;

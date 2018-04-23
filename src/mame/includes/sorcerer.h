@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef SORCERER_H_
-#define SORCERER_H_
+#ifndef MAME_INCLUDES_SORCERER_H
+#define MAME_INCLUDES_SORCERER_H
 
 #include "cpu/z80/z80.h"
 #include "sound/wave.h"
@@ -68,10 +68,8 @@ public:
 		, m_iop_x(*this, "X.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(sorcerer_fc_r);
 	DECLARE_READ8_MEMBER(sorcerer_fd_r);
 	DECLARE_READ8_MEMBER(sorcerer_fe_r);
-	DECLARE_WRITE8_MEMBER(sorcerer_fc_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_fd_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_fe_w);
 	DECLARE_WRITE8_MEMBER(sorcerer_ff_w);
@@ -85,6 +83,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sorcerer(machine_config &config);
 	void sorcererd(machine_config &config);
+	void sorcerer_io(address_map &map);
+	void sorcerer_mem(address_map &map);
+	void sorcererd_mem(address_map &map);
 private:
 	uint8_t m_fe;
 	uint8_t m_keyboard_line;
@@ -111,4 +112,4 @@ private:
 	required_ioport_array<16> m_iop_x;
 };
 
-#endif /* SORCERER_H_ */
+#endif // MAME_INCLUDES_SORCERER_H

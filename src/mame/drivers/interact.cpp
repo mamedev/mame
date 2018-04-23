@@ -78,30 +78,32 @@ public:
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void hector1(machine_config &config);
 	void interact(machine_config &config);
+	void interact_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	/* Hardware address mapping*/
-/*  AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)// Bank management not udsed in BR machine*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
-
+void interact_state::interact_mem(address_map &map)
+{
+	map.unmap_value_high();
 	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROM  /*BANK(2)*/
+	map(0x0000, 0x3fff).rom();  /*BANK(2)*/
 	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
-	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
-	/* continous RAM*/
-	AM_RANGE(0x4A00,0xffff) AM_RAM
+	/* Hardware address mapping*/
+/*  AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)// Bank management not udsed in BR machine*/
+	map(0x1000, 0x1000).w(this, FUNC(interact_state::hector_color_a_w));  /* Color c0/c1*/
+	map(0x1800, 0x1800).w(this, FUNC(interact_state::hector_color_b_w));  /* Color c2/c3*/
+	map(0x2000, 0x2003).w(this, FUNC(interact_state::hector_sn_2000_w));  /* Sound*/
+	map(0x2800, 0x2803).w(this, FUNC(interact_state::hector_sn_2800_w));  /* Sound*/
+	map(0x3000, 0x3000).rw(this, FUNC(interact_state::hector_cassette_r), FUNC(interact_state::hector_sn_3000_w));/* Write necessary*/
+	map(0x3800, 0x3807).rw(this, FUNC(interact_state::hector_keyboard_r), FUNC(interact_state::hector_keyboard_w));  /* Keyboard*/
 
-ADDRESS_MAP_END
+	/* Video br mapping*/
+	map(0x4000, 0x49ff).ram().share("videoram");
+	/* continous RAM*/
+	map(0x4A00, 0xffff).ram();
+
+}
 
 
 MACHINE_RESET_MEMBER(interact_state,interact)
@@ -145,7 +147,7 @@ MACHINE_CONFIG_START(interact_state::interact)
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)
@@ -182,7 +184,7 @@ MACHINE_CONFIG_START(interact_state::hector1)
 
 	MCFG_VIDEO_START_OVERRIDE(interact_state,hec2hrp)
 
-	MCFG_FRAGMENT_ADD(hector_audio)
+	hector_audio(config);
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(hector_cassette_formats)

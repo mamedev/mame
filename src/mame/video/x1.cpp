@@ -21,10 +21,9 @@
 
 VIDEO_START_MEMBER(x1_state,x1)
 {
-	m_avram = make_unique_clear<uint8_t[]>(0x800);
-	m_tvram = make_unique_clear<uint8_t[]>(0x800);
-	m_kvram = make_unique_clear<uint8_t[]>(0x800);
 	m_gfx_bitmap_ram = make_unique_clear<uint8_t[]>(0xc000*2);
+	m_bitmapbank->configure_entries(0, 2, m_gfx_bitmap_ram.get(), 0xc000);
+	m_bitmapbank->set_entry(0);
 	m_pal_4096 = make_unique_clear<uint8_t[]>(0x1000*3);
 }
 

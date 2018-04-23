@@ -378,7 +378,7 @@ WRITE_LINE_MEMBER(md_cons_state::screen_vblank_console)
 }
 
 MACHINE_CONFIG_START(md_cons_state::ms_megadriv)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(md_cons_state::ms_megadriv)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::ms_megadpal)
-	MCFG_FRAGMENT_ADD( md_pal )
+	md_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
@@ -403,12 +403,13 @@ MACHINE_CONFIG_START(md_cons_state::ms_megadpal)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(md_cons_state::genesis_tmss, ms_megadriv)
+MACHINE_CONFIG_START(md_cons_state::genesis_tmss)
+	ms_megadriv(config);
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","TMSS")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv)
-	MCFG_FRAGMENT_ADD( dcat16_megadriv_base )
+	dcat16_megadriv_base(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
@@ -455,7 +456,7 @@ ROM_END
 
 ROM_START(dcat16)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "MG6025.U1", 0x0000,  0x800000, CRC(5453d673) SHA1(b9f8d849cbed81fe73525229f4897ccaeeb7a833) )
+	ROM_LOAD16_WORD_SWAP( "mg6025.u1", 0x0000,  0x800000, CRC(5453d673) SHA1(b9f8d849cbed81fe73525229f4897ccaeeb7a833) )
 
 	ROM_REGION( 0x10000, "soundcpu", ROMREGION_ERASEFF)
 ROM_END
@@ -598,7 +599,7 @@ void md_cons_state::_32x_scanline_helper_callback(int scanline)
 }
 
 MACHINE_CONFIG_START(md_cons_state::genesis_32x)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
@@ -639,7 +640,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(md_cons_state::mdj_32x)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
@@ -680,7 +681,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(md_cons_state::md_32x)
-	MCFG_FRAGMENT_ADD( md_pal )
+	md_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
@@ -753,7 +754,7 @@ ROM_END
 /****************************************** SegaCD emulation ****************************************/
 
 MACHINE_CONFIG_START(md_cons_state::genesis_scd)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
@@ -771,7 +772,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::md_scd)
-	MCFG_FRAGMENT_ADD( md_pal )
+	md_pal(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
@@ -789,7 +790,7 @@ MACHINE_CONFIG_START(md_cons_state::md_scd)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(md_cons_state::mdj_scd)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
@@ -808,7 +809,8 @@ MACHINE_CONFIG_END
 
 /******************SEGA CD + 32X****************************/
 
-MACHINE_CONFIG_DERIVED(md_cons_state::genesis_32x_scd, genesis_32x)
+MACHINE_CONFIG_START(md_cons_state::genesis_32x_scd)
+	genesis_32x(config);
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
 	MCFG_GFX_PALETTE("gen_vdp:palette")
@@ -827,7 +829,8 @@ MACHINE_CONFIG_DERIVED(md_cons_state::genesis_32x_scd, genesis_32x)
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "segacd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(md_cons_state::md_32x_scd, md_32x)
+MACHINE_CONFIG_START(md_cons_state::md_32x_scd)
+	md_32x(config);
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
 	MCFG_GFX_PALETTE("gen_vdp:palette")
@@ -846,7 +849,8 @@ MACHINE_CONFIG_DERIVED(md_cons_state::md_32x_scd, md_32x)
 	MCFG_SOFTWARE_LIST_ADD("cd_list", "megacd")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(md_cons_state::mdj_32x_scd, mdj_32x)
+MACHINE_CONFIG_START(md_cons_state::mdj_32x_scd)
+	mdj_32x(config);
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
 	MCFG_GFX_PALETTE("gen_vdp:palette")

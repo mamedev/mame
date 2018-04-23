@@ -14,8 +14,8 @@
  *
  ******************************************************************************/
 
-#ifndef MICROTAN_H_
-#define MICROTAN_H_
+#ifndef MAME_INCLUDES_MICROTAN_H
+#define MAME_INCLUDES_MICROTAN_H
 
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
@@ -97,8 +97,9 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
 
 	void microtan(machine_config &config);
+	void microtan_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-#endif /* MICROTAN_H_ */
+#endif // MAME_INCLUDES_MICROTAN_H

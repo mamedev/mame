@@ -63,12 +63,14 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void shtzone(machine_config &config);
+	void shtzone_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( shtzone_map, AS_PROGRAM, 8, shtzone_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM
-ADDRESS_MAP_END
+void shtzone_state::shtzone_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram();
+}
 
 
 static INPUT_PORTS_START( shtzone )

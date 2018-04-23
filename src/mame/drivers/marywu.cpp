@@ -29,6 +29,7 @@ class marywu_state : public driver_device
 public:
 	marywu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(display_7seg_data_w);
@@ -38,10 +39,13 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_port_a_w);
 	DECLARE_WRITE8_MEMBER(ay2_port_b_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(port_r);
 	void marywu(machine_config &config);
+	void io_map(address_map &map);
+	void program_map(address_map &map);
 private:
 	uint8_t m_selected_7seg_module;
+	virtual void machine_start() override;
+	output_finder<32> m_digits;
 };
 
 static INPUT_PORTS_START( marywu )
@@ -136,17 +140,6 @@ WRITE8_MEMBER( marywu_state::multiplex_7seg_w )
 	m_selected_7seg_module = data;
 }
 
-READ8_MEMBER( marywu_state::port_r )
-{
-//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
-	switch(offset){
-		//case 1:
-	//  return (1 << 6);
-	default:
-		return 0x00;
-	}
-}
-
 READ8_MEMBER( marywu_state::keyboard_r )
 {
 	switch(m_selected_7seg_module % 8){
@@ -163,30 +156,37 @@ WRITE8_MEMBER( marywu_state::display_7seg_data_w )
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
 
-	output().set_digit_value(2 * m_selected_7seg_module + 0, patterns[data & 0x0F]);
-	output().set_digit_value(2 * m_selected_7seg_module + 1, patterns[(data >> 4) & 0x0F]);
+	m_digits[2 * m_selected_7seg_module + 0] = patterns[data & 0x0F];
+	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
 }
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, marywu_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void marywu_state::program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, marywu_state )
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM /* HM6116: 2kbytes of Static RAM */
-	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
-	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
-	AM_RANGE(0x9003, 0x9003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0xb000, 0xb001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_NOP /* TODO: Investigate this. There's something going on at this address range. */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(port_r)
-ADDRESS_MAP_END
+void marywu_state::io_map(address_map &map)
+{
+	map(0x8000, 0x87ff).mirror(0x0800).ram(); /* HM6116: 2kbytes of Static RAM */
+	map(0x9000, 0x9000).mirror(0x0ffc).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x9001, 0x9001).mirror(0x0ffc).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x9002, 0x9002).mirror(0x0ffc).w("ay2", FUNC(ay8910_device::data_address_w));
+	map(0x9003, 0x9003).mirror(0x0ffc).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb000, 0xb001).mirror(0x0ffe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xf000, 0xf000).noprw(); /* TODO: Investigate this. There's something going on at this address range. */
+}
+
+void marywu_state::machine_start()
+{
+	m_digits.resolve();
+}
 
 MACHINE_CONFIG_START(marywu_state::marywu)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'738'635)) //actual CPU is a Winbond w78c31b-24
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
+	//TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 
 	/* Keyboard & display interface */
 	MCFG_DEVICE_ADD("i8279", I8279, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */

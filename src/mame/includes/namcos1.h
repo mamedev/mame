@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+#include "cpu/m6800/m6801.h"
 #include "machine/c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
@@ -35,7 +36,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_mcu;
+	required_device<hd63701_cpu_device> m_mcu;
 	required_device<namco_c116_device> m_c116;
 	required_device<namco_c117_device> m_c117;
 	required_device<dac_8bit_r2r_device> m_dac0;
@@ -141,6 +142,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void ns1(machine_config &config);
+	void main_map(address_map &map);
+	void mcu_map(address_map &map);
+	void mcu_port_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
+	void virtual_map(address_map &map);
 private:
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *info_vram);
 };

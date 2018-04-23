@@ -54,15 +54,19 @@ public:
 		DECLARE_DRIVER_INIT(os214);
 	required_device<cpu_device> m_maincpu;
 	void os214(machine_config &config);
+	void os214_io_map(address_map &map);
+	void os214_prg_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( os214_prg_map, AS_PROGRAM, 16, os214_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-ADDRESS_MAP_END
+void os214_state::os214_prg_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+}
 
-static ADDRESS_MAP_START( os214_io_map, AS_IO, 8, os214_state )
+void os214_state::os214_io_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 MACHINE_CONFIG_START(os214_state::os214)
 	/* basic machine hardware */

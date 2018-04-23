@@ -55,6 +55,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "logmacro.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/6840ptm.h"
@@ -63,7 +64,9 @@
 #include "bus/hp_dio/hp98544.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
-#include "bus/hp_dio/hp98603.h"
+#include "bus/hp_dio/hp98603a.h"
+#include "bus/hp_dio/hp98603b.h"
+#include "bus/hp_dio/hp98644.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -111,6 +114,9 @@ public:
 	DECLARE_READ8_MEMBER(iocpu_port1_r);
 	DECLARE_READ8_MEMBER(iocpu_test0_r);
 
+	DECLARE_READ8_MEMBER(gpib_r);
+	DECLARE_WRITE8_MEMBER(gpib_w);
+
 	DECLARE_WRITE32_MEMBER(led_w)
 	{
 		if (mem_mask != 0x000000ff)
@@ -142,11 +148,20 @@ public:
 	void hp9k380(machine_config &config);
 	void hp9k320(machine_config &config);
 	void hp9k332(machine_config &config);
+	void hp9k310_map(address_map &map);
+	void hp9k320_map(address_map &map);
+	void hp9k330_map(address_map &map);
+	void hp9k332_map(address_map &map);
+	void hp9k370_map(address_map &map);
+	void hp9k380_map(address_map &map);
+	void hp9k382_map(address_map &map);
+	void hp9k3xx_common(address_map &map);
+	void iocpu_map(address_map &map);
 private:
-	bool m_in_buserr;
 	bool m_hil_read;
 	uint8_t m_hil_data;
 	uint8_t m_latch_data;
+	uint32_t m_lastpc;
 };
 
 uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -174,93 +189,106 @@ uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bi
 }
 
 // shared mappings for all 9000/3xx systems
-static ADDRESS_MAP_START(hp9k3xx_common, AS_PROGRAM, 32, hp9k3xx_state)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_REGION("maincpu",0) AM_WRITE(led_w)  // writes to 1fffc are the LED
+void hp9k3xx_state::hp9k3xx_common(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).w(this, FUNC(hp9k3xx_state::led_w));  // writes to 1fffc are the LED
 
-	AM_RANGE(0x00428000, 0x00428003) AM_DEVREADWRITE8(IOCPU_TAG, upi41_cpu_device, upi41_master_r, upi41_master_w, 0x00ff00ff)
+	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask32(0x00ff00ff);
+	map(0x00478000, 0x0047ffff).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
-	AM_RANGE(0x00510000, 0x00510003) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
-	AM_RANGE(0x00538000, 0x00538003) AM_READWRITE(buserror_r, buserror_w)   // no "Graphics"
-	AM_RANGE(0x005c0000, 0x005c0003) AM_READWRITE(buserror_r, buserror_w)   // no add-on FP coprocessor
+	map(0x005f8000, 0x005f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask32(0x00ff00ff);
 
-	AM_RANGE(0x00600000, 0x007fffff) AM_READWRITE(buserror_r, buserror_w)   // prevent reading invalid DIO slots
-	AM_RANGE(0x01000000, 0x1fffffff) AM_READWRITE(buserror_r, buserror_w)   // prevent reading invalid DIO-II slots
+	map(0x005f4000, 0x005f400f).ram(); // somehow coprocessor related - bootrom crashes if not present
+	map(0x00474000, 0x00474fff).ram(); // unknown
 
-	AM_RANGE(0x005f8000, 0x005f800f) AM_DEVREADWRITE8(PTM6840_TAG, ptm6840_device, read, write, 0x00ff00ff)
-ADDRESS_MAP_END
+}
 
 // 9000/310 - has onboard video that the graphics card used in other 3xxes conflicts with
-static ADDRESS_MAP_START(hp9k310_map, AS_PROGRAM, 16, hp9k3xx_state)
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION("maincpu",0) AM_WRITENOP  // writes to 1fffc are the LED
+void hp9k3xx_state::hp9k310_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
 
-	AM_RANGE(0x00428000, 0x00428003) AM_DEVREADWRITE8(IOCPU_TAG, upi41_cpu_device, upi41_master_r, upi41_master_w, 0x00ff)
+	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
 
-	AM_RANGE(0x510000, 0x510003) AM_READWRITE(buserror16_r, buserror16_w)   // no "Alpha display"
-	AM_RANGE(0x538000, 0x538003) AM_READWRITE(buserror16_r, buserror16_w)   // no "Graphics"
-	AM_RANGE(0x5c0000, 0x5c0003) AM_READWRITE(buserror16_r, buserror16_w)   // no add-on FP coprocessor
+	map(0x510000, 0x510003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
+	map(0x538000, 0x538003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Graphics"
+	map(0x5c0000, 0x5c0003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no add-on FP coprocessor
 
-	AM_RANGE(0x5f8000, 0x5f800f) AM_DEVREADWRITE8(PTM6840_TAG, ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0x600000, 0x7fffff) AM_READWRITE(buserror16_r, buserror16_w)   // prevent reading invalid DIO slots
-	AM_RANGE(0x800000, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+	map(0x5f8000, 0x5f800f).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
+	map(0x600000, 0x7fffff).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // prevent reading invalid DIO slots
+	map(0x800000, 0xffffff).ram();
+}
 
 // 9000/320
-static ADDRESS_MAP_START(hp9k320_map, AS_PROGRAM, 32, hp9k3xx_state)
-	AM_RANGE(0xffe00000, 0xffefffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM
+void hp9k3xx_state::hp9k320_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_IMPORT_FROM(hp9k3xx_common)
-ADDRESS_MAP_END
+	// unknown, but bootrom crashes without
+	map(0x00510000, 0x00510fff).ram();
+	map(0x00516000, 0x00516fff).ram();
+	map(0x00440000, 0x0044ffff).ram();
+
+	// main memory
+	map(0xfff00000, 0xffffffff).ram();
+}
 
 // 9000/330 and 9000/340
-static ADDRESS_MAP_START(hp9k330_map, AS_PROGRAM, 32, hp9k3xx_state)
-	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
+void hp9k3xx_state::hp9k330_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_IMPORT_FROM(hp9k3xx_common)
-ADDRESS_MAP_END
+	map(0xffb00000, 0xffbfffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffc00000, 0xffffffff).ram();
+}
 
 // 9000/332, with built-in medium-res video
-static ADDRESS_MAP_START(hp9k332_map, AS_PROGRAM, 32, hp9k3xx_state)
-	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_SHARE("vram")    // 98544 mono framebuffer
-	AM_RANGE(0x00560000, 0x00563fff) AM_ROM AM_REGION("graphics", 0x0000)   // 98544 mono ROM
+void hp9k3xx_state::hp9k332_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
+	map(0x00200000, 0x002fffff).ram().share("vram");    // 98544 mono framebuffer
+	map(0x00560000, 0x00563fff).rom().region("graphics", 0x0000);   // 98544 mono ROM
 
-	AM_IMPORT_FROM(hp9k3xx_common)
-ADDRESS_MAP_END
+	map(0xffb00000, 0xffbfffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffc00000, 0xffffffff).ram();
+}
 
 // 9000/370 - 8 MB RAM standard
-static ADDRESS_MAP_START(hp9k370_map, AS_PROGRAM, 32, hp9k3xx_state)
-	AM_RANGE(0xff700000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
+void hp9k3xx_state::hp9k370_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_IMPORT_FROM(hp9k3xx_common)
-ADDRESS_MAP_END
+	map(0xff700000, 0xff7fffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xff800000, 0xffffffff).ram();
+}
 
 // 9000/380 - '040
-static ADDRESS_MAP_START(hp9k380_map, AS_PROGRAM, 32, hp9k3xx_state)
-	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
+void hp9k3xx_state::hp9k380_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_RANGE(0xc0000000, 0xff7fffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM
+	map(0x0051a000, 0x0051afff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
 
-	AM_IMPORT_FROM(hp9k3xx_common)
-ADDRESS_MAP_END
+	map(0xc0000000, 0xff7fffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xff800000, 0xffffffff).ram();
+}
 
 // 9000/382 - onboard VGA compatible video (where?)
-static ADDRESS_MAP_START(hp9k382_map, AS_PROGRAM, 32, hp9k3xx_state)
-	AM_RANGE(0xffb00000, 0xffbfffff) AM_READWRITE(buserror_r, buserror_w)
-	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
+void hp9k3xx_state::hp9k382_map(address_map &map)
+{
+	hp9k3xx_common(map);
 
-	AM_RANGE(0x0051a000, 0x0051afff) AM_READWRITE(buserror_r, buserror_w)   // no "Alpha display"
+	map(0xffb00000, 0xffbfffff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));
+	map(0xffc00000, 0xffffffff).ram();
 
-	AM_IMPORT_FROM(hp9k3xx_common)
-ADDRESS_MAP_END
+	map(0x0051a000, 0x0051afff).rw(this, FUNC(hp9k3xx_state::buserror_r), FUNC(hp9k3xx_state::buserror_w));   // no "Alpha display"
+}
 
-static ADDRESS_MAP_START(iocpu_map, AS_PROGRAM, 8, hp9k3xx_state)
-ADDRESS_MAP_END
+void hp9k3xx_state::iocpu_map(address_map &map)
+{
+}
 
 uint32_t hp9k3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -274,53 +302,54 @@ INPUT_PORTS_END
 
 void hp9k3xx_state::machine_reset()
 {
-	m_in_buserr = false;
+}
+
+WRITE8_MEMBER(hp9k3xx_state::gpib_w)
+{
+	LOG("%s: 0x%02x = 0x%02x\n", __FUNCTION__, offset ,data);
+}
+
+READ8_MEMBER(hp9k3xx_state::gpib_r)
+{
+	LOG("%s: 0x%02x\n", __FUNCTION__, offset);
+	return 0xff;
 }
 
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
-	}
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	m_lastpc = machine().device<cpu_device>("maincpu")->pc();
 	return 0;
 }
 
 WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
+	if (m_lastpc == machine().device<cpu_device>("maincpu")->pc()) {
+		logerror("%s: ignoring r-m-w double bus error\n", __FUNCTION__);
+		return;
 	}
+
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
 READ32_MEMBER(hp9k3xx_state::buserror_r)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
-	}
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	m_lastpc = machine().device<cpu_device>("maincpu")->pc();
 	return 0;
 }
 
 WRITE32_MEMBER(hp9k3xx_state::buserror_w)
 {
-	if (!m_in_buserr)
-	{
-		m_in_buserr = true;
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-		m_in_buserr = false;
+	if (m_lastpc == machine().device<cpu_device>("maincpu")->pc()) {
+		logerror("%s: ignoring r-m-w double bus error\n", __FUNCTION__);
+		return;
 	}
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(hp9k3xx_state::iocpu_port1_w)
@@ -364,7 +393,9 @@ READ8_MEMBER(hp9k3xx_state::iocpu_test0_r)
 
 static SLOT_INTERFACE_START(dio16_cards)
 	SLOT_INTERFACE("98544", HPDIO_98544) /* 98544 High Resolution Monochrome Card */
-	SLOT_INTERFACE("98603", HPDIO_98603) /* 98603 ROM BASIC */
+	SLOT_INTERFACE("98603a", HPDIO_98603A) /* 98603A ROM BASIC (4.0) */
+	SLOT_INTERFACE("98603b", HPDIO_98603B) /* 98603B ROM BASIC (5.1) */
+	SLOT_INTERFACE("98644", HPDIO_98644) /* 98644 Async serial interface */
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
@@ -392,8 +423,9 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_DEVICE_ADD("diobus", DIO16, 0)
 	MCFG_DIO16_CPU(":maincpu")
 	MCFG_DIO16_SLOT_ADD("diobus", "sl1", dio16_cards, "98544", true)
-	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603", true)
-	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
+	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603b", true)
+	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, "98644", true)
+	MCFG_DIO16_SLOT_ADD("diobus", "sl4", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
@@ -421,11 +453,13 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_DEVICE_ADD("diobus", DIO32, 0)
 	MCFG_DIO32_CPU(":maincpu")
 	MCFG_DIO32_SLOT_ADD("diobus", "sl1", dio16_cards, "98544", true)
-	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603", true)
-	MCFG_DIO32_SLOT_ADD("diobus", "sl3", dio16_cards, nullptr, false)
+	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603b", true)
+	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, "98644", true)
+	MCFG_DIO32_SLOT_ADD("diobus", "sl4", dio16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k330, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68020PMMU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
@@ -460,25 +494,29 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	MCFG_SCREEN_REFRESH_RATE(70)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k340, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k340)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k370, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k370)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k370_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k380, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k380)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k380_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(hp9k3xx_state::hp9k382, hp9k320)
+MACHINE_CONFIG_START(hp9k3xx_state::hp9k382)
+	hp9k320(config);
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE(MAINCPU_TAG, M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k382_map)

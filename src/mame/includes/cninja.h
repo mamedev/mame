@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "cpu/h6280/h6280.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/bufsprite.h"
@@ -118,4 +119,15 @@ public:
 	void stoneage(machine_config &config);
 	void cninjabl2(machine_config &config);
 	void mutantf(machine_config &config);
+	void cninja_map(address_map &map);
+	void cninjabl2_oki_map(address_map &map);
+	void cninjabl2_s_map(address_map &map);
+	void cninjabl_map(address_map &map);
+	void cninjabl_sound_map(address_map &map);
+	void edrandy_map(address_map &map);
+	void mutantf_map(address_map &map);
+	void robocop2_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_map_mutantf(address_map &map);
+	void stoneage_s_map(address_map &map);
 };

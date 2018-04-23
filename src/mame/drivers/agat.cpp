@@ -19,7 +19,7 @@
     - video: vertical raster splits (used at least by Rapira)
     - what is the state of devices at init and reset?
     - what do floating bus reads do?
-    - ignore debugger reads -- use side_effect_disabled()
+    - ignore debugger reads -- use side_effects_disabled()
     - softlists
 
     To do (agat7):
@@ -51,14 +51,22 @@
 ************************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
 #include "video/agat7.h"
 
-#include "machine/bankdev.h"
+#include "cpu/m6502/m6502.h"
+
+#include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
+
+#include "machine/bankdev.h"
+#include "machine/kb3600.h"
+#include "machine/timer.h"
+
+#include "sound/spkrdev.h"
 
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/agat7langcard.h"
+#include "bus/a2bus/agat7ports.h"
 #include "bus/a2bus/agat7ram.h"
 #include "bus/a2bus/agat840k_hle.h"
 
@@ -154,6 +162,8 @@ public:
 	DECLARE_WRITE8_MEMBER(controller_strobe_w);
 
 	void agat7(machine_config &config);
+	void agat7_map(address_map &map);
+	void inhbank_map(address_map &map);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -348,7 +358,7 @@ READ8_MEMBER(agat7_state::keyb_strobe_r)
 {
 	// reads any key down, clears strobe
 	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		m_strobe = 0;
 	return rv;
 }
@@ -361,7 +371,7 @@ WRITE8_MEMBER(agat7_state::keyb_strobe_w)
 
 READ8_MEMBER(agat7_state::cassette_toggle_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		cassette_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -374,7 +384,7 @@ WRITE8_MEMBER(agat7_state::cassette_toggle_w)
 
 READ8_MEMBER(agat7_state::speaker_toggle_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		speaker_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -387,7 +397,7 @@ WRITE8_MEMBER(agat7_state::speaker_toggle_w)
 
 READ8_MEMBER(agat7_state::interrupts_on_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		interrupts_on_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -399,7 +409,7 @@ WRITE8_MEMBER(agat7_state::interrupts_on_w)
 
 READ8_MEMBER(agat7_state::interrupts_off_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		interrupts_off_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -444,7 +454,7 @@ READ8_MEMBER(agat7_state::flags_r)
 
 READ8_MEMBER(agat7_state::controller_strobe_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 		controller_strobe_w(space, offset, 0);
 	return read_floatingbus();
 }
@@ -459,7 +469,7 @@ WRITE8_MEMBER(agat7_state::controller_strobe_w)
 
 READ8_MEMBER(agat7_state::c080_r)
 {
-	if (!machine().side_effect_disabled())
+	if (!machine().side_effects_disabled())
 	{
 		int slot;
 
@@ -501,7 +511,7 @@ READ8_MEMBER(agat7_state::c100_r)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
@@ -524,7 +534,7 @@ WRITE8_MEMBER(agat7_state::c100_w)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
@@ -539,7 +549,7 @@ READ8_MEMBER(agat7_state::c800_r)
 
 	if (offset == 0x7ff)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_cnxx_slot = -1;
 		}
@@ -561,7 +571,7 @@ WRITE8_MEMBER(agat7_state::c800_w)
 
 	if (offset == 0x7ff)
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			m_cnxx_slot = -1;
 		}
@@ -680,29 +690,31 @@ WRITE8_MEMBER(agat7_state::agat7_ram_w)
  * and are supported only on motherboards with 32K onboard.
  * all extra RAM (onboard or addon) is accessible via 16K window at 0x8000.
  */
-static ADDRESS_MAP_START( agat7_map, AS_PROGRAM, 8, agat7_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(agat7_ram_r, agat7_ram_w)
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0xf) AM_READ(keyb_data_r) AM_WRITENOP
-	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0xf) AM_READWRITE(keyb_strobe_r, keyb_strobe_w)
-	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0xf) AM_READWRITE(cassette_toggle_r, cassette_toggle_w)
-	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0xf) AM_READWRITE(speaker_toggle_r, speaker_toggle_w)
-	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0xf) AM_READWRITE(interrupts_on_r, interrupts_on_w)
-	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0xf) AM_READWRITE(interrupts_off_r, interrupts_off_w)
-	AM_RANGE(0xc060, 0xc067) AM_MIRROR(0x8) AM_READ(flags_r) AM_WRITENOP
-	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0xf) AM_READWRITE(controller_strobe_r, controller_strobe_w)
-	AM_RANGE(0xc080, 0xc0ef) AM_READWRITE(c080_r, c080_w)
-	AM_RANGE(0xc0f0, 0xc0ff) AM_READWRITE(agat7_membank_r, agat7_membank_w)
-	AM_RANGE(0xc100, 0xc6ff) AM_READWRITE(c100_r, c100_w)
-	AM_RANGE(0xc700, 0xc7ff) AM_DEVREADWRITE("a7video", agat7video_device, read, write)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(c800_r, c800_w)
-	AM_RANGE(0xd000, 0xffff) AM_DEVICE(A7_UPPERBANK_TAG, address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void agat7_state::agat7_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xbfff).rw(this, FUNC(agat7_state::agat7_ram_r), FUNC(agat7_state::agat7_ram_w));
+	map(0xc000, 0xc000).mirror(0xf).r(this, FUNC(agat7_state::keyb_data_r)).nopw();
+	map(0xc010, 0xc010).mirror(0xf).rw(this, FUNC(agat7_state::keyb_strobe_r), FUNC(agat7_state::keyb_strobe_w));
+	map(0xc020, 0xc020).mirror(0xf).rw(this, FUNC(agat7_state::cassette_toggle_r), FUNC(agat7_state::cassette_toggle_w));
+	map(0xc030, 0xc030).mirror(0xf).rw(this, FUNC(agat7_state::speaker_toggle_r), FUNC(agat7_state::speaker_toggle_w));
+	map(0xc040, 0xc040).mirror(0xf).rw(this, FUNC(agat7_state::interrupts_on_r), FUNC(agat7_state::interrupts_on_w));
+	map(0xc050, 0xc050).mirror(0xf).rw(this, FUNC(agat7_state::interrupts_off_r), FUNC(agat7_state::interrupts_off_w));
+	map(0xc060, 0xc067).mirror(0x8).r(this, FUNC(agat7_state::flags_r)).nopw();
+	map(0xc070, 0xc070).mirror(0xf).rw(this, FUNC(agat7_state::controller_strobe_r), FUNC(agat7_state::controller_strobe_w));
+	map(0xc080, 0xc0ef).rw(this, FUNC(agat7_state::c080_r), FUNC(agat7_state::c080_w));
+	map(0xc0f0, 0xc0ff).rw(this, FUNC(agat7_state::agat7_membank_r), FUNC(agat7_state::agat7_membank_w));
+	map(0xc100, 0xc6ff).rw(this, FUNC(agat7_state::c100_r), FUNC(agat7_state::c100_w));
+	map(0xc700, 0xc7ff).rw("a7video", FUNC(agat7video_device::read), FUNC(agat7video_device::write));
+	map(0xc800, 0xcfff).rw(this, FUNC(agat7_state::c800_r), FUNC(agat7_state::c800_w));
+	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+}
 
-static ADDRESS_MAP_START( inhbank_map, AS_PROGRAM, 8, agat7_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("maincpu", 0x1000) AM_WRITE(inh_w)
-	AM_RANGE(0x3000, 0x5fff) AM_READWRITE(inh_r, inh_w)
-ADDRESS_MAP_END
+void agat7_state::inhbank_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom().region("maincpu", 0x1000).w(this, FUNC(agat7_state::inh_w));
+	map(0x3000, 0x5fff).rw(this, FUNC(agat7_state::inh_r), FUNC(agat7_state::inh_w));
+}
 
 /***************************************************************************
     KEYBOARD
@@ -1058,7 +1070,7 @@ static SLOT_INTERFACE_START(agat7_cards)
 	SLOT_INTERFACE("a7ram", A2BUS_AGAT7RAM) // Agat-7 32K RAM Card -- decimal 3.089.119-01, KR565RU6D chips
 	SLOT_INTERFACE("a7fdc", A2BUS_AGAT7_FDC) // Disk II clone -- decimal 3.089.105
 	SLOT_INTERFACE("a7fdc840", A2BUS_AGAT840K_HLE) // 840K floppy controller -- decimal 7.104.351 or 3.089.023?
-	// Serial-parallel card -- decimal 3.089.106
+	SLOT_INTERFACE("a7ports", A2BUS_AGAT7_PORTS) // Serial-parallel card -- decimal 3.089.106
 	// Printer card (agat9) -- decimal 3.089.174
 
 	// 3rd party cards
@@ -1126,7 +1138,7 @@ MACHINE_CONFIG_START(agat7_state::agat7)
 	MCFG_A2BUS_OUT_INH_CB(WRITELINE(agat7_state, a2bus_inh_w))
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl2", agat7_cards, "a7lang")
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl3", agat7_cards, "a7fdc")
-	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl4", agat7_cards, nullptr)
+	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl4", agat7_cards, "a7ports")
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl5", agat7_cards, nullptr)
 	MCFG_A2BUS_SLOT_ADD(A7_BUS_TAG, "sl6", agat7_cards, "a7ram")
 

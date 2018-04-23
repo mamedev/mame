@@ -41,6 +41,7 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(u10_a_r);
@@ -59,6 +60,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	void st_mp100(machine_config &config);
+	void st_mp100_map(address_map &map);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -73,6 +75,7 @@ private:
 	uint8_t m_counter;
 	uint8_t m_segment[5];
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<m6800_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_u10;
 	required_device<pia6821_device> m_pia_u11;
@@ -86,19 +89,21 @@ private:
 	required_ioport m_io_x2;
 	required_ioport m_io_x3;
 	required_ioport m_io_x4;
+	output_finder<48> m_digits;
 };
 
 
-static ADDRESS_MAP_START( st_mp100_map, AS_PROGRAM, 8, st_mp100_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
-	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x00a0, 0x00a7) AM_WRITENOP // to sound board
-	AM_RANGE(0x00c0, 0x00c7) // to sound board
-	AM_RANGE(0x0200, 0x02ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("roms", 0 )
-ADDRESS_MAP_END
+void st_mp100_state::st_mp100_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x007f).ram(); // internal to the cpu
+	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x00a0, 0x00a7).nopw(); // to sound board
+	map(0x00c0, 0x00c7); // to sound board
+	map(0x0200, 0x02ff).ram().share("nvram");
+	map(0x1000, 0x1fff).rom().region("roms", 0);
+}
 
 static INPUT_PORTS_START( mp100 )
 	PORT_START("TEST")
@@ -614,11 +619,11 @@ WRITE8_MEMBER( st_mp100_state::u11_a_w )
 		if (BIT(data, 0) && (m_counter > 8))
 		{
 			static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
-			output().set_digit_value(m_digit, patterns[m_segment[0]]);
-			output().set_digit_value(10+m_digit, patterns[m_segment[1]]);
-			output().set_digit_value(20+m_digit, patterns[m_segment[2]]);
-			output().set_digit_value(30+m_digit, patterns[m_segment[3]]);
-			output().set_digit_value(40+m_digit, patterns[m_segment[4]]);
+			m_digits[m_digit] = patterns[m_segment[0]];
+			m_digits[10+m_digit] = patterns[m_segment[1]];
+			m_digits[20+m_digit] = patterns[m_segment[2]];
+			m_digits[30+m_digit] = patterns[m_segment[3]];
+			m_digits[40+m_digit] = patterns[m_segment[4]];
 		}
 	}
 }
@@ -712,7 +717,7 @@ MACHINE_CONFIG_START(st_mp100_state::st_mp100)
 	MCFG_DEFAULT_LAYOUT(layout_st_mp100)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia_u10", PIA6821, 0)
@@ -815,14 +820,14 @@ ROM_END
 /-------------------------------*/
 ROM_START(trident)
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "25AROM_P11A.U2",  0x0000, 0x0800, CRC(6dcd6ad3) SHA1(f748acc8628c5013b630a5c7b25a1bf72e36b16d))   // 9316A-2920
-	ROM_LOAD( "25AROM_P12AU.U6", 0x0800, 0x0800, CRC(fb955a6f) SHA1(387080d5af318463475797fecff026d6db776a0c))   // 9316A-2921
+	ROM_LOAD( "25arom_p11a.u2",  0x0000, 0x0800, CRC(6dcd6ad3) SHA1(f748acc8628c5013b630a5c7b25a1bf72e36b16d))   // 9316A-2920
+	ROM_LOAD( "25arom_p12au.u6", 0x0800, 0x0800, CRC(fb955a6f) SHA1(387080d5af318463475797fecff026d6db776a0c))   // 9316A-2921
 ROM_END
 
 ROM_START(tridento)
 	ROM_REGION(0x1000, "roms", 0)
-	ROM_LOAD( "25AROM_P11.U2",  0x0000, 0x0800, CRC(934e49dd) SHA1(cbf6ca2759166f522f651825da0c75cf7248d3da))
-	ROM_LOAD( "25AROM_P12U.U6", 0x0800, 0x0800, CRC(540bce56) SHA1(0b21385501b83e448403e0216371487ed54026b7))
+	ROM_LOAD( "25arom_p11.u2",  0x0000, 0x0800, CRC(934e49dd) SHA1(cbf6ca2759166f522f651825da0c75cf7248d3da))
+	ROM_LOAD( "25arom_p12u.u6", 0x0800, 0x0800, CRC(540bce56) SHA1(0b21385501b83e448403e0216371487ed54026b7))
 ROM_END
 
 /*-------------------------------------

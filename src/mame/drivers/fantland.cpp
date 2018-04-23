@@ -124,43 +124,45 @@ WRITE16_MEMBER(fantland_state::spriteram2_16_w)
 		spriteram_2[2 * offset + 1] = data >> 8;
 }
 
-static ADDRESS_MAP_START( fantland_map, AS_PROGRAM, 16, fantland_state )
-	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x7ffff ) AM_ROM
+void fantland_state::fantland_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+	map(0x08000, 0x7ffff).rom();
 
-	AM_RANGE( 0xa2000, 0xa21ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	map(0xa2000, 0xa21ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	AM_RANGE( 0xa3000, 0xa3001 ) AM_READ_PORT("a3000") AM_WRITE(fantland_nmi_enable_16_w )
-	AM_RANGE( 0xa3002, 0xa3003 ) AM_READ_PORT("a3002") AM_WRITE(fantland_soundlatch_16_w )
+	map(0xa3000, 0xa3001).portr("a3000").w(this, FUNC(fantland_state::fantland_nmi_enable_16_w));
+	map(0xa3002, 0xa3003).portr("a3002").w(this, FUNC(fantland_state::fantland_soundlatch_16_w));
 
-	AM_RANGE( 0xa4000, 0xa67ff ) AM_READWRITE(spriteram_16_r,  spriteram_16_w  ) AM_SHARE("spriteram")
-	AM_RANGE( 0xc0000, 0xcffff ) AM_READWRITE(spriteram2_16_r, spriteram2_16_w ) AM_SHARE("spriteram2")
+	map(0xa4000, 0xa67ff).rw(this, FUNC(fantland_state::spriteram_16_r), FUNC(fantland_state::spriteram_16_w)).share("spriteram");
+	map(0xc0000, 0xcffff).rw(this, FUNC(fantland_state::spriteram2_16_r), FUNC(fantland_state::spriteram2_16_w)).share("spriteram2");
 
-	AM_RANGE( 0xe0000, 0xfffff ) AM_ROM
-ADDRESS_MAP_END
+	map(0xe0000, 0xfffff).rom();
+}
 
 
 /***************************************************************************
                                 Galaxy Gunners
 ***************************************************************************/
 
-static ADDRESS_MAP_START( galaxygn_map, AS_PROGRAM, 8, fantland_state )
-	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
-	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
+void fantland_state::galaxygn_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+	map(0x10000, 0x2ffff).rom();
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE( 0x53000, 0x53000 ) AM_READ_PORT("P1") AM_WRITE(fantland_nmi_enable_w )
-	AM_RANGE( 0x53001, 0x53001 ) AM_READ_PORT("P2")
-	AM_RANGE( 0x53002, 0x53002 ) AM_READ_PORT("DSW1") AM_WRITE(fantland_soundlatch_w )
-	AM_RANGE( 0x53003, 0x53003 ) AM_READ_PORT("DSW2")
+	map(0x53000, 0x53000).portr("P1").w(this, FUNC(fantland_state::fantland_nmi_enable_w));
+	map(0x53001, 0x53001).portr("P2");
+	map(0x53002, 0x53002).portr("DSW1").w(this, FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53003, 0x53003).portr("DSW2");
 
-	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_SHARE("spriteram2")
+	map(0x54000, 0x567ff).ram().share("spriteram");
+	map(0x60000, 0x6ffff).ram().share("spriteram2");
 
-	AM_RANGE( 0x70000, 0x7ffff ) AM_ROM
-	AM_RANGE( 0xf0000, 0xfffff ) AM_ROM
-ADDRESS_MAP_END
+	map(0x70000, 0x7ffff).rom();
+	map(0xf0000, 0xfffff).rom();
+}
 
 
 /***************************************************************************
@@ -236,51 +238,53 @@ READ8_MEMBER(fantland_state::borntofi_inputs_r)
 	return m_input_ret[offset];
 }
 
-static ADDRESS_MAP_START( borntofi_map, AS_PROGRAM, 8, fantland_state )
-	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
-	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
+void fantland_state::borntofi_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+	map(0x10000, 0x2ffff).rom();
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE( 0x53000, 0x53001 ) AM_READWRITE(borntofi_inputs_r, borntofi_nmi_enable_w )
-	AM_RANGE( 0x53002, 0x53002 ) AM_READ_PORT( "DSW" ) AM_WRITE(fantland_soundlatch_w )
-	AM_RANGE( 0x53003, 0x53003 ) AM_READ_PORT( "Controls" )
+	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x53000, 0x53001).rw(this, FUNC(fantland_state::borntofi_inputs_r), FUNC(fantland_state::borntofi_nmi_enable_w));
+	map(0x53002, 0x53002).portr("DSW").w(this, FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53003, 0x53003).portr("Controls");
 
-	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_SHARE("spriteram")
+	map(0x54000, 0x567ff).ram().share("spriteram");
 
-	AM_RANGE( 0x57000, 0x57000 ) AM_READ_PORT( "P1 Lightgun Y" )
-	AM_RANGE( 0x57001, 0x57001 ) AM_READ_PORT( "P1 Lightgun X" )
-	AM_RANGE( 0x57002, 0x57002 ) AM_READ_PORT( "P2 Lightgun Y" )
-	AM_RANGE( 0x57003, 0x57003 ) AM_READ_PORT( "P2 Lightgun X" )
+	map(0x57000, 0x57000).portr("P1 Lightgun Y");
+	map(0x57001, 0x57001).portr("P1 Lightgun X");
+	map(0x57002, 0x57002).portr("P2 Lightgun Y");
+	map(0x57003, 0x57003).portr("P2 Lightgun X");
 
-	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_SHARE("spriteram2")
+	map(0x60000, 0x6ffff).ram().share("spriteram2");
 
-	AM_RANGE( 0x70000, 0x7ffff ) AM_ROM
-	AM_RANGE( 0xf0000, 0xfffff ) AM_ROM
-ADDRESS_MAP_END
+	map(0x70000, 0x7ffff).rom();
+	map(0xf0000, 0xfffff).rom();
+}
 
 
 /***************************************************************************
                            Wheels Runner
 ***************************************************************************/
 
-static ADDRESS_MAP_START( wheelrun_map, AS_PROGRAM, 8, fantland_state )
-	AM_RANGE(0x00000, 0x07fff) AM_RAM
+void fantland_state::wheelrun_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
 
-	AM_RANGE(0x30000, 0x3ffff) AM_ROM
-	AM_RANGE(0x70000, 0x7ffff) AM_ROM
+	map(0x30000, 0x3ffff).rom();
+	map(0x70000, 0x7ffff).rom();
 
-	AM_RANGE(0x52000, 0x521ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	map(0x52000, 0x521ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
-	AM_RANGE(0x53000, 0x53000) AM_READ_PORT( "53000" ) AM_WRITE(borntofi_nmi_enable_w )
-	AM_RANGE(0x53001, 0x53001) AM_READ_PORT( "53001" )
-	AM_RANGE(0x53002, 0x53002) AM_READ_PORT( "53002" ) AM_WRITE(fantland_soundlatch_w )
-	AM_RANGE(0x53003, 0x53003) AM_READ_PORT( "53003" ) AM_WRITENOP
+	map(0x53000, 0x53000).portr("53000").w(this, FUNC(fantland_state::borntofi_nmi_enable_w));
+	map(0x53001, 0x53001).portr("53001");
+	map(0x53002, 0x53002).portr("53002").w(this, FUNC(fantland_state::fantland_soundlatch_w));
+	map(0x53003, 0x53003).portr("53003").nopw();
 
-	AM_RANGE(0x54000, 0x567ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x60000, 0x6ffff) AM_RAM AM_SHARE("spriteram2")
+	map(0x54000, 0x567ff).ram().share("spriteram");
+	map(0x60000, 0x6ffff).ram().share("spriteram2");
 
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xf0000, 0xfffff).rom();
+}
 
 
 
@@ -290,22 +294,25 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( fantland_sound_map, AS_PROGRAM, 8, fantland_state )
-	AM_RANGE( 0x00000, 0x01fff ) AM_RAM
-	AM_RANGE( 0x80000, 0x9ffff ) AM_ROM
-	AM_RANGE( 0xc0000, 0xfffff ) AM_ROM
-ADDRESS_MAP_END
+void fantland_state::fantland_sound_map(address_map &map)
+{
+	map(0x00000, 0x01fff).ram();
+	map(0x80000, 0x9ffff).rom();
+	map(0xc0000, 0xfffff).rom();
+}
 
-static ADDRESS_MAP_START( fantland_sound_iomap, AS_IO, 8, fantland_state )
-	AM_RANGE( 0x0080, 0x0080 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE("dac", dac_byte_interface, write )
-ADDRESS_MAP_END
+void fantland_state::fantland_sound_iomap(address_map &map)
+{
+	map(0x0080, 0x0080).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x0100, 0x0101).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x0180, 0x0180).w("dac", FUNC(dac_byte_interface::write));
+}
 
-static ADDRESS_MAP_START( galaxygn_sound_iomap, AS_IO, 8, fantland_state )
-	AM_RANGE( 0x0080, 0x0080 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-ADDRESS_MAP_END
+void fantland_state::galaxygn_sound_iomap(address_map &map)
+{
+	map(0x0080, 0x0080).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x0100, 0x0101).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+}
 
 
 /***************************************************************************
@@ -400,29 +407,31 @@ WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_2) { borntofi_adpcm_int(m_m
 WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_3) { borntofi_adpcm_int(m_msm4, 3); }
 
 
-static ADDRESS_MAP_START( borntofi_sound_map, AS_PROGRAM, 8, fantland_state )
-	AM_RANGE( 0x00000, 0x003ff ) AM_RAM
-	AM_RANGE( 0x04000, 0x04000 ) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE( 0x04000, 0x0401f ) AM_WRITE(borntofi_msm5205_w)
-	AM_RANGE( 0x08000, 0x0ffff ) AM_ROM
-	AM_RANGE( 0xf8000, 0xfffff ) AM_ROM
-ADDRESS_MAP_END
+void fantland_state::borntofi_sound_map(address_map &map)
+{
+	map(0x00000, 0x003ff).ram();
+	map(0x04000, 0x04000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x04000, 0x0401f).w(this, FUNC(fantland_state::borntofi_msm5205_w));
+	map(0x08000, 0x0ffff).rom();
+	map(0xf8000, 0xfffff).rom();
+}
 
 
 /***************************************************************************
                            Wheels Runner
 ***************************************************************************/
 
-static ADDRESS_MAP_START( wheelrun_sound_map, AS_PROGRAM, 8, fantland_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
+void fantland_state::wheelrun_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // on a car crash / hit
-	AM_RANGE(0xc000, 0xc000) AM_WRITENOP    // ""
+	map(0xb000, 0xb000).nopw();    // on a car crash / hit
+	map(0xc000, 0xc000).nopw();    // ""
 
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)    // during NMI
-ADDRESS_MAP_END
+	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));    // during NMI
+}
 
 
 
@@ -609,20 +618,20 @@ static INPUT_PORTS_START( borntofi )
 	PORT_START("P1_TRACK")  /* 53000 (Trackball) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_START1 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
 
 	PORT_START("P2_TRACK")  /* 53001 (Trackball) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_START2 )    PORT_CONDITION("Controls", 0x03, EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball x
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) // trackball y
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON2 )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 )   PORT_CONDITION("Controls", 0x03, EQUALS, 0x00) PORT_PLAYER(2)
 
@@ -739,7 +748,7 @@ static INPUT_PORTS_START( wheelrun )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fantland_state,wheelrun_wheel_r, (void *)0)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fantland_state,wheelrun_wheel_r, (void *)0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("53001")     /* 53001 */
@@ -747,7 +756,7 @@ static INPUT_PORTS_START( wheelrun )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fantland_state,wheelrun_wheel_r, (void *)1)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fantland_state,wheelrun_wheel_r, (void *)1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("53002")     /* 53002 */
@@ -828,10 +837,10 @@ MACHINE_RESET_MEMBER(fantland_state,fantland)
 	m_nmi_enable = 0;
 }
 
-INTERRUPT_GEN_MEMBER(fantland_state::fantland_irq)
+WRITE_LINE_MEMBER(fantland_state::fantland_irq)
 {
-	if (m_nmi_enable & 8)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && BIT(m_nmi_enable, 3))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
@@ -844,7 +853,6 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)        // ?
 	MCFG_CPU_PROGRAM_MAP(fantland_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
 	MCFG_CPU_ADD("audiocpu", I8088, 8000000)        // ?
 	MCFG_CPU_PROGRAM_MAP(fantland_sound_map)
@@ -865,6 +873,7 @@ MACHINE_CONFIG_START(fantland_state::fantland)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -895,7 +904,6 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)        // ?
 	MCFG_CPU_PROGRAM_MAP(galaxygn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
 	MCFG_CPU_ADD("audiocpu", I8088, 8000000)        // ?
 	MCFG_CPU_PROGRAM_MAP(fantland_sound_map)
@@ -913,6 +921,7 @@ MACHINE_CONFIG_START(fantland_state::galaxygn)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -977,7 +986,6 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
 	MCFG_CPU_PROGRAM_MAP(borntofi_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
 	MCFG_CPU_ADD("audiocpu", I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
 	MCFG_CPU_PROGRAM_MAP(borntofi_sound_map)
@@ -993,6 +1001,7 @@ MACHINE_CONFIG_START(fantland_state::borntofi)
 	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -1031,7 +1040,6 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, XTAL(18'000'000)/2)      // D701080C-8 (V20)
 	MCFG_CPU_PROGRAM_MAP(wheelrun_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/2)     // Z8400BB1 (Z80B)
 	MCFG_CPU_PROGRAM_MAP(wheelrun_sound_map)
@@ -1048,6 +1056,7 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fantland_state, screen_update_fantland)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fantland_state, fantland_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fantland)
 	MCFG_PALETTE_ADD("palette", 256)

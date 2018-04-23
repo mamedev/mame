@@ -24,6 +24,9 @@ protected:
 
 private:
 	required_device<nsc800_device> m_cpu;
+
+	void chess_io(address_map &map);
+	void chess_mem(address_map &map);
 };
 
 // device type definition

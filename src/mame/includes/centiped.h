@@ -120,4 +120,16 @@ public:
 	void mazeinv(machine_config &config);
 	void warlords(machine_config &config);
 	void multiped(machine_config &config);
+	void bullsdrt_data_map(address_map &map);
+	void bullsdrt_map(address_map &map);
+	void bullsdrt_port_map(address_map &map);
+	void caterplr_map(address_map &map);
+	void centipdb_map(address_map &map);
+	void centiped_base_map(address_map &map);
+	void centiped_map(address_map &map);
+	void magworm_map(address_map &map);
+	void mazeinv_map(address_map &map);
+	void milliped_map(address_map &map);
+	void multiped_map(address_map &map);
+	void warlords_map(address_map &map);
 };

@@ -27,7 +27,7 @@ public:
 	required_device<mas3507d_device> mas3507d;
 	required_device<ds2401_device> digital_id;
 
-	DECLARE_ADDRESS_MAP(amap, 16);
+	void amap(address_map &map);
 
 	DECLARE_READ16_MEMBER(a00_r);
 	DECLARE_READ16_MEMBER(a02_r);

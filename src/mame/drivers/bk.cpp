@@ -22,34 +22,36 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START(bk0010_mem, AS_PROGRAM, 16, bk_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_SHARE("video_ram") // Video RAM
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // ROM
-	AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // ROM
-	AM_RANGE( 0xc000, 0xdfff ) AM_ROM  // ROM
-	AM_RANGE( 0xe000, 0xfeff ) AM_ROM  // ROM
-	AM_RANGE( 0xffb0, 0xffb1 ) AM_READWRITE(bk_key_state_r,bk_key_state_w)
-	AM_RANGE( 0xffb2, 0xffb3 ) AM_READ(bk_key_code_r)
-	AM_RANGE( 0xffb4, 0xffb5 ) AM_READWRITE(bk_vid_scrool_r,bk_vid_scrool_w)
-	AM_RANGE( 0xffce, 0xffcf ) AM_READWRITE(bk_key_press_r,bk_key_press_w)
-ADDRESS_MAP_END
+void bk_state::bk0010_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram();  // RAM
+	map(0x4000, 0x7fff).ram().share("video_ram"); // Video RAM
+	map(0x8000, 0x9fff).rom();  // ROM
+	map(0xa000, 0xbfff).rom();  // ROM
+	map(0xc000, 0xdfff).rom();  // ROM
+	map(0xe000, 0xfeff).rom();  // ROM
+	map(0xffb0, 0xffb1).rw(this, FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
+	map(0xffb2, 0xffb3).r(this, FUNC(bk_state::bk_key_code_r));
+	map(0xffb4, 0xffb5).rw(this, FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
+	map(0xffce, 0xffcf).rw(this, FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
+}
 
-static ADDRESS_MAP_START(bk0010fd_mem, AS_PROGRAM, 16, bk_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_SHARE("video_ram") // Video RAM
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROM  // ROM
-	AM_RANGE( 0xa000, 0xdfff ) AM_RAM  // RAM
-	AM_RANGE( 0xe000, 0xfdff ) AM_ROM  // ROM
-	AM_RANGE( 0xfe58, 0xfe59 ) AM_READWRITE(bk_floppy_cmd_r,bk_floppy_cmd_w)
-	AM_RANGE( 0xfe5a, 0xfe5b ) AM_READWRITE(bk_floppy_data_r,bk_floppy_data_w)
-	AM_RANGE( 0xffb0, 0xffb1 ) AM_READWRITE(bk_key_state_r,bk_key_state_w)
-	AM_RANGE( 0xffb2, 0xffb3 ) AM_READ(bk_key_code_r)
-	AM_RANGE( 0xffb4, 0xffb5 ) AM_READWRITE(bk_vid_scrool_r,bk_vid_scrool_w)
-	AM_RANGE( 0xffce, 0xffcf ) AM_READWRITE(bk_key_press_r,bk_key_press_w)
-ADDRESS_MAP_END
+void bk_state::bk0010fd_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram();  // RAM
+	map(0x4000, 0x7fff).ram().share("video_ram"); // Video RAM
+	map(0x8000, 0x9fff).rom();  // ROM
+	map(0xa000, 0xdfff).ram();  // RAM
+	map(0xe000, 0xfdff).rom();  // ROM
+	map(0xfe58, 0xfe59).rw(this, FUNC(bk_state::bk_floppy_cmd_r), FUNC(bk_state::bk_floppy_cmd_w));
+	map(0xfe5a, 0xfe5b).rw(this, FUNC(bk_state::bk_floppy_data_r), FUNC(bk_state::bk_floppy_data_w));
+	map(0xffb0, 0xffb1).rw(this, FUNC(bk_state::bk_key_state_r), FUNC(bk_state::bk_key_state_w));
+	map(0xffb2, 0xffb3).r(this, FUNC(bk_state::bk_key_code_r));
+	map(0xffb4, 0xffb5).rw(this, FUNC(bk_state::bk_vid_scrool_r), FUNC(bk_state::bk_vid_scrool_w));
+	map(0xffce, 0xffcf).rw(this, FUNC(bk_state::bk_key_press_r), FUNC(bk_state::bk_key_press_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( bk0010 )
@@ -192,7 +194,8 @@ MACHINE_CONFIG_START(bk_state::bk0010)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","bk0010")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(bk_state::bk0010fd, bk0010)
+MACHINE_CONFIG_START(bk_state::bk0010fd)
+	bk0010(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bk0010fd_mem)

@@ -73,4 +73,7 @@ public:
 	void ROM16_split_gfx( const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2 );
 	void glass(machine_config &config);
 	void glass_ds5002fp(machine_config &config);
+	void glass_map(address_map &map);
+	void mcu_hostmem_map(address_map &map);
+	void oki_map(address_map &map);
 };

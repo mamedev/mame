@@ -35,4 +35,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(parentj_interrupt);
 	void parentj_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void parentj(machine_config &config);
+	void parentj_map(address_map &map);
 };

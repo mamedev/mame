@@ -33,30 +33,38 @@ public:
 	required_device<cpu_device> m_maincpu;
 	void a5130(machine_config &config);
 	void a5120(machine_config &config);
+	void a5120_io(address_map &map);
+	void a5120_mem(address_map &map);
+	void a5130_io(address_map &map);
+	void a5130_mem(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(a5120_mem, AS_PROGRAM, 8, a51xx_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x03ff ) AM_ROM
-	AM_RANGE( 0x0400, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void a51xx_state::a5120_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x0400, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( a5120_io, AS_IO, 8, a51xx_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void a51xx_state::a5120_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
-static ADDRESS_MAP_START(a5130_mem, AS_PROGRAM, 8, a51xx_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
-	AM_RANGE( 0x1000, 0xffff ) AM_RAM
-ADDRESS_MAP_END
+void a51xx_state::a5130_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).rom();
+	map(0x1000, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( a5130_io, AS_IO, 8, a51xx_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void a51xx_state::a5130_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 /* Input ports */
@@ -136,7 +144,8 @@ MACHINE_CONFIG_START(a51xx_state::a5120)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(a51xx_state::a5130, a5120)
+MACHINE_CONFIG_START(a51xx_state::a5130)
+	a5120(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(a5130_mem)

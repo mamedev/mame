@@ -76,7 +76,7 @@ nubus_wsportrait_device::nubus_wsportrait_device(const machine_config &mconfig, 
 	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
 	m_assembled_tag(util::string_format("%s:%s", tag, WSPORTRAIT_SCREEN_NAME))
 {
-	static_set_screen(*this, m_assembled_tag.c_str());
+	set_screen(m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -87,8 +87,6 @@ void nubus_wsportrait_device::device_start()
 {
 	uint32_t slotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, WSPORTRAIT_ROM_REGION, true);
 
 	slotspace = get_slotspace();
@@ -98,9 +96,9 @@ void nubus_wsportrait_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_wsportrait_device::vram_r), this), write32_delegate(FUNC(nubus_wsportrait_device::vram_w), this));
-	m_nubus->install_device(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, read32_delegate(FUNC(nubus_wsportrait_device::vram_r), this), write32_delegate(FUNC(nubus_wsportrait_device::vram_w), this));
-	m_nubus->install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_wsportrait_device::wsportrait_r), this), write32_delegate(FUNC(nubus_wsportrait_device::wsportrait_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_wsportrait_device::vram_r), this), write32_delegate(FUNC(nubus_wsportrait_device::vram_w), this));
+	nubus().install_device(slotspace+0x900000, slotspace+0x900000+VRAM_SIZE-1, read32_delegate(FUNC(nubus_wsportrait_device::vram_r), this), write32_delegate(FUNC(nubus_wsportrait_device::vram_w), this));
+	nubus().install_device(slotspace+0x80000, slotspace+0xeffff, read32_delegate(FUNC(nubus_wsportrait_device::wsportrait_r), this), write32_delegate(FUNC(nubus_wsportrait_device::wsportrait_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(869, 0), 0);

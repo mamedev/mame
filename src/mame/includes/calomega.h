@@ -58,6 +58,10 @@ public:
 	void s903mod(machine_config &config);
 	void sys906(machine_config &config);
 	void sys903(machine_config &config);
+	void s903mod_map(address_map &map);
+	void sys903_map(address_map &map);
+	void sys905_map(address_map &map);
+	void sys906_map(address_map &map);
 protected:
 	virtual void video_start() override;
 

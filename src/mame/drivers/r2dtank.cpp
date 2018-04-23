@@ -93,6 +93,8 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	void r2dtank(machine_config &config);
+	void r2dtank_audio_map(address_map &map);
+	void r2dtank_main_map(address_map &map);
 };
 
 
@@ -324,26 +326,28 @@ WRITE8_MEMBER(r2dtank_state::pia_comp_w)
 }
 
 
-static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8, r2dtank_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x8003) AM_DEVREAD("pia_main", pia6821_device, read) AM_WRITE(pia_comp_w)
-	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0xc000, 0xc007) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void r2dtank_state::r2dtank_main_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share("videoram");
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x5fff).ram().share("colorram");
+	map(0x6000, 0x7fff).ram();
+	map(0x8000, 0x8003).r("pia_main", FUNC(pia6821_device::read)).w(this, FUNC(r2dtank_state::pia_comp_w));
+	map(0x8004, 0x8004).rw(this, FUNC(r2dtank_state::audio_answer_r), FUNC(r2dtank_state::audio_command_w));
+	map(0xb000, 0xb000).w("crtc", FUNC(mc6845_device::address_w));
+	map(0xb001, 0xb001).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xc000, 0xc007).ram().share("nvram");
+	map(0xc800, 0xffff).rom();
+}
 
 
-static ADDRESS_MAP_START( r2dtank_audio_map, AS_PROGRAM, 8, r2dtank_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
-	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("pia_audio", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(audio_command_r, audio_answer_w)
-	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void r2dtank_state::r2dtank_audio_map(address_map &map)
+{
+	map(0x0000, 0x007f).ram();     /* internal RAM */
+	map(0xd000, 0xd003).rw("pia_audio", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xf000, 0xf000).rw(this, FUNC(r2dtank_state::audio_command_r), FUNC(r2dtank_state::audio_answer_w));
+	map(0xf800, 0xffff).rom();
+}
 
 
 
@@ -363,7 +367,7 @@ static INPUT_PORTS_START( r2dtank )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, r2dtank_state,get_ttl74123_output, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, r2dtank_state,get_ttl74123_output, nullptr)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL

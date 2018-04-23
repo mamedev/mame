@@ -33,6 +33,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void write_v(uint8_t data) override;
 
+	void data_128x4(address_map &map);
+	void program_2kx9(address_map &map);
+
 	emu_timer *m_timer;
 	void reset_timer();
 };

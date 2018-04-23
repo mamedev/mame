@@ -52,6 +52,9 @@ public:
 	DECLARE_READ8_MEMBER(port91_r);
 	void kbd_put(u8 data);
 	void chaos(machine_config &config);
+	void data_map(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -61,23 +64,26 @@ private:
 };
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, chaos_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("ram")
-ADDRESS_MAP_END
+void chaos_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram().share("ram");
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, chaos_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x1e, 0x1e) AM_READ(port1e_r)
-	AM_RANGE(0x1f, 0x1f) AM_READWRITE(port90_r, port1f_w)
-	AM_RANGE(0x90, 0x90) AM_READ(port90_r)
-	AM_RANGE(0x91, 0x91) AM_READ(port91_r)
-	AM_RANGE(0x92, 0x92) AM_DEVWRITE("terminal", generic_terminal_device, write)
-ADDRESS_MAP_END
+void chaos_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x1e, 0x1e).r(this, FUNC(chaos_state::port1e_r));
+	map(0x1f, 0x1f).rw(this, FUNC(chaos_state::port90_r), FUNC(chaos_state::port1f_w));
+	map(0x90, 0x90).r(this, FUNC(chaos_state::port90_r));
+	map(0x91, 0x91).r(this, FUNC(chaos_state::port91_r));
+	map(0x92, 0x92).w(m_terminal, FUNC(generic_terminal_device::write));
+}
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 8, chaos_state )
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // stops error log filling up while using debug
-ADDRESS_MAP_END
+void chaos_state::data_map(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).noprw(); // stops error log filling up while using debug
+}
 
 /* Input ports */
 static INPUT_PORTS_START( chaos )

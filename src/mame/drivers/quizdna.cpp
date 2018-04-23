@@ -33,72 +33,77 @@ WRITE8_MEMBER(quizdna_state::gekiretu_rombank_w)
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( quizdna_map, AS_PROGRAM, 8, quizdna_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(fg_ram_w)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(bg_ram_w)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe200, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_SHARE("paletteram")
-ADDRESS_MAP_END
+void quizdna_state::quizdna_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0x9fff).w(this, FUNC(quizdna_state::fg_ram_w));
+	map(0xa000, 0xbfff).w(this, FUNC(quizdna_state::bg_ram_w));
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe1ff).ram().share("spriteram");
+	map(0xe200, 0xefff).ram();
+	map(0xf000, 0xffff).ram().w(this, FUNC(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)).share("paletteram");
+}
 
-static ADDRESS_MAP_START( gekiretu_map, AS_PROGRAM, 8, quizdna_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(fg_ram_w)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(bg_ram_w)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_SHARE("paletteram")
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf200, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void quizdna_state::gekiretu_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0x9fff).w(this, FUNC(quizdna_state::fg_ram_w));
+	map(0xa000, 0xbfff).w(this, FUNC(quizdna_state::bg_ram_w));
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xefff).ram().w(this, FUNC(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)).share("paletteram");
+	map(0xf000, 0xf1ff).ram().share("spriteram");
+	map(0xf200, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( quizdna_io_map, AS_IO, 8, quizdna_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_WRITE(bg_xscroll_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(bg_yscroll_w)
-	AM_RANGE(0x05, 0x06) AM_WRITENOP /* unknown */
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
-	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void quizdna_state::quizdna_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).w(this, FUNC(quizdna_state::bg_xscroll_w));
+	map(0x04, 0x04).w(this, FUNC(quizdna_state::bg_yscroll_w));
+	map(0x05, 0x06).nopw(); /* unknown */
+	map(0x80, 0x80).portr("P1");
+	map(0x81, 0x81).portr("P2");
+	map(0x90, 0x90).portr("SYSTEM");
+	map(0x91, 0x91).portr("SERVICE");
+	map(0xc0, 0xc0).w(this, FUNC(quizdna_state::rombank_w));
+	map(0xd0, 0xd0).w(this, FUNC(quizdna_state::screen_ctrl_w));
+	map(0xe0, 0xe1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf0, 0xf0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-static ADDRESS_MAP_START( gakupara_io_map, AS_IO, 8, quizdna_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(bg_xscroll_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(bg_yscroll_w)
-	AM_RANGE(0x03, 0x04) AM_WRITENOP /* unknown */
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
-	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void quizdna_state::gakupara_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(this, FUNC(quizdna_state::bg_xscroll_w));
+	map(0x02, 0x02).w(this, FUNC(quizdna_state::bg_yscroll_w));
+	map(0x03, 0x04).nopw(); /* unknown */
+	map(0x80, 0x80).portr("P1");
+	map(0x81, 0x81).portr("P2");
+	map(0x90, 0x90).portr("SYSTEM");
+	map(0x91, 0x91).portr("SERVICE");
+	map(0xc0, 0xc0).w(this, FUNC(quizdna_state::rombank_w));
+	map(0xd0, 0xd0).w(this, FUNC(quizdna_state::screen_ctrl_w));
+	map(0xe0, 0xe1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf0, 0xf0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
-static ADDRESS_MAP_START( gekiretu_io_map, AS_IO, 8, quizdna_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_WRITE(bg_xscroll_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(bg_yscroll_w)
-	AM_RANGE(0x05, 0x06) AM_WRITENOP /* unknown */
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
-	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(gekiretu_rombank_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-ADDRESS_MAP_END
+void quizdna_state::gekiretu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x02, 0x03).w(this, FUNC(quizdna_state::bg_xscroll_w));
+	map(0x04, 0x04).w(this, FUNC(quizdna_state::bg_yscroll_w));
+	map(0x05, 0x06).nopw(); /* unknown */
+	map(0x80, 0x80).portr("P1");
+	map(0x81, 0x81).portr("P2");
+	map(0x90, 0x90).portr("SYSTEM");
+	map(0x91, 0x91).portr("SERVICE");
+	map(0xc0, 0xc0).w(this, FUNC(quizdna_state::gekiretu_rombank_w));
+	map(0xd0, 0xd0).w(this, FUNC(quizdna_state::screen_ctrl_w));
+	map(0xe0, 0xe1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xf0, 0xf0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 
 /****************************************************************************/
@@ -471,7 +476,8 @@ MACHINE_CONFIG_START(quizdna_state::quizdna)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(quizdna_state::gakupara, quizdna)
+MACHINE_CONFIG_START(quizdna_state::gakupara)
+	quizdna(config);
 
 	/* basic machine hardware */
 
@@ -480,7 +486,8 @@ MACHINE_CONFIG_DERIVED(quizdna_state::gakupara, quizdna)
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(quizdna_state::gekiretu, quizdna)
+MACHINE_CONFIG_START(quizdna_state::gekiretu)
+	quizdna(config);
 
 	/* basic machine hardware */
 

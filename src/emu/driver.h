@@ -130,42 +130,33 @@ public:
 	// output heler
 	output_manager &output() const { return machine().output(); }
 
-	INTERRUPT_GEN_MEMBER( nmi_line_pulse );
-	INTERRUPT_GEN_MEMBER( nmi_line_assert );
+	void nmi_line_pulse(device_t &device);
+	void nmi_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq0_line_hold );
-	INTERRUPT_GEN_MEMBER( irq0_line_assert );
+	void irq0_line_hold(device_t &device);
+	void irq0_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq1_line_hold );
-	INTERRUPT_GEN_MEMBER( irq1_line_assert );
+	void irq1_line_hold(device_t &device);
+	void irq1_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq2_line_hold );
-	INTERRUPT_GEN_MEMBER( irq2_line_assert );
+	void irq2_line_hold(device_t &device);
+	void irq2_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq3_line_hold );
-	INTERRUPT_GEN_MEMBER( irq3_line_assert );
+	void irq3_line_hold(device_t &device);
+	void irq3_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq4_line_hold );
-	INTERRUPT_GEN_MEMBER( irq4_line_assert );
+	void irq4_line_hold(device_t &device);
+	void irq4_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq5_line_hold );
-	INTERRUPT_GEN_MEMBER( irq5_line_assert );
+	void irq5_line_hold(device_t &device);
+	void irq5_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq6_line_hold );
-	INTERRUPT_GEN_MEMBER( irq6_line_assert );
+	void irq6_line_hold(device_t &device);
+	void irq6_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq7_line_hold );
-	INTERRUPT_GEN_MEMBER( irq7_line_assert );
+	void irq7_line_hold(device_t &device);
+	void irq7_line_assert(device_t &device);
 
-
-	// generic video
-	void flip_screen_set(u32 on);
-	void flip_screen_set_no_update(u32 on);
-	void flip_screen_x_set(u32 on);
-	void flip_screen_y_set(u32 on);
-	u32 flip_screen() const { return m_flip_screen_x; }
-	u32 flip_screen_x() const { return m_flip_screen_x; }
-	u32 flip_screen_y() const { return m_flip_screen_y; }
 
 	// generic input port helpers
 	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
@@ -189,6 +180,14 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset_after_children() override;
+
+	// generic video
+	void flip_screen_set(u32 on);
+	void flip_screen_x_set(u32 on);
+	void flip_screen_y_set(u32 on);
+	u32 flip_screen() const { return m_flip_screen_x; }
+	u32 flip_screen_x() const { return m_flip_screen_x; }
+	u32 flip_screen_y() const { return m_flip_screen_y; }
 
 private:
 	// helpers

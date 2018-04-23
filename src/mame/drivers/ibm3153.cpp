@@ -55,6 +55,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ibm3153(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -62,16 +64,18 @@ private:
 };
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, ibm3153_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000,0x0ffff) AM_ROM AM_REGION("user1", 0)
-ADDRESS_MAP_END
+void ibm3153_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x0ffff).rom().region("user1", 0);
+}
 
-static ADDRESS_MAP_START(io_map, AS_IO, 8, ibm3153_state)
-	AM_RANGE(0x0000,0xffff) AM_RAM
+void ibm3153_state::io_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
 	//ADDRESS_MAP_UNMAP_HIGH
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+}
 
 
 /* Input ports */

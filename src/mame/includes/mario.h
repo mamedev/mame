@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni
-#ifndef MARIO_H_
-#define MARIO_H_
+
+#ifndef MAME_INCLUDES_MARIO_H
+#define MAME_INCLUDES_MARIO_H
 
 #include "machine/gen_latch.h"
 #include "machine/z80dma.h"
@@ -130,7 +131,7 @@ public:
 	virtual void sound_reset() override;
 	DECLARE_PALETTE_INIT(mario);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	DECLARE_WRITE8_MEMBER(mario_sh_sound_w);
 	DECLARE_WRITE8_MEMBER(mario_sh1_w);
 	DECLARE_WRITE8_MEMBER(mario_sh2_w);
@@ -143,6 +144,12 @@ public:
 	void masao_audio(machine_config &config);
 	void mario(machine_config &config);
 	void mario_audio(machine_config &config);
+	void mario_io_map(address_map &map);
+	void mario_map(address_map &map);
+	void mario_sound_io_map(address_map &map);
+	void mario_sound_map(address_map &map);
+	void masao_map(address_map &map);
+	void masao_sound_map(address_map &map);
 };
 
-#endif /*MARIO_H_*/
+#endif // MAME_INCLUDES_MARIO_H

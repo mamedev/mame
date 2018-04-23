@@ -51,6 +51,16 @@ public:
 	DECLARE_DRIVER_INIT(mastkin);
 	DECLARE_DRIVER_INIT(trackfldnz);
 
+	void hyprolyb_sound_map(address_map &map);
+	void main_map(address_map &map);
+	void mastkin_map(address_map &map);
+	void reaktor_io_map(address_map &map);
+	void reaktor_map(address_map &map);
+	void sound_map(address_map &map);
+	void vlm_map(address_map &map);
+	void wizzquiz_map(address_map &map);
+	void yieartf_map(address_map &map);
+	void hyprolyb_adpcm_map(address_map &map);
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram2;
@@ -93,8 +103,8 @@ private:
 	DECLARE_PALETTE_INIT(trackfld);
 	DECLARE_VIDEO_START(atlantol);
 	uint32_t screen_update_trackfld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(vblank_nmi);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_nmi);
 	INTERRUPT_GEN_MEMBER(yieartf_timer_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

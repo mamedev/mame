@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MIKRO80_H_
-#define MIKRO80_H_
+#ifndef MAME_INCLUDES_MIKRO80_H
+#define MAME_INCLUDES_MIKRO80_H
 
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
@@ -64,6 +64,10 @@ public:
 	void kristall(machine_config &config);
 	void radio99(machine_config &config);
 	void mikro80(machine_config &config);
+	void kristall_io(address_map &map);
+	void mikro80_io(address_map &map);
+	void mikro80_mem(address_map &map);
+	void radio99_io(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<i8255_device> m_ppi8255;
@@ -84,4 +88,4 @@ protected:
 	required_device<cpu_device> m_maincpu;
 };
 
-#endif /* UT88_H_ */
+#endif // MAME_INCLUDES_MIKRO80_H

@@ -25,7 +25,7 @@
 #define INLINE_EA   1
 
 
-DEFINE_DEVICE_TYPE(S2650, s2650_device, "s2650", "S2650")
+DEFINE_DEVICE_TYPE(S2650, s2650_device, "s2650", "Signetics S2650")
 
 
 s2650_device::s2650_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -48,9 +48,9 @@ bool s2650_device::get_z80_mnemonics_mode() const
 	return false;
 }
 
-util::disasm_interface *s2650_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> s2650_device::create_disassembler()
 {
-	return new s2650_disassembler(this);
+	return std::make_unique<s2650_disassembler>(this);
 }
 
 device_memory_interface::space_config_vector s2650_device::memory_space_config() const
@@ -858,7 +858,7 @@ void s2650_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_ppc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void s2650_device::state_import(const device_state_entry &entry)
@@ -1002,7 +1002,7 @@ void s2650_device::execute_run()
 	{
 		m_ppc = m_page + m_iar;
 
-		debugger_instruction_hook(this, m_page + m_iar);
+		debugger_instruction_hook(m_page + m_iar);
 
 		m_ir = ROP();
 		m_r = m_ir & 3;         /* register / value */

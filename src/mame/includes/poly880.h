@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __POLY880__
-#define __POLY880__
+#ifndef MAME_INCLUDES_POLY880_H
+#define MAME_INCLUDES_POLY880_H
 
 
 #include "cpu/z80/z80.h"
@@ -26,16 +26,14 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_cassette(*this, "cassette"),
-			m_ki1(*this, "KI1"),
-			m_ki2(*this, "KI2"),
-			m_ki3(*this, "KI3")
+			m_ki(*this, "KI%u", 1U),
+			m_digits(*this, "digit%u", 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
-	required_ioport m_ki1;
-	required_ioport m_ki2;
-	required_ioport m_ki3;
+	required_ioport_array<3> m_ki;
+	output_finder<8> m_digits;
 
 	virtual void machine_start() override;
 
@@ -54,6 +52,8 @@ public:
 	uint8_t m_digit;
 	uint8_t m_segment;
 	void poly880(machine_config &config);
+	void poly880_io(address_map &map);
+	void poly880_mem(address_map &map);
 };
 
 #endif

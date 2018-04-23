@@ -64,36 +64,6 @@ ticket_dispenser_device::~ticket_dispenser_device()
 
 
 //**************************************************************************
-//  CONFIGURATION HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  static_set_period - configure the clock period
-//  for dispensing
-//-------------------------------------------------
-
-void ticket_dispenser_device::static_set_period(device_t &device, const attotime &period)
-{
-	downcast<ticket_dispenser_device &>(device).m_period = period;
-}
-
-
-//-------------------------------------------------
-//  static_set_senses - configure the senses of
-//  the motor and status bits
-//-------------------------------------------------
-
-void ticket_dispenser_device::static_set_senses(device_t &device, uint8_t motor_sense, uint8_t status_sense, bool hopper_type)
-{
-	ticket_dispenser_device &ticket = downcast<ticket_dispenser_device &>(device);
-	ticket.m_motor_sense = motor_sense;
-	ticket.m_status_sense = status_sense;
-	ticket.m_hopper_type = hopper_type;
-}
-
-
-
-//**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
 

@@ -88,7 +88,7 @@ struct chrn_id
 #define FLOPPY_DRIVE_INDEX                      0x0020
 
 #define MCFG_LEGACY_FLOPPY_IDX_CB(_devcb) \
-	devcb = &legacy_floppy_image_device::set_out_idx_func(*device, DEVCB_##_devcb);
+	devcb = &downcast<legacy_floppy_image_device &>(*device).set_out_idx_func(DEVCB_##_devcb);
 
 class legacy_floppy_image_device :  public device_t,
 									public device_image_interface
@@ -98,8 +98,8 @@ public:
 	legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~legacy_floppy_image_device();
 
-	static void static_set_floppy_config(device_t &device, const floppy_interface *config) { downcast<legacy_floppy_image_device &>(device).m_config = config; }
-	template<class _Object> static devcb_base &set_out_idx_func(device_t &device, _Object object) { return downcast<legacy_floppy_image_device &>(device).m_out_idx_func.set_callback(object); }
+	void set_floppy_config(const floppy_interface *config) { m_config = config; }
+	template<class Object> devcb_base &set_out_idx_func(Object &&cb) { return m_out_idx_func.set_callback(std::forward<Object>(cb)); }
 
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
@@ -247,7 +247,7 @@ int floppy_get_count(running_machine &machine);
 
 
 #define MCFG_LEGACY_FLOPPY_CONFIG(_config) \
-	legacy_floppy_image_device::static_set_floppy_config(*device, &(_config));
+	downcast<legacy_floppy_image_device &>(*device).set_floppy_config(&(_config));
 
 #define MCFG_LEGACY_FLOPPY_DRIVE_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, LEGACY_FLOPPY, 0)         \

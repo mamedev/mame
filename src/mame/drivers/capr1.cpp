@@ -51,6 +51,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	void cspin2(machine_config &config);
+	void cspin2_map(address_map &map);
 };
 
 WRITE8_MEMBER(capr1_state::output_w)
@@ -65,17 +66,18 @@ WRITE8_MEMBER(capr1_state::output_w)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( cspin2_map, AS_PROGRAM, 8, capr1_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("te7750", te7750_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2203_device, read, write)
-	AM_RANGE(0xc004, 0xc004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+void capr1_state::cspin2_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa00f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write));
+	map(0xc000, 0xc001).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc004, 0xc004).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  AM_RANGE(0xc008, 0xc009) AM_DEVWRITE("fifo1", m66300_device, write)
 //  AM_RANGE(0xc00c, 0xc00d) AM_DEVWRITE("fifo2", m66300_device, write)
 //  AM_RANGE(0xe000, 0xe001) AM_WRITENOP
 //  AM_RANGE(0xe002, 0xe004) AM_WRITENOP
-ADDRESS_MAP_END
+}
 
 
 

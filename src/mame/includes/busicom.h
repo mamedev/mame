@@ -46,6 +46,11 @@ public:
 	uint8_t get_bit_selected(uint32_t val,int num);
 
 	void busicom(machine_config &config);
+	void busicom_mem(address_map &map);
+	void busicom_mp(address_map &map);
+	void busicom_rom(address_map &map);
+	void busicom_rp(address_map &map);
+	void busicom_stat(address_map &map);
 private:
 	required_device<i4004_cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;

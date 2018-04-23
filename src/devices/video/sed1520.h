@@ -12,15 +12,18 @@
 #pragma once
 
 
-#define MCFG_SED1520_ADD( _tag, _cb ) \
-	MCFG_DEVICE_ADD( _tag, SED1520, 0 ) \
-	sed1520_device::static_set_screen_update_cb(*device, _cb);
+#define SED1520CB_UPDATE(cls, fnc) sed1520_device::screen_update_delegate((&cls::fnc), (#cls "::" #fnc), DEVICE_SELF, ((cls *)nullptr))
+#define SED1520CB_DEVUPDATE(tag, cls, fnc) sed1520_device::screen_update_delegate((&cls::fnc), (#cls "::" #fnc), (tag), ((cls *)nullptr))
+
+#define MCFG_SED1520_ADD(tag, cb) \
+	MCFG_DEVICE_ADD(tag, SED1520, 0) \
+	downcast<sed1520_device &>(*device).set_screen_update_cb(SED1520CB_##cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-#define SED1520_UPDATE_CB(name) uint32_t name(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc)
+#define SED1520_UPDATE_CB(name) uint32_t name(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc)
 
 
 // ======================> sed1520_device
@@ -28,13 +31,13 @@
 class sed1520_device :  public device_t
 {
 public:
-	typedef uint32_t (*screen_update_func)(device_t &device, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc);
+	typedef device_delegate<uint32_t (bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc)> screen_update_delegate;
 
 	// construction/destruction
 	sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void static_set_screen_update_cb(device_t &device, screen_update_func _cb) { downcast<sed1520_device &>(device).m_screen_update_func = _cb; }
+	// sconfiguration helpers
+	template <typename Object> void set_screen_update_cb(Object &&cb) { m_screen_update_cb = std::forward<Object>(cb); }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);
@@ -52,18 +55,18 @@ protected:
 
 private:
 	// internal state
-	uint8_t       m_lcd_on;
-	uint8_t       m_busy;
-	uint8_t       m_page;
-	uint8_t       m_column;
-	uint8_t       m_old_column;
-	uint8_t       m_start_line;
-	uint8_t       m_adc;
-	uint8_t       m_static_drive;
+	uint8_t     m_lcd_on;
+	uint8_t     m_busy;
+	uint8_t     m_page;
+	uint8_t     m_column;
+	uint8_t     m_old_column;
+	uint8_t     m_start_line;
+	uint8_t     m_adc;
+	uint8_t     m_static_drive;
 	bool        m_modify_write;
-	screen_update_func m_screen_update_func;
+	screen_update_delegate m_screen_update_cb;
 
-	uint8_t       m_vram[0x140];
+	uint8_t     m_vram[0x140];
 };
 
 

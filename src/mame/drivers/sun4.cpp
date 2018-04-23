@@ -594,6 +594,11 @@ public:
 	static void ncr5390(device_t *device);
 	void sun4c(machine_config &config);
 	void sun4(machine_config &config);
+	void sun4_mem(address_map &map);
+	void sun4c_mem(address_map &map);
+	void type0space_map(address_map &map);
+	void type1space_map(address_map &map);
+	void type1space_s4_map(address_map &map);
 protected:
 	required_device<mb86901_device> m_maincpu;
 
@@ -719,7 +724,7 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 	}
 	else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -786,7 +791,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 	uint32_t retval = 0;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (machine().side_effect_disabled()) asi = 9;
+	if (machine().side_effects_disabled()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -865,7 +870,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		return read_insn_data_4c(asi, space, offset, mem_mask);
 
 	default:
-		if (!machine().side_effect_disabled()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effects_disabled()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1010,7 +1015,7 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 	}
 	else
 	{
-		if (!machine().side_effect_disabled())
+		if (!machine().side_effects_disabled())
 		{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -1067,7 +1072,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	int page;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (machine().side_effect_disabled()) asi = 9;
+	if (machine().side_effects_disabled()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -1146,7 +1151,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		return read_insn_data(asi, space, offset, mem_mask);
 
 	default:
-		if (!machine().side_effect_disabled()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!machine().side_effects_disabled()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1326,13 +1331,15 @@ void sun4_state::fcodes_command(int ref, const std::vector<std::string> &params)
 #endif
 }
 
-static ADDRESS_MAP_START(sun4_mem, AS_PROGRAM, 32, sun4_state)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( sun4_mmu_r, sun4_mmu_w )
-ADDRESS_MAP_END
+void sun4_state::sun4_mem(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(sun4_state::sun4_mmu_r), FUNC(sun4_state::sun4_mmu_w));
+}
 
-static ADDRESS_MAP_START(sun4c_mem, AS_PROGRAM, 32, sun4_state)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( sun4c_mmu_r, sun4c_mmu_w )
-ADDRESS_MAP_END
+void sun4_state::sun4c_mem(address_map &map)
+{
+	map(0x00000000, 0xffffffff).rw(this, FUNC(sun4_state::sun4c_mmu_r), FUNC(sun4_state::sun4c_mmu_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sun4 )
@@ -1455,33 +1462,36 @@ WRITE32_MEMBER( sun4_state::ram_w )
 	}
 }
 
-static ADDRESS_MAP_START(type0space_map, AS_PROGRAM, 32, sun4_state)
-	AM_RANGE(0x00000000, 0x03ffffff) AM_READWRITE(ram_r, ram_w)
-ADDRESS_MAP_END
+void sun4_state::type0space_map(address_map &map)
+{
+	map(0x00000000, 0x03ffffff).rw(this, FUNC(sun4_state::ram_r), FUNC(sun4_state::ram_w));
+}
 
-static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
-	AM_RANGE(0x00000000, 0x0000000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
-	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
-	AM_RANGE(0x02000000, 0x020007ff) AM_DEVREADWRITE8(TIMEKEEPER_TAG, timekeeper_device, read, write, 0xffffffff)
-	AM_RANGE(0x03000000, 0x0300000f) AM_READWRITE(timer_r, timer_w) AM_MIRROR(0xfffff0)
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE8(irq_r, irq_w, 0xffffffff)
-	AM_RANGE(0x06000000, 0x0607ffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x07200000, 0x07200003) AM_READWRITE8(fdc_r, fdc_w, 0xffffffff)
-	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)    // slot 0 contains SCSI/DMA/Ethernet
-	AM_RANGE(0x08400000, 0x0840000f) AM_READWRITE(dma_r, dma_w)
-	AM_RANGE(0x08800000, 0x0880001f) AM_DEVICE8("scsibus:7:ncr5390", ncr5390_device, map, 0xff000000)
-	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)    // slot 3 contains video board
-	AM_RANGE(0x0e800000, 0x0e8fffff) AM_RAM AM_SHARE("bw2_vram")
-ADDRESS_MAP_END
+void sun4_state::type1space_map(address_map &map)
+{
+	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x01000000, 0x0100000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x02000000, 0x020007ff).rw(m_timekpr, FUNC(timekeeper_device::read), FUNC(timekeeper_device::write));
+	map(0x03000000, 0x0300000f).rw(this, FUNC(sun4_state::timer_r), FUNC(sun4_state::timer_w)).mirror(0xfffff0);
+	map(0x05000000, 0x05000003).rw(this, FUNC(sun4_state::irq_r), FUNC(sun4_state::irq_w));
+	map(0x06000000, 0x0607ffff).rom().region("user1", 0);
+	map(0x07200000, 0x07200003).rw(this, FUNC(sun4_state::fdc_r), FUNC(sun4_state::fdc_w));
+	map(0x08000000, 0x08000003).r(this, FUNC(sun4_state::ss1_sl0_id));    // slot 0 contains SCSI/DMA/Ethernet
+	map(0x08400000, 0x0840000f).rw(this, FUNC(sun4_state::dma_r), FUNC(sun4_state::dma_w));
+	map(0x08800000, 0x0880001f).m(m_scsi, FUNC(ncr5390_device::map)).umask32(0xff000000);
+	map(0x0e000000, 0x0e000003).r(this, FUNC(sun4_state::ss1_sl3_id));    // slot 3 contains video board
+	map(0x0e800000, 0x0e8fffff).ram().share("bw2_vram");
+}
 
-static ADDRESS_MAP_START(type1space_s4_map, AS_PROGRAM, 32, sun4_state)
-	AM_RANGE(0x00000000, 0x0000000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
-	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
-ADDRESS_MAP_END
+void sun4_state::type1space_s4_map(address_map &map)
+{
+	map(0x00000000, 0x0000000f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+	map(0x01000000, 0x0100000f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0xff00ff00);
+}
 
 READ8_MEMBER( sun4_state::fdc_r )
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return 0;
 
 	switch(offset)
@@ -2174,7 +2184,7 @@ ROM_START( sun4_50 )
 	ROM_SYSTEM_BIOS( 0, "v29", "V2.9" )
 	ROMX_LOAD( "ipx-29.h1.u0501", 0x0000, 0x40000, CRC(1910aa65) SHA1(7d8832fea8e299b89e6ec7137fcde497673c14f8), ROM_BIOS(1)) // 525-1177-06(?) Boot (Version 2.9 version 20, supposedly?)
 	ROM_SYSTEM_BIOS( 1, "v26", "V2.6" )
-	ROMX_LOAD( "525-1177-05__(c)_sun_1992.am27c020.h1.u0501", 0x0000, 0x40000, CRC(aad28dee) SHA1(18075afa479fdc8d318df9aef9847dfb20591d79), ROM_BIOS(2)) // 525-1177-05 Boot (Version 2.6 version 410, supposedly?)
+	ROMX_LOAD( "525-1177-05__=c=_sun_1992.am27c020.h1.u0501", 0x0000, 0x40000, CRC(aad28dee) SHA1(18075afa479fdc8d318df9aef9847dfb20591d79), ROM_BIOS(2)) // 525-1177-05 Boot (Version 2.6 version 410, supposedly?)
 	ROM_SYSTEM_BIOS( 2, "v23", "V2.3" )
 	ROMX_LOAD( "525-1177-03.h1.u0501", 0x0000, 0x40000, CRC(dcc1e66c) SHA1(a4dc3d8631aaa8416e22de273707c4ed7a2fe561), ROM_BIOS(3)) // 525-1177-03 Boot (Version 2.3)
 ROM_END

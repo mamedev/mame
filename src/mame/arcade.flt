@@ -92,6 +92,7 @@ avt.cpp
 aztarac.cpp
 backfire.cpp
 badlands.cpp
+badlandsbl.cpp
 bagman.cpp
 bailey.cpp
 balsente.cpp
@@ -141,6 +142,7 @@ blmbycar.cpp
 blockade.cpp
 blockhl.cpp
 blockout.cpp
+blocktax.cpp
 bloodbro.cpp
 blstroid.cpp
 blueprnt.cpp
@@ -598,8 +600,10 @@ konamigq.cpp
 konamigv.cpp
 konamigx.cpp
 konamim2.cpp
+konblands.cpp
 konendev.cpp
 konmedal.cpp
+konmedal68k.cpp
 kontest.cpp
 kopunch.cpp
 ksayakyu.cpp
@@ -621,6 +625,7 @@ laz_awetoss.cpp
 laz_ribrac.cpp
 lazercmd.cpp
 lbeach.cpp
+lckydraw.cpp
 legionna.cpp
 leland.cpp
 lemmings.cpp
@@ -638,10 +643,10 @@ looping.cpp
 lordgun.cpp
 lsasquad.cpp
 ltcasino.cpp
-luckybal.cpp
 ltd.cpp
 luckgrln.cpp
 lucky74.cpp
+luckybal.cpp
 lvcards.cpp
 lwings.cpp
 m10.cpp
@@ -680,6 +685,7 @@ mario.cpp
 markham.cpp
 marywu.cpp
 mastboy.cpp
+mastboyo.cpp
 matmania.cpp
 maxaflex.cpp
 maygay1b.cpp
@@ -1210,7 +1216,6 @@ tattack.cpp
 taxidriv.cpp
 tbowl.cpp
 tceptor.cpp
-tcl.cpp
 techno.cpp
 tecmo.cpp
 tecmo16.cpp
@@ -1393,6 +1398,11 @@ zwackery.cpp
 -jaguarcd
 //neogeo.cpp
 -aes
+-ng_mv1
+-ng_mv1f
+-ng_mv1fz
+-ng_mv2f
+-ng_mv4f
 //saturn.cpp
 -saturn
 -saturnjp

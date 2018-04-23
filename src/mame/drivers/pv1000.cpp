@@ -174,20 +174,24 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	void pv1000(machine_config &config);
+	void pv1000(address_map &map);
+	void pv1000_io(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8, pv1000_state )
+void pv1000_state::pv1000(address_map &map)
+{
 	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
-	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(gfxram_w) AM_REGION("gfxram", 0)
-ADDRESS_MAP_END
+	map(0xb800, 0xbbff).ram().share("videoram");
+	map(0xbc00, 0xbfff).ram().w(this, FUNC(pv1000_state::gfxram_w)).region("gfxram", 0);
+}
 
 
-static ADDRESS_MAP_START( pv1000_io, AS_IO, 8, pv1000_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf8, 0xff) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void pv1000_state::pv1000_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0xf8, 0xff).rw(this, FUNC(pv1000_state::io_r), FUNC(pv1000_state::io_w));
+}
 
 
 WRITE8_MEMBER( pv1000_state::gfxram_w )

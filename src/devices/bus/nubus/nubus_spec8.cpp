@@ -78,7 +78,7 @@ nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device
 	m_assembled_tag(util::string_format("%s:%s", tag, SPEC8S3_SCREEN_NAME)),
 	m_vbl_pending(false), m_parameter(0)
 {
-	static_set_screen(*this, m_assembled_tag.c_str());
+	set_screen(m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -89,8 +89,6 @@ void nubus_spec8s3_device::device_start()
 {
 	uint32_t slotspace;
 
-	// set_nubus_device makes m_slot valid
-	set_nubus_device();
 	install_declaration_rom(this, SPEC8S3_ROM_REGION);
 
 	slotspace = get_slotspace();
@@ -99,9 +97,9 @@ void nubus_spec8s3_device::device_start()
 
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
-	m_nubus->install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
-	m_nubus->install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
-	m_nubus->install_device(slotspace+0xd0000, slotspace+0xfffff, read32_delegate(FUNC(nubus_spec8s3_device::spec8s3_r), this), write32_delegate(FUNC(nubus_spec8s3_device::spec8s3_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
+	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
+	nubus().install_device(slotspace+0xd0000, slotspace+0xfffff, read32_delegate(FUNC(nubus_spec8s3_device::spec8s3_r), this), write32_delegate(FUNC(nubus_spec8s3_device::spec8s3_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(767, 0), 0);

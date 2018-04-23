@@ -49,25 +49,25 @@
 	MCFG_DEVICE_ADD(_tag, SVI_EXPANDER, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(svi_expander_modules, nullptr, false)
 #define MCFG_SVI_EXPANDER_INT_HANDLER(_devcb) \
-	devcb = &svi_expander_device::set_int_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_expander_device &>(*device).set_int_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_ROMDIS_HANDLER(_devcb) \
-	devcb = &svi_expander_device::set_romdis_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_expander_device &>(*device).set_romdis_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_RAMDIS_HANDLER(_devcb) \
-	devcb = &svi_expander_device::set_ramdis_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_expander_device &>(*device).set_ramdis_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_CTRL1_HANDLER(_devcb) \
-	devcb = &svi_expander_device::set_ctrl1_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_expander_device &>(*device).set_ctrl1_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_CTRL2_HANDLER(_devcb) \
-	devcb = &svi_expander_device::set_ctrl2_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_expander_device &>(*device).set_ctrl2_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_EXCSR_HANDLER(_devcb) \
-	devcb = &svi_expander_device::set_excsr_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_expander_device &>(*device).set_excsr_handler(DEVCB_##_devcb);
 
 #define MCFG_SVI_EXPANDER_EXCSW_HANDLER(_devcb) \
-	devcb = &svi_expander_device::set_excsw_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<svi_expander_device &>(*device).set_excsw_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -86,26 +86,13 @@ public:
 	virtual ~svi_expander_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_int_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_expander_device &>(device).m_int_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_romdis_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_expander_device &>(device).m_romdis_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ramdis_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_expander_device &>(device).m_ramdis_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ctrl1_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_expander_device &>(device).m_ctrl1_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ctrl2_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_expander_device &>(device).m_ctrl2_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_excsr_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_expander_device &>(device).m_excsr_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_excsw_handler(device_t &device, Object &&cb)
-	{ return downcast<svi_expander_device &>(device).m_excsw_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_romdis_handler(Object &&cb) { return m_romdis_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ramdis_handler(Object &&cb) { return m_ramdis_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ctrl1_handler(Object &&cb) { return m_ctrl1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ctrl2_handler(Object &&cb) { return m_ctrl2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_excsr_handler(Object &&cb) { return m_excsr_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_excsw_handler(Object &&cb) { return m_excsw_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from cart device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }

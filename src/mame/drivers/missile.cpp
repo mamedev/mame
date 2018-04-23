@@ -426,6 +426,8 @@ public:
 	void missileb(machine_config &config);
 	void missile(machine_config &config);
 	void missilea(machine_config &config);
+	void bootleg_main_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 
@@ -944,14 +946,16 @@ READ8_MEMBER(missile_state::bootleg_r)
  *************************************/
 
 /* complete memory map derived from schematics (implemented above) */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, missile_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(missile_r, missile_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void missile_state::main_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(missile_state::missile_r), FUNC(missile_state::missile_w)).share("videoram");
+}
 
 /* adjusted from the above to get the bootlegs to boot */
-static ADDRESS_MAP_START( bootleg_main_map, AS_PROGRAM, 8, missile_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(bootleg_r, bootleg_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void missile_state::bootleg_main_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(missile_state::bootleg_r), FUNC(missile_state::bootleg_w)).share("videoram");
+}
 
 /*************************************
  *
@@ -974,10 +978,10 @@ static INPUT_PORTS_START( missile )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, missile_state,get_vblank, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, missile_state,get_vblank, nullptr)
 
 	PORT_START("R10")   /* IN2 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("R10:1,2")
@@ -1064,10 +1068,10 @@ static INPUT_PORTS_START( suprmatk )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x18, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, missile_state,get_vblank, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, missile_state,get_vblank, nullptr)
 
 	PORT_START("R10")   /* IN2 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("R10:1,2")
@@ -1164,12 +1168,14 @@ MACHINE_CONFIG_START(missile_state::missile)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(missile_state::missilea, missile)
+MACHINE_CONFIG_START(missile_state::missilea)
+	missile(config);
 
 	MCFG_DEVICE_REMOVE("pokey")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(missile_state::missileb, missilea)
+MACHINE_CONFIG_START(missile_state::missileb)
+	missilea(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_main_map)

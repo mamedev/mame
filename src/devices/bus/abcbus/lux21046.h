@@ -54,16 +54,6 @@ public:
 	// construction/destruction
 	luxor_55_21046_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// not really public
-	DECLARE_READ8_MEMBER( out_r );
-	DECLARE_WRITE8_MEMBER( inp_w );
-	DECLARE_WRITE8_MEMBER( _4b_w );
-	DECLARE_WRITE8_MEMBER( _9b_w );
-	DECLARE_WRITE8_MEMBER( _8a_w );
-	DECLARE_READ8_MEMBER( _9a_r );
-
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 protected:
 	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -86,6 +76,8 @@ protected:
 	virtual void abcbus_c3(uint8_t data) override;
 	virtual void abcbus_c4(uint8_t data) override;
 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 private:
 	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
 
@@ -95,6 +87,16 @@ private:
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+
+	DECLARE_READ8_MEMBER( out_r );
+	DECLARE_WRITE8_MEMBER( inp_w );
+	DECLARE_WRITE8_MEMBER( _4b_w );
+	DECLARE_WRITE8_MEMBER( _9b_w );
+	DECLARE_WRITE8_MEMBER( _8a_w );
+	DECLARE_READ8_MEMBER( _9a_r );
+
+	void luxor_55_21046_io(address_map &map);
+	void luxor_55_21046_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;

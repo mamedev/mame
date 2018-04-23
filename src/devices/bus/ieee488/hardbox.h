@@ -56,6 +56,9 @@ private:
 	DECLARE_READ8_MEMBER( ppi1_pc_r );
 	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
 
+	void hardbox_io(address_map &map);
+	void hardbox_mem(address_map &map);
+
 	enum
 	{
 		LED_A,

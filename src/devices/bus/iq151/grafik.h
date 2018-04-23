@@ -56,7 +56,6 @@ private:
 
 
 // device type definition
-extern const device_type IQ151_GRAFIK;
 DECLARE_DEVICE_TYPE(IQ151_GRAFIK, iq151_grafik_device)
 
 #endif // MAME_BUS_IQ151_GRAFIK_H

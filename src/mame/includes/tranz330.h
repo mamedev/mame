@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef VERIFONE_TRANZ330_H
-#define VERIFONE_TRANZ330_H
+
+#ifndef MAME_INCLUDES_TRANZ330_H
+#define MAME_INCLUDES_TRANZ330_H
 
 #pragma once
 
@@ -54,6 +55,8 @@ public:
 	DECLARE_READ8_MEMBER( card_r );
 
 	void tranz330(machine_config &config);
+	void tranz330_mem(address_map &map);
+	void tranz330_io(address_map &map);
 private:
 	required_device<cpu_device>             m_cpu;
 	required_device<z80ctc_device>          m_ctc;

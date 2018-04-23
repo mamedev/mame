@@ -61,19 +61,20 @@ WRITE16_MEMBER(xorworld_state::irq6_ack_w)
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1")
-	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVWRITE8("mainlatch", ls259_device, write_d0, 0x00ff)
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xffc800, 0xffc87f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(irq2_ack_w) AM_READNOP
-	AM_RANGE(0xffc882, 0xffc883) AM_WRITE(irq6_ack_w) AM_READNOP
-	AM_RANGE(0xffc884, 0xffffff) AM_RAM
-ADDRESS_MAP_END
+void xorworld_state::xorworld_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x200000, 0x200001).portr("P1");
+	map(0x400000, 0x400001).portr("P2");
+	map(0x600000, 0x600001).portr("DSW");
+	map(0x800000, 0x800003).w("saa", FUNC(saa1099_device::write)).umask16(0x00ff);
+	map(0xa00000, 0xa0000f).w("mainlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0xffc000, 0xffc7ff).ram().w(this, FUNC(xorworld_state::videoram_w)).share("videoram");
+	map(0xffc800, 0xffc87f).ram().share("spriteram");
+	map(0xffc880, 0xffc881).w(this, FUNC(xorworld_state::irq2_ack_w)).nopr();
+	map(0xffc882, 0xffc883).w(this, FUNC(xorworld_state::irq6_ack_w)).nopr();
+	map(0xffc884, 0xffffff).ram();
+}
 
 
 static INPUT_PORTS_START( xorworld )
@@ -90,7 +91,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* used for accessing the NVRAM */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* used for accessing the NVRAM */
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )

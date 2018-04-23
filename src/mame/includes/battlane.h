@@ -52,4 +52,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg_bitmap( bitmap_ind16 &bitmap );
 	void battlane(machine_config &config);
+	void battlane_map(address_map &map);
 };

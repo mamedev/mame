@@ -126,6 +126,7 @@ dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag,
 	, m_ppi(*this, "ppi8255")
 	, m_ram(*this, "ram")
 	, m_rom(*this, "rom")
+	, m_digits(*this, "digit%u", 0U)
 	, m_portc(0)
 {
 }
@@ -139,6 +140,8 @@ void dmv_k220_device::device_start()
 	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
 	space.install_readwrite_handler(0x08, 0x0b, read8_delegate(FUNC(pit8253_device::read), &(*m_pit)), write8_delegate(FUNC(pit8253_device::write), &(*m_pit)), 0);
 	space.install_readwrite_handler(0x0c, 0x0f, read8_delegate(FUNC(i8255_device::read), &(*m_ppi)), write8_delegate(FUNC(i8255_device::write), &(*m_ppi)), 0);
+
+	m_digits.resolve();
 }
 
 //-------------------------------------------------
@@ -231,8 +234,8 @@ WRITE8_MEMBER( dmv_k220_device::porta_w )
 	// 74LS247 BCD-to-Seven-Segment Decoder
 	static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
-	machine().output().set_digit_value(0, bcd2hex[(data >> 4) & 0x0f]);
-	machine().output().set_digit_value(1, bcd2hex[data & 0x0f]);
+	m_digits[0] = bcd2hex[(data >> 4) & 0x0f];
+	m_digits[1] = bcd2hex[data & 0x0f];
 }
 
 

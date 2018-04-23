@@ -49,12 +49,13 @@ private:
 	required_memory_region m_ram;
 	required_memory_region m_rom;
 
+	output_finder<2> m_digits;
+
 	uint8_t   m_portc;
 };
 
 
 // device type definition
-extern const device_type DMV_K220;
 DECLARE_DEVICE_TYPE(DMV_K220, dmv_k220_device)
 
 #endif // MAME_BUS_DMV_K220_H

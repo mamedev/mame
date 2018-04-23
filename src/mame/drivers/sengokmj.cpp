@@ -65,7 +65,7 @@ RSSENGO2.72   chr.
 #include "speaker.h"
 
 
-class sengokmj_state : public driver_device
+class sengokmj_state : public driver_device, protected seibu_sound_common
 {
 public:
 	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -115,7 +115,7 @@ public:
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -123,6 +123,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sengokmj(machine_config &config);
+	void sengokmj_io_map(address_map &map);
+	void sengokmj_map(address_map &map);
 };
 
 
@@ -388,32 +390,34 @@ READ16_MEMBER(sengokmj_state::system_r)
 	return (ioport("SYSTEM")->read() & 0xffbf) | m_hopper_io;
 }
 
-static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
-	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_SHARE("sc0_vram")
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc1vram_w) AM_SHARE("sc1_vram")
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(seibucrtc_sc2vram_w) AM_SHARE("sc2_vram")
-	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM_WRITE(seibucrtc_sc3vram_w) AM_SHARE("sc3_vram")
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void sengokmj_state::sengokmj_map(address_map &map)
+{
+	map(0x00000, 0x07fff).ram();
+	map(0x08000, 0x09fff).ram().share("nvram");
+	map(0x0c000, 0x0c7ff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc0vram_w)).share("sc0_vram");
+	map(0x0c800, 0x0cfff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc1vram_w)).share("sc1_vram");
+	map(0x0d000, 0x0d7ff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc2vram_w)).share("sc2_vram");
+	map(0x0d800, 0x0e7ff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc3vram_w)).share("sc3_vram");
+	map(0x0e800, 0x0f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0f800, 0x0ffff).ram().share("sprite_ram");
+	map(0xc0000, 0xfffff).rom();
+}
 
-static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16, sengokmj_state )
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
+void sengokmj_state::sengokmj_io_map(address_map &map)
+{
+	map(0x4000, 0x400f).rw("seibu_sound", FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
-	AM_RANGE(0x8000, 0x804f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
+	map(0x8000, 0x804f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 
 //  AM_RANGE(0x8080, 0x8081) CRTC extra register?
 //  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?
 //  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
-	AM_RANGE(0x8180, 0x8181) AM_WRITE(out_w)
-	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)
-	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW")
-	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
-	AM_RANGE(0xc004, 0xc005) AM_READ(system_r) //switches
-ADDRESS_MAP_END
+	map(0x8180, 0x8181).w(this, FUNC(sengokmj_state::out_w));
+	map(0x8140, 0x8141).w(this, FUNC(sengokmj_state::mahjong_panel_w));
+	map(0xc000, 0xc001).portr("DSW");
+	map(0xc002, 0xc003).r(this, FUNC(sengokmj_state::mahjong_panel_r));
+	map(0xc004, 0xc005).r(this, FUNC(sengokmj_state::system_r)); //switches
+}
 
 
 static INPUT_PORTS_START( sengokmj )
@@ -551,9 +555,10 @@ static GFXDECODE_START( sengokmj )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x700, 0x10 ) /* Text */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(sengokmj_state::interrupt)
+WRITE_LINE_MEMBER(sengokmj_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0,HOLD_LINE,0xc8/4);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
 }
 
 WRITE16_MEMBER( sengokmj_state::layer_en_w )
@@ -573,7 +578,6 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */
 	MCFG_CPU_PROGRAM_MAP(sengokmj_map)
 	MCFG_CPU_IO_MAP(sengokmj_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sengokmj_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
@@ -588,6 +592,7 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1) //TODO: dynamic resolution
 	MCFG_SCREEN_UPDATE_DRIVER(sengokmj_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sengokmj_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(sengokmj_state, layer_en_w))

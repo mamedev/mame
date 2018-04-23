@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
-
 /*****************************************************************************
  *
  *   pps4.c
@@ -85,8 +84,8 @@
 #define VERBOSE 0       //!< set to 1 to log certain instruction conditions
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(PPS4,   pps4_device,   "pps4",   "PPS4-4")
-DEFINE_DEVICE_TYPE(PPS4_2, pps4_2_device, "pps4_2", "PPS-4/2")
+DEFINE_DEVICE_TYPE(PPS4,   pps4_device,   "pps4",   "Rockwell PPS4-4")
+DEFINE_DEVICE_TYPE(PPS4_2, pps4_2_device, "pps4_2", "Rockwell PPS-4/2")
 
 pps4_device::pps4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
@@ -140,9 +139,9 @@ void pps4_device::W(u8 data)
 	m_SAG = 0;
 }
 
-util::disasm_interface *pps4_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pps4_device::create_disassembler()
 {
-	return new pps4_disassembler;
+	return std::make_unique<pps4_disassembler>();
 }
 
 /**
@@ -1557,7 +1556,7 @@ void pps4_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, m_P);
+		debugger_instruction_hook(m_P);
 		execute_one();
 
 	} while (m_icount > 0);
@@ -1604,7 +1603,7 @@ void pps4_device::device_start()
 	state_add( STATE_GENPCBASE,"CURPC", m_P ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_C).formatstr("%3s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_dia_cb.resolve_safe(0);
 	m_dib_cb.resolve_safe(0);

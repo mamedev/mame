@@ -52,4 +52,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	void prehisle(machine_config &config);
+	void prehisle_map(address_map &map);
+	void prehisle_sound_io_map(address_map &map);
+	void prehisle_sound_map(address_map &map);
 };

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef _CPS1_H_
-#define _CPS1_H_
+#ifndef MAME_INCLUDES_CPS1_H
+#define MAME_INCLUDES_CPS1_H
 
 #include "sound/msm5205.h"
 #include "sound/qsound.h"
@@ -344,6 +344,7 @@ public:
 	DECLARE_DRIVER_INIT(sf2mdtb);
 	DECLARE_DRIVER_INIT(sf2b);
 	DECLARE_DRIVER_INIT(slampic);
+	DECLARE_DRIVER_INIT(wofabl);
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(cawingbl);
@@ -419,6 +420,7 @@ public:
 	void kodb(machine_config &config);
 	void varthb(machine_config &config);
 	void sgyxz(machine_config &config);
+	void wofabl(machine_config &config);
 	void punipic(machine_config &config);
 	void dinopic(machine_config &config);
 	void slampic(machine_config &config);
@@ -434,11 +436,36 @@ public:
 	void wofhfh(machine_config &config);
 	void cps1_10MHz(machine_config &config);
 	void pang3(machine_config &config);
+	void cps2_map(address_map &map);
+	void dead_cps2_map(address_map &map);
+	void decrypted_opcodes_map(address_map &map);
+	void dinopic_map(address_map &map);
+	void fcrash_map(address_map &map);
+	void forgottn_map(address_map &map);
+	void knightsb_map(address_map &map);
+	void knightsb_z80map(address_map &map);
+	void kodb_sound_map(address_map &map);
+	void main_map(address_map &map);
+	void punipic_map(address_map &map);
+	void qsound_decrypted_opcodes_map(address_map &map);
+	void qsound_main_map(address_map &map);
+	void qsound_sub_map(address_map &map);
+	void sf2b_map(address_map &map);
+	void sf2m10_map(address_map &map);
+	void sf2m1_map(address_map &map);
+	void sf2m3_map(address_map &map);
+	void sf2mdt_map(address_map &map);
+	void sf2mdt_z80map(address_map &map);
+	void sgyxz_map(address_map &map);
+	void sgyxz_sound_map(address_map &map);
+	void wofabl_map(address_map &map);
+	void slampic_map(address_map &map);
+	void sound_map(address_map &map);
+	void sub_map(address_map &map);
+	void varthb_map(address_map &map);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
-
-ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
 
 GFXDECODE_EXTERN( cps1 );
 

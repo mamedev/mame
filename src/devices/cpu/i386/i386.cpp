@@ -28,17 +28,17 @@
 /* seems to be defined on mingw-gcc */
 #undef i386
 
-DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "I386")
-DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "I386SX")
-DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "I486")
-DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "I486DX4")
-DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Pentium")
+DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "Intel I386")
+DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX")
+DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
+DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
+DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
 DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
-DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Pentium Pro")
-DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Pentium MMX")
-DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Pentium II")
-DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Pentium III")
-DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Pentium 4")
+DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentium Pro")
+DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
+DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
+DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
+DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Intel Pentium 4")
 
 
 i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -269,8 +269,13 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		m_sreg[segment].d = 0;
 		m_sreg[segment].valid = true;
 
-		if( segment == CS && !m_performed_intersegment_jump )
-			m_sreg[segment].base |= 0xfff00000;
+		if( segment == CS )
+		{
+			if( !m_performed_intersegment_jump )
+				m_sreg[segment].base |= 0xfff00000;
+			if(m_cpu_version < 0x5000)
+				m_sreg[segment].flags = 0x93;
+		}
 	}
 }
 
@@ -1715,7 +1720,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 		}
 		if (operand32 != 0)  // if 32-bit
 		{
-			if(i386_limit_check(SS, REG32(ESP) - 8))
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) - 8 : (REG16(SP) - 8) & 0xffff);
+			if(i386_limit_check(SS, offset))
 			{
 				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
@@ -1723,7 +1729,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 		}
 		else
 		{
-			if(i386_limit_check(SS, (REG16(SP) - 4) & 0xffff))
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) - 4 : (REG16(SP) - 4) & 0xffff);
+			if(i386_limit_check(SS, offset))
 			{
 				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
@@ -1973,7 +1980,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 					/* same privilege */
 					if (operand32 != 0)  // if 32-bit
 					{
-						if(i386_limit_check(SS, REG32(ESP) - 8))
+						uint32_t stkoff = (STACK_32BIT ? REG32(ESP) - 8 : (REG16(SP) - 8) & 0xffff);
+						if(i386_limit_check(SS, stkoff))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)
@@ -1983,7 +1991,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 					}
 					else
 					{
-						if(i386_limit_check(SS, (REG16(SP) - 4) & 0xffff))
+						uint32_t stkoff = (STACK_32BIT ? REG32(ESP) - 4 : (REG16(SP) - 4) & 0xffff);
+						if(i386_limit_check(SS, stkoff))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)
@@ -3324,7 +3333,7 @@ void i386_device::i386_common_init()
 	m_ferr_handler.resolve_safe();
 	m_ferr_handler(0);
 
-	m_icountptr = &m_cycles;
+	set_icountptr(m_cycles);
 }
 
 void i386_device::device_start()
@@ -3739,12 +3748,12 @@ void i386_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x9b;
+	m_sreg[CS].flags    = 0x93;
 	m_sreg[CS].valid    = true;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 	m_sreg[DS].valid = m_sreg[ES].valid = m_sreg[FS].valid = m_sreg[GS].valid = m_sreg[SS].valid =true;
 
 	m_idtr.base = 0;
@@ -3854,7 +3863,7 @@ void i386_device::pentium_smi()
 	m_sreg[CS].selector = 0x3000; // pentium only, ppro sel = smbase >> 4
 	m_sreg[CS].base = m_smbase;
 	m_sreg[CS].limit = 0xffffffff;
-	m_sreg[CS].flags = 0x809b;
+	m_sreg[CS].flags = 0x8093;
 	m_sreg[CS].valid = true;
 	m_cr[4] = 0;
 	m_dr[7] = 0x400;
@@ -3959,7 +3968,7 @@ void i386_device::execute_run()
 		m_segment_prefix = 0;
 		m_prev_eip = m_eip;
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if(m_delayed_interrupt_enable != 0)
 		{
@@ -4007,9 +4016,9 @@ int i386_device::get_mode() const
 	return m_sreg[CS].d ? 32 : 16;
 }
 
-util::disasm_interface *i386_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i386_device::create_disassembler()
 {
-	return new i386_disassembler(this);
+	return std::make_unique<i386_disassembler>(this);
 }
 
 /*****************************************************************************/
@@ -4035,11 +4044,11 @@ void i486_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4101,11 +4110,11 @@ void pentium_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4173,11 +4182,11 @@ void mediagx_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4236,11 +4245,11 @@ void pentium_pro_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4309,11 +4318,11 @@ void pentium_mmx_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4380,11 +4389,11 @@ void pentium2_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4445,11 +4454,11 @@ void pentium3_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4512,11 +4521,11 @@ void pentium4_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;

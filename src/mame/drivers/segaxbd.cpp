@@ -466,7 +466,7 @@ void segaxbd_state::timer_ack_callback()
 //  sound_data_w - write data to the sound CPU
 //-------------------------------------------------
 
-void segaxbd_state::sound_data_w(uint8_t data)
+WRITE8_MEMBER(segaxbd_state::sound_data_w)
 {
 	synchronize(TID_SOUND_WRITE, data);
 }
@@ -958,58 +958,61 @@ WRITE16_MEMBER( segaxbd_state::paletteram_w )
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup1")
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup2")
-	AM_RANGE(0x0c0000, 0x0cffff) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, tileram_r, tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_DEVREADWRITE("segaic16vid", segaic16_video_device, textram_r, textram_w) AM_SHARE("textram")
-	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("multiplier_main", sega_315_5248_multiplier_device, read, write)
-	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_main", sega_315_5249_divider_device, read, write)
-	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("cmptimer_main", sega_315_5250_compare_timer_device, read, write)
-	AM_RANGE(0x100000, 0x100fff) AM_MIRROR(0x00f000) AM_RAM AM_SHARE("sprites")
-	AM_RANGE(0x110000, 0x11ffff) AM_DEVWRITE("sprites", sega_xboard_sprite_device, draw_write)
-	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x130000, 0x13ffff) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x00fff0) AM_DEVREADWRITE8("iochip_0", cxd1095_device, read, write, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_MIRROR(0x00fff0) AM_DEVREADWRITE8("iochip_1", cxd1095_device, read, write, 0x00ff)
-	AM_RANGE(0x160000, 0x16ffff) AM_WRITE(iocontrol_w)
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("subcpu", 0x00000)
-	AM_RANGE(0x280000, 0x283fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("subram0")
-	AM_RANGE(0x2a0000, 0x2a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("subram1")
-	AM_RANGE(0x2e0000, 0x2e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("multiplier_subx", sega_315_5248_multiplier_device, read, write)
-	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
-	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("cmptimer_subx", sega_315_5250_compare_timer_device, read, write)
-	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x2ee000, 0x2effff) AM_DEVREADWRITE("segaic16road", segaic16_road_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
+void segaxbd_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x3fffff);
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x083fff).mirror(0x01c000).ram().share("backup1");
+	map(0x0a0000, 0x0a3fff).mirror(0x01c000).ram().share("backup2");
+	map(0x0c0000, 0x0cffff).rw("segaic16vid", FUNC(segaic16_video_device::tileram_r), FUNC(segaic16_video_device::tileram_w)).share("tileram");
+	map(0x0d0000, 0x0d0fff).mirror(0x00f000).rw("segaic16vid", FUNC(segaic16_video_device::textram_r), FUNC(segaic16_video_device::textram_w)).share("textram");
+	map(0x0e0000, 0x0e0007).mirror(0x003ff8).rw("multiplier_main", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
+	map(0x0e4000, 0x0e401f).mirror(0x003fe0).rw("divider_main", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
+	map(0x0e8000, 0x0e801f).mirror(0x003fe0).rw("cmptimer_main", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
+	map(0x100000, 0x100fff).mirror(0x00f000).ram().share("sprites");
+	map(0x110000, 0x11ffff).w("sprites", FUNC(sega_xboard_sprite_device::draw_write));
+	map(0x120000, 0x123fff).mirror(0x00c000).ram().w(this, FUNC(segaxbd_state::paletteram_w)).share("paletteram");
+	map(0x130000, 0x13ffff).rw(this, FUNC(segaxbd_state::adc_r), FUNC(segaxbd_state::adc_w));
+	map(0x140000, 0x14000f).mirror(0x00fff0).rw("iochip_0", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
+	map(0x150000, 0x15000f).mirror(0x00fff0).rw("iochip_1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write)).umask16(0x00ff);
+	map(0x160000, 0x16ffff).w(this, FUNC(segaxbd_state::iocontrol_w));
+	map(0x200000, 0x27ffff).rom().region("subcpu", 0x00000);
+	map(0x280000, 0x283fff).mirror(0x01c000).ram().share("subram0");
+	map(0x2a0000, 0x2a3fff).mirror(0x01c000).ram().share("subram1");
+	map(0x2e0000, 0x2e0007).mirror(0x003ff8).rw("multiplier_subx", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
+	map(0x2e4000, 0x2e401f).mirror(0x003fe0).rw("divider_subx", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
+	map(0x2e8000, 0x2e800f).mirror(0x003ff0).rw("cmptimer_subx", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
+	map(0x2ec000, 0x2ecfff).mirror(0x001000).ram().share("roadram");
+	map(0x2ee000, 0x2effff).rw("segaic16road", FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
 //  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE(excs_r, excs_w)
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("backup1")
-	AM_RANGE(0x3fc000, 0x3fffff) AM_RAM AM_SHARE("backup2")
-ADDRESS_MAP_END
+	map(0x3f8000, 0x3fbfff).ram().share("backup1");
+	map(0x3fc000, 0x3fffff).ram().share("backup2");
+}
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segaxbd_state )
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segaxbd_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 //**************************************************************************
 //  SUB CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("subram0")
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("subram1")
-	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("multiplier_subx", sega_315_5248_multiplier_device, read, write)
-	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("divider_subx", sega_315_5249_divider_device, read, write)
-	AM_RANGE(0x0e8000, 0x0e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("cmptimer_subx", sega_315_5250_compare_timer_device, read, write)
-	AM_RANGE(0x0ec000, 0x0ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("roadram")
-	AM_RANGE(0x0ee000, 0x0effff) AM_DEVREADWRITE("segaic16road", segaic16_road_device, segaic16_road_control_0_r, segaic16_road_control_0_w)
+void segaxbd_state::sub_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xfffff);
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x083fff).mirror(0x01c000).ram().share("subram0");
+	map(0x0a0000, 0x0a3fff).mirror(0x01c000).ram().share("subram1");
+	map(0x0e0000, 0x0e0007).mirror(0x003ff8).rw("multiplier_subx", FUNC(sega_315_5248_multiplier_device::read), FUNC(sega_315_5248_multiplier_device::write));
+	map(0x0e4000, 0x0e401f).mirror(0x003fe0).rw("divider_subx", FUNC(sega_315_5249_divider_device::read), FUNC(sega_315_5249_divider_device::write));
+	map(0x0e8000, 0x0e800f).mirror(0x003ff0).rw("cmptimer_subx", FUNC(sega_315_5250_compare_timer_device::read), FUNC(sega_315_5250_compare_timer_device::write));
+	map(0x0ec000, 0x0ecfff).mirror(0x001000).ram().share("roadram");
+	map(0x0ee000, 0x0effff).rw("segaic16road", FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
 //  AM_RANGE(0x0f0000, 0x0f3fff) AM_READWRITE(excs_r, excs_w)
-ADDRESS_MAP_END
+}
 
 
 
@@ -1017,19 +1020,21 @@ ADDRESS_MAP_END
 //  Z80 SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::sound_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf800, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segaxbd_state::sound_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segaxbd_state::sound_data_r));
+}
 
 
 
@@ -1040,18 +1045,20 @@ ADDRESS_MAP_END
 // Sound Board
 // The extra sound is used when the cabinet is Deluxe(Air Drive), or Cockpit. The soundlatch is
 // shared with the main board sound.
-static ADDRESS_MAP_START( smgp_sound2_map, AS_PROGRAM, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm2", segapcm_device, sega_pcm_r, sega_pcm_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::smgp_sound2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm2", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf800, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( smgp_sound2_portmap, AS_IO, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segaxbd_state::smgp_sound2_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segaxbd_state::sound_data_r));
+}
 
 
 
@@ -1060,18 +1067,20 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Motor Board, not yet emulated
-static ADDRESS_MAP_START( smgp_airdrive_map, AS_PROGRAM, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::smgp_airdrive_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xafff).ram();
+}
 
-static ADDRESS_MAP_START( smgp_airdrive_portmap, AS_IO, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READNOP
-	AM_RANGE(0x02, 0x03) AM_NOP
-ADDRESS_MAP_END
+void segaxbd_state::smgp_airdrive_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x01, 0x01).nopr();
+	map(0x02, 0x03).noprw();
+}
 
 
 
@@ -1080,17 +1089,19 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Link Board, not yet emulated
-static ADDRESS_MAP_START( smgp_comm_map, AS_PROGRAM, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM // MB8421 Dual-Port SRAM
-ADDRESS_MAP_END
+void segaxbd_state::smgp_comm_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x47ff).ram(); // MB8421 Dual-Port SRAM
+}
 
-static ADDRESS_MAP_START( smgp_comm_portmap, AS_IO, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segaxbd_state::smgp_comm_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 
@@ -1099,16 +1110,18 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Z80, unknown function
-static ADDRESS_MAP_START( rascot_z80_map, AS_PROGRAM, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::rascot_z80_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xafff).ram();
+}
 
-static ADDRESS_MAP_START( rascot_z80_portmap, AS_IO, 8, segaxbd_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segaxbd_state::rascot_z80_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 
@@ -1119,7 +1132,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( xboard_generic )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )    // D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // D6: /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // D6: /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )     // D7: (Not connected)
 
 	// I/O port: CN C pins 17,15,13,11,9,7,5,3
@@ -1205,10 +1218,10 @@ static INPUT_PORTS_START( aburner )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(79)
 
 	PORT_START("mainpcb:ADC3")  // motor Y
-	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
+	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_CUSTOM )
 
 	PORT_START("mainpcb:ADC4")  // motor X
-	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
+	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -1556,7 +1569,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gprider )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:IO0PORTB")
@@ -1613,7 +1626,7 @@ static INPUT_PORTS_START( gprider_double )
 
 	PORT_START("subpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("subpcb:IO0PORTB")
@@ -1714,7 +1727,7 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_main")
 	MCFG_SEGA_315_5250_TIMER_ACK(segaxbd_state, timer_ack_callback)
-	MCFG_SEGA_315_5250_SOUND_WRITE(segaxbd_state, sound_data_w)
+	MCFG_SEGA_315_5250_SOUND_WRITE_CALLBACK(WRITE8(segaxbd_state, sound_data_w))
 
 	MCFG_SEGA_315_5250_COMPARE_TIMER_ADD("cmptimer_subx")
 
@@ -1793,7 +1806,7 @@ MACHINE_CONFIG_START(segaxbd_fd1094_state::device_add_mconfig)
 
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -1847,7 +1860,7 @@ MACHINE_CONFIG_START(segaxbd_lastsurv_fd1094_state::device_add_mconfig)
 
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	// basic machine hardware
 	// TODO: network board
@@ -1914,7 +1927,7 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("soundcpu2", Z80, SOUND_CLOCK/4)

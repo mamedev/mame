@@ -170,21 +170,19 @@ class esq5505_state : public driver_device
 {
 public:
 	esq5505_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_duart(*this, "duart"),
-		m_otis(*this, "otis"),
-		m_esp(*this, "esp"),
-		m_pump(*this, "pump"),
-		m_fdc(*this, "wd1772"),
-		m_panel(*this, "panel"),
-		m_dmac(*this, "mc68450"),
-		m_mdout(*this, "mdout")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_duart(*this, "duart")
+		, m_esp(*this, "esp")
+		, m_pump(*this, "pump")
+		, m_fdc(*this, "wd1772")
+		, m_panel(*this, "panel")
+		, m_dmac(*this, "mc68450")
+		, m_mdout(*this, "mdout")
 	{ }
 
 	required_device<m68000_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
-	required_device<es5505_device> m_otis;
 	required_device<es5510_device> m_esp;
 	required_device<esq_5505_5510_pump_device> m_pump;
 	optional_device<wd1772_device> m_fdc;
@@ -223,6 +221,10 @@ public:
 	void vfxsd(machine_config &config);
 	void eps(machine_config &config);
 	void vfx32(machine_config &config);
+	void eps_map(address_map &map);
+	void sq1_map(address_map &map);
+	void vfx_map(address_map &map);
+	void vfxsd_map(address_map &map);
 private:
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
@@ -269,8 +271,7 @@ IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 void esq5505_state::machine_start()
 {
 	driver_device::machine_start();
-	// tell the pump about the OTIS & ESP chips
-	m_pump->set_otis(m_otis);
+	// tell the pump about the ESP chips
 	m_pump->set_esp(m_esp);
 
 	m_rom = (uint16_t *)(void *)memregion("osrom")->base();
@@ -346,7 +347,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 		m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 	}
 
-	if (!machine().side_effect_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
+	if (!machine().side_effects_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
 	{
 		return m_rom[offset];
 	}
@@ -377,46 +378,50 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 	}
 }
 
-static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
-ADDRESS_MAP_END
+void esq5505_state::vfx_map(address_map &map)
+{
+	map(0x000000, 0x007fff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
+	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
+	map(0xc00000, 0xc1ffff).rom().region("osrom", 0);
+	map(0xff0000, 0xffffff).ram().share("osram");
+}
 
-static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_READWRITE(lower_r, lower_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x00ff)
-	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_device, read, write, 0x00ff)
-	AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
-	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
-ADDRESS_MAP_END
+void esq5505_state::vfxsd_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
+	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
+	map(0x2c0000, 0x2c0007).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
+	map(0x330000, 0x3bffff).ram(); // sequencer memory?
+	map(0xc00000, 0xc3ffff).rom().region("osrom", 0);
+	map(0xff0000, 0xffffff).ram().share("osram");
+}
 
-static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
-	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_device, read, write, 0x00ff)
-	AM_RANGE(0x580000, 0x7fffff) AM_RAM         // sample RAM?
-	AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
-ADDRESS_MAP_END
+void esq5505_state::eps_map(address_map &map)
+{
+	map(0x000000, 0x007fff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
+	map(0x240000, 0x2400ff).rw(m_dmac, FUNC(hd63450_device::read), FUNC(hd63450_device::write));
+	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x2c0000, 0x2c0007).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
+	map(0x580000, 0x7fffff).ram();         // sample RAM?
+	map(0xc00000, 0xc1ffff).rom().region("osrom", 0);
+	map(0xff0000, 0xffffff).ram().share("osram");
+}
 
-static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
-	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x0ff)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
-	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
-ADDRESS_MAP_END
+void esq5505_state::sq1_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rw(this, FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
+	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
+	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
+	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	map(0x330000, 0x3bffff).ram(); // sequencer memory?
+	map(0xc00000, 0xc3ffff).rom().region("osrom", 0);
+	map(0xff0000, 0xffffff).ram().share("osram");
+}
 
 WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
 {
@@ -655,7 +660,8 @@ MACHINE_CONFIG_START(esq5505_state::vfx)
 	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq5505_state::eps, vfx)
+MACHINE_CONFIG_START(esq5505_state::eps)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(eps_map)
 
@@ -677,7 +683,8 @@ MACHINE_CONFIG_DERIVED(esq5505_state::eps, vfx)
 	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(esq5505_state, fdc_write_byte))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq5505_state::vfxsd, vfx)
+MACHINE_CONFIG_START(esq5505_state::vfxsd)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
@@ -735,7 +742,8 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(esq5505_state::sq1, vfx)
+MACHINE_CONFIG_START(esq5505_state::sq1)
+	vfx(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 

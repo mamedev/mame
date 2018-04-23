@@ -50,7 +50,6 @@ private:
 	void reset_indexes();
 };
 
-extern const device_type K053251;
 DECLARE_DEVICE_TYPE(K053251, k053251_device)
 
 #define MCFG_K053251_ADD(_tag) \

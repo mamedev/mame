@@ -57,6 +57,8 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void headonb(machine_config &config);
+	void headonb_io_map(address_map &map);
+	void headonb_map(address_map &map);
 };
 
 
@@ -96,16 +98,18 @@ WRITE8_MEMBER(headonb_state::video_ram_w)
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-static ADDRESS_MAP_START( headonb_map, AS_PROGRAM, 8, headonb_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_MIRROR(0x4000)
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
-	AM_RANGE(0xff00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void headonb_state::headonb_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom().mirror(0x4000);
+	map(0xe000, 0xe3ff).ram().w(this, FUNC(headonb_state::video_ram_w)).share("video_ram");
+	map(0xff00, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( headonb_io_map, AS_IO, 8, headonb_state )
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
+void headonb_state::headonb_io_map(address_map &map)
+{
+	map(0x01, 0x01).portr("IN0");
+	map(0x04, 0x04).portr("IN1");
+}
 
 
 /***************************************************************************

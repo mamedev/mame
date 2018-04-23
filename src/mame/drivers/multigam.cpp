@@ -208,6 +208,10 @@ public:
 	void supergm3(machine_config &config);
 	void multigmt(machine_config &config);
 	void multigm3(machine_config &config);
+	void multigam_map(address_map &map);
+	void multigm3_map(address_map &map);
+	void multigmt_map(address_map &map);
+	void supergm3_map(address_map &map);
 };
 
 
@@ -398,37 +402,39 @@ WRITE8_MEMBER(multigam_state::multigam_mapper2_w)
 
 *******************************************************/
 
-static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8, multigam_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
-	AM_RANGE(0x5000, 0x5ffe) AM_ROM
-	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x6fff, 0x6fff) AM_WRITE(multigam_switch_prg_rom)
-	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(multigam_switch_gfx_rom)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)
-ADDRESS_MAP_END
+void multigam_state::multigam_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x0800, 0x0fff).ram(); /* additional RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(this, FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(this, FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(this, FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
+	map(0x5000, 0x5ffe).rom();
+	map(0x5002, 0x5002).nopw();
+	map(0x5fff, 0x5fff).portr("IN0");
+	map(0x6000, 0x7fff).rom();
+	map(0x6fff, 0x6fff).w(this, FUNC(multigam_state::multigam_switch_prg_rom));
+	map(0x7fff, 0x7fff).w(this, FUNC(multigam_state::multigam_switch_gfx_rom));
+	map(0x8000, 0xffff).rom().w(this, FUNC(multigam_state::multigam_mapper2_w));
+}
 
-static ADDRESS_MAP_START( multigmt_map, AS_PROGRAM, 8, multigam_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(multigam_switch_prg_rom)
-	AM_RANGE(0x3fff, 0x3fff) AM_WRITE(multigam_switch_gfx_rom)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)     /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
-	AM_RANGE(0x5000, 0x5ffe) AM_ROM
-	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)
-ADDRESS_MAP_END
+void multigam_state::multigmt_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x0800, 0x0fff).ram(); /* additional RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x3000, 0x3000).w(this, FUNC(multigam_state::multigam_switch_prg_rom));
+	map(0x3fff, 0x3fff).w(this, FUNC(multigam_state::multigam_switch_gfx_rom));
+	map(0x4014, 0x4014).w(this, FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(this, FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(this, FUNC(multigam_state::multigam_IN1_r));     /* IN1 - input port 2 / PSG second control register */
+	map(0x5000, 0x5ffe).rom();
+	map(0x5002, 0x5002).nopw();
+	map(0x5fff, 0x5fff).portr("IN0");
+	map(0x6000, 0x7fff).rom();
+	map(0x8000, 0xffff).rom().w(this, FUNC(multigam_state::multigam_mapper2_w));
+}
 
 /******************************************************
 
@@ -677,22 +683,23 @@ WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 
 *******************************************************/
 
-static ADDRESS_MAP_START( multigm3_map, AS_PROGRAM, 8, multigam_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(multigm3_switch_prg_rom)
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
-	AM_RANGE(0x5003, 0x5003) AM_WRITE(multigm3_switch_gfx_rom)
-	AM_RANGE(0x5000, 0x5ffe) AM_ROM
-	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank10")
-	AM_RANGE(0x6fff, 0x6fff) AM_WRITENOP /* 0x00 in attract mode, 0xff during play */
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigm3_mapper2_w)
-ADDRESS_MAP_END
+void multigam_state::multigm3_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x0800, 0x0fff).ram(); /* additional RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(this, FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(this, FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(this, FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
+	map(0x5001, 0x5001).w(this, FUNC(multigam_state::multigm3_switch_prg_rom));
+	map(0x5002, 0x5002).nopw();
+	map(0x5003, 0x5003).w(this, FUNC(multigam_state::multigm3_switch_gfx_rom));
+	map(0x5000, 0x5ffe).rom();
+	map(0x5fff, 0x5fff).portr("IN0");
+	map(0x6000, 0x7fff).bankrw("bank10");
+	map(0x6fff, 0x6fff).nopw(); /* 0x00 in attract mode, 0xff during play */
+	map(0x8000, 0xffff).rom().w(this, FUNC(multigam_state::multigm3_mapper2_w));
+}
 
 /******************************************************
 
@@ -977,22 +984,23 @@ WRITE8_MEMBER(multigam_state::supergm3_chr_bank_w)
 
 *******************************************************/
 
-static ADDRESS_MAP_START( supergm3_map, AS_PROGRAM, 8, multigam_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x4fff, 0x4fff) AM_READ_PORT("IN0")
-	AM_RANGE(0x5000, 0x5fff) AM_ROM
-	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(supergm3_prg_bank_w)
-	AM_RANGE(0x5002, 0x5002) AM_WRITE(supergm3_chr_bank_w)
-	AM_RANGE(0x5fff, 0x5fff) AM_WRITENOP
-	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank10")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void multigam_state::supergm3_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram(); /* NES RAM */
+	map(0x0800, 0x0fff).ram(); /* additional RAM */
+	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
+	map(0x4014, 0x4014).w(this, FUNC(multigam_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(this, FUNC(multigam_state::multigam_IN0_r), FUNC(multigam_state::multigam_IN0_w));   /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(this, FUNC(multigam_state::multigam_IN1_r));      /* IN1 - input port 2 / PSG second control register */
+	map(0x4fff, 0x4fff).portr("IN0");
+	map(0x5000, 0x5fff).rom();
+	map(0x5000, 0x5000).nopw();
+	map(0x5001, 0x5001).w(this, FUNC(multigam_state::supergm3_prg_bank_w));
+	map(0x5002, 0x5002).w(this, FUNC(multigam_state::supergm3_chr_bank_w));
+	map(0x5fff, 0x5fff).nopw();
+	map(0x6000, 0x7fff).bankrw("bank10");
+	map(0x8000, 0xffff).rom();
+}
 
 /******************************************************
 
@@ -1022,7 +1030,7 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, multigam_state,multigam_inputs_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, multigam_state,multigam_inputs_r, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
@@ -1221,7 +1229,6 @@ MACHINE_CONFIG_START(multigam_state::multigam)
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(multigam_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1242,7 +1249,8 @@ MACHINE_CONFIG_START(multigam_state::multigam)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(multigam_state::multigm3, multigam)
+MACHINE_CONFIG_START(multigam_state::multigm3)
+	multigam(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigm3_map)
 
@@ -1250,12 +1258,14 @@ MACHINE_CONFIG_DERIVED(multigam_state::multigm3, multigam)
 	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(multigam_state::multigmt, multigam)
+MACHINE_CONFIG_START(multigam_state::multigmt)
+	multigam(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigmt_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(multigam_state::supergm3, multigam)
+MACHINE_CONFIG_START(multigam_state::supergm3)
+	multigam(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supergm3_map)
 

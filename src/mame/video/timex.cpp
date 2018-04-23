@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker
 /***************************************************************************
 
-  timex.c
+  timex.cpp
 
   Functions to emulate the video hardware of the Timex ZX Spectrum clones.
 
@@ -28,8 +28,19 @@ inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
 VIDEO_START_MEMBER(spectrum_state,ts2068)
 {
-	VIDEO_START_CALL_MEMBER( spectrum );
 	m_frame_invert_count = 30;
+
+	m_frame_number = 0;
+	m_flash_invert = 0;
+
+	m_previous_border_x = 0;
+	m_previous_border_y = 0;
+	m_screen->register_screen_bitmap(m_border_bitmap);
+	m_previous_screen_x = 0;
+	m_previous_screen_y = 0;
+	m_screen->register_screen_bitmap(m_screen_bitmap);
+
+	m_screen_location = m_video_ram;
 }
 
 WRITE_LINE_MEMBER(spectrum_state::screen_vblank_timex)

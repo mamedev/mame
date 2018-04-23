@@ -165,7 +165,7 @@ const uint8_t i80286_cpu_device::m_i80286_timing[] =
 	13,             /* (80186) BOUND */
 };
 
-DEFINE_DEVICE_TYPE(I80286, i80286_cpu_device, "i80286", "I80286")
+DEFINE_DEVICE_TYPE(I80286, i80286_cpu_device, "i80286", "Intel I80286")
 
 i80286_cpu_device::i80286_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_common_cpu_device(mconfig, I80286, tag, owner, clock)
@@ -204,7 +204,7 @@ void i80286_cpu_device::device_reset()
 	m_sregs[DS] = m_sregs[SS] = m_sregs[ES] = 0;
 	m_base[DS] = m_base[SS] = m_base[ES] = 0;
 	m_rights[DS] = m_rights[SS] = m_rights[ES] = 0x93;
-	m_rights[CS] = 0x9b;
+	m_rights[CS] = 0x93;
 	m_valid[CS] = m_valid[SS] = m_valid[DS] = m_valid[ES] = true;
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -866,7 +866,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 		m_ip = offset;
 		m_sregs[CS]=selector;
 		m_base[CS]=selector<<4;
-		m_rights[CS]=0x9b;
+		m_rights[CS]=0x93;
 		m_limit[CS]=0xffff;
 	}
 }
@@ -1020,17 +1020,6 @@ void i80286_cpu_device::write_port_word(uint16_t port, uint16_t data)
 	m_io->write_word_unaligned(port, data);
 }
 
-uint8_t i80286_cpu_device::fetch_op()
-{
-	uint8_t data;
-	if(m_ip > m_limit[CS])
-		throw TRAP(FAULT_GP, 0);
-
-	data = m_direct_opcodes->read_byte( update_pc() & m_amask, m_fetch_xor );
-	m_ip++;
-	return data;
-}
-
 uint8_t i80286_cpu_device::fetch()
 {
 	uint8_t data;
@@ -1112,7 +1101,7 @@ void i80286_cpu_device::execute_run()
 				}
 			}
 
-			debugger_instruction_hook( this, update_pc() & m_amask );
+			debugger_instruction_hook( update_pc() & m_amask );
 
 			uint8_t op = fetch_op();
 
@@ -2021,7 +2010,7 @@ uint16_t i80286_cpu_device::far_return(int iret, int bytes)
 		m_regs.w[SP] += (iret ? 6 : 4) + bytes;
 		m_sregs[CS] = sel;
 		m_base[CS] = sel << 4;
-		m_rights[CS] = 0x9b;
+		m_rights[CS] = 0x93;
 		m_limit[CS] = 0xffff;
 		m_ip = off;
 	}

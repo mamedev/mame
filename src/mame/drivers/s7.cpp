@@ -83,6 +83,7 @@ public:
 		, m_pia24(*this, "pia24")
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(sound_r);
@@ -117,6 +118,8 @@ public:
 	DECLARE_MACHINE_RESET(s7);
 	DECLARE_DRIVER_INIT(s7);
 	void s7(machine_config &config);
+	void s7_audio_map(address_map &map);
+	void s7_main_map(address_map &map);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -137,27 +140,30 @@ private:
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
+	output_finder<61> m_digits;
 };
 
-static ADDRESS_MAP_START( s7_main_map, AS_PROGRAM, 8, s7_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x1000)
-	AM_RANGE(0x0100, 0x01ff) AM_READWRITE(nvram_r,nvram_w)
-	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_MIRROR(0x1000)
-	AM_RANGE(0x1100, 0x11ff) AM_RAM
-	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
-	AM_RANGE(0x2200, 0x2203) AM_DEVREADWRITE("pia22", pia6821_device, read, write) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x5000, 0x7fff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void s7_state::s7_main_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x00ff).ram().mirror(0x1000);
+	map(0x0100, 0x01ff).rw(this, FUNC(s7_state::nvram_r), FUNC(s7_state::nvram_w));
+	map(0x0200, 0x03ff).ram().mirror(0x1000);
+	map(0x1100, 0x11ff).ram();
+	map(0x2100, 0x2103).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
+	map(0x2200, 0x2203).rw(m_pia22, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // solenoids
+	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
+	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
+	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
+	map(0x5000, 0x7fff).rom().region("roms", 0);
+}
 
-static ADDRESS_MAP_START( s7_audio_map, AS_PROGRAM, 8, s7_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pias", pia6821_device, read, write)
-	AM_RANGE(0xb000, 0xffff) AM_ROM AM_REGION("audioroms", 0)
-ADDRESS_MAP_END
+void s7_state::s7_audio_map(address_map &map)
+{
+	map(0x0000, 0x00ff).ram();
+	map(0x0400, 0x0403).mirror(0x8000).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0xb000, 0xffff).rom().region("audioroms", 0);
+}
 
 static INPUT_PORTS_START( s7 )
 	PORT_START("X0")
@@ -305,7 +311,7 @@ WRITE8_MEMBER( s7_state::dig0_w )
 	m_strobe = data & 15;
 	data ^= 0xf0; // inverted by ic33
 	m_data_ok = true;
-	output().set_digit_value(60, patterns[data>>4]); // diag digit
+	m_digits[60] = patterns[data>>4]; // diag digit
 }
 
 WRITE8_MEMBER( s7_state::dig1_w )
@@ -313,8 +319,8 @@ WRITE8_MEMBER( s7_state::dig1_w )
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
 	{
-		output().set_digit_value(m_strobe+16, patterns[data&15]);
-		output().set_digit_value(m_strobe, patterns[data>>4]);
+		m_digits[m_strobe+16] = patterns[data&15];
+		m_digits[m_strobe] = patterns[data>>4];
 	}
 	m_data_ok = false;
 }
@@ -408,6 +414,7 @@ void s7_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 
 void s7_state::machine_start()
 {
+	m_digits.resolve();
 	m_memprotect = 0;
 	save_item(NAME(m_nvram));
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
@@ -433,7 +440,7 @@ MACHINE_CONFIG_START(s7_state::s7)
 	MCFG_DEFAULT_LAYOUT(layout_s7)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)

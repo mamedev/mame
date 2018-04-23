@@ -166,9 +166,10 @@ const tiny_rom_entry *ef9365_device::device_rom_region() const
 // default address map
 // Up to 512*512 per bitplane, 8 bitplanes max.
 //-------------------------------------------------
-static ADDRESS_MAP_START( ef9365, 0, 8, ef9365_device )
-	AM_RANGE(0x00000, ( ( ef9365_device::BITPLANE_MAX_SIZE * ef9365_device::MAX_BITPLANES ) - 1 ) ) AM_RAM
-ADDRESS_MAP_END
+void ef9365_device::ef9365(address_map &map)
+{
+	map(0x00000, ef9365_device::BITPLANE_MAX_SIZE * ef9365_device::MAX_BITPLANES - 1).ram();
+}
 
 //-------------------------------------------------
 //  memory_space_config - return a description of
@@ -199,7 +200,7 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, EF9365, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, nullptr, *ADDRESS_MAP_NAME(ef9365)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, address_map_constructor(), address_map_constructor(FUNC(ef9365_device::ef9365), this)),
 	m_charset(*this, "ef9365"),
 	m_palette(*this, finder_base::DUMMY_TAG),
 	m_irq_handler(*this)
@@ -208,78 +209,68 @@ ef9365_device::ef9365_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
+//  set_nb_of_bitplanes: Set the number of bitplanes
 //-------------------------------------------------
 
-void ef9365_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<ef9365_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_nb_of_bitplanes: Set the number of bitplanes
-//-------------------------------------------------
-
-void ef9365_device::static_set_nb_bitplanes(device_t &device, int nb_bitplanes )
+void ef9365_device::set_nb_bitplanes(int nb_bitplanes)
 {
 	if( nb_bitplanes > 0 && nb_bitplanes <= 8 )
 	{
-		downcast<ef9365_device &>(device).nb_of_bitplanes = nb_bitplanes;
-		downcast<ef9365_device &>(device).nb_of_colors = pow(2,nb_bitplanes);
+		nb_of_bitplanes = nb_bitplanes;
+		nb_of_colors = pow(2, nb_bitplanes);
 	}
 }
 
 //-------------------------------------------------
-//  static_set_display_mode: Set the display mode
+//  set_display_mode: Set the display mode
 //-------------------------------------------------
 
-void ef9365_device::static_set_display_mode(device_t &device, int display_mode )
+void ef9365_device::set_display_mode(int display_mode)
 {
 	switch(display_mode)
 	{
 	case DISPLAY_MODE_256x256:
-		downcast<ef9365_device &>(device).bitplane_xres = 256;
-		downcast<ef9365_device &>(device).bitplane_yres = 256;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 250;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFF00;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFF00;
+		bitplane_xres = 256;
+		bitplane_yres = 256;
+		vsync_scanline_pos = 250;
+		overflow_mask_x = 0xFF00;
+		overflow_mask_y = 0xFF00;
 		break;
 	case DISPLAY_MODE_512x512:
-		downcast<ef9365_device &>(device).bitplane_xres = 512;
-		downcast<ef9365_device &>(device).bitplane_yres = 512;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 506;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFE00;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFE00;
+		bitplane_xres = 512;
+		bitplane_yres = 512;
+		vsync_scanline_pos = 506;
+		overflow_mask_x = 0xFE00;
+		overflow_mask_y = 0xFE00;
 		break;
 	case DISPLAY_MODE_512x256:
-		downcast<ef9365_device &>(device).bitplane_xres = 512;
-		downcast<ef9365_device &>(device).bitplane_yres = 256;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 250;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFE00;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFF00;
+		bitplane_xres = 512;
+		bitplane_yres = 256;
+		vsync_scanline_pos = 250;
+		overflow_mask_x = 0xFE00;
+		overflow_mask_y = 0xFF00;
 		break;
 	case DISPLAY_MODE_128x128:
-		downcast<ef9365_device &>(device).bitplane_xres = 128;
-		downcast<ef9365_device &>(device).bitplane_yres = 128;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 124;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFF80;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFF80;
+		bitplane_xres = 128;
+		bitplane_yres = 128;
+		vsync_scanline_pos = 124;
+		overflow_mask_x = 0xFF80;
+		overflow_mask_y = 0xFF80;
 		break;
 	case DISPLAY_MODE_64x64:
-		downcast<ef9365_device &>(device).bitplane_xres = 64;
-		downcast<ef9365_device &>(device).bitplane_yres = 64;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 62;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFFC0;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFFC0;
+		bitplane_xres = 64;
+		bitplane_yres = 64;
+		vsync_scanline_pos = 62;
+		overflow_mask_x = 0xFFC0;
+		overflow_mask_y = 0xFFC0;
 		break;
 	default:
-		downcast<ef9365_device &>(device).logerror("Invalid EF9365 Display mode: %02x\n", display_mode);
-		downcast<ef9365_device &>(device).bitplane_xres = 256;
-		downcast<ef9365_device &>(device).bitplane_yres = 256;
-		downcast<ef9365_device &>(device).vsync_scanline_pos = 250;
-		downcast<ef9365_device &>(device).overflow_mask_x = 0xFF00;
-		downcast<ef9365_device &>(device).overflow_mask_y = 0xFF00;
+		logerror("Invalid EF9365 Display mode: %02x\n", display_mode);
+		bitplane_xres = 256;
+		bitplane_yres = 256;
+		vsync_scanline_pos = 250;
+		overflow_mask_x = 0xFF00;
+		overflow_mask_y = 0xFF00;
 		break;
 	}
 }

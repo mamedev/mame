@@ -27,6 +27,9 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void mvme350_mem(address_map &map);
 };
 
 #endif // MAME_BUS_VME_VME_MVME350_H

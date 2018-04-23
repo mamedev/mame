@@ -103,37 +103,6 @@ kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &m
 	m_invert_flip = 0;
 }
 
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void kaneko_view2_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<kaneko_view2_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-void kaneko_view2_tilemap_device::set_gfx_region(device_t &device, int region)
-{
-	kaneko_view2_tilemap_device &dev = downcast<kaneko_view2_tilemap_device &>(device);
-	dev.m_tilebase = region;
-}
-
-void kaneko_view2_tilemap_device::set_offset(device_t &device, int dx, int dy, int xdim, int ydim)
-{
-	kaneko_view2_tilemap_device &dev = downcast<kaneko_view2_tilemap_device &>(device);
-	dev.m_dx = dx;
-	dev.m_dy = dy;
-	dev.m_xdim = xdim;
-	dev.m_ydim = ydim;
-}
-
-void kaneko_view2_tilemap_device::set_invert_flip(device_t &device, int invert_flip)
-{
-	kaneko_view2_tilemap_device &dev = downcast<kaneko_view2_tilemap_device &>(device);
-	dev.m_invert_flip = invert_flip;
-}
-
 void kaneko_view2_tilemap_device::get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
 	uint16_t code_hi = m_vram[_N_][ 2 * tile_index + 0];

@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MACPCI_H_
-#define MACPCI_H_
+#ifndef MAME_INCLUDES_MACPCI_H
+#define MAME_INCLUDES_MACPCI_H
 
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
@@ -140,6 +140,7 @@ public:
 
 	DECLARE_DRIVER_INIT(pippin);
 	void pippin(machine_config &config);
+	void pippin_mem(address_map &map);
 private:
 	// wait states for accessing the VIA
 	int m_via_cycles;
@@ -161,4 +162,4 @@ public:
 	void mac_driver_init(model_t model);
 };
 
-#endif /* PCIMAC_H_ */
+#endif // MAME_INCLUDES_MACPCI_H

@@ -45,6 +45,7 @@ public:
 	sdk86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
@@ -52,24 +53,30 @@ public:
 	DECLARE_READ8_MEMBER(kbd_r);
 
 	void sdk86(machine_config &config);
+	void sdk86_io(address_map &map);
+	void sdk86_mem(address_map &map);
 private:
 	uint8_t m_digit;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
+	output_finder<8> m_digits;
 };
 
-static ADDRESS_MAP_START(sdk86_mem, AS_PROGRAM, 16, sdk86_state)
-	AM_RANGE(0x00000, 0x00fff) AM_RAM //2K standard, or 4k (board fully populated)
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void sdk86_state::sdk86_mem(address_map &map)
+{
+	map(0x00000, 0x00fff).ram(); //2K standard, or 4k (board fully populated)
+	map(0xfe000, 0xfffff).rom();
+}
 
-static ADDRESS_MAP_START(sdk86_io, AS_IO, 16, sdk86_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xfff0, 0xfff1) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, data_r, data_w, 0xff)
-	AM_RANGE(0xfff2, 0xfff3) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, status_r, control_w, 0xff)
-	AM_RANGE(0xffe8, 0xffeb) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, read, write, 0xff)
-	AM_RANGE(0xfff8, 0xffff) AM_DEVREADWRITE8("port1", i8255_device, read, write, 0xff00)
-	AM_RANGE(0xfff8, 0xffff) AM_DEVREADWRITE8("port2", i8255_device, read, write, 0x00ff)
-ADDRESS_MAP_END
+void sdk86_state::sdk86_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xfff0, 0xfff0).mirror(4).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xfff2, 0xfff2).mirror(4).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xffe8, 0xffeb).mirror(4).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write)).umask16(0x00ff);
+	map(0xfff8, 0xffff).rw("port1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
+	map(0xfff8, 0xffff).rw("port2", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sdk86 )
@@ -112,7 +119,7 @@ WRITE8_MEMBER( sdk86_state::scanlines_w )
 WRITE8_MEMBER( sdk86_state::digit_w )
 {
 	if (m_digit < 8)
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 }
 
 READ8_MEMBER( sdk86_state::kbd_r )

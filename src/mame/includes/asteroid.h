@@ -70,4 +70,7 @@ public:
 	void asteroid_sound(machine_config &config);
 	void astdelux_sound(machine_config &config);
 	void llander_sound(machine_config &config);
+	void astdelux_map(address_map &map);
+	void asteroid_map(address_map &map);
+	void llander_map(address_map &map);
 };

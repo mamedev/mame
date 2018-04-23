@@ -184,161 +184,171 @@ TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
 	m_audionmi->in_w<1>((scanline & 8) >> 3);
 }
 
-static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITENOP
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("P2")
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0xb000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void btime_state::btime_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("rambase");
+	map(0x0c00, 0x0c0f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x1000, 0x13ff).ram().share("videoram");
+	map(0x1400, 0x17ff).ram().share("colorram");
+	map(0x1800, 0x1bff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x1c00, 0x1fff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x4000, 0x4000).portr("P1").nopw();
+	map(0x4001, 0x4001).portr("P2");
+	map(0x4002, 0x4002).portr("SYSTEM").w(this, FUNC(btime_state::btime_video_control_w));
+	map(0x4003, 0x4003).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x4004, 0x4004).portr("DSW2").w(this, FUNC(btime_state::bnj_scroll1_w));
+	map(0xb000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x0500, 0x3fff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_RAM                         /* background? */
-	AM_RANGE(0xd100, 0xd3ff) AM_RAM                         /* ? */
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("bnj_bgram")
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1")   /* mirror address used on high score name entry */
+void btime_state::cookrace_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("rambase");
+	map(0x0500, 0x3fff).rom();
+	map(0xc000, 0xc3ff).ram().share("videoram");
+	map(0xc400, 0xc7ff).ram().share("colorram");
+	map(0xc800, 0xcbff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0xcc00, 0xcfff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0xd000, 0xd0ff).ram();                         /* background? */
+	map(0xd100, 0xd3ff).ram();                         /* ? */
+	map(0xd400, 0xd7ff).ram().share("bnj_bgram");
+	map(0xe000, 0xe000).portr("DSW1").w(this, FUNC(btime_state::bnj_video_control_w));
+	map(0xe300, 0xe300).portr("DSW1");   /* mirror address used on high score name entry */
 													/* screen */
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P1")
-	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
-	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfff9, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0xe001, 0xe001).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xe002, 0xe002).portr("P1");
+	map(0xe003, 0xe003).portr("P2");
+	map(0xe004, 0xe004).portr("SYSTEM");
+	map(0xfff9, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITENOP
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("P2")
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0x4005, 0x4005) AM_WRITE(bnj_scroll2_w)
-	AM_RANGE(0x9000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void btime_state::tisland_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("rambase");
+	map(0x0c00, 0x0c0f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x1000, 0x13ff).ram().share("videoram");
+	map(0x1400, 0x17ff).ram().share("colorram");
+	map(0x1800, 0x1bff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x1c00, 0x1fff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x4000, 0x4000).portr("P1").nopw();
+	map(0x4001, 0x4001).portr("P2");
+	map(0x4002, 0x4002).portr("SYSTEM").w(this, FUNC(btime_state::btime_video_control_w));
+	map(0x4003, 0x4003).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x4004, 0x4004).portr("DSW2").w(this, FUNC(btime_state::bnj_scroll1_w));
+	map(0x4005, 0x4005).w(this, FUNC(btime_state::bnj_scroll2_w));
+	map(0x9000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x8000, 0x83ff) AM_WRITEONLY AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_WRITEONLY AM_SHARE("colorram")
-	AM_RANGE(0x8800, 0x8bff) AM_WRITE(btime_mirrorvideoram_w)
-	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(btime_mirrorcolorram_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(zoar_video_control_w)
-	AM_RANGE(0x9800, 0x9800) AM_READ(zoar_dsw1_read)
-	AM_RANGE(0x9801, 0x9801) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9802, 0x9802) AM_READ_PORT("P1")
-	AM_RANGE(0x9803, 0x9803) AM_READ_PORT("P2")
-	AM_RANGE(0x9800, 0x9803) AM_WRITEONLY AM_SHARE("zoar_scrollram")
-	AM_RANGE(0x9804, 0x9804) AM_READ_PORT("SYSTEM") AM_WRITE(bnj_scroll2_w)
-	AM_RANGE(0x9805, 0x9805) AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0x9806, 0x9806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xd000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void btime_state::zoar_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("rambase");
+	map(0x8000, 0x83ff).writeonly().share("videoram");
+	map(0x8400, 0x87ff).writeonly().share("colorram");
+	map(0x8800, 0x8bff).w(this, FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x8c00, 0x8fff).w(this, FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x9000, 0x9000).w(this, FUNC(btime_state::zoar_video_control_w));
+	map(0x9800, 0x9800).r(this, FUNC(btime_state::zoar_dsw1_read));
+	map(0x9801, 0x9801).portr("DSW2");
+	map(0x9802, 0x9802).portr("P1");
+	map(0x9803, 0x9803).portr("P2");
+	map(0x9800, 0x9803).writeonly().share("zoar_scrollram");
+	map(0x9804, 0x9804).portr("SYSTEM").w(this, FUNC(btime_state::bnj_scroll2_w));
+	map(0x9805, 0x9805).w(this, FUNC(btime_state::bnj_scroll1_w));
+	map(0x9806, 0x9806).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xd000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_SHARE("colorram")  /* this is just here to initialize the pointer */
-	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW1") AM_WRITENOP     /* ??? */
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_SHARE("lnc_charbank")
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP     /* IRQ ack??? */
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("P2")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xb000, 0xb1ff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void btime_state::lnc_map(address_map &map)
+{
+	map(0x0000, 0x3bff).ram().share("rambase");
+	map(0x3c00, 0x3fff).ram().w(this, FUNC(btime_state::lnc_videoram_w)).share("videoram");
+	map(0x7800, 0x7bff).writeonly().share("colorram");  /* this is just here to initialize the pointer */
+	map(0x7c00, 0x7fff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
+	map(0x8000, 0x8000).portr("DSW1").nopw();     /* ??? */
+	map(0x8001, 0x8001).portr("DSW2").w(this, FUNC(btime_state::bnj_video_control_w));
+	map(0x8003, 0x8003).writeonly().share("lnc_charbank");
+	map(0x9000, 0x9000).portr("P1").nopw();     /* IRQ ack??? */
+	map(0x9001, 0x9001).portr("P2");
+	map(0x9002, 0x9002).portr("SYSTEM").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xb000, 0xb1ff).ram();
+	map(0xc000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_SHARE("colorram")      /* this is just here to initialize the pointer */
-	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_SHARE("lnc_charbank")
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP /* IRQ ack??? */
-	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("P2")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(mmonkey_protection_r, mmonkey_protection_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void btime_state::mmonkey_map(address_map &map)
+{
+	map(0x0000, 0x3bff).ram().share("rambase");
+	map(0x3c00, 0x3fff).ram().w(this, FUNC(btime_state::lnc_videoram_w)).share("videoram");
+	map(0x7800, 0x7bff).writeonly().share("colorram");      /* this is just here to initialize the pointer */
+	map(0x7c00, 0x7fff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::lnc_mirrorvideoram_w));
+	map(0x8000, 0x8000).portr("DSW1");
+	map(0x8001, 0x8001).portr("DSW2").w(this, FUNC(btime_state::bnj_video_control_w));
+	map(0x8003, 0x8003).writeonly().share("lnc_charbank");
+	map(0x9000, 0x9000).portr("P1").nopw(); /* IRQ ack??? */
+	map(0x9001, 0x9001).portr("P2");
+	map(0x9002, 0x9002).portr("SYSTEM").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xb000, 0xbfff).rw(this, FUNC(btime_state::mmonkey_protection_r), FUNC(btime_state::mmonkey_protection_w));
+	map(0xc000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("P2")
-	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4400, 0x47ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
-	AM_RANGE(0x5000, 0x51ff) AM_RAM_WRITE(bnj_background_w) AM_SHARE("bnj_bgram")
-	AM_RANGE(0x5200, 0x53ff) AM_RAM
-	AM_RANGE(0x5400, 0x5400) AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(bnj_scroll2_w)
-	AM_RANGE(0x5c00, 0x5c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void btime_state::bnj_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("rambase");
+	map(0x1000, 0x1000).portr("DSW1");
+	map(0x1001, 0x1001).portr("DSW2").w(this, FUNC(btime_state::bnj_video_control_w));
+	map(0x1002, 0x1002).portr("P1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1003, 0x1003).portr("P2");
+	map(0x1004, 0x1004).portr("SYSTEM");
+	map(0x4000, 0x43ff).ram().share("videoram");
+	map(0x4400, 0x47ff).ram().share("colorram");
+	map(0x4800, 0x4bff).rw(this, FUNC(btime_state::btime_mirrorvideoram_r), FUNC(btime_state::btime_mirrorvideoram_w));
+	map(0x4c00, 0x4fff).rw(this, FUNC(btime_state::btime_mirrorcolorram_r), FUNC(btime_state::btime_mirrorcolorram_w));
+	map(0x5000, 0x51ff).ram().w(this, FUNC(btime_state::bnj_background_w)).share("bnj_bgram");
+	map(0x5200, 0x53ff).ram();
+	map(0x5400, 0x5400).w(this, FUNC(btime_state::bnj_scroll1_w));
+	map(0x5800, 0x5800).w(this, FUNC(btime_state::bnj_scroll2_w));
+	map(0x5c00, 0x5c0f).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xa000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( disco_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x04ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x2000, 0x7fff) AM_RAM_WRITE(deco_charram_w) AM_SHARE("deco_charram")
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x8800, 0x881f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1")
-	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2")
-	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x9c00, 0x9c00) AM_READ_PORT("VBLANK") AM_WRITE(disco_video_control_w)
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void btime_state::disco_map(address_map &map)
+{
+	map(0x0000, 0x04ff).ram().share("rambase");
+	map(0x2000, 0x7fff).ram().w(this, FUNC(btime_state::deco_charram_w)).share("deco_charram");
+	map(0x8000, 0x83ff).ram().share("videoram");
+	map(0x8400, 0x87ff).ram().share("colorram");
+	map(0x8800, 0x881f).ram().share("spriteram");
+	map(0x9000, 0x9000).portr("SYSTEM");
+	map(0x9200, 0x9200).portr("P1");
+	map(0x9400, 0x9400).portr("P2");
+	map(0x9800, 0x9800).portr("DSW1");
+	map(0x9a00, 0x9a00).portr("DSW2").w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x9c00, 0x9c00).portr("VBLANK").w(this, FUNC(btime_state::disco_video_control_w));
+	map(0xa000, 0xffff).rom();
+}
 
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_SHARE("audio_rambase")
-	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xbfff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(audio_nmi_enable_w)
-	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
-ADDRESS_MAP_END
+void btime_state::audio_map(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x1c00).ram().share("audio_rambase");
+	map(0x2000, 0x3fff).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x4000, 0x5fff).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x7fff).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x8000, 0x9fff).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xa000, 0xbfff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xc000, 0xdfff).w(this, FUNC(btime_state::audio_nmi_enable_w));
+	map(0xe000, 0xefff).mirror(0x1000).rom();
+}
 
-static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void btime_state::disco_audio_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x4000, 0x4fff).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x5000, 0x5fff).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6fff).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x7000, 0x7fff).w("ay2", FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8fff).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+	map(0xf000, 0xffff).rom();
+}
 
 
 INPUT_CHANGED_MEMBER(btime_state::coin_inserted_irq_hi)
@@ -573,7 +583,7 @@ static INPUT_PORTS_START( zoar )
 //  PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 //  PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 	/* I can't use PORT_VBLANK as players would have almost no time to enter their initials */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
@@ -1322,7 +1332,8 @@ MACHINE_CONFIG_START(btime_state::btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::cookrace, btime)
+MACHINE_CONFIG_START(btime_state::cookrace)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
@@ -1339,7 +1350,8 @@ MACHINE_CONFIG_DERIVED(btime_state::cookrace, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::lnc, btime)
+MACHINE_CONFIG_START(btime_state::lnc)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
@@ -1359,7 +1371,8 @@ MACHINE_CONFIG_DERIVED(btime_state::lnc, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::wtennis, lnc)
+MACHINE_CONFIG_START(btime_state::wtennis)
+	lnc(config);
 
 	/* basic machine hardware */
 
@@ -1369,7 +1382,8 @@ MACHINE_CONFIG_DERIVED(btime_state::wtennis, lnc)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::mmonkey, wtennis)
+MACHINE_CONFIG_START(btime_state::mmonkey)
+	wtennis(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1379,7 +1393,8 @@ MACHINE_CONFIG_DERIVED(btime_state::mmonkey, wtennis)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(btime_state::bnj, btime)
+MACHINE_CONFIG_START(btime_state::bnj)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK4)
@@ -1397,7 +1412,8 @@ MACHINE_CONFIG_DERIVED(btime_state::bnj, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::sdtennis, bnj)
+MACHINE_CONFIG_START(btime_state::sdtennis)
+	bnj(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
@@ -1405,7 +1421,8 @@ MACHINE_CONFIG_DERIVED(btime_state::sdtennis, bnj)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::zoar, btime)
+MACHINE_CONFIG_START(btime_state::zoar)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1433,7 +1450,8 @@ MACHINE_CONFIG_DERIVED(btime_state::zoar, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::disco, btime)
+MACHINE_CONFIG_START(btime_state::disco)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1459,7 +1477,8 @@ MACHINE_CONFIG_DERIVED(btime_state::disco, btime)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(btime_state::tisland, btime)
+MACHINE_CONFIG_START(btime_state::tisland)
+	btime(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

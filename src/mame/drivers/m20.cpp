@@ -106,6 +106,9 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 
 	void m20(machine_config &config);
+	void m20_data_mem(address_map &map);
+	void m20_io(address_map &map);
+	void m20_program_mem(address_map &map);
 private:
 	offs_t m_memsize;
 	uint8_t m_port21;
@@ -316,17 +319,19 @@ B/W, 128K cards, 3 cards => 512K of memory:
 */
 
 
-static ADDRESS_MAP_START(m20_program_mem, AS_PROGRAM, 16, m20_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
-ADDRESS_MAP_END
+void m20_state::m20_program_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x30000, 0x33fff).ram().share("videoram");
+	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+}
 
-static ADDRESS_MAP_START(m20_data_mem, AS_DATA, 16, m20_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
-	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
-ADDRESS_MAP_END
+void m20_state::m20_data_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x30000, 0x33fff).ram().share("videoram");
+	map(0x40000, 0x41fff).rom().region("maincpu", 0x00000);
+}
 
 
 void m20_state::install_memory()
@@ -427,9 +432,9 @@ void m20_state::install_memory()
 			/* DRAM1, 32K */
 
 			/* prog
-			   AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+			   map( 0x2c000, 0x2ffff ).ram().share("dram1_0000");
+			   map( 0x88000, 0x8bfff ).ram().share("dram1_4000");
+			   map( 0xa8000, 0xabfff ).ram().share("dram1_4000");
 			*/
 			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0, "dram1_0000");
 			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0, "dram1_4000");
@@ -437,10 +442,10 @@ void m20_state::install_memory()
 
 			/*
 			  data
-			  AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram1_4000")
-			  AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram1_0000")
-			  AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-			  AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+			  map( 0x04000, 0x07fff ).ram().share("dram1_4000");
+			  map( 0x1c000, 0x1ffff ).ram().share("dram1_0000");
+			  map( 0x2c000, 0x2ffff ).ram().share("dram1_0000");
+			  map( 0xa8000, 0xabfff ).ram().share("dram1_4000");
 			*/
 			dspace.install_readwrite_bank(0x4000, 0x7fff, 0, "dram1_4000");
 			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0, "dram1_0000");
@@ -454,20 +459,20 @@ void m20_state::install_memory()
 				/* DRAM2, 32K */
 
 				/* prog
-				   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram2_0000")
-				   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
+				   map( 0x8c000, 0x8ffff ).ram().share("dram2_0000");
+				   map( 0x98000, 0x9bfff ).ram().share("dram2_4000");
+				   map( 0xac000, 0xaffff ).ram().share("dram2_0000");
 				*/
 				pspace.install_readwrite_bank(0x8c000, 0x8ffff, 0, "dram2_0000");
 				pspace.install_readwrite_bank(0x98000, 0x9bfff, 0, "dram2_4000");
 				pspace.install_readwrite_bank(0xac000, 0xaffff, 0, "dram2_0000");
 
 				/* data
-				   AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
-				   AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
+				   map( 0x08000, 0x0bfff ).ram().share("dram2_0000");
+				   map( 0x0c000, 0x0ffff ).ram().share("dram2_4000");
+				   map( 0x88000, 0x8bfff ).ram().share("dram2_4000");
+				   map( 0x98000, 0x9bfff ).ram().share("dram2_4000");
+				   map( 0xac000, 0xaffff ).ram().share("dram2_0000");
 				 */
 				dspace.install_readwrite_bank(0x8000, 0xbfff, 0, "dram2_0000");
 				dspace.install_readwrite_bank(0xc000, 0xffff, 0, "dram2_4000");
@@ -482,19 +487,19 @@ void m20_state::install_memory()
 				/* DRAM3, 32K */
 
 				/* prog
-				   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
+				   map( 0x9c000, 0x9ffff ).ram().share("dram3_0000");
+				   map( 0xb0000, 0xb3fff ).ram().share("dram3_4000");
 				*/
 				pspace.install_readwrite_bank(0x9c000, 0x9ffff, 0, "dram3_0000");
 				pspace.install_readwrite_bank(0xb0000, 0xb3fff, 0, "dram3_4000");
 
 				/* data
-				   AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0x48000, 0x4bfff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram3_4000")
+				   map( 0x44000, 0x47fff ).ram().share("dram3_0000");
+				   map( 0x48000, 0x4bfff ).ram().share("dram3_4000");
+				   map( 0x8c000, 0x8ffff ).ram().share("dram3_0000");
+				   map( 0x9c000, 0x9ffff ).ram().share("dram3_0000");
+				   map( 0xb0000, 0xb3fff ).ram().share("dram3_4000");
+				   map( 0xc0000, 0xc3fff ).ram().share("dram3_4000");
 				 */
 				dspace.install_readwrite_bank(0x44000, 0x47fff, 0, "dram3_0000");
 				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0, "dram3_4000");
@@ -513,16 +518,16 @@ void m20_state::install_memory()
 			/* DRAM1, 128K */
 
 			/* prog
-			   AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram1_8000")
-			   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram1_c000")
-			   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram1_10000")
-			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram1_8000")
-			   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram1_14000")
-			   AM_RANGE( 0xb4000, 0xb7fff ) AM_RAM AM_SHARE("dram1_18000")
-			   AM_RANGE( 0xb8000, 0xbbfff ) AM_RAM AM_SHARE("dram1_1c000")
+			   map( 0x2c000, 0x2ffff ).ram().share("dram1_0000");
+			   map( 0x88000, 0x8bfff ).ram().share("dram1_4000");
+			   map( 0x8c000, 0x8ffff ).ram().share("dram1_8000");
+			   map( 0x98000, 0x9bfff ).ram().share("dram1_c000");
+			   map( 0x9c000, 0x9ffff ).ram().share("dram1_10000");
+			   map( 0xa8000, 0xabfff ).ram().share("dram1_4000");
+			   map( 0xac000, 0xaffff ).ram().share("dram1_8000");
+			   map( 0xb0000, 0xb3fff ).ram().share("dram1_14000");
+			   map( 0xb4000, 0xb7fff ).ram().share("dram1_18000");
+			   map( 0xb8000, 0xbbfff ).ram().share("dram1_1c000");
 			*/
 			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0, "dram1_0000");
 			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0, "dram1_4000");
@@ -536,18 +541,18 @@ void m20_state::install_memory()
 			pspace.install_readwrite_bank(0xb8000, 0xbbfff, 0, "dram1_1c000");
 
 			/* data
-			   AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram1_0000")
-			   AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_c000")
-			   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram1_10000")
-			   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram1_c000")
-			   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram1_10000")
-			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
-			   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram1_8000")
-			   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram1_14000")
-			   AM_RANGE( 0xb4000, 0xb7fff ) AM_RAM AM_SHARE("dram1_18000")
-			   AM_RANGE( 0xb8000, 0xbbfff ) AM_RAM AM_SHARE("dram1_1c000")
+			   map( 0x04000, 0x07fff ).ram().share("dram1_4000");
+			   map( 0x1c000, 0x1ffff ).ram().share("dram1_0000");
+			   map( 0x2c000, 0x2ffff ).ram().share("dram1_0000");
+			   map( 0x88000, 0x8bfff ).ram().share("dram1_c000");
+			   map( 0x8c000, 0x8ffff ).ram().share("dram1_10000");
+			   map( 0x98000, 0x9bfff ).ram().share("dram1_c000");
+			   map( 0x9c000, 0x9ffff ).ram().share("dram1_10000");
+			   map( 0xa8000, 0xabfff ).ram().share("dram1_4000");
+			   map( 0xac000, 0xaffff ).ram().share("dram1_8000");
+			   map( 0xb0000, 0xb3fff ).ram().share("dram1_14000");
+			   map( 0xb4000, 0xb7fff ).ram().share("dram1_18000");
+			   map( 0xb8000, 0xbbfff ).ram().share("dram1_1c000");
 			 */
 			dspace.install_readwrite_bank(0x4000, 0x7fff, 0, "dram1_4000");
 			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0, "dram1_0000");
@@ -575,16 +580,16 @@ void m20_state::install_memory()
 				/* DRAM2, 128K */
 
 				/* prog
-				   AM_RANGE( 0xbc000, 0xbffff ) AM_RAM AM_SHARE("dram2_0000")
+				   map( 0xbc000, 0xbffff ).ram().share("dram2_0000");
 
-				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0xc4000, 0xc7fff ) AM_RAM AM_SHARE("dram2_8000")
-				   AM_RANGE( 0xc8000, 0xcbfff ) AM_RAM AM_SHARE("dram2_c000")
-				   AM_RANGE( 0xcc000, 0xcffff ) AM_RAM AM_SHARE("dram2_10000")
+				   map( 0xc0000, 0xc3fff ).ram().share("dram2_4000");
+				   map( 0xc4000, 0xc7fff ).ram().share("dram2_8000");
+				   map( 0xc8000, 0xcbfff ).ram().share("dram2_c000");
+				   map( 0xcc000, 0xcffff ).ram().share("dram2_10000");
 
-				   AM_RANGE( 0xd0000, 0xd3fff ) AM_RAM AM_SHARE("dram2_14000")
-				   AM_RANGE( 0xd4000, 0xd7fff ) AM_RAM AM_SHARE("dram2_18000")
-				   AM_RANGE( 0xd8000, 0xdbfff ) AM_RAM AM_SHARE("dram2_1c000")
+				   map( 0xd0000, 0xd3fff ).ram().share("dram2_14000");
+				   map( 0xd4000, 0xd7fff ).ram().share("dram2_18000");
+				   map( 0xd8000, 0xdbfff ).ram().share("dram2_1c000");
 				 */
 				pspace.install_readwrite_bank(0xbc000, 0xbffff, 0, "dram2_0000");
 				pspace.install_readwrite_bank(0xc0000, 0xc3fff, 0, "dram2_4000");
@@ -596,19 +601,19 @@ void m20_state::install_memory()
 				pspace.install_readwrite_bank(0xd8000, 0xdbfff, 0, "dram2_1c000");
 
 				/* data
-				   AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
-				   AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram2_4000")
+				   map( 0x08000, 0x0bfff ).ram().share("dram2_0000");
+				   map( 0x0c000, 0x0ffff ).ram().share("dram2_4000");
 
-				   AM_RANGE( 0xbc000, 0xbffff ) AM_RAM AM_SHARE("dram2_0000")
+				   map( 0xbc000, 0xbffff ).ram().share("dram2_0000");
 
-				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram2_4000")
-				   AM_RANGE( 0xc4000, 0xc7fff ) AM_RAM AM_SHARE("dram2_8000")
-				   AM_RANGE( 0xc8000, 0xcbfff ) AM_RAM AM_SHARE("dram2_c000")
-				   AM_RANGE( 0xcc000, 0xcffff ) AM_RAM AM_SHARE("dram2_10000")
+				   map( 0xc0000, 0xc3fff ).ram().share("dram2_4000");
+				   map( 0xc4000, 0xc7fff ).ram().share("dram2_8000");
+				   map( 0xc8000, 0xcbfff ).ram().share("dram2_c000");
+				   map( 0xcc000, 0xcffff ).ram().share("dram2_10000");
 
-				   AM_RANGE( 0xd0000, 0xd3fff ) AM_RAM AM_SHARE("dram2_14000")
-				   AM_RANGE( 0xd4000, 0xd7fff ) AM_RAM AM_SHARE("dram2_18000")
-				   AM_RANGE( 0xd8000, 0xdbfff ) AM_RAM AM_SHARE("dram2_1c000")
+				   map( 0xd0000, 0xd3fff ).ram().share("dram2_14000");
+				   map( 0xd4000, 0xd7fff ).ram().share("dram2_18000");
+				   map( 0xd8000, 0xdbfff ).ram().share("dram2_1c000");
 				*/
 				dspace.install_readwrite_bank(0x8000, 0xbfff, 0, "dram2_0000");
 				dspace.install_readwrite_bank(0xc000, 0xffff, 0, "dram2_4000");
@@ -634,17 +639,17 @@ void m20_state::install_memory()
 				/* DRAM3, 128K */
 
 				/* prog
-				   AM_RANGE( 0xdc000, 0xdffff ) AM_RAM AM_SHARE("dram3_0000")
+				   map( 0xdc000, 0xdffff ).ram().share("dram3_0000");
 
-				   AM_RANGE( 0xe0000, 0xe3fff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0xe4000, 0xe7fff ) AM_RAM AM_SHARE("dram3_8000")
-				   AM_RANGE( 0xe8000, 0xebfff ) AM_RAM AM_SHARE("dram3_c000")
-				   AM_RANGE( 0xec000, 0xeffff ) AM_RAM AM_SHARE("dram3_10000")
+				   map( 0xe0000, 0xe3fff ).ram().share("dram3_4000");
+				   map( 0xe4000, 0xe7fff ).ram().share("dram3_8000");
+				   map( 0xe8000, 0xebfff ).ram().share("dram3_c000");
+				   map( 0xec000, 0xeffff ).ram().share("dram3_10000");
 
-				   AM_RANGE( 0xf0000, 0xf3fff ) AM_RAM AM_SHARE("dram3_14000")
-				   AM_RANGE( 0xf4000, 0xf7fff ) AM_RAM AM_SHARE("dram3_18000")
-				   AM_RANGE( 0xf8000, 0xfbfff ) AM_RAM AM_SHARE("dram3_1c000")
-				   AM_RANGE( 0xfc000, 0xfffff ) AM_RAM AM_SHARE("dram3_0000")
+				   map( 0xf0000, 0xf3fff ).ram().share("dram3_14000");
+				   map( 0xf4000, 0xf7fff ).ram().share("dram3_18000");
+				   map( 0xf8000, 0xfbfff ).ram().share("dram3_1c000");
+				   map( 0xfc000, 0xfffff ).ram().share("dram3_0000");
 				*/
 				pspace.install_readwrite_bank(0xdc000, 0xdffff, 0, "dram3_0000");
 				pspace.install_readwrite_bank(0xe0000, 0xe3fff, 0, "dram3_4000");
@@ -657,19 +662,19 @@ void m20_state::install_memory()
 				pspace.install_readwrite_bank(0xfc000, 0xfffff, 0, "dram3_0000");
 
 				/* data
-				   AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
-				   AM_RANGE( 0x48000, 0x4bfff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0xdc000, 0xdffff ) AM_RAM AM_SHARE("dram3_0000")
+				   map( 0x44000, 0x47fff ).ram().share("dram3_0000");
+				   map( 0x48000, 0x4bfff ).ram().share("dram3_4000");
+				   map( 0xdc000, 0xdffff ).ram().share("dram3_0000");
 
-				   AM_RANGE( 0xe0000, 0xe3fff ) AM_RAM AM_SHARE("dram3_4000")
-				   AM_RANGE( 0xe4000, 0xe7fff ) AM_RAM AM_SHARE("dram3_8000")
-				   AM_RANGE( 0xe8000, 0xebfff ) AM_RAM AM_SHARE("dram3_c000")
-				   AM_RANGE( 0xec000, 0xeffff ) AM_RAM AM_SHARE("dram3_10000")
+				   map( 0xe0000, 0xe3fff ).ram().share("dram3_4000");
+				   map( 0xe4000, 0xe7fff ).ram().share("dram3_8000");
+				   map( 0xe8000, 0xebfff ).ram().share("dram3_c000");
+				   map( 0xec000, 0xeffff ).ram().share("dram3_10000");
 
-				   AM_RANGE( 0xf0000, 0xf3fff ) AM_RAM AM_SHARE("dram3_14000")
-				   AM_RANGE( 0xf4000, 0xf7fff ) AM_RAM AM_SHARE("dram3_18000")
-				   AM_RANGE( 0xf8000, 0xfbfff ) AM_RAM AM_SHARE("dram3_1c000")
-				   AM_RANGE( 0xfc000, 0xfffff ) AM_RAM AM_SHARE("dram3_0000")
+				   map( 0xf0000, 0xf3fff ).ram().share("dram3_14000");
+				   map( 0xf4000, 0xf7fff ).ram().share("dram3_18000");
+				   map( 0xf8000, 0xfbfff ).ram().share("dram3_1c000");
+				   map( 0xfc000, 0xfffff ).ram().share("dram3_0000");
 				*/
 				dspace.install_readwrite_bank(0x44000, 0x47fff, 0, "dram3_0000");
 				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0, "dram3_4000");
@@ -696,32 +701,33 @@ void m20_state::install_memory()
 	}
 }
 
-static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
-	ADDRESS_MAP_UNMAP_HIGH
+void m20_state::m20_io(address_map &map)
+{
+	map.unmap_value_high();
 
-	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0x00ff)
+	map(0x00, 0x07).rw(m_fd1797, FUNC(fd1797_device::read), FUNC(fd1797_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
+	map(0x20, 0x21).rw(this, FUNC(m20_state::port21_r), FUNC(m20_state::port21_w));
 
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
-	AM_RANGE(0x62, 0x63) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0xff00) // FIXME
-	AM_RANGE(0x62, 0x63) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0x00ff)
-	AM_RANGE(0x64, 0x65) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
+	map(0x61, 0x61).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x62, 0x62).w("crtc", FUNC(mc6845_device::address_w)); // FIXME
+	map(0x63, 0x63).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x64, 0x64).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	AM_RANGE(0x80, 0x87) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0x00ff)
+	map(0x80, 0x87).rw(m_i8255, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE8("i8251_1", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xa2, 0xa3) AM_DEVREADWRITE8("i8251_1", i8251_device, status_r, control_w, 0x00ff)
+	map(0xa1, 0xa1).rw(m_kbdi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xa3, 0xa3).rw(m_kbdi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0xc0, 0xc1) AM_DEVREADWRITE8("i8251_2", i8251_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0xc2, 0xc3) AM_DEVREADWRITE8("i8251_2", i8251_device, status_r, control_w, 0x00ff)
+	map(0xc1, 0xc1).rw(m_ttyi8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0xc3, 0xc3).rw(m_ttyi8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 
-	AM_RANGE(0x120, 0x127) AM_DEVREADWRITE8("pit8253", pit8253_device, read, write, 0x00ff)
+	map(0x120, 0x127).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
-	AM_RANGE(0x140, 0x143) AM_READWRITE(m20_i8259_r, m20_i8259_w)
+	map(0x140, 0x143).rw(this, FUNC(m20_state::m20_i8259_r), FUNC(m20_state::m20_i8259_w));
 
-	AM_RANGE(0x3ffa, 0x3ffd) AM_DEVWRITE("apb", m20_8086_device, handshake_w)
-ADDRESS_MAP_END
+	map(0x3ffa, 0x3ffd).w(m_apb, FUNC(m20_8086_device::handshake_w));
+}
 
 IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 {

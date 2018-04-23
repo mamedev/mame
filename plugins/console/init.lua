@@ -36,13 +36,14 @@ ln.setcompletion(function(c, str, pos)
 	yield()
 	ln.addcompletion(c, status:match("([^\x01]*)\x01(.*)"))
 end)
-return ln.linenoise('\x1b[1;36m[MAME]\x1b[0m> ')
+return ln.linenoise('$PROMPT')
 ]]
 	local keywords = {
 		'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for',
 		'function', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat',
 		'return', 'then', 'true', 'until', 'while'
 	}
+	local cmdbuf = ""
 
 	-- Main completion function. It evaluates the current sub-expression
 	-- to determine its type. Currently supports tables fields, global
@@ -209,6 +210,7 @@ return ln.linenoise('\x1b[1;36m[MAME]\x1b[0m> ')
 	emu.register_stop(function() consolebuf = nil end)
 
 	emu.register_periodic(function()
+		local prompt = "\x1b[1;36m[MAME]\x1b[0m> "
 		if consolebuf and (#consolebuf > lastindex) then
 			local last = #consolebuf
 			print("\n")
@@ -225,28 +227,33 @@ return ln.linenoise('\x1b[1;36m[MAME]\x1b[0m> ')
 			return
 		elseif started then
 			local cmd = conth.result
-			preload = false
-			local func, err = load(cmd)
-			if not func then
-				if err:match("<eof>") then
-					print("incomplete command")
-					ln.preload(cmd)
-					preload = true
-				else
-					print("error: ", err)
+			if cmd == "" then
+				if cmdbuf ~= "" then
+					print("Incomplete command")
+					cmdbuf = ""
 				end
 			else
-				local status
-				status, err = pcall(func)
-				if not status then
-					print("error: ", err)
+				cmdbuf = cmdbuf .. "\n" .. cmd
+				local func, err = load(cmdbuf)
+				if not func then
+					if err:match("<eof>") then
+						prompt = "\x1b[1;36m[MAME]\x1b[0m>> "
+					else
+						print("error: ", err)
+						cmdbuf = ""
+					end
+				else
+					local status
+					status, err = pcall(func)
+					if not status then
+						print("error: ", err)
+					end
+					cmdbuf = ""
 				end
-			end
-			if not preload then
 				ln.historyadd(cmd)
 			end
 		end
-		conth:start(scr)
+		conth:start(scr:gsub("$PROMPT", prompt))
 		started = true
 	end)
 end

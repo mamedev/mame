@@ -141,4 +141,14 @@ public:
 							void tisland(machine_config &config);
 							void zoar(machine_config &config);
 							void btime(machine_config &config);
+							void audio_map(address_map &map);
+							void bnj_map(address_map &map);
+							void btime_map(address_map &map);
+							void cookrace_map(address_map &map);
+							void disco_audio_map(address_map &map);
+							void disco_map(address_map &map);
+							void lnc_map(address_map &map);
+							void mmonkey_map(address_map &map);
+							void tisland_map(address_map &map);
+							void zoar_map(address_map &map);
 };

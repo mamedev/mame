@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef __PROF80__
-#define __PROF80__
+#ifndef MAME_INCLUDES_PROF80_H
+#define MAME_INCLUDES_PROF80_H
 
 #include "bus/ecbbus/ecbbus.h"
 #include "bus/rs232/rs232.h"
@@ -102,6 +102,9 @@ public:
 	emu_timer   *m_floppy_motor_off_timer;
 
 	void prof80(machine_config &config);
+	void prof80_io(address_map &map);
+	void prof80_mem(address_map &map);
+	void prof80_mmu(address_map &map);
 };
 
 #endif

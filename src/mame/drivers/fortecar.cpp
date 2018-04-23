@@ -358,6 +358,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void fortecar(machine_config &config);
+	void fortecar_map(address_map &map);
+	void fortecar_ports(address_map &map);
 };
 
 
@@ -533,24 +535,26 @@ Seems to work properly, but must be checked closely...
 *      Memory Map Information      *
 ***********************************/
 
-static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8, fortecar_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd800, 0xffff) AM_RAM AM_SHARE("vram")
-ADDRESS_MAP_END
+void fortecar_state::fortecar_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc7ff).rom();
+	map(0xd000, 0xd7ff).ram().share("nvram");
+	map(0xd800, 0xffff).ram().share("vram");
+}
 
-static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8, fortecar_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)  // pc=444
-	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", i8255_device, read, write)//M5L8255AP
+void fortecar_state::fortecar_ports(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x20, 0x20).w("crtc", FUNC(mc6845_device::address_w));  // pc=444
+	map(0x21, 0x21).w("crtc", FUNC(mc6845_device::register_w));
+	map(0x40, 0x40).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0x40, 0x41).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x60, 0x63).rw("fcppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));//M5L8255AP
 //  AM_RANGE(0x80, 0x81) //8251A UART
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("rtc", v3021_device, read, write)
-	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
+	map(0xa0, 0xa0).rw("rtc", FUNC(v3021_device::read), FUNC(v3021_device::write));
+	map(0xa1, 0xa1).portr("DSW");
+}
 /*
 
 CRTC REGISTER: 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f
@@ -678,7 +682,6 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)
 	MCFG_CPU_IO_MAP(fortecar_ports)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fortecar_state, nmi_line_pulse)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(200))   /* guess */
@@ -714,6 +717,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* 1.5 MHz, measured */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

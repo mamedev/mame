@@ -59,7 +59,7 @@
 
 // Callbacks to the board from the VME bus comes through here
 #define MCFG_VME_J1_CB(_devcb) \
-	devcb = &vme_slot_device::static_set_vme_j1_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<vme_slot_device &>(*device).set_vme_j1_callback(DEVCB_##_devcb);
 
 //SLOT_INTERFACE_EXTERN(vme_slot1); // Disabled until we know how to combine a board driver and a slot device.
 SLOT_INTERFACE_EXTERN(vme_slots);
@@ -91,10 +91,10 @@ public:
 	// construction/destruction
 	vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &static_set_vme_j1_callback(device_t &device, Object &&cb)  { return downcast<vme_slot_device &>(device).m_vme_j1_callback.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_vme_j1_callback(Object &&cb)  { return m_vme_j1_callback.set_callback(std::forward<Object>(cb)); }
 
-	static void static_set_vme_slot(device_t &device, const char *tag, const char *slottag);
-	static void static_update_vme_chains(device_t &device, uint32_t slot_nbr);
+	void set_vme_slot(const char *tag, const char *slottag);
+	void update_vme_chains(uint32_t slot_nbr);
 
 	virtual DECLARE_READ8_MEMBER(read8);
 	virtual DECLARE_WRITE8_MEMBER(write8);
@@ -124,10 +124,10 @@ DECLARE_DEVICE_TYPE(VME, vme_device)
 	MCFG_DEVICE_ADD(_tag, VME, 0)
 
 #define MCFG_VME_CPU(_cputag) \
-	vme_device::static_set_cputag(*device, _cputag);
+	downcast<vme_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_VME_BUS_OWNER_SPACES() \
-	vme_device::static_use_owner_spaces(*device);
+	downcast<vme_device &>(*device).use_owner_spaces();
 
 class vme_card_interface;
 
@@ -139,8 +139,8 @@ public:
 	~vme_device();
 
 	// inline configuration
-	static void static_set_cputag(device_t &device, const char *tag);
-	static void static_use_owner_spaces(device_t &device);
+	void set_cputag(const char *tag) { m_cputag = tag; }
+	void use_owner_spaces();
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -219,7 +219,7 @@ class device_vme_card_interface : public device_slot_card_interface
 	template <class ElementType> friend class simple_list;
 public:
 	// inline configuration
-	static void static_set_vme_tag(device_t &device, const char *tag, const char *slottag);
+	void set_vme_tag(const char *tag, const char *slottag);
 
 	// construction/destruction
 	virtual ~device_vme_card_interface();
@@ -245,8 +245,8 @@ private:
 	{   std::string stag = "slot" + std::to_string(_slotnbr);              \
 		MCFG_DEVICE_ADD(stag.c_str(), VME_SLOT, 0);                        \
 		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false);          \
-		vme_slot_device::static_set_vme_slot(*device, _tag, stag.c_str()); \
-		vme_slot_device::static_update_vme_chains(*device, _slotnbr);      \
+		downcast<vme_slot_device &>(*device).set_vme_slot(_tag, stag.c_str()); \
+		downcast<vme_slot_device &>(*device).update_vme_chains(_slotnbr);      \
 	}
 
 #define MCFG_VME_SLOT_REMOVE(_tag)        \

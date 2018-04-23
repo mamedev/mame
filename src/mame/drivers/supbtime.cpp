@@ -98,6 +98,10 @@ public:
 	void chinatwn(machine_config &config);
 	void supbtime(machine_config &config);
 	void tumblep(machine_config &config);
+	void chinatwn_map(address_map &map);
+	void sound_map(address_map &map);
+	void supbtime_map(address_map &map);
+	void tumblep_map(address_map &map);
 private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;
@@ -112,78 +116,82 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x104000, 0x11ffff) AM_WRITENOP // Nothing there
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x120800, 0x13ffff) AM_WRITENOP // Nothing there
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ(vblank_ack_r)
-	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP // ?
-	AM_RANGE(0x1a0000, 0x1a0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_r, pf_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("pf1_rowscroll")
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll")
-ADDRESS_MAP_END
+void supbtime_state::supbtime_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x103fff).ram();
+	map(0x104000, 0x11ffff).nopw(); // Nothing there
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x120800, 0x13ffff).nopw(); // Nothing there
+	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180001).portr("INPUTS");
+	map(0x180002, 0x180003).portr("DSW");
+	map(0x180008, 0x180009).portr("SYSTEM");
+	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000d).nopw(); // ?
+	map(0x1a0001, 0x1a0001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x300000, 0x30000f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x321fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x323fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x340000, 0x3407ff).ram().share("pf1_rowscroll");
+	map(0x342000, 0x3427ff).ram().share("pf2_rowscroll");
+}
 
-static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ(vblank_ack_r)
-	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP // ?
-	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_r, pf_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("pf1_rowscroll") // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_SHARE("pf2_rowscroll") // unused
-ADDRESS_MAP_END
+void supbtime_state::chinatwn_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180001).portr("INPUTS");
+	map(0x180002, 0x180003).portr("DSW");
+	map(0x180008, 0x180009).portr("SYSTEM");
+	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000d).nopw(); // ?
+	map(0x1a0000, 0x1a3fff).ram();
+	map(0x300000, 0x30000f).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_r), FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x321fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x323fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x340000, 0x3407ff).ram().share("pf1_rowscroll"); // unused
+	map(0x342000, 0x3427ff).ram().share("pf2_rowscroll"); // unused
+}
 
-static ADDRESS_MAP_START( tumblep_map, AS_PROGRAM, 16, supbtime_state )
+void supbtime_state::tumblep_map(address_map &map)
+{
 #if TUMBLEP_HACK
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY   // To write levels modifications
+	map(0x000000, 0x07ffff).writeonly();   // To write levels modifications
 #endif
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x18000a, 0x18000b) AM_READ(vblank_ack_r)
-	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP // ?
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-	AM_RANGE(0x320000, 0x320fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
-	AM_RANGE(0x322000, 0x322fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_SHARE("pf1_rowscroll") // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_SHARE("pf2_rowscroll") // unused
-ADDRESS_MAP_END
+	map(0x000000, 0x07ffff).rom();
+	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x120000, 0x123fff).ram();
+	map(0x140000, 0x1407ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180001).portr("INPUTS");
+	map(0x180002, 0x180003).portr("DSW");
+	map(0x180008, 0x180009).portr("SYSTEM");
+	map(0x18000a, 0x18000b).r(this, FUNC(supbtime_state::vblank_ack_r));
+	map(0x18000a, 0x18000d).nopw(); // ?
+	map(0x1a0000, 0x1a07ff).ram().share("spriteram");
+	map(0x300000, 0x30000f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x320000, 0x320fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x322000, 0x322fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x340000, 0x3407ff).writeonly().share("pf1_rowscroll"); // unused
+	map(0x342000, 0x3427ff).writeonly().share("pf2_rowscroll"); // unused
+}
 
 // Physical memory map (21 bits)
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supbtime_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP // YM2203 - this board doesn't have one
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_NOP // This board only has 1 oki chip
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
+void supbtime_state::sound_map(address_map &map)
+{
+	map.global_mask(0x1fffff);
+	map(0x000000, 0x00ffff).rom();
+	map(0x100000, 0x100001).noprw(); // YM2203 - this board doesn't have one
+	map(0x110000, 0x110001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x120000, 0x120001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x130000, 0x130001).noprw(); // This board only has 1 oki chip
+	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x1f0000, 0x1f1fff).bankrw("bank8");
+	map(0x1fec00, 0x1fec01).w("audiocpu", FUNC(h6280_device::timer_w));
+	map(0x1ff400, 0x1ff403).w("audiocpu", FUNC(h6280_device::irq_status_w));
+}
 
 
 //**************************************************************************
@@ -209,6 +217,7 @@ uint32_t supbtime_state::screen_update_supbtime(screen_device &screen, bitmap_in
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(768, cliprect);
@@ -228,6 +237,7 @@ uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(256+512, cliprect); // not verified
@@ -481,12 +491,14 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(supbtime_state::chinatwn, supbtime)
+MACHINE_CONFIG_START(supbtime_state::chinatwn)
+	supbtime(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chinatwn_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(supbtime_state::tumblep, supbtime)
+MACHINE_CONFIG_START(supbtime_state::tumblep)
+	supbtime(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tumblep_map)
 

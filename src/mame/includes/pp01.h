@@ -63,6 +63,8 @@ public:
 	void pp01_video_w(uint8_t block,uint16_t offset,uint8_t data,uint8_t part);
 	void pp01_set_memory(uint8_t block, uint8_t data);
 	void pp01(machine_config &config);
+	void pp01_io(address_map &map);
+	void pp01_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PP01_H

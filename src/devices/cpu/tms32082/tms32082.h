@@ -74,6 +74,7 @@ public:
 	void set_command_callback(write32_delegate callback);
 
 
+	void mp_internal_map(address_map &map);
 protected:
 	// device level overrides
 	virtual void device_start() override;
@@ -93,7 +94,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 
@@ -161,6 +162,7 @@ public:
 		PP_PC = 1
 	};
 
+	void pp_internal_map(address_map &map);
 protected:
 	// device level overrides
 	virtual void device_start() override;
@@ -179,7 +181,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	address_space_config m_program_config;
 

@@ -19,13 +19,16 @@
 
 #define MCFG_NAMCO_C148_ADD(_tag, _cputag, _cpumaster) \
 	MCFG_DEVICE_ADD(_tag, NAMCO_C148, 0) \
-	namco_c148_device::configure_device(*device, _cputag, _cpumaster);
+	downcast<namco_c148_device &>(*device).configure_device(_cputag, _cpumaster);
+
+#define MCFG_NAMCO_C148_LINK(_tag) \
+	downcast<namco_c148_device &>(*device).link_c148_device(_tag);
 
 #define MCFG_NAMCO_C148_EXT1_CB(_cb) \
-	devcb = &namco_c148_device::set_out_ext1_callback(*device, DEVCB_##_cb);
+	devcb = &downcast<namco_c148_device &>(*device).set_out_ext1_callback(DEVCB_##_cb);
 
 #define MCFG_NAMCO_C148_EXT2_CB(_cb) \
-	devcb = &namco_c148_device::set_out_ext2_callback(*device, DEVCB_##_cb);
+	devcb = &downcast<namco_c148_device &>(*device).set_out_ext2_callback(DEVCB_##_cb);
 
 
 //**************************************************************************
@@ -40,24 +43,18 @@ public:
 	// construction/destruction
 	namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
-	static void configure_device(device_t &device, const char *tag, bool is_master)
+	void configure_device(const char *tag, bool is_master)
 	{
-		namco_c148_device &dev = downcast<namco_c148_device &>(device);
-		dev.m_hostcpu_tag = tag;
-		dev.m_hostcpu_master = is_master;
+		m_hostcpu_tag = tag;
+		m_hostcpu_master = is_master;
 	}
 
-	static void link_c148_device(device_t &device, const char *tag)
-	{
-		namco_c148_device &dev = downcast<namco_c148_device &>(device);
+	void link_c148_device(const char *tag) { m_linked_c148_tag = tag; }
 
-		dev.m_linked_c148_tag = tag;
-	}
-
-	template<class _Object> static devcb_base &set_out_ext1_callback(device_t &device, _Object object) { return downcast<namco_c148_device &>(device).m_out_ext1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_ext2_callback(device_t &device, _Object object) { return downcast<namco_c148_device &>(device).m_out_ext2_cb.set_callback(object); }
+	template <class Object> devcb_base &set_out_ext1_callback(Object &&cb) { return m_out_ext1_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_ext2_callback(Object &&cb) { return m_out_ext2_cb.set_callback(std::forward<Object>(cb)); }
 
 	devcb_write8 m_out_ext1_cb;
 	devcb_write8 m_out_ext2_cb;

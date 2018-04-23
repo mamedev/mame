@@ -42,7 +42,6 @@ Aska Base                                                     Algo              
 Aska Word                                                     Algo                              1991/1     SET(CD+FD)
 Band-kun                                                      Koei                              1991/1     SET(CD+FD)
 Battle                                                        GAM                               1992/10    CD
-Battle Chess                                                  Fujitsu                           1991/9     CD
 Bell's Avenue Vol. 3                                          Wendy Magazine                    1995/4     CD
 Bible Master 2: Aglia no Jashin                               Glodia                            1995/1     SET(CD+FD)
 Big Honour                                                    Artdink                           1992/9     CD
@@ -134,7 +133,6 @@ Dengeki Nurse 2: More Sexy                                    Cocktail Soft     
 Diamond Players                                               Wolf Team                         1993/6     SET(CD+FD)
 Dick                                                          Amorphous                         1996/1     CD
 Digital Pinup Girls Vol. 2                                    Transpegasus Limited              1993/6     CD
-Doda Mega-Mix!!!                                              FNC                               1989/11    CD
 Doki Doki Vacation                                            Cocktail Soft                     1995/3     SET(CD+FD)
 Dor Best Selection Gekan                                      D.O.                              1993/5     CD×02
 Do-Re-Mi Canvas                                               Tokyo Shoseki                     1994/12    CD
@@ -183,8 +181,6 @@ Eigo de Eigo ni Tsuyoku Naru 9                                Infortech         
 Eikan wa Kimi ni 2: Koukou Yakyuu Zenkoku Taikai              Artdink                           1991/8     CD
 Eikan wa Kimi ni 3: Koukou Yakyuu Zenkoku Taikai              Artdink                           1993/8     SET(CD+FD)
 Ei-wa-doku-ro Denki Jutsugo Daijiten                          Ohmsha                            1990/4     CD
-Emit Vol. 1: Toki no Maigo                                    Koei                              1994/3     SET(CD+FD)
-Emit Vol. 2: Inochigake no Tabi                               Koei                              1994/7     SET(CD+FD)
 Emit Vol. 3: Watashi ni Sayonara wo                           Koei                              1994/9     SET(CD+FD)
 Engage Errands 2: Kouki wo Niau Mono                          Ponytail Soft                     1995/5     CD
 Engage Errands: Miwaku no Shito-tachi                         Ponytail Soft                     1995/4     CD
@@ -383,7 +379,6 @@ Koujien Daisanban CD-ROM                                      Fujitsu           
 Koujien Daiyonban CD-ROM                                      Fujitsu                           1993/3     CD
 Kouryuuki                                                     Koei                              1993/10    SET(CD+FD)
 Kousoku Choujin                                               Foster                            1996/8     CD
-Ku^2++                                                        Panther Software                  1993/11    CD
 Kusuriyubi no Kyoukasho                                       Active                            1996/4     CD
 Kyouko no Ijiwaru!! Hachamecha Daishingeki                    Ponytail Soft                     1994/10    CD
 Leading Company                                               Koei                              1992/4     SET(CD+FD)
@@ -420,7 +415,6 @@ Maruanki Eitango: Chuugaku 2-nensei                           CSK Research Insti
 Maruanki Eitango: Chuugaku 3-nensei                           CSK Research Institute (CRI)      1990/2     SET(CD+FD)
 Masuo per Masuo: Ikeda Masuo Hanga-shuu Kazadama Vol. 2       Fujitsu                           1994/7     CD
 Megalomania                                                   Imagineer                         1993/3     CD
-Megaspectre                                                   Fujitsu                           1993/6     CD
 Meisou Toshi                                                  Tiara                             1995/12    CD
 Microsoft Windows 95 (Upgrade Package)                        Fujitsu                           1996/6     CD
 Mietarou V2.0                                                 Uchida Youkou                     1992/12    SET(CD+FD)
@@ -529,7 +523,6 @@ Obaachan no Chiebukuro                                        Gyousei           
 Only You: Seikimatsu Juliet-tachi                             Alice Soft                        1996/1     CD
 Orient Express                                                Gyousei                           1994/12    CD
 Oryx Blue Wave: Eikou e no Kiseki                             Data West                         1995/10    SET(CD+FD)
-Oshare Club                                                   Misawa Home Sougou Kenkyuusho     1991/3     CD
 Oshiete, Nouveau                                              TDK Core                          1994/3     CD
 Otto Anime-kun                                                Nihon Micom Hanbai                1990/3     CD
 Palamedes                                                     Ving                              1991/10    CD
@@ -572,7 +565,6 @@ Remember Beatles No.4 Let It Be                               SofMedia          
 Remember Beatles No.5 The Long and Winding Road               SofMedia                          1990/8     CD
 Remember Beatles No.6 Imagine                                 SofMedia                          1990/8     CD
 Rika Nenpyou CD-ROM                                           Maruzen                           1996/1     CD
-Rinkan Gakkou                                                 Foster                            1996/2     CD
 Robin Hood                                                    DynEd Japan                       1993/12    SET(CD+FD)
 Rockpaedia Vol. 2: 1961-1970                                  Toshiba EMI                       ?          CD
 Round the World in 80 Days                                    DynEd Japan                       1993/12    SET(CD+FD)
@@ -580,7 +572,6 @@ Royal Blood                                                   Koei              
 Saishin American Idiom Jiten                                  Sanshusha                         1990/2     CD
 Saishin Igaku Daijiten CD-ROM                                 Fujitsu                           1990/5     CD
 Saishin Igaku Daijiten Standard-ban CD-ROM                    Fujitsu                           1993/2     CD
-Sakura no Mori                                                Active                            1995/10    CD
 * Samurai Spirits                                             Japan Home Video (JHV)            1995/9     SET(CD+FD)
 Sangokushi 4                                                  Koei                              1994/6     SET(CD+FD)
 Sanseido Word Hunter Multi CD-ROM Jiten                       Fujitsu                           1991/10    CD
@@ -1145,8 +1136,7 @@ User/save disks that can be created from the game itself are not included.
 <!-- Game (& Utility) Disks -->
 
 
-	<!-- Hangs after selecting a card -->
-	<software name="100isshu" supported="no">
+	<software name="100isshu">
 		<!--
 		 Origin: Neo Kobe Collection
 		 <rom name="Towns Hyakunin Isshu.ccd" size="768" crc="c78291fe" sha1="fb1ba0eff32b21ae3d2d8c62b9606261c533742c"/>
@@ -1269,8 +1259,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Invisible menus -->
-	<software name="dualtarg" supported="no">
+	<!-- Runs too fast -->
+	<software name="dualtarg" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The 4th Unit 3 - Dual Targets.ccd" size="2660" crc="c418053d" sha1="e05dad8651923707c27da766604627e31ddd250c"/>
@@ -1346,8 +1336,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs after some scenes -->
-	<software name="wyatt" supported="no">
+	<software name="wyatt">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="The 4th Unit 7 - Wyatt.ccd" size="1918" crc="3f8f70ba" sha1="0e23516693f3ed1165e6819367604e5a6ac50f8e"/>
@@ -1492,8 +1481,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Sound issues -->
-	<software name="adtennis" supported="partial">
+	<software name="adtennis">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Advantage Tennis.ccd" size="2666" crc="dea6a4bf" sha1="d4eaf822278f20273a67afab833a6c4eb3f80ea4"/>
@@ -2203,6 +2191,45 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="batchess">
+		<!--
+		Origin: redump.org
+		<rom name="Battle Chess (Japan) (En,Ja).cue" size="2711" crc="990dafd7" sha1="870b4574afeef42b0a0c4b58021c27ec75e72f1f"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 01).bin" size="52038000" crc="f120a9a5" sha1="789d19facee66da91a619799bd4ea902af12050a"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 02).bin" size="160702752" crc="2a8c7147" sha1="27aad576f603d55ea8e762aab44e896fbec2b2c0"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 03).bin" size="22160544" crc="253f669b" sha1="ec097ad141d8be24c24f46e3528a3d80f10ecd1c"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 04).bin" size="28320432" crc="730800a6" sha1="42fe6d8f6e40e9c50da33dbf98fea32e5ec659ea"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 05).bin" size="29785728" crc="f96c9d0f" sha1="d7e904620d731d1f361db8546beeab8d9b9a5729"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 06).bin" size="29277696" crc="4f0e4085" sha1="41615b562a3238f7971c5a63790b6f4f0365a170"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 07).bin" size="29748096" crc="171b2ba5" sha1="b0f1ab7a99be2a459dc5cac517f729cee10049cb"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 08).bin" size="29291808" crc="5bf64bb6" sha1="7c9a5a7a8e30da487a8549a0654dae417168f999"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 09).bin" size="3789072" crc="3edc18fa" sha1="2c5e747a22160b26b8e25be50962b3ae9e4c73f7"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 10).bin" size="3916080" crc="2dbd4230" sha1="751bb51c36ef95d53e24908c2c541e9734b22671"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 11).bin" size="4038384" crc="8d77e34f" sha1="d134ca6a91a492ad6a8d2cac1771013289a2838f"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 12).bin" size="3711456" crc="bb5593a2" sha1="a4b1d84a33b3e5b68bd29db9b243994dbd91302b"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 13).bin" size="3796128" crc="77c50f28" sha1="0c0e8d3b10f69eb02a67bff10eb57b8b632d2887"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 14).bin" size="3845520" crc="06055f6c" sha1="6a016acb05d3c940a6f7958370bd647d865cb336"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 15).bin" size="3847872" crc="b1e83660" sha1="f456d11fab38743561722191452d8f4bb5d18cd2"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 16).bin" size="3911376" crc="64d85973" sha1="d06fbc8a5ff7bd70f371d9e18af9a207959c0780"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 17).bin" size="3337488" crc="43f387c9" sha1="8e49bb1f30f16f9d2ada8327dfcff6ffcf54c421"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 18).bin" size="4377072" crc="ed4aed97" sha1="559f10457b31bdf206bca84ea0a38e57211bd7fa"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 19).bin" size="3669120" crc="4c19f9d9" sha1="dabcc461eafb13fbc78edd0fd9b49c1d8bc18d05"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 20).bin" size="4353552" crc="a57e29c9" sha1="8a82b620cdce3d28eb300cc04dbebfd668f70ecc"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 21).bin" size="18841872" crc="15fc36b7" sha1="9e26abdfb6423bc8d245d233ae4872300169ecfb"/>
+		<rom name="Battle Chess (Japan) (En,Ja) (Track 22).bin" size="284326224" crc="62d2dd00" sha1="4f70592502f9a3f6af48dee67f38f86d60bbfebf"/>
+		-->
+		<description>Battle Chess</description>
+		<year>1991</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="alt_title" value="バトル・チェス" />
+		<info name="release" value="199109xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="battle chess (japan) (en,ja)" sha1="0697976fd0d3c5a8a1282d3bf3a319d50d525036" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="beast3">
 		<!--
 		Origin: Neo Kobe Collection
@@ -2358,8 +2385,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices - can be skipped to advance -->
-	<software name="branmark" supported="partial">
+	<software name="branmark">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Branmarker.ccd" size="768" crc="a0dc5e2e" sha1="3bbbf9ae17ea1a1781d6b228a3c70fdd3b1f8b1b"/>
@@ -2378,8 +2404,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices - can be skipped to advance -->
-	<software name="branmar2" supported="partial">
+	<software name="branmar2">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Branmarker 2 (Game disc).ccd" size="1152" crc="5a5c5567" sha1="9201413c9a0109f0ebe03a99e35e01d18c9a09a5"/>
@@ -2607,7 +2632,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
+	<!-- Mouse input issues -->
 	<software name="condor" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
@@ -2626,8 +2651,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices - can be skipped to advance -->
-	<software name="crystalr" supported="partial">
+	<software name="crystalr">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Crystal Rinal.ccd" size="4493" crc="f5c45a4a" sha1="8355ecfcc6f7474de451783582200ecbba475b6a"/>
@@ -2694,7 +2718,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs at Interplay logo -->
+	<!-- Hangs at name entry -->
 	<software name="cyberia" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
@@ -3127,6 +3151,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="dodamega">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="1823" crc="6569150c" sha1="09802a94fad080d4464fce17ba161c137dc5b0a0"/>
+		<rom name="Image.cue" size="299" crc="b5d5ad42" sha1="ae01659fda3d965a3bbf242bcc69267e9dc6ca0e"/>
+		<rom name="Image.img" size="210720384" crc="d2f023c4" sha1="f9e43906de2e78275eb05d571d404da8654da671"/>
+		<rom name="Image.sub" size="8600832" crc="51fc181b" sha1="5552f73174a7ecd821d5a758b3d378ca3d996235"/>
+		-->
+		<description>Doda Mega-Mix!!!</description>
+		<year>1989</year>
+		<publisher>FNC</publisher>
+		<info name="release" value="198911xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dodamega" sha1="876ebe9db24ad2206e2bb4795284d828fa264442" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dokidok1">
 		<!--
 		Origin: Neo Kobe Collection
@@ -3173,8 +3216,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices - can be skipped to advance -->
-	<software name="dorse93" supported="partial">
+	<software name="dorse93">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="DOR Special Edition &apos;93 (Track 1).bin" size="317167200" crc="e4cc8ac3" sha1="e8e32b1a959f69b4bdd0fef124d72ce2e64c747d"/>
@@ -3193,8 +3235,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices - can be skipped to advance -->
-	<software name="dorse93a" supported="partial">
+	<software name="dorse93a">
 		<!--
 		Origin: redump.org
 		<rom name="DOR - Special Edition &apos;93 (Japan) (Alt) (Track 1).bin" size="310421664" crc="752f9bdd" sha1="ae19d158d5cc4c094d216b593ff383bd7ee33abb"/>
@@ -3452,8 +3493,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Restarts TownsOS -->
-	<software name="elfish" supported="no">
+	<software name="elfish">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Elfish.ccd" size="769" crc="3990aa0a" sha1="a34bc28fd4c9074206e28db7b1226f645afc4602"/>
@@ -3465,7 +3505,7 @@ User/save disks that can be created from the game itself are not included.
 		<year>1994</year>
 		<publisher>富士通 (Fujitsu)</publisher>
 		<info name="release" value="199407xx" />
-		<info name="usage" value="Requires HDD installation"/>
+		<info name="usage" value="Requires HDD installation and an FPU"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="elfish" sha1="c0dd2d0c0caaea9098de8a550aac7b5005030f8f" />
@@ -3473,8 +3513,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="elfishlt" supported="no">
+	<software name="elfishlt">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Elfish Lite.ccd" size="751" crc="ea2bdac2" sha1="62a9f7f9d82e1084e35e01212a84464b5c1838bb"/>
@@ -3533,6 +3572,69 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="emerald dragon" sha1="87147a20f1a7422e8ced81c664180538be39f9ae" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The spoken dialogue (CDDA) seems to start playing at the wrong point and doesn't match what's being said on each scene -->
+	<software name="emit1" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja).cue" size="1078" crc="4ed341d2" sha1="7d5c07157bd438cab5d0d84dd1024b369cfd9db6"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 1).bin" size="20281296" crc="4b15bc51" sha1="02433dd33ba55bf686349d1332a5d72914f418c2"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 2).bin" size="42766416" crc="cddb61dc" sha1="f40ae55a596258434672d7975388b2bdbfc08125"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 3).bin" size="151908624" crc="0480ad92" sha1="e62722a8e8c0e54b11a8a293950a55410d1e7086"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 4).bin" size="159395040" crc="3e561925" sha1="c0f4058a6678439d128648e8d48e8344e828bca8"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 5).bin" size="72077040" crc="0c366937" sha1="77f71ca8d795a8c2e6ed0e286750fea7becc1abb"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 6).bin" size="114714096" crc="3422fc41" sha1="57197a1ccb5c7d2a02a84ee6929fcd2d958e7eb7"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 7).bin" size="6837264" crc="a8bb630c" sha1="34c54fa85a566a00e3c9ba4572a347a15d718170"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 8).bin" size="70376544" crc="a9597842" sha1="07b706406105d4f4d99038aad84a2c9408692ee6"/>
+		-->
+		<description>Emit Vol. 1 - Toki no Maigo</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="release" value="199403xx" />
+		<info name="alt_title" value="エミット Vol. 1 時の迷子" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emit1.hdm" size="1261568" crc="660198bd" sha1="f84e0ede2de479d61de72c59e64a5c6829ae9cb7" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 1 - toki no maigo (japan) (en,ja)" sha1="038ddc530689da76a82b225a8deefd713b0b059e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- The spoken dialogue (CDDA) seems to start playing at the wrong point and doesn't match what's being said on each scene -->
+	<software name="emit2" supported="partial">
+		<!--
+		Origin: redump.org
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja).cue" size="1260" crc="92e3280f" sha1="f86c316920455ad3be2769edee7a33cdc890fb65"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 1).bin" size="20815200" crc="0ae40089" sha1="6b7c70f4c14602f9866e2c125491d39ae80dfdfe"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 2).bin" size="69595680" crc="346a3abd" sha1="ee7325fea4ecd2bb5a63356f511566284669efd0"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 3).bin" size="147070560" crc="67ca5cca" sha1="74ffd1b5a5401f03aa388a50259e748f3fdd8241"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 4).bin" size="156419760" crc="68fe96cd" sha1="8c388642e46f5743e8dc565f61367ccc78679c82"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 5).bin" size="47256384" crc="2a47da59" sha1="0347296eb5d4bf61c297088c5b906bb5cd3f5f54"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 6).bin" size="117936336" crc="38c90df5" sha1="b3012938f2992be2645d6b8bb1b67f7caa89742a"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 7).bin" size="6738480" crc="1f2dbaa5" sha1="2e1b29fb2597477ac45e471c14865f13614263c4"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 8).bin" size="43175664" crc="3134c4b6" sha1="39899d98d01020a589e67674300a7fbae74b2f5d"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 9).bin" size="2598960" crc="c08c050d" sha1="5464a05ade770fe4fbc211b1789b8d13d1444301"/>
+		-->
+		<description>Emit Vol. 2 - Inochigake no Tabi</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="release" value="199407xx" />
+		<info name="alt_title" value="エミット Vol. 2 命がけの旅" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emit2.hdm" size="1261568" crc="b0e599e6" sha1="a7ba288dd17aa136e3fad5d5d070d5c87c61d5b6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 2 - inochigake no tabi (japan) (en,ja)" sha1="ae0de13b275b8f7ce5082008002aa4c275d011db" />
 			</diskarea>
 		</part>
 	</software>
@@ -3713,8 +3815,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="f29ret" supported="partial">
+	<software name="f29ret">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="F29 Retaliator.ccd" size="1393" crc="6c22f526" sha1="5b2ba6d41fba1afc5cf3ac10523d48581c612ef0"/>
@@ -4480,8 +4581,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs on some scenarios -->
-	<software name="hanakiok" supported="no">
+	<software name="hanakiok">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Hana no Kioku.ccd" size="1536" crc="fb0735ea" sha1="8cbab4ded5211a62e586e46c91494819a9e11107"/>
@@ -4678,8 +4778,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs shortly after starting -->
-	<software name="hoshisn3" supported="no">
+	<software name="hoshisn3">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Hoshi no Suna Monogatari 3.ccd" size="3455" crc="ad50647d" sha1="68ff4745927e47067532944526ac7bf8e8833ba9"/>
@@ -5189,8 +5288,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices - can be skipped to advance -->
-	<software name="kindanke" supported="partial">
+	<software name="kindanke">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Kindan no Ketsuzoku.ccd" size="2823" crc="0eb0eeae" sha1="0c2bdf0b806b1264c57468c1e0461a2f30502b88"/>
@@ -5228,7 +5326,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs on the title screen -->
+	<!-- Mouse input issues -->
 	<software name="kingqst5" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
@@ -5288,8 +5386,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing sound effects -->
-	<software name="kokoraku" supported="no">
+	<software name="kokoraku">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Koko wa Rakuensou.ccd" size="771" crc="c947821b" sha1="64d7ff9b4bb361413ef535edd08ccf23d9c5f297"/>
@@ -5308,8 +5405,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing sound effects -->
-	<software name="kokorak2" supported="no">
+	<software name="kokorak2">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Koko wa Rakuensou 2.bin" size="163745792" crc="750dc712" sha1="07ce9185b8448e18f20906127e4603c62b670b9d"/>
@@ -5425,6 +5521,25 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="ku2pp">
+		<!--
+		Origin: Tokugawa Corporate Forums (DamienD)
+		<rom name="KU²++.ccd" size="5176" crc="1e5aa465" sha1="9569466d627ebb8f004d3ffd44cd48096829ff63"/>
+		<rom name="KU²++.cue" size="981" crc="02e50d19" sha1="97a5444839919629278980b9df44196e505af7da"/>
+		<rom name="KU²++.img" size="600514992" crc="50a05b7f" sha1="08ac4b3cb8755b25a93ac20a3a0b5364bb127b4f"/>
+		<rom name="KU²++.sub" size="24510816" crc="2eeb7669" sha1="2dba78cc9b1c8a7961109fcdd31ca7f5f68f2f73"/>
+		-->
+		<description>Ku²++</description>
+		<year>1993</year>
+		<publisher>パンサーソフトウェア (Panther Software)</publisher>
+		<info name="release" value="199311xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ku2++" sha1="89f36240314f15dcb45526b03beb84e417296a97" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="landlore">
 		<!--
 		Origin: Neo Kobe Collection
@@ -5486,8 +5601,8 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs after the main menu -->
-	<software name="lastsurv" supported="no">
+	<!-- Runs too fast? -->
+	<software name="lastsurv" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Last Survivor.ccd" size="2083" crc="dd87d31e" sha1="8453a35a485de1b0343da937e5a2236e799032fe"/>
@@ -6070,8 +6185,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="menzober" supported="partial">
+	<software name="menzober">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Menzoberranzan.mdf" size="385295616" crc="452d6d6a" sha1="83eceac9677e92b5909782acee8092b80bb5a6a9"/>
@@ -6261,8 +6375,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs on the intro, but it can be skipped -->
-	<software name="mightmg5" supported="partial">
+	<software name="mightmg5">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Might and Magic V - Darkside of Xeen.mdf" size="36691200" crc="c1bf597c" sha1="f0c3c649a77242223076ccafc608a702ede112db"/>
@@ -6419,8 +6532,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some sound issues -->
-	<software name="msdet1" supported="partial">
+	<software name="msdet1">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ms. Detective File #1 (Disc 1).ccd" size="772" crc="92ccce73" sha1="717957cf8f02b585c5845347035cafca1be9613c"/>
@@ -6528,7 +6640,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs shortly after starting -->
+	<!-- Mouse input issues -->
 	<software name="mumgoose" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
@@ -6688,6 +6800,7 @@ User/save disks that can be created from the game itself are not included.
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
+			<feature name="part_id" value="Course Disc" />
 			<diskarea name="cdrom">
 				<disk name="new 3d golf simulation - harukanaru augusta (japan)" sha1="7fea48e34903ae09c89f5fda5470b9b5edbe2975" />
 			</diskarea>
@@ -6964,8 +7077,28 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs on the title screen -->
-	<software name="oshacook" supported="no">
+	<!-- Wrong colors on the title screen and some menus -->
+	<software name="oshaclub" supported="partial">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="6862" crc="b5a55841" sha1="fe809a2eaf60f268d9ff862a8412327110250029"/>
+		<rom name="Image.cue" size="1365" crc="dc16b4d5" sha1="e13c05e2832fb1864e6917c9134ac67045cc834c"/>
+		<rom name="Image.img" size="565573680" crc="5d094d0e" sha1="0a4286a0014debf4b99fb07df439ffaaa21cfe9c"/>
+		<rom name="Image.sub" size="23084640" crc="400992c2" sha1="36572b953f879ff713c058ea8d13734150795c29"/>
+		-->
+		<description>Oshare Club</description>
+		<year>1991</year>
+		<publisher>ミサワホーム総合研究所 (Misawa Home Sougou Kenkyuusho)</publisher>
+		<info name="alt_title" value="おしゃれ倶楽部" />
+		<info name="release" value="199103xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="oshaclub" sha1="16bff0197bb8fbb97667004205bb02b093376cb2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="oshacook">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Oshare Cooking.ccd" size="4746" crc="d0a44b7f" sha1="28a145333fc404047066f95a99824c09def8e545"/>
@@ -7382,8 +7515,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs shortly after starting -->
-	<software name="psydet3" supported="no">
+	<software name="psydet3">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Psychic Detective Series Vol. 3 - Aya (Track 1).bin" size="158407200" crc="476a9efa" sha1="419edde4eef471df10e6756d7936aca1eeccaa04"/>
@@ -7650,8 +7782,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices - can be skipped to advance -->
-	<software name="raidy" supported="partial">
+	<software name="raidy">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ikazuchi no Senshi Raidy.ccd" size="3636" crc="f35a60da" sha1="7c0a1ca01cdf442d09f5c94ae288f71a56136c7f"/>
@@ -7669,8 +7800,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices - can be skipped to advance -->
-	<software name="raidy2" supported="partial">
+	<software name="raidy2">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ikazuchi no Senshi Raidy II.ccd" size="2298" crc="1062dae1" sha1="80718cfb56b6a7551f0360c618db42a39df3db7d"/>
@@ -7699,7 +7829,7 @@ User/save disks that can be created from the game itself are not included.
 	</software>
 
 	<!-- Missing a floppy disk -->
-	<software name="railtycn">
+	<software name="railtycn" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Railroad Tycoon.ccd" size="2223" crc="0d66b2f2" sha1="07a4e276d83d808f21f86b32a5b0dfafa26efdb9"/>
@@ -7802,8 +7932,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="ravnloft" supported="partial">
+	<software name="ravnloft">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ravenloft.ccd" size="770" crc="858e0052" sha1="2d92be1ed3f46893d857d3d5f8932d8bc430fc6a"/>
@@ -7926,8 +8055,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices - can be skipped to advance -->
-	<software name="ringout" supported="partial">
+	<software name="ringout">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ring Out!!.ccd" size="2486" crc="1ba43240" sha1="5d105ef08eb749c775b410c251088e151d15cb8e"/>
@@ -7942,6 +8070,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ring out!!" sha1="2b50d05b278824e36a1b2fdf500a5ec4c9daeb3b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rinkan">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="2046" crc="54f0ec1f" sha1="686a7ecc6a53e9b2ede8ff3396ad0c6e38b87e3c"/>
+		<rom name="Image.cue" size="340" crc="c0ad3f7d" sha1="6d39c08ccbd98363f1cc7bbc79038baacae268f4"/>
+		<rom name="Image.img" size="379859760" crc="fef77566" sha1="fd7569f8c41405fd2898577ffc1806d57e47bd7d"/>
+		<rom name="Image.sub" size="15504480" crc="1d0cc31c" sha1="8f56ddae02360a9f22821ba35ae1c7def1462c13"/>
+		-->
+		<description>Rinkan Gakkou</description>
+		<year>1996</year>
+		<publisher>フォスター (Foster)</publisher>
+		<info name="alt_title" value="林間学校" />
+		<info name="release" value="199602xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="rinkan" sha1="2574f07d8495ea197b5a04136f860b5466fa1ad5" />
 			</diskarea>
 		</part>
 	</software>
@@ -7977,6 +8125,26 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="ryuutouden" sha1="b3468afda6c697b270d49ccc89545dc57b0c6c80" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sakumori">
+		<!--
+		Origin: P2P
+		<rom name="Image.cdm" size="868" crc="8bab4d7b" sha1="dec4dc62f9c5446d07c280c5563bedff37e9f4f4"/>
+		<rom name="Image.cue" size="71" crc="b496048a" sha1="8590392ca153b7559d50bef2f83defc45e315624"/>
+		<rom name="Image.img" size="23317728" crc="ec413202" sha1="1f368669d90cca79982c174970ca2ca942fcb291"/>
+		<rom name="Image.sub" size="951744" crc="955d3498" sha1="e8acdd0fb86ee2217fdeed8cd13e1ac96422afc0"/>
+		-->
+		<description>Sakura no Mori</description>
+		<year>1995</year>
+		<publisher>アクティブ (Active)</publisher>
+		<info name="alt_title" value="櫻の杜" />
+		<info name="release" value="19951027" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="sakumori" sha1="36bfe8686bb2eadb962852e5e1e44de94e654c23" />
 			</diskarea>
 		</part>
 	</software>
@@ -8098,8 +8266,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some sound issues -->
-	<software name="scholar" supported="partial">
+	<software name="scholar">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Scholar Movie Magazine.ccd" size="771" crc="43f604ad" sha1="afc766ade7cb05fbd26e703baa1873ea043b346d"/>
@@ -8318,8 +8485,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Severe graphics issues -->
-	<software name="simearth" supported="no">
+	<software name="simearth">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="SimEarth.ccd" size="6113" crc="4f860edf" sha1="198af871373683d7af8eb221ae81cae78762d398"/>
@@ -9302,8 +9468,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs after initial menu -->
-	<software name="trigger" supported="no">
+	<software name="trigger">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Trigger.ccd" size="1335" crc="ce397f34" sha1="4c862a13fb30162b64b56558ac91cafba82f03fd"/>
@@ -9391,8 +9556,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Hangs when playing voices -->
-	<software name="ultima6" supported="no">
+	<software name="ultima6">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Ultima VI - The False Prophet.ccd" size="788" crc="412311ab" sha1="66855cb375a7d84284eba0f87c4e487ea50b16fc"/>
@@ -9567,8 +9731,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some graphics issues -->
-	<software name="veildark" supported="partial">
+	<software name="veildark">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Veil of Darkness.mdf" size="10648800" crc="a6a3495a" sha1="94c27245b4212049ae4114c0bd9e32614d80a807"/>
@@ -9779,7 +9942,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some sound issues -->
+	<!-- No CDDA sound -->
 	<software name="wingcomm" supported="partial">
 		<!--
 		Origin: Neo Kobe Collection
@@ -9818,7 +9981,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Restarts TownsOS -->
+	<!-- Restarts TownsOS; apparently it's complaining about not having enough memory, but according to the back cover it should only require 4 MB -->
 	<software name="wingcom2" supported="no">
 		<!--
 		Origin: Neo Kobe Collection
@@ -9957,8 +10120,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<!-- Some sound issues -->
-	<software name="carmnwld" supported="partial">
+	<software name="carmnwld">
 		<!--
 		Origin: Neo Kobe Collection
 		<rom name="Where in the World is Carmen Sandiego.ccd" size="770" crc="f0949d02" sha1="fbffe498730e20f16f9073c9bf9e9517c7787734"/>

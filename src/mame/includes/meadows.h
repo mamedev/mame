@@ -65,8 +65,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(meadows_interrupt);
-	INTERRUPT_GEN_MEMBER(minferno_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(meadows_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(minferno_vblank_irq);
 	INTERRUPT_GEN_MEMBER(audio_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
 	void meadows_sh_update();
@@ -74,4 +74,9 @@ public:
 	void bowl3d(machine_config &config);
 	void meadows(machine_config &config);
 	void minferno(machine_config &config);
+	void audio_map(address_map &map);
+	void bowl3d_main_map(address_map &map);
+	void meadows_main_map(address_map &map);
+	void minferno_data_map(address_map &map);
+	void minferno_main_map(address_map &map);
 };

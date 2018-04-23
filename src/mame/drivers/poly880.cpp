@@ -46,11 +46,10 @@ Test Paste:
 
 void poly880_state::update_display()
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(m_digit, i)) output().set_digit_value(7 - i, m_segment);
+		if (BIT(m_digit, i))
+			m_digits[7 - i] = m_segment;
 	}
 }
 
@@ -63,22 +62,24 @@ WRITE8_MEMBER( poly880_state::cldig_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( poly880_mem, AS_PROGRAM, 8, poly880_state )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x3c00) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
-ADDRESS_MAP_END
+void poly880_state::poly880_mem(address_map &map)
+{
+	map(0x0000, 0x03ff).mirror(0x0c00).rom();
+	map(0x1000, 0x13ff).mirror(0x0c00).rom();
+	map(0x2000, 0x23ff).mirror(0x0c00).rom();
+	map(0x3000, 0x33ff).mirror(0x0c00).rom();
+	map(0x4000, 0x43ff).mirror(0x3c00).ram();
+	map(0x8000, 0xffff).bankrw("bank1");
+}
 
-static ADDRESS_MAP_START( poly880_io, AS_IO, 8, poly880_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xaf)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(cldig_w)
-ADDRESS_MAP_END
+void poly880_state::poly880_io(address_map &map)
+{
+	map.global_mask(0xaf);
+	map(0x80, 0x83).rw(Z80PIO1_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x84, 0x87).rw(Z80PIO2_TAG, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x88, 0x8b).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0xa0, 0xa0).mirror(0x0f).w(this, FUNC(poly880_state::cldig_w));
+}
 
 /* Input Ports */
 
@@ -189,9 +190,9 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 	{
 		if (BIT(m_digit, i))
 		{
-			if (!BIT(m_ki1->read(), i)) data &= ~0x10;
-			if (!BIT(m_ki2->read(), i)) data &= ~0x20;
-			if (!BIT(m_ki3->read(), i)) data &= ~0x80;
+			if (!BIT(m_ki[0]->read(), i)) data &= ~0x10;
+			if (!BIT(m_ki[1]->read(), i)) data &= ~0x20;
+			if (!BIT(m_ki[2]->read(), i)) data &= ~0x80;
 		}
 	}
 
@@ -235,6 +236,8 @@ static const z80_daisy_config poly880_daisy_chain[] =
 
 void poly880_state::machine_start()
 {
+	m_digits.resolve();
+
 	/* register for state saving */
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));

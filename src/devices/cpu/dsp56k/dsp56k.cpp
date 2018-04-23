@@ -60,7 +60,7 @@
 #include "dsp56mem.h"
 
 
-DEFINE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device, "dsp56156", "DSP56156")
+DEFINE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device, "dsp56156", "Motorola DSP56156")
 
 
 namespace DSP56K {
@@ -109,21 +109,23 @@ enum
 /****************************************************************************
  *  Internal Memory Maps
  ****************************************************************************/
-static ADDRESS_MAP_START( dsp56156_program_map, AS_PROGRAM, 16, dsp56k_device )
-	AM_RANGE(0x0000,0x07ff) AM_RAM AM_SHARE("dsk56k_program_ram")   /* 1-5 */
+void dsp56k_device::dsp56156_program_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("dsk56k_program_ram");   /* 1-5 */
 //  AM_RANGE(0x2f00,0x2fff) AM_ROM                              /* 1-5 PROM reserved memory.  Is this the right spot for it? */
-ADDRESS_MAP_END
+}
 
-static ADDRESS_MAP_START( dsp56156_x_data_map, AS_DATA, 16, dsp56k_device )
-	AM_RANGE(0x0000,0x07ff) AM_RAM                              /* 1-5 */
-	AM_RANGE(0xffc0,0xffff) AM_READWRITE(peripheral_register_r, peripheral_register_w)   /* 1-5 On-chip peripheral registers memory mapped in data space */
-ADDRESS_MAP_END
+void dsp56k_device::dsp56156_x_data_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();                              /* 1-5 */
+	map(0xffc0, 0xffff).rw(this, FUNC(dsp56k_device::peripheral_register_r), FUNC(dsp56k_device::peripheral_register_w));   /* 1-5 On-chip peripheral registers memory mapped in data space */
+}
 
 
 dsp56k_device::dsp56k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, DSP56156, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_program_map))
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_x_data_map))
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(dsp56k_device::dsp56156_program_map), this))
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(dsp56k_device::dsp56156_x_data_map), this))
 	, m_program_ram(*this, "dsk56k_program_ram")
 {
 }
@@ -346,7 +348,7 @@ void dsp56k_device::device_start()
 	state_add(STATE_GENSP, "GENSP", m_dsp56k_core.PCU.sp).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_dsp56k_core.PCU.sr).formatstr("%14s").noshow();
 
-	m_icountptr = &m_dsp56k_core.icount;
+	set_icountptr(m_dsp56k_core.icount);
 }
 
 
@@ -462,7 +464,8 @@ static size_t execute_one_new(dsp56k_core* cpustate)
 {
 	// For MAME
 	cpustate->ppc = PC;
-	debugger_instruction_hook(cpustate->device, PC);
+	if (cpustate->device->machine().debug_flags & DEBUG_FLAG_CALL_HOOK) // FIXME: if this was a member, the helper would work
+		cpustate->device->debug()->instruction_hook(PC);
 
 	cpustate->op = ROPCODE(PC);
 	uint16_t w0 = ROPCODE(PC);
@@ -504,9 +507,9 @@ void dsp56k_device::execute_run()
 }
 
 
-util::disasm_interface *dsp56k_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> dsp56k_device::create_disassembler()
 {
-	return new dsp56k_disassembler;
+	return std::make_unique<dsp56k_disassembler>();
 }
 
 } // namespace DSP56K

@@ -75,6 +75,8 @@ public:
 
 	void fredmem(machine_config &config);
 	void dcheese(machine_config &config);
+	void main_cpu_map(address_map &map);
+	void sound_cpu_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -225,13 +225,15 @@ DEFINE_DEVICE_TYPE(MOS8566, mos8566_device, "mos8566", "MOS 8566 VIC-II")
 
 
 // default address maps
-static ADDRESS_MAP_START( mos6566_videoram_map, 0, 8, mos6566_device )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void mos6566_device::mos6566_videoram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+}
 
-static ADDRESS_MAP_START( mos6566_colorram_map, 1, 8, mos6566_device )
-	AM_RANGE(0x000, 0x3ff) AM_RAM
-ADDRESS_MAP_END
+void mos6566_device::mos6566_colorram_map(address_map &map)
+{
+	map(0x000, 0x3ff).ram();
+}
 
 
 //-------------------------------------------------
@@ -585,8 +587,8 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, nullptr, *ADDRESS_MAP_NAME(mos6566_colorram_map)),
+		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(), address_map_constructor(FUNC(mos6566_device::mos6566_videoram_map), this)),
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(), address_map_constructor(FUNC(mos6566_device::mos6566_colorram_map), this)),
 		m_write_irq(*this),
 		m_write_ba(*this),
 		m_write_aec(*this),
@@ -646,7 +648,7 @@ mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, d
 void mos6566_device::device_start()
 {
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();

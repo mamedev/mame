@@ -213,6 +213,8 @@ public:
 
 	uint16_t get_peripheral_memory(uint16_t addr);
 
+	void dsp56156_program_map(address_map &map);
+	void dsp56156_x_data_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -235,7 +237,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	address_space_config m_program_config;

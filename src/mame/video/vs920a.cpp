@@ -61,20 +61,6 @@ void vs920a_text_tilemap_device::device_reset()
 {
 }
 
-
-void vs920a_text_tilemap_device::set_gfx_region(device_t &device, int gfxregion)
-{
-	vs920a_text_tilemap_device &dev = downcast<vs920a_text_tilemap_device &>(device);
-	dev.m_gfx_region = gfxregion;
-}
-
-void vs920a_text_tilemap_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<vs920a_text_tilemap_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-
-
 TILE_GET_INFO_MEMBER(vs920a_text_tilemap_device::get_tile_info)
 {
 	int data;

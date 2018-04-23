@@ -16,7 +16,7 @@
 DECLARE_DEVICE_TYPE(PSX_DMA, psxdma_device)
 
 #define MCFG_PSX_DMA_IRQ_HANDLER(_devcb) \
-	devcb = &psxdma_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<psxdma_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 class psxdma_device : public device_t
 {
@@ -26,8 +26,8 @@ public:
 
 	psxdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxdma_device &>(device).m_irq_handler.set_callback(object); }
+	//configuration helpers
+	template<class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	void install_read_handler( int n_channel, read_delegate p_fn_dma_read );
 	void install_write_handler( int n_channel, write_delegate p_fn_dma_write );

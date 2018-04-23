@@ -17,7 +17,7 @@
 #define LOG_Move0905    0
 
 #define MCFG_RAIDEN2COP_VIDEORAM_OUT_CB(_devcb) \
-	devcb = &raiden2cop_device::set_m_videoramout_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<raiden2cop_device &>(*device).set_m_videoramout_cb(DEVCB_##_devcb);
 
 #define MCFG_RAIDEN2COP_ADD(_tag ) \
 	MCFG_DEVICE_ADD(_tag, RAIDEN2COP, 0)
@@ -76,7 +76,7 @@ public:
 
 	uint8_t fade_table(int v);
 
-	template<class _Object> static devcb_base &set_m_videoramout_cb(device_t &device, _Object object) { return downcast<raiden2cop_device &>(device).m_videoramout_cb.set_callback(object); }
+	template<class Object> devcb_base &set_m_videoramout_cb(Object &&cb) { return m_videoramout_cb.set_callback(std::forward<Object>(cb)); }
 
 	// Number Conversion
 

@@ -200,104 +200,112 @@ WRITE8_MEMBER(exidy_state::fax_bank_select_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( exidy_map, AS_PROGRAM, 8, exidy_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite1_xpos")
-	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite1_ypos")
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite2_xpos")
-	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0x003f) AM_WRITEONLY AM_SHARE("sprite2_ypos")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("spriteno")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("sprite_enable")
-	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_SHARE("color_latch")
-	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
+void exidy_state::exidy_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x4000, 0x43ff).mirror(0x0400).ram().share("videoram");
+	map(0x5000, 0x5000).mirror(0x003f).writeonly().share("sprite1_xpos");
+	map(0x5040, 0x5040).mirror(0x003f).writeonly().share("sprite1_ypos");
+	map(0x5080, 0x5080).mirror(0x003f).writeonly().share("sprite2_xpos");
+	map(0x50c0, 0x50c0).mirror(0x003f).writeonly().share("sprite2_ypos");
+	map(0x5100, 0x5100).mirror(0x00fc).portr("DSW");
+	map(0x5100, 0x5100).mirror(0x00fc).writeonly().share("spriteno");
+	map(0x5101, 0x5101).mirror(0x00fc).portr("IN0");
+	map(0x5101, 0x5101).mirror(0x00fc).writeonly().share("sprite_enable");
+	map(0x5103, 0x5103).mirror(0x00fc).r(this, FUNC(exidy_state::exidy_interrupt_r));
+	map(0x5210, 0x5212).writeonly().share("color_latch");
+	map(0x5213, 0x5213).portr("IN2");
+}
 
 
-static ADDRESS_MAP_START( sidetrac_map, AS_PROGRAM, 8, exidy_state )
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
-ADDRESS_MAP_END
+void exidy_state::sidetrac_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).rom().share("characterram");
+	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(this, FUNC(exidy_state::spectar_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-static ADDRESS_MAP_START( targ_map, AS_PROGRAM, 8, exidy_state )
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(targ_audio_2_w)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
-ADDRESS_MAP_END
+void exidy_state::targ_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(this, FUNC(exidy_state::targ_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-static ADDRESS_MAP_START( spectar_map, AS_PROGRAM, 8, exidy_state )
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
-ADDRESS_MAP_END
+void exidy_state::spectar_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(this, FUNC(exidy_state::spectar_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-static ADDRESS_MAP_START( rallys_map, AS_PROGRAM, 8, exidy_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY AM_SHARE("sprite1_xpos")
-	AM_RANGE(0x5001, 0x5001) AM_WRITEONLY AM_SHARE("sprite1_ypos")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("spriteno")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_SHARE("sprite_enable")
-	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_SHARE("color_latch")
-	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
-	AM_RANGE(0x5300, 0x5300) AM_WRITEONLY AM_SHARE("sprite2_xpos")
-	AM_RANGE(0x5301, 0x5301) AM_WRITEONLY AM_SHARE("sprite2_ypos")
-	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-ADDRESS_MAP_END
+void exidy_state::rallys_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x3fff).rom();
+	map(0x4000, 0x43ff).mirror(0x0400).ram().share("videoram");
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5000, 0x5000).writeonly().share("sprite1_xpos");
+	map(0x5001, 0x5001).writeonly().share("sprite1_ypos");
+	map(0x5100, 0x5100).mirror(0x00fc).portr("DSW");
+	map(0x5100, 0x5100).mirror(0x00fc).writeonly().share("spriteno");
+	map(0x5101, 0x5101).mirror(0x00fc).portr("IN0");
+	map(0x5101, 0x5101).mirror(0x00fc).writeonly().share("sprite_enable");
+	map(0x5103, 0x5103).mirror(0x00fc).r(this, FUNC(exidy_state::exidy_interrupt_r));
+	map(0x5200, 0x5200).w(this, FUNC(exidy_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(this, FUNC(exidy_state::spectar_audio_2_w));
+	map(0x5210, 0x5212).writeonly().share("color_latch");
+	map(0x5213, 0x5213).portr("IN2");
+	map(0x5300, 0x5300).writeonly().share("sprite2_xpos");
+	map(0x5301, 0x5301).writeonly().share("sprite2_ypos");
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
 
 
-static ADDRESS_MAP_START( venture_map, AS_PROGRAM, 8, exidy_state )
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
-ADDRESS_MAP_END
+void exidy_state::venture_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x520f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 
-static ADDRESS_MAP_START( pepper2_map, AS_PROGRAM, 8, exidy_state )
-	AM_RANGE(0x4800, 0x4fff) AM_NOP
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
-ADDRESS_MAP_END
+void exidy_state::pepper2_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x4800, 0x4fff).noprw();
+	map(0x5200, 0x520f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x6fff).ram().share("characterram");
+	map(0x8000, 0xffff).rom();
+}
 
 
-static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
-	AM_RANGE(0x0400, 0x07ff) AM_RAM
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(fax_bank_select_w)
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x5213, 0x5217) AM_WRITENOP        /* empty control lines on color/sound board */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
-ADDRESS_MAP_END
+void exidy_state::fax_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0400, 0x07ff).ram();
+	map(0x1a00, 0x1a00).portr("IN4");
+	map(0x1c00, 0x1c00).portr("IN3");
+	map(0x2000, 0x2000).w(this, FUNC(exidy_state::fax_bank_select_w));
+	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x5200, 0x520f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x5213, 0x5217).nopw();        /* empty control lines on color/sound board */
+	map(0x6000, 0x6fff).ram().share("characterram");
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -376,7 +384,7 @@ static INPUT_PORTS_START( targ )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("INTSOURCE")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -396,7 +404,7 @@ static INPUT_PORTS_START( spectar )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( German ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Spanish ) )
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spectarrf ) // default to Spanish since it's a Spanish bootleg
@@ -446,7 +454,7 @@ static INPUT_PORTS_START( rallys )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_MODIFY("INTSOURCE")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
@@ -515,7 +523,7 @@ static INPUT_PORTS_START( mtrap )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
 
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -577,7 +585,7 @@ static INPUT_PORTS_START( venture )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -613,7 +621,7 @@ static INPUT_PORTS_START( teetert )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, nullptr)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -693,7 +701,7 @@ static INPUT_PORTS_START( pepper2 )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -745,7 +753,7 @@ static INPUT_PORTS_START( fax )
     PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_CUSTOM )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
@@ -832,40 +840,44 @@ MACHINE_CONFIG_START(exidy_state::base)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::sidetrac, base)
+MACHINE_CONFIG_START(exidy_state::sidetrac)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sidetrac_map)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spectar_audio)
+	spectar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::targ, base)
+MACHINE_CONFIG_START(exidy_state::targ)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(targ_map)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(targ_audio)
+	targ_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::spectar, base)
+MACHINE_CONFIG_START(exidy_state::spectar)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spectar_map)
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(spectar_audio)
+	spectar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::rallys, spectar)
+MACHINE_CONFIG_START(exidy_state::rallys)
+	spectar(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -873,7 +885,8 @@ MACHINE_CONFIG_DERIVED(exidy_state::rallys, spectar)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::venture, base)
+MACHINE_CONFIG_START(exidy_state::venture)
+	base(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -882,11 +895,12 @@ MACHINE_CONFIG_DERIVED(exidy_state::venture, base)
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(venture_audio)
+	venture_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::teetert, venture)
+MACHINE_CONFIG_START(exidy_state::teetert)
+	venture(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -897,18 +911,20 @@ MACHINE_CONFIG_DERIVED(exidy_state::teetert, venture)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::mtrap, venture)
+MACHINE_CONFIG_START(exidy_state::mtrap)
+	venture(config);
 
 	/* basic machine hardware */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
 
 	/* audio hardware */
-	MCFG_FRAGMENT_ADD(mtrap_cvsd_audio)
+	mtrap_cvsd_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::pepper2, venture)
+MACHINE_CONFIG_START(exidy_state::pepper2)
+	venture(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -916,7 +932,8 @@ MACHINE_CONFIG_DERIVED(exidy_state::pepper2, venture)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(exidy_state::fax, pepper2)
+MACHINE_CONFIG_START(exidy_state::fax)
+	pepper2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -40,13 +40,6 @@ kaneko_hit_device::kaneko_hit_device(const machine_config &mconfig, const char *
 
 }
 
-void kaneko_hit_device::set_type(device_t &device, int hittype)
-{
-	kaneko_hit_device &dev = downcast<kaneko_hit_device &>(device);
-	dev.m_hittype = hittype;
-}
-
-
 void kaneko_hit_device::device_start()
 {
 	/* m_hit */

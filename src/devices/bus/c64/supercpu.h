@@ -51,6 +51,8 @@ private:
 
 	required_shared_ptr<uint8_t> m_sram;
 	required_shared_ptr<uint8_t> m_dimm;
+
+	void c64_supercpu_map(address_map &map);
 };
 
 

@@ -36,14 +36,16 @@ READ8_MEMBER( advision_state::rom_r )
 	return m_cart->read_rom(space, offset & 0xfff);
 }
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, advision_state )
-	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank1")
-	AM_RANGE(0x0400, 0x0fff) AM_READ(rom_r)
-ADDRESS_MAP_END
+void advision_state::program_map(address_map &map)
+{
+	map(0x0000, 0x03ff).bankr("bank1");
+	map(0x0400, 0x0fff).r(this, FUNC(advision_state::rom_r));
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, advision_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(ext_ram_r, ext_ram_w)
-ADDRESS_MAP_END
+void advision_state::io_map(address_map &map)
+{
+	map(0x00, 0xff).rw(this, FUNC(advision_state::ext_ram_r), FUNC(advision_state::ext_ram_w));
+}
 
 /* Input Ports */
 

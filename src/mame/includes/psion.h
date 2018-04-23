@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef _PSION_H_
-#define _PSION_H_
+#ifndef MAME_INCLUDES_PSION_H
+#define MAME_INCLUDES_PSION_H
 
 #include "cpu/m6800/m6801.h"
 #include "machine/nvram.h"
@@ -90,6 +90,11 @@ public:
 	void psionlz(machine_config &config);
 	void psionla(machine_config &config);
 	void psionp350(machine_config &config);
+	void psioncm_mem(address_map &map);
+	void psionla_mem(address_map &map);
+	void psionlam_mem(address_map &map);
+	void psionlz_mem(address_map &map);
+	void psionp350_mem(address_map &map);
 };
 
 
@@ -108,6 +113,7 @@ public:
 
 	HD44780_PIXEL_UPDATE(psion1_pixel_update);
 	void psion1(machine_config &config);
+	void psion1_mem(address_map &map);
 };
 
-#endif  // _PSION_H_
+#endif // MAME_INCLUDES_PSION_H

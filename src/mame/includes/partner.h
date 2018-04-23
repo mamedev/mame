@@ -24,6 +24,7 @@ public:
 		: radio86_state(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
 		, m_fdc(*this, "wd1793")
+		, m_bank(*this, "bank%u", 1U)
 	{
 	}
 
@@ -39,6 +40,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void partner(machine_config &config);
+	void partner_mem(address_map &map);
 protected:
 	void partner_window_1(uint8_t bank_num, uint16_t offset,uint8_t *rom);
 	void partner_window_2(uint8_t bank_num, uint16_t offset,uint8_t *rom);
@@ -50,6 +52,7 @@ protected:
 
 	required_device<ram_device> m_ram;
 	required_device<fd1793_device> m_fdc;
+	required_memory_bank_array<13> m_bank;
 };
 
 

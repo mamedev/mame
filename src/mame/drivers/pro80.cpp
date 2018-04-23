@@ -38,6 +38,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(digit_w);
@@ -46,13 +47,17 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 
 	void pro80(machine_config &config);
+	void pro80_io(address_map &map);
+	void pro80_mem(address_map &map);
 private:
 	uint8_t m_digit_sel;
 	uint8_t m_cass_in;
 	uint16_t m_cass_data[4];
 	void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+	output_finder<6> m_digits;
 };
 
 // This can read the first few bytes correctly, but after that bit slippage occurs.
@@ -85,12 +90,12 @@ WRITE8_MEMBER( pro80_state::segment_w )
 {
 	if (m_digit_sel)
 	{
-		if (!BIT(m_digit_sel, 0)) output().set_digit_value(0, data);
-		if (!BIT(m_digit_sel, 1)) output().set_digit_value(1, data);
-		if (!BIT(m_digit_sel, 2)) output().set_digit_value(2, data);
-		if (!BIT(m_digit_sel, 3)) output().set_digit_value(3, data);
-		if (!BIT(m_digit_sel, 4)) output().set_digit_value(4, data);
-		if (!BIT(m_digit_sel, 5)) output().set_digit_value(5, data);
+		if (!BIT(m_digit_sel, 0)) m_digits[0] = data;
+		if (!BIT(m_digit_sel, 1)) m_digits[1] = data;
+		if (!BIT(m_digit_sel, 2)) m_digits[2] = data;
+		if (!BIT(m_digit_sel, 3)) m_digits[3] = data;
+		if (!BIT(m_digit_sel, 4)) m_digits[4] = data;
+		if (!BIT(m_digit_sel, 5)) m_digits[5] = data;
 
 		m_digit_sel = 0;
 	}
@@ -110,21 +115,23 @@ READ8_MEMBER( pro80_state::kp_r )
 	return data | m_cass_in | 0xc0;
 }
 
-static ADDRESS_MAP_START( pro80_mem, AS_PROGRAM, 8, pro80_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
-	AM_RANGE(0x1400, 0x17ff) AM_RAM // 2nd RAM is optional
-ADDRESS_MAP_END
+void pro80_state::pro80_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x03ff).rom();
+	map(0x1000, 0x13ff).ram();
+	map(0x1400, 0x17ff).ram(); // 2nd RAM is optional
+}
 
-static ADDRESS_MAP_START( pro80_io, AS_IO, 8, pro80_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pio", z80pio_device, read, write)
-	AM_RANGE(0x44, 0x47) AM_READ(kp_r)
-	AM_RANGE(0x48, 0x4b) AM_WRITE(digit_w)
-	AM_RANGE(0x4c, 0x4f) AM_WRITE(segment_w)
-ADDRESS_MAP_END
+void pro80_state::pro80_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x40, 0x43).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x44, 0x47).r(this, FUNC(pro80_state::kp_r));
+	map(0x48, 0x4b).w(this, FUNC(pro80_state::digit_w));
+	map(0x4c, 0x4f).w(this, FUNC(pro80_state::segment_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pro80 )

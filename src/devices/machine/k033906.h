@@ -19,7 +19,7 @@
 ***************************************************************************/
 
 #define MCFG_K033906_VOODOO(_tag) \
-	k033906_device::set_voodoo_tag(*device, "^" _tag);
+	downcast<k033906_device &>(*device).set_voodoo_tag("^" _tag);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -34,7 +34,7 @@ public:
 	// construction/destruction
 	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_voodoo_tag(device_t &device, const char *tag) { downcast<k033906_device &>(device).m_voodoo.set_tag(tag); }
+	void set_voodoo_tag(const char *tag) { m_voodoo.set_tag(tag); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );

@@ -43,4 +43,7 @@ public:
 	void snookr10(machine_config &config);
 	void crystalc(machine_config &config);
 	void tenballs(machine_config &config);
+	void crystalc_map(address_map &map);
+	void snookr10_map(address_map &map);
+	void tenballs_map(address_map &map);
 };

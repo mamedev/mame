@@ -94,28 +94,31 @@ WRITE8_MEMBER( coleco_state::paddle_on_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( coleco_map, AS_PROGRAM, 8, coleco_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) AM_SHARE("ram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void coleco_state::coleco_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x6000, 0x63ff).ram().mirror(0x1c00).share("ram");
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( coleco_io_map, AS_IO, 8, coleco_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_off_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(paddle_on_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE("sn76489a", sn76489a_device, write)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(paddle_1_r)
-	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(paddle_2_r)
-ADDRESS_MAP_END
+void coleco_state::coleco_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x80).mirror(0x1f).w(this, FUNC(coleco_state::paddle_off_w));
+	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
+	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
+	map(0xc0, 0xc0).mirror(0x1f).w(this, FUNC(coleco_state::paddle_on_w));
+	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::write));
+	map(0xe0, 0xe0).mirror(0x1d).r(this, FUNC(coleco_state::paddle_1_r));
+	map(0xe2, 0xe2).mirror(0x1d).r(this, FUNC(coleco_state::paddle_2_r));
+}
 
-static ADDRESS_MAP_START( czz50_map, AS_PROGRAM, 8, coleco_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_MIRROR(0x1c00) AM_SHARE("ram")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void coleco_state::czz50_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x6000, 0x63ff).ram().mirror(0x1c00).share("ram");
+	map(0x8000, 0xffff).rom();
+}
 
 
 /* Input Ports */
@@ -389,6 +392,7 @@ MACHINE_CONFIG_START(coleco_state::coleco)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) // 3.579545 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SN76496_READY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
 
 	/* cartridge */
 	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, nullptr)
@@ -399,7 +403,8 @@ MACHINE_CONFIG_START(coleco_state::coleco)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coleco_state::colecop, coleco)
+MACHINE_CONFIG_START(coleco_state::colecop)
+	coleco(config);
 
 	/* video hardware */
 	MCFG_DEVICE_REMOVE("tms9928a")
@@ -412,14 +417,16 @@ MACHINE_CONFIG_DERIVED(coleco_state::colecop, coleco)
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coleco_state::czz50, coleco)
+MACHINE_CONFIG_START(coleco_state::czz50)
+	coleco(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
 	MCFG_CPU_PROGRAM_MAP(czz50_map)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(coleco_state::dina, czz50)
+MACHINE_CONFIG_START(coleco_state::dina)
+	czz50(config);
 
 	/* video hardware */
 	MCFG_DEVICE_REMOVE("tms9928a")

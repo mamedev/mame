@@ -309,23 +309,23 @@ class nss_state : public snes_state
 {
 public:
 	nss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: snes_state(mconfig, type, tag),
-		m_m50458(*this,"m50458"),
-		m_s3520cf(*this, "s3520cf"),
-		m_rp5h01(*this,"rp5h01"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		: snes_state(mconfig, type, tag)
+		, m_bioscpu(*this, "bios")
+		, m_m50458(*this, "m50458")
+		, m_s3520cf(*this, "s3520cf")
+		, m_rp5h01(*this, "rp5h01")
+		, m_palette(*this, "palette")
 	{ }
 
+	required_device<cpu_device> m_bioscpu;
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
 	required_device<rp5h01_device> m_rp5h01;
-	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 
 	uint8_t m_wram_wp_flag;
 	std::unique_ptr<uint8_t[]> m_wram;
-	uint8_t m_nmi_enable;
+	bool m_nmi_enable;
 	uint8_t m_cart_sel;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -347,10 +347,14 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(nss_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(nss_vblank_irq);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 	void nss(machine_config &config);
+	void bios_io_map(address_map &map);
+	void bios_map(address_map &map);
+	void snes_map(address_map &map);
+	void spc_mem(address_map &map);
 };
 
 
@@ -363,11 +367,12 @@ uint32_t nss_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, 
 
 
 
-static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, nss_state )
-	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)
-	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
-ADDRESS_MAP_END
+void nss_state::snes_map(address_map &map)
+{
+	map(0x000000, 0x7dffff).rw(this, FUNC(nss_state::snes_r_bank1), FUNC(nss_state::snes_w_bank1));
+	map(0x7e0000, 0x7fffff).ram();                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
+	map(0x800000, 0xffffff).rw(this, FUNC(nss_state::snes_r_bank2), FUNC(nss_state::snes_w_bank2));    /* Mirror and ROM */
+}
 
 READ8_MEMBER(nss_state::spc_ram_100_r)
 {
@@ -379,11 +384,12 @@ WRITE8_MEMBER(nss_state::spc_ram_100_w)
 	m_spc700->spc_ram_w(space, offset + 0x100, data);
 }
 
-static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, nss_state )
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", snes_sound_device, spc_ram_r, spc_ram_w) /* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", snes_sound_device, spc_io_r, spc_io_w)   /* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_READWRITE(spc_ram_100_r, spc_ram_100_w)
-ADDRESS_MAP_END
+void nss_state::spc_mem(address_map &map)
+{
+	map(0x0000, 0x00ef).rw(m_spc700, FUNC(snes_sound_device::spc_ram_r), FUNC(snes_sound_device::spc_ram_w)); /* lower 32k ram */
+	map(0x00f0, 0x00ff).rw(m_spc700, FUNC(snes_sound_device::spc_io_r), FUNC(snes_sound_device::spc_io_w));   /* spc io */
+	map(0x0100, 0xffff).rw(this, FUNC(nss_state::spc_ram_100_r), FUNC(nss_state::spc_ram_100_w));
+}
 
 /* NSS specific */
 /*
@@ -502,14 +508,15 @@ WRITE8_MEMBER(nss_state::nss_prot_w)
 }
 
 
-static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(ram_wp_r,ram_wp_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("EEPROMIN")
-	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_REGION("ibios_rom", 0x6000 )
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(nss_prot_r,nss_prot_w)
-ADDRESS_MAP_END
+void nss_state::bios_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x8fff).ram();
+	map(0x9000, 0x9fff).rw(this, FUNC(nss_state::ram_wp_r), FUNC(nss_state::ram_wp_w));
+	map(0xa000, 0xa000).portr("EEPROMIN");
+	map(0xc000, 0xdfff).rom().region("ibios_rom", 0x6000);
+	map(0xe000, 0xffff).rw(this, FUNC(nss_state::nss_prot_r), FUNC(nss_state::nss_prot_w));
+}
 
 READ8_MEMBER(nss_state::port_00_r)
 {
@@ -549,6 +556,8 @@ WRITE8_MEMBER(nss_state::port_00_w)
 */
 	m_wram_wp_flag = (data & 4) >> 2;
 	m_nmi_enable = data & 1;
+	if (!m_nmi_enable)
+		m_bioscpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 }
 
@@ -619,15 +628,16 @@ WRITE8_MEMBER(nss_state::port_07_w)
 	m_joy_flag = 1;
 }
 
-static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_READ(port_00_r) AM_WRITE(port_00_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("FP")  AM_WRITE(port_01_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM") AM_WRITE(port_02_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("RTC") AM_WRITE(port_03_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(port_04_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(port_07_w)
-ADDRESS_MAP_END
+void nss_state::bios_io_map(address_map &map)
+{
+	map.global_mask(0x7);
+	map(0x00, 0x00).r(this, FUNC(nss_state::port_00_r)).w(this, FUNC(nss_state::port_00_w));
+	map(0x01, 0x01).portr("FP").w(this, FUNC(nss_state::port_01_w));
+	map(0x02, 0x02).portr("SYSTEM").w(this, FUNC(nss_state::port_02_w));
+	map(0x03, 0x03).portr("RTC").w(this, FUNC(nss_state::port_03_w));
+	map(0x04, 0x04).w(this, FUNC(nss_state::port_04_w));
+	map(0x07, 0x07).w(this, FUNC(nss_state::port_07_w));
+}
 
 void nss_state::machine_start()
 {
@@ -651,7 +661,7 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("FP")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nss_state,game_over_flag_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nss_state,game_over_flag_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Restart Button")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Page Up Button")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Page Down Button")
@@ -661,8 +671,8 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Game 1 Button")
 
 	PORT_START("EEPROMIN")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, read_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, ready_line )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, read_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, ready_line )
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("EEPROMOUT")
@@ -681,7 +691,7 @@ static INPUT_PORTS_START( snes )
 
 	PORT_START("RTC")
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, read_bit)
 
 	PORT_START("SERIAL1_DATA1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1)
@@ -794,10 +804,10 @@ static INPUT_PORTS_START( snes )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(nss_state::nss_vblank_irq)
+WRITE_LINE_MEMBER(nss_state::nss_vblank_irq)
 {
-	if(m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_enable)
+		m_bioscpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 void nss_state::machine_reset()
@@ -834,7 +844,6 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_CPU_ADD("bios", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(bios_map)
 	MCFG_CPU_IO_MAP(bios_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nss_state,  nss_vblank_irq)
 
 	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
@@ -855,6 +864,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(nss_state, nss_vblank_irq))
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
 	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))

@@ -53,4 +53,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void vulgus(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

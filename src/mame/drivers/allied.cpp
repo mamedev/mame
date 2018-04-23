@@ -27,6 +27,7 @@
   For some reason the 'rol $46' instruction outputs the original data
   followed by the new result, so I've had to employ a horrible hack.
 
+  Hold down X while inserting a coin.
   At the start of each ball, the display will be flashing. You need to
   hit Z, and then you can get a score. When the ball indicator goes out,
   your game is over.
@@ -63,6 +64,8 @@ public:
 		, m_ic6(*this, "ic6")
 		, m_ic7(*this, "ic7")
 		, m_ic8(*this, "ic8")
+		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(ic1_b_w);
@@ -86,6 +89,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ic8_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void allied(machine_config &config);
+	void allied_map(address_map &map);
 private:
 	uint32_t m_player_score[6];
 	uint8_t m_display;
@@ -98,6 +102,7 @@ private:
 	uint8_t m_ic6b4;
 	uint8_t m_ic6b7;
 	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
 	required_device<pia6821_device> m_ic2;
@@ -106,21 +111,24 @@ private:
 	required_device<mos6530_device> m_ic6;
 	required_device<pia6821_device> m_ic7;
 	required_device<pia6821_device> m_ic8;
+	output_finder<42> m_digits;
+	output_finder<7> m_leds;
 };
 
 
-static ADDRESS_MAP_START( allied_map, AS_PROGRAM, 8, allied_state )
-	AM_RANGE(0x0000, 0x003f) AM_RAM // ic6
-	AM_RANGE(0x0044, 0x0047) AM_DEVREADWRITE("ic2", pia6821_device, read, write)
-	AM_RANGE(0x0048, 0x004b) AM_DEVREADWRITE("ic1", pia6821_device, read, write)
-	AM_RANGE(0x0050, 0x0053) AM_DEVREADWRITE("ic7", pia6821_device, read, write)
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ic4", pia6821_device, read, write)
-	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE("ic5", mos6530_device, read, write)
-	AM_RANGE(0x0840, 0x084f) AM_DEVREADWRITE("ic6", mos6530_device, read, write)
-	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE("ic8", pia6821_device, read, write)
-	AM_RANGE(0x0100, 0x013f) AM_RAM // ic5
-	AM_RANGE(0x1400, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void allied_state::allied_map(address_map &map)
+{
+	map(0x0000, 0x003f).ram(); // ic6
+	map(0x0044, 0x0047).rw(m_ic2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0048, 0x004b).rw(m_ic1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0050, 0x0053).rw(m_ic7, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0060, 0x0063).rw(m_ic4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0080, 0x008f).rw(m_ic5, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x0840, 0x084f).rw(m_ic6, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map(0x00c0, 0x00c3).rw(m_ic8, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0100, 0x013f).ram(); // ic5
+	map(0x1400, 0x1fff).rom();
+}
 
 static INPUT_PORTS_START( allied )
 	PORT_START("TEST")
@@ -411,34 +419,34 @@ WRITE8_MEMBER( allied_state::ic4_b_w )
 	{
 		if (!BIT(data, i+4))
 		{
-			output().set_digit_value(i*10, patterns[0]);
+			m_digits[i*10] = patterns[0];
 			segment = (m_player_score[i] >> 0) & 15;
-			output().set_digit_value(i*10+1, patterns[segment]);
+			m_digits[i*10+1] = patterns[segment];
 			segment = (m_player_score[i] >> 4) & 15;
-			output().set_digit_value(i*10+2, patterns[segment]);
+			m_digits[i*10+2] =  patterns[segment];
 			segment = (m_player_score[i] >> 8) & 15;
-			output().set_digit_value(i*10+3, patterns[segment]);
+			m_digits[i*10+3] = patterns[segment];
 			segment = (m_player_score[i] >> 12) & 15;
-			output().set_digit_value(i*10+4, patterns[segment]);
+			m_digits[i*10+4] = patterns[segment];
 			segment = (m_player_score[i] >> 16) & 15;
-			output().set_digit_value(i*10+5, patterns[segment]);
+			m_digits[i*10+5] = patterns[segment];
 		}
 		else
 		{
-			output().set_digit_value(i*10, 0);
-			output().set_digit_value(i*10+1, 0);
-			output().set_digit_value(i*10+2, 0);
-			output().set_digit_value(i*10+3, 0);
-			output().set_digit_value(i*10+4, 0);
-			output().set_digit_value(i*10+5, 0);
+			m_digits[i*10] = 0;
+			m_digits[i*10+1] = 0;
+			m_digits[i*10+2] = 0;
+			m_digits[i*10+3] = 0;
+			m_digits[i*10+4] = 0;
+			m_digits[i*10+5] = 0;
 		}
 	}
 
 	// doesn't seem to be a strobe for the credits display
 	segment = (m_player_score[4] >> 0) & 15;
-	output().set_digit_value(40, patterns[segment]);
+	m_digits[40] = patterns[segment];
 	segment = (m_player_score[4] >> 4) & 15;
-	output().set_digit_value(41, patterns[segment]);
+	m_digits[41] = patterns[segment];
 
 // PB0-3 - player 1-4 LED - to do
 }
@@ -572,12 +580,8 @@ WRITE8_MEMBER( allied_state::ic8_a_w )
 // PB0-4 = ball 1-5 LED; PB5 = shoot again lamp
 WRITE8_MEMBER( allied_state::ic8_b_w )
 {
-	output().set_value("led1", !BIT(data, 0));
-	output().set_value("led2", !BIT(data, 1));
-	output().set_value("led3", !BIT(data, 2));
-	output().set_value("led4", !BIT(data, 3));
-	output().set_value("led5", !BIT(data, 4));
-	output().set_value("led6", !BIT(data, 5));
+	for (int i = 0; i < 6; i++)
+		m_leds[i+1] = !BIT(data, i);
 }
 
 // this line not emulated in PinMAME, maybe it isn't needed
@@ -596,6 +600,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 	m_ic8->ca2_w(BIT(data, 6));
 }
 
+void allied_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
+}
+
 void allied_state::machine_reset()
 {
 	m_display = 0;
@@ -607,7 +617,7 @@ void allied_state::machine_reset()
 	m_ic6a2 = 0;
 	m_ic6b4 = 0;
 	m_ic6b7 = 0;
-	output().set_value("led0", 1);  //1=off
+	m_leds[0] = 1;
 }
 
 MACHINE_CONFIG_START(allied_state::allied)
@@ -619,7 +629,7 @@ MACHINE_CONFIG_START(allied_state::allied)
 	MCFG_DEFAULT_LAYOUT(layout_allied)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ic1", PIA6821, 0)

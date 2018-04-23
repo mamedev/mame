@@ -164,6 +164,8 @@ public:
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
 	void rblaster(machine_config &config);
+	void rblaster_map(address_map &map);
+	void rblaster_sound_map(address_map &map);
 };
 
 void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
@@ -267,26 +269,27 @@ READ8_MEMBER(deco_ld_state::acia_status_hack_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0") AM_WRITENOP // (w) coin lockout
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN1")
-	AM_RANGE(0x1004, 0x1004) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(decold_sound_cmd_w)
-	AM_RANGE(0x1005, 0x1005) AM_READ(sound_status_r)
+void deco_ld_state::rblaster_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1000).portr("IN0").nopw(); // (w) coin lockout
+	map(0x1001, 0x1001).portr("DSW1");
+	map(0x1002, 0x1002).portr("DSW2");
+	map(0x1003, 0x1003).portr("IN1");
+	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(this, FUNC(deco_ld_state::decold_sound_cmd_w));
+	map(0x1005, 0x1005).r(this, FUNC(deco_ld_state::sound_status_r));
 	//AM_RANGE(0x1006, 0x1007) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x1006, 0x1006) AM_READ(acia_status_hack_r)
-	AM_RANGE(0x1007, 0x1007) AM_DEVREADWRITE("laserdisc", sony_ldp1000_device, status_r, command_w)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("vram0")
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("attr0")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("vram1")
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM AM_SHARE("attr1")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+	map(0x1006, 0x1006).r(this, FUNC(deco_ld_state::acia_status_hack_r));
+	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
+	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2000, 0x27ff).ram();
+	map(0x2800, 0x2bff).ram().share("vram0");
+	map(0x2c00, 0x2fff).ram().share("attr0");
+	map(0x3000, 0x37ff).ram();
+	map(0x3800, 0x3bff).ram().share("vram1");
+	map(0x3c00, 0x3fff).ram().share("attr1");
+	map(0x4000, 0xffff).rom();
+}
 
 
 /* sound arrangement is pratically identical to Zero Target. */
@@ -304,15 +307,16 @@ INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 }
 
 
-static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8, deco_ld_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void deco_ld_state::rblaster_sound_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x2000, 0x2000).w("ay1", FUNC(ay8910_device::data_w));
+	map(0x4000, 0x4000).w("ay1", FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::data_w));
+	map(0x8000, 0x8000).w("ay2", FUNC(ay8910_device::address_w));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
+	map(0xe000, 0xffff).rom();
+}
 
 CUSTOM_INPUT_MEMBER( deco_ld_state::begas_vblank_r )
 {
@@ -357,7 +361,7 @@ static INPUT_PORTS_START( begas )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, nullptr) // TODO: IPT_VBLANK doesn't seem to work fine?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF,deco_ld_state,begas_vblank_r, nullptr) // TODO: IPT_VBLANK doesn't seem to work fine?
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )

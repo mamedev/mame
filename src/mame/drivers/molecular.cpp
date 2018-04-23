@@ -94,6 +94,10 @@ public:
 	DECLARE_PALETTE_INIT(molecula);
 
 	void molecula(machine_config &config);
+	void molecula_app_io(address_map &map);
+	void molecula_app_map(address_map &map);
+	void molecula_file_io(address_map &map);
+	void molecula_file_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -171,25 +175,29 @@ WRITE8_MEMBER( molecula_state::sio_w)
 		printf("%c\n",data);
 }
 
-static ADDRESS_MAP_START( molecula_file_map, AS_PROGRAM, 8, molecula_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(file_r,file_w)
-ADDRESS_MAP_END
+void molecula_state::molecula_file_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(molecula_state::file_r), FUNC(molecula_state::file_w));
+}
 
-static ADDRESS_MAP_START( molecula_file_io, AS_IO, 8, molecula_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+void molecula_state::molecula_file_io(address_map &map)
+{
+	map.global_mask(0xff);
 //  AM_RANGE(0x40, 0x43) AM_READWRITE(sio_r,sio_w)
-	AM_RANGE(0x72, 0x73) AM_WRITE(file_output_w) // unknown
-ADDRESS_MAP_END
+	map(0x72, 0x73).w(this, FUNC(molecula_state::file_output_w)); // unknown
+}
 
-static ADDRESS_MAP_START( molecula_app_map, AS_PROGRAM, 8, molecula_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(app_r,app_w)
-ADDRESS_MAP_END
+void molecula_state::molecula_app_map(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(molecula_state::app_r), FUNC(molecula_state::app_w));
+}
 
-static ADDRESS_MAP_START( molecula_app_io, AS_IO, 8, molecula_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(app_output_w)
-	AM_RANGE(0x60, 0x63) AM_READWRITE(sio_r,sio_w)
-ADDRESS_MAP_END
+void molecula_state::molecula_app_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x10, 0x10).w(this, FUNC(molecula_state::app_output_w));
+	map(0x60, 0x63).rw(this, FUNC(molecula_state::sio_r), FUNC(molecula_state::sio_w));
+}
 
 static INPUT_PORTS_START( molecula )
 	/* dummy active high structure */

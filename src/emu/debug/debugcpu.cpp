@@ -29,12 +29,6 @@
 #include <fstream>
 
 
-enum
-{
-	EXECUTION_STATE_STOPPED,
-	EXECUTION_STATE_RUNNING
-};
-
 const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
 
 /*-------------------------------------------------
@@ -49,7 +43,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_breakcpu(nullptr)
 	, m_symtable(nullptr)
 	, m_vblank_occurred(false)
-	, m_execution_state(EXECUTION_STATE_STOPPED)
+	, m_execution_state(exec_state::STOPPED)
 	, m_stop_when_not_device(nullptr)
 	, m_bpindex(1)
 	, m_wpindex(1)
@@ -59,8 +53,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_last_periodic_update_time(0)
 	, m_comments_loaded(false)
 {
-	screen_device *first_screen = m_machine.first_screen();
-
 	m_tempvar = make_unique_clear<u64[]>(NUM_TEMP_VARIABLES);
 
 	/* create a global symbol table */
@@ -75,9 +67,28 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 
 	using namespace std::placeholders;
 	m_symtable->add("cpunum", std::bind(&debugger_cpu::get_cpunum, this, _1));
-	m_symtable->add("beamx", std::bind(&debugger_cpu::get_beamx, this, _1, first_screen));
-	m_symtable->add("beamy", std::bind(&debugger_cpu::get_beamy, this, _1, first_screen));
-	m_symtable->add("frame", std::bind(&debugger_cpu::get_frame, this, _1, first_screen));
+
+	screen_device_iterator screen_iterator = screen_device_iterator(m_machine.root_device());
+	screen_device_iterator::auto_iterator iter = screen_iterator.begin();
+	const uint32_t count = (uint32_t)screen_iterator.count();
+
+	if (count == 1)
+	{
+		m_symtable->add("beamx", std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
+		m_symtable->add("beamy", std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
+		m_symtable->add("frame", std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
+		iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
+	}
+	else if (count > 1)
+	{
+		for (uint32_t i = 0; i < count; i++, iter++)
+		{
+			m_symtable->add(string_format("beamx%d", i).c_str(), std::bind(&debugger_cpu::get_beamx, this, _1, iter.current()));
+			m_symtable->add(string_format("beamy%d", i).c_str(), std::bind(&debugger_cpu::get_beamy, this, _1, iter.current()));
+			m_symtable->add(string_format("frame%d", i).c_str(), std::bind(&debugger_cpu::get_frame, this, _1, iter.current()));
+			iter.current()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
+		}
+	}
 
 	/* add the temporary variables to the global symbol table */
 	for (int regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
@@ -97,10 +108,6 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 			break;
 		}
 	}
-
-	/* add callback for breaking on VBLANK */
-	if (m_machine.first_screen() != nullptr)
-		m_machine.first_screen()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
 }
 
 void debugger_cpu::configure_memory(symbol_table &table)
@@ -131,56 +138,8 @@ void debugger_cpu::flush_traces()
 
 
 /***************************************************************************
-    DEBUGGING STATUS AND INFORMATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    get_visible_cpu - return the visible CPU
-    device (the one that commands should apply to)
--------------------------------------------------*/
-
-device_t* debugger_cpu::get_visible_cpu()
-{
-	return m_visiblecpu;
-}
-
-
-/*-------------------------------------------------
-    within_instruction_hook - true if the debugger
-    is currently live
--------------------------------------------------*/
-
-bool debugger_cpu::within_instruction_hook()
-{
-	return m_within_instruction_hook;
-}
-
-
-/*-------------------------------------------------
-    is_stopped - return true if the
-    current execution state is stopped
--------------------------------------------------*/
-
-bool debugger_cpu::is_stopped()
-{
-	return m_execution_state == EXECUTION_STATE_STOPPED;
-}
-
-
-/***************************************************************************
     SYMBOL TABLE INTERFACES
 ***************************************************************************/
-
-/*-------------------------------------------------
-    get_global_symtable - return the global
-    symbol table
--------------------------------------------------*/
-
-symbol_table* debugger_cpu::get_global_symtable()
-{
-	return m_symtable.get();
-}
-
 
 /*-------------------------------------------------
     get_visible_symtable - return the
@@ -762,7 +721,7 @@ void debugger_cpu::process_source_file()
 	std::string buf;
 
 	// loop until the file is exhausted or until we are executing again
-	while (m_execution_state == EXECUTION_STATE_STOPPED
+	while (m_execution_state == exec_state::STOPPED
 			&& m_source_file
 			&& std::getline(*m_source_file, buf))
 	{
@@ -835,7 +794,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				return read_memory(space, address, size, true);
 			}
 			break;
@@ -859,7 +818,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				return read_memory(space, address, size, false);
 			}
 			break;
@@ -877,7 +836,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			return expression_read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
@@ -894,7 +853,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			return expression_read_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 		}
@@ -1040,7 +999,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				write_memory(space, address, data, size, true);
 			}
 			break;
@@ -1059,7 +1018,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
-				auto dis = m_machine.disable_side_effect(disable_se);
+				auto dis = m_machine.disable_side_effects(disable_se);
 				write_memory(space, address, data, size, false);
 			}
 			break;
@@ -1072,7 +1031,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			expression_write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 		}
@@ -1085,7 +1044,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 				device = get_visible_cpu();
 				memory = &device->memory();
 			}
-			auto dis = m_machine.disable_side_effect(disable_se);
+			auto dis = m_machine.disable_side_effects(disable_se);
 			expression_write_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 		}
@@ -1359,12 +1318,12 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 	if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device)
 	{
 		m_stop_when_not_device = nullptr;
-		m_execution_state = EXECUTION_STATE_STOPPED;
+		m_execution_state = exec_state::STOPPED;
 		reset_transient_flags();
 	}
 
 	// if we're running, do some periodic updating
-	if (m_execution_state != EXECUTION_STATE_STOPPED)
+	if (m_execution_state != exec_state::STOPPED)
 	{
 		if (device == m_visiblecpu && osd_ticks() > m_last_periodic_update_time + osd_ticks_per_second() / 4)
 		{   // check for periodic updates
@@ -1374,7 +1333,7 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 		}
 		else if (device == m_breakcpu)
 		{   // check for pending breaks
-			m_execution_state = EXECUTION_STATE_STOPPED;
+			m_execution_state = exec_state::STOPPED;
 			m_breakcpu = nullptr;
 		}
 
@@ -1386,7 +1345,7 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 			// if we were waiting for a VBLANK, signal it now
 			if (stop_on_vblank)
 			{
-				m_execution_state = EXECUTION_STATE_STOPPED;
+				m_execution_state = exec_state::STOPPED;
 				m_machine.debugger().console().printf("Stopped at VBLANK\n");
 			}
 		}
@@ -1422,13 +1381,13 @@ void debugger_cpu::ensure_comments_loaded()
 void debugger_cpu::go_next_device(device_t *device)
 {
 	m_stop_when_not_device = device;
-	m_execution_state = EXECUTION_STATE_RUNNING;
+	m_execution_state = exec_state::RUNNING;
 }
 
 void debugger_cpu::go_vblank()
 {
 	m_vblank_occurred = false;
-	m_execution_state = EXECUTION_STATE_RUNNING;
+	m_execution_state = exec_state::RUNNING;
 }
 
 void debugger_cpu::halt_on_next_instruction(device_t *device, util::format_argument_pack<std::ostream> &&args)
@@ -1443,7 +1402,7 @@ void debugger_cpu::halt_on_next_instruction(device_t *device, util::format_argum
 	// if we are live, stop now, otherwise note that we want to break there
 	if (device == m_livecpu)
 	{
-		m_execution_state = EXECUTION_STATE_STOPPED;
+		m_execution_state = exec_state::STOPPED;
 		if (m_livecpu != nullptr)
 			m_livecpu->debug()->compute_debug_flags();
 	}
@@ -1621,7 +1580,7 @@ void device_debug::interrupt_hook(int irqline)
 	// see if this matches a pending interrupt request
 	if ((m_flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (m_stopirq == -1 || m_stopirq == irqline))
 	{
-		m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_STOPPED);
+		m_device.machine().debugger().cpu().set_execution_stopped();
 		m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d)\n", m_device.tag(), irqline);
 		compute_debug_flags();
 	}
@@ -1638,7 +1597,7 @@ void device_debug::exception_hook(int exception)
 	// see if this matches a pending interrupt request
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
-		m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_STOPPED);
+		m_device.machine().debugger().cpu().set_execution_stopped();
 		m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %d)\n", m_device.tag(), exception);
 		compute_debug_flags();
 	}
@@ -1677,11 +1636,11 @@ void device_debug::instruction_hook(offs_t curpc)
 		m_trace->update(curpc);
 
 	// per-instruction hook?
-	if (debugcpu.execution_state() != EXECUTION_STATE_STOPPED && (m_flags & DEBUG_FLAG_HOOKED) != 0 && (*m_instrhook)(m_device, curpc))
-		debugcpu.set_execution_state(EXECUTION_STATE_STOPPED);
+	if (!debugcpu.is_stopped() && (m_flags & DEBUG_FLAG_HOOKED) != 0 && (*m_instrhook)(m_device, curpc))
+		debugcpu.set_execution_stopped();
 
 	// handle single stepping
-	if (debugcpu.execution_state() != EXECUTION_STATE_STOPPED && (m_flags & DEBUG_FLAG_STEPPING_ANY) != 0)
+	if (!debugcpu.is_stopped() && (m_flags & DEBUG_FLAG_STEPPING_ANY) != 0)
 	{
 		// is this an actual step?
 		if (m_stepaddr == ~0 || curpc == m_stepaddr)
@@ -1692,7 +1651,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 			// if we hit 0, stop
 			if (m_stepsleft == 0)
-				debugcpu.set_execution_state(EXECUTION_STATE_STOPPED);
+				debugcpu.set_execution_stopped();
 
 			// update every 100 steps until we are within 200 of the end
 			else if ((m_flags & DEBUG_FLAG_STEPPING_OUT) == 0 && (m_stepsleft < 200 || m_stepsleft % 100 == 0))
@@ -1705,20 +1664,20 @@ void device_debug::instruction_hook(offs_t curpc)
 	}
 
 	// handle breakpoints
-	if (debugcpu.execution_state() != EXECUTION_STATE_STOPPED && (m_flags & (DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_LIVE_BP)) != 0)
+	if (!debugcpu.is_stopped() && (m_flags & (DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_LIVE_BP)) != 0)
 	{
 		// see if we hit a target time
 		if ((m_flags & DEBUG_FLAG_STOP_TIME) != 0 && machine.time() >= m_stoptime)
 		{
 			machine.debugger().console().printf("Stopped at time interval %.1g\n", machine.time().as_double());
-			debugcpu.set_execution_state(EXECUTION_STATE_STOPPED);
+			debugcpu.set_execution_stopped();
 		}
 
 		// check the temp running breakpoint and break if we hit it
 		else if ((m_flags & DEBUG_FLAG_STOP_PC) != 0 && m_stopaddr == curpc)
 		{
 			machine.debugger().console().printf("Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag());
-			debugcpu.set_execution_state(EXECUTION_STATE_STOPPED);
+			debugcpu.set_execution_stopped();
 		}
 
 		// check for execution breakpoints
@@ -1727,7 +1686,7 @@ void device_debug::instruction_hook(offs_t curpc)
 	}
 
 	// if we are supposed to halt, do it now
-	if (debugcpu.execution_state() == EXECUTION_STATE_STOPPED)
+	if (debugcpu.is_stopped())
 	{
 		bool firststop = true;
 
@@ -1747,7 +1706,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 		// wait for the debugger; during this time, disable sound output
 		m_device.machine().sound().debugger_mute(true);
-		while (debugcpu.execution_state() == EXECUTION_STATE_STOPPED)
+		while (debugcpu.is_stopped())
 		{
 			// flush any pending updates before waiting again
 			machine.debug_view().flush_osd_updates();
@@ -1772,7 +1731,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 			// if an event got scheduled, resume
 			if (machine.scheduled_event_pending())
-				debugcpu.set_execution_state(EXECUTION_STATE_RUNNING);
+				debugcpu.set_execution_running();
 		}
 		m_device.machine().sound().debugger_mute(false);
 
@@ -1782,7 +1741,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 	// handle step out/over on the instruction we are about to execute
 	if ((m_flags & (DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT)) != 0 && m_stepaddr == ~0)
-		prepare_for_step_overout(m_device.safe_pcbase());
+		prepare_for_step_overout(m_state->pcbase());
 
 	// no longer in debugger code
 	debugcpu.set_within_instruction(false);
@@ -1861,6 +1820,29 @@ void device_debug::ignore(bool ignore)
 	}
 }
 
+//-------------------------------------------------
+//  suspend
+//-------------------------------------------------
+
+void device_debug::suspend(bool suspend)
+{
+	assert(m_exec != nullptr);
+
+	if (suspend) {
+		m_flags |= DEBUG_FLAG_SUSPENDED;
+		m_exec->suspend(SUSPEND_REASON_HALT, 1);
+	}
+	else {
+		m_flags &= ~DEBUG_FLAG_SUSPENDED;
+		m_exec->resume(SUSPEND_REASON_HALT);
+	}
+
+	if (&m_device == m_device.machine().debugger().cpu().live_cpu() && suspend)
+	{
+		assert(m_exec != nullptr);
+		go_next_device();
+	}
+}
 
 //-------------------------------------------------
 //  single_step - single step the device past the
@@ -1875,7 +1857,7 @@ void device_debug::single_step(int numsteps)
 	m_stepsleft = numsteps;
 	m_stepaddr = ~0;
 	m_flags |= DEBUG_FLAG_STEPPING;
-	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
+	m_device.machine().debugger().cpu().set_execution_running();
 }
 
 
@@ -1892,7 +1874,7 @@ void device_debug::single_step_over(int numsteps)
 	m_stepsleft = numsteps;
 	m_stepaddr = ~0;
 	m_flags |= DEBUG_FLAG_STEPPING_OVER;
-	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
+	m_device.machine().debugger().cpu().set_execution_running();
 }
 
 
@@ -1909,7 +1891,7 @@ void device_debug::single_step_out()
 	m_stepsleft = 100;
 	m_stepaddr = ~0;
 	m_flags |= DEBUG_FLAG_STEPPING_OUT;
-	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
+	m_device.machine().debugger().cpu().set_execution_running();
 }
 
 
@@ -1925,7 +1907,7 @@ void device_debug::go(offs_t targetpc)
 	m_device.machine().rewind_invalidate();
 	m_stopaddr = targetpc;
 	m_flags |= DEBUG_FLAG_STOP_PC;
-	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
+	m_device.machine().debugger().cpu().set_execution_running();
 }
 
 
@@ -1955,7 +1937,7 @@ void device_debug::go_interrupt(int irqline)
 	m_device.machine().rewind_invalidate();
 	m_stopirq = irqline;
 	m_flags |= DEBUG_FLAG_STOP_INTERRUPT;
-	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
+	m_device.machine().debugger().cpu().set_execution_running();
 }
 
 void device_debug::go_next_device()
@@ -1975,7 +1957,7 @@ void device_debug::go_exception(int exception)
 	m_device.machine().rewind_invalidate();
 	m_stopexception = exception;
 	m_flags |= DEBUG_FLAG_STOP_EXCEPTION;
-	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
+	m_device.machine().debugger().cpu().set_execution_running();
 }
 
 
@@ -1991,7 +1973,7 @@ void device_debug::go_milliseconds(u64 milliseconds)
 	m_device.machine().rewind_invalidate();
 	m_stoptime = m_device.machine().time() + attotime::from_msec(milliseconds);
 	m_flags |= DEBUG_FLAG_STOP_TIME;
-	m_device.machine().debugger().cpu().set_execution_state(EXECUTION_STATE_RUNNING);
+	m_device.machine().debugger().cpu().set_execution_running();
 }
 
 
@@ -2543,7 +2525,7 @@ void device_debug::compute_debug_flags()
 		return;
 
 	// if we're stopped, keep calling the hook
-	if (debugcpu.execution_state() == EXECUTION_STATE_STOPPED)
+	if (debugcpu.is_stopped())
 		machine.debug_flags |= DEBUG_FLAG_CALL_HOOK;
 
 	// if we're tracking history, or we're hooked, or stepping, or stopping at a breakpoint
@@ -2582,7 +2564,7 @@ void device_debug::prepare_for_step_overout(offs_t pc)
 		// if we need to skip additional instructions, advance as requested
 		while (extraskip-- > 0) {
 			u32 result = buffer.disassemble_info(pc);
-			pc += buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
+			pc = buffer.next_pc_wrap(pc, result & util::disasm_interface::LENGTHMASK);
 		}
 		m_stepaddr = pc;
 	}
@@ -2646,14 +2628,14 @@ void device_debug::breakpoint_check(offs_t pc)
 		if (bp->hit(pc))
 		{
 			// halt in the debugger by default
-			debugcpu.set_execution_state(EXECUTION_STATE_STOPPED);
+			debugcpu.set_execution_stopped();
 
 			// if we hit, evaluate the action
 			if (!bp->m_action.empty())
 				m_device.machine().debugger().console().execute_command(bp->m_action, false);
 
 			// print a notification, unless the action made us go again
-			if (debugcpu.execution_state() == EXECUTION_STATE_STOPPED)
+			if (debugcpu.is_stopped())
 				m_device.machine().debugger().console().printf("Stopped at breakpoint %X\n", bp->m_index);
 			break;
 		}
@@ -2664,7 +2646,7 @@ void device_debug::breakpoint_check(offs_t pc)
 		if (rp->hit())
 		{
 			// halt in the debugger by default
-			debugcpu.set_execution_state(EXECUTION_STATE_STOPPED);
+			debugcpu.set_execution_stopped();
 
 			// if we hit, evaluate the action
 			if (!rp->m_action.empty())
@@ -2673,7 +2655,7 @@ void device_debug::breakpoint_check(offs_t pc)
 			}
 
 			// print a notification, unless the action made us go again
-			if (debugcpu.execution_state() == EXECUTION_STATE_STOPPED)
+			if (debugcpu.is_stopped())
 			{
 				m_device.machine().debugger().console().printf("Stopped at registerpoint %X\n", rp->m_index);
 			}
@@ -2726,7 +2708,7 @@ void device_debug::watchpoint_check(address_space& space, int type, offs_t addre
 void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, std::vector<device_debug::watchpoint *> &wplist)
 {
 	// if we're within debugger code, don't stop
-	if (m_within_instruction_hook || m_machine.side_effect_disabled())
+	if (m_within_instruction_hook || m_machine.side_effects_disabled())
 		return;
 
 	m_within_instruction_hook = true;
@@ -2781,20 +2763,20 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 			if (wp->hit(type, address, size))
 			{
 				// halt in the debugger by default
-				m_execution_state = EXECUTION_STATE_STOPPED;
+				m_execution_state = exec_state::STOPPED;
 
 				// if we hit, evaluate the action
 				if (!wp->action().empty())
 					m_machine.debugger().console().execute_command(wp->action(), false);
 
 				// print a notification, unless the action made us go again
-				if (m_execution_state == EXECUTION_STATE_STOPPED)
+				if (m_execution_state == exec_state::STOPPED)
 				{
 					static const char *const sizes[] =
 					{
 						"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
 					};
-					offs_t pc = space.device().safe_pcbase();
+					offs_t pc = space.device().state().pcbase();
 					std::string buffer;
 
 					if (type & WATCHPOINT_WRITE)
@@ -2824,7 +2806,7 @@ void debugger_cpu::watchpoint_check(address_space& space, int type, offs_t addre
 
 void device_debug::hotspot_check(address_space &space, offs_t address)
 {
-	offs_t curpc = m_device.safe_pcbase();
+	offs_t curpc = m_device.state().pcbase();
 
 	// see if we have a match in our list
 	unsigned int hotindex;
@@ -2870,7 +2852,7 @@ void device_debug::hotspot_check(address_space &space, offs_t address)
 u64 device_debug::get_current_pc(symbol_table &table)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->safe_pcbase();
+	return device->state().pcbase();
 }
 
 

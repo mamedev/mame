@@ -58,6 +58,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_switch(*this, "SWITCH.%u", 0)
 		, m_testipt(*this, "TEST.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_DRIVER_INIT(v115);
@@ -68,30 +69,36 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	void g627(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_seg[6];
 	uint8_t m_portc;
 	uint8_t m_motor;
 	bool m_type;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<7> m_switch;
 	required_ioport_array<6> m_testipt;
+	output_finder<56> m_digits;
 };
 
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, g627_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_DEVREADWRITE("i8156", i8155_device, memory_r, memory_w)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("nvram") // battery backed
-ADDRESS_MAP_END
+void g627_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0xc000, 0xc0ff).rw("i8156", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0xe000, 0xe0ff).ram().share("nvram"); // battery backed
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, g627_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x02) AM_WRITE(disp_w)
-	AM_RANGE(0x03, 0x07) AM_WRITE(lamp_w)
-	AM_RANGE(0x10, 0x17) AM_DEVWRITE("astrocade", astrocade_device, astrocade_sound_w)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("i8156", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+void g627_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x02).w(this, FUNC(g627_state::disp_w));
+	map(0x03, 0x07).w(this, FUNC(g627_state::lamp_w));
+	map(0x10, 0x17).w("astrocade", FUNC(astrocade_device::astrocade_sound_w));
+	map(0x20, 0x27).rw("i8156", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 static INPUT_PORTS_START( g627 )
 	PORT_START("SWITCH.0")
@@ -210,22 +217,22 @@ WRITE8_MEMBER( g627_state::portc_w )
 	m_portc = data;
 	if ((m_type) && (data < 6))
 	{
-		output().set_digit_value(data, m_seg[0]);
-		output().set_digit_value(10 + data, m_seg[1]);
-		output().set_digit_value(20 + data, m_seg[2]);
-		output().set_digit_value(30 + data, m_seg[3]);
-		output().set_digit_value(50 + data, m_seg[5]);
+		m_digits[data] = m_seg[0];
+		m_digits[10 + data] = m_seg[1];
+		m_digits[20 + data] = m_seg[2];
+		m_digits[30 + data] = m_seg[3];
+		m_digits[50 + data] = m_seg[5];
 	}
 	else
-	if ((!m_type) && (data))
+	if ((!m_type) && (data) && (data < 7))
 	{
 		data--;
 
-		output().set_digit_value(data, m_seg[0]);
-		output().set_digit_value(10 + data, m_seg[1]);
-		output().set_digit_value(20 + data, m_seg[2]);
-		output().set_digit_value(30 + data, m_seg[3]);
-		output().set_digit_value(50 + data, m_seg[5]);
+		m_digits[data] = m_seg[0];
+		m_digits[10 + data] = m_seg[1];
+		m_digits[20 + data] = m_seg[2];
+		m_digits[30 + data] = m_seg[3];
+		m_digits[50 + data] = m_seg[5];
 	}
 }
 
@@ -302,7 +309,7 @@ MACHINE_CONFIG_START(g627_state::g627)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("astrocade",  ASTROCADE, 14138000/8) // 0066-117XX audio chip
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

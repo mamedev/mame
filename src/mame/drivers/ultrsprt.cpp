@@ -53,6 +53,8 @@ public:
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ultrsprt(machine_config &config);
+	void sound_map(address_map &map);
+	void ultrsprt_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -146,28 +148,30 @@ READ16_MEMBER(ultrsprt_state::upd2_r)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32, ultrsprt_state )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAMBANK("vram")
-	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE8(eeprom_r, eeprom_w, 0xff000000)
-	AM_RANGE(0x70000020, 0x70000023) AM_READ16(upd1_r, 0xffffffff)
-	AM_RANGE(0x70000040, 0x70000043) AM_READ16(upd2_r, 0xffffffff)
-	AM_RANGE(0x70000080, 0x7000008f) AM_DEVREADWRITE8("k056800", k056800_device, host_r, host_w, 0xffffffff)
-	AM_RANGE(0x700000c0, 0x700000cf) AM_WRITENOP // Written following DMA interrupt - unused int ack?
-	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
-	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_DEVWRITE("palette",  palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("program", 0)
-ADDRESS_MAP_END
+void ultrsprt_state::ultrsprt_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).bankrw("vram");
+	map(0x70000000, 0x70000000).rw(this, FUNC(ultrsprt_state::eeprom_r), FUNC(ultrsprt_state::eeprom_w));
+	map(0x70000020, 0x70000023).r(this, FUNC(ultrsprt_state::upd1_r));
+	map(0x70000040, 0x70000043).r(this, FUNC(ultrsprt_state::upd2_r));
+	map(0x70000080, 0x7000008f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
+	map(0x700000c0, 0x700000cf).nopw(); // Written following DMA interrupt - unused int ack?
+	map(0x700000e0, 0x700000e3).w(this, FUNC(ultrsprt_state::int_ack_w));
+	map(0x7f000000, 0x7f01ffff).ram().share("workram");
+	map(0x7f700000, 0x7f703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x7f800000, 0x7f9fffff).mirror(0x00600000).rom().region("program", 0);
+}
 
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, ultrsprt_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
-	AM_RANGE(0x00100000, 0x00101fff) AM_RAM
-	AM_RANGE(0x00200000, 0x0020000f) AM_DEVREADWRITE8("k056800", k056800_device, sound_r, sound_w, 0xffff)
-	AM_RANGE(0x00400000, 0x004002ff) AM_DEVREADWRITE8("k054539", k054539_device, read, write, 0xffff)
-ADDRESS_MAP_END
+void ultrsprt_state::sound_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
+	map(0x00100000, 0x00101fff).ram();
+	map(0x00200000, 0x0020000f).rw(m_k056800, FUNC(k056800_device::sound_r), FUNC(k056800_device::sound_w));
+	map(0x00400000, 0x004002ff).rw("k054539", FUNC(k054539_device::read), FUNC(k054539_device::write));
+}
 
 
 /*****************************************************************************/
@@ -195,8 +199,8 @@ static INPUT_PORTS_START( ultrsprt )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // VRAM page flip status?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // VRAM page flip status?
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 

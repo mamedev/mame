@@ -13,31 +13,31 @@
 ***************************************************************************/
 
 #define MCFG_E05A30_PRINTHEAD_CALLBACK(_write) \
-	devcb = &e05a30_device::set_printhead_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<e05a30_device &>(*device).set_printhead_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_PF_STEPPER_CALLBACK(_write) \
-	devcb = &e05a30_device::set_pf_stepper_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<e05a30_device &>(*device).set_pf_stepper_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CR_STEPPER_CALLBACK(_write) \
-	devcb = &e05a30_device::set_cr_stepper_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<e05a30_device &>(*device).set_cr_stepper_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_READY_CALLBACK(_write) \
-	devcb = &e05a30_device::set_ready_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<e05a30_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_ACK_CALLBACK(_write) \
-	devcb = &e05a30_device::set_centronics_ack_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<e05a30_device &>(*device).set_centronics_ack_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_BUSY_CALLBACK(_write) \
-	devcb = &e05a30_device::set_centronics_busy_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<e05a30_device &>(*device).set_centronics_busy_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_PERROR_CALLBACK(_write) \
-	devcb = &e05a30_device::set_centronics_perror_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<e05a30_device &>(*device).set_centronics_perror_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_FAULT_CALLBACK(_write) \
-	devcb = &e05a30_device::set_centronics_fault_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<e05a30_device &>(*device).set_centronics_fault_wr_callback(DEVCB_##_write);
 
 #define MCFG_E05A30_CENTRONICS_SELECT_CALLBACK(_write) \
-	devcb = &e05a30_device::set_centronics_select_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<e05a30_device &>(*device).set_centronics_select_wr_callback(DEVCB_##_write);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -48,15 +48,15 @@ class e05a30_device : public device_t
 public:
 	e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_printhead_wr_callback(device_t &device, Object &&cb) { return downcast<e05a30_device &>(device).m_write_printhead.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_pf_stepper_wr_callback(device_t &device, Object &&cb) { return downcast<e05a30_device &>(device).m_write_pf_stepper.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_cr_stepper_wr_callback(device_t &device, Object &&cb) { return downcast<e05a30_device &>(device).m_write_cr_stepper.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_ready_wr_callback(device_t &device, Object &&cb) { return downcast<e05a30_device &>(device).m_write_ready.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_centronics_ack_wr_callback(device_t &device, Object &&cb) { return downcast<e05a30_device &>(device).m_write_centronics_ack.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_centronics_busy_wr_callback(device_t &device, Object &&cb) { return downcast<e05a30_device &>(device).m_write_centronics_busy.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_centronics_perror_wr_callback(device_t &device, Object &&cb) { return downcast<e05a30_device &>(device).m_write_centronics_perror.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_centronics_fault_wr_callback(device_t &device, Object &&cb) { return downcast<e05a30_device &>(device).m_write_centronics_fault.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_centronics_select_wr_callback(device_t &device, Object &&cb) { return downcast<e05a30_device &>(device).m_write_centronics_select.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_printhead_wr_callback(Object &&cb) { return m_write_printhead.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_pf_stepper_wr_callback(Object &&cb) { return m_write_pf_stepper.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_cr_stepper_wr_callback(Object &&cb) { return m_write_cr_stepper.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_write_ready.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_centronics_ack_wr_callback(Object &&cb) { return m_write_centronics_ack.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_centronics_busy_wr_callback(Object &&cb) { return m_write_centronics_busy.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_centronics_perror_wr_callback(Object &&cb) { return m_write_centronics_perror.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_centronics_fault_wr_callback(Object &&cb) { return m_write_centronics_fault.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_centronics_select_wr_callback(Object &&cb) { return m_write_centronics_select.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );

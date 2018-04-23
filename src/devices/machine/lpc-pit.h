@@ -17,16 +17,16 @@ public:
 	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	DECLARE_READ8_MEMBER( status_r);
-	DECLARE_WRITE8_MEMBER(access_w);
-	DECLARE_WRITE8_MEMBER(control_w);
-
 protected:
 	void device_start() override;
 	void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
+
+	DECLARE_READ8_MEMBER( status_r);
+	DECLARE_WRITE8_MEMBER(access_w);
+	DECLARE_WRITE8_MEMBER(control_w);
 };
 
 DECLARE_DEVICE_TYPE(LPC_PIT, lpc_pit_device)

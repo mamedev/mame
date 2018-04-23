@@ -65,6 +65,7 @@ public:
 	void ripcord(machine_config &config);
 	void crash(machine_config &config);
 	void circus(machine_config &config);
+	void circus_map(address_map &map);
 };
 /*----------- defined in audio/circus.c -----------*/
 

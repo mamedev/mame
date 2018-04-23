@@ -389,9 +389,9 @@ READ8_MEMBER(kaypro_10_keyboard_device::p2_r)
 
 WRITE8_MEMBER(kaypro_10_keyboard_device::p2_w)
 {
-	if ((VERBOSE & LOG_TXD) && (0x0014U >= static_cast<device_state_interface *>(m_mcu)->safe_pc()))
+	if ((VERBOSE & LOG_TXD) && (0x0014U >= m_mcu->pc()))
 	{
-		auto const suppressor(machine().disable_side_effect());
+		auto const suppressor(machine().disable_side_effects());
 		address_space &mcu_ram(m_mcu->space(AS_DATA));
 		std::uint8_t const txd_time(mcu_ram.read_byte(0x1cU));
 		std::uint8_t const serial_flags(mcu_ram.read_byte(0x1eU));

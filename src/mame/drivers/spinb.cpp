@@ -97,6 +97,12 @@ public:
 	void jolypark(machine_config &config);
 	void vrnwrld(machine_config &config);
 	void spinb(machine_config &config);
+	void dmd_io(address_map &map);
+	void dmd_mem(address_map &map);
+	void spinb_audio_map(address_map &map);
+	void spinb_map(address_map &map);
+	void spinb_music_map(address_map &map);
+	void vrnwrld_map(address_map &map);
 private:
 	bool m_pc0a;
 	bool m_pc0m;
@@ -135,59 +141,63 @@ private:
 	required_ioport_array<11> m_switches;
 };
 
-static ADDRESS_MAP_START( spinb_map, AS_PROGRAM, 8, spinb_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("nvram") // 6164, battery-backed
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi60", i8255_device, read, write)
-	AM_RANGE(0x6400, 0x6403) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi64", i8255_device, read, write)
-	AM_RANGE(0x6800, 0x6803) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi68", i8255_device, read, write)
-	AM_RANGE(0x6c00, 0x6c03) AM_MIRROR(0x131c) AM_DEVREADWRITE("ppi6c", i8255_device, read, write)
-	AM_RANGE(0x6c20, 0x6c3f) AM_MIRROR(0x1300) AM_WRITE(sndcmd_w)
-	AM_RANGE(0x6c40, 0x6c45) AM_MIRROR(0x1300) AM_WRITE(lamp1_w)
-	AM_RANGE(0x6c60, 0x6c60) AM_MIRROR(0x1300) AM_WRITE(disp_w)
-	AM_RANGE(0x6ce0, 0x6ce0) AM_WRITENOP
-ADDRESS_MAP_END
+void spinb_state::spinb_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram().share("nvram"); // 6164, battery-backed
+	map(0x6000, 0x6003).mirror(0x13fc).rw("ppi60", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6400, 0x6403).mirror(0x13fc).rw("ppi64", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6800, 0x6803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6c00, 0x6c03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6c20, 0x6c3f).mirror(0x1300).w(this, FUNC(spinb_state::sndcmd_w));
+	map(0x6c40, 0x6c45).mirror(0x1300).w(this, FUNC(spinb_state::lamp1_w));
+	map(0x6c60, 0x6c60).mirror(0x1300).w(this, FUNC(spinb_state::disp_w));
+	map(0x6ce0, 0x6ce0).nopw();
+}
 
-static ADDRESS_MAP_START( vrnwrld_map, AS_PROGRAM, 8, spinb_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram") // 6164, battery-backed
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi60", i8255_device, read, write)
-	AM_RANGE(0xc400, 0xc403) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi64", i8255_device, read, write)
-	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x13fc) AM_DEVREADWRITE("ppi68", i8255_device, read, write)
-	AM_RANGE(0xcc00, 0xcc03) AM_MIRROR(0x131c) AM_DEVREADWRITE("ppi6c", i8255_device, read, write)
-	AM_RANGE(0xcc20, 0xcc3f) AM_MIRROR(0x1300) AM_WRITE(sndcmd_w)
-	AM_RANGE(0xcc40, 0xcc45) AM_MIRROR(0x1300) AM_WRITE(lamp1_w)
-	AM_RANGE(0xcc60, 0xcc60) AM_MIRROR(0x1300) AM_WRITE(disp_w)
-	AM_RANGE(0xcce0, 0xcce0) AM_WRITENOP
-ADDRESS_MAP_END
+void spinb_state::vrnwrld_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram().share("nvram"); // 6164, battery-backed
+	map(0xc000, 0xc003).mirror(0x13fc).rw("ppi60", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc400, 0xc403).mirror(0x13fc).rw("ppi64", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xc800, 0xc803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xcc00, 0xcc03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xcc20, 0xcc3f).mirror(0x1300).w(this, FUNC(spinb_state::sndcmd_w));
+	map(0xcc40, 0xcc45).mirror(0x1300).w(this, FUNC(spinb_state::lamp1_w));
+	map(0xcc60, 0xcc60).mirror(0x1300).w(this, FUNC(spinb_state::disp_w));
+	map(0xcce0, 0xcce0).nopw();
+}
 
-static ADDRESS_MAP_START( spinb_audio_map, AS_PROGRAM, 8, spinb_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM // 6164
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppia", i8255_device, read, write)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(sndbank_a_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ(sndcmd_r)
-ADDRESS_MAP_END
+void spinb_state::spinb_audio_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram(); // 6164
+	map(0x4000, 0x4003).mirror(0x1ffc).rw("ppia", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6000, 0x6000).w(this, FUNC(spinb_state::sndbank_a_w));
+	map(0x8000, 0x8000).r(this, FUNC(spinb_state::sndcmd_r));
+}
 
-static ADDRESS_MAP_START( spinb_music_map, AS_PROGRAM, 8, spinb_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM // 6164
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppim", i8255_device, read, write)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(sndbank_m_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ(sndcmd_r)
-	AM_RANGE(0xA000, 0xA000) AM_WRITE(volume_w)
-ADDRESS_MAP_END
+void spinb_state::spinb_music_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram(); // 6164
+	map(0x4000, 0x4003).mirror(0x1ffc).rw("ppim", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x6000, 0x6000).w(this, FUNC(spinb_state::sndbank_m_w));
+	map(0x8000, 0x8000).r(this, FUNC(spinb_state::sndcmd_r));
+	map(0xA000, 0xA000).w(this, FUNC(spinb_state::volume_w));
+}
 
-static ADDRESS_MAP_START(dmd_mem, AS_PROGRAM, 8, spinb_state)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void spinb_state::dmd_mem(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START(dmd_io, AS_IO, 8, spinb_state)
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(dmdram_w)
-	AM_RANGE(0x0000, 0xffff) AM_READ(dmdram_r)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(p1_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
-ADDRESS_MAP_END
+void spinb_state::dmd_io(address_map &map)
+{
+	map(0x0000, 0x1fff).w(this, FUNC(spinb_state::dmdram_w));
+	map(0x0000, 0xffff).r(this, FUNC(spinb_state::dmdram_r));
+}
 
 static INPUT_PORTS_START( spinb )
 	PORT_START("SW.0")
@@ -636,6 +646,9 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_CPU_ADD("dmdcpu",I8031, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(dmd_mem)
 	MCFG_CPU_IO_MAP(dmd_io)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(spinb_state, p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(spinb_state, p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(spinb_state, p3_w))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -651,7 +664,7 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_PALETTE_INIT_OWNER(spinb_state, spinb)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("msmavol")
 	MCFG_SOUND_ADD("msm_a", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
@@ -721,7 +734,8 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm_m", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spinb_state::jolypark, spinb)
+MACHINE_CONFIG_START(spinb_state::jolypark)
+	spinb(config);
 	MCFG_SOUND_REPLACE("msm_a", MSM6585, XTAL(640'000))
 	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
@@ -732,7 +746,8 @@ MACHINE_CONFIG_DERIVED(spinb_state::jolypark, spinb)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(spinb_state::vrnwrld, jolypark)
+MACHINE_CONFIG_START(spinb_state::vrnwrld)
+	jolypark(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vrnwrld_map)

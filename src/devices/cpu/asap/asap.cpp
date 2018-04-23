@@ -131,7 +131,7 @@ const asap_device::ophandler asap_device::s_conditiontable[16] =
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(ASAP, asap_device, "asap", "ASAP")
+DEFINE_DEVICE_TYPE(ASAP, asap_device, "asap", "Atari ASAP")
 
 //-------------------------------------------------
 //  asap_device - constructor
@@ -209,7 +209,7 @@ void asap_device::device_start()
 	save_item(NAME(m_irq_state));
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -305,9 +305,9 @@ void asap_device::state_string_export(const device_state_entry &entry, std::stri
 //  helper function
 //-------------------------------------------------
 
-util::disasm_interface *asap_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> asap_device::create_disassembler()
 {
-	return new asap_disassembler;
+	return std::make_unique<asap_disassembler>();
 }
 
 
@@ -484,7 +484,7 @@ inline void asap_device::fetch_instruction_debug()
 {
 	// debugging
 	m_ppc = m_pc;
-	debugger_instruction_hook(this, m_pc);
+	debugger_instruction_hook(m_pc);
 
 	// instruction fetch
 	m_op = readop(m_pc);

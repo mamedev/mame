@@ -55,6 +55,8 @@ public:
 	{ }
 
 	void speeddrv(machine_config &config);
+	void speeddrv_io(address_map &map);
+	void speeddrv_map(address_map &map);
 protected:
 
 	// devices
@@ -63,12 +65,14 @@ public:
 	DECLARE_DRIVER_INIT(speeddrv);
 };
 
-static ADDRESS_MAP_START( speeddrv_map, AS_PROGRAM, 32, speeddrv_state )
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+void speeddrv_state::speeddrv_map(address_map &map)
+{
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
+}
 
-static ADDRESS_MAP_START( speeddrv_io, AS_IO, 32, speeddrv_state )
-ADDRESS_MAP_END
+void speeddrv_state::speeddrv_io(address_map &map)
+{
+}
 
 
 static INPUT_PORTS_START( speeddrv )

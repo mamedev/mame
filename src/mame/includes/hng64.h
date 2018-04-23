@@ -396,4 +396,9 @@ public:
 	void hng64(machine_config &config);
 	void hng64_audio(machine_config &config);
 	void hng64_network(machine_config &config);
+	void hng_comm_io_map(address_map &map);
+	void hng_comm_map(address_map &map);
+	void hng_map(address_map &map);
+	void hng_sound_io(address_map &map);
+	void hng_sound_map(address_map &map);
 };

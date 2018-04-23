@@ -106,4 +106,11 @@ public:
 	void nekkyoku(machine_config &config);
 	void fromance(machine_config &config);
 	void idolmj(machine_config &config);
+	void fromance_main_map(address_map &map);
+	void fromance_sub_io_map(address_map &map);
+	void fromance_sub_map(address_map &map);
+	void idolmj_sub_io_map(address_map &map);
+	void nekkyoku_main_map(address_map &map);
+	void nekkyoku_sub_io_map(address_map &map);
+	void nekkyoku_sub_map(address_map &map);
 };

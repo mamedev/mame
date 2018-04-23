@@ -59,10 +59,11 @@ I8275_DRAW_CHARACTER_MEMBER( mm1_state::crtc_display_pixels )
 //  ADDRESS_MAP( mm1_upd7220_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( mm1_upd7220_map, 0, 16, mm1_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("video_ram")
-ADDRESS_MAP_END
+void mm1_state::mm1_upd7220_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7fff).ram().share("video_ram");
+}
 
 
 //-------------------------------------------------

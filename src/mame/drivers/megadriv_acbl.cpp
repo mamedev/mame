@@ -264,27 +264,28 @@ connector, but of course, I can be wrong.
 /************************************ Megadrive Bootlegs *************************************/
 
 // smaller ROM region because some bootlegs check for RAM there (used by topshoot and hshavoc)
-static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* Cartridge Program Rom */
-	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
+void md_boot_state::md_bootleg_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom(); /* Cartridge Program Rom */
+	map(0x200000, 0x2023ff).ram(); // tested
 
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_READWRITE8(megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
-	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
+	map(0xa00000, 0xa01fff).rw(this, FUNC(md_boot_state::megadriv_68k_read_z80_ram), FUNC(md_boot_state::megadriv_68k_write_z80_ram));
+	map(0xa02000, 0xa03fff).w(this, FUNC(md_boot_state::megadriv_68k_write_z80_ram));
+	map(0xa04000, 0xa04003).rw(this, FUNC(md_boot_state::megadriv_68k_YM2612_read), FUNC(md_boot_state::megadriv_68k_YM2612_write));
+	map(0xa06000, 0xa06001).w(this, FUNC(md_boot_state::megadriv_68k_z80_bank_write));
 
-	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read, megadriv_68k_io_write)
-	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
+	map(0xa10000, 0xa1001f).rw(this, FUNC(md_boot_state::megadriv_68k_io_read), FUNC(md_boot_state::megadriv_68k_io_write));
+	map(0xa11100, 0xa11101).rw(this, FUNC(md_boot_state::megadriv_68k_check_z80_bus), FUNC(md_boot_state::megadriv_68k_req_z80_bus));
+	map(0xa11200, 0xa11201).w(this, FUNC(md_boot_state::megadriv_68k_req_z80_reset));
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
+	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
+	map(0xd00000, 0xd0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
-ADDRESS_MAP_END
+	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
+}
 
 MACHINE_CONFIG_START(md_boot_state::md_bootleg)
-	MCFG_FRAGMENT_ADD( md_ntsc )
+	md_ntsc(config);
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(md_bootleg_map)
@@ -593,7 +594,7 @@ INPUT_PORTS_START( aladmdb )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
-//  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )         /* to avoid it being changed and corrupting Coinage settings */
+//  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM )         /* to avoid it being changed and corrupting Coinage settings */
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )       /* code at 0x1b2680 */
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )             /* "PRACTICE" */
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )           /* "NORMAL" */
@@ -679,7 +680,7 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(md_boot_state::megadrvb)
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 MACHINE_CONFIG_END
 
@@ -698,7 +699,7 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 }
 
 MACHINE_CONFIG_START(md_boot_state::megadrvb_6b)
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_6button)
 MACHINE_CONFIG_END
 

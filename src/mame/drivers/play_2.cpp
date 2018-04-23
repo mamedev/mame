@@ -56,6 +56,7 @@ public:
 		, m_1863(*this, "1863")
 		, m_aysnd1(*this, "aysnd1")
 		, m_keyboard(*this, "X.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port01_w);
@@ -81,6 +82,9 @@ public:
 
 	void play_2(machine_config &config);
 	void zira(machine_config &config);
+	void play_2_io(address_map &map);
+	void play_2_map(address_map &map);
+	void zira_sound_map(address_map &map);
 private:
 	uint16_t m_clockcnt;
 	uint16_t m_resetcnt;
@@ -91,33 +95,38 @@ private:
 	uint8_t m_psg_latch;
 	uint8_t m_port06;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cosmac_device> m_maincpu;
 	required_device<ttl7474_device> m_4013a;
 	required_device<ttl7474_device> m_4013b;
 	optional_device<cdp1863_device> m_1863;
 	optional_device<ay8910_device> m_aysnd1;
 	required_ioport_array<8> m_keyboard;
+	output_finder<60> m_digits;
 };
 
 
-static ADDRESS_MAP_START( play_2_map, AS_PROGRAM, 8, play_2_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("roms", 0)
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
-ADDRESS_MAP_END
+void play_2_state::play_2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("roms", 0);
+	map(0x2000, 0x20ff).ram().share("nvram"); // pair of 5101, battery-backed
+}
 
-static ADDRESS_MAP_START( play_2_io, AS_IO, 8, play_2_state )
-	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // digits
-	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("1863", cdp1863_device, str_w)
-	AM_RANGE(0x04, 0x04) AM_READ(port04_r)
-	AM_RANGE(0x05, 0x05) AM_READ(port05_r)
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(port07_w)
-ADDRESS_MAP_END
+void play_2_state::play_2_io(address_map &map)
+{
+	map(0x01, 0x01).w(this, FUNC(play_2_state::port01_w)); // digits
+	map(0x02, 0x02).w(this, FUNC(play_2_state::port02_w));
+	map(0x03, 0x03).w(m_1863, FUNC(cdp1863_device::str_w));
+	map(0x04, 0x04).r(this, FUNC(play_2_state::port04_r));
+	map(0x05, 0x05).r(this, FUNC(play_2_state::port05_r));
+	map(0x06, 0x06).w(this, FUNC(play_2_state::port06_w));
+	map(0x07, 0x07).w(this, FUNC(play_2_state::port07_w));
+}
 
-static ADDRESS_MAP_START( zira_sound_map, AS_PROGRAM, 8, play_2_state )
-	AM_RANGE(0x000, 0x3ff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void play_2_state::zira_sound_map(address_map &map)
+{
+	map(0x000, 0x3ff).bankr("bank1");
+}
 
 
 static INPUT_PORTS_START( play_2 )
@@ -217,7 +226,7 @@ WRITE8_MEMBER( play_2_state::port01_w )
 		for (uint8_t j = 0; j < 6; j++)
 			if (BIT(m_kbdrow, j))
 				for (uint8_t i = 0; i < 5; i++)
-					output().set_digit_value(j*10 + i, m_segment[i] & 0x7f);
+					m_digits[j*10 + i] = m_segment[i] & 0x7f;
 	}
 	m_1863->set_output_gain(0, BIT(data, 7) ? 1.00 : 0.00);
 }
@@ -385,14 +394,15 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", cosmac_device, int_w)) MCFG_DEVCB_INVERT // int is reversed in mame
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(play_2_state::zira, play_2)
+MACHINE_CONFIG_START(play_2_state::zira)
+	play_2(config);
 	MCFG_CPU_ADD("cop402", COP402, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(zira_sound_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )

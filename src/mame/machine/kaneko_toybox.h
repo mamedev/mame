@@ -17,8 +17,8 @@ public:
 
 	kaneko_toybox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_table(device_t &device, int tabletype);
-	static void set_game_type(device_t &device, int gametype);
+	void set_table(int tabletype) { m_tabletype = tabletype; }
+	void set_game_type(int gametype) { m_gametype = gametype; }
 
 	DECLARE_WRITE16_MEMBER(mcu_com0_w);
 	DECLARE_WRITE16_MEMBER(mcu_com1_w);
@@ -47,9 +47,9 @@ private:
 DECLARE_DEVICE_TYPE(KANEKO_TOYBOX, kaneko_toybox_device)
 
 #define MCFG_TOYBOX_TABLE_TYPE(_type) \
-	kaneko_toybox_device::set_table(*device, kaneko_toybox_device::TABLE_##_type);
+	downcast<kaneko_toybox_device &>(*device).set_table(kaneko_toybox_device::TABLE_##_type);
 
 #define MCFG_TOYBOX_GAME_TYPE(_type) \
-	kaneko_toybox_device::set_game_type(*device, kaneko_toybox_device::GAME_##_type);
+	downcast<kaneko_toybox_device &>(*device).set_game_type(kaneko_toybox_device::GAME_##_type);
 
 #endif // MAME_MACHINE_KANEKO_TOYBOX_H

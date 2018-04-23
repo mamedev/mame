@@ -77,7 +77,7 @@ READ8_MEMBER(msx_cart_holy_quran_device::read_cart)
 
 		// The decryption should actually start working after the first M1 cycle executing something
 		// from the cartridge.
-		if (offset == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effect_disabled())
+		if (offset == ((m_rom[3] << 8) | m_rom[2]) && !machine().side_effects_disabled())
 		{
 			m_decrypt = true;
 		}

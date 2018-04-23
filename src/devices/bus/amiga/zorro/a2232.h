@@ -35,10 +35,6 @@ public:
 	// construction/destruction
 	a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// cpu
-	WRITE8_MEMBER( int2_w );
-	WRITE8_MEMBER( irq_ack_w );
-
 	// zorro slot
 	DECLARE_READ16_MEMBER( shared_ram_r );
 	DECLARE_WRITE16_MEMBER( shared_ram_w );
@@ -51,25 +47,7 @@ public:
 	DECLARE_READ16_MEMBER( reset_high_r );
 	DECLARE_WRITE16_MEMBER( reset_high_w );
 
-	// acia
-	DECLARE_READ8_MEMBER( acia_0_r );
-	DECLARE_WRITE8_MEMBER( acia_0_w );
-	DECLARE_READ8_MEMBER( acia_1_r );
-	DECLARE_WRITE8_MEMBER( acia_1_w );
-	DECLARE_READ8_MEMBER( acia_2_r );
-	DECLARE_WRITE8_MEMBER( acia_2_w );
-	DECLARE_READ8_MEMBER( acia_3_r );
-	DECLARE_WRITE8_MEMBER( acia_3_w );
-	DECLARE_READ8_MEMBER( acia_4_r );
-	DECLARE_WRITE8_MEMBER( acia_4_w );
-	DECLARE_READ8_MEMBER( acia_5_r );
-	DECLARE_WRITE8_MEMBER( acia_5_w );
-	DECLARE_READ8_MEMBER( acia_6_r );
-	DECLARE_WRITE8_MEMBER( acia_6_w );
-
-	// cia
-	DECLARE_READ8_MEMBER( cia_r );
-	DECLARE_WRITE8_MEMBER( cia_w );
+	void iocpu_map(address_map &map);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -99,6 +77,10 @@ private:
 
 	void update_irqs();
 
+	// cpu
+	WRITE8_MEMBER( int2_w );
+	WRITE8_MEMBER( irq_ack8_w );
+
 	// acia
 	DECLARE_WRITE_LINE_MEMBER( acia_0_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_1_irq_w );
@@ -107,12 +89,28 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( acia_4_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_5_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_6_irq_w );
+	DECLARE_READ8_MEMBER( acia_0_r );
+	DECLARE_WRITE8_MEMBER( acia_0_w );
+	DECLARE_READ8_MEMBER( acia_1_r );
+	DECLARE_WRITE8_MEMBER( acia_1_w );
+	DECLARE_READ8_MEMBER( acia_2_r );
+	DECLARE_WRITE8_MEMBER( acia_2_w );
+	DECLARE_READ8_MEMBER( acia_3_r );
+	DECLARE_WRITE8_MEMBER( acia_3_w );
+	DECLARE_READ8_MEMBER( acia_4_r );
+	DECLARE_WRITE8_MEMBER( acia_4_w );
+	DECLARE_READ8_MEMBER( acia_5_r );
+	DECLARE_WRITE8_MEMBER( acia_5_w );
+	DECLARE_READ8_MEMBER( acia_6_r );
+	DECLARE_WRITE8_MEMBER( acia_6_w );
 
 	// cia
 	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
 	DECLARE_READ8_MEMBER( cia_port_a_r );
 	DECLARE_READ8_MEMBER( cia_port_b_r );
 	DECLARE_WRITE8_MEMBER( cia_port_b_w );
+	DECLARE_READ8_MEMBER( cia_r );
+	DECLARE_WRITE8_MEMBER( cia_w );
 
 	// rs232
 	DECLARE_WRITE_LINE_MEMBER( rs232_1_rxd_w );

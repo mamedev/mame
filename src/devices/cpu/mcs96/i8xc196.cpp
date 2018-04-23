@@ -17,9 +17,9 @@ i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-util::disasm_interface *i8xc196_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8xc196_device::create_disassembler()
 {
-	return new i8xc196_disassembler;
+	return std::make_unique<i8xc196_disassembler>();
 }
 
 void i8xc196_device::io_w8(uint8_t adr, uint8_t data)

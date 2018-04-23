@@ -24,6 +24,7 @@ public:
 	uint32_t screen_update_segapm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	void segapm(machine_config &config);
+	void segapm_map(address_map &map);
 };
 
 
@@ -38,14 +39,15 @@ uint32_t segapm_state::screen_update_segapm(screen_device &screen, bitmap_ind16 
 
 
 
-static ADDRESS_MAP_START( segapm_map, AS_PROGRAM, 16, segapm_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+void segapm_state::segapm_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
 
 	// A15100
 
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM
+	map(0xe00000, 0xe7ffff).ram();
 
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( segapm )
 INPUT_PORTS_END
@@ -76,7 +78,7 @@ MACHINE_CONFIG_END
 
 ROM_START( segapm ) // was more than one cartridge available? if so softlist them?
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD( "picture magic boot cart (j) [!].bin", 0x00000, 0x80000, CRC(c9ab4e60) SHA1(9c4d4ab3e59c8acde86049a1ba3787aa03b549a3) ) // internal header is GOUSEI HENSYUU
+	ROM_LOAD( "picture magic boot cart.bin", 0x00000, 0x80000, CRC(c9ab4e60) SHA1(9c4d4ab3e59c8acde86049a1ba3787aa03b549a3) ) // internal header is GOUSEI HENSYUU
 
 	// todo, sh2 bios roms etc.
 ROM_END

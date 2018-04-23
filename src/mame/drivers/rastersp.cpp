@@ -129,7 +129,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_timer1);
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_tx_timer);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	std::unique_ptr<uint8_t[]>   m_nvram8;
 	uint8_t   m_io_reg;
@@ -146,6 +146,9 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	static void ncr53c700(device_t *device);
 	void rastersp(machine_config &config);
+	void cpu_map(address_map &map);
+	void dsp_map(address_map &map);
+	void io_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -414,9 +417,10 @@ WRITE_LINE_MEMBER( rastersp_state::scsi_irq )
 }
 
 
-INTERRUPT_GEN_MEMBER( rastersp_state::vblank_irq )
+WRITE_LINE_MEMBER( rastersp_state::vblank_irq )
 {
-	update_irq(IRQ_VBLANK, ASSERT_LINE);
+	if (state)
+		update_irq(IRQ_VBLANK, ASSERT_LINE);
 }
 
 
@@ -670,40 +674,43 @@ READ32_MEMBER( rastersp_state::dsp_speedup_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, rastersp_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("dram")
-	AM_RANGE(0x01000000, 0x010bffff) AM_NOP // External ROM
-	AM_RANGE(0x010c0000, 0x010cffff) AM_ROM AM_REGION("bios", 0)
-	AM_RANGE(0x02200800, 0x02200803) AM_WRITENOP // ?
-	AM_RANGE(0x02208000, 0x02208fff) AM_DEVREADWRITE("scsibus:7:ncr53c700", ncr53c7xx_device, read, write)
-	AM_RANGE(0x0220e000, 0x0220e003) AM_WRITE(dpylist_w)
-	AM_RANGE(0x02200000, 0x022fffff) AM_READWRITE8(nvram_r, nvram_w, 0x000000ff)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_RAMBANK("bank3")
-ADDRESS_MAP_END
+void rastersp_state::cpu_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram().share("dram");
+	map(0x01000000, 0x010bffff).noprw(); // External ROM
+	map(0x010c0000, 0x010cffff).rom().region("bios", 0);
+	map(0x02200000, 0x022fffff).rw(this, FUNC(rastersp_state::nvram_r), FUNC(rastersp_state::nvram_w)).umask32(0x000000ff);
+	map(0x02200800, 0x02200803).nopw(); // ?
+	map(0x02208000, 0x02208fff).rw("scsibus:7:ncr53c700", FUNC(ncr53c7xx_device::read), FUNC(ncr53c7xx_device::write));
+	map(0x0220e000, 0x0220e003).w(this, FUNC(rastersp_state::dpylist_w));
+	map(0xfff00000, 0xffffffff).bankrw("bank3");
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 32, rastersp_state )
-	AM_RANGE(0x0020, 0x0023) AM_WRITE(cyrix_cache_w)
-	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("P1") AM_WRITE(port1_w)
-	AM_RANGE(0x1004, 0x1007) AM_READ_PORT("P2") AM_WRITE(port2_w)
-	AM_RANGE(0x1008, 0x100b) AM_READ_PORT("COMMON") AM_WRITE(port3_w)
-	AM_RANGE(0x100c, 0x100f) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1010, 0x1013) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1014, 0x1017) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x4000, 0x4007) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0x000000ff)
-	AM_RANGE(0x6008, 0x600b) AM_READNOP AM_WRITENOP // RS232
-ADDRESS_MAP_END
+void rastersp_state::io_map(address_map &map)
+{
+	map(0x0020, 0x0023).w(this, FUNC(rastersp_state::cyrix_cache_w));
+	map(0x1000, 0x1003).portr("P1").w(this, FUNC(rastersp_state::port1_w));
+	map(0x1004, 0x1007).portr("P2").w(this, FUNC(rastersp_state::port2_w));
+	map(0x1008, 0x100b).portr("COMMON").w(this, FUNC(rastersp_state::port3_w));
+	map(0x100c, 0x100f).portr("DSW2");
+	map(0x1010, 0x1013).portr("DSW1");
+	map(0x1014, 0x1017).portr("EXTRA");
+	map(0x4000, 0x4007).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write)).umask32(0x000000ff);
+	map(0x6008, 0x600b).nopr().nopw(); // RS232
+}
 
 
-static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 32, rastersp_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_RAMBANK("bank1")
-	AM_RANGE(0x400000, 0x40ffff) AM_ROM AM_REGION("dspboot", 0)
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w)
-	AM_RANGE(0x880402, 0x880402) AM_WRITE(dsp_unk_w)
-	AM_RANGE(0x883c00, 0x883c00) AM_WRITE(dsp_486_int_w)
-	AM_RANGE(0xc00000, 0xc03fff) AM_RAMBANK("bank2")
-	AM_RANGE(0xc80000, 0xc80000) AM_WRITE(dsp_ctrl_w)
-	AM_RANGE(0xfc0000, 0xffffff) AM_RAMBANK("bank3")
-ADDRESS_MAP_END
+void rastersp_state::dsp_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).bankrw("bank1");
+	map(0x400000, 0x40ffff).rom().region("dspboot", 0);
+	map(0x808000, 0x80807f).rw(this, FUNC(rastersp_state::tms32031_control_r), FUNC(rastersp_state::tms32031_control_w));
+	map(0x880402, 0x880402).w(this, FUNC(rastersp_state::dsp_unk_w));
+	map(0x883c00, 0x883c00).w(this, FUNC(rastersp_state::dsp_486_int_w));
+	map(0xc00000, 0xc03fff).bankrw("bank2");
+	map(0xc80000, 0xc80000).w(this, FUNC(rastersp_state::dsp_ctrl_w));
+	map(0xfc0000, 0xffffff).bankrw("bank3");
+}
 
 
 
@@ -857,7 +864,6 @@ MACHINE_CONFIG_START(rastersp_state::rastersp)
 	MCFG_CPU_ADD("maincpu", I486, 33330000)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rastersp_state, vblank_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(rastersp_state,irq_callback)
 
 	MCFG_CPU_ADD("dsp", TMS32031, 33330000)
@@ -883,6 +889,7 @@ MACHINE_CONFIG_START(rastersp_state::rastersp)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rastersp_state, vblank_irq))
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 

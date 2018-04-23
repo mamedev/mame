@@ -54,6 +54,10 @@ public:
 	uint32_t screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mosaicf2(machine_config &config);
 	void royalpk2(machine_config &config);
+	void common_map(address_map &map);
+	void mosaicf2_io(address_map &map);
+	void royalpk2_io(address_map &map);
+	void royalpk2_map(address_map &map);
 };
 
 
@@ -78,12 +82,13 @@ uint32_t mosaicf2_state::screen_update_mosaicf2(screen_device &screen, bitmap_in
 
 
 
-static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32, mosaicf2_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x80000000, 0x80ffffff) AM_ROM AM_REGION("user2",0)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void mosaicf2_state::common_map(address_map &map)
+{
+	map(0x00000000, 0x001fffff).ram();
+	map(0x40000000, 0x4003ffff).ram().share("videoram");
+	map(0x80000000, 0x80ffffff).rom().region("user2", 0);
+	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
+}
 
 READ32_MEMBER(mosaicf2_state::f32_input_port_1_r)
 {
@@ -97,19 +102,20 @@ READ32_MEMBER(mosaicf2_state::f32_input_port_1_r)
 }
 
 
-static ADDRESS_MAP_START( mosaicf2_io, AS_IO, 32, mosaicf2_state )
-	AM_RANGE(0x4000, 0x4003) AM_DEVREAD8("oki", okim6295_device, read, 0x000000ff)
-	AM_RANGE(0x4810, 0x4813) AM_DEVREAD8("ymsnd", ym2151_device, status_r, 0x000000ff)
-	AM_RANGE(0x5000, 0x5003) AM_READ_PORT("P1")
-	AM_RANGE(0x5200, 0x5203) AM_READ(f32_input_port_1_r)
-	AM_RANGE(0x5400, 0x5403) AM_READ_PORT("EEPROMIN")
-	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE8("oki", okim6295_device, write, 0x000000ff)
-	AM_RANGE(0x6800, 0x6803) AM_DEVWRITE8("ymsnd", ym2151_device, data_w, 0x000000ff)
-	AM_RANGE(0x6810, 0x6813) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x000000ff)
-	AM_RANGE(0x7000, 0x7003) AM_WRITE_PORT("EEPROMCLK")
-	AM_RANGE(0x7200, 0x7203) AM_WRITE_PORT("EEPROMCS")
-	AM_RANGE(0x7400, 0x7403) AM_WRITE_PORT("EEPROMOUT")
-ADDRESS_MAP_END
+void mosaicf2_state::mosaicf2_io(address_map &map)
+{
+	map(0x4003, 0x4003).r("oki", FUNC(okim6295_device::read));
+	map(0x4813, 0x4813).r("ymsnd", FUNC(ym2151_device::status_r));
+	map(0x5000, 0x5003).portr("P1");
+	map(0x5200, 0x5203).r(this, FUNC(mosaicf2_state::f32_input_port_1_r));
+	map(0x5400, 0x5403).portr("EEPROMIN");
+	map(0x6003, 0x6003).w("oki", FUNC(okim6295_device::write));
+	map(0x6803, 0x6803).w("ymsnd", FUNC(ym2151_device::data_w));
+	map(0x6813, 0x6813).w("ymsnd", FUNC(ym2151_device::register_w));
+	map(0x7000, 0x7003).portw("EEPROMCLK");
+	map(0x7200, 0x7203).portw("EEPROMCS");
+	map(0x7400, 0x7403).portw("EEPROMOUT");
+}
 
 
 static INPUT_PORTS_START( mosaicf2 )
@@ -143,7 +149,7 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
@@ -203,7 +209,7 @@ static INPUT_PORTS_START( royalpk2 )
 	PORT_BIT( 0xff7fffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
@@ -217,22 +223,24 @@ INPUT_PORTS_END
 
 
 
-static ADDRESS_MAP_START( royalpk2_map, AS_PROGRAM, 32, mosaicf2_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x80000000, 0x807fffff) AM_ROM AM_REGION("user2",0)
-	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
-ADDRESS_MAP_END
+void mosaicf2_state::royalpk2_map(address_map &map)
+{
+	map(0x00000000, 0x003fffff).ram();
+	map(0x40000000, 0x4003ffff).ram().share("videoram");
+	map(0x80000000, 0x807fffff).rom().region("user2", 0);
+	map(0xfff00000, 0xffffffff).rom().region("user1", 0);
+}
 
-static ADDRESS_MAP_START( royalpk2_io, AS_IO, 32, mosaicf2_state )
-	AM_RANGE(0x4900, 0x4903) AM_READ_PORT("SYSTEM_P2")
+void mosaicf2_state::royalpk2_io(address_map &map)
+{
+	map(0x4900, 0x4903).portr("SYSTEM_P2");
 
-	AM_RANGE(0x4a00, 0x4a03) AM_READ_PORT("EEPROMIN")
+	map(0x4a00, 0x4a03).portr("EEPROMIN");
 
-	AM_RANGE(0x6800, 0x6803) AM_WRITE_PORT("EEPROMCLK")
-	AM_RANGE(0x6900, 0x6903) AM_WRITE_PORT("EEPROMCS")
-	AM_RANGE(0x6a00, 0x6a03) AM_WRITE_PORT("EEPROMOUT")
-ADDRESS_MAP_END
+	map(0x6800, 0x6803).portw("EEPROMCLK");
+	map(0x6900, 0x6903).portw("EEPROMCS");
+	map(0x6a00, 0x6a03).portw("EEPROMOUT");
+}
 
 MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 
@@ -331,7 +339,7 @@ L00-L03 & U00-U03 are 29F1610ML Flash roms
 todo: royalpk2 layout (it's very different)
 */
 
-ROM_START( mosaicf2 )
+ROM_START( mosaicf2 ) /* Released October 1999 */
 	ROM_REGION32_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "rom1.bin",            0x80000, 0x080000, CRC(fceb6f83) SHA1(b98afb477627c3b2d584c0f0fb26c4dd5b1a31e2) )

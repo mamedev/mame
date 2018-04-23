@@ -96,7 +96,7 @@ void mb8421_master_device::device_reset()
 template<read_or_write row, bool is_right>
 void mb8421_master_device::update_intr(offs_t offset)
 {
-	if (machine().side_effect_disabled())
+	if (machine().side_effects_disabled())
 		return;
 
 	if (row == read_or_write::WRITE && offset == (is_right ? 0x7fe : 0x7ff))

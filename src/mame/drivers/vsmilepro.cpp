@@ -35,13 +35,15 @@ public:
 	{ }
 
 	void vsmilpro(machine_config &config);
+	void vsmilpro_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 };
 
-static ADDRESS_MAP_START(vsmilpro_map, AS_PROGRAM, 32, vsmilpro_state)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
-ADDRESS_MAP_END
+void vsmilpro_state::vsmilpro_map(address_map &map)
+{
+	map(0x00000000, 0x0007ffff).rom();
+}
 
 
 /* Input ports */

@@ -139,6 +139,7 @@ Region byte at offset 0x031:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/adc0808.h"
 #include "machine/timekpr.h"
 #include "sound/2610intf.h"
 #include "screen.h"
@@ -186,39 +187,6 @@ READ16_MEMBER(slapshot_state::service_input_r)
 	}
 }
 
-
-READ16_MEMBER(slapshot_state::opwolf3_adc_r)
-{
-	static const char *const adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
-
-	return ioport(adcnames[offset])->read() << 8;
-}
-
-WRITE16_MEMBER(slapshot_state::opwolf3_adc_req_w)
-{
-	switch (offset)
-	{
-	case 0:
-	/* gun outputs... not 100% sure they are correct yet */
-	/* p2 gun recoil seems ever so slighty slower than p1 */
-	/* also you get a false fire every once in a while on the p1 gun */
-
-	if (((data & 0x100) == 0x100) && ((data & 0x400)==0))
-		output().set_value("Player1_Gun_Recoil",1);
-	else
-		output().set_value("Player1_Gun_Recoil",0);
-
-	if (((data & 0x100) == 0x100) && ((data & 0x400)==0x400))
-		output().set_value("Player2_Gun_Recoil",1);
-	else
-		output().set_value("Player2_Gun_Recoil",0);
-	break;
-	}
-
-	/* 4 writes a frame - one for each analogue port */
-	m_maincpu->set_input_line(3, HOLD_LINE);
-}
-
 WRITE8_MEMBER(slapshot_state::coin_control_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
@@ -262,53 +230,57 @@ READ16_MEMBER(slapshot_state::msb_sound_r)
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16, slapshot_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM /* main RAM */
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
-	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
-	AM_RANGE(0xc00020, 0xc0002f) AM_READ(service_input_r)  /* service mirror */
-	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(msb_sound_r, msb_sound_w)
-ADDRESS_MAP_END
+void slapshot_state::slapshot_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();
+	map(0x500000, 0x50ffff).ram(); /* main RAM */
+	map(0x600000, 0x60ffff).ram().share("spriteram");   /* sprite ram */
+	map(0x700000, 0x701fff).ram().share("spriteext");   /* debugging */
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));    /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa00000, 0xa03fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00); /* nvram (only low bytes used) */
+	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);  /* priority chip */
+	map(0xc00000, 0xc0000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
+	map(0xc00020, 0xc0002f).r(this, FUNC(slapshot_state::service_input_r));  /* service mirror */
+	map(0xd00000, 0xd00003).rw(this, FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
+}
 
-static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16, slapshot_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM /* main RAM */
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")   /* sprite ram */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
-	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
-	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
-	AM_RANGE(0xc00020, 0xc0002f) AM_READ(service_input_r)   /* service mirror */
-	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(msb_sound_r, msb_sound_w)
-	AM_RANGE(0xe00000, 0xe00007) AM_READWRITE(opwolf3_adc_r, opwolf3_adc_req_w)
-ADDRESS_MAP_END
+void slapshot_state::opwolf3_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).rom();
+	map(0x500000, 0x50ffff).ram(); /* main RAM */
+	map(0x600000, 0x60ffff).ram().share("spriteram");   /* sprite ram */
+	map(0x700000, 0x701fff).ram().share("spriteext");   /* debugging */
+	map(0x800000, 0x80ffff).rw(m_tc0480scp, FUNC(tc0480scp_device::word_r), FUNC(tc0480scp_device::word_w));    /* tilemaps */
+	map(0x830000, 0x83002f).rw(m_tc0480scp, FUNC(tc0480scp_device::ctrl_word_r), FUNC(tc0480scp_device::ctrl_word_w));
+	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xa00000, 0xa03fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00); /* nvram (only low bytes used) */
+	map(0xb00000, 0xb0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0xff00);  /* priority chip */
+	map(0xc00000, 0xc0000f).rw(m_tc0640fio, FUNC(tc0640fio_device::halfword_byteswap_r), FUNC(tc0640fio_device::halfword_byteswap_w));
+	map(0xc00020, 0xc0002f).r(this, FUNC(slapshot_state::service_input_r));   /* service mirror */
+	map(0xd00000, 0xd00003).rw(this, FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
+	map(0xe00000, 0xe0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0xff00);
+//  map(0xe80000, 0xe80001) // gun recoil here?
+}
 
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( opwolf3_z80_sound_map, AS_PROGRAM, 8, slapshot_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("z80bank")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
-	AM_RANGE(0xea00, 0xea00) AM_READNOP
-	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
-ADDRESS_MAP_END
+void slapshot_state::opwolf3_z80_sound_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).bankr("z80bank");
+	map(0xc000, 0xdfff).ram();
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
+	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
+	map(0xe400, 0xe403).nopw(); /* pan */
+	map(0xea00, 0xea00).nopr();
+	map(0xee00, 0xee00).nopw(); /* ? */
+	map(0xf000, 0xf000).nopw(); /* ? */
+	map(0xf200, 0xf200).w(this, FUNC(slapshot_state::sound_bankswitch_w));
+}
 
 
 /***********************************************************
@@ -541,6 +513,13 @@ MACHINE_CONFIG_START(slapshot_state::opwolf3)
 	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 500000) // unknown clock
+	MCFG_ADC0808_EOC_FF_CB(INPUTLINE("maincpu", 3))
+	MCFG_ADC0808_IN0_CB(IOPORT("GUN1X"))
+	MCFG_ADC0808_IN1_CB(IOPORT("GUN1Y"))
+	MCFG_ADC0808_IN2_CB(IOPORT("GUN2X"))
+	MCFG_ADC0808_IN3_CB(IOPORT("GUN2Y"))
 
 	MCFG_DEVICE_ADD("tc0640fio", TC0640FIO, 0)
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))

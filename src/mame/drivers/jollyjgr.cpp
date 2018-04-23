@@ -168,7 +168,7 @@ public:
 	DECLARE_PALETTE_INIT(jollyjgr);
 	uint32_t screen_update_jollyjgr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fspider(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jollyjgr_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_bitmap( bitmap_rgb32 &bitmap );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -176,6 +176,8 @@ public:
 	required_device<palette_device> m_bm_palette;
 	void fspider(machine_config &config);
 	void jollyjgr(machine_config &config);
+	void fspider_map(address_map &map);
+	void jollyjgr_map(address_map &map);
 };
 
 
@@ -224,6 +226,8 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
 	m_bg_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
 
 	m_nmi_enable = data & 0x80;
+	if (!m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
@@ -239,41 +243,43 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( jollyjgr_map, AS_PROGRAM, 8, jollyjgr_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
-	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
-	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9880, 0x9bff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_SHARE("bitmap")
-ADDRESS_MAP_END
+void jollyjgr_state::jollyjgr_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8ff8, 0x8ff8).portr("DSW1");
+	map(0x8ff9, 0x8ff9).portr("INPUTS");
+	map(0x8ff8, 0x8ff8).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x8ffa, 0x8ffa).portr("SYSTEM").w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x8ffc, 0x8ffc).w(this, FUNC(jollyjgr_state::jollyjgr_misc_w));
+	map(0x8ffd, 0x8ffd).w(this, FUNC(jollyjgr_state::jollyjgr_coin_lookout_w));
+	map(0x8fff, 0x8fff).portr("DSW2");
+	map(0x9000, 0x93ff).ram().w(this, FUNC(jollyjgr_state::jollyjgr_videoram_w)).share("videoram");
+	map(0x9800, 0x983f).ram().w(this, FUNC(jollyjgr_state::jollyjgr_attrram_w)).share("colorram");
+	map(0x9840, 0x987f).ram().share("spriteram");
+	map(0x9880, 0x9bff).ram();
+	map(0xa000, 0xffff).ram().share("bitmap");
+}
 
-static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8, jollyjgr_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
-	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
-	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_SHARE("colorram")
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9880, 0x989f) AM_RAM // ?
-	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_SHARE("bulletram")
-	AM_RANGE(0x98b0, 0x9bff) AM_RAM // ?
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_SHARE("bitmap")
-ADDRESS_MAP_END
+void jollyjgr_state::fspider_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8ff8, 0x8ff8).portr("DSW1");
+	map(0x8ff9, 0x8ff9).portr("INPUTS");
+	map(0x8ff8, 0x8ff8).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x8ffa, 0x8ffa).portr("SYSTEM").w("aysnd", FUNC(ay8910_device::data_w));
+	map(0x8ffc, 0x8ffc).w(this, FUNC(jollyjgr_state::jollyjgr_misc_w));
+	map(0x8ffd, 0x8ffd).w(this, FUNC(jollyjgr_state::jollyjgr_coin_lookout_w));
+	map(0x8fff, 0x8fff).portr("DSW2");
+	map(0x9000, 0x93ff).ram().w(this, FUNC(jollyjgr_state::jollyjgr_videoram_w)).share("videoram");
+	map(0x9800, 0x983f).ram().w(this, FUNC(jollyjgr_state::jollyjgr_attrram_w)).share("colorram");
+	map(0x9840, 0x987f).ram().share("spriteram");
+	map(0x9880, 0x989f).ram(); // ?
+	map(0x98a0, 0x98af).ram().share("bulletram");
+	map(0x98b0, 0x9bff).ram(); // ?
+	map(0xa000, 0xffff).ram().share("bitmap");
+}
 
 
 
@@ -647,10 +653,10 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(jollyjgr_state::jollyjgr_interrupt)
+WRITE_LINE_MEMBER(jollyjgr_state::vblank_irq)
 {
-	if(m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -666,6 +672,7 @@ void jollyjgr_state::machine_start()
 void jollyjgr_state::machine_reset()
 {
 	m_nmi_enable = 0;
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_flip_x = 0;
 	m_flip_y = 0;
 	m_bitmap_disable = 0;
@@ -676,7 +683,6 @@ MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/6)  /* 3MHz verified */
 	MCFG_CPU_PROGRAM_MAP(jollyjgr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jollyjgr_state,  jollyjgr_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -685,6 +691,7 @@ MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jollyjgr_state, screen_update_jollyjgr)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jollyjgr_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jollyjgr)
 	MCFG_PALETTE_ADD("palette", 32) // tilemap and sprites
@@ -698,7 +705,8 @@ MACHINE_CONFIG_START(jollyjgr_state::jollyjgr)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(jollyjgr_state::fspider, jollyjgr)
+MACHINE_CONFIG_START(jollyjgr_state::fspider)
+	jollyjgr(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fspider_map)
 

@@ -54,4 +54,8 @@ public:
 	virtual void video_start() override;
 	void unkpacg(machine_config &config);
 	void _4enraya(machine_config &config);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void unkpacg_main_map(address_map &map);
+	void unkpacg_main_portmap(address_map &map);
 };

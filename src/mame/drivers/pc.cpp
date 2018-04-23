@@ -395,52 +395,66 @@ public:
 	void eagle1600(machine_config &config);
 	void laser_turbo_xt(machine_config &config);
 	void ibm5550(machine_config &config);
+	void epc_io(address_map &map);
+	void ibm5550_io(address_map &map);
+	void pc16_io(address_map &map);
+	void pc16_map(address_map &map);
+	void pc8_io(address_map &map);
+	void pc8_map(address_map &map);
+	void zenith_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, pc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pc_state::pc8_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8, pc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xf7fff) AM_RAM
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("bios", 0x8000)
-ADDRESS_MAP_END
+void pc_state::zenith_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xf7fff).ram();
+	map(0xf8000, 0xfffff).rom().region("bios", 0x8000);
+}
 
-static ADDRESS_MAP_START( pc16_map, AS_PROGRAM, 16, pc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
-ADDRESS_MAP_END
+void pc_state::pc16_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0xf0000, 0xfffff).rom().region("bios", 0);
+}
 
-static ADDRESS_MAP_START(pc8_io, AS_IO, 8, pc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-ADDRESS_MAP_END
+void pc_state::pc8_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+}
 
-static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
-ADDRESS_MAP_END
+void pc_state::pc16_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x0070, 0x007f).ram(); // needed for Poisk-2
+}
 
 READ8_MEMBER(pc_state::unk_r)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00a0, 0x00a1) AM_READ8(unk_r, 0x00ff )
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
-ADDRESS_MAP_END
+void pc_state::ibm5550_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x00a0, 0x00a0).r(this, FUNC(pc_state::unk_r));
+}
 
-static ADDRESS_MAP_START(epc_io, AS_IO, 8, pc_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0070, 0x0070) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
-	AM_RANGE(0x0071, 0x0071) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-ADDRESS_MAP_END
+void pc_state::epc_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x00ff).m("mb", FUNC(ibm5160_mb_device::map));
+	map(0x0070, 0x0070).rw("i8251", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x0071, 0x0071).rw("i8251", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+}
 
 INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
 {
@@ -529,32 +543,34 @@ MACHINE_CONFIG_END
 
 void pc_state::cfg_dual_720K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("35dd");
 }
 
 void pc_state::cfg_single_360K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "525dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 void pc_state::cfg_single_720K(device_t *device)
 {
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
-	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
-	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
 //Data General One
-MACHINE_CONFIG_DERIVED(pc_state::dgone, pccga)
+MACHINE_CONFIG_START(pc_state::dgone)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_dual_720K)
 MACHINE_CONFIG_END
 
 // Ericsson Information System
-MACHINE_CONFIG_DERIVED(pc_state::epc, pccga)
+MACHINE_CONFIG_START(pc_state::epc)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc8, epc, I8088, 4772720)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -562,7 +578,8 @@ MACHINE_CONFIG_DERIVED(pc_state::epc, pccga)
 	MCFG_DEVICE_ADD("i8251", I8251, 0) // clock?
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pc_state::eppc, pccga)
+MACHINE_CONFIG_START(pc_state::eppc)
+	pccga(config);
 MACHINE_CONFIG_END
 
 // Bondwell BW230
@@ -575,7 +592,8 @@ static INPUT_PORTS_START( bondwell )
 	PORT_DIPSETTING(    0x02, "On (12 MHz)" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_DERIVED(pc_state::bondwell, pccga)
+MACHINE_CONFIG_START(pc_state::bondwell)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc8, pc8, I8088, 4772720) // turbo?
 MACHINE_CONFIG_END
@@ -632,7 +650,8 @@ MACHINE_CONFIG_END
 
 
 //MK-88
-MACHINE_CONFIG_DERIVED(pc_state::mk88, poisk2)
+MACHINE_CONFIG_START(pc_state::mk88)
+	poisk2(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("cga_ec1841")
 MACHINE_CONFIG_END
@@ -665,7 +684,8 @@ MACHINE_CONFIG_END
 
 
 //NCR PC4i
-MACHINE_CONFIG_DERIVED(pc_state::ncrpc4i, pccga)
+MACHINE_CONFIG_START(pc_state::ncrpc4i)
+	pccga(config);
 	//MCFG_DEVICE_MODIFY("mb:isa")
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
@@ -733,7 +753,8 @@ static DEVICE_INPUT_DEFAULTS_START( m15 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x01, 0x00)
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_DERIVED(pc_state::m15, pccga)
+MACHINE_CONFIG_START(pc_state::m15)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(m15)
 	MCFG_DEVICE_MODIFY("isa2")
@@ -745,7 +766,8 @@ MACHINE_CONFIG_END
 
 
 // Atari PC1
-MACHINE_CONFIG_DERIVED(pc_state::ataripc1, pccga)
+MACHINE_CONFIG_START(pc_state::ataripc1)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_DEFAULT_OPTION("ega")
 	MCFG_DEVICE_MODIFY("isa2")
@@ -753,7 +775,8 @@ MACHINE_CONFIG_DERIVED(pc_state::ataripc1, pccga)
 MACHINE_CONFIG_END
 
 //Eagle 1600
-MACHINE_CONFIG_DERIVED(pc_state::eagle1600, pccga)
+MACHINE_CONFIG_START(pc_state::eagle1600)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc16, pc16, I8086, 8000000)
 MACHINE_CONFIG_END
@@ -817,7 +840,8 @@ MACHINE_CONFIG_START(pc_state::laser_turbo_xt)
 MACHINE_CONFIG_END
 
 //Olytext 30
-MACHINE_CONFIG_DERIVED(pc_state::olytext30, pccga)
+MACHINE_CONFIG_START(pc_state::olytext30)
+	pccga(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_PC(pc8, pc8, V20, XTAL(14'318'181)/3) /* 4,77 MHz */
 	MCFG_DEVICE_MODIFY("isa2")
@@ -831,7 +855,8 @@ MACHINE_CONFIG_DERIVED(pc_state::olytext30, pccga)
 MACHINE_CONFIG_END
 
 // Kaypro 16
-MACHINE_CONFIG_DERIVED(pc_state::kaypro16, pccga)
+MACHINE_CONFIG_START(pc_state::kaypro16)
+	pccga(config);
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_SLOT_FIXED(true)
 	MCFG_DEVICE_MODIFY("isa2")
@@ -931,9 +956,9 @@ ROM_END
 
 ROM_START( mc1702 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
-	ROM_LOAD16_BYTE( "2764_2_(573rf4).rom", 0xc000,  0x2000, CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
-	ROM_LOAD16_BYTE( "2764_3_(573rf4).rom", 0xc001, 0x2000, CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
-	ROM_LOAD( "ba1m_(573rf5).rom", 0x0000, 0x0800, CRC(08d938e8) SHA1(957b6c691dbef75c1c735e8e4e81669d056971e4))
+	ROM_LOAD16_BYTE( "2764_2,573rf4.rom", 0xc000,  0x2000, CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
+	ROM_LOAD16_BYTE( "2764_3,573rf4.rom", 0xc001, 0x2000, CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
+	ROM_LOAD( "ba1m,573rf5.rom", 0x0000, 0x0800, CRC(08d938e8) SHA1(957b6c691dbef75c1c735e8e4e81669d056971e4))
 ROM_END
 
 ROM_START( zdsupers )

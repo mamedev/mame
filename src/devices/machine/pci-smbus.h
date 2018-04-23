@@ -12,6 +12,13 @@ class smbus_device : public pci_device {
 public:
 	smbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	void map(address_map &map);
+
 	DECLARE_READ8_MEMBER  (hst_sts_r);
 	DECLARE_WRITE8_MEMBER (hst_sts_w);
 	DECLARE_READ8_MEMBER  (hst_cnt_r);
@@ -47,13 +54,6 @@ public:
 	DECLARE_READ8_MEMBER  (notify_daddr_r);
 	DECLARE_READ8_MEMBER  (notify_dlow_r);
 	DECLARE_READ8_MEMBER  (notify_dhigh_r);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-private:
-	DECLARE_ADDRESS_MAP(map, 32);
 
 	uint16_t slv_data;
 

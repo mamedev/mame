@@ -34,15 +34,17 @@ class uzebox_state : public driver_device
 {
 public:
 	uzebox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartslot"),
-		m_ctrl1(*this, "ctrl1"),
-		m_ctrl2(*this, "ctrl2"),
-		m_speaker(*this, "speaker")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_cart(*this, "cartslot")
+		, m_ctrl1(*this, "ctrl1")
+		, m_ctrl2(*this, "ctrl2")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	required_device<avr8_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<generic_slot_device> m_cart;
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
@@ -64,6 +66,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
 
 	void uzebox(machine_config &config);
+	void uzebox_data_map(address_map &map);
+	void uzebox_io_map(address_map &map);
+	void uzebox_prg_map(address_map &map);
 private:
 	int             m_vpos;
 	uint64_t          m_line_start_cycles;
@@ -77,7 +82,7 @@ private:
 
 void uzebox_state::machine_start()
 {
-	machine().first_screen()->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
@@ -194,20 +199,23 @@ READ8_MEMBER(uzebox_state::port_d_r)
 * Address maps                                       *
 \****************************************************/
 
-static ADDRESS_MAP_START( uzebox_prg_map, AS_PROGRAM, 8, uzebox_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM // 64 KB internal eprom  ATmega644
-ADDRESS_MAP_END
+void uzebox_state::uzebox_prg_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom(); // 64 KB internal eprom  ATmega644
+}
 
-static ADDRESS_MAP_START( uzebox_data_map, AS_DATA, 8, uzebox_state )
-	AM_RANGE(0x0100, 0x10ff) AM_RAM //  4KB RAM
-ADDRESS_MAP_END
+void uzebox_state::uzebox_data_map(address_map &map)
+{
+	map(0x0100, 0x10ff).ram(); //  4KB RAM
+}
 
-static ADDRESS_MAP_START( uzebox_io_map, AS_IO, 8, uzebox_state )
-	AM_RANGE(AVR8_REG_A, AVR8_REG_A) AM_READWRITE( port_a_r, port_a_w )
-	AM_RANGE(AVR8_REG_B, AVR8_REG_B) AM_READWRITE( port_b_r, port_b_w )
-	AM_RANGE(AVR8_REG_C, AVR8_REG_C) AM_READWRITE( port_c_r, port_c_w )
-	AM_RANGE(AVR8_REG_D, AVR8_REG_D) AM_READWRITE( port_d_r, port_d_w )
-ADDRESS_MAP_END
+void uzebox_state::uzebox_io_map(address_map &map)
+{
+	map(AVR8_REG_A, AVR8_REG_A).rw(this, FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
+	map(AVR8_REG_B, AVR8_REG_B).rw(this, FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
+	map(AVR8_REG_C, AVR8_REG_C).rw(this, FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
+	map(AVR8_REG_D, AVR8_REG_D).rw(this, FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
+}
 
 /****************************************************\
 * Input ports                                        *

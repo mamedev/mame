@@ -76,6 +76,9 @@ public:
 	void refresh();
 
 	void cchasm(machine_config &config);
+	void memmap(address_map &map);
+	void sound_memmap(address_map &map);
+	void sound_portmap(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

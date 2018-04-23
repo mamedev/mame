@@ -173,13 +173,14 @@ WRITE16_MEMBER(gp9001vdp_device::top_tmap_w)
 }
 
 
-DEVICE_ADDRESS_MAP_START( map, 16, gp9001vdp_device )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(bg_tmap_w) AM_SHARE("vram_bg")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(fg_tmap_w) AM_SHARE("vram_fg")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(top_tmap_w) AM_SHARE("vram_top")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") AM_MIRROR(0x0800)
+void gp9001vdp_device::map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram().w(this, FUNC(gp9001vdp_device::bg_tmap_w)).share("vram_bg");
+	map(0x1000, 0x1fff).ram().w(this, FUNC(gp9001vdp_device::fg_tmap_w)).share("vram_fg");
+	map(0x2000, 0x2fff).ram().w(this, FUNC(gp9001vdp_device::top_tmap_w)).share("vram_top");
+	map(0x3000, 0x37ff).ram().share("spriteram").mirror(0x0800);
 //  AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
-ADDRESS_MAP_END
+}
 
 
 const gfx_layout gp9001vdp_device::tilelayout =
@@ -219,7 +220,7 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_video_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
-		m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, address_map_delegate(FUNC(gp9001vdp_device::map), this)),
+		m_space_config("gp9001vdp", ENDIANNESS_BIG, 16,14, 0, address_map_constructor(FUNC(gp9001vdp_device::map), this)),
 		m_vram_bg(*this, "vram_bg"),
 		m_vram_fg(*this, "vram_fg"),
 		m_vram_top(*this, "vram_top"),

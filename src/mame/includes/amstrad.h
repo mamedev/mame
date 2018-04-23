@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef AMSTRAD_H_
-#define AMSTRAD_H_
+#ifndef MAME_INCLUDES_AMSTRAD_H
+#define MAME_INCLUDES_AMSTRAD_H
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
@@ -269,6 +269,8 @@ public:
 	void aleste(machine_config &config);
 	void kccomp(machine_config &config);
 	void cpc464(machine_config &config);
+	void amstrad_io(address_map &map);
+	void amstrad_mem(address_map &map);
 protected:
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_user1;
@@ -336,4 +338,4 @@ protected:
 SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 SLOT_INTERFACE_EXTERN(cpcplus_exp_cards);
 
-#endif /* AMSTRAD_H_ */
+#endif // MAME_INCLUDES_AMSTRAD_H

@@ -145,6 +145,8 @@ public:
 	void megatech(machine_config &config);
 	void megatech_multislot(machine_config &config);
 	void megatech_fixedslot(machine_config &config);
+	void megatech_bios_map(address_map &map);
+	void megatech_bios_portmap(address_map &map);
 private:
 	uint8_t m_mt_cart_select_reg;
 	uint32_t m_bios_port_ctrl;
@@ -520,17 +522,18 @@ WRITE8_MEMBER(mtech_state::banked_ram_w )
 
 
 
-static ADDRESS_MAP_START( megatech_bios_map, AS_PROGRAM, 8, mtech_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM // from bios rom (0x0000-0x2fff populated in ROM)
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(banked_ram_r, banked_ram_w) // copies instruction data here at startup, must be banked
-	AM_RANGE(0x4000, 0x5fff) AM_RAM // plain ram?
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(mt_z80_bank_w )
-	AM_RANGE(0x6400, 0x6407) AM_DEVREADWRITE("io1", cxd1095_device, read, write)
-	AM_RANGE(0x6800, 0x6807) AM_DEVREADWRITE("io2", cxd1095_device, read, write)
-	AM_RANGE(0x7000, 0x77ff) AM_ROM // from bios rom (0x7000-0x77ff populated in ROM)
+void mtech_state::megatech_bios_map(address_map &map)
+{
+	map(0x0000, 0x2fff).rom(); // from bios rom (0x0000-0x2fff populated in ROM)
+	map(0x3000, 0x3fff).rw(this, FUNC(mtech_state::banked_ram_r), FUNC(mtech_state::banked_ram_w)); // copies instruction data here at startup, must be banked
+	map(0x4000, 0x5fff).ram(); // plain ram?
+	map(0x6000, 0x6000).w(this, FUNC(mtech_state::mt_z80_bank_w));
+	map(0x6400, 0x6407).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
+	map(0x6800, 0x6807).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
+	map(0x7000, 0x77ff).rom(); // from bios rom (0x7000-0x77ff populated in ROM)
 	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(read_68k_banked_data, write_68k_banked_data) // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
-ADDRESS_MAP_END
+	map(0x8000, 0x9fff).rw(this, FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
+}
 
 
 WRITE8_MEMBER(mtech_state::bios_port_ctrl_w )
@@ -574,17 +577,18 @@ READ8_MEMBER(mtech_state::vdp1_count_r)
 		return m_vdp1->vcount_read(prg, offset);
 }
 
-static ADDRESS_MAP_START( megatech_bios_portmap, AS_IO, 8, mtech_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x3f, 0x3f) AM_WRITE(bios_port_ctrl_w)
-	AM_RANGE(0x7f, 0x7f) AM_WRITE(bios_port_7f_w)
+void mtech_state::megatech_bios_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x3f, 0x3f).w(this, FUNC(mtech_state::bios_port_ctrl_w));
+	map(0x7f, 0x7f).w(this, FUNC(mtech_state::bios_port_7f_w));
 
-	AM_RANGE(0x40, 0x41) AM_MIRROR(0x3e) AM_READ(vdp1_count_r)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, vram_read, vram_write)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("vdp1", sega315_5124_device, register_read, register_write)
+	map(0x40, 0x41).mirror(0x3e).r(this, FUNC(mtech_state::vdp1_count_r));
+	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::vram_read), FUNC(sega315_5124_device::vram_write));
+	map(0x81, 0x81).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::register_read), FUNC(sega315_5124_device::register_write));
 
-	AM_RANGE(0xdc, 0xdd) AM_READ(bios_joypad_r)  // player inputs
-ADDRESS_MAP_END
+	map(0xdc, 0xdd).r(this, FUNC(mtech_state::bios_joypad_r));  // player inputs
+}
 
 
 
@@ -673,7 +677,7 @@ uint32_t mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bi
 
 MACHINE_CONFIG_START(mtech_state::megatech)
 	/* basic machine hardware */
-	MCFG_FRAGMENT_ADD(md_ntsc)
+	md_ntsc(config);
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
 	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
@@ -764,7 +768,8 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "megatech_cart") \
 	MCFG_GENERIC_LOAD(mtech_state, _load)
 
-MACHINE_CONFIG_DERIVED(mtech_state::megatech_multislot, megatech)
+MACHINE_CONFIG_START(mtech_state::megatech_multislot)
+	megatech(config);
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
@@ -780,7 +785,8 @@ MACHINE_CONFIG_DERIVED(mtech_state::megatech_multislot, megatech)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(mtech_state::megatech_fixedslot, megatech)
+MACHINE_CONFIG_START(mtech_state::megatech_fixedslot)
+	megatech(config);
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)

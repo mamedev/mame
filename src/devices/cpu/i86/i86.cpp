@@ -88,8 +88,8 @@ const uint8_t i8086_cpu_device::m_i8086_timing[] =
 
 /***************************************************************************/
 
-DEFINE_DEVICE_TYPE(I8086, i8086_cpu_device, "i8086", "I8086")
-DEFINE_DEVICE_TYPE(I8088, i8088_cpu_device, "i8088", "I8088")
+DEFINE_DEVICE_TYPE(I8086, i8086_cpu_device, "i8086", "Intel I8086")
+DEFINE_DEVICE_TYPE(I8088, i8088_cpu_device, "i8088", "Intel I8088")
 
 i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_cpu_device(mconfig, I8088, tag, owner, clock, 8)
@@ -136,7 +136,7 @@ device_memory_interface::space_config_vector i8086_cpu_device::memory_space_conf
 	return spaces;
 }
 
-uint8_t i8086_cpu_device::fetch_op()
+uint8_t i8086_cpu_device::fetch()
 {
 	uint8_t data;
 	data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
@@ -144,12 +144,39 @@ uint8_t i8086_cpu_device::fetch_op()
 	return data;
 }
 
-uint8_t i8086_cpu_device::fetch()
+address_space *i8086_cpu_device::sreg_to_space(int sreg) const
 {
-	uint8_t data;
-	data = m_direct_opcodes->read_byte(update_pc(), m_fetch_xor);
-	m_ip++;
-	return data;
+	switch(sreg)
+	{
+		default:
+			return m_program;
+		case CS:
+			return m_code;
+		case SS:
+			return m_stack;
+		case ES:
+			return m_extra;
+	}
+}
+
+uint8_t i8086_cpu_device::read_byte(uint32_t addr)
+{
+	return sreg_to_space(m_easeg)->read_byte(addr);
+}
+
+uint16_t i8086_cpu_device::read_word(uint32_t addr)
+{
+	return sreg_to_space(m_easeg)->read_word_unaligned(addr);
+}
+
+void i8086_cpu_device::write_byte(uint32_t addr, uint8_t data)
+{
+	sreg_to_space(m_easeg)->write_byte(addr, data);
+}
+
+void i8086_cpu_device::write_word(uint32_t addr, uint16_t data)
+{
+	sreg_to_space(m_easeg)->write_word_unaligned(addr, data);
 }
 
 void i8086_cpu_device::execute_run()
@@ -210,7 +237,7 @@ void i8086_cpu_device::execute_run()
 
 		if (!m_seg_prefix)
 		{
-			debugger_instruction_hook( this, update_pc() );
+			debugger_instruction_hook( update_pc() );
 		}
 
 		uint8_t op = fetch_op();
@@ -435,9 +462,6 @@ void i8086_common_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_stack = m_program;
-	m_code = m_program;
-	m_extra = m_program;
 	m_direct = m_program->direct<0>();
 	m_direct_opcodes = m_opcodes->direct<0>();
 	m_io = &space(AS_IO);
@@ -480,7 +504,7 @@ void i8086_common_cpu_device::device_start()
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).formatstr("%16s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	m_lock_handler.resolve_safe();
 }
@@ -525,7 +549,6 @@ void i8086_common_cpu_device::device_reset()
 	m_seg_prefix_next = false;
 	m_ea = 0;
 	m_eo = 0;
-	m_e16 = 0;
 	m_modrm = 0;
 	m_dst = 0;
 	m_src = 0;
@@ -549,8 +572,9 @@ void i8086_common_cpu_device::interrupt(int int_num, int trap)
 		m_pending_irq &= ~INT_IRQ;
 	}
 
-	uint16_t dest_off = read_word( int_num * 4 + 0, CS );
-	uint16_t dest_seg = read_word( int_num * 4 + 2, CS );
+	m_easeg = CS;
+	uint16_t dest_off = read_word(int_num * 4 + 0);
+	uint16_t dest_seg = read_word(int_num * 4 + 2);
 
 	PUSH(m_sregs[CS]);
 	PUSH(m_ip);
@@ -591,14 +615,34 @@ void i8086_common_cpu_device::execute_set_input( int inptnum, int state )
 	}
 }
 
-util::disasm_interface *i8086_common_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> i8086_common_cpu_device::create_disassembler()
 {
-	return new i386_disassembler(this);
+	return std::make_unique<i386_disassembler>(this);
 }
 
 int i8086_common_cpu_device::get_mode() const
 {
 	return 1;
+}
+
+uint8_t i8086_common_cpu_device::read_byte(uint32_t addr)
+{
+	return m_program->read_byte(addr);
+}
+
+uint16_t i8086_common_cpu_device::read_word(uint32_t addr)
+{
+	return m_program->read_word_unaligned(addr);
+}
+
+void i8086_common_cpu_device::write_byte(uint32_t addr, uint8_t data)
+{
+	m_program->write_byte(addr, data);
+}
+
+void i8086_common_cpu_device::write_word(uint32_t addr, uint16_t data)
+{
+	m_program->write_word_unaligned(addr, data);
 }
 
 uint8_t i8086_common_cpu_device::read_port_byte(uint16_t port)

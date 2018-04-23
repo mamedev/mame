@@ -65,6 +65,8 @@ private:
 	int m_x, m_y;
 	required_device<palette_device> m_palette;
 
+	void hd66421(address_map &map);
+
 	DECLARE_PALETTE_INIT(hd66421);
 };
 

@@ -633,7 +633,7 @@ uint32_t skns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	m_sprite_bitmap.fill(0x0000, cliprect);
 
 	if (m_alt_enable_sprites)
-		m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_spc_regs );
+		m_spritegen->skns_draw_sprites(m_sprite_bitmap, cliprect, m_spriteram, m_spriteram.bytes(), m_spc_regs ); // TODO : not all 0x4000 of the sprite RAM area can be displayed on real hardware
 
 
 	return 0;

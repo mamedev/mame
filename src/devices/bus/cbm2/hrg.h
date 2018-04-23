@@ -58,6 +58,9 @@ public:
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void hrg_a_map(address_map &map);
 };
 
 
@@ -72,6 +75,9 @@ public:
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void hrg_b_map(address_map &map);
 };
 
 

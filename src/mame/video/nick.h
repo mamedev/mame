@@ -33,7 +33,7 @@
 
 
 #define MCFG_NICK_VIRQ_CALLBACK(_write) \
-	devcb = &nick_device::set_virq_wr_callback(*device, DEVCB_##_write);
+	devcb = &downcast<nick_device &>(*device).set_virq_wr_callback(DEVCB_##_write);
 
 
 /* there are 64us per line, although in reality
@@ -75,13 +75,14 @@ public:
 	// construction/destruction
 	nick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_virq_wr_callback(device_t &device, _Object object) { return downcast<nick_device &>(device).m_write_virq.set_callback(object); }
+	template<class _Object> devcb_base &set_virq_wr_callback(_Object object) { return m_write_virq.set_callback(object); }
 
-	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
-	virtual DECLARE_ADDRESS_MAP(vio_map, 8);
+	virtual void vram_map(address_map &map);
+	virtual void vio_map(address_map &map);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void nick_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -19,7 +19,7 @@
 //**************************************************************************
 
 #define MCFG_CDP1879_IRQ_CALLBACK(_cb) \
-	devcb = &cdp1879_device::set_irq_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<cdp1879_device &>(*device).set_irq_cb(DEVCB_##_cb);
 
 
 //**************************************************************************
@@ -38,7 +38,7 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object wr) { return downcast<cdp1879_device &>(device).m_irq_w.set_callback(wr); }
+	template<class Object> devcb_base &set_irq_cb(Object &&cb) { return m_irq_w.set_callback(std::forward<Object>(cb)); }
 
 	devcb_write_line m_irq_w;
 

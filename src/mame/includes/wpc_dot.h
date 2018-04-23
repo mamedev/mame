@@ -7,8 +7,8 @@
  *      Author: bsr
  */
 
-#ifndef WPC_DOT_H_
-#define WPC_DOT_H_
+#ifndef MAME_INCLUDES_WPC_DOT_H
+#define MAME_INCLUDES_WPC_DOT_H
 
 #include "cpu/m6809/m6809.h"
 #include "audio/wpcsnd.h"
@@ -35,6 +35,7 @@ public:
 	{ }
 
 	void wpc_dot(machine_config &config);
+	void wpc_dot_map(address_map &map);
 protected:
 
 	// devices
@@ -81,4 +82,4 @@ private:
 	emu_timer* m_irq_timer;
 };
 
-#endif /* WPC_DOT_H_ */
+#endif // MAME_INCLUDES_WPC_DOT_H

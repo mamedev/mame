@@ -26,6 +26,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(pc0_r);
 	DECLARE_WRITE_LINE_MEMBER(sync_w);
 
+	void internal_pgm(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -35,7 +36,7 @@ protected:
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
 	enum {

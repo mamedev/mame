@@ -61,7 +61,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "wd1772"),
-		m_via(*this, "via6522")
+		m_via(*this, "via6522"),
+		m_digits(*this, "digit%u", 0U)
 	{
 	}
 
@@ -75,8 +76,10 @@ public:
 	DECLARE_READ8_MEMBER(mirage_adc_read);
 
 	void mirage(machine_config &config);
+	void mirage_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	virtual void video_start() override;
 
 	required_device<mc6809e_device> m_maincpu;
@@ -87,6 +90,7 @@ protected:
 
 	uint8_t m_l_segs, m_r_segs;
 	int   m_l_hi, m_r_hi;
+	output_finder<2> m_digits;
 };
 
 FLOPPY_FORMATS_MEMBER( enmirage_state::floppy_formats )
@@ -122,17 +126,18 @@ void enmirage_state::machine_reset()
 	membank("sndbank")->set_base(memregion("es5503")->base() );
 }
 
-static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, enmirage_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("sndbank")  // 32k window on 128k of wave RAM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM         // main RAM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM         // expansion RAM
-	AM_RANGE(0xe100, 0xe101) AM_DEVREADWRITE("acia6850", acia6850_device, read, write)
-	AM_RANGE(0xe200, 0xe2ff) AM_DEVREADWRITE("via6522", via6522_device, read, write)
-	AM_RANGE(0xe400, 0xe4ff) AM_NOP
-	AM_RANGE(0xe800, 0xe803) AM_DEVREADWRITE("wd1772", wd1772_device, read, write)
-	AM_RANGE(0xec00, 0xecef) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("osrom", 0)
-ADDRESS_MAP_END
+void enmirage_state::mirage_map(address_map &map)
+{
+	map(0x0000, 0x7fff).bankrw("sndbank");  // 32k window on 128k of wave RAM
+	map(0x8000, 0xbfff).ram();         // main RAM
+	map(0xc000, 0xdfff).ram();         // expansion RAM
+	map(0xe100, 0xe101).rw("acia6850", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xe200, 0xe2ff).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe400, 0xe4ff).noprw();
+	map(0xe800, 0xe803).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write));
+	map(0xec00, 0xecef).rw("es5503", FUNC(es5503_device::read), FUNC(es5503_device::write));
+	map(0xf000, 0xffff).rom().region("osrom", 0);
+}
 
 // port A: front panel
 // bits 0-2: column select from 0-7
@@ -163,7 +168,7 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_porta)
 		}
 
 		m_l_hi = seg;
-		output().set_digit_value(0, m_l_segs);
+		m_digits[0] = m_l_segs;
 //      printf("L LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_l_hi, segconv[seg], m_l_segs);
 	}
 	// right LED selected?
@@ -181,7 +186,7 @@ WRITE8_MEMBER(enmirage_state::mirage_via_write_porta)
 		}
 
 		m_r_hi = seg;
-		output().set_digit_value(1, m_r_segs);
+		m_digits[1] = m_r_segs;
 //      printf("R LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_r_hi, segconv[seg], m_r_segs);
 	}
 }

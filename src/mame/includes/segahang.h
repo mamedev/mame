@@ -88,6 +88,17 @@ public:
 	void endurobl(machine_config &config);
 	void enduror1(machine_config &config);
 	void hangon(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void fd1094_decrypted_opcodes_map(address_map &map);
+	void hangon_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void sharrier_map(address_map &map);
+	void sound_map_2151(address_map &map);
+	void sound_map_2203(address_map &map);
+	void sound_portmap_2151(address_map &map);
+	void sound_portmap_2203(address_map &map);
+	void sound_portmap_2203x2(address_map &map);
+	void sub_map(address_map &map);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;

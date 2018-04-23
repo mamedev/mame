@@ -38,10 +38,12 @@ public:
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
 	void digijet(machine_config &config);
+	void io_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, digijet_state )
-ADDRESS_MAP_END
+void digijet_state::io_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( digijet )
 INPUT_PORTS_END

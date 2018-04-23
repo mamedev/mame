@@ -103,46 +103,49 @@ WRITE8_MEMBER(shootout_state::coincounter_w)
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8, shootout_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE(bankswitch_w)
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE(flipscreen_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE(coincounter_w)
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2") AM_WRITE(sound_cpu_command_w)
-	AM_RANGE(0x1004, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(textram_w) AM_SHARE("textram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
-ADDRESS_MAP_END
+void shootout_state::shootout_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1000).portr("DSW1").w(this, FUNC(shootout_state::bankswitch_w));
+	map(0x1001, 0x1001).portr("P1").w(this, FUNC(shootout_state::flipscreen_w));
+	map(0x1002, 0x1002).portr("P2").w(this, FUNC(shootout_state::coincounter_w));
+	map(0x1003, 0x1003).portr("DSW2").w(this, FUNC(shootout_state::sound_cpu_command_w));
+	map(0x1004, 0x17ff).ram();
+	map(0x1800, 0x19ff).ram().share("spriteram");
+	map(0x2000, 0x27ff).ram().w(this, FUNC(shootout_state::textram_w)).share("textram");
+	map(0x2800, 0x2fff).ram().w(this, FUNC(shootout_state::videoram_w)).share("videoram");
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom().region("maincpu", 0x0000);
+}
 
-static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8, shootout_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1004, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(coincounter_w)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(textram_w) AM_SHARE("textram")
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
-ADDRESS_MAP_END
+void shootout_state::shootouj_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1000).portr("DSW1");
+	map(0x1001, 0x1001).portr("P1");
+	map(0x1002, 0x1002).portr("P2");
+	map(0x1003, 0x1003).portr("DSW2");
+	map(0x1004, 0x17ff).ram();
+	map(0x1800, 0x1800).w(this, FUNC(shootout_state::coincounter_w));
+	map(0x2000, 0x21ff).ram().share("spriteram");
+	map(0x2800, 0x2801).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x3000, 0x37ff).ram().w(this, FUNC(shootout_state::textram_w)).share("textram");
+	map(0x3800, 0x3fff).ram().w(this, FUNC(shootout_state::videoram_w)).share("videoram");
+	map(0x4000, 0x7fff).bankr("bank1");
+	map(0x8000, 0xffff).rom().region("maincpu", 0x0000);
+}
 
 /*******************************************************************************/
 
 /* same as Tryout */
-static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8, shootout_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(sound_cpu_command_r)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x0000)
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // Unknown, NOT irq/nmi mask (Always 0x80 ???)
-ADDRESS_MAP_END
+void shootout_state::shootout_sound_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram();
+	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa000).r(this, FUNC(shootout_state::sound_cpu_command_r));
+	map(0xc000, 0xffff).rom().region("audiocpu", 0x0000);
+	map(0xd000, 0xd000).nopw(); // Unknown, NOT irq/nmi mask (Always 0x80 ???)
+}
 
 /*******************************************************************************/
 
@@ -210,7 +213,7 @@ static INPUT_PORTS_START( shootout )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) // This needs to be low to allows both coins to be accepted...
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // This needs to be low to allows both coins to be accepted...
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
@@ -337,7 +340,8 @@ MACHINE_CONFIG_START(shootout_state::shootouj)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(shootout_state::shootouk, shootouj)
+MACHINE_CONFIG_START(shootout_state::shootouk)
+	shootouj(config);
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)

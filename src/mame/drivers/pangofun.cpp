@@ -110,29 +110,33 @@ public:
 	DECLARE_DRIVER_INIT(pangofun);
 	virtual void machine_start() override;
 	void pangofun(machine_config &config);
+	void pcat_io(address_map &map);
+	void pcat_map(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pangofun_state )
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000e0000, 0x000effff) AM_ROM AM_REGION("game_prg", 0)
-	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
+void pangofun_state::pcat_map(address_map &map)
+{
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
+	map(0x000e0000, 0x000effff).rom().region("game_prg", 0);
+	map(0x000f0000, 0x000fffff).rom().region("bios", 0);
 	/* TODO: correct RAM mapping/size? */
-	AM_RANGE(0x00100000, 0x00ffffff) AM_NOP
-	AM_RANGE(0x01000000, 0x01ffffff) AM_RAM
-	AM_RANGE(0x02000000, 0xfffeffff) AM_NOP
-	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
-ADDRESS_MAP_END
+	map(0x00100000, 0x00ffffff).noprw();
+	map(0x01000000, 0x01ffffff).ram();
+	map(0x02000000, 0xfffeffff).noprw();
+	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
+}
 
-static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pangofun_state )
-	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x00e0, 0x00e3) AM_WRITENOP
-	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
-	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-ADDRESS_MAP_END
+void pangofun_state::pcat_io(address_map &map)
+{
+	pcat32_io_common(map);
+	map(0x00e0, 0x00e3).nopw();
+	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
+	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
+	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+}
 
 #define AT_KEYB_HELPER(bit, text, key1) \
 	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(text) PORT_CODE(key1)
@@ -180,12 +184,12 @@ MACHINE_CONFIG_START(pangofun_state::pangofun)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	pcvideo_vga(config);
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MCFG_FRAGMENT_ADD( pcat_common )
+	pcat_common(config);
 MACHINE_CONFIG_END
 
 

@@ -293,15 +293,17 @@ WRITE8_MEMBER( tiki100_state::system_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( tiki100_mem, AS_PROGRAM, 8, tiki100_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mrq_r, mrq_w)
-ADDRESS_MAP_END
+void tiki100_state::tiki100_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(tiki100_state::mrq_r), FUNC(tiki100_state::mrq_w));
+}
 
-static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
-ADDRESS_MAP_END
+void tiki100_state::tiki100_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(tiki100_state::iorq_r), FUNC(tiki100_state::iorq_w));
+}
 
 /* Input Ports */
 

@@ -85,17 +85,18 @@ class tec1_state : public driver_device
 {
 public:
 	tec1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker"),
-		m_cass(*this, "cassette"),
-		m_wave(*this, WAVE_TAG),
-		m_key_pressed(0),
-		m_io_line0(*this, "LINE0"),
-		m_io_line1(*this, "LINE1"),
-		m_io_line2(*this, "LINE2"),
-		m_io_line3(*this, "LINE3"),
-		m_io_shift(*this, "SHIFT")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
+		, m_cass(*this, "cassette")
+		, m_wave(*this, WAVE_TAG)
+		, m_key_pressed(0)
+		, m_io_line0(*this, "LINE0")
+		, m_io_line1(*this, "LINE1")
+		, m_io_line2(*this, "LINE2")
+		, m_io_line3(*this, "LINE3")
+		, m_io_shift(*this, "SHIFT")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -108,6 +109,7 @@ public:
 	required_ioport m_io_line2;
 	required_ioport m_io_line3;
 	required_ioport m_io_shift;
+	output_finder<6> m_digits;
 	emu_timer *m_kbd_timer;
 	DECLARE_READ8_MEMBER( tec1_kbd_r );
 	DECLARE_READ8_MEMBER( latch_r );
@@ -125,6 +127,10 @@ public:
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
 	void tec1(machine_config &config);
 	void tecjmon(machine_config &config);
+	void tec1_io(address_map &map);
+	void tec1_map(address_map &map);
+	void tecjmon_io(address_map &map);
+	void tecjmon_map(address_map &map);
 };
 
 
@@ -237,12 +243,12 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 		if (BIT(m_digit, i))
 		{
 			m_refresh[i] = 1;
-			output().set_digit_value(i, m_segment);
+			m_digits[i] = m_segment;
 		}
 		else
 		if (m_refresh[i] == 0x80)
 		{
-			output().set_digit_value(i, 0);
+			m_digits[i] = 0;
 			m_refresh[i] = 0;
 		}
 		else
@@ -306,6 +312,7 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 
 void tec1_state::machine_start()
 {
+	m_digits.resolve();
 	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tec1_state::tec1_kbd_callback),this));
 	m_kbd_timer->adjust( attotime::zero, 0, attotime::from_hz(500) );
 }
@@ -323,37 +330,41 @@ void tec1_state::machine_reset()
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( tec1_map, AS_PROGRAM, 8, tec1_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM // on main board
-	AM_RANGE(0x1000, 0x3fff) AM_RAM // expansion
-ADDRESS_MAP_END
+void tec1_state::tec1_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x0fff).ram(); // on main board
+	map(0x1000, 0x3fff).ram(); // expansion
+}
 
-static ADDRESS_MAP_START( tec1_io, AS_IO, 8, tec1_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(tec1_digit_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tec1_segment_w)
-ADDRESS_MAP_END
+void tec1_state::tec1_io(address_map &map)
+{
+	map.global_mask(0x07);
+	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(this, FUNC(tec1_state::tec1_digit_w));
+	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
+}
 
 
-static ADDRESS_MAP_START( tecjmon_map, AS_PROGRAM, 8, tec1_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3fff) AM_ROM
-ADDRESS_MAP_END
+void tec1_state::tecjmon_map(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x37ff).ram();
+	map(0x3800, 0x3fff).rom();
+}
 
-static ADDRESS_MAP_START( tecjmon_io, AS_IO, 8, tec1_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(tec1_kbd_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE(tecjmon_digit_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(tec1_segment_w)
-	AM_RANGE(0x03, 0x03) AM_READ(latch_r)
+void tec1_state::tecjmon_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(this, FUNC(tec1_state::tecjmon_digit_w));
+	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
+	map(0x03, 0x03).r(this, FUNC(tec1_state::latch_r));
 	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
 	//AM_RANGE(0x84, 0x84) AM_WRITE(lcd_2nd_w)
-ADDRESS_MAP_END
+}
 
 
 /**************************************************************************

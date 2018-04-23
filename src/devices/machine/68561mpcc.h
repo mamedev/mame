@@ -63,26 +63,26 @@
 
 /* Generic macros */
 #define MCFG_MPCC_CLOCK(_rx, _tx) \
-	mpcc_device::configure_clocks(*device, _rx, _tx);
+	downcast<mpcc_device &>(*device).configure_clocks(_rx, _tx);
 
 /* Callbacks to be called by us for signals driven by the MPCC */
 #define MCFG_MPCC_OUT_TXD_CB(_devcb) \
-	devcb = &mpcc_device::set_out_txd_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mpcc_device &>(*device).set_out_txd_callback(DEVCB_##_devcb);
 
 #define MCFG_MPCC_OUT_DTR_CB(_devcb) \
-	devcb = &mpcc_device::set_out_dtr_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mpcc_device &>(*device).set_out_dtr_callback(DEVCB_##_devcb);
 
 #define MCFG_MPCC_OUT_RTS_CB(_devcb) \
-	devcb = &mpcc_device::set_out_rts_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mpcc_device &>(*device).set_out_rts_callback(DEVCB_##_devcb);
 
 #define MCFG_MPCC_OUT_TRXC_CB(_devcb) \
-	devcb = &mpcc_device::set_out_trxc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mpcc_device &>(*device).set_out_trxc_callback(DEVCB_##_devcb);
 
 #define MCFG_MPCC_OUT_RTXC_CB(_devcb) \
-	devcb = &mpcc_device::set_out_rtxc_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mpcc_device &>(*device).set_out_rtxc_callback(DEVCB_##_devcb);
 
 #define MCFG_MPCC_OUT_INT_CB(_devcb) \
-	devcb = &mpcc_device::set_out_int_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<mpcc_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 
 
@@ -95,19 +95,18 @@ public:
 	// construction/destruction
 	mpcc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_out_txd_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_txd_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_dtr_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_dtr_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_rts_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_rts_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_rtxc_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_rtxc_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_out_trxc_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_trxc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_txd_callback(Object &&cb) { return m_out_txd_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_dtr_callback(Object &&cb) { return m_out_dtr_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_rts_callback(Object &&cb) { return m_out_rts_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_rtxc_callback(Object &&cb) { return m_out_rtxc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_trxc_callback(Object &&cb) { return m_out_trxc_cb.set_callback(std::forward<Object>(cb)); }
 
-	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<mpcc_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
 
-	static void configure_clocks(device_t &device, int rxc, int txc)
+	void configure_clocks(int rxc, int txc)
 	{
-		mpcc_device &dev = downcast<mpcc_device &>(device);
-		dev.m_rxc = rxc;
-		dev.m_txc = txc;
+		m_rxc = rxc;
+		m_txc = txc;
 	}
 
 	DECLARE_READ8_MEMBER( read );

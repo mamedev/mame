@@ -378,7 +378,7 @@
 #define PREVIOUS_PC     ((PC & ADDRESS_EXTENSION_MASK) | ((PC-1) & BASE_ADDRESS_MASK))
 
 
-DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "PDP1")
+DEFINE_DEVICE_TYPE(PDP1, pdp1_device, "pdp1_cpu", "DEC PDP1")
 
 
 pdp1_device::pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -419,9 +419,9 @@ void pdp1_device::device_config_complete()
 }
 
 
-util::disasm_interface *pdp1_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> pdp1_device::create_disassembler()
 {
-	return new pdp1_disassembler;
+	return std::make_unique<pdp1_disassembler>();
 }
 
 
@@ -649,7 +649,7 @@ void pdp1_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_pf ).formatstr("%13s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	/* reset CPU flip-flops */
 	pulse_start_clear();
@@ -796,7 +796,7 @@ void pdp1_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 
 
 		/* ioh should be cleared at the end of the instruction cycle, and ios at the

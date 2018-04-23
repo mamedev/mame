@@ -73,4 +73,6 @@ public:
 	void svolley(machine_config &config);
 	void rpunch(machine_config &config);
 	void svolleybl(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

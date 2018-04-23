@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "cpu/z80/tmpz84c011.h"
+#include "machine/nb1413m3.h"      // needed for mahjong input controller
 #include "machine/gen_latch.h"
 #include "screen.h"
 
@@ -103,8 +104,6 @@ public:
 	DECLARE_VIDEO_START(_1layer);
 	DECLARE_VIDEO_START(nb22090);
 
-	INTERRUPT_GEN_MEMBER(ctc0_trg1);
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int blitter_r(int offset, int vram);
 	void blitter_w(int offset, int data, int vram);
@@ -148,6 +147,41 @@ public:
 	void bakuhatu(machine_config &config);
 	void ultramhm(machine_config &config);
 	void otatidai(machine_config &config);
+	void cmehyou_io_map(address_map &map);
+	void gal10ren_io_map(address_map &map);
+	void imekura_io_map(address_map &map);
+	void jituroku_io_map(address_map &map);
+	void koinomp_io_map(address_map &map);
+	void koinomp_map(address_map &map);
+	void mjegolf_io_map(address_map &map);
+	void mjegolf_map(address_map &map);
+	void mjgottsu_io_map(address_map &map);
+	void mjkoiura_io_map(address_map &map);
+	void mjlaman_io_map(address_map &map);
+	void mjuraden_io_map(address_map &map);
+	void mjuraden_map(address_map &map);
+	void mkeibaou_io_map(address_map &map);
+	void mkoiuraa_io_map(address_map &map);
+	void mmehyou_io_map(address_map &map);
+	void mscoutm_io_map(address_map &map);
+	void mscoutm_map(address_map &map);
+	void ngpgal_io_map(address_map &map);
+	void ngpgal_map(address_map &map);
+	void otatidai_io_map(address_map &map);
+	void pachiten_io_map(address_map &map);
+	void patimono_io_map(address_map &map);
+	void psailor1_io_map(address_map &map);
+	void psailor2_io_map(address_map &map);
+	void renaiclb_io_map(address_map &map);
+	void sailorwr_io_map(address_map &map);
+	void sailorws_io_map(address_map &map);
+	void sailorws_map(address_map &map);
+	void sailorws_sound_io_map(address_map &map);
+	void sailorws_sound_map(address_map &map);
+	void shabdama_io_map(address_map &map);
+	void shabdama_map(address_map &map);
+	void yosimotm_io_map(address_map &map);
+	void yosimoto_io_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

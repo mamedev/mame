@@ -13,6 +13,7 @@ public:
 	{ }
 
 	void alvg(machine_config &config);
+	void alvg_map(address_map &map);
 protected:
 
 	// devices
@@ -25,11 +26,12 @@ public:
 };
 
 
-static ADDRESS_MAP_START( alvg_map, AS_PROGRAM, 8, alvg_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void alvg_state::alvg_map(address_map &map)
+{
+	map(0x0000, 0xffff).noprw();
+	map(0x0000, 0x3fff).ram();
+	map(0x4000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( alvg )
 INPUT_PORTS_END

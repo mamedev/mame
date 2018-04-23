@@ -18,9 +18,9 @@
 // 4-bit ports (3210 = DCBA)
 // valid ports: 4-7 for TMS1024, 1-7 for TMS1025
 #define MCFG_TMS1025_READ_PORT_CB(X, cb) \
-		devcb = &tms1024_device::set_read_port_callback<(tms1024_device::X)>(*device, (DEVCB_##cb));
+	devcb = &downcast<tms1024_device &>(*device).set_read_port_callback<(tms1024_device::X)>((DEVCB_##cb));
 #define MCFG_TMS1025_WRITE_PORT_CB(X, cb) \
-		devcb = &tms1024_device::set_write_port_callback<(tms1024_device::X)>(*device, (DEVCB_##cb));
+	devcb = &downcast<tms1024_device &>(*device).set_write_port_callback<(tms1024_device::X)>((DEVCB_##cb));
 
 // pinout reference
 
@@ -68,15 +68,9 @@ public:
 
 	tms1024_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// static configuration helpers
-	template <unsigned N, class Object> static devcb_base &set_read_port_callback(device_t &device, Object &&cb)
-	{
-		return downcast<tms1024_device &>(device).m_read_port[N].set_callback(std::forward<Object>(cb));
-	}
-	template <unsigned N, class Object> static devcb_base &set_write_port_callback(device_t &device, Object &&cb)
-	{
-		return downcast<tms1024_device &>(device).m_write_port[N].set_callback(std::forward<Object>(cb));
-	}
+	// configuration helpers
+	template <unsigned N, class Object> devcb_base &set_read_port_callback(Object &&cb) { return m_read_port[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> devcb_base &set_write_port_callback(Object &&cb) { return m_write_port[N].set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(write_h);
 	DECLARE_READ8_MEMBER(read_h);

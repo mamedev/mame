@@ -515,7 +515,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 		// COP to VFD serial format, bits 15..0
 		// A B J I x H G2 C x F G1 E K L M D
 		uint16_t value = bitswap<16>(m_402_q, 11, 7, 1, 13, 10, 3, 2, 12, 9, 5, 6, 4, 0, 8, 14, 15) & 0x3fff;
-		output().set_digit_value(m_405_q & 0x0f, value);
+		m_digits[m_405_q & 0x0f] = value;
 
 		if (LOG_VFD) logerror("%s %s vfd segment %u 402.Q %04x data %04x\n", machine().time().as_string(), machine().describe_context(), m_405_q & 0x0f, m_402_q, value);
 	}
@@ -577,20 +577,22 @@ READ_LINE_MEMBER( newbrain_state::tdi_r )
 //  ADDRESS_MAP( newbrain_mreq )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( newbrain_mreq, AS_PROGRAM, 8, newbrain_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
-ADDRESS_MAP_END
+void newbrain_state::newbrain_mreq(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(newbrain_state::mreq_r), FUNC(newbrain_state::mreq_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( newbrain_iorq )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( newbrain_iorq, AS_IO, 8, newbrain_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
-ADDRESS_MAP_END
+void newbrain_state::newbrain_iorq(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xffff).rw(this, FUNC(newbrain_state::iorq_r), FUNC(newbrain_state::iorq_w));
+}
 
 
 
@@ -723,6 +725,8 @@ int newbrain_state::get_pwrup_t()
 
 void newbrain_state::machine_start()
 {
+	m_digits.resolve();
+
 	// set power up timer
 	timer_set(attotime::from_usec(get_pwrup_t()), TIMER_ID_PWRUP);
 
@@ -822,7 +826,7 @@ MACHINE_CONFIG_START(newbrain_state::newbrain)
 	MCFG_COP400_READ_SI_CB(READLINE(newbrain_state, tdi_r))
 
 	// video hardware
-	MCFG_FRAGMENT_ADD(newbrain_video)
+	newbrain_video(config);
 
 	// devices
 	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim")
@@ -846,7 +850,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_ad )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_ad, newbrain)
+MACHINE_CONFIG_START(newbrain_state::newbrain_ad)
+	newbrain(config);
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 
@@ -855,7 +860,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_a )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_a, newbrain)
+MACHINE_CONFIG_START(newbrain_state::newbrain_a)
+	newbrain(config);
 	MCFG_DEFAULT_LAYOUT(layout_newbraina)
 MACHINE_CONFIG_END
 
@@ -864,7 +870,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( newbrain_md )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(newbrain_state::newbrain_md, newbrain)
+MACHINE_CONFIG_START(newbrain_state::newbrain_md)
+	newbrain(config);
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 MACHINE_CONFIG_END
 

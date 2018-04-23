@@ -76,27 +76,31 @@ public:
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
 	void pb2000c(machine_config &config);
 	void pb1000(machine_config &config);
+	void pb1000_mem(address_map &map);
+	void pb2000c_mem(address_map &map);
 };
 
-static ADDRESS_MAP_START(pb1000_mem, AS_PROGRAM, 16, pb1000_state)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE( 0x00000, 0x00bff ) AM_ROM
+void pb1000_state::pb1000_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x00000, 0x00bff).rom();
 	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
-	AM_RANGE( 0x06000, 0x07fff ) AM_RAM                 AM_SHARE("nvram1")
-	AM_RANGE( 0x08000, 0x0ffff ) AM_ROMBANK("bank1")
-	AM_RANGE( 0x18000, 0x1ffff ) AM_RAM                 AM_SHARE("nvram2")
-ADDRESS_MAP_END
+	map(0x06000, 0x07fff).ram().share("nvram1");
+	map(0x08000, 0x0ffff).bankr("bank1");
+	map(0x18000, 0x1ffff).ram().share("nvram2");
+}
 
-static ADDRESS_MAP_START(pb2000c_mem, AS_PROGRAM, 16, pb1000_state)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE( 0x00000, 0x00bff ) AM_ROM
+void pb1000_state::pb2000c_mem(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x00000, 0x0ffff).bankr("bank1");
+	map(0x00000, 0x00bff).rom();
 	//AM_RANGE( 0x00c00, 0x00c0f ) AM_NOP   //I/O
-	AM_RANGE( 0x00c10, 0x00c11 ) AM_WRITE(gatearray_w)
-	AM_RANGE( 0x00000, 0x0ffff ) AM_ROMBANK("bank1")
-	AM_RANGE( 0x10000, 0x1ffff ) AM_RAM                 AM_SHARE("nvram1")
-	AM_RANGE( 0x20000, 0x27fff ) AM_DEVREAD("cardslot1", generic_slot_device, read16_rom)
-	AM_RANGE( 0x28000, 0x2ffff ) AM_RAM                 AM_SHARE("nvram2")
-ADDRESS_MAP_END
+	map(0x00c10, 0x00c11).w(this, FUNC(pb1000_state::gatearray_w));
+	map(0x10000, 0x1ffff).ram().share("nvram1");
+	map(0x20000, 0x27fff).r(m_card1, FUNC(generic_slot_device::read16_rom));
+	map(0x28000, 0x2ffff).ram().share("nvram2");
+}
 
 
 /* Input ports */
@@ -514,7 +518,8 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(pb1000_state::pb2000c, pb1000)
+MACHINE_CONFIG_START(pb1000_state::pb2000c)
+	pb1000(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pb2000c_mem)

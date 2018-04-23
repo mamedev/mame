@@ -288,21 +288,23 @@ WRITE8_MEMBER(vicdual_state::depthch_io_w)
 }
 
 
-static ADDRESS_MAP_START( depthch_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::depthch_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-static ADDRESS_MAP_START( depthch_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::depthch_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(depthch_io_r, depthch_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::depthch_io_r), FUNC(vicdual_state::depthch_io_w));
+}
 
 
 static INPUT_PORTS_START( depthch )
@@ -319,15 +321,16 @@ static INPUT_PORTS_START( depthch )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::depthch, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::depthch)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, VICDUAL_MAIN_CPU_CLOCK)
@@ -340,7 +343,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::depthch, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(depthch_audio)
+	depthch_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -369,23 +372,25 @@ WRITE8_MEMBER(vicdual_state::safari_io_w)
 }
 
 
-static ADDRESS_MAP_START( safari_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_NOP /* unused */
-	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::safari_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x7fff).noprw(); /* unused */
+	map(0x8000, 0x8fff).mirror(0x3000).ram();
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-static ADDRESS_MAP_START( safari_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::safari_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(safari_io_r, safari_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::safari_io_r), FUNC(vicdual_state::safari_io_w));
+}
 
 
 static INPUT_PORTS_START( safari )
@@ -400,7 +405,7 @@ static INPUT_PORTS_START( safari )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -408,13 +413,14 @@ static INPUT_PORTS_START( safari )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::safari, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::safari)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -452,21 +458,23 @@ WRITE8_MEMBER(vicdual_state::frogs_io_w)
 }
 
 
-static ADDRESS_MAP_START( frogs_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::frogs_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-static ADDRESS_MAP_START( frogs_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::frogs_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(frogs_io_r, frogs_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::frogs_io_r), FUNC(vicdual_state::frogs_io_w));
+}
 
 
 static INPUT_PORTS_START( frogs )
@@ -492,9 +500,9 @@ static INPUT_PORTS_START( frogs )
 	PORT_CONFSETTING(    0x40, DEF_STR( 1C_1C ) )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 
@@ -518,7 +526,8 @@ static INPUT_PORTS_START( frogs )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::frogs, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::frogs)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -533,7 +542,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::frogs, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(frogs_audio)
+	frogs_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -576,31 +585,34 @@ WRITE8_MEMBER(vicdual_state::headon_io_w)
 }
 
 
-static ADDRESS_MAP_START( headon_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::headon_map(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x6000).rom();
+	map(0x8000, 0xbfff).noprw(); /* unused */
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-static ADDRESS_MAP_START( headon_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-
-	/* no decoder, just logic gates, so in theory the
-	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(headon_io_r, headon_io_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( sspaceat_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::headon_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(sspaceat_io_r, headon_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::headon_io_r), FUNC(vicdual_state::headon_io_w));
+}
+
+
+void vicdual_state::sspaceat_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
+
+	/* no decoder, just logic gates, so in theory the
+	   game can read/write from multiple locations at once */
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::sspaceat_io_r), FUNC(vicdual_state::headon_io_w));
+}
 
 
 static INPUT_PORTS_START( headon )
@@ -620,9 +632,9 @@ static INPUT_PORTS_START( headon )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_4WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_CABINET_COLOR_OR_BW
 
@@ -646,10 +658,10 @@ static INPUT_PORTS_START( headonmz )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_4WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) // protection? (check on startup)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) // protection? (check on startup)
 	PORT_BIT( 0x7a, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_CABINET_COLOR_OR_BW
 
@@ -682,7 +694,7 @@ static INPUT_PORTS_START( supcrash )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_4WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) // see comment above
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -690,7 +702,7 @@ static INPUT_PORTS_START( supcrash )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
@@ -708,9 +720,9 @@ static INPUT_PORTS_START( carnivalh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_CABINET_COLOR_OR_BW
 
@@ -752,9 +764,9 @@ static INPUT_PORTS_START( sspaceat )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_CABINET_COLOR_OR_BW
 
@@ -762,7 +774,8 @@ static INPUT_PORTS_START( sspaceat )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headon, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::headon)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -775,10 +788,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headon, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headons, headon)
+MACHINE_CONFIG_START(vicdual_state::headons)
+	headon(config);
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -786,7 +800,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headons, headon)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::sspaceat, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::sspaceat)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -842,28 +857,31 @@ WRITE8_MEMBER(vicdual_state::digger_io_w)
 }
 
 
-static ADDRESS_MAP_START( headon2_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
+void vicdual_state::headon2_map(address_map &map)
+{
+	map(0x0000, 0x1fff).mirror(0x6000).rom();
 	/* AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x3f00) */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-static ADDRESS_MAP_START( headon2_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(headon2_io_r, headon2_io_w)
-ADDRESS_MAP_END
+void vicdual_state::headon2_io_map(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x00, 0x1f).rw(this, FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::headon2_io_w));
+}
 
 
-static ADDRESS_MAP_START( digger_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
+void vicdual_state::digger_io_map(address_map &map)
+{
+	map.global_mask(0x1f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(headon2_io_r, digger_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x1f).rw(this, FUNC(vicdual_state::headon2_io_r), FUNC(vicdual_state::digger_io_w));
+}
 
 
 static INPUT_PORTS_START( headon2 )
@@ -892,7 +910,7 @@ static INPUT_PORTS_START( headon2 )
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x02, DEF_STR( On ))
 	PORT_BIT(0x7c, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
@@ -921,12 +939,12 @@ static INPUT_PORTS_START( car2 )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* probably unused */
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
@@ -964,10 +982,10 @@ static INPUT_PORTS_START( digger )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)          // it's like this according to the schematics, but gameplay speed is too fast;
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr) // gameplay speed is correct now, there's likely an error in the schematics then...
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)          // it's like this according to the schematics, but gameplay speed is too fast;
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr) // gameplay speed is correct now, there's likely an error in the schematics then...
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
@@ -979,7 +997,8 @@ MACHINE_RESET_MEMBER( vicdual_state, headon2 )
 }
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headon2, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::headon2)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -994,10 +1013,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headon2, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headon2bw, headon2)
+MACHINE_CONFIG_START(vicdual_state::headon2bw)
+	headon2(config);
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -1006,7 +1026,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headon2bw, headon2)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::digger, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::digger)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1149,184 +1170,198 @@ WRITE8_MEMBER(vicdual_state::headonn_io_w)
 }
 
 
-static ADDRESS_MAP_START( vicdual_dualgame_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::vicdual_dualgame_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
-static ADDRESS_MAP_START( carhntds_dualgame_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM // also has part of a rom mapped at 0x4000
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::carhntds_dualgame_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom(); // also has part of a rom mapped at 0x4000
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
-static ADDRESS_MAP_START( invho2_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+void vicdual_state::invho2_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(invho2_io_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( invds_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(invds_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::invho2_io_w));
+}
 
-static ADDRESS_MAP_START( carhntds_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+void vicdual_state::invds_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(carhntds_io_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sspacaho_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(sspacaho_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::invds_io_w));
+}
 
+void vicdual_state::carhntds_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-static ADDRESS_MAP_START( tranqgun_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_WRITE(tranqgun_io_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( spacetrk_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(spacetrk_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::carhntds_io_w));
+}
 
+void vicdual_state::sspacaho_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-static ADDRESS_MAP_START( carnival_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(carnival_io_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( brdrline_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_WRITE(brdrline_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::sspacaho_io_w));
+}
 
 
-static ADDRESS_MAP_START( pulsar_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+void vicdual_state::tranqgun_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(pulsar_io_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( heiankyo_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x0c).portr("IN0");
+	map(0x01, 0x01).mirror(0x0c).portr("IN1");
+	map(0x02, 0x02).mirror(0x0c).portr("IN2");
+	map(0x03, 0x03).mirror(0x0c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_WRITE(heiankyo_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).w(this, FUNC(vicdual_state::tranqgun_io_w));
+}
 
 
-static ADDRESS_MAP_START( alphaho_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+void vicdual_state::spacetrk_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
-
-	/* no decoder, just logic gates, so in theory the
-	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(alphaho_io_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( headonn_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
-
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(headonn_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::spacetrk_io_w));
+}
+
+
+void vicdual_state::carnival_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
+
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::carnival_io_w));
+}
+
+
+void vicdual_state::brdrline_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
+
+	map(0x00, 0x00).mirror(0x0c).portr("IN0");
+	map(0x01, 0x01).mirror(0x0c).portr("IN1");
+	map(0x02, 0x02).mirror(0x0c).portr("IN2");
+	map(0x03, 0x03).mirror(0x0c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x0f).w(this, FUNC(vicdual_state::brdrline_io_w));
+}
+
+
+void vicdual_state::pulsar_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
+
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::pulsar_io_w));
+}
+
+
+void vicdual_state::heiankyo_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
+
+	map(0x00, 0x00).mirror(0x0c).portr("IN0");
+	map(0x01, 0x01).mirror(0x0c).portr("IN1");
+	map(0x02, 0x02).mirror(0x0c).portr("IN2");
+	map(0x03, 0x03).mirror(0x0c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x0f).w(this, FUNC(vicdual_state::heiankyo_io_w));
+}
+
+
+void vicdual_state::alphaho_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
+
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::alphaho_io_w));
+}
+
+
+void vicdual_state::headonn_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
+
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
+
+	/* no decoder, just logic gates, so in theory the
+	   game can write to multiple locations at once */
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::headonn_io_w));
+}
 
 
 /* several of the games' lives DIPs are spread across two input ports */
@@ -1345,7 +1380,7 @@ static INPUT_PORTS_START( invho2 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1356,8 +1391,8 @@ static INPUT_PORTS_START( invho2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1365,8 +1400,8 @@ static INPUT_PORTS_START( invho2 )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x101)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x101)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1374,8 +1409,8 @@ static INPUT_PORTS_START( invho2 )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x102)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x102)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1408,7 +1443,7 @@ static INPUT_PORTS_START( carhntds )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1419,8 +1454,8 @@ static INPUT_PORTS_START( carhntds )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1428,8 +1463,8 @@ static INPUT_PORTS_START( carhntds )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x101)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x101)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1437,8 +1472,8 @@ static INPUT_PORTS_START( carhntds )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x102)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x102)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1465,7 +1500,7 @@ static INPUT_PORTS_START( invds )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1476,8 +1511,8 @@ static INPUT_PORTS_START( invds )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1485,8 +1520,8 @@ static INPUT_PORTS_START( invds )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x101)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x101)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1494,8 +1529,8 @@ static INPUT_PORTS_START( invds )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x102)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x102)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1523,7 +1558,7 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, "Head On Lives" )         PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
@@ -1534,8 +1569,8 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1546,7 +1581,7 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_DIPNAME( 0x04, 0x00, "Space Attack Bonus Life" )       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x04, "15000" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1557,7 +1592,7 @@ static INPUT_PORTS_START( sspacaho )
 	PORT_DIPNAME( 0x04, 0x00, "Space Attack Final UFO Bonus" )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1593,7 +1628,7 @@ static INPUT_PORTS_START( tranqgun )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_vblank_comp, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_vblank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1604,7 +1639,7 @@ static INPUT_PORTS_START( tranqgun )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1615,7 +1650,7 @@ static INPUT_PORTS_START( tranqgun )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1644,7 +1679,7 @@ static INPUT_PORTS_START( spacetrk )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2") // unknown, but used
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_8WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1655,7 +1690,7 @@ static INPUT_PORTS_START( spacetrk )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1666,7 +1701,7 @@ static INPUT_PORTS_START( spacetrk )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1716,7 +1751,7 @@ static INPUT_PORTS_START( carnival )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1727,7 +1762,7 @@ static INPUT_PORTS_START( carnival )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1738,7 +1773,7 @@ static INPUT_PORTS_START( carnival )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1765,7 +1800,7 @@ static INPUT_PORTS_START( brdrline )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 8-pos (is 6-8 unconnected?)
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
@@ -1776,8 +1811,8 @@ static INPUT_PORTS_START( brdrline )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_vblank_comp, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_vblank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1785,8 +1820,8 @@ static INPUT_PORTS_START( brdrline )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x004)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)  /* yes, this is different */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x004)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_64v, nullptr)  /* yes, this is different */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1797,7 +1832,7 @@ static INPUT_PORTS_START( brdrline )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x04, "15000" )
 	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1838,7 +1873,7 @@ static INPUT_PORTS_START( pulsar )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1849,8 +1884,8 @@ static INPUT_PORTS_START( pulsar )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1861,7 +1896,7 @@ static INPUT_PORTS_START( pulsar )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1872,7 +1907,7 @@ static INPUT_PORTS_START( pulsar )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1908,7 +1943,7 @@ static INPUT_PORTS_START( heiankyo )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2") // bonus life?
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1919,7 +1954,7 @@ static INPUT_PORTS_START( heiankyo )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3") // bonus life?
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* has to be 0, protection? */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1930,7 +1965,7 @@ static INPUT_PORTS_START( heiankyo )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )    PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1943,7 +1978,7 @@ static INPUT_PORTS_START( alphaho )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x001)
 	PORT_DIPNAME( 0x08, 0x00, "Head On Lives" )         PORT_DIPLOCATION("SW1:5") // SW1 @ C1, 6-pos (is #6 unconnected?)
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
@@ -1954,8 +1989,8 @@ static INPUT_PORTS_START( alphaho )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, fake_lives_r, (void *)0x002)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1966,7 +2001,7 @@ static INPUT_PORTS_START( alphaho )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1977,7 +2012,7 @@ static INPUT_PORTS_START( alphaho )
 	PORT_DIPNAME( 0x04, 0x00, "Alpha Fighter Unknown" ) PORT_DIPLOCATION("SW1:4") // related to soccer frequency (code at 0x4950)
 	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR ( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Game Select") PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2028,7 +2063,7 @@ static INPUT_PORTS_START( headonn )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY PORT_COCKTAIL
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START2)
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -2037,7 +2072,8 @@ static INPUT_PORTS_START( headonn )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::vicdual_dualgame_root, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::vicdual_dualgame_root)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2050,7 +2086,8 @@ MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::invho2, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::invho2)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2058,13 +2095,14 @@ MACHINE_CONFIG_DERIVED(vicdual_state::invho2, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(invinco_audio)
-	MCFG_FRAGMENT_ADD(headon_audio)
+	invinco_audio(config);
+	headon_audio(config);
 MACHINE_CONFIG_END
 
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::invds, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::invds)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2072,10 +2110,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::invds, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(invinco_audio)
+	invinco_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::carhntds, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::carhntds)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2084,7 +2123,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::carhntds, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::sspacaho, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::sspacaho)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2092,11 +2132,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::sspacaho, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::spacetrk, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::spacetrk)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2104,7 +2145,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::spacetrk, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::carnival, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::carnival)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2114,10 +2156,11 @@ MACHINE_CONFIG_DERIVED(vicdual_state::carnival, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(carnival_audio)
+	carnival_audio(config);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(vicdual_state::carnivalh, carnival)
+MACHINE_CONFIG_START(vicdual_state::carnivalh)
+	carnival(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2125,7 +2168,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::carnivalh, carnival)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::tranqgun, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::tranqgun)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2133,11 +2177,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::tranqgun, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(tranqgun_audio)
+	tranqgun_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::brdrline, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::brdrline)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2145,11 +2190,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::brdrline, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(brdrline_audio)
+	brdrline_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::pulsar, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::pulsar)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2157,11 +2203,12 @@ MACHINE_CONFIG_DERIVED(vicdual_state::pulsar, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(pulsar_audio)
+	pulsar_audio(config);
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::heiankyo, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::heiankyo)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2169,7 +2216,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::heiankyo, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::alphaho, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::alphaho)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2177,7 +2225,8 @@ MACHINE_CONFIG_DERIVED(vicdual_state::alphaho, vicdual_dualgame_root)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::headonn, vicdual_dualgame_root)
+MACHINE_CONFIG_START(vicdual_state::headonn)
+	vicdual_dualgame_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2185,7 +2234,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::headonn, vicdual_dualgame_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(headon_audio)
+	headon_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -2224,26 +2273,28 @@ WRITE8_MEMBER(vicdual_state::samurai_io_w)
 
 
 /* dual game hardware */
-static ADDRESS_MAP_START( samurai_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM AM_WRITE(samurai_protection_w)
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::samurai_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom().w(this, FUNC(vicdual_state::samurai_protection_w));
+	map(0x8000, 0x83ff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).mirror(0x7000).ram();
+	map(0x8800, 0x8fff).mirror(0x7000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-static ADDRESS_MAP_START( samurai_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+void vicdual_state::samurai_io_map(address_map &map)
+{
+	map.global_mask(0x7f);
 
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x7c) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x7c) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x7c) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x7c) AM_READ_PORT("IN3")
+	map(0x00, 0x00).mirror(0x7c).portr("IN0");
+	map(0x01, 0x01).mirror(0x7c).portr("IN1");
+	map(0x02, 0x02).mirror(0x7c).portr("IN2");
+	map(0x03, 0x03).mirror(0x7c).portr("IN3");
 
 	/* no decoder, just logic gates, so in theory the
 	   game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(samurai_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x7f).w(this, FUNC(vicdual_state::samurai_io_w));
+}
 
 
 static INPUT_PORTS_START( samurai )
@@ -2262,33 +2313,33 @@ static INPUT_PORTS_START( samurai )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,samurai_protection_r, (void *)1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,samurai_protection_r, (void *)1)
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )          PORT_DIPLOCATION("SW1:2") // unknown, but used
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,samurai_protection_r, (void *)2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,samurai_protection_r, (void *)2)
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )           PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,samurai_protection_r, (void *)3)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,samurai_protection_r, (void *)3)
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )           PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2305,7 +2356,8 @@ MACHINE_START_MEMBER(vicdual_state,samurai)
 	machine_start();
 }
 
-MACHINE_CONFIG_DERIVED(vicdual_state::samurai, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::samurai)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2353,22 +2405,24 @@ WRITE8_MEMBER(nsub_state::nsub_io_w)
 }
 
 
-static ADDRESS_MAP_START( nsub_map, AS_PROGRAM, 8, nsub_state )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void nsub_state::nsub_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0xbfff).noprw(); /* unused */
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(nsub_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(nsub_state::characterram_w)).share("characterram");
+}
 
 
-static ADDRESS_MAP_START( nsub_io_map, AS_IO, 8, nsub_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void nsub_state::nsub_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(nsub_io_r, nsub_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(nsub_state::nsub_io_r), FUNC(nsub_state::nsub_io_w));
+}
 
 
 // coinage is handled by extra hardware on a daughterboard, put before the coin-in pin on the main logic board
@@ -2437,9 +2491,9 @@ static INPUT_PORTS_START( nsub )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nsub_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nsub_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nsub_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nsub_state, read_coin_status, nullptr)
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, nsub_state, nsub_coin_in, (void*)0)
@@ -2540,22 +2594,24 @@ WRITE8_MEMBER(vicdual_state::invinco_io_w)
 }
 
 
-static ADDRESS_MAP_START( invinco_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_NOP /* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(characterram_w) AM_SHARE("characterram")
-ADDRESS_MAP_END
+void vicdual_state::invinco_map(address_map &map)
+{
+	map(0x0000, 0x3fff).mirror(0x4000).rom();
+	map(0x8000, 0xbfff).noprw(); /* unused */
+	map(0xc000, 0xc3ff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::videoram_w)).share("videoram");
+	map(0xc400, 0xc7ff).mirror(0x3000).ram();
+	map(0xc800, 0xcfff).mirror(0x3000).ram().w(this, FUNC(vicdual_state::characterram_w)).share("characterram");
+}
 
 
-static ADDRESS_MAP_START( invinco_io_map, AS_IO, 8, vicdual_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x0f)
+void vicdual_state::invinco_io_map(address_map &map)
+{
+	map.global_mask(0x0f);
 
 	/* no decoder, just logic gates, so in theory the
 	   game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(invinco_io_r, invinco_io_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0f).rw(this, FUNC(vicdual_state::invinco_io_r), FUNC(vicdual_state::invinco_io_w));
+}
 
 
 static INPUT_PORTS_START( invinco )
@@ -2590,15 +2646,16 @@ static INPUT_PORTS_START( invinco )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_composite_blank_comp, nullptr)
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED(vicdual_state::invinco, vicdual_root)
+MACHINE_CONFIG_START(vicdual_state::invinco)
+	vicdual_root(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2611,7 +2668,7 @@ MACHINE_CONFIG_DERIVED(vicdual_state::invinco, vicdual_root)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_FRAGMENT_ADD(invinco_audio)
+	invinco_audio(config);
 MACHINE_CONFIG_END
 
 
@@ -2924,21 +2981,21 @@ THO VIDEO PI-500891
 
 ROM_START( headonn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ROM.E4", 0x0000, 0x0400, CRC(a6cd13fc) SHA1(0fda6b06e7864feae8e4e94cf17f50c9c033aa39) )
-	ROM_LOAD( "ROM.F4", 0x0400, 0x0400, CRC(d1cd498f) SHA1(ded1a97c7f76af195b247135469b84c25d4096c4) )
-	ROM_LOAD( "ROM.G4", 0x0800, 0x0400, CRC(0fb02db2) SHA1(6e9ad34a205838339a76ba6eeaf02cf663c2b750) )
-	ROM_LOAD( "ROM.H4", 0x0c00, 0x0400, CRC(38db2d02) SHA1(a86c4208154f65a83f55c1fbfd041b56ebd11106) )
-	ROM_LOAD( "ROM.I4", 0x1000, 0x0400, CRC(a04d8522) SHA1(58d6c3168ac7227e78ff699449008dbf999ea794) )
-	ROM_LOAD( "ROM.J4", 0x1400, 0x0400, CRC(52bd2151) SHA1(4f6bc10dabadf65f638aed46b0f0a1ba00e83afd) )
-	ROM_LOAD( "ROM.K4", 0x1800, 0x0400, CRC(9488a8b3) SHA1(a7e8bc341c839eba3b84af78f19cefafe91d42e3) )
-	ROM_LOAD( "ROM.L4", 0x1c00, 0x0400, CRC(a37f0be0) SHA1(4548cf05256764588feeade29368f5abfbf75a7d) )
+	ROM_LOAD( "rom.e4", 0x0000, 0x0400, CRC(a6cd13fc) SHA1(0fda6b06e7864feae8e4e94cf17f50c9c033aa39) )
+	ROM_LOAD( "rom.f4", 0x0400, 0x0400, CRC(d1cd498f) SHA1(ded1a97c7f76af195b247135469b84c25d4096c4) )
+	ROM_LOAD( "rom.g4", 0x0800, 0x0400, CRC(0fb02db2) SHA1(6e9ad34a205838339a76ba6eeaf02cf663c2b750) )
+	ROM_LOAD( "rom.h4", 0x0c00, 0x0400, CRC(38db2d02) SHA1(a86c4208154f65a83f55c1fbfd041b56ebd11106) )
+	ROM_LOAD( "rom.i4", 0x1000, 0x0400, CRC(a04d8522) SHA1(58d6c3168ac7227e78ff699449008dbf999ea794) )
+	ROM_LOAD( "rom.j4", 0x1400, 0x0400, CRC(52bd2151) SHA1(4f6bc10dabadf65f638aed46b0f0a1ba00e83afd) )
+	ROM_LOAD( "rom.k4", 0x1800, 0x0400, CRC(9488a8b3) SHA1(a7e8bc341c839eba3b84af78f19cefafe91d42e3) )
+	ROM_LOAD( "rom.l4", 0x1c00, 0x0400, CRC(a37f0be0) SHA1(4548cf05256764588feeade29368f5abfbf75a7d) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "PROM.G2", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
+	ROM_LOAD( "prom.g2", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )
 
 	ROM_REGION( 0x0040, "user1", 0 )    /* timing PROMs */
-	ROM_LOAD( "PROM.B6", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )    /* control PROM */
-	ROM_LOAD( "PROM.F2", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
+	ROM_LOAD( "prom.b6", 0x0000, 0x0020, CRC(67104ea9) SHA1(26b6bd2a1973b83bb9af4e3385d8cb14cb3f62f2) )    /* control PROM */
+	ROM_LOAD( "prom.f2", 0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )    /* sequence PROM */
 ROM_END
 
 ROM_START( headonmz )

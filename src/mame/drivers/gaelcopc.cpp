@@ -40,6 +40,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void gaelcopc(machine_config &config);
+	void gaelcopc_map(address_map &map);
 protected:
 
 	// devices
@@ -59,9 +60,10 @@ uint32_t gaelcopc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-static ADDRESS_MAP_START( gaelcopc_map, AS_PROGRAM, 32, gaelcopc_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
-ADDRESS_MAP_END
+void gaelcopc_state::gaelcopc_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rom();
+}
 
 static INPUT_PORTS_START( gaelcopc )
 INPUT_PORTS_END

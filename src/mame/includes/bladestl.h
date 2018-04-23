@@ -57,7 +57,6 @@ public:
 	/* devices */
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(bladestl_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bladestl_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(bladestl_port_B_w);
 	DECLARE_READ8_MEMBER(bladestl_speech_busy_r);
 	DECLARE_WRITE8_MEMBER(bladestl_speech_ctrl_w);
@@ -69,4 +68,6 @@ public:
 	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
 	K007420_CALLBACK_MEMBER(bladestl_sprite_callback);
 	void bladestl(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };

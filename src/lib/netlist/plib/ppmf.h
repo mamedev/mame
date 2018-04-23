@@ -188,7 +188,7 @@ namespace plib {
 			for (; p < e; p++)
 				if (*p != 0)
 					return true;
-			
+
 			return false;
 #else
 			return m_func != nullptr;

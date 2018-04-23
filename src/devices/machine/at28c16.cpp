@@ -22,9 +22,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( at28c16_map8, AS_PROGRAM, 8, at28c16_device )
-	AM_RANGE(0x0000, 0x081f) AM_RAM
-ADDRESS_MAP_END
+void at28c16_device::at28c16_map8(address_map &map)
+{
+	map(0x0000, 0x081f).ram();
+}
 
 
 
@@ -43,7 +44,7 @@ at28c16_device::at28c16_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, AT28C16, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
-		m_space_config("at28c16", ENDIANNESS_BIG, 8,  12, 0, *ADDRESS_MAP_NAME(at28c16_map8)),
+		m_space_config("at28c16", ENDIANNESS_BIG, 8,  12, 0, address_map_constructor(FUNC(at28c16_device::at28c16_map8), this)),
 		m_a9_12v(0),
 		m_oe_12v(0),
 		m_last_write(-1),
@@ -145,11 +146,11 @@ WRITE8_MEMBER( at28c16_device::write )
 {
 	if( m_last_write >= 0 )
 	{
-//      logerror( "%s: AT28C16: write( %04x, %02x ) busy\n", machine.describe_context(), offset, data );
+//      logerror( "%s: AT28C16: write( %04x, %02x ) busy\n", machine().describe_context(), offset, data );
 	}
 	else if( m_oe_12v )
 	{
-//      logerror( "%s: AT28C16: write( %04x, %02x ) erase\n", machine.describe_context(), offset, data );
+//      logerror( "%s: AT28C16: write( %04x, %02x ) erase\n", machine().describe_context(), offset, data );
 		if( m_last_write < 0 )
 		{
 			for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
@@ -168,7 +169,7 @@ WRITE8_MEMBER( at28c16_device::write )
 			offset += AT28C16_ID_BYTES;
 		}
 
-//      logerror( "%s: AT28C16: write( %04x, %02x )\n", machine.describe_context(), offset, data );
+//      logerror( "%s: AT28C16: write( %04x, %02x )\n", machine().describe_context(), offset, data );
 		if( m_last_write < 0 && this->space(AS_PROGRAM).read_byte( offset ) != data )
 		{
 			this->space(AS_PROGRAM).write_byte( offset, data );
@@ -184,7 +185,7 @@ READ8_MEMBER( at28c16_device::read )
 	if( m_last_write >= 0 )
 	{
 		uint8_t data = m_last_write ^ 0x80;
-//      logerror( "%s: AT28C16: read( %04x ) write status %02x\n", machine.describe_context(), offset, data );
+//      logerror( "%s: AT28C16: read( %04x ) write status %02x\n", machine().describe_context(), offset, data );
 		return data;
 	}
 	else
@@ -195,7 +196,7 @@ READ8_MEMBER( at28c16_device::read )
 		}
 
 		uint8_t data = this->space(AS_PROGRAM).read_byte( offset );
-//      logerror( "%s: AT28C16: read( %04x ) data %02x\n", machine.describe_context(), offset, data );
+//      logerror( "%s: AT28C16: read( %04x ) data %02x\n", machine().describe_context(), offset, data );
 		return data;
 	}
 }
@@ -206,7 +207,7 @@ WRITE_LINE_MEMBER( at28c16_device::set_a9_12v )
 	state &= 1;
 	if( m_a9_12v != state )
 	{
-//      logerror( "%s: AT28C16: set_a9_12v( %d )\n", machine.describe_context(), state );
+//      logerror( "%s: AT28C16: set_a9_12v( %d )\n", machine().describe_context(), state );
 		m_a9_12v = state;
 	}
 }
@@ -217,7 +218,7 @@ WRITE_LINE_MEMBER( at28c16_device::set_oe_12v )
 	state &= 1;
 	if( m_oe_12v != state )
 	{
-//      logerror( "%s: AT28C16: set_oe_12v( %d )\n", machine.describe_context(), state );
+//      logerror( "%s: AT28C16: set_oe_12v( %d )\n", machine().describe_context(), state );
 		m_oe_12v = state;
 	}
 }

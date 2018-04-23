@@ -231,6 +231,7 @@ public:
 	required_device<dcs_audio_2k_device> m_dcs;
 
 	void kinst(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -447,15 +448,16 @@ WRITE32_MEMBER(kinst_state::control_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, kinst_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_SHARE("rambase2")
-	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(control_r, control_w) AM_SHARE("control")
-	AM_RANGE(0x10000100, 0x1000013f) AM_READWRITE(ide_r, ide_w)
-	AM_RANGE(0x10000170, 0x10000173) AM_READWRITE(ide_extra_r, ide_extra_w)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
-ADDRESS_MAP_END
+void kinst_state::main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x0007ffff).ram().share("rambase");
+	map(0x08000000, 0x087fffff).ram().share("rambase2");
+	map(0x10000080, 0x100000ff).rw(this, FUNC(kinst_state::control_r), FUNC(kinst_state::control_w)).share("control");
+	map(0x10000100, 0x1000013f).rw(this, FUNC(kinst_state::ide_r), FUNC(kinst_state::ide_w));
+	map(0x10000170, 0x10000173).rw(this, FUNC(kinst_state::ide_extra_r), FUNC(kinst_state::ide_extra_w));
+	map(0x1fc00000, 0x1fc7ffff).rom().region("user1", 0).share("rombase");
+}
 
 
 
@@ -483,7 +485,7 @@ static INPUT_PORTS_START( kinst )
 	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* door */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* door */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
@@ -502,12 +504,12 @@ static INPUT_PORTS_START( kinst )
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BILL1 )    /* bill */
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* coin door */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* coin door */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("VOLUME")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_SPECIAL )  /* sound status */
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_CUSTOM )  /* sound status */
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0000fff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -592,7 +594,7 @@ static INPUT_PORTS_START( kinst2 )
 	PORT_SERVICE_NO_TOGGLE( 0x00001000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* door */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* door */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
@@ -611,12 +613,12 @@ static INPUT_PORTS_START( kinst2 )
 	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BILL1 )    /* bill */
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_SPECIAL )  /* coin door */
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM )  /* coin door */
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("VOLUME")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_SPECIAL )  /* sound status */
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_CUSTOM )  /* sound status */
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0000fff0, IP_ACTIVE_LOW, IPT_UNKNOWN )

@@ -116,7 +116,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/monitor/monitor_sdl.cpp",
 	}
 	includedirs {
-		MAME_DIR .. "3rdparty/asio/include",
+		ext_includedir("asio"),
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
@@ -215,7 +215,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "3rdparty/bgfx/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
-		MAME_DIR .. "3rdparty/rapidjson/include",
+		ext_includedir("rapidjson")
 	}
 
 	if _OPTIONS["NO_USE_PORTAUDIO"]=="1" then

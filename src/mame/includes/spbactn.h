@@ -87,4 +87,8 @@ public:
 	}
 	void spbactn(machine_config &config);
 	void spbactnp(machine_config &config);
+	void spbactn_map(address_map &map);
+	void spbactn_sound_map(address_map &map);
+	void spbactnp_extra_map(address_map &map);
+	void spbactnp_map(address_map &map);
 };

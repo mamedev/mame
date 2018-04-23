@@ -35,10 +35,10 @@
 	MCFG_DEVICE_ADD(_tag, LC7535, 0)
 
 #define MCFG_LC7535_SELECT_CB(_read) \
-		devcb = &lc7535_device::set_select_callback(*device, DEVCB_##_read);
+	devcb = &downcast<lc7535_device &>(*device).set_select_callback(DEVCB_##_read);
 
 #define MCFG_LC7535_VOLUME_CB(_class, _method) \
-	lc7535_device::set_volume_callback(*device, lc7535_device::volume_delegate(&_class::_method, #_class "::" #_method, this));
+	downcast<lc7535_device &>(*device).set_volume_callback(lc7535_device::volume_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define LC7535_VOLUME_CHANGED(name) void name(int attenuation_right, int attenuation_left, bool loudness)
 
@@ -55,11 +55,9 @@ public:
 
 	typedef device_delegate<void (int attenuation_right, int attenuation_left, bool loudness)> volume_delegate;
 
-	static void set_volume_callback(device_t &device, volume_delegate &&cb)
-		{ downcast<lc7535_device &>(device).m_volume_cb = std::move(cb); }
+	template <typename Object> void set_volume_callback(Object &&cb) { m_volume_cb = std::forward<Object>(cb); }
 
-	template <class Object> static devcb_base &set_select_callback(device_t &device, Object &&cb)
-		{ return downcast<lc7535_device &>(device).m_select_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_select_callback(Object &&cb) { return m_select_cb.set_callback(std::forward<Object>(cb)); }
 
 	// serial interface
 	DECLARE_WRITE_LINE_MEMBER( ce_w );

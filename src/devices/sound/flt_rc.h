@@ -53,7 +53,7 @@
 	MCFG_DEVICE_REPLACE(_tag, FILTER_RC, _clock)
 
 #define MCFG_FILTER_RC_AC() \
-	filter_rc_device::static_set_rc(*device, filter_rc_device::AC, 10000, 0, 0, CAP_U(1));
+	downcast<filter_rc_device &>(*device).set_rc(filter_rc_device::AC, 10000, 0, 0, CAP_U(1));
 
 
 //**************************************************************************
@@ -74,10 +74,22 @@ public:
 
 	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration
-	static void static_set_rc(device_t &device, int type, double R1, double R2, double R3, double C);
+	// configuration
+	void set_rc(int type, double R1, double R2, double R3, double C)
+	{
+		m_type = type;
+		m_R1 = R1;
+		m_R2 = R2;
+		m_R3 = R3;
+		m_C = C;
+	}
 
-	void filter_rc_set_RC(int type, double R1, double R2, double R3, double C);
+	void filter_rc_set_RC(int type, double R1, double R2, double R3, double C)
+	{
+		m_stream->update();
+		set_rc(type, R1, R2, R3, C);
+		recalc();
+	}
 
 protected:
 	// device-level overrides

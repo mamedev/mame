@@ -174,31 +174,33 @@ static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 4;
  Pretty Straightforward
 *******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(fg0_videoram_w) AM_SHARE("fg0_videoram") /* FG0 Ram */
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram") /* BG0 Ram */
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_SHARE("spriteram")       /* SPR Ram */
-	AM_RANGE(0x140000, 0x140fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x180000, 0x180003) AM_WRITE(irqack_w)
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("P1")
-	AM_RANGE(0x180004, 0x180007) AM_WRITE(scroll_w)
-	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P2")
-	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180008, 0x180009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x18000a, 0x18000b) AM_WRITE(flipscreen_w)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM                             /* Work Ram */
-ADDRESS_MAP_END
+void wwfsstar_state::main_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080fff).ram().w(this, FUNC(wwfsstar_state::fg0_videoram_w)).share("fg0_videoram"); /* FG0 Ram */
+	map(0x0c0000, 0x0c0fff).ram().w(this, FUNC(wwfsstar_state::bg0_videoram_w)).share("bg0_videoram"); /* BG0 Ram */
+	map(0x100000, 0x1003ff).ram().share("spriteram");       /* SPR Ram */
+	map(0x140000, 0x140fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180003).w(this, FUNC(wwfsstar_state::irqack_w));
+	map(0x180000, 0x180001).portr("DSW1");
+	map(0x180002, 0x180003).portr("DSW2");
+	map(0x180004, 0x180005).portr("P1");
+	map(0x180004, 0x180007).w(this, FUNC(wwfsstar_state::scroll_w));
+	map(0x180006, 0x180007).portr("P2");
+	map(0x180008, 0x180009).portr("SYSTEM");
+	map(0x180009, 0x180009).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x18000a, 0x18000b).w(this, FUNC(wwfsstar_state::flipscreen_w));
+	map(0x1c0000, 0x1c3fff).ram();                             /* Work Ram */
+}
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wwfsstar_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-ADDRESS_MAP_END
+void wwfsstar_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram();
+	map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+}
 
 
 /*******************************************************************************
@@ -313,7 +315,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Button B (1P VS 2P - Buy-in)")
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfsstar_state, vblank_r, nullptr) /* VBlank */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wwfsstar_state, vblank_r, nullptr) /* VBlank */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )

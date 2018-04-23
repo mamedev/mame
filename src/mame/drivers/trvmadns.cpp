@@ -125,6 +125,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
 	void trvmadns(machine_config &config);
+	void cpu_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
@@ -254,24 +256,26 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 }
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, trvmadns_state )
-	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_SHARE("gfxram")
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(trvmadns_tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(trvmadns_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(w2)//NOP
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
-ADDRESS_MAP_END
+void trvmadns_state::cpu_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).bankr("bank1");
+	map(0x7000, 0x7fff).bankr("bank2");
+	map(0x6000, 0x7fff).w(this, FUNC(trvmadns_state::trvmadns_gfxram_w)).share("gfxram");
+	map(0x8000, 0x87ff).ram();
+	map(0xa000, 0xa7ff).ram().w(this, FUNC(trvmadns_state::trvmadns_tileram_w)).share("tileram");
+	map(0xc000, 0xc01f).ram().w(this, FUNC(trvmadns_state::trvmadns_palette_w)).share("paletteram");
+	map(0xe000, 0xe000).w(this, FUNC(trvmadns_state::w2));//NOP
+	map(0xe004, 0xe004).w(this, FUNC(trvmadns_state::w3));//NOP
+}
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, trvmadns_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x80, 0x80) AM_WRITE(trvmadns_banking_w)
-ADDRESS_MAP_END
+void trvmadns_state::io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x02, 0x02).portr("IN0");
+	map(0x80, 0x80).w(this, FUNC(trvmadns_state::trvmadns_banking_w));
+}
 
 static INPUT_PORTS_START( trvmadns )
 	PORT_START("IN0")
@@ -384,7 +388,6 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", trvmadns_state,  nmi_line_pulse)
 
 
 	/* video hardware */
@@ -395,6 +398,7 @@ MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trvmadns_state, screen_update_trvmadns)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trvmadns)
 	MCFG_PALETTE_ADD("palette", 16)

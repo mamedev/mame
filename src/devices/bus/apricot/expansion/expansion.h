@@ -54,32 +54,32 @@
 
 #define MCFG_EXPANSION_ADD(_tag, _cpu_tag) \
 	MCFG_DEVICE_ADD(_tag, APRICOT_EXPANSION_BUS, 0) \
-	apricot_expansion_bus_device::set_cpu_tag(*device, this, _cpu_tag);
+	downcast<apricot_expansion_bus_device &>(*device).set_cpu_tag(this, _cpu_tag);
 
 #define MCFG_EXPANSION_IOP_ADD(_tag) \
-	apricot_expansion_bus_device::set_iop_tag(*device, this, _tag);
+	downcast<apricot_expansion_bus_device &>(*device).set_iop_tag(this, _tag);
 
 #define MCFG_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, APRICOT_EXPANSION_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_EXPANSION_DMA1_HANDLER(_devcb) \
-	devcb = &apricot_expansion_bus_device::set_dma1_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_dma1_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_DMA2_HANDLER(_devcb) \
-	devcb = &apricot_expansion_bus_device::set_dma2_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_dma2_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_EXT1_HANDLER(_devcb) \
-	devcb = &apricot_expansion_bus_device::set_ext1_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_ext1_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_EXT2_HANDLER(_devcb) \
-	devcb = &apricot_expansion_bus_device::set_ext2_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_ext2_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_INT2_HANDLER(_devcb) \
-	devcb = &apricot_expansion_bus_device::set_int2_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_int2_handler(DEVCB_##_devcb);
 
 #define MCFG_EXPANSION_INT3_HANDLER(_devcb) \
-	devcb = &apricot_expansion_bus_device::set_int3_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<apricot_expansion_bus_device &>(*device).set_int3_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -118,27 +118,16 @@ public:
 	apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apricot_expansion_bus_device();
 
-	template <class Object> static devcb_base &set_dma1_handler(device_t &device, Object &&cb)
-	{ return downcast<apricot_expansion_bus_device &>(device).m_dma1_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_dma2_handler(device_t &device, Object &&cb)
-	{ return downcast<apricot_expansion_bus_device &>(device).m_dma2_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ext1_handler(device_t &device, Object &&cb)
-	{ return downcast<apricot_expansion_bus_device &>(device).m_ext1_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_ext2_handler(device_t &device, Object &&cb)
-	{ return downcast<apricot_expansion_bus_device &>(device).m_ext2_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_int2_handler(device_t &device, Object &&cb)
-	{ return downcast<apricot_expansion_bus_device &>(device).m_int2_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_int3_handler(device_t &device, Object &&cb)
-	{ return downcast<apricot_expansion_bus_device &>(device).m_int3_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma1_handler(Object &&cb) { return m_dma1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_dma2_handler(Object &&cb) { return m_dma2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ext1_handler(Object &&cb) { return m_ext1_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_ext2_handler(Object &&cb) { return m_ext2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int2_handler(Object &&cb) { return m_int2_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_int3_handler(Object &&cb) { return m_int3_handler.set_callback(std::forward<Object>(cb)); }
 
 	// inline configuration
-	static void set_cpu_tag(device_t &device, device_t *owner, const char *tag);
-	static void set_iop_tag(device_t &device, device_t *owner, const char *tag);
+	void set_cpu_tag(device_t *owner, const char *tag) { m_cpu_tag = tag; }
+	void set_iop_tag(device_t *owner, const char *tag) { m_iop_tag = tag; }
 
 	void add_card(device_apricot_expansion_card_interface *card);
 

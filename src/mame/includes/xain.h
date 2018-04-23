@@ -59,6 +59,10 @@ public:
 
 	void xsleenab(machine_config &config);
 	void xsleena(machine_config &config);
+	void bootleg_map(address_map &map);
+	void cpu_map_B(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;

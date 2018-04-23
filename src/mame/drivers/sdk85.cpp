@@ -52,21 +52,22 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_keyboard(*this, "X%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-
 	void sdk85(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
-
+	void sdk85_io(address_map &map);
+	void sdk85_mem(address_map &map);
 private:
 	u8 m_digit;
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<3> m_keyboard;
+	output_finder<6> m_digits;
 };
 
 void sdk85_state::machine_reset()
@@ -75,23 +76,25 @@ void sdk85_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static ADDRESS_MAP_START(sdk85_mem, AS_PROGRAM, 8, sdk85_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_DEVREAD("romio", i8355_device, memory_r)
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("expromio", i8355_device, memory_r)
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x06ff) AM_DEVREADWRITE("kdc", i8279_device, data_r, data_w)
-	AM_RANGE(0x1900, 0x1900) AM_MIRROR(0x06ff) AM_DEVREADWRITE("kdc", i8279_device, status_r, cmd_w)
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("ramio", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x2800, 0x28ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("expramio", i8155_device, memory_r, memory_w)
-ADDRESS_MAP_END
+void sdk85_state::sdk85_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).r("romio", FUNC(i8355_device::memory_r));
+	map(0x0800, 0x0fff).r("expromio", FUNC(i8355_device::memory_r));
+	map(0x1800, 0x1800).mirror(0x06ff).rw("kdc", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
+	map(0x1900, 0x1900).mirror(0x06ff).rw("kdc", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
+	map(0x2000, 0x20ff).mirror(0x0700).rw("ramio", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x2800, 0x28ff).mirror(0x0700).rw("expramio", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+}
 
-static ADDRESS_MAP_START(sdk85_io, AS_IO, 8, sdk85_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x04) AM_DEVREADWRITE("romio", i8355_device, io_r, io_w)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0x04) AM_DEVREADWRITE("expromio", i8355_device, io_r, io_w)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("ramio", i8155_device, io_r, io_w)
-	AM_RANGE(0x28, 0x2f) AM_DEVREADWRITE("expramio", i8155_device, io_r, io_w)
-ADDRESS_MAP_END
+void sdk85_state::sdk85_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x03).mirror(0x04).rw("romio", FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
+	map(0x08, 0x0b).mirror(0x04).rw("expromio", FUNC(i8355_device::io_r), FUNC(i8355_device::io_w));
+	map(0x20, 0x27).rw("ramio", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x28, 0x2f).rw("expramio", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( sdk85 )
@@ -134,7 +137,7 @@ WRITE8_MEMBER( sdk85_state::scanlines_w )
 WRITE8_MEMBER( sdk85_state::digit_w )
 {
 	if (m_digit < 6)
-		output().set_digit_value(m_digit, bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4)^0xff);
+		m_digits[m_digit] = bitswap<8>(~data, 3, 2, 1, 0, 7, 6, 5, 4);
 }
 
 READ8_MEMBER( sdk85_state::kbd_r )

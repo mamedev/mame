@@ -10,19 +10,6 @@
 #include "includes/vertigo.h"
 
 
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-/* Timestamp of last INTL4 change. The vector CPU runs for
-   the delta between this and now.
-*/
-
-/* State of the priority encoder output */
-
-/* Result of the last ADC channel sampled */
 
 /*************************************
  *
@@ -75,24 +62,16 @@ WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
  *
  *************************************/
 
-READ16_MEMBER(vertigo_state::vertigo_io_convert)
+WRITE_LINE_MEMBER( vertigo_state::adc_eoc_w )
 {
-	static const char *const adcnames[] = { "P1X", "P1Y", "PADDLE" };
-
-	if (offset > 2)
-		m_adc_result = 0;
-	else
-		m_adc_result = ioport(adcnames[offset])->read();
-
-	update_irq_encoder(INPUT_LINE_IRQ2, ASSERT_LINE);
-	return 0;
+	update_irq_encoder(INPUT_LINE_IRQ2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-READ16_MEMBER(vertigo_state::vertigo_io_adc)
+READ16_MEMBER(vertigo_state::vertigo_io_convert)
 {
-	update_irq_encoder(INPUT_LINE_IRQ2, CLEAR_LINE);
-	return m_adc_result;
+	m_adc->address_offset_start_w(space, offset, 0);
+	return 0;
 }
 
 
@@ -163,7 +142,6 @@ READ16_MEMBER(vertigo_state::vertigo_sio_r)
 void vertigo_state::machine_start()
 {
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_adc_result));
 	save_item(NAME(m_irq4_time));
 
 	vertigo_vproc_init();

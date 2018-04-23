@@ -9,9 +9,9 @@
     Golden Tee variants & World Class Bowling Deluxe additions by Brian A. Troha
 
     Games supported:
-        * Time Killers (4 sets)
+        * Time Killers (5 sets)
         * Bloodstorm (5 sets)
-        * Hard Yardage (2 sets)
+        * Hard Yardage (3 sets)
         * Pairs (4 sets)
         * Pairs Redemption (Child's version of pairs)
         * Driver's Edge (1 set)
@@ -421,11 +421,14 @@ void itech32_state::itech32_update_interrupts(int vint, int xint, int qint)
 }
 
 
-INTERRUPT_GEN_MEMBER(itech32_state::generate_int1)
+WRITE_LINE_MEMBER(itech32_state::generate_int1)
 {
-	/* signal the NMI */
-	itech32_update_interrupts(1, -1, -1);
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+	if (state)
+	{
+		/* signal the NMI */
+		itech32_update_interrupts(1, -1, -1);
+		if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", m_screen->vpos());
+	}
 }
 
 
@@ -894,41 +897,43 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
  *************************************/
 
 /*------ Time Killers memory layout ------*/
-static ADDRESS_MAP_START( timekill_map, AS_PROGRAM, 16, itech32_state )
-	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x040000, 0x040001) AM_READ_PORT("P1")
-	AM_RANGE(0x048000, 0x048001) AM_READ_PORT("P2")
-	AM_RANGE(0x050000, 0x050001) AM_READ_PORT("SYSTEM") AM_WRITE(timekill_intensity_w)
-	AM_RANGE(0x058000, 0x058001) AM_READ_PORT("DIPS") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x060000, 0x060001) AM_WRITE(timekill_colora_w)
-	AM_RANGE(0x068000, 0x068001) AM_WRITE(timekill_colorbc_w)
-	AM_RANGE(0x070000, 0x070001) AM_WRITENOP    /* noisy */
-	AM_RANGE(0x078000, 0x078001) AM_WRITE(sound_data_w)
-	AM_RANGE(0x080000, 0x08007f) AM_READWRITE(itech32_video_r, itech32_video_w) AM_SHARE("video")
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(int1_ack_w)
-	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("main_rom")
-ADDRESS_MAP_END
+void itech32_state::timekill_map(address_map &map)
+{
+	map(0x000000, 0x003fff).ram().share("nvram");
+	map(0x040000, 0x040001).portr("P1");
+	map(0x048000, 0x048001).portr("P2");
+	map(0x050000, 0x050001).portr("SYSTEM").w(this, FUNC(itech32_state::timekill_intensity_w));
+	map(0x058000, 0x058001).portr("DIPS").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x060000, 0x060001).w(this, FUNC(itech32_state::timekill_colora_w));
+	map(0x068000, 0x068001).w(this, FUNC(itech32_state::timekill_colorbc_w));
+	map(0x070000, 0x070001).nopw();    /* noisy */
+	map(0x078000, 0x078001).w(this, FUNC(itech32_state::sound_data_w));
+	map(0x080000, 0x08007f).rw(this, FUNC(itech32_state::itech32_video_r), FUNC(itech32_state::itech32_video_w)).share("video");
+	map(0x0a0000, 0x0a0001).w(this, FUNC(itech32_state::int1_ack_w));
+	map(0x0c0000, 0x0c7fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x100000, 0x17ffff).rom().region("user1", 0).share("main_rom");
+}
 
 
 /*------ BloodStorm and later games memory layout ------*/
-static ADDRESS_MAP_START( bloodstm_map, AS_PROGRAM, 16, itech32_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1") AM_WRITE(int1_ack_w)
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P2")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P3")
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P4") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("DIPS")
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(bloodstm_color1_w)
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(bloodstm_color2_w)
-	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x480000, 0x480001) AM_WRITE(sound_data_w)
-	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(bloodstm_video_r, bloodstm_video_w) AM_SHARE("video")
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(bloodstm_paletteram_w) AM_SHARE("palette")
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(bloodstm_plane_w)
-	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x800000, 0x87ffff) AM_MIRROR(0x780000) AM_ROM AM_REGION("user1", 0) AM_SHARE("main_rom")
-ADDRESS_MAP_END
+void itech32_state::bloodstm_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).ram().share("nvram");
+	map(0x080000, 0x080001).portr("P1").w(this, FUNC(itech32_state::int1_ack_w));
+	map(0x100000, 0x100001).portr("P2");
+	map(0x180000, 0x180001).portr("P3");
+	map(0x200000, 0x200001).portr("P4").w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x280000, 0x280001).portr("DIPS");
+	map(0x300000, 0x300001).w(this, FUNC(itech32_state::bloodstm_color1_w));
+	map(0x380000, 0x380001).w(this, FUNC(itech32_state::bloodstm_color2_w));
+	map(0x400000, 0x400001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
+	map(0x480000, 0x480001).w(this, FUNC(itech32_state::sound_data_w));
+	map(0x500000, 0x5000ff).rw(this, FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w)).share("video");
+	map(0x580000, 0x59ffff).ram().w(this, FUNC(itech32_state::bloodstm_paletteram_w)).share("palette");
+	map(0x700000, 0x700001).w(this, FUNC(itech32_state::bloodstm_plane_w));
+	map(0x780000, 0x780001).portr("EXTRA");
+	map(0x800000, 0x87ffff).mirror(0x780000).rom().region("user1", 0).share("main_rom");
+}
 
 
 /*------ Driver's Edge memory layouts ------*/
@@ -972,68 +977,72 @@ WRITE32_MEMBER(itech32_state::test2_w)
 }
 #endif
 
-static ADDRESS_MAP_START( drivedge_map, AS_PROGRAM, 32, itech32_state )
+void itech32_state::drivedge_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).mirror(0x40000).ram().share("nvram");
 #if LOG_DRIVEDGE_UNINIT_RAM
-AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE(test1_r, test1_w)
-AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
+map(0x000100, 0x0003ff).mirror(0x40000).rw(this, FUNC(itech32_state::test1_r), FUNC(itech32_state::test1_w));
+map(0x000c00, 0x007fff).mirror(0x40000).rw(this, FUNC(itech32_state::test2_r), FUNC(itech32_state::test2_w));
 #endif
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("80000")
-	AM_RANGE(0x082000, 0x082003) AM_READ_PORT("82000")
-	AM_RANGE(0x084000, 0x084003) AM_READWRITE(sound_data32_r, sound_data32_w)
+	map(0x080000, 0x080003).portr("80000");
+	map(0x082000, 0x082003).portr("82000");
+	map(0x084000, 0x084003).rw(this, FUNC(itech32_state::sound_data32_r), FUNC(itech32_state::sound_data32_w));
 //  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
-	AM_RANGE(0x088000, 0x088003) AM_READ(drivedge_steering_r)
-	AM_RANGE(0x08a000, 0x08a003) AM_READ(drivedge_gas_r) AM_WRITENOP
-	AM_RANGE(0x08c000, 0x08c003) AM_READ_PORT("8c000")
-	AM_RANGE(0x08e000, 0x08e003) AM_READ_PORT("8e000") AM_WRITENOP
-	AM_RANGE(0x100000, 0x10000f) AM_WRITE(drivedge_zbuf_control_w) AM_SHARE("drivedge_zctl")
-	AM_RANGE(0x180000, 0x180003) AM_WRITE(drivedge_color0_w)
-	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x1c0000, 0x1c0003) AM_WRITENOP
-	AM_RANGE(0x1e0000, 0x1e0113) AM_READWRITE(itech020_video_r, itech020_video_w) AM_SHARE("video")
-	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE(tms_reset_assert_w)
-	AM_RANGE(0x1ec000, 0x1ec003) AM_WRITE(tms_reset_clear_w)
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("200000")
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(tms1_68k_ram_w) AM_SHARE("tms1_ram")
-	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(tms2_68k_ram_w) AM_SHARE("tms2_ram")
-	AM_RANGE(0x380000, 0x380003) AM_WRITENOP // AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x600000, 0x607fff) AM_ROM AM_REGION("user1", 0) AM_SHARE("main_rom")
-ADDRESS_MAP_END
+	map(0x088000, 0x088003).r(this, FUNC(itech32_state::drivedge_steering_r));
+	map(0x08a000, 0x08a003).r(this, FUNC(itech32_state::drivedge_gas_r)).nopw();
+	map(0x08c000, 0x08c003).portr("8c000");
+	map(0x08e000, 0x08e003).portr("8e000").nopw();
+	map(0x100000, 0x10000f).w(this, FUNC(itech32_state::drivedge_zbuf_control_w)).share("drivedge_zctl");
+	map(0x180000, 0x180003).w(this, FUNC(itech32_state::drivedge_color0_w));
+	map(0x1a0000, 0x1bffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x1c0000, 0x1c0003).nopw();
+	map(0x1e0000, 0x1e0113).rw(this, FUNC(itech32_state::itech020_video_r), FUNC(itech32_state::itech020_video_w)).share("video");
+	map(0x1e4000, 0x1e4003).w(this, FUNC(itech32_state::tms_reset_assert_w));
+	map(0x1ec000, 0x1ec003).w(this, FUNC(itech32_state::tms_reset_clear_w));
+	map(0x200000, 0x200003).portr("200000");
+	map(0x280000, 0x280fff).ram().w(this, FUNC(itech32_state::tms1_68k_ram_w)).share("tms1_ram");
+	map(0x300000, 0x300fff).ram().w(this, FUNC(itech32_state::tms2_68k_ram_w)).share("tms2_ram");
+	map(0x380000, 0x380003).nopw(); // AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	map(0x600000, 0x607fff).rom().region("user1", 0).share("main_rom");
+}
 
-static ADDRESS_MAP_START( drivedge_tms1_map, AS_PROGRAM, 32, itech32_state )
-	AM_RANGE(0x000000, 0x001fff) AM_RAM AM_SHARE("tms1_boot")
-	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x400) AM_RAM_WRITE(tms1_trigger_w) AM_SHARE("tms1_ram")
-	AM_RANGE(0x080000, 0x0bffff) AM_RAM
-ADDRESS_MAP_END
+void itech32_state::drivedge_tms1_map(address_map &map)
+{
+	map(0x000000, 0x001fff).ram().share("tms1_boot");
+	map(0x008000, 0x0083ff).mirror(0x400).ram().w(this, FUNC(itech32_state::tms1_trigger_w)).share("tms1_ram");
+	map(0x080000, 0x0bffff).ram();
+}
 
-static ADDRESS_MAP_START( drivedge_tms2_map, AS_PROGRAM, 32, itech32_state )
-	AM_RANGE(0x000000, 0x0003ff) AM_MIRROR(0x8400) AM_RAM_WRITE(tms2_trigger_w) AM_SHARE("tms2_ram")
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-ADDRESS_MAP_END
+void itech32_state::drivedge_tms2_map(address_map &map)
+{
+	map(0x000000, 0x0003ff).mirror(0x8400).ram().w(this, FUNC(itech32_state::tms2_trigger_w)).share("tms2_ram");
+	map(0x080000, 0x08ffff).ram();
+}
 
 
 /*------ 68EC020-based memory layout ------*/
-static ADDRESS_MAP_START( itech020_map, AS_PROGRAM, 32, itech32_state )
-	AM_RANGE(0x000000, 0x007fff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("P1") AM_WRITE(int1_ack32_w)
-	AM_RANGE(0x100000, 0x100003) AM_READ_PORT("P2")
-	AM_RANGE(0x180000, 0x180003) AM_READ_PORT("P3")
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("P4")
-	AM_RANGE(0x280000, 0x280003) AM_READ_PORT("DIPS")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(itech020_color1_w)
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(itech020_color2_w)
-	AM_RANGE(0x400000, 0x400003) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
-	AM_RANGE(0x480000, 0x480003) AM_WRITE(sound_data32_w)
-	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(itech020_video_r, itech020_video_w) AM_SHARE("video")
-	AM_RANGE(0x578000, 0x57ffff) AM_READNOP             /* touched by protection */
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_RANGE(0x600000, 0x603fff) AM_RAM AM_SHARE("nvram")
-/* ? */ AM_RANGE(0x61ff00, 0x61ffff) AM_WRITENOP            /* Unknown Writes */
-	AM_RANGE(0x680000, 0x680003) AM_READ(itech020_prot_result_r) AM_WRITENOP
-/* ! */ AM_RANGE(0x680800, 0x68083f) AM_READONLY AM_WRITENOP /* Serial DUART Channel A/B & Top LED sign - To Do! */
-	AM_RANGE(0x700000, 0x700003) AM_WRITE(itech020_plane_w)
-	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("main_rom")
-ADDRESS_MAP_END
+void itech32_state::itech020_map(address_map &map)
+{
+	map(0x000000, 0x007fff).ram().share("main_ram");
+	map(0x080000, 0x080003).portr("P1").w(this, FUNC(itech32_state::int1_ack32_w));
+	map(0x100000, 0x100003).portr("P2");
+	map(0x180000, 0x180003).portr("P3");
+	map(0x200000, 0x200003).portr("P4");
+	map(0x280000, 0x280003).portr("DIPS");
+	map(0x300000, 0x300003).w(this, FUNC(itech32_state::itech020_color1_w));
+	map(0x380000, 0x380003).w(this, FUNC(itech32_state::itech020_color2_w));
+	map(0x400000, 0x400003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
+	map(0x480000, 0x480003).w(this, FUNC(itech32_state::sound_data32_w));
+	map(0x500000, 0x5000ff).rw(this, FUNC(itech32_state::itech020_video_r), FUNC(itech32_state::itech020_video_w)).share("video");
+	map(0x578000, 0x57ffff).nopr();             /* touched by protection */
+	map(0x580000, 0x59ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x600000, 0x603fff).ram().share("nvram");
+/* ? */ map(0x61ff00, 0x61ffff).nopw();            /* Unknown Writes */
+	map(0x680000, 0x680003).r(this, FUNC(itech32_state::itech020_prot_result_r)).nopw();
+/* ! */ map(0x680800, 0x68083f).readonly().nopw(); /* Serial DUART Channel A/B & Top LED sign - To Do! */
+	map(0x700000, 0x700003).w(this, FUNC(itech32_state::itech020_plane_w));
+	map(0x800000, 0xbfffff).rom().region("user1", 0).share("main_rom");
+}
 
 
 
@@ -1044,30 +1053,32 @@ ADDRESS_MAP_END
  *************************************/
 
 /*------ Rev 1 sound board memory layout ------*/
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, itech32_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(sound_return_w)
-	AM_RANGE(0x0400, 0x0400) AM_READ(sound_data_r)
-	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE("ensoniq", es5506_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP    /* noisy */
-	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("soundbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void itech32_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x0000).w(this, FUNC(itech32_state::sound_return_w));
+	map(0x0400, 0x0400).r(this, FUNC(itech32_state::sound_data_r));
+	map(0x0800, 0x083f).mirror(0x80).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
+	map(0x0c00, 0x0c00).w(this, FUNC(itech32_state::sound_bank_w));
+	map(0x1000, 0x1000).nopw();    /* noisy */
+	map(0x1400, 0x140f).rw("via6522_0", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x7fff).bankr("soundbank");
+	map(0x8000, 0xffff).rom();
+}
 
 
 /*------ Rev 2 sound board memory layout ------*/
-static ADDRESS_MAP_START( sound_020_map, AS_PROGRAM, 8, itech32_state )
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x400) AM_READ(sound_data_r)
-	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE("ensoniq", es5506_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(firq_clear_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ(sound_data_buffer_r) AM_WRITENOP
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("soundbank")
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void itech32_state::sound_020_map(address_map &map)
+{
+	map(0x0000, 0x0000).mirror(0x400).r(this, FUNC(itech32_state::sound_data_r));
+	map(0x0800, 0x083f).mirror(0x80).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
+	map(0x0c00, 0x0c00).w(this, FUNC(itech32_state::sound_bank_w));
+	map(0x1400, 0x1400).w(this, FUNC(itech32_state::firq_clear_w));
+	map(0x1800, 0x1800).r(this, FUNC(itech32_state::sound_data_buffer_r)).nopw();
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x7fff).bankr("soundbank");
+	map(0x8000, 0xffff).rom();
+}
 
 
 
@@ -1112,7 +1123,7 @@ static INPUT_PORTS_START( timekill )
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
 	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )     PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0000, "-" )
 	PORT_DIPSETTING(      0x0010, "+" )
@@ -1157,7 +1168,7 @@ static INPUT_PORTS_START( itech32_base_16bit )
 	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
 	PORT_DIPNAME( 0x0010, 0x0000, "Video Sync" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, "-" )
 	PORT_DIPSETTING(      0x0010, "+" )
@@ -1275,7 +1286,7 @@ static INPUT_PORTS_START( drivedge )
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_CUSTOM )
 	PORT_DIPNAME( 0x70000000, 0x00000000, "Network Number" ) PORT_DIPLOCATION("SW1:4,3,2")
 	PORT_DIPSETTING(          0x00000000, "1" )
 	PORT_DIPSETTING(          0x10000000, "2" )
@@ -1376,7 +1387,7 @@ static INPUT_PORTS_START( itech32_base_32bit )
 	PORT_SERVICE_NO_TOGGLE( 0x00010000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech32_state,special_port_r, nullptr)
 	PORT_DIPNAME( 0x00100000, 0x00000000, "Video Sync" )     PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(          0x00000000, "-" )
 	PORT_DIPSETTING(          0x00100000, "+" )
@@ -1676,7 +1687,6 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(timekill_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech32_state,  generate_int1)
 
 	MCFG_CPU_ADD("soundcpu", MC6809, SOUND_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1697,10 +1707,10 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 //  MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 286, 0, 256) // sftm, wcbowl and shufshot configure it this way
 	MCFG_SCREEN_UPDATE_DRIVER(itech32_state, screen_update_itech32)
 	MCFG_SCREEN_PALETTE("palette")
-
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(itech32_state, generate_int1))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ensoniq", ES5506, SOUND_CLOCK)
 	MCFG_ES5506_REGION0("ensoniq.0")
@@ -1708,7 +1718,8 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 	MCFG_ES5506_REGION2("ensoniq.2")
 	MCFG_ES5506_REGION3("ensoniq.3")
 	MCFG_ES5506_CHANNELS(1)               /* channels */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.1)  /* swapped stereo */
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.1)
 
 	/* via */
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, SOUND_CLOCK/8)
@@ -1717,7 +1728,8 @@ MACHINE_CONFIG_START(itech32_state::timekill)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech32_state::bloodstm, timekill)
+MACHINE_CONFIG_START(itech32_state::bloodstm)
+	timekill(config);
 
 	/* basic machine hardware */
 
@@ -1732,7 +1744,8 @@ MACHINE_CONFIG_DERIVED(itech32_state::bloodstm, timekill)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech32_state::drivedge, timekill)
+MACHINE_CONFIG_START(itech32_state::drivedge)
+	timekill(config);
 
 	/* basic machine hardware */
 
@@ -1757,16 +1770,26 @@ MACHINE_CONFIG_DERIVED(itech32_state::drivedge, timekill)
 
 	MCFG_MACHINE_RESET_OVERRIDE(itech32_state,drivedge)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(NOOP) // interrupt not used?
+
+	MCFG_SPEAKER_STANDARD_STEREO("left_back", "right_back")
+
+	MCFG_SOUND_MODIFY("ensoniq")
+	MCFG_ES5506_CHANNELS(2)               /* channels */
+	MCFG_SOUND_ROUTE(2, "right_back", 0.1)  /* swapped stereo */
+	MCFG_SOUND_ROUTE(3, "left_back", 0.1)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech32_state::sftm, timekill)
+MACHINE_CONFIG_START(itech32_state::sftm)
+	timekill(config);
 
 	/* basic machine hardware */
 
 	MCFG_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(itech020_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", itech32_state,  generate_int1)
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(sound_020_map)
@@ -1781,7 +1804,8 @@ MACHINE_CONFIG_DERIVED(itech32_state::sftm, timekill)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(itech32_state::tourny, sftm)
+MACHINE_CONFIG_START(itech32_state::tourny)
+	sftm(config);
 
 	/* basic machine hardware */
 
@@ -1800,7 +1824,8 @@ MACHINE_CONFIG_END
 #undef  CODE_SIZE
 #define CODE_SIZE   0x0400000
 
-ROM_START( timekill )
+
+ROM_START( timekill ) /* Version 1.32 (3-tier board set: P/N 1050 Rev 1, P/N 1051 Rev 0 &  P/N 1052 Rev 2) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.32_u54.u54", 0x00000, 0x40000, CRC(68c74b81) SHA1(acdf677f82d7428acc6cf01076d43dd6330e9cb3) ) /* Labeled TK00 V1.32 (U54) */
 	ROM_LOAD16_BYTE( "tk01_v1.32_u53.u53", 0x00001, 0x40000, CRC(2158d8ef) SHA1(14aa66e020a9fa890fadbaf0936dfdc4e272f543) ) /* Labeled TK01 V1.32 (U53) */
@@ -1828,7 +1853,7 @@ ROM_START( timekill )
 	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
 ROM_END
 
-ROM_START( timekill132i ) /* Additional Violence Level:  Level 4 - Limbs, Decapitations, No Blood */
+ROM_START( timekill132i ) /* Version 1.32I (3-tier board set: P/N 1050 Rev 1, P/N 1051 Rev 0 &  P/N 1052 Rev 2) - Additional Violence Level:  Level 4 - Limbs, Decapitations, No Blood */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.32i_u54.u54", 0x00000, 0x40000, CRC(6cef5e8c) SHA1(43cd3e704567be7a60558e12c43f0bb4456ec96d) ) /* Labeled TK00 V1.32I (U54) */
 	ROM_LOAD16_BYTE( "tk01_v1.32i_u53.u53", 0x00001, 0x40000, CRC(3360f6a3) SHA1(37b49928db6d672a2bc9ddf4d35d649655450c08) ) /* Labeled TK01 V1.32I (U53) */
@@ -1856,14 +1881,14 @@ ROM_START( timekill132i ) /* Additional Violence Level:  Level 4 - Limbs, Decapi
 	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
 ROM_END
 
-ROM_START( timekill131 )
+ROM_START( timekill131 ) /* Version 1.31 (3-tier board set: P/N 1050 Rev 1, P/N 1051 Rev 0 &  P/N 1052 Rev 2) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.31_u54.u54", 0x00000, 0x40000, CRC(e09ae32b) SHA1(b090a38600d0499f7b4cb80a2715f27216d408b0) ) /* Labeled TK00 V1.31 (U54) */
 	ROM_LOAD16_BYTE( "tk01_v1.31_u53.u53", 0x00001, 0x40000, CRC(c29137ec) SHA1(4dcfba13b6f865a256bcb0406b6c83c309b17313) ) /* Labeled TK01 V1.31 (U53) */
 
 	ROM_REGION( 0x28000, "soundcpu", 0 ) /* At 0x18002 in rom: ITS Ver 4.0 OTTO Sound Board 6255 I/O 6/3/92 */
-	ROM_LOAD( "tksnd.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) )
-	ROM_CONTINUE(          0x08000, 0x08000 )
+	ROM_LOAD( "timekillsnd_u17.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) ) /* Labeled TIMEKILLSND (U17) */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1051 REV0 */
 	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin MASK ROM */
@@ -1884,14 +1909,14 @@ ROM_START( timekill131 )
 	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
 ROM_END
 
-ROM_START( timekill121 )
+ROM_START( timekill121 ) /* Version 1.21 (3-tier board set: P/N 1050 Rev 1, P/N 1051 Rev 0 &  P/N 1052 Rev 2) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.21_u54.u54", 0x00000, 0x40000, CRC(4938a940) SHA1(c42c5067ba0536ab22071c80a50434905acd93c2) ) /* Labeled TK00 V1.21 (U54) */
 	ROM_LOAD16_BYTE( "tk01_v1.21_u53.u53", 0x00001, 0x40000, CRC(0bb75c40) SHA1(99829ecb0692ea8b313bd8c2e982258c97599b06) ) /* Labeled TK01 V1.21 (U53) */
 
 	ROM_REGION( 0x28000, "soundcpu", 0 ) /* At 0x18002 in rom: ITS Ver 4.0 OTTO Sound Board 6255 I/O 6/3/92 */
-	ROM_LOAD( "tksnd.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) )
-	ROM_CONTINUE(          0x08000, 0x08000 )
+	ROM_LOAD( "timekillsnd_u17.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) ) /* Labeled TIMEKILLSND (U17) */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1051 REV0 */
 	ROM_LOAD32_BYTE( "time_killers_0.rom0",   0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) ) /* 42 pin MASK ROM */
@@ -1905,6 +1930,43 @@ ROM_START( timekill121 )
 	ROM_LOAD32_BYTE( "timekill_grom02.grom2", 0x800001, 0x020000, CRC(e98492a4) SHA1(fe8fb4bd3900109f3872f2930e8ddc9d19f599fd) )
 	ROM_LOAD32_BYTE( "timekill_grom03.grom3", 0x800002, 0x020000, CRC(6088fa64) SHA1(a3eee10bdef48fefec3836f551172dbe0819acf6) )
 	ROM_LOAD32_BYTE( "timekill_grom04.grom4", 0x800003, 0x020000, CRC(95be2318) SHA1(60580c87d63a114df44e2580e138128388ff447b) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 ) /* Sound board P/N 1052 REV 4 */
+	ROM_LOAD16_BYTE( "tksrom00_u18.u18", 0x000000, 0x80000, CRC(79d8b83a) SHA1(78934b4d0ccca8fefcf8277e4296eb1d59cd575b) ) /* Labeled TKSROM00 (U18) */
+	ROM_LOAD16_BYTE( "tksrom01_u20.u20", 0x100000, 0x80000, CRC(ec01648c) SHA1(b83c66cf22db5d89b9ed79b79861b79429d8380c) ) /* Labeled TKSROM01 (U20) */
+	ROM_LOAD16_BYTE( "tksrom02_u26.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) ) /* Labeled TKSROM02 (U26) */
+ROM_END
+
+ROM_START( timekill121a ) /* Version 1.21 (3-tier board set: P/N 1050 Rev 1, P/N 1049 Rev 1 &  P/N 1052 Rev 2) */
+	ROM_REGION16_BE( 0x80000, "user1", 0 )
+	ROM_LOAD16_BYTE( "tk00_v1.21_u54.u54", 0x00000, 0x40000, CRC(4938a940) SHA1(c42c5067ba0536ab22071c80a50434905acd93c2) ) /* Labeled TK00 V1.21 (U54) */
+	ROM_LOAD16_BYTE( "tk01_v1.21_u53.u53", 0x00001, 0x40000, CRC(0bb75c40) SHA1(99829ecb0692ea8b313bd8c2e982258c97599b06) ) /* Labeled TK01 V1.21 (U53) */
+
+	ROM_REGION( 0x28000, "soundcpu", 0 ) /* At 0x18002 in rom: ITS Ver 4.0 OTTO Sound Board 6255 I/O 6/3/92 */
+	ROM_LOAD( "timekillsnd_u17.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) ) /* Labeled TIMEKILLSND (U17) */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, "gfx1", 0 ) /* Rom board P/N 1049 REV1 */
+	ROM_LOAD32_BYTE( "timekill_grom00.grom00", 0x000000, 0x080000, CRC(980aab02) SHA1(c5ce18748b1677d7b8fc599355d282d7fb9dda11) )
+	ROM_LOAD32_BYTE( "timekill_grom05.grom05", 0x000001, 0x080000, CRC(0b28ae65) SHA1(854091d312512eedb0f5acc7b31d7033dd138352) )
+	ROM_LOAD32_BYTE( "timekill_grom10.grom10", 0x000002, 0x080000, CRC(6092c59e) SHA1(70be57e2039786f9384f7d39daccfea3028afdd6) )
+	ROM_LOAD32_BYTE( "timekill_grom15.grom15", 0x000003, 0x080000, CRC(b08497c1) SHA1(8a7f4fffae2903e38c4f00662bcf3dee3086c087) )
+	ROM_LOAD32_BYTE( "timekill_grom01.grom01", 0x200000, 0x080000, CRC(c37d9486) SHA1(a0623855ffb72d4a8e1b22476481a8d3bf3d9813) )
+	ROM_LOAD32_BYTE( "timekill_grom06.grom06", 0x200001, 0x080000, CRC(f698fc14) SHA1(5325faa3fababa2e5492f2aedb759ec5774f9482) )
+	ROM_LOAD32_BYTE( "timekill_grom11.grom11", 0x200002, 0x080000, CRC(69735cd0) SHA1(3deef8975eeca41c6588bb39185b6ecd8286f6bf) )
+	ROM_LOAD32_BYTE( "timekill_grom16.grom16", 0x200003, 0x080000, CRC(1fe7cd97) SHA1(f7d29e9fe228b0e5d768b8eefc6fe945e54c1682) )
+	ROM_LOAD32_BYTE( "timekill_grom02.grom02", 0x400000, 0x080000, CRC(a7b9240c) SHA1(e80728b2f09cbef3fce7cd3653cddd28f494f4c0) )
+	ROM_LOAD32_BYTE( "timekill_grom07.grom07", 0x400001, 0x080000, CRC(fb9c04d2) SHA1(44063fe860473891276021d2561c692e50e6f8fb) )
+	ROM_LOAD32_BYTE( "timekill_grom12.grom12", 0x400002, 0x080000, CRC(383adf84) SHA1(c03bb975646c01c731bd1cd6c89ef9d14bf83da8) )
+	ROM_LOAD32_BYTE( "timekill_grom17.grom17", 0x400003, 0x080000, CRC(77dcbf80) SHA1(06bf9e83d93f7e980f83a5a7dc5cd3016315c54c) )
+	ROM_LOAD32_BYTE( "timekill_grom03.grom03", 0x600000, 0x080000, CRC(7a464aa0) SHA1(57af1d838534117c459146d1f375900337a8b99d) )
+	ROM_LOAD32_BYTE( "timekill_grom08.grom08", 0x600001, 0x080000, CRC(7d6f7ba9) SHA1(cc4a51a3e883345d3dee600913f3d6ba5b74951e) )
+	ROM_LOAD32_BYTE( "timekill_grom13.grom13", 0x600002, 0x080000, CRC(ecde039d) SHA1(83f5d979e3055ac09b5b652e40115338559f9a53) )
+	ROM_LOAD32_BYTE( "timekill_grom18.grom18", 0x600003, 0x080000, CRC(05cb6d82) SHA1(ddba15ceabcbcce86baf95d844e3ef5e1246d926) )
+	ROM_LOAD32_BYTE( "timekill_grom04.grom04", 0x800000, 0x020000, CRC(b030c3d9) SHA1(f5c21285ec8ff4f74205e0cf18da67e733e31183) ) /* == timekill_grom01.grom1 */
+	ROM_LOAD32_BYTE( "timekill_grom09.grom09", 0x800001, 0x020000, CRC(e98492a4) SHA1(fe8fb4bd3900109f3872f2930e8ddc9d19f599fd) ) /* == timekill_grom02.grom2 */
+	ROM_LOAD32_BYTE( "timekill_grom14.grom14", 0x800002, 0x020000, CRC(6088fa64) SHA1(a3eee10bdef48fefec3836f551172dbe0819acf6) ) /* == timekill_grom03.grom3 */
+	ROM_LOAD32_BYTE( "timekill_grom19.grom19", 0x800003, 0x020000, CRC(95be2318) SHA1(60580c87d63a114df44e2580e138128388ff447b) ) /* == timekill_grom04.grom4 */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 ) /* Sound board P/N 1052 REV 4 */
 	ROM_LOAD16_BYTE( "tksrom00_u18.u18", 0x000000, 0x80000, CRC(79d8b83a) SHA1(78934b4d0ccca8fefcf8277e4296eb1d59cd575b) ) /* Labeled TKSROM00 (U18) */
@@ -2102,67 +2164,99 @@ ROM_START( bloodstm10 )
 ROM_END
 
 
-ROM_START( hardyard )   /* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+ROM_START( hardyard ) /* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
-	ROM_LOAD16_BYTE( "fb00v12.u83", 0x00000, 0x40000, CRC(c7497692) SHA1(6c11535cf011e15dd7ffb5eba8e8da557c38277e) )
-	ROM_LOAD16_BYTE( "fb01v12.u88", 0x00001, 0x40000, CRC(3320c79a) SHA1(d1d32048c541782e60c525d9789fe12607a6df3a) )
+	ROM_LOAD16_BYTE( "fb00_v1.20_u83.u83", 0x00000, 0x40000, CRC(c7497692) SHA1(6c11535cf011e15dd7ffb5eba8e8da557c38277e) ) /* Labeled FB00 V1.20 (U83) */
+	ROM_LOAD16_BYTE( "fb01_v1.20_u88.u88", 0x00001, 0x40000, CRC(3320c79a) SHA1(d1d32048c541782e60c525d9789fe12607a6df3a) ) /* Labeled FB01 V1.20 (U88) */
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "fbsndv11.u17", 0x10000, 0x18000, CRC(d221b121) SHA1(06f351274a9dcb522f67f58499c9dc2ef5f06c07) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_LOAD( "fb_snd_v1.1_u17.u17", 0x10000, 0x18000, CRC(d221b121) SHA1(06f351274a9dcb522f67f58499c9dc2ef5f06c07) ) /* Labeled FB SND V1.1 (U17) */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "itfb0.bin",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) )
-	ROM_LOAD32_BYTE( "itfb1.bin",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) )
-	ROM_LOAD32_BYTE( "itfb2.bin",  0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) )
-	ROM_LOAD32_BYTE( "itfb3.bin",  0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) )
-	ROM_LOAD32_BYTE( "itfb4.bin",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) )
-	ROM_LOAD32_BYTE( "itfb5.bin",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) )
-	ROM_LOAD32_BYTE( "itfb6.bin",  0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) )
-	ROM_LOAD32_BYTE( "itfb7.bin",  0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) )
-	ROM_LOAD32_BYTE( "itfb8.bin",  0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) )
-	ROM_LOAD32_BYTE( "itfb9.bin",  0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) )
-	ROM_LOAD32_BYTE( "itfb10.bin", 0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) )
-	ROM_LOAD32_BYTE( "itfb11.bin", 0x800003, 0x020000, CRC(cd4f0df0) SHA1(632eb0cf27d7bf3df09d03f373a3195dd5a702b8) )
+	ROM_LOAD32_BYTE( "footbal_0.grom0.itfb0",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) ) /* MASK ROM, socket silkscreened GROM0/ITFB0 */
+	ROM_LOAD32_BYTE( "footbal_1.grom5.itfb1",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) ) /* MASK ROM, socket silkscreened GROM5/ITFB1 */
+	ROM_LOAD32_BYTE( "footbal_2.grom10.itfb2", 0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) ) /* MASK ROM, socket silkscreened GROM10/ITFB2 */
+	ROM_LOAD32_BYTE( "footbal_3.grom15.itfb3", 0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) ) /* MASK ROM, socket silkscreened GROM15/ITFB3 */
+	ROM_LOAD32_BYTE( "footbal_4.grom1.itfb4",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) ) /* MASK ROM, socket silkscreened GROM1/ITFB4 */
+	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* MASK ROM, socket silkscreened GROM6/ITFB5 */
+	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* MASK ROM, socket silkscreened GROM11/ITFB6 */
+	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* MASK ROM, socket silkscreened GROM16/ITFB7 */
+	ROM_LOAD32_BYTE( "itfb-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
+	ROM_LOAD32_BYTE( "itfb-9.grom7.itfb9",     0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) ) /* EPROM, socket silkscreened GROM7/ITFB9 */
+	ROM_LOAD32_BYTE( "itfb-10.grom12.itfb10",  0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) ) /* EPROM, socket silkscreened GROM12/ITFB10 */
+	ROM_LOAD32_BYTE( "itfb-11.grom17.itfb11",  0x800003, 0x020000, CRC(cd4f0df0) SHA1(632eb0cf27d7bf3df09d03f373a3195dd5a702b8) ) /* EPROM, socket silkscreened GROM17/ITFB11 */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "ensoniq.2m", 0x000000, 0x200000, CRC(9fdc4825) SHA1(71e5255c66d9010be7e6f27916b605441fc53839) ) /* Ensoniq 2m 1350901601 */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "fbsrom00.bin", 0x000000, 0x080000, CRC(b0a76ad2) SHA1(d1125cf96f6b9613840b8d22afa59748fb32ab90) )
-	ROM_LOAD16_BYTE( "fbsrom01.bin", 0x100000, 0x080000, CRC(9fbf6a02) SHA1(90c86a94767a383895183a25b15084ed62891518) )
+	ROM_LOAD16_BYTE( "fb_srom00.srom0", 0x000000, 0x080000, CRC(b0a76ad2) SHA1(d1125cf96f6b9613840b8d22afa59748fb32ab90) )
+	ROM_LOAD16_BYTE( "fb_srom01.srom1", 0x100000, 0x080000, CRC(9fbf6a02) SHA1(90c86a94767a383895183a25b15084ed62891518) )
+ROM_END
+
+
+ROM_START( hardyard11 ) /* Version 1.1 (3-tier board set: P/N 1059 Rev 3,  P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
+	ROM_REGION16_BE( 0x80000, "user1", 0 )
+	ROM_LOAD16_BYTE( "fb00_v1.10_u83.u83", 0x00000, 0x40000, CRC(603f8a03) SHA1(b6c037c960dd09269b948533109ff379e091c62d) ) /* Labeled FB00 V1.10 (U83) */
+	ROM_LOAD16_BYTE( "fb01_v1.10_u88.u88", 0x00001, 0x40000, CRC(7b11db88) SHA1(d45eb5dece4b86b833f0824ffc04ad406a15603d) ) /* Labeled FB01 V1.10 (U88) */
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "fb_snd_v1.1_u17.u17", 0x10000, 0x18000, CRC(d221b121) SHA1(06f351274a9dcb522f67f58499c9dc2ef5f06c07) ) /* Labeled FB SND V1.1 (U17) */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "footbal_0.grom0.itfb0",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) ) /* MASK ROM, socket silkscreened GROM0/ITFB0 */
+	ROM_LOAD32_BYTE( "footbal_1.grom5.itfb1",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) ) /* MASK ROM, socket silkscreened GROM5/ITFB1 */
+	ROM_LOAD32_BYTE( "footbal_2.grom10.itfb2", 0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) ) /* MASK ROM, socket silkscreened GROM10/ITFB2 */
+	ROM_LOAD32_BYTE( "footbal_3.grom15.itfb3", 0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) ) /* MASK ROM, socket silkscreened GROM15/ITFB3 */
+	ROM_LOAD32_BYTE( "footbal_4.grom1.itfb4",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) ) /* MASK ROM, socket silkscreened GROM1/ITFB4 */
+	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* MASK ROM, socket silkscreened GROM6/ITFB5 */
+	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* MASK ROM, socket silkscreened GROM11/ITFB6 */
+	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* MASK ROM, socket silkscreened GROM16/ITFB7 */
+	ROM_LOAD32_BYTE( "itfb-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
+	ROM_LOAD32_BYTE( "itfb-9.grom7.itfb9",     0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) ) /* EPROM, socket silkscreened GROM7/ITFB9 */
+	ROM_LOAD32_BYTE( "itfb-10.grom12.itfb10",  0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) ) /* EPROM, socket silkscreened GROM12/ITFB10 */
+	ROM_LOAD32_BYTE( "itfb-11.grom17.itfb11",  0x800003, 0x020000, CRC(cd4f0df0) SHA1(632eb0cf27d7bf3df09d03f373a3195dd5a702b8) ) /* EPROM, socket silkscreened GROM17/ITFB11 */
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "ensoniq.2m", 0x000000, 0x200000, CRC(9fdc4825) SHA1(71e5255c66d9010be7e6f27916b605441fc53839) ) /* Ensoniq 2m 1350901601 */
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "fb_srom00.srom0", 0x000000, 0x080000, CRC(b0a76ad2) SHA1(d1125cf96f6b9613840b8d22afa59748fb32ab90) )
+	ROM_LOAD16_BYTE( "fb_srom01.srom1", 0x100000, 0x080000, CRC(9fbf6a02) SHA1(90c86a94767a383895183a25b15084ed62891518) )
 ROM_END
 
 
 ROM_START( hardyard10 ) /* Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 1061 Rev 1 &  P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
-	ROM_LOAD16_BYTE( "fb00v10.u83", 0x00000, 0x40000, CRC(f839393c) SHA1(ba06172bc4781f7738ce43019031715fee4b344c) )
-	ROM_LOAD16_BYTE( "fb01v10.u88", 0x00001, 0x40000, CRC(ca444702) SHA1(49bcc0994da9cd2c31c0cd78b822aceeaffd035f) )
+	ROM_LOAD16_BYTE( "fb00_v1.0_u83.u83", 0x00000, 0x40000, CRC(f839393c) SHA1(ba06172bc4781f7738ce43019031715fee4b344c) )
+	ROM_LOAD16_BYTE( "fb01_v1.0_u88.u88", 0x00001, 0x40000, CRC(ca444702) SHA1(49bcc0994da9cd2c31c0cd78b822aceeaffd035f) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "fbsndv10.u17", 0x10000, 0x18000, CRC(6c6db5b8) SHA1(925e7c7cc7c3d290f4a334f24eef574aaac3150c) )
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_LOAD( "fb_snd_v1.0_u17.u17", 0x10000, 0x18000, CRC(6c6db5b8) SHA1(925e7c7cc7c3d290f4a334f24eef574aaac3150c) ) /* Labeled FB SND V1.0 (U17) */
+	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
-	ROM_LOAD32_BYTE( "itfb0.bin",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) )
-	ROM_LOAD32_BYTE( "itfb1.bin",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) )
-	ROM_LOAD32_BYTE( "itfb2.bin",  0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) )
-	ROM_LOAD32_BYTE( "itfb3.bin",  0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) )
-	ROM_LOAD32_BYTE( "itfb4.bin",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) )
-	ROM_LOAD32_BYTE( "itfb5.bin",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) )
-	ROM_LOAD32_BYTE( "itfb6.bin",  0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) )
-	ROM_LOAD32_BYTE( "itfb7.bin",  0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) )
-	ROM_LOAD32_BYTE( "itfb8.bin",  0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) )
-	ROM_LOAD32_BYTE( "itfb9.bin",  0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) )
-	ROM_LOAD32_BYTE( "itfb10.bin", 0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) )
-	ROM_LOAD32_BYTE( "itfb11.bin", 0x800003, 0x020000, CRC(cd4f0df0) SHA1(632eb0cf27d7bf3df09d03f373a3195dd5a702b8) )
+	ROM_LOAD32_BYTE( "footbal_0.grom0.itfb0",  0x000000, 0x100000, CRC(0b7781af) SHA1(0e6b617a5d9a2d0d50a3839231177f2934177b87) ) /* MASK ROM, socket silkscreened GROM0/ITFB0 */
+	ROM_LOAD32_BYTE( "footbal_1.grom5.itfb1",  0x000001, 0x100000, CRC(178d0f9b) SHA1(2c13be9063742c24a4b8409fe1d16f6c989f20e0) ) /* MASK ROM, socket silkscreened GROM5/ITFB1 */
+	ROM_LOAD32_BYTE( "footbal_2.grom10.itfb2", 0x000002, 0x100000, CRC(0a17231e) SHA1(1499783ac32c3c6956d4084d623a432aecfd7769) ) /* MASK ROM, socket silkscreened GROM10/ITFB2 */
+	ROM_LOAD32_BYTE( "footbal_3.grom15.itfb3", 0x000003, 0x100000, CRC(104456af) SHA1(6b6adca80f663cdc8fcbdf58c033d32193e91b4b) ) /* MASK ROM, socket silkscreened GROM15/ITFB3 */
+	ROM_LOAD32_BYTE( "footbal_4.grom1.itfb4",  0x400000, 0x100000, CRC(2cb6f454) SHA1(e3af2809d43ddb4f17342a0b63848bf9a579b1eb) ) /* MASK ROM, socket silkscreened GROM1/ITFB4 */
+	ROM_LOAD32_BYTE( "footbal_5.grom6.itfb5",  0x400001, 0x100000, CRC(9b19b873) SHA1(4393dce2fd6e1f3c2b855759a985e1e068959e0a) ) /* MASK ROM, socket silkscreened GROM6/ITFB5 */
+	ROM_LOAD32_BYTE( "footbal_6.grom11.itfb6", 0x400002, 0x100000, CRC(58694394) SHA1(9b0742d136de9870f50a1f47347071a21283067b) ) /* MASK ROM, socket silkscreened GROM11/ITFB6 */
+	ROM_LOAD32_BYTE( "footbal_7.grom16.itfb7", 0x400003, 0x100000, CRC(9b7a2d1a) SHA1(e4aa8d5f76b26d16cabaf88dfa1bfba8052fe99d) ) /* MASK ROM, socket silkscreened GROM16/ITFB7 */
+	ROM_LOAD32_BYTE( "itfb-8.grom2.itfb8",     0x800000, 0x020000, CRC(a1656bf8) SHA1(4df05a1cdf5d636956d1c3d1f4f1988b254608d5) ) /* EPROM, socket silkscreened GROM2/ITFB8 */
+	ROM_LOAD32_BYTE( "itfb-9.grom7.itfb9",     0x800001, 0x020000, CRC(2afa9e10) SHA1(d422447fd2fc2f9350af472eb1f1223383a1a259) ) /* EPROM, socket silkscreened GROM7/ITFB9 */
+	ROM_LOAD32_BYTE( "itfb-10.grom12.itfb10",  0x800002, 0x020000, CRC(d5d15b38) SHA1(f414c19d8d88f916fbfa24fc3e16cea2e0acce08) ) /* EPROM, socket silkscreened GROM12/ITFB10 */
+	ROM_LOAD32_BYTE( "itfb-11.grom17.itfb11",  0x800003, 0x020000, CRC(cd4f0df0) SHA1(632eb0cf27d7bf3df09d03f373a3195dd5a702b8) ) /* EPROM, socket silkscreened GROM17/ITFB11 */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "ensoniq.2m", 0x000000, 0x200000, CRC(9fdc4825) SHA1(71e5255c66d9010be7e6f27916b605441fc53839) ) /* Ensoniq 2m 1350901601 */
 
 	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "fbsrom00.bin", 0x000000, 0x080000, CRC(b0a76ad2) SHA1(d1125cf96f6b9613840b8d22afa59748fb32ab90) )
-	ROM_LOAD16_BYTE( "fbsrom01.bin", 0x100000, 0x080000, CRC(9fbf6a02) SHA1(90c86a94767a383895183a25b15084ed62891518) )
+	ROM_LOAD16_BYTE( "fb_srom00.srom0", 0x000000, 0x080000, CRC(b0a76ad2) SHA1(d1125cf96f6b9613840b8d22afa59748fb32ab90) )
+	ROM_LOAD16_BYTE( "fb_srom01.srom1", 0x100000, 0x080000, CRC(9fbf6a02) SHA1(90c86a94767a383895183a25b15084ed62891518) )
 ROM_END
 
 
@@ -2741,7 +2835,7 @@ ROM_END
 
 ROM_START( drivedge )
 	ROM_REGION32_BE( 0x8000, "user1", 0 )
-	ROM_LOAD( "de-u130.bin", 0x00000, 0x8000, CRC(873579b0) SHA1(ce7fcbea780aee376c2f4c659a75fcf6b7abbdb4) )
+	ROM_LOAD( "de_v1.6-u130.bin", 0x00000, 0x8000, CRC(873579b0) SHA1(ce7fcbea780aee376c2f4c659a75fcf6b7abbdb4) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "desndu17.bin", 0x10000, 0x18000, CRC(6e8ca8bc) SHA1(98ad36877b40123b0396943754234df8de183687) )
@@ -4570,7 +4664,9 @@ GAME( 1992, timekill,     0,        timekill, timekill, itech32_state, timekill,
 GAME( 1992, timekill132i, timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32I)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, timekill131,  timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.31)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, timekill121,  timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, timekill121a, timekill, timekill, timekill, itech32_state, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21, alternate ROM board)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hardyard,     0,        bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hardyard11,   hardyard, bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hardyard10,   hardyard, bloodstm, hardyard, itech32_state, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bloodstm,     0,        bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.22)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bloodstm22,   bloodstm, bloodstm, bloodstm, itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.20)", MACHINE_SUPPORTS_SAVE )
@@ -4582,7 +4678,7 @@ GAME( 1994, pairs,        0,        bloodstm, pairs,    itech32_state, bloodstm,
 GAME( 1994, pairsa,       pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Strata/Incredible Technologies",   "Pairs (V1, 09/07/94)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, hotmemry,     pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.2, Germany, 12/28/94)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, hotmemry11,   pairs,    bloodstm, pairs,    itech32_state, bloodstm, ROT0, "Incredible Technologies (Tuning license)", "Hot Memory (V1.1, Germany, 11/30/94)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, drivedge,     0,        drivedge, drivedge, itech32_state, drivedge, ROT0, "Strata/Incredible Technologies",   "Driver's Edge", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, drivedge,     0,        drivedge, drivedge, itech32_state, drivedge, ROT0, "Strata/Incredible Technologies",   "Driver's Edge (v1.6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wcbowl,       0,        sftm,     wcbowln,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.66)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1995, wcbowl165,    wcbowl,   sftm,     wcbowlo,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.65)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1995, wcbowl161,    wcbowl,   sftm,     wcbowlo,  itech32_state, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.61)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITBWL-3 */

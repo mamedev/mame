@@ -16,10 +16,10 @@
 
 #define MCFG_SAM6883_ADD(_tag, _clock, _cputag, _cpuspace) \
 	MCFG_DEVICE_ADD(_tag, SAM6883, _clock) \
-	sam6883_device::configure_cpu(*device, _cputag, _cpuspace);
+	downcast<sam6883_device &>(*device).configure_cpu(_cputag, _cpuspace);
 
 #define MCFG_SAM6883_RES_CALLBACK(_read) \
-	devcb = &sam6883_device::set_res_rd_callback(*device, DEVCB_##_read);
+	devcb = &downcast<sam6883_device &>(*device).set_res_rd_callback(DEVCB_##_read);
 
 
 //**************************************************************************
@@ -91,13 +91,12 @@ class sam6883_device : public device_t, public sam6883_friend_device_interface
 public:
 	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_res_rd_callback(device_t &device, Object &&cb) { return downcast<sam6883_device &>(device).m_read_res.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_res_rd_callback(Object &&cb) { return m_read_res.set_callback(std::forward<Object>(cb)); }
 
-	static void configure_cpu(device_t &device, const char *tag, int space)
+	void configure_cpu(const char *tag, int space)
 	{
-		sam6883_device &dev = downcast<sam6883_device &>(device);
-		dev.m_cpu_tag = tag;
-		dev.m_cpu_space_ref = space;
+		m_cpu_tag = tag;
+		m_cpu_space_ref = space;
 	}
 
 	// called to configure banks

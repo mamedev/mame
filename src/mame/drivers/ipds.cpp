@@ -38,6 +38,8 @@ public:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	void ipds(machine_config &config);
+	void ipds_io(address_map &map);
+	void ipds_mem(address_map &map);
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )
@@ -61,19 +63,21 @@ WRITE8_MEMBER( ipds_state::ipds_b1_w )
 {
 }
 
-static ADDRESS_MAP_START(ipds_mem, AS_PROGRAM, 8, ipds_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ipds_state::ipds_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( ipds_io, AS_IO, 8, ipds_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xb0, 0xb0) AM_READ(ipds_b0_r)
-	AM_RANGE(0xb1, 0xb1) AM_READWRITE(ipds_b1_r,ipds_b1_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(ipds_c0_r)
-ADDRESS_MAP_END
+void ipds_state::ipds_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+	map(0xb0, 0xb0).r(this, FUNC(ipds_state::ipds_b0_r));
+	map(0xb1, 0xb1).rw(this, FUNC(ipds_state::ipds_b1_r), FUNC(ipds_state::ipds_b1_w));
+	map(0xc0, 0xc0).r(this, FUNC(ipds_state::ipds_c0_r));
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ipds )

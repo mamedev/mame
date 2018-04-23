@@ -172,6 +172,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ppmast93(machine_config &config);
+	void ppmast93_cpu1_io(address_map &map);
+	void ppmast93_cpu1_map(address_map &map);
+	void ppmast93_cpu2_io(address_map &map);
+	void ppmast93_cpu2_map(address_map &map);
 };
 
 
@@ -200,35 +204,39 @@ WRITE8_MEMBER(ppmast93_state::port4_w)
 	membank("cpubank")->set_entry(data & 0x07);
 }
 
-static ADDRESS_MAP_START( ppmast93_cpu1_map, AS_PROGRAM, 8, ppmast93_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubank")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fgram_w) AM_SHARE("fgram")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ppmast93_state::ppmast93_cpu1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().nopw();
+	map(0x8000, 0xbfff).bankr("cpubank");
+	map(0xd000, 0xd7ff).ram().w(this, FUNC(ppmast93_state::bgram_w)).share("bgram");
+	map(0xd800, 0xdfff).nopw();
+	map(0xf000, 0xf7ff).ram().w(this, FUNC(ppmast93_state::fgram_w)).share("fgram");
+	map(0xf800, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( ppmast93_cpu1_io, AS_IO, 8, ppmast93_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM") AM_WRITE(port4_w)
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW1")
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
+void ppmast93_state::ppmast93_cpu1_io(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("P1").w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x02, 0x02).portr("P2");
+	map(0x04, 0x04).portr("SYSTEM").w(this, FUNC(ppmast93_state::port4_w));
+	map(0x06, 0x06).portr("DSW1");
+	map(0x08, 0x08).portr("DSW2");
+}
 
-static ADDRESS_MAP_START( ppmast93_cpu2_map, AS_PROGRAM, 8, ppmast93_state )
-	AM_RANGE(0x0000, 0xfbff) AM_ROM AM_REGION("sub", 0x10000)
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xfd00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void ppmast93_state::ppmast93_cpu2_map(address_map &map)
+{
+	map(0x0000, 0xfbff).rom().region("sub", 0x10000);
+	map(0xfc00, 0xfc00).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0xfd00, 0xffff).ram();
+}
 
-static ADDRESS_MAP_START( ppmast93_cpu2_io, AS_IO, 8, ppmast93_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("sub", 0x20000)
-	AM_RANGE(0x0000, 0x0001) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym2413_device, write)
-	AM_RANGE(0x0002, 0x0002) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write)
-ADDRESS_MAP_END
+void ppmast93_state::ppmast93_cpu2_io(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("sub", 0x20000);
+	map(0x0000, 0x0001).mirror(0xff00).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x0002, 0x0002).mirror(0xff00).w("dac", FUNC(dac_byte_interface::write));
+}
 
 static INPUT_PORTS_START( ppmast93 )
 	PORT_START("P1")
@@ -258,7 +266,7 @@ static INPUT_PORTS_START( ppmast93 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) // or it always goes to test mode
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) // or it always goes to test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")

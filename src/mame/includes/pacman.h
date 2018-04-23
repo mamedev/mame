@@ -30,7 +30,35 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-private:
+	void _8bpm_portmap(address_map &map);
+	void alibaba_map(address_map &map);
+	void bigbucks_map(address_map &map);
+	void bigbucks_portmap(address_map &map);
+	void birdiy_map(address_map &map);
+	void crushs_map(address_map &map);
+	void crushs_portmap(address_map &map);
+	void dremshpr_map(address_map &map);
+	void dremshpr_portmap(address_map &map);
+	void drivfrcp_portmap(address_map &map);
+	void epos_map(address_map &map);
+	void epos_portmap(address_map &map);
+	void mschamp_map(address_map &map);
+	void mschamp_portmap(address_map &map);
+	void mspacman_map(address_map &map);
+	void nmouse_portmap(address_map &map);
+	void numcrash_map(address_map &map);
+	void pacman_map(address_map &map);
+	void pengojpm_map(address_map &map);
+	void piranha_portmap(address_map &map);
+	void porky_portmap(address_map &map);
+	void rocktrv2_map(address_map &map);
+	void s2650games_dataport(address_map &map);
+	void s2650games_map(address_map &map);
+	void superabc_map(address_map &map);
+	void vanvan_portmap(address_map &map);
+	void woodpek_map(address_map &map);
+	void writeport(address_map &map);
+protected:
 	optional_device<namco_device> m_namco_sound;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<uint8_t> m_spriteram;
@@ -155,9 +183,11 @@ public:
 	DECLARE_VIDEO_START(jrpacman);
 	uint32_t screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_s2650games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(vblank_nmi);
-	INTERRUPT_GEN_MEMBER(s2650_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
+	INTERRUPT_GEN_MEMBER(periodic_irq);
+	DECLARE_WRITE_LINE_MEMBER(rocktrv2_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_nmi);
+	DECLARE_WRITE_LINE_MEMBER(s2650_interrupt);
 
 private:
 	void init_save_state();

@@ -24,7 +24,7 @@
 #include "machine/bankdev.h"
 #include "sound/dac.h"
 #include "sound/wave.h"
-
+#include "screen.h"
 
 
 //**************************************************************************
@@ -134,6 +134,8 @@ public:
 	void coco_sound(machine_config &config);
 	void coco_floating(machine_config &config);
 
+	void coco_floating_map(address_map &map);
+	void coco_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -151,8 +153,6 @@ protected:
 	virtual void pia1_pb_changed(uint8_t data);
 
 	// accessors
-	cpu_device &maincpu() { return *m_maincpu; }
-	address_space &cpu_address_space() { return maincpu().space(); }
 	pia6821_device &pia_0() { return *m_pia_0; }
 	pia6821_device &pia_1() { return *m_pia_1; }
 	cococart_slot_device &cococart() { return *m_cococart; }
@@ -163,7 +163,7 @@ protected:
 	virtual void cart_w(bool state);
 	virtual void update_cart_base(uint8_t *cart_base) = 0;
 
-private:
+protected:
 	// timer constants
 	static const device_timer_id TIMER_HIRES_JOYSTICK_X = 0;
 	static const device_timer_id TIMER_HIRES_JOYSTICK_Y = 1;
@@ -237,6 +237,7 @@ private:
 	required_device<dac_byte_interface> m_dac;
 	required_device<dac_1bit_device> m_sbs;
 	required_device<wave_device> m_wave;
+	optional_device<screen_device> m_screen;
 	required_device<cococart_slot_device> m_cococart;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;

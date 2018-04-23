@@ -20,15 +20,15 @@
 
 #define MCFG_PLA_ADD(tag, inputs, outputs, terms) \
 		MCFG_DEVICE_ADD((tag), PLA, 0) \
-		pla_device::set_num_inputs(*device, (inputs)); \
-		pla_device::set_num_outputs(*device, (outputs)); \
-		pla_device::set_num_terms(*device, (terms));
+		downcast<pla_device &>(*device).set_num_inputs((inputs)); \
+		downcast<pla_device &>(*device).set_num_outputs((outputs)); \
+		downcast<pla_device &>(*device).set_num_terms((terms));
 
 #define MCFG_PLA_INPUTMASK(mask) \
-		pla_device::set_inputmask(*device, (mask));
+		downcast<pla_device &>(*device).set_inputmask((mask));
 
 #define MCFG_PLA_FILEFORMAT(format) \
-		pla_device::set_format(*device, (pla_device::FMT::format));
+		downcast<pla_device &>(*device).set_format((pla_device::FMT::format));
 
 
 // macros for known (and used) devices
@@ -52,12 +52,12 @@
     GND  14 |_____________| 15  F3
 */
 #define MCFG_PLS100_ADD(tag) \
-		MCFG_PLA_ADD((tag), 16, 8, 48)
+	MCFG_PLA_ADD((tag), 16, 8, 48)
 
 // MOS 8721 PLA
 // TODO: actual number of terms is unknown
 #define MCFG_MOS8721_ADD(tag) \
-		MCFG_PLA_ADD((tag), 27, 18, 379)
+	MCFG_PLA_ADD((tag), 27, 18, 379)
 
 
 
@@ -79,12 +79,12 @@ public:
 	// construction/destruction
 	pla_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
-	static void set_num_inputs(device_t &device, uint32_t i) { downcast<pla_device &>(device).m_inputs = i; }
-	static void set_num_outputs(device_t &device, uint32_t o) { downcast<pla_device &>(device).m_outputs = o; }
-	static void set_num_terms(device_t &device, uint32_t t) { downcast<pla_device &>(device).m_terms = t; }
-	static void set_inputmask(device_t &device, uint32_t mask) { downcast<pla_device &>(device).m_input_mask = mask; } // uint32_t!
-	static void set_format(device_t &device, FMT format) { downcast<pla_device &>(device).m_format = format; }
+	// configuration helpers
+	void set_num_inputs(uint32_t i) { m_inputs = i; }
+	void set_num_outputs(uint32_t o) { m_outputs = o; }
+	void set_num_terms(uint32_t t) { m_terms = t; }
+	void set_inputmask(uint32_t mask) { m_input_mask = mask; } // uint32_t!
+	void set_format(FMT format) { m_format = format; }
 
 	uint32_t inputs() { return m_inputs; }
 	uint32_t outputs() { return m_outputs; }

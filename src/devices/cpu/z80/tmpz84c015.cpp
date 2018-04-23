@@ -15,19 +15,20 @@
 #include "emu.h"
 #include "tmpz84c015.h"
 
-DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "TMPZ84C015")
+DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "Toshiba TMPZ84C015")
 
-static ADDRESS_MAP_START( tmpz84c015_internal_io_map, AS_IO, 8, tmpz84c015_device )
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE("tmpz84c015_ctc", z80ctc_device, read, write)
-	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE("tmpz84c015_sio", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE("tmpz84c015_pio", z80pio_device, read_alt, write_alt)
-	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_WRITE(irq_priority_w)
-ADDRESS_MAP_END
+void tmpz84c015_device::tmpz84c015_internal_io_map(address_map &map)
+{
+	map(0x10, 0x13).mirror(0xff00).rw("tmpz84c015_ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x18, 0x1b).mirror(0xff00).rw("tmpz84c015_sio", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x1c, 0x1f).mirror(0xff00).rw("tmpz84c015_pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xf4, 0xf4).mirror(0xff00).w(this, FUNC(tmpz84c015_device::irq_priority_w));
+}
 
 
 tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z80_device(mconfig, TMPZ84C015, tag, owner, clock),
-	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME( tmpz84c015_internal_io_map ) ),
+	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(tmpz84c015_device::tmpz84c015_internal_io_map), this)),
 	m_ctc(*this, "tmpz84c015_ctc"),
 	m_sio(*this, "tmpz84c015_sio"),
 	m_pio(*this, "tmpz84c015_pio"),

@@ -40,12 +40,13 @@ public:
 	// construction/destruction
 	abc1600_mover_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(vram_map, 8);
-	virtual DECLARE_ADDRESS_MAP(crtc_map, 8);
-	virtual DECLARE_ADDRESS_MAP(iowr0_map, 8);
-	virtual DECLARE_ADDRESS_MAP(iowr1_map, 8);
-	virtual DECLARE_ADDRESS_MAP(iowr2_map, 8);
+	virtual void vram_map(address_map &map);
+	virtual void crtc_map(address_map &map);
+	virtual void iowr0_map(address_map &map);
+	virtual void iowr1_map(address_map &map);
+	virtual void iowr2_map(address_map &map);
 
+	void mover_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

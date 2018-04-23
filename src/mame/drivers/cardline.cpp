@@ -76,6 +76,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	void cardline(machine_config &config);
+	void mem_io(address_map &map);
+	void mem_prg(address_map &map);
 };
 
 void cardline_state::machine_start()
@@ -210,30 +212,30 @@ WRITE8_MEMBER(cardline_state::lamps_w)
 	output().set_lamp_value(7,(data >> 7) & 1);
 }
 
-static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, cardline_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void cardline_state::mem_prg(address_map &map)
+{
+	map(0x0000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("IN0")
-	AM_RANGE(0x2005, 0x2005) AM_READ_PORT("IN1")
-	AM_RANGE(0x2006, 0x2006) AM_READ_PORT("DSW")
-	AM_RANGE(0x2007, 0x2007) AM_WRITE(lamps_w)
-	AM_RANGE(0x2008, 0x2008) AM_NOP // set to 1 during coin input
+void cardline_state::mem_io(address_map &map)
+{
+	map(0x0000, 0x1fff).ram();
+	map(0x2003, 0x2003).portr("IN0");
+	map(0x2005, 0x2005).portr("IN1");
+	map(0x2006, 0x2006).portr("DSW");
+	map(0x2007, 0x2007).w(this, FUNC(cardline_state::lamps_w));
+	map(0x2008, 0x2008).noprw(); // set to 1 during coin input
 	//AM_RANGE(0x2080, 0x213f) AM_NOP // ????
-	AM_RANGE(0x2100, 0x213f) AM_READWRITE(asic_r, asic_w)
-	AM_RANGE(0x2400, 0x2400) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2801, 0x2801) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	map(0x2100, 0x213f).rw(this, FUNC(cardline_state::asic_r), FUNC(cardline_state::asic_w));
+	map(0x2400, 0x2400).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).w("crtc", FUNC(mc6845_device::register_w));
 	//AM_RANGE(0x2840, 0x2840) AM_NOP // ???
 	//AM_RANGE(0x2880, 0x2880) AM_NOP // ???
-	AM_RANGE(0x3003, 0x3003) AM_WRITE(a3003_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_SHARE("colorram")
-	/* Ports */
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(hsync_r, video_w)
-ADDRESS_MAP_END
+	map(0x3003, 0x3003).w(this, FUNC(cardline_state::a3003_w));
+	map(0xc000, 0xdfff).w(this, FUNC(cardline_state::vram_w)).share("videoram");
+	map(0xe000, 0xffff).w(this, FUNC(cardline_state::attr_w)).share("colorram");
+}
 
 
 static INPUT_PORTS_START( cardline )
@@ -264,7 +266,7 @@ static INPUT_PORTS_START( cardline )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_SPECIAL ) // h/w status bits
+	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_CUSTOM ) // h/w status bits
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") // VBLANK_Q
@@ -321,6 +323,8 @@ MACHINE_CONFIG_START(cardline_state::cardline)
 	MCFG_MCS51_PORT1_CONFIG(0x10)
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(cardline_state, hsync_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(cardline_state, video_w))
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", cardline_state,  irq1_line_hold)
 
 	/* video hardware */

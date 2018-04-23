@@ -428,35 +428,39 @@ READ16_MEMBER(karnov_state::karnov_control_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16, karnov_state )
-	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x060000, 0x063fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(karnov_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x0a0800, 0x0a0fff) AM_WRITE(karnov_videoram_w) /* Wndrplnt Mirror */
-	AM_RANGE(0x0a1000, 0x0a17ff) AM_WRITEONLY AM_SHARE("pf_data")
-	AM_RANGE(0x0a1800, 0x0a1fff) AM_WRITE(karnov_playfield_swap_w)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_READ(karnov_control_r)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(karnov_control_w)
-ADDRESS_MAP_END
+void karnov_state::karnov_map(address_map &map)
+{
+	map(0x000000, 0x05ffff).rom();
+	map(0x060000, 0x063fff).ram().share("ram");
+	map(0x080000, 0x080fff).ram().share("spriteram");
+	map(0x0a0000, 0x0a07ff).ram().w(this, FUNC(karnov_state::karnov_videoram_w)).share("videoram");
+	map(0x0a0800, 0x0a0fff).w(this, FUNC(karnov_state::karnov_videoram_w)); /* Wndrplnt Mirror */
+	map(0x0a1000, 0x0a17ff).writeonly().share("pf_data");
+	map(0x0a1800, 0x0a1fff).w(this, FUNC(karnov_state::karnov_playfield_swap_w));
+	map(0x0c0000, 0x0c0007).r(this, FUNC(karnov_state::karnov_control_r));
+	map(0x0c0000, 0x0c000f).w(this, FUNC(karnov_state::karnov_control_w));
+}
 
 
-static ADDRESS_MAP_START( base_sound_map, AS_PROGRAM, 8, karnov_state )
-	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void karnov_state::base_sound_map(address_map &map)
+{
+	map(0x0000, 0x05ff).ram();
+	map(0x0800, 0x0800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x1000, 0x1001).w("ym1", FUNC(ym2203_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8, karnov_state )
-	AM_IMPORT_FROM(base_sound_map)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3526_device, write)
-ADDRESS_MAP_END
+void karnov_state::karnov_sound_map(address_map &map)
+{
+	base_sound_map(map);
+	map(0x1800, 0x1801).w("ym2", FUNC(ym3526_device::write));
+}
 
-static ADDRESS_MAP_START( karnovjbl_sound_map, AS_PROGRAM, 8, karnov_state )
-	AM_IMPORT_FROM(base_sound_map)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3812_device, write)
-ADDRESS_MAP_END
+void karnov_state::karnovjbl_sound_map(address_map &map)
+{
+	base_sound_map(map);
+	map(0x1800, 0x1801).w("ym2", FUNC(ym3812_device::write));
+}
 
 
 /*************************************
@@ -737,8 +741,11 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
+WRITE_LINE_MEMBER(karnov_state::vbint_w)
 {
+	if (!state)
+		return;
+
 	uint8_t port = ioport("FAKE")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
@@ -755,14 +762,14 @@ INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
 		else
 		{
 			m_i8751_return = port | 0x8000;
-			device.execute().set_input_line(6, HOLD_LINE);
+			m_maincpu->set_input_line(6, ASSERT_LINE);
 			m_i8751_needs_ack = 1;
 		}
 
 		m_latch = 0;
 	}
 
-	device.execute().set_input_line(7, HOLD_LINE);  /* VBL */
+	m_maincpu->set_input_line(7, ASSERT_LINE);
 }
 
 /*************************************
@@ -807,7 +814,6 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(karnov_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", karnov_state,  karnov_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)    /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)
@@ -823,6 +829,7 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(karnov_state, vbint_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting
@@ -847,7 +854,8 @@ MACHINE_CONFIG_START(karnov_state::karnov)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(karnov_state::karnovjbl, karnov)
+MACHINE_CONFIG_START(karnov_state::karnovjbl)
+	karnov(config);
 	/* X-TALs:
 	Top board next to #9 is 20.000 MHz
 	Top board next to the microcontroller is 6.000 MHz
@@ -861,22 +869,20 @@ MACHINE_CONFIG_DERIVED(karnov_state::karnovjbl, karnov)
 
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( chelnovjbl_mcu_map, AS_PROGRAM, 8, karnov_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( chelnovjbl_mcu_io_map, AS_IO, 8, karnov_state )
-	//internal port
-//  AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(p1_r, p1_w)
-//  AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
-ADDRESS_MAP_END
+void karnov_state::chelnovjbl_mcu_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+}
 
 
-MACHINE_CONFIG_DERIVED(karnov_state::chelnovjbl, karnov)
+MACHINE_CONFIG_START(karnov_state::chelnovjbl)
+	karnov(config);
 	MCFG_CPU_ADD("mcu", I8031, 2000000) // ??mhz
 	MCFG_CPU_PROGRAM_MAP(chelnovjbl_mcu_map)
-	MCFG_CPU_IO_MAP(chelnovjbl_mcu_io_map)
-
+//  MCFG_MCS51_PORT_P1_IN_CB(READ8(karnov_state, p1_r))
+//  MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(karnov_state, p1_w))
+//  MCFG_MCS51_PORT_P3_IN_CB(READ8(karnov_state, p3_r))
+//  MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(karnov_state, p3_w))
 MACHINE_CONFIG_END
 
 
@@ -886,7 +892,6 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(karnov_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", karnov_state,  karnov_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)    /* Accurate */
 	MCFG_CPU_PROGRAM_MAP(karnov_sound_map)
@@ -902,6 +907,7 @@ MACHINE_CONFIG_START(karnov_state::wndrplnt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(karnov_state, screen_update_karnov)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(karnov_state, vbint_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", karnov)
 	MCFG_DECO_RMC3_ADD_PROMS("palette","proms",1024) // xxxxBBBBGGGGRRRR with custom weighting

@@ -146,6 +146,11 @@ public:
 	DECLARE_READ16_MEMBER(b38_crtc_r);
 	DECLARE_WRITE16_MEMBER(b38_crtc_w);
 	void ngen(machine_config &config);
+	void ngen386_io(address_map &map);
+	void ngen386_mem(address_map &map);
+	void ngen386i_mem(address_map &map);
+	void ngen_io(address_map &map);
+	void ngen_mem(address_map &map);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -250,13 +255,13 @@ WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
 		addr = (m_peripheral & 0xffc0) << 4;
 		if(m_middle & 0x0040)
 		{
-			m_maincpu->device_t::memory().space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(FUNC(ngen_state::peripheral_r), this), write16_delegate(FUNC(ngen_state::peripheral_w), this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(FUNC(ngen_state::peripheral_r), this), write16_delegate(FUNC(ngen_state::peripheral_w), this));
 			logerror("Mapped peripherals to memory 0x%08x\n",addr);
 		}
 		else
 		{
 			addr &= 0xffff;
-			m_maincpu->device_t::memory().space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(FUNC(ngen_state::peripheral_r), this), write16_delegate(FUNC(ngen_state::peripheral_w), this));
+			m_maincpu->space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(FUNC(ngen_state::peripheral_r), this), write16_delegate(FUNC(ngen_state::peripheral_w), this));
 			logerror("Mapped peripherals to I/O 0x%04x\n",addr);
 		}
 		break;
@@ -434,7 +439,7 @@ WRITE16_MEMBER(ngen_state::xbus_w)
 		cpu = m_maincpu;
 	else
 		cpu = m_i386cpu;
-	address_space& io = cpu->device_t::memory().space(AS_IO);
+	address_space& io = cpu->space(AS_IO);
 	switch(m_xbus_current)
 	{
 		case 0x00:  // Floppy/Hard disk module
@@ -855,16 +860,18 @@ void ngen_state::machine_reset()
 }
 
 // boot ROMs from modules are not mapped anywhere, instead, they have to send the code from the boot ROM via DMA
-static ADDRESS_MAP_START( ngen_mem, AS_PROGRAM, 16, ngen_state )
-	AM_RANGE(0x00000, 0xf7fff) AM_RAM
-	AM_RANGE(0xf8000, 0xf9fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xfa000, 0xfbfff) AM_RAM AM_SHARE("fontram")
-	AM_RANGE(0xfc000, 0xfcfff) AM_RAM
-	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("bios",0)
-ADDRESS_MAP_END
+void ngen_state::ngen_mem(address_map &map)
+{
+	map(0x00000, 0xf7fff).ram();
+	map(0xf8000, 0xf9fff).ram().share("vram");
+	map(0xfa000, 0xfbfff).ram().share("fontram");
+	map(0xfc000, 0xfcfff).ram();
+	map(0xfe000, 0xfffff).rom().region("bios", 0);
+}
 
-static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
-	AM_RANGE(0x0000, 0x0001) AM_READWRITE(xbus_r,xbus_w)
+void ngen_state::ngen_io(address_map &map)
+{
+	map(0x0000, 0x0001).rw(this, FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
 
 	// Floppy/Hard disk module
 //  AM_RANGE(0x0100, 0x0107) AM_DEVREADWRITE8("fdc",wd2797_t,read,write,0x00ff)  // a guess for now
@@ -875,33 +882,36 @@ static ADDRESS_MAP_START( ngen_io, AS_IO, 16, ngen_state )
 	// 0x0120-0x012f - WD1010 Winchester disk controller (unemulated)
 //  AM_RANGE(0x0130, 0x0137) AM_DEVREADWRITE8("hdc_timer",pit8253_device,read,write,0x00ff)
 
-ADDRESS_MAP_END
+}
 
-static ADDRESS_MAP_START( ngen386_mem, AS_PROGRAM, 32, ngen_state )
-	AM_RANGE(0x00000000, 0x000f7fff) AM_RAM
-	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
-	AM_RANGE(0x000fc000, 0x000fcfff) AM_RAM
-	AM_RANGE(0x000fe000, 0x000fffff) AM_ROM AM_REGION("bios",0)
-	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM  // some extra RAM
-	AM_RANGE(0xffffe000, 0xffffffff) AM_ROM AM_REGION("bios",0)
-ADDRESS_MAP_END
+void ngen_state::ngen386_mem(address_map &map)
+{
+	map(0x00000000, 0x000f7fff).ram();
+	map(0x000f8000, 0x000f9fff).ram().share("vram");
+	map(0x000fa000, 0x000fbfff).ram().share("fontram");
+	map(0x000fc000, 0x000fcfff).ram();
+	map(0x000fe000, 0x000fffff).rom().region("bios", 0);
+	map(0x00100000, 0x00ffffff).ram();  // some extra RAM
+	map(0xffffe000, 0xffffffff).rom().region("bios", 0);
+}
 
-static ADDRESS_MAP_START( ngen386i_mem, AS_PROGRAM, 32, ngen_state )
-	AM_RANGE(0x00000000, 0x000f7fff) AM_RAM
-	AM_RANGE(0x000f8000, 0x000f9fff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x000fa000, 0x000fbfff) AM_RAM AM_SHARE("fontram")
-	AM_RANGE(0x000fc000, 0x000fffff) AM_ROM AM_REGION("bios",0)
-	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM  // some extra RAM
-	AM_RANGE(0xffffc000, 0xffffffff) AM_ROM AM_REGION("bios",0)
-ADDRESS_MAP_END
+void ngen_state::ngen386i_mem(address_map &map)
+{
+	map(0x00000000, 0x000f7fff).ram();
+	map(0x000f8000, 0x000f9fff).ram().share("vram");
+	map(0x000fa000, 0x000fbfff).ram().share("fontram");
+	map(0x000fc000, 0x000fffff).rom().region("bios", 0);
+	map(0x00100000, 0x00ffffff).ram();  // some extra RAM
+	map(0xffffc000, 0xffffffff).rom().region("bios", 0);
+}
 
-static ADDRESS_MAP_START( ngen386_io, AS_IO, 32, ngen_state )
-	AM_RANGE(0x0000, 0x0003) AM_READWRITE16(xbus_r, xbus_w, 0x0000ffff)
+void ngen_state::ngen386_io(address_map &map)
+{
+	map(0x0000, 0x0001).rw(this, FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
 //  AM_RANGE(0xf800, 0xfeff) AM_READWRITE16(peripheral_r, peripheral_w,0xffffffff)
-	AM_RANGE(0xfd08, 0xfd0b) AM_READWRITE16(b38_crtc_r, b38_crtc_w,0xffffffff)
-	AM_RANGE(0xfd0c, 0xfd0f) AM_READWRITE16(b38_keyboard_r, b38_keyboard_w,0xffffffff)
-ADDRESS_MAP_END
+	map(0xfd08, 0xfd0b).rw(this, FUNC(ngen_state::b38_crtc_r), FUNC(ngen_state::b38_crtc_w));
+	map(0xfd0c, 0xfd0f).rw(this, FUNC(ngen_state::b38_keyboard_r), FUNC(ngen_state::b38_keyboard_w));
+}
 
 static INPUT_PORTS_START( ngen )
 INPUT_PORTS_END
@@ -1138,7 +1148,8 @@ MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_HARDDISK_ADD("hard0")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(ngen386_state::_386i, ngen386)
+MACHINE_CONFIG_START(ngen386_state::_386i)
+	ngen386(config);
 	MCFG_CPU_MODIFY("i386cpu")
 	MCFG_CPU_PROGRAM_MAP(ngen386i_mem)
 MACHINE_CONFIG_END

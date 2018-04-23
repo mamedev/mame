@@ -59,8 +59,8 @@ class ioport_device : public device_t, public device_slot_interface
 public:
 	ioport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &static_set_extint_callback(device_t &device, _Object object)  {  return downcast<ioport_device &>(device).m_console_extint.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)     {  return downcast<ioport_device &>(device).m_console_ready.set_callback(object); }
+	template<class Object> devcb_base &set_extint_callback(Object &&cb) {  return m_console_extint.set_callback(std::forward<Object>(cb)); }
+	template<class Object> devcb_base &set_ready_callback(Object &&cb)  {  return m_console_ready.set_callback(std::forward<Object>(cb)); }
 
 	// Methods called from the console
 	DECLARE_READ8Z_MEMBER( readz );
@@ -99,9 +99,9 @@ SLOT_INTERFACE_EXTERN(ti99_io_port_ev);
 	MCFG_DEVICE_SLOT_INTERFACE(ti99_io_port_ev, "peb", false)
 
 #define MCFG_IOPORT_EXTINT_HANDLER( _extint ) \
-	devcb = &bus::ti99::internal::ioport_device::static_set_extint_callback( *device, DEVCB_##_extint );
+	devcb = &downcast<bus::ti99::internal::ioport_device &>(*device).set_extint_callback(DEVCB_##_extint);
 
 #define MCFG_IOPORT_READY_HANDLER( _ready ) \
-	devcb = &bus::ti99::internal::ioport_device::static_set_ready_callback( *device, DEVCB_##_ready );
+	devcb = &downcast<bus::ti99::internal::ioport_device &>(*device).set_ready_callback(DEVCB_##_ready);
 
 #endif /* __TI99IOPORT__ */

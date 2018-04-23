@@ -90,28 +90,29 @@ WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, copsnrob_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0500, 0x0507) AM_DEVWRITE("latch", f9334_device, write_d0)
-	AM_RANGE(0x0600, 0x0600) AM_WRITEONLY AM_SHARE("trucky")
-	AM_RANGE(0x0700, 0x07ff) AM_WRITEONLY AM_SHARE("truckram")
-	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_SHARE("bulletsram")
-	AM_RANGE(0x0900, 0x0903) AM_WRITEONLY AM_SHARE("carimage")
-	AM_RANGE(0x0a00, 0x0a03) AM_WRITEONLY AM_SHARE("cary")
-	AM_RANGE(0x0b00, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x1000, 0x1000) AM_READ(copsnrob_misc_r)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(copsnrob_misc2_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("CTRL1")
-	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("CTRL2")
-	AM_RANGE(0x100a, 0x100a) AM_READ_PORT("CTRL3")
-	AM_RANGE(0x100e, 0x100e) AM_READ_PORT("CTRL4")
-	AM_RANGE(0x1012, 0x1012) AM_READ_PORT("DSW")
-	AM_RANGE(0x1016, 0x1016) AM_READ_PORT("IN1")
-	AM_RANGE(0x101a, 0x101a) AM_READ_PORT("IN2")
-	AM_RANGE(0x1200, 0x1fff) AM_ROM
-ADDRESS_MAP_END
+void copsnrob_state::main_map(address_map &map)
+{
+	map.global_mask(0x1fff);
+	map(0x0000, 0x01ff).ram();
+	map(0x0500, 0x0507).w("latch", FUNC(f9334_device::write_d0));
+	map(0x0600, 0x0600).writeonly().share("trucky");
+	map(0x0700, 0x07ff).writeonly().share("truckram");
+	map(0x0800, 0x08ff).ram().share("bulletsram");
+	map(0x0900, 0x0903).writeonly().share("carimage");
+	map(0x0a00, 0x0a03).writeonly().share("cary");
+	map(0x0b00, 0x0bff).ram();
+	map(0x0c00, 0x0fff).ram().share("videoram");
+	map(0x1000, 0x1000).r(this, FUNC(copsnrob_state::copsnrob_misc_r));
+	map(0x1000, 0x1000).w(this, FUNC(copsnrob_state::copsnrob_misc2_w));
+	map(0x1002, 0x1002).portr("CTRL1");
+	map(0x1006, 0x1006).portr("CTRL2");
+	map(0x100a, 0x100a).portr("CTRL3");
+	map(0x100e, 0x100e).portr("CTRL4");
+	map(0x1012, 0x1012).portr("DSW");
+	map(0x1016, 0x1016).portr("IN1");
+	map(0x101a, 0x101a).portr("IN2");
+	map(0x1200, 0x1fff).rom();
+}
 
 
 
@@ -237,6 +238,7 @@ void copsnrob_state::machine_start()
 {
 	save_item(NAME(m_ic_h3_data));
 	save_item(NAME(m_misc));
+	m_led.resolve();
 }
 
 void copsnrob_state::machine_reset()
@@ -264,7 +266,7 @@ MACHINE_CONFIG_START(copsnrob_state::copsnrob)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", copsnrob)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_FRAGMENT_ADD(copsnrob_audio)
+	copsnrob_audio(config);
 MACHINE_CONFIG_END
 
 

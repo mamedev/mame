@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver, Bernd Wiebelt, Allard van der Bas
 
-#ifndef BWIDOW_H_
-#define BWIDOW_H_
+#ifndef MAME_INCLUDES_BWIDOW_H
+#define MAME_INCLUDES_BWIDOW_H
 
 #define MASTER_CLOCK (XTAL(12'096'000))
 #define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
@@ -36,6 +36,9 @@ public:
 	void lunarbat(machine_config &config);
 	void bwidow_audio(machine_config &config);
 	void gravitar_audio(machine_config &config);
+	void bwidow_map(address_map &map);
+	void bwidowp_map(address_map &map);
+	void spacduel_map(address_map &map);
 };
 
-#endif /* BWIDOW_H_ */
+#endif // MAME_INCLUDES_BWIDOW_H

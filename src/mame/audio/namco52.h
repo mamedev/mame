@@ -10,19 +10,19 @@
 	MCFG_DEVICE_ADD(_tag, NAMCO_52XX, _clock)
 
 #define MCFG_NAMCO_52XX_DISCRETE(_tag) \
-	namco_52xx_device::set_discrete(*device, "^" _tag);
+	downcast<namco_52xx_device &>(*device).set_discrete("^" _tag);
 
 #define MCFG_NAMCO_52XX_BASENODE(_node) \
-	namco_52xx_device::set_basenote(*device, _node);
+	downcast<namco_52xx_device &>(*device).set_basenote(_node);
 
 #define MCFG_NAMCO_52XX_EXT_CLOCK(_clock) \
-	namco_52xx_device::set_extclock(*device, _clock);
+	downcast<namco_52xx_device &>(*device).set_extclock(_clock);
 
 #define MCFG_NAMCO_52XX_ROMREAD_CB(_devcb) \
-	devcb = &namco_52xx_device::set_romread_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_52xx_device &>(*device).set_romread_callback(DEVCB_##_devcb);
 
 #define MCFG_NAMCO_52XX_SI_CB(_devcb) \
-	devcb = &namco_52xx_device::set_si_callback(*device, DEVCB_##_devcb);
+	devcb = &downcast<namco_52xx_device &>(*device).set_si_callback(DEVCB_##_devcb);
 
 
 class namco_52xx_device : public device_t
@@ -30,11 +30,11 @@ class namco_52xx_device : public device_t
 public:
 	namco_52xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_discrete(device_t &device, const char *tag) { downcast<namco_52xx_device &>(device).m_discrete.set_tag(tag); }
-	static void set_basenote(device_t &device, int node) { downcast<namco_52xx_device &>(device).m_basenode = node; }
-	static void set_extclock(device_t &device, attoseconds_t clk) { downcast<namco_52xx_device &>(device).m_extclock = clk; }
-	template <class Object> static devcb_base &set_romread_callback(device_t &device, Object &&cb) { return downcast<namco_52xx_device &>(device).m_romread.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_si_callback(device_t &device, Object &&cb) { return downcast<namco_52xx_device &>(device).m_si.set_callback(std::forward<Object>(cb)); }
+	void set_discrete(const char *tag) { m_discrete.set_tag(tag); }
+	void set_basenote(int node) { m_basenode = node; }
+	void set_extclock(attoseconds_t clk) { m_extclock = clk; }
+	template <class Object> devcb_base &set_romread_callback(Object &&cb) { return m_romread.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_si_callback(Object &&cb) { return m_si.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(write);
 

@@ -29,10 +29,10 @@
 //**************************************************************************
 
 #define MCFG_APOLLO_KBD_TX_CALLBACK(_cb) \
-	devcb = &apollo_kbd_device::set_tx_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<apollo_kbd_device &>(*device).set_tx_cb(DEVCB_##_cb);
 
 #define MCFG_APOLLO_KBD_GERMAN_CALLBACK(_cb) \
-	devcb = &apollo_kbd_device::set_german_cb(*device, DEVCB_##_cb);
+	devcb = &downcast<apollo_kbd_device &>(*device).set_german_cb(DEVCB_##_cb);
 
 
 //**************************************************************************
@@ -47,8 +47,8 @@ public:
 	// construction/destruction
 	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> static devcb_base &set_tx_cb(device_t &device, Object &&cb) { return downcast<apollo_kbd_device &>(device).m_tx_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> static devcb_base &set_german_cb(device_t &device, Object &&cb) { return downcast<apollo_kbd_device &>(device).m_german_r.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_tx_cb(Object &&cb) { return m_tx_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_german_cb(Object &&cb) { return m_german_r.set_callback(std::forward<Object>(cb)); }
 
 private:
 	// device-level overrides

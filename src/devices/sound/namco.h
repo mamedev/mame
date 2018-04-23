@@ -7,19 +7,19 @@
 
 
 #define MCFG_NAMCO_AUDIO_VOICES(_voices) \
-	namco_audio_device::set_voices(*device, _voices);
+	downcast<namco_audio_device &>(*device).set_voices(_voices);
 
 #define MCFG_NAMCO_AUDIO_STEREO(_stereo) \
-	namco_audio_device::set_stereo(*device, _stereo);
+	downcast<namco_audio_device &>(*device).set_stereo(_stereo);
 
 
 class namco_audio_device : public device_t,
 							public device_sound_interface
 {
 public:
-	// static configuration
-	static void set_voices(device_t &device, int voices) { downcast<namco_audio_device &>(device).m_voices = voices; }
-	static void set_stereo(device_t &device, int stereo) { downcast<namco_audio_device &>(device).m_stereo = stereo; }
+	// configuration
+	void set_voices(int voices) { m_voices = voices; }
+	void set_stereo(int stereo) { m_stereo = stereo; }
 
 protected:
 	static constexpr unsigned MAX_VOICES = 8;

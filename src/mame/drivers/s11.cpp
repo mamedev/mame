@@ -28,32 +28,35 @@ ToDo:
 #include "s11.lh"
 
 
-static ADDRESS_MAP_START( s11_main_map, AS_PROGRAM, 8, s11_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(sol3_w) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
-	AM_RANGE(0x2c00, 0x2c03) AM_DEVREADWRITE("pia2c", pia6821_device, read, write) // alphanumeric display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia34", pia6821_device, read, write) // widget
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void s11_state::s11_main_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x2100, 0x2103).rw(m_pia21, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // sound+solenoids
+	map(0x2200, 0x2200).w(this, FUNC(s11_state::sol3_w)); // solenoids
+	map(0x2400, 0x2403).rw(m_pia24, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // lamps
+	map(0x2800, 0x2803).rw(m_pia28, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // display
+	map(0x2c00, 0x2c03).rw(m_pia2c, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
+	map(0x3000, 0x3003).rw(m_pia30, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
+	map(0x3400, 0x3403).rw(m_pia34, FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
+	map(0x4000, 0xffff).rom();
+}
 
-static ADDRESS_MAP_START( s11_audio_map, AS_PROGRAM, 8, s11_state )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(bank_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pias", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank0")
-	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank1")
-ADDRESS_MAP_END
+void s11_state::s11_audio_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x0800).ram();
+	map(0x1000, 0x1fff).w(this, FUNC(s11_state::bank_w));
+	map(0x2000, 0x2003).mirror(0x0ffc).rw(m_pias, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xbfff).bankr("bank0");
+	map(0xc000, 0xffff).bankr("bank1");
+}
 
-static ADDRESS_MAP_START( s11_bg_map, AS_PROGRAM, 8, s11_state )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia40", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void s11_state::s11_bg_map(address_map &map)
+{
+	map(0x0000, 0x07ff).mirror(0x1800).ram();
+	map(0x2000, 0x2001).mirror(0x1ffe).rw(m_ym, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_pia40, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x8000, 0xffff).rom();
+}
 
 static INPUT_PORTS_START( s11 )
 	PORT_START("X0")
@@ -231,7 +234,7 @@ WRITE8_MEMBER( s11_state::dig0_w )
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_diag = (data & 0x70) >> 4;
-	output().set_digit_value(60, patterns[data>>4]); // diag digit
+	m_digits[60] = patterns[data>>4]; // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
 }
@@ -242,7 +245,7 @@ WRITE8_MEMBER( s11_state::dig1_w )
 	m_segment2 |= 0x20000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		m_digits[m_strobe+16] = bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
 		m_segment2 |= 0x40000;
 	}
 }
@@ -266,7 +269,7 @@ WRITE8_MEMBER( s11_state::pia2c_pa_w )
 	m_segment1 |= 0x10000;
 	if ((m_segment1 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe, bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		m_digits[m_strobe] = bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
 		m_segment1 |= 0x40000;
 	}
 }
@@ -277,7 +280,7 @@ WRITE8_MEMBER( s11_state::pia2c_pb_w )
 	m_segment1 |= 0x20000;
 	if ((m_segment1 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe, bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		m_digits[m_strobe] = bitswap<16>(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
 		m_segment1 |= 0x40000;
 	}
 }
@@ -300,7 +303,7 @@ WRITE8_MEMBER( s11_state::pia34_pa_w )
 	m_segment2 |= 0x10000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output().set_digit_value(m_strobe+16, bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		m_digits[m_strobe+16] = bitswap<16>(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0);
 		m_segment2 |= 0x40000;
 	}
 }
@@ -389,7 +392,7 @@ MACHINE_CONFIG_START(s11_state::s11)
 	MCFG_DEFAULT_LAYOUT(layout_s11)
 
 	/* Sound */
-	MCFG_FRAGMENT_ADD( genpin_audio )
+	genpin_audio(config);
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia21", PIA6821, 0)

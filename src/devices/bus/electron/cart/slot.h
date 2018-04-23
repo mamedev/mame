@@ -110,10 +110,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(_devcb) \
-	devcb = &electron_cartslot_device::set_irq_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<electron_cartslot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
 #define MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(_devcb) \
-	devcb = &electron_cartslot_device::set_nmi_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<electron_cartslot_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -134,11 +134,8 @@ public:
 	virtual ~electron_cartslot_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
-	{ return downcast<electron_cartslot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
-	{ return downcast<electron_cartslot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
 	// device-level overrides
 	virtual void device_start() override;

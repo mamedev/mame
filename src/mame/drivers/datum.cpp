@@ -63,6 +63,7 @@ public:
 		, m_pia1(*this, "pia1")
 		, m_keyboard(*this, "X%u", 0)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(pa_r);
@@ -71,25 +72,29 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 	void datum(machine_config &config);
+	void datum_mem(address_map &map);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<pia6821_device> m_pia1;
 	required_ioport_array<4> m_keyboard;
 	required_device<cpu_device> m_maincpu;
+	output_finder<16> m_digits;
 };
 
 
-static ADDRESS_MAP_START(datum_mem, AS_PROGRAM, 8, datum_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK (0x7fff) // A15 not used
-	AM_RANGE(0x0000, 0x007f) AM_RAM // inside CPU
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM // main ram 2x 2114
-	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+void datum_state::datum_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0x7fff); // A15 not used
+	map(0x0000, 0x007f).ram(); // inside CPU
+	map(0x1000, 0x13ff).mirror(0x0c00).ram(); // main ram 2x 2114
+	map(0x4000, 0x4001).mirror(0x0ffe).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x5000, 0x5003).mirror(0x0ffc).rw("pia2", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x6003).mirror(0x0ffc).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x7000, 0x77ff).mirror(0x0800).rom().region("roms", 0);
+}
 
 
 /* Input ports */
@@ -162,7 +167,7 @@ WRITE8_MEMBER( datum_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output().set_digit_value(m_keydata, bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3));
+		m_digits[m_keydata] = bitswap<8>(data & 0x7f, 7, 0, 5, 6, 4, 2, 1, 3);
 		m_keydata = 0;
 	}
 

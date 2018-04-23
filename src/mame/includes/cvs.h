@@ -140,4 +140,9 @@ public:
 	void cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);
 	void start_393hz_timer();
 	void cvs(machine_config &config);
+	void cvs_dac_cpu_map(address_map &map);
+	void cvs_main_cpu_data_map(address_map &map);
+	void cvs_main_cpu_io_map(address_map &map);
+	void cvs_main_cpu_map(address_map &map);
+	void cvs_speech_cpu_map(address_map &map);
 };

@@ -156,6 +156,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( usrpia_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER (write_acia_clock);
 	void can09t(machine_config &config);
+	void can09t_map(address_map &map);
 protected:
 	required_device<pia6821_device> m_syspia;
 	required_device<pia6821_device> m_usrpia;
@@ -470,10 +471,11 @@ WRITE_LINE_MEMBER (can09t_state::write_acia_clock){
  *  *0xe000-0xffff PROM monitor        0xe000-0xffff PROM monitor
  */
 
-static ADDRESS_MAP_START( can09t_map, AS_PROGRAM, 8, can09t_state )
+void can09t_state::can09t_map(address_map &map)
+{
 // Everything is dynamically and asymetrically mapped through the PAL decoded by read/write
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+	map(0x0000, 0xffff).rw(this, FUNC(can09t_state::read), FUNC(can09t_state::write));
+}
 
 static INPUT_PORTS_START( can09t )
 INPUT_PORTS_END
@@ -511,6 +513,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void can09(machine_config &config);
+	void can09_map(address_map &map);
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<ram_device> m_ram;
@@ -623,7 +626,8 @@ INPUT_PORTS_END
 
 // traced and guessed from pcb images and debugger
 // It is very likelly that this is a PIA based dynamic address map, needs more analysis
-static ADDRESS_MAP_START( can09_map, AS_PROGRAM, 8, can09_state )
+void can09_state::can09_map(address_map &map)
+{
 /*
  * Port A=0x18 B=0x20 erase 0-7fff
  * Port A=0x18 B=0x30 erase 0-7fff
@@ -631,21 +635,21 @@ static ADDRESS_MAP_START( can09_map, AS_PROGRAM, 8, can09_state )
  * Port A=0x10 B=
 */
 //  AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_RAMBANK("bank1")
-	AM_RANGE(0xe020, 0xe020) AM_DEVWRITE("crtc", h46505_device, address_w)
-	AM_RANGE(0xe021, 0xe021) AM_DEVWRITE("crtc", h46505_device, register_w)
-	AM_RANGE(0xe034, 0xe037) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read, write)
+	map(0x0000, 0x7fff).ram().bankrw("bank1");
+	map(0xe000, 0xffff).rom().region("roms", 0);
+	map(0xe020, 0xe020).w(m_crtc, FUNC(h46505_device::address_w));
+	map(0xe021, 0xe021).w(m_crtc, FUNC(h46505_device::register_w));
+	map(0xe034, 0xe037).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 
 #if 0
-	AM_RANGE(0xb100, 0xb101) AM_DEVREADWRITE("acia", acia6850_device, read, write)
-	AM_RANGE(0xb110, 0xb113) AM_DEVREADWRITE(PIA1_TAG, pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xb120, 0xb123) AM_DEVREADWRITE(PIA2_TAG, pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xb130, 0xb137) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
-	AM_RANGE(0xb200, 0xc1ff) AM_ROM AM_REGION("roms", 0x3200)
-	AM_RANGE(0xc200, 0xdfff) AM_RAM /* Needed for BASIC etc */
+	map(0xb100, 0xb101).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0xb110, 0xb113).rw(m_pia1, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xb120, 0xb123).rw(PIA2_TAG, FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
+	map(0xb130, 0xb137).rw("ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
+	map(0xb200, 0xc1ff).rom().region("roms", 0x3200);
+	map(0xc200, 0xdfff).ram(); /* Needed for BASIC etc */
 #endif
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("roms", 0)
-ADDRESS_MAP_END
+}
 
 #ifdef UNUSED_VARIABLE
 static DEVICE_INPUT_DEFAULTS_START( terminal )

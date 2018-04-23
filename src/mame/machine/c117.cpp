@@ -52,19 +52,6 @@ device_memory_interface::space_config_vector namco_c117_device::memory_space_con
 }
 
 //-------------------------------------------------
-//  set_cpu_tags - set the tags of the two CPUs
-//  connected to the device
-//-------------------------------------------------
-
-void namco_c117_device::set_cpu_tags(device_t &device, const char *maintag, const char *subtag)
-{
-	namco_c117_device &c117 = downcast<namco_c117_device &>(device);
-	c117.m_maincpu_tag = maintag;
-	c117.m_subcpu_tag = subtag;
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

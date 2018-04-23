@@ -331,7 +331,7 @@ field:      X address   D           Function    Y address   D (part 2)
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APEXC")
+DEFINE_DEVICE_TYPE(APEXC, apexc_cpu_device, "apexc_cpu", "APE(X)C")
 
 
 /* decrement ICount by n */
@@ -787,7 +787,7 @@ void apexc_cpu_device::device_start()
 	state_add( STATE_GENPC, "PC", m_pc ).mask(0x7ffc).callimport().formatstr("%04X");
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).mask(0x7ffc).callimport().noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 
@@ -846,7 +846,7 @@ void apexc_cpu_device::execute_run()
 {
 	do
 	{
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if (m_running)
 			execute();
@@ -857,7 +857,7 @@ void apexc_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-util::disasm_interface *apexc_cpu_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> apexc_cpu_device::create_disassembler()
 {
-	return new apexc_disassembler;
+	return std::make_unique<apexc_disassembler>();
 }

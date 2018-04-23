@@ -548,65 +548,70 @@ WRITE8_MEMBER( hx20_state::slave_p4_w )
 //  ADDRESS_MAP( hx20_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hx20_mem, AS_PROGRAM, 8, hx20_state )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_MAIN_TAG, hd63701_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0020, 0x0020) AM_WRITE(ksc_w)
-	AM_RANGE(0x0022, 0x0022) AM_READ(krtn07_r)
-	AM_RANGE(0x0026, 0x0026) AM_WRITE(lcd_cs_w)
-	AM_RANGE(0x0028, 0x0028) AM_READ(krtn89_r)
-	AM_RANGE(0x002a, 0x002a) AM_WRITE(lcd_data_w)
-	AM_RANGE(0x002c, 0x002c) // mask interruption by using IC 8E in sleep mode
-	AM_RANGE(0x0040, 0x007f) AM_DEVREADWRITE(MC146818_TAG, mc146818_device, read, write)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x3fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_READ(optrom_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(HD6301V1_MAIN_TAG, 0)
-ADDRESS_MAP_END
+void hx20_state::hx20_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(m_maincpu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0020, 0x0020).w(this, FUNC(hx20_state::ksc_w));
+	map(0x0022, 0x0022).r(this, FUNC(hx20_state::krtn07_r));
+	map(0x0026, 0x0026).w(this, FUNC(hx20_state::lcd_cs_w));
+	map(0x0028, 0x0028).r(this, FUNC(hx20_state::krtn89_r));
+	map(0x002a, 0x002a).w(this, FUNC(hx20_state::lcd_data_w));
+	map(0x002c, 0x002c); // mask interruption by using IC 8E in sleep mode
+	map(0x0040, 0x007f).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+	map(0x0080, 0x00ff).ram();
+	map(0x0100, 0x3fff).ram();
+	map(0x6000, 0x7fff).rom().r(this, FUNC(hx20_state::optrom_r));
+	map(0x8000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( hx20_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hx20_io, AS_IO, 8, hx20_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(main_p1_r, main_p1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(main_p2_r, main_p2_w)
-	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_NOP // A0-A7, D0-D7
-	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_NOP // A8-A15
-ADDRESS_MAP_END
+void hx20_state::hx20_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(hx20_state::main_p1_r), FUNC(hx20_state::main_p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(hx20_state::main_p2_r), FUNC(hx20_state::main_p2_w));
+	map(M6801_PORT3, M6801_PORT3).noprw(); // A0-A7, D0-D7
+	map(M6801_PORT4, M6801_PORT4).noprw(); // A8-A15
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( hx20_sub_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hx20_sub_mem, AS_PROGRAM, 8, hx20_state )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(HD6301V1_SLAVE_TAG, hd63701_cpu_device, m6801_io_r, m6801_io_w)
-	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6301V1_SLAVE_TAG, 0)
-ADDRESS_MAP_END
+void hx20_state::hx20_sub_mem(address_map &map)
+{
+	map(0x0000, 0x001f).rw(m_subcpu, FUNC(hd63701_cpu_device::m6801_io_r), FUNC(hd63701_cpu_device::m6801_io_w));
+	map(0x0080, 0x00ff).ram();
+	map(0xf000, 0xffff).rom().region(HD6301V1_SLAVE_TAG, 0);
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( hx20_sub_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( hx20_sub_io, AS_IO, 8, hx20_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(slave_p1_r, slave_p1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(slave_p2_r, slave_p2_w)
-	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_READWRITE(slave_p3_r, slave_p3_w)
-	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_READWRITE(slave_p4_r, slave_p4_w)
-ADDRESS_MAP_END
+void hx20_state::hx20_sub_io(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(hx20_state::slave_p1_r), FUNC(hx20_state::slave_p1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(hx20_state::slave_p2_r), FUNC(hx20_state::slave_p2_w));
+	map(M6801_PORT3, M6801_PORT3).rw(this, FUNC(hx20_state::slave_p3_r), FUNC(hx20_state::slave_p3_w));
+	map(M6801_PORT4, M6801_PORT4).rw(this, FUNC(hx20_state::slave_p4_r), FUNC(hx20_state::slave_p4_w));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( cm6000_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( cm6000_mem, AS_PROGRAM, 8, hx20_state )
-	AM_IMPORT_FROM(hx20_mem)
-	AM_RANGE(0x4000, 0xffff) AM_ROM AM_REGION(HD6301V1_MAIN_TAG, 0)
-ADDRESS_MAP_END
+void hx20_state::cm6000_mem(address_map &map)
+{
+	hx20_mem(map);
+	map(0x4000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
+}
 
 
 //**************************************************************************
@@ -628,7 +633,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) // SW6:1
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // SW6:1
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KSC1")
@@ -641,7 +646,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD )  PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD )  PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) // SW6:2
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // SW6:2
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KSC2")
@@ -654,7 +659,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) // SW6:3
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // SW6:3
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KSC3")
@@ -667,7 +672,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SPECIAL ) // SW6:4
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // SW6:4
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KSC4")
@@ -953,7 +958,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( hx20 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_DERIVED(hx20_state::cm6000, hx20)
+MACHINE_CONFIG_START(hx20_state::cm6000)
+	hx20(config);
 	// basic machine hardware
 	MCFG_CPU_MODIFY(HD6301V1_MAIN_TAG)
 	MCFG_CPU_PROGRAM_MAP(cm6000_mem)

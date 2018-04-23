@@ -105,7 +105,7 @@ public:
 
 protected:
 	// construction/destruction
-	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_delegate map_delegate);
+	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -127,7 +127,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual util::disasm_interface *create_disassembler() override;
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual bool get_m_flag() const override;
 	virtual bool get_x_flag() const override;
 
@@ -2027,7 +2027,7 @@ public:
 	// construction/destruction
 	m37702s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 };
 
 class m37702m2_device : public m37710_cpu_device
@@ -2037,7 +2037,7 @@ public:
 	m37702m2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	m37702m2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 };
 
 class m37710s4_device : public m37710_cpu_device
@@ -2046,7 +2046,7 @@ public:
 	// construction/destruction
 	m37710s4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 };
 
 class m37720s1_device : public m37710_cpu_device
@@ -2055,7 +2055,7 @@ public:
 	// construction/destruction
 	m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(M37702M2, m37702m2_device)

@@ -17,10 +17,10 @@
 	MCFG_DEVICE_ADD(_tag, VT82C496, 0)
 
 #define MCFG_VT82C496_CPU( _tag ) \
-	vt82c496_device::static_set_cpu(*device, _tag);
+	downcast<vt82c496_device &>(*device).set_cpu(_tag);
 
 #define MCFG_VT82C496_REGION( _tag ) \
-	vt82c496_device::static_set_region(*device, _tag);
+	downcast<vt82c496_device &>(*device).set_region(_tag);
 
 class vt82c496_device :  public device_t
 {
@@ -28,8 +28,8 @@ public:
 	// construction/destruction
 	vt82c496_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void static_set_cpu(device_t &device, const char *tag) { dynamic_cast<vt82c496_device &>(device).m_cpu_tag = tag; }
-	static void static_set_region(device_t &device, const char *tag) { dynamic_cast<vt82c496_device &>(device).m_region_tag = tag; }
+	void set_cpu(const char *tag) { m_cpu_tag = tag; }
+	void set_region(const char *tag) { m_region_tag = tag; }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

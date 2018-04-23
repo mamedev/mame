@@ -67,12 +67,15 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(tutankhm_state::tutankhm_interrupt)
+WRITE_LINE_MEMBER(tutankhm_state::vblank_irq)
 {
 	/* flip flops cause the interrupt to be signalled every other frame */
-	m_irq_toggle ^= 1;
-	if (m_irq_toggle && m_irq_enable)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state)
+	{
+		m_irq_toggle ^= 1;
+		if (m_irq_toggle && m_irq_enable)
+			m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 }
 
 
@@ -127,24 +130,25 @@ WRITE8_MEMBER(tutankhm_state::sound_on_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2") /* DSW2 (inverted bits) */
-	AM_RANGE(0x8180, 0x8180) AM_MIRROR(0x000f) AM_READ_PORT("IN0")  /* IN0 I/O: Coin slots, service, 1P/2P buttons */
-	AM_RANGE(0x81a0, 0x81a0) AM_MIRROR(0x000f) AM_READ_PORT("IN1")  /* IN1: Player 1 I/O */
-	AM_RANGE(0x81c0, 0x81c0) AM_MIRROR(0x000f) AM_READ_PORT("IN2")  /* IN2: Player 2 I/O */
-	AM_RANGE(0x81e0, 0x81e0) AM_MIRROR(0x000f) AM_READ_PORT("DSW1") /* DSW1 (inverted bits) */
-	AM_RANGE(0x8200, 0x8207) AM_MIRROR(0x00f8) AM_READNOP AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x8300, 0x8300) AM_MIRROR(0x00ff) AM_WRITE(tutankhm_bankselect_w)
-	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_WRITE(sound_on_w)
-	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sound_data_w)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void tutankhm_state::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).ram().share("videoram");
+	map(0x8000, 0x800f).mirror(0x00f0).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x8100, 0x8100).mirror(0x000f).ram().share("scroll");
+	map(0x8120, 0x8120).mirror(0x000f).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0x8160, 0x8160).mirror(0x000f).portr("DSW2"); /* DSW2 (inverted bits) */
+	map(0x8180, 0x8180).mirror(0x000f).portr("IN0");  /* IN0 I/O: Coin slots, service, 1P/2P buttons */
+	map(0x81a0, 0x81a0).mirror(0x000f).portr("IN1");  /* IN1: Player 1 I/O */
+	map(0x81c0, 0x81c0).mirror(0x000f).portr("IN2");  /* IN2: Player 2 I/O */
+	map(0x81e0, 0x81e0).mirror(0x000f).portr("DSW1"); /* DSW1 (inverted bits) */
+	map(0x8200, 0x8207).mirror(0x00f8).nopr().w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x8300, 0x8300).mirror(0x00ff).w(this, FUNC(tutankhm_state::tutankhm_bankselect_w));
+	map(0x8600, 0x8600).mirror(0x00ff).w(this, FUNC(tutankhm_state::sound_on_w));
+	map(0x8700, 0x8700).mirror(0x00ff).w(m_timeplt_audio, FUNC(timeplt_audio_device::sound_data_w));
+	map(0x8800, 0x8fff).ram();
+	map(0x9000, 0x9fff).bankr("bank1");
+	map(0xa000, 0xffff).rom();
+}
 
 
 /*************************************
@@ -227,7 +231,6 @@ MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tutankhm_state,  tutankhm_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tutankhm_state,tutankhm)
 	MCFG_MACHINE_RESET_OVERRIDE(tutankhm_state,tutankhm)
@@ -251,6 +254,7 @@ MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* not sure about the visible area */
 	MCFG_SCREEN_UPDATE_DRIVER(tutankhm_state, screen_update_tutankhm)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tutankhm_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)

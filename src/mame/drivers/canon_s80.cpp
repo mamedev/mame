@@ -29,13 +29,15 @@ public:
 
 	DECLARE_DRIVER_INIT(canons80);
 	void canons80(machine_config &config);
+	void canons80_map(address_map &map);
 };
 
 
-static ADDRESS_MAP_START(canons80_map, AS_PROGRAM, 8, canons80_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void canons80_state::canons80_map(address_map &map)
+{
+	map(0x0000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom();
+}
 
 MACHINE_CONFIG_START(canons80_state::canons80)
 	/* basic machine hardware */

@@ -48,28 +48,31 @@
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( lc80_mem, AS_PROGRAM, 8, lc80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK("bank1")
-	AM_RANGE(0x0800, 0x0fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x1000, 0x17ff) AM_ROMBANK("bank3")
-	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x2400, 0x2fff) AM_RAMBANK("bank4")
-ADDRESS_MAP_END
+void lc80_state::lc80_mem(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).bankr("bank1");
+	map(0x0800, 0x0fff).bankr("bank2");
+	map(0x1000, 0x17ff).bankr("bank3");
+	map(0x2000, 0x23ff).ram();
+	map(0x2400, 0x2fff).bankrw("bank4");
+}
 
 #if 0
-static ADDRESS_MAP_START( sc80_mem, AS_PROGRAM, 8, lc80_state )
-	AM_IMPORT_FROM(lc80_mem)
-	AM_RANGE(0xc000, 0xcfff) AM_ROM
-ADDRESS_MAP_END
+void lc80_state::sc80_mem(address_map &map)
+{
+	lc80_mem(map);
+	map(0xc000, 0xcfff).rom();
+}
 #endif
 
-static ADDRESS_MAP_START( lc80_io, AS_IO, 8, lc80_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read, write)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-ADDRESS_MAP_END
+void lc80_state::lc80_io(address_map &map)
+{
+	map.global_mask(0x1f);
+	map(0x14, 0x17).rw(Z80PIO1_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x18, 0x1b).rw(m_pio2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x0c, 0x0f).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 /* Input Ports */
 
@@ -139,11 +142,10 @@ WRITE_LINE_MEMBER( lc80_state::ctc_z2_w )
 
 void lc80_state::update_display()
 {
-	int i;
-
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
-		if (!BIT(m_digit, i)) output().set_digit_value(5 - i, m_segment);
+		if (!BIT(m_digit, i))
+			m_digits[5 - i] = m_segment;
 	}
 }
 
@@ -213,7 +215,7 @@ WRITE8_MEMBER( lc80_state::pio1_pb_w )
 	m_speaker->level_w(!BIT(data, 1));
 
 	/* OUT led */
-	output().set_led_value(0, !BIT(data, 1));
+	m_out_led = !BIT(data, 1);
 
 	/* keyboard */
 	m_digit = data >> 2;
@@ -246,10 +248,10 @@ READ8_MEMBER( lc80_state::pio2_pb_r )
 	{
 		if (!BIT(m_digit, i))
 		{
-			if (!BIT(m_y0->read(), i)) data &= ~0x10;
-			if (!BIT(m_y1->read(), i)) data &= ~0x20;
-			if (!BIT(m_y2->read(), i)) data &= ~0x40;
-			if (!BIT(m_y3->read(), i)) data &= ~0x80;
+			if (!BIT(m_y[0]->read(), i)) data &= ~0x10;
+			if (!BIT(m_y[1]->read(), i)) data &= ~0x20;
+			if (!BIT(m_y[2]->read(), i)) data &= ~0x40;
+			if (!BIT(m_y[3]->read(), i)) data &= ~0x80;
 		}
 	}
 
@@ -317,6 +319,9 @@ void lc80_state::machine_start()
 		program.install_readwrite_bank(0x2000, 0x2fff, "bank4");
 		break;
 	}
+
+	m_digits.resolve();
+	m_out_led.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_digit));
@@ -404,7 +409,8 @@ MACHINE_CONFIG_START(lc80_state::lc80_2)
 MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_CONFIG_DERIVED( sc80, lc80_2 )
+static MACHINE_CONFIG_START( sc80 )
+	lc80_2(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(Z80_TAG)

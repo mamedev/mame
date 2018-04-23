@@ -25,81 +25,89 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START(radio86_mem, AS_PROGRAM, 8, radio86_state )
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
-	AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
+void radio86_state::radio86_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0x7fff).ram();  // RAM
+	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
 	//AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x1ffe) // video
-	AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
+	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom();  // System ROM
+}
 
-static ADDRESS_MAP_START( radio86_io , AS_IO, 8, radio86_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(radio_io_r,radio_io_w)
-ADDRESS_MAP_END
+void radio86_state::radio86_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0xff).rw(this, FUNC(radio86_state::radio_io_r), FUNC(radio86_state::radio_io_w));
+}
 
-static ADDRESS_MAP_START( rk7007_io , AS_IO, 8, radio86_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x80, 0x83 ) AM_DEVREADWRITE("ms7007", i8255_device, read, write)
-ADDRESS_MAP_END
+void radio86_state::rk7007_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x80, 0x83).rw("ms7007", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
 
-static ADDRESS_MAP_START(radio86rom_mem, AS_PROGRAM, 8, radio86_state )
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
-	AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x1ffe) // video
-	AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+void radio86_state::radio86rom_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0x7fff).ram();  // RAM
+	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	map(0xa000, 0xa003).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
+	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom();  // System ROM
+}
 
-static ADDRESS_MAP_START(radio86ram_mem, AS_PROGRAM, 8, radio86_state )
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0xdfff ) AM_RAM  // RAM
-	AM_RANGE( 0xe000, 0xe7ff ) AM_ROM  // System ROM page 2
-	AM_RANGE( 0xe800, 0xf5ff ) AM_RAM  // RAM
-	AM_RANGE( 0xf700, 0xf703 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE( 0xf780, 0xf7bf ) AM_DEVREADWRITE("i8275", i8275_device, read, write) // video
-	AM_RANGE( 0xf684, 0xf687 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE( 0xf688, 0xf688 ) AM_WRITE(radio86_pagesel )
-	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM page 1
-ADDRESS_MAP_END
+void radio86_state::radio86ram_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0xdfff).ram();  // RAM
+	map(0xe000, 0xe7ff).rom();  // System ROM page 2
+	map(0xe800, 0xf5ff).ram();  // RAM
+	map(0xf700, 0xf703).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf780, 0xf7bf).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)); // video
+	map(0xf684, 0xf687).rw(m_ppi8255_2, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xf688, 0xf688).w(this, FUNC(radio86_state::radio86_pagesel));
+	map(0xf800, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf800, 0xffff).rom();  // System ROM page 1
+}
 
-static ADDRESS_MAP_START(radio86_16_mem, AS_PROGRAM, 8, radio86_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0x3fff ) AM_RAM  // RAM
-	AM_RANGE( 0x4000, 0x7fff ) AM_READ(radio_cpu_state_r)
-	AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
+void radio86_state::radio86_16_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0x3fff).ram();  // RAM
+	map(0x4000, 0x7fff).r(this, FUNC(radio86_state::radio_cpu_state_r));
+	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
 	//AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x1ffe) // video
-	AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
+	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom();  // System ROM
+}
 
 
-static ADDRESS_MAP_START(mikron2_mem, AS_PROGRAM, 8, radio86_state )
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
-	AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
+void radio86_state::mikron2_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0x7fff).ram();  // RAM
+	map(0xc000, 0xc003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x00fc);
 	//AM_RANGE( 0xc100, 0xc103 ) AM_DEVREADWRITE_LEGACY("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x00fc)
-	AM_RANGE( 0xc200, 0xc201 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x00fe) // video
-	AM_RANGE( 0xc300, 0xc3ff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+	map(0xc200, 0xc201).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x00fe); // video
+	map(0xc300, 0xc3ff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom();  // System ROM
+}
 
-static ADDRESS_MAP_START(impuls03_mem, AS_PROGRAM, 8, radio86_state )
-	AM_RANGE( 0x0000, 0x0fff ) AM_RAMBANK("bank1") // First bank
-	AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
-	AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
-	AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // Basic ROM
-	AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x1ffe) // video
-	AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE("dma8257", i8257_device, write)    // DMA
-	AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
-ADDRESS_MAP_END
+void radio86_state::impuls03_mem(address_map &map)
+{
+	map(0x0000, 0x0fff).bankrw("bank1"); // First bank
+	map(0x1000, 0x7fff).ram();  // RAM
+	map(0x8000, 0x8003).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x1ffc);
+	map(0xa000, 0xbfff).rom();  // Basic ROM
+	map(0xc000, 0xc001).rw("i8275", FUNC(i8275_device::read), FUNC(i8275_device::write)).mirror(0x1ffe); // video
+	map(0xe000, 0xffff).w(m_dma8257, FUNC(i8257_device::write));    // DMA
+	map(0xf000, 0xffff).rom();  // System ROM
+}
 
 /* Input ports */
 INPUT_PORTS_START( radio86 )
@@ -391,13 +399,15 @@ MACHINE_CONFIG_START(radio86_state::radio86)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED(radio86_state::radio16, radio86)
+MACHINE_CONFIG_START(radio86_state::radio16)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86_16_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::radiorom, radio86)
+MACHINE_CONFIG_START(radio86_state::radiorom)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86rom_mem)
@@ -413,7 +423,8 @@ MACHINE_CONFIG_DERIVED(radio86_state::radiorom, radio86)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "radio86_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::radioram, radio86)
+MACHINE_CONFIG_START(radio86_state::radioram)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(radio86ram_mem)
@@ -424,7 +435,8 @@ MACHINE_CONFIG_DERIVED(radio86_state::radioram, radio86)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_romdisk_portc_w))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::rk7007, radio86)
+MACHINE_CONFIG_START(radio86_state::rk7007)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rk7007_io)
@@ -436,7 +448,8 @@ MACHINE_CONFIG_DERIVED(radio86_state::rk7007, radio86)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::rk700716, radio16)
+MACHINE_CONFIG_START(radio86_state::rk700716)
+	radio16(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rk7007_io)
@@ -448,13 +461,15 @@ MACHINE_CONFIG_DERIVED(radio86_state::rk700716, radio16)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(radio86_state, radio86_8255_portc_w2))
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::mikron2, radio86)
+MACHINE_CONFIG_START(radio86_state::mikron2)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mikron2_mem)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(radio86_state::impuls03, radio86)
+MACHINE_CONFIG_START(radio86_state::impuls03)
+	radio86(config);
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(impuls03_mem)

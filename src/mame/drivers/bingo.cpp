@@ -15,6 +15,7 @@ public:
 	{ }
 
 	void bingo(machine_config &config);
+	void bingo_map(address_map &map);
 protected:
 
 	// devices
@@ -27,11 +28,12 @@ public:
 };
 
 
-static ADDRESS_MAP_START( bingo_map, AS_PROGRAM, 8, bingo_state )
-	AM_RANGE(0x0000, 0x7fff) AM_NOP
-	AM_RANGE(0x0000, 0x1eff) AM_ROM
-	AM_RANGE(0x1f00, 0x1fff) AM_RAM
-ADDRESS_MAP_END
+void bingo_state::bingo_map(address_map &map)
+{
+	map(0x0000, 0x7fff).noprw();
+	map(0x0000, 0x1eff).rom();
+	map(0x1f00, 0x1fff).ram();
+}
 
 static INPUT_PORTS_START( bingo )
 INPUT_PORTS_END
@@ -59,6 +61,7 @@ public:
 	{ }
 
 	void seeben(machine_config &config);
+	void seeben_map(address_map &map);
 protected:
 
 	// devices
@@ -71,8 +74,9 @@ public:
 };
 
 
-static ADDRESS_MAP_START( seeben_map, AS_PROGRAM, 8, seeben_state )
-ADDRESS_MAP_END
+void seeben_state::seeben_map(address_map &map)
+{
+}
 
 static INPUT_PORTS_START( seeben )
 INPUT_PORTS_END
@@ -100,6 +104,7 @@ public:
 	{ }
 
 	void splin(machine_config &config);
+	void splin_map(address_map &map);
 protected:
 
 	// devices
@@ -111,11 +116,12 @@ public:
 	DECLARE_DRIVER_INIT(splin);
 };
 
-static ADDRESS_MAP_START( splin_map, AS_PROGRAM, 16, splin_state )
-	AM_RANGE(0x00000, 0x0bfff) AM_RAM
-	AM_RANGE(0x0d900, 0x0d9ff) AM_RAM
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
+void splin_state::splin_map(address_map &map)
+{
+	map(0x00000, 0x0bfff).ram();
+	map(0x0d900, 0x0d9ff).ram();
+	map(0xe0000, 0xfffff).rom();
+}
 
 static INPUT_PORTS_START( splin )
 INPUT_PORTS_END

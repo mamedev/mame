@@ -45,4 +45,5 @@ public:
 	int SpriteCollision(int first,int second);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tinvader(machine_config &config);
+	void main_map(address_map &map);
 };

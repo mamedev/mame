@@ -108,6 +108,10 @@ public:
 	INTERRUPT_GEN_MEMBER(polygonet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 	void plygonet(machine_config &config);
+	void dsp_data_map(address_map &map);
+	void dsp_program_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PLYGONET_H

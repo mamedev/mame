@@ -218,20 +218,21 @@ WRITE8_MEMBER(videopin_state::note_dvsr_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, videopin_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
-	AM_RANGE(0x0800, 0x0800) AM_READ(misc_r) AM_WRITE(note_dvsr_w)
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(led_w)
-	AM_RANGE(0x0802, 0x0802) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x0804, 0x0804) AM_WRITE(ball_w)
-	AM_RANGE(0x0805, 0x0805) AM_WRITE(out1_w)
-	AM_RANGE(0x0806, 0x0806) AM_WRITE(out2_w)
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW")
-	AM_RANGE(0x2000, 0x3fff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM   /* mirror for 6502 vectors */
-ADDRESS_MAP_END
+void videopin_state::main_map(address_map &map)
+{
+	map(0x0000, 0x01ff).ram();
+	map(0x0200, 0x07ff).ram().w(this, FUNC(videopin_state::video_ram_w)).share("video_ram");
+	map(0x0800, 0x0800).r(this, FUNC(videopin_state::misc_r)).w(this, FUNC(videopin_state::note_dvsr_w));
+	map(0x0801, 0x0801).w(this, FUNC(videopin_state::led_w));
+	map(0x0802, 0x0802).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0804, 0x0804).w(this, FUNC(videopin_state::ball_w));
+	map(0x0805, 0x0805).w(this, FUNC(videopin_state::out1_w));
+	map(0x0806, 0x0806).w(this, FUNC(videopin_state::out2_w));
+	map(0x1000, 0x1000).portr("IN0");
+	map(0x1800, 0x1800).portr("DSW");
+	map(0x2000, 0x3fff).rom();
+	map(0xe000, 0xffff).rom();   /* mirror for 6502 vectors */
+}
 
 
 /*************************************
@@ -276,8 +277,8 @@ static INPUT_PORTS_START( videopin )
 	PORT_DIPSETTING(    0x01, "210000 (3 balls) / 350000 (5 balls)" )
 
 	PORT_START("IN1")   /* IN2 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 1 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) /* PLUNGER 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) /* PLUNGER 1 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) /* PLUNGER 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )

@@ -80,6 +80,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void nibble(machine_config &config);
+	void nibble_cru_map(address_map &map);
+	void nibble_map(address_map &map);
 };
 
 
@@ -150,17 +152,19 @@ void nibble_state::machine_reset()
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( nibble_map, AS_PROGRAM, 16, nibble_state )
+void nibble_state::nibble_map(address_map &map)
+{
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(nibble_videoram_w) AM_SHARE("videoram")   // placeholder
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).w(this, FUNC(nibble_state::nibble_videoram_w)).share("videoram");   // placeholder
 //  AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("crtc", mc6845_device, address_w)
 //  AM_RANGE(0xff02, 0xff03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-ADDRESS_MAP_END
+}
 
 
-static ADDRESS_MAP_START( nibble_cru_map, AS_IO, 8, nibble_state )
-ADDRESS_MAP_END
+void nibble_state::nibble_cru_map(address_map &map)
+{
+}
 
 
 /*************************
@@ -334,7 +338,7 @@ MACHINE_CONFIG_END
 
 ROM_START( l9nibble )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "09.U123", 0x00000, 0x10000, CRC(dfef685d) SHA1(0aeb4257e408e8549df629a0cdb5f2b6790e32de) ) // tms9900 code?
+	ROM_LOAD( "09.u123", 0x00000, 0x10000, CRC(dfef685d) SHA1(0aeb4257e408e8549df629a0cdb5f2b6790e32de) ) // tms9900 code?
 
 	ROM_REGION( 0x80000, "gfx", 0 )
 	ROM_LOAD( "01.u139", 0x00000, 0x10000, CRC(aba06e58) SHA1(5841beec122613eed2ba9f48cb1d51bfa0ff450c) )

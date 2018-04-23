@@ -78,4 +78,10 @@ public:
 	void srmp2(machine_config &config);
 	void rmgoldyh(machine_config &config);
 	void srmp3(machine_config &config);
+	void mjyuugi_map(address_map &map);
+	void rmgoldyh_io_map(address_map &map);
+	void rmgoldyh_map(address_map &map);
+	void srmp2_map(address_map &map);
+	void srmp3_io_map(address_map &map);
+	void srmp3_map(address_map &map);
 };

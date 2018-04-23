@@ -58,4 +58,7 @@ public:
 	void crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	void crzrally(machine_config &config);
 	void holeland(machine_config &config);
+	void crzrally_map(address_map &map);
+	void holeland_map(address_map &map);
+	void io_map(address_map &map);
 };

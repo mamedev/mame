@@ -125,6 +125,8 @@ public:
 	void statriv2(machine_config &config);
 	void funcsino(machine_config &config);
 	void statriv2v(machine_config &config);
+	void statriv2_io_map(address_map &map);
+	void statriv2_map(address_map &map);
 };
 
 
@@ -284,20 +286,22 @@ WRITE8_MEMBER(statriv2_state::ppi_portc_hi_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8, statriv2_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_SHARE("videoram")
-ADDRESS_MAP_END
+void statriv2_state::statriv2_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x43ff).ram();
+	map(0x4800, 0x48ff).ram().share("nvram");
+	map(0xc800, 0xcfff).ram().w(this, FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
+}
 
-static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_SHARE("question_offset")
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_device, data_r)
-	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_device, read, write)
-ADDRESS_MAP_END
+void statriv2_state::statriv2_io_map(address_map &map)
+{
+	map(0x20, 0x23).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x28, 0x2b).r(this, FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
+	map(0xb0, 0xb1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0xb1, 0xb1).r("aysnd", FUNC(ay8910_device::data_r));
+	map(0xc0, 0xcf).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write));
+}
 
 
 /*************************************
@@ -320,7 +324,7 @@ static INPUT_PORTS_START( statusbj )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -353,7 +357,7 @@ static INPUT_PORTS_START( funcsino )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Game")   PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -389,7 +393,7 @@ static INPUT_PORTS_START( bigcsino ) // flyer shows 8 buttons on the cabinet
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -464,7 +468,7 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state, latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x20, 0x20, "Show Correct Answer" )
@@ -618,7 +622,7 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_SCREEN_UPDATE_DRIVER(statriv2_state, screen_update_statriv2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("tms", TMS9927, MASTER_CLOCK/2/8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", horizontal)
@@ -632,7 +636,8 @@ MACHINE_CONFIG_START(statriv2_state::statriv2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(statriv2_state::statriv2v, statriv2)
+MACHINE_CONFIG_START(statriv2_state::statriv2v)
+	statriv2(config);
 
 	/* basic machine hardware */
 
@@ -643,7 +648,8 @@ MACHINE_CONFIG_DERIVED(statriv2_state::statriv2v, statriv2)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", vertical)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED(statriv2_state::funcsino, statriv2)
+MACHINE_CONFIG_START(statriv2_state::funcsino)
+	statriv2(config);
 
 	/* basic machine hardware */
 

@@ -100,13 +100,6 @@ a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type 
 {
 }
 
-void a2bus_slot_device::static_set_a2bus_slot(device_t &device, const char *tag, const char *slottag)
-{
-	a2bus_slot_device &a2bus_card = dynamic_cast<a2bus_slot_device &>(device);
-	a2bus_card.m_a2bus_tag = tag;
-	a2bus_card.m_a2bus_slottag = slottag;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -115,7 +108,7 @@ void a2bus_slot_device::device_start()
 {
 	device_a2bus_card_interface *dev = dynamic_cast<device_a2bus_card_interface *>(get_card_device());
 
-	if (dev) device_a2bus_card_interface::static_set_a2bus_tag(*dev, m_a2bus_tag, m_a2bus_slottag);
+	if (dev) dev->set_a2bus_tag(m_a2bus_tag, m_a2bus_slottag);
 }
 
 //**************************************************************************
@@ -123,12 +116,6 @@ void a2bus_slot_device::device_start()
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2BUS, a2bus_device, "a2bus", "Apple II Bus")
-
-void a2bus_device::static_set_cputag(device_t &device, const char *tag)
-{
-	a2bus_device &a2bus = downcast<a2bus_device &>(device);
-	a2bus.m_cputag = tag;
-}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -302,13 +289,6 @@ device_a2bus_card_interface::device_a2bus_card_interface(const machine_config &m
 
 device_a2bus_card_interface::~device_a2bus_card_interface()
 {
-}
-
-void device_a2bus_card_interface::static_set_a2bus_tag(device_t &device, const char *tag, const char *slottag)
-{
-	device_a2bus_card_interface &a2bus_card = dynamic_cast<device_a2bus_card_interface &>(device);
-	a2bus_card.m_a2bus_tag = tag;
-	a2bus_card.m_a2bus_slottag = slottag;
 }
 
 void device_a2bus_card_interface::interface_pre_start()

@@ -32,7 +32,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(einstein_userport_cards, nullptr, false)
 
 #define MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(_devcb) \
-	devcb = &einstein_userport_device::set_bstb_handler(*device, DEVCB_##_devcb);
+	devcb = &downcast<einstein_userport_device &>(*device).set_bstb_handler(DEVCB_##_devcb);
 
 
 //**************************************************************************
@@ -49,8 +49,7 @@ public:
 	virtual ~einstein_userport_device();
 
 	// callbacks
-	template <class Object> static devcb_base &set_bstb_handler(device_t &device, Object &&cb)
-	{ return downcast<einstein_userport_device &>(device).m_bstb_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> devcb_base &set_bstb_handler(Object &&cb) { return m_bstb_handler.set_callback(std::forward<Object>(cb)); }
 
 	// called from card device
 	DECLARE_WRITE_LINE_MEMBER( bstb_w ) { m_bstb_handler(state); }
