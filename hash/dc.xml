@@ -14766,7 +14766,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 	</software>
 	-->
 
-	<software name="golfs1" cloneof="teeoff">
+	<software name="golfsr1" cloneof="teeoff">
 		<!--
 		<rom name="Golf Shiyouyo v2.000 (1999)(Bottom Up)(NTSC)(JP)(en)[!].gdi" size="88" md5="ebfa20655976b113837f162e5aff4e9f" sha1="639b5a95deb0231e933d0e93d5e6e16923d4c7b5"/>
 		<rom name="track01.bin" size="15262128" md5="0a6d8bcf40af844b3a8e4a6b0cd54acf" sha1="2358ea1a0d140365e31d46463c76ab62e0298627"/>
@@ -14785,7 +14785,7 @@ P830-****-** : Appears to be a Sega part number for promo discs.
 		</part>
 	</software>
 
-	<software name="golfs2" cloneof="teeoff">
+	<software name="golfsr2" cloneof="teeoff">
 		<!-- http://redump.org/disc/45370/
 		<rom name="Golf Shiyou yo (Japan) (Rev B).gdi" size="198" crc="eb37a1d4" md5="ee1353f8ff3e5b1c2da080ed1cbb942f" sha1="3e944ef7998c253b445a25fefb92138c27e6cbd5"/>
 		<rom name="Golf Shiyou yo (Japan) (Rev B) (Track 1).bin" size="15262128" crc="5a321916" md5="fb6163f4681f0c80114676e16e64eb1d" sha1="6ce7d22ceebe199d40e5f1da8dfa39c258c6695a"/>
