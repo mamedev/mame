@@ -15110,6 +15110,7 @@ hotstuff                        //
 
 @source:hp_ipc.cpp
 hp_ipc                          //
+hp9808a
 
 @source:hp16500.cpp
 hp16500b                        //
