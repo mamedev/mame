@@ -1438,6 +1438,7 @@ void pc9801_state::pc9821_map(address_map &map)
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0x00f00000, 0x00f9ffff).ram().share("ext_gvram");
 	map(0xffee8000, 0xffefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0xfff00000, 0xfff9ffff).ram().share("ext_gvram");
 	map(0xfffe8000, 0xffffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 

@@ -183,11 +183,15 @@ void pc9801_86_device::device_reset()
 	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opn_r), this), write8_delegate(FUNC(pc9801_86_device::opn_w), this) );
 	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
 	install_device(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
+	install_device(0xa66c, 0xa66f, read8_delegate([this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
+								   write8_delegate([this](address_space &s, offs_t o, u8 d, u8 mm){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
 	m_fmirq = m_pcmirq = false;
 	m_irq_rate = 0;
 	m_pcm_ctrl = m_pcm_mode = 0;
+	m_pcm_mute = 0;
+	m_pcm_clk = false;
 	memset(&m_queue[0], 0, QUEUE_SIZE);
 }
 
@@ -234,15 +238,13 @@ READ8_MEMBER(pc9801_86_device::pcm_r)
 		{
 			case 1:
 				return ((queue_count() == QUEUE_SIZE) ? 0x80 : 0) |
-						(!queue_count() ? 0x40 : 0);
+						(!queue_count() ? 0x40 : 0) | (m_pcm_clk ? 1 : 0);
 			case 2:
 				return m_pcm_ctrl | (m_pcmirq ? 0x10 : 0);
 			case 3:
 				return m_pcm_mode;
 			case 4:
 				return 0;
-			case 5:
-				return m_pcm_mute;
 		}
 	}
 	else // odd
@@ -263,10 +265,7 @@ WRITE8_MEMBER(pc9801_86_device::pcm_w)
 				break;
 			case 2:
 				m_pcm_ctrl = data & ~0x10;
-				if(data & 0x80)
-					m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
-				else
-					m_dac_timer->adjust(attotime::never);
+				m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
 				if(data & 8)
 					m_head = m_tail = m_count = 0;
 				if(!(data & 0x10))
@@ -288,9 +287,6 @@ WRITE8_MEMBER(pc9801_86_device::pcm_w)
 					m_head %= QUEUE_SIZE;
 					m_count++;
 				}
-				break;
-			case 5:
-				m_pcm_mute = data;
 				break;
 		}
 	}
@@ -317,6 +313,7 @@ void pc9801_86_device::device_timer(emu_timer& timer, device_timer_id id, int pa
 {
 	int16_t lsample, rsample;
 
+	m_pcm_clk = !m_pcm_clk;
 	if((m_pcm_ctrl & 0x40) || !(m_pcm_ctrl & 0x80) || !queue_count())
 		return;
 
