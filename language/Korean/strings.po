@@ -1,5 +1,5 @@
 # Korean translations for PACKAGE package
-# PACKAGE ��Ű���� ���� �ѱ��� ������.
+# PACKAGE 패키지에 대한 한국어 번역문.
 # Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Automatically generated, 2016.
@@ -62,11 +62,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:53 src/frontend/mame/ui/dirmenu.cpp:47
 msgid "Flyers"
-msgstr ""
+msgstr "광고지"
 
 #: src/frontend/mame/ui/selmenu.cpp:54 src/frontend/mame/ui/dirmenu.cpp:48
 msgid "Titles"
-msgstr ""
+msgstr "제목"
 
 #: src/frontend/mame/ui/selmenu.cpp:55 src/frontend/mame/ui/dirmenu.cpp:49
 msgid "Ends"
@@ -74,7 +74,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:56
 msgid "Artwork Preview"
-msgstr ""
+msgstr "전단 미리보기"
 
 #: src/frontend/mame/ui/selmenu.cpp:57 src/frontend/mame/ui/dirmenu.cpp:55
 msgid "Bosses"
@@ -115,7 +115,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:69
 msgid "Add or remove favorites"
-msgstr ""
+msgstr "즐겨찾기 추가 및 삭제"
 
 #: src/frontend/mame/ui/selmenu.cpp:70
 msgid "Export displayed list to file"
@@ -131,7 +131,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:343
 msgid "BIOS selection:"
-msgstr ""
+msgstr "바이오스 선택:"
 
 #: src/frontend/mame/ui/selmenu.cpp:570 src/frontend/mame/ui/selmenu.cpp:606
 #: src/frontend/mame/ui/simpleselgame.cpp:311
@@ -320,15 +320,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:179
 msgid "Change Folder"
-msgstr ""
+msgstr "폴더 변경"
 
 #: src/frontend/mame/ui/dirmenu.cpp:179
 msgid "Add Folder"
-msgstr ""
+msgstr "폴더 추가"
 
 #: src/frontend/mame/ui/dirmenu.cpp:182
 msgid "Remove Folder"
-msgstr ""
+msgstr "폴더 삭제"
 
 #: src/frontend/mame/ui/dirmenu.cpp:418
 #, c-format
@@ -371,35 +371,35 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:35
 msgid "keyboard"
-msgstr ""
+msgstr "키보드"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "mouse"
-msgstr ""
+msgstr "마우스"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "microphone"
-msgstr ""
+msgstr "마이크로폰"
 
 #: src/frontend/mame/ui/info.cpp:38
 msgid "camera"
-msgstr ""
+msgstr "카메라"
 
 #: src/frontend/mame/ui/info.cpp:39
 msgid "disk"
-msgstr ""
+msgstr "디스크"
 
 #: src/frontend/mame/ui/info.cpp:40
 msgid "printer"
-msgstr ""
+msgstr "프린터"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgid "LAN"
-msgstr ""
+msgstr "LAN"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgid "WAN"
-msgstr ""
+msgstr "WAN"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "timing"
@@ -416,6 +416,8 @@ msgid ""
 "There are known problems with this machine\n"
 "\n"
 msgstr ""
+"이 장치에 다음과 같은 문제가 있습니다\n"
+"\n"
 
 #: src/frontend/mame/ui/info.cpp:195
 msgid ""
@@ -468,6 +470,10 @@ msgid ""
 "complete. There is nothing you can do to fix this problem except wait for "
 "the developers to improve the emulation.\n"
 msgstr ""
+"\n"
+"이 장치는 작동되지 않습니다. 이 장치를 실행하기 위한 에뮬레이션이 아직 완성되지 "
+"않았습니다. 이 장치를 사용하기 위해선 개발자들이 에뮬레이션을 개선해서 이 문제를 "
+"해결할 때까지 기다리는 수밖에 없습니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:243
 msgid ""
@@ -476,6 +482,10 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
+"이 장치의 요소 일부는 직접적인 상호작용이나 별도의 보조장비에 의존하고 "
+"있습니다. 때문에 에뮬레이션만으로 이 장치를 완벽하게 재현하는 것은 "
+"가능하지 않습니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:265
 #, c-format
@@ -490,7 +500,7 @@ msgid ""
 "\n"
 "\n"
 "Press any key to continue"
-msgstr ""
+msgstr "아무 키를 누르면 진행합니다"
 
 #: src/frontend/mame/ui/info.cpp:293
 #, c-format
@@ -504,23 +514,27 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:328 src/frontend/mame/ui/info.cpp:366
 msgid "MHz"
-msgstr ""
+msgstr "MHz"
 
 #: src/frontend/mame/ui/info.cpp:328 src/frontend/mame/ui/info.cpp:366
 msgid "kHz"
-msgstr ""
+msgstr "kHZ"
 
 #: src/frontend/mame/ui/info.cpp:342
 msgid ""
 "\n"
 "Sound:\n"
 msgstr ""
+"\n"
+"사운드:\n"
 
 #: src/frontend/mame/ui/info.cpp:370
 msgid ""
 "\n"
 "Video:\n"
 msgstr ""
+"\n"
+"비디오:\n"
 
 #: src/frontend/mame/ui/info.cpp:374
 msgid "None\n"
@@ -550,23 +564,23 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:525
 msgid "Not supported"
-msgstr ""
+msgstr "지원 안 함"
 
 #: src/frontend/mame/ui/info.cpp:528
 msgid "Partially supported"
-msgstr ""
+msgstr "부분적으로 지원함"
 
 #: src/frontend/mame/ui/info.cpp:536
 msgid "[empty]"
-msgstr ""
+msgstr "[공백]"
 
 #: src/frontend/mame/ui/optsmenu.cpp:193
 msgid "Filter"
-msgstr ""
+msgstr "필터"
 
 #: src/frontend/mame/ui/optsmenu.cpp:206
 msgid "Customize UI"
-msgstr ""
+msgstr "UI 꾸미기"
 
 #: src/frontend/mame/ui/optsmenu.cpp:207
 msgid "Configure Directories"
@@ -902,31 +916,31 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:760 src/frontend/mame/ui/utils.cpp:66
 msgid "BIOS"
-msgstr ""
+msgstr "바이오스"
 
 #: src/frontend/mame/ui/miscmenu.cpp:764
 msgid "Driver"
-msgstr ""
+msgstr "드라이버"
 
 #: src/frontend/mame/ui/miscmenu.cpp:767
 msgid "This machine has no BIOS."
-msgstr ""
+msgstr "장치에 바이오스가 없습니다."
 
 #: src/frontend/mame/ui/miscmenu.cpp:776 src/frontend/mame/ui/mainmenu.cpp:145
 msgid "Add To Favorites"
-msgstr ""
+msgstr "즐겨찾기에 추가"
 
 #: src/frontend/mame/ui/miscmenu.cpp:778 src/frontend/mame/ui/mainmenu.cpp:147
 msgid "Remove From Favorites"
-msgstr ""
+msgstr "즐겨찾기에서 삭제"
 
 #: src/frontend/mame/ui/miscmenu.cpp:781
 msgid "Save machine configuration"
-msgstr ""
+msgstr "장치 환경설정 저장"
 
 #: src/frontend/mame/ui/miscmenu.cpp:792
 msgid "Configure machine:"
-msgstr ""
+msgstr "장치 환경설정:"
 
 #: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/sndmenu.cpp:135
 #: src/frontend/mame/ui/sndmenu.cpp:137 src/frontend/mame/ui/menu.cpp:736
@@ -1896,10 +1910,13 @@ msgid ""
 "Please select a different machine.\n"
 "\n"
 msgstr ""
+"선택한 장치에 필요한 ROM이나 CHD 파일이 없습니다. "
+"다른 장치를 선택하십시오.\n"
+"\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1245 src/frontend/mame/ui/selsoft.cpp:462
 msgid "Press any key to continue."
-msgstr ""
+msgstr "아무 키를 누르면 진행합니다."
 
 #: src/frontend/mame/ui/sndmenu.cpp:135
 msgid "Sound"
@@ -1927,11 +1944,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:60
 msgid "Working"
-msgstr ""
+msgstr "작동함"
 
 #: src/frontend/mame/ui/utils.cpp:61
 msgid "Not Working"
-msgstr ""
+msgstr "작동 안 함"
 
 #: src/frontend/mame/ui/utils.cpp:62
 msgid "Mechanical"
@@ -1943,11 +1960,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Category"
-msgstr ""
+msgstr "분류"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Favorites"
-msgstr ""
+msgstr "즐겨찾기"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
@@ -1963,35 +1980,35 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgid "Manufacturer"
-msgstr ""
+msgstr "제조사"
 
 #: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/utils.cpp:86
 msgid "Year"
-msgstr ""
+msgstr "연도"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgid "Save Supported"
-msgstr ""
+msgstr "저장 지원"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgid "Save Unsupported"
-msgstr ""
+msgstr "저장 지원 안 됨"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgid "CHD Required"
-msgstr ""
+msgstr "CHD 필요"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "No CHD Required"
-msgstr ""
+msgstr "CHD 필요없음"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Vertical Screen"
-msgstr ""
+msgstr "세로 화면"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "가로 화면"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
@@ -2003,19 +2020,19 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgid "Supported"
-msgstr ""
+msgstr "지원됨"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgid "Partially Supported"
-msgstr ""
+msgstr "부분적으로 지원됨"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgid "Unsupported"
-msgstr ""
+msgstr "지원 안 됨"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgid "Release Region"
-msgstr ""
+msgstr "발매 지역"
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgid "Device Type"
@@ -2040,15 +2057,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:518
 msgid "Remove last filter"
-msgstr ""
+msgstr "가장 최근의 필터 삭제"
 
 #: src/frontend/mame/ui/utils.cpp:520
 msgid "Add filter"
-msgstr ""
+msgstr "필터 추가"
 
 #: src/frontend/mame/ui/utils.cpp:959
 msgid "Select category:"
-msgstr ""
+msgstr "분류 선택"
 
 #: src/frontend/mame/ui/utils.cpp:990
 msgid "[no category INI files]"
