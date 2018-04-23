@@ -29809,6 +29809,7 @@ sdodgeb                         // 0208 (c) 1996 Technos
 sengoku                         // 0017 (c) 1991 SNK
 sengoku2                        // 0040 (c) 1993 SNK
 sengoku3                        // 0261 (c) 2001 Noise Factory / SNK
+sengoku3a                       //
 sengokuh                        // 0017 (c) 1991 SNK
 shocktr2                        // 0246 (c) 1998 Saurus
 shocktro                        // 0238 (c) 1997 Saurus
@@ -29840,12 +29841,14 @@ twinspri                        // 0224 (c) 1996 ADK
 twsoc96                         // 0086 (c) 1996 Tecmo
 viewpoin                        // 0051 (c) 1992 Sammy
 vliner                          //
-vlinero                         //
+vliner6e                        //
+vliner54                        //
 wakuwak7                        // 0225 (c) 1996 Sunsoft
 wh1                             // 0053 (c) 1992 Alpha Denshi Co.
 wh1h                            // 0053 (c) 1992 Alpha Denshi Co.
 wh1ha                           // 0053 (c) 1992 Alpha Denshi Co.
 wh2                             // 0057 (c) 1993 ADK
+wh2h                            //
 wh2j                            // 0064 (c) 1994 ADK / SNK
 whp                             // 0090 (c) 1995 ADK / SNK
 wjammers                        // 0065 (c) 1994 Data East Corporation

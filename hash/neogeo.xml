@@ -3079,7 +3079,41 @@
 		</part>
 	</software>
 
-
+	<software name="wh2h" cloneof="wh2">
+		<description>World Heroes 2 (ALH-006)</description>
+		<year>1993</year>
+		<publisher>ADK</publisher>
+		<info name="serial" value="ALH-006, ALH-006"/>
+		<info name="release" value="19930604"/>
+		<info name="alt_title" value="ワールドヒーローズ2"/>
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="057-pg1.p" offset="0x100000" size="0x100000" crc="cde9aff5" sha1="003f79cbff1383b59588ccee4b372027e506235c" />   <!-- TC5316200 -->
+				<rom size="0x100000" offset="0x000000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="057-s1.s1" crc="fcaeb3a4" sha1="1f3f85e38b8552333261c04ae5af0d6e3b310622" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="057-m1.m1" crc="8fa3bc77" sha1="982f92978671e4ee66630948e6bb7565b37b5dc0" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x400000">
+				<rom name="057-v1.v1" offset="0x000000" size="0x200000" crc="8877e301" sha1="1bab988d74ea8fd12db201c257ec844622cf5f4e" />   <!-- TC5316200 -->
+				<rom name="057-v2.v2" offset="0x200000" size="0x200000" crc="c1317ff4" sha1="4c28b2b5998abaeaa5143f2f3a9ba52c6041f4f3" />   <!-- TC5316200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0xc00000">
+				<rom loadflag="load16_byte" name="057-c1.c1" offset="0x000000" size="0x200000" crc="21c6bb91" sha1="a2c17d0c91dd59528d8fa7fe110af8b20b25ff99" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="057-c2.c2" offset="0x000001" size="0x200000" crc="a3999925" sha1="0ee861a77850d378d03c1bf00b9692abd860c759" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="057-c3.c3" offset="0x400000" size="0x200000" crc="b725a219" sha1="4857687d156a9150a69b97d2729245a51c144a0c" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="057-c4.c4" offset="0x400001" size="0x200000" crc="8d96425e" sha1="0f79c868a6a33ad25e38d842f30ec4440d809033" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="057-c5.c5" offset="0x800000" size="0x200000" crc="b20354af" sha1="da7609fd467f2f4d71d92970f438a04d11ab1cc1" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="057-c6.c6" offset="0x800001" size="0x200000" crc="b13d1de3" sha1="7d749c23a33d90fe50279e884540d71cf1aaaa6b" />    <!-- TC5316200 -->
+			</dataarea>
+		</part>
+	</software>
+	
 	<!--
 	ID-0058
 	. NGM-058
@@ -8417,7 +8451,7 @@
 	-->
 
 	<software name="sengoku3">
-		<description>Sengoku 3 / Sengoku Densho 2001</description>
+		<description>Sengoku 3 / Sengoku Densho 2001 (set 1)</description>
 		<year>2001</year>
 		<publisher>Noise Factory / SNK</publisher>
 		<info name="serial" value="NGM-2610"/>
@@ -8453,7 +8487,43 @@
 		</part>
 	</software>
 
-
+	<software name="sengoku3a" cloneof="sengoku3">
+		<description>Sengoku 3 / Sengoku Densho 2001 (set 2)</description>
+		<year>2001</year>
+		<publisher>Noise Factory / SNK</publisher>
+		<info name="serial" value="NGM-2610"/>
+		<info name="release" value="20010718"/>
+		<info name="alt_title" value="戦国伝承2001"/>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<feature name="slot" value="cmc42_sengoku3" />
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="261-pg1.p1" offset="0x100000" size="0x100000" crc="5b557201" sha1="d01421d1dc80fe7d2a46b9f79c0f344b3c81c1e7" />  <!-- mask rom TC5316200 -->
+				<rom size="0x100000" offset="0x000000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="fixed" size="0x20000">
+				<!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
+				<rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x080000">
+				<rom offset="0x000000" size="0x080000" name="261-m1.m1" crc="7d501c39" sha1="8e6bcc428f5ac7532d9c9be7e07ad0821461a080" />   <!-- mask rom TC534000 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x0e00000">
+				<rom name="261-v1.v1" offset="0x000000" size="0x400000" crc="64c30081" sha1="f9ebd20cf59b72e864b7274c1bdb6d99ecaf4595" />   <!-- mask rom TC5332204 -->
+				<rom name="261-v2.v2" offset="0x400000" size="0x400000" crc="392a9c47" sha1="7ab90a54089236ca6c3ef1af8e566a8025d38159" />   <!-- mask rom TC5332204 -->
+				<rom name="261-v3.v3" offset="0x800000" size="0x400000" crc="c1a7ebe3" sha1="1d7bb481451f5ee0457e954bb5210300182c3c9c" />   <!-- mask rom TC5332204 -->
+				<rom name="261-v4.v4" offset="0xc00000" size="0x200000" crc="9000d085" sha1="11157b355ab4eb6627e9f322ed875332d3d77349" />   <!-- mask rom TC5316200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="261-c1.c1" offset="0x000000" size="0x800000" crc="ded84d9c" sha1="d960523b813d4fae06d716298d4e431a5c77a0c5" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="261-c2.c2" offset="0x000001" size="0x800000" crc="b8eb4348" sha1="619d24312549932959481fa58f43f11c048e1ca5" />    <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="261-c3.c3" offset="0x1000000" size="0x800000" crc="84e2034a" sha1="38ec4ae4b86933a25c9a03799b8cade4b1346401" />   <!-- mask rom TC5364205 -->
+				<rom loadflag="load16_byte" name="261-c4.c4" offset="0x1000001" size="0x800000" crc="0b45ae53" sha1="a19fb21408ab633aee8bbf38bf43b5e26766b355" />   <!-- mask rom TC5364205 -->
+			</dataarea>
+		</part>
+	</software>
+	
 	<!--
 	ID-0262
 	. NGM-262?
