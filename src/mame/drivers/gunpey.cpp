@@ -270,7 +270,7 @@ private:
 
 	uint8_t get_vrom_byte(int x, int y);
 	int write_dest_byte(uint8_t usedata);
-	int decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh);
+	int decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh, int dx, int dy);
 	int next_node(struct huffman_node_s **res, struct state_s *s);
 	int get_next_bit(struct state_s *s);
 
@@ -348,20 +348,20 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 		if (zoomheight) heightstep = sourceheight / zoomheight;
 
 		uint16_t unused;
-		if (debug) printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
+		if (debug) logerror("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
 
-		unused = m_wram[count+0]&~0xff98; if (unused) printf("unused bits set in word 0 - %04x\n", unused);
-		unused = m_wram[count+1]&~0xf89f; if (unused) printf("unused bits set in word 1 - %04x\n", unused);
-		unused = m_wram[count+2]&~0xfc3f; if (unused) printf("unused bits set in word 2 - %04x\n", unused);
-		unused = m_wram[count+3]&~0xff1f; if (unused) printf("unused bits set in word 3 - %04x\n", unused);
-		unused = m_wram[count+4]&~0xff77; if (unused) printf("unused bits set in word 4 - %04x\n", unused);
-		unused = m_wram[count+5]&~0xffff; if (unused) printf("unused bits set in word 5 - %04x\n", unused);
-		unused = m_wram[count+6]&~0x00ff; if (unused) printf("unused bits set in word 6 - %04x\n", unused);
-		unused = m_wram[count+7]&~0xff00; if (unused) printf("unused bits set in word 7 - %04x\n", unused);
+		unused = m_wram[count+0]&~0xff98; if (unused) logerror("unused bits set in word 0 - %04x\n", unused);
+		unused = m_wram[count+1]&~0xf89f; if (unused) logerror("unused bits set in word 1 - %04x\n", unused);
+		unused = m_wram[count+2]&~0xfc3f; if (unused) logerror("unused bits set in word 2 - %04x\n", unused);
+		unused = m_wram[count+3]&~0xff1f; if (unused) logerror("unused bits set in word 3 - %04x\n", unused);
+		unused = m_wram[count+4]&~0xff77; if (unused) logerror("unused bits set in word 4 - %04x\n", unused);
+		unused = m_wram[count+5]&~0xffff; if (unused) logerror("unused bits set in word 5 - %04x\n", unused);
+		unused = m_wram[count+6]&~0x00ff; if (unused) logerror("unused bits set in word 6 - %04x\n", unused);
+		unused = m_wram[count+7]&~0xff00; if (unused) logerror("unused bits set in word 7 - %04x\n", unused);
 
 		if (((zoomwidth<<ZOOM_SHIFT) != sourcewidth) || ((zoomheight<<ZOOM_SHIFT) != sourceheight))
 		{
-		//  printf("sw %08x zw %08x sh %08x zh %08x heightstep %08x widthstep %08x \n", sourcewidth, zoomwidth<<ZOOM_SHIFT, sourceheight, zoomheight<<ZOOM_SHIFT, heightstep, widthstep );
+		//  logerror("sw %08x zw %08x sh %08x zh %08x heightstep %08x widthstep %08x \n", sourcewidth, zoomwidth<<ZOOM_SHIFT, sourceheight, zoomheight<<ZOOM_SHIFT, heightstep, widthstep );
 		}
 
 		if(bpp_sel == 0x00)  // 4bpp
@@ -445,7 +445,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 		else if(bpp_sel == 0x08) // 6bpp
 		{
 			// not used by Gunpey?
-			printf("6bpp\n");
+			logerror("6bpp\n");
 		}
 		else if(bpp_sel == 0x10) // 8bpp
 		{
@@ -519,7 +519,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 		else if(bpp_sel == 0x18) // RGB32k
 		{
 			// not used by Gunpey?
-			printf("32k\n");
+			logerror("32k\n");
 			// ...
 		}
 	}
@@ -555,7 +555,7 @@ uint32_t gunpey_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		scene_enabled = m_wram[scene_index+0] & 0x01;
 		scene_gradient = m_wram[scene_index+1] & 0xff;
 
-//      printf("%08x: %08x %08x %08x %08x | %08x %08x %08x %08x\n",scene_index,m_wram[scene_index+0],m_wram[scene_index+1],m_wram[scene_index+2],m_wram[scene_index+3],
+//      logerror("%08x: %08x %08x %08x %08x | %08x %08x %08x %08x\n",scene_index,m_wram[scene_index+0],m_wram[scene_index+1],m_wram[scene_index+2],m_wram[scene_index+3],
 //                                                  m_wram[scene_index+4],m_wram[scene_index+5],m_wram[scene_index+6],m_wram[scene_index+7]);
 
 		if(scene_enabled)
@@ -664,6 +664,7 @@ struct state_s
 	unsigned char colour[16];
 	int basex;
 	int ix, iy, iw;
+	int dx, dy;
 	int ow, oh;
 	int ox, oy;
 };
@@ -710,7 +711,7 @@ void gunpey_state::set_o(struct state_s *s, unsigned char v)
 			break;
 	}
 
-	s->buf[(s->ox++) + (s->oy * 256)] = v;
+	s->buf[((s->dx + s->ox++) & 0x7ff) + (((s->dy + s->oy) & 0x7ff) * 0x800)] = v;
 }
 
 
@@ -723,7 +724,7 @@ unsigned char gunpey_state::get_o(struct state_s *s, int x, int y)
 	assert(y < s->oh);
 	assert(y < 256);
 
-	return s->buf[x + y * 256];
+	return s->buf[((s->dx + x) & 0x7ff) + (((s->dy + y) & 0x7ff) * 0x800)];
 }
 
 
@@ -891,7 +892,7 @@ int gunpey_state::next_node(struct huffman_node_s **res, struct state_s *s)
 	return -1;
 }
 
-int gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh)
+int gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, int oh, int dx, int dy)
 {
 	struct huffman_node_s *n;
 	struct state_s s;
@@ -908,6 +909,8 @@ int gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow, 
 	s.ix = ix;
 	s.iy = iy;
 	s.iw = get_vrom_byte(s.ix++, s.iy) + 1;
+	s.dx = dx;
+	s.dy = dy;
 
 	s.ow = ow;
 	s.oh = oh;
@@ -990,7 +993,7 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 {
 	uint16_t *blit_ram = m_blit_ram;
 
-	//printf("gunpey_blitter_w offset %01x data %02x\n", offset,data);
+	//logerror("gunpey_blitter_w offset %01x data %02x\n", offset,data);
 
 	blit_ram[offset] = data;
 
@@ -1010,25 +1013,14 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 		if(compression)
 		{
 			if(compression == 8)
-			{
-				unsigned char buf[256*256];
-				
-				if (decompress_sprite(buf, m_srcx, m_srcy, m_xsize, m_ysize))
+			{				
+				if (decompress_sprite(m_vram, m_srcx, m_srcy, m_xsize, m_ysize, m_dstx, m_dsty))
 				{
-					printf("[-] Failed to decompress sprite at %04x %04x\n", m_srcx, m_srcy);
-				}
-
-				// TODO: decompress directly into vram instead of into the 256x256 buffer so that this copy isn't needed
-				for (int y = 0; y < m_ysize; y++)
-				{
-					for (int x = 0; x < m_xsize; x++)
-					{
-						m_vram[(((m_dsty + y) & 0x7ff) * 0x800) + ((m_dstx + x) & 0x7ff)] = buf[x + y * 256];
-					}
+					logerror("[-] Failed to decompress sprite at %04x %04x\n", m_srcx, m_srcy);
 				}
 			}
 			else
-				printf("unknown compression mode %02x\n",compression);
+				logerror("unknown compression mode %02x\n",compression);
 		}
 		else
 		{
@@ -1061,13 +1053,13 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 
 WRITE8_MEMBER(gunpey_state::blitter_upper_w)
 {
-	//printf("gunpey_blitter_upper_w %02x %02x\n", offset, data);
+	//logerror("gunpey_blitter_upper_w %02x %02x\n", offset, data);
 
 }
 
 WRITE8_MEMBER(gunpey_state::blitter_upper2_w)
 {
-	//printf("gunpey_blitter_upper2_w %02x %02x\n", offset, data);
+	//logerror("gunpey_blitter_upper2_w %02x %02x\n", offset, data);
 
 }
 
@@ -1219,7 +1211,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::scanline)
 
 	if(scanline == 240)
 	{
-		//printf("frame\n");
+		//logerror("frame\n");
 		irq_check(0x50);
 	}
 }
