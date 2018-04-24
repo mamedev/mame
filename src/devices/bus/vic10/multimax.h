@@ -31,10 +31,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// device_vic10_expansion_card_interface overrides
 	virtual uint8_t vic10_cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) override;
 	virtual void vic10_cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) override;
+
+private:
+	uint8_t m_latch;
 };
 
 
