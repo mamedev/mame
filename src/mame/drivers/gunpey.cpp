@@ -258,7 +258,6 @@ private:
 	int m_scrxcount;
 	int m_srcy;
 	int m_srcycount;
-	uint8_t m_sourcewide;
 	int m_ysize;
 	int m_xsize;
 	int m_dstx;
