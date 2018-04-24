@@ -1547,7 +1547,7 @@ const char *a2_edd_format::extensions() const
 
 bool a2_edd_format::supports_save() const
 {
-	return true;
+	return false;
 }
 
 int a2_edd_format::identify(io_generic *io, uint32_t form_factor)
@@ -1645,3 +1645,124 @@ bool a2_edd_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 }
 
 const floppy_format_type FLOPPY_EDD_FORMAT = &floppy_image_format_creator<a2_edd_format>;
+
+
+a2_woz_format::a2_woz_format() : floppy_image_format_t()
+{
+}
+
+const char *a2_woz_format::name() const
+{
+	return "a2_woz";
+}
+
+const char *a2_woz_format::description() const
+{
+	return "Apple II WOZ Image";
+}
+
+const char *a2_woz_format::extensions() const
+{
+	return "woz";
+}
+
+bool a2_woz_format::supports_save() const
+{
+	return false;
+}
+
+const uint8_t a2_woz_format::signature[8] = { 0x57, 0x4f, 0x5a, 0x31, 0xff, 0x0a, 0x0d, 0x0a };
+
+int a2_woz_format::identify(io_generic *io, uint32_t form_factor)
+{
+	uint8_t header[8];
+	io_generic_read(io, header, 0, 8);
+	return !memcmp(header, signature, 8) ? 100 : 0;
+}
+
+bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+{
+	std::vector<uint8_t> img(io_generic_size(io));
+	io_generic_read(io, &img[0], 0, img.size());
+
+	// Check signature
+	if(memcmp(&img[0], signature, 8))
+		return false;
+
+	// Check integrity
+	uint32_t crc = crc32r(&img[12], img.size() - 12);
+	if(crc != r32(img, 8))
+		return false;
+
+	uint32_t off_info = find_tag(img, 0x4f464e49);
+	uint32_t off_tmap = find_tag(img, 0x50414d54);
+	uint32_t off_trks = find_tag(img, 0x534b5254);
+
+	if(!off_info || !off_tmap || !off_trks)
+		return false;
+	if(r8(img, off_info + 0) != 1)
+		return false;
+
+	bool is_35 = r8(img, off_info + 1) == 2;
+	if((form_factor == floppy_image::FF_35 && !is_35) || (form_factor == floppy_image::FF_525 && is_35))
+		return false;
+
+	unsigned int limit = is_35 ? 160 : 141;
+	for(unsigned int trkid = 0; trkid != limit; trkid++) {
+		int head = is_35 && trkid >= 80 ? 1 : 0;
+		int track = is_35 ? trkid % 80 : trkid / 4;
+		int subtrack = is_35 ? 0 : trkid & 3;
+
+		uint8_t idx = r8(img, off_tmap + trkid);
+		if(idx != 0xff) {
+			uint32_t boff = off_trks + 6656*idx;
+			generate_track_from_bitstream(track, head, &img[boff], r16(img, boff + 6648), image, subtrack, r16(img, boff + 6650));
+		}
+	}
+
+	return true;
+}
+
+uint32_t a2_woz_format::find_tag(const std::vector<uint8_t> &data, uint32_t tag)
+{
+	uint32_t offset = 12;
+	do {
+		if(r32(data, offset) == tag)
+			return offset + 8;
+		offset += r32(data, offset+4) + 8;
+	} while(offset < data.size() - 8);
+	return 0;
+}
+
+uint32_t a2_woz_format::r32(const std::vector<uint8_t> &data, uint32_t offset)
+{
+	return data[offset] | (data[offset+1] << 8) | (data[offset+2] << 16) | (data[offset+3] << 24);
+}
+
+uint16_t a2_woz_format::r16(const std::vector<uint8_t> &data, uint32_t offset)
+{
+	return data[offset] | (data[offset+1] << 8);
+}
+
+uint8_t a2_woz_format::r8(const std::vector<uint8_t> &data, uint32_t offset)
+{
+	return data[offset];
+}
+
+uint32_t a2_woz_format::crc32r(const uint8_t *data, uint32_t size)
+{
+	// Reversed crc32
+	uint32_t crc = 0xffffffff;
+	for(uint32_t i=0; i != size; i++) {
+		crc = crc ^ data[i];
+		for(int j=0; j<8; j++)
+			if(crc & 1)
+				crc = (crc >> 1) ^ 0xedb88320;
+			else
+				crc = crc >> 1;
+	}
+	return ~crc;
+}
+
+
+const floppy_format_type FLOPPY_WOZ_FORMAT = &floppy_image_format_creator<a2_woz_format>;
