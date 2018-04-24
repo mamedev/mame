@@ -1,0 +1,44 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+/**********************************************************************
+
+    MultiMAX 1MB ROM / 2KB RAM cartridge emulation
+
+**********************************************************************/
+
+#ifndef MAME_BUS_VIC10_MULTIMAX_H
+#define MAME_BUS_VIC10_MULTIMAX_H
+
+#pragma once
+
+#include "exp.h"
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> multimax_t
+
+class multimax_t :  public device_t,
+					public device_vic10_expansion_card_interface
+{
+public:
+	// construction/destruction
+	multimax_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// device_vic10_expansion_card_interface overrides
+	virtual uint8_t vic10_cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) override;
+	virtual void vic10_cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) override;
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(MULTIMAX, multimax_t)
+
+#endif // MAME_BUS_VIC10_MULTIMAX_H
