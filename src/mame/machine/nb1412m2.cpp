@@ -229,29 +229,13 @@ READ8_MEMBER( nb1412m2_device::rom_decrypt_r )
 {
 	uint8_t prot_adj;
 
-	// TODO: provided by commands 0x35 & 0x36 (maybe 0x32 too)
-	switch(m_data[m_adj_address])
-	{
-		// common, most games uses this
-		case 0xff:
-			prot_adj = 0x44;
-			break;
-		// Mighty Guy specific
-		case 0x86: // SFXs
-			prot_adj = 0xbd;
-			break;
-		case 0x94: // BGM
-			prot_adj = 0xaf; // 0xef
-			break;
-		case 0x00: // DAC
-			prot_adj = 0x43; // matches address 0x840 at POST (first valid 8-bit data for DAC)
-			//machine().debug_break();
-			break;
-		default:
-			prot_adj = 0;
-			popmessage("nb1412m2: prot adjust %02x, contact MAMEdev",m_data[m_adj_address]);
-			break;
-	}
+	// all games but Mighty Guy uses this form as protection:
+	// 0xff: -> 0x44
+	// Mighty Guy variants
+	// 0x86: SFXs -> 0xbd
+	// 0x94: BGM  -> 0xaf
+	// 0x00: DAC  -> 0x43
+	prot_adj = (0x43 - m_data[m_adj_address]) & 0xff;
 
 //	printf("%02x %04x %04x %02x\n",m_data[m_adj_address],m_rom_address,m_adj_address,m_rom_op);
 	
