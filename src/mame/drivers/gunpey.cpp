@@ -384,17 +384,15 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 					if (xi2 & 1)
 					{
 						pix = (data & 0xf0)>>4;
-						col_offs = ((pix + color*0x10) & 0xff) << 1;
-						col_offs+= ((pix + color*0x10) >> 8)*0x800;
-						color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
 					}
 					else
 					{
 						pix = (data & 0x0f);
-						col_offs = ((pix + color*0x10) & 0xff) << 1;
-						col_offs+= ((pix + color*0x10) >> 8)*0x800;
-						color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
 					}
+
+					col_offs = ((pix + color*0x10) & 0xff) << 1;
+					col_offs+= ((pix + color*0x10) >> 8)*0x800;
+					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
 					{
