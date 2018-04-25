@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Couriersud
+// copyright-holders:smf, Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
 /***************************************************************************
 

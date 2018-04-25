@@ -32,6 +32,7 @@ SOUND : YM2151 uPD7759C
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/315_5338a.h"
 #include "machine/gen_latch.h"
 #include "machine/i8251.h"
 #include "sound/ym2151.h"
@@ -143,8 +144,8 @@ void bingoc_state::main_map(address_map &map)
 	map(0x100033, 0x100033).rw("uart7", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x100039, 0x100039).rw("uart8", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x10003b, 0x10003b).rw("uart8", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x180000, 0x18007f).r(this, FUNC(bingoc_state::unknown_r)); //lamps?
-#if !SOUND_TEST
+	map(0x180000, 0x18001f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write)).umask16(0x00ff); //lamps?
+#if 0 // !SOUND_TEST
 	map(0x180010, 0x180011).w(this, FUNC(bingoc_state::main_sound_latch_w)); //WRONG there...
 #endif
 	map(0xff8000, 0xffffff).ram();
@@ -195,6 +196,8 @@ MACHINE_CONFIG_START(bingoc_state::bingoc)
 	MCFG_DEVICE_ADD("uart6", I8251, 4000000) // unknown
 	MCFG_DEVICE_ADD("uart7", I8251, 4000000) // unknown
 	MCFG_DEVICE_ADD("uart8", I8251, 4000000) // unknown
+
+	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0) // ?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

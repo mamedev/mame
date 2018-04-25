@@ -118,7 +118,7 @@ public:
 	virtual ~device_sr_card_interface();
 
 	void set_sr_device();
-	void irq(int status);
+	void irq(int state);
 
 	// inline configuration
 	void set_sr_tag(const char *tag, const char *slot_tag) { m_sr_tag = tag; m_sr_slot_tag = slot_tag; }

@@ -444,9 +444,10 @@ void casloopy_state::casloopy_map(address_map &map)
 }
 
 #if 0
-ADDRESS_MAP_START(casloopy_state::casloopy_sub_map)
-	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("subcpu",0)
-ADDRESS_MAP_END
+void casloopy_state::casloopy_sub_map(address_map &map)
+{
+	map(0xf80000, 0xffffff).rom().region("subcpu",0);
+}
 #endif
 
 static INPUT_PORTS_START( casloopy )

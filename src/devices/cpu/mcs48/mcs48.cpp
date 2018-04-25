@@ -167,29 +167,35 @@ DEFINE_DEVICE_TYPE(M58715, m58715_device, "m58715", "M58715")
 ***************************************************************************/
 
 /* FIXME: the memory maps should probably support rom banking for EA */
-ADDRESS_MAP_START(mcs48_cpu_device::program_10bit)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_10bit(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::program_11bit)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_11bit(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::program_12bit)
-	AM_RANGE(0x000, 0xfff) AM_ROM
-ADDRESS_MAP_END
+void mcs48_cpu_device::program_12bit(address_map &map)
+{
+	map(0x000, 0xfff).rom();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_6bit)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_6bit(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_7bit)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_7bit(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
-ADDRESS_MAP_START(mcs48_cpu_device::data_8bit)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void mcs48_cpu_device::data_8bit(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 
 mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)

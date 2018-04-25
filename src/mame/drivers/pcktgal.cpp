@@ -228,7 +228,6 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)
 	MCFG_CPU_PROGRAM_MAP(pcktgal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pcktgal_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
 	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)
@@ -243,6 +242,7 @@ MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgal)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcktgal)
 	MCFG_PALETTE_ADD("palette", 512)

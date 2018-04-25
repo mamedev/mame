@@ -40,6 +40,7 @@ public:
 		m_rom(*this, Z80_TAG),
 		m_char_rom(*this, "chargen"),
 		m_y(*this, "Y%u", 0),
+		m_digits(*this, "digit%u", 0U),
 		m_pwrup(0),
 		m_userint(1),
 		m_clkint(1),
@@ -113,6 +114,7 @@ protected:
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
 	required_ioport_array<16> m_y;
+	output_finder<16> m_digits;
 
 	int m_clk;
 	int m_tvp;

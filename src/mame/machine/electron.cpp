@@ -18,9 +18,9 @@ void electron_state::waitforramsync()
 {
 	int cycles = 0;
 
-	if (!(m_ula.screen_mode & 4) && m_screen->hpos()<640)
+	if (!(m_ula.screen_mode & 4) && (m_screen->vpos() > m_screen->visible_area().min_y) && (m_screen->vpos() < m_screen->visible_area().max_y) && !m_screen->hblank())
 	{
-		cycles += (640 - m_screen->hpos()) / 8;
+		cycles += (m_screen->visible_area().max_x - m_screen->hpos()) / 16;
 	}
 	if (cycles & 1) cycles++;
 
@@ -156,7 +156,7 @@ READ8_MEMBER(electron_state::electron_mem_r)
 	case 0x00: /* Normal */
 		/* The processor will run at 1MHz during an access cycle to the RAM */
 		m_maincpu->set_clock_scale(0.5f);
-		//waitforramsync();
+		waitforramsync();
 		break;
 
 	case 0x01: /* Turbo */
@@ -177,7 +177,7 @@ WRITE8_MEMBER(electron_state::electron_mem_w)
 	case 0x00: /* Normal */
 		/* The processor will run at 1MHz during an access cycle to the RAM */
 		m_maincpu->set_clock_scale(0.5f);
-		//waitforramsync();
+		waitforramsync();
 		break;
 
 	case 0x01: /* Turbo */
@@ -335,7 +335,8 @@ READ8_MEMBER(electron_state::electron_sheila_r)
 }
 
 static const int electron_palette_offset[4] = { 0, 4, 5, 1 };
-static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
+static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x6000 };
+static const int electron_mode_end[8] = { 255, 255, 255 ,249 ,255, 255, 249, 249 };
 
 WRITE8_MEMBER(electron_state::electron_sheila_w)
 {
@@ -358,7 +359,7 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
 	case 0x03:  /* Screen start address #2 */
-		m_ula.screen_start = ( m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
+		m_ula.screen_start = ( m_ula.screen_start & 0x1ff ) | ( ( data & 0x3f ) << 9 );
 		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
 	case 0x04:  /* Cassette data shift register */
@@ -429,22 +430,22 @@ WRITE8_MEMBER(electron_state::electron_sheila_w)
 		m_ula.screen_mode = ( data >> 3 ) & 0x07;
 		m_ula.screen_base = electron_screen_base[ m_ula.screen_mode ];
 		m_ula.screen_size = 0x8000 - m_ula.screen_base;
-		m_ula.vram = (uint8_t *)m_ram->pointer() + m_ula.screen_base;
+		m_ula.screen_dispend = electron_mode_end[ m_ula.screen_mode ];
 		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
 		m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
 		m_cassette->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
 		m_ula.capslock_mode = ( data >> 7 ) & 0x01;
 		output().set_value("capslock_led", m_ula.capslock_mode);
 		break;
-	case 0x08: case 0x0A: case 0x0C: case 0x0E:
-		// video_update
-		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 1));
+	case 0x08: case 0x0a: case 0x0c: case 0x0e:
+		/* colour palette */
+		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 2));
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x01) | (((data & 0x40) >> 4) | ((data & 0x04) >> 1));
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x03) | ((data & 0x20) >> 3);
 		m_ula.current_pal[i] = (m_ula.current_pal[i] & 0x03) | ((data & 0x10) >> 2);
 		break;
-	case 0x09: case 0x0B: case 0x0D: case 0x0F:
-		// video_update
+	case 0x09: case 0x0b: case 0x0d: case 0x0f:
+		/* colour palette */
 		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
@@ -494,9 +495,8 @@ void electron_state::machine_reset()
 	m_ula.screen_start = 0x3000;
 	m_ula.screen_base = 0x3000;
 	m_ula.screen_size = 0x8000 - 0x3000;
-	m_ula.screen_addr = 0;
+	m_ula.screen_addr = 0x3000;
 	m_ula.tape_running = 0;
-	m_ula.vram = (uint8_t *)m_ram->pointer() + m_ula.screen_base;
 
 	m_mrb_mapped = true;
 	m_vdu_drivers = false;

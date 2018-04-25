@@ -25,9 +25,10 @@ const device_type HD61830B = HD61830;
 
 
 // default address map
-ADDRESS_MAP_START(hd61830_device::hd61830)
-	AM_RANGE(0x0000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void hd61830_device::hd61830(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
 
 
 // internal character generator ROM

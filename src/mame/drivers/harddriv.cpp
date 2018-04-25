@@ -1822,6 +1822,16 @@ MACHINE_CONFIG_START(racedrivc_panorama_side_board_device_state::device_add_mcon
 
 	multisync_nomsp(config);
 
+	MCFG_DEVICE_MODIFY("adc8") // 8-bit analog inputs read but not used?
+	MCFG_ADC0808_IN0_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN1_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN2_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN3_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN4_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN5_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN6_CB(CONSTANT(0xff))
+	MCFG_ADC0808_IN7_CB(CONSTANT(0xff))
+
 	/* basic machine hardware */        /* multisync board without MSP */
 	adsp(config);                       /* ADSP board */
 //  dsk(config);                        /* DSK board */

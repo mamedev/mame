@@ -110,17 +110,19 @@ DEFINE_DEVICE_TYPE_NS(HX5102, bus::hexbus, hx5102_device, "ti_hx5102", "TI Hexbu
 
 namespace bus { namespace hexbus {
 
-ADDRESS_MAP_START(hx5102_device::memmap)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void hx5102_device::memmap(address_map &map)
+{
+	map(0x0000, 0xffff).rw(this, FUNC(hx5102_device::read), FUNC(hx5102_device::write));
+}
 
 /*
     CRU access to CRU addresses 1700 - 17FE)
 */
-ADDRESS_MAP_START(hx5102_device::crumap)
-	AM_RANGE(0x17e0>>4,0x17fe>>4) AM_READ(cruread)
-	AM_RANGE(0x17e0>>1,0x17fe>>1) AM_WRITE(cruwrite)
-ADDRESS_MAP_END
+void hx5102_device::crumap(address_map &map)
+{
+	map(0x17e0>>4, 0x17fe>>4).r(this, FUNC(hx5102_device::cruread));
+	map(0x17e0>>1, 0x17fe>>1).w(this, FUNC(hx5102_device::cruwrite));
+}
 
 hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
 	hexbus_chained_device(mconfig, HX5102, tag, owner, clock),

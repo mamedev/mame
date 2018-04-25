@@ -60,7 +60,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 			res_x = x + xi;
 			res_y = y;
 
-			pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x20000)];
+			pen = ext_gvram[(address >> 1)*16+xi+(m_vram_disp*0x40000)];
 
 			bitmap.pix32(res_y, res_x) = palette[pen + 0x20];
 		}
@@ -167,7 +167,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					int res_x,res_y;
 
 					res_x = ((x+kanji_lr)*8+xi) * (m_video_ff[WIDTH40_REG]+1);
-					res_y = y+yi - (m_txt_scroll_reg[3] & 0xf);
+					res_y = y+yi - (m_txt_scroll_reg[3] % 20);
 
 					if(!m_screen->visible_area().contains(res_x, res_y))
 						continue;

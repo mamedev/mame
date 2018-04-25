@@ -429,12 +429,13 @@ void pcd_video_device::device_reset()
 	m_t1 = CLEAR_LINE;
 }
 
-ADDRESS_MAP_START(pcd_video_device::map)
-	AM_RANGE(0x00, 0x0f) AM_DEVWRITE8("crtc", scn2674_device, write, 0x00ff)
-	AM_RANGE(0x00, 0x0f) AM_DEVREAD8("crtc", scn2674_device, read, 0xff00)
-	AM_RANGE(0x20, 0x21) AM_WRITE8(vram_sw_w, 0x00ff)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE8("graphics", i8741_device, upi41_master_r, upi41_master_w, 0x00ff)
-ADDRESS_MAP_END
+void pcd_video_device::map(address_map &map)
+{
+	map(0x00, 0x0f).w("crtc", FUNC(scn2674_device::write)).umask16(0x00ff);
+	map(0x00, 0x0f).r("crtc", FUNC(scn2674_device::read)).umask16(0xff00);
+	map(0x20, 0x20).w(this, FUNC(pcd_video_device::vram_sw_w));
+	map(0x30, 0x33).rw("graphics", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w)).umask16(0x00ff);
+}
 
 void pcx_video_device::device_start()
 {
@@ -457,9 +458,10 @@ void pcx_video_device::device_reset()
 	m_txd_handler(1);
 }
 
-ADDRESS_MAP_START(pcx_video_device::map)
-	AM_RANGE(0x0, 0xf) AM_READWRITE8(term_r, term_w, 0xffff)
-ADDRESS_MAP_END
+void pcx_video_device::map(address_map &map)
+{
+	map(0x0, 0xf).rw(this, FUNC(pcx_video_device::term_r), FUNC(pcx_video_device::term_w));
+}
 
 READ8_MEMBER(pcx_video_device::rx_callback)
 {

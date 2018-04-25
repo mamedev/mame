@@ -93,13 +93,15 @@ DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "Texas Instruments TMS
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms32031_device::internal_32031)
-	AM_RANGE(0x809800, 0x809fff) AM_RAM
-ADDRESS_MAP_END
+void tms32031_device::internal_32031(address_map &map)
+{
+	map(0x809800, 0x809fff).ram();
+}
 
-ADDRESS_MAP_START(tms32032_device::internal_32032)
-	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
-ADDRESS_MAP_END
+void tms32032_device::internal_32032(address_map &map)
+{
+	map(0x87fe00, 0x87ffff).ram();
+}
 
 
 // ROM definitions for the internal boot loader programs

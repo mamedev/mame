@@ -112,12 +112,12 @@ void isa8_pgc_device::pgc_map(address_map &map)
 	map(0x00000, 0x07fff).rom();
 	map(0x08000, 0x0ffff).rom().region("maincpu", 0x8000);
 	map(0x10000, 0x1001f).rw(this, FUNC(isa8_pgc_device::stateparam_r), FUNC(isa8_pgc_device::stateparam_w));
-//	map(0x18000, 0x18fff).ram();   // ??
+//  map(0x18000, 0x18fff).ram();   // ??
 	map(0x28000, 0x287ff).ram().region("commarea", 0).mirror(0x800);
 	map(0x32001, 0x32001).nopw();
 	map(0x32020, 0x3203f).w(this, FUNC(isa8_pgc_device::accel_w));
 	map(0x3c000, 0x3c001).r(this, FUNC(isa8_pgc_device::init_r));
-//	map(0x3e000, 0x3efff).ram();   // ??
+//  map(0x3e000, 0x3efff).ram();   // ??
 	map(0x80000, 0xf7fff).rw(this, FUNC(isa8_pgc_device::vram_r), FUNC(isa8_pgc_device::vram_w));
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0x8000);
 }

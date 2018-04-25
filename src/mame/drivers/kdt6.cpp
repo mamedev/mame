@@ -197,9 +197,9 @@ void kdt6_state::psi98_io(address_map &map)
 	map(0x3b, 0x3b).rw(this, FUNC(kdt6_state::sasi_ctrl_r), FUNC(kdt6_state::sasi_ctrl_w));
 	map(0x3c, 0x3c).w(this, FUNC(kdt6_state::dma_map_w));
 #if 0
-	AM_RANGE(0x3d, 0x3d) WATCHDOG
-	AM_RANGE(0x3e, 0x3e) WATCHDOG TRIGGER
-	AM_RANGE(0x3f, 0x3f) SASI DATA
+	map(0x3d, 0x3d) WATCHDOG
+	map(0x3e, 0x3e) WATCHDOG TRIGGER
+	map(0x3f, 0x3f) SASI DATA
 #endif
 	map(0x40, 0x40).w(this, FUNC(kdt6_state::video_address_latch_high_w));
 	map(0x41, 0x41).w(this, FUNC(kdt6_state::video_address_latch_low_w));

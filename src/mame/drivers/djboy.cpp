@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(djboy_state::djboy)
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(djboy_state, beast_p3_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-	
+
 	MCFG_GENERIC_LATCH_8_ADD("slavelatch")
 
 	MCFG_GENERIC_LATCH_8_ADD("beastlatch")

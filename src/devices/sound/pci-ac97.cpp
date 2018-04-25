@@ -5,17 +5,21 @@
 
 DEFINE_DEVICE_TYPE(AC97, ac97_device, "ac97", "AC'97 Audio")
 
-ADDRESS_MAP_START(ac97_device::native_audio_mixer_map)
-ADDRESS_MAP_END
+void ac97_device::native_audio_mixer_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(ac97_device::native_audio_bus_mastering_map)
-ADDRESS_MAP_END
+void ac97_device::native_audio_bus_mastering_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(ac97_device::mixer_map)
-ADDRESS_MAP_END
+void ac97_device::mixer_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(ac97_device::bus_mastering_map)
-ADDRESS_MAP_END
+void ac97_device::bus_mastering_map(address_map &map)
+{
+}
 
 ac97_device::ac97_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, AC97, tag, owner, clock)

@@ -458,7 +458,7 @@ CUSTOM_INPUT_MEMBER(psikyo_state::z80_nmi_r)
 		/* main CPU might be waiting for sound CPU to finish NMI,
 		   so set a timer to give sound CPU a chance to run */
 		machine().scheduler().synchronize();
-//      logerror("%s - Read coin port during Z80 NMI\n", machine.describe_context());
+//      logerror("%s - Read coin port during Z80 NMI\n", machine().describe_context());
 	}
 
 	return ret;

@@ -27,8 +27,10 @@ HD68HC000P12 CPU, 12MHz XTAL
 PCB label 510-1129A01
 PCB has edge connector for module, but no external slot
 
-There's room for 2 SIMMs at U22 and U23. Unpopulated in Excel 68000, used for
-128KB hashtable RAM in Mach II. Mach III has wire mods to U8/U9(2*8KB + 2*32KB piggybacked).
+There's room for 2 SIMMs at U22 and U23, unpopulated in Excel 68000 and Mach III.
+Mach II has 2*64KB DRAM with a MB1422A DRAM controller @ 25MHz.
+Mach III has wire mods from U22/U23 to U8/U9(2*8KB + 2*32KB piggybacked).
+Mach IV has 2*256KB DRAM, and a daughterboard(510.1123B01) for the 68020.
 
 I/O is via TTL, overall very similar to EAG.
 
@@ -701,10 +703,22 @@ ROM_START( fex68k ) // model 6094, PCB label 510.1120B01
 	ROM_LOAD16_BYTE("o4_red.u7",    0x00001, 0x08000, CRC(560a14b7) SHA1(11f2375255bfa229314697f103e891ba1cf0c715) ) // "
 ROM_END
 
+ROM_START( fex68ka )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("e3_yellow.u6", 0x00000, 0x08000, CRC(7dc60d05) SHA1(e47b4d4e64c4cac6c5a94a900c9f2dd017f849ce) )
+	ROM_LOAD16_BYTE("o4_red.u7",    0x00001, 0x08000, CRC(4b738583) SHA1(ff506296ea460c7ed852339d2ab24aaae01730d8) )
+ROM_END
+
+ROM_START( fex68kb )
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("e3_yellow.u6", 0x00000, 0x08000, CRC(d9f252f5) SHA1(205cdbadb58a4cdd486d4e40d2fe6a5209d2f8a4) )
+	ROM_LOAD16_BYTE("o4_red.u7",    0x00001, 0x08000, CRC(3bf8b3d7) SHA1(6ce419c63159501d2349abfd1e142e38e5466fbc) )
+ROM_END
+
 ROM_START( fex68km2 ) // model 6097, PCB label 510.1120B01
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("fex68km2.u6", 0x00000, 0x08000, CRC(2e65e7ad) SHA1(4f3aec12041c9014d5d700909bac66bae1f9eadf) )
-	ROM_LOAD16_BYTE("fex68km2.u7", 0x00001, 0x08000, CRC(4c20334a) SHA1(2e575b88c41505cc89599d2fc13e1e84fe474469) )
+	ROM_LOAD16_BYTE("e6_yellow.u6", 0x00000, 0x08000, CRC(2e65e7ad) SHA1(4f3aec12041c9014d5d700909bac66bae1f9eadf) ) // 27c256
+	ROM_LOAD16_BYTE("o7_red.u7",    0x00001, 0x08000, CRC(4c20334a) SHA1(2e575b88c41505cc89599d2fc13e1e84fe474469) ) // "
 ROM_END
 
 ROM_START( fex68km3 ) // model 6098, PCB label 510.1120B01
@@ -782,7 +796,9 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT   CMP MACHINE   INPUT    STATE           INIT      COMPANY, FULLNAME, FLAGS
-CONS( 1987, fex68k,   0,        0, fex68k,   fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68k,   0,        0, fex68k,   fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68ka,  fex68k,   0, fex68k,   fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1987, fex68kb,  fex68k,   0, fex68k,   fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fex68km2, fex68k,   0, fex68km2, fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 Mach II (rev. C+)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1988, fex68km3, fex68k,   0, fex68km3, fex68k,  fidel68k_state, 0,        "Fidelity Electronics", "Excel 68000 Mach III Master", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 

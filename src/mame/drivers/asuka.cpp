@@ -38,7 +38,7 @@ The other games seem identical but Eto is slightly different.
 0x400000 - 0x40000f : input ports and dipswitches
 0x3a0000 - 0x3a0003 : sprite control
 0x3e0000 - 0x3e0003 : communication with sound CPU
-0xc00000 - 0xc2000f : TC0100SCN (see taitoic.c)
+0xc00000 - 0xc2000f : TC0100SCN (see video/tc0100scn.cpp)
 0xd00000 - 0xd007ff : sprite RAM
 
 
@@ -261,14 +261,8 @@ INTERRUPT_GEN_MEMBER(asuka_state::cadash_interrupt)
 
 WRITE8_MEMBER(asuka_state::sound_bankswitch_w)
 {
-	membank("audiobank")->set_entry(data & 0x03);
+	m_audiobank->set_entry(data & 0x03);
 }
-
-WRITE8_MEMBER(asuka_state::sound_bankswitch_2151_w)
-{
-	membank("audiobank")->set_entry(data & 0x03);
-}
-
 
 
 WRITE_LINE_MEMBER(asuka_state::asuka_msm5205_vck)
@@ -798,7 +792,7 @@ GFXDECODE_END
 void asuka_state::machine_start()
 {
 	/* configure the banks */
-	membank("audiobank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x04000);
+	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x04000);
 
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_ff));
@@ -961,7 +955,7 @@ MACHINE_CONFIG_START(asuka_state::asuka)
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(asuka_state,sound_bankswitch_2151_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
@@ -1037,7 +1031,7 @@ MACHINE_CONFIG_START(asuka_state::cadash)
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(8'000'000)/2)   /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(asuka_state,sound_bankswitch_2151_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
@@ -1100,7 +1094,7 @@ MACHINE_CONFIG_START(asuka_state::mofflott)
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(asuka_state,sound_bankswitch_2151_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
@@ -1171,7 +1165,7 @@ MACHINE_CONFIG_START(asuka_state::eto)
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(asuka_state,sound_bankswitch_2151_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(MEMBANK("audiobank")) MCFG_DEVCB_MASK(0x03)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 

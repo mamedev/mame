@@ -32,26 +32,14 @@ class chexx_state : public driver_device
 {
 public:
 	chexx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_via(*this, "via6522"),
-			m_digitalker(*this, "digitalker"),
-			m_aysnd(*this, "aysnd")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_via(*this, "via6522")
+		, m_digitalker(*this, "digitalker")
+		, m_aysnd(*this, "aysnd")
+		, m_digits(*this, "digit%u", 0U)
 	{
 	}
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<via6522_device> m_via;
-	required_device<digitalker_device> m_digitalker;
-	optional_device<ay8910_device> m_aysnd; // only faceoffh
-
-	// vars
-	uint8_t  m_port_a, m_port_b;
-	uint8_t  m_bank;
-	uint32_t m_shift;
-	uint8_t  m_lamp;
-	uint8_t  m_ay_cmd, m_ay_data;
 
 	// callbacks
 	TIMER_DEVICE_CALLBACK_MEMBER(update);
@@ -73,16 +61,32 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_w);
 	DECLARE_WRITE8_MEMBER(lamp_w);
 
+	void faceoffh(machine_config &config);
+	void chexx83(machine_config &config);
+	void chexx83_map(address_map &map);
+	void faceoffh_map(address_map &map);
+
+private:
+	// vars
+	uint8_t  m_port_a, m_port_b;
+	uint8_t  m_bank;
+	uint32_t m_shift;
+	uint8_t  m_lamp;
+	uint8_t  m_ay_cmd, m_ay_data;
+
 	// digitalker
 	void digitalker_set_bank(uint8_t bank);
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void faceoffh(machine_config &config);
-	void chexx83(machine_config &config);
-	void chexx83_map(address_map &map);
-	void faceoffh_map(address_map &map);
+
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<via6522_device> m_via;
+	required_device<digitalker_device> m_digitalker;
+	optional_device<ay8910_device> m_aysnd; // only faceoffh
+	output_finder<4> m_digits;
 };
 
 
@@ -139,13 +143,12 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 	m_shift = ((m_shift << 1) & 0xffffff) | state;
 
 	// 7segs (score)
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	constexpr uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 
-	output().set_digit_value(0, patterns[(m_shift >> (16+4)) & 0xf]);
-	output().set_digit_value(1, patterns[(m_shift >> (16+0)) & 0xf]);
-
-	output().set_digit_value(2, patterns[(m_shift >>  (8+4)) & 0xf]);
-	output().set_digit_value(3, patterns[(m_shift >>  (8+0)) & 0xf]);
+	m_digits[0] = patterns[(m_shift >> (16+4)) & 0xf];
+	m_digits[1] = patterns[(m_shift >> (16+0)) & 0xf];
+	m_digits[2] = patterns[(m_shift >>  (8+4)) & 0xf];
+	m_digits[3] = patterns[(m_shift >>  (8+0)) & 0xf];
 
 	// Leds (period being played)
 	output().set_led_value(0, BIT(m_shift,2));
@@ -258,6 +261,7 @@ INPUT_PORTS_END
 
 void chexx_state::machine_start()
 {
+	m_digits.resolve();
 }
 
 void chexx_state::digitalker_set_bank(uint8_t bank)

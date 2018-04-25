@@ -1365,7 +1365,11 @@ READ16_MEMBER(pc9801_state::pc9821_grcg_gvram_r)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
-		return space.read_word(0xf00000|(offset*2)|((m_analog256.write_bank)*0x8000),mem_mask);
+		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
+		int bank = offset >> 14;
+		if(bank <= 1)
+			return ext_gvram[((m_analog256.bank[bank])*0x4000) + (offset & 0x3fff)];
+		return 0xffff;
 	}
 
 	return grcg_gvram_r(space,offset,mem_mask);
@@ -1375,7 +1379,10 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram_w)
 {
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
-		space.write_word(0xf00000|(offset*2)|(m_analog256.write_bank*0x8000),data,mem_mask);
+		u16 *ext_gvram = (u16 *)m_ext_gvram.target();
+		int bank = offset >> 14;
+		if(bank <= 1)
+			COMBINE_DATA(&ext_gvram[((m_analog256.bank[bank])*0x4000) + (offset & 0x3fff)]);
 		return;
 	}
 
@@ -1388,8 +1395,8 @@ READ16_MEMBER(pc9801_state::pc9821_grcg_gvram0_r)
 	{
 		switch(offset*2)
 		{
-			case 4: return m_analog256.write_bank;
-//          case 6: return m_analog256.read_bank;
+			case 4: return m_analog256.bank[0];
+			case 6: return m_analog256.bank[1];
 		}
 
 		//return 0;
@@ -1403,12 +1410,15 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
 	if(m_ex_video_ff[ANALOG_256_MODE])
 	{
 		//printf("%08x %08x\n",offset*2,data);
-		switch(offset*2)
+		if(mem_mask & 0xff)
 		{
-			case 4: COMBINE_DATA(&m_analog256.write_bank); break;
-//          case 6: COMBINE_DATA(&m_analog256.read_bank); break;
+			switch(offset*2)
+			{
+				case 4: m_analog256.bank[0] = data & 0xf; break;
+				case 6: m_analog256.bank[1] = data & 0xf; break;
+			}
 		}
-		//return;
+		return;
 	}
 
 	grcg_gvram0_w(space,offset,data,mem_mask);
@@ -1417,17 +1427,18 @@ WRITE16_MEMBER(pc9801_state::pc9821_grcg_gvram0_w)
 
 void pc9801_state::pc9821_map(address_map &map)
 {
-	//AM_RANGE(0x00080000, 0x0009ffff) AM_READWRITE8(winram_r, winram_w, 0xffffffff)
+	//map(0x00080000, 0x0009ffff).rw(this, FUNC(pc9801_state::winram_r), FUNC(pc9801_state::winram_w))
 	map(0x000a0000, 0x000a3fff).rw(this, FUNC(pc9801_state::tvram_r), FUNC(pc9801_state::tvram_w));
 	map(0x000a4000, 0x000a4fff).rw(this, FUNC(pc9801_state::pc9801rs_knjram_r), FUNC(pc9801_state::pc9801rs_knjram_w));
 	map(0x000a8000, 0x000bffff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram_r), FUNC(pc9801_state::pc9821_grcg_gvram_w));
 	map(0x000cc000, 0x000cdfff).rom().region("sound_bios", 0); //sound BIOS
-//  AM_RANGE(0x000d8000, 0x000d9fff) AM_ROM AM_REGION("ide",0)
+	//map(0x000d8000, 0x000d9fff).rom().region("ide",0)
 	map(0x000da000, 0x000dbfff).ram(); // ide ram
 	map(0x000e0000, 0x000e7fff).rw(this, FUNC(pc9801_state::pc9821_grcg_gvram0_r), FUNC(pc9801_state::pc9821_grcg_gvram0_w));
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 	map(0x00f00000, 0x00f9ffff).ram().share("ext_gvram");
 	map(0xffee8000, 0xffefffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+	map(0xfff00000, 0xfff9ffff).ram().share("ext_gvram");
 	map(0xfffe8000, 0xffffffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 }
 
@@ -1483,6 +1494,7 @@ void pc9801_state::pc9821_io(address_map &map)
 //  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
+	map(0x2ed0, 0x2edf).r(read8_delegate([](address_space &s, offs_t o, u8 mm) { return 0xff; }, "pc9821_unkaudio")).umask32(0xffffffff); // unknown sound related
 	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
 	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
 	map(0x841c, 0x841f).rw(this, FUNC(pc9801_state::sdip_0_r), FUNC(pc9801_state::sdip_0_w));
@@ -2265,12 +2277,21 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_sasi)
 	MCFG_I8237_OUT_IOW_0_CB(WRITE8(pc9801_state, sasi_data_w))
 MACHINE_CONFIG_END
 
+void pc9801_state::cdrom_headphones(device_t *device)
+{
+	device = device->subdevice("cdda");
+	MCFG_SOUND_ROUTE(0, "^^^^lheadphone", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^rheadphone", 1.0)
+}
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
+	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide1_irq_w))
 	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide2_irq_w))
+	MCFG_DEVICE_MODIFY("ide2:0")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("pc9801_cd", cdrom_headphones)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pc98_cd")
 MACHINE_CONFIG_END
@@ -2670,10 +2691,48 @@ ROM_END
 /*
 VM - V30 8/10
 
-TODO: this ISN'T a real VM model!
+TODO: doesn't boot, missing roms?
 */
 
 ROM_START( pc9801vm )
+	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
+//	ROM_LOAD( "itf_ux.rom",  0x10000, 0x08000, BAD_DUMP CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
+//	ROM_LOAD( "bios_vm.rom", 0x18000, 0x18000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
+	// bios
+    ROM_LOAD16_BYTE( "cpu_board_1a_23128e.bin",   0x10001, 0x4000, CRC(9965c914) SHA1(1ed318b774340bd532ef02ac02f39a012354dbf8) )
+    ROM_LOAD16_BYTE( "cpu_board_4a_d23128ec.bin", 0x10000, 0x4000, CRC(e7c24a70) SHA1(cc9584b8e56b391f103e9d559d397d0bc6d00b35) )
+	// itf
+    ROM_LOAD16_BYTE( "cpu_board_2a_d23c256ec.bin", 0x18001, 0x8000, CRC(3874970d) SHA1(e50ec5ae38f00dbfd156288dd42c7f2a2bf8bc35) )
+    ROM_LOAD16_BYTE( "cpu_board_3a_23c256e.bin",   0x18000, 0x8000, CRC(4128276e) SHA1(32acb7eee779a31838a17ce51b05a9a987af4099) )
+
+	ROM_REGION( 0x10000, "sound_bios", ROMREGION_ERASEFF )
+	// unknown if present on this board
+//	ROM_LOAD( "sound_vm.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+//	ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+	// TODO: it invertes X pixel order and loads 8x8 charset bank in interleaved form, needs mods in own driver_init
+    ROM_LOAD( "main_board_12f_d2364ec.bin", 0x000000, 0x002000, CRC(11197271) SHA1(8dbd2f25daeed545ea2c74d849f0a209ceaf4dd7) )
+	// contains some 8x16 chars
+    ROM_LOAD( "main_board_8h_d23256ac.bin", 0x002000, 0x008000, CRC(62a32ba6) SHA1(cdab480ae0dad9d128e52afb15e6c0b2b122cc3f) )
+
+	ROM_REGION( 0x40000, "unk", 0 )
+	// on main board, uPD23100 type roms
+	// probably kanji roms by judging the size of them
+	ROM_LOAD( "231000-1-535", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD( "231000-1-536", 0x20000, 0x20000, NO_DUMP )
+	
+	LOAD_KANJI_ROMS
+//  LOAD_IDE_ROM
+ROM_END
+
+/*
+VM11 - V30 8/10
+
+TODO: this ISN'T a real VM11 model!
+*/
+
+ROM_START( pc9801vm11 )
 	ROM_REGION( 0x30000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_ux.rom",  0x10000, 0x08000, BAD_DUMP CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
 	ROM_LOAD( "bios_vm.rom", 0x18000, 0x18000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
@@ -2687,6 +2746,8 @@ ROM_START( pc9801vm )
 	LOAD_KANJI_ROMS
 //  LOAD_IDE_ROM
 ROM_END
+
+
 
 /*
 98MATE A - 80486SX 25
@@ -2943,10 +3004,11 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 
 /* Genuine dumps */
 COMP( 1983, pc9801f,   0,        0,     pc9801,    pc9801,   pc9801_state, pc9801_kanji, "NEC",   "PC-9801F",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1985, pc9801vm,  pc9801ux, 0,     pc9801vm,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801VM",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 /* TODO: ANYTHING below there needs REDUMPING! */
 COMP( 1989, pc9801rs,  0,        0,     pc9801rs,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801RS",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: not sure about the exact model
-COMP( 1985, pc9801vm,  pc9801ux, 0,     pc9801vm,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801VM",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1985, pc9801vm11,  pc9801ux, 0,   pc9801vm,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801VM11",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1987, pc9801ux,  0,        0,     pc9801ux,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801UX",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1988, pc9801rx,  pc9801rs, 0,     pc9801rs,  pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801RX",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1993, pc9801bx2, pc9801rs, 0,     pc9801bx2, pc9801rs, pc9801_state, pc9801_kanji, "NEC",   "PC-9801BX2/U2",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

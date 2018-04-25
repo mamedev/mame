@@ -251,10 +251,8 @@ public:
 	void set_pc(offs_t pc) { set_state_int(STATE_GENPC, pc); }
 
 	// deliberately ambiguous functions; if you have the state interface
-	// just use it or pc() and pcbase() directly
+	// just use it directly
 	device_state_interface &state() { return *this; }
-	offs_t safe_pc() { return pc(); }
-	offs_t safe_pcbase() { return pcbase(); }
 
 public: // protected eventually
 
@@ -310,33 +308,5 @@ protected:
 
 // iterator
 typedef device_interface_iterator<device_state_interface> state_interface_iterator;
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_t::safe_pc - return the current PC
-//  or 0 if no state object exists
-//-------------------------------------------------
-
-inline offs_t device_t::safe_pc() const
-{
-	return (m_interfaces.m_state != nullptr) ? m_interfaces.m_state->pc() : 0;
-}
-
-
-//-------------------------------------------------
-//  device_t::safe_pcbase - return the current PC
-//  base or 0 if no state object exists
-//-------------------------------------------------
-
-inline offs_t device_t::safe_pcbase() const
-{
-	return (m_interfaces.m_state != nullptr) ? m_interfaces.m_state->pcbase() : 0;
-}
-
 
 #endif  /* MAME_EMU_DISTATE_H */

@@ -155,6 +155,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ncr5385.h,MACHINES["NCR5385"] = true
+---------------------------------------------------
+
+if (MACHINES["NCR5385"]~=null) then
+	MACHINES["NSCSI"] = true
+	files {
+		MAME_DIR .. "src/devices/machine/ncr5385.cpp",
+		MAME_DIR .. "src/devices/machine/ncr5385.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/53c810.h,MACHINES["LSI53C810"] = true
 ---------------------------------------------------
 
@@ -2459,6 +2472,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/saa1043.h,MACHINES["SAA1043"] = true
+---------------------------------------------------
+
+if (MACHINES["SAA1043"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/saa1043.cpp",
+		MAME_DIR .. "src/devices/machine/saa1043.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/scnxx562.h,MACHINES["DUSCC"] = true
 ---------------------------------------------------
 
@@ -3443,5 +3468,17 @@ if (MACHINES["28FXXX"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/28fxxx.cpp",
 		MAME_DIR .. "src/devices/machine/28fxxx.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/gen_fifo.h,MACHINES["GEN_FIFO"] = true
+---------------------------------------------------
+
+if (MACHINES["GEN_FIFO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/gen_fifo.cpp",
+		MAME_DIR .. "src/devices/machine/gen_fifo.h",
 	}
 end

@@ -37,22 +37,26 @@ DEFINE_DEVICE_TYPE(MC141200, mc141200_cpu_device, "mc141200", "Motorola MC141200
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms1000_cpu_device::program_10bit_8)
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
+void tms1000_cpu_device::program_10bit_8(address_map &map)
+{
+	map(0x000, 0x3ff).rom();
+}
 
-ADDRESS_MAP_START(tms1000_cpu_device::data_64x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void tms1000_cpu_device::data_64x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(tms1000_cpu_device::program_9bit_8)
-	AM_RANGE(0x000, 0x1ff) AM_MIRROR(0x200) AM_ROM
-ADDRESS_MAP_END
+void tms1000_cpu_device::program_9bit_8(address_map &map)
+{
+	map(0x000, 0x1ff).mirror(0x200).rom();
+}
 
-ADDRESS_MAP_START(tms1000_cpu_device::data_32x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(0x08, 0x0f) AM_MIRROR(0x30) AM_NOP // override
-ADDRESS_MAP_END
+void tms1000_cpu_device::data_32x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+	map(0x08, 0x0f).mirror(0x30).noprw(); // override
+}
 
 
 // device definitions

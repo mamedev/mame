@@ -4,6 +4,7 @@
 #include "machine/tmp68301.h"
 #include "screen.h"
 #include "audio/nichisnd.h"
+#include "machine/nb1413m3.h"
 
 #define VRAM_MAX    3
 

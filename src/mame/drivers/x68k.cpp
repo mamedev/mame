@@ -1420,7 +1420,7 @@ INPUT_PORTS_END
 
 void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 {
-	dev->mon_w(m_fdc.motor && !load);
+	dev->mon_w(!(m_fdc.motor && load));
 	if(m_ioc.irqstatus & 0x02)
 	{
 		m_current_vector[1] = 0x61;

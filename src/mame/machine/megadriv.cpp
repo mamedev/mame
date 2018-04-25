@@ -468,10 +468,11 @@ void md_base_state::megadriv_map(address_map &map)
 }
 
 
-ADDRESS_MAP_START(md_base_state::dcat16_megadriv_map)
-	AM_IMPORT_FROM(megadriv_map)
-	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-ADDRESS_MAP_END
+void md_base_state::dcat16_megadriv_map(address_map &map)
+{
+	megadriv_map(map);
+	map(0x000000, 0x7fffff).rom();
+}
 
 
 /* z80 sounds/sub CPU */

@@ -714,9 +714,10 @@ void equites_state::sound_portmap(address_map &map)
 }
 
 
-ADDRESS_MAP_START(equites_state::mcu_map)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("mcuram") /* main CPU shared RAM */
-ADDRESS_MAP_END
+void equites_state::mcu_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram().share("mcuram"); /* main CPU shared RAM */
+}
 
 
 

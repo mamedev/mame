@@ -538,19 +538,20 @@ BootSeqDone is 1, DisableROM is 0,       mem map is 0x00000-0x00fff reading is t
 BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for both reading and writing.
 */
 
-ADDRESS_MAP_START(notetaker_state::iop_mem)
+void notetaker_state::iop_mem(address_map &map)
+{
 	/*
-	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iop", 0xff000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
-	AM_RANGE(0x01000, 0x3ffff) AM_RAM AM_REGION("mainram", 0) // 256k of ram (less 8k), shared between both processors. rom goes here if bootseqdone is 0
+	map(0x00000, 0x00fff).rom().region("iop", 0xff000); // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
+	map(0x01000, 0x3ffff).ram().region("mainram", 0); // 256k of ram (less 8k), shared between both processors. rom goes here if bootseqdone is 0
 	// note 4000-d5ff is the framebuffer for the screen, in two sets of fields for odd/even interlace?
-	AM_RANGE(0xff000, 0xfffe7) AM_ROM AM_REGION("iop", 0xff000) // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
-	//AM_RANGE(0xfffea, 0xfffeb) AM_WRITE(cpuCtl_w);
-	//AM_RANGE(0xfffec, 0xfffed) AM_READ(parityErrHi_r);
-	//AM_RANGE(0xfffee, 0xfffef) AM_READ(parityErrLo_r);
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("iop", 0xffff0)
+	map(0xff000, 0xfffe7).rom().region("iop", 0xff000); // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
+	//map(0xfffea, 0xfffeb).w(this, FUNC(notetaker_state::cpuCtl_w));
+	//map(0xfffec, 0xfffed).r(this, FUNC(notetaker_state::parityErrHi_r));
+	//map(0xfffee, 0xfffef).r(this. FUNC(notetaker_state::parityErrLo_r));
+	map(0xffff0, 0xfffff).rom().region("iop", 0xffff0);
 	*/
-	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(iop_r, iop_w) // bypass MAME's memory map system as we need finer grained control
-ADDRESS_MAP_END
+	map(0x00000, 0xfffff).rw(this, FUNC(notetaker_state::iop_r), FUNC(notetaker_state::iop_w)); // bypass MAME's memory map system as we need finer grained control
+}
 
 /* iop memory map comes from http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/memos/19790605_Definition_of_8086_Ports.pdf
    and from the schematic at http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf
@@ -586,32 +587,33 @@ x   x   x   x    0   x   x   x    x   x   x   1    1   0   1   x    1   1   1   
 x   x   x   x    0   x   x   x    x   x   x   1    1   1   0   x    x   x   x   .       R   SelADCHi
 x   x   x   x    0   x   x   x    x   x   x   1    1   1   1   x    x   x   x   .       W   CRTSwitch
 */
-ADDRESS_MAP_START(notetaker_state::iop_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7e1c) AM_DEVREADWRITE8("iop_pic8259", pic8259_device, read, write, 0x00ff)
-	AM_RANGE(0x20, 0x21) AM_MIRROR(0x7e1e) AM_WRITE(IPConReg_w) // I/O processor (rom mapping, etc) control register
-	AM_RANGE(0x42, 0x43) AM_MIRROR(0x7e10) AM_DEVREAD8("kbduart", ay31015_device, receive, 0x00ff) // read keyboard data
-	AM_RANGE(0x44, 0x45) AM_MIRROR(0x7e10) AM_READ(ReadOPStatus_r) // read keyboard fifo state
-	AM_RANGE(0x48, 0x49) AM_MIRROR(0x7e10) AM_WRITE(LoadKeyCtlReg_w) // kbd uart control register
-	AM_RANGE(0x4a, 0x4b) AM_MIRROR(0x7e10) AM_DEVWRITE8("kbduart", ay31015_device, transmit, 0x00ff) // kbd uart data register
-	AM_RANGE(0x4c, 0x4d) AM_MIRROR(0x7e10) AM_WRITE(KeyDataReset_w) // kbd uart ddr switch (data reset)
-	AM_RANGE(0x4e, 0x4f) AM_MIRROR(0x7e10) AM_WRITE(KeyChipReset_w) // kbd uart reset
-	AM_RANGE(0x60, 0x61) AM_MIRROR(0x7e1e) AM_WRITE(FIFOReg_w) // DAC sample and hold and frequency setup
-	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7e18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
-	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x7e1e) AM_WRITE(FIFOBus_w) // DAC data write to FIFO
-	AM_RANGE(0x100, 0x101) AM_MIRROR(0x7e1e) AM_WRITE(DiskReg_w) // I/O register (adc speed, crtc pixel clock and clock enable, +5 and +12v relays for floppy, etc)
-	AM_RANGE(0x120, 0x127) AM_MIRROR(0x7e18) AM_DEVREADWRITE8("wd1791", fd1791_device, read, write, 0x00FF) // floppy controller
-	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7e00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
-	AM_RANGE(0x160, 0x161) AM_MIRROR(0x7e1e) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
-	AM_RANGE(0x1a0, 0x1a1) AM_MIRROR(0x7e10) AM_READ(ReadEIAStatus_r) // read eia fifo state
-	AM_RANGE(0x1a2, 0x1a3) AM_MIRROR(0x7e10) AM_DEVREAD8("eiauart", ay31015_device, receive, 0x00ff) // read eia data
-	AM_RANGE(0x1a8, 0x1a9) AM_MIRROR(0x7e10) AM_WRITE(LoadEIACtlReg_w) // eia uart control register
-	AM_RANGE(0x1aa, 0x1ab) AM_MIRROR(0x7e10) AM_DEVWRITE8("eiauart", ay31015_device, transmit, 0x00ff) // eia uart data register
-	AM_RANGE(0x1ac, 0x1ad) AM_MIRROR(0x7e10) AM_WRITE(EIADataReset_w) // eia uart ddr switch (data reset)
-	AM_RANGE(0x1ae, 0x1af) AM_MIRROR(0x7e10) AM_WRITE(EIAChipReset_w) // eia uart reset
-	//AM_RANGE(0x1c0, 0x1c1) AM_MIRROR(0x7e1e) AM_READ(SelADCHi_r) // ADC read
-	//AM_RANGE(0x1e0, 0x1e1) AM_MIRROR(0x7e1e) AM_READ(CRTSwitch_w) // CRT power enable?
-ADDRESS_MAP_END
+void notetaker_state::iop_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x03).mirror(0x7e1c).rw(m_iop_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x20, 0x21).mirror(0x7e1e).w(this, FUNC(notetaker_state::IPConReg_w)); // I/O processor (rom mapping, etc) control register
+	map(0x42, 0x42).mirror(0x7e10).r(m_kbduart, FUNC(ay31015_device::receive)); // read keyboard data
+	map(0x44, 0x45).mirror(0x7e10).r(this, FUNC(notetaker_state::ReadOPStatus_r)); // read keyboard fifo state
+	map(0x48, 0x49).mirror(0x7e10).w(this, FUNC(notetaker_state::LoadKeyCtlReg_w)); // kbd uart control register
+	map(0x4a, 0x4a).mirror(0x7e10).w(m_kbduart, FUNC(ay31015_device::transmit)); // kbd uart data register
+	map(0x4c, 0x4d).mirror(0x7e10).w(this, FUNC(notetaker_state::KeyDataReset_w)); // kbd uart ddr switch (data reset)
+	map(0x4e, 0x4f).mirror(0x7e10).w(this, FUNC(notetaker_state::KeyChipReset_w)); // kbd uart reset
+	map(0x60, 0x61).mirror(0x7e1e).w(this, FUNC(notetaker_state::FIFOReg_w)); // DAC sample and hold and frequency setup
+	//map(0xa0, 0xa1).mirror(0x7e18).rw("debug8255", FUNC(8255_device::read), FUNC(8255_device::write)); // debugger board 8255
+	map(0xc0, 0xc1).mirror(0x7e1e).w(this, FUNC(notetaker_state::FIFOBus_w)); // DAC data write to FIFO
+	map(0x100, 0x101).mirror(0x7e1e).w(this, FUNC(notetaker_state::DiskReg_w)); // I/O register (adc speed, crtc pixel clock and clock enable, +5 and +12v relays for floppy, etc)
+	map(0x120, 0x127).mirror(0x7e18).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write)).umask16(0x00ff); // floppy controller
+	map(0x140, 0x15f).mirror(0x7e00).rw(m_crtc, FUNC(crt5027_device::read), FUNC(crt5027_device::write)).umask16(0x00ff); // crt controller
+	map(0x160, 0x161).mirror(0x7e1e).w(this, FUNC(notetaker_state::LoadDispAddr_w)); // loads the start address for the display framebuffer
+	map(0x1a0, 0x1a1).mirror(0x7e10).r(this, FUNC(notetaker_state::ReadEIAStatus_r)); // read eia fifo state
+	map(0x1a2, 0x1a2).mirror(0x7e10).r(m_eiauart, FUNC(ay31015_device::receive)); // read eia data
+	map(0x1a8, 0x1a9).mirror(0x7e10).w(this, FUNC(notetaker_state::LoadEIACtlReg_w)); // eia uart control register
+	map(0x1aa, 0x1aa).mirror(0x7e10).w(m_eiauart, FUNC(ay31015_device::transmit)); // eia uart data register
+	map(0x1ac, 0x1ad).mirror(0x7e10).w(this, FUNC(notetaker_state::EIADataReset_w)); // eia uart ddr switch (data reset)
+	map(0x1ae, 0x1af).mirror(0x7e10).w(this, FUNC(notetaker_state::EIAChipReset_w)); // eia uart reset
+	//map(0x1c0, 0x1c1).mirror(0x7e1e).r(this, FUNC(notetaker_state::SelADCHi_r)); // ADC read
+	//map(0x1e0, 0x1e1).mirror(0x7e1e).r(this, FUNC(notetaker_state::CRTSwitch_w)); // CRT power enable?
+}
 
 /* iop_pic8259 interrupts:
 irq0    parity error (parity error syndrome data will be in fffdx/fffex) - currently ignored
@@ -697,12 +699,13 @@ x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   0   
 x   x   1   1    1   1   1   1    1   1   1   1    1   1   1   0    1   1   1   x    x                       R   FFFEE (Parity Error Address: row bits 15-8, column bits 7-0; reading this also acknowledges a parity interrupt)
 */
 
-ADDRESS_MAP_START(notetaker_state::ep_mem)
-	AM_RANGE(0x00000, 0x01fff) AM_MIRROR(0xc0000) AM_RAM // actually a banked block of ram, 8kb (4kw)
-	AM_RANGE(0x02000, 0x3ffff) AM_MIRROR(0xc0000) AM_RAM AM_REGION("mainram", 0x2000) // 256k of ram (less 8k), shared between both processors, mirrored 4 times
-	//AM_RANGE(0xfffc0, 0xfffdf) AM_MIRROR(0xc0000) AM_READWRITE(proc_illinst_r, proc_illinst_w)
-	//AM_RANGE(0xfffe0, 0xfffef) AM_MIRROR(0xc0000) AM_READWRITE(proc_control_r, proc_control_w)
-ADDRESS_MAP_END
+void notetaker_state::ep_mem(address_map &map)
+{
+	map(0x00000, 0x01fff).mirror(0xc0000).ram(); // actually a banked block of ram, 8kb (4kw)
+	map(0x02000, 0x3ffff).mirror(0xc0000).ram().region("mainram", 0x2000); // 256k of ram (less 8k), shared between both processors, mirrored 4 times
+	//map(0xfffc0, 0xfffdf).mirror(0xc0000).rw(this, FUNC(notetaker_state::proc_illinst_r), FUNC(notetaker_state::proc_illinst_w));
+	//map(0xfffe0, 0xfffef).mirror(0xc0000).rw(this, FUNC(notetaker_state::proc_control_r), FUNC(notetaker_state::proc_control_w));
+}
 
 /* note everything in the emulatorcpu's io range is incompletely decoded; so if
    0x1800 is accessed it will write to both the debug 8255 AND the pic8259!
@@ -717,13 +720,14 @@ x   x   x   x    x   x   1   x    x   x   x   x    x   x   x   x    x   x   x   
 x   x   x   x    x   1   x   x    x   x   x   x    x   x   x   x    x   x   x   x    x                       W   Writing anything here clears the parity error latch
 */
 
-ADDRESS_MAP_START(notetaker_state::ep_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x800, 0x803) AM_MIRROR(0x07fc) AM_DEVREADWRITE8("ep_pic8259", pic8259_device, read, write, 0x00ff)
-	//AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_WRITE(EPConReg_w) // emu processor control reg & leds
-	//AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07fe) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
-ADDRESS_MAP_END
+void notetaker_state::ep_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x800, 0x803).mirror(0x07fc).rw(m_ep_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	//map(0x1000, 0x1001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
+	map(0x2000, 0x2001).mirror(0x07fe).w(this, FUNC(notetaker_state::EPConReg_w)); // emu processor control reg & leds
+	//map(0x4000, 0x4001) AM_MIRROR(0x07fe) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
+}
 
 /* Input ports */
 
@@ -765,14 +769,14 @@ void notetaker_state::iop_reset()
 	m_eiauart->write_xr(0); // MR - pin 21
 	m_eiauart->write_xr(1); // ''
 	// reset the IPConReg ls273 latch at #f1
-	IPConReg_w(m_iop_cpu->device_t::memory().space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	IPConReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
 	// Clear the DAC FIFO
 	for (int i=0; i<16; i++) m_outfifo[i] = 0;
 	m_outfifo_count = m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
 	// reset the FIFOReg latch at #h9
-	FIFOReg_w(m_iop_cpu->device_t::memory().space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	FIFOReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
 	// reset the DiskReg latches at #c4 and #b4 on the disk/display/eia controller board
-	DiskReg_w(m_iop_cpu->device_t::memory().space(AS_PROGRAM), 0, 0x0000, 0xffff);
+	DiskReg_w(m_iop_cpu->space(AS_PROGRAM), 0, 0x0000, 0xffff);
 	// reset the framebuffer display address counter:
 	m_DispAddr = 0;
 }

@@ -88,11 +88,12 @@ SEGA 1998
 #define M68K_TAG     "m3commcpu"
 
 //////// Model 3 (main CPU @ C00xxxxx) and Hikaru (MMctrl bank 0E) interface
-ADDRESS_MAP_START(m3comm_device::m3_map)
-	AM_RANGE(0x0000000, 0x000ffff) AM_READWRITE8(m3_comm_ram_r, m3_comm_ram_w, 0xffffffff)
-	AM_RANGE(0x0010000, 0x00101ff) AM_READWRITE16(m3_ioregs_r, m3_ioregs_w, 0xffff0000)
-	AM_RANGE(0x0020000, 0x003ffff) AM_READWRITE16(m3_m68k_ram_r, m3_m68k_ram_w, 0xffff0000)
-ADDRESS_MAP_END
+void m3comm_device::m3_map(address_map &map)
+{
+	map(0x0000000, 0x000ffff).rw(this, FUNC(m3comm_device::m3_comm_ram_r), FUNC(m3comm_device::m3_comm_ram_w));
+	map(0x0010000, 0x00101ff).rw(this, FUNC(m3comm_device::m3_ioregs_r), FUNC(m3comm_device::m3_ioregs_w)).umask32(0xffff0000);
+	map(0x0020000, 0x003ffff).rw(this, FUNC(m3comm_device::m3_m68k_ram_r), FUNC(m3comm_device::m3_m68k_ram_w)).umask32(0xffff0000);
+}
 
 
 /*************************************

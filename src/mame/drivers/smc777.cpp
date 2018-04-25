@@ -101,7 +101,7 @@ public:
 	DECLARE_WRITE8_MEMBER(floppy_select_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	
+
 	DECLARE_QUICKLOAD_LOAD_MEMBER(smc777);
 
 	void smc777(machine_config &config);

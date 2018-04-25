@@ -46,13 +46,13 @@ protected:
 
 private:
 	// internal state
-	uint8_t m_local_paletteram[0x300];
+	std::unique_ptr<uint8_t[]> m_local_paletteram[3];
 	uint8_t m_regs[0x10];
 	uint8_t m_palettedata[3];
 	uint8_t m_writeindex;
 	uint8_t m_readindex;
 	uint8_t m_dacbits;
-	rgb_t m_pens[0x100];
+	std::unique_ptr<rgb_t[]> m_pens;
 };
 
 
