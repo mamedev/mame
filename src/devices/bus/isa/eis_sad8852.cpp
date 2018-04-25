@@ -36,7 +36,7 @@
  Nokia Data -  marked TVK 119 5211 R3, rev date 9127, assembled in 1991 indicated by chip dates
  ICL        -  marked TVK 119 5211 R3, rev date 9343, assembled in 1993 indicated by chip dates
  +--------------------------------------------------------------------------------------+ ___
- |	     IC18  IC24  +----------+                                                   ||
+ |       IC18  IC24  +----------+                                                   ||
  | IC1  IC9              |IC31 EPROM|  +--------------+   IC44                          ||
  |           IC19  IC25  |27128     |  | IC35 i8274   |         IC51                    ||
  | IC2  IC10             +----------+  | MPSC serial  |  IC45                           ||
@@ -233,9 +233,10 @@ void isa16_sad8852_device::device_reset()
 {
 	if (!m_installed)
 	{
-		m_isa->install_device(0x378, 0x378, // Wrong, need to find real i/o addresses
-				      read8_delegate(FUNC( isa16_sad8852_device::sad8852_r ), this),
-				      write8_delegate(FUNC( isa16_sad8852_device::sad8852_w ), this) );
+		m_isa->install_device(
+				0x378, 0x378, // Wrong, need to find real i/o addresses
+				read8_delegate(FUNC( isa16_sad8852_device::sad8852_r ), this),
+				write8_delegate(FUNC( isa16_sad8852_device::sad8852_w ), this));
 		m_irq = m_isairq->read();
 		m_installed = true;
 	}

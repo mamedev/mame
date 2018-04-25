@@ -5,54 +5,54 @@
     Sega Model 1/2 I/O Board
 
 
-	I/O PCB
-	-------
+    I/O PCB
+    -------
 
-	837-8950-01 (C) SEGA 1992
-	|-------------------------------------------|
-	| CN6                           J3   J2     |
-	|                                        CN5|
-	|                      DSW3       LED1      |
-	|                                           |
-	| SW7    |---------|                        |
-	|  32MHz |SEGA     |   DSW1                 |
-	| SW6    |315-5338A|                        |
-	|        |         |                        |
-	| SW5    |---------|   DSW2                 |
-	|                                        CN1|
-	| SW4      MB8464                           |
-	|          14869.25                         |
-	|   3771                                    |
-	|          Z80                              |
-	|   93C45                                   |
-	|                               PC910 PC910 |
-	|   LED2                           J1       |
-	|      M6253                                |
-	| CN3              CN2          CN4     TL1 |
-	|-------------------------------------------|
-	Notes:
-		  315-5338A - Sega Custom (QFP100)
-		  Z80       - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40, clock 32 / 8)
-		  14869.25  - ST Microelectronics M27C512 64k x8 EPROM (DIP28, labelled 'EPR-14869')
-					  There is an alternative revision B 'EPR-14869B' also
-		  MB8464    - Fujitsu MB8464 8k x8 SRAM (DIP28)
-		  93C45     - 128bytes x8 EEPROM (DIP8)
-		  M6253     - OKI M6253 (DIP18)
-		  3771      - Fujitsu MB3771 Master Reset IC (DIP8)
-		  PC910     - Sharp PC910 opto-isolator (x2, DIP8)
-		  DSW1/2/3  - 8-position Dip Switch (x3)
-		  J1        - Jumper, set to 2-3
-		  J2, J3    - Jumper, both set to 1-2
-		  CN1       - 50 pin connector (joins to control panel assembly)
-		  CN2       - 26 pin connector (joins to foot pedal assembly)
-		  CN3       - 10 pin connector for power input
-		  CN4       - 6 pin connector (joins to sound PCB -> CN2, used for sound communication from Main PCB to Sound PCB)
-		  CN5       - 12 pin connector for input/output controls
-		  CN6       - 12 pin connector (joins to Motor PCB)
-		  TL1       - Connector for network optical cable link
-		  SW7       - Push Button Service Switch
-		  SW6       - Push Button Test Switch
-		  SW5, SW4  - Push Button Switches (purpose unknown)
+    837-8950-01 (C) SEGA 1992
+    |-------------------------------------------|
+    | CN6                           J3   J2     |
+    |                                        CN5|
+    |                      DSW3       LED1      |
+    |                                           |
+    | SW7    |---------|                        |
+    |  32MHz |SEGA     |   DSW1                 |
+    | SW6    |315-5338A|                        |
+    |        |         |                        |
+    | SW5    |---------|   DSW2                 |
+    |                                        CN1|
+    | SW4      MB8464                           |
+    |          14869.25                         |
+    |   3771                                    |
+    |          Z80                              |
+    |   93C45                                   |
+    |                               PC910 PC910 |
+    |   LED2                           J1       |
+    |      M6253                                |
+    | CN3              CN2          CN4     TL1 |
+    |-------------------------------------------|
+    Notes:
+          315-5338A - Sega Custom (QFP100)
+          Z80       - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz (DIP40, clock 32 / 8)
+          14869.25  - ST Microelectronics M27C512 64k x8 EPROM (DIP28, labelled 'EPR-14869')
+                      There is an alternative revision B 'EPR-14869B' also
+          MB8464    - Fujitsu MB8464 8k x8 SRAM (DIP28)
+          93C45     - 128bytes x8 EEPROM (DIP8)
+          M6253     - OKI M6253 (DIP18)
+          3771      - Fujitsu MB3771 Master Reset IC (DIP8)
+          PC910     - Sharp PC910 opto-isolator (x2, DIP8)
+          DSW1/2/3  - 8-position Dip Switch (x3)
+          J1        - Jumper, set to 2-3
+          J2, J3    - Jumper, both set to 1-2
+          CN1       - 50 pin connector (joins to control panel assembly)
+          CN2       - 26 pin connector (joins to foot pedal assembly)
+          CN3       - 10 pin connector for power input
+          CN4       - 6 pin connector (joins to sound PCB -> CN2, used for sound communication from Main PCB to Sound PCB)
+          CN5       - 12 pin connector for input/output controls
+          CN6       - 12 pin connector (joins to Motor PCB)
+          TL1       - Connector for network optical cable link
+          SW7       - Push Button Service Switch
+          SW6       - Push Button Test Switch
+          SW5, SW4  - Push Button Switches (purpose unknown)
 
 ***************************************************************************/
 

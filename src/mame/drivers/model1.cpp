@@ -1067,15 +1067,15 @@ INPUT_PORTS_END
 	ROM_REGION32_LE( 0x40000, "copro_tables", 0 ) \
 	ROM_LOAD32_WORD("opr14742.bin",  0x000000,  0x20000, CRC(446a1085) SHA1(51b3f4d3a35a36087ea0ba4e26d6e7d17b6418e2) ) \
 	ROM_LOAD32_WORD("opr14743.bin",  0x000002,  0x20000, CRC(e8953554) SHA1(1499f8e30ac15affc66e6f04ae031bb8680d9260) ) \
-    \
+	\
 	ROM_REGION32_LE( 0x80000, "other_data", 0 ) \
-	/* 1/x table */	\
+	/* 1/x table */ \
 	ROM_LOAD32_WORD("opr-14744.58",   0x000000,  0x20000, CRC(730ea9e0) SHA1(651f1db4089a400d073b19ada299b4b08b08f372) ) \
 	ROM_LOAD32_WORD("opr-14745.59",   0x000002,  0x20000, CRC(4c934d96) SHA1(e3349ece0e47f684d61ad11bfea4a90602287350) ) \
 	/* 1/sqrt(x) table */ \
 	ROM_LOAD32_WORD("opr-14746.62",   0x040000,  0x20000, CRC(2a266cbd) SHA1(34e047a93459406c22acf4c25089d1a4955f94ca) ) \
 	ROM_LOAD32_WORD("opr-14747.63",   0x040002,  0x20000, CRC(a4ad5e19) SHA1(7d7ec300eeb9a8de1590011e37108688c092f329) ) \
-    \
+	\
 	ROM_REGION16_LE( 0x20000, "other_other_data", 0 ) \
 	/* 1/(1+x) again, but bottom 16 bits only */ \
 	ROM_LOAD("opr14748.bin",   0x000000,  0x20000, CRC(4a532cb8) SHA1(23280ebbcd6b2bc8a8e643a2d07a58d6598301b8) ) \

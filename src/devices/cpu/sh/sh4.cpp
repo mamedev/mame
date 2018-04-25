@@ -3429,10 +3429,10 @@ bool sh34_base_device::generate_group_15_FADD(drcuml_block &block, compiler_stat
 	UML_FDADD(block, FPD32(Rn), FPD32(Rn), FPD32(Rm));
 	UML_JMP(block, compiler.labelnum+1);
 
-	UML_LABEL(block, compiler.labelnum++);	// labelnum:
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
 	UML_FSADD(block, FPS32(Rn), FPS32(Rn), FPS32(Rm));
 
-	UML_LABEL(block, compiler.labelnum++);	// labelnum+1:
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 
 	return true;
 }
@@ -3445,10 +3445,10 @@ bool sh34_base_device::generate_group_15_FSUB(drcuml_block &block, compiler_stat
 	UML_FDSUB(block, FPD32(Rn), FPD32(Rn), FPD32(Rm));
 	UML_JMP(block, compiler.labelnum+1);
 
-	UML_LABEL(block, compiler.labelnum++);	// labelnum:
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
 	UML_FSSUB(block, FPS32(Rn), FPS32(Rn), FPS32(Rm));
 
-	UML_LABEL(block, compiler.labelnum++);	// labelnum+1:
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 
 	return true;
 }
@@ -3461,10 +3461,10 @@ bool sh34_base_device::generate_group_15_FMUL(drcuml_block &block, compiler_stat
 	UML_FDMUL(block, FPD32(Rn), FPD32(Rn), FPD32(Rm));
 	UML_JMP(block, compiler.labelnum+1);
 
-	UML_LABEL(block, compiler.labelnum++);	// labelnum:
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
 	UML_FSMUL(block, FPS32(Rn), FPS32(Rn), FPS32(Rm));
 
-	UML_LABEL(block, compiler.labelnum++);	// labelnum+1:
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 
 	return true;
 }
@@ -3477,10 +3477,10 @@ bool sh34_base_device::generate_group_15_FDIV(drcuml_block &block, compiler_stat
 	UML_FDDIV(block, FPD32(Rn), FPD32(Rn), FPD32(Rm));
 	UML_JMP(block, compiler.labelnum+1);
 
-	UML_LABEL(block, compiler.labelnum++);	// labelnum:
+	UML_LABEL(block, compiler.labelnum++);  // labelnum:
 	UML_FSDIV(block, FPS32(Rn), FPS32(Rn), FPS32(Rm));
 
-	UML_LABEL(block, compiler.labelnum++);	// labelnum+1:
+	UML_LABEL(block, compiler.labelnum++);  // labelnum+1:
 
 	return true;
 }

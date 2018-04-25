@@ -277,7 +277,7 @@ void dreamwld_state::video_start()
 			m_tilemap[layer][size]->set_scroll_cols(1);
 		}
 	}
-	
+
 	m_spritebuf[0] = std::make_unique<uint32_t[]>(0x2000 / 4);
 	m_spritebuf[1] = std::make_unique<uint32_t[]>(0x2000 / 4);
 	m_lineram16 = make_unique_clear<uint16_t[]>(0x400 / 2);

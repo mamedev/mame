@@ -2074,8 +2074,8 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 		case ADDR_P1:   return RWM ? P1 : (P1 | m_forced_inputs[1]) & m_port_in_cb[1]();
 		case ADDR_P2:   return RWM ? P2 : (P2 | m_forced_inputs[2]) & m_port_in_cb[2]();
 		case ADDR_P3:   return RWM ? P3 : (P3 | m_forced_inputs[3]) & m_port_in_cb[3]()
-		                    & ~(GET_BIT(m_last_line_state, MCS51_INT0_LINE) ? 4 : 0)
-		                    & ~(GET_BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0);
+							& ~(GET_BIT(m_last_line_state, MCS51_INT0_LINE) ? 4 : 0)
+							& ~(GET_BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0);
 
 		case ADDR_PSW:
 		case ADDR_ACC:

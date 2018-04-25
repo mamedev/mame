@@ -5,8 +5,10 @@
 --   "ports":{
 --     "<ioport name>":{
 --       "labels":{
---         "player":<int player number>,
---         "name":"<field label>"
+--         "<field mask>":{
+--           "player":<int player number>,
+--           "name":"<field label>"
+--         }
 --     },{
 --       ...
 --     }

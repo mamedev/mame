@@ -1586,6 +1586,8 @@ if (BUSES["VIC10"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/vic10/exp.cpp",
 		MAME_DIR .. "src/devices/bus/vic10/exp.h",
+		MAME_DIR .. "src/devices/bus/vic10/multimax.cpp",
+		MAME_DIR .. "src/devices/bus/vic10/multimax.h",
 		MAME_DIR .. "src/devices/bus/vic10/std.cpp",
 		MAME_DIR .. "src/devices/bus/vic10/std.h",
 	}

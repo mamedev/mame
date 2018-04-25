@@ -27,9 +27,10 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_bank_16k(*this, {"block0", "block4", "block8", "blockc"})
-		, m_p_chargen(*this, "chargen")
-		, m_p_videoram(*this, "videoram")
-		, m_p_nvram(*this, "nvram")
+		, m_rom_chargen(*this, "chargen")
+		, m_ram_chargen(*this, "chargen")
+		, m_videoram(*this, "videoram")
+		, m_nvram(*this, "nvram")
 	{ }
 
 	void cdc721(machine_config &config);
@@ -56,9 +57,10 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_bank_16k;
-	required_region_ptr<u8> m_p_chargen;
-	required_shared_ptr<u8> m_p_videoram;
-	required_shared_ptr<u8> m_p_nvram;
+	required_region_ptr<u8> m_rom_chargen;
+	required_shared_ptr<u8> m_ram_chargen;
+	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_nvram;
 };
 
 WRITE8_MEMBER(cdc721_state::interrupt_mask_w)
@@ -88,7 +90,7 @@ WRITE8_MEMBER(cdc721_state::bank_select_w)
 
 WRITE8_MEMBER(cdc721_state::nvram_w)
 {
-	m_p_nvram[offset] = data & 0x0f;
+	m_nvram[offset] = data & 0x0f;
 }
 
 void cdc721_state::mem_map(address_map &map)
@@ -108,13 +110,14 @@ void cdc721_state::block0_map(address_map &map)
 void cdc721_state::block4_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram().share("nvram").w(this, FUNC(cdc721_state::nvram_w));
-	map(0x0800, 0x0bff).ram();
-	map(0x8000, 0xbfff).rom().region("rompack", 0);
+	map(0x0800, 0x0bff).ram().share("chargen"); // 2x P2114AL-2
+	map(0x8000, 0xbfff).rom().region("16krom", 0);
 	map(0xc000, 0xffff).ram();
 }
 
 void cdc721_state::block8_map(address_map &map)
 {
+	map(0x0000, 0x3fff).rom().region("rompack", 0);
 	map(0x4000, 0x7fff).ram();
 }
 
@@ -149,11 +152,6 @@ void cdc721_state::machine_reset()
 
 void cdc721_state::machine_start()
 {
-//  uint8_t *main = memregion("maincpu")->base();
-
-//  membank("bankr0")->configure_entry(1, &main[0x14000]);
-//  membank("bankr0")->configure_entry(0, &main[0x4000]);
-//  membank("bankw0")->configure_entry(0, &main[0x4000]);
 }
 
 /* F4 Character Displayer */
@@ -190,7 +188,7 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (y = 0; y < 30; y++)
 	{
-		uint16_t ma = m_p_videoram[y * 2] | m_p_videoram[y * 2 + 1] << 8;
+		uint16_t ma = m_videoram[y * 2] | m_videoram[y * 2 + 1] << 8;
 
 		for (ra = 0; ra < 16; ra++)
 		{
@@ -199,9 +197,9 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			for (x = 0; x < 160; x+=2)
 			{
 				pen = 1;
-				chr = m_p_videoram[(x + ma) & 0x1fff];
-				attr = m_p_videoram[(x + ma + 1) & 0x1fff];
-				gfx = m_p_chargen[chr | (ra << 8) ];
+				chr = m_videoram[(x + ma) & 0x1fff];
+				attr = m_videoram[(x + ma + 1) & 0x1fff];
+				gfx = m_rom_chargen[chr | (ra << 8) ];
 				if (BIT(attr, 0))  // blank
 					pen = 0;
 				if (BIT(attr, 1) && (ra == 14)) // underline
@@ -239,7 +237,7 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	MCFG_CPU_ADD("maincpu", Z80, 6_MHz_XTAL) // Zilog Z8400B (Z80B)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(cdc721_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(cdc721_daisy_chain) // FIXME: vector is independently generated
 
 	MCFG_DEVICE_ADD("block0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_ADDRESS_MAP(0, block0_map)
@@ -300,15 +298,15 @@ ROM_START( cdc721 )
 	ROM_LOAD( "66315359", 0x0000, 0x2000, CRC(20ff3eb4) SHA1(5f15cb14893d75a46dc66d3042356bb054d632c2) )
 	ROM_LOAD( "66315361", 0x2000, 0x2000, CRC(21d59d09) SHA1(9c087537d68c600ddf1eb9b009cf458231c279f4) )
 
-	ROM_REGION( 0x4000, "rompack", 0 )
+	ROM_REGION( 0x4000, "16krom", 0 )
 	ROM_LOAD( "66315360", 0x0000, 0x1000, CRC(feaa0fc5) SHA1(f06196553a1f10c07b2f7e495823daf7ea26edee) )
 	//ROM_FILL(0x0157,1,0xe0)
 
-	ROM_REGION( 0x1000, "keyboard", 0 )
-	ROM_LOAD( "66307828", 0x0000, 0x1000, CRC(ac97136f) SHA1(0d280e1aa4b9502bd390d260f83af19bf24905cd) ) // keyboard lookup
+	ROM_REGION( 0x4000, "rompack", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "66315039", 0x0000, 0x1000, CRC(5c9aa968) SHA1(3ec7c5f25562579e6ed3fda7562428ff5e6b9550) )
+	ROM_LOAD( "66307828", 0x1000, 0x1000, CRC(ac97136f) SHA1(0d280e1aa4b9502bd390d260f83af19bf24905cd) ) // foreign character ROM
 ROM_END
 
 COMP( 1981, cdc721, 0, 0, cdc721, cdc721, cdc721_state, 0, "Control Data Corporation", "721 Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

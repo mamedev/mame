@@ -1291,15 +1291,15 @@ void segas1x_bootleg_state::mwalkbl_map(address_map &map)
 
 	/* bootleg video regs */
 /*  map(0xc00000, 0xc00001).nop();
-	map(0xc00002, 0xc00003).nop();
-	map(0xc00004, 0xc00005).nop(); // tile bank?
-	map(0xc00006, 0xc00007).nop();
-	map(0xc44000, 0xc44001).nop();
-	map(0xc46000, 0xc46001).nop();
-	map(0xc46200, 0xc46201).nop();
-	map(0xc46400, 0xc464ff).nop(); // scroll?
-	map(0xc46500, 0xc465ff).nop(); // scroll?
-	*/
+    map(0xc00002, 0xc00003).nop();
+    map(0xc00004, 0xc00005).nop(); // tile bank?
+    map(0xc00006, 0xc00007).nop();
+    map(0xc44000, 0xc44001).nop();
+    map(0xc46000, 0xc46001).nop();
+    map(0xc46200, 0xc46201).nop();
+    map(0xc46400, 0xc464ff).nop(); // scroll?
+    map(0xc46500, 0xc465ff).nop(); // scroll?
+    */
 
 	map(0xc40000, 0xc40001).portr("COINAGE");
 	map(0xc40002, 0xc40003).portr("DSW1");

@@ -123,13 +123,13 @@ Notes:
 
 - There are images/videos on the net of kaitei and geebee running in 3bpp
   (aka 7 colors), this is assumed to be a homebrew repair or hack.
-  Update: Gee Bee definitely uses an overlay while kaitei actually outputs 
+  Update: Gee Bee definitely uses an overlay while kaitei actually outputs
   colors depending on the monitor type used (color or b&w).
-  sos is the odd one: it seems to be running in a b&w environment but a pic 
-  on the net shows it with reversed black and white compared to current 
-  implementation. 
-  Also the flyer shows the girl to be colorized purple, while the points 
-  numbers are in cyan and text in red (and this arrangement doesn't 
+  sos is the odd one: it seems to be running in a b&w environment but a pic
+  on the net shows it with reversed black and white compared to current
+  implementation.
+  Also the flyer shows the girl to be colorized purple, while the points
+  numbers are in cyan and text in red (and this arrangement doesn't
   make much sense, different version maybe?).
 
 ***************************************************************************/

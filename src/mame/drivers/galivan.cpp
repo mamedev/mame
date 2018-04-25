@@ -58,41 +58,6 @@ READ8_MEMBER(galivan_state::IO_port_c0_r)
 	return (0x58); /* To Avoid Reset on Ufo Robot dangar */
 }
 
-// simplified version of the 1412M2 in cop01 (needs to be device-ified)
-READ8_MEMBER(galivan_state::prot_data_r)
-{
-	if(m_prot_command == 0x37)
-	{
-		uint16_t prot_offset = (m_prot_reg[1]<<8)|(m_prot_reg[2]);
-		uint8_t *prot_rom = memregion("prot_data")->base();
-		uint8_t prot_adj = 0x44;
-
-		//printf("%02x",(prot_rom[prot_offset] - 0x44) & 0xff);
-
-		return prot_rom[prot_offset & 0x1fff] - prot_adj; // minus value correct?
-	}
-	
-	popmessage("%02x protection read used",m_prot_command);
-
-	return 0;
-}
-
-WRITE8_MEMBER(galivan_state::prot_data_w)
-{
-	if( m_prot_command >=0x32 && m_prot_command <=0x37 )
-	{
-		m_prot_reg[m_prot_command-0x32] = data;
-		return;
-	}
-	
-	popmessage("%02x protection write used",m_prot_command);
-}
-
-WRITE8_MEMBER(galivan_state::prot_address_w)
-{
-	m_prot_command = data;
-}
-
 void galivan_state::galivan_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
@@ -132,12 +97,12 @@ void galivan_state::io_map(address_map &map)
 	map(0xc0, 0xc0).r(this, FUNC(galivan_state::IO_port_c0_r)); /* dangar needs to return 0x58 */
 }
 
-void galivan_state::dangarj_io_map(address_map &map)
+void dangarj_state::dangarj_io_map(address_map &map)
 {
 	io_map(map);
 	// 1412M2
-	map(0x80, 0x80).rw(this, FUNC(galivan_state::prot_data_r), FUNC(galivan_state::prot_data_w));
-	map(0x81, 0x81).w(this, FUNC(galivan_state::prot_address_w));
+	map(0x80, 0x80).rw("prot_chip", FUNC(nb1412m2_device::data_r), FUNC(nb1412m2_device::data_w));
+	map(0x81, 0x81).w("prot_chip", FUNC(nb1412m2_device::command_w));
 }
 
 
@@ -514,10 +479,12 @@ MACHINE_CONFIG_START(galivan_state::galivan)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(galivan_state::dangarj)
+MACHINE_CONFIG_START(dangarj_state::dangarj)
 	galivan(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(dangarj_io_map)
+
+	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)) // divided by 2 maybe
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(galivan_state::ninjemak)
@@ -814,7 +781,9 @@ ROM_START( dangarj ) /* all rom labels are simply numbers, with the owl logo and
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu code */
 	ROM_LOAD( "21.14b", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
-	ROM_LOAD( "22.15b", 0x4000, 0x4000, CRC(1d484f68) SHA1(7de13d6c6850280fed011c1d1b211cdc5ea9f935) )
+	// following is most likely half size dumped, so we load parent set rom here.
+	ROM_LOAD( "22.15b", 0x4000, 0x4000, BAD_DUMP CRC(1d484f68) SHA1(7de13d6c6850280fed011c1d1b211cdc5ea9f935) )
+	ROM_LOAD( "14.b15", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
 	ROM_LOAD( "11.13d",  0x00000, 0x4000, CRC(e804ffe1) SHA1(22f16c23b9a82f104dda24bc8fccc08f3f69cf97) )   /* chars */
@@ -842,7 +811,7 @@ ROM_START( dangarj ) /* all rom labels are simply numbers, with the owl logo and
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "82s129.7f",    0x0000, 0x0100, CRC(29bc6216) SHA1(1d7864ad06ad0cd5e3d1905fc6066bee1cd90995) )    /* sprite palette bank */
 
-	ROM_REGION( 0x2000, "prot_data", 0 ) /* located on a daughter card DG-3 with an additional 8.00MHz OSC & Nichibutsu 1412M2 XBA (unknown MCU?) */
+	ROM_REGION( 0x2000, "prot_chip", 0 ) /* located on a daughter card DG-3 with an additional 8.00MHz OSC & Nichibutsu 1412M2 XBA (unknown MCU?) */
 	ROM_LOAD( "dg-3.ic7.2764",    0x0000, 0x2000, CRC(84a56d26) SHA1(6a1cdac7b9e04ccbcc29491f37f7554d09ea6d34) )
 ROM_END
 
@@ -1238,9 +1207,9 @@ GAME( 1985, galivan2, galivan,  galivan,  galivan,  galivan_state, 0,      ROT27
 GAME( 1985, galivan3, galivan,  galivan,  galivan,  galivan_state, 0,      ROT270, "Nichibutsu",   "Cosmo Police Galivan (12/11/1985)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (4/07/1987)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangara,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (12/1/1986)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND ) // wrong BGM in game, no SFXs
+GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  dangarj_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND ) // wrong BGM in game, no SFXs
 GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state, 0,      ROT270, "Nichibutsu",   "Ufo Robo Dangar (9/26/1986, bootleg set 1)", MACHINE_SUPPORTS_SAVE ) // checks protection like dangarj but check readback is patched at 0x9d58 (also checks i/o port 0xc0?)
-GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state, 0,      ROT270, "bootleg",      "Ufo Robo Dangar (9/26/1986, bootleg set 2)", MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44 
+GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state, 0,      ROT270, "bootleg",      "Ufo Robo Dangar (9/26/1986, bootleg set 2)", MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Ninja Emaki (US)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, galivan_state, 0,      ROT270, "Nichibutsu",   "Youma Ninpou Chou (Japan, alt)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )

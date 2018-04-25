@@ -11,7 +11,7 @@
     Known to be on this hardware
 
     Golden Tee Golf Home Edition (developed by FarSight Studios)
-	Connectv Football (developed by Medialink)
+    Connectv Football (developed by Medialink)
 
     Also on this hardware
 
@@ -207,7 +207,7 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase, int size)
 {
 	gfx_element *gfx;
-	
+
 	int base = (m_tilebase[1] << 8) | m_tilebase[0];
 	if (m_tilecfg[2] & 0x04)
 	{

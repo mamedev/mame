@@ -4,10 +4,10 @@
 
     NCR 5385 SCSI Controller emulation
 
-	TODO:
-	- Everything. Currently, just enough is implemented to make the
-	  Philips VP415 CPU / Datagrabber board satisfied that the
-	  controller has passed its internal diagnostics.
+    TODO:
+    - Everything. Currently, just enough is implemented to make the
+      Philips VP415 CPU / Datagrabber board satisfied that the
+      controller has passed its internal diagnostics.
 
 ************************************************************************
                             _____   _____

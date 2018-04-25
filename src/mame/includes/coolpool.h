@@ -25,7 +25,7 @@ public:
 	required_device<tms34010_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
 	optional_device<tlc34076_device> m_tlc34076;
-	
+
 	required_device<generic_latch_16_device> m_main2dsp;
 	required_device<generic_latch_16_device> m_dsp2main;
 

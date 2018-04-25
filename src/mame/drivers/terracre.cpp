@@ -93,78 +93,6 @@ AT-2
 #include "speaker.h"
 
 
-#ifdef UNUSED_FUNCTION
-/*
-0000 5000 5341 4b45 5349 4755 5245
-0000 4000 0e4b 4154 5544 4f4e 0e0e
-0000 3000 414e 4b41 4b45 5544 4f4e
-0000 2000 0e0e 4b49 5455 4e45 0e0e
-0000 1000 0e4b 414b 4553 4f42 410e
-2079 0001 0004 4ed0 2079 0001 0008
-4ed0 7c
-*/
-
-// protection data left for reference
-static const uint16_t mAmazonProtData[] =
-{
-	/* default high scores (0x40db4) - wrong data ? */
-	0x0000,0x5000,0x5341,0x4b45,0x5349,0x4755,0x5245,
-	0x0000,0x4000,0x0e4b,0x4154,0x5544,0x4f4e,0x0e0e,
-	0x0000,0x3000,0x414e,0x4b41,0x4b45,0x5544,0x4f4e,
-	0x0000,0x2000,0x0e0e,0x4b49,0x5455,0x4e45,0x0e0e,
-	0x0000,0x1000,0x0e4b,0x414b,0x4553,0x4f42,0x410e,
-
-	/* code (0x40d92) */
-	0x4ef9,0x0000,0x62fa,0x0000,0x4ef9,0x0000,0x805E,0x0000,
-	0xc800 /* checksum */
-};
-
-/*
-0000 5000 5341 4b45 5349 4755 5245
-0000 4000 0e4b 4154 5544 4f4e 0e0e
-0000 3000 414e 4b41 4b45 5544 4f4e
-0000 2000 0e0e 4b49 5455 4e45 0e0e
-0000 1000 0e4b 414b 4553 4f42 410e
-2079 0001 0004 4ed0 2079 0001 0008
-4ed0 7c
- */
-
-static const uint16_t mAmatelasProtData[] =
-{
-	/* default high scores (0x40db4) */
-	0x0000,0x5000,0x5341,0x4b45,0x5349,0x4755,0x5245,
-	0x0000,0x4000,0x0e4b,0x4154,0x5544,0x4f4e,0x0e0e,
-	0x0000,0x3000,0x414e,0x4b41,0x4b45,0x5544,0x4f4e,
-	0x0000,0x2000,0x0e0e,0x4b49,0x5455,0x4e45,0x0e0e,
-	0x0000,0x1000,0x0e4b,0x414b,0x4553,0x4f42,0x410e,
-
-	/* code (0x40d92) */
-	0x4ef9,0x0000,0x632e,0x0000,0x4ef9,0x0000,0x80C2,0x0000,
-	0x6100 /* checksum */
-};
-
-/*
-2079 0001 0004 4ed0 2079 0001 0008
-4ed0 7c
-
-It actually never jumps to 0x40dba?
-*/
-
-static const uint16_t mHoreKidProtData[] =
-{
-	/* N/A */
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-	0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,
-
-	/* code (0x40dba) */
-	0x4e75,0x4e75,0x4e75,0x4e75,0x4e75,0x4e75,0x4e75,0x4e75,
-	0x1800 /* checksum */
-};
-#endif
-
 WRITE16_MEMBER(terracre_state::amazon_sound_w)
 {
 	m_soundlatch->write(space,0,((data & 0x7f) << 1) | 1);
@@ -174,61 +102,6 @@ READ8_MEMBER(terracre_state::soundlatch_clear_r)
 {
 	m_soundlatch->clear_w(space,0,0);
 	return 0;
-}
-
-// 1412M2
-READ16_MEMBER(terracre_state::amazon_protection_r)
-{
-	if(m_mAmazonProtCmd == 0x37)
-	{
-		//m_mAmazonProtReg[4] bit 0 used on hiscore data (clear on code), 0x29f vs 0x29e (not an offset?)
-		//its usage is more variable in mightguy for whatever reason.
-		uint16_t prot_offset = (m_mAmazonProtReg[1]<<8)|(m_mAmazonProtReg[2]);
-		uint8_t *prot_rom = memregion("prot_data")->base();
-
-		//printf("Mode %02x:%04x %04x R -> %02x (fixed %02x)\n",m_mAmazonProtReg[0],prot_offset,(m_mAmazonProtReg[3]<<8)|(m_mAmazonProtReg[4]),prot_rom[prot_offset],(prot_rom[prot_offset] - 0x44) & 0xff);
-
-		return prot_rom[prot_offset & 0x1fff] - 0x44;
-	}
-
-	popmessage("unknown prot cmd R %02x",m_mAmazonProtCmd);
-
-	return 0;
-}
-
-WRITE16_MEMBER(terracre_state::amazon_protection_w)
-{
-	if( ACCESSING_BITS_0_7 )
-	{
-		if( offset==1 )
-		{
-			m_mAmazonProtCmd = data;
-		}
-		else
-		{
-			if( m_mAmazonProtCmd>=0x32 && m_mAmazonProtCmd<=0x37 )
-			{
-				m_mAmazonProtReg[m_mAmazonProtCmd-0x32] = data;
-
-				#if 0
-				if(m_mAmazonProtCmd == 0x32)
-				{
-					for(int i=0;i<6;i++)
-						printf("%02x ",m_mAmazonProtReg[i]);
-
-					printf("\n");
-				}
-				#endif
-			}
-		}
-	}
-}
-
-MACHINE_START_MEMBER(terracre_state,amazon)
-{
-	/* set up for save */
-	save_item(NAME(m_mAmazonProtCmd));
-	save_item(NAME(m_mAmazonProtReg));
 }
 
 void terracre_state::terracre_map(address_map &map)
@@ -271,10 +144,12 @@ void terracre_state::amazon_base_map(address_map &map)
 	map(0x070000, 0x070003).noprw(); // protection (nop for bootlegs)
 }
 
-void terracre_state::amazon_1412m2_map(address_map &map)
+void amazon_state::amazon_1412m2_map(address_map &map)
 {
 	amazon_base_map(map);
-	map(0x070000, 0x070003).rw(this, FUNC(terracre_state::amazon_protection_r), FUNC(terracre_state::amazon_protection_w));
+	map(0x070000, 0x070001).rw("prot_chip", FUNC(nb1412m2_device::data_r), FUNC(nb1412m2_device::data_w)).umask16(0x00ff);
+	map(0x070002, 0x070003).w("prot_chip", FUNC(nb1412m2_device::command_w)).umask16(0x00ff);
+
 }
 
 void terracre_state::sound_map(address_map &map)
@@ -637,16 +512,14 @@ MACHINE_CONFIG_START(terracre_state::amazon_base)
 	ym3526(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amazon_base_map)
-
-	MCFG_MACHINE_START_OVERRIDE(terracre_state,amazon)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(terracre_state::amazon_1412m2)
+MACHINE_CONFIG_START(amazon_state::amazon_1412m2)
 	amazon_base(config);
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amazon_1412m2_map)
 
-	// TODO: install 1412m2 here
+	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(16'000'000)) // divided by 4 maybe
 MACHINE_CONFIG_END
 
 
@@ -849,7 +722,7 @@ ROM_START( amazon )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "4e",      0x000, 0x100, CRC(035f2c7b) SHA1(36e32a50146631e763711b586936b2815600f52d) ) /* ctable */
 
-	ROM_REGION( 0x2000, "prot_data", 0 ) /* unknown, mostly text */
+	ROM_REGION( 0x2000, "prot_chip", 0 ) /* unknown, mostly text */
 	ROM_LOAD( "16.18g", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
@@ -888,7 +761,7 @@ ROM_START( amatelas )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "4e",      0x000, 0x100, CRC(035f2c7b) SHA1(36e32a50146631e763711b586936b2815600f52d) ) /* ctable */
 
-	ROM_REGION( 0x2000, "prot_data", 0 ) /* unknown, mostly text */
+	ROM_REGION( 0x2000, "prot_chip", 0 ) /* unknown, mostly text */
 	ROM_LOAD( "16.18g", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
@@ -928,7 +801,7 @@ ROM_START( horekid )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 
-	ROM_REGION( 0x2000, "prot_data", 0 ) /* unknown, mostly text */
+	ROM_REGION( 0x2000, "prot_chip", 0 ) /* unknown, mostly text */
 	ROM_LOAD( "horekid.17", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
@@ -968,7 +841,7 @@ ROM_START( horekidb )
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
 
-	ROM_REGION( 0x2000, "prot_data", 0 ) /* unknown, mostly text */
+	ROM_REGION( 0x2000, "prot_chip", 0 ) /* unknown, mostly text */
 	ROM_LOAD( "horekid.17", 0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
@@ -1024,10 +897,10 @@ GAME( 1985, terracrea,terracre, ym3526,  terracre, terracre_state, 0,        ROT
 GAME( 1985, terracren,terracre, ym2203,  terracre, terracre_state, 0,        ROT270,  "Nichibutsu", "Terra Cresta (YM2203)", MACHINE_SUPPORTS_SAVE )
 
 // later HW: supports 1412M2 device, see also mightguy.cpp
-GAME( 1986, amazon,   0,        amazon_1412m2,  amazon,   terracre_state, 0,   ROT270,  "Nichibutsu", "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, amatelas, amazon,   amazon_1412m2,  amazon,   terracre_state, 0, ROT270,  "Nichibutsu", "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, horekid,  0,        amazon_1412m2,  horekid,  terracre_state, 0,  ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amazon,   0,        amazon_1412m2,  amazon,   amazon_state, 0,   ROT270,  "Nichibutsu", "Soldier Girl Amazon", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, amatelas, amazon,   amazon_1412m2,  amazon,   amazon_state, 0,   ROT270,  "Nichibutsu", "Sei Senshi Amatelass", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekid,  0,        amazon_1412m2,  horekid,  amazon_state, 0,   ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs
-GAME( 1987, horekidb, horekid,  amazon_base,  horekid,  terracre_state, 0,  ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, horekidb, horekid,  amazon_base,    horekid,  terracre_state, 0,  ROT270,  "bootleg",    "Kid no Hore Hore Daisakusen (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, boobhack, horekid,  amazon_base,    horekid,  terracre_state, 0,  ROT270,  "bootleg",    "Booby Kids (Italian manufactured graphic hack / bootleg of Kid no Hore Hore Daisakusen (bootleg))", MACHINE_SUPPORTS_SAVE )

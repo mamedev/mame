@@ -145,7 +145,7 @@ void cop01_state::io_map(address_map &map)
 	map(0x45, 0x45).w(this, FUNC(cop01_state::cop01_irq_ack_w)); /* ? */
 }
 
-void cop01_state::mightguy_io_map(address_map &map)
+void mightguy_state::mightguy_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("P1");
@@ -174,83 +174,12 @@ void cop01_state::audio_io_map(address_map &map)
 	map(0x06, 0x06).r(this, FUNC(cop01_state::cop01_sound_command_r));
 }
 
-
-/*
- * sound "protection" uses address/data to ports 2/3 (R/W)
- * Register map:
- * 0x32: always 5, rom read trigger?
- * 0x33: - address 1 (source?)
- * 0x34: /
- * 0x35: - address 2 (adjust value in rom?)
- * 0x36: /
- * 0x37: R reused for ym3526 register set, read protection rom (same as amatelas)
- *
- * 0x40: counter set, always 1?
- * 0x41: R bit 0 pulse timer? W oneshot timer?
- * 0x42: counter set, always 3?
- * 0x43: counter set, always 3?
- *
- * 0x92: data in/out (for dac?)
- * 0x94: test register? (W 0xaa, checks if R 0xaa)
- */
-
-/* this just gets some garbage out of the YM3526 */
-READ8_MEMBER(cop01_state::prot_data_r)
-{
-	if(m_prot_command == 0x41)
-		return (m_audiocpu->total_cycles() / 0x34) & 1; // wrong
-
-	if(m_prot_command == 0x37)
-	{
-		uint16_t prot_offset = (m_prot_reg[1]<<8)|(m_prot_reg[2]);
-		uint8_t *prot_rom = memregion("prot_data")->base();
-		// 0x37c are BGMs while 0x34e are SFXs?
-		uint8_t prot_adj = 0x82; //0xbd
-
-		//printf("%02x",(prot_rom[prot_offset] - 0x44) & 0xff);
-
-		return prot_rom[prot_offset & 0x1fff] - prot_adj; // minus value correct?
-	}
-
-	if(m_prot_command == 0x92) // affects coin SFX playback
-		return 1;
-
-	if(m_prot_command == 0x94)
-		return 0;
-
-	return 0;
-}
-
-WRITE8_MEMBER(cop01_state::prot_address_w)
-{
-	m_prot_command = data;
-}
-
-WRITE8_MEMBER(cop01_state::prot_data_w)
-{
-	if( m_prot_command >=0x32 && m_prot_command <=0x37 )
-	{
-		m_prot_reg[m_prot_command-0x32] = data;
-
-		#if 0
-		if(m_prot_command == 0x32)
-		{
-			for(int i=0;i<6;i++)
-				printf("%02x ",m_prot_reg[i]);
-
-			printf("\n");
-		}
-		#endif
-	}
-}
-
-void cop01_state::mightguy_audio_io_map(address_map &map)
+void mightguy_state::mightguy_audio_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ymsnd", FUNC(ym3526_device::write));
-	map(0x02, 0x02).w(this, FUNC(cop01_state::prot_address_w));    /* 1412M2 address? */
-	map(0x03, 0x03).w(this, FUNC(cop01_state::prot_data_w));    /* 1412M2 data? */
-	map(0x03, 0x03).r(this, FUNC(cop01_state::prot_data_r));    /* 1412M2? */
+	map(0x02, 0x02).w("prot_chip", FUNC(nb1412m2_device::command_w));
+	map(0x03, 0x03).rw("prot_chip", FUNC(nb1412m2_device::data_r), FUNC(nb1412m2_device::data_w));
 	map(0x06, 0x06).r(this, FUNC(cop01_state::cop01_sound_command_r));
 }
 
@@ -557,7 +486,7 @@ MACHINE_CONFIG_START(cop01_state::cop01)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(cop01_state::mightguy)
+MACHINE_CONFIG_START(mightguy_state::mightguy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
@@ -569,6 +498,7 @@ MACHINE_CONFIG_START(cop01_state::mightguy)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(mightguy_audio_io_map)
 
+	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)/2) // divided by 2 maybe
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -682,7 +612,7 @@ ROM_START( mightguy )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound cpu) */
 	ROM_LOAD( "11.15b",     0x0000, 0x4000, CRC(576183ea) SHA1(e3f28e8e8c34ab396d158da122584ed226729c99) )
 
-	ROM_REGION( 0x8000, "prot_data", 0 ) /* 1412M2 protection data, z80 encrypted code presumably */
+	ROM_REGION( 0x8000, "prot_chip", 0 ) /* 1412M2 protection data, z80 encrypted code presumably */
 	ROM_LOAD( "10.ic2",     0x0000, 0x8000, CRC(1a5d2bb1) SHA1(0fd4636133a980ba9ffa076f9010474586d37635) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 ) /* alpha */
@@ -736,6 +666,6 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
  *
  *************************************/
 
-GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state, 0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state, 0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, mightguy, 0,     mightguy, mightguy, cop01_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01,    0,     cop01,    cop01,    cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cop01a,   cop01, cop01,    cop01,    cop01_state,    0,        ROT0,   "Nichibutsu", "Cop 01 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, mightguy, 0,     mightguy, mightguy, mightguy_state, mightguy, ROT270, "Nichibutsu", "Mighty Guy",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -7,14 +7,14 @@
     6502 with custom opcodes
     integrated gfx / sound
 
-	special notes
+    special notes
 
-	0x0000-0x7fff seems to be a 'low bus' area, it is always the same regardless
-	              of banking
-	0x8000-0xffff is a banked area with individual code and data banks
-	              0x00ff contains the DATA bank, set manually in code
-				  0x00fe appears to be the current CODE bank, set with either the
-				         custom opcodes, or manually (if running from lowbus only?)
+    0x0000-0x7fff seems to be a 'low bus' area, it is always the same regardless
+                  of banking
+    0x8000-0xffff is a banked area with individual code and data banks
+                  0x00ff contains the DATA bank, set manually in code
+                  0x00fe appears to be the current CODE bank, set with either the
+                         custom opcodes, or manually (if running from lowbus only?)
 
 ***************************************************************************/
 
@@ -144,25 +144,25 @@ uint8_t xavix_device::mi_xavix_nd::read_arg(uint16_t adr)
 
 inline void xavix_device::set_codebank(uint8_t bank)
 {
-//	space().write_byte(0xfe, bank);
+//  space().write_byte(0xfe, bank);
 	m_codebank = bank;
 }
-	
+
 inline uint8_t xavix_device::get_codebank()
 {
-//	return space().read_byte(0xfe);
+//  return space().read_byte(0xfe);
 	return m_codebank;
 }
 
 inline void xavix_device::set_databank(uint8_t bank)
 {
-//	space().write_byte(0xff, bank);
+//  space().write_byte(0xff, bank);
 	m_databank = bank;
 }
-	
+
 inline uint8_t xavix_device::get_databank()
 {
-//	return space().read_byte(0xff);
+//  return space().read_byte(0xff);
 	return m_databank;
 }
 

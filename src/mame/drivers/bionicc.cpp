@@ -54,14 +54,14 @@
           - see the beginning of level 3: background screwed
           - gray tiles around the title in Top Secret
 
-	Note: The MCU rom contains the string
-		  "<for dealer-location test & USA show. 87/03/10 >"
-		  which indicates it could be from an earlier version, especially with it
-		  coming from a 'Top Secret' bootleg with identical program but unprotected 
-		  MCU, however f1dream has a similar string, and is verified as being from
-		  a production board.
+    Note: The MCU rom contains the string
+          "<for dealer-location test & USA show. 87/03/10 >"
+          which indicates it could be from an earlier version, especially with it
+          coming from a 'Top Secret' bootleg with identical program but unprotected
+          MCU, however f1dream has a similar string, and is verified as being from
+          a production board.
 
-		  The MCU hookup is currently wrong, maybe IRQ4 related?
+          The MCU hookup is currently wrong, maybe IRQ4 related?
 
     ToDo:
         IRQ4 seems to be control related.
@@ -103,7 +103,7 @@ WRITE8_MEMBER(bionicc_state::mcu_shared_w)
 }
 
 WRITE8_MEMBER(bionicc_state::out1_w)
-{ 
+{
 	m_soundlatch->write(space,0,data);
 }
 

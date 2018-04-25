@@ -167,7 +167,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 					int res_x,res_y;
 
 					res_x = ((x+kanji_lr)*8+xi) * (m_video_ff[WIDTH40_REG]+1);
-					res_y = y+yi - (m_txt_scroll_reg[3] & 0xf);
+					res_y = y+yi - (m_txt_scroll_reg[3] % 20);
 
 					if(!m_screen->visible_area().contains(res_x, res_y))
 						continue;

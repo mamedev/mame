@@ -1581,8 +1581,8 @@ ROM_START( rad_sktv )
 
 	/* The external scanner MCU is a Winbond from 2000: SA5641
 	   the scanner plays sound effects when scanning, without being connected to the main unit, so a way to dump / emulate
-	   this MCU is also needed for complete emulation 
-	   
+	   this MCU is also needed for complete emulation
+
 	   TODO: find details on MCU so that we know capacity etc. */
 ROM_END
 

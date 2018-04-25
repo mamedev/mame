@@ -1354,7 +1354,7 @@ REF: 950906
 |                                             |          |    TG IC67.IC67 |P|
 |                                      6264   |----------|                 |6|
 |                                      6264                         IC68*  | |
-| J                                                                        | | 
+| J                                                                        | |
 | A                       |-------------------------|         TG IC69.IC69 |-|
 | M                       |                         |                        |
 | M                       |  62256  DS5002  BATT_3V |                        |
@@ -2054,10 +2054,10 @@ REF: 950510-1
 
 Notes
 -----
-Gaelco's MASK ROMs:
- WR2 IC70 42pin 16Mbit MASK read as 27C160 (Graphics)
- WR2 IC69 42pin 32Mbit MASK read as 27C332 (Graphics & Sound)
- WR2 IC68 32pin  8Mbit MASK read as 27C801 (Graphics)
+Gaelco's mask ROMs:
+ WR2 IC70 42pin 16Mbit mask read as 27C160 (Graphics)
+ WR2 IC69 42pin 32Mbit mask read as 27C332 (Graphics & Sound)
+ WR2 IC68 32pin  8Mbit mask read as 27C801 (Graphics)
 
 JP6: 50 pin connector for duaghter card - Not populated
 
@@ -2189,7 +2189,7 @@ GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touc
 GAME( 1995, touchgoe, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
 GAME( 1995, touchgok, touchgo,  touchgo,           touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (MASK ROM version)", 0 )
+GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
 GAME( 1995, wrally2a, wrally2,  wrally2,           wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
