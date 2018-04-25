@@ -14,8 +14,9 @@ It is unknown at current stage if inside the chip there's a MCU
 (with internal ROM).
 
 TODO:
-- understand how Mighty Guy decrypts data (uses port adjuster in a 
-  different way than the other games);
+- double check Mighty Guy port adjuster data;
+- implement DAC (reads data from ROM);
+- timer is handtuned;
 
 Legacy notes from drivers:
 - m_mAmazonProtReg[4] bit 0 used on hiscore data (clear on code), 
@@ -91,19 +92,28 @@ DEFINE_DEVICE_TYPE(NB1412M2, nb1412m2_device, "nb1412m2", "NB1412M2 Mahjong Cust
 
 void nb1412m2_device::nb1412m2_map(address_map &map)
 {
-	map(0x32, 0x32).w(this,FUNC(nb1412m2_device::rom_op_w));
-	map(0x33, 0x34).w(this,FUNC(nb1412m2_device::rom_address_w));
-	map(0x35, 0x36).w(this,FUNC(nb1412m2_device::rom_adjust_w));
-	map(0x37, 0x37).r(this,FUNC(nb1412m2_device::rom_decrypt_r));
+	// data decrypter
+	map(0x32, 0x32).w(this, FUNC(nb1412m2_device::rom_op_w));
+	map(0x33, 0x34).w(this, FUNC(nb1412m2_device::rom_address_w));
+	map(0x35, 0x36).w(this, FUNC(nb1412m2_device::rom_adjust_w));
+	map(0x37, 0x37).r(this, FUNC(nb1412m2_device::rom_decrypt_r));
 	
-	map(0x40, 0x40).nopw();
-	map(0x41, 0x41).r(this,FUNC(nb1412m2_device::timer_r)).nopw();
-	map(0x42, 0x43).nopw();
+	// timer
+	map(0x40, 0x40).w(this, FUNC(nb1412m2_device::timer_w));
+	map(0x41, 0x41).rw(this, FUNC(nb1412m2_device::timer_r), FUNC(nb1412m2_device::timer_ack_w));
+	map(0x42, 0x43).nopw(); // always 0x03
 	
-	map(0x92, 0x92).ram(); // latch?
-	map(0x94, 0x94).rw(this,FUNC(nb1412m2_device::xor_r),FUNC(nb1412m2_device::xor_w));
+	// DAC control
+	map(0x11, 0x11).nopw(); // - unknown (volume/channel control?)
+	map(0x18, 0x18).nopw(); // ^ unknown
+	map(0x51, 0x52).nopw(); //  start address
 	
-	// 16-bit registers (1=upper), more latches?
+	// latches?
+	map(0x90, 0x90).rw(this, FUNC(nb1412m2_device::const90_r),FUNC(nb1412m2_device::const90_w)); //ram();
+	map(0x92, 0x92).ram();
+	map(0x94, 0x94).ram(); //rw(this,FUNC(nb1412m2_device::xor_r),FUNC(nb1412m2_device::xor_w));
+	
+	// 16-bit registers (1=upper address), more latches?
 	map(0xa0, 0xa1).ram();
 	map(0xa2, 0xa3).ram();
 }
@@ -137,7 +147,12 @@ void nb1412m2_device::device_start()
 	save_item(NAME(m_rom_address));
 	save_item(NAME(m_adj_address));
 	save_item(NAME(m_rom_op));
-	save_item(NAME(m_xor));
+	save_item(NAME(m_timer_reg));
+	save_item(NAME(m_const90));
+	
+	m_timer = timer_alloc(TIMER_MAIN);
+	m_timer->adjust(attotime::never);
+
 }
 
 
@@ -151,9 +166,22 @@ void nb1412m2_device::device_reset()
 	m_rom_address = 0;
 	m_adj_address = 0;
 	m_rom_op = 0;
-	m_xor = 0;
+	m_const90 = 0;
+	m_timer_reg = false;
 }
 
+void nb1412m2_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_MAIN:
+			m_timer_reg = true;
+			m_timer->adjust(attotime::never);
+			break;
+		default:
+			assert_always(false, "Unknown id in nb1412m2_device::device_timer");
+	}
+}
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
@@ -161,6 +189,10 @@ void nb1412m2_device::device_reset()
 
 WRITE8_MEMBER( nb1412m2_device::rom_op_w )
 {
+//	TODO: data == 2 starts DAC playback?
+//	if(data != 5)
+//		printf("%02x rom_op\n",data);
+	
 	m_rom_op = data;
 }
 
@@ -195,10 +227,33 @@ WRITE8_MEMBER( nb1412m2_device::rom_adjust_w )
 // readback from ROM data
 READ8_MEMBER( nb1412m2_device::rom_decrypt_r )
 {
-	// TODO: provided by commands 0x35 & 0x36 (maybe 0x32 too)
-	uint8_t prot_adj = m_data[m_adj_address] == 0xff ? 0x44 : 0x82;
+	uint8_t prot_adj;
 
-//	printf("%02x %04x %02x\n",m_data[m_adj_address],m_adj_address,m_rom_op);
+	// TODO: provided by commands 0x35 & 0x36 (maybe 0x32 too)
+	switch(m_data[m_adj_address])
+	{
+		// common, most games uses this
+		case 0xff:
+			prot_adj = 0x44;
+			break;
+		// Mighty Guy specific
+		case 0x86: // SFXs
+			prot_adj = 0xbd;
+			break;
+		case 0x94: // BGM
+			prot_adj = 0xaf; // 0xef
+			break;
+		case 0x00: // DAC
+			prot_adj = 0x43; // matches address 0x840 at POST (first valid 8-bit data for DAC)
+			//machine().debug_break();
+			break;
+		default:
+			prot_adj = 0;
+			popmessage("nb1412m2: prot adjust %02x, contact MAMEdev",m_data[m_adj_address]);
+			break;
+	}
+
+//	printf("%02x %04x %04x %02x\n",m_data[m_adj_address],m_rom_address,m_adj_address,m_rom_op);
 	
 	return m_data[m_rom_address & 0x1fff] - prot_adj;	
 }
@@ -206,19 +261,31 @@ READ8_MEMBER( nb1412m2_device::rom_decrypt_r )
 // Mighty Guy specifics
 READ8_MEMBER( nb1412m2_device::timer_r )
 {
-//	return (this->clock().cycles() / 0x34) & 1; // wrong
-	return machine().rand() & 1; 
+	return m_timer_reg == true; 
 }
 
-WRITE8_MEMBER( nb1412m2_device::xor_w )
+WRITE8_MEMBER( nb1412m2_device::timer_w )
 {
-	m_xor = data ^ m_xor;
+	// TODO: timing of this, this port is always 1?
+	m_timer->adjust(attotime::from_usec(800));
 }
 
-READ8_MEMBER( nb1412m2_device::xor_r )
+WRITE8_MEMBER( nb1412m2_device::timer_ack_w )
 {
-	// write 0xaa, reads back if register is equal to 0xaa (xor reg?)
-	return m_xor;
+	m_timer_reg = false;
+	m_timer->adjust(attotime::never);
+}
+
+// controls music tempo
+READ8_MEMBER( nb1412m2_device::const90_r )
+{
+	// TODO: likely wrong
+	return m_const90+0x08;
+}
+
+WRITE8_MEMBER( nb1412m2_device::const90_w )
+{
+	m_const90 = data;
 }
 
 // public accessors
