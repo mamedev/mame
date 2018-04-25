@@ -14,9 +14,8 @@ It is unknown at current stage if inside the chip there's a MCU
 (with internal ROM).
 
 TODO:
-- double check Mighty Guy port adjuster data;
 - implement DAC (reads data from ROM);
-- timer is handtuned;
+- jumpy timer, presumably one of the "latches" controls that;
 
 Legacy notes from drivers:
 - m_mAmazonProtReg[4] bit 0 used on hiscore data (clear on code), 
@@ -235,6 +234,7 @@ READ8_MEMBER( nb1412m2_device::rom_decrypt_r )
 	// 0x86: SFXs -> 0xbd
 	// 0x94: BGM  -> 0xaf
 	// 0x00: DAC  -> 0x43
+	// summing adjust entry and actual value needed always make 0x143 therefore:
 	prot_adj = (0x43 - m_data[m_adj_address]) & 0xff;
 
 //	printf("%02x %04x %04x %02x\n",m_data[m_adj_address],m_rom_address,m_adj_address,m_rom_op);
