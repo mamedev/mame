@@ -376,7 +376,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 				for(int xi=0;xi<zoomwidth;xi++)
 				{
 					int xi2 = xsourceoff>>ZOOM_SHIFT;
-					uint8_t data = m_vram[((((ysource + yi2) & 0x7ff) << 11) | ((xsource + (xi2/2)) & 0x7ff))];
+					uint8_t data = m_vram[((((ysource + yi2) & 0x7ff) * 0x800) + ((xsource + (xi2/2)) & 0x7ff))];
 					uint8_t pix;
 					uint32_t col_offs;
 					uint16_t color_data;
@@ -460,7 +460,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 				{
 					int xi2 = xsourceoff>>ZOOM_SHIFT;
 
-					uint8_t data = m_vram[((((ysource+yi2)&0x7ff)<<11) | ((xsource+xi2)&0x7ff))];
+					uint8_t data = m_vram[((((ysource+yi2)&0x7ff)*0x800) + ((xsource+xi2)&0x7ff))];
 					uint8_t pix;
 					uint32_t col_offs;
 					uint16_t color_data;
@@ -633,7 +633,7 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 int gunpey_state::write_dest_byte(uint8_t usedata)
 {
 	// write the byte we and to destination and increase our counters
-	m_vram[(((m_dsty)&0x7ff)<<11)|((m_dstx)&0x7ff)] = usedata;
+	m_vram[(((m_dsty)&0x7ff)*0x800)+((m_dstx)&0x7ff)] = usedata;
 
 	// increase destination counter and check if we've filled our destination rectangle
 	m_dstx++; m_dstxcount++;
@@ -654,7 +654,7 @@ int gunpey_state::write_dest_byte(uint8_t usedata)
 
 inline uint8_t gunpey_state::get_vrom_byte(int x, int y)
 {
-	return m_blit_rom[(x | (y<<11)) & m_blit_rom.mask()];
+	return m_blit_rom[((x)+2048 * (y)) & m_blit_rom.mask()];
 }
 
 struct state_s
@@ -712,7 +712,7 @@ void gunpey_state::set_o(struct state_s *s, unsigned char v)
 			break;
 	}
 
-	s->buf[((s->dx + s->ox++) & 0x7ff) | (((s->dy + s->oy) & 0x7ff) << 11)] = v;
+	s->buf[((s->dx + s->ox++) & 0x7ff) + (((s->dy + s->oy) & 0x7ff) * 0x800)] = v;
 }
 
 
@@ -725,7 +725,7 @@ unsigned char gunpey_state::get_o(struct state_s *s, int x, int y)
 	assert(y < s->oh);
 	assert(y < 256);
 
-	return s->buf[((s->dx + x) & 0x7ff) | (((s->dy + y) & 0x7ff) << 11)];
+	return s->buf[((s->dx + x) & 0x7ff) + (((s->dy + y) & 0x7ff) * 0x800)];
 }
 
 
@@ -1034,7 +1034,7 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 
 			for (;;)
 			{
-				uint8_t usedata = m_blit_rom[(((m_srcy)&0x7ff)<<11)|((m_srcx)&0x7ff)];
+				uint8_t usedata = m_blit_rom[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)];
 				m_srcx++; m_scrxcount++;
 				if (m_scrxcount==m_xsize)
 				{
