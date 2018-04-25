@@ -205,11 +205,12 @@ class gunpey_state : public driver_device
 {
 public:
 	gunpey_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki"),
-		m_wram(*this, "wram"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_wram(*this, "wram")
+		, m_palette(*this, "palette")
+		, m_blit_rom(*this, "blit_data")
 	{ }
 
 	// TODO: make these non-static and private
@@ -247,9 +248,6 @@ private:
 	uint16_t m_vram_bank;
 	uint16_t m_vreg_addr;
 
-	uint8_t* m_blit_rom;
-	uint8_t* m_vram;
-
 	emu_timer *m_blitter_end_timer;
 
 	// work variables for the decompression
@@ -273,21 +271,25 @@ private:
 	int next_node(struct huffman_node_s **res, struct state_s *s);
 	int get_next_bit(struct state_s *s);
 
-
 	uint8_t m_irq_cause, m_irq_mask;
 	std::unique_ptr<uint16_t[]> m_blit_buffer;
+	std::unique_ptr<uint8_t[]> m_vram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_shared_ptr<uint16_t> m_wram;
 	required_device<palette_device> m_palette;
+	required_region_ptr<uint8_t> m_blit_rom;
 };
 
 
 void gunpey_state::video_start()
 {
 	m_blit_buffer = std::make_unique<uint16_t[]>(512*512);
+	m_vram = std::make_unique<uint8_t[]>(0x400000);
+	std::fill_n(&m_vram[0], 0x400000, 0xff);
 	m_blitter_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gunpey_state::blitter_end), this));
+	save_pointer(NAME(m_vram.get()), 0x400000);
 }
 
 uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient)
@@ -374,7 +376,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 				for(int xi=0;xi<zoomwidth;xi++)
 				{
 					int xi2 = xsourceoff>>ZOOM_SHIFT;
-					uint8_t data = m_vram[((((ysource + yi2) & 0x7ff) * 0x800) + ((xsource + (xi2/2)) & 0x7ff))];
+					uint8_t data = m_vram[((((ysource + yi2) & 0x7ff) << 11) | ((xsource + (xi2/2)) & 0x7ff))];
 					uint8_t pix;
 					uint32_t col_offs;
 					uint16_t color_data;
@@ -458,7 +460,7 @@ uint8_t gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,in
 				{
 					int xi2 = xsourceoff>>ZOOM_SHIFT;
 
-					uint8_t data = m_vram[((((ysource+yi2)&0x7ff)*0x800) + ((xsource+xi2)&0x7ff))];
+					uint8_t data = m_vram[((((ysource+yi2)&0x7ff)<<11) | ((xsource+xi2)&0x7ff))];
 					uint8_t pix;
 					uint32_t col_offs;
 					uint16_t color_data;
@@ -631,7 +633,7 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 int gunpey_state::write_dest_byte(uint8_t usedata)
 {
 	// write the byte we and to destination and increase our counters
-	m_vram[(((m_dsty)&0x7ff)*0x800)+((m_dstx)&0x7ff)] = usedata;
+	m_vram[(((m_dsty)&0x7ff)<<11)|((m_dstx)&0x7ff)] = usedata;
 
 	// increase destination counter and check if we've filled our destination rectangle
 	m_dstx++; m_dstxcount++;
@@ -652,7 +654,7 @@ int gunpey_state::write_dest_byte(uint8_t usedata)
 
 inline uint8_t gunpey_state::get_vrom_byte(int x, int y)
 {
-	return m_blit_rom[(x)+2048 * (y)];
+	return m_blit_rom[(x | (y<<11)) & m_blit_rom.mask()];
 }
 
 struct state_s
@@ -710,7 +712,7 @@ void gunpey_state::set_o(struct state_s *s, unsigned char v)
 			break;
 	}
 
-	s->buf[((s->dx + s->ox++) & 0x7ff) + (((s->dy + s->oy) & 0x7ff) * 0x800)] = v;
+	s->buf[((s->dx + s->ox++) & 0x7ff) | (((s->dy + s->oy) & 0x7ff) << 11)] = v;
 }
 
 
@@ -723,7 +725,7 @@ unsigned char gunpey_state::get_o(struct state_s *s, int x, int y)
 	assert(y < s->oh);
 	assert(y < 256);
 
-	return s->buf[((s->dx + x) & 0x7ff) + (((s->dy + y) & 0x7ff) * 0x800)];
+	return s->buf[((s->dx + x) & 0x7ff) | (((s->dy + y) & 0x7ff) << 11)];
 }
 
 
@@ -998,10 +1000,10 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 
 	if(offset == 0 && data == 2) // blitter trigger, 0->1 transition
 	{
-		m_srcx = blit_ram[0x04]+(blit_ram[0x05]<<8);
-		m_srcy = blit_ram[0x06]+(blit_ram[0x07]<<8);
-		m_dstx = blit_ram[0x08]+(blit_ram[0x09]<<8);
-		m_dsty = blit_ram[0x0a]+(blit_ram[0x0b]<<8);
+		m_srcx = blit_ram[0x04]|(blit_ram[0x05]<<8);
+		m_srcy = blit_ram[0x06]|(blit_ram[0x07]<<8);
+		m_dstx = blit_ram[0x08]|(blit_ram[0x09]<<8);
+		m_dsty = blit_ram[0x0a]|(blit_ram[0x0b]<<8);
 		m_xsize = blit_ram[0x0c]+1;
 		m_ysize = blit_ram[0x0e]+1;
 		int compression = blit_ram[0x01];
@@ -1013,7 +1015,7 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 		{
 			if(compression == 8)
 			{				
-				if (decompress_sprite(m_vram, m_srcx, m_srcy, m_xsize, m_ysize, m_dstx, m_dsty))
+				if (decompress_sprite(m_vram.get(), m_srcx, m_srcy, m_xsize, m_ysize, m_dstx, m_dsty))
 				{
 					logerror("[-] Failed to decompress sprite at %04x %04x\n", m_srcx, m_srcy);
 				}
@@ -1032,7 +1034,7 @@ WRITE8_MEMBER(gunpey_state::blitter_w)
 
 			for (;;)
 			{
-				uint8_t usedata = m_blit_rom[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)];
+				uint8_t usedata = m_blit_rom[(((m_srcy)&0x7ff)<<11)|((m_srcx)&0x7ff)];
 				m_srcx++; m_scrxcount++;
 				if (m_scrxcount==m_xsize)
 				{
@@ -1253,8 +1255,6 @@ ROM_START( gunpey )
 	ROM_REGION( 0x400000, "blit_data", 0 )
 	ROM_LOAD( "gp_rom3.025",  0x00000, 0x400000,  CRC(f2d1f9f0) SHA1(0d20301fd33892074508b9d127456eae80cc3a1c) )
 
-	ROM_REGION( 0x400000, "vram", ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x400000, "ymz", 0 )
 	ROM_LOAD( "gp_rom4.525",  0x000000, 0x400000, CRC(78dd1521) SHA1(91d2046c60e3db348f29f776def02e3ef889f2c1) ) // 11xxxxxxxxxxxxxxxxxxxx = 0xFF
 
@@ -1264,8 +1264,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 {
-	m_blit_rom = memregion("blit_data")->base();
-	m_vram = memregion("vram")->base();
 }
 
 GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Bandai / Banpresto", "Gunpey (Japan)", 0 )
