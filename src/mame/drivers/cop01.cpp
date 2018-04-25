@@ -61,6 +61,8 @@ Mighty Guy board layout:
 #include "sound/3526intf.h"
 #include "screen.h"
 #include "speaker.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 #define MIGHTGUY_HACK    0
@@ -499,7 +501,8 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 	MCFG_CPU_IO_MAP(mightguy_audio_io_map)
 
 	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)/2) // divided by 2 maybe
-
+	MCFG_NB1412M2_DAC_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -521,6 +524,12 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
 MACHINE_CONFIG_END
 
 
