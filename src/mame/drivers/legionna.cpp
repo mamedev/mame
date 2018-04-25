@@ -2641,7 +2641,17 @@ DRIVER_INIT_MEMBER(legionna_state,legiongfx)
 	descramble_legionnaire_gfx(memregion("gfx5")->base() );
 }
 
-
+DRIVER_INIT_MEMBER(legionna_state,godzilla)
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	// TODO: some game elements doesn't collide properly, @see seibucop.cpp
+	ROM[(0xbe0e + 0x0a)/2] = 0xb000;
+	ROM[(0xbe0e + 0x1a)/2] = 0xb800;
+	ROM[(0xbb0a + 0x0a)/2] = 0xb000;
+	ROM[(0xbb0a + 0x1a)/2] = 0xb800;
+	// patch ROM checksum
+	ROM[0x3fffe/2] = 0x61ba;
+}
 
 GAME( 1992, legionna, 0,        legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation",                  "Legionnaire (World)", 0 )
 GAME( 1992, legionnau,legionna, legionna, legionna, legionna_state, legiongfx, ROT0, "TAD Corporation (Fabtek license)", "Legionnaire (US)", 0 )
@@ -2653,7 +2663,7 @@ GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         R
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation", "Heated Barrel (US)", 0 )
 GAME( 1992, heatbrle, heatbrl,  heatbrl,  heatbrl,  legionna_state, 0,         ROT0, "TAD Corporation (Electronic Devices license)", "Heated Barrel (Electronic Devices license)", 0 )
 
-GAME( 1993, godzilla, 0,        godzilla, godzilla, legionna_state, 0,         ROT0, "Banpresto", "Godzilla (Japan)", 0 )
+GAME( 1993, godzilla, 0,        godzilla, godzilla, legionna_state, godzilla,  ROT0, "Banpresto", "Godzilla (Japan)", 0 )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1993, grainbowk,grainbow, grainbow, grainbow, legionna_state, 0,         ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki (Korea)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, legionna_state, 0,         ROT0, "Winkysoft (Banpresto license)", "Denjin Makai", 0 )

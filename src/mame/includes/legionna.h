@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE16_MEMBER(palette_swap_w);
 
 	DECLARE_DRIVER_INIT(legiongfx);
+	DECLARE_DRIVER_INIT(godzilla);
 	DECLARE_DRIVER_INIT(cupsoc_debug);
 	DECLARE_DRIVER_INIT(cupsoc);
 	DECLARE_DRIVER_INIT(cupsocs);
