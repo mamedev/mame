@@ -123,7 +123,7 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 	m_speaker(*this, "speaker"),
 	m_ide(*this, "ide"),
 	m_ide2(*this, "ide2"),
-	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
+	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_eisa_irq_mode(0), m_channel_check(0), m_nmi_enabled(0), m_ide_io_ports_enabled(true)
 {
 }
 
@@ -133,25 +133,80 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
  *
  **********************************************************/
 
-/// HACK: the memory system cannot cope with mixing the  8 bit device map from the fdc with a 32 bit handler
-READ8_MEMBER(southbridge_device::ide_read_cs1_r)
+READ32_MEMBER(southbridge_device::ide1_read32_cs0_r)
 {
+	if (!m_ide_io_ports_enabled)
+		return 0xffffffff;
+	return m_ide->read_cs0(space, offset, mem_mask);
+}
+
+WRITE32_MEMBER(southbridge_device::ide1_write32_cs0_w)
+{
+	if (!m_ide_io_ports_enabled)
+		return;
+	m_ide->write_cs0(space, offset, data, mem_mask);
+}
+
+READ32_MEMBER(southbridge_device::ide2_read32_cs0_r)
+{
+	if (!m_ide_io_ports_enabled)
+		return 0xffffffff;
+	return m_ide2->read_cs0(space, offset, mem_mask);
+}
+
+WRITE32_MEMBER(southbridge_device::ide2_write32_cs0_w)
+{
+	if (!m_ide_io_ports_enabled)
+		return;
+	m_ide2->write_cs0(space, offset, data, mem_mask);
+}
+
+READ8_MEMBER(southbridge_device::ide1_read_cs1_r)
+{
+	if (!m_ide_io_ports_enabled)
+		return 0xff;
 	return m_ide->read_cs1(1, 0xff0000) >> 16;
 }
 
-WRITE8_MEMBER(southbridge_device::ide_write_cs1_w)
+WRITE8_MEMBER(southbridge_device::ide1_write_cs1_w)
 {
+	if (!m_ide_io_ports_enabled)
+		return;
 	m_ide->write_cs1(1, data << 16, 0xff0000);
 }
 
 READ8_MEMBER(southbridge_device::ide2_read_cs1_r)
 {
+	if (!m_ide_io_ports_enabled)
+		return 0xff;
 	return m_ide2->read_cs1(1, 0xff0000) >> 16;
 }
 
 WRITE8_MEMBER(southbridge_device::ide2_write_cs1_w)
 {
+	if (!m_ide_io_ports_enabled)
+		return;
 	m_ide2->write_cs1(1, data << 16, 0xff0000);
+}
+
+// With EISA it is possible to select whether each IRQ line is edge sensitive or level sensitive
+// Each bit corresponds to an IRQ, 0 for edge triggered 1 for level sensitive
+// IRQs 0 1 2 8 13 are always edge triggered
+READ8_MEMBER(southbridge_device::eisa_irq_read)
+{
+	if (offset == 0)
+		return m_eisa_irq_mode & 0xff;
+	else
+		return m_eisa_irq_mode >> 8;
+}
+
+WRITE8_MEMBER(southbridge_device::eisa_irq_write)
+{
+	if (offset == 0)
+		m_eisa_irq_mode = (m_eisa_irq_mode & 0xff00) | data;
+	else
+		m_eisa_irq_mode = (m_eisa_irq_mode & 0x00ff) | (data << 8);
+	// TODO: update m_pic8259_master and m_pic8259_slave with the new configuration
 }
 
 //-------------------------------------------------
@@ -160,23 +215,21 @@ WRITE8_MEMBER(southbridge_device::ide2_write_cs1_w)
 
 void southbridge_device::device_start()
 {
-	address_space& spaceio = machine().device(":maincpu")->memory().space(AS_IO);
+	spaceio = &machine().device(":maincpu")->memory().space(AS_IO);
 
-	spaceio.install_readwrite_handler(0x0000, 0x001f, read8_delegate(FUNC(am9517a_device::read),&(*m_dma8237_1)), write8_delegate(FUNC(am9517a_device::write),&(*m_dma8237_1)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0020, 0x003f, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_master)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_master)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0040, 0x005f, read8_delegate(FUNC(pit8254_device::read),&(*m_pit8254)), write8_delegate(FUNC(pit8254_device::write),&(*m_pit8254)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(southbridge_device::at_portb_r), this), write8_delegate(FUNC(southbridge_device::at_portb_w), this), 0x0000ff00);
-	spaceio.install_readwrite_handler(0x0080, 0x009f, read8_delegate(FUNC(southbridge_device::at_page8_r),this), write8_delegate(FUNC(southbridge_device::at_page8_w),this), 0xffffffff);
-	spaceio.install_readwrite_handler(0x00a0, 0x00bf, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_slave)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_slave)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(southbridge_device::at_dma8237_2_r),this), write8_delegate(FUNC(southbridge_device::at_dma8237_2_w),this), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0170, 0x0177, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs0),&(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs0), &(*m_ide2)),0xffffffff);
-	spaceio.install_readwrite_handler(0x01f0, 0x01f7, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs0),&(*m_ide)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs0), &(*m_ide)),0xffffffff);
-//  HACK: this works if you take out the (non working) fdc
-//  spaceio.install_readwrite_handler(0x0370, 0x0377, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs1),&(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs1), &(*m_ide2)),0xffffffff);
-//  spaceio.install_readwrite_handler(0x03f0, 0x03f7, read32_delegate(FUNC(bus_master_ide_controller_device::read_cs1),&(*m_ide)), write32_delegate(FUNC(bus_master_ide_controller_device::write_cs1), &(*m_ide)),0xffffffff);
-	spaceio.install_readwrite_handler(0x0374, 0x0377, read8_delegate(FUNC(southbridge_device::ide2_read_cs1_r),this), write8_delegate(FUNC(southbridge_device::ide2_write_cs1_w), this),0xff0000);
-	spaceio.install_readwrite_handler(0x03f4, 0x03f7, read8_delegate(FUNC(southbridge_device::ide_read_cs1_r),this), write8_delegate(FUNC(southbridge_device::ide_write_cs1_w), this),0xff0000);
-	spaceio.nop_readwrite(0x00e0, 0x00ef);
+	spaceio->install_readwrite_handler(0x0000, 0x001f, read8_delegate(FUNC(am9517a_device::read), &(*m_dma8237_1)), write8_delegate(FUNC(am9517a_device::write), &(*m_dma8237_1)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0020, 0x003f, read8_delegate(FUNC(pic8259_device::read), &(*m_pic8259_master)), write8_delegate(FUNC(pic8259_device::write), &(*m_pic8259_master)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0040, 0x005f, read8_delegate(FUNC(pit8254_device::read), &(*m_pit8254)), write8_delegate(FUNC(pit8254_device::write), &(*m_pit8254)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(southbridge_device::at_portb_r), this), write8_delegate(FUNC(southbridge_device::at_portb_w), this), 0x0000ff00);
+	spaceio->install_readwrite_handler(0x0080, 0x009f, read8_delegate(FUNC(southbridge_device::at_page8_r), this), write8_delegate(FUNC(southbridge_device::at_page8_w), this), 0xffffffff);
+	spaceio->install_readwrite_handler(0x00a0, 0x00bf, read8_delegate(FUNC(pic8259_device::read), &(*m_pic8259_slave)), write8_delegate(FUNC(pic8259_device::write), &(*m_pic8259_slave)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(southbridge_device::at_dma8237_2_r), this), write8_delegate(FUNC(southbridge_device::at_dma8237_2_w), this), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0170, 0x0177, read32_delegate(FUNC(southbridge_device::ide2_read32_cs0_r), this), write32_delegate(FUNC(southbridge_device::ide2_write32_cs0_w), this), 0xffffffff);
+	spaceio->install_readwrite_handler(0x01f0, 0x01f7, read32_delegate(FUNC(southbridge_device::ide1_read32_cs0_r), this), write32_delegate(FUNC(southbridge_device::ide1_write32_cs0_w), this), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0374, 0x0377, read8_delegate(FUNC(southbridge_device::ide2_read_cs1_r), this), write8_delegate(FUNC(southbridge_device::ide2_write_cs1_w), this), 0xff0000);
+	spaceio->install_readwrite_handler(0x03f4, 0x03f7, read8_delegate(FUNC(southbridge_device::ide1_read_cs1_r), this), write8_delegate(FUNC(southbridge_device::ide1_write_cs1_w), this), 0xff0000);
+	spaceio->install_readwrite_handler(0x04d0, 0x04d3, read8_delegate(FUNC(southbridge_device::eisa_irq_read), this), write8_delegate(FUNC(southbridge_device::eisa_irq_write), this), 0x0000ffff);
+	spaceio->nop_readwrite(0x00e0, 0x00ef);
 }
 
 //-------------------------------------------------
