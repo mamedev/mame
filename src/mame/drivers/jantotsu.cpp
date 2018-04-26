@@ -505,8 +505,6 @@ MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 	MCFG_CPU_ADD("maincpu", Z80,MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(jantotsu_map)
 	MCFG_CPU_IO_MAP(jantotsu_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jantotsu_state,  nmi_line_pulse)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -515,6 +513,7 @@ MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(jantotsu_state, screen_update_jantotsu)
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(jantotsu_state, jantotsu)
