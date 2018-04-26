@@ -2580,6 +2580,7 @@ atomeb                          // 1979 Acorn Atom with Eprom Box
 @source:atpci.cpp
 at586                           // 19?? AT 586
 at586x3                         // 19?? AT 586
+m55hipl                         // 19?? Micronics M55HI-Plus
 ficvt503                        // 1997 FIC VT-503
 
 @source:atronic.cpp
