@@ -387,17 +387,7 @@ Keyboard TX commands:
 
 #include "emu.h"
 #include "includes/pc9801.h"
-
-
-void pc9801_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-		case TIMER_VBIRQ:
-			m_pic1->ir2_w(0);
-			break;
-	}
-}
+#include "machine/input_merger.h"
 
 
 
@@ -435,12 +425,6 @@ WRITE8_MEMBER(pc9801_state::nmi_ctrl_w)
 WRITE8_MEMBER(pc9801_state::vrtc_clear_w)
 {
 	m_pic1->ir2_w(0);
-}
-
-DECLARE_WRITE_LINE_MEMBER(pc9801_state::write_uart_clock)
-{
-	m_sio->write_txc(state);
-	m_sio->write_rxc(state);
 }
 
 READ8_MEMBER(pc9801_state::fdc_2hd_ctrl_r)
@@ -511,34 +495,22 @@ WRITE8_MEMBER(pc9801_state::ide_ctrl_w)
 
 READ16_MEMBER(pc9801_state::ide_cs0_r)
 {
-	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs0(offset, mem_mask);
+	return m_ide[m_ide_sel]->read_cs0(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs0_w)
 {
-	(m_ide_sel ? m_ide2 : m_ide1)->write_cs0(offset, data, mem_mask);
+	m_ide[m_ide_sel]->write_cs0(offset, data, mem_mask);
 }
 
 READ16_MEMBER(pc9801_state::ide_cs1_r)
 {
-	return (m_ide_sel ? m_ide2 : m_ide1)->read_cs1(offset, mem_mask);
+	return m_ide[m_ide_sel]->read_cs1(offset, mem_mask);
 }
 
 WRITE16_MEMBER(pc9801_state::ide_cs1_w)
 {
-	(m_ide_sel ? m_ide2 : m_ide1)->write_cs1(offset, data, mem_mask);
-}
-
-WRITE_LINE_MEMBER(pc9801_state::ide1_irq_w)
-{
-	m_ide1_irq = state ? true : false;
-	m_pic2->ir1_w((state || m_ide2_irq) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(pc9801_state::ide2_irq_w)
-{
-	m_ide2_irq = state ? true : false;
-	m_pic2->ir1_w((state || m_ide1_irq) ? ASSERT_LINE : CLEAR_LINE);
+	m_ide[m_ide_sel]->write_cs1(offset, data, mem_mask);
 }
 
 READ8_MEMBER( pc9801_state::sasi_data_r )
@@ -2068,8 +2040,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
 
-	m_vbirq = timer_alloc(TIMER_VBIRQ);
-
 	int ram_size = m_ram->size() - (640*1024);
 
 	address_space& space = m_maincpu->space(AS_PROGRAM);
@@ -2177,7 +2147,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_fdc_ctrl = 3;
 	m_access_ctrl = 0;
 	m_ide_sel = 0;
-	m_ide1_irq = m_ide2_irq = false;
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 
 	if(memregion("ide"))
@@ -2196,10 +2165,9 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9821)
 	m_pc9821_window_bank = 0x08;
 }
 
-INTERRUPT_GEN_MEMBER(pc9801_state::vrtc_irq)
+WRITE_LINE_MEMBER(pc9801_state::vrtc_irq)
 {
-	m_pic1->ir2_w(1);
-	m_vbirq->adjust(m_screen->time_until_vblank_end());
+	m_pic1->ir2_w(state);
 }
 
 
@@ -2287,11 +2255,14 @@ void pc9801_state::cdrom_headphones(device_t *device)
 MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
 	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
 	MCFG_ATA_INTERFACE_ADD("ide1", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide1_irq_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("ideirq", input_merger_device, in_w<0>))
 	MCFG_ATA_INTERFACE_ADD("ide2", pc9801_atapi_devices, "pc9801_cd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(pc9801_state, ide2_irq_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("ideirq", input_merger_device, in_w<1>))
 	MCFG_DEVICE_MODIFY("ide2:0")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("pc9801_cd", cdrom_headphones)
+
+	MCFG_INPUT_MERGER_ANY_HIGH("ideirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir1_w))
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","pc98_cd")
 MACHINE_CONFIG_END
@@ -2302,7 +2273,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259_master", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(MAIN_CLOCK_X1) /* Memory Refresh */
 	MCFG_PIT8253_CLK2(MAIN_CLOCK_X1) /* RS-232c */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pc9801_state, write_uart_clock))
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(UPD8251_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(UPD8251_TAG, i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("i8237", AM9517A, 5000000) // unknown clock, TODO: check channels 0 - 1
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc9801_state, dma_hrq_changed))
@@ -2357,10 +2329,9 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_RAW_PARAMS(21.0526_MHz_XTAL, 848, 0, 640, 440, 0, 400)
 	MCFG_SCREEN_UPDATE_DRIVER(pc9801_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pc9801_state, vrtc_irq))
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, 5000000/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
@@ -2382,7 +2353,6 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
 	MCFG_CPU_IO_MAP(pc9801_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	pc9801_common(config);
@@ -2417,7 +2387,6 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_CPU_ADD("maincpu", I386SX, MAIN_CLOCK_X1*8) // unknown clock.
 	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
 	MCFG_CPU_IO_MAP(pc9801rs_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	pc9801_common(config);
@@ -2454,7 +2423,6 @@ MACHINE_CONFIG_START(pc9801_state::pc9801vm)
 	MCFG_CPU_REPLACE("maincpu",V30,10000000)
 	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
 	MCFG_CPU_IO_MAP(pc9801ux_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
@@ -2470,7 +2438,6 @@ MACHINE_CONFIG_START(pc9801_state::pc9801ux)
 	MCFG_CPU_PROGRAM_MAP(pc9801ux_map)
 	MCFG_CPU_IO_MAP(pc9801ux_io)
 	MCFG_80286_A20(pc9801_state, a20_286)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 //  MCFG_DEVICE_MODIFY("i8237", AM9157A, 10000000) // unknown clock
 MACHINE_CONFIG_END
@@ -2480,7 +2447,6 @@ MACHINE_CONFIG_START(pc9801_state::pc9801bx2)
 	MCFG_CPU_REPLACE("maincpu",I486,25000000)
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801bx2)
@@ -2491,7 +2457,6 @@ MACHINE_CONFIG_START(pc9801_state::pc9821)
 	MCFG_CPU_REPLACE("maincpu", I486, 16000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_MODIFY("pit8253")
@@ -2515,7 +2480,6 @@ MACHINE_CONFIG_START(pc9801_state::pc9821ap2)
 	MCFG_CPU_REPLACE("maincpu", I486, 66666667) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821ap2)
@@ -2526,7 +2490,6 @@ MACHINE_CONFIG_START(pc9801_state::pc9821v20)
 	MCFG_CPU_REPLACE("maincpu",PENTIUM,32000000) /* TODO: clock */
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, vrtc_irq)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 
