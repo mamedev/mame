@@ -732,7 +732,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 {
 	uint32_t pcg_offset;
 
-	pcg_offset = m_font_addr << 5;
+	pcg_offset = (m_font_addr & 0x7fff) << 5;
 	pcg_offset|= offset & 0x1e;
 	pcg_offset|= m_font_lr;
 
@@ -746,7 +746,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 		return m_kanji_rom[pcg_offset];
 
-	pcg_offset = m_font_addr << 5;
+	pcg_offset = (m_font_addr & 0x7fff) << 5;
 	pcg_offset|= offset & 0x1f;
 //  pcg_offset|= m_font_lr;
 
@@ -757,7 +757,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 {
 	uint32_t pcg_offset;
 
-	pcg_offset = m_font_addr << 5;
+	pcg_offset = (m_font_addr & 0x7fff) << 5;
 	pcg_offset|= offset & 0x1e;
 	pcg_offset|= m_font_lr;
 
