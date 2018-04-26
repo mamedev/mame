@@ -2708,6 +2708,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/phi.h,MACHINES["PHI"] = true
+---------------------------------------------------
+
+if (MACHINES["TMS9914"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tms9914.cpp",
+		MAME_DIR .. "src/devices/machine/tms9914.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/tube.h,MACHINES["TUBE"] = true
 ---------------------------------------------------
 
