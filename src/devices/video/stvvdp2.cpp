@@ -2244,7 +2244,8 @@ uint8_t saturn_state::stv_vdp2_is_rotation_applied(void)
 			RP.dx == _FIXED_1 &&
 			RP.dy == _FIXED_0 &&
 			RP.kx == _FIXED_1 &&
-			RP.ky == _FIXED_1 )
+			RP.ky == _FIXED_1 && 
+			STV_VDP2_RPMD < 2) // disable optimizations if roz mode is 2 or 3
 	{
 		return 0;
 	}
