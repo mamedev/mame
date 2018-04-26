@@ -3299,6 +3299,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/fdc37c93x.h,MACHINES["FDC37C93X"] = true
+---------------------------------------------------
+
+if (MACHINES["FDC37C93X"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/fdc37c93x.cpp",
+		MAME_DIR .. "src/devices/machine/fdc37c93x.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pdc.h,MACHINES["PDC"] = true
 ---------------------------------------------------
 
