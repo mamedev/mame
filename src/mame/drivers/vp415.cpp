@@ -38,25 +38,26 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/vp415.h"
 
-/*static*/ const char* vp415_state::DATACPU_TAG = "datacpu";
-/*static*/ const char* vp415_state::DATAMCU_TAG = "datamcu";
-/*static*/ const char* vp415_state::DATARAM_TAG = "dataram";
-/*static*/ const char* vp415_state::SCSI_TAG = "ncr5385";
-/*static*/ const char* vp415_state::CTRLCPU_TAG = "ctrlcpu";
-/*static*/ const char* vp415_state::CTRLMCU_TAG = "ctrlmcu";
-/*static*/ const char* vp415_state::CTRLRAM_TAG = "ctrlram";
-/*static*/ const char* vp415_state::DRIVECPU_TAG = "drivecpu";
-/*static*/ const char* vp415_state::DESCRAMBLE_ROM_TAG = "descramblerom";
-/*static*/ const char* vp415_state::SYNC_ROM_TAG = "syncrom";
-/*static*/ const char* vp415_state::DRIVE_ROM_TAG = "driverom";
-/*static*/ const char* vp415_state::CONTROL_ROM_TAG = "controlrom";
-/*static*/ const char* vp415_state::SWITCHES_TAG = "SWITCHES";
-/*static*/ const char* vp415_state::I8155_TAG = "i8155";
-/*static*/ const char* vp415_state::I8255_TAG = "i8255";
-/*static*/ const char* vp415_state::CHARGEN_TAG = "mb88303";
-/*static*/ const char* vp415_state::SYNCGEN_TAG = "saa1043";
+/*static*/ const char *const vp415_state::DATACPU_TAG = "datacpu";
+/*static*/ const char *const vp415_state::DATAMCU_TAG = "datamcu";
+/*static*/ const char *const vp415_state::DATARAM_TAG = "dataram";
+/*static*/ const char *const vp415_state::SCSI_TAG = "ncr5385";
+/*static*/ const char *const vp415_state::CTRLCPU_TAG = "ctrlcpu";
+/*static*/ const char *const vp415_state::CTRLMCU_TAG = "ctrlmcu";
+/*static*/ const char *const vp415_state::CTRLRAM_TAG = "ctrlram";
+/*static*/ const char *const vp415_state::DRIVECPU_TAG = "drivecpu";
+/*static*/ const char *const vp415_state::DESCRAMBLE_ROM_TAG = "descramblerom";
+/*static*/ const char *const vp415_state::SYNC_ROM_TAG = "syncrom";
+/*static*/ const char *const vp415_state::DRIVE_ROM_TAG = "driverom";
+/*static*/ const char *const vp415_state::CONTROL_ROM_TAG = "controlrom";
+/*static*/ const char *const vp415_state::SWITCHES_TAG = "SWITCHES";
+/*static*/ const char *const vp415_state::I8155_TAG = "i8155";
+/*static*/ const char *const vp415_state::I8255_TAG = "i8255";
+/*static*/ const char *const vp415_state::CHARGEN_TAG = "mb88303";
+/*static*/ const char *const vp415_state::SYNCGEN_TAG = "saa1043";
 
 /*static*/ const device_timer_id vp415_state::DRIVE_2PPR_ID = 0;
 
