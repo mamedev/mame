@@ -1169,7 +1169,7 @@ msgstr "UI 문자 환경설정"
 
 #: src/frontend/mame/ui/custui.cpp:371
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "예시문 - 다람쥐 헌 쳇바퀴에 타고파."
+msgstr "예시문 - 다람쥐 헌 쳇바퀴에 타고파. ABCDEFGHIJKLMNabcdefghijklmn 1234567890"
 
 #: src/frontend/mame/ui/custui.cpp:451
 msgid "Normal text"
