@@ -138,7 +138,7 @@ private:
 
 	devcb_read8 m_read_cb;
 	devcb_write8 m_write_cb;
-	devcb_read8 m_in_cb[4];
+	devcb_read8 m_in_cb[6];
 	devcb_read8 m_drive_read_cb;
 	devcb_write8 m_drive_write_cb;
 	devcb_read8 m_an_cb[8];
