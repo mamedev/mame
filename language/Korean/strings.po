@@ -2645,7 +2645,7 @@ msgid ""
 "Ensure that cheatpath folder exists"
 msgstr ""
 "파일을 쓸 수 없습니다\n"
-"경로에 폴더가 존재하는지 확인하십시오"
+"cheatpath 폴더가 존재하는지 확인하십시오"
 
 #: plugins/cheatfind/init.lua:451
 msgid "Cancel"
