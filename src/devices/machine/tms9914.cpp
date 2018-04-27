@@ -189,6 +189,14 @@ tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, d
 		  devcb_write_line(*this) },
 	  m_int_write_func(*this)
 {
+	// Silence compiler complaints about unused variables
+	(void)REG_INT0_RLC_BIT;
+	(void)REG_INT0_SPAS_BIT;
+	(void)REG_INT1_IFC_BIT;
+	(void)REG_INT1_SRQ_BIT;
+	(void)REG_INT1_GET_BIT;
+	(void)REG_SERIAL_P_MASK;
+	(void)REG_SERIAL_P_RSV1_BIT;
 }
 
 // Signal inputs
