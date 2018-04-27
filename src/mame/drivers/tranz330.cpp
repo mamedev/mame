@@ -140,10 +140,10 @@ static const z80_daisy_config tranz330_daisy_chain[] =
 // * - check clocks
 // ? - check purported RS232 hookup, inconsistent information found at the relevant webpage vs. user-submitted errata
 MACHINE_CONFIG_START(tranz330_state::tranz330)
-	MCFG_CPU_ADD(CPU_TAG, Z80, XTAL(7'159'090)/2) //*
-	MCFG_CPU_PROGRAM_MAP(tranz330_mem)
-	MCFG_CPU_IO_MAP(tranz330_io)
-	MCFG_Z80_DAISY_CHAIN(tranz330_daisy_chain)
+	z80_device &cpu = Z80(config, this, CPU_TAG, XTAL(7'159'090)/2); //*
+	cpu.set_addrmap(AS_PROGRAM, address_map_constructor(&tranz330_state::tranz330_mem, tag(), this));
+	cpu.set_addrmap(AS_IO, address_map_constructor(&tranz330_state::tranz330_io, tag(), this));
+	cpu.set_daisy_config(tranz330_daisy_chain);
 
 	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(7'159'090)/4) // ?
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tranz330_state, clock_w))

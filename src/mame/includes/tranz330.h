@@ -42,21 +42,24 @@ public:
 		, m_keypad(*this, "COL.%u", 0)
 	{ }
 
+	void tranz330(machine_config &config);
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER( syncb_w );
+	DECLARE_WRITE_LINE_MEMBER(syncb_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
-	DECLARE_WRITE_LINE_MEMBER( sound_w );
+	DECLARE_WRITE_LINE_MEMBER(sound_w);
 
-	DECLARE_WRITE8_MEMBER( pio_a_w );
-	DECLARE_READ8_MEMBER( pio_b_r );
-	DECLARE_READ8_MEMBER( card_r );
+	DECLARE_WRITE8_MEMBER(pio_a_w);
+	DECLARE_READ8_MEMBER( pio_b_r);
+	DECLARE_READ8_MEMBER(card_r);
 
-	void tranz330(machine_config &config);
 	void tranz330_mem(address_map &map);
 	void tranz330_io(address_map &map);
+
 private:
 	required_device<cpu_device>             m_cpu;
 	required_device<z80ctc_device>          m_ctc;
