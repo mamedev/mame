@@ -40,6 +40,12 @@
 #define MCFG_MODEL1IO_IN3_CB(_devcb) \
 	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 3);
 
+#define MCFG_MODEL1IO_IN4_CB(_devcb) \
+	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 4);
+
+#define MCFG_MODEL1IO_IN5_CB(_devcb) \
+	devcb = &downcast<model1io_device &>(*device).set_in_callback(DEVCB_##_devcb, 5);
+
 #define MCFG_MODEL1IO_DRIVE_READ_CB(_devcb) \
 	devcb = &downcast<model1io_device &>(*device).set_drive_read_callback(DEVCB_##_devcb);
 
