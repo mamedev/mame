@@ -236,5 +236,5 @@ WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_card != nullptr) 
 SLOT_INTERFACE_START( vic10_expansion_cards )
 	// the following need ROMs from the software list
 	SLOT_INTERFACE_INTERNAL("standard", VIC10_STD)
-	SLOT_INTERFACE_INTERNAL("multimax", MULTIMAX)
+	SLOT_INTERFACE_INTERNAL("multimax", VIC10_MULTIMAX)
 SLOT_INTERFACE_END
