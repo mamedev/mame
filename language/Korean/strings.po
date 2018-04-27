@@ -21,12 +21,12 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr "현재 이용할 수 없는 모든 %1$u 장치에 대해 ROM 검사를 실시합니까?"
+msgstr "현재 이용불가능한 %1$u 장치들에 대해 ROM 검사를 실시합니까?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
 msgid "Audit ROMs for all %1$u machines?"
-msgstr "모든 %1$u 장치에 대해 ROM 검사를 실시합니까?"
+msgstr "모든 %1$u 장치들에 대해 ROM 검사를 실시합니까?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:104
 #, c-format
@@ -48,7 +48,7 @@ msgstr "검사 시작"
 
 #: src/frontend/mame/ui/selmenu.cpp:49 src/frontend/mame/ui/dirmenu.cpp:45
 msgid "Snapshots"
-msgstr "스크린샷"
+msgstr "스냅샷"
 
 #: src/frontend/mame/ui/selmenu.cpp:50 src/frontend/mame/ui/dirmenu.cpp:46
 msgid "Cabinets"
@@ -68,7 +68,7 @@ msgstr "전단지"
 
 #: src/frontend/mame/ui/selmenu.cpp:54 src/frontend/mame/ui/dirmenu.cpp:48
 msgid "Titles"
-msgstr "제목"
+msgstr "타이틀"
 
 #: src/frontend/mame/ui/selmenu.cpp:55 src/frontend/mame/ui/dirmenu.cpp:49
 msgid "Ends"
@@ -121,7 +121,7 @@ msgstr "즐겨찾기 추가 및 삭제"
 
 #: src/frontend/mame/ui/selmenu.cpp:70
 msgid "Export displayed list to file"
-msgstr "표시한 목록을 파일로 출력"
+msgstr "표시된 목록을 파일로 보내기"
 
 #: src/frontend/mame/ui/selmenu.cpp:71
 msgid "Show DATs view"
@@ -144,7 +144,7 @@ msgstr "%1$s, %2$-.100s"
 #: src/frontend/mame/ui/selmenu.cpp:574
 #, c-format
 msgid "Software is clone of: %1$-.100s"
-msgstr "이 소프트웨어는 다음의 복제입니다: "
+msgstr "이 소프트웨어는 다음의 복제입니다: %1$-.100s"
 
 #: src/frontend/mame/ui/selmenu.cpp:576
 msgid "Software is parent"
@@ -305,7 +305,7 @@ msgstr "삽화"
 
 #: src/frontend/mame/ui/dirmenu.cpp:56
 msgid "Artworks Preview"
-msgstr " 미리보기"
+msgstr "삽화 미리보기"
 
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgid "GameOver"
@@ -462,7 +462,7 @@ msgid ""
 "elements that are not bugs in the emulation.\n"
 msgstr ""
 "이 장치는 완제품이 아닙니다. 에뮬레이션 이외에 장치 자체의 결함에서 비롯된 "
-"비정상적인 오류나 미완성된 요소가 나타날 수 있습니다.\n"
+"비정상적인 오류나 마감이 안 된 요소가 나타날 수 있습니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:237
 msgid ""
@@ -493,7 +493,7 @@ msgid ""
 msgstr ""
 "\n"
 "이 장치의 요소 일부는 직접적인 상호작용이나 별도의 보조장비에 의존하고 "
-"있습니다. 때문에 에뮬레이션만으로 이 장치를 완벽하게 재현하는 것은 "
+"있습니다. 때문에 에뮬레이션만으로 이 장치를 완벽히 재현하는 것은 "
 "가능하지 않습니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:265
@@ -612,7 +612,7 @@ msgstr "사운드 설정"
 
 #: src/frontend/mame/ui/optsmenu.cpp:213
 msgid "General Inputs"
-msgstr "일반 입력 장치 설정"
+msgstr "일반 입력장비 설정"
 
 #: src/frontend/mame/ui/optsmenu.cpp:216
 msgid "Save Configuration"
@@ -682,7 +682,7 @@ msgstr "선택 목록 - 검색: "
 #: src/frontend/mame/ui/selector.cpp:124
 #, c-format
 msgid "Double click or press %1$s to select"
-msgstr "더블 클릭 혹은 %1$s를 눌러 선택"
+msgstr "더블 클릭 혹은 %1$s 키를 눌러 선택"
 
 #: src/frontend/mame/ui/swlist.cpp:83 src/frontend/mame/ui/slotopt.cpp:220
 #: src/frontend/mame/ui/filesel.cpp:256
@@ -704,7 +704,7 @@ msgstr "항목 정렬순서 변경"
 #: src/frontend/mame/ui/swlist.cpp:259
 #, c-format
 msgid "Switched Order: entries now ordered by %s"
-msgstr "정렬순서 변경: 현재 %s 순서로 목록이 배열됨"
+msgstr "정렬순서 변경: 현재 %s 순서로 항목이 배열됨"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 msgid "shortname"
@@ -720,7 +720,7 @@ msgstr "[호환 목록]"
 
 #: src/frontend/mame/ui/datmenu.cpp:80
 msgid "Software Usage"
-msgstr "소프트웨어 사용법"
+msgstr "소프트웨어 사용"
 
 #: src/frontend/mame/ui/datmenu.cpp:362
 msgid "Revision: "
@@ -1336,7 +1336,7 @@ msgstr "마지막으로 실행한 장치 재선택"
 
 #: src/frontend/mame/ui/submenu.cpp:24
 msgid "Enlarge images in the right panel"
-msgstr "오른쪽 판 이미지 확대"
+msgstr "오른쪽 패널 이미지 확대"
 
 #: src/frontend/mame/ui/submenu.cpp:26
 msgid "Show mouse pointer"
@@ -1384,7 +1384,7 @@ msgstr "사양 조절"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
-msgstr "자동으로 프레임 건너뒤기"
+msgstr "자동으로 프레임 건너뛰기"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Frame skip"
@@ -1412,11 +1412,11 @@ msgstr "회전 설정"
 
 #: src/frontend/mame/ui/submenu.cpp:49
 msgid "Rotate right"
-msgstr "우로 회전"
+msgstr "우측 회전"
 
 #: src/frontend/mame/ui/submenu.cpp:50
 msgid "Rotate left"
-msgstr "좌로 회전"
+msgstr "좌측 회전"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Auto rotate right"
@@ -1524,7 +1524,7 @@ msgstr "화면 밖에서 재실행"
 
 #: src/frontend/mame/ui/submenu.cpp:81
 msgid "Joystick deadzone"
-msgstr "조이스틱 내부임계값 (데드존)"
+msgstr "조이스틱 내부임계값"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Joystick saturation"
@@ -2011,7 +2011,7 @@ msgstr "즐겨찾기"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgid "Not BIOS"
-msgstr "바이오스 "
+msgstr "바이오스 아님"
 
 #: src/frontend/mame/ui/utils.cpp:68 src/frontend/mame/ui/utils.cpp:84
 msgid "Parents"
@@ -2254,7 +2254,7 @@ msgstr "자동연사 간격"
 
 #: src/frontend/mame/ui/ui.cpp:337
 msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "이 드라이버를 사용하기 위해선 다음 장치(들)에 이미지를 불러와야 합니다:"
+msgstr "이 드라이버를 사용하기 위해선 다음 장치(들)에 이미지를 불러와야 합니다: "
 
 #: src/frontend/mame/ui/ui.cpp:1084 src/frontend/mame/ui/ui.cpp:1094
 msgid "Keyboard Emulation Status"
@@ -2262,7 +2262,7 @@ msgstr "키보드 에뮬레이션 현황"
 
 #: src/frontend/mame/ui/ui.cpp:1086
 msgid "Mode: PARTIAL Emulation"
-msgstr "모드: 부분적 에뮬레이션
+msgstr "모드: 부분적 에뮬레이션"
 
 #: src/frontend/mame/ui/ui.cpp:1087
 msgid "UI:   Enabled"
@@ -2644,7 +2644,7 @@ msgid ""
 "Ensure that cheatpath folder exists"
 msgstr ""
 "파일을 쓸 수 없습니다\n"
-"경로에 폴더가 존재하는 지 확인하십시오"
+"경로에 폴더가 존재하는지 확인하십시오"
 
 #: plugins/cheatfind/init.lua:451
 msgid "Cancel"
@@ -2677,7 +2677,7 @@ msgstr "현재 저장 -- #"
 #: plugins/cheatfind/init.lua:536
 #, lua-format
 msgid "%d total matches found"
-msgstr "총 %d개의 시합 발견"
+msgstr "총 %d개의 값이 일치함"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Compare"
@@ -2685,7 +2685,7 @@ msgstr "비교"
 
 #: plugins/cheatfind/init.lua:546
 msgid "Left operand"
-msgstr "좌측 연산값"
+msgstr "좌측 피연산자"
 
 #: plugins/cheatfind/init.lua:549
 msgid "Current"
@@ -2693,7 +2693,7 @@ msgstr "현재"
 
 #: plugins/cheatfind/init.lua:554
 msgid "Operator"
-msgstr "시동"
+msgstr "연산자"
 
 #: plugins/cheatfind/init.lua:561
 msgid "Left less than right, value is difference"
@@ -2705,7 +2705,7 @@ msgstr "좌가 우보다 큼, 값은 차이"
 
 #: plugins/cheatfind/init.lua:565
 msgid "Left equal to right"
-msgstr "좌와 우가 같은"
+msgstr "좌와 우가 같음"
 
 #: plugins/cheatfind/init.lua:567
 msgid "Left not equal to right, value is difference"
@@ -2737,7 +2737,7 @@ msgstr "좌가 특정값과 같지 않음"
 
 #: plugins/cheatfind/init.lua:590
 msgid "Right operand"
-msgstr "우측 연산값"
+msgstr "우측 피연산자"
 
 #: plugins/cheatfind/init.lua:598
 msgid "Value"
@@ -2745,7 +2745,7 @@ msgstr "값"
 
 #: plugins/cheatfind/init.lua:602
 msgid "Any"
-msgstr "Any"
+msgstr "임의"
 
 #: plugins/cheatfind/init.lua:608
 msgid "Data Format"
@@ -2757,7 +2757,7 @@ msgstr "가장 최근의 검색 취소 -- #"
 
 #: plugins/cheatfind/init.lua:636
 msgid "Match block"
-msgstr "블록 일치"
+msgstr "일치 블록"
 
 #: plugins/cheatfind/init.lua:639
 msgid "All"
@@ -2782,7 +2782,7 @@ msgstr "쓰기"
 
 #: plugins/cheatfind/init.lua:771
 msgid "Watch"
-msgstr "보기"
+msgstr "주시"
 
 #: plugins/cheatfind/init.lua:788
 msgid "Page"
@@ -2790,7 +2790,7 @@ msgstr "쪽"
 
 #: plugins/cheatfind/init.lua:806
 msgid "Clear Watches"
-msgstr "보기 청소"
+msgstr "주시 목록 지우기"
 
 #: plugins/cheatfind/init.lua:816
 msgid "Cheat Finder"
