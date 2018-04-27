@@ -94,6 +94,7 @@
 #include "machine/clock.h"
 #include "machine/cxd1095.h"
 #include "machine/eepromser.h"
+#include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
@@ -1190,18 +1191,21 @@ void model2_state::model2_5881_mem(address_map &map)
 // Interface board ID: 837-12079
 // ALTERA FLEX + Sega 315-5338A
 
-READ8_MEMBER( model2_state::lightgun_r )
+READ8_MEMBER( model2_state::lightgun_data_r )
+{
+	uint16_t data = m_lightgun_ports[offset].read_safe(0);
+	return BIT(offset, 0) ? (data >> 8) : data;
+}
+
+READ8_MEMBER( model2_state::lightgun_mux_r )
 {
 	if (m_lightgun_mux < 8)
-	{
-		uint16_t data = m_lightgun_ports[m_lightgun_mux >> 1].read_safe(0);
-		return m_lightgun_mux & 1 ? (data >> 8) : data;
-	}
+		return lightgun_data_r(space, m_lightgun_mux);
 	else
 		return lightgun_offscreen_r(space, 0);
 }
 
-WRITE8_MEMBER( model2_state::lightgun_w )
+WRITE8_MEMBER( model2_state::lightgun_mux_w )
 {
 	m_lightgun_mux = data;
 }
@@ -1289,70 +1293,9 @@ WRITE8_MEMBER( model2o_state::vcop_output_w )
 //  I/O BOARD
 //**************************************************************************
 
-READ32_MEMBER( model2o_state::dpram_r )
-{
-	uint32_t data = m_dpram[offset] & mem_mask;
-
-	// intercept reads for the lightgun ports
-	// needs to be done because the vcop ioboard isn't emulated
-	// can be removed once that's done (837-11130 + 837-11131)
-
-	if (offset >= 0x100/4 && offset <= 0x10f/4)
-	{
-		if (ACCESSING_BITS_16_31)
-		{
-			data &= 0x0000ffff;
-			data |= (m_lightgun_ports[offset & 0x03].read_safe(0) >> 8) << 16;
-		}
-		if (ACCESSING_BITS_0_15)
-		{
-			data &= 0xffff0000;
-			data |= m_lightgun_ports[offset & 0x03].read_safe(0) & 0xff;
-		}
-	}
-
-	if (offset >= 0x110/4 && offset <= 0x113/4)
-	{
-		if (ACCESSING_BITS_0_15)
-		{
-			data &= 0xffff0000;
-			data |= lightgun_offscreen_r(space, 0);
-		}
-	}
-
-	return data;
-}
-
-WRITE32_MEMBER( model2o_state::dpram_w )
-{
-	COMBINE_DATA(&m_dpram[offset]);
-}
-
 // On the real system, another 315-5338A is acting as slave
 // and writes the data to the dual port RAM. This isn't
 // emulated yet, data just gets written to RAM.
-
-READ8_MEMBER( model2o_state::io_r )
-{
-	if ((offset & 1) == 0)
-		return m_dpram[offset >> 1];
-	else
-		return m_dpram[offset >> 1] >> 16;
-}
-
-WRITE8_MEMBER( model2o_state::io_w )
-{
-	if ((offset & 1) == 0)
-	{
-		m_dpram[offset >> 1] &= 0x00ff0000;
-		m_dpram[offset >> 1] |= data;
-	}
-	else
-	{
-		m_dpram[offset >> 1] &= 0x000000ff;
-		m_dpram[offset >> 1] |= data << 16;
-	}
-}
 
 /* model 2/2a common memory map */
 void model2_tgp_state::model2_tgp_mem(address_map &map)
@@ -1379,7 +1322,13 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00200000, 0x0021ffff).ram();
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
-	map(0x01c00000, 0x01c007ff).rw(this, FUNC(model2o_state::dpram_r), FUNC(model2o_state::dpram_w)).share("dpram"); // 2k*8-bit dual port ram
+	map(0x01c00000, 0x01c007ff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
+	// intercept reads for the lightgun ports
+	// needs to be done because the vcop ioboard isn't emulated
+	// can be removed once that's done (837-11130 + 837-11131)
+	map(0x01c00100, 0x01c0010f).r(this, FUNC(model2o_state::lightgun_data_r)).umask32(0x00ff00ff);
+	map(0x01c00110, 0x01c00110).r(this, FUNC(model2o_state::lightgun_offscreen_r));
+
 	map(0x01c80000, 0x01c80003).rw(this, FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
 }
 
@@ -2497,10 +2446,12 @@ MACHINE_CONFIG_START(model2o_state::model2o)
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
 	MCFG_DEVICE_BIOS("epr14869c");
-	MCFG_MODEL1IO_READ_CB(READ8(model2o_state, io_r))
-	MCFG_MODEL1IO_WRITE_CB(WRITE8(model2o_state, io_w))
+	MCFG_MODEL1IO_READ_CB(DEVREAD8("dpram", mb8421_device, left_r))
+	MCFG_MODEL1IO_WRITE_CB(DEVWRITE8("dpram", mb8421_device, left_w))
 	MCFG_MODEL1IO_IN0_CB(IOPORT("IN0"))
 	MCFG_MODEL1IO_IN1_CB(IOPORT("IN1"))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
 	model2_timers(config);
 	model2_screen(config);
@@ -2685,8 +2636,8 @@ MACHINE_CONFIG_START( model2a_state::vcop2 )
 	model2a(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(model2a_state, lightgun_r))
-	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(model2a_state, lightgun_w))
+	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(model2a_state, lightgun_mux_r))
+	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(model2a_state, lightgun_mux_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START( model2a_state::skytargt )
@@ -2927,8 +2878,8 @@ MACHINE_CONFIG_START( model2c_state::hotd )
 	model2c(config);
 
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(model2c_state, lightgun_r))
-	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(model2c_state, lightgun_w))
+	MCFG_315_5649_SERIAL_CH2_READ_CB(READ8(model2c_state, lightgun_mux_r))
+	MCFG_315_5649_SERIAL_CH2_WRITE_CB(WRITE8(model2c_state, lightgun_mux_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(model2c_state::model2c_5881)

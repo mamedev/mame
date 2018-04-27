@@ -67,6 +67,7 @@
 
 #pragma once
 
+#include <forward_list>
 
 
 //**************************************************************************
@@ -256,6 +257,10 @@ public:
 
 	virtual void set_dma_channel(uint8_t channel, device_isa8_card_interface *dev, bool do_eop);
 
+	void add_slot(const char *tag);
+	void add_slot(device_slot_interface *slot);
+	virtual void remap(int space_id, offs_t start, offs_t end);
+
 	const address_space_config m_mem_config, m_io_config, m_mem16_config, m_io16_config;
 
 protected:
@@ -288,6 +293,7 @@ protected:
 	device_isa8_card_interface *m_dma_device[8];
 	bool                        m_dma_eop[8];
 	bool                        m_nmi_enabled;
+	std::forward_list<device_slot_interface *> m_slot_list;
 
 private:
 	devcb_write_line m_write_iochck;
@@ -315,6 +321,8 @@ public:
 	virtual uint8_t dack_r(int line);
 	virtual void dack_w(int line,uint8_t data);
 	virtual void eop_w(int state);
+
+	virtual void remap(int space_id, offs_t start, offs_t end) {}
 
 	// inline configuration
 	void set_isabus(device_t *isa_device) { m_isa_dev = isa_device; }
@@ -382,6 +390,7 @@ public:
 
 	uint16_t dack16_r(int line);
 	void dack16_w(int line,uint16_t data);
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	// 16 bit accessors for ISA-defined address spaces
 	DECLARE_READ16_MEMBER(mem16_r);

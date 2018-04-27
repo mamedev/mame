@@ -371,6 +371,8 @@ Software to look for
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "video/hp1ll3.h"
+#include "machine/tms9914.h"
+#include "bus/ieee488/ieee488.h"
 
 #include "rendlay.h"
 
@@ -496,7 +498,7 @@ void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 	map(0x0610000, 0x0610007).rw(this, FUNC(hp_ipc_state::floppy_id_r), FUNC(hp_ipc_state::floppy_id_w)).umask16(0x00ff);
 	map(0x0610008, 0x061000F).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x0620000, 0x062000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
-	map(0x0630000, 0x063FFFF).noprw();       // AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
+	map(0x0630000, 0x063FFFF).mask(0xf).rw("hpib" , FUNC(tms9914_device::reg8_r) , FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
 	map(0x0640000, 0x064002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 	map(0x0660000, 0x06600FF).rw("mlc", FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write)).umask16(0x00ff);  // 'caravan', scrn/caravan.h
 	map(0x0670000, 0x067FFFF).noprw();       // Speaker (NatSemi COP 452)
@@ -614,7 +616,8 @@ READ8_MEMBER(hp_ipc_state::floppy_id_r)
 {
 	uint8_t data = 0;
 
-	data = (m_fdc->intrq_r() << 6);
+	// TODO: fix sys controller switch
+	data = (m_fdc->intrq_r() << 6) | 0x80;
 
 	if (m_floppy)
 	{
@@ -756,6 +759,28 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp_ipc_state, irq_2))
 	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(hp_ipc_state, irq_7))
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
+
+	MCFG_DEVICE_ADD("hpib" , TMS9914 , XTAL(4000000))
+	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(hp_ipc_state, irq_3))
+	MCFG_TMS9914_DIO_READWRITE_CB(DEVREAD8(IEEE488_TAG , ieee488_device , dio_r) , DEVWRITE8(IEEE488_TAG , ieee488_device , dio_w))
+	MCFG_TMS9914_EOI_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , eoi_w))
+	MCFG_TMS9914_DAV_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , dav_w))
+	MCFG_TMS9914_NRFD_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , nrfd_w))
+	MCFG_TMS9914_NDAC_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , ndac_w))
+	MCFG_TMS9914_IFC_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , ifc_w))
+	MCFG_TMS9914_SRQ_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , srq_w))
+	MCFG_TMS9914_ATN_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , atn_w))
+	MCFG_TMS9914_REN_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , ren_w))
+	MCFG_IEEE488_BUS_ADD()
+	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , atn_w))
+	MCFG_IEEE488_REN_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , ren_w))
+	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
