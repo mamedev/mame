@@ -95,8 +95,7 @@ public:
 		m_sasi_data_out(*this, "sasi_data_out"),
 		m_sasi_data_in(*this, "sasi_data_in"),
 		m_sasi_ctrl_in(*this, "sasi_ctrl_in"),
-		m_ide1(*this, "ide1"),
-		m_ide2(*this, "ide2"),
+		m_ide(*this, "ide%u", 1U),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"),
 		m_ext_gvram(*this, "ext_gvram"),
@@ -122,7 +121,6 @@ public:
 
 protected:
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	static void cdrom_headphones(device_t *device);
@@ -143,8 +141,7 @@ private:
 	optional_device<output_latch_device> m_sasi_data_out;
 	optional_device<input_buffer_device> m_sasi_data_in;
 	optional_device<input_buffer_device> m_sasi_ctrl_in;
-	optional_device<ata_interface_device> m_ide1;
-	optional_device<ata_interface_device> m_ide2;
+	optional_device_array<ata_interface_device, 2> m_ide;
 	required_shared_ptr<uint16_t> m_video_ram_1;
 	required_shared_ptr<uint16_t> m_video_ram_2;
 	optional_shared_ptr<uint32_t> m_ext_gvram;
@@ -155,7 +152,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_WRITE8_MEMBER(dmapg4_w);
 	DECLARE_WRITE8_MEMBER(dmapg8_w);
@@ -197,8 +193,6 @@ private:
 	DECLARE_WRITE16_MEMBER(ide_cs0_w);
 	DECLARE_READ16_MEMBER(ide_cs1_r);
 	DECLARE_WRITE16_MEMBER(ide_cs1_w);
-	DECLARE_WRITE_LINE_MEMBER(ide1_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ide2_irq_w);
 
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
 	DECLARE_READ8_MEMBER(sasi_data_r);
@@ -279,7 +273,7 @@ private:
 	DECLARE_MACHINE_RESET(pc9821);
 
 	DECLARE_PALETTE_INIT(pc9801);
-	INTERRUPT_GEN_MEMBER(vrtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(tc_w);
@@ -332,7 +326,6 @@ private:
 	};
 
 	inline void set_dma_channel(int channel, int state);
-	emu_timer *m_vbirq;
 	uint8_t *m_char_rom;
 	uint8_t *m_kanji_rom;
 
@@ -369,7 +362,6 @@ private:
 	}m_mouse;
 
 	uint8_t m_ide_sel;
-	bool m_ide1_irq, m_ide2_irq;
 
 	/* PC9801RS specific, move to specific state */
 	uint8_t m_gate_a20; //A20 line

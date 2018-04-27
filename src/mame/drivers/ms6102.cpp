@@ -12,7 +12,7 @@
 
     To do:
     - character attributes
-    - keyboard (MS7002)
+    - improve keyboard response and add LED layout (MS7002)
 
     Chips:
     - DD5 - KR580WM80A (8080 clone) - CPU
@@ -347,7 +347,7 @@ MACHINE_CONFIG_START(ms6102_state::ms6102)
 	MCFG_RIPPLE_COUNTER_STAGES(2)
 	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(WRITE8(ms6102_state, kbd_uart_clock_w))
 
-	MCFG_DEVICE_ADD("keyboard", VT100_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", MS7002, 0)
 	MCFG_VT100_KEYBOARD_SIGNAL_OUT_CALLBACK(DEVWRITELINE("589wa1", ay31015_device, write_si))
 
 	// serial connection to host

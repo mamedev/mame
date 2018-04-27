@@ -503,7 +503,7 @@ void ddragon_state::ddragon_map(address_map &map)
 void toffy_state::toffy_map(address_map &map)
 {
 	ddragon_base_map(map);
-	map(0x3808, 0x3808).w(this, FUNC(ddragon_state::toffy_bankswitch_w));
+	map(0x3808, 0x3808).w(this, FUNC(toffy_state::toffy_bankswitch_w));
 	map(0x4000, 0x7fff).bankr("mainbank");
 }
 
