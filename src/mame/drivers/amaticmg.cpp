@@ -958,6 +958,8 @@ ROM_START( suprstar )
 ROM_END
 
 
+//******** Multi Game sets ********
+
 ROM_START( am_mg24 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 
@@ -999,6 +1001,9 @@ ROM_START( am_mg24a )
 	ROM_LOAD( "n82s147n_1.bin", 0x0000, 0x0200, CRC(08e304e3) SHA1(e6f7cda9a626bb4b123889446dac9807983fa8c1) )
 	ROM_LOAD( "n82s147n_2.bin", 0x0200, 0x0200, BAD_DUMP CRC(c962a66d) SHA1(d93aa03a9aa5cd93131e830c1221da5366662474) )
 ROM_END
+
+
+//******** MG III ********
 
 ROM_START( am_mg3 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
@@ -1091,6 +1096,7 @@ ROM_START( am_mg35i )
 	ROM_REGION( 0x4000, "proms", 0 )
 	ROM_LOAD( "ama80003_fprom.bin", 0x0000, 0x4000, BAD_DUMP CRC(65a784b8) SHA1(bd23136261e22f0294cff90040f3015ba0c10d7e) )
 ROM_END
+
 
 //******** MG IV ********
 
