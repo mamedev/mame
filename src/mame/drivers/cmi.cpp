@@ -99,7 +99,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "emu.h"
+
+#include "audio/cmi01a.h"
 
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
@@ -205,196 +206,6 @@ static const int ch_int_levels[8] =
 #define FDC_STATUS_INTERRUPT    (1 << 6)
 #define FDC_STATUS_DRIVER_LOAD  (1 << 7)
 
-
-#define ENV_DIR_DOWN            0
-#define ENV_DIR_UP              1
-
-#define MCFG_CMI01A_ADD(_tag, _channel)  \
-	MCFG_DEVICE_ADD(_tag, CMI01A_CHANNEL_CARD, 0) \
-	cmi01a_device::set_channel_number(*device, _channel);
-
-#define MCFG_CMI01A_CHANNEL_NUMBER(_channel) \
-	cmi01a_device::set_channel_number(*device, _channel);
-
-class cmi01a_device : public device_t, public device_sound_interface {
-public:
-	cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	static void set_channel_number(device_t &device, int channel) { dynamic_cast<cmi01a_device&>(device).m_channel = channel; }
-
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
-
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	static const device_timer_id TIMER_ZX = 0;
-
-	required_device<pia6821_device> m_pia_0;
-	required_device<pia6821_device> m_pia_1;
-	required_device<ptm6840_device> m_ptm;
-
-	required_device<pia6821_device> m_cmi02_pia_0;
-	required_device<pia6821_device> m_cmi02_pia_1;
-
-	sound_stream* m_stream;
-
-private:
-	void zx_timer_cb();
-	void run_voice();
-	void update_wave_addr(int inc);
-	void update_interrupts();
-
-	emu_timer * m_zx_timer;
-	uint8_t       m_zx_flag;
-	uint8_t       m_zx_ff;
-
-	int     m_channel;
-	std::unique_ptr<uint8_t[]>    m_wave_ram;
-	uint16_t  m_segment_cnt;
-	uint8_t   m_new_addr;     // Flag
-	uint8_t   m_env_dir_ctrl;
-	uint8_t   m_vol_latch;
-	uint8_t   m_flt_latch;
-	uint8_t m_rp;
-	uint8_t m_ws;
-	int     m_dir;
-
-	double  m_freq;
-	bool    m_active;
-
-	int     m_ptm_o1;
-
-	int     m_pia_0_irqa;
-	int     m_pia_0_irqb;
-	int     m_pia_1_irqa;
-	int     m_pia_1_irqb;
-	int     m_ptm_irq;
-	int     m_irq_state;
-
-	DECLARE_WRITE8_MEMBER( rp_w );
-	DECLARE_WRITE8_MEMBER( ws_dir_w );
-	DECLARE_READ_LINE_MEMBER( tri_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_irqa );
-	DECLARE_WRITE_LINE_MEMBER( pia_0_irqb );
-
-	DECLARE_READ_LINE_MEMBER( eosi_r );
-	DECLARE_READ_LINE_MEMBER( zx_r );
-	DECLARE_WRITE8_MEMBER( pia_1_a_w );
-	DECLARE_WRITE8_MEMBER( pia_1_b_w );
-	DECLARE_WRITE_LINE_MEMBER( pia_1_irqa );
-	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
-
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq );
-	DECLARE_WRITE_LINE_MEMBER( ptm_o1 );
-};
-
-DEFINE_DEVICE_TYPE(CMI01A_CHANNEL_CARD, cmi01a_device, "cmi_01a", "Fairlight CMI-01A Channel Card")
-
-cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CMI01A_CHANNEL_CARD, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_pia_0(*this, "cmi01a_pia_0")
-	, m_pia_1(*this, "cmi01a_pia_1")
-	, m_ptm(*this, "cmi01a_ptm")
-	, m_cmi02_pia_0(*this, "^cmi02_pia_1")
-	, m_cmi02_pia_1(*this, "^cmi02_pia_2")
-	, m_stream(nullptr)
-{
-}
-
-MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
-	MCFG_PIA_READCB1_HANDLER(READLINE(cmi01a_device, tri_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, ws_dir_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi01a_device, rp_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(cmi01a_device, pia_0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi01a_device, pia_0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, pia_0_irqa))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, pia_0_irqb))
-
-	MCFG_DEVICE_ADD("cmi01a_pia_1", PIA6821, 0) // pia_cmi01a_2_config
-	MCFG_PIA_READCA1_HANDLER(READLINE(cmi01a_device, zx_r))
-	MCFG_PIA_READCA2_HANDLER(READLINE(cmi01a_device, eosi_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, pia_1_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi01a_device, pia_1_b_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, pia_1_irqa))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, pia_1_irqb))
-
-	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 2000000) // ptm_cmi01a_config
-	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
-	MCFG_PTM6840_O1_CB(WRITELINE(cmi01a_device, ptm_o1))
-	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ptm_irq))
-MACHINE_CONFIG_END
-
-
-void cmi01a_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	if (m_active && m_vol_latch)
-	{
-		int length = samples;
-		int seg_addr = m_segment_cnt & 0x7f;
-		uint8_t *wave_ptr = &m_wave_ram[m_segment_cnt & 0x3fff];
-		stream_sample_t *buf = outputs[0];
-
-		while (length--)
-		{
-			*buf++ = wave_ptr[seg_addr];
-			seg_addr = (seg_addr + 1) & 0x7f;
-		}
-
-		m_segment_cnt = (m_segment_cnt & ~0x7f) | seg_addr;
-	}
-	else
-	{
-		memset(outputs[0], 0, samples);
-	}
-}
-
-void cmi01a_device::device_start()
-{
-	m_wave_ram = std::make_unique<uint8_t[]>(0x4000);
-
-	m_zx_timer = timer_alloc(TIMER_ZX);
-	m_zx_timer->adjust(attotime::never);
-
-	m_stream = stream_alloc(0, 1, 44100);
-}
-
-void cmi01a_device::device_reset()
-{
-	m_ptm->set_g1(1);
-	m_ptm->set_g2(1);
-	m_ptm->set_g3(1);
-
-	m_pia_0_irqa = 0;
-	m_pia_0_irqb = 0;
-	m_pia_1_irqa = 0;
-	m_pia_1_irqb = 0;
-	m_ptm_irq = 0;
-	m_irq_state = 0;
-
-	m_segment_cnt = 0;
-	m_new_addr = 0;
-	m_env_dir_ctrl = 0;
-	m_vol_latch = 0;
-	m_flt_latch = 0;
-	m_rp = 0;
-	m_ws = 0;
-	m_dir = 0;
-
-	m_freq = 0.0;
-	m_active = false;
-
-	m_ptm_o1 = 0;
-}
 
 class cmi_state : public driver_device
 {
@@ -550,6 +361,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mkbd_cmi_acia_int );
 	DECLARE_WRITE_LINE_MEMBER( cmi07_irq );
 	DECLARE_WRITE_LINE_MEMBER( mkbd_acia_clock );
+
+	template<int Channel> DECLARE_WRITE_LINE_MEMBER( channel_irq );
 
 	void cmi2x(machine_config &config);
 	void alphakeys_map(address_map &map);
@@ -1692,353 +1505,6 @@ WRITE8_MEMBER( cmi_state::master_tune_w )
 //  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
 }
 
-WRITE_LINE_MEMBER( cmi01a_device::pia_0_ca2_w )
-{
-	// upate_stream()
-	if (!state)
-	{
-		m_segment_cnt = 0x4000 | ((m_pia_0->a_output() & 0x7f) << 7);
-		m_new_addr = 1;
-		m_pia_1->cb1_w(1);
-	}
-}
-
-WRITE_LINE_MEMBER( cmi01a_device::pia_0_irqa )
-{
-	m_pia_0_irqa = state;
-	//printf("CH%d pia0 irqa int: %x\n", m_channel, state);
-	update_interrupts();
-}
-
-WRITE_LINE_MEMBER( cmi01a_device::pia_0_irqb )
-{
-	m_pia_0_irqb = state;
-	//printf("CH%d pia0 irqb int: %x\n", m_channel, state);
-	update_interrupts();
-}
-
-WRITE8_MEMBER( cmi01a_device::pia_1_a_w )
-{
-// top two
-}
-
-WRITE8_MEMBER( cmi01a_device::pia_1_b_w )
-{
-}
-
-WRITE8_MEMBER( cmi01a_device::rp_w )
-{
-	m_rp = data;
-}
-
-WRITE8_MEMBER( cmi01a_device::ws_dir_w )
-{
-	m_ws = data & 0x7f;
-	m_dir = (data >> 7) & 1;
-}
-
-READ_LINE_MEMBER( cmi01a_device::tri_r )
-{
-	bool top_terminal_count = (m_dir == ENV_DIR_UP && m_rp == 0);
-	bool bottom_terminal_count = (m_dir == ENV_DIR_DOWN && m_rp == 0xff);
-	return (top_terminal_count || bottom_terminal_count) ? 1 : 0;
-}
-
-WRITE_LINE_MEMBER( cmi01a_device::pia_1_irqa )
-{
-	m_pia_1_irqa = state;
-	//printf("CH%d pia1 irqa int: %x\n", m_channel, state);
-	update_interrupts();
-}
-
-WRITE_LINE_MEMBER( cmi01a_device::pia_1_irqb )
-{
-	m_pia_1_irqb = state;
-	//printf("CH%d pia1 irqb int: %x\n", m_channel, state);
-	update_interrupts();
-}
-
-void cmi01a_device::update_interrupts()
-{
-	int old_state = m_irq_state;
-	m_irq_state = m_pia_0_irqa || m_pia_0_irqb || m_pia_1_irqa || m_pia_1_irqb || m_ptm_irq;
-
-	if (m_irq_state != old_state)
-		dynamic_cast<cmi_state*>(owner())->set_interrupt(CPU_1, ch_int_levels[m_channel], m_irq_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER( cmi01a_device::ptm_irq )
-{
-	m_ptm_irq = state;
-	//printf("CH%d ptm irq int: %x\n", m_channel, state);
-	update_interrupts();
-}
-
-void cmi01a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-		case TIMER_ZX:
-			zx_timer_cb();
-			break;
-	}
-}
-
-void cmi01a_device::zx_timer_cb()
-{
-	/* Set ZX */
-	if (m_zx_flag == 0)
-		m_pia_1->ca1_w(1);
-	else
-		m_pia_1->ca1_w(0);
-
-	m_zx_flag ^= 1;
-
-	if (m_zx_flag == 0)
-	{
-		/* Low to high transition - clock flip flop */
-		int op = m_ptm_o1;
-
-		/* Set /ZCINT */
-		if (op != m_zx_ff)
-			m_pia_0->ca1_w(0);
-
-		m_zx_ff = op;
-		m_pia_0->ca1_w(1);
-	}
-}
-
-void cmi01a_device::run_voice()
-{
-	int val_a = m_pia_1->a_output();
-	int pitch = ((val_a & 3) << 8) | m_pia_1->b_output();
-	int o_val = (val_a >> 2) & 0xf;
-
-	int m_tune = m_cmi02_pia_0->b_output();
-	double mfreq = (double)(0xf00 | m_tune) * (MASTER_OSCILLATOR / 2.0 / 4096.0).dvalue();
-
-	double cfreq = ((double)(0x800 | (pitch << 1))* mfreq) / 4096.0;
-
-//  if (cfreq > 0.0)
-	{
-		/* Octave register enabled? */
-		if (!(o_val & 0x8))
-			cfreq /= 2 << ((7 ^ o_val) & 7);
-
-		cfreq /= 16.0f;
-
-		m_freq = cfreq;
-
-		m_stream->set_sample_rate(cfreq);
-
-		// Set timers and things?
-		attotime zx_period = attotime::from_ticks(64, cfreq);
-		m_zx_timer->adjust(zx_period, 0, zx_period);
-
-		m_active = true;
-	}
-}
-
-WRITE_LINE_MEMBER( cmi01a_device::pia_0_cb2_w )
-{
-	//streams_update();
-
-	/* RUN */
-	if (state)
-	{
-		m_segment_cnt = 0x4000 | ((m_pia_0->a_output() & 0x7f) << 7);
-		m_new_addr = 1;
-
-		/* Clear /EOSI */
-//      pia6821_cb1_w(card->pia[1], 0, 1);
-
-		/* Clear ZX */
-		m_pia_1->ca1_w(0);
-
-		/* Clear /ZCINT */
-		m_pia_0->ca1_w(1);
-
-		m_ptm->set_g1(0);
-		m_ptm->set_g2(0);
-		m_ptm->set_g3(0);
-
-		run_voice();
-	}
-	else
-	{
-		/* Clear /EOSI */
-		m_pia_1->cb1_w(1);
-
-		m_ptm->set_g1(1);
-		m_ptm->set_g2(1);
-		m_ptm->set_g3(1);
-
-		//printf("Stop %d\n", m_channel);
-
-		m_zx_timer->adjust(attotime::never);
-		m_active = false;
-		m_zx_flag = 0;  // TEST
-		m_zx_ff = 0;
-	}
-
-}
-
-void cmi01a_device::update_wave_addr(int inc)
-{
-	int old_cnt = m_segment_cnt;
-
-	if (inc)
-		++m_segment_cnt;
-
-	/* Update end of sound interrupt flag */
-	m_pia_1->cb1_w((m_segment_cnt & 0x4000) >> 14);
-
-	/* TODO Update zero crossing flag */
-	m_pia_1->ca1_w((m_segment_cnt & 0x40) >> 6);
-
-	/* Clock a latch on a transition */
-	if ((old_cnt & 0x40) && !(m_segment_cnt & 0x40))
-	{
-		// TODO: ECLK
-		m_pia_1->ca2_w(1);
-		m_pia_1->ca2_w(0);
-	}
-
-	/* Zero crossing interrupt is a pulse */
-}
-
-WRITE_LINE_MEMBER( cmi01a_device::ptm_o1 )
-{
-	m_ptm_o1 = state;
-}
-
-READ_LINE_MEMBER( cmi01a_device::eosi_r )
-{
-	return (m_segment_cnt & 0x4000) >> 14;
-}
-
-READ_LINE_MEMBER( cmi01a_device::zx_r )
-{
-	return m_segment_cnt & 0x40;
-}
-
-WRITE8_MEMBER( cmi01a_device::write )
-{
-	//printf("C%d W: %02x = %02x\n", m_channel, offset, data);
-
-	switch (offset)
-	{
-		case 0x0:
-			if (m_new_addr)
-				m_new_addr = 0;
-
-			m_wave_ram[m_segment_cnt & 0x3fff] = data;
-			update_wave_addr(1);
-			break;
-
-		case 0x3:
-			m_env_dir_ctrl = ENV_DIR_DOWN;
-			break;
-
-		case 0x4:
-			m_env_dir_ctrl = ENV_DIR_UP;
-			break;
-
-		case 0x5:
-			m_vol_latch = data;
-			break;
-
-		case 0x6:
-			m_flt_latch = data;
-			break;
-
-		case 0x8: case 0x9: case 0xa: case 0xb:
-			m_pia_0->write(space, offset & 3, data);
-			break;
-
-		case 0xc: case 0xd: case 0xe: case 0xf:
-			m_pia_1->write(space, (BIT(offset, 0) << 1) | BIT(offset, 1), data);
-			break;
-
-		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
-		{
-			/* PTM addressing is a little funky */
-			int a0 = offset & 1;
-			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
-			int a2 = BIT(offset, 1);
-
-			//printf("CH%d PTM W: [%x] = %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
-			m_ptm->write(space, (a2 << 2) | (a1 << 1) | a0, data);
-			break;
-		}
-
-		default:
-			printf("Unknown channel card %d write to E0%02X = %02X\n", m_channel, offset, data);
-			break;
-	}
-}
-
-READ8_MEMBER( cmi01a_device::read )
-{
-	if (machine().side_effects_disabled())
-		return 0;
-
-	uint8_t data = 0;
-
-	switch (offset)
-	{
-		case 0x0:
-			if (m_new_addr)
-			{
-				m_new_addr = 0;
-				break;
-			}
-			data = m_wave_ram[m_segment_cnt & 0x3fff];
-			update_wave_addr(1);
-			break;
-
-		case 0x3:
-			m_env_dir_ctrl = ENV_DIR_DOWN;
-			break;
-
-		case 0x4:
-			m_env_dir_ctrl = ENV_DIR_UP;
-			break;
-
-		case 0x5:
-			data = 0xff;
-			break;
-
-		case 0x8: case 0x9: case 0xa: case 0xb:
-			data = m_pia_0->read(space, offset & 3);
-			break;
-
-		case 0xc: case 0xd: case 0xe: case 0xf:
-			data = m_pia_1->read(space, (BIT(offset, 0) << 1) | BIT(offset, 1));
-			break;
-
-		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
-		{
-			int a0 = offset & 1;
-			int a1 = (m_ptm_o1 && BIT(offset, 3)) || (!BIT(offset, 3) && BIT(offset, 2));
-			int a2 = BIT(offset, 1);
-
-			data = m_ptm->read(space, (a2 << 2) | (a1 << 1) | a0);
-
-			//printf("CH%d PTM R: [%x] %02x\n", m_channel, (a2 << 2) | (a1 << 1) | a0, data);
-			break;
-		}
-
-		default:
-			printf("Unknown channel card %d read from E0%02X\n", m_channel, offset);
-			break;
-	}
-
-	//printf("C%d R: %02x = %02x\n", m_channel, offset, data);
-
-	return data;
-}
-
 WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_irq )
 {
 	//printf("cmi02_ptm_irq: %d\n", state);
@@ -2148,6 +1614,12 @@ WRITE8_MEMBER( cmi_state::cmi02_w )
 				logerror("CMI02 W: %x %x\n", offset, data);
 		}
 	}
+}
+
+template<int Channel>
+WRITE_LINE_MEMBER(cmi_state::channel_irq)
+{
+	set_interrupt(CPU_1, ch_int_levels[Channel], state);
 }
 
 void cmi_state::install_video_ram(int cpunum)
@@ -2855,22 +2327,30 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// Channel cards
-	MCFG_CMI01A_ADD("cmi01a_0", 0)
+	MCFG_DEVICE_ADD("cmi01a_0", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_ADD("cmi01a_1", 1)
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<0>))
+	MCFG_DEVICE_ADD("cmi01a_1", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_ADD("cmi01a_2", 2)
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<1>))
+	MCFG_DEVICE_ADD("cmi01a_2", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_ADD("cmi01a_3", 3)
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<2>))
+	MCFG_DEVICE_ADD("cmi01a_3", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_ADD("cmi01a_4", 4)
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<3>))
+	MCFG_DEVICE_ADD("cmi01a_4", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_ADD("cmi01a_5", 5)
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<4>))
+	MCFG_DEVICE_ADD("cmi01a_5", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_ADD("cmi01a_6", 6)
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<5>))
+	MCFG_DEVICE_ADD("cmi01a_6", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CMI01A_ADD("cmi01a_7", 7)
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<6>))
+	MCFG_DEVICE_ADD("cmi01a_7", CMI01A_CHANNEL_CARD, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_CMI01A_IRQ_CALLBACK(WRITELINE(cmi_state, channel_irq<7>))
 MACHINE_CONFIG_END
 
 ROM_START( cmi2x )
