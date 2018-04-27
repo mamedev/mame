@@ -128,7 +128,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	}
 	assert(tag[0] != '\0');
 
-	if (!owner)
+	if (owner)
 	{
 		// allocate the new device and append it to the owner's list
 		device_t *const device = &owner->subdevices().m_list.append(*type(*this, tag, owner, clock).release());
