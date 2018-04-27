@@ -146,6 +146,8 @@ void jpmimpct_state::update_irqs()
 
 MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
 {
+	m_digits.resolve();
+
 	save_item(NAME(m_tms_irq));
 	save_item(NAME(m_duart_1_irq));
 	save_item(NAME(m_touch_cnt));
@@ -566,7 +568,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
 
 		case 0x0b:
 		{
-			output().set_digit_value(m_lamp_strobe,data);
+			m_digits[m_lamp_strobe] = data;
 			break;
 		}
 		case 0x0f:
@@ -1163,7 +1165,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 
 		case 0x0b:
 		{
-			output().set_digit_value(m_lamp_strobe,data);
+			m_digits[m_lamp_strobe] = data;
 			break;
 		}
 		case 0x0f:

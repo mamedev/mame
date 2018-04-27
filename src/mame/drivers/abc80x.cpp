@@ -141,7 +141,6 @@ Notes:
 
     TODO:
 
-    - option ROM/HR video RAM access needs refactor of memory banking
     - cassette
     - abc806 RTC
     - abc806 disks except ufd631 won't boot
@@ -380,6 +379,68 @@ void abc806_state::bankswitch()
 
 
 //-------------------------------------------------
+//  m1_r - opcode read
+//-------------------------------------------------
+
+READ8_MEMBER( abc800_state::m1_r )
+{
+	if (offset >= 0x7800 && offset < 0x8000)
+	{
+		if (!m_fetch_charram)
+		{
+			m_fetch_charram = 1;
+			bankswitch();
+		}
+
+		return m_rom->base()[0x7800 | (offset & 0x7ff)];
+	}
+
+	if (m_fetch_charram)
+	{
+		m_fetch_charram = 0;
+		bankswitch();
+	}
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+READ8_MEMBER( abc800c_state::m1_r )
+{
+	if (offset >= 0x7c00 && offset < 0x8000)
+	{
+		if (!m_fetch_charram)
+		{
+			m_fetch_charram = 1;
+			bankswitch();
+		}
+
+		return m_rom->base()[0x7c00 | (offset & 0x3ff)];
+	}
+
+	if (m_fetch_charram)
+	{
+		m_fetch_charram = 0;
+		bankswitch();
+	}
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+READ8_MEMBER( abc802_state::m1_r )
+{
+	if (m_lrs)
+	{
+		if (offset >= 0x7800 && offset < 0x8000)
+		{
+			return m_rom->base()[0x7800 | (offset & 0x7ff)];
+		}
+	}
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+
+//-------------------------------------------------
 //  mai_r - memory bank map read
 //-------------------------------------------------
 
@@ -426,6 +487,16 @@ WRITE8_MEMBER( abc806_state::mao_w )
 //**************************************************************************
 
 //-------------------------------------------------
+//  ADDRESS_MAP( abc800_m1 )
+//-------------------------------------------------
+
+void abc800_state::abc800_m1(address_map &map)
+{
+	map(0x0000, 0xffff).r(this, FUNC(abc800_state::m1_r));
+}
+
+
+//-------------------------------------------------
 //  ADDRESS_MAP( abc800c_mem )
 //-------------------------------------------------
 
@@ -443,47 +514,50 @@ void abc800c_state::abc800c_mem(address_map &map)
 //  ADDRESS_MAP( abc800c_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc800_state::abc800c_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, inp_r, out_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_slot_device, stat_r, cs_w)
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c1_w)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c2_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c3_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c4_w)
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(pling_r)
-	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r) AM_WRITE(hrc_w)
-	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio2_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-ADDRESS_MAP_END
+void abc800_state::abc800c_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::inp_r), FUNC(abcbus_slot_device::out_w));
+	map(0x01, 0x01).mirror(0x18).rw(ABCBUS_TAG, FUNC(abcbus_slot_device::stat_r), FUNC(abcbus_slot_device::cs_w));
+	map(0x02, 0x02).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c1_w));
+	map(0x03, 0x03).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c2_w));
+	map(0x04, 0x04).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c3_w));
+	map(0x05, 0x05).mirror(0x18).w(ABCBUS_TAG, FUNC(abcbus_slot_device::c4_w));
+	map(0x05, 0x05).mirror(0x18).r(this, FUNC(abc800_state::pling_r));
+	map(0x06, 0x06).mirror(0x18).w(this, FUNC(abc800_state::hrs_w));
+	map(0x07, 0x07).mirror(0x18).r(ABCBUS_TAG, FUNC(abcbus_slot_device::rst_r)).w(this, FUNC(abc800_state::hrc_w));
+	map(0x20, 0x23).mirror(0x0c).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x40, 0x43).mirror(0x1c).rw(m_sio, FUNC(z80sio2_device::ba_cd_r), FUNC(z80sio2_device::ba_cd_w));
+	map(0x60, 0x63).mirror(0x1c).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc800m_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc800_state::abc800m_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x4000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("char_ram")
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void abc800_state::abc800m_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram().share("video_ram");
+	map(0x4000, 0x77ff).rom();
+	map(0x7800, 0x7fff).ram().share("char_ram");
+	map(0x8000, 0xffff).ram();
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( abc800m_io )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(abc800_state::abc800m_io)
-	AM_IMPORT_FROM( abc800c_io )
-	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_device, register_r)
-	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
-ADDRESS_MAP_END
+void abc800_state::abc800m_io(address_map &map)
+{
+	abc800c_io(map);
+	map(0x31, 0x31).mirror(0x06).r(MC6845_TAG, FUNC(mc6845_device::register_r));
+	map(0x38, 0x38).mirror(0x06).w(MC6845_TAG, FUNC(mc6845_device::address_w));
+	map(0x39, 0x39).mirror(0x06).w(MC6845_TAG, FUNC(mc6845_device::register_w));
+}
 
 
 //-------------------------------------------------
@@ -1024,6 +1098,7 @@ MACHINE_CONFIG_START(abc800c_state::abc800c)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
+	MCFG_CPU_OPCODES_MAP(abc800_m1)
 	MCFG_CPU_PROGRAM_MAP(abc800c_mem)
 	MCFG_CPU_IO_MAP(abc800c_io)
 
@@ -1099,6 +1174,7 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
+	MCFG_CPU_OPCODES_MAP(abc800_m1)
 	MCFG_CPU_PROGRAM_MAP(abc800m_mem)
 	MCFG_CPU_IO_MAP(abc800m_io)
 
@@ -1174,6 +1250,7 @@ MACHINE_CONFIG_START(abc802_state::abc802)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
+	MCFG_CPU_OPCODES_MAP(abc800_m1)
 	MCFG_CPU_PROGRAM_MAP(abc802_mem)
 	MCFG_CPU_IO_MAP(abc802_io)
 
@@ -1250,6 +1327,7 @@ MACHINE_CONFIG_START(abc806_state::abc806)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC800_X01/2/2)
 	MCFG_Z80_DAISY_CHAIN(abc800_daisy_chain)
+	MCFG_CPU_OPCODES_MAP(abc800_m1)
 	MCFG_CPU_PROGRAM_MAP(abc806_mem)
 	MCFG_CPU_IO_MAP(abc806_io)
 
@@ -1586,5 +1664,5 @@ ROM_END
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE           INIT  COMPANY             FULLNAME        FLAGS
 COMP( 1981, abc800c,    0,          0,      abc800c,    abc800, abc800c_state,  0,    "Luxor Datorer AB", "ABC 800 C/HR", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1981, abc800m,    abc800c,    0,      abc800m,    abc800, abc800m_state,  0,    "Luxor Datorer AB", "ABC 800 M/HR", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,   0,    "Luxor Datorer AB", "ABC 802",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,   0,    "Luxor Datorer AB", "ABC 802",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state,   0,    "Luxor Datorer AB", "ABC 806",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

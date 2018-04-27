@@ -803,7 +803,7 @@ WRITE8_MEMBER(sms_state::sms_mem_control_w)
 {
 	m_mem_ctrl_reg = data;
 
-	logerror("memory control reg write %02x, pc: %04x\n", data, space.device().safe_pc());
+	logerror("%s memory control reg write %02x\n", machine().describe_context(), data);
 
 	setup_media_slots();
 }

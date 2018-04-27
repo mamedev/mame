@@ -99,16 +99,16 @@ void kaypro_state::kaypro484_io(address_map &map)
 	map(0x1f, 0x1f).rw(this, FUNC(kaypro_state::kaypro484_videoram_r), FUNC(kaypro_state::kaypro484_videoram_w));
 
 	/* The below are not emulated */
-/*  AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("z80pio", kaypro484_pio_r, kaypro484_pio_w) - for RTC and Modem
-    AM_RANGE(0x24, 0x27) communicate with MM58167A RTC. Modem uses TMS99531 and TMS99532 chips.
-    AM_RANGE(0x80, 0x80) Hard drive controller card I/O port - 10MB hard drive only fitted to the Kaypro 10
-    AM_RANGE(0x81, 0x81) Hard Drive READ error register, WRITE precomp
-    AM_RANGE(0x82, 0x82) Hard Drive Sector register count I/O
-    AM_RANGE(0x83, 0x83) Hard Drive Sector register number I/O
-    AM_RANGE(0x84, 0x84) Hard Drive Cylinder low register I/O
-    AM_RANGE(0x85, 0x85) Hard Drive Cylinder high register I/O
-    AM_RANGE(0x86, 0x86) Hard Drive Size / Drive / Head register I/O
-    AM_RANGE(0x87, 0x87) Hard Drive READ status register, WRITE command register */
+/*  map(0x20, 0x23).rw("z80pio", FUNC(z80pio_device::kaypro484_pio_r), FUNC(z80pio_device::kaypro484_pio_w)) - for RTC and Modem
+    map(0x24, 0x27) communicate with MM58167A RTC. Modem uses TMS99531 and TMS99532 chips.
+    map(0x80, 0x80) Hard drive controller card I/O port - 10MB hard drive only fitted to the Kaypro 10
+    map(0x81, 0x81) Hard Drive READ error register, WRITE precomp
+    map(0x82, 0x82) Hard Drive Sector register count I/O
+    map(0x83, 0x83) Hard Drive Sector register number I/O
+    map(0x84, 0x84) Hard Drive Cylinder low register I/O
+    map(0x85, 0x85) Hard Drive Cylinder high register I/O
+    map(0x86, 0x86) Hard Drive Size / Drive / Head register I/O
+    map(0x87, 0x87) Hard Drive READ status register, WRITE command register */
 	map(0x20, 0x86).noprw();
 	map(0x87, 0x87).r(this, FUNC(kaypro_state::kaypro484_87_r));
 }

@@ -96,7 +96,7 @@ uint32_t md_rom_svp_device::pm_io(int reg, int write, uint32_t d)
 	if (m_emu_status & SSP_PMC_HAVE_ADDR)
 		m_emu_status &= ~SSP_PMC_HAVE_ADDR;
 
-	if (reg == 4 || (m_svp->state().state_int(SSP_ST) & 0x60))
+	if (reg == 4 || (m_svp->state_int(SSP_ST) & 0x60))
 	{
 #define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
 		uint16_t *dram = (uint16_t *)m_dram;

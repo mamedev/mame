@@ -53,7 +53,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jackal);
 	uint32_t screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jackal_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void jackal_mark_tile_dirty( int offset );
 	void draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank );

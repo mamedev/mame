@@ -19,25 +19,28 @@
 DEFINE_DEVICE_TYPE(PC_FDC_XT, pc_fdc_xt_device, "pc_fdc_xt", "PC FDC (XT)")
 DEFINE_DEVICE_TYPE(PC_FDC_AT, pc_fdc_at_device, "pc_fdc_at", "PC FDC (AT)")
 
-ADDRESS_MAP_START(pc_fdc_family_device::map)
-ADDRESS_MAP_END
+void pc_fdc_family_device::map(address_map &map)
+{
+}
 
 // The schematics show address decoding is minimal
-ADDRESS_MAP_START(pc_fdc_xt_device::map)
-	AM_RANGE(0x0, 0x0) AM_DEVREAD("upd765", upd765a_device, msr_r) AM_WRITE(dor_w)
-	AM_RANGE(0x1, 0x1) AM_DEVREAD("upd765", upd765a_device, fifo_r) AM_WRITE(dor_fifo_w)
-	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
-	AM_RANGE(0x3, 0x3) AM_WRITE(dor_w)
-	AM_RANGE(0x4, 0x5) AM_DEVICE("upd765", upd765a_device, map)
-ADDRESS_MAP_END
+void pc_fdc_xt_device::map(address_map &map)
+{
+	map(0x0, 0x0).r("upd765", FUNC(upd765a_device::msr_r)).w(this, FUNC(pc_fdc_xt_device::dor_w));
+	map(0x1, 0x1).r("upd765", FUNC(upd765a_device::fifo_r)).w(this, FUNC(pc_fdc_xt_device::dor_fifo_w));
+	map(0x2, 0x2).w(this, FUNC(pc_fdc_xt_device::dor_w));
+	map(0x3, 0x3).w(this, FUNC(pc_fdc_xt_device::dor_w));
+	map(0x4, 0x5).m("upd765", FUNC(upd765a_device::map));
+}
 
 
 // Decoding is through a PAL, so presumably complete
-ADDRESS_MAP_START(pc_fdc_at_device::map)
-	AM_RANGE(0x2, 0x2) AM_READWRITE(dor_r, dor_w)
-	AM_RANGE(0x4, 0x5) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
-ADDRESS_MAP_END
+void pc_fdc_at_device::map(address_map &map)
+{
+	map(0x2, 0x2).rw(this, FUNC(pc_fdc_at_device::dor_r), FUNC(pc_fdc_at_device::dor_w));
+	map(0x4, 0x5).m("upd765", FUNC(upd765a_device::map));
+	map(0x7, 0x7).rw(this, FUNC(pc_fdc_at_device::dir_r), FUNC(pc_fdc_at_device::ccr_w));
+}
 
 pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	pc_fdc_interface(mconfig, type, tag, owner, clock), fdc(*this, "upd765"),

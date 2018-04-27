@@ -143,9 +143,9 @@ void galpani2_state::machine_reset()
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); //initial mcu xchk
 }
 
-static void galpani2_write_kaneko(device_t *device)
+static void galpani2_write_kaneko(cpu_device *cpu)
 {
-	address_space &dstspace = device->memory().space(AS_PROGRAM);
+	address_space &dstspace = cpu->space(AS_PROGRAM);
 	int i,x,tpattidx;
 	unsigned char testpattern[] = {0xFF,0x55,0xAA,0xDD,0xBB,0x99};
 
@@ -519,9 +519,9 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_SPECIAL )  // CARD full
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SPECIAL )  // CARD full
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )  // CARD empty
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM )  // CARD full
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_CUSTOM )  // CARD full
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM )  // CARD empty
 
 	PORT_START("SERVICE")   /* 780006.w */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )

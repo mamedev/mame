@@ -37,14 +37,12 @@
 void atarig1_state::update_interrupts()
 {
 	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 MACHINE_START_MEMBER(atarig1_state,atarig1)
 {
 	atarigen_state::machine_start();
-	save_item(NAME(m_which_input));
 }
 
 
@@ -76,33 +74,19 @@ WRITE16_MEMBER(atarig1_state::mo_command_w)
  *
  *************************************/
 
-READ16_MEMBER(atarig1_state::special_port0_r)
-{
-	int temp = ioport("IN0")->read();
-	temp ^= 0x2000;     /* A2DOK always high for now */
-	return temp;
-}
-
-
 WRITE16_MEMBER(atarig1_state::a2d_select_w)
 {
-	m_which_input = offset;
+	if (m_adc.found())
+		m_adc->address_offset_start_w(space, offset, 0);
 }
 
 
 READ16_MEMBER(atarig1_state::a2d_data_r)
 {
-	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2" };
-
-	/* Pit Fighter has no A2D, just another input port */
-	if (m_is_pitfight)
-		return ioport("ADC0")->read();
-
-	/* otherwise, assume it's hydra */
-	if (m_which_input < 3)
-		return ioport(adcnames[m_which_input])->read() << 8;
-
-	return 0;
+	if (m_adc.found())
+		return m_adc->data_r(space, offset) << 8;
+	else
+		return m_in1->read();
 }
 
 
@@ -202,7 +186,7 @@ void atarig1_state::main_map(address_map &map)
 	map(0xf98000, 0xf98001).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0xfa0001, 0xfa0001).w(m_rle, FUNC(atari_rle_objects_device::control_write));
 	map(0xfb0000, 0xfb0001).w(this, FUNC(atarig1_state::video_int_ack_w));
-	map(0xfc0000, 0xfc0001).r(this, FUNC(atarig1_state::special_port0_r));
+	map(0xfc0000, 0xfc0001).portr("IN0");
 	map(0xfc8000, 0xfc8007).rw(this, FUNC(atarig1_state::a2d_data_r), FUNC(atarig1_state::a2d_select_w));
 	map(0xfd0000, 0xfd0000).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0xfd8000, 0xfdffff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
@@ -232,17 +216,15 @@ static INPUT_PORTS_START( hydra )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Boost")
 	PORT_BIT( 0x0fe0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0808_device, eoc_r)
 	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("ADC0")      /* ADC 0 @ fc8000 */
-	PORT_BIT( 0x00ff, 0x0080, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
 	PORT_START("ADC1")      /* ADC 1 @ fc8000 */
-	PORT_BIT( 0x00ff, 0x0080, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
 	PORT_START("ADC2")      /* ADC 2 @ fc8000 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -264,11 +246,11 @@ static INPUT_PORTS_START( pitfight )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump/Start")
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("ADC0")      /* fc8000 */
+	PORT_START("IN1")     /* fc8000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
@@ -285,12 +267,6 @@ static INPUT_PORTS_START( pitfight )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Kick")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Jump/Start")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ADC1")      /* not used */
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ADC2")      /* not used */
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 // todo:
 //  PORT_MODIFY( "jsa:JSAII" )
@@ -309,11 +285,11 @@ static INPUT_PORTS_START( pitfightj )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Jump/P1 Start")
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_ATARI_JSA_MAIN_TO_SOUND_READY("jsa")
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("ADC0")      /* fc8000 */
+	PORT_START("IN1")     /* fc8000 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -323,12 +299,6 @@ static INPUT_PORTS_START( pitfightj )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Kick")
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Jump/P2 Start")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ADC1")      /* not used */
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ADC2")      /* not used */
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 // todo:
 //  PORT_MODIFY( "jsa:JSAII" )
@@ -430,10 +400,14 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", atarig1_state, video_int_gen)
 
 	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
+
+	MCFG_DEVICE_ADD("adc", ADC0809, ATARI_CLOCK_14MHz/16)
+	MCFG_ADC0808_IN0_CB(IOPORT("ADC0"))
+	MCFG_ADC0808_IN1_CB(IOPORT("ADC1"))
+	MCFG_ADC0808_IN2_CB(IOPORT("ADC2"))
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
@@ -455,13 +429,14 @@ MACHINE_CONFIG_START(atarig1_state::atarig1)
 	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(atarig1_state, screen_update_atarig1)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarig1_state, video_int_write_line))
 
 	MCFG_VIDEO_START_OVERRIDE(atarig1_state,atarig1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_ATARI_JSA_II_ADD("jsa", WRITELINE(atarig1_state, sound_int_write_line))
+	MCFG_ATARI_JSA_II_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_2))
 	MCFG_ATARI_JSA_TEST_PORT("IN0", 14)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -484,6 +459,7 @@ MACHINE_CONFIG_START(atarig1_state::pitfight9)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 114)
+	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 
@@ -491,6 +467,7 @@ MACHINE_CONFIG_START(atarig1_state::pitfight7)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 112)
+	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 
@@ -498,6 +475,7 @@ MACHINE_CONFIG_START(atarig1_state::pitfight)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 111)
+	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 
@@ -505,12 +483,14 @@ MACHINE_CONFIG_START(atarig1_state::pitfightj)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 113)
+	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(atarig1_state::pitfightb)
 	atarig1(config);
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
+	MCFG_DEVICE_REMOVE("adc")
 MACHINE_CONFIG_END
 
 
@@ -1296,18 +1276,18 @@ ROM_END
 DRIVER_INIT_MEMBER(atarig1_state,hydra)
 {
 	slapstic_configure(*m_maincpu, 0x078000, 0, memregion("maincpu")->base() + 0x78000);
-	m_is_pitfight = 0;
+	m_is_pitfight = false;
 }
 
 DRIVER_INIT_MEMBER(atarig1_state,hydrap)
 {
-	m_is_pitfight = 0;
+	m_is_pitfight = false;
 }
 
 DRIVER_INIT_MEMBER(atarig1_state,pitfight)
 {
 	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
-	m_is_pitfight = 1;
+	m_is_pitfight = true;
 }
 
 DRIVER_INIT_MEMBER(atarig1_state,pitfightb)
@@ -1315,7 +1295,7 @@ DRIVER_INIT_MEMBER(atarig1_state,pitfightb)
 	pitfightb_cheap_slapstic_init();
 	save_item(NAME(m_bslapstic_bank));
 	save_item(NAME(m_bslapstic_primed));
-	m_is_pitfight = 1;
+	m_is_pitfight = true;
 }
 
 

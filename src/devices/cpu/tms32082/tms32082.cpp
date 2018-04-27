@@ -22,15 +22,16 @@ DEFINE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device, "tms32082_pp", "Texas Instru
 // Master Processor
 
 // internal memory map
-ADDRESS_MAP_START(tms32082_mp_device::mp_internal_map)
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("pp0_data0")
-	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("pp1_data0")
-	AM_RANGE(0x00008000, 0x00008fff) AM_RAM AM_SHARE("pp0_data1")
-	AM_RANGE(0x00009000, 0x00009fff) AM_RAM AM_SHARE("pp1_data1")
-	AM_RANGE(0x01000000, 0x01000fff) AM_RAM AM_SHARE("pp0_param")
-	AM_RANGE(0x01001000, 0x01001fff) AM_RAM AM_SHARE("pp1_param")
-	AM_RANGE(0x01010000, 0x010107ff) AM_READWRITE(mp_param_r, mp_param_w)
-ADDRESS_MAP_END
+void tms32082_mp_device::mp_internal_map(address_map &map)
+{
+	map(0x00000000, 0x00000fff).ram().share("pp0_data0");
+	map(0x00001000, 0x00001fff).ram().share("pp1_data0");
+	map(0x00008000, 0x00008fff).ram().share("pp0_data1");
+	map(0x00009000, 0x00009fff).ram().share("pp1_data1");
+	map(0x01000000, 0x01000fff).ram().share("pp0_param");
+	map(0x01001000, 0x01001fff).ram().share("pp1_param");
+	map(0x01010000, 0x010107ff).rw(this, FUNC(tms32082_mp_device::mp_param_r), FUNC(tms32082_mp_device::mp_param_w));
+}
 
 const uint32_t tms32082_mp_device::SHIFT_MASK[] =
 {
@@ -223,7 +224,7 @@ void tms32082_mp_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = m_program->direct<0>();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void tms32082_mp_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -445,7 +446,7 @@ uint32_t tms32082_mp_device::fetch()
 
 void tms32082_mp_device::delay_slot()
 {
-	debugger_instruction_hook(this, m_pc);
+	debugger_instruction_hook(m_pc);
 	m_ir = fetch();
 	execute();
 
@@ -460,7 +461,7 @@ void tms32082_mp_device::execute_run()
 
 		check_interrupts();
 
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		m_ir = fetch();
 		execute();
@@ -484,14 +485,15 @@ void tms32082_mp_device::execute_run()
 // Parallel Processor
 
 // internal memory map
-ADDRESS_MAP_START(tms32082_pp_device::pp_internal_map)
-	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("pp0_data0")
-	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("pp1_data0")
-	AM_RANGE(0x00008000, 0x00008fff) AM_RAM AM_SHARE("pp0_data1")
-	AM_RANGE(0x00009000, 0x00009fff) AM_RAM AM_SHARE("pp1_data1")
-	AM_RANGE(0x01000000, 0x01000fff) AM_RAM AM_SHARE("pp0_param")
-	AM_RANGE(0x01001000, 0x01001fff) AM_RAM AM_SHARE("pp1_param")
-ADDRESS_MAP_END
+void tms32082_pp_device::pp_internal_map(address_map &map)
+{
+	map(0x00000000, 0x00000fff).ram().share("pp0_data0");
+	map(0x00001000, 0x00001fff).ram().share("pp1_data0");
+	map(0x00008000, 0x00008fff).ram().share("pp0_data1");
+	map(0x00009000, 0x00009fff).ram().share("pp1_data1");
+	map(0x01000000, 0x01000fff).ram().share("pp0_param");
+	map(0x01001000, 0x01001fff).ram().share("pp1_param");
+}
 
 tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS32082_PP, tag, owner, clock)
@@ -521,7 +523,7 @@ void tms32082_pp_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = m_program->direct<0>();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void tms32082_pp_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -543,7 +545,7 @@ void tms32082_pp_device::device_reset()
 void tms32082_pp_device::execute_run()
 {
 	m_pc = m_fetchpc;
-	debugger_instruction_hook(this, m_pc);
+	debugger_instruction_hook(m_pc);
 
 	m_icount = 0;
 

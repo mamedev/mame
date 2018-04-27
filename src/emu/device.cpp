@@ -231,7 +231,56 @@ void device_t::set_clock(u32 clock)
 
 void device_t::config_complete()
 {
-	// first notify the interfaces
+	// resolve default BIOS
+	tiny_rom_entry const *const roms(rom_region());
+	if (roms)
+	{
+		// first pass: try to find default BIOS from ROM region or machine configuration
+		char const *defbios(m_default_bios_tag.empty() ? nullptr : m_default_bios_tag.c_str());
+		bool twopass(false), havebios(false);
+		u8 firstbios(0);
+		for (const tiny_rom_entry *rom = roms; !m_default_bios && !ROMENTRY_ISEND(rom); ++rom)
+		{
+			if (ROMENTRY_ISSYSTEM_BIOS(rom))
+			{
+				if (!havebios)
+				{
+					havebios = true;
+					firstbios = ROM_GETBIOSFLAGS(rom);
+				}
+				if (!defbios)
+					twopass = true;
+				else if (!std::strcmp(rom->name, defbios))
+					m_default_bios = ROM_GETBIOSFLAGS(rom);
+			}
+			else if (!defbios && ROMENTRY_ISDEFAULT_BIOS(rom))
+			{
+				defbios = rom->name;
+			}
+		}
+
+		// second pass is needed if default BIOS came after one or more system BIOSes
+		if (havebios && !m_default_bios)
+		{
+			if (defbios && twopass)
+			{
+				for (const tiny_rom_entry *rom = roms; !m_default_bios && !ROMENTRY_ISEND(rom); ++rom)
+				{
+					if (ROMENTRY_ISSYSTEM_BIOS(rom) && !std::strcmp(rom->name, defbios))
+						m_default_bios = ROM_GETBIOSFLAGS(rom);
+				}
+			}
+
+			// no default BIOS declared but at least one system BIOS declared
+			if (!m_default_bios)
+				m_default_bios = firstbios;
+		}
+
+		// set system BIOS to the default unless something overrides it
+		set_system_bios(m_default_bios);
+	}
+
+	// notify the interfaces
 	for (device_interface &intf : interfaces())
 		intf.interface_config_complete();
 

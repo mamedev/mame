@@ -25,11 +25,12 @@
 #include "xmlfile.h"
 
 #include <ctype.h>
+#include <cstring>
 #include <map>
 
 
-#define XML_ROOT                "mame"
-#define XML_TOP                 "machine"
+#define XML_ROOT    "mame"
+#define XML_TOP     "machine"
 
 
 //**************************************************************************
@@ -191,6 +192,7 @@ const char info_xml_creator::s_dtd_string[] =
 "\t\t\t<!ATTLIST softwarelist status (original|compatible) #REQUIRED>\n"
 "\t\t\t<!ATTLIST softwarelist filter CDATA #IMPLIED>\n"
 "\t\t<!ELEMENT ramoption (#PCDATA)>\n"
+"\t\t\t<!ATTLIST ramoption name CDATA #REQUIRED>\n"
 "\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
 "]>";
 
@@ -204,8 +206,8 @@ const char info_xml_creator::s_dtd_string[] =
 //-------------------------------------------------
 
 info_xml_creator::info_xml_creator(emu_options const &options, bool dtd)
-	: m_output(nullptr),
-		m_dtd(dtd)
+	: m_output(nullptr)
+	, m_dtd(dtd)
 {
 }
 
@@ -1817,14 +1819,28 @@ void info_xml_creator::output_software_list(device_t &root)
 
 void info_xml_creator::output_ramoptions(device_t &root)
 {
-	for (const ram_device &ram : ram_device_iterator(root))
+	for (const ram_device &ram : ram_device_iterator(root, 1))
 	{
-		for (uint32_t option : ram.extra_options())
+		if (!std::strcmp(ram.tag(), ":" RAM_TAG))
 		{
-			if (option == ram.default_size())
-				fprintf(m_output, "\t\t<ramoption default=\"1\">%u</ramoption>\n", option);
-			else
-				fprintf(m_output, "\t\t<ramoption>%u</ramoption>\n", option);
+			uint32_t const defsize(ram.default_size());
+			bool havedefault(false);
+			for (ram_device::extra_option const &option : ram.extra_options())
+			{
+				if (defsize == option.second)
+				{
+					assert(!havedefault);
+					havedefault = true;
+					fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
+				}
+				else
+				{
+					fprintf(m_output, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", util::xml::normalize_string(option.first.c_str()), option.second);
+				}
+			}
+			if (!havedefault)
+				fprintf(m_output, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
+			break;
 		}
 	}
 }

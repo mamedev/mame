@@ -156,11 +156,12 @@ const uint16_t lc8670_cpu_device::s_irq_vectors[] =
 //  Internal memory map
 //**************************************************************************
 
-ADDRESS_MAP_START(lc8670_cpu_device::lc8670_internal_map)
-	AM_RANGE(0x000, 0x0ff) AM_READWRITE(mram_r, mram_w)
-	AM_RANGE(0x100, 0x17f) AM_READWRITE(regs_r, regs_w)
-	AM_RANGE(0x180, 0x1ff) AM_READWRITE(xram_r, xram_w)
-ADDRESS_MAP_END
+void lc8670_cpu_device::lc8670_internal_map(address_map &map)
+{
+	map(0x000, 0x0ff).rw(this, FUNC(lc8670_cpu_device::mram_r), FUNC(lc8670_cpu_device::mram_w));
+	map(0x100, 0x17f).rw(this, FUNC(lc8670_cpu_device::regs_r), FUNC(lc8670_cpu_device::regs_w));
+	map(0x180, 0x1ff).rw(this, FUNC(lc8670_cpu_device::xram_r), FUNC(lc8670_cpu_device::xram_w));
+}
 
 
 //**************************************************************************
@@ -198,7 +199,7 @@ void lc8670_cpu_device::device_start()
 	m_direct = m_program->direct<0>();
 
 	// set our instruction counter
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 
 	// resolve callbacks
 	m_bankswitch_func.resolve();
@@ -420,7 +421,7 @@ void lc8670_cpu_device::execute_run()
 		check_irqs();
 
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		int cycles;
 

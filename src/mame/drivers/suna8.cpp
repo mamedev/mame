@@ -1580,7 +1580,7 @@ static INPUT_PORTS_START( brickzn )
 	PORT_CONFNAME( 0x02, 0x02, "1: Unused?" )
 	PORT_CONFSETTING(    0x02, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT(  0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )  // Must flip rapidly
+	PORT_BIT(  0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )  // Must flip rapidly
 	PORT_CONFNAME( 0x08, 0x08, "3: Unused?" )
 	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
@@ -1756,7 +1756,7 @@ static INPUT_PORTS_START( starfigh )
 	PORT_BIT(  0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")    // 0 = skip color cycling (red)
-	PORT_BIT(  0x80, IP_ACTIVE_LOW,  IPT_SPECIAL )  // read in protection check, see code at 787
+	PORT_BIT(  0x80, IP_ACTIVE_LOW,  IPT_CUSTOM )  // read in protection check, see code at 787
 
 INPUT_PORTS_END
 
@@ -1830,7 +1830,7 @@ static INPUT_PORTS_START( sparkman )
 	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_SPECIAL )                   // protection
+	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_CUSTOM )                   // protection
 
 INPUT_PORTS_END
 

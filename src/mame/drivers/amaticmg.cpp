@@ -437,8 +437,20 @@ public:
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_lamps(*this, "lamp%u", 0U)
+	{
+	}
 
+	void amaticmg2(machine_config &config);
+	void amaticmg(machine_config &config);
+	void amaticmg4(machine_config &config);
+	DECLARE_DRIVER_INIT(ama8000_3_o);
+	DECLARE_DRIVER_INIT(ama8000_2_i);
+	DECLARE_DRIVER_INIT(ama8000_2_v);
+	DECLARE_DRIVER_INIT(ama8000_1_x);
+
+private:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
 
@@ -449,10 +461,6 @@ public:
 	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_WRITE8_MEMBER(out_c_w);
-	DECLARE_DRIVER_INIT(ama8000_3_o);
-	DECLARE_DRIVER_INIT(ama8000_2_i);
-	DECLARE_DRIVER_INIT(ama8000_2_v);
-	DECLARE_DRIVER_INIT(ama8000_1_x);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -460,19 +468,19 @@ public:
 	DECLARE_PALETTE_INIT(amaticmg2);
 	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
+	DECLARE_WRITE_LINE_MEMBER(amaticmg2_irq);
 	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void amaticmg2(machine_config &config);
-	void amaticmg(machine_config &config);
-	void amaticmg4(machine_config &config);
+
 	void amaticmg2_portmap(address_map &map);
 	void amaticmg4_portmap(address_map &map);
 	void amaticmg_map(address_map &map);
 	void amaticmg_portmap(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<7> m_lamps;
 };
 
 
@@ -603,10 +611,10 @@ WRITE8_MEMBER(amaticmg_state::out_a_w)
     -x-- ----  HOLD4
 */
 
-	output().set_lamp_value(0, (data >> 3) & 1);  /* START */
-	output().set_lamp_value(1, (data >> 4) & 1);  /* BET */
-	output().set_lamp_value(2, (data >> 5) & 1);  /* HOLD3 */
-	output().set_lamp_value(3, (data >> 6) & 1);  /* HOLD4 */
+	m_lamps[0] = BIT(data, 3);  /* START */
+	m_lamps[1] = BIT(data, 4);  /* BET */
+	m_lamps[2] = BIT(data, 5);  /* HOLD3 */
+	m_lamps[3] = BIT(data, 6);  /* HOLD4 */
 
 	logerror("port A: %2X\n", data);
 }
@@ -624,9 +632,9 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
     x--- ----  Hopper motor
     --x- x---  (unknown)
 */
-	output().set_lamp_value(4, (data >> 1) & 1);  /* HOLD1 */
-	output().set_lamp_value(5, (data >> 4) & 1);  /* HOLD2 */
-	output().set_lamp_value(6, (data >> 6) & 1);  /* CANCEL */
+	m_lamps[4] = BIT(data, 1);  /* HOLD1 */
+	m_lamps[5] = BIT(data, 4);  /* HOLD2 */
+	m_lamps[6] = BIT(data, 6);  /* CANCEL */
 
 //  machine().bookkeeping().coin_counter_w(0, data & 0x04);  /* Coin In */
 //  machine().bookkeeping().coin_counter_w(1, data & 0x01);  /* Coin Out */
@@ -819,6 +827,8 @@ void amaticmg_state::machine_start()
 	uint8_t *rombank = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
+
+	m_lamps.resolve();
 }
 
 void amaticmg_state::machine_reset()
@@ -837,7 +847,6 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)
 	MCFG_CPU_IO_MAP(amaticmg_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state, nmi_line_pulse) // no NMI mask?
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -864,6 +873,7 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // no NMI mask?
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amaticmg)
 
@@ -878,10 +888,10 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg)
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(amaticmg_state::amaticmg2_irq)
+WRITE_LINE_MEMBER(amaticmg_state::amaticmg2_irq)
 {
-	if(m_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -890,12 +900,14 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg2_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
+
+	MCFG_DEVICE_MODIFY("crtc")
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amaticmg_state, amaticmg2_irq))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")
@@ -909,12 +921,14 @@ MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(amaticmg4_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amaticmg_state,  amaticmg2_irq)
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
+
+	MCFG_DEVICE_MODIFY("crtc")
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amaticmg_state, amaticmg2_irq))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", amaticmg2)
 	MCFG_PALETTE_MODIFY("palette")
@@ -1156,7 +1170,7 @@ DRIVER_INIT_MEMBER(amaticmg_state,ama8000_3_o)
 ************************************/
 
 /*     YEAR  NAME      PARENT    MACHINE    INPUT     STATE           INIT         ROT     COMPANY                FULLNAME                      FLAGS                                                                                                                       LAYOUT */
-GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 MACHINE_IMPERFECT_SOUND,                                                                                                    layout_suprstar )
+GAMEL( 1996, suprstar, 0,        amaticmg,  amaticmg, amaticmg_state, ama8000_1_x, ROT90, "Amatic Trading GmbH", "Super Stars",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING,                                                                              layout_suprstar )
 GAME(  2000, am_mg24,  0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (V.Ger 2.4)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg24a, 0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game I (unknown V2.4)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )  // needs proper decryption.
 GAME(  2000, am_mg3,   0,        amaticmg2, amaticmg, amaticmg_state, ama8000_2_i, ROT0,  "Amatic Trading GmbH", "Multi Game III (V.Ger 3.5)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

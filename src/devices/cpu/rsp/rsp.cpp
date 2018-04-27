@@ -502,7 +502,7 @@ void rsp_device::device_start()
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%1s").noshow();
 	state_add( STATE_GENSP, "GENSP", m_rsp_state->r[31]).noshow();
 
-	m_icountptr = &m_rsp_state->icount;
+	set_icountptr(m_rsp_state->icount);
 }
 
 void rsp_device::state_import(const device_state_entry &entry)
@@ -626,7 +626,7 @@ void rsp_device::execute_run()
 	while (m_rsp_state->icount > 0)
 	{
 		m_ppc = m_rsp_state->pc;
-		debugger_instruction_hook(this, m_rsp_state->pc);
+		debugger_instruction_hook(m_rsp_state->pc);
 
 		uint32_t op = ROPCODE(m_rsp_state->pc);
 		if (m_nextpc != ~0)

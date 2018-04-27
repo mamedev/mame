@@ -108,6 +108,8 @@ void tehkanwc_state::machine_start()
 	save_item(NAME(m_track1));
 	save_item(NAME(m_msm_data_offs));
 	save_item(NAME(m_toggle));
+
+	m_digits.resolve();
 }
 
 WRITE8_MEMBER(tehkanwc_state::sub_cpu_halt_w)

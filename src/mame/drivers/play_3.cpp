@@ -70,6 +70,7 @@ public:
 		, m_aysnd2(*this, "aysnd2")
 		, m_zsu(*this, "zsu")
 		, m_keyboard(*this, "X.%u", 0)
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port01_w);
@@ -112,6 +113,7 @@ private:
 	u8 m_segment[5];
 	bool m_disp_sw;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cosmac_device> m_maincpu;
 	optional_device<cosmac_device> m_audiocpu;
 	required_device<ttl7474_device> m_4013a;
@@ -120,6 +122,7 @@ private:
 	optional_device<ay8910_device> m_aysnd2;
 	optional_device<efo_zsu_device> m_zsu;
 	required_ioport_array<10> m_keyboard;
+	output_finder<66> m_digits;
 };
 
 
@@ -293,10 +296,10 @@ WRITE8_MEMBER( play_3_state::port01_w )
 			if (BIT(m_kbdrow, j))
 				for (uint8_t i = 0; i < 5; i++)
 				{
-					output().set_digit_value(j*10 + i, m_segment[i] & 0x7f);
+					m_digits[j*10 + i] = m_segment[i] & 0x7f;
 					// decimal dot on tens controls if last 0 shows or not
 					if ((j == 5) && BIT(m_segment[i], 7))
-						output().set_digit_value(60 + i, 0x3f);
+						m_digits[60 + i] = 0x3f;
 				}
 	}
 }
@@ -316,10 +319,10 @@ WRITE8_MEMBER( play_3_state::megaaton_port01_w )
 					digit = j*10+i;
 					if (digit == 44)
 						digit = 64;
-					output().set_digit_value(digit, m_segment[i] & 0x7f);
+					m_digits[digit] = m_segment[i] & 0x7f;
 					// decimal dot on tens controls if last 0 shows or not
 					if ((j == 5) && (i < 4) && BIT(m_segment[i], 7))
-						output().set_digit_value(60 + i, 0x3f);
+						m_digits[60 + i] = 0x3f;
 				}
 	}
 }

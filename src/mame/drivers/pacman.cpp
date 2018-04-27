@@ -408,16 +408,28 @@ MACHINE_RESET_MEMBER(pacman_state,maketrax)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pacman_state::vblank_irq)
+WRITE_LINE_MEMBER(pacman_state::vblank_irq)
+{
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+WRITE_LINE_MEMBER(pacman_state::rocktrv2_vblank_irq)
+{
+	if (state)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+INTERRUPT_GEN_MEMBER(pacman_state::periodic_irq)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pacman_state::vblank_nmi)
+WRITE_LINE_MEMBER(pacman_state::vblank_nmi)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE_LINE_MEMBER(pacman_state::irq_mask_w)
@@ -726,9 +738,10 @@ READ8_MEMBER(pacman_state::bigbucks_question_r)
  *
  ************************************/
 
-INTERRUPT_GEN_MEMBER(pacman_state::s2650_interrupt)
+WRITE_LINE_MEMBER(pacman_state::s2650_interrupt)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
 
 WRITE8_MEMBER(pacman_state::porky_banking_w)
@@ -1834,7 +1847,7 @@ static INPUT_PORTS_START( crush4 )
 	PORT_INCLUDE( maketrax )
 
 	PORT_START("GAME")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) // always select 2nd part of code
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) // always select 2nd part of code
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( korosuke )
@@ -3005,7 +3018,7 @@ static INPUT_PORTS_START( numcrash )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // all ipt_unknown probably ipt_unused, game is one player only
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_SPECIAL ) // or it won't boot "I CAN NOT RUN"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_CUSTOM ) // or it won't boot "I CAN NOT RUN"
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -3524,7 +3537,6 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pacman_map)
 	MCFG_CPU_IO_MAP(writeport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state, vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 74LS259 at 8K or 4099 at 7K
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pacman_state, irq_mask_w))
@@ -3550,6 +3562,7 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(pacman_state, screen_update_pacman)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pacman_state, vblank_irq))
 
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,pacman)
 
@@ -3679,7 +3692,9 @@ MACHINE_CONFIG_START(pacman_state::dremshpr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
 	MCFG_CPU_IO_MAP(dremshpr_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_nmi)
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pacman_state, vblank_nmi))
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("namco")
@@ -3737,11 +3752,11 @@ MACHINE_CONFIG_START(pacman_state::vanvan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
 	MCFG_CPU_IO_MAP(vanvan_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_nmi)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pacman_state, vblank_nmi))
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("namco")
@@ -3764,7 +3779,7 @@ MACHINE_CONFIG_START(pacman_state::bigbucks)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bigbucks_map)
 	MCFG_CPU_IO_MAP(bigbucks_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(pacman_state, vblank_irq, 20*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(pacman_state, periodic_irq, 20*60)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
@@ -3778,11 +3793,9 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	pacman(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)    /* 2H */
+	MCFG_CPU_REPLACE("maincpu", S2650, MASTER_CLOCK/6/2)    /* 2H */
 	MCFG_CPU_PROGRAM_MAP(s2650games_map)
 	MCFG_CPU_DATA_MAP(s2650games_dataport)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  s2650_interrupt)
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_MODIFY("mainlatch")
@@ -3802,6 +3815,7 @@ MACHINE_CONFIG_START(pacman_state::s2650games)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_UPDATE_DRIVER(pacman_state, screen_update_s2650games)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pacman_state, s2650_interrupt))
 
 	MCFG_VIDEO_START_OVERRIDE(pacman_state,s2650games)
 
@@ -3845,10 +3859,10 @@ MACHINE_CONFIG_START(pacman_state::rocktrv2)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rocktrv2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  irq0_line_hold)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pacman_state, rocktrv2_vblank_irq))
 MACHINE_CONFIG_END
 
 
@@ -3859,7 +3873,6 @@ MACHINE_CONFIG_START(pacman_state::mschamp)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mschamp_map)
 	MCFG_CPU_IO_MAP(mschamp_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacman_state,  vblank_irq)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,mschamp)
 MACHINE_CONFIG_END

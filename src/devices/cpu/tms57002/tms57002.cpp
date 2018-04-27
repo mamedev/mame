@@ -17,9 +17,10 @@
 DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "Texas Instruments TMS57002 \"DASP\"")
 
 // Can't use a DEVICE_ADDRESS_MAP, not yet anyway
-ADDRESS_MAP_START(tms57002_device::internal_pgm)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void tms57002_device::internal_pgm(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS57002, tag, owner, clock)
@@ -724,7 +725,7 @@ void tms57002_device::execute_run()
 	while(icount > 0 && !(sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
 		int iipc;
 
-		debugger_instruction_hook(this, pc);
+		debugger_instruction_hook(pc);
 
 		if(ipc == -1)
 			ipc = decode_get_pc();
@@ -842,7 +843,7 @@ void tms57002_device::device_start()
 	state_add(TMS57002_HOST2, "HOST2",  host[2]);
 	state_add(TMS57002_HOST3, "HOST3",  host[3]);
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	stream_alloc(4, 4, STREAM_SYNC);
 

@@ -38,6 +38,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cass(*this, "cassette")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(digit_w);
@@ -53,8 +54,10 @@ private:
 	uint8_t m_cass_in;
 	uint16_t m_cass_data[4];
 	void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+	output_finder<6> m_digits;
 };
 
 // This can read the first few bytes correctly, but after that bit slippage occurs.
@@ -87,12 +90,12 @@ WRITE8_MEMBER( pro80_state::segment_w )
 {
 	if (m_digit_sel)
 	{
-		if (!BIT(m_digit_sel, 0)) output().set_digit_value(0, data);
-		if (!BIT(m_digit_sel, 1)) output().set_digit_value(1, data);
-		if (!BIT(m_digit_sel, 2)) output().set_digit_value(2, data);
-		if (!BIT(m_digit_sel, 3)) output().set_digit_value(3, data);
-		if (!BIT(m_digit_sel, 4)) output().set_digit_value(4, data);
-		if (!BIT(m_digit_sel, 5)) output().set_digit_value(5, data);
+		if (!BIT(m_digit_sel, 0)) m_digits[0] = data;
+		if (!BIT(m_digit_sel, 1)) m_digits[1] = data;
+		if (!BIT(m_digit_sel, 2)) m_digits[2] = data;
+		if (!BIT(m_digit_sel, 3)) m_digits[3] = data;
+		if (!BIT(m_digit_sel, 4)) m_digits[4] = data;
+		if (!BIT(m_digit_sel, 5)) m_digits[5] = data;
 
 		m_digit_sel = 0;
 	}

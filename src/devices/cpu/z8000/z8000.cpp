@@ -670,7 +670,7 @@ void z8001_device::device_start()
 
 	register_debug_state();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_mo_out.resolve_safe();
 	m_mi = CLEAR_LINE;
 }
@@ -693,7 +693,7 @@ void z8002_device::device_start()
 
 	register_debug_state();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 	m_mo_out.resolve_safe();
 	m_mi = CLEAR_LINE;
 }
@@ -732,7 +732,7 @@ void z8002_device::execute_run()
 			Interrupt();
 
 		m_ppc = m_pc;
-		debugger_instruction_hook(this, m_pc);
+		debugger_instruction_hook(m_pc);
 
 		if (m_irq_req & Z8000_HALT)
 		{

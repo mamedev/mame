@@ -317,7 +317,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<0>, nullptr)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<0>, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("P2")
@@ -326,7 +326,7 @@ static INPUT_PORTS_START( squaitsa )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<1>, nullptr)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, squaitsa_state, dial_input_r<1>, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("DSW")
@@ -418,10 +418,10 @@ template <unsigned N> CUSTOM_INPUT_MEMBER(squaitsa_state::dial_input_r)
 	return m_res[N];
 }
 
-INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
+WRITE_LINE_MEMBER(bagman_state::vblank_irq)
 {
-	if (m_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -431,7 +431,6 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bagman_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 8H
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(bagman_state, irq_mask_w))
@@ -447,6 +446,7 @@ MACHINE_CONFIG_START(bagman_state::bagman)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bagman_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
 	MCFG_PALETTE_ADD("palette", 64)
@@ -510,7 +510,6 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MCFG_CPU_PROGRAM_MAP(pickin_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bagman_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(bagman_state, irq_mask_w))
@@ -527,6 +526,7 @@ MACHINE_CONFIG_START(bagman_state::pickin)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bagman_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pickin)
 	MCFG_PALETTE_ADD("palette", 64)
@@ -570,7 +570,6 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
 	MCFG_CPU_PROGRAM_MAP(pickin_map)
 	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bagman_state,  vblank_irq)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(bagman_state, irq_mask_w))
@@ -587,6 +586,7 @@ MACHINE_CONFIG_START(bagman_state::botanic)
 	MCFG_SCREEN_RAW_PARAMS(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(bagman_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bagman_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bagman)
 	MCFG_PALETTE_ADD("palette", 64)

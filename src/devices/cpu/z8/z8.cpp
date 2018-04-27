@@ -165,13 +165,15 @@ DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
     ADDRESS MAPS
 ***************************************************************************/
 
-ADDRESS_MAP_START(z8_device::program_2kb)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void z8_device::program_2kb(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
-ADDRESS_MAP_START(z8_device::program_4kb)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
+void z8_device::program_4kb(address_map &map)
+{
+	map(0x0000, 0x0fff).rom();
+}
 
 
 z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, address_map_constructor map)
@@ -270,7 +272,7 @@ uint8_t z8_device::fetch()
 uint8_t z8_device::fetch_opcode()
 {
 	m_ppc = (m_pc < m_rom_size) ? m_pc : mask_external_address(m_pc);
-	debugger_instruction_hook(this, m_ppc);
+	debugger_instruction_hook(m_ppc);
 
 	uint8_t data = m_direct->read_byte(m_ppc);
 
@@ -809,7 +811,7 @@ void z8_device::device_start()
 	save_item(NAME(m_irq_line));
 	save_item(NAME(m_irq_taken));
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 /***************************************************************************

@@ -169,6 +169,22 @@ public:
 	DECLARE_READ8_MEMBER( pa_r ) { return m_pio->pa_r(space, offset, mem_mask); }
 	DECLARE_WRITE8_MEMBER( pb_w ) { m_pio->pb_w(space, offset, data, mem_mask); }
 	DECLARE_READ8_MEMBER( pb_r ) { return m_pio->pb_r(space, offset, mem_mask); }
+	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { m_pio->pa0_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { m_pio->pa1_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { m_pio->pa2_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { m_pio->pa3_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { m_pio->pa4_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { m_pio->pa5_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { m_pio->pa6_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { m_pio->pa7_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { m_pio->pb0_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { m_pio->pb1_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { m_pio->pb2_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { m_pio->pb3_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { m_pio->pb4_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { m_pio->pb5_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { m_pio->pb6_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { m_pio->pb7_w(state); }
 
 	/////////////////////////////////////////////////////////
 

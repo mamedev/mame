@@ -222,9 +222,10 @@ const int STATUS_LIGHT_PEN_UPDATE       = 0x20;
 //**************************************************************************
 
 // default address map
-ADDRESS_MAP_START(crt9007_device::crt9007)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void crt9007_device::crt9007(address_map &map)
+{
+	map(0x0000, 0x3fff).ram();
+}
 
 
 

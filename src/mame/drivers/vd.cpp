@@ -31,6 +31,7 @@ public:
 	vd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(ack_r);
@@ -42,16 +43,14 @@ public:
 	void vd(machine_config &config);
 	void vd_io(address_map &map);
 	void vd_map(address_map &map);
-protected:
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void machine_reset() override;
 private:
 	uint8_t m_t_c;
 	uint8_t segment[5];
+	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
+	required_device<cpu_device> m_maincpu;
+	output_finder<60> m_digits;
 };
 
 
@@ -173,11 +172,11 @@ WRITE8_MEMBER( vd_state::col_w )
 	if (data != 0x3f)
 	{
 		data &= 7;
-		output().set_digit_value(data + 11, segment[0]);
-		output().set_digit_value(data + 21, segment[1]);
-		output().set_digit_value(data + 31, segment[2]);
-		output().set_digit_value(data + 41, segment[3]);
-		output().set_digit_value(data + 51, segment[4]);
+		m_digits[data + 11] = segment[0];
+		m_digits[data + 21] = segment[1];
+		m_digits[data + 31] = segment[2];
+		m_digits[data + 41] = segment[3];
+		m_digits[data + 51] = segment[4];
 	}
 }
 

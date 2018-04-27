@@ -455,7 +455,7 @@ WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
 
 READ8_MEMBER(darius_state::adpcm_command_read)
 {
-	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, space.device().safe_pc() ); */
+	/* logerror("%s read port 0: %02x\n", machine().describe_context(), adpcm_command ); */
 	return m_adpcm_command;
 }
 
@@ -472,13 +472,13 @@ READ8_MEMBER(darius_state::readport3)
 WRITE8_MEMBER(darius_state::adpcm_nmi_disable)
 {
 	m_nmi_enable = 0;
-	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, space.device().safe_pc() ); */
+	/* logerror("%s write port 0: NMI DISABLE\n", machine().describe_context(), data ); */
 }
 
 WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
 {
 	m_nmi_enable = 1;
-	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", space.device().safe_pc() ); */
+	/* logerror("%s write port 1: NMI ENABLE\n", machine().describe_context() ); */
 }
 
 WRITE8_MEMBER(darius_state::adpcm_data_w)

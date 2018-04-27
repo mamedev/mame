@@ -1575,13 +1575,14 @@ void bfm_sc2_state::sc2_basemap(address_map &map)
 	map(0x8000, 0xFFFF).rom();
 }
 
-ADDRESS_MAP_START(bfm_sc2_novid_state::memmap_no_vid)
-	AM_IMPORT_FROM( sc2_basemap )
-	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
-	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
-	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
-	AM_RANGE(0x2200, 0x22FF) AM_WRITE(reel56_w)
-ADDRESS_MAP_END
+void bfm_sc2_novid_state::memmap_no_vid(address_map &map)
+{
+	sc2_basemap(map);
+	map(0x2000, 0x2000).r(this, FUNC(bfm_sc2_novid_state::vfd_status_r));
+	map(0x2000, 0x20FF).w(this, FUNC(bfm_sc2_novid_state::reel12_w));
+	map(0x2100, 0x21FF).w(this, FUNC(bfm_sc2_novid_state::reel34_w));
+	map(0x2200, 0x22FF).w(this, FUNC(bfm_sc2_novid_state::reel56_w));
+}
 
 // memory map for scorpion2 board video addon /////////////////////////////
 
@@ -1909,7 +1910,7 @@ static INPUT_PORTS_START( quintoon )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9) PORT_NAME("?3") PORT_CODE(KEYCODE_O)
 
 	PORT_MODIFY("STROBE5")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SPECIAL) //Payout opto
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_CUSTOM) //Payout opto
 
 	PORT_MODIFY("STROBE9")
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "DIL:!02" )
@@ -2016,8 +2017,8 @@ static INPUT_PORTS_START( sltblgtk )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
 
 	PORT_MODIFY("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SPECIAL ) //Tube 1
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SPECIAL ) //Tube 2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM ) //Tube 1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM ) //Tube 2
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1)
 
 	PORT_MODIFY("STROBE9")
@@ -3004,10 +3005,10 @@ static INPUT_PORTS_START( drwho )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STROBE4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )/*Tube status Low switch for 1 Pound*/
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )/*Tube status Low switch for 20p*/
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )/*Tube status Low switch for Token Front*/
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )/*Tube status Low switch for Token Rear*/
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )/*Tube status Low switch for 1 Pound*/
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )/*Tube status Low switch for 20p*/
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )/*Tube status Low switch for Token Front*/
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )/*Tube status Low switch for Token Rear*/
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3040,10 +3041,10 @@ static INPUT_PORTS_START( drwho )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STROBE7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )/*Tube status High switch for 1 Pound*/
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )/*Tube status High switch for 20p*/
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )/*Tube status High switch for Token Front*/
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL )/*Tube status High switch for Token Rear*/
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )/*Tube status High switch for 1 Pound*/
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )/*Tube status High switch for 20p*/
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )/*Tube status High switch for Token Front*/
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )/*Tube status High switch for Token Rear*/
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )

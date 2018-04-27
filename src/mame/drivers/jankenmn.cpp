@@ -163,19 +163,30 @@ class jankenmn_state : public driver_device
 {
 public:
 	jankenmn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_digits(*this, "digit%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
 
+	void jankenmn(machine_config &config);
+
+protected:
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(lamps3_w);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
-	void jankenmn(machine_config &config);
+	virtual void machine_start() override;
+
 	void jankenmn_map(address_map &map);
 	void jankenmn_port_map(address_map &map);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	output_finder<2> m_digits;
+	output_finder<16> m_lamps;
 };
 
 
@@ -183,21 +194,21 @@ public:
 *            Read/Write Handlers             *
 *********************************************/
 
-static const uint8_t led_map[16] = // 7748 IC?
+static constexpr uint8_t led_map[16] = // 7748 IC?
 	{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
 WRITE8_MEMBER(jankenmn_state::lamps1_w)
 {
 	// hand state: d0: rock, d1: scissors, d2: paper
-	output().set_lamp_value(8, (data & 7) != 0);
-	output().set_lamp_value(11, data & 1);
-	output().set_lamp_value(12, data >> 1 & 1);
-	output().set_lamp_value(9, data >> 2 & 1);
-	output().set_lamp_value(10, (data & 6) != 0);
-	output().set_lamp_value(13, (data & 3) != 0);
+	m_lamps[8] = (data & 7) != 0;
+	m_lamps[11] = BIT(data, 0);
+	m_lamps[12] = BIT(data, 1);
+	m_lamps[9] = BIT(data, 2);
+	m_lamps[10] = (data & 6) != 0;
+	m_lamps[13] = (data & 3) != 0;
 
 	// d4-d7: led7seg (remaining credits) right digit
-	output().set_digit_value(1, led_map[data >> 4 & 0x0f]);
+	m_digits[1] = led_map[(data >> 4) & 0x0f];
 
 	// d3: ? (only set if game is over)
 }
@@ -205,33 +216,33 @@ WRITE8_MEMBER(jankenmn_state::lamps1_w)
 WRITE8_MEMBER(jankenmn_state::lamps2_w)
 {
 	// button LEDs: d1: paper, d2: scissors, d3: rock
-	output().set_lamp_value(2, data >> 3 & 1);
-	output().set_lamp_value(3, data >> 2 & 1);
-	output().set_lamp_value(4, data >> 1 & 1);
+	m_lamps[2] = BIT(data, 3);
+	m_lamps[3] = BIT(data, 2);
+	m_lamps[4] = BIT(data, 1);
 
 	// lamps: d5: draw, d6: lose, d7: win
-	output().set_lamp_value(5, data >> 6 & 1);
-	output().set_lamp_value(6, data >> 5 & 1);
-	output().set_lamp_value(7, data >> 7 & 1);
+	m_lamps[5] = BIT(data, 6);
+	m_lamps[6] = BIT(data, 5);
+	m_lamps[7] = BIT(data, 7);
 
 	// d4: payout error LED
-	output().set_lamp_value(14, data >> 4 & 1);
+	m_lamps[14] = BIT(data, 4);
 
 	// d0: led7seg (remaining credits) left digit
-	output().set_digit_value(0, led_map[data & 1]);
+	m_digits[0] = led_map[data & 1];
 }
 
 WRITE8_MEMBER(jankenmn_state::lamps3_w)
 {
 	// d1: blue rotating lamp on top of cab
-	output().set_lamp_value(15, data >> 1 & 1);
+	m_lamps[15] = BIT(data, 1);
 
 	// d2: payout (waits for hopper status)
 	machine().bookkeeping().coin_counter_w(2, data & 0x04);
 
 	// d3: right multiplier lamp(2), d4: left multiplier lamp(1)
-	output().set_lamp_value(0, data >> 4 & 1);
-	output().set_lamp_value(1, data >> 3 & 1);
+	m_lamps[0] = BIT(data, 4);
+	m_lamps[1] = BIT(data, 3);
 
 	// d5: assume coin lockout
 	machine().bookkeeping().coin_lockout_global_w(~data & 0x20);
@@ -245,6 +256,12 @@ CUSTOM_INPUT_MEMBER(jankenmn_state::hopper_status_r)
 {
 	// temp workaround, needs hopper
 	return machine().rand();
+}
+
+void jankenmn_state::machine_start()
+{
+	m_digits.resolve();
+	m_lamps.resolve();
 }
 
 
@@ -320,7 +337,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state, hopper_status_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state, hopper_status_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 

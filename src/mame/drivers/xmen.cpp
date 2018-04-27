@@ -128,39 +128,39 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x10a006, 0x10a007).portr("P5_P6");
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r)); /* sprites */
 	map(0x110000, 0x113fff).ram();     /* main RAM */
-/*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_device, lsb_w) AM_SHARE("tilemapleft") */
+/*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:lsb_w)).share("tilemapleft"); */
 	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
 	map(0x18fa00, 0x18fa01).w(this, FUNC(xmen_state::xmen_18fa00_w));
 /*
-    AM_RANGE(0x1ac000, 0x1af7ff) AM_READONLY
-    AM_RANGE(0x1ac000, 0x1af7ff) AM_WRITEONLY
+    map(0x1ac000, 0x1af7ff).readonly();
+    map(0x1ac000, 0x1af7ff).writeonly();
 
-    AM_RANGE(0x1b0000, 0x1b37ff) AM_READONLY
-    AM_RANGE(0x1b0000, 0x1b37ff) AM_WRITEONLY
+    map(0x1b0000, 0x1b37ff).readonly();
+    map(0x1b0000, 0x1b37ff).writeonly();
 
-    AM_RANGE(0x1b4000, 0x1b77ff) AM_READONLY
-    AM_RANGE(0x1b4000, 0x1b77ff) AM_WRITEONLY
+    map(0x1b4000, 0x1b77ff).readonly();
+    map(0x1b4000, 0x1b77ff).writeonly();
 */
 	map(0x1ac000, 0x1b7fff).ram().share("tilemapright"); /* right tilemap */
 
 	/* what are the regions below buffers? (used by hw or software?) */
 /*
-    AM_RANGE(0x1cc000, 0x1cf7ff) AM_READONLY
-    AM_RANGE(0x1cc000, 0x1cf7ff) AM_WRITEONLY
+    map(0x1cc000, 0x1cf7ff).readonly();
+    map(0x1cc000, 0x1cf7ff).writeonly();
 
-    AM_RANGE(0x1d0000, 0x1d37ff) AM_READONLY
-    AM_RANGE(0x1d0000, 0x1d37ff) AM_WRITEONLY
+    map(0x1d0000, 0x1d37ff).readonly();
+    map(0x1d0000, 0x1d37ff).writeonly();
 */
 	map(0x1cc000, 0x1d7fff).ram(); /* tilemap ? */
 
 	/* whats the stuff below, buffers? */
 /*
-    AM_RANGE(0x1ec000, 0x1ef7ff) AM_READONLY
-    AM_RANGE(0x1ec000, 0x1ef7ff) AM_WRITEONLY
-    AM_RANGE(0x1f0000, 0x1f37ff) AM_READONLY
-    AM_RANGE(0x1f0000, 0x1f37ff) AM_WRITEONLY
-    AM_RANGE(0x1f4000, 0x1f77ff) AM_READONLY
-    AM_RANGE(0x1f4000, 0x1f77ff) AM_WRITEONLY
+    map(0x1ec000, 0x1ef7ff).readonly();
+    map(0x1ec000, 0x1ef7ff).writeonly();
+    map(0x1f0000, 0x1f37ff).readonly();
+    map(0x1f0000, 0x1f37ff).writeonly();
+    map(0x1f4000, 0x1f77ff).readonly();
+    map(0x1f4000, 0x1f77ff).writeonly();
 */
 	map(0x1ec000, 0x1f7fff).ram(); /* tilemap ? */
 }
@@ -177,8 +177,8 @@ static INPUT_PORTS_START( xmen )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -206,8 +206,8 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x003c, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -242,8 +242,8 @@ static INPUT_PORTS_START( xmen6p )
 
 	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
@@ -251,7 +251,7 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START5 ) /* not verified */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) /* not verified */
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xmen_state,xmen_frame_r, nullptr)  /* screen indicator? */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xmen_state,xmen_frame_r, nullptr)  /* screen indicator? */
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)

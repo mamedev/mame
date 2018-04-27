@@ -9,12 +9,6 @@
 
 DEFINE_DEVICE_TYPE(INTERPRO_KEYBOARD_PORT, interpro_keyboard_port_device, "interpro_keyboard_port", "InterPro Keyboard Port")
 
-int const device_interpro_keyboard_port_interface::START_BIT_COUNT;
-int const device_interpro_keyboard_port_interface::DATA_BIT_COUNT;
-device_serial_interface::parity_t const device_interpro_keyboard_port_interface::PARITY;
-device_serial_interface::stop_bits_t const device_interpro_keyboard_port_interface::STOP_BITS;
-int const device_interpro_keyboard_port_interface::BAUD;
-
 interpro_keyboard_port_device::interpro_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: interpro_keyboard_port_device(mconfig, INTERPRO_KEYBOARD_PORT, tag, owner, clock)
 {
@@ -61,7 +55,9 @@ device_interpro_keyboard_port_interface::~device_interpro_keyboard_port_interfac
 }
 
 #include "hle.h"
+#include "lle.h"
 
 SLOT_INTERFACE_START(interpro_keyboard_devices)
 	SLOT_INTERFACE("hle_en_us", INTERPRO_HLE_EN_US_KEYBOARD)
+	SLOT_INTERFACE("lle_en_us", INTERPRO_LLE_EN_US_KEYBOARD)
 SLOT_INTERFACE_END

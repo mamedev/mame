@@ -17,7 +17,7 @@ fetch
 	}
 	PPC = PC;
 	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 	OP1 = read_pc();
 	if(OP1 == 0xfe) {
 		OP1 = read_pc();
@@ -28,7 +28,7 @@ fetch
 fetch_noirq
 	PPC = PC;
 	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-		debugger_instruction_hook(this, PC);
+		debugger_instruction_hook(PC);
 	OP1 = read_pc();
 	if(OP1 == 0xfe) {
 		OP1 = read_pc();

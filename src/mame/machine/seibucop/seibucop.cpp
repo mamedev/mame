@@ -844,7 +844,7 @@ WRITE16_MEMBER(raiden2cop_device::cop_dma_trigger_w)
 /* Number Conversion */
 void raiden2cop_device::bcd_update()
 {
-		//int digits = 1 << cop_itoa_mode*2;
+	//int digits = 1 << cop_itoa_mode*2;
 	uint32_t val = cop_itoa;
 
 	//if(digits > 9)

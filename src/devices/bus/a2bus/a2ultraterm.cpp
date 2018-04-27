@@ -183,7 +183,7 @@ void a2bus_videx160_device::device_reset()
 
 uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 {
-//    printf("Read c0n%x (PC=%x)\n", offset, machine().describe_context());
+//    printf("%s Read c0n%x\n", machine().describe_context().c_str(), offset);
 
 	if (!(m_ctrl1 & CT1_VTEMU))
 	{
@@ -212,7 +212,7 @@ uint8_t a2bus_videx160_device::read_c0nx(uint8_t offset)
 
 void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-//    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, machine().describe_context());
+//    printf("%s Write %02x to c0n%x\n", machine().describe_context().c_str(), data, offset);
 
 	switch (offset)
 	{

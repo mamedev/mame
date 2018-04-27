@@ -21,6 +21,7 @@
 #include "cpu/tms34010/tms34010.h"
 
 #include "machine/74259.h"
+#include "machine/adc0808.h"
 #include "machine/asic65.h"
 #include "machine/eeprompar.h"
 #include "machine/mc68681.h"
@@ -99,7 +100,6 @@ public:
 
 	DECLARE_READ16_MEMBER( hd68k_a80000_r );
 	DECLARE_READ16_MEMBER( hd68k_port0_r );
-	DECLARE_READ16_MEMBER( hd68k_adc8_r );
 	DECLARE_READ16_MEMBER( hd68k_adc12_r );
 	DECLARE_READ16_MEMBER( hdc68k_port1_r );
 	DECLARE_READ16_MEMBER( hda68k_port1_r );
@@ -202,7 +202,7 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(hdgsp_write_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(hdgsp_read_from_shiftreg);
 
-	INTERRUPT_GEN_MEMBER(video_int_gen);
+	DECLARE_WRITE_LINE_MEMBER(video_int_write_line);
 	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 
 
@@ -300,6 +300,7 @@ protected:
 	optional_device<atari_jsa_base_device> m_jsa;
 	optional_device<screen_device> m_screen;
 	optional_device<mc68681_device> m_duartn68681;
+	required_device<adc0808_device> m_adc8;
 
 	uint8_t                   m_hd34010_host_access;
 
@@ -354,7 +355,6 @@ protected:
 	required_ioport m_in0;
 	optional_ioport m_sw1;
 	required_ioport m_a80000;
-	optional_ioport_array<8> m_8badc;
 	optional_ioport_array<4> m_12badc;
 
 	/* machine state */
@@ -416,8 +416,6 @@ protected:
 	optional_device<timer_device> m_ds3xdsp_internal_timer;
 
 	uint16_t                  m_adc_control;
-	uint8_t                   m_adc8_select;
-	uint8_t                   m_adc8_data;
 	uint8_t                   m_adc12_select;
 	uint8_t                   m_adc12_byte;
 	uint16_t                  m_adc12_data;

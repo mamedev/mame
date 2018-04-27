@@ -309,13 +309,15 @@ class nss_state : public snes_state
 {
 public:
 	nss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: snes_state(mconfig, type, tag),
-		m_m50458(*this,"m50458"),
-		m_s3520cf(*this, "s3520cf"),
-		m_rp5h01(*this,"rp5h01"),
-		m_palette(*this, "palette")
+		: snes_state(mconfig, type, tag)
+		, m_bioscpu(*this, "bios")
+		, m_m50458(*this, "m50458")
+		, m_s3520cf(*this, "s3520cf")
+		, m_rp5h01(*this, "rp5h01")
+		, m_palette(*this, "palette")
 	{ }
 
+	required_device<cpu_device> m_bioscpu;
 	required_device<m50458_device> m_m50458;
 	required_device<s3520cf_device> m_s3520cf;
 	required_device<rp5h01_device> m_rp5h01;
@@ -323,7 +325,7 @@ public:
 
 	uint8_t m_wram_wp_flag;
 	std::unique_ptr<uint8_t[]> m_wram;
-	uint8_t m_nmi_enable;
+	bool m_nmi_enable;
 	uint8_t m_cart_sel;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -345,7 +347,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(nss_vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(nss_vblank_irq);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 	void nss(machine_config &config);
@@ -554,6 +556,8 @@ WRITE8_MEMBER(nss_state::port_00_w)
 */
 	m_wram_wp_flag = (data & 4) >> 2;
 	m_nmi_enable = data & 1;
+	if (!m_nmi_enable)
+		m_bioscpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 }
 
@@ -657,7 +661,7 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("FP")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nss_state,game_over_flag_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nss_state,game_over_flag_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Restart Button")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Page Up Button")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Page Down Button")
@@ -667,8 +671,8 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Game 1 Button")
 
 	PORT_START("EEPROMIN")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, read_bit)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, ready_line )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, read_bit)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("m6m80011ap", m6m80011ap_device, ready_line )
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("EEPROMOUT")
@@ -687,7 +691,7 @@ static INPUT_PORTS_START( snes )
 
 	PORT_START("RTC")
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, read_bit)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("s3520cf", s3520cf_device, read_bit)
 
 	PORT_START("SERIAL1_DATA1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1)
@@ -800,10 +804,10 @@ static INPUT_PORTS_START( snes )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(nss_state::nss_vblank_irq)
+WRITE_LINE_MEMBER(nss_state::nss_vblank_irq)
 {
-	if(m_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_nmi_enable)
+		m_bioscpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 void nss_state::machine_reset()
@@ -840,7 +844,6 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_CPU_ADD("bios", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(bios_map)
 	MCFG_CPU_IO_MAP(bios_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nss_state,  nss_vblank_irq)
 
 	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
@@ -861,6 +864,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(nss_state, nss_vblank_irq))
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
 	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))

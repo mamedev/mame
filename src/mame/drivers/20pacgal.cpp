@@ -318,7 +318,7 @@ static INPUT_PORTS_START( 20pacgal )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START( "EEPROMIN" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* bit 7 is EEPROM data */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* bit 7 is EEPROM data */
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)    /* bit 5 is cs (active high) */
@@ -387,10 +387,10 @@ void _20pacgal_state::machine_reset()
 	m_game_selected = 0;
 }
 
-INTERRUPT_GEN_MEMBER(_20pacgal_state::vblank_irq)
+WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
 }
 
 MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
@@ -399,7 +399,6 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 	MCFG_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(_20pacgal_map)
 	MCFG_CPU_IO_MAP(_20pacgal_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", _20pacgal_state,  vblank_irq)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 

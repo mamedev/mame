@@ -765,35 +765,41 @@ void intellec4_state::intellec4_rom_port_banks(address_map &map)
   CPU views of address spaces
 ---------------------------------*/
 
-ADDRESS_MAP_START(intellec4_state::intellec4_rom)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("prgbank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void intellec4_state::intellec4_rom(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x0fff).m(m_program_banks, FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(intellec4_state::intellec4_ram_memory)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("memory") // 4 * 4002
-ADDRESS_MAP_END
+void intellec4_state::intellec4_ram_memory(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x00ff).ram().share("memory"); // 4 * 4002
+}
 
-ADDRESS_MAP_START(intellec4_state::intellec4_rom_ports)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("rpbank", address_map_bank_device, amap8)
-ADDRESS_MAP_END
+void intellec4_state::intellec4_rom_ports(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).m("rpbank", FUNC(address_map_bank_device::amap8));
+}
 
-ADDRESS_MAP_START(intellec4_state::intellec4_ram_status)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x003f) AM_RAM AM_SHARE("status") // 4 * 4002
-ADDRESS_MAP_END
+void intellec4_state::intellec4_ram_status(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x003f).ram().share("status"); // 4 * 4002
+}
 
-ADDRESS_MAP_START(intellec4_state::intellec4_ram_ports)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ram0_out)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ram1_out)
-ADDRESS_MAP_END
+void intellec4_state::intellec4_ram_ports(address_map &map)
+{
+	map(0x00, 0x00).w(this, FUNC(intellec4_state::ram0_out));
+	map(0x01, 0x01).w(this, FUNC(intellec4_state::ram1_out));
+}
 
-ADDRESS_MAP_START(intellec4_state::intellec4_program_memory)
-	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(pm_read, pm_write)
-ADDRESS_MAP_END
+void intellec4_state::intellec4_program_memory(address_map &map)
+{
+	map.unmap_value_low();
+	map(0x0000, 0x01ff).rw(this, FUNC(intellec4_state::pm_read), FUNC(intellec4_state::pm_write));
+}
 
 
 /*----------------------------------

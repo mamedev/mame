@@ -164,50 +164,11 @@ BIT M - ( DATA1 != 0) ? 1 : 0  (or DATA1 MSB)
 BIT N - ( scale < 50% ) ? 1 : 0
 
 
-pcb linking
------------
-
-suspicious code:
-
-
-(write/read (exchange data))
-
-0A535C: 48E7 6080                  movem.l D1-D2/A0, -(A7)
-0A5360: 41F9 0078 0000             lea     $780000.l, A0
-0A5366: D040                       add.w   D0, D0
-0A5368: 3181 0000                  move.w  D1, (A0,D0.w)  ; write data
-
-0A536C: 3239 007E 0000             move.w  $7e0000.l, D1
-0A5372: 0801 000D                  btst    #$d, D1
-0A5376: 67F4                       beq     $a536c
-
-0A5378: 3230 0000                  move.w  (A0,D0.w), D1 ; read data
-0A537C: 0241 00FF                  andi.w  #$ff, D1
-
-(unk., maybe sync or config ?)
-
-0A53C2: 2F08                       move.l  A0, -(A7)
-0A53C4: 3F01                       move.w  D1, -(A7)
-0A53C6: 41F9 0078 0000             lea     $780000.l, A0
-0A53CC: D040                       add.w   D0, D0
-0A53CE: 3180 0000                  move.w  D0, (A0,D0.w) ; write offset
-0A53D2: 3180 0000                  move.w  D0, (A0,D0.w) ; again
-
-0A53D6: 3239 007E 0000             move.w  $7e0000.l, D1
-0A53DC: 0801 000D                  btst    #$d, D1   ; flag test
-0A53E0: 67F4                       beq     $a53d6
-
-0A53E2: 3030 0000                  move.w  (A0,D0.w), D0
-0A53E6: 0240 00FF                  andi.w  #$ff, D0
-0A53EA: 321F                       move.w  (A7)+, D1
-0A53EC: 205F                       movea.l (A7)+, A0
-0A53EE: 4E75                       rts
-
-
 */
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -240,8 +201,18 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_adc_eoc(0)
+	{ }
 
+	void wheelfir(machine_config &config);
+	DECLARE_READ_LINE_MEMBER(adc_eoc_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -283,15 +254,14 @@ public:
 	DECLARE_WRITE16_MEMBER(wheelfir_snd_w);
 	DECLARE_READ16_MEMBER(wheelfir_snd_r);
 	DECLARE_WRITE16_MEMBER(coin_cnt_w);
-	virtual void machine_start() override;
-	virtual void video_start() override;
+	DECLARE_WRITE_LINE_MEMBER(adc_eoc_w);
 	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_wheelfir);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
-	void wheelfir(machine_config &config);
 	void ramdac_map(address_map &map);
 	void wheelfir_main(address_map &map);
 	void wheelfir_sub(address_map &map);
+	int m_adc_eoc;
 };
 
 
@@ -459,7 +429,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 			{
 				vpage=LAYER_BG;
 /*
-                printf("bg -> %d %d   %d %d  %d %d @ %x\n",dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0,space.device().safe_pc());
+                printf("%s bg -> %d %d   %d %d  %d %d @ %x\n",machine().describe_context().c_str(), dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0);
 
                 for(int i=0;i<16;++i)
                 {
@@ -568,8 +538,8 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		//{uint16_t x = data & 0xf800; static int y = -1; if (x != y) { y = x; printf("%s wheelfir_7c0000_w %d%d%d%d%d\n", machine().describe_context(), BIT(data, 15), BIT(data, 14), BIT(data, 13), BIT(data, 12), BIT(data, 11)); }}
-		//{uint16_t x = data & 0x0700; static int y = -1; if (x != y) { y = x; printf("%s eeprom write %d%d%d\n", machine().describe_context(), BIT(data, 10), BIT(data, 9), BIT(data, 8)); }}
+		//{uint16_t x = data & 0xf800; static int y = -1; if (x != y) { y = x; printf("%s wheelfir_7c0000_w %d%d%d%d%d\n", machine().describe_context().c_str(), BIT(data, 15), BIT(data, 14), BIT(data, 13), BIT(data, 12), BIT(data, 11)); }}
+		//{uint16_t x = data & 0x0700; static int y = -1; if (x != y) { y = x; printf("%s eeprom write %d%d%d\n", machine().describe_context().c_str(), BIT(data, 10), BIT(data, 9), BIT(data, 8)); }}
 		m_eeprom->di_write(BIT(data, 9));
 		m_eeprom->clk_write(BIT(data, 8));
 		m_eeprom->cs_write(BIT(data, 10));
@@ -591,7 +561,7 @@ READ16_MEMBER(wheelfir_state::wheelfir_7c0000_r)
 	{
 		data |= (machine().rand() & 0x2000); // ?
 		data |= m_eeprom->do_read() << 15;
-		//printf("%s eeprom read %04x %04x\n", machine().describe_context(), data, mem_mask);
+		//printf("%s eeprom read %04x %04x\n", machine().describe_context().c_str(), data, mem_mask);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -620,10 +590,7 @@ void wheelfir_state::wheelfir_main(address_map &map)
 	map(0x720005, 0x720005).w("ramdac", FUNC(ramdac_device::mask_w)); // word write?
 	map(0x740000, 0x740001).w("soundlatch", FUNC(generic_latch_16_device::write));
 	map(0x760000, 0x760001).w(this, FUNC(wheelfir_state::coin_cnt_w));
-	map(0x780000, 0x780005).nopw(); // Start ADC0808 conversion
-	map(0x780000, 0x780001).portr("STEERING");
-	map(0x780002, 0x780003).portr("ACCELERATOR");
-	map(0x780004, 0x780005).portr("BRAKE");
+	map(0x780000, 0x78000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
 	map(0x7a0000, 0x7a0001).w(this, FUNC(wheelfir_state::wheelfir_scanline_cnt_w));
 	map(0x7c0000, 0x7c0001).rw(this, FUNC(wheelfir_state::wheelfir_7c0000_r), FUNC(wheelfir_state::wheelfir_7c0000_w));
 	map(0x7e0000, 0x7e0001).portr("P1");
@@ -658,7 +625,7 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Test" )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED ) /* net comm flag ? */
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, wheelfir_state, adc_eoc_r)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -682,6 +649,16 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_START("BRAKE")
 	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_INVERT PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00, 0xff) PORT_REVERSE
 INPUT_PORTS_END
+
+READ_LINE_MEMBER( wheelfir_state::adc_eoc_r )
+{
+	return m_adc_eoc;
+}
+
+WRITE_LINE_MEMBER( wheelfir_state::adc_eoc_w )
+{
+	m_adc_eoc = state;
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 {
@@ -764,6 +741,11 @@ MACHINE_CONFIG_START(wheelfir_state::wheelfir)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
+	MCFG_DEVICE_ADD("adc", ADC0808, 500000) // unknown clock
+	MCFG_ADC0808_EOC_FF_CB(WRITELINE(wheelfir_state, adc_eoc_w))
+	MCFG_ADC0808_IN0_CB(IOPORT("STEERING"))
+	MCFG_ADC0808_IN1_CB(IOPORT("ACCELERATOR"))
+	MCFG_ADC0808_IN2_CB(IOPORT("BRAKE"))
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", wheelfir_state, scanline_timer_callback, "screen", 0, 1)
 

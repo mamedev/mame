@@ -4,8 +4,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="org.mamedev.mame"
-      android:versionCode="196"
-      android:versionName="0.196"
+      android:versionCode="197"
+      android:versionName="0.197"
       android:installLocation="auto">
 
     <!-- Android 5.0 -->

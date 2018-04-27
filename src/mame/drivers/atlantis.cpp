@@ -193,25 +193,25 @@ public:
 READ8_MEMBER(atlantis_state::parallel_r)
 {
 	uint8_t result = 0x7;
-	logerror("%06X: parallel_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, result);
+	logerror("%s: parallel_r %08x = %02x\n", machine().describe_context(), offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(atlantis_state::parallel_w)
 {
-	logerror("%06X: parallel_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+	logerror("%s: parallel_w %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
 // Expansion ROM
 READ8_MEMBER (atlantis_state::exprom_r)
 {
-	logerror("%06X: exprom_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, 0xff);
+	logerror("%s: exprom_r %08x = %02x\n", machine().describe_context(), offset, 0xff);
 	return 0xff;
 }
 
 WRITE8_MEMBER(atlantis_state::exprom_w)
 {
-	logerror("%06X: exprom_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+	logerror("%s: exprom_w %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
 // Board PLD
@@ -319,7 +319,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 			case 0xbf: digit = '|'; break;
 			case 0xfe: digit = '-'; break;
 			case 0xff: digit = 'Z'; break;
-				if (0) logerror("%06X: status_leds_w digit: %c %08x = %02x\n", machine().device("maincpu")->safe_pc(), digit, offset, data);
+				if (0) logerror("%s: status_leds_w digit: %c %08x = %02x\n", machine().describe_context(), digit, offset, data);
 			}
 		}
 		break;
@@ -355,7 +355,7 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 	if (offset == 0 && (m_user_io_state & 0x1)) {
 		// Data written is shifted by 1 bit each time.  Maybe a serial line output?
 		if (LOG_RTC && m_serial_count == 0)
-			logerror("%06X: cmos_w[0] start serial %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
+			logerror("%s: cmos_w[0] start serial %08x = %02x\n", machine().describe_context(), offset, data);
 		m_serial_count++;
 		if (m_serial_count == 8)
 			m_serial_count = 0;
@@ -665,43 +665,47 @@ void atlantis_state::device_timer(emu_timer &timer, device_timer_id id, int para
 /*************************************
  *  Address Maps
  *************************************/
-ADDRESS_MAP_START(atlantis_state::map0)
-	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE8(cmos_r, cmos_w, 0xff)
+void atlantis_state::map0(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rw(this, FUNC(atlantis_state::cmos_r), FUNC(atlantis_state::cmos_w)).umask32(0x000000ff);
 	//AM_RANGE(0x00080000, 0x000?0000) AM_READWRITE8(zeus debug)
-	AM_RANGE(0x00100000, 0x0010001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART1 (TL16C552 CS0)
-	AM_RANGE(0x00180000, 0x0018001f) AM_DEVREADWRITE8("uart2", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART2 (TL16C552 CS1)
-	AM_RANGE(0x00200000, 0x0020001f) AM_READWRITE8(parallel_r, parallel_w, 0xff) // Parallel UART (TL16C552 CS2)
-	AM_RANGE(0x00400000, 0x007fffff) AM_READWRITE8(exprom_r, exprom_w, 0xff) // EXPROM
-	AM_RANGE(0x00800000, 0x00f00003) AM_READWRITE(board_ctrl_r, board_ctrl_w)
+	map(0x00100000, 0x0010001f).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial UART1 (TL16C552 CS0)
+	map(0x00180000, 0x0018001f).rw(m_uart2, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff); // Serial UART2 (TL16C552 CS1)
+	map(0x00200000, 0x0020001f).rw(this, FUNC(atlantis_state::parallel_r), FUNC(atlantis_state::parallel_w)).umask32(0x000000ff); // Parallel UART (TL16C552 CS2)
+	map(0x00400000, 0x007fffff).rw(this, FUNC(atlantis_state::exprom_r), FUNC(atlantis_state::exprom_w)).umask32(0x000000ff); // EXPROM
+	map(0x00800000, 0x00f00003).rw(this, FUNC(atlantis_state::board_ctrl_r), FUNC(atlantis_state::board_ctrl_w));
 	//AM_RANGE(0x00d80000, 0x00d80003) AM_READWRITE(status_leds_r, status_leds_w)
 	//AM_RANGE(0x00e00000, 0x00e00003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
 	//AM_RANGE(0x00e80000, 0x00e80003) AM_NOP // Watchdog
 	//AM_RANGE(0x00f00000, 0x00f00003) AM_NOP // Trackball ctrl
-	ADDRESS_MAP_END
+	}
 
-ADDRESS_MAP_START(atlantis_state::map1)
-	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(dcs3_fifo_full_w)
-	AM_RANGE(0x00400000, 0x00400003) AM_DEVWRITE("dcs", dcs_audio_device, dsio_idma_addr_w)
-	AM_RANGE(0x00600000, 0x00600003) AM_DEVREADWRITE("dcs", dcs_audio_device, dsio_idma_data_r, dsio_idma_data_w)
-	AM_RANGE(0x00800000, 0x00900003) AM_READWRITE16(port_ctrl_r, port_ctrl_w, 0xffff)
+void atlantis_state::map1(address_map &map)
+{
+	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x00200000, 0x00200003).w(this, FUNC(atlantis_state::dcs3_fifo_full_w));
+	map(0x00400000, 0x00400003).w(m_dcs, FUNC(dcs_audio_device::dsio_idma_addr_w));
+	map(0x00600000, 0x00600003).rw(m_dcs, FUNC(dcs_audio_device::dsio_idma_data_r), FUNC(dcs_audio_device::dsio_idma_data_w));
+	map(0x00800000, 0x00900003).rw(this, FUNC(atlantis_state::port_ctrl_r), FUNC(atlantis_state::port_ctrl_w)).umask32(0x0000ffff);
 	//AM_RANGE(0x00880000, 0x00880003) // AUX Output Initial write 0000fff0, follow by sequence ffef, ffdf, ffbf, fff7. Row Select?
 	//AM_RANGE(0x00900000, 0x00900003) // AUX Input Read once before each sequence write to 0x00880000. Code checks bits 0,1,2. Keypad?
-	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE16(a2d_ctrl_r, a2d_ctrl_w, 0xffff) // A2D Control Read / Write.  Bytes written 0x8f, 0xcf. Code if read 0x1 then read 00a00000.
-	AM_RANGE(0x00a00000, 0x00a00003) AM_READWRITE16(a2d_data_r, a2d_data_w, 0xffff) // A2D Data
+	map(0x00980000, 0x00980001).rw(this, FUNC(atlantis_state::a2d_ctrl_r), FUNC(atlantis_state::a2d_ctrl_w)); // A2D Control Read / Write.  Bytes written 0x8f, 0xcf. Code if read 0x1 then read 00a00000.
+	map(0x00a00000, 0x00a00001).rw(this, FUNC(atlantis_state::a2d_data_r), FUNC(atlantis_state::a2d_data_w)); // A2D Data
 	//AM_RANGE(0x00a80000, 0x00a80003) // Trackball Chan 0 16 bits
 	//AM_RANGE(0x00b00000, 0x00b00003) // Trackball Chan 1 16 bits
 	//AM_RANGE(0x00b80000, 0x00b80003) // Trackball Error 16 bits
 	//AM_RANGE(0x00c00000, 0x00c00003) // Trackball Pins 16 bits
-ADDRESS_MAP_END
+}
 
-ADDRESS_MAP_START(atlantis_state::map2)
-	AM_RANGE(0x00000000, 0x000001ff) AM_DEVREADWRITE("zeus2", zeus2_device, zeus2_r, zeus2_w)
-ADDRESS_MAP_END
+void atlantis_state::map2(address_map &map)
+{
+	map(0x00000000, 0x000001ff).rw(m_zeus, FUNC(zeus2_device::zeus2_r), FUNC(zeus2_device::zeus2_w));
+}
 
-ADDRESS_MAP_START(atlantis_state::map3)
+void atlantis_state::map3(address_map &map)
+{
 	//AM_RANGE(0x000000, 0xffffff) ROMBUS
-ADDRESS_MAP_END
+}
 
 /*************************************
  *
@@ -757,7 +761,7 @@ static INPUT_PORTS_START( mwskins )
 	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN2")
-	//PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, atlantis_state, port_mod_r, "KEYPAD")
+	//PORT_BIT(0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, atlantis_state, port_mod_r, "KEYPAD")
 	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("AN.0")
@@ -776,9 +780,9 @@ static INPUT_PORTS_START( mwskins )
 	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) PORT_CODE(KEYCODE_7_PAD)   /* keypad 7 */
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) PORT_CODE(KEYCODE_8_PAD)   /* keypad 8 */
 	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) PORT_CODE(KEYCODE_9_PAD)   /* keypad 9 */
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_CODE(KEYCODE_ASTERISK)    /* keypad * */
+	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_OTHER) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) PORT_CODE(KEYCODE_ASTERISK)    /* keypad * */
 	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) PORT_CODE(KEYCODE_0_PAD)   /* keypad 0 */
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)   /* keypad + */
+	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Keypad #") PORT_CODE(KEYCODE_PLUS_PAD)   /* keypad + */
 
 INPUT_PORTS_END
 

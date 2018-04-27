@@ -147,91 +147,76 @@ WRITE8_MEMBER(konblands_state::firq_enable_w)
 	m_firq_enable = bool(BIT(data,0));
 }
 
-ADDRESS_MAP_START(konblands_state::konblands_map)
-	AM_RANGE(0x0000, 0x0000) AM_READ_PORT("DSW1") AM_WRITENOP // sn latch
-	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW2") AM_WRITE(ldp_w)
-	AM_RANGE(0x1000, 0x1000) AM_READ(ldp_r) AM_WRITENOP // led
-	AM_RANGE(0x1001, 0x1001) AM_WRITENOP // coin counter 2
-	AM_RANGE(0x1002, 0x1002) AM_WRITENOP // coin counter 1
-	AM_RANGE(0x1003, 0x1003) AM_WRITENOP // enable overlay transparency
-	AM_RANGE(0x1004, 0x1004) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0x1005, 0x1005) AM_WRITENOP // enable audio
-	AM_RANGE(0x1006, 0x1006) AM_WRITE(irq_enable_w)
-	AM_RANGE(0x1007, 0x1007) AM_WRITE(firq_enable_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("INPUTS") AM_DEVWRITE("sn", sn76496_device, write)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x4800, 0x4bff) AM_RAM
-	AM_RANGE(0x5800, 0x5800) AM_WRITENOP // watchdog
-	AM_RANGE(0x8000, 0x9fff) AM_READNOP // diagnostic ROM?
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("ipl",0)
-ADDRESS_MAP_END
+void konblands_state::konblands_map(address_map &map)
+{
+	map(0x0000, 0x0000).portr("DSW1").nopw(); // sn latch
+	map(0x0800, 0x0800).portr("DSW2").w(this, FUNC(konblands_state::ldp_w));
+	map(0x1000, 0x1000).nopw().r(this, FUNC(konblands_state::ldp_r)); // led
+	map(0x1001, 0x1001).nopw(); // coin counter 2
+	map(0x1002, 0x1002).nopw(); // coin counter 1
+	map(0x1003, 0x1003).nopw(); // enable overlay transparency
+	map(0x1004, 0x1004).w(this, FUNC(konblands_state::nmi_enable_w));
+	map(0x1005, 0x1005).nopw(); // enable audio
+	map(0x1006, 0x1006).w(this, FUNC(konblands_state::irq_enable_w));
+	map(0x1007, 0x1007).w(this, FUNC(konblands_state::firq_enable_w));
+	map(0x1800, 0x1800).portr("INPUTS").w("sn", FUNC(sn76496_device::write));
+	map(0x4000, 0x47ff).ram().share("vram");
+	map(0x4800, 0x4bff).ram();
+	map(0x5800, 0x5800).nopw(); // watchdog
+	map(0x8000, 0x9fff).nopr(); // diagnostic ROM?
+	map(0xc000, 0xffff).rom().region("ipl",0);
+}
 
-ADDRESS_MAP_START(konblands_state::konblandsh_map)
-	AM_RANGE(0x0000, 0x0000) AM_READ(ldp_r)
-	AM_RANGE(0x0400, 0x0400) AM_WRITE(ldp_w)
-	AM_RANGE(0x0802, 0x0802) AM_WRITENOP // led
-	AM_RANGE(0x0803, 0x0803) AM_WRITENOP // enable overlay transparency
-	AM_RANGE(0x0806, 0x0806) AM_READNOP AM_WRITE(irq_enable_w)
-	AM_RANGE(0x0807, 0x0807) AM_READNOP AM_WRITE(firq_enable_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("sn", sn76496_device, write)
-	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // sn latch
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("ipl",0)
-ADDRESS_MAP_END
+void konblands_state::konblandsh_map(address_map &map)
+{
+	map(0x0000, 0x0000).r(this, FUNC(konblands_state::ldp_r));
+	map(0x0400, 0x0400).w(this, FUNC(konblands_state::ldp_w));
+	map(0x0802, 0x0802).nopw(); // led
+	map(0x0803, 0x0803).nopw(); // enable overlay transparency
+	map(0x0806, 0x0806).nopr().w(this, FUNC(konblands_state::irq_enable_w));
+	map(0x0807, 0x0807).nopr().w(this, FUNC(konblands_state::firq_enable_w));
+	map(0x0c00, 0x0c00).portr("INPUTS");
+	map(0x1000, 0x1000).portr("DSW1");
+	map(0x1400, 0x1400).w("sn", FUNC(sn76496_device::write));
+	map(0x1800, 0x1800).nopw(); // sn latch
+	map(0x2000, 0x27ff).ram().share("vram");
+	map(0x2800, 0x2fff).ram();
+	map(0xc000, 0xffff).rom().region("ipl",0);
+}
 
 static INPUT_PORTS_START( konblands )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW1:1,2,3,4,5,6,7,8")
+	PORT_DIPSETTING(    0x22, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x55, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x88, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x44, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x11, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0xff, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x77, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x33, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0xee, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x66, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(    0xdd, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xcc, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xbb, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xaa, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x99, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )        PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPSETTING(    0x03, "2")
+	PORT_DIPSETTING(    0x02, "3")
+	PORT_DIPSETTING(    0x01, "5")
+	PORT_DIPSETTING(    0x00, "7")
+	/* SW3-SW7 NOT IN USE.  Keep switches in OFF position (per manual) */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "DSW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "DSW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -242,12 +227,7 @@ static INPUT_PORTS_START( konblands )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

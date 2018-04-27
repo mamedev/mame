@@ -1103,50 +1103,55 @@ PCI Mem  = 08000000-09FFFFFF
 
 */
 
-ADDRESS_MAP_START(seattle_state::seattle_cs0_map)
-ADDRESS_MAP_END
+void seattle_state::seattle_cs0_map(address_map &map)
+{
+}
 
-ADDRESS_MAP_START(seattle_state::seattle_cs1_map)
-	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(asic_fifo_w)
-ADDRESS_MAP_END
+void seattle_state::seattle_cs1_map(address_map &map)
+{
+	map(0x01000000, 0x01000003).w(this, FUNC(seattle_state::asic_fifo_w));
+}
 
-ADDRESS_MAP_START(seattle_state::seattle_cs2_map)
-	AM_RANGE(0x00000000, 0x00000003) AM_READWRITE(analog_port_r, analog_port_w)  // Flagstaff only
-ADDRESS_MAP_END
+void seattle_state::seattle_cs2_map(address_map &map)
+{
+	map(0x00000000, 0x00000003).rw(this, FUNC(seattle_state::analog_port_r), FUNC(seattle_state::analog_port_w));  // Flagstaff only
+}
 
 // This map shares the PHOENIX, SEATTLE, and SEATTLE_WIDGET calls
-ADDRESS_MAP_START(seattle_state::seattle_cs3_map)
-	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x00100000, 0x0011ffff) AM_READWRITE(cmos_r, cmos_w)
-	AM_RANGE(0x00800000, 0x0080001f) AM_READWRITE(carnevil_gun_r, carnevil_gun_w) // Carnevil driver only
-	AM_RANGE(0x00c00000, 0x00c0001f) AM_READWRITE(widget_r, widget_w); // Seattle widget only
-	AM_RANGE(0x01000000, 0x01000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
-	AM_RANGE(0x01100000, 0x01100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x01300000, 0x01300003) AM_READWRITE(seattle_interrupt_enable_r, seattle_interrupt_enable_w)
-	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(interrupt_config_r, interrupt_config_w)
-	AM_RANGE(0x01500000, 0x01500003) AM_READ(interrupt_state_r)
-	AM_RANGE(0x01600000, 0x01600003) AM_READ(interrupt_state2_r)
-	AM_RANGE(0x01700000, 0x01700003) AM_WRITE(vblank_clear_w)
-	AM_RANGE(0x01800000, 0x01800003) AM_NOP
-	AM_RANGE(0x01900000, 0x01900003) AM_READWRITE(status_leds_r, status_leds_w)
-	AM_RANGE(0x01f00000, 0x01f00003) AM_READWRITE(asic_reset_r, asic_reset_w)
-ADDRESS_MAP_END
+void seattle_state::seattle_cs3_map(address_map &map)
+{
+	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00800000, 0x0080001f).rw(this, FUNC(seattle_state::carnevil_gun_r), FUNC(seattle_state::carnevil_gun_w)); // Carnevil driver only
+	map(0x00c00000, 0x00c0001f).rw(this, FUNC(seattle_state::widget_r), FUNC(seattle_state::widget_w)); // Seattle widget only
+	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x01800000, 0x01800003).noprw();
+	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+}
 
-ADDRESS_MAP_START(seattle_state::seattle_flagstaff_cs3_map)
-	AM_RANGE(0x00000000, 0x0000003f) AM_DEVREADWRITE("ioasic", midway_ioasic_device, read, write)
-	AM_RANGE(0x00100000, 0x0011ffff) AM_READWRITE(cmos_r, cmos_w)
-	AM_RANGE(0x00c00000, 0x00c0003f) AM_READWRITE(ethernet_r, ethernet_w);
-	AM_RANGE(0x01000000, 0x01000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
-	AM_RANGE(0x01100000, 0x01100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x01300000, 0x01300003) AM_READWRITE(seattle_interrupt_enable_r, seattle_interrupt_enable_w)
-	AM_RANGE(0x01400000, 0x01400003) AM_READWRITE(interrupt_config_r, interrupt_config_w)
-	AM_RANGE(0x01500000, 0x01500003) AM_READ(interrupt_state_r)
-	AM_RANGE(0x01600000, 0x01600003) AM_READ(interrupt_state2_r)
-	AM_RANGE(0x01700000, 0x01700003) AM_WRITE(vblank_clear_w)
-	AM_RANGE(0x01800000, 0x01800003) AM_NOP
-	AM_RANGE(0x01900000, 0x01900003) AM_READWRITE(status_leds_r, status_leds_w)
-	AM_RANGE(0x01f00000, 0x01f00003) AM_READWRITE(asic_reset_r, asic_reset_w)
-ADDRESS_MAP_END
+void seattle_state::seattle_flagstaff_cs3_map(address_map &map)
+{
+	map(0x00000000, 0x0000003f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
+	map(0x00100000, 0x0011ffff).rw(this, FUNC(seattle_state::cmos_r), FUNC(seattle_state::cmos_w));
+	map(0x00c00000, 0x00c0003f).rw(this, FUNC(seattle_state::ethernet_r), FUNC(seattle_state::ethernet_w));
+	map(0x01000000, 0x01000003).rw(this, FUNC(seattle_state::cmos_protect_r), FUNC(seattle_state::cmos_protect_w));
+	map(0x01100000, 0x01100003).w(this, FUNC(seattle_state::seattle_watchdog_w));
+	map(0x01300000, 0x01300003).rw(this, FUNC(seattle_state::seattle_interrupt_enable_r), FUNC(seattle_state::seattle_interrupt_enable_w));
+	map(0x01400000, 0x01400003).rw(this, FUNC(seattle_state::interrupt_config_r), FUNC(seattle_state::interrupt_config_w));
+	map(0x01500000, 0x01500003).r(this, FUNC(seattle_state::interrupt_state_r));
+	map(0x01600000, 0x01600003).r(this, FUNC(seattle_state::interrupt_state2_r));
+	map(0x01700000, 0x01700003).w(this, FUNC(seattle_state::vblank_clear_w));
+	map(0x01800000, 0x01800003).noprw();
+	map(0x01900000, 0x01900003).rw(this, FUNC(seattle_state::status_leds_r), FUNC(seattle_state::status_leds_w));
+	map(0x01f00000, 0x01f00003).rw(this, FUNC(seattle_state::asic_reset_r), FUNC(seattle_state::asic_reset_w));
+}
 
 /*************************************
  *
@@ -1319,9 +1324,9 @@ static INPUT_PORTS_START( sfrush )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Track 2") PORT_PLAYER(1) /* track 2 */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Track 3") PORT_PLAYER(1) /* track 3 */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Track 4") PORT_PLAYER(1) /* track 4 */
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1335,16 +1340,16 @@ static INPUT_PORTS_START( sfrush )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN1")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN2")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN4")   /* Accel */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_PLAYER(1)
@@ -1404,7 +1409,7 @@ static INPUT_PORTS_START( calspeed )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") PORT_PLAYER(1)   /* tailgate cam */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") PORT_PLAYER(1)   /* sky cam */
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, seattle_state, gearshift_r, "GEAR" )
 
 	PORT_START("GEAR")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1st Gear") PORT_PLAYER(1) /* 1st gear */
@@ -1425,19 +1430,19 @@ static INPUT_PORTS_START( calspeed )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
 	PORT_START("AN3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -1475,7 +1480,7 @@ static INPUT_PORTS_START( vaportrx )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1484,19 +1489,19 @@ static INPUT_PORTS_START( vaportrx )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("AN3")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -1836,20 +1841,20 @@ static INPUT_PORTS_START( hyprdriv )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(25)
 
 	PORT_START("AN4")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN5")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN6")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	PORT_START("AN7")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 
 	/* 2008-06 FP: is this ever read?? */
 	PORT_START("AN8")
-	PORT_BIT( 0xff, 0x80, IPT_SPECIAL )
+	PORT_BIT( 0xff, 0x80, IPT_CUSTOM )
 INPUT_PORTS_END
 
 

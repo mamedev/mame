@@ -932,14 +932,15 @@ void midway_squawk_n_talk_device::squawkntalk_map(address_map &map)
 // alternate address map if the ROM jumpers are changed to support a smaller
 // ROM size of 2k
 #ifdef UNUSED_FUNCTION
-ADDRESS_MAP_START(midway_squawk_n_talk_device::squawkntalk_alt_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE(dac_w)
-	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x6000) AM_ROM
-ADDRESS_MAP_END
+void midway_squawk_n_talk_device::squawkntalk_alt_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram();     // internal RAM
+	map(0x0080, 0x0083).mirror(0x676c).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).mirror(0x676c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0800, 0x0fff).mirror(0x6000).w(this, FUNC(midway_squawk_n_talk_device::dac_w));
+	map(0x8000, 0x9fff).mirror(0x6000).rom();
+}
 #endif
 
 

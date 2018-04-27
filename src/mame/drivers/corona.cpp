@@ -1385,7 +1385,6 @@ MACHINE_CONFIG_START(corona_state::winner81)
 	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_map)
 	MCFG_CPU_IO_MAP(winner81_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("soundcpu", Z80, WC81_MAIN_XTAL/10)    /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_sound_map)
@@ -1402,6 +1401,7 @@ MACHINE_CONFIG_START(corona_state::winner81)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
@@ -1420,7 +1420,6 @@ MACHINE_CONFIG_START(corona_state::winner82)
 	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_map)
 	MCFG_CPU_IO_MAP(winner82_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8) /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
@@ -1436,6 +1435,7 @@ MACHINE_CONFIG_START(corona_state::winner82)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
@@ -1454,7 +1454,6 @@ MACHINE_CONFIG_START(corona_state::re800)
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
 	MCFG_CPU_IO_MAP(re800_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_sound_map)
@@ -1471,6 +1470,7 @@ MACHINE_CONFIG_START(corona_state::re800)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
@@ -1489,7 +1489,6 @@ MACHINE_CONFIG_START(corona_state::rcirulet)
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
 	MCFG_CPU_IO_MAP(re800_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)        /* IM1 instead of NMI */
@@ -1505,6 +1504,7 @@ MACHINE_CONFIG_START(corona_state::rcirulet)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_winner)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)
@@ -1523,7 +1523,6 @@ MACHINE_CONFIG_START(corona_state::luckyrlt)
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)
 	MCFG_CPU_IO_MAP(luckyrlt_cpu_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", corona_state,  nmi_line_pulse)
 
 	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)   /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(luckyrlt_sound_map)
@@ -1540,6 +1539,7 @@ MACHINE_CONFIG_START(corona_state::luckyrlt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(corona_state, screen_update_luckyrlt)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_PALETTE_INIT_OWNER(corona_state, corona)

@@ -369,7 +369,7 @@ Part No.: E192
 * Denotes unpopulated sockets
 
 Although this version of Maniac Square use the same PCB as Snow Board Championship, there are some minor
-omponent changes:
+component changes:
 
  Slower OSC clocks
    30.000MHz down from 34.000MHz
@@ -378,6 +378,15 @@ omponent changes:
 The CG-1V 366 has been upgraded to a CG-1V 427
 
 Game configuration is store in 93C66 EEPROM as this PCB doesn't have dipswitches
+
+This PCB has a large number of unpopulated ICs and connectors at the bottom left, apparently for extra
+digital and analog inputs not required by Maniac Square or Snow Board Championship:
+
+  1x 74LS14 (IC20)
+  3x 74LS245 (IC26, IC27, IC28)
+  4x TLC549 (IC9, IC10, IC21, IC22)
+  4x 6-pin headers (JP2, JP3, JP5, JP6)
+  2x 15-pin headers (JP4, JP7)
 
 */
 
@@ -677,8 +686,8 @@ static INPUT_PORTS_START( bang )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* bit 6 is EEPROM data (DOUT) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )  /* bit 7 is EEPROM ready */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* bit 6 is EEPROM data (DOUT) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )  /* bit 7 is EEPROM ready */
 
 	PORT_START("LIGHT0_X")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -1327,18 +1336,74 @@ REF: 950510-1
    |  DSW1                                                                   |
 |---  DSW2                                                                   |
 |                                                                            |
-|                                32.000MHz      MC68000P16      TG57         |
-| CONN1                                                         TG56         |
-|                                                                            |
-| CONN4    CONN2    CONN3                                                    |
+| J J                            26.000MHz      MC68000P12      TG57         |
+| P P                                                           TG56         |
+| 1 4                                                                        |
+|      JP2   JP3                                                             |
 -----------------------------------------------------------------------------|
+
+REF: 950906
+------------------------------------------------------------------------------
+|                POT1                        KM428C256J-6 (x4)               |
+|                POT2                                                        |
+|                                                                            |
+|                                             |----------|    TG IC65.IC65 |-|
+|---                                          |          |                 | |
+   |                                          | GAE1 506 |    TG IC66.IC66 | |
+|---                                          | (QFP208) |                 |J|
+|                                             |          |    TG IC67.IC67 |P|
+|                                      6264   |----------|                 |6|
+|                                      6264                         IC68*  | |
+| J                                                                        | |
+| A                       |-------------------------|         TG IC69.IC69 |-|
+| M                       |                         |                        |
+| M                       |  62256  DS5002  BATT_3V |                        |
+| A                       |                         |                        |
+|                         |-------------------------|                        |
+|                                                                            |
+|                                       62256                       62256    |
+|---                                    62256                       62256    |
+   |  DSW1                                            40.000MHz              |
+|---  DSW2                         |-----------|                             |
+|                                  |           |                             |
+| J J                32.000MHz     |MC68000FN16|    TG 57.IC57               |
+| P P                              |           |    TG 56.IC56               |
+| 1 4  JP2   JP3                   |-----------|                             |
+-----------------------------------------------------------------------------|
+
+Notes
+-----
+IC68 - 42 pin 32M socket - not populated
+JP6: 50 pin connector for duaghter card - Not populated
+POT1: Volume adjust for cabinet 1
+POT2: Volume adjust for cabinet 2
+
+JP1: 6 pin connector - Video signals for cabinet 2
+  1| Video
+  2| No Connection
+  3| Video GND
+  4| Video Blue
+  5| Video Green
+  6| Video Red
+JP4: 4 pin connector - Sound for cabinet 2
+  1| Speaker (+)
+  2| Speaker (-)
+  3| No Connection
+  4| Audio GND
+JP2: 15 pin connector - pin out unknown - Players 3 & 4 controls for cabinet 2
+JP3: 15 pin connector - pin out unknown - Players 3 & 4 controls for cabinet 2
+
+NOTE: It's unknown if Player 1 & Player 2 controls are connected through the JAMMA harness for cabinet 1
+      and controls for Player 3 & Player 4 are connected through JP2 & JP3 and what the pin outs are.
+
+Wires run to male JAMMA board with corresponding JP1, JP2, JP3 & JP4 connectors for cabinet 2 JAMMA harness
 */
 
 
 ROM_START( touchgo ) /* REF: 950906 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "tg_56", 0x000000, 0x080000, CRC(8ab065f3) SHA1(7664abd7e5f66ffca4a2865bba56ac36bd04f4e9) )
-	ROM_LOAD16_BYTE( "tg_57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
+	ROM_LOAD16_BYTE( "tg_56.ic56", 0x000000, 0x080000, CRC(8ab065f3) SHA1(7664abd7e5f66ffca4a2865bba56ac36bd04f4e9) )
+	ROM_LOAD16_BYTE( "tg_57.ic57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -1353,13 +1418,13 @@ ROM_START( touchgo ) /* REF: 950906 */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
-	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
-	ROM_FILL(          0x0600000, 0x0200000, 0x00 )          /* Empty */
-	ROM_LOAD( "ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          /* Empty */
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
 ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America Notice */
@@ -1380,13 +1445,13 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
-	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
-	ROM_FILL(          0x0600000, 0x0200000, 0x00 )          /* Empty */
-	ROM_LOAD( "ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          /* Empty */
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
 ROM_START( touchgoe ) /* REF: 950510-1 */
@@ -1407,13 +1472,13 @@ ROM_START( touchgoe ) /* REF: 950510-1 */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
-	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
-	ROM_FILL(          0x0600000, 0x0200000, 0x00 )          /* Empty */
-	ROM_LOAD( "ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          /* Empty */
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
 ROM_START( touchgok ) /* REF: 950510-1 - ds5002fp unpopulated, game is unprotected */
@@ -1423,13 +1488,13 @@ ROM_START( touchgok ) /* REF: 950510-1 - ds5002fp unpopulated, game is unprotect
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
-	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
-	ROM_FILL(          0x0600000, 0x0200000, 0x00 )          /* Empty */
-	ROM_LOAD( "ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          /* Empty */
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
 /*============================================================================
@@ -1481,8 +1546,8 @@ static INPUT_PORTS_START( snowboar )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* bit 6 is EEPROM data (DOUT) */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)   /* bit 6 is EEPROM data (DOUT) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::snowboar)
@@ -1691,7 +1756,7 @@ static INPUT_PORTS_START( wrally2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Acc.")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Gear") PORT_TOGGLE
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, wrally2_state,wrally2_analog_bit_r, (void *)0x00)   /* ADC_1 serial input */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, wrally2_state,wrally2_analog_bit_r, (void *)0x00)   /* ADC_1 serial input */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE_DIPLOC(  0x0100, IP_ACTIVE_LOW, "SW2:1" )
 	PORT_DIPNAME( 0x0200, 0x0000, "Coin mechanism" ) PORT_DIPLOCATION("SW2:2")
@@ -1749,7 +1814,7 @@ static INPUT_PORTS_START( wrally2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Acc.")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Gear") PORT_TOGGLE
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, wrally2_state,wrally2_analog_bit_r, (void *)0x01)   /* ADC_2 serial input */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, wrally2_state,wrally2_analog_bit_r, (void *)0x01)   /* ADC_2 serial input */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1833,16 +1898,15 @@ PCB Layout:
 REF: 950510
 ------------------------------------------------------------------------------
 |                POT1                        KM428C256J-6 (x4)               |
-|                POT2                                                        |
-|                                            ----------------------------    |
-|                                            | (Plug-In Daughterboard)  |    |
-|                                            | WR2.1   WR2.9    WR2.16  |    |
-|---                                         | WR2.2   WR2.10   WR2.17  |    |
-   |                                         |         WR2.11   WR2.18  |    |
-   |                                         |         WR2.12   WR2.19  |    |
-|---                                         |         WR2.13   WR2.20  |    |
-|                                            |         WR2.14   WR2.21  |    |
-|                                            ----------------------------    |
+|                POT1                        ------------------------------  |
+|                                            | (Plug-In Daughterboard)  | |  |
+|                                            | WR2.1   WR2.9    WR2.16  | |  |
+|                                            | WR2.2   WR2.10   WR2.17  |J|  |
+|---                                         |         WR2.11   WR2.18  |P|  |
+   |                                         |         WR2.12   WR2.19  |1|  |
+   |                                         |         WR2.13   WR2.20  | |  |
+|---                                         |         WR2.14   WR2.21  | |  |
+|                                            ------------------------------  |
 |                                                                            |
 |                                            |----------|                    |
 | J                                          |          |                    |
@@ -1862,76 +1926,201 @@ REF: 950510
    |  DSW1                                                                   |
 |---  DSW2                                                                   |
 |                                                                            |
-|                                26.000MHz      MC68000P12      WR2.63       |
-| CONN1                                                         WR2.64       |
-|                                                                            |
-| CONN2    CONN3                                                             |
+| J J                            26.000MHz      MC68000P12      WR2 63.IC63  |
+| P P                                                           WR2 64.IC64  |
+| 1 4                                                                        |
+|      JP2   JP3                                                             |
 -----------------------------------------------------------------------------|
 
 
 Notes
 -----
+JP1 on duaghter card connects through the 50 pin connector JP6 on main PCB
 All ROMs are type 27C040
-CONN1: RGBSync OUT (additional to JAMMA RGBSync)
-CONN2: Right speaker sound OUT (for second cabinat)
-CONN3: For connection of wheel etc
-POT1/2: Volume adjust of left/right channel
+
+POT1: Volume adjust for cabinet 1
+POT2: Volume adjust for cabinet 2
+
+JP1: 6 pin connector - Video signals for cabinet 2
+  1| Video
+  2| No Connection
+  3| Video GND
+  4| Video Blue
+  5| Video Green
+  6| Video Red
+JP4: 4 pin connector - Sound for cabinet 2
+  1| Speaker (+)
+  2| Speaker (-)
+  3| No Connection
+  4| Audio GND
+JP2: 15 pin connector - Inputs for Player 2 / Cabinet 2
+  1| Coin
+  2| Potentiometer VCC
+  3| Left
+  4| Right
+  5| Up
+  6| Down
+  7| Accelerator
+  8| Shift Lever
+  9| No Connection
+ 10| Start
+ 11| Service
+ 12| Potentiometer Top
+ 13| Coin Counter
+ 14| GND
+ 15| GND
+JP3: 15 pin connector - Not populated (used on Touch and Go PCBs)
+
+Wires run to male JAMMA board with corresponding JP1, JP2, JP3 & JP4 connectors for cabinet 2 JAMMA harness
+
+Controls:
+    8-Way Joystick - optional 270 Degree Steering Wheel (Potentiometer 5K)
+    Accelerator button
+    Shift Lever
+
+            PCB Conector JAMMA for Cabinet 1 and Cabinet 2
+                          Main Jamma Connector
+            Solder Side          |             Parts Side
+------------------------------------------------------------------
+             GND             | A | 1 |             GND
+             GND             | B | 2 |             GND
+             +5              | C | 3 |             +5
+             +5              | D | 4 |             +5
+                             | E | 5 |
+             +12             | F | 6 |             +12
+------------ KEY ------------| H | 7 |------------ KEY -----------
+                             | J | 8 |      Coin Counter # 1
+                             | K | 9 |
+        Speaker (-)          | L | 10|        Speaker (+)
+                             | M | 11|
+        Video Green          | N | 12|        Video Red
+        Video Sync           | P | 13|        Video Blue
+       Service Switch        | R | 14|        Video GND
+                             | S | 15|        Test Switch
+                             | T | 16|        Coin Switch
+                             | U | 17|        Start
+                             | V | 18|        Up
+                             | W | 19|        Down
+                             | X | 20|        Left
+                             | Y | 21|        Right
+                             | Z | 22|        Accelerator
+                             | a | 23|        Shift Lever
+                             | b | 24|
+      Potentiometer VCC      | c | 25|        Potentiometer Top
+                             | d | 26|
+             GND             | e | 27|             GND
+             GND             | f | 28|             GND
 
 PCB Layout:
 
-REF: 950510-1
 
+REF: 950510-1
 ------------------------------------------------------------------------------
- |         POT1              TI F20LB         KM428C256J-6 (x4)               |
- |         POT2                                                               |
- |                                                                            |
- |                                                                            |
- |                                              PROM IC68                     |
- |---                                           PROM IC69                     |
-    |                                           PROM IC70                     |
-    |                                                                         |
- |---                                                                         |
- |                                                                            |
- |                                                                            |
- |                                                                            |
- |                                            |----------|                    |
- | J                                          |          |                    |
- |                                            | GAE1 506 |                    |
- | A                              65764       | (QFP160) |                    |
- |                                65764       |          |                    |
- | M                                          |----------|                    |
- |                                                                            |
- | M                       |-------------------------|                        |
- |                         |                         |  34.000MHz     62256   |
- | A                       |  62256  DS5002  BATT_3V |                62256   |
- |                         |                         |                        |
- |                         |-------------------------|                        |
- |    TLC569   TLC569                                                         |
- |---                                    62256                                |
-    |                                    62256                                |
-    |  DSW1                                                                   |
- |---  DSW2                                                                   |
- |                                                                            |
- |                                26.000MHz      MC68000P12      WR2.63       |
- | CONN1                                                         WR2.64       |
- |                                                                            |
- | CONN2    CONN3                                                             |
- -----------------------------------------------------------------------------|
+|         POT1              TI F20LB         KM428C256J-6                    |
+|         POT2                                                               |
+|                                            KM428C256J-6                  |-|
+|                                                                          | |
+|                                            KM428C256J-6    WR2 IC68.IC68 | |
+|---                                                                       |J|
+   |                                         KM428C256J-6    WR2 IC69.IC69 |P|
+   |                                                                       |6|
+|---                                                         WR2 IC70.IC70 | |
+|                                                                          | |
+|                                                                          |-|
+|                                            |----------|                    |
+| J                                          |          |                    |
+|                                            | GAE1 506 |                    |
+| A                              65764       | (QFP160) |                    |
+|                                65764       |          |                    |
+| M                                          |----------|                    |
+|                                                                            |
+| M                       |-------------------------|                        |
+|                         |                         |  34.000MHz     62256   |
+| A                       |  62256  DS5002  BATT_3V |                62256   |
+|                         |                         |                        |
+|                         |-------------------------|                        |
+|    TLC569   TLC569                                                         |
+|---                                    62256                                |
+   |                                    62256                                |
+   |  DSW1                                                                   |
+|---  DSW2                                                                   |
+|                                                                            |
+| J J                            26.000MHz      MC68000P12      WR2 63.IC63  |
+| P P                                                           WR2 64.IC64  |
+| 1 4                                                                        |
+|      JP2   JP3                                                             |
+-----------------------------------------------------------------------------|
 
 
 Notes
 -----
-Gaelco's PROMs IC70 and IC69 has DIP42 package (gfx rom)
-Gaelco's PROM IC68 has DIP32 package (sound rom)
+Gaelco's mask ROMs:
+ WR2 IC70 42pin 16Mbit mask read as 27C160 (Graphics)
+ WR2 IC69 42pin 32Mbit mask read as 27C332 (Graphics & Sound)
+ WR2 IC68 32pin  8Mbit mask read as 27C801 (Graphics)
+
+JP6: 50 pin connector for duaghter card - Not populated
+
 TI F20L8 is a Texas Ins. DIP24 (may be a PAL). Is marked as F 406 XF 21869 F20L8-25CNT
 TLC569 (IC2 and IC7) is a 8-bit serial ADC
 
+Also known to come with a GAE1 with various production codes including 449, 501 & 506
+
 */
 
-ROM_START( wrally2 )
+ROM_START( wrally2 ) // REF: 950510-1
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "wr2.64",  0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
-	ROM_LOAD16_BYTE( "wr2.63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
+	ROM_LOAD16_BYTE( "wr2_64.ic64",  0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
+	ROM_LOAD16_BYTE( "wr2_63.ic63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
+	/* This SRAM has been dumped from 2 PCBs.  The first had unused space filled as 0xff, the 2nd space was filled as 0x00.
+	   In addition, the first had 2 bad bytes, one of which was identified at the time, the other not.  For reference the
+	   one that was not is "1938: 18 <-> 9B" (part of a data table)
+
+	   A little less obvious is why the older dump had the following startup code, which appears to have been partially
+	   patched out
+
+	    0200: mov   sp,#$70
+	    0203: mov   a,pcon
+	    0205: anl   a,#$20
+	    0207: jnz   $0203
+	    0209: nop
+	    020A: nop
+	    020B: nop
+	    020C: mov   dptr,#$FC01
+
+	   while the newer dump has this
+
+	    0200: mov   sp,#$70
+	    0203: mov   mcon,#$68
+	    0206: mov   i2cfg,#$00
+	    0209: mov   crcr,#$80
+	    020C: mov   dptr,#$FC01
+
+	   either way the 2nd dump is in much better state, so we're using that.
+	*/
+	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	/* these are the default states stored in NVRAM */
+	DS5002FP_SET_MON( 0x69 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x0a00000, "gfx1", 0 ) /* GFX + Sound */
+	/* 0x0000000-0x06fffff filled in in the DRIVER_INIT */
+	ROM_LOAD( "wr2_ic68.ic68",  0x0800000, 0x0100000, CRC(4a75ffaa) SHA1(ffae561ad4fa100398ab6b94d8dcb13e9fae4272) ) /* GFX only - read as 27C801 */
+
+	ROM_REGION( 0x0600000, "gfx2", 0 ) /* Temporary storage */
+	ROM_LOAD( "wr2_ic69.ic69",  0x0000000, 0x0400000, CRC(a174d196) SHA1(4a7da1cd288e73518143a027782f3140e6582cf4) ) /* GFX & Sound - read as 27C332 */
+	ROM_LOAD( "wr2_ic70.ic70",  0x0400000, 0x0200000, CRC(8d1e43ba) SHA1(79eed51788c6c55a4347be70a3be4eb14a0d1747) ) /* GFX only - read as 27C160 */
+ROM_END
+
+ROM_START( wrally2a ) // REF: 950510
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "wr2_64.ic64",  0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
+	ROM_LOAD16_BYTE( "wr2_63.ic63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	/* This SRAM has been dumped from 2 PCBs.  The first had unused space filled as 0xff, the 2nd space was filled as 0x00.
@@ -2000,7 +2189,8 @@ GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touc
 GAME( 1995, touchgoe, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
 GAME( 1995, touchgok, touchgo,  touchgo,           touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", 0 )
+GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
+GAME( 1995, wrally2a, wrally2,  wrally2,           wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
 GAME( 1996, maniacsq,  0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )

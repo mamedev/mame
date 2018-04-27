@@ -100,7 +100,7 @@ void h8_device::device_start()
 	save_item(NAME(taken_irq_level));
 	save_item(NAME(irq_nmi));
 
-	m_icountptr = &icount;
+	set_icountptr(icount);
 
 	PC = 0;
 	PPC = 0;
@@ -208,7 +208,7 @@ void h8_device::execute_run()
 			if(inst_state < 0x10000) {
 				PPC = NPC;
 				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
-					debugger_instruction_hook(this, NPC);
+					debugger_instruction_hook(NPC);
 			}
 			do_exec_full();
 		}

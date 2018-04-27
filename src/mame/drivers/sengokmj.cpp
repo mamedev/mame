@@ -115,7 +115,7 @@ public:
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -555,9 +555,10 @@ static GFXDECODE_START( sengokmj )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x700, 0x10 ) /* Text */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(sengokmj_state::interrupt)
+WRITE_LINE_MEMBER(sengokmj_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0,HOLD_LINE,0xc8/4);
+	if (state)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
 }
 
 WRITE16_MEMBER( sengokmj_state::layer_en_w )
@@ -577,7 +578,6 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */
 	MCFG_CPU_PROGRAM_MAP(sengokmj_map)
 	MCFG_CPU_IO_MAP(sengokmj_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sengokmj_state,  interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
@@ -592,6 +592,7 @@ MACHINE_CONFIG_START(sengokmj_state::sengokmj)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1) //TODO: dynamic resolution
 	MCFG_SCREEN_UPDATE_DRIVER(sengokmj_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sengokmj_state, vblank_irq))
 
 	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
 	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(sengokmj_state, layer_en_w))

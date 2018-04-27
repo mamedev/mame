@@ -990,9 +990,10 @@ void segaxbd_state::main_map(address_map &map)
 	map(0x3fc000, 0x3fffff).ram().share("backup2");
 }
 
-ADDRESS_MAP_START(segaxbd_state::decrypted_opcodes_map)
-	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
-ADDRESS_MAP_END
+void segaxbd_state::decrypted_opcodes_map(address_map &map)
+{
+	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
+}
 
 //**************************************************************************
 //  SUB CPU ADDRESS MAPS
@@ -1044,18 +1045,20 @@ void segaxbd_state::sound_portmap(address_map &map)
 // Sound Board
 // The extra sound is used when the cabinet is Deluxe(Air Drive), or Cockpit. The soundlatch is
 // shared with the main board sound.
-ADDRESS_MAP_START(segaxbd_state::smgp_sound2_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm2", segapcm_device, sega_pcm_r, sega_pcm_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::smgp_sound2_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0xefff).rom();
+	map(0xf000, 0xf0ff).mirror(0x0700).rw("pcm2", FUNC(segapcm_device::sega_pcm_r), FUNC(segapcm_device::sega_pcm_w));
+	map(0xf800, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(segaxbd_state::smgp_sound2_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
-ADDRESS_MAP_END
+void segaxbd_state::smgp_sound2_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x40, 0x40).mirror(0x3f).r(this, FUNC(segaxbd_state::sound_data_r));
+}
 
 
 
@@ -1064,18 +1067,20 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Motor Board, not yet emulated
-ADDRESS_MAP_START(segaxbd_state::smgp_airdrive_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::smgp_airdrive_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xafff).ram();
+}
 
-ADDRESS_MAP_START(segaxbd_state::smgp_airdrive_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READNOP
-	AM_RANGE(0x02, 0x03) AM_NOP
-ADDRESS_MAP_END
+void segaxbd_state::smgp_airdrive_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x01, 0x01).nopr();
+	map(0x02, 0x03).noprw();
+}
 
 
 
@@ -1084,17 +1089,19 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Link Board, not yet emulated
-ADDRESS_MAP_START(segaxbd_state::smgp_comm_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM // MB8421 Dual-Port SRAM
-ADDRESS_MAP_END
+void segaxbd_state::smgp_comm_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x3fff).ram();
+	map(0x4000, 0x47ff).ram(); // MB8421 Dual-Port SRAM
+}
 
-ADDRESS_MAP_START(segaxbd_state::smgp_comm_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segaxbd_state::smgp_comm_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 
@@ -1103,16 +1110,18 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 // Z80, unknown function
-ADDRESS_MAP_START(segaxbd_state::rascot_z80_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_RAM
-ADDRESS_MAP_END
+void segaxbd_state::rascot_z80_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xafff).ram();
+}
 
-ADDRESS_MAP_START(segaxbd_state::rascot_z80_portmap)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void segaxbd_state::rascot_z80_portmap(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+}
 
 
 
@@ -1123,7 +1132,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( xboard_generic )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )    // D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // D6: /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // D6: /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )     // D7: (Not connected)
 
 	// I/O port: CN C pins 17,15,13,11,9,7,5,3
@@ -1209,10 +1218,10 @@ static INPUT_PORTS_START( aburner )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(79)
 
 	PORT_START("mainpcb:ADC3")  // motor Y
-	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
+	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_CUSTOM )
 
 	PORT_START("mainpcb:ADC4")  // motor X
-	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_SPECIAL )
+	PORT_BIT( 0xff, (0xb0+0x50)/2, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -1560,7 +1569,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gprider )
 	PORT_START("mainpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("mainpcb:IO0PORTB")
@@ -1617,7 +1626,7 @@ static INPUT_PORTS_START( gprider_double )
 
 	PORT_START("subpcb:IO0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )    // /INTR of ADC0804
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM )    // /INTR of ADC0804
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("subpcb:IO0PORTB")

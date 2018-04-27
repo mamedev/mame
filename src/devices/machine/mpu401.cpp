@@ -204,7 +204,7 @@ WRITE8_MEMBER(mpu401_device::port1_w)
 
 READ8_MEMBER(mpu401_device::port2_r)
 {
-//  printf("Read P2 %s\n", machine().describe_context());
+//  printf("%s Read P2\n", machine().describe_context().c_str());
 	return m_port2;
 }
 

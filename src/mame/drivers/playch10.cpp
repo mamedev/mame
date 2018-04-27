@@ -389,7 +389,7 @@ static INPUT_PORTS_START( playch10 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Channel Select") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Enter") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Reset") PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, playch10_state,pc10_int_detect_r, nullptr)   // INT Detect
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, playch10_state,pc10_int_detect_r, nullptr)   // INT Detect
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -632,14 +632,16 @@ static GFXDECODE_START( playch10 )
 	GFXDECODE_ENTRY( "gfx1", 0, bios_charlayout,   0,  32 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
-	/* LS161A, Sheet 1 - bottom left of Z80 */
-	if ( !m_pc10_dog_di && !m_pc10_nmi_enable ) {
-		device.execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE );
+WRITE_LINE_MEMBER(playch10_state::vblank_irq)
+{
+	if (state)
+	{
+		/* LS161A, Sheet 1 - bottom left of Z80 */
+		if (!m_pc10_dog_di && !m_pc10_nmi_enable)
+			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		else if (m_pc10_nmi_enable)
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
-
-	else if ( m_pc10_nmi_enable )
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 MACHINE_CONFIG_START(playch10_state::playch10)
@@ -647,7 +649,6 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(bios_map)
 	MCFG_CPU_IO_MAP(bios_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("top", playch10_state,  playch10_interrupt)
 
 	MCFG_CPU_ADD("cart", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cart_map)
@@ -679,6 +680,7 @@ MACHINE_CONFIG_START(playch10_state::playch10)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(playch10_state, screen_update_playch10_top)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(playch10_state, vblank_irq))
 
 	MCFG_SCREEN_ADD("bottom", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

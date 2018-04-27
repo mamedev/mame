@@ -56,7 +56,7 @@ protected:
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(primob);
 	uint32_t screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(primo_vblank_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline);
 	void primo_update_memory();
 	void primo_common_driver_init (primo_state *state);

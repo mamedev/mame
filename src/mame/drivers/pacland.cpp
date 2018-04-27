@@ -375,9 +375,9 @@ static INPUT_PORTS_START( pacland )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_COCKTAIL   // IPT_JOYSTICK_UP according to schematics
 
 	PORT_START("IN2")   /* MCU Input Port */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_COCKTAIL  /* OUT:coin lockout */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 1 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )    /* OUT:coin counter 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_COCKTAIL  /* OUT:coin lockout */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 1 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )    /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Jump")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Left")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Right")
@@ -416,15 +416,12 @@ static GFXDECODE_START( pacland )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(pacland_state::main_vblank_irq)
+WRITE_LINE_MEMBER(pacland_state::vblank_irq)
 {
-	if(m_main_irq_mask)
+	if (state && m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-}
 
-INTERRUPT_GEN_MEMBER(pacland_state::mcu_vblank_irq)
-{
-	if(m_mcu_irq_mask)
+	if (state && m_mcu_irq_mask)
 		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -433,12 +430,10 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacland_state,  main_vblank_irq)
 
 	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* 6.144 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacland_state,  mcu_vblank_irq)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synching between the MCU and the CPU */
 
@@ -449,6 +444,7 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 3*8, 39*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pacland_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pacland)
 	MCFG_PALETTE_ADD("palette", 256*4+256*4+64*16)

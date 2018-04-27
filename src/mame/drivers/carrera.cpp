@@ -318,7 +318,6 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
 	MCFG_CPU_PROGRAM_MAP(carrera_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", carrera_state,  nmi_line_pulse)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -332,6 +331,7 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", carrera)
 	MCFG_PALETTE_ADD("palette", 32)

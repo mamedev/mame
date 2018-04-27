@@ -51,12 +51,13 @@ public:
 
 	public:
 		// construction/destruction
-		breakpoint(device_debug* debugInterface,
-					symbol_table &symbols,
-					int index,
-					offs_t address,
-					const char *condition = nullptr,
-					const char *action = nullptr);
+		breakpoint(
+				device_debug* debugInterface,
+				symbol_table &symbols,
+				int index,
+				offs_t address,
+				const char *condition = nullptr,
+				const char *action = nullptr);
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
@@ -90,15 +91,16 @@ public:
 
 	public:
 		// construction/destruction
-		watchpoint(device_debug* debugInterface,
-					symbol_table &symbols,
-					int index,
-					address_space &space,
-					int type,
-					offs_t address,
-					offs_t length,
-					const char *condition = nullptr,
-					const char *action = nullptr);
+		watchpoint(
+				device_debug* debugInterface,
+				symbol_table &symbols,
+				int index,
+				address_space &space,
+				int type,
+				offs_t address,
+				offs_t length,
+				const char *condition = nullptr,
+				const char *action = nullptr);
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
@@ -186,6 +188,10 @@ public:
 	// debugger focus
 	void ignore(bool ignore = true);
 	bool observing() const { return ((m_flags & DEBUG_FLAG_OBSERVING) != 0); }
+
+	// debugger suspend/unsuspend
+	void suspend(bool suspend = true);
+	bool suspended() const { return ((m_flags & DEBUG_FLAG_SUSPENDED) != 0); }
 
 	// single stepping
 	void single_step(int numsteps = 1);
@@ -445,6 +451,7 @@ private:
 	static constexpr u32 DEBUG_FLAG_STOP_EXCEPTION  = 0x00000800;       // there is a pending stop on the next exception
 	static constexpr u32 DEBUG_FLAG_STOP_VBLANK     = 0x00001000;       // there is a pending stop on the next VBLANK
 	static constexpr u32 DEBUG_FLAG_STOP_TIME       = 0x00002000;       // there is a pending stop at cpu->stoptime
+	static constexpr u32 DEBUG_FLAG_SUSPENDED       = 0x00004000;       // CPU currently suspended
 	static constexpr u32 DEBUG_FLAG_LIVE_BP         = 0x00010000;       // there are live breakpoints for this CPU
 
 	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
@@ -460,6 +467,8 @@ private:
 class debugger_cpu
 {
 public:
+	enum class exec_state { STOPPED, RUNNING };
+
 	debugger_cpu(running_machine &machine);
 
 	/* ----- initialization and cleanup ----- */
@@ -473,19 +482,17 @@ public:
 	/* ----- debugging status & information ----- */
 
 	/* return the visible CPU device (the one that commands should apply to) */
-	device_t *get_visible_cpu();
-
-	/* true if the debugger is currently stopped within an instruction hook callback */
-	bool within_instruction_hook();
+	device_t *get_visible_cpu() { return m_visiblecpu; }
 
 	/* return true if the current execution state is stopped */
-	bool is_stopped();
+	bool is_stopped() const { return m_execution_state == exec_state::STOPPED; }
+	bool is_running() const { return m_execution_state == exec_state::RUNNING; }
 
 
 	/* ----- symbol table interfaces ----- */
 
 	/* return the global symbol table */
-	symbol_table *get_global_symtable();
+	symbol_table *get_global_symtable() { return m_symtable.get(); }
 
 	/* return the locally-visible symbol table */
 	symbol_table *get_visible_symtable();
@@ -544,7 +551,7 @@ public:
 	// getters
 	bool within_instruction_hook() const { return m_within_instruction_hook; }
 	bool memory_modified() const { return m_memory_modified; }
-	int execution_state() const { return m_execution_state; }
+	exec_state execution_state() const { return m_execution_state; }
 	device_t *live_cpu() { return m_livecpu; }
 	u32 get_breakpoint_index() { return m_bpindex++; }
 	u32 get_watchpoint_index() { return m_wpindex++; }
@@ -555,7 +562,8 @@ public:
 	void set_break_cpu(device_t * breakcpu) { m_breakcpu = breakcpu; }
 	void set_within_instruction(bool within_instruction) { m_within_instruction_hook = within_instruction; }
 	void set_memory_modified(bool memory_modified) { m_memory_modified = memory_modified; }
-	void set_execution_state(int execution_state) { m_execution_state = execution_state; }
+	void set_execution_stopped() { m_execution_state = exec_state::STOPPED; }
+	void set_execution_running() { m_execution_state = exec_state::RUNNING; }
 
 	// device_debug helpers
 	// [TODO] [RH]: Look into this more later, can possibly merge these two classes
@@ -605,7 +613,7 @@ private:
 	bool        m_vblank_occurred;
 	bool        m_memory_modified;
 
-	int         m_execution_state;
+	exec_state  m_execution_state;
 	device_t *  m_stop_when_not_device; // stop execution when the device ceases to be this
 
 	u32         m_bpindex;

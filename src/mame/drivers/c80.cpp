@@ -209,7 +209,7 @@ WRITE8_MEMBER( c80_state::pio1_pb_w )
 
 	if (!m_pio1_a5)
 	{
-		output().set_digit_value(m_digit, data);
+		m_digits[m_digit] = data;
 	}
 
 	m_keylatch = data;
@@ -244,6 +244,7 @@ static const z80_daisy_config c80_daisy_chain[] =
 
 void c80_state::machine_start()
 {
+	m_digits.resolve();
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_digit));

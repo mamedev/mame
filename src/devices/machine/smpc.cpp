@@ -178,20 +178,21 @@ DEFINE_DEVICE_TYPE(SMPC_HLE, smpc_hle_device, "smpc_hle", "Sega Saturn SMPC HLE 
 
 // TODO: use DEVICE_ADDRESS_MAP once this fatalerror is fixed:
 // "uplift_submaps unhandled case: range straddling slots."
-ADDRESS_MAP_START(smpc_hle_device::smpc_regs)
+void smpc_hle_device::smpc_regs(address_map &map)
+{
 //  ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x0d) AM_WRITE(ireg_w)
-	AM_RANGE(0x1f, 0x1f) AM_WRITE(command_register_w)
-	AM_RANGE(0x20, 0x5f) AM_READ(oreg_r)
-	AM_RANGE(0x61, 0x61) AM_READ(status_register_r)
-	AM_RANGE(0x63, 0x63) AM_READWRITE(status_flag_r, status_flag_w)
-	AM_RANGE(0x75, 0x75) AM_READWRITE(pdr1_r, pdr1_w)
-	AM_RANGE(0x77, 0x77) AM_READWRITE(pdr2_r, pdr2_w)
-	AM_RANGE(0x79, 0x79) AM_WRITE(ddr1_w)
-	AM_RANGE(0x7b, 0x7b) AM_WRITE(ddr2_w)
-	AM_RANGE(0x7d, 0x7d) AM_WRITE(iosel_w)
-	AM_RANGE(0x7f, 0x7f) AM_WRITE(exle_w)
-ADDRESS_MAP_END
+	map(0x00, 0x0d).w(this, FUNC(smpc_hle_device::ireg_w));
+	map(0x1f, 0x1f).w(this, FUNC(smpc_hle_device::command_register_w));
+	map(0x20, 0x5f).r(this, FUNC(smpc_hle_device::oreg_r));
+	map(0x61, 0x61).r(this, FUNC(smpc_hle_device::status_register_r));
+	map(0x63, 0x63).rw(this, FUNC(smpc_hle_device::status_flag_r), FUNC(smpc_hle_device::status_flag_w));
+	map(0x75, 0x75).rw(this, FUNC(smpc_hle_device::pdr1_r), FUNC(smpc_hle_device::pdr1_w));
+	map(0x77, 0x77).rw(this, FUNC(smpc_hle_device::pdr2_r), FUNC(smpc_hle_device::pdr2_w));
+	map(0x79, 0x79).w(this, FUNC(smpc_hle_device::ddr1_w));
+	map(0x7b, 0x7b).w(this, FUNC(smpc_hle_device::ddr2_w));
+	map(0x7d, 0x7d).w(this, FUNC(smpc_hle_device::iosel_w));
+	map(0x7f, 0x7f).w(this, FUNC(smpc_hle_device::exle_w));
+}
 
 //**************************************************************************
 //  LIVE DEVICE

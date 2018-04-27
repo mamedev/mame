@@ -41,7 +41,7 @@ READ64_MEMBER(naomi_state::naomi_biosh_idle_skip_r )
 //  if (m_maincpu->pc()==0xc045ffc)
 //      m_maincpu->spin_until_time(attotime::from_usec(500));
 
-//   printf("%08x\n", m_maincpu->safe_pc());
+//   printf("%08\n", m_maincpu->pc());
 
 	return dc_ram[0x2b0600/8];
 }

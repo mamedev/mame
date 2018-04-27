@@ -170,7 +170,7 @@ void f8_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_debug_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_w).formatstr("%5s").noshow();
 
-	m_icountptr = &m_icount;
+	set_icountptr(m_icount);
 }
 
 void f8_cpu_device::device_reset()
@@ -1655,7 +1655,7 @@ void f8_cpu_device::execute_run()
 		u8 op = m_dbus;
 
 		m_debug_pc = (m_pc0 - 1) & 0xffff;
-		debugger_instruction_hook(this, m_debug_pc);
+		debugger_instruction_hook(m_debug_pc);
 
 		switch( op )
 		{

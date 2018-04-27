@@ -38,6 +38,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_dips(*this, "X.%u", 0)
 		, m_monotone(*this, "monotone")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_READ8_MEMBER(port07_r);
@@ -67,9 +68,11 @@ private:
 	uint8_t m_match;
 	uint8_t m_ball;
 	virtual void machine_reset() override;
+	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cosmac_device> m_maincpu;
 	required_ioport_array<4> m_dips;
 	required_device<clock_device> m_monotone;
+	output_finder<46> m_digits;
 };
 
 void play_1_state::play_1_map(address_map &map)
@@ -273,19 +276,19 @@ WRITE8_MEMBER( play_1_state::port01_w )
 	// d0-1 via 4013 to match-game board
 	// d4-7 via 4511 to match-game board
 	if (BIT(data, 0))
-		output().set_digit_value(40, patterns[1]);
+		m_digits[40] = patterns[1];
 	else
-		output().set_digit_value(40, 0);
+		m_digits[40] = 0;
 
 	if (BIT(data, 1))
 	{
-		output().set_digit_value(44, patterns[0]);
-		output().set_digit_value(45, patterns[0]);
+		m_digits[44] = patterns[0];
+		m_digits[45] = patterns[0];
 	}
 	else
 	{
-		output().set_digit_value(44, 0);
-		output().set_digit_value(45, 0);
+		m_digits[44] = 0;
+		m_digits[45] = 0;
 	}
 
 	m_match = patterns[data>>4];
@@ -342,47 +345,47 @@ WRITE8_MEMBER( play_1_state::port03_w )
 			}
 			break;
 		case 2:
-			output().set_digit_value(0, patterns[m_segment>>4]);
-			output().set_digit_value(1, patterns[m_segment&15]);
+			m_digits[0] = patterns[m_segment>>4];
+			m_digits[1] = patterns[m_segment&15];
 			break;
 		case 3:
-			output().set_digit_value(2, patterns[m_segment>>4]);
-			output().set_digit_value(3, patterns[m_segment&15]);
+			m_digits[2] = patterns[m_segment>>4];
+			m_digits[3] = patterns[m_segment&15];
 			break;
 		case 4:
-			output().set_digit_value(4, patterns[m_segment>>4]);
-			output().set_digit_value(5, patterns[m_segment&15]);
-			output().set_digit_value(14, patterns[m_segment>>4]);
-			output().set_digit_value(15, patterns[m_segment&15]);
-			output().set_digit_value(24, patterns[m_segment>>4]);
-			output().set_digit_value(25, patterns[m_segment&15]);
-			output().set_digit_value(34, patterns[m_segment>>4]);
-			output().set_digit_value(35, patterns[m_segment&15]);
+			m_digits[4] = patterns[m_segment>>4];
+			m_digits[5] = patterns[m_segment&15];
+			m_digits[14] = patterns[m_segment>>4];
+			m_digits[15] = patterns[m_segment&15];
+			m_digits[24] = patterns[m_segment>>4];
+			m_digits[25] = patterns[m_segment&15];
+			m_digits[34] = patterns[m_segment>>4];
+			m_digits[35] = patterns[m_segment&15];
 			break;
 		case 5:
-			output().set_digit_value(10, patterns[m_segment>>4]);
-			output().set_digit_value(11, patterns[m_segment&15]);
+			m_digits[10] = patterns[m_segment>>4];
+			m_digits[11] = patterns[m_segment&15];
 			break;
 		case 6:
-			output().set_digit_value(12, patterns[m_segment>>4]);
-			output().set_digit_value(13, patterns[m_segment&15]);
+			m_digits[12] = patterns[m_segment>>4];
+			m_digits[13] = patterns[m_segment&15];
 			break;
 		case 7:
-			output().set_digit_value(20, patterns[m_segment>>4]);
-			output().set_digit_value(21, patterns[m_segment&15]);
+			m_digits[20] = patterns[m_segment>>4];
+			m_digits[21] = patterns[m_segment&15];
 			break;
 		case 8:
-			output().set_digit_value(22, patterns[m_segment>>4]);
-			output().set_digit_value(23, patterns[m_segment&15]);
+			m_digits[22] = patterns[m_segment>>4];
+			m_digits[23] = patterns[m_segment&15];
 			break;
 		case 9:
-			output().set_digit_value(30, patterns[m_segment>>4]);
-			output().set_digit_value(31, patterns[m_segment&15]);
+			m_digits[30] = patterns[m_segment>>4];
+			m_digits[31] = patterns[m_segment&15];
 			break;
 		case 10:
 		case 11:
-			output().set_digit_value(32, patterns[m_segment>>4]);
-			output().set_digit_value(33, patterns[m_segment&15]);
+			m_digits[32] = patterns[m_segment>>4];
+			m_digits[33] = patterns[m_segment&15];
 			break;
 		default:
 			break;
@@ -452,10 +455,10 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 		m_maincpu->int_w(BIT(m_clockcnt, 0)); // inverted
 		m_maincpu->ef1_w(BIT(m_clockcnt, 1)); // inverted
 		if (BIT(m_clockcnt, 1))
-			output().set_digit_value(41, m_match);
+			m_digits[41] = m_match;
 		else
 		{
-			output().set_digit_value(43, m_match);
+			m_digits[43] = m_match;
 			output().set_value("led1", !BIT(m_ball, 1));
 			output().set_value("led2", !BIT(m_ball, 2));
 			output().set_value("led3", !BIT(m_ball, 3));

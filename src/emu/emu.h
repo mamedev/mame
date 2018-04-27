@@ -68,12 +68,10 @@ class address_map; // Forward declaration
 #include "distate.h"
 #include "dimemory.h"
 #include "dirom.h"
-#include "diexec.h"
 #include "opresolv.h"
 #include "dipalette.h"
 #include "digfx.h"
 #include "diimage.h"
-#include "diserial.h"
 #include "dislot.h"
 #include "disound.h"
 #include "divideo.h"
@@ -86,13 +84,15 @@ class address_map; // Forward declaration
 #include "gamedrv.h"
 #include "parameters.h"
 
-// timers, CPU and scheduling
-#include "devcpu.h"
-
 // the running machine
 #include "main.h"
 #include "machine.h"
 #include "driver.h"
+
+// common device interfaces
+#include "diexec.h"
+#include "diserial.h"
+#include "devcpu.h"
 
 // video-related
 #include "drawgfx.h"

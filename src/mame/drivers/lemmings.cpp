@@ -38,13 +38,8 @@ WRITE16_MEMBER(lemmings_state::lemmings_control_w)
 
 READ16_MEMBER(lemmings_state::lemmings_trackball_r)
 {
-	switch (offset)
-	{
-	case 0: return ioport("AN0")->read();
-	case 1: return ioport("AN1")->read();
-	case 4: return ioport("AN2")->read();
-	case 5: return ioport("AN3")->read();
-	}
+	if ((offset & 2) == 0)
+		return m_trackball_io[(offset & 1) | ((offset & 4) >> 1)]->read();
 	return 0;
 }
 
@@ -72,14 +67,14 @@ void lemmings_state::lemmings_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x120000, 0x1207ff).ram().share("spriteram");
+	map(0x120000, 0x1207ff).ram().share("spriteram1");
 	map(0x140000, 0x1407ff).ram().share("spriteram2");
 	map(0x160000, 0x160fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x170000, 0x17000f).ram().w(this, FUNC(lemmings_state::lemmings_control_w)).share("control_data");
 	map(0x190000, 0x19000f).r(this, FUNC(lemmings_state::lemmings_trackball_r));
 	map(0x1a0000, 0x1a3fff).rw(this, FUNC(lemmings_state::lem_protection_region_0_146_r), FUNC(lemmings_state::lem_protection_region_0_146_w)).share("prot16ram"); /* Protection device */
-	map(0x1c0000, 0x1c0001).w(m_spriteram, FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
-	map(0x1e0000, 0x1e0001).w(m_spriteram2, FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
+	map(0x1c0000, 0x1c0001).w(m_spriteram[0], FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
+	map(0x1e0000, 0x1e0001).w(m_spriteram[1], FUNC(buffered_spriteram16_device::write)); /* 1 written once a frame */
 	map(0x200000, 0x201fff).ram().w(this, FUNC(lemmings_state::lemmings_vram_w)).share("vram_data");
 	map(0x202000, 0x202fff).ram();
 	map(0x300000, 0x37ffff).ram().w(this, FUNC(lemmings_state::lemmings_pixel_0_w)).share("pixel_0_data");
@@ -189,29 +184,27 @@ static const gfx_layout charlayout =
 	8,8,
 	2048,
 	4,
-	{ 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	{ 0*0, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
-	8*64
+	{ STEP4(4,1) },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8*8*8
 };
 
 static const gfx_layout sprite_layout =
 {
 	16,16,
-	RGN_FRAC(1,4),
+	RGN_FRAC(1,1),
 	4,
-	{ 0x30000*8, 0x20000*8, 0x10000*8, 0x00000*8 },
-	{
-		16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,0, 1, 2, 3, 4, 5, 6, 7
-	},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8
+	{ STEP4(0,8) },
+	{ STEP8(8*4*16,1), STEP8(0,1) },
+	{ STEP16(0,8*4) },
+	16*16*4
 };
 
 static GFXDECODE_START( lemmings )
-	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  0, 16 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,  0, 16 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( nullptr,           0, charlayout,         0, 16 ) /* Dynamically modified */
+	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,  512, 16 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, sprite_layout,  768, 16 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( nullptr,0, charlayout,     0,   16 ) /* Dynamically modified */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -230,9 +223,8 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 	MCFG_CPU_ADD("audiocpu", M6809,32220000/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -247,8 +239,7 @@ MACHINE_CONFIG_START(lemmings_state::lemmings)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(XBGR)
 
-
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(1)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
@@ -294,17 +285,15 @@ ROM_START( lemmings )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "lemmings.15",    0x00000, 0x10000, CRC(f0b24a35) SHA1(1aaeb1e6faee04d2e433161fd7aa965b58e3b8a7) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
-	ROM_LOAD( "lemmings.9",  0x000000, 0x10000, CRC(e06442f5) SHA1(d9c8b681cce1d0257a0446bc820c7d679e2a1168) )
-	ROM_LOAD( "lemmings.10", 0x010000, 0x10000, CRC(36398848) SHA1(6c6956607f889c35367e6df4a32359042fad695e) )
-	ROM_LOAD( "lemmings.11", 0x020000, 0x10000, CRC(b46a54e5) SHA1(53b053346f80357aecff4ab888a8562f99cb318f) )
-	ROM_FILL(                0x030000, 0x10000, 0x00 ) /* 3bpp data but sprite chip expects 4 */
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_ERASE00 ) /* 3bpp data but sprite chip expects 4 */
+	ROM_LOAD32_BYTE( "lemmings.9",  0x000003, 0x10000, CRC(e06442f5) SHA1(d9c8b681cce1d0257a0446bc820c7d679e2a1168) )
+	ROM_LOAD32_BYTE( "lemmings.10", 0x000002, 0x10000, CRC(36398848) SHA1(6c6956607f889c35367e6df4a32359042fad695e) )
+	ROM_LOAD32_BYTE( "lemmings.11", 0x000001, 0x10000, CRC(b46a54e5) SHA1(53b053346f80357aecff4ab888a8562f99cb318f) )
 
-	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "lemmings.12", 0x000000, 0x10000, CRC(dc9047ff) SHA1(1bbe573fa51127a9e8b970a353f3cceab00f486a) )
-	ROM_LOAD( "lemmings.13", 0x010000, 0x10000, CRC(7cc15491) SHA1(73c1c11b2738f6679c70cae8ac4c55cdc9b8fc27) )
-	ROM_LOAD( "lemmings.14", 0x020000, 0x10000, CRC(c162788f) SHA1(e1f669efa59699cd1b7da71b112701ee79240c18) )
-	ROM_FILL(                0x030000, 0x10000, 0x00 ) /* 3bpp data but sprite chip expects 4 */
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_ERASE00 ) /* 3bpp data but sprite chip expects 4 */
+	ROM_LOAD32_BYTE( "lemmings.12", 0x000003, 0x10000, CRC(dc9047ff) SHA1(1bbe573fa51127a9e8b970a353f3cceab00f486a) )
+	ROM_LOAD32_BYTE( "lemmings.13", 0x000002, 0x10000, CRC(7cc15491) SHA1(73c1c11b2738f6679c70cae8ac4c55cdc9b8fc27) )
+	ROM_LOAD32_BYTE( "lemmings.14", 0x000001, 0x10000, CRC(c162788f) SHA1(e1f669efa59699cd1b7da71b112701ee79240c18) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "lemmings.16",    0x00000, 0x20000, CRC(f747847c) SHA1(00880fa6dff979e5d15daea61938bd18c768c92f) )

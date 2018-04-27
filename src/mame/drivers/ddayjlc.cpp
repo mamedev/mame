@@ -102,8 +102,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	DECLARE_PALETTE_INIT(ddayjlc);
 	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
-	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void ddayjlc(machine_config &config);
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
@@ -127,8 +126,8 @@ private:
 	int32_t    m_bgadr;
 
 	/* misc */
-	int32_t    m_sound_nmi_enable;
-	int32_t    m_main_nmi_enable;
+	bool       m_sound_nmi_enable;
+	bool       m_main_nmi_enable;
 	int32_t    m_e00x_l[4];
 	int32_t    m_e00x_d[4][2];
 	uint8_t    m_prot_addr;
@@ -313,12 +312,16 @@ WRITE8_MEMBER(ddayjlc_state::vram_w)
 
 WRITE8_MEMBER(ddayjlc_state::sound_nmi_w)
 {
-	m_sound_nmi_enable = data;
+	m_sound_nmi_enable = BIT(data, 0);
+	if (!m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(ddayjlc_state::main_nmi_w)
 {
-	m_main_nmi_enable = data;
+	m_main_nmi_enable = BIT(data, 0);
+	if (!m_main_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(ddayjlc_state::bg0_w)
@@ -446,7 +449,7 @@ static INPUT_PORTS_START( ddayjlc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddayjlc_state,prot_r, nullptr)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddayjlc_state,prot_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -517,16 +520,13 @@ static GFXDECODE_START( ddayjlc )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_interrupt)
+WRITE_LINE_MEMBER(ddayjlc_state::vblank_irq)
 {
-	if(m_main_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
+	if (state && m_main_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
-INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_snd_interrupt)
-{
-	if(m_sound_nmi_enable)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (state && m_sound_nmi_enable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -551,8 +551,8 @@ void ddayjlc_state::machine_reset()
 
 	m_char_bank = 0;
 	m_bgadr = 0;
-	m_sound_nmi_enable = 0;
-	m_main_nmi_enable = 0;
+	m_sound_nmi_enable = false;
+	m_main_nmi_enable = false;
 	m_prot_addr = 0;
 
 	for (i = 0; i < 4; i++)
@@ -601,11 +601,9 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddayjlc_state,  ddayjlc_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddayjlc_state,  ddayjlc_snd_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -617,6 +615,7 @@ MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ddayjlc_state, screen_update_ddayjlc)
 	MCFG_SCREEN_PALETTE("palette")
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ddayjlc_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ddayjlc)
 	MCFG_PALETTE_ADD("palette", 0x200+4)

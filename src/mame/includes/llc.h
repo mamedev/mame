@@ -30,6 +30,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
 		, m_p_chargen(*this, "chargen")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
@@ -68,6 +69,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<ram_device> m_ram;
 	required_region_ptr<u8> m_p_chargen;
+	output_finder<8> m_digits;
 };
 
 #endif // MAME_INCLUDES_LLC_H

@@ -1087,7 +1087,7 @@ READ8_MEMBER( snes_sound_device::spc_io_r )
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
-			// osd_printf_debug("SPC: rd %02x @ %d, %s\n", m_port_in[offset - 4], offset - 4, machine().describe_context());
+			// osd_printf_debug("%s SPC: rd %02x @ %d\n", machine().describe_context().c_str(), m_port_in[offset - 4], offset - 4);
 			return m_port_in[offset - 4];
 		case 0x8: //normal RAM, can be read even if the ram disabled flag ($f0 bit 1) is active
 		case 0x9:
@@ -1154,7 +1154,7 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
-			// osd_printf_debug("SPC: %02x to APU @ %d %s\n", data, offset & 3, machine().describe_context());
+			// osd_printf_debug("%s SPC: %02x to APU @ %d\n", machine().describe_context().c_str(), data, offset & 3);
 			m_port_out[offset - 4] = data;
 			// Unneeded, we already run at perfect_interleave
 			// machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));

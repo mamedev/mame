@@ -47,6 +47,7 @@ public:
 		, m_p_ram(*this, "ram")
 		, m_keyboard(*this, "X%u", 0)
 		, m_clock(*this, "uart_clock")
+		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
@@ -67,6 +68,8 @@ private:
 	optional_shared_ptr<uint8_t> m_p_ram;
 	required_ioport_array<4> m_keyboard;
 	required_device<clock_device> m_clock;
+	output_finder<8> m_digits;
+	virtual void machine_start() override;
 };
 
 void selz80_state::dagz80_mem(address_map &map)
@@ -193,7 +196,8 @@ WRITE8_MEMBER( selz80_state::scanlines_w )
 
 WRITE8_MEMBER( selz80_state::digit_w )
 {
-	output().set_digit_value(m_digit, bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4));
+	if (m_digit < 8)
+		m_digits[m_digit] = bitswap<8>(data, 3, 2, 1, 0, 7, 6, 5, 4);
 }
 
 READ8_MEMBER( selz80_state::kbd_r )
@@ -204,6 +208,11 @@ READ8_MEMBER( selz80_state::kbd_r )
 		data = m_keyboard[m_digit]->read();
 
 	return data;
+}
+
+void selz80_state::machine_start()
+{
+	m_digits.resolve();
 }
 
 MACHINE_CONFIG_START(selz80_state::selz80)

@@ -130,8 +130,6 @@ public:
 	DECLARE_READ8_MEMBER(bbcm_acccon_r);
 	DECLARE_WRITE8_MEMBER(bbcm_acccon_w);
 	DECLARE_WRITE8_MEMBER(page_selectbm_w);
-	DECLARE_READ8_MEMBER(bbc_memorybm2_r);
-	DECLARE_WRITE8_MEMBER(bbc_memorybm2_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorybm4_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorybm5_w);
 	DECLARE_WRITE8_MEMBER(bbc_memorybm7_w);
@@ -165,7 +163,6 @@ public:
 	DECLARE_MACHINE_START(cfa3000);
 
 	DECLARE_PALETTE_INIT(bbc);
-	INTERRUPT_GEN_MEMBER(bbcb_vsync);
 	INTERRUPT_GEN_MEMBER(bbcb_keyscan);
 	TIMER_CALLBACK_MEMBER(bbc_tape_timer_cb);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);

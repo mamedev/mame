@@ -250,18 +250,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::interrupt)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::gdfs_interrupt)
+WRITE_LINE_MEMBER(ssv_state::gdfs_adc_int_w)
 {
-	int scanline = param;
-
-	if ((scanline % 64) == 0)
+	if (state)
 	{
 		m_requested_int |= 1 << 6;  // reads lightgun (4 times for 4 axis)
-		update_irq_state();
-	}
-	else if(scanline == 240)
-	{
-		m_requested_int |= 1 << 3;  // vblank
 		update_irq_state();
 	}
 }
@@ -452,7 +445,7 @@ void ssv_state::drifto94_map(address_map &map)
 
 READ16_MEMBER(ssv_state::gdfs_eeprom_r)
 {
-	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ m_io_gun[m_gdfs_lightgun_select]->read()) | (m_eeprom->do_read() << 8);
+	return m_adc->data_r(space, 0) | (m_eeprom->do_read() << 8);
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
@@ -466,19 +459,17 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 //      data & 0x0001 ?
 
 		// latch the bit
-		m_eeprom->di_write((data & 0x4000) >> 14);
+		m_eeprom->di_write(BIT(data, 14));
 
 		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x1000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->cs_write(BIT(data, 12) ? ASSERT_LINE : CLEAR_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->clk_write(BIT(data, 13) ? ASSERT_LINE : CLEAR_LINE);
 
-		if (!(m_gdfs_eeprom_old & 0x0800) && (data & 0x0800))   // rising clock
-			m_gdfs_lightgun_select = (data & 0x0300) >> 8;
+		m_adc->address_w(space, 0, (data & 0x0700) >> 8);
+		m_adc->start_w(BIT(data, 11));
 	}
-
-	COMBINE_DATA(&m_gdfs_eeprom_old);
 }
 
 
@@ -513,10 +504,10 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 {
 	uint16_t input_sel = *m_input_sel;
 
-	if (input_sel & 0x0001) return m_io_key0->read();
-	if (input_sel & 0x0002) return m_io_key1->read();
-	if (input_sel & 0x0004) return m_io_key2->read();
-	if (input_sel & 0x0008) return m_io_key3->read();
+	if (input_sel & 0x0001) return m_io_key[0]->read();
+	if (input_sel & 0x0002) return m_io_key[1]->read();
+	if (input_sel & 0x0004) return m_io_key[2]->read();
+	if (input_sel & 0x0008) return m_io_key[3]->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",m_maincpu->pc(),input_sel);
 	return 0xffff;
 }
@@ -643,10 +634,10 @@ READ16_MEMBER(ssv_state::srmp4_input_r)
 {
 	uint16_t input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002) return m_io_key0->read();
-	if (input_sel & 0x0004) return m_io_key1->read();
-	if (input_sel & 0x0008) return m_io_key2->read();
-	if (input_sel & 0x0010) return m_io_key3->read();
+	if (input_sel & 0x0002) return m_io_key[0]->read();
+	if (input_sel & 0x0004) return m_io_key[1]->read();
+	if (input_sel & 0x0008) return m_io_key[2]->read();
+	if (input_sel & 0x0010) return m_io_key[3]->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",m_maincpu->pc(),input_sel);
 	return 0xffff;
 }
@@ -691,10 +682,10 @@ READ16_MEMBER(ssv_state::srmp7_input_r)
 {
 	uint16_t input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002) return m_io_key0->read();
-	if (input_sel & 0x0004) return m_io_key1->read();
-	if (input_sel & 0x0008) return m_io_key2->read();
-	if (input_sel & 0x0010) return m_io_key3->read();
+	if (input_sel & 0x0002) return m_io_key[0]->read();
+	if (input_sel & 0x0004) return m_io_key[1]->read();
+	if (input_sel & 0x0008) return m_io_key[2]->read();
+	if (input_sel & 0x0010) return m_io_key[3]->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",m_maincpu->pc(),input_sel);
 	return 0xffff;
 }
@@ -1344,13 +1335,13 @@ static INPUT_PORTS_START( gdfs )
 	PORT_DIPSETTING(      0x0000, "Heavy" )
 
 	PORT_START("GUNX1") // IN5 - $540000(0)
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_INVERT
 
 	PORT_START("GUNY1") // IN6 - $540000(1)
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
 	PORT_START("GUNX2") // IN7 - $540000(2)
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(2) PORT_INVERT
 
 	PORT_START("GUNY2") // IN8 - $540000(3)
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_PLAYER(2)
@@ -2519,30 +2510,9 @@ void ssv_state::init_eaglshot_banking()
 	membank("gfxrom")->configure_entries(0, 6+1, memregion("gfxdata")->base(), 0x200000);
 }
 
-// massages the data from the BPMicro-compatible dump to runnable form
-void ssv_state::init_st010()
-{
-	uint8_t *dspsrc = (uint8_t *)memregion("st010")->base();
-	uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
-	uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
-
-	// copy DSP program
-	for (int i = 0; i < 0x10000; i+= 4)
-	{
-		*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
-		dspprg++;
-	}
-
-	// copy DSP data
-	for (int i = 0; i < 0x1000; i+= 2)
-	{
-		*dspdata++ = dspsrc[0x10000+i]<<8 | dspsrc[0x10001+i];
-	}
-}
-
-DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init(0); init_st010();  }
-DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init(0); init_eaglshot_banking(); save_item(NAME(m_trackball_select)); }
-DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init(0); save_item(NAME(m_gdfs_lightgun_select)); save_item(NAME(m_gdfs_eeprom_old)); }
+DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init(0); }
+DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init(0); init_eaglshot_banking(); }
+DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,hypreact)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,hypreac2)     {    init(0); init_hypreac2_common();    }
 DRIVER_INIT_MEMBER(ssv_state,janjans1)     {    init(0); }
@@ -2554,13 +2524,13 @@ DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init(0);
 //  ((uint16_t *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init(0); }
-DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); init_st010(); }
+DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,survarts)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,dynagear)     {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,sxyreact)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
 DRIVER_INIT_MEMBER(ssv_state,cairblad)     {    init(0); init_hypreac2_common();    }
 DRIVER_INIT_MEMBER(ssv_state,sxyreac2)     {    init(0); init_hypreac2_common();  save_item(NAME(m_sxyreact_serial)); save_item(NAME(m_sxyreact_dial)); }
-DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init(1); init_st010();  }
+DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init(1); }
 DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init(1); }
 DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latches)); }
@@ -2634,10 +2604,15 @@ MACHINE_CONFIG_START(ssv_state::gdfs)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gdfs_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(ssv_state, gdfs_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("adc", ADC0809, 1000000) // unknown clock
+	MCFG_ADC0808_IN0_CB(IOPORT("GUNX1"))
+	MCFG_ADC0808_IN1_CB(IOPORT("GUNY1"))
+	MCFG_ADC0808_IN2_CB(IOPORT("GUNX2"))
+	MCFG_ADC0808_IN3_CB(IOPORT("GUNY2"))
+	MCFG_ADC0808_EOC_CB(WRITELINE(ssv_state, gdfs_adc_int_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -3151,9 +3126,11 @@ ROM_START( drifto94 )
 	ROM_LOAD16_BYTE( "vg003-18.u15", 0x000000, 0x200000, CRC(511b3e93) SHA1(09eda175c8f1b21c18645519cc6e89c6ca1fc5de) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 
@@ -4340,9 +4317,11 @@ ROM_START( stmblade )
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 ROM_START( stmbladej )
@@ -4369,9 +4348,11 @@ ROM_START( stmbladej )
 	ROM_LOAD16_BYTE( "sb-snd0.u22", 0x000000, 0x200000, CRC(4efd605b) SHA1(9c97be105c923c7db847d9b9aea37025edb685a0) )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 
@@ -4444,9 +4425,11 @@ ROM_START( twineag2 )
 	ROM_COPY( "ensoniq.1", 0x000000, 0x000000, 0x400000 )
 
 	ROM_REGION( 0x11000, "st010", 0)
-	ROM_LOAD( "st010.bin",    0x000000, 0x011000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_REGION( 0x10000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x1000, "dspdata", ROMREGION_ERASEFF)
+	ROM_LOAD( "st010.bin",    0x00000, 0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) ) // BPMicro-compatible dump
+	ROM_REGION32_BE( 0x10000, "dspprg", 0)
+	ROM_COPY( "st010", 0x00000, 0x00000, 0x10000 )
+	ROM_REGION16_BE( 0x01000, "dspdata", 0)
+	ROM_COPY( "st010", 0x10000, 0x00000, 0x01000 )
 ROM_END
 
 
@@ -4794,8 +4777,9 @@ GAME( 1994,  twineag2,  0,        twineag2, twineag2, ssv_state, twineag2, ROT27
 
 GAME( 1995,  gdfs,      0,        gdfs,     gdfs,     ssv_state, gdfs,     ROT0,   "Banpresto",          "Mobil Suit Gundam Final Shooting (Japan)",                               MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
-GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
+// Ultra X Weapon: "developed by Seta" in ending screen
+GAME( 1995,  ultrax,    0,        ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai",                        MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-01-30 13:27:15 on startup
+GAME( 1995,  ultraxg,   ultrax,   ultrax,   ultrax,   ssv_state, ultrax,   ROT270, "Banpresto / Tsuburaya Productions / Seta", "Ultra X Weapons / Ultra Keibitai (GAMEST review build)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 95-02-16 15:30:24 on startup (newer, but could have pause functionality due to being a review build so left as clone)
 
 GAME( 1996,  janjans1,  0,        janjans1, janjans1, ssv_state, janjans1, ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho (Japan)",                           MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 

@@ -142,7 +142,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_toaplan1);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_samesame);
-	INTERRUPT_GEN_MEMBER(toaplan1_interrupt);
+	void toaplan1_interrupt();
 
 	void demonwld_restore_dsp();
 	void toaplan1_create_tilemaps();

@@ -1333,8 +1333,7 @@ WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 
 				dump_chain(space, m_hpc3.m_scsi0_desc);
 
-				printf("PC is %08x\n", machine.device("maincpu")->safe_pc());
-				printf("DMA to device: length %x xie %d eox %d\n", length, xie, eox);
+				printf("%s DMA to device: length %x xie %d eox %d\n", machine().describe_context().c_str(), length, xie, eox);
 
 				if (length <= 0x4000)
 				{

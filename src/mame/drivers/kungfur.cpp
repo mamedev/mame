@@ -72,15 +72,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_adpcm1(*this, "adpcm1"),
-		m_adpcm2(*this, "adpcm2")
+		m_adpcm2(*this, "adpcm2"),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	uint8_t m_latch[3];
-	uint8_t m_control;
-
-	uint32_t m_adpcm_pos[2];
-	uint8_t m_adpcm_data[2];
-	uint8_t m_adpcm_sel[2];
 	DECLARE_WRITE8_MEMBER(kungfur_output_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
@@ -88,16 +83,24 @@ public:
 	DECLARE_WRITE8_MEMBER(kungfur_control_w);
 	DECLARE_WRITE8_MEMBER(kungfur_adpcm1_w);
 	DECLARE_WRITE8_MEMBER(kungfur_adpcm2_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(kungfur_irq);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);
+	void kungfur(machine_config &config);
+	void kungfur_map(address_map &map);
+
+private:
+	uint8_t m_latch[3];
+	uint8_t m_control;
+	uint32_t m_adpcm_pos[2];
+	uint8_t m_adpcm_data[2];
+	uint8_t m_adpcm_sel[2];
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm1;
 	required_device<msm5205_device> m_adpcm2;
-	void kungfur(machine_config &config);
-	void kungfur_map(address_map &map);
+	output_finder<14> m_digits;
 };
 
 
@@ -117,30 +120,30 @@ INTERRUPT_GEN_MEMBER(kungfur_state::kungfur_irq)
 WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 {
 	// d0-d2: output led7seg
-	static const int lut_digits[24] =
+	static const u8 lut_digits[24] =
 	{
 		0, 2, 4, 6, 9, 12,14,0,
 		0, 1, 3, 5, 8, 11,13,0,
 		0, 0, 0, 0, 7, 10,0, 0
 	};
-	for (int i = 0; i < 3; i++)
+	for (u8 i = 0; i < 3; i++)
 	{
-		int offs = i << 3 | (data & 7);
+		u8 offs = i << 3 | (data & 7);
 		if (lut_digits[offs])
-			output().set_digit_value(lut_digits[offs] - 1, m_latch[i]);
+			m_digits[lut_digits[offs] - 1] = m_latch[i];
 	}
 
 	// 2.6 goes to level lamps
 	if ((data & 7) == 6)
 	{
-		for (int i = 0; i < 5; i++)
-			output().set_lamp_value(i, m_latch[2] >> i & 1);
+		for (u8 i = 0; i < 5; i++)
+			output().set_lamp_value(i, BIT(m_latch[2], i));
 	}
 
 	// d7: game-over lamp, d3-d4: marquee lamps
-	output().set_lamp_value(5, data >> 7 & 1);
-	output().set_lamp_value(6, data >> 3 & 1);
-	output().set_lamp_value(7, data >> 4 & 1);
+	output().set_lamp_value(5, BIT(data, 7));
+	output().set_lamp_value(6, BIT(data, 3));
+	output().set_lamp_value(7, BIT(data, 4));
 
 	// d5: N/C?
 	// d6: coincounter
@@ -274,6 +277,8 @@ INPUT_PORTS_END
 
 void kungfur_state::machine_start()
 {
+	m_digits.resolve();
+
 	save_item(NAME(m_control));
 	save_item(NAME(m_latch));
 
