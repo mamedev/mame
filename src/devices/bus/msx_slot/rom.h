@@ -33,6 +33,6 @@ private:
 	const uint8_t *m_rom;
 };
 
-extern const device_type MSX_SLOT_ROM;
+DECLARE_DEVICE_TYPE(MSX_SLOT_ROM, msx_slot_rom_device)
 
 #endif // MAME_BUS_MSX_SLOT_ROM_H

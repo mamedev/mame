@@ -711,7 +711,7 @@ private:
 // ======================> tilemap_device
 
 // device type definition
-extern const device_type TILEMAP;
+DECLARE_DEVICE_TYPE(TILEMAP, tilemap_device)
 
 class tilemap_device :  public device_t,
 						public tilemap_t

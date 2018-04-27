@@ -106,7 +106,7 @@ machine_config::~machine_config()
 
 device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, u32 clock)
 {
-	const char *orig_tag = tag;
+	char const *const orig_tag = tag;
 
 	// if the device path is absolute, start from the root
 	if (tag[0] == ':')
@@ -122,13 +122,13 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 		assert(next != tag);
 		std::string part(tag, next-tag);
 		owner = owner->subdevices().find(part);
-		if (owner == nullptr)
+		if (!owner)
 			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part.c_str(), orig_tag);
 		tag = next+1;
 	}
 	assert(tag[0] != '\0');
 
-	if (owner != nullptr)
+	if (!owner)
 	{
 		// allocate the new device and append it to the owner's list
 		device_t *const device = &owner->subdevices().m_list.append(*type(*this, tag, owner, clock).release());
@@ -146,13 +146,6 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 		m_root_device->add_machine_configuration(*this);
 		return m_root_device.get();
 	}
-}
-
-device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, const XTAL &clock)
-{
-	std::string msg = std::string("Instantiating device ") + tag;
-	clock.validate(msg);
-	return device_add(owner, tag, type, clock.value());
 }
 
 

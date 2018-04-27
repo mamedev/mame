@@ -33,14 +33,14 @@
 #include "emu.h"
 #include "coco_ssc.h"
 
+#include "cpu/tms7000/tms7000.h"
+#include "machine/netlist.h"
+#include "machine/ram.h"
+#include "netlist/devices/net_lib.h"
 #include "sound/ay8910.h"
 #include "sound/sp0256.h"
-#include "machine/netlist.h"
-#include "netlist/devices/net_lib.h"
-#include "cpu/tms7000/tms7000.h"
+
 #include "speaker.h"
-#include "cococart.h"
-#include "machine/ram.h"
 
 #define LOG_SSC 0
 #define PIC_TAG "pic7040"
@@ -72,8 +72,8 @@ namespace
 	// ======================> coco_ssc_device
 
 	class coco_ssc_device :
-		public device_t,
-		public device_cococart_interface
+			public device_t,
+			public device_cococart_interface
 	{
 	public:
 		// construction/destruction
@@ -144,8 +144,10 @@ namespace
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(COCO_SSC, coco_ssc_device, "coco_ssc", "CoCo S/SC PAK");
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_SSC, device_cococart_interface, coco_ssc_device, "coco_ssc", "CoCo S/SC PAK");
 DEFINE_DEVICE_TYPE(COCOSSC_SAC, cocossc_sac_device, "cocossc_sac", "CoCo SSC Sound Activity Circuit");
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
 
 
 //**************************************************************************

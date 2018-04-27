@@ -11,7 +11,7 @@
 #include "formats/asst128_dsk.h"
 
 
-extern const device_type ASST128_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device)
 
 class asst128_mb_device : public ibm5150_mb_device
 {

@@ -9,7 +9,7 @@
 #include "machine/nvram.h"
 
 
-extern const device_type MSX_SLOT_SONY08;
+DECLARE_DEVICE_TYPE(MSX_SLOT_SONY08, msx_slot_sony08_device)
 
 
 #define MCFG_MSX_SLOT_SONY08_ADD(_tag, _startpage, _numpages, _region, _offset) \

@@ -25,9 +25,9 @@ namespace {
 
 struct device_registrations
 {
-	device_type_impl *first = nullptr;
-	device_type_impl *last = nullptr;
-	device_type_impl *unsorted = nullptr;
+	device_type_impl_base *first = nullptr;
+	device_type_impl_base *last = nullptr;
+	device_type_impl_base *unsorted = nullptr;
 };
 
 device_registrations &device_registration_data()
@@ -53,7 +53,7 @@ device_registrar::const_iterator device_registrar::cend() const
 }
 
 
-device_type_impl *device_registrar::register_device(device_type_impl &type)
+device_type_impl_base *device_registrar::register_device(device_type_impl_base &type)
 {
 	device_registrations &data(device_registration_data());
 

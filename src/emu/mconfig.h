@@ -68,7 +68,12 @@ public:
 
 	// helpers during configuration; not for general use
 	device_t *device_add(device_t *owner, const char *tag, device_type type, u32 clock);
-	device_t *device_add(device_t *owner, const char *tag, device_type type, const XTAL &xtal);
+	template <typename... Params>
+	device_t *device_add(device_t *owner, const char *tag, device_type type, const XTAL &clock, Params &&... args)
+	{
+		clock.validate(std::string("Instantiating device ") + tag);
+		return device_add(owner, tag, type, clock.value(), std::forward<Params>(args)...);
+	}
 	device_t *device_replace(device_t *owner, const char *tag, device_type type, u32 clock);
 	device_t *device_replace(device_t *owner, const char *tag, device_type type, const XTAL &xtal);
 	device_t *device_remove(device_t *owner, const char *tag);
@@ -83,6 +88,17 @@ private:
 	emu_options &           m_options;
 	std::unique_ptr<device_t>  m_root_device;
 };
+
+
+namespace emu { namespace detail {
+
+template <class DeviceClass> template <typename... Params>
+DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &config, device_t *owner, char const *tag, Params &&... args) const
+{
+	return dynamic_cast<DeviceClass &>(*config.device_add(owner, tag, *this, std::forward<Params>(args)...));
+}
+
+} } // namespace emu::detail
 
 
 //*************************************************************************/

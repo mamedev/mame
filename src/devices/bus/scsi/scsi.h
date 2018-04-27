@@ -217,7 +217,7 @@ private:
 	int m_data7_out;
 };
 
-extern const device_type SCSI_PORT;
+DECLARE_DEVICE_TYPE(SCSI_PORT, scsi_port_device)
 
 class scsi_port_interface;
 
