@@ -21,7 +21,7 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable?"
-msgstr "현재 이용불가능한 %1$u 장치들에 대해 ROM 검사를 실시합니까?"
+msgstr "현재 이용할 수 없는 %1$u 장치들에 대해 ROM 검사를 실시합니까?"
 
 #: src/frontend/mame/ui/auditmenu.cpp:99
 #, c-format
@@ -612,7 +612,7 @@ msgstr "사운드 설정"
 
 #: src/frontend/mame/ui/optsmenu.cpp:213
 msgid "General Inputs"
-msgstr "일반 입력장비 설정"
+msgstr "일반 입력 설정"
 
 #: src/frontend/mame/ui/optsmenu.cpp:216
 msgid "Save Configuration"
@@ -754,7 +754,7 @@ msgstr ""
 #: src/frontend/mame/ui/simpleselgame.cpp:271
 #: src/frontend/mame/ui/selgame.cpp:436
 msgid "Configure Options"
-msgstr "옵션 조절"
+msgstr "옵션 환경설정"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:292
 #, c-format
@@ -936,6 +936,7 @@ msgstr "XML 형식으로 명단 보내기 (-listxml)"
 #: src/frontend/mame/ui/miscmenu.cpp:656
 msgid "Export list in XML format (like -listxml, but exclude devices)"
 msgstr "XML 형식으로 명단 보내기 (-listxml, 장치 제외)"
+
 
 #: src/frontend/mame/ui/miscmenu.cpp:657
 msgid "Export list in TXT format (like -listfull)"
@@ -1712,7 +1713,7 @@ msgstr "종합\t보호처리 에뮬레이션 미완\n"
 
 #: src/frontend/mame/ui/selgame.cpp:869
 msgid "Overall\tWorking\n"
-msgstr "종합\t작동 \n"
+msgstr "종합\t작동\n"
 
 #: src/frontend/mame/ui/selgame.cpp:872
 msgid "Graphics\tUnimplemented\n"
@@ -1880,11 +1881,11 @@ msgstr "저장 지원\t아니오\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Screen Orientation\tVertical\n"
-msgstr "화면 방향\t가로형\n"
+msgstr "화면 방향\t세로형\n"
 
 #: src/frontend/mame/ui/selgame.cpp:947
 msgid "Screen Orientation\tHorizontal\n"
-msgstr "화면 방향\t세로형\n"
+msgstr "화면 방향\t가로형\n"
 
 #: src/frontend/mame/ui/selgame.cpp:957
 msgid "Requires CHD\tYes\n"
@@ -1975,7 +1976,7 @@ msgstr "외부 샘플 이용"
 
 #: src/frontend/mame/ui/utils.cpp:57 src/frontend/mame/ui/utils.cpp:81
 msgid "Unfiltered"
-msgstr "필터 없음"
+msgstr "필터 미사용"
 
 #: src/frontend/mame/ui/utils.cpp:58 src/frontend/mame/ui/utils.cpp:82
 msgid "Available"
@@ -2055,7 +2056,7 @@ msgstr "가로 화면"
 
 #: src/frontend/mame/ui/utils.cpp:78 src/frontend/mame/ui/utils.cpp:94
 msgid "Custom Filter"
-msgstr "임의 필터"
+msgstr "사용자 제작 필터"
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgid "Publisher"
@@ -2091,7 +2092,7 @@ msgstr "<필터 결정>"
 
 #: src/frontend/mame/ui/utils.cpp:352
 msgid "Select custom filters:"
-msgstr "임의 필터 선택:"
+msgstr "사용자 제작 필터 선택:"
 
 #: src/frontend/mame/ui/utils.cpp:503
 #, c-format
@@ -2189,7 +2190,7 @@ msgstr "이 이미지를 읽고 diff에 씁니다"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:117
 msgid "Cannot save over directory"
-msgstr "다른 경로에 저장할 수 없습니다"
+msgstr "경로에 저장할 수 없습니다"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:150
 msgid ""
@@ -2274,7 +2275,7 @@ msgstr "**ScrLock 키로 전환**"
 
 #: src/frontend/mame/ui/ui.cpp:1096
 msgid "Mode: FULL Emulation"
-msgstr "모드: 전체적 에뮬레이션"
+msgstr "모드: 전체 에뮬레이션"
 
 #: src/frontend/mame/ui/ui.cpp:1097
 msgid "UI:   Disabled"
@@ -2713,27 +2714,27 @@ msgstr "좌와 우가 같지 않음, 값은 차이"
 
 #: plugins/cheatfind/init.lua:569
 msgid "Left equal to right with bitmask"
-msgstr "좌와 우의 비트마스크값이 서로 일치"
+msgstr "좌와 우의 비트마스크값이 일치"
 
 #: plugins/cheatfind/init.lua:571
 msgid "Left not equal to right with bitmask"
-msgstr "좌와 우의 비트마스크값이 서로 일치하지 않음"
+msgstr "좌와 우의 비트마스크값이 일치하지 않음"
 
 #: plugins/cheatfind/init.lua:573
 msgid "Left less than value"
-msgstr "좌가 특정값보다 작음"
+msgstr "좌가 이 값보다 작음"
 
 #: plugins/cheatfind/init.lua:575
 msgid "Left greater than value"
-msgstr "좌가 특정값보다 큼"
+msgstr "좌가 이 값보다 큼"
 
 #: plugins/cheatfind/init.lua:577
 msgid "Left equal to value"
-msgstr "좌가 특정값과 같음"
+msgstr "좌가 이 값과 같음"
 
 #: plugins/cheatfind/init.lua:579
 msgid "Left not equal to value"
-msgstr "좌가 특정값과 같지 않음"
+msgstr "좌가 이 값과 같지 않음"
 
 #: plugins/cheatfind/init.lua:590
 msgid "Right operand"
@@ -2790,11 +2791,11 @@ msgstr "쪽"
 
 #: plugins/cheatfind/init.lua:806
 msgid "Clear Watches"
-msgstr "주시 목록 지우기"
+msgstr "주시 항목 지우기"
 
 #: plugins/cheatfind/init.lua:816
 msgid "Cheat Finder"
-msgstr "치트 검색기"
+msgstr "치트 탐색기"
 
 #: plugins/portname/init.lua:67
 msgid "Save input names to file"
