@@ -466,10 +466,7 @@ public:
 	DECLARE_DRIVER_INIT( cmi2x );
 
 	// CPU card
-	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq0 );
-	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq1 );
-	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq2 );
-	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq3 );
+	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq );
 	DECLARE_WRITE8_MEMBER( i8214_cpu1_w );
 	DECLARE_WRITE8_MEMBER( i8214_cpu2_w );
 	DECLARE_WRITE_LINE_MEMBER( i8214_1_int_w );
@@ -483,7 +480,7 @@ public:
 	DECLARE_WRITE8_MEMBER( q133_1_porta_w );
 	DECLARE_WRITE8_MEMBER( q133_1_portb_w );
 
-	INTERRUPT_GEN_MEMBER( cmi_iix_vblank );
+	DECLARE_WRITE_LINE_MEMBER( cmi_iix_vblank );
 	IRQ_CALLBACK_MEMBER( cpu1_interrupt_callback );
 	IRQ_CALLBACK_MEMBER( cpu2_interrupt_callback );
 
@@ -534,8 +531,6 @@ public:
 	// Alphanumeric keyboard
 	DECLARE_READ8_MEMBER( ank_col_r );
 	DECLARE_READ_LINE_MEMBER( ank_rts_r );
-	DECLARE_WRITE_LINE_MEMBER( ank_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( ank_irqb_w );
 
 	// ???
 	DECLARE_READ8_MEMBER( cmi07_r );
@@ -659,7 +654,6 @@ private:
 
 	// Q133 CPU Card
 	uint8_t *m_q133_rom;
-	uint8_t m_q133_acia_irq;
 
 	uint8_t   m_hp_int;
 	std::unique_ptr<uint8_t[]>    m_shared_ram;
@@ -703,10 +697,6 @@ private:
 	uint8_t   m_msm5832_addr;
 	int     m_mkbd_kbd_acia_irq;
 	int     m_mkbd_cmi_acia_irq;
-
-	// Alphanumeric keyboard
-	int     m_ank_irqa;
-	int     m_ank_irqb;
 
 	// Master card (CMI-02)
 	int     m_cmi02_ptm_irq;
@@ -1457,28 +1447,9 @@ READ8_MEMBER( cmi_state::cmi07_r )
 	return 0xff;
 }
 
-WRITE_LINE_MEMBER( cmi_state::q133_acia_irq0 )
+WRITE_LINE_MEMBER( cmi_state::q133_acia_irq )
 {
-	m_q133_acia_irq = (m_q133_acia_irq & ~1) | state;
-	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, m_q133_acia_irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER( cmi_state::q133_acia_irq1 )
-{
-	m_q133_acia_irq = (m_q133_acia_irq & ~2) | (state << 1);
-	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, m_q133_acia_irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER( cmi_state::q133_acia_irq2 )
-{
-	m_q133_acia_irq = (m_q133_acia_irq & ~4) | (state << 2);
-	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, m_q133_acia_irq ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER( cmi_state::q133_acia_irq3 )
-{
-	m_q133_acia_irq = (m_q133_acia_irq & ~8) | (state << 3);
-	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, m_q133_acia_irq ? ASSERT_LINE : CLEAR_LINE);
+	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER( cmi_state::ank_col_r )
@@ -2216,26 +2187,6 @@ WRITE8_MEMBER( cmi_state::shared_ram_w )
 	m_shared_ram[offset] = data;
 }
 
-WRITE_LINE_MEMBER( cmi_state::ank_irqa_w )
-{
-	m_ank_irqa = state;
-
-	if (m_ank_irqa)
-		m_alphakeyscpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
-	else if(!m_ank_irqb)
-		m_alphakeyscpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER( cmi_state::ank_irqb_w )
-{
-	m_ank_irqb = state;
-
-	if (m_ank_irqb)
-		m_alphakeyscpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
-	else if(!m_ank_irqa)
-		m_alphakeyscpu->set_input_line(M6802_IRQ_LINE, CLEAR_LINE);
-}
-
 READ_LINE_MEMBER( cmi_state::ank_rts_r )
 {
 //  printf("ANK RTS?\n");
@@ -2687,9 +2638,6 @@ void cmi_state::machine_reset()
 	m_cmi10_scnd_timer->adjust(attotime::from_hz(4000000 / 4 / 2048 / 2), 0, attotime::from_hz(4000000 / 4 / 2048 / 2));
 	m_scnd = 0;
 
-	m_ank_irqa = 0;
-	m_ank_irqb = 0;
-	m_q133_acia_irq = 0;
 	m_cmi02_ptm_irq = 0;
 	m_m6809_bs_hack_cnt = 0;
 	m_m6809_bs_hack_cpu = 0;
@@ -2733,14 +2681,17 @@ void cmi_state::machine_start()
 	m_msm5832->cs_w(1);
 }
 
-INTERRUPT_GEN_MEMBER( cmi_state::cmi_iix_vblank )
+WRITE_LINE_MEMBER( cmi_state::cmi_iix_vblank )
 {
-	/* VSYNC */
-	m_q219_pia->cb2_w(1);
-	m_q219_pia->cb2_w(0);
+	if (state)
+	{
+		/* VSYNC */
+		m_q219_pia->cb2_w(1);
+		m_q219_pia->cb2_w(0);
 
-	/* LPSTB */
-	m_q219_pia->cb1_w(0);
+		/* LPSTB */
+		m_q219_pia->cb1_w(0);
+	}
 }
 
 static SLOT_INTERFACE_START( cmi2x_floppies )
@@ -2751,7 +2702,6 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_CPU_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(maincpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmi_state, cmi_iix_vblank)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu1_interrupt_callback)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu1")
 
@@ -2785,6 +2735,8 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START)
 	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cmi_state, cmi_iix_vblank))
+
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MSM5832_ADD("msm5832", XTAL(32'768))
@@ -2831,19 +2783,22 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 
 	MCFG_DEVICE_ADD("q133_acia_0", MOS6551, XTAL(1'843'200))
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq0))
+	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("q133_acia_irq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("q133_acia_1", MOS6551, XTAL(1'843'200))
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq1))
+	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("q133_acia_irq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("q133_acia_2", MOS6551, XTAL(1'843'200))
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq2))
+	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("q133_acia_irq", input_merger_device, in_w<2>))
 
 	MCFG_DEVICE_ADD("q133_acia_3", MOS6551, XTAL(1'843'200))
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq3))
+	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("q133_acia_irq", input_merger_device, in_w<3>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("q133_acia_irq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(cmi_state, q133_acia_irq))
 
 	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, XTAL(1'843'200) / 12) // acia_mkbd_kbd
 	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, XTAL(1'843'200) / 12) // acia_mkbd_cmi
@@ -2871,8 +2826,8 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_PIA_READCB1_HANDLER(READLINE(cmi_state, ank_rts_r))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("acia_mkbd_kbd", acia6850_device, write_cts))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("acia_mkbd_kbd", acia6850_device, write_rxd))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi_state, ank_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi_state, ank_irqb_w))
+	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
+	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("ank_pia_clock", CLOCK, 9600)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, ca1_w))
