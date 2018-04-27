@@ -13,7 +13,7 @@ SMSC FDC37C93x Plug and Play Compatible Ultra I/O Controller
 #include "machine/ds128x.h"
 #include "machine/fdc37c93x.h"
 
-DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "FDC37C93X", "SMSC FDC37C93X")
+DEFINE_DEVICE_TYPE(FDC37C93X, fdc37c93x_device, "fdc37c93x", "SMSC FDC37C93X")
 
 fdc37c93x_device::fdc37c93x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FDC37C93X, tag, owner, clock)
