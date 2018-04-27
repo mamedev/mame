@@ -1110,6 +1110,37 @@ ROM_START( am_mg4v )
 ROM_END
 
 
+//******** MG V ********
+
+/* 
+  Multi Game 5.
+  PCB: AMA 8000-2
+  Program: AMGHU_V83.65
+
+  ROMs:
+  OMH (program): 27C020.
+  MG5 ZG1: 27C4001.
+  MG5 ZG2: 27C4001.
+  MG5 ZG3: 27C4000DC.
+  1BFF: AM27C1024.
+
+*/
+ROM_START( am_mg5hu )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "mainprg", 0 ) /* encrypted program ROM...*/
+	ROM_LOAD( "omh.bin", 0x00000, 0x40000, CRC(e68522df) SHA1(b53ef40ee65df855b4dc843119a2337fa0a39d6e) )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )
+	ROM_LOAD( "mg5_zg1.bin", 0x100000, 0x80000, CRC(e3c0e0a5) SHA1(9c672f49bf10dd96f9dc6eb9ca58aaba93576764) )
+	ROM_LOAD( "mg5_zg2.bin", 0x080000, 0x80000, CRC(76bbce77) SHA1(cc11efb151e749040ca69c4e91e7adaa992577ce) )
+	ROM_LOAD( "mg5_zg3.bin", 0x000000, 0x80000, CRC(2a78f9b5) SHA1(eb46c2da70a0aba4d1f93b99f39a2d3d594cb758) )
+
+	ROM_REGION( 0x20000, "proms", 0 )
+	ROM_LOAD( "1bff.bin", 0x00000, 0x20000, CRC(99d1750e) SHA1(22d000e358ed236a42d927d0b3e01d8c6e5c31d9) )
+ROM_END
+
+
 /************************************
 *       Driver Initialization       *
 ************************************/
@@ -1180,3 +1211,4 @@ GAME(  2000, am_mg34i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, ama8000_3_
 GAME(  2000, am_mg33i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg31i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game III (S.Ita 3.1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2000, am_mg4v,  0,        amaticmg4, amaticmg, amaticmg_state, ama8000_2_v, ROT0,  "Amatic Trading GmbH", "Multi Game IV (V.Ger 3.44)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  200?, am_mg5hu, 0,        amaticmg4, amaticmg, amaticmg_state, 0,           ROT0,  "Amatic Trading GmbH", "Multi Game V (AMGHU_V83.65)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )  // needs decryption.
