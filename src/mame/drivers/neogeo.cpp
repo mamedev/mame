@@ -2397,8 +2397,8 @@ CONS( 1990, neogeo,   0,       0,      mv6f,    neogeo_mvs6,  mvs_led_el_state, 
 CONS( 1990, ng_mv4f,  neogeo,  0,      mv4f,    neogeo_mvs,   mvs_led_el_state,  0,    "SNK", "Neo-Geo MV-4F",   MACHINE_SUPPORTS_SAVE )
 CONS( 1990, ng_mv2f,  neogeo,  0,      mv2f,    neogeo_mvs,   mvs_led_el_state,  0,    "SNK", "Neo-Geo MV-2F",   MACHINE_SUPPORTS_SAVE )
 CONS( 1990, ng_mv1,   neogeo,  0,      mv1,     neogeo,       mvs_led_state,     0,    "SNK", "Neo-Geo MV-1",    MACHINE_SUPPORTS_SAVE )
-CONS( 1990, ng_mv1f,  neogeo,  0,      mv1f,    neogeo,       mvs_led_state,     0,    "SNK", "Neo-Geo MV-1F",   MACHINE_SUPPORTS_SAVE )
-CONS( 1990, ng_mv1fz, neogeo,  0,      mv1fz,   neogeo,       mvs_state,         0,    "SNK", "Neo-Geo MV-1FZ",  MACHINE_SUPPORTS_SAVE )
+CONS( 1990, ng_mv1f,  ng_mv1,  0,      mv1f,    neogeo,       mvs_led_state,     0,    "SNK", "Neo-Geo MV-1F",   MACHINE_SUPPORTS_SAVE )
+CONS( 1990, ng_mv1fz, ng_mv1,  0,      mv1fz,   neogeo,       mvs_state,         0,    "SNK", "Neo-Geo MV-1FZ",  MACHINE_SUPPORTS_SAVE )
 CONS( 1990, aes,      0,       0,      aes,     aes,          aes_state,         0,    "SNK", "Neo-Geo AES",     MACHINE_SUPPORTS_SAVE )
 
 
