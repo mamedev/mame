@@ -878,9 +878,9 @@ CUSTOM_INPUT_MEMBER(ngarcade_base_state::startsel_edge_joy_r)
 {
 	uint32_t ret = m_edge->read_start_sel() | ~0x05;
 	if (m_ctrl1)
-		ret &= (m_ctrl1->read_start_sel() << 0) | ~0x01;
+		ret &= (m_ctrl1->read_start_sel() << 0) | ~0x03;
 	if (m_ctrl2)
-		ret &= (m_ctrl2->read_start_sel() << 0) | ~0x04;
+		ret &= (m_ctrl2->read_start_sel() << 2) | ~0x0c;
 	return ret;
 }
 
@@ -1808,8 +1808,8 @@ INPUT_PORTS_START( neogeo )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0aff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0500, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ngarcade_base_state, startsel_edge_joy_r, nullptr)
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ngarcade_base_state, startsel_edge_joy_r, nullptr)
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_base_state, get_memcard_status, nullptr)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hardware type (AES=0, MVS=1). Some games check this and show a piracy warning screen if the hardware and BIOS don't match
 
@@ -1834,6 +1834,7 @@ static INPUT_PORTS_START( neogeo_mvs )
 	PORT_INCLUDE( neogeo )
 
 	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x0500, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ngarcade_base_state, startsel_edge_joy_r, nullptr)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_4)
 
@@ -2665,15 +2666,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mvs_led_state::neogeo_mj)
 	mv1_fixed(config);
+	set_default_bios_tag("japan");
 
 	//no joystick panel
 	MCFG_DEVICE_REMOVE("edge")
-	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "", true)
+	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge, "", false)
 
 	//P1 mahjong controller
 	MCFG_DEVICE_REMOVE("ctrl1")
 	MCFG_DEVICE_REMOVE("ctrl2")
-	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "mahjong", true)
+	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl1", neogeo_arc_pin15, "mahjong", false)
 	MCFG_NEOGEO_CONTROL_PORT_ADD("ctrl2", neogeo_arc_pin15, "", true)
 
 	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
@@ -11413,7 +11415,7 @@ GAME( 1990, nam1975,    neogeo,   neobase,   neogeo,    mvs_led_state,  0,    RO
 GAME( 1990, bstars,     neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Baseball Stars Professional (NGM-002)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bstarsh,    bstars,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Baseball Stars Professional (NGH-002)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, tpgolf,     neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Top Player's Golf (NGM-003 ~ NGH-003)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mahretsu,   neogeo,   neogeo_mj, neogeo_mj, mvs_led_state,  0,    ROT0, "SNK", "Mahjong Kyo Retsuden (NGM-004 ~ NGH-004)", MACHINE_SUPPORTS_SAVE ) // does not support mahjong panel in MVS mode <- it actually works fine???
+GAME( 1990, mahretsu,   neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Mahjong Kyo Retsuden (NGM-004 ~ NGH-004)", MACHINE_SUPPORTS_SAVE ) // does not support mahjong panel in MVS mode <- it actually works fine???
 GAME( 1990, ridhero,    neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Riding Hero (NGM-006 ~ NGH-006)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ridheroh,   ridhero,  neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Riding Hero (set 2)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, alpham2,    neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Alpha Mission II / ASO II - Last Guardian (NGM-007 ~ NGH-007)", MACHINE_SUPPORTS_SAVE )
