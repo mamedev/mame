@@ -36,7 +36,7 @@
     Confirmed non-bugs:
 
         * Bad zooming in the Kof2003 bootlegs - this is what happens
-          if you try and use the normal bios with a pcb set, it
+          if you try and use the normal bios with a PCB set, it
           looks like the bootleggers didn't care.
         * Glitches at the edges of the screen - the real hardware
           can display 320x224 but most of the games seem designed
@@ -48,12 +48,12 @@
 *****************************************************************************
 
     The Neo-Geo Multi Video System (MVS), is an arcade system board, being
-    the first product in the Neo-Geo family, designed by Alpha Denshi(ADK)
-    and released in 1990 by SNK. It was known to the coin-op industry, and
+    the first product in the Neo-Geo family, designed by Alpha Denshi (ADK)
+    and released in 1990 by SNK.  It was known to the coin-op industry, and
     offered arcade operators the ability to put up to 6 different arcade
     titles into a single cabinet, a key economic consideration for operators
     with limited floorspace (games for the Neo-Geo are cartridge based and are
-    easily exchangeable). It comes in many different cabinets but basically
+    easily exchangeable).  It comes in many different cabinets but basically
     consists of an add on board that can be linked to a standard Jamma system.
     The system was discontinued in 2004.
     Source (modified): http://en.wikipedia.org/wiki/Neo_Geo
@@ -411,8 +411,8 @@
          VCC = 30A | 30B = VCC            VCC = 30A | 30B = VCC
          VCC = 31A | 31B = VCC            VCC = 31A | 31B = VCC
          VCC = 32A | 32B = VCC            VCC = 32A | 32B = VCC
-        CR20 = 33A | 33B = CR21      PORTADRS = 33A | 33B = 4MB
-        CR22 = 34A | 34B = CR23            NC = 34A | 34B = ROMOE
+        CR20 = 33A | 33B = CR21      PORTADRS = 33A | 33B = ROMOE
+        CR22 = 34A | 34B = CR23            NC = 34A | 34B = 4MB
         CR24 = 35A | 35B = CR25            NC = 35A | 35B = RESET
         CR26 = 36A | 36B = CR27            NC = 36A | 36B = NC
         CR28 = 37A | 37B = CR29            NC = 37A | 37B = NC
@@ -420,21 +420,21 @@
           NC = 39A | 39B = FIX00           NC = 39A | 39B = NC
           NC = 40A | 40B = FIX01           NC = 40A | 40B = NC
           NC = 41A | 41B = FIX02           NC = 41A | 41B = SDPAD0
-     SYSTEMB = 42A | 42B = FIX03      SYSTEMB = 42A | 42B = SDPAD1
+      SLOTCS = 42A | 42B = FIX03       SLOTCS = 42A | 42B = SDPAD1
         SDA0 = 43A | 43B = FIX04        SDPA8 = 43A | 43B = SDPAD2
         SDA1 = 44A | 44B = FIX05        SDPA9 = 44A | 44B = SDPAD3
         SDA2 = 45A | 45B = FIX06       SDPA10 = 45A | 45B = SDPAD4
         SDA3 = 46A | 46B = FIX07       SDPA11 = 46A | 46B = SDPAD5
         SDA4 = 47A | 47B = SDRD0       SDPMPX = 47A | 47B = SDPAD6
         SDA5 = 48A | 48B = SDRD1        SDPOE = 48A | 48B = SDPAD7
-        SDA6 = 49A | 49B = SDROM        SDRA8 = 49A | 49B = SDRA00
-        SDA7 = 50A | 50B = SDMRD        SDRA9 = 50A | 50B = SDRA01
-        SDA8 = 51A | 51B = SDDO        SDRA20 = 51A | 51B = SDRA02
-        SDA9 = 52A | 52B = SDD1        SDRA21 = 52A | 52B = SDRA03
-       SDA10 = 53A | 53B = SDD2        SDRA22 = 53A | 53B = SDRA04
-       SDA11 = 54A | 54B = SDD3        SDRA23 = 54A | 54B = SDRA05
-       SDA12 = 55A | 55B = SDD4        SDRMPX = 55A | 55B = SDRA06
-       SDA13 = 56A | 56B = SDD5         SDROE = 56A | 56B = SDRA07
+        SDA6 = 49A | 49B = SDROM        SDRA8 = 49A | 49B = SDRAD0
+        SDA7 = 50A | 50B = SDMRD        SDRA9 = 50A | 50B = SDRAD1
+        SDA8 = 51A | 51B = SDD0        SDRA20 = 51A | 51B = SDRAD2
+        SDA9 = 52A | 52B = SDD1        SDRA21 = 52A | 52B = SDRAD3
+       SDA10 = 53A | 53B = SDD2        SDRA22 = 53A | 53B = SDRAD4
+       SDA11 = 54A | 54B = SDD3        SDRA23 = 54A | 54B = SDRAD5
+       SDA12 = 55A | 55B = SDD4        SDRMPX = 55A | 55B = SDRAD6
+       SDA13 = 56A | 56B = SDD5         SDROE = 56A | 56B = SDRAD7
        SDA14 = 57A | 57B = SDD6           GND = 57A | 57B = GND
        SDA15 = 58A | 58B = SDD7           GND = 58A | 58B = GND
          GND = 59A | 59B = GND            GND = 59A | 59B = GND
@@ -553,10 +553,12 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_start_r);
-
 	// mainboard configurations
 	void mv1fz(machine_config &config);
+
+	// fixed software configurations
+	void kizuna4p(machine_config &config);
+	void irrmaze(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -589,10 +591,8 @@ public:
 	// fixed software configurations
 	void neobase(machine_config &config);
 	void fatfur2(machine_config &config);
-	void kizuna4p(machine_config &config);
 	void kof97oro(machine_config &config);
 	void kog(machine_config &config);
-	void irrmaze(machine_config &config);
 	void kof98(machine_config &config);
 	void mslugx(machine_config &config);
 	void kof99(machine_config &config);
@@ -874,9 +874,14 @@ READ16_MEMBER(ngarcade_base_state::in1_edge_joy_r)
 	return ((m_edge->in1_r(space, offset) & m_ctrl2->ctrl_r(space, offset)) << 8) | 0xff;
 }
 
-CUSTOM_INPUT_MEMBER(mvs_state::kizuna4p_start_r)
+CUSTOM_INPUT_MEMBER(ngarcade_base_state::startsel_edge_joy_r)
 {
-	return (m_edge->read_start_sel() & 0x05) | ~0x05;
+	uint32_t ret = m_edge->read_start_sel() | ~0x05;
+	if (m_ctrl1)
+		ret &= (m_ctrl1->read_start_sel() << 0) | ~0x01;
+	if (m_ctrl2)
+		ret &= (m_ctrl2->read_start_sel() << 0) | ~0x04;
+	return ret;
 }
 
 WRITE8_MEMBER(neogeo_base_state::io_control_w)
@@ -1621,7 +1626,7 @@ void mvs_state::neogeo_postload()
 
 void neogeo_base_state::machine_reset()
 {
-	// disable audiocpu nmi
+	// disable audiocpu NMI
 	m_audionmi->in_w<1>(0);
 	m_soundlatch->acknowledge_r(machine().dummy_space(), 0);
 
@@ -1803,13 +1808,10 @@ INPUT_PORTS_START( neogeo )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0aff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0500, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ngarcade_base_state, startsel_edge_joy_r, nullptr)
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_base_state, get_memcard_status, nullptr)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) /* Hardware type (AES=0, MVS=1). Some games check this and show a piracy warning screen if the hardware and BIOS don't match */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) // Hardware type (AES=0, MVS=1). Some games check this and show a piracy warning screen if the hardware and BIOS don't match
 
 	PORT_START("AUDIO/COIN")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // coin 1 (combined) or P1 coin 1 (separate) for BIOS that supports it
@@ -1903,8 +1905,6 @@ MACHINE_CONFIG_START(neogeo_base_state::neogeo_base)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // memory card: register select enable/set to normal (what does it mean?)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(neogeo_base_state, set_palette_bank))
 
-	MCFG_WATCHDOG_ADD("watchdog")
-
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_neogeo)
 
@@ -1953,8 +1953,9 @@ MACHINE_CONFIG_START(ngarcade_base_state::neogeo_arcade)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ngarcade_base_state, set_use_cart_audio))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(ngarcade_base_state, set_save_ram_unlock))
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_ticks(3244030, NEOGEO_MASTER_CLOCK))
+
 	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
 
 	MCFG_NVRAM_ADD_0FILL("saveram")
@@ -2422,9 +2423,10 @@ MACHINE_CONFIG_START(mvs_led_state::fatfur2)
 	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom_fatfur2")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mvs_led_state::kizuna4p)
-	mv1_fixed(config);
-	MCFG_DEVICE_REMOVE("edge")
+MACHINE_CONFIG_START(mvs_state::kizuna4p)
+	neogeo_arcade(config);
+	neogeo_mono(config);
+
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "kiz4p", true)
 
 	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("rom")
@@ -2440,10 +2442,10 @@ MACHINE_CONFIG_START(mvs_led_state::kog)
 	NEOGEO_CONFIG_ONE_FIXED_CARTSLOT("boot_kog")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(mvs_led_state::irrmaze)
-	mv1_fixed(config);
+MACHINE_CONFIG_START(mvs_state::irrmaze)
+	neogeo_arcade(config);
+	neogeo_mono(config);
 
-	MCFG_DEVICE_REMOVE("edge")
 	MCFG_NEOGEO_CONTROL_EDGE_CONNECTOR_ADD("edge", neogeo_arc_edge_fixed, "irrmaze", true)
 
 	MCFG_DEFAULT_LAYOUT(layout_irrmaze)
@@ -2890,9 +2892,6 @@ static INPUT_PORTS_START( kizuna4p )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Players ) ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x00, "4" )
-
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mvs_led_state, kizuna4p_start_r, nullptr)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vliner )
@@ -6948,7 +6947,7 @@ ROM_START( kizuna )
 ROM_END
 
 
-ROM_START( kizuna4p ) /* same cartridge as kizuna - 4-player mode is enabled by an extension board that plugs into a compatible MVS */
+ROM_START( kizuna4p ) /* same cartridge as kizuna - 4-player mode is enabled by FTC1B JAMMA splitter board that plugs into MV-1B/MV-1C */
 	ROM_REGION( 0x200000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "216-p1.p1", 0x100000, 0x100000, CRC(75d2b3de) SHA1(ee778656c26828935ee2a2bfd0ce5a22aa681c10) ) /* mask rom TC5316200 */
 	ROM_CONTINUE( 0x000000, 0x100000 )
@@ -11490,7 +11489,7 @@ GAME( 1996, kof96,      neogeo,   neobase,   neogeo,    mvs_led_state,  0,    RO
 GAME( 1996, kof96h,     kof96,    neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "The King of Fighters '96 (NGH-214)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ssideki4,   neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "The Ultimate 11 - The SNK Football Championship / Tokuten Ou - Honoo no Libero", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, kizuna,     neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Kizuna Encounter - Super Tag Battle / Fu'un Super Tag Battle", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kizuna4p,   kizuna,   kizuna4p,  kizuna4p,  mvs_led_state,  0,    ROT0, "SNK", "Kizuna Encounter - Super Tag Battle 4 Way Battle Version / Fu'un Super Tag Battle Special Version", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kizuna4p,   kizuna,   kizuna4p,  kizuna4p,  mvs_state,      0,    ROT0, "SNK", "Kizuna Encounter - Super Tag Battle 4 Way Battle Version / Fu'un Super Tag Battle Special Version", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, samsho4,    neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Samurai Shodown IV - Amakusa's Revenge / Samurai Spirits - Amakusa Kourin (NGM-222 ~ NGH-222)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, samsho4k,   samsho4,  neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Pae Wang Jeon Seol / Legend of a Warrior (Korean censored Samurai Shodown IV)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, rbffspec,   neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special", MACHINE_SUPPORTS_SAVE )
@@ -11504,7 +11503,7 @@ GAME( 1997, kog,        kof97,    kog,       neogeo,    mvs_led_state,  0,    RO
 GAME( 1997, lastblad,   neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGM-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastbladh,  lastblad, neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGH-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastsold,   lastblad, neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "The Last Soldier (Korean release of The Last Blade)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, irrmaze,    neogeo,   irrmaze,   neogeo,    mvs_led_state,  0,    ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, irrmaze,    neogeo,   irrmaze,   neogeo,    mvs_state,      0,    ROT0, "SNK / Saurus", "The Irritating Maze / Ultra Denryu Iraira Bou", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2,      neogeo,   neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - The Newcomers (NGM-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2h,     rbff2,    neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - The Newcomers (NGH-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2k,     rbff2,    neobase,   neogeo,    mvs_led_state,  0,    ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", MACHINE_SUPPORTS_SAVE ) // no Japanese title / mode

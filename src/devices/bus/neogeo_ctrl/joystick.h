@@ -50,21 +50,19 @@ public:
 	// construction/destruction
 	neogeo_joy_ac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
-
 protected:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// device_neogeo_ctrl_edge_interface overrides
 	virtual DECLARE_READ8_MEMBER( in0_r ) override;
 	virtual DECLARE_READ8_MEMBER( in1_r ) override;
+	virtual uint8_t read_start_sel() override;
 
 private:
-	required_ioport m_joy1;
-	required_ioport m_joy2;
+	required_ioport_array<2> m_joy;
+	required_ioport m_ss;
 };
 
 
