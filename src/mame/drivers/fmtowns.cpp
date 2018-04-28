@@ -1936,44 +1936,45 @@ READ8_MEMBER(towns_state::towns_rtc_r)
 
 WRITE8_MEMBER(towns_state::towns_rtc_w)
 {
-	m_rtc->d0_w(data & 1 ? ASSERT_LINE : CLEAR_LINE);
-	m_rtc->d1_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
-	m_rtc->d2_w(data & 4 ? ASSERT_LINE : CLEAR_LINE);
-	m_rtc->d3_w(data & 8 ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d0_w(BIT(data, 0));
+	m_rtc->d1_w(BIT(data, 1));
+	m_rtc->d2_w(BIT(data, 2));
+	m_rtc->d3_w(BIT(data, 3));
 }
 
 WRITE8_MEMBER(towns_state::towns_rtc_select_w)
 {
-	m_rtc->cs1_w(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
-	m_rtc->cs2_w(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
-	m_rtc->read_w(data & 4 ? ASSERT_LINE : CLEAR_LINE);
-	m_rtc->write_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
-	m_rtc->address_write_w(data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->cs1_w(BIT(data, 7));
+	m_rtc->cs2_w(BIT(data, 7));
+	m_rtc->read_w(BIT(data, 2));
+	m_rtc->write_w(BIT(data, 1));
+	m_rtc->address_write_w(BIT(data, 0));
 }
 
 WRITE_LINE_MEMBER(towns_state::rtc_d0_w)
 {
-	m_rtc_d = (m_rtc_d & ~1) | (state == ASSERT_LINE ? 1 : 0);
+	m_rtc_d = (m_rtc_d & ~1) | (state ? 1 : 0);
 }
 
 WRITE_LINE_MEMBER(towns_state::rtc_d1_w)
 {
-	m_rtc_d = (m_rtc_d & ~2) | (state == ASSERT_LINE ? 2 : 0);
+	m_rtc_d = (m_rtc_d & ~2) | (state ? 2 : 0);
 }
 
 WRITE_LINE_MEMBER(towns_state::rtc_d2_w)
 {
-	m_rtc_d = (m_rtc_d & ~4) | (state == ASSERT_LINE ? 4 : 0);
+	m_rtc_d = (m_rtc_d & ~4) | (state ? 4 : 0);
 }
 
 WRITE_LINE_MEMBER(towns_state::rtc_d3_w)
 {
-	m_rtc_d = (m_rtc_d & ~8) | (state == ASSERT_LINE ? 8 : 0);
+	m_rtc_d = (m_rtc_d & ~8) | (state ? 8 : 0);
 }
 
 WRITE_LINE_MEMBER(towns_state::rtc_busy_w)
 {
-	m_rtc_busy = state == ASSERT_LINE ? true : false;
+	// active low output
+	m_rtc_busy = !state;
 }
 
 // SCSI controller - I/O ports 0xc30 and 0xc32
