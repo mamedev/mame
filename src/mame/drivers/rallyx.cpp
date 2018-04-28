@@ -918,8 +918,7 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->locomotn_sound(config);
+	MCFG_SOUND_ADD("timeplt_audio", LOCOMOTN_AUDIO, 0)
 MACHINE_CONFIG_END
 
 

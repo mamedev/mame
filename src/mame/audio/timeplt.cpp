@@ -20,13 +20,24 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK         XTAL(14'318'181)
+static constexpr XTAL MASTER_CLOCK(14'318'181);
 
 
 DEFINE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device, "timplt_audio", "Time Pilot Audio")
+DEFINE_DEVICE_TYPE(LOCOMOTN_AUDIO, locomotn_audio_device, "locomotn_audio", "Loco-Motion Audio")
 
 timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TIMEPLT_AUDIO, tag, owner, clock)
+	: timeplt_audio_device(mconfig, TIMEPLT_AUDIO, tag, owner, clock)
+{
+}
+
+locomotn_audio_device::locomotn_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: timeplt_audio_device(mconfig, LOCOMOTN_AUDIO, tag, owner, clock)
+{
+}
+
+timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_soundcpu(*this, "tpsound")
 	, m_soundlatch(*this, "soundlatch")
@@ -163,11 +174,11 @@ void timeplt_audio_device::timeplt_sound_map(address_map &map)
 }
 
 
-void timeplt_audio_device::locomotn_sound_map(address_map &map)
+void locomotn_audio_device::locomotn_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).mirror(0x0c00).ram();
-	map(0x3000, 0x3fff).w(this, FUNC(timeplt_audio_device::filter_w));
+	map(0x3000, 0x3fff).w(this, FUNC(locomotn_audio_device::filter_w));
 	map(0x4000, 0x4000).mirror(0x0fff).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x5000, 0x5000).mirror(0x0fff).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6000).mirror(0x0fff).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
@@ -181,10 +192,10 @@ void timeplt_audio_device::locomotn_sound_map(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(timeplt_audio_device::timeplt_sound)
+MACHINE_CONFIG_START(timeplt_audio_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("tpsound",Z80,MASTER_CLOCK/8)
+	MCFG_CPU_ADD("tpsound", Z80, MASTER_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(timeplt_sound_map)
 
 	/* sound hardware */
@@ -220,8 +231,8 @@ MACHINE_CONFIG_START(timeplt_audio_device::timeplt_sound)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START(timeplt_audio_device::locomotn_sound)
-	timeplt_sound(config);
+MACHINE_CONFIG_START(locomotn_audio_device::device_add_mconfig)
+	timeplt_audio_device::device_add_mconfig(config);
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("tpsound")

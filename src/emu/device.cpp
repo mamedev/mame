@@ -208,6 +208,19 @@ std::string device_t::parameter(const char *tag) const
 
 
 //-------------------------------------------------
+//  add_machine_configuration - add device-
+//  specific machine configuration
+//-------------------------------------------------
+
+void device_t::add_machine_configuration(machine_config &config)
+{
+	assert(&config == &m_machine_config);
+	machine_config::token const token(config.begin_configuration(*this));
+	device_add_mconfig(config);
+}
+
+
+//-------------------------------------------------
 //  set_clock - set/change the clock on
 //  a device
 //-------------------------------------------------

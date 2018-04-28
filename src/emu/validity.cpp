@@ -1963,7 +1963,7 @@ void validity_checker::validate_devices()
 
 		// if it's a slot, iterate over possible cards (don't recurse, or you'll stack infinite tee connectors)
 		device_slot_interface *const slot = dynamic_cast<device_slot_interface *>(&device);
-		if (slot != nullptr && !slot->fixed() && !duplicate)
+		if (slot && !slot->fixed() && !duplicate)
 		{
 			for (auto &option : slot->option_list())
 			{
@@ -1971,14 +1971,18 @@ void validity_checker::validate_devices()
 				if (slot->default_option() != nullptr && option.first == slot->default_option())
 					continue;
 
-				device_t *const card = m_current_config->device_add(&slot->device(), option.second->name(), option.second->devtype(), option.second->clock());
+				device_t *card;
+				{
+					machine_config::token const tok(m_current_config->begin_configuration(slot->device()));
+					card = m_current_config->device_add(option.second->name(), option.second->devtype(), option.second->clock());
 
-				const char *const def_bios = option.second->default_bios();
-				if (def_bios)
-					card->set_default_bios_tag(def_bios);
-				auto additions = option.second->machine_config();
-				if (additions)
-					additions(card);
+					const char *const def_bios = option.second->default_bios();
+					if (def_bios)
+						card->set_default_bios_tag(def_bios);
+					auto additions = option.second->machine_config();
+					if (additions)
+						additions(card);
+				}
 
 				for (device_slot_interface &subslot : slot_interface_iterator(*card))
 				{
@@ -1987,7 +1991,8 @@ void validity_checker::validate_devices()
 						device_slot_option const *const suboption = subslot.option(subslot.default_option());
 						if (suboption)
 						{
-							device_t *const sub_card = m_current_config->device_add(&subslot.device(), suboption->name(), suboption->devtype(), suboption->clock());
+							machine_config::token const tok(m_current_config->begin_configuration(subslot.device()));
+							device_t *const sub_card = m_current_config->device_add(suboption->name(), suboption->devtype(), suboption->clock());
 							const char *const sub_bios = suboption->default_bios();
 							if (sub_bios)
 								sub_card->set_default_bios_tag(sub_bios);
@@ -2011,7 +2016,8 @@ void validity_checker::validate_devices()
 					m_current_device = nullptr;
 				}
 
-				m_current_config->device_remove(&slot->device(), option.second->name());
+				machine_config::token const tok(m_current_config->begin_configuration(slot->device()));
+				m_current_config->device_remove(option.second->name());
 			}
 		}
 	}
@@ -2034,9 +2040,10 @@ void validity_checker::validate_device_types()
 
 	std::unordered_map<std::string, std::add_pointer_t<device_type> > device_name_map, device_shortname_map;
 	machine_config config(GAME_NAME(___empty), m_drivlist.options());
+	machine_config::token const tok(config.begin_configuration(config.root_device()));
 	for (device_type type : registered_device_types)
 	{
-		device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+		device_t *const dev = config.device_add("_tmp", type, 0);
 
 		char const *name((dev->shortname() && *dev->shortname()) ? dev->shortname() : type.type().name());
 		std::string const description((dev->source() && *dev->source()) ? util::string_format("%s(%s)", core_filename_extract_base(dev->source()).c_str(), name) : name);
@@ -2073,9 +2080,9 @@ void validity_checker::validate_device_types()
 			}
 			else if (!devname.second)
 			{
-				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devname.first->second, 0);
+				device_t *const dup = config.device_add("_dup", *devname.first->second, 0);
 				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
-				config.device_remove(&config.root_device(), "_dup");
+				config.device_remove("_dup");
 			}
 		}
 
@@ -2097,9 +2104,9 @@ void validity_checker::validate_device_types()
 			}
 			else if (!devdesc.second)
 			{
-				device_t *const dup = config.device_add(&config.root_device(), "_dup", *devdesc.first->second, 0);
+				device_t *const dup = config.device_add("_dup", *devdesc.first->second, 0);
 				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
-				config.device_remove(&config.root_device(), "_dup");
+				config.device_remove("_dup");
 			}
 		}
 
@@ -2121,7 +2128,7 @@ void validity_checker::validate_device_types()
 		if (unemulated & imperfect)
 			osd_printf_error("Device cannot have features that are both unemulated and imperfect (0x%08lX)\n", static_cast<unsigned long>(unemulated & imperfect));
 
-		config.device_remove(&config.root_device(), "_tmp");
+		config.device_remove("_tmp");
 	}
 
 	// if we had warnings or errors, output

@@ -264,7 +264,7 @@ class device_type_impl : public device_type_impl_base
 {
 public:
 	using device_type_impl_base::device_type_impl_base;
-	template <typename... Params> DeviceClass &operator()(machine_config &config, device_t *owner, char const *tag, Params &&... args) const;
+	template <typename... Params> DeviceClass &operator()(machine_config &config, char const *tag, Params &&... args) const;
 };
 
 
@@ -514,7 +514,7 @@ public:
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
-	void add_machine_configuration(machine_config &config) { device_add_mconfig(config); }
+	void add_machine_configuration(machine_config &config);
 	void set_clock(u32 clock);
 	void set_clock(const XTAL &xtal) { set_clock(xtal.value()); }
 	void set_input_default(const input_device_default *config) { m_input_defaults = config; }

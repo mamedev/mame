@@ -19,18 +19,32 @@
 //  MACHINE CONFIGURATIONS
 //**************************************************************************
 
+class machine_config::current_device_stack
+{
+public:
+	current_device_stack(current_device_stack const &) = delete;
+	current_device_stack(machine_config &host) : m_host(host), m_device(host.m_current_device) { m_host.m_current_device = nullptr; }
+	~current_device_stack() { assert(!m_host.m_current_device); m_host.m_current_device = m_device; }
+private:
+	machine_config &m_host;
+	device_t *const m_device;
+};
+
+
 //-------------------------------------------------
 //  machine_config - constructor
 //-------------------------------------------------
 
 machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
-	: m_minimum_quantum(attotime::zero),
-		m_default_layout(nullptr),
-		m_gamedrv(gamedrv),
-		m_options(options)
+	: m_minimum_quantum(attotime::zero)
+	, m_default_layout(nullptr)
+	, m_gamedrv(gamedrv)
+	, m_options(options)
+	, m_root_device()
+	, m_current_device(nullptr)
 {
 	// add the root device
-	device_add(nullptr, "root", gamedrv.type, 0);
+	device_add("root", gamedrv.type, 0);
 
 	// intialize slot devices - make sure that any required devices have been allocated
 	for (device_slot_interface &slot : slot_interface_iterator(root_device()))
@@ -63,7 +77,8 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 			if (option && (is_default || option->selectable()))
 			{
 				// create the device
-				device_t *new_dev = device_add(&owner, option->name(), option->devtype(), option->clock());
+				token const tok(begin_configuration(owner));
+				device_t *const new_dev = device_add(option->name(), option->devtype(), option->clock());
 				slot.set_card_device(new_dev);
 
 				char const *const default_bios = option->default_bios();
@@ -104,9 +119,11 @@ machine_config::~machine_config()
 //  new device
 //-------------------------------------------------
 
-device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, u32 clock)
+device_t *machine_config::device_add(const char *tag, device_type type, u32 clock)
 {
+	assert(bool(m_current_device) == bool(m_root_device));
 	char const *const orig_tag = tag;
+	device_t *owner(m_current_device);
 
 	// if the device path is absolute, start from the root
 	if (tag[0] == ':')
@@ -128,6 +145,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 	}
 	assert(tag[0] != '\0');
 
+	current_device_stack context(*this);
 	if (owner)
 	{
 		// allocate the new device and append it to the owner's list
@@ -154,38 +172,39 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 //  replace one device with a new device
 //-------------------------------------------------
 
-device_t *machine_config::device_replace(device_t *owner, const char *tag, device_type type, u32 clock)
+device_t *machine_config::device_replace(const char *tag, device_type type, u32 clock)
 {
 	// find the original device by relative tag (must exist)
-	assert(owner != nullptr);
-	device_t *old_device = owner->subdevice(tag);
-	if (old_device == nullptr)
+	assert(m_current_device);
+	device_t *old_device = m_current_device->subdevice(tag);
+	if (!old_device)
 	{
 		osd_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
-		return device_add(owner, tag, type, clock);
+		return device_add(tag, type, clock);
 	}
 	else
 	{
 		// make sure we have the old device's actual owner
-		owner = old_device->owner();
-		assert(owner != nullptr);
+		device_t *const owner = old_device->owner();
+		assert(owner);
 
 		// remove references to the old device
 		remove_references(*old_device);
 
 		// allocate the new device and substitute it for the old one in the owner's list
 		device_t *const new_device = &owner->subdevices().m_list.replace_and_remove(*type(*this, tag, owner, clock).release(), *old_device);
+		current_device_stack context(*this);
 		new_device->add_machine_configuration(*this);
 		return new_device;
 	}
 }
 
 
-device_t *machine_config::device_replace(device_t *owner, const char *tag, device_type type, const XTAL &clock)
+device_t *machine_config::device_replace(const char *tag, device_type type, const XTAL &clock)
 {
 	std::string msg = std::string("Replacing device ") + tag;
 	clock.validate(msg);
-	return device_replace(owner, tag, type, clock.value());
+	return device_replace(tag, type, clock.value());
 }
 
 
@@ -194,26 +213,27 @@ device_t *machine_config::device_replace(device_t *owner, const char *tag, devic
 //  remove a device
 //-------------------------------------------------
 
-device_t *machine_config::device_remove(device_t *owner, const char *tag)
+device_t *machine_config::device_remove(const char *tag)
 {
 	// find the original device by relative tag (must exist)
-	assert(owner != nullptr);
-	device_t *device = owner->subdevice(tag);
+	assert(m_current_device);
+	device_t *const device = m_current_device->subdevice(tag);
 	if (device == nullptr)
 	{
 		osd_printf_warning("Warning: attempting to remove non-existent device '%s'\n", tag);
-		return nullptr;
 	}
+	else
+	{
+		// make sure we have the old device's actual owner
+		device_t *const owner = device->owner();
+		assert(owner);
 
-	// make sure we have the old device's actual owner
-	owner = device->owner();
-	assert(owner != nullptr);
+		// remove references to the old device
+		remove_references(*device);
 
-	// remove references to the old device
-	remove_references(*device);
-
-	// let the device's owner do the work
-	owner->subdevices().m_list.remove(*device);
+		// let the device's owner do the work
+		owner->subdevices().m_list.remove(*device);
+	}
 	return nullptr;
 }
 
