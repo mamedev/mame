@@ -1322,7 +1322,7 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00200000, 0x0021ffff).ram();
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
-	map(0x01c00000, 0x01c007ff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
+	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
 	// intercept reads for the lightgun ports
 	// needs to be done because the vcop ioboard isn't emulated
 	// can be removed once that's done (837-11130 + 837-11131)
