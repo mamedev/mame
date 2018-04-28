@@ -14313,6 +14313,8 @@ gradius3js                      // GX945 (c) 1989 (Japan, split)
 
 @source:grchamp.cpp
 grchamp                         // GM  (c) 1981 Taito Corporation
+grchampa                        // GM  (c) 1981 Taito Corporation
+grchampb                        // GM  (c) 1981 Taito Corporation
 
 @source:grfd2301.cpp
 grfd2301                        //
