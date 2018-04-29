@@ -26,8 +26,28 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_aysnd(*this, "aysnd") { }
+		m_aysnd(*this, "aysnd"),
+		m_leds(*this, "led%u", 0U) { }
 
+	void centiped_base(machine_config &config);
+	void milliped(machine_config &config);
+	void bullsdrt(machine_config &config);
+	void centipdb(machine_config &config);
+	void magworm(machine_config &config);
+	void caterplr(machine_config &config);
+	void centiped(machine_config &config);
+	void centipedj(machine_config &config);
+	void mazeinv(machine_config &config);
+	void warlords(machine_config &config);
+	void multiped(machine_config &config);
+
+	DECLARE_DRIVER_INIT(multiped);
+	DECLARE_DRIVER_INIT(bullsdrt);
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	optional_shared_ptr<uint8_t> m_rambase;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -41,6 +61,8 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<ay8910_device> m_aysnd;
 
+	output_finder<4> m_leds;
+
 	uint8_t m_oldpos[4];
 	uint8_t m_sign[4];
 	uint8_t m_dsw_select;
@@ -52,7 +74,7 @@ public:
 	uint8_t m_penmask[64];
 	tilemap_t *m_bg_tilemap;
 
-	// drivers/centiped.c
+	// drivers/centiped.cpp
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_READ8_MEMBER(centiped_IN0_r);
 	DECLARE_READ8_MEMBER(centiped_IN2_r);
@@ -78,7 +100,7 @@ public:
 	DECLARE_WRITE8_MEMBER(multiped_eeprom_w);
 	DECLARE_WRITE8_MEMBER(multiped_prgbank_w);
 
-	// video/centiped.c
+	// video/centiped.cpp
 	DECLARE_WRITE8_MEMBER(centiped_videoram_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(multiped_gfxbank_w);
@@ -87,8 +109,6 @@ public:
 	DECLARE_WRITE8_MEMBER(centiped_paletteram_w);
 	DECLARE_WRITE8_MEMBER(milliped_paletteram_w);
 	DECLARE_WRITE8_MEMBER(mazeinv_paletteram_w);
-	DECLARE_DRIVER_INIT(multiped);
-	DECLARE_DRIVER_INIT(bullsdrt);
 	TILE_GET_INFO_MEMBER(centiped_get_tile_info);
 	TILE_GET_INFO_MEMBER(warlords_get_tile_info);
 	TILE_GET_INFO_MEMBER(milliped_get_tile_info);
@@ -110,16 +130,6 @@ public:
 	void init_common();
 	void milliped_set_color(offs_t offset, uint8_t data);
 	inline int read_trackball(int idx, int switch_port);
-	void centiped_base(machine_config &config);
-	void milliped(machine_config &config);
-	void bullsdrt(machine_config &config);
-	void centipdb(machine_config &config);
-	void magworm(machine_config &config);
-	void caterplr(machine_config &config);
-	void centiped(machine_config &config);
-	void mazeinv(machine_config &config);
-	void warlords(machine_config &config);
-	void multiped(machine_config &config);
 	void bullsdrt_data_map(address_map &map);
 	void bullsdrt_map(address_map &map);
 	void bullsdrt_port_map(address_map &map);
@@ -127,6 +137,7 @@ public:
 	void centipdb_map(address_map &map);
 	void centiped_base_map(address_map &map);
 	void centiped_map(address_map &map);
+	void centipedj_map(address_map &map);
 	void magworm_map(address_map &map);
 	void mazeinv_map(address_map &map);
 	void milliped_map(address_map &map);
