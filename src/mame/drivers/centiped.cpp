@@ -2104,8 +2104,8 @@ ROM_START( centipedj ) // PCB C2-00158 CENTIPEDE, manufactured by Sanritsu but m
 	ROM_LOAD( "cen-21.3c",  0x0800, 0x0800, CRC(064a6b8b) SHA1(50fd0c18b6ba03759f117feaef799c6e310bbeed) ) // 2732, 1xxxxxxxxxxx = 0xFF
 	ROM_IGNORE(0x800)
 
-	ROM_REGION( 0x0100, "proms", 0 ) // not dumped for this board
-	ROM_LOAD( "136001-213.p4",  0x0000, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) )
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "cen_60.1h",  0x0000, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) )
 ROM_END
 
 
