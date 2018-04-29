@@ -1409,6 +1409,22 @@ ROM_START( pc_gntlt )   /* Gauntlet */
 	ROM_LOAD( "security.prm", 0x00, 0x10, CRC(ba7f2e13) SHA1(8b9ee3b18bcb4b258a46d1c900b18a9cb2594046) )
 ROM_END
 
+ROM_START( pc_gntlta )   /* Gauntlet set 2 */
+	BIOS_CPU
+	ROM_LOAD( "u3gl",    0x0c000, 0x2000, CRC(57575b92) SHA1(7ac633f253496f353d388bef30e6ec74a3d18814) ) /* extra bios code for this game */
+	BIOS_GFX
+
+	ROM_REGION( 0x50000, "cart", 0 )
+	ROM_LOAD( "nes-gl-0.prg", 0x10000, 0x20000, CRC(2f7bfc60) SHA1(b0f84b341772a526b00a7380096121b8c861ed7a) )   /* banked */
+	ROM_RELOAD(          0x30000, 0x20000 )
+
+	ROM_REGION( 0x010000, "gfx2", 0 )   /* cart gfx */
+	ROM_LOAD( "nes-gl-0.chr", 0x00000, 0x10000, CRC(22af8849) SHA1(01054943c1d069f5f535e93f969a5b6bfb958e0b) )
+
+	ROM_REGION( 0x10, "rp5h01", 0 ) /* rp5h01 data */
+	ROM_LOAD( "security.prm", 0x00, 0x10, NO_DUMP ) /* Missing */
+ROM_END
+
 ROM_START( pc_pwbld )   /* Power Blade */
 	BIOS_CPU
 	ROM_LOAD( "7t-u3",    0x0c000, 0x2000, CRC(edcc21c6) SHA1(5d73c6a747cfe951dc7c6ddfbb29859e9548aded) ) /* extra bios code for this game */
@@ -1777,7 +1793,8 @@ GAME( 1991, pc_ttoon, playch10, playch10, playch10, playch10_state, ttoon,    RO
 
 /* variant with 4 screen mirror */
 GAME( 1990, pc_radr2, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", 0 )
-GAME( 1985, pc_gntlt, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, pc_gntlt, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10, set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, pc_gntlta,pc_gntlt, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10, set 2)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* H-Board Games */
 GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, playch10_state, pchboard, ROT0, "Rare (Nintendo of America license)", "PinBot (PlayChoice-10)", MACHINE_IMPERFECT_GRAPHICS )
