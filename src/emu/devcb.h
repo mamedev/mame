@@ -26,6 +26,7 @@
 #define DEVCB_NOOP devcb_base::null_desc()
 #define DEVCB_IOPORT(_tag) devcb_base::ioport_desc(_tag)
 #define DEVCB_MEMBANK(_tag) devcb_base::membank_desc(_tag)
+#define DEVCB_OUTPUT(_tag) devcb_base::output_desc(_tag)
 #define DEVCB_CONSTANT(_value) devcb_base::constant_desc(_value)
 #define DEVCB_LOGGER(_string) devcb_base::logger_desc(_string)
 #define DEVCB_INPUTLINE(_tag, _line) devcb_base::inputline_desc(_tag, _line)
@@ -101,6 +102,7 @@ protected:
 		CALLBACK_64,
 		CALLBACK_IOPORT,
 		CALLBACK_MEMBANK,
+		CALLBACK_OUTPUT,
 		CALLBACK_LOG,
 		CALLBACK_CONSTANT,
 		CALLBACK_INPUTLINE,
@@ -141,6 +143,13 @@ public:
 	{
 	public:
 		membank_desc(const char *tag) { m_tag = tag; }
+		const char *m_tag;
+	};
+
+	class output_desc
+	{
+	public:
+		output_desc(const char *tag) { m_tag = tag; }
 		const char *m_tag;
 	};
 
@@ -194,6 +203,7 @@ public:
 	devcb_base &set_callback(null_desc null) { reset(CALLBACK_NONE); return *this; }
 	devcb_base &set_callback(ioport_desc ioport) { reset(CALLBACK_IOPORT); m_target_tag = ioport.m_tag; return *this; }
 	devcb_base &set_callback(membank_desc membank) { reset(CALLBACK_MEMBANK); m_target_tag = membank.m_tag; return *this; }
+	devcb_base &set_callback(output_desc output) { reset(CALLBACK_OUTPUT); m_target_tag = output.m_tag; return *this; }
 	devcb_base &set_callback(constant_desc constant) { reset(CALLBACK_CONSTANT); m_target_int = constant.m_value; return *this; }
 	devcb_base &set_callback(logger_desc logger) { reset(CALLBACK_LOG); m_target_tag = logger.m_string; return *this; }
 	void reset() { reset(CALLBACK_NONE); }
@@ -208,6 +218,7 @@ protected:
 	virtual void devcb_reset() = 0;
 	void resolve_ioport();
 	void resolve_membank();
+	void resolve_output();
 	void resolve_inputline();
 	void resolve_space();
 
@@ -218,6 +229,7 @@ protected:
 		device_t *          device;
 		ioport_port *       ioport;
 		memory_bank *       membank;
+		output_manager::output_item *item;
 	};
 
 	// configuration
@@ -338,6 +350,7 @@ private:
 	void write64_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 	void write_ioport_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 	void write_membank_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write_output_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 	void write_logged_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 	void write_noop_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 	void write_inputline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
@@ -364,7 +377,7 @@ private:
 class devcb_read_line : public devcb_read_base
 {
 public:
-	devcb_read_line(device_t &device) : devcb_read_base(device, 0xff) { }
+	devcb_read_line(device_t &device) : devcb_read_base(device, 1) { }
 	int operator()() { return read(*m_space, 0, 0xffU) & 1; }
 	int operator()(address_space &space) { return read((m_space_tag != nullptr) ? *m_space : space, 0, 0xffU) & 1; }
 };
@@ -419,7 +432,7 @@ public:
 class devcb_write_line : public devcb_write_base
 {
 public:
-	devcb_write_line(device_t &device) : devcb_write_base(device, 0xff) { }
+	devcb_write_line(device_t &device) : devcb_write_base(device, 1) { }
 	void operator()(int state) { write(*m_space, 0, state & 1, 0xffU); }
 	void operator()(address_space &space, int state) { write((m_space_tag != nullptr) ? *m_space : space, 0, state & 1, 0xffU); }
 };

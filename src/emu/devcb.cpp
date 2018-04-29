@@ -60,7 +60,7 @@ void devcb_base::reset(callback_type type)
 	m_space = nullptr;
 	m_target.ptr = nullptr;
 	m_rshift = 0;
-	m_mask = ~u64(0);
+	m_mask = m_defmask;
 	m_xor = 0;
 	devcb_reset();
 }
@@ -97,6 +97,17 @@ void devcb_base::resolve_membank()
 	m_target.membank = (m_target_tag != nullptr) ? m_device.owner()->membank(m_target_tag) : nullptr;
 	if (m_target.membank == nullptr)
 		throw emu_fatalerror("Unable to resolve memory bank callback reference to '%s' in device '%s'\n", m_target_tag, m_device.tag());
+}
+
+
+//-------------------------------------------------
+//  resolve_output - resolve an output item
+//-------------------------------------------------
+
+void devcb_base::resolve_output()
+{
+	assert(m_target_tag != nullptr);
+	m_target.item = &m_device.machine().output().find_or_create_item(m_target_tag, 0);
 }
 
 
@@ -253,6 +264,9 @@ void devcb_read_base::resolve()
 
 		case CALLBACK_MEMBANK:
 			throw emu_fatalerror("Device read callbacks can't be connected to bank switches\n");
+
+		case CALLBACK_OUTPUT:
+			throw emu_fatalerror("Device read callbacks can't be connected to output items\n");
 
 		case CALLBACK_LOG:
 			m_adapter = &devcb_read_base::read_logged_adapter;
@@ -444,6 +458,10 @@ void devcb_read_base::validity_check(validity_checker &valid) const
 		osd_printf_error("Device read callbacks can't be connected to bank switches\n");
 		break;
 
+	case CALLBACK_OUTPUT:
+		osd_printf_error("Device read callbacks can't be connected to output items\n");
+		break;
+
 	case CALLBACK_INPUTLINE:
 	case CALLBACK_ASSERTLINE:
 	case CALLBACK_CLEARLINE:
@@ -566,6 +584,11 @@ void devcb_write_base::resolve()
 			m_adapter = (m_target.membank == nullptr) ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_membank_adapter;
 			break;
 
+		case CALLBACK_OUTPUT:
+			resolve_output();
+			m_adapter = (m_target.item == nullptr) ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_output_adapter;
+			break;
+
 		case CALLBACK_LOG:
 			m_adapter = &devcb_write_base::write_logged_adapter;
 			break;
@@ -636,6 +659,7 @@ void devcb_write_base::validity_check(validity_checker &valid) const
 	case CALLBACK_LOG:
 	case CALLBACK_IOPORT:
 	case CALLBACK_MEMBANK:
+	case CALLBACK_OUTPUT:
 		break;
 
 	case CALLBACK_LINE:
@@ -766,6 +790,17 @@ void devcb_write_base::write_membank_adapter(address_space &space, offs_t offset
 {
 	if (m_target.membank)
 		m_target.membank->set_entry(unshift_mask_xor(data));
+}
+
+
+//-------------------------------------------------
+//  write_output_adapter - set an output item
+//-------------------------------------------------
+
+void devcb_write_base::write_output_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
+{
+	if (m_target.item)
+		m_target.item->set(unshift_mask_xor(data));
 }
 
 
