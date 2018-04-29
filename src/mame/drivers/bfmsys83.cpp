@@ -44,7 +44,7 @@ MACHINE_CONFIG_START(bfmsys83_state::bfmsys83)
 MACHINE_CONFIG_END
 
 /*
-DRIVER_INIT_MEMBER(bfmsys83_state,decode)
+void bfmsys83_state::init_decode()
 {
     bfm_decode_mainrom(machine(),"maincpu", m_codec_data);
 }

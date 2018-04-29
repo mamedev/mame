@@ -1725,7 +1725,7 @@ MACHINE_CONFIG_START(model1_state::netmerc)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER( model1_state, wingwar360 )
+void model1_state::init_wingwar360()
 {
 	// install r360 hack
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00014, 0xc00015, read16_delegate(FUNC(model1_state::r360_r),this));

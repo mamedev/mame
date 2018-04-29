@@ -70,7 +70,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(taito);
+	void init_taito();
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ8_MEMBER(pia_pb_r);
@@ -333,7 +333,7 @@ void taito_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER( taito_state, taito )
+void taito_state::init_taito()
 {
 }
 

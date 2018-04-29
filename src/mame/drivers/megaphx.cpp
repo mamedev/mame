@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(dsw_w);
 
-	DECLARE_DRIVER_INIT(megaphx);
+	void init_megaphx();
 
 	void megaphx(machine_config &config);
 	void megaphx_68k_map(address_map &map);
@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(megaphx_state::megaphx)
 	MCFG_INDER_AUDIO_ADD("inder_sb")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(megaphx_state, megaphx)
+void megaphx_state::init_megaphx()
 {
 	uint16_t *src = (uint16_t*)memregion( "boot" )->base();
 	// copy vector table? - it must be writable because the game write the irq vector..

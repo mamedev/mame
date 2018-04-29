@@ -73,7 +73,7 @@ public:
 		{ }
 
 	DECLARE_MACHINE_RESET(tosh1000);
-	DECLARE_DRIVER_INIT(tosh1000);
+	void init_tosh1000();
 
 	DECLARE_WRITE8_MEMBER(romdos_bank_w);
 	DECLARE_READ8_MEMBER(romdos_bank_r);
@@ -102,7 +102,7 @@ private:
 };
 
 
-DRIVER_INIT_MEMBER(tosh1000_state, tosh1000)
+void tosh1000_state::init_tosh1000()
 {
 }
 

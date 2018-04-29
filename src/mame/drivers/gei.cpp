@@ -111,10 +111,10 @@ public:
 	DECLARE_WRITE8_MEMBER(nmi_w);
 	DECLARE_READ8_MEMBER(portC_r);
 
-	DECLARE_DRIVER_INIT(setbank);
-	DECLARE_DRIVER_INIT(bank2k);
-	DECLARE_DRIVER_INIT(bank8k);
-	DECLARE_DRIVER_INIT(geimulti);
+	void init_setbank();
+	void init_bank2k();
+	void init_bank8k();
+	void init_geimulti();
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -1906,24 +1906,24 @@ ROM_START( sprtauth )
 	ROM_LOAD( "sprtauth.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
 ROM_END
 
-DRIVER_INIT_MEMBER(gei_state, setbank)
+void gei_state::init_setbank()
 {
 	m_rombank->set_base(memregion("maincpu")->base() + 0x2000);
 }
 
-DRIVER_INIT_MEMBER(gei_state, bank2k)
+void gei_state::init_bank2k()
 {
 	m_rombank->configure_entries(0, 10, memregion("maincpu")->base() + 0x10000, 0x2000);
 	m_rombank->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(gei_state, bank8k)
+void gei_state::init_bank8k()
 {
 	m_rombank->configure_entries(0, 6, memregion("maincpu")->base() + 0x8000, 0x8000);
 	m_rombank->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(gei_state, geimulti)
+void gei_state::init_geimulti()
 {
 	m_rombank->configure_entries(0, 14, memregion("bank")->base(), 0x8000);
 	m_rombank->set_entry(0);

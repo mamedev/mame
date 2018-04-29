@@ -109,12 +109,12 @@ public:
 	DECLARE_READ8_MEMBER(question_data_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
-	DECLARE_DRIVER_INIT(addr_xlh);
-	DECLARE_DRIVER_INIT(addr_lhx);
-	DECLARE_DRIVER_INIT(addr_lmh);
-	DECLARE_DRIVER_INIT(addr_lmhe);
-	DECLARE_DRIVER_INIT(addr_xhl);
-	DECLARE_DRIVER_INIT(laserdisc);
+	void init_addr_xlh();
+	void init_addr_lhx();
+	void init_addr_lmh();
+	void init_addr_lmhe();
+	void init_addr_xhl();
+	void init_laserdisc();
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
 	TILE_GET_INFO_MEMBER(vertical_tile_info);
 	virtual void video_start() override;
@@ -1485,7 +1485,7 @@ ROM_END
  *************************************/
 
 /* question address is stored as L/H/X (low/high/don't care) */
-DRIVER_INIT_MEMBER(statriv2_state, addr_lhx)
+void statriv2_state::init_addr_lhx()
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
@@ -1493,7 +1493,7 @@ DRIVER_INIT_MEMBER(statriv2_state, addr_lhx)
 }
 
 /* question address is stored as X/L/H (don't care/low/high) */
-DRIVER_INIT_MEMBER(statriv2_state, addr_xlh)
+void statriv2_state::init_addr_xlh()
 {
 	m_question_offset_low = 1;
 	m_question_offset_mid = 2;
@@ -1501,7 +1501,7 @@ DRIVER_INIT_MEMBER(statriv2_state, addr_xlh)
 }
 
 /* question address is stored as X/H/L (don't care/high/low) */
-DRIVER_INIT_MEMBER(statriv2_state, addr_xhl)
+void statriv2_state::init_addr_xhl()
 {
 	m_question_offset_low = 2;
 	m_question_offset_mid = 1;
@@ -1509,14 +1509,14 @@ DRIVER_INIT_MEMBER(statriv2_state, addr_xhl)
 }
 
 /* question address is stored as L/M/H (low/mid/high) */
-DRIVER_INIT_MEMBER(statriv2_state, addr_lmh)
+void statriv2_state::init_addr_lmh()
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
 	m_question_offset_high = 2;
 }
 
-DRIVER_INIT_MEMBER(statriv2_state, addr_lmhe)
+void statriv2_state::init_addr_lmhe()
 {
 	/***************************************************\
 	*                                                   *
@@ -1587,10 +1587,10 @@ DRIVER_INIT_MEMBER(statriv2_state, addr_lmhe)
 	for (address = 0; address < length; address++)
 		qrom[address] ^= bitswap<8>(address, 4,3,3,2,2,1,1,0);
 
-	DRIVER_INIT_CALL(addr_lmh);
+	init_addr_lmh();
 }
 
-DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
+void statriv2_state::init_laserdisc()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_readwrite_handler(0x28, 0x2b,

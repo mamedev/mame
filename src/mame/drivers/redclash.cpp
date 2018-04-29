@@ -565,7 +565,7 @@ ROM_START( redclashk )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(redclash_state, redclash)
+void redclash_state::init_redclash()
 {
 	uint8_t const *const src = memregion("gfx2")->base();
 	uint8_t *const dst = memregion("gfx3")->base();

@@ -1668,17 +1668,16 @@ void gauntlet_state::common_init(int vindctr2)
 }
 
 
-DRIVER_INIT_MEMBER(gauntlet_state,gauntlet)
+void gauntlet_state::init_gauntlet()
 {
 	common_init(0);
 }
 
 
-DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
+void gauntlet_state::init_vindctr2()
 {
 	uint8_t *gfx2_base = memregion("gfx2")->base();
 	std::vector<uint8_t> data(0x8000);
-	int i;
 
 	common_init(1);
 
@@ -1686,7 +1685,7 @@ DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 	   chip) are scrambled -- this is verified on the schematics! */
 
 	memcpy(&data[0], &gfx2_base[0x88000], 0x8000);
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
 		int srcoffs = (i & 0x4000) | ((i << 11) & 0x3800) | ((i >> 3) & 0x07ff);
 		gfx2_base[0x88000 + i] = data[srcoffs];

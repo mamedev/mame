@@ -2951,7 +2951,7 @@ void leland_state::init_master_ports(uint8_t mvram_base, uint8_t io_base)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,cerberus)
+void leland_state::init_cerberus()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::cerberus_bankswitch;
@@ -2968,7 +2968,7 @@ DRIVER_INIT_MEMBER(leland_state,cerberus)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,mayhem)
+void leland_state::init_mayhem()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -2978,7 +2978,7 @@ DRIVER_INIT_MEMBER(leland_state,mayhem)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,powrplay)
+void leland_state::init_powrplay()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -2988,7 +2988,7 @@ DRIVER_INIT_MEMBER(leland_state,powrplay)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,wseries)
+void leland_state::init_wseries()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -2998,7 +2998,7 @@ DRIVER_INIT_MEMBER(leland_state,wseries)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,alleymas)
+void leland_state::init_alleymas()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -3014,7 +3014,7 @@ DRIVER_INIT_MEMBER(leland_state,alleymas)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,upyoural)
+void leland_state::init_upyoural()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::mayhem_bankswitch;
@@ -3024,7 +3024,7 @@ DRIVER_INIT_MEMBER(leland_state,upyoural)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,dangerz)
+void leland_state::init_dangerz()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::dangerz_bankswitch;
@@ -3042,7 +3042,7 @@ DRIVER_INIT_MEMBER(leland_state,dangerz)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,basebal2)
+void leland_state::init_basebal2()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::basebal2_bankswitch;
@@ -3052,7 +3052,7 @@ DRIVER_INIT_MEMBER(leland_state,basebal2)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,dblplay)
+void leland_state::init_dblplay()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::basebal2_bankswitch;
@@ -3062,7 +3062,7 @@ DRIVER_INIT_MEMBER(leland_state,dblplay)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,strkzone)
+void leland_state::init_strkzone()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::basebal2_bankswitch;
@@ -3072,7 +3072,7 @@ DRIVER_INIT_MEMBER(leland_state,strkzone)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,redlin2p)
+void leland_state::init_redlin2p()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::redline_bankswitch;
@@ -3090,7 +3090,7 @@ DRIVER_INIT_MEMBER(leland_state,redlin2p)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,quarterb)
+void leland_state::init_quarterb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3102,7 +3102,7 @@ DRIVER_INIT_MEMBER(leland_state,quarterb)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,viper)
+void leland_state::init_viper()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3124,7 +3124,7 @@ DRIVER_INIT_MEMBER(leland_state,viper)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,teamqb)
+void leland_state::init_teamqb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3142,7 +3142,7 @@ DRIVER_INIT_MEMBER(leland_state,teamqb)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,aafb)
+void leland_state::init_aafb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3160,7 +3160,7 @@ DRIVER_INIT_MEMBER(leland_state,aafb)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,aafbb)
+void leland_state::init_aafbb()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3178,7 +3178,7 @@ DRIVER_INIT_MEMBER(leland_state,aafbb)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,aafbd2p)
+void leland_state::init_aafbd2p()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::viper_bankswitch;
@@ -3196,7 +3196,7 @@ DRIVER_INIT_MEMBER(leland_state,aafbd2p)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,offroad)
+void leland_state::init_offroad()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::offroad_bankswitch;
@@ -3216,7 +3216,7 @@ DRIVER_INIT_MEMBER(leland_state,offroad)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,offroadt)
+void leland_state::init_offroadt()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::offroad_bankswitch;
@@ -3235,7 +3235,7 @@ DRIVER_INIT_MEMBER(leland_state,offroadt)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,pigout)
+void leland_state::init_pigout()
 {
 	/* master CPU bankswitching */
 	m_update_master_bank = &leland_state::offroad_bankswitch;
@@ -3252,7 +3252,7 @@ DRIVER_INIT_MEMBER(leland_state,pigout)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,ataxx)
+void leland_state::init_ataxx()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3262,7 +3262,7 @@ DRIVER_INIT_MEMBER(leland_state,ataxx)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,ataxxj)
+void leland_state::init_ataxxj()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3272,7 +3272,7 @@ DRIVER_INIT_MEMBER(leland_state,ataxxj)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,wsf)
+void leland_state::init_wsf()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3284,7 +3284,7 @@ DRIVER_INIT_MEMBER(leland_state,wsf)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,indyheat)
+void leland_state::init_indyheat()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3301,7 +3301,7 @@ DRIVER_INIT_MEMBER(leland_state,indyheat)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,brutforc)
+void leland_state::init_brutforc()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");
@@ -3313,7 +3313,7 @@ DRIVER_INIT_MEMBER(leland_state,brutforc)
 }
 
 
-DRIVER_INIT_MEMBER(leland_state,asylum)
+void leland_state::init_asylum()
 {
 	leland_rotate_memory("master");
 	leland_rotate_memory("slave");

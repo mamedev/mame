@@ -987,13 +987,13 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(rbisland_state,rbisland)
+void rbisland_state::init_rbisland()
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(rbisland_state,jumping)
+void rbisland_state::init_jumping()
 {
 	m_jumping_latch = 0;
 	save_item(NAME(m_jumping_latch));

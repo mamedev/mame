@@ -166,8 +166,8 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_speech);
 	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
 	DECLARE_WRITE8_MEMBER(socrates_sound_w);
-	DECLARE_DRIVER_INIT(socrates);
-	DECLARE_DRIVER_INIT(iqunlimz);
+	void init_socrates();
+	void init_iqunlimz();
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -385,7 +385,7 @@ void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-DRIVER_INIT_MEMBER(socrates_state,socrates)
+void socrates_state::init_socrates()
 {
 	uint8_t *gfx = memregion("vram")->base();
 
@@ -396,7 +396,7 @@ DRIVER_INIT_MEMBER(socrates_state,socrates)
 	m_kbmcu_type = 0;
 }
 
-DRIVER_INIT_MEMBER(socrates_state,iqunlimz)
+void socrates_state::init_iqunlimz()
 {
 	uint8_t *gfx = memregion("vram")->base();
 

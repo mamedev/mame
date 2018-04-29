@@ -127,7 +127,7 @@ public:
 	DECLARE_READ8_MEMBER(portA_r);
 	DECLARE_WRITE8_MEMBER(portB_w);
 
-	DECLARE_DRIVER_INIT(junofrst);
+	void init_junofrst();
 	DECLARE_MACHINE_START(junofrst);
 	DECLARE_MACHINE_RESET(junofrst);
 
@@ -514,7 +514,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(junofrst_state,junofrst)
+void junofrst_state::init_junofrst()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 }

@@ -52,9 +52,9 @@ public:
 		, m_solenoids(*this, "solenoid%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(by17);
-	DECLARE_DRIVER_INIT(matahari);
-	DECLARE_DRIVER_INIT(pwerplay);
+	void init_by17();
+	void init_matahari();
+	void init_pwerplay();
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -849,7 +849,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
 
 
 
-DRIVER_INIT_MEMBER( by17_state, by17 )
+void by17_state::init_by17()
 {
 	static const uint8_t solenoid_features_default[20][4] =
 	{
@@ -889,7 +889,7 @@ DRIVER_INIT_MEMBER( by17_state, by17 )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, matahari )
+void by17_state::init_matahari()
 {
 	static const uint8_t solenoid_features_matahari[20][4] =
 	{
@@ -925,7 +925,7 @@ DRIVER_INIT_MEMBER( by17_state, matahari )
 }
 
 
-DRIVER_INIT_MEMBER( by17_state, pwerplay )
+void by17_state::init_pwerplay()
 {
 	static const uint8_t solenoid_features_pwerplay[20][4] =
 	{

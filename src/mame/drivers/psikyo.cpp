@@ -1798,15 +1798,14 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(psikyo_state,sngkace)
+void psikyo_state::init_sngkace()
 {
 	{
 		uint8_t *RAM = memregion("ymsnd")->base();
 		int len = memregion("ymsnd")->bytes();
-		int i;
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
-		for (i = 0; i < len; i++)
+		for (int i = 0; i < len; i++)
 		{
 			int x = RAM[i];
 			RAM[i] = ((x & 0x40) << 1) | ((x & 0x80) >> 1) | (x & 0x3f);
@@ -1855,7 +1854,7 @@ void psikyo_state::s1945_mcu_init(  )
 	save_item(NAME(m_s1945_mcu_bctrl));
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,tengai)
+void psikyo_state::init_tengai()
 {
 	s1945_mcu_init();
 	m_s1945_mcu_table = nullptr;
@@ -1867,7 +1866,7 @@ DRIVER_INIT_MEMBER(psikyo_state,tengai)
 	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,gunbird)
+void psikyo_state::init_gunbird()
 {
 	m_ka302c_banking = 1;
 
@@ -1877,7 +1876,7 @@ DRIVER_INIT_MEMBER(psikyo_state,gunbird)
 }
 
 
-DRIVER_INIT_MEMBER(psikyo_state,s1945)
+void psikyo_state::init_s1945()
 {
 	s1945_mcu_init();
 	m_s1945_mcu_table = s1945_table;
@@ -1889,7 +1888,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945)
 	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,s1945a)
+void psikyo_state::init_s1945a()
 {
 	s1945_mcu_init();
 	m_s1945_mcu_table = s1945a_table;
@@ -1901,7 +1900,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945a)
 	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,s1945j)
+void psikyo_state::init_s1945j()
 {
 	s1945_mcu_init();
 	m_s1945_mcu_table = s1945j_table;
@@ -1913,7 +1912,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945j)
 	m_audiobank->configure_entries(0, 4, memregion("audiocpu")->base() + 0x200, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(psikyo_state,s1945bl)
+void psikyo_state::init_s1945bl()
 {
 	m_ka302c_banking = 1;
 

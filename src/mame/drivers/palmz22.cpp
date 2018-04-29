@@ -89,7 +89,7 @@ public:
 	nand_device *m_nand;
 
 	uint32_t m_port[8];
-	DECLARE_DRIVER_INIT(palmz22);
+	void init_palmz22();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(palmz22_input_changed);
@@ -277,7 +277,7 @@ void palmz22_state::palmz22_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(palmz22_state,palmz22)
+void palmz22_state::init_palmz22()
 {
 }
 

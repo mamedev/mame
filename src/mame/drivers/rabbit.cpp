@@ -124,7 +124,7 @@ public:
 	DECLARE_WRITE32_MEMBER(blitter_w);
 	DECLARE_WRITE32_MEMBER(eeprom_write);
 
-	DECLARE_DRIVER_INIT(rabbit);
+	void init_rabbit();
 
 	void rabbit(machine_config &config);
 
@@ -934,7 +934,7 @@ MACHINE_CONFIG_END
 
 
 
-DRIVER_INIT_MEMBER(rabbit_state,rabbit)
+void rabbit_state::init_rabbit()
 {
 	m_banking = 1;
 	m_vblirqlevel = 6;

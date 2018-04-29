@@ -30,7 +30,7 @@ public:
 	{ }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_DRIVER_INIT(init);
+	void init_init();
 
 	void esprit(machine_config &config);
 	void esprit3(machine_config &config);
@@ -110,7 +110,7 @@ static GFXDECODE_START( esprit )
 	GFXDECODE_ENTRY( "chargen", 0x0000, esprit_charlayout, 0, 1 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER( esprit_state, init )
+void esprit_state::init_init()
 {
 	// chargen is incomplete, copy the first half into the vacant second half
 	for (u16 i = 0; i < 0x800; i++)

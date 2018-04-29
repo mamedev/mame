@@ -168,7 +168,7 @@ public:
 	DECLARE_READ8_MEMBER(question_r);
 	DECLARE_WRITE8_MEMBER(question_w);
 	DECLARE_READ8_MEMBER(ff_r);
-	DECLARE_DRIVER_INIT(coinmstr);
+	void init_coinmstr();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_coinmstr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1554,16 +1554,15 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
+void coinmstr_state::init_coinmstr()
 {
 	uint8_t *rom = memregion("user1")->base();
 	int length = memregion("user1")->bytes();
 	std::vector<uint8_t> buf(length);
-	int i;
 
 	memcpy(&buf[0],rom,length);
 
-	for(i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 	{
 		int adr = bitswap<24>(i, 23,22,21,20,19,18,17,16,15, 14,8,7,2,5,12,10,9,11,13,3,6,0,1,4);
 		rom[i] = bitswap<8>(buf[adr],3,2,4,1,5,0,6,7);

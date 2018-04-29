@@ -46,7 +46,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 public:
-	DECLARE_DRIVER_INIT(sleic);
+	void init_sleic();
 };
 
 
@@ -63,7 +63,7 @@ void sleic_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(sleic_state,sleic)
+void sleic_state::init_sleic()
 {
 }
 

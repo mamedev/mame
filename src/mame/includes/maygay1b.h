@@ -133,9 +133,9 @@ public:
 
 	uint8_t m_main_to_mcu;
 
-	DECLARE_DRIVER_INIT(m1);
-	DECLARE_DRIVER_INIT(m1common);
-	DECLARE_DRIVER_INIT(m1nec);
+	void init_m1();
+	void init_m1common();
+	void init_m1nec();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void cpu0_firq(int data);

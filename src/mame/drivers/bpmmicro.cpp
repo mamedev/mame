@@ -175,7 +175,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(bp1200);
+	void init_bp1200();
 	DECLARE_WRITE16_MEMBER(unknown_82200_w);
 	DECLARE_READ16_MEMBER(latch_84000_r);
 	DECLARE_WRITE16_MEMBER(latch_84002_w);
@@ -198,7 +198,7 @@ private:
  Driver Init
 ******************************************************************************/
 
-DRIVER_INIT_MEMBER(bpmmicro_state,bp1200)
+void bpmmicro_state::init_bp1200()
 {
 	m_shifter = 0;
 	m_latch = 0;

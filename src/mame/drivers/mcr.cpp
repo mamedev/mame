@@ -2811,7 +2811,7 @@ void mcr_state::mcr_init(int cpuboard, int vidboard, int ssioboard)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,solarfox)
+void mcr_state::init_solarfox()
 {
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs = 16;
@@ -2821,7 +2821,7 @@ DRIVER_INIT_MEMBER(mcr_state,solarfox)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,kick)
+void mcr_state::init_kick()
 {
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs_flip = 16;
@@ -2830,7 +2830,7 @@ DRIVER_INIT_MEMBER(mcr_state,kick)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_dpoker_state,dpoker)
+void mcr_dpoker_state::init_dpoker()
 {
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs_flip = 16;
@@ -2858,13 +2858,13 @@ DRIVER_INIT_MEMBER(mcr_dpoker_state,dpoker)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,mcr_90010)
+void mcr_state::init_mcr_90010()
 {
 	mcr_init(90010, 91399, 90913);
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,wacko)
+void mcr_state::init_wacko()
 {
 	mcr_init(90010, 91399, 90913);
 
@@ -2874,7 +2874,7 @@ DRIVER_INIT_MEMBER(mcr_state,wacko)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,twotiger)
+void mcr_state::init_twotiger()
 {
 	mcr_init(90010, 91399, 90913);
 
@@ -2883,7 +2883,7 @@ DRIVER_INIT_MEMBER(mcr_state,twotiger)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,kroozr)
+void mcr_state::init_kroozr()
 {
 	mcr_init(90010, 91399, 91483);
 
@@ -2892,7 +2892,7 @@ DRIVER_INIT_MEMBER(mcr_state,kroozr)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,journey)
+void mcr_state::init_journey()
 {
 	mcr_init(91475, 91464, 90913);
 
@@ -2900,13 +2900,13 @@ DRIVER_INIT_MEMBER(mcr_state,journey)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,mcr_91490)
+void mcr_state::init_mcr_91490()
 {
 	mcr_init(91490, 91464, 90913);
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,dotrone)
+void mcr_state::init_dotrone()
 {
 	mcr_init(91490, 91464, 91657);
 
@@ -2914,7 +2914,7 @@ DRIVER_INIT_MEMBER(mcr_state,dotrone)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_nflfoot_state,nflfoot)
+void mcr_nflfoot_state::init_nflfoot()
 {
 	mcr_init(91490, 91464, 91657);
 
@@ -2926,7 +2926,7 @@ DRIVER_INIT_MEMBER(mcr_nflfoot_state,nflfoot)
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,demoderb)
+void mcr_state::init_demoderb()
 {
 	mcr_init(91490, 91464, 90913);
 

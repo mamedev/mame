@@ -87,7 +87,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cham24_IN0_w);
 	DECLARE_READ8_MEMBER(cham24_IN1_r);
 	DECLARE_WRITE8_MEMBER(cham24_mapper_w);
-	DECLARE_DRIVER_INIT(cham24);
+	void init_cham24();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -304,7 +304,7 @@ void cham24_state::machine_reset()
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff,read8_delegate(FUNC(cham24_state::nt_r), this), write8_delegate(FUNC(cham24_state::nt_w), this));
 }
 
-DRIVER_INIT_MEMBER(cham24_state,cham24)
+void cham24_state::init_cham24()
 {
 }
 

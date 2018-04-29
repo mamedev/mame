@@ -46,24 +46,23 @@ TODO:
 #include "nbmj8688.lh"
 
 
-DRIVER_INIT_MEMBER(nbmj8688_state,mjcamera)
+void nbmj8688_state::init_mjcamera()
 {
 	uint8_t *rom = memregion("voice")->base() + 0x20000;
 	uint8_t *prot = memregion("user1")->base();
-	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x5894 checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x10000;i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		rom[i] = bitswap<8>(prot[i],1,6,0,4,2,3,5,7);
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,kanatuen)
+void nbmj8688_state::init_kanatuen()
 {
 	/* uses the same protection data as mjcamer, but a different check */
 	uint8_t *rom = memregion("voice")->base() + 0x30000;
@@ -74,7 +73,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kanatuen)
 	rom[0x0301] = 0xdc;
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,kyuhito)
+void nbmj8688_state::init_kyuhito()
 {
 #if 1
 	/* uses the same protection data as ????, but a different check */
@@ -86,35 +85,33 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kyuhito)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,idhimitu)
+void nbmj8688_state::init_idhimitu()
 {
 	uint8_t *rom = memregion("voice")->base() + 0x20000;
 	uint8_t *prot = memregion("user1")->base();
-	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x9944 checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x10000;i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		rom[i] = bitswap<8>(prot[i + 0x10000],4,6,2,1,7,0,3,5);
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8688_state,kaguya2)
+void nbmj8688_state::init_kaguya2()
 {
 	uint8_t *rom = memregion("voice")->base() + 0x20000;
 	uint8_t *prot = memregion("user1")->base();
-	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x5894 checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x10000;i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
 		rom[i] = bitswap<8>(prot[i],1,6,0,4,2,3,5,7);
 	}

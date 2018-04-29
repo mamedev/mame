@@ -247,7 +247,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(expro02_6295_bankswitch_w);
 
-	DECLARE_DRIVER_INIT(expro02);
+	void init_expro02();
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(expro02);
 
@@ -1821,18 +1821,17 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(expro02_state,expro02)
+void expro02_state::init_expro02()
 {
 	uint32_t *src = (uint32_t *)memregion("gfx3" )->base();
 	uint32_t *dst = (uint32_t *)memregion("gfx2" )->base();
-	int x, offset;
 
 	// the VIEW2 tiledata is scrambled
 	if (src)
 	{
-		for (x = 0; x < 0x80000; x++)
+		for (int x = 0; x < 0x80000; x++)
 		{
-			offset = x;
+			int offset = x;
 
 			// swap bits around to simplify further processing
 			offset = bitswap<24>(offset, 23, 22, 21, 20, 19, 18, 15, 9, 10, 8, 7, 12, 13, 16, 17, 6, 5, 4, 3, 14, 11, 2, 1, 0);

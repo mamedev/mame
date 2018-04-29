@@ -1168,7 +1168,7 @@ READ32_MEMBER( captaven_state::_71_r )
 	return 0xffffffff;
 }
 
-DRIVER_INIT_MEMBER( captaven_state, captaven )
+void captaven_state::init_captaven()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
@@ -1214,7 +1214,7 @@ void dragngun_state::dragngun_init_common()
 //  process_dvi_data(this,memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
-DRIVER_INIT_MEMBER( dragngun_state, dragngun )
+void dragngun_state::init_dragngun()
 {
 	dragngun_init_common();
 
@@ -1222,7 +1222,7 @@ DRIVER_INIT_MEMBER( dragngun_state, dragngun )
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER( dragngun_state, dragngunj )
+void dragngun_state::init_dragngunj()
 {
 	dragngun_init_common();
 
@@ -1230,13 +1230,13 @@ DRIVER_INIT_MEMBER( dragngun_state, dragngunj )
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
-DRIVER_INIT_MEMBER( fghthist_state, fghthist )
+void fghthist_state::init_fghthist()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 }
 
-DRIVER_INIT_MEMBER( dragngun_state, lockload )
+void dragngun_state::init_lockload()
 {
 //  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
@@ -1251,7 +1251,7 @@ DRIVER_INIT_MEMBER( dragngun_state, lockload )
 	save_item(NAME(m_oki2_bank));
 }
 
-DRIVER_INIT_MEMBER( nslasher_state, tattass )
+void nslasher_state::init_tattass()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);
@@ -1278,7 +1278,7 @@ DRIVER_INIT_MEMBER( nslasher_state, tattass )
 	save_item(NAME(m_byteAddr));
 }
 
-DRIVER_INIT_MEMBER( nslasher_state, nslasher )
+void nslasher_state::init_nslasher()
 {
 	uint8_t *RAM = memregion("gfx1")->base();
 	std::vector<uint8_t> tmp(0x80000);

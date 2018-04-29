@@ -86,7 +86,7 @@ public:
 	DECLARE_READ16_MEMBER(mjmux_r);
 	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
 	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
-	DECLARE_DRIVER_INIT(mirage);
+	void init_mirage();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -369,7 +369,7 @@ ROM_START( mirage )
 	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(miragemj_state,mirage)
+void miragemj_state::init_mirage()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }

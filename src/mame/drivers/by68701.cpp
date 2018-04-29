@@ -22,7 +22,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 public:
-	DECLARE_DRIVER_INIT(by68701);
+	void init_by68701();
 };
 
 
@@ -42,7 +42,7 @@ void by68701_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(by68701_state,by68701)
+void by68701_state::init_by68701()
 {
 }
 

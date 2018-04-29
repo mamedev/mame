@@ -67,7 +67,7 @@ public:
 	DECLARE_WRITE16_MEMBER(prot_w);
 	DECLARE_WRITE16_MEMBER(bmc_1_videoram_w);
 	DECLARE_WRITE16_MEMBER(bmc_2_videoram_w);
-	DECLARE_DRIVER_INIT(koftball);
+	void init_koftball();
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
 	virtual void video_start() override;
@@ -304,14 +304,14 @@ static const uint16_t nvram[]=
 };
 
 #endif
-DRIVER_INIT_MEMBER(koftball_state,koftball)
+void koftball_state::init_koftball()
 {
 	save_item(NAME(m_prot_data));
 
 #if NVRAM_HACK
 	{
-		int offset=0;
-		while(nvram[offset]!=0xffff)
+		int offset = 0;
+		while(nvram[offset] != 0xffff)
 		{
 			m_main_ram[offset]=nvram[offset];
 			++offset;

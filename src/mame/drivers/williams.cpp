@@ -3128,26 +3128,24 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(williams_state,defender)
+void williams_state::init_defender()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,defndjeu)
+void williams_state::init_defndjeu()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* apply simple decryption by swapping bits 0 and 7 */
-	for (i = 0xd000; i < 0x19000; i++)
+	for (int i = 0xd000; i < 0x19000; i++)
 		rom[i] = bitswap<8>(rom[i],0,6,5,4,3,2,1,7);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,mayday)
+void williams_state::init_mayday()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
@@ -3164,25 +3162,25 @@ DRIVER_INIT_MEMBER(williams_state,mayday)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(williams_state,stargate)
+void williams_state::init_stargate()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,robotron)
+void williams_state::init_robotron()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,joust)
+void williams_state::init_joust()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,bubbles)
+void williams_state::init_bubbles()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 
@@ -3191,31 +3189,31 @@ DRIVER_INIT_MEMBER(williams_state,bubbles)
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,splat)
+void williams_state::init_splat()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0xc000);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,sinistar)
+void williams_state::init_sinistar()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0x7400);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,playball)
+void williams_state::init_playball()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 }
 
 
-DRIVER_INIT_MEMBER(blaster_state,blaster)
+void blaster_state::init_blaster()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9700);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,spdball)
+void williams_state::init_spdball()
 {
 	pia6821_device *pia_3 = machine().device<pia6821_device>("pia_3");
 
@@ -3232,21 +3230,21 @@ DRIVER_INIT_MEMBER(williams_state,spdball)
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,alienar)
+void williams_state::init_alienar()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,alienaru)
+void williams_state::init_alienaru()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
 }
 
 
-DRIVER_INIT_MEMBER(williams_state,lottofun)
+void williams_state::init_lottofun()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC1, 0xc000);
 }
@@ -3259,28 +3257,28 @@ DRIVER_INIT_MEMBER(williams_state,lottofun)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(williams2_state,mysticm)
+void williams2_state::init_mysticm()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_MYSTICM);
 }
 
 
-DRIVER_INIT_MEMBER(williams2_state,tshoot)
+void williams2_state::init_tshoot()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
 }
 
 
-DRIVER_INIT_MEMBER(williams2_state,inferno)
+void williams2_state::init_inferno()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
 }
 
 
-DRIVER_INIT_MEMBER(joust2_state,joust2)
+void joust2_state::init_joust2()
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC2, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_JOUST2);

@@ -6001,7 +6001,7 @@ void model3_state::interleave_vroms()
 }
 
 
-DRIVER_INIT_MEMBER(model3_state,model3_10)
+void model3_state::init_model3_10()
 {
 	interleave_vroms();
 
@@ -6014,7 +6014,7 @@ DRIVER_INIT_MEMBER(model3_state,model3_10)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
 }
 
-DRIVER_INIT_MEMBER(model3_state,model3_15)
+void model3_state::init_model3_15()
 {
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
@@ -6024,7 +6024,7 @@ DRIVER_INIT_MEMBER(model3_state,model3_15)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
 }
 
-DRIVER_INIT_MEMBER(model3_state,model3_20)
+void model3_state::init_model3_20()
 {
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
@@ -6036,19 +6036,19 @@ DRIVER_INIT_MEMBER(model3_state,model3_20)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
 }
 
-DRIVER_INIT_MEMBER(model3_state,lostwsga)
+void model3_state::init_lostwsga()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 
-	DRIVER_INIT_CALL(model3_15);
+	init_model3_15();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
 	rom[0x7374f0/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
 }
 
-DRIVER_INIT_MEMBER(model3_state,scud)
+void model3_state::init_scud()
 {
-	DRIVER_INIT_CALL(model3_15);
+	init_model3_15();
 	/* TODO: network device at 0xC0000000 - FF */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
@@ -6056,32 +6056,32 @@ DRIVER_INIT_MEMBER(model3_state,scud)
 //  rom[(0x799de8^4)/4] = 0x00050208;       // secret debug menu
 }
 
-DRIVER_INIT_MEMBER(model3_state,scudplus)
+void model3_state::init_scudplus()
 {
-	DRIVER_INIT_CALL(model3_15);
+	init_model3_15();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 }
 
-DRIVER_INIT_MEMBER(model3_state,scudplusa)
+void model3_state::init_scudplusa()
 {
-	DRIVER_INIT_CALL(model3_15);
+	init_model3_15();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 }
 
-DRIVER_INIT_MEMBER(model3_state,lemans24)
+void model3_state::init_lemans24()
 {
-	DRIVER_INIT_CALL(model3_15);
+	init_model3_15();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc1000000, 0xc10000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
 //  rom[(0x73fe38^4)/4] = 0x38840004;       /* This seems to be an actual bug in the original code */
 }
 
-DRIVER_INIT_MEMBER(model3_state,vf3)
+void model3_state::init_vf3()
 {
 	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
 
-	DRIVER_INIT_CALL(model3_10);
+	init_model3_10();
 
 	/*
 	rom[(0x713c7c^4)/4] = 0x60000000;
@@ -6091,7 +6091,7 @@ DRIVER_INIT_MEMBER(model3_state,vf3)
 	*/
 }
 
-DRIVER_INIT_MEMBER(model3_state,vs215)
+void model3_state::init_vs215()
 {
 	m_step15_with_mpc106 = true;
 
@@ -6107,7 +6107,7 @@ DRIVER_INIT_MEMBER(model3_state,vs215)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
 }
 
-DRIVER_INIT_MEMBER(model3_state,vs29815)
+void model3_state::init_vs29815()
 {
 	m_step15_with_mpc106 = true;
 
@@ -6128,7 +6128,7 @@ DRIVER_INIT_MEMBER(model3_state,vs29815)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
 }
 
-DRIVER_INIT_MEMBER(model3_state,bass)
+void model3_state::init_bass()
 {
 	m_step15_with_mpc106 = true;
 
@@ -6144,7 +6144,7 @@ DRIVER_INIT_MEMBER(model3_state,bass)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc106_reg_r),this), write64_delegate(FUNC(model3_state::mpc106_reg_w),this));
 }
 
-DRIVER_INIT_MEMBER(model3_state,getbass)
+void model3_state::init_getbass()
 {
 	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
@@ -6156,34 +6156,34 @@ DRIVER_INIT_MEMBER(model3_state,getbass)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf8fff000, 0xf8fff0ff, read64_delegate(FUNC(model3_state::mpc105_reg_r),this), write64_delegate(FUNC(model3_state::mpc105_reg_w),this));
 }
 
-DRIVER_INIT_MEMBER(model3_state,vs2)
+void model3_state::init_vs2()
 {
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 }
 
-DRIVER_INIT_MEMBER(model3_state,vs298)
+void model3_state::init_vs298()
 {
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 }
 
-DRIVER_INIT_MEMBER(model3_state,vs299)
+void model3_state::init_vs299()
 {
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 }
 
-DRIVER_INIT_MEMBER(model3_state,harley)
+void model3_state::init_harley()
 {
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 }
 
-DRIVER_INIT_MEMBER(model3_state,harleya)
+void model3_state::init_harleya()
 {
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 }
 
-DRIVER_INIT_MEMBER(model3_state,srally2)
+void model3_state::init_srally2()
 {
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	rom[(0x7c0c4^4)/4] = 0x60000000;
@@ -6195,10 +6195,10 @@ DRIVER_INIT_MEMBER(model3_state,srally2)
 	// Writes command 000023FFFFFFFFFE, expects result 0x01000000000 (?? bits)
 }
 
-DRIVER_INIT_MEMBER(model3_state,swtrilgy)
+void model3_state::init_swtrilgy()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	// Unemulated JTAG stuff, see srally2
 	rom[(0xf776c^4)/4] = 0x60000000;
@@ -6209,32 +6209,32 @@ DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 	rom[(0xf6e44^4)/4] = 0x60000000;
 }
 
-DRIVER_INIT_MEMBER(model3_state,swtrilga)
+void model3_state::init_swtrilga()
 {
 	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	//rom[(0xf6dd0^4)/4] = 0x60000000;
 }
 
-DRIVER_INIT_MEMBER(model3_state,von2)
+void model3_state::init_von2()
 {
 	m_step20_with_old_real3d = true;
 
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 }
 
-DRIVER_INIT_MEMBER(model3_state,dirtdvls)
+void model3_state::init_dirtdvls()
 {
 	m_step20_with_old_real3d = true;
 
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 }
 
-DRIVER_INIT_MEMBER(model3_state,daytona2)
+void model3_state::init_daytona2()
 {
 //  uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
@@ -6245,10 +6245,10 @@ DRIVER_INIT_MEMBER(model3_state,daytona2)
 	//rom[(0x69f4e4^4)/4] = 0x60000000;
 }
 
-DRIVER_INIT_MEMBER(model3_state,dayto2pe)
+void model3_state::init_dayto2pe()
 {
 //  uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc3800000, 0xc3800007, write64_delegate(FUNC(model3_state::daytona2_rombank_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
@@ -6260,27 +6260,27 @@ DRIVER_INIT_MEMBER(model3_state,dayto2pe)
 //  rom[(0x64ca34^4)/4] = 0x60000000;       // dec
 }
 
-DRIVER_INIT_MEMBER(model3_state,spikeout)
+void model3_state::init_spikeout()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
 	rom[(0x6059ec^4)/4] = 0x60000000;
 }
 
-DRIVER_INIT_MEMBER(model3_state,spikeofe)
+void model3_state::init_spikeofe()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
 	rom[(0x6059ec^4)/4] = 0x60000000;
 }
 
-DRIVER_INIT_MEMBER(model3_state,eca)
+void model3_state::init_eca()
 {
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	// base = 0xffc80000
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
@@ -6293,10 +6293,10 @@ DRIVER_INIT_MEMBER(model3_state,eca)
 	rom[(0x5523d4^4)/4] = 0x60000000;
 }
 
-DRIVER_INIT_MEMBER(model3_state,skichamp)
+void model3_state::init_skichamp()
 {
 	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	/*
 	rom[(0x5263c8^4)/4] = 0x60000000;
@@ -6306,26 +6306,26 @@ DRIVER_INIT_MEMBER(model3_state,skichamp)
 	*/
 }
 
-DRIVER_INIT_MEMBER(model3_state,oceanhun)
+void model3_state::init_oceanhun()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 
 	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
 }
 
-DRIVER_INIT_MEMBER(model3_state,magtruck)
+void model3_state::init_magtruck()
 {
 	m_step20_with_old_real3d = true;
 
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 }
 
-DRIVER_INIT_MEMBER(model3_state,lamachin)
+void model3_state::init_lamachin()
 {
 	m_step20_with_old_real3d = true;
 
-	DRIVER_INIT_CALL(model3_20);
+	init_model3_20();
 }
 
 

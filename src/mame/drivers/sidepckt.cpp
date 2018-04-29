@@ -495,7 +495,7 @@ ROM_START( sidepcktb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
+void sidepckt_state::init_sidepckt()
 {
 	m_prot_table[0] = sidepckt_prot_table_1;
 	m_prot_table[1] = sidepckt_prot_table_2;
@@ -509,7 +509,7 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 	save_item(NAME(m_scroll_y));
 }
 
-DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
+void sidepckt_state::init_sidepcktj()
 {
 	m_prot_table[0] = sidepcktj_prot_table_1;
 	m_prot_table[1] = sidepcktj_prot_table_2;

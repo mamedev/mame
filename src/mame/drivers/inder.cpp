@@ -81,8 +81,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
-	DECLARE_DRIVER_INIT(inder);
-	DECLARE_DRIVER_INIT(inder1);
+	void init_inder();
+	void init_inder1();
 	void inder(machine_config &config);
 	void brvteam(machine_config &config);
 	void canasta(machine_config &config);
@@ -1330,7 +1330,7 @@ void inder_state::machine_reset()
 	}
 }
 
-DRIVER_INIT_MEMBER( inder_state, inder )
+void inder_state::init_inder()
 {
 	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())
@@ -1342,7 +1342,7 @@ DRIVER_INIT_MEMBER( inder_state, inder )
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( inder_state, inder1 )
+void inder_state::init_inder1()
 {
 	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())

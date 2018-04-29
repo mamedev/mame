@@ -74,7 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(irq_enable_r);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 
-	DECLARE_DRIVER_INIT(lastbank);
+	void init_lastbank();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_scanline);
 	void lastbank(machine_config &config);
@@ -592,7 +592,7 @@ ROM_START( lastbank )
 	ROM_LOAD( "7.u60", 0x00000, 0x80000, CRC(41be7146) SHA1(00f1c0d5809efccf888e27518a2a5876c4b633d8) )
 ROM_END
 
-DRIVER_INIT_MEMBER(lastbank_state,lastbank)
+void lastbank_state::init_lastbank()
 {
 	uint32_t max = memregion("maincpu")->bytes() / 0x2000;
 	m_mainbank->configure_entries(0, max, memregion("maincpu")->base(), 0x2000);

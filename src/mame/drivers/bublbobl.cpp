@@ -2012,23 +2012,22 @@ void bublbobl_state::configure_banks(  )
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,common)
+void bublbobl_state::init_common()
 {
 	configure_banks();
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,dland)
+void bublbobl_state::init_dland()
 {
 	// rearrange gfx to original format
-	int i;
 	uint8_t* src = memregion("gfx1")->base();
-	for (i = 0; i < 0x40000; i++)
+	for (int i = 0; i < 0x40000; i++)
 		src[i] = bitswap<8>(src[i],7,6,5,4,0,1,2,3);
 
-	for (i = 0x40000; i < 0x80000; i++)
+	for (int i = 0x40000; i < 0x80000; i++)
 		src[i] = bitswap<8>(src[i],7,4,5,6,3,0,1,2);
 
-	DRIVER_INIT_CALL(common);
+	init_common();
 }
 
 

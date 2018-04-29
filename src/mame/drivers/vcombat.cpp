@@ -126,8 +126,8 @@ public:
 	DECLARE_WRITE16_MEMBER(crtc_w);
 	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
-	DECLARE_DRIVER_INIT(shadfgtr);
-	DECLARE_DRIVER_INIT(vcombat);
+	void init_shadfgtr();
+	void init_vcombat();
 	DECLARE_MACHINE_RESET(vcombat);
 	DECLARE_MACHINE_RESET(shadfgtr);
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
@@ -443,7 +443,7 @@ MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
 }
 
 
-DRIVER_INIT_MEMBER(vcombat_state,vcombat)
+void vcombat_state::init_vcombat()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -475,7 +475,7 @@ DRIVER_INIT_MEMBER(vcombat_state,vcombat)
 	ROM[0x4017] = 0x66;
 }
 
-DRIVER_INIT_MEMBER(vcombat_state,shadfgtr)
+void vcombat_state::init_shadfgtr()
 {
 	/* Allocate th 68000 frame buffers */
 	m_m68k_framebuffer[0] = std::make_unique<uint16_t[]>(0x8000);

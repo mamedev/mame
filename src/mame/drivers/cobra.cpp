@@ -831,9 +831,9 @@ public:
 
 	dmadac_sound_device *m_dmadac[2];
 
-	DECLARE_DRIVER_INIT(racjamdx);
-	DECLARE_DRIVER_INIT(bujutsu);
-	DECLARE_DRIVER_INIT(cobra);
+	void init_racjamdx();
+	void init_bujutsu();
+	void init_cobra();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -3348,7 +3348,7 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(cobra_state, cobra)
+void cobra_state::init_cobra()
 {
 	m_gfxfifo_in  = auto_alloc(machine(),
 								cobra_fifo(machine(),
@@ -3403,9 +3403,9 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 	m_gfx_pagetable[0x80 / 8] = 0x80000100200001a8U;        // should this map to 0x1e000000?
 }
 
-DRIVER_INIT_MEMBER(cobra_state,bujutsu)
+void cobra_state::init_bujutsu()
 {
-	DRIVER_INIT_CALL(cobra);
+	init_cobra();
 
 	// rom hacks for sub board...
 	{
@@ -3485,9 +3485,9 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 	m_has_psac = false;
 }
 
-DRIVER_INIT_MEMBER(cobra_state,racjamdx)
+void cobra_state::init_racjamdx()
 {
-	DRIVER_INIT_CALL(cobra);
+	init_cobra();
 
 	// rom hacks for sub board...
 	{
@@ -3514,7 +3514,6 @@ DRIVER_INIT_MEMBER(cobra_state,racjamdx)
 
 	// rom hacks for gfx board...
 	{
-		int i;
 		uint32_t sum = 0;
 
 		uint32_t *rom = (uint32_t*)memregion("user3")->base();
@@ -3524,7 +3523,7 @@ DRIVER_INIT_MEMBER(cobra_state,racjamdx)
 		rom[(0x02438^4) / 4] = 0x60000000;      // awfully long delay loop (5000000 * 166)
 
 		// calculate the checksum of the patched rom...
-		for (i=0; i < 0x20000/4; i++)
+		for (int i = 0; i < 0x20000/4; i++)
 		{
 			sum += (uint8_t)((rom[i] >> 24) & 0xff);
 			sum += (uint8_t)((rom[i] >> 16) & 0xff);

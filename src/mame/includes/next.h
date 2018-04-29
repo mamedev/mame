@@ -188,14 +188,14 @@ protected:
 	void dma_end(int slot);
 
 public:
-	DECLARE_DRIVER_INIT(nexts2);
-	DECLARE_DRIVER_INIT(next);
-	DECLARE_DRIVER_INIT(nextsc);
-	DECLARE_DRIVER_INIT(nextst);
-	DECLARE_DRIVER_INIT(nextct);
-	DECLARE_DRIVER_INIT(nextstc);
-	DECLARE_DRIVER_INIT(nextctc);
-	DECLARE_DRIVER_INIT(nexts);
+	void init_nexts2();
+	void init_next();
+	void init_nextsc();
+	void init_nextst();
+	void init_nextct();
+	void init_nextstc();
+	void init_nextctc();
+	void init_nexts();
 };
 
 #endif

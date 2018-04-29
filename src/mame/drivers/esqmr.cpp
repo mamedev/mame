@@ -223,7 +223,7 @@ public:
 	virtual void machine_reset() override;
 
 public:
-	DECLARE_DRIVER_INIT(mr);
+	void init_mr();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 	void mr(machine_config &config);
@@ -317,7 +317,7 @@ ROM_START( mrrack )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqmr_state, mr)
+void esqmr_state::init_mr()
 {
 }
 

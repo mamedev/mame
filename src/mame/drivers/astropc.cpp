@@ -31,7 +31,7 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 public:
-	DECLARE_DRIVER_INIT(astropc);
+	void init_astropc();
 };
 
 void astropc_state::astropc_map(address_map &map)
@@ -163,7 +163,7 @@ ROM_START( rasce )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(astropc_state,astropc)
+void astropc_state::init_astropc()
 {
 }
 

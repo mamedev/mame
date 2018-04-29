@@ -914,15 +914,15 @@ READ8_MEMBER(lkage_state::fake_status_r)
 	return m_mcu_ready;
 }
 
-DRIVER_INIT_MEMBER(lkage_state,lkage)
+void lkage_state::init_lkage()
 {
-	m_sprite_dx=0;
+	m_sprite_dx = 0;
 }
 
 
-DRIVER_INIT_MEMBER(lkage_state,bygone)
+void lkage_state::init_bygone()
 {
-	m_sprite_dx=1;
+	m_sprite_dx = 1;
 }
 
 GAME( 1984, lkage,    0,        lkage,    lkage,  lkage_state,   lkage,    ROT0, "Taito Corporation", "The Legend of Kage",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

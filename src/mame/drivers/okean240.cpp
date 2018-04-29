@@ -91,7 +91,7 @@ public:
 	DECLARE_READ8_MEMBER(okean240a_port42_r);
 	void kbd_put(u8 data);
 	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_DRIVER_INIT(okean240);
+	void init_okean240();
 	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void okean240a(machine_config &config);
@@ -441,7 +441,7 @@ void okean240_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-DRIVER_INIT_MEMBER(okean240_state,okean240)
+void okean240_state::init_okean240()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);

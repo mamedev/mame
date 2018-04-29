@@ -92,7 +92,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
 	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
 	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
-	DECLARE_DRIVER_INIT(pzlestar);
+	void init_pzlestar();
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(pzlestar);
 	DECLARE_MACHINE_RESET(sexyboom);
@@ -537,7 +537,7 @@ ROM_START( sexyboom )
 	/* 15 empty */
 ROM_END
 
-DRIVER_INIT_MEMBER(sangho_state,pzlestar)
+void sangho_state::init_pzlestar()
 {
 	uint8_t *ROM = m_region_user1->base();
 

@@ -120,7 +120,7 @@ public:
 		m_watchdog(*this, "watchdog")
 	{ }
 
-	DECLARE_DRIVER_INIT(looping);
+	void init_looping();
 	void looping(machine_config &config);
 
 protected:
@@ -920,16 +920,15 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(looping_state,looping)
+void looping_state::init_looping()
 {
 	int length = memregion("maincpu")->bytes();
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
 
 	m_cop_port_l = 0;
 
 	/* bitswap the TMS9995 ROMs */
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */

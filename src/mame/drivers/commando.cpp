@@ -669,7 +669,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DRIVER_INIT_MEMBER(commando_state,commando)
+void commando_state::init_commando()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -682,7 +682,7 @@ DRIVER_INIT_MEMBER(commando_state,commando)
 	}
 }
 
-DRIVER_INIT_MEMBER(commando_state,spaceinv)
+void commando_state::init_spaceinv()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 

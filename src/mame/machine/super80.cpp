@@ -226,7 +226,7 @@ MACHINE_RESET_MEMBER( super80_state, super80r )
 	membank("boot")->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER( super80_state,super80 )
+void super80_state::init_super80()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);

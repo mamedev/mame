@@ -267,7 +267,7 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	MCFG_DEVICE_ADDRESS_MAP(0, pokechmp_oki_map)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(pokechmp_state,pokechmp)
+void pokechmp_state::init_pokechmp()
 {
 	// default sound rom bank
 	membank("bank3")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);

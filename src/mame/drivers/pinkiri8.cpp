@@ -64,7 +64,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_DRIVER_INIT(ronjan);
+	void init_ronjan();
 	void pinkiri8(machine_config &config);
 
 protected:
@@ -1240,7 +1240,7 @@ READ8_MEMBER(pinkiri8_state::ronjan_patched_prot_r)
 	return 0; //value is read then discarded
 }
 
-DRIVER_INIT_MEMBER(pinkiri8_state,ronjan)
+void pinkiri8_state::init_ronjan()
 {
 	m_maincpu->space(AS_IO).install_readwrite_handler(0x90, 0x90, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_r), this), write8_delegate(FUNC(pinkiri8_state::ronjan_prot_w), this));
 	m_maincpu->space(AS_IO).install_read_handler(0x66, 0x66, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_status_r), this));

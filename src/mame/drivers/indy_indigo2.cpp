@@ -85,8 +85,7 @@ public:
 
 	DECLARE_WRITE32_MEMBER(ip22_write_ram);
 
-	DECLARE_DRIVER_INIT(ip225015);
-
+	void init_ip225015();
 	void ip225015(machine_config &config);
 	void ip224613(machine_config &config);
 	void ip244415(machine_config &config);
@@ -185,7 +184,7 @@ void ip22_state::machine_start()
 {
 }
 
-DRIVER_INIT_MEMBER(ip22_state, ip225015)
+void ip22_state::init_ip225015()
 {
 	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
 	// interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.

@@ -2104,39 +2104,36 @@ void arkanoid_state::arkanoid_bootleg_init(  )
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd008, 0xd008, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d008_r),this) );
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkangc)
+void arkanoid_state::init_arkangc()
 {
 	m_bootleg_id = ARKANGC;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkangc2)
+void arkanoid_state::init_arkangc2()
 {
 	m_bootleg_id = ARKANGC2;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,block2)
+void arkanoid_state::init_block2()
 {
 	// the graphics on this bootleg have the data scrambled
-	int tile;
 	uint8_t* srcgfx = memregion("gfx1")->base();
 	std::vector<uint8_t> buffer(0x18000);
 
-	for (tile = 0; tile < 0x3000; tile++)
+	for (int tile = 0; tile < 0x3000; tile++)
 	{
-		int srctile;
-
 		// combine these into a single swap..
-		srctile = bitswap<16>(tile,15,14,13,12,
-						11,10,9,8,
-						7,5,6,3,
-						1,2,4,0);
+		int srctile = bitswap<16>(tile,15,14,13,12,
+						               11,10, 9, 8,
+						                7, 5, 6, 3,
+						                1, 2, 4, 0);
 
 		srctile = bitswap<16>(srctile,15,14,13,12,
-						11,9,10,5,
-						7,6,8,4,
-						3,2,1,0);
+						              11, 9,10, 5,
+						               7, 6, 8, 4,
+						               3, 2, 1, 0);
 
 		srctile = srctile ^ 0xd4;
 
@@ -2149,37 +2146,35 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkblock)
+void arkanoid_state::init_arkblock()
 {
 	m_bootleg_id = ARKBLOCK;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkbloc2)
+void arkanoid_state::init_arkbloc2()
 {
 	m_bootleg_id = ARKBLOC2;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,arkgcbl)
+void arkanoid_state::init_arkgcbl()
 {
 	m_bootleg_id = ARKGCBL;
 	arkanoid_bootleg_init();
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,paddle2)
+void arkanoid_state::init_paddle2()
 {
 	m_bootleg_id = PADDLE2;
 	arkanoid_bootleg_init();
 }
 
 
-DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
+void arkanoid_state::init_tetrsark()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int x;
-
-	for (x = 0; x < 0x8000; x++)
+	for (int x = 0; x < 0x8000; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x94;
 	}
@@ -2188,12 +2183,10 @@ DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
 }
 
 
-DRIVER_INIT_MEMBER(arkanoid_state,hexa)
+void arkanoid_state::init_hexa()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 #if 0
-
-
 	/* Hexa is not protected or anything, but it keeps writing 0x3f to register */
 	/* 0x07 of the AY8910, to read the input ports. This causes clicks in the */
 	/* music since the output channels are continuously disabled and reenabled. */
@@ -2207,9 +2200,9 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 	membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,hexaa)
+void arkanoid_state::init_hexaa()
 {
-	DRIVER_INIT_CALL(hexa);
+	init_hexa();
 
 	m_hexaa_from_main = 0;
 	m_hexaa_from_sub = 0;
@@ -2218,7 +2211,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexaa)
 	save_item(NAME(m_hexaa_from_sub));
 }
 
-DRIVER_INIT_MEMBER(arkanoid_state,brixian)
+void arkanoid_state::init_brixian()
 {
 	uint8_t *RAM = memregion("protdata")->base();
 

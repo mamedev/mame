@@ -73,15 +73,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 
 	virtual void machine_start() override;
-	DECLARE_DRIVER_INIT(cclimber);
-	DECLARE_DRIVER_INIT(yamato);
-	DECLARE_DRIVER_INIT(ckongb);
-	DECLARE_DRIVER_INIT(toprollr);
-	DECLARE_DRIVER_INIT(cclimberj);
-	DECLARE_DRIVER_INIT(cannonb2);
-	DECLARE_DRIVER_INIT(cannonb);
-	DECLARE_DRIVER_INIT(dking);
-	DECLARE_DRIVER_INIT(rpatrol);
+	void init_cclimber();
+	void init_yamato();
+	void init_ckongb();
+	void init_toprollr();
+	void init_cclimberj();
+	void init_cannonb2();
+	void init_cannonb();
+	void init_dking();
+	void init_rpatrol();
 	DECLARE_VIDEO_START(cclimber);
 	DECLARE_PALETTE_INIT(cclimber);
 	DECLARE_VIDEO_START(swimmer);

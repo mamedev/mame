@@ -620,7 +620,7 @@ void esripsys_state::video_cpu_map(address_map &map)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(esripsys_state,esripsys)
+void esripsys_state::init_esripsys()
 {
 	uint8_t *rom = memregion("sound_data")->base();
 

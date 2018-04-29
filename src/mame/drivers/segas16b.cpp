@@ -8937,12 +8937,12 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 //  initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16b_state,generic_5358_small) { init_generic(ROM_BOARD_171_5358_SMALL); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5358) { init_generic(ROM_BOARD_171_5358); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5521) { init_generic(ROM_BOARD_171_5521); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5704) { init_generic(ROM_BOARD_171_5704); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_5797) { init_generic(ROM_BOARD_171_5797); }
-DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
+void segas16b_state::init_generic_5358_small() { init_generic(ROM_BOARD_171_5358_SMALL); }
+void segas16b_state::init_generic_5358() { init_generic(ROM_BOARD_171_5358); }
+void segas16b_state::init_generic_5521() { init_generic(ROM_BOARD_171_5521); }
+void segas16b_state::init_generic_5704() { init_generic(ROM_BOARD_171_5704); }
+void segas16b_state::init_generic_5797() { init_generic(ROM_BOARD_171_5797); }
+void segas16b_state::init_generic_korean()
 {
 	init_generic(ROM_BOARD_KOREAN);
 
@@ -8955,7 +8955,7 @@ DRIVER_INIT_MEMBER(segas16b_state,generic_korean)
 	emu_timer *timer = timer_alloc(TID_ATOMICP_SOUND_IRQ);
 	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
-DRIVER_INIT_MEMBER(segas16b_state, lockonph)
+void segas16b_state::init_lockonph()
 {
 	init_generic(ROM_BOARD_KOREAN);
 
@@ -8966,7 +8966,7 @@ DRIVER_INIT_MEMBER(segas16b_state, lockonph)
 
 	m_spritepalbase = 0x800; // tiles are 4bpp so sprite base is 0x800 instead of 0x400
 }
-DRIVER_INIT_MEMBER(segas16b_state, generic_bootleg)
+void segas16b_state::init_generic_bootleg()
 {
 	init_generic(ROM_BOARD_KOREAN);
 	m_disable_screen_blanking = true;
@@ -8978,78 +8978,78 @@ DRIVER_INIT_MEMBER(segas16b_state, generic_bootleg)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segas16b_state,aceattac_5358)
+void segas16b_state::init_aceattac_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::aceattac_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::aceattac_custom_io_w), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,aliensyn7_5358_small)
+void segas16b_state::init_aliensyn7_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,altbeasj_5521)
+void segas16b_state::init_altbeasj_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeasj_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,altbeas5_5521)
+void segas16b_state::init_altbeas5_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeas5_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,altbeas4_5521)
+void segas16b_state::init_altbeas4_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,ddux_5704)
+void segas16b_state::init_ddux_5704()
 {
-	DRIVER_INIT_CALL(generic_5704);
+	init_generic_5704();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::ddux_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,dunkshot_5358_small)
+void segas16b_state::init_dunkshot_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::dunkshot_custom_io_r), this);
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,exctleag_5358)
+void segas16b_state::init_exctleag_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,hwchamp_5521)
+void segas16b_state::init_hwchamp_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::hwchamp_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::hwchamp_custom_io_w), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,passshtj_5358)
+void segas16b_state::init_passshtj_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::passshtj_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,cencourt_5358)
+void segas16b_state::init_cencourt_5358()
 {
-	DRIVER_INIT_CALL(passshtj_5358);
+	init_passshtj_5358();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
+void segas16b_state::init_sdi_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 
 	if (memregion("maincpux") != nullptr)
@@ -9059,9 +9059,9 @@ DRIVER_INIT_MEMBER(segas16b_state,sdi_5358_small)
 	}
 }
 
-DRIVER_INIT_MEMBER(segas16b_state, fpointbla)
+void segas16b_state::init_fpointbla()
 {
-	DRIVER_INIT_CALL(generic_bootleg);
+	init_generic_bootleg();
 
 	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
@@ -9071,53 +9071,53 @@ DRIVER_INIT_MEMBER(segas16b_state, fpointbla)
 	}
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,defense_5358_small)
+void segas16b_state::init_defense_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sdi_custom_io_r), this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,shinobi4_5521)
+void segas16b_state::init_shinobi4_5521()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,shinobi3_5358)
+void segas16b_state::init_shinobi3_5358()
 {
-	DRIVER_INIT_CALL(generic_5358);
+	init_generic_5358();
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,sjryuko_5358_small)
+void segas16b_state::init_sjryuko_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::sjryuko_custom_io_r), this);
 	m_custom_io_w = write16_delegate(FUNC(segas16b_state::sjryuko_custom_io_w), this);
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,timescan_5358_small)
+void segas16b_state::init_timescan_5358_small()
 {
-	DRIVER_INIT_CALL(generic_5358_small);
+	init_generic_5358_small();
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,tturf_5704)
+void segas16b_state::init_tturf_5704()
 {
-	DRIVER_INIT_CALL(generic_5704);
+	init_generic_5704();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::tturf_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,wb3_5704)
+void segas16b_state::init_wb3_5704()
 {
-	DRIVER_INIT_CALL(generic_5704);
+	init_generic_5704();
 	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::wb3_i8751_sim, this);
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,snapper)
+void segas16b_state::init_snapper()
 {
-	DRIVER_INIT_CALL(generic_korean);
+	init_generic_korean();
 	m_atomicp_sound_divisor = 4;
 }
 
@@ -9779,9 +9779,9 @@ MACHINE_CONFIG_START(isgsm_state::isgsm)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(isgsm_state,isgsm)
+void isgsm_state::init_isgsm()
 {
-	DRIVER_INIT_CALL(generic_5521);
+	init_generic_5521();
 
 	// decrypt the bios...
 	std::vector<uint16_t> temp(0x20000/2);
@@ -9791,7 +9791,7 @@ DRIVER_INIT_MEMBER(isgsm_state,isgsm)
 	memcpy(rom, &temp[0], 0x20000);
 }
 
-DRIVER_INIT_MEMBER(isgsm_state,shinfz)
+void isgsm_state::init_shinfz()
 {
 	init_isgsm();
 
@@ -9805,7 +9805,7 @@ DRIVER_INIT_MEMBER(isgsm_state,shinfz)
 	m_security_callback = security_callback_delegate(&isgsm_state::shinfz_security, this);
 }
 
-DRIVER_INIT_MEMBER(isgsm_state,tetrbx)
+void isgsm_state::init_tetrbx()
 {
 	init_isgsm();
 

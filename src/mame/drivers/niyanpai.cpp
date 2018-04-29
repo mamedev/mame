@@ -44,7 +44,7 @@ Memo:
 
 
 
-DRIVER_INIT_MEMBER(niyanpai_state,niyanpai)
+void niyanpai_state::init_niyanpai()
 {
 	//uint8_t *SNDROM = memregion(":nichisnd:audiorom")->base();
 

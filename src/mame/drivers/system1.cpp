@@ -5277,16 +5277,16 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(system1_state,bank00)
+void system1_state::init_bank00()
 {
 }
 
-DRIVER_INIT_MEMBER(system1_state,bank44)
+void system1_state::init_bank44()
 {
 	m_videomode_custom = &system1_state::bank44_custom_w;
 }
 
-DRIVER_INIT_MEMBER(system1_state,bank0c)
+void system1_state::init_bank0c()
 {
 	m_videomode_custom = &system1_state::bank0c_custom_w;
 }
@@ -5294,7 +5294,7 @@ DRIVER_INIT_MEMBER(system1_state,bank0c)
 
 
 
-DRIVER_INIT_MEMBER(system1_state,myherok)
+void system1_state::init_myherok()
 {
 	// extra layer of encryption applied BEFORE the usual CPU decryption
 	// probably bootleg?
@@ -5338,43 +5338,34 @@ DRIVER_INIT_MEMBER(system1_state,myherok)
 		}
 	}
 
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 }
 
 
 
-
-
-
-
-DRIVER_INIT_MEMBER(system1_state,blockgal)
+void system1_state::init_blockgal()
 {
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000);
 }
 
 
 
-
-
-
-DRIVER_INIT_MEMBER(system1_state,wbml)
+void system1_state::init_wbml()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
-DRIVER_INIT_MEMBER(system1_state,ufosensi)
+void system1_state::init_ufosensi()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
-
-
-DRIVER_INIT_MEMBER(system1_state,dakkochn)
+void system1_state::init_dakkochn()
 {
 	m_videomode_custom = &system1_state::dakkochn_custom_w;
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
@@ -5389,12 +5380,12 @@ READ8_MEMBER(system1_state::nob_start_r)
 	return (m_maincpu->pc() <= 0x0003) ? 0x80 : m_maincpu_region->base()[1];
 }
 
-DRIVER_INIT_MEMBER(system1_state,nob)
+void system1_state::init_nob()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	DRIVER_INIT_CALL(bank44);
+	init_bank44();
 
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
@@ -5406,7 +5397,7 @@ DRIVER_INIT_MEMBER(system1_state,nob)
 	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nob_mcu_status_r),this));
 }
 
-DRIVER_INIT_MEMBER(system1_state,nobb)
+void system1_state::init_nobb()
 {
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
@@ -5428,7 +5419,7 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
-	DRIVER_INIT_CALL(bank44);
+	init_bank44();
 
 	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nobb_inport1c_r),this));
 	iospace.install_read_handler(0x02, 0x02, read8_delegate(FUNC(system1_state::nobb_inport22_r),this));
@@ -5437,29 +5428,29 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,bootleg)
+void system1_state::init_bootleg()
 {
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 	memcpy(m_decrypted_opcodes, m_maincpu_region->base() + 0x10000, 0x8000);
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,bootsys2)
+void system1_state::init_bootsys2()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_bank0d->set_base(m_maincpu_region->base() + 0x20000);
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x30000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(system1_state,bootsys2d)
+void system1_state::init_bootsys2d()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_bank0d->set_base(m_maincpu_region->base());
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x10000, 0x4000);
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,choplift)
+void system1_state::init_choplift()
 {
 	uint8_t *mcurom = memregion("mcu")->base();
 
@@ -5468,17 +5459,17 @@ DRIVER_INIT_MEMBER(system1_state,choplift)
 	mcurom[0x27b] = 0xfb;       /* F2 in current dump */
 	mcurom[0x2ff] = 0xff - 9;   /* fix up checksum; means there's still something incorrect */
 
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 }
 
-DRIVER_INIT_MEMBER(system1_state,shtngmst)
+void system1_state::init_shtngmst()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_read_port(0x12, 0x12, "TRIGGER");
 	iospace.install_read_port(0x18, 0x18, 0x03, "18");
 	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
 	iospace.install_read_port(0x1d, 0x1d, 0x02, "GUNY");
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 }
 
 

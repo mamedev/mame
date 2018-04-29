@@ -73,14 +73,14 @@ public:
 
 
 	/* Public for access by GAME() */
-	DECLARE_DRIVER_INIT(overrev);
-	DECLARE_DRIVER_INIT(pltkids);
-	DECLARE_DRIVER_INIT(rchase2);
-	DECLARE_DRIVER_INIT(manxttdx);
-	DECLARE_DRIVER_INIT(doa);
-	DECLARE_DRIVER_INIT(zerogun);
-	DECLARE_DRIVER_INIT(sgt24h);
-	DECLARE_DRIVER_INIT(srallyc);
+	void init_overrev();
+	void init_pltkids();
+	void init_rchase2();
+	void init_manxttdx();
+	void init_doa();
+	void init_zerogun();
+	void init_sgt24h();
+	void init_srallyc();
 
 protected:
 	required_shared_ptr<uint32_t> m_workram;

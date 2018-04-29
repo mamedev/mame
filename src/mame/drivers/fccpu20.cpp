@@ -97,13 +97,13 @@ cpu20_state(const machine_config &mconfig, device_type type, const char *tag)
 	virtual void machine_start () override { LOGSETUP("%s\n", FUNCNAME); }
 //  virtual void machine_reset () override;
 
-	DECLARE_DRIVER_INIT(cpu20)      { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21s)     { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21)      { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21a)     { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21ya)    { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21b)     { LOGSETUP("%s\n", FUNCNAME); }
-	DECLARE_DRIVER_INIT(cpu21yb)    { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu20()      { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21s()     { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21()      { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21a()     { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21ya()    { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21b()     { LOGSETUP("%s\n", FUNCNAME); }
+	void init_cpu21yb()    { LOGSETUP("%s\n", FUNCNAME); }
 	void cpu21(machine_config &config);
 	void cpu20(machine_config &config);
 	void cpu21yb(machine_config &config);

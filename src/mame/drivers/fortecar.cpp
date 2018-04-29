@@ -345,7 +345,7 @@ public:
 
 	void fortecar(machine_config &config);
 
-	DECLARE_DRIVER_INIT(fortecar);
+	void init_fortecar();
 
 protected:
 	virtual void machine_start() override;
@@ -779,7 +779,7 @@ ROM_END
 *           Driver Init            *
 ***********************************/
 
-DRIVER_INIT_MEMBER(fortecar_state, fortecar)
+void fortecar_state::init_fortecar()
 {
 	// ...
 }

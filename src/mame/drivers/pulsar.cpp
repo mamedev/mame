@@ -59,7 +59,7 @@ public:
 		, m_rtc(*this, "rtc")
 		{ }
 
-	DECLARE_DRIVER_INIT(pulsar);
+	void init_pulsar();
 	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
 	DECLARE_WRITE8_MEMBER(baud_w);
@@ -197,7 +197,7 @@ MACHINE_RESET_MEMBER( pulsar_state, pulsar )
 	m_rtc->cs_w(1); // always enabled
 }
 
-DRIVER_INIT_MEMBER( pulsar_state, pulsar )
+void pulsar_state::init_pulsar()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

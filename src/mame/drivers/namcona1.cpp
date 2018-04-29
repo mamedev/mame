@@ -1021,21 +1021,21 @@ MACHINE_CONFIG_START(xday2_namcona2_state::xday2)
 MACHINE_CONFIG_END
 
  /* NA-1 Hardware */
-DRIVER_INIT_MEMBER(namcona1_state,bkrtmaq)         { m_gametype = NAMCO_BKRTMAQ; }
-DRIVER_INIT_MEMBER(namcona1_state,cgangpzl)        { m_gametype = NAMCO_CGANGPZL; }
-DRIVER_INIT_MEMBER(namcona1_state,emeraldj)        { m_gametype = NAMCO_EMERALDA; }
-DRIVER_INIT_MEMBER(namcona1_state,exvania)         { m_gametype = NAMCO_EXVANIA; }
-DRIVER_INIT_MEMBER(namcona1_state,fa)              { m_gametype = NAMCO_FA; }
-DRIVER_INIT_MEMBER(namcona1_state,swcourt)         { m_gametype = NAMCO_SWCOURT; }
-DRIVER_INIT_MEMBER(namcona1_state,swcourtb)        { m_gametype = NAMCO_SWCOURTB; }
-DRIVER_INIT_MEMBER(namcona1_state,tinklpit)        { m_gametype = NAMCO_TINKLPIT; save_item(NAME(m_keyval)); }
+void namcona1_state::init_bkrtmaq()         { m_gametype = NAMCO_BKRTMAQ; }
+void namcona1_state::init_cgangpzl()        { m_gametype = NAMCO_CGANGPZL; }
+void namcona1_state::init_emeraldj()        { m_gametype = NAMCO_EMERALDA; }
+void namcona1_state::init_exvania()         { m_gametype = NAMCO_EXVANIA; }
+void namcona1_state::init_fa()              { m_gametype = NAMCO_FA; }
+void namcona1_state::init_swcourt()         { m_gametype = NAMCO_SWCOURT; }
+void namcona1_state::init_swcourtb()        { m_gametype = NAMCO_SWCOURTB; }
+void namcona1_state::init_tinklpit()        { m_gametype = NAMCO_TINKLPIT; save_item(NAME(m_keyval)); }
 
  /* NA-2 Hardware */
-DRIVER_INIT_MEMBER(namcona2_state,emeralda)        { m_gametype = NAMCO_EMERALDA; }
-DRIVER_INIT_MEMBER(namcona2_state,knckhead)        { m_gametype = NAMCO_KNCKHEAD; }
-DRIVER_INIT_MEMBER(namcona2_state,numanath)        { m_gametype = NAMCO_NUMANATH; }
-DRIVER_INIT_MEMBER(namcona2_state,quiztou)         { m_gametype = NAMCO_QUIZTOU; }
-DRIVER_INIT_MEMBER(xday2_namcona2_state,xday2)     { m_gametype = NAMCO_XDAY2; }
+void namcona2_state::init_emeralda()        { m_gametype = NAMCO_EMERALDA; }
+void namcona2_state::init_knckhead()        { m_gametype = NAMCO_KNCKHEAD; }
+void namcona2_state::init_numanath()        { m_gametype = NAMCO_NUMANATH; }
+void namcona2_state::init_quiztou()         { m_gametype = NAMCO_QUIZTOU; }
+void xday2_namcona2_state::init_xday2()     { m_gametype = NAMCO_XDAY2; }
 
 ROM_START( bkrtmaq )
 	ROM_REGION( 0x200000, "maincpu", 0 )

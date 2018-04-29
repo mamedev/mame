@@ -517,7 +517,7 @@ ROM_END
 //  DRIVER_INIT( sage2 )
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(sage2_state,sage2)
+void sage2_state::init_sage2()
 {
 }
 

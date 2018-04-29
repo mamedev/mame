@@ -195,8 +195,8 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(4roses);
-	DECLARE_DRIVER_INIT(rugby);
+	void init_4roses();
+	void init_rugby();
 	void _4roses(machine_config &config);
 	void rugby(machine_config &config);
 private:
@@ -553,14 +553,14 @@ ROM_END
 *  Driver Initialization  *
 **************************/
 
-DRIVER_INIT_MEMBER(_4roses_state,4roses)
+void _4roses_state::init_4roses()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	for (offs_t addr = 0x8000; addr < 0x10000; addr++)
 		rom[addr] = bitswap<8>(rom[addr] ^ 0xca, 6, 5, 4, 3, 2, 1, 0, 7);
 }
 
-DRIVER_INIT_MEMBER(_4roses_state,rugby)
+void _4roses_state::init_rugby()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	for (offs_t addr = 0x8000; addr < 0x10000; addr++)

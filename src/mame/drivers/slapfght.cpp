@@ -778,12 +778,12 @@ void slapfght_state::init_banks()
 	membank("bank1")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(slapfght_state,slapfigh)
+void slapfght_state::init_slapfigh()
 {
 	init_banks();
 }
 
-DRIVER_INIT_MEMBER(slapfght_state,getstarb1)
+void slapfght_state::init_getstarb1()
 {
 	m_getstar_id = GETSTARB1;
 	init_banks();
@@ -796,7 +796,7 @@ DRIVER_INIT_MEMBER(slapfght_state,getstarb1)
 	ROM[0x6d56] = 0xc3; // jp instead of jp z
 }
 
-DRIVER_INIT_MEMBER(slapfght_state,getstarb2)
+void slapfght_state::init_getstarb2()
 {
 	m_getstar_id = GETSTARB2;
 	init_banks();

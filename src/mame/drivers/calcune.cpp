@@ -46,7 +46,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
-	DECLARE_DRIVER_INIT(calcune);
+	void init_calcune();
 
 	DECLARE_READ16_MEMBER(cal_700000_r);
 	DECLARE_WRITE16_MEMBER(cal_770000_w);
@@ -305,7 +305,7 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(calcune_state,calcune)
+void calcune_state::init_calcune()
 {
 	m_vdp->set_use_cram(1);
 	m_vdp->set_vdp_pal(false);

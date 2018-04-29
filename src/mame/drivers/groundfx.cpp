@@ -356,17 +356,17 @@ READ32_MEMBER(groundfx_state::irq_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(groundfx_state,groundfx)
+void groundfx_state::init_groundfx()
 {
 	uint8_t *gfx = memregion("gfx3")->base();
-	int size=memregion("gfx3")->bytes();
+	int size = memregion("gfx3")->bytes();
 
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r),this));
 
 	/* make SCC tile GFX format suitable for gfxdecode */
 	uint32_t offset = size/2;
-	for (uint32_t i = size/2+size/4; i<size; i++)
+	for (uint32_t i = size/2 + size/4; i < size; i++)
 	{
 		/* Expand 2bits into 4bits format */
 		int data = gfx[i];

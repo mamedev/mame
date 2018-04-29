@@ -1683,17 +1683,17 @@ ROM_START( perestro )
 	ROM_LOAD( "rom3a.bin",       0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
 ROM_END
 
-DRIVER_INIT_MEMBER(superqix_state_base, sqix)
+void superqix_state_base::init_sqix()
 {
 	m_invert_coin_lockout = true;
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, sqixr0)
+void superqix_state_base::init_sqixr0()
 {
 	m_invert_coin_lockout = false;
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, perestro)
+void superqix_state_base::init_perestro()
 {
 	uint8_t *src;
 	int len;
@@ -1755,12 +1755,12 @@ DRIVER_INIT_MEMBER(superqix_state_base, perestro)
 	}
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, pbillian)
+void superqix_state_base::init_pbillian()
 {
 	m_invert_p2_spinner = false;
 }
 
-DRIVER_INIT_MEMBER(superqix_state_base, hotsmash)
+void superqix_state_base::init_hotsmash()
 {
 	m_invert_p2_spinner = true;
 }

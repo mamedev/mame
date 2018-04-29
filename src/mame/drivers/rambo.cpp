@@ -53,7 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 
-	DECLARE_DRIVER_INIT(rambo);
+	void init_rambo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void rambo(machine_config &config);
@@ -126,7 +126,7 @@ void rambo_state::rambo_io_map(address_map &map)
 * Machine definition                                 *
 \****************************************************/
 
-DRIVER_INIT_MEMBER(rambo_state, rambo)
+void rambo_state::init_rambo()
 {
 }
 

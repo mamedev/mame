@@ -1082,26 +1082,26 @@ void gstriker_state::mcu_init()
 	save_item(NAME(m_prot_reg));
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twcup94)
+void gstriker_state::init_twcup94()
 {
 	m_gametype = TECMO_WCUP94_MCU;
 	mcu_init();
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twcup94a)
+void gstriker_state::init_twcup94a()
 {
 	m_gametype = TECMO_WCUP94A_MCU;
 	mcu_init();
 }
 
-DRIVER_INIT_MEMBER(gstriker_state,twcup94b)
+void gstriker_state::init_twcup94b()
 {
 	m_gametype = TECMO_WCUP94B_MCU;
 	mcu_init();
 }
 
 
-DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
+void gstriker_state::init_vgoalsoc()
 {
 	m_gametype = VGOAL_SOCCER_MCU;
 	mcu_init();

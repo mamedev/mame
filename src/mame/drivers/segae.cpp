@@ -336,8 +336,8 @@ public:
 	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
 	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
 
-	DECLARE_DRIVER_INIT( opaopa );
-	DECLARE_DRIVER_INIT( fantzn2 );
+	void init_opaopa();
+	void init_fantzn2();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -961,7 +961,7 @@ MACHINE_CONFIG_START(systeme_state::systemeb)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(systeme_state, opaopa)
+void systeme_state::init_opaopa()
 {
 	uint8_t *banked_decrypted_opcodes = auto_alloc_array(machine(), uint8_t, m_maincpu_region->bytes());
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), banked_decrypted_opcodes, m_maincpu_region->bytes());
@@ -971,7 +971,7 @@ DRIVER_INIT_MEMBER(systeme_state, opaopa)
 }
 
 
-DRIVER_INIT_MEMBER(systeme_state, fantzn2)
+void systeme_state::init_fantzn2()
 {
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000);
 }

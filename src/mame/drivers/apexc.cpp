@@ -34,7 +34,7 @@ public:
 
 	int m_letters;
 	int m_pos;
-	DECLARE_DRIVER_INIT(apexc);
+	void init_apexc();
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(apexc);
@@ -727,10 +727,8 @@ enum
 };
 
 /* apexc driver init : builds a font for use by the teletyper */
-DRIVER_INIT_MEMBER(apexc_state,apexc)
+void apexc_state::init_apexc()
 {
-	uint8_t *dst;
-
 	static const unsigned char fontdata6x8[apexcfontdata_size] =
 	{   /* ASCII characters */
 		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x00,
@@ -823,7 +821,7 @@ DRIVER_INIT_MEMBER(apexc_state,apexc)
 		0x00
 	};
 
-	dst = memregion("chargen")->base();
+	uint8_t *dst = memregion("chargen")->base();
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }

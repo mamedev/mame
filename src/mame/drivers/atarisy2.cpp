@@ -3258,15 +3258,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
+void atarisy2_state::init_paperboy()
 {
-	int i;
 	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 
 	/* expand the 16k program ROMs into full 64k chunks */
-	for (i = 0x10000; i < 0x90000; i += 0x20000)
+	for (int i = 0x10000; i < 0x90000; i += 0x20000)
 	{
 		memcpy(&cpu1[i + 0x08000], &cpu1[i], 0x8000);
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x8000);
@@ -3278,7 +3277,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy2_state,720)
+void atarisy2_state::init_720()
 {
 	m_slapstic->slapstic_init();
 
@@ -3287,37 +3286,35 @@ DRIVER_INIT_MEMBER(atarisy2_state,720)
 }
 
 
-DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
+void atarisy2_state::init_ssprint()
 {
-	int i;
 	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 
 	/* expand the 32k program ROMs into full 64k chunks */
-	for (i = 0x10000; i < 0x90000; i += 0x20000)
+	for (int i = 0x10000; i < 0x90000; i += 0x20000)
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
 	m_pedal_count = 3;
 }
 
 
-DRIVER_INIT_MEMBER(atarisy2_state,csprint)
+void atarisy2_state::init_csprint()
 {
-	int i;
 	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 
 	/* expand the 32k program ROMs into full 64k chunks */
-	for (i = 0x10000; i < 0x90000; i += 0x20000)
+	for (int i = 0x10000; i < 0x90000; i += 0x20000)
 		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x10000);
 
 	m_pedal_count = 2;
 }
 
 
-DRIVER_INIT_MEMBER(atarisy2_state,apb)
+void atarisy2_state::init_apb()
 {
 	m_slapstic->slapstic_init();
 

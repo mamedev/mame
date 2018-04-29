@@ -74,7 +74,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(henry_p1_w);
 	DECLARE_WRITE8_MEMBER(henry_p3_w);
-	DECLARE_DRIVER_INIT(hprot1);
+	void init_hprot1();
 	DECLARE_PALETTE_INIT(hprot1);
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void hprotr8a(machine_config &config);
@@ -96,16 +96,15 @@ void hprot1_state::i80c31_prg(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
+void hprot1_state::init_hprot1()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t bitswapped_ROM[0x10000];
 
-	for(i=0x0000;i<0x10000;i++)
+	for (int i = 0x0000; i < 0x10000; i++)
 		bitswapped_ROM[i] = ROM[i];
 
-	for(i=0x0000;i<0x10000;i++)
+	for (int i = 0x0000; i < 0x10000; i++)
 		ROM[bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 3, 2, 1, 0, 4, 5, 6, 7)] = bitswapped_ROM[i];
 }
 

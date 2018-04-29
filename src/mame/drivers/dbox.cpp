@@ -448,7 +448,7 @@ class dbox_state : public driver_device
 
 	virtual void machine_reset() override;
 	virtual void machine_start () override;
-	DECLARE_DRIVER_INIT(dbox);
+	void init_dbox();
 	DECLARE_WRITE8_MEMBER(sda5708_reset);
 	DECLARE_WRITE8_MEMBER(sda5708_clk);
 	DECLARE_WRITE8_MEMBER(write_pa);
@@ -631,7 +631,7 @@ MACHINE_CONFIG_START(dbox_state::dbox)
 	MCFG_LATCH8_WRITE_4(DEVWRITELINE("display", sda5708_device, reset_w))
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(dbox_state, dbox)
+void dbox_state::init_dbox()
 {
 }
 

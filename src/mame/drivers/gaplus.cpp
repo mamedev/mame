@@ -992,11 +992,9 @@ ROM_START( galaga3m ) /* Version (AKA Midway) 1 PCB */
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gaplus_state,gaplus)
+void gaplus_state::init_gaplus()
 {
-	uint8_t *rom;
-
-	rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	for (int i = 0;i < 0x2000;i++)
 		rom[i + 0x2000] = rom[i] >> 4;
 
@@ -1008,15 +1006,15 @@ DRIVER_INIT_MEMBER(gaplus_state,gaplus)
 }
 
 
-DRIVER_INIT_MEMBER(gaplus_state,gaplusd)
+void gaplus_state::init_gaplusd()
 {
-	DRIVER_INIT_CALL(gaplus);
+	init_gaplus();
 	m_type = GAME_GAPLUSD;
 }
 
-DRIVER_INIT_MEMBER(gaplus_state,galaga3)
+void gaplus_state::init_galaga3()
 {
-	DRIVER_INIT_CALL(gaplus);
+	init_gaplus();
 	m_type = GAME_GALAGA3;
 }
 

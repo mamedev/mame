@@ -987,7 +987,7 @@ ROM_END
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(m107_state,firebarr)
+void m107_state::init_firebarr()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -996,7 +996,7 @@ DRIVER_INIT_MEMBER(m107_state,firebarr)
 	m_spritesystem = 1;
 }
 
-DRIVER_INIT_MEMBER(m107_state,dsoccr94)
+void m107_state::init_dsoccr94()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -1005,7 +1005,7 @@ DRIVER_INIT_MEMBER(m107_state,dsoccr94)
 	m_spritesystem = 0;
 }
 
-DRIVER_INIT_MEMBER(m107_state,wpksoc)
+void m107_state::init_wpksoc()
 {
 	m_spritesystem = 0;
 }

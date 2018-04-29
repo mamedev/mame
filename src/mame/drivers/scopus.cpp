@@ -40,7 +40,7 @@ public:
 		m_dma8257(*this, "dma"),
 		m_maincpu(*this, "maincpu"){ }
 
-	DECLARE_DRIVER_INIT(sagitta180);
+	void init_sagitta180();
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);

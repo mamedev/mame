@@ -65,7 +65,7 @@ public:
 	DECLARE_READ8_MEMBER( europc_rtc_r );
 	DECLARE_WRITE8_MEMBER( europc_rtc_w );
 
-	DECLARE_DRIVER_INIT(europc);
+	void init_europc();
 
 	void europc_rtc_set_time();
 
@@ -359,20 +359,21 @@ WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
 	}
 }
 
-DRIVER_INIT_MEMBER(europc_pc_state,europc)
+void europc_pc_state::init_europc()
 {
 	uint8_t *rom = &memregion("bios")->base()[0];
 
-	int i;
 	/*
 	  fix century rom bios bug !
 	  if year <79 month (and not CENTURY) is loaded with 0x20
 	*/
 	if (rom[0xf93e]==0xb6){ // mov dh,
-		uint8_t a;
 		rom[0xf93e]=0xb5; // mov ch,
-		for (i=0x8000, a=0; i<0xffff; i++ ) a+=rom[i];
-		rom[0xffff]=256-a;
+		uint8_t a = 0;
+		int i = 0x8000;
+		for (; i < 0xffff; i++)
+			a += rom[i];
+		rom[0xffff] = 256 - a;
 	}
 
 	memset(&m_rtc_data,0,sizeof(m_rtc_data));

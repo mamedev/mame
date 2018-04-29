@@ -52,7 +52,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(gp_1);
+	void init_gp_1();
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portas_w);
 	DECLARE_WRITE8_MEMBER(portc_w);

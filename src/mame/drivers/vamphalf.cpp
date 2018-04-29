@@ -179,31 +179,31 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	virtual void video_start() override;
-	DECLARE_DRIVER_INIT(vamphalf);
-	DECLARE_DRIVER_INIT(vamphalfr1);
-	DECLARE_DRIVER_INIT(vamphafk);
-	DECLARE_DRIVER_INIT(coolmini);
-	DECLARE_DRIVER_INIT(coolminii);
-	DECLARE_DRIVER_INIT(mrkickera);
-	DECLARE_DRIVER_INIT(mrdig);
-	DECLARE_DRIVER_INIT(jmpbreak);
-	DECLARE_DRIVER_INIT(poosho);
-	DECLARE_DRIVER_INIT(newxpang);
-	DECLARE_DRIVER_INIT(dtfamily);
-	DECLARE_DRIVER_INIT(dquizgo2);
-	DECLARE_DRIVER_INIT(suplup);
-	DECLARE_DRIVER_INIT(luplup);
-	DECLARE_DRIVER_INIT(luplup29);
-	DECLARE_DRIVER_INIT(luplup10);
-	DECLARE_DRIVER_INIT(puzlbang);
-	DECLARE_DRIVER_INIT(toyland);
-	DECLARE_DRIVER_INIT(aoh);
-	DECLARE_DRIVER_INIT(finalgdr);
-	DECLARE_DRIVER_INIT(misncrft);
-	DECLARE_DRIVER_INIT(boonggab);
-	DECLARE_DRIVER_INIT(wyvernwg);
-	DECLARE_DRIVER_INIT(yorijori);
-	DECLARE_DRIVER_INIT(mrkicker);
+	void init_vamphalf();
+	void init_vamphalfr1();
+	void init_vamphafk();
+	void init_coolmini();
+	void init_coolminii();
+	void init_mrkickera();
+	void init_mrdig();
+	void init_jmpbreak();
+	void init_poosho();
+	void init_newxpang();
+	void init_dtfamily();
+	void init_dquizgo2();
+	void init_suplup();
+	void init_luplup();
+	void init_luplup29();
+	void init_luplup10();
+	void init_puzlbang();
+	void init_toyland();
+	void init_aoh();
+	void init_finalgdr();
+	void init_misncrft();
+	void init_boonggab();
+	void init_wyvernwg();
+	void init_yorijori();
+	void init_mrkicker();
 
 	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -3066,7 +3066,7 @@ READ16_MEMBER(vamphalf_state::boonggab_speedup_r)
 	return m_wram[0xf1b74 / 2];
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
+void vamphalf_state::init_vamphalf()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a7b8, 0x0004a7b9, read16_delegate(FUNC(vamphalf_state::vamphalf_speedup_r), this));
 
@@ -3074,7 +3074,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphalf)
 	m_flip_bit = 0x80;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,vamphalfr1)
+void vamphalf_state::init_vamphalfr1()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a468, 0x0004a469, read16_delegate(FUNC(vamphalf_state::vamphalfr1_speedup_r), this));
 
@@ -3082,7 +3082,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphalfr1)
 	m_flip_bit = 0x80;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,vamphafk)
+void vamphalf_state::init_vamphafk()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0004a648, 0x0004a649, read16_delegate(FUNC(vamphalf_state::vamphafk_speedup_r), this));
 
@@ -3090,7 +3090,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,vamphafk)
 	m_flip_bit = 0x80;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
+void vamphalf_state::init_misncrft()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000741e8, 0x000741e9, read16_delegate(FUNC(vamphalf_state::misncrft_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00072e2c, 0x00072e2d, read16_delegate(FUNC(vamphalf_state::misncrfta_speedup_r), this));
@@ -3102,7 +3102,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,misncrft)
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
+void vamphalf_state::init_coolmini()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d2df8, 0x000d2df9, read16_delegate(FUNC(vamphalf_state::coolmini_speedup_r), this));
 
@@ -3110,7 +3110,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolmini)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,coolminii)
+void vamphalf_state::init_coolminii()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000d30a8, 0x000d30a9, read16_delegate(FUNC(vamphalf_state::coolminii_speedup_r), this));
 
@@ -3118,7 +3118,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolminii)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
+void vamphalf_state::init_mrkicker()
 {
 	banked_oki(0);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, read16_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
@@ -3127,7 +3127,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,suplup)
+void vamphalf_state::init_suplup()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0011605c, 0x0011605d, read16_delegate(FUNC(vamphalf_state::suplup_speedup_r), this));
 
@@ -3135,7 +3135,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,suplup)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,luplup)
+void vamphalf_state::init_luplup()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00115e84, 0x00115e85, read16_delegate(FUNC(vamphalf_state::luplup_speedup_r), this));
 
@@ -3143,7 +3143,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
+void vamphalf_state::init_luplup29()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f08, 0x00113f09, read16_delegate(FUNC(vamphalf_state::luplup29_speedup_r), this));
 
@@ -3151,7 +3151,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup29)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,luplup10)
+void vamphalf_state::init_luplup10()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113b78, 0x00113b79, read16_delegate(FUNC(vamphalf_state::luplup10_speedup_r), this));
 
@@ -3159,7 +3159,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,luplup10)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
+void vamphalf_state::init_puzlbang()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113f14, 0x00113f15, read16_delegate(FUNC(vamphalf_state::puzlbang_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00113ecc, 0x00113ecd, read16_delegate(FUNC(vamphalf_state::puzlbanga_speedup_r), this));
@@ -3168,7 +3168,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,puzlbang)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
+void vamphalf_state::init_wyvernwg()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b4cc4, 0x00b4cc7, read32_delegate(FUNC(vamphalf_state::wivernwg_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00b56f4, 0x00b56f7, read32_delegate(FUNC(vamphalf_state::wyvernwg_speedup_r), this));
@@ -3188,7 +3188,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,wyvernwg)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
+void vamphalf_state::init_yorijori()
 {
 	// seems close to Final Godori in terms of port mappings, possibly a SemiCom game?
 
@@ -3209,7 +3209,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 	membank("qs1000:data")->configure_entries(0, 16, memregion("qs1000:cpu")->base()+0x100, 0x8000-0x100);
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
+void vamphalf_state::init_finalgdr()
 {
 	banked_oki(0);
 	m_finalgdr_backupram_bank = 1;
@@ -3230,7 +3230,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
+void vamphalf_state::init_mrkickera()
 {
 	banked_oki(0);
 	// backup ram isn't used
@@ -3250,7 +3250,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
 	save_item(NAME(m_semicom_prot_which));
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
+void vamphalf_state::init_dquizgo2()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00cdde8, 0x00cdde9, read16_delegate(FUNC(vamphalf_state::dquizgo2_speedup_r), this));
 
@@ -3258,7 +3258,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
+void vamphalf_state::init_dtfamily()
 {
 	banked_oki(0);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xcc2a8, 0xcc2a9, read16_delegate(FUNC(vamphalf_state::dtfamily_speedup_r), this));
@@ -3268,7 +3268,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
 }
 
 
-DRIVER_INIT_MEMBER(vamphalf_state,toyland)
+void vamphalf_state::init_toyland()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x780d8, 0x780d9, read16_delegate(FUNC(vamphalf_state::toyland_speedup_r), this));
 
@@ -3276,7 +3276,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,toyland)
 	m_flip_bit = 1;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,aoh)
+void vamphalf_state::init_aoh()
 {
 	banked_oki(1);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x028a09c, 0x028a09f, read32_delegate(FUNC(vamphalf_state::aoh_speedup_r), this));
@@ -3285,7 +3285,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,aoh)
 	/* no flipscreen */
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,jmpbreak)
+void vamphalf_state::init_jmpbreak()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00906f4, 0x00906f5, read16_delegate(FUNC(vamphalf_state::jmpbreak_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -3293,7 +3293,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,jmpbreak)
 	m_palshift = 0;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,mrdig)
+void vamphalf_state::init_mrdig()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0768, 0x0e0769, read16_delegate(FUNC(vamphalf_state::mrdig_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -3301,7 +3301,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,mrdig)
 	m_palshift = 0;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,poosho)
+void vamphalf_state::init_poosho()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c8b58, 0x0c8b59, read16_delegate(FUNC(vamphalf_state::poosho_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -3309,7 +3309,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,poosho)
 	m_palshift = 0;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,newxpang)
+void vamphalf_state::init_newxpang()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x061218, 0x061219, read16_delegate(FUNC(vamphalf_state::newxpang_speedup_r), this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16_delegate(FUNC(vamphalf_state::jmpbreak_flipscreen_w), this));
@@ -3317,7 +3317,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,newxpang)
 	m_palshift = 0;
 }
 
-DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
+void vamphalf_state::init_boonggab()
 {
 	banked_oki(0);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000f1b74, 0x000f1b75, read16_delegate(FUNC(vamphalf_state::boonggab_speedup_r), this));

@@ -1684,30 +1684,26 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(namcos86_state,namco86)
+void namcos86_state::init_namco86()
 {
-	int size;
-	uint8_t *gfx;
-
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = memregion("gfx1")->base();
-	size = memregion("gfx1")->bytes() * 2 / 3;
+	uint8_t *gfx = memregion("gfx1")->base();
+	int size = memregion("gfx1")->bytes() * 2 / 3;
 
 	{
-		std::vector<uint8_t> buffer( size );
+		std::vector<uint8_t> buffer(size);
 		uint8_t *dest1 = gfx;
-		uint8_t *dest2 = gfx + ( size / 2 );
+		uint8_t *dest2 = gfx + (size / 2);
 		uint8_t *mono = gfx + size;
-		int i;
 
-		memcpy( &buffer[0], gfx, size );
+		memcpy(&buffer[0], gfx, size);
 
-		for ( i = 0; i < size; i += 2 )
+		for (int i = 0; i < size; i += 2)
 		{
 			uint8_t data1 = buffer[i];
 			uint8_t data2 = buffer[i+1];
-			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
-			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
+			*dest1++ = (data1 << 4) | (data2 & 0xf);
+			*dest2++ = (data1 & 0xf0) | (data2 >> 4);
 
 			*mono ^= 0xff; mono++;
 		}
@@ -1717,20 +1713,19 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 	size = memregion("gfx2")->bytes() * 2 / 3;
 
 	{
-		std::vector<uint8_t> buffer( size );
+		std::vector<uint8_t> buffer(size);
 		uint8_t *dest1 = gfx;
-		uint8_t *dest2 = gfx + ( size / 2 );
+		uint8_t *dest2 = gfx + (size / 2);
 		uint8_t *mono = gfx + size;
-		int i;
 
-		memcpy( &buffer[0], gfx, size );
+		memcpy(&buffer[0], gfx, size);
 
-		for ( i = 0; i < size; i += 2 )
+		for (int i = 0; i < size; i += 2)
 		{
 			uint8_t data1 = buffer[i];
 			uint8_t data2 = buffer[i+1];
-			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
-			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
+			*dest1++ = (data1 << 4) | (data2 & 0xf);
+			*dest2++ = (data1 & 0xf0) | (data2 >> 4);
 
 			*mono ^= 0xff; mono++;
 		}

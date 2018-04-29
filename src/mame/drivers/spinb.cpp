@@ -89,9 +89,9 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	DECLARE_DRIVER_INIT(game0);
-	DECLARE_DRIVER_INIT(game1);
-	DECLARE_DRIVER_INIT(game2);
+	void init_game0();
+	void init_game1();
+	void init_game2();
 	DECLARE_PALETTE_INIT(spinb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void jolypark(machine_config &config);
@@ -548,14 +548,14 @@ void spinb_state::machine_start()
 	save_item(NAME(m_dmdram)); // make it visible in the debugger
 }
 
-DRIVER_INIT_MEMBER( spinb_state, game0 )
+void spinb_state::init_game0()
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();
 	m_game = 0;
 }
 
-DRIVER_INIT_MEMBER( spinb_state, game1 )
+void spinb_state::init_game1()
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();
@@ -563,7 +563,7 @@ DRIVER_INIT_MEMBER( spinb_state, game1 )
 	m_game = 1;
 }
 
-DRIVER_INIT_MEMBER( spinb_state, game2 )
+void spinb_state::init_game2()
 {
 	m_p_audio = memregion("audiorom")->base();
 	m_p_music = memregion("musicrom")->base();

@@ -3117,12 +3117,12 @@ ROM_START( vimanaj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(toaplan1_state,toaplan1)
+void toaplan1_state::init_toaplan1()
 {
 	toaplan1_driver_savestate();
 }
 
-DRIVER_INIT_MEMBER(toaplan1_state,demonwld)
+void toaplan1_state::init_demonwld()
 {
 	toaplan1_driver_savestate();
 	demonwld_driver_savestate();

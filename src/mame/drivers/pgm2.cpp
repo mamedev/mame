@@ -1420,19 +1420,19 @@ void pgm2_state::common_encryption_init()
 	m_has_decrypted = 0;
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,orleg2)
+void pgm2_state::init_orleg2()
 {
 	common_encryption_init();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
+void pgm2_state::init_kov2nl()
 {
 	common_encryption_init();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(FUNC(pgm2_state::kov2nl_speedup_r), this));
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,ddpdojt)
+void pgm2_state::init_ddpdojt()
 {
 	common_encryption_init();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::ddpdojt_speedup_r), this));
@@ -1445,7 +1445,7 @@ static const kov3_module_key kov3_102_key = { { 0x49,0xac,0xb0,0xec,0x47,0x49,0x
 static const kov3_module_key kov3_101_key = { { 0xc1,0x2c,0xc1,0xe5,0x3c,0xc1,0x59,0x9e } ,{ 0xf2,0xb2,0xf0,0x89,0x37,0xf2,0xc7,0x0b }, 0, 0xffff }; // real xor values is unknown
 static const kov3_module_key kov3_100_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0x96,0xf0,0x91,0xe1,0xb3,0xf1,0xef,0x90 }, 0x3e8aa8, 0xc530 }; // fake zero-key
 
-DRIVER_INIT_MEMBER(pgm2_state,kov3)
+void pgm2_state::init_kov3()
 {
 	common_encryption_init();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32_delegate(FUNC(pgm2_state::kov3_speedup_r),this));
@@ -1466,31 +1466,31 @@ void pgm2_state::decrypt_kov3_module(uint32_t addrxor, uint16_t dataxor)
 	m_has_decrypted_kov3_module = 1;
 }
 
-DRIVER_INIT_MEMBER(pgm2_state, kov3_104)
+void pgm2_state::init_kov3_104()
 {
 	module_key = &kov3_104_key;
-	DRIVER_INIT_CALL(kov3);
+	init_kov3();
 }
 
-DRIVER_INIT_MEMBER(pgm2_state, kov3_102)
+void pgm2_state::init_kov3_102()
 {
 	module_key = &kov3_102_key;
-	DRIVER_INIT_CALL(kov3);
+	init_kov3();
 }
 
-DRIVER_INIT_MEMBER(pgm2_state, kov3_101)
+void pgm2_state::init_kov3_101()
 {
 	module_key = &kov3_101_key;
-	DRIVER_INIT_CALL(kov3);
+	init_kov3();
 }
 
-DRIVER_INIT_MEMBER(pgm2_state, kov3_100)
+void pgm2_state::init_kov3_100()
 {
 	module_key = &kov3_100_key;
-	DRIVER_INIT_CALL(kov3);
+	init_kov3();
 }
 
-DRIVER_INIT_MEMBER(pgm2_state,kof98umh)
+void pgm2_state::init_kof98umh()
 {
 	common_encryption_init();
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::kof98umh_speedup_r),this));

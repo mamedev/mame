@@ -67,8 +67,8 @@ public:
 	DECLARE_WRITE16_MEMBER(dassault_control_w);
 	DECLARE_READ16_MEMBER(dassault_sub_control_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(thndzone);
-	DECLARE_DRIVER_INIT(dassault);
+	void init_thndzone();
+	void init_dassault();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

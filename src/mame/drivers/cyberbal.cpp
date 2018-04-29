@@ -1048,7 +1048,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
+void cyberbal_state::init_cyberbalt()
 {
 	slapstic_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
 }

@@ -72,8 +72,8 @@ public:
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger1_w);
 	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger2_r);
 	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
-	DECLARE_DRIVER_INIT(magerror);
-	DECLARE_DRIVER_INIT(hyprduel);
+	void init_magerror();
+	void init_hyprduel();
 	DECLARE_MACHINE_START(hyprduel);
 	DECLARE_MACHINE_START(magerror);
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
@@ -593,7 +593,7 @@ ROM_START( magerror )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::init_hyprduel()
 {
 	m_int_num = 0x02;
 
@@ -604,7 +604,7 @@ DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
 }
 
-DRIVER_INIT_MEMBER(hyprduel_state,magerror)
+void hyprduel_state::init_magerror()
 {
 	m_int_num = 0x01;
 }

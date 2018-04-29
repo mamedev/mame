@@ -888,7 +888,7 @@ void c1p_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-DRIVER_INIT_MEMBER(c1p_state,c1p)
+void c1p_state::init_c1p()
 {
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 }

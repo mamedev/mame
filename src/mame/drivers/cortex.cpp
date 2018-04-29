@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
 	DECLARE_READ8_MEMBER(pio_r);
 	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_DRIVER_INIT(init);
+	void init_init();
 
 	void cortex(machine_config &config);
 	void io_map(address_map &map);
@@ -170,7 +170,7 @@ void cortex_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-DRIVER_INIT_MEMBER( cortex_state, init )
+void cortex_state::init_init()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

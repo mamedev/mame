@@ -981,7 +981,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(warpwarp_state,geebee)
+void warpwarp_state::init_geebee()
 {
 	m_handle_joystick = 0;
 
@@ -990,7 +990,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,geebee)
 	m_ball_sizey = 4;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,navarone)
+void warpwarp_state::init_navarone()
 {
 	m_handle_joystick = 1;
 
@@ -999,7 +999,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,navarone)
 	m_ball_sizey = 4;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,kaitein)
+void warpwarp_state::init_kaitein()
 {
 	m_handle_joystick = 1;
 
@@ -1008,7 +1008,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,kaitein)
 	m_ball_sizey = 16;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,kaitei)
+void warpwarp_state::init_kaitei()
 {
 	m_handle_joystick = 0;
 
@@ -1017,7 +1017,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,kaitei)
 	m_ball_sizey = 16;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,sos)
+void warpwarp_state::init_sos()
 {
 	m_handle_joystick = 1;
 
@@ -1026,7 +1026,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,sos)
 	m_ball_sizey = 2;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,bombbee)
+void warpwarp_state::init_bombbee()
 {
 	m_handle_joystick = 0;
 
@@ -1035,7 +1035,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,bombbee)
 	m_ball_sizey = 4;
 }
 
-DRIVER_INIT_MEMBER(warpwarp_state,warpwarp)
+void warpwarp_state::init_warpwarp()
 {
 	m_handle_joystick = 1;
 

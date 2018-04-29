@@ -35,7 +35,7 @@ public:
 		m_dma8257(*this, "dma8257")
 	{ }
 
-	DECLARE_DRIVER_INIT(fi6845);
+	void init_fi6845();
 
 	void fastinvaders(machine_config &config);
 	void fastinvaders_8275(machine_config &config);
@@ -707,15 +707,14 @@ MACHINE_CONFIG_END
 
 
 
-DRIVER_INIT_MEMBER(fastinvaders_state, fi6845)
+void fastinvaders_state::init_fi6845()
 {
-const uint8_t *prom = memregion("prom")->base();
-	int i;
-	for (i=0;i<256;i++){
-		m_prom[i]=prom[i];
+	const uint8_t *prom = memregion("prom")->base();
+	for (int i = 0; i < 256; i++){
+		m_prom[i] = prom[i];
 	}
-	m_dma1=0;
-	m_io_40=0;
+	m_dma1 = 0;
+	m_io_40 = 0;
 }
 
 

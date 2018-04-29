@@ -729,12 +729,12 @@ ROM_START( bounty2 ) // The PCB uses a large CPU epoxy module marked "CPU PACKII
 	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
 
-DRIVER_INIT_MEMBER(zodiack_state,zodiack)
+void zodiack_state::init_zodiack()
 {
 	m_percuss_hardware = false;
 }
 
-DRIVER_INIT_MEMBER(zodiack_state,percuss)
+void zodiack_state::init_percuss()
 {
 	m_percuss_hardware = true;
 }

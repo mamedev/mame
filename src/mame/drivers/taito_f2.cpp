@@ -5592,24 +5592,19 @@ ROM_START( driveout )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(taitof2_state,finalb)
+void taitof2_state::init_finalb()
 {
-	int i;
-	uint8_t data;
-	uint32_t offset;
 	uint8_t *gfx = memregion("gfx2")->base();
 
-	offset = 0x100000;
-	for (i = 0x180000; i < 0x200000; i++)
+	uint32_t offset = 0x100000;
+	for (int i = 0x180000; i < 0x200000; i++)
 	{
-		int d1,d2,d3,d4;
-
 		/* convert from 2bits into 4bits format */
-		data = gfx[i];
-		d1 = (data >> 0) & 3;
-		d2 = (data >> 2) & 3;
-		d3 = (data >> 4) & 3;
-		d4 = (data >> 6) & 3;
+		uint8_t data = gfx[i];
+		int d1 = (data >> 0) & 3;
+		int d2 = (data >> 2) & 3;
+		int d3 = (data >> 4) & 3;
+		int d4 = (data >> 6) & 3;
 
 		gfx[offset] = (d3 << 2) | (d4 << 6);
 		offset++;
@@ -5619,7 +5614,7 @@ DRIVER_INIT_MEMBER(taitof2_state,finalb)
 	}
 }
 
-DRIVER_INIT_MEMBER(taitof2_state,cameltry)
+void taitof2_state::init_cameltry()
 {
 	m_last[0] = 0;
 	m_last[1] = 0;
@@ -5628,7 +5623,7 @@ DRIVER_INIT_MEMBER(taitof2_state,cameltry)
 }
 
 
-DRIVER_INIT_MEMBER(taitof2_state,mjnquest)
+void taitof2_state::init_mjnquest()
 {
 	int i, len = memregion("gfx2")->bytes();
 	uint8_t *gfx = memregion("gfx2")->base();
@@ -5649,7 +5644,7 @@ DRIVER_INIT_MEMBER(taitof2_state,mjnquest)
 	save_item(NAME(m_mjnquest_input));
 }
 
-DRIVER_INIT_MEMBER(taitof2_state,driveout)
+void taitof2_state::init_driveout()
 {
 	m_driveout_sound_latch = 0;
 	m_oki_bank = 0;

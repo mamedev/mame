@@ -66,7 +66,7 @@ public:
 	emu_timer *m_led_refresh_timer;
 	address_space *m_program;
 
-	DECLARE_DRIVER_INIT(mpf1);
+	void init_mpf1();
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
 	void mpf1p(machine_config &config);

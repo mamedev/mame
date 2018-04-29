@@ -593,15 +593,15 @@ public:
 	int m_count;
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
-	DECLARE_DRIVER_INIT(batlgr2a);
-	DECLARE_DRIVER_INIT(batlgr2);
-	DECLARE_DRIVER_INIT(pwrshovl);
-	DECLARE_DRIVER_INIT(batlgear);
-	DECLARE_DRIVER_INIT(landhigh);
-	DECLARE_DRIVER_INIT(landhigha);
-	DECLARE_DRIVER_INIT(raizpin);
-	DECLARE_DRIVER_INIT(raizpinj);
-	DECLARE_DRIVER_INIT(styphp);
+	void init_batlgr2a();
+	void init_batlgr2();
+	void init_pwrshovl();
+	void init_batlgear();
+	void init_landhigh();
+	void init_landhigha();
+	void init_raizpin();
+	void init_raizpinj();
+	void init_styphp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -2656,7 +2656,7 @@ static const char RAIZPINJ_HDD_SERIAL[] =           // "824915745143        "
 static const char STYPHP_HDD_SERIAL[] =             // "            05872160"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x38, 0x37, 0x32, 0x31, 0x36, 0x30 };
 
-DRIVER_INIT_MEMBER(taitotz_state,landhigh)
+void taitotz_state::init_landhigh()
 {
 	init_taitotz_152();
 
@@ -2665,7 +2665,7 @@ DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,landhigha)
+void taitotz_state::init_landhigha()
 {
 	init_taitotz_152();
 
@@ -2674,7 +2674,7 @@ DRIVER_INIT_MEMBER(taitotz_state,landhigha)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,batlgear)
+void taitotz_state::init_batlgear()
 {
 	init_taitotz_111a();
 
@@ -2684,7 +2684,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgear)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
+void taitotz_state::init_batlgr2()
 {
 	init_taitotz_152();
 
@@ -2693,7 +2693,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
 	m_scr_base = 0x1e0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
+void taitotz_state::init_batlgr2a()
 {
 	init_taitotz_152();
 
@@ -2702,7 +2702,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
 	m_scr_base = 0x1e0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
+void taitotz_state::init_pwrshovl()
 {
 	init_taitotz_111a();
 
@@ -2712,7 +2712,7 @@ DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,raizpin)
+void taitotz_state::init_raizpin()
 {
 	init_taitotz_152();
 
@@ -2721,7 +2721,7 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpin)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
+void taitotz_state::init_raizpinj()
 {
 	init_taitotz_152();
 
@@ -2730,7 +2730,7 @@ DRIVER_INIT_MEMBER(taitotz_state,raizpinj)
 	m_scr_base = 0x1c0000;
 }
 
-DRIVER_INIT_MEMBER(taitotz_state,styphp)
+void taitotz_state::init_styphp()
 {
 	init_taitotz_152();
 

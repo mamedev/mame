@@ -72,10 +72,10 @@ public:
 	DECLARE_WRITE8_MEMBER(unkitpkr_out1_w);
 	DECLARE_WRITE8_MEMBER(unkitpkr_out2_w);
 
-	DECLARE_DRIVER_INIT(wallc);
-	DECLARE_DRIVER_INIT(wallca);
-	DECLARE_DRIVER_INIT(sidam);
-	DECLARE_DRIVER_INIT(unkitpkr);
+	void init_wallc();
+	void init_wallca();
+	void init_sidam();
+	void init_unkitpkr();
 
 	void unkitpkr(machine_config &config);
 	void wallc(machine_config &config);
@@ -444,38 +444,33 @@ static GFXDECODE_START( wallc )
 GFXDECODE_END
 
 
-DRIVER_INIT_MEMBER(wallc_state, wallc)
+void wallc_state::init_wallc()
 {
-	uint8_t c;
-	uint32_t i;
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	for (i=0; i<0x2000*2; i++)
+	for (uint32_t i = 0; i < 0x2000 * 2; i++)
 	{
-		c = ROM[ i ] ^ 0x55 ^ 0xff; /* NOTE: this can be shortened but now it fully reflects what the bigger module really does */
+		uint8_t c = ROM[ i ] ^ 0x55 ^ 0xff; /* NOTE: this can be shortened but now it fully reflects what the bigger module really does */
 		c = bitswap<8>(c, 4,2,6,0,7,1,3,5); /* also swapped inside of the bigger module */
 		ROM[ i ] = c;
 	}
 }
 
-DRIVER_INIT_MEMBER(wallc_state, wallca)
+void wallc_state::init_wallca()
 {
-	uint8_t c;
-	uint32_t i;
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	for (i=0; i<0x4000; i++)
+	for (uint32_t i = 0; i < 0x4000; i++)
 	{
-		if(i & 0x100)
+		uint8_t c;
+		if (i & 0x100)
 		{
-			c = ROM[ i ] ^ 0x4a;
+			c = ROM[i] ^ 0x4a;
 			c = bitswap<8>(c, 4,7,1,3,2,0,5,6);
 		}
 		else
 		{
-			c = ROM[ i ] ^ 0xa5;
+			c = ROM[i] ^ 0xa5;
 			c = bitswap<8>(c, 0,2,3,6,1,5,7,4);
 		}
 
@@ -643,15 +638,12 @@ ROM_START( sidampkr )
 	ROM_LOAD( "11607-74.288",  0x0000, 0x0020, CRC(e14bf545) SHA1(5e8c5a9ea6e4842f27a47c1d7224ed294bbaa40b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(wallc_state, sidam)
+void wallc_state::init_sidam()
 {
-	uint8_t c;
-	uint32_t i;
-
 	uint8_t *ROM = memregion("maincpu")->base();
 	int count = 0;
 
-	for (i=0; i<0x2000; i++)
+	for (uint32_t i = 0; i < 0x2000; i++)
 	{
 		switch (i & 0x4a)  // A1, A3, A6
 		{
@@ -675,15 +667,13 @@ DRIVER_INIT_MEMBER(wallc_state, sidam)
 				break;
 		}
 
-
-
 		if (count==16)
 		{
 			count = 0;
 			logerror("\n");
 		}
 
-		c = ROM[ i ] ^ 0x0f;
+		uint8_t c = ROM[ i ] ^ 0x0f;
 		ROM[ i ] = c;
 	}
 }
@@ -743,7 +733,7 @@ ROM_START( unkitpkr )
 	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) ) // dumped; matches the wallc bp
 ROM_END
 
-DRIVER_INIT_MEMBER(wallc_state, unkitpkr)
+void wallc_state::init_unkitpkr()
 {
 	// line swapping is too annoying to handle with ROM_LOAD macros
 	uint8_t buffer[0x400];

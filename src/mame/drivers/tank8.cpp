@@ -462,20 +462,17 @@ ROM_START( tank8 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(tank8_state,decode)
+void tank8_state::init_decode()
 {
 	const uint8_t* DECODE = memregion("user1")->base();
-
 	uint8_t* p1 = memregion("maincpu")->base() + 0x00000;
 	uint8_t* p2 = memregion("maincpu")->base() + 0x10000;
 
-	int i;
-
-	for (i = 0x0400; i <= 0x17ff; i++)
+	for (int i = 0x0400; i <= 0x17ff; i++)
 	{
 		p1[i] = DECODE[p2[i]];
 	}
-	for (i = 0xf800; i <= 0xffff; i++)
+	for (int i = 0xf800; i <= 0xffff; i++)
 	{
 		p1[i] = DECODE[p2[i]];
 	}

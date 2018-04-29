@@ -99,8 +99,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sexygal_audioff_w);
 	DECLARE_WRITE8_MEMBER(sexygal_audionmi_w);
 
-	DECLARE_DRIVER_INIT(ngalsumr);
-	DECLARE_DRIVER_INIT(royalqn);
+	void init_ngalsumr();
+	void init_royalqn();
 	DECLARE_WRITE8_MEMBER(ngalsumr_prot_latch_w);
 	DECLARE_READ8_MEMBER(ngalsumr_prot_value_r);
 	virtual void machine_start() override;
@@ -1265,7 +1265,7 @@ ROM_START(sgaltrop)
 	ROM_LOAD( "gt.7f", 0x00, 0x20, CRC(59e36d6e) SHA1(2e0f3d4809ec727518e6ec883f67ede8831681bf) )
 ROM_END
 
-DRIVER_INIT_MEMBER(nightgal_state,royalqn)
+void nightgal_state::init_royalqn()
 {
 	uint8_t *ROM = memregion("subrom")->base();
 
@@ -1325,7 +1325,7 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
+void nightgal_state::init_ngalsumr()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_prot_latch_w), this) );
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(FUNC(nightgal_state::ngalsumr_prot_value_r), this) );

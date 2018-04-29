@@ -205,7 +205,7 @@ public:
 	DECLARE_WRITE32_MEMBER(cmd2_word_w);
 	DECLARE_READ32_MEMBER(cmd_stat_word_r);
 
-	DECLARE_DRIVER_INIT(jclub2o);
+	void init_jclub2o();
 
 	void jclub2o(machine_config &config);
 	void jclub2o_map(address_map &map);
@@ -245,7 +245,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DRIVER_INIT(darkhors);
+	void init_darkhors();
 	DECLARE_VIDEO_START(darkhors);
 
 	void darkhors(machine_config &config);
@@ -1506,12 +1506,12 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(jclub2o_state,jclub2o)
+void jclub2o_state::init_jclub2o()
 {
 	m_soundbank->configure_entries(0, 32, memregion("soundcpu")->base(), 0x4000);
 }
 
-DRIVER_INIT_MEMBER(darkhors_state,darkhors)
+void darkhors_state::init_darkhors()
 {
 	// the dumped eeprom bytes are in a different order to how MAME expects them to be!?
 	// (offset 0x00, 0x40, 0x01, 0x41, 0x02, 0x42 ..... )

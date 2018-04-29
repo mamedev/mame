@@ -307,7 +307,6 @@ void sms_state::sg1000m3_io(address_map &map)
 	map(0xc0, 0xc7).mirror(0x38).rw(this, FUNC(sms_state::sg1000m3_peripheral_r), FUNC(sms_state::sg1000m3_peripheral_w));
 }
 
-
 void sms_state::sms_io(address_map &map)
 {
 	map.global_mask(0xff);

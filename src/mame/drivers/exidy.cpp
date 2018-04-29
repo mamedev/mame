@@ -1612,7 +1612,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(exidy_state,sidetrac)
+void exidy_state::init_sidetrac()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1623,7 +1623,7 @@ DRIVER_INIT_MEMBER(exidy_state,sidetrac)
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,targ)
+void exidy_state::init_targ()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1634,7 +1634,7 @@ DRIVER_INIT_MEMBER(exidy_state,targ)
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,spectar)
+void exidy_state::init_spectar()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1644,7 +1644,7 @@ DRIVER_INIT_MEMBER(exidy_state,spectar)
 	m_color_latch[0] = 0x09;
 }
 
-DRIVER_INIT_MEMBER(exidy_state,rallys)
+void exidy_state::init_rallys()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1654,7 +1654,7 @@ DRIVER_INIT_MEMBER(exidy_state,rallys)
 	m_color_latch[0] = 0x09;
 }
 
-DRIVER_INIT_MEMBER(exidy_state,phantoma)
+void exidy_state::init_phantoma()
 {
 	exidy_video_config(0x00, 0x00, false);
 
@@ -1669,31 +1669,31 @@ DRIVER_INIT_MEMBER(exidy_state,phantoma)
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,mtrap)
+void exidy_state::init_mtrap()
 {
 	exidy_video_config(0x14, 0x00, false);
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,venture)
+void exidy_state::init_venture()
 {
 	exidy_video_config(0x04, 0x04, false);
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,teetert)
+void exidy_state::init_teetert()
 {
 	exidy_video_config(0x0c, 0x0c, false);
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,pepper2)
+void exidy_state::init_pepper2()
 {
 	exidy_video_config(0x14, 0x04, true);
 }
 
 
-DRIVER_INIT_MEMBER(exidy_state,fax)
+void exidy_state::init_fax()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 

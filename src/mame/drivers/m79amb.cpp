@@ -275,20 +275,18 @@ static const uint8_t lut_pos[0x20] = {
 };
 
 
-DRIVER_INIT_MEMBER(m79amb_state,m79amb)
+void m79amb_state::init_m79amb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i, j;
-
 	/* PROM data is active low */
-	for (i = 0; i < 0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 		rom[i] = ~rom[i];
 
 	/* gun positions */
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		/* gun 1, start at left 18 */
-		for (j = 0; j < 0x20; j++)
+		for (int j = 0; j < 0x20; j++)
 		{
 			if (i <= lut_cross[j])
 			{
@@ -298,7 +296,7 @@ DRIVER_INIT_MEMBER(m79amb_state,m79amb)
 		}
 
 		/* gun 2, start at right 235 */
-		for (j = 0; j < 0x20; j++)
+		for (int j = 0; j < 0x20; j++)
 		{
 			if (i >= (253 - lut_cross[j]))
 			{

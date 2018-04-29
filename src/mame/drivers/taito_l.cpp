@@ -2369,7 +2369,7 @@ ROM_END
 
 
 // bits 7..0 => bits 0..7
-DRIVER_INIT_MEMBER(taitol_1cpu_state, plottinga)
+void taitol_1cpu_state::init_plottinga()
 {
 	u8 tab[256];
 	u8 *RAM = m_main_prg->base();

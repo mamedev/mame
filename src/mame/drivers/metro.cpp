@@ -5564,7 +5564,7 @@ void metro_state::metro_common(  )
 }
 
 
-DRIVER_INIT_MEMBER(metro_state,metro)
+void metro_state::init_metro()
 {
 	metro_common();
 	if (m_audiobank.found())
@@ -5578,16 +5578,16 @@ DRIVER_INIT_MEMBER(metro_state,metro)
 	m_busy_sndcpu = 0;
 }
 
-DRIVER_INIT_MEMBER(metro_state,karatour)
+void metro_state::init_karatour()
 {
 	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 
-	DRIVER_INIT_CALL(metro);
+	init_metro();
 }
 
 
 /* Unscramble the GFX ROMs */
-DRIVER_INIT_MEMBER(metro_state,balcube)
+void metro_state::init_balcube()
 {
 	uint8_t *ROM         = memregion("gfx1")->base();
 	const unsigned len = memregion("gfx1")->bytes();
@@ -5602,15 +5602,12 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 }
 
 
-DRIVER_INIT_MEMBER(metro_state,dharmak)
+void metro_state::init_dharmak()
 {
 	uint8_t *src = memregion( "gfx1" )->base();
-	int i;
-
-	for (i = 0; i < 0x200000; i += 4)
+	for (int i = 0; i < 0x200000; i += 4)
 	{
-		uint8_t dat;
-		dat = src[i + 1];
+		uint8_t dat = src[i + 1];
 		dat = bitswap<8>(dat, 7,3,2,4, 5,6,1,0);
 		src[i + 1] = dat;
 
@@ -5619,10 +5616,10 @@ DRIVER_INIT_MEMBER(metro_state,dharmak)
 		src[i + 3] = dat;
 	}
 
-	DRIVER_INIT_CALL(metro);
+	init_metro();
 }
 
-DRIVER_INIT_MEMBER(metro_state,blzntrnd)
+void metro_state::init_blzntrnd()
 {
 	metro_common();
 	m_irq_line = 1;
@@ -5631,7 +5628,7 @@ DRIVER_INIT_MEMBER(metro_state,blzntrnd)
 	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 }
 
-DRIVER_INIT_MEMBER(metro_state,vmetal)
+void metro_state::init_vmetal()
 {
 	metro_common();
 	m_irq_line = 1;
@@ -5639,7 +5636,7 @@ DRIVER_INIT_MEMBER(metro_state,vmetal)
 	save_item(NAME(m_essnd_gate));
 }
 
-DRIVER_INIT_MEMBER(metro_state,mouja)
+void metro_state::init_mouja()
 {
 	metro_common();
 	m_irq_line = -1;    /* split interrupt handlers */
@@ -5648,7 +5645,7 @@ DRIVER_INIT_MEMBER(metro_state,mouja)
 	m_okibank->configure_entries(0, 8, memregion("oki")->base(), 0x20000);
 }
 
-DRIVER_INIT_MEMBER(metro_state,gakusai)
+void metro_state::init_gakusai()
 {
 	metro_common();
 	m_irq_line = -1;
@@ -5656,7 +5653,7 @@ DRIVER_INIT_MEMBER(metro_state,gakusai)
 	m_blitter_bit = 3;
 }
 
-DRIVER_INIT_MEMBER(metro_state,puzzlet)
+void metro_state::init_puzzlet()
 {
 	metro_common();
 	m_irq_line = 0;
@@ -5664,9 +5661,9 @@ DRIVER_INIT_MEMBER(metro_state,puzzlet)
 	m_blitter_bit = 3;
 }
 
-DRIVER_INIT_MEMBER(metro_state,lastfortg)
+void metro_state::init_lastfortg()
 {
-	DRIVER_INIT_CALL(metro);
+	init_metro();
 	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 }
 

@@ -218,7 +218,7 @@ void interpro_state::machine_reset()
 	m_sreg_ctrl1 = CTRL1_FLOPLOW;
 }
 
-DRIVER_INIT_MEMBER(interpro_state, common)
+void interpro_state::init_common()
 {
 	// FIXME: not all memory sizes are reported properly using fdm "5 inqhw" and
 	// "optimum_memory" commands

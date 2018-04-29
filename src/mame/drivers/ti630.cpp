@@ -53,7 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i80c31_p1_w);
 	DECLARE_WRITE8_MEMBER(i80c31_p3_w);
 	DECLARE_READ8_MEMBER(i80c31_p1_r);
-	DECLARE_DRIVER_INIT(ti630);
+	void init_ti630();
 	DECLARE_PALETTE_INIT(ti630);
 	void ti630(machine_config &config);
 	void i80c31_io(address_map &map);
@@ -72,7 +72,7 @@ void ti630_state::i80c31_prg(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-DRIVER_INIT_MEMBER( ti630_state, ti630 )
+void ti630_state::init_ti630()
 {
 }
 

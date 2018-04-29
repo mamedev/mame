@@ -76,7 +76,7 @@ public:
 	// floppy state
 	int m_fdc_int;
 	int m_fdie;
-	DECLARE_DRIVER_INIT(sage2);
+	void init_sage2();
 
 	int m_centronics_busy;
 	int m_centronics_perror;

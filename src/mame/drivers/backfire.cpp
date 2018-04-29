@@ -48,7 +48,7 @@ public:
 	{ }
 
 	void backfire(machine_config &config);
-	DECLARE_DRIVER_INIT(backfire);
+	void init_backfire();
 
 private:
 	DECLARE_READ32_MEMBER(control2_r);
@@ -667,7 +667,7 @@ READ32_MEMBER(backfire_state::backfire_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(backfire_state,backfire)
+void backfire_state::init_backfire()
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */

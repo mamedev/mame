@@ -1045,25 +1045,22 @@ ROM_END
 */
 
 
-DRIVER_INIT_MEMBER(simpl156_state,simpl156)
+void simpl156_state::init_simpl156()
 {
 	uint8_t *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
 	std::vector<uint8_t> buf1(length);
 
-	uint32_t x;
-
 	/* hmm low address line goes to banking chip instead? */
-	for (x = 0; x < length; x++)
+	for (uint32_t x = 0; x < length; x++)
 	{
-		uint32_t addr;
-
-		addr = bitswap<24> (x,23,22,21,0, 20,
-							19,18,17,16,
+		uint32_t addr = bitswap<24> (x,23,
+		                    22,21, 0,20,
+ 							19,18,17,16,
 							15,14,13,12,
-							11,10,9, 8,
-							7, 6, 5, 4,
-							3, 2, 1 );
+							11,10, 9, 8,
+							 7, 6, 5, 4,
+							 3, 2, 1 );
 
 		buf1[addr] = rom[x];
 	}
@@ -1083,10 +1080,10 @@ READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 }
 
 
-DRIVER_INIT_MEMBER(simpl156_state,joemacr)
+void simpl156_state::init_joemacr()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::joemacr_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 READ32_MEMBER(simpl156_state::chainrec_speedup_r)
@@ -1096,10 +1093,10 @@ READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 	return m_systemram[0x18/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,chainrec)
+void simpl156_state::init_chainrec()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201018, 0x020101b, read32_delegate(FUNC(simpl156_state::chainrec_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 READ32_MEMBER(simpl156_state::prtytime_speedup_r)
@@ -1109,10 +1106,10 @@ READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 	return m_systemram[0xae0/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,prtytime)
+void simpl156_state::init_prtytime()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201ae0, 0x0201ae3, read32_delegate(FUNC(simpl156_state::prtytime_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 
@@ -1123,10 +1120,10 @@ READ32_MEMBER(simpl156_state::charlien_speedup_r)
 	return m_systemram[0x10/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,charlien)
+void simpl156_state::init_charlien()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::charlien_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 }
 
 READ32_MEMBER(simpl156_state::osman_speedup_r)
@@ -1136,10 +1133,10 @@ READ32_MEMBER(simpl156_state::osman_speedup_r)
 	return m_systemram[0x10/4];
 }
 
-DRIVER_INIT_MEMBER(simpl156_state,osman)
+void simpl156_state::init_osman()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0201010, 0x0201013, read32_delegate(FUNC(simpl156_state::osman_speedup_r),this));
-	DRIVER_INIT_CALL(simpl156);
+	init_simpl156();
 
 }
 

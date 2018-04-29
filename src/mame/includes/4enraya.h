@@ -45,7 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fenraya_custom_map_w);
 	DECLARE_WRITE8_MEMBER(fenraya_videoram_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_DRIVER_INIT(unkpacg);
+	void init_unkpacg();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update_4enraya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

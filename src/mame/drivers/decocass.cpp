@@ -2025,7 +2025,7 @@ ROM_START( decomult )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(decocass_state,decocass)
+void decocass_state::init_decocass()
 {
 	/* Call the state save setup code in machine/decocass.c */
 	decocass_machine_state_save_init();
@@ -2033,10 +2033,10 @@ DRIVER_INIT_MEMBER(decocass_state,decocass)
 	decocass_video_state_save_init();
 }
 
-DRIVER_INIT_MEMBER(decocass_state,decocrom)
+void decocass_state::init_decocrom()
 {
 	/* standard init */
-	DRIVER_INIT_CALL(decocass);
+	init_decocass();
 
 	/* convert charram to a banked ROM */
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x6000, 0xafff, "bank1");
@@ -2074,10 +2074,10 @@ WRITE8_MEMBER(decocass_state::cdsteljn_mux_w )
 		printf("%02x\n",data);
 }
 
-DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
+void decocass_state::init_cdsteljn()
 {
 	/* standard init */
-	DRIVER_INIT_CALL(decocass);
+	init_decocass();
 
 	/* install custom mahjong panel */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe413, 0xe413, write8_delegate(FUNC(decocass_state::cdsteljn_mux_w), this));

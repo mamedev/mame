@@ -78,7 +78,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s9);
-	DECLARE_DRIVER_INIT(s9);
+	void init_s9();
 	void s9(machine_config &config);
 	void s9_audio_map(address_map &map);
 	void s9_main_map(address_map &map);
@@ -312,7 +312,7 @@ MACHINE_RESET_MEMBER( s9_state, s9 )
 {
 }
 
-DRIVER_INIT_MEMBER( s9_state, s9 )
+void s9_state::init_s9()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);

@@ -40,10 +40,10 @@ public:
 	DECLARE_WRITE8_MEMBER(circus_clown_x_w);
 	DECLARE_WRITE8_MEMBER(circus_clown_y_w);
 	DECLARE_WRITE8_MEMBER(circus_clown_z_w);
-	DECLARE_DRIVER_INIT(ripcord);
-	DECLARE_DRIVER_INIT(circus);
-	DECLARE_DRIVER_INIT(robotbwl);
-	DECLARE_DRIVER_INIT(crash);
+	void init_ripcord();
+	void init_circus();
+	void init_robotbwl();
+	void init_crash();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -69,7 +69,7 @@ public:
 	};
 
 protected:
-	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t id);
+	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -150,6 +150,7 @@ protected:
 	required_device<pit8254_device> m_pit;
 
 	virtual void handle_reset_reg_write(uint8_t data);
+	virtual uint8_t get_system_id() = 0;
 
 	uint8_t m_gen_ctrl_select_reg;
 	uint8_t m_gen_ctrl_reg;
@@ -193,20 +194,18 @@ class ioc2_guinness_device : public ioc2_device
 {
 public:
 	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	ioc2_guinness_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: ioc2_device(mconfig, type, tag, owner, clock, 0x01)
-	{ }
+	uint8_t get_system_id() override { return 0x01; }
 };
 
 class ioc2_full_house_device : public ioc2_device
 {
 public:
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	ioc2_full_house_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: ioc2_device(mconfig, type, tag, owner, clock, 0x20)
-	{ }
+	uint8_t get_system_id() override { return 0x20; }
 };
 
 DECLARE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device)

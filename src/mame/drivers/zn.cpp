@@ -118,12 +118,12 @@ public:
 	DECLARE_WRITE16_MEMBER(vt83c461_16_w);
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
-	DECLARE_DRIVER_INIT(coh1000tb);
-	DECLARE_DRIVER_INIT(nbajamex);
-	DECLARE_DRIVER_INIT(bam2);
-	DECLARE_DRIVER_INIT(jdredd);
-	DECLARE_DRIVER_INIT(coh1000w);
-	DECLARE_DRIVER_INIT(primrag2);
+	void init_coh1000tb();
+	void init_nbajamex();
+	void init_bam2();
+	void init_jdredd();
+	void init_coh1000w();
+	void init_primrag2();
 	DECLARE_MACHINE_START(coh1000c);
 	DECLARE_MACHINE_START(coh1000ta);
 	DECLARE_MACHINE_START(coh1002e);
@@ -1178,7 +1178,7 @@ void zn_state::coh1000tb_map(address_map &map)
 	map(0x1fbe0000, 0x1fbe01ff).rw(m_zoom, FUNC(taito_zoom_device::shared_ram_r), FUNC(taito_zoom_device::shared_ram_w)).umask32(0x00ff00ff); // M66220FP for comm with the MN10200
 }
 
-DRIVER_INIT_MEMBER(zn_state,coh1000tb)
+void zn_state::init_coh1000tb()
 {
 	m_fx1b_fram = std::make_unique<uint8_t[]>(0x200);
 	machine().device<nvram_device>("fm1208s")->set_base(m_fx1b_fram.get(), 0x200);
@@ -1441,7 +1441,7 @@ WRITE16_MEMBER(zn_state::vt83c461_32_w)
 	logerror( "unhandled 32 bit write %04x %04x %04x\n", offset, data, mem_mask );
 }
 
-DRIVER_INIT_MEMBER(zn_state,primrag2)
+void zn_state::init_primrag2()
 {
 	save_item(NAME(m_vt83c461_latch));
 }
@@ -1816,7 +1816,7 @@ void zn_state::bam2_map(address_map &map)
 	map(0x1fb00000, 0x1fb00007).rw(this, FUNC(zn_state::bam2_mcu_r), FUNC(zn_state::bam2_mcu_w));
 }
 
-DRIVER_INIT_MEMBER(zn_state,bam2)
+void zn_state::init_bam2()
 {
 	save_item(NAME(m_bam2_mcu_command));
 }
@@ -2142,7 +2142,7 @@ void zn_state::nbajamex_bank_map(address_map &map)
 	map(0xa00000, 0xffffff).bankr("rombank2");
 }
 
-DRIVER_INIT_MEMBER(zn_state,nbajamex)
+void zn_state::init_nbajamex()
 {
 	m_nbajamex_sram = std::make_unique<uint8_t[]>(0x8000);
 	machine().device<nvram_device>("71256")->set_base(m_nbajamex_sram.get(), 0x8000);
@@ -2167,7 +2167,7 @@ MACHINE_RESET_MEMBER(zn_state,nbajamex)
 	m_rombank[1]->set_entry( 0 );
 }
 
-DRIVER_INIT_MEMBER(zn_state,jdredd)
+void zn_state::init_jdredd()
 {
 	save_item(NAME(m_jdredd_gun_mux));
 }

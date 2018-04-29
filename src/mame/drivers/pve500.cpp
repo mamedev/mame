@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_sel_w);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
-	DECLARE_DRIVER_INIT(pve500);
+	void init_pve500();
 	void pve500(machine_config &config);
 	void maincpu_io(address_map &map);
 	void maincpu_prg(address_map &map);
@@ -157,7 +157,7 @@ void pve500_state::subcpu_prg(address_map &map)
 	map(0xc000, 0xc7ff).mirror(0x3800).rw("mb8421", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w));
 }
 
-DRIVER_INIT_MEMBER( pve500_state, pve500 )
+void pve500_state::init_pve500()
 {
 }
 

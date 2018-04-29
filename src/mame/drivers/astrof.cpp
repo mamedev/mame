@@ -1333,14 +1333,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(astrof_state,abattle)
+void astrof_state::init_abattle()
 {
 	/* use the protection PROM to decrypt the ROMs */
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *prom = memregion("user1")->base();
-	int i;
 
-	for(i = 0xd000; i < 0x10000; i++)
+	for (int i = 0xd000; i < 0x10000; i++)
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
@@ -1349,12 +1348,10 @@ DRIVER_INIT_MEMBER(astrof_state,abattle)
 }
 
 
-DRIVER_INIT_MEMBER(astrof_state,afire)
+void astrof_state::init_afire()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
-	for(i = 0xd000; i < 0x10000; i++)
+	for (int i = 0xd000; i < 0x10000; i++)
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
@@ -1363,12 +1360,10 @@ DRIVER_INIT_MEMBER(astrof_state,afire)
 }
 
 
-DRIVER_INIT_MEMBER(astrof_state,sstarbtl)
+void astrof_state::init_sstarbtl()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
-	for(i = 0xd000; i < 0x10000; i++)
+	for (int i = 0xd000; i < 0x10000; i++)
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
@@ -1376,7 +1371,7 @@ DRIVER_INIT_MEMBER(astrof_state,sstarbtl)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::abattle_coin_prot_r),this));
 }
 
-DRIVER_INIT_MEMBER(astrof_state,acombat3)
+void astrof_state::init_acombat3()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),this));

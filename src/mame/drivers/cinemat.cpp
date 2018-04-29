@@ -1466,7 +1466,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cinemat_state,speedfrk)
+void cinemat_state::init_speedfrk()
 {
 	m_gear = 0xe;
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(cinemat_state::speedfrk_wheel_r),this));
@@ -1474,19 +1474,19 @@ DRIVER_INIT_MEMBER(cinemat_state,speedfrk)
 }
 
 
-DRIVER_INIT_MEMBER(cinemat_state,sundance)
+void cinemat_state::init_sundance()
 {
 	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x0f, read8_delegate(FUNC(cinemat_state::sundance_inputs_r),this));
 }
 
 
-DRIVER_INIT_MEMBER(cinemat_state,boxingb)
+void cinemat_state::init_boxingb()
 {
 	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8_delegate(FUNC(cinemat_state::boxingb_dial_r),this));
 }
 
 
-DRIVER_INIT_MEMBER(cinemat_state,qb3)
+void cinemat_state::init_qb3()
 {
 	membank("bank1")->configure_entries(0, 4, m_rambase, 0x100*2);
 }

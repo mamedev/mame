@@ -51,7 +51,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	DECLARE_DRIVER_INIT(gen32);
+	void init_gen32();
 	void alm32(machine_config &config);
 	void van32(machine_config &config);
 	void van16(machine_config &config);
@@ -242,7 +242,7 @@ static INPUT_PORTS_START( berlinp )
 INPUT_PORTS_END
 
 
-DRIVER_INIT_MEMBER(mmodular_state, gen32)
+void mmodular_state::init_gen32()
 {
 	// patch LCD delay loop
 	uint8_t *rom = memregion("maincpu")->base();

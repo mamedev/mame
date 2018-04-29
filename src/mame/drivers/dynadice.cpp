@@ -65,7 +65,7 @@ public:
 	DECLARE_WRITE8_MEMBER(dynadice_videoram_w);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE8_MEMBER(sound_control_w);
-	DECLARE_DRIVER_INIT(dynadice);
+	void init_dynadice();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -300,9 +300,8 @@ ROM_START( dynadice )
 	ROM_LOAD( "dy_5.bin",     0x0000, 0x0800, CRC(e4799462) SHA1(5cd0f003572540522d72706bc5a8fa6588553031) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dynadice_state,dynadice)
+void dynadice_state::init_dynadice()
 {
-	int i, j;
 	uint8_t *usr1 = memregion("user1")->base();
 	uint8_t *cpu2 = memregion("audiocpu")->base();
 	uint8_t *gfx1 = memregion("gfx1")->base();
@@ -311,8 +310,8 @@ DRIVER_INIT_MEMBER(dynadice_state,dynadice)
 	cpu2[0x0b] = 0x23;  /* bug in game code  Dec HL -> Inc HL*/
 
 	/* 1bpp tiles -> 3bpp tiles (dy_5.bin  contains bg/fg color data for each tile line) */
-	for (i = 0; i < 0x800; i++)
-		for (j = 0; j < 8; j++)
+	for (int i = 0; i < 0x800; i++)
+		for (int j = 0; j < 8; j++)
 			gfx2[(i << 3) + j] = (gfx1[i] & (0x80 >> j)) ? (usr1[i] & 7) : (usr1[i] >> 4);
 }
 

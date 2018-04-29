@@ -113,7 +113,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_io_analog(*this, "AN.%u", 0)
 	{ }
-	DECLARE_DRIVER_INIT(mwskins);
+	void init_mwskins();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -936,7 +936,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(atlantis_state,mwskins)
+void atlantis_state::init_mwskins()
 {
 }
 

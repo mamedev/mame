@@ -111,9 +111,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
-	DECLARE_DRIVER_INIT(at);
-	DECLARE_DRIVER_INIT(atpci);
-	DECLARE_DRIVER_INIT(megapcpla);
+	void init_at();
+	void init_atpci();
+	void init_megapcpla();
 	DECLARE_READ16_MEMBER(ps1_unk_r);
 	DECLARE_WRITE16_MEMBER(ps1_unk_w);
 	DECLARE_READ8_MEMBER(ps1_portb_r);
@@ -175,8 +175,8 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_DRIVER_INIT(megapc);
-	DECLARE_DRIVER_INIT(megapcpl);
+	void init_megapc();
+	void init_megapcpl();
 
 	DECLARE_READ16_MEMBER( wd7600_ior );
 	DECLARE_WRITE16_MEMBER( wd7600_iow );
@@ -295,21 +295,21 @@ void at_state::ficpio_io(address_map &map)
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
-DRIVER_INIT_MEMBER(megapc_state, megapc)
+void megapc_state::init_megapc()
 {
 	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x19145] = 0x45;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
-DRIVER_INIT_MEMBER(megapc_state, megapcpl)
+void megapc_state::init_megapcpl()
 {
 	uint8_t* ROM = memregion("bios")->base();
 	ROM[0x187b1] = 0x55;  // hack to fix keyboard.  To be removed when the keyboard controller from the MegaPC is dumped
 	ROM[0x1fea0] = 0x20;  // to correct checksum
 }
 
-DRIVER_INIT_MEMBER(at_state, megapcpla)
+void at_state::init_megapcpla()
 {
 	uint8_t* ROM = memregion("bios")->base();
 
@@ -387,12 +387,12 @@ void at_state::init_at_common(int xmsbase)
 	}
 }
 
-DRIVER_INIT_MEMBER(at_state,at)
+void at_state::init_at()
 {
 	init_at_common(0xa0000);
 }
 
-DRIVER_INIT_MEMBER(at_state,atpci)
+void at_state::init_atpci()
 {
 	init_at_common(0x100000);
 }

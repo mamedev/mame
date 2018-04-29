@@ -211,25 +211,25 @@ public:
 	DECLARE_READ16_MEMBER(ics2115_word_r);
 	DECLARE_WRITE16_MEMBER(ics2115_word_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_DRIVER_INIT(lhbv33c);
-	DECLARE_DRIVER_INIT(drgnwrldv21j);
-	DECLARE_DRIVER_INIT(wlcc);
-	DECLARE_DRIVER_INIT(nkishusp);
-	DECLARE_DRIVER_INIT(drgnwrldv21);
-	DECLARE_DRIVER_INIT(dbc);
-	DECLARE_DRIVER_INIT(lhb);
-	DECLARE_DRIVER_INIT(drgnwrld);
-	DECLARE_DRIVER_INIT(drgnwrldv30);
-	DECLARE_DRIVER_INIT(drgnwrldv11h);
-	DECLARE_DRIVER_INIT(lhb2);
-	DECLARE_DRIVER_INIT(xymg);
-	DECLARE_DRIVER_INIT(drgnwrldv10c);
-	DECLARE_DRIVER_INIT(drgnwrldv20j);
-	DECLARE_DRIVER_INIT(drgnwrldv40k);
-	DECLARE_DRIVER_INIT(vbowl);
-	DECLARE_DRIVER_INIT(vbowlj);
-	DECLARE_DRIVER_INIT(vbowlhk);
-	DECLARE_DRIVER_INIT(ryukobou);
+	void init_lhbv33c();
+	void init_drgnwrldv21j();
+	void init_wlcc();
+	void init_nkishusp();
+	void init_drgnwrldv21();
+	void init_dbc();
+	void init_lhb();
+	void init_drgnwrld();
+	void init_drgnwrldv30();
+	void init_drgnwrldv11h();
+	void init_lhb2();
+	void init_xymg();
+	void init_drgnwrldv10c();
+	void init_drgnwrldv20j();
+	void init_drgnwrldv40k();
+	void init_vbowl();
+	void init_vbowlj();
+	void init_vbowlhk();
+	void init_ryukobou();
 	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
@@ -2157,7 +2157,7 @@ WRITE16_MEMBER(igs011_state::vbowlhk_igs003_w)
 ***************************************************************************/
 
 // V0400O
-DRIVER_INIT_MEMBER(igs011_state,drgnwrld)
+void igs011_state::init_drgnwrld()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2183,7 +2183,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrld)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv30)
+void igs011_state::init_drgnwrldv30()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2208,7 +2208,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv30)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
+void igs011_state::init_drgnwrldv21()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2237,7 +2237,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21j)
+void igs011_state::init_drgnwrldv21j()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2264,7 +2264,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv21j)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
+void igs011_state::init_drgnwrldv20j()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2293,7 +2293,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv20j)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv40k)
+void igs011_state::init_drgnwrldv40k()
 {
 	//drgnwrld_type3_decrypt(); // wrong
 	drgnwrld_gfx_decrypt();
@@ -2301,7 +2301,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv40k)
 	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), this)); // wrong
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
+void igs011_state::init_drgnwrldv11h()
 {
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2310,7 +2310,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv11h)
 	// the protection checks are already patched out like we do!
 }
 
-DRIVER_INIT_MEMBER(igs011_state,drgnwrldv10c)
+void igs011_state::init_drgnwrldv10c()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2336,7 +2336,7 @@ DRIVER_INIT_MEMBER(igs011_state,drgnwrldv10c)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,lhb)
+void igs011_state::init_lhb()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2346,7 +2346,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhb)
 //  rom[0x2eef6/2]  =   0x4e75;     // 02EEF6: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-DRIVER_INIT_MEMBER(igs011_state,lhbv33c)
+void igs011_state::init_lhbv33c()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2356,7 +2356,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhbv33c)
 //  rom[0x2e988/2]  =   0x4e75;     // 02E988: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-DRIVER_INIT_MEMBER(igs011_state,dbc)
+void igs011_state::init_dbc()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2386,7 +2386,7 @@ DRIVER_INIT_MEMBER(igs011_state,dbc)
 //  rom[0x19E90/2]  =   0x00ff;
 }
 
-DRIVER_INIT_MEMBER(igs011_state,ryukobou)
+void igs011_state::init_ryukobou()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2399,7 +2399,7 @@ DRIVER_INIT_MEMBER(igs011_state,ryukobou)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,xymg)
+void igs011_state::init_xymg()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2433,7 +2433,7 @@ DRIVER_INIT_MEMBER(igs011_state,xymg)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,wlcc)
+void igs011_state::init_wlcc()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2457,7 +2457,7 @@ DRIVER_INIT_MEMBER(igs011_state,wlcc)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,lhb2)
+void igs011_state::init_lhb2()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2480,7 +2480,7 @@ DRIVER_INIT_MEMBER(igs011_state,lhb2)
 */
 }
 
-DRIVER_INIT_MEMBER(igs011_state,vbowl)
+void igs011_state::init_vbowl()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2500,7 +2500,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowl)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,vbowlj)
+void igs011_state::init_vbowlj()
 {
 //  uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
@@ -2518,7 +2518,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowlj)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,vbowlhk)
+void igs011_state::init_vbowlhk()
 {
 	vbowlhk_decrypt();
 	vbowl_gfx_decrypt();
@@ -2527,7 +2527,7 @@ DRIVER_INIT_MEMBER(igs011_state,vbowlhk)
 }
 
 
-DRIVER_INIT_MEMBER(igs011_state,nkishusp)
+void igs011_state::init_nkishusp()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 

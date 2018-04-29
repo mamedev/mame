@@ -411,13 +411,12 @@ INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
 	}
 }
 
-DRIVER_INIT_MEMBER(microtan_state,microtan)
+void microtan_state::init_microtan()
 {
 	uint8_t *dst = memregion("gfx2")->base();
-	int i;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		switch (i & 3)
 		{

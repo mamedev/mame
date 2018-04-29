@@ -59,7 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i87c52_p3_w);
 	DECLARE_READ8_MEMBER(i87c52_p1_r);
 	DECLARE_READ8_MEMBER(i87c52_p2_r);
-	DECLARE_DRIVER_INIT(minicom);
+	void init_minicom();
 	void minicom(machine_config &config);
 private:
 	uint8_t m_p[4];
@@ -212,7 +212,7 @@ WRITE8_MEMBER(minicom_state::i87c52_p3_w)
 	}
 }
 
-DRIVER_INIT_MEMBER( minicom_state, minicom )
+void minicom_state::init_minicom()
 {
 }
 

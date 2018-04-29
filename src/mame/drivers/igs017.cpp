@@ -90,20 +90,20 @@ public:
 	void spkrform(machine_config &config);
 	void sdmg2(machine_config &config);
 
-	DECLARE_DRIVER_INIT(iqblocka);
-	DECLARE_DRIVER_INIT(mgdh);
-	DECLARE_DRIVER_INIT(slqz2);
-	DECLARE_DRIVER_INIT(lhzb2);
-	DECLARE_DRIVER_INIT(starzan);
-	DECLARE_DRIVER_INIT(mgcs);
-	DECLARE_DRIVER_INIT(tjsb);
-	DECLARE_DRIVER_INIT(spkrform);
-	DECLARE_DRIVER_INIT(iqblockf);
-	DECLARE_DRIVER_INIT(sdmg2);
-	DECLARE_DRIVER_INIT(tarzan);
-	DECLARE_DRIVER_INIT(tarzana);
-	DECLARE_DRIVER_INIT(lhzb2a);
-	DECLARE_DRIVER_INIT(mgdha);
+	void init_iqblocka();
+	void init_mgdh();
+	void init_slqz2();
+	void init_lhzb2();
+	void init_starzan();
+	void init_mgcs();
+	void init_tjsb();
+	void init_spkrform();
+	void init_iqblockf();
+	void init_sdmg2();
+	void init_tarzan();
+	void init_tarzana();
+	void init_lhzb2a();
+	void init_mgdha();
 
 protected:
 	virtual void video_start() override;
@@ -364,7 +364,7 @@ void igs017_state::iqblocka_patch_rom()
 //  rom[0x385b1] = 0x18;
 }
 
-DRIVER_INIT_MEMBER(igs017_state,iqblocka)
+void igs017_state::init_iqblocka()
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
 	iqblocka_patch_rom();
@@ -389,7 +389,7 @@ void igs017_state::iqblockf_patch_rom() // very preliminary
 	rom[0x23c90] = 0x18;
 }
 
-DRIVER_INIT_MEMBER(igs017_state,iqblockf)
+void igs017_state::init_iqblockf()
 {
 	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
 	iqblockf_patch_rom();
@@ -422,7 +422,7 @@ void igs017_state::tjsb_decrypt_sprites()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tjsb)
+void igs017_state::init_tjsb()
 {
 	decrypt_program_rom(0x05, 7, 6, 3, 2, 5, 4, 1, 0);
 
@@ -530,7 +530,7 @@ void igs017_state::mgcs_patch_rom()
 //  rom[0x4e036/2] = 0x6006;    // 04E036: 6306    bls     $4e03e
 }
 
-DRIVER_INIT_MEMBER(igs017_state,mgcs)
+void igs017_state::init_mgcs()
 {
 	mgcs_decrypt_program_rom();
 	mgcs_patch_rom();
@@ -602,13 +602,13 @@ void igs017_state::tarzana_decrypt_program_rom()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tarzan)
+void igs017_state::init_tarzan()
 {
 	tarzan_decrypt_program_rom();
 	tarzan_decrypt_tiles();
 }
 
-DRIVER_INIT_MEMBER(igs017_state,tarzana)
+void igs017_state::init_tarzana()
 {
 	tarzana_decrypt_program_rom();
 //  tarzana_decrypt_tiles();    // to do
@@ -666,7 +666,7 @@ void igs017_state::starzan_decrypt(uint8_t *ROM, int size, bool isOpcode)
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,starzan)
+void igs017_state::init_starzan()
 {
 	int size = 0x040000;
 
@@ -683,52 +683,47 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 
 // sdmg2
 
-DRIVER_INIT_MEMBER(igs017_state,sdmg2)
+void igs017_state::init_sdmg2()
 {
-	int i;
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
-		if( i & 0x20/2 )
+		if (i & 0x20/2)
 		{
-			if( i & 0x02/2 )
+			if (i & 0x02/2)
 			{
 				x ^= 0x0001;
 			}
 		}
 
-		if( !(i & 0x4000/2) )
+		if (!(i & 0x4000/2))
 		{
-			if( !(i & 0x300/2) )
+			if (!(i & 0x300/2))
 			{
 				x ^= 0x0001;
 			}
 		}
 
 		/* bit 9 xor layer */
-
-		if( i & 0x20000/2 )
+		if (i & 0x20000/2)
 		{
 			x ^= 0x0200;
 		}
 		else
 		{
-			if( !(i & 0x400/2) )
+			if (!(i & 0x400/2))
 			{
 				x ^= 0x0200;
 			}
 		}
 
 		/* bit 12 xor layer */
-
-		if( i & 0x20000/2 )
+		if (i & 0x20000/2)
 		{
 			x ^= 0x1000;
 		}
@@ -740,32 +735,29 @@ DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 
 // mgdh, mgdha
 
-DRIVER_INIT_MEMBER(igs017_state,mgdha)
+void igs017_state::init_mgdha()
 {
-	int i;
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
-		if( (i & 0x20/2) && (i & 0x02/2) )
+		if ((i & 0x20/2) && (i & 0x02/2))
 		{
-			if( (i & 0x300/2) || (i & 0x4000/2) )
+			if ((i & 0x300/2) || (i & 0x4000/2))
 				x ^= 0x0001;
 		}
 		else
 		{
-			if( !(i & 0x300/2) && !(i & 0x4000/2) )
+			if (!(i & 0x300/2) && !(i & 0x4000/2))
 				x ^= 0x0001;
 		}
 
-		if( (i & 0x60000/2) )
+		if ((i & 0x60000/2))
 			x ^= 0x0100;
 
-		if( (i & 0x1000/2) || ((i & 0x4000/2) && (i & 0x40/2) && (i & 0x80/2)) || ((i & 0x2000/2) && (i & 0x400/2)) )
+		if ((i & 0x1000/2) || ((i & 0x4000/2) && (i & 0x40/2) && (i & 0x80/2)) || ((i & 0x2000/2) && (i & 0x400/2)))
 			x ^= 0x0800;
 
 		src[i] = x;
@@ -774,9 +766,9 @@ DRIVER_INIT_MEMBER(igs017_state,mgdha)
 	mgcs_flip_sprites();
 }
 
-DRIVER_INIT_MEMBER(igs017_state,mgdh)
+void igs017_state::init_mgdh()
 {
-	DRIVER_INIT_CALL(mgdha);
+	init_mgdha();
 
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
@@ -847,30 +839,26 @@ void igs017_state::igs025_to_igs022_callback( void )
 
 
 
-DRIVER_INIT_MEMBER(igs017_state,lhzb2)
+void igs017_state::init_lhzb2()
 {
-	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
-
-		if( i & 0x20/2 )
+		if (i & 0x20/2)
 		{
-			if( i & 0x02/2 )
+			if (i & 0x02/2)
 			{
 				x ^= 0x0001;
 			}
 		}
 
-		if( !(i & 0x4000/2) )
+		if (!(i & 0x4000/2))
 		{
-			if( !(i & 0x300/2) )
+			if (!(i & 0x300/2))
 			{
 				x ^= 0x0001;
 			}
@@ -878,17 +866,17 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 
 		/* bit 13 xor layer */
 
-		if( !(i & 0x1000/2) )
+		if (!(i & 0x1000/2))
 		{
-			if( i & 0x2000/2 )
+			if (i & 0x2000/2)
 			{
-				if( i & 0x8000/2 )
+				if (i & 0x8000/2)
 				{
-					if( !(i & 0x100/2) )
+					if (!(i & 0x100/2))
 					{
-						if( i & 0x200/2 )
+						if (i & 0x200/2)
 						{
-							if( !(i & 0x40/2) )
+							if (!(i & 0x40/2))
 							{
 								x ^= 0x2000;
 							}
@@ -901,7 +889,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 				}
 				else
 				{
-					if( !(i & 0x100/2) )
+					if (!(i & 0x100/2))
 					{
 						x ^= 0x2000;
 					}
@@ -909,11 +897,11 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 			}
 			else
 			{
-				if( i & 0x8000/2 )
+				if (i & 0x8000/2)
 				{
-					if( i & 0x200/2 )
+					if (i & 0x200/2)
 					{
-						if( !(i & 0x40/2) )
+						if (!(i & 0x40/2))
 						{
 							x ^= 0x2000;
 						}
@@ -948,30 +936,26 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 
 //lhzb2a
 
-DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
+void igs017_state::init_lhzb2a()
 {
-	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
-
-		if( i & 0x20/2 )
+		if (i & 0x20/2)
 		{
-			if( i & 0x02/2 )
+			if (i & 0x02/2)
 			{
 				x ^= 0x0001;
 			}
 		}
 
-		if( !(i & 0x4000/2) )
+		if (!(i & 0x4000/2))
 		{
-			if( !(i & 0x300/2) )
+			if (!(i & 0x300/2))
 			{
 				x ^= 0x0001;
 			}
@@ -979,15 +963,15 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 
 		/* bit 5 xor layer */
 
-		if( i & 0x4000/2 )
+		if (i & 0x4000/2)
 		{
-			if( i & 0x8000/2 )
+			if (i & 0x8000/2)
 			{
-				if( i & 0x2000/2 )
+				if (i & 0x2000/2)
 				{
-					if( i & 0x200/2 )
+					if (i & 0x200/2)
 					{
-						if( !(i & 0x40/2) || (i & 0x800/2) )
+						if (!(i & 0x40/2) || (i & 0x800/2))
 						{
 							x ^= 0x0020;
 						}
@@ -996,7 +980,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 			}
 			else
 			{
-				if( !(i & 0x40/2) || (i & 0x800/2) )
+				if (!(i & 0x40/2) || (i & 0x800/2))
 				{
 					x ^= 0x0020;
 				}
@@ -1039,30 +1023,27 @@ void igs017_state::slqz2_decrypt_tiles()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,slqz2)
+void igs017_state::init_slqz2()
 {
-	int i;
 	uint16_t *src = (uint16_t *) (memregion("maincpu")->base());
-
 	int rom_size = 0x80000;
-
-	for (i=0; i<rom_size/2; i++)
+	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = src[i];
 
 		/* bit 0 xor layer */
 
-		if( i & 0x20/2 )
+		if (i & 0x20/2)
 		{
-			if( i & 0x02/2 )
+			if (i & 0x02/2)
 			{
 				x ^= 0x0001;
 			}
 		}
 
-		if( !(i & 0x4000/2) )
+		if (!(i & 0x4000/2))
 		{
-			if( !(i & 0x300/2) )
+			if (!(i & 0x300/2))
 			{
 				x ^= 0x0001;
 			}
@@ -1070,19 +1051,19 @@ DRIVER_INIT_MEMBER(igs017_state,slqz2)
 
 		/* bit 14 xor layer */
 
-		if( i & 0x1000/2 )
+		if (i & 0x1000/2)
 		{
-			if( i & 0x800/2 )
+			if (i & 0x800/2)
 			{
 				x ^= 0x4000;
 			}
 			else
 			{
-				if( i & 0x200/2 )
+				if (i & 0x200/2)
 				{
-					if( !(i & 0x100/2) )
+					if (!(i & 0x100/2))
 					{
-						if( i & 0x40/2 )
+						if (i & 0x40/2)
 						{
 							x ^= 0x4000;
 						}
@@ -1096,15 +1077,15 @@ DRIVER_INIT_MEMBER(igs017_state,slqz2)
 		}
 		else
 		{
-			if( i & 0x800/2 )
+			if (i & 0x800/2)
 			{
 				x ^= 0x4000;
 			}
 			else
 			{
-				if( !(i & 0x100/2) )
+				if (!(i & 0x100/2))
 				{
-					if( i & 0x40/2 )
+					if (i & 0x40/2)
 					{
 						x ^= 0x4000;
 					}
@@ -1149,7 +1130,7 @@ void igs017_state::spkrform_decrypt_sprites()
 	}
 }
 
-DRIVER_INIT_MEMBER(igs017_state,spkrform)
+void igs017_state::init_spkrform()
 {
 	decrypt_program_rom(0x14, 7, 6, 5, 4, 3, 0, 1, 2);
 

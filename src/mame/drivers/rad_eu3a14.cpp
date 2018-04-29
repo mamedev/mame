@@ -113,8 +113,8 @@ public:
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
-	DECLARE_DRIVER_INIT(rad_gtg);
-	DECLARE_DRIVER_INIT(rad_foot);
+	void init_rad_gtg();
+	void init_rad_foot();
 
 	void bank_map(address_map &map);
 	void radica_eu3a14_map(address_map &map);
@@ -815,14 +815,14 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14_adc)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", radica_eu3a14_state, scanline_cb, "screen", 0, 1)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(radica_eu3a14_state, rad_gtg)
+void radica_eu3a14_state::init_rad_gtg()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0a00 - 0x200;
 	m_spriterambase = 0x0220 - 0x200;
 }
 
-DRIVER_INIT_MEMBER(radica_eu3a14_state, rad_foot)
+void radica_eu3a14_state::init_rad_foot()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0200 - 0x200;

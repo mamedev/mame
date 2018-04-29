@@ -283,15 +283,15 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
-	DECLARE_DRIVER_INIT(cpu30x);
-	DECLARE_DRIVER_INIT(cpu30xa);
-	DECLARE_DRIVER_INIT(cpu30za);
-	DECLARE_DRIVER_INIT(cpu30zbe);
-	DECLARE_DRIVER_INIT(cpu30be8);
-	DECLARE_DRIVER_INIT(cpu30be16);
-	DECLARE_DRIVER_INIT(cpu30lite4);
-	DECLARE_DRIVER_INIT(cpu30lite8);
-	DECLARE_DRIVER_INIT(cpu33);
+	void init_cpu30x();
+	void init_cpu30xa();
+	void init_cpu30za();
+	void init_cpu30zbe();
+	void init_cpu30be8();
+	void init_cpu30be16();
+	void init_cpu30lite4();
+	void init_cpu30lite8();
+	void init_cpu33();
 	void cpu30(machine_config &config);
 	void cpu30x(machine_config &config);
 	void cpu30zbe(machine_config &config);
@@ -382,15 +382,15 @@ void cpu30_state::machine_reset ()
 }
 
 /*                                                                              setup board ID */
-DRIVER_INIT_MEMBER( cpu30_state, cpu30x )      { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30xa )     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30za )     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30zbe )    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be8 )    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be16 )   { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu33 )       { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x68; } // 0x60 skips FGA prompt
+void cpu30_state::init_cpu30x()      { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30xa()     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30za()     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30zbe()    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30be8()    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30be16()   { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30lite4()  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu30lite8()  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+void cpu30_state::init_cpu33()       { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x68; } // 0x60 skips FGA prompt
 
 /* Mock FDC driver */
 READ8_MEMBER (cpu30_state::fdc_r){

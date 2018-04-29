@@ -59,7 +59,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_DRIVER_INIT(kov3hd);
+	void init_kov3hd();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -162,7 +162,7 @@ ROM_START( kov3hd101 )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(pgm3_state,kov3hd)
+void pgm3_state::init_kov3hd()
 {
 }
 

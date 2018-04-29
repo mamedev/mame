@@ -233,7 +233,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(bfcobra);
+	void init_bfcobra();
 	void bfcobra(machine_config &config);
 
 protected:
@@ -1569,7 +1569,7 @@ WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
 
 
 /* TODO: Driver vs Machine Init */
-DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
+void bfcobra_state::init_bfcobra()
 {
 	/*
 	    6809 ROM address and data lines are scrambled.
@@ -1578,24 +1578,20 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 	static const uint8_t datalookup[] = { 1, 3, 5, 6, 4, 2, 0, 7 };
 	static const uint8_t addrlookup[] = { 11, 12, 0, 2, 3, 5, 7, 9, 8, 6, 1, 4, 10, 13, 14 };
 
-	uint32_t i;
-	uint8_t *rom;
-
 	std::vector<uint8_t> tmp(0x8000);
-	rom = memregion("audiocpu")->base() + 0x8000;
+	uint8_t *rom = memregion("audiocpu")->base() + 0x8000;
 	memcpy(&tmp[0], rom, 0x8000);
 
-	for (i = 0; i < 0x8000; i++)
+	for (uint32_t i = 0; i < 0x8000; i++)
 	{
-		uint16_t addr = 0;
-		uint8_t x;
-		uint8_t data = 0;
 		uint8_t val = tmp[i];
 
-		for (x = 0; x < 8; x ++)
+		uint8_t data = 0;
+		for (uint8_t x = 0; x < 8; x ++)
 			data |= ((val >> x) & 1) << datalookup[x];
 
-		for (x = 0; x < 15; x ++)
+		uint16_t addr = 0;
+		for (uint8_t x = 0; x < 15; x ++)
 			addr |= ((i >> x) & 1)  << addrlookup[x];
 
 		rom[addr] = data;

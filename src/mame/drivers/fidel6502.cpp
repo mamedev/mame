@@ -565,21 +565,21 @@ public:
 	DECLARE_WRITE8_MEMBER(fdesdis_control_w);
 	DECLARE_WRITE8_MEMBER(fdesdis_lcd_w);
 	DECLARE_READ8_MEMBER(fdesdis_input_r);
-	DECLARE_DRIVER_INIT(fdesdis);
+	void init_fdesdis();
 	void fdesdis_map(address_map &map);
 	void fdes2000d(machine_config &config);
 	void fdes2100d(machine_config &config);
 
 	// Phantom
 	DECLARE_MACHINE_RESET(fphantom);
-	DECLARE_DRIVER_INIT(fphantom);
+	void init_fphantom();
 	void fphantom_map(address_map &map);
 	void fphantom(machine_config &config);
 
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
 	DECLARE_WRITE8_MEMBER(kishon_control_w);
-	DECLARE_DRIVER_INIT(chesster);
+	void init_chesster();
 	void chesster_map(address_map &map);
 	void kishon_map(address_map &map);
 	void chesster(machine_config &config);
@@ -1077,7 +1077,7 @@ READ8_MEMBER(fidel6502_state::fdesdis_input_r)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-DRIVER_INIT_MEMBER(fidel6502_state, fdesdis)
+void fidel6502_state::init_fdesdis()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
 }
@@ -1096,7 +1096,7 @@ MACHINE_RESET_MEMBER(fidel6502_state, fphantom)
 	membank("bank1")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(fidel6502_state, fphantom)
+void fidel6502_state::init_fphantom()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
 }
@@ -1138,7 +1138,7 @@ WRITE8_MEMBER(fidel6502_state::kishon_control_w)
 	membank("bank1")->set_entry(bank);
 }
 
-DRIVER_INIT_MEMBER(fidel6502_state, chesster)
+void fidel6502_state::init_chesster()
 {
 	membank("bank1")->configure_entries(0, memregion("user1")->bytes() / 0x4000, memregion("user1")->base(), 0x4000);
 }

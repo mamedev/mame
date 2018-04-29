@@ -49,12 +49,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_trigger_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_holster_r);
 
-	DECLARE_DRIVER_INIT(aplatoon);
-	DECLARE_DRIVER_INIT(palr3);
-	DECLARE_DRIVER_INIT(palr1);
-	DECLARE_DRIVER_INIT(palr6);
-	DECLARE_DRIVER_INIT(ntsc);
-	DECLARE_DRIVER_INIT(pal);
+	void init_aplatoon();
+	void init_palr3();
+	void init_palr1();
+	void init_palr6();
+	void init_ntsc();
+	void init_pal();
 
 	DECLARE_VIDEO_START(alg);
 
@@ -702,29 +702,28 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER( alg_state, ntsc )
+void alg_state::init_ntsc()
 {
 	m_agnus_id = AGNUS_NTSC;
 	m_denise_id = DENISE;
 }
 
-DRIVER_INIT_MEMBER( alg_state, pal )
+void alg_state::init_pal()
 {
 	m_agnus_id = AGNUS_PAL;
 	m_denise_id = DENISE;
 }
 
-DRIVER_INIT_MEMBER(alg_state,palr1)
+void alg_state::init_palr1()
 {
-	DRIVER_INIT_CALL(ntsc);
+	init_ntsc();
 
 	uint32_t length = memregion("user2")->bytes();
 	uint8_t *rom = memregion("user2")->base();
 	std::vector<uint8_t> original(length);
-	uint32_t srcaddr;
 
 	memcpy(&original[0], rom, length);
-	for (srcaddr = 0; srcaddr < length; srcaddr++)
+	for (uint32_t srcaddr = 0; srcaddr < length; srcaddr++)
 	{
 		uint32_t dstaddr = srcaddr;
 		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
@@ -733,17 +732,16 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 	}
 }
 
-DRIVER_INIT_MEMBER(alg_state,palr3)
+void alg_state::init_palr3()
 {
-	DRIVER_INIT_CALL(ntsc);
+	init_ntsc();
 
 	uint32_t length = memregion("user2")->bytes();
 	uint8_t *rom = memregion("user2")->base();
 	std::vector<uint8_t> original(length);
-	uint32_t srcaddr;
 
 	memcpy(&original[0], rom, length);
-	for (srcaddr = 0; srcaddr < length; srcaddr++)
+	for (uint32_t srcaddr = 0; srcaddr < length; srcaddr++)
 	{
 		uint32_t dstaddr = srcaddr;
 		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
@@ -751,17 +749,16 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 	}
 }
 
-DRIVER_INIT_MEMBER(alg_state,palr6)
+void alg_state::init_palr6()
 {
-	DRIVER_INIT_CALL(ntsc);
+	init_ntsc();
 
 	uint32_t length = memregion("user2")->bytes();
 	uint8_t *rom = memregion("user2")->base();
 	std::vector<uint8_t> original(length);
-	uint32_t srcaddr;
 
 	memcpy(&original[0], rom, length);
-	for (srcaddr = 0; srcaddr < length; srcaddr++)
+	for (uint32_t srcaddr = 0; srcaddr < length; srcaddr++)
 	{
 		uint32_t dstaddr = srcaddr;
 		if (~srcaddr & 0x2000) dstaddr ^= 0x1000;
@@ -771,14 +768,13 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 	}
 }
 
-DRIVER_INIT_MEMBER(alg_state,aplatoon)
+void alg_state::init_aplatoon()
 {
-	DRIVER_INIT_CALL(ntsc);
+	init_ntsc();
 
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
 	uint8_t *rom = memregion("user2")->base();
 	std::unique_ptr<uint8_t[]> decrypted = std::make_unique<uint8_t[]>(0x40000);
-	int i;
 
 	static const int shuffle[] =
 	{
@@ -786,7 +782,7 @@ DRIVER_INIT_MEMBER(alg_state,aplatoon)
 		32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
 	};
 
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 		memcpy(decrypted.get() + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
 	memcpy(rom, decrypted.get(), 0x40000);
 	logerror("decrypt done\n ");

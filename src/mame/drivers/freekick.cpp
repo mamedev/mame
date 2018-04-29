@@ -1438,14 +1438,14 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(freekick_state,gigasb)
+void freekick_state::init_gigasb()
 {
 	membank("bank0d")->set_base(memregion("maincpu")->base() + 0xc000);
 	m_bank1d->set_base(memregion("maincpu")->base() + 0x14000);
 }
 
 
-DRIVER_INIT_MEMBER(freekick_state,pbillrds)
+void freekick_state::init_pbillrds()
 {
 	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0x10000);
 	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), decrypted_opcodes, 0x10000);
@@ -1453,7 +1453,7 @@ DRIVER_INIT_MEMBER(freekick_state,pbillrds)
 	m_bank1d->configure_entries(0, 2, decrypted_opcodes + 0x8000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(freekick_state,gigas)
+void freekick_state::init_gigas()
 {
 	uint8_t *decrypted_opcodes = auto_alloc_array(machine(), uint8_t, 0xc000);
 	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), decrypted_opcodes, 0xc000);

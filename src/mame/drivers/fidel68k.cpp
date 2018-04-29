@@ -220,14 +220,14 @@ public:
 	DECLARE_WRITE8_MEMBER(fdes68k_control_w);
 	DECLARE_READ8_MEMBER(fdes68k_input_r);
 	DECLARE_WRITE8_MEMBER(fdes68k_lcd_w);
-	DECLARE_DRIVER_INIT(fdes2265);
+	void init_fdes2265();
 	void fdes2265_map(address_map &map);
 	void fdes2325_map(address_map &map);
 	void fdes2265(machine_config &config);
 	void fdes2325(machine_config &config);
 
 	// EAG(6114/6117)
-	DECLARE_DRIVER_INIT(eag);
+	void init_eag();
 	void eag_prepare_display();
 	DECLARE_READ8_MEMBER(eag_input1_r);
 	DECLARE_WRITE8_MEMBER(eag_leds_w);
@@ -316,7 +316,7 @@ WRITE8_MEMBER(fidel68k_state::fdes68k_lcd_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(fidel68k_state, fdes2265)
+void fidel68k_state::init_fdes2265()
 {
 	u16 *rom = (u16*)memregion("maincpu")->base();
 	const u32 len = memregion("maincpu")->bytes() / 2;
@@ -444,7 +444,7 @@ void fidel68k_state::fdes2325_map(address_map &map)
 
 // EAG
 
-DRIVER_INIT_MEMBER(fidel68k_state, eag)
+void fidel68k_state::init_eag()
 {
 	// eag_map: DRAM slots at $200000-$2fffff - V1/V2: 128K, V3: 512K, V4: 1M
 	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());

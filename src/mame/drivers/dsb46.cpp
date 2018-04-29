@@ -46,7 +46,7 @@ public:
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port1a_w);
-	DECLARE_DRIVER_INIT(dsb46);
+	void init_dsb46();
 	DECLARE_MACHINE_RESET(dsb46);
 
 	void dsb46(machine_config &config);
@@ -79,7 +79,7 @@ void dsb46_state::dsb46_io(address_map &map)
 static INPUT_PORTS_START( dsb46 )
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(dsb46_state, dsb46)
+void dsb46_state::init_dsb46()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("read")->configure_entry(0, &RAM[0x10000]);

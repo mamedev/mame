@@ -202,7 +202,7 @@ protected:
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
 public:
-	DECLARE_DRIVER_INIT(hb);
+	void init_hb();
 	virtual void machine_start() override;
 };
 
@@ -857,17 +857,16 @@ static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
 }
 
 
-DRIVER_INIT_MEMBER(pluto5_state,hb)
+void pluto5_state::init_hb()
 {
 	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
 
 	#if 0
 	{
 		uint8_t* ROM = memregion( "maincpu" )->base();
-		FILE *fp;
 		char filename[256];
 		sprintf(filename,"%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		FILE *fp = fopen(filename, "w+b");
 		if (fp)
 		{
 			fwrite(ROM,  memregion( "maincpu" )->bytes(), 1, fp);

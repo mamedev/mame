@@ -36,7 +36,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_DRIVER_INIT(intrscti);
+	void init_intrscti();
 	virtual void video_start() override;
 	uint32_t screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void intrscti(machine_config &config);
@@ -226,11 +226,10 @@ ROM_START( intrscti )
 	ROM_LOAD( "b.5a", 0x2000, 0x1000, CRC(8951fb7e) SHA1(c423bf0536e3a09453814172e31b47f9c3c3324c) )
 ROM_END
 
-DRIVER_INIT_MEMBER(intrscti_state,intrscti)
+void intrscti_state::init_intrscti()
 {
 	uint8_t *cpu = memregion( "maincpu" )->base();
-	int i;
-	for (i=0;i<0x1000;i++)
+	for (int i = 0; i < 0x1000; i++)
 		cpu[i+0x8000]=0xc9; // ret
 
 	/*
@@ -239,7 +238,7 @@ DRIVER_INIT_MEMBER(intrscti_state,intrscti)
 	*/
 
 	/* one of the protection sub-routines does this */
-	for (i=0;i<0x400;i++)
+	for (int i = 0; i < 0x400; i++)
 	{
 		m_vram[i+0x000] = 0x0e;
 		m_vram[i+0x400] = 0xff;

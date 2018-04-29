@@ -52,34 +52,32 @@ TODO:
 #include "speaker.h"
 
 
-DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
+void nbmj8891_state::init_gionbana()
 {
 	uint8_t *prot = memregion("protection")->base();
-	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x5ece checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
+void nbmj8891_state::init_omotesnd()
 {
 #if 0
 	uint8_t *prot = memregion("protection")->base();
-	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x5ece checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
@@ -102,59 +100,56 @@ DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
+void nbmj8891_state::init_telmahjn()
 {
 	uint8_t *prot = memregion("protection")->base();
-	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x7354 checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i + 0x20000],7,0,4,1,5,2,6,3);
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
+void nbmj8891_state::init_mgmen89()
 {
 	uint8_t *prot = memregion("protection")->base();
-	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x4b98 checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i],5,6,1,0,7,3,2,4);
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
+void nbmj8891_state::init_mjfocus()
 {
 	uint8_t *prot = memregion("protection")->base();
 	uint8_t *ram = memregion("maincpu")->base() + 0xf800;
-	int i;
 
 	/* need to clear RAM otherwise it doesn't boot... */
-	for (i = 0; i < 0x800; i++) ram[i] = 0x00;
+	for (int i = 0; i < 0x800; i++) ram[i] = 0x00;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x7354 checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i + 0x20000],7,0,4,1,5,2,6,3);
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mjfocusm)
+void nbmj8891_state::init_mjfocusm()
 {
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -166,21 +161,17 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocusm)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,scandal)
+void nbmj8891_state::init_scandal()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
-
-	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
+	for (int i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
+void nbmj8891_state::init_mjnanpas()
 {
 	/* they forgot to enable the protection check in this game... */
 #if 0
 	uint8_t *prot = memregion("protection")->base();
-	int i;
-
 	memregion("maincpu")->base()[0x003d] = 0x01;    // force the protection check to be executed
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -188,40 +179,38 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i + 0x20000],0,5,2,3,6,7,1,4);
 	}
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
+void nbmj8891_state::init_pairsnb()
 {
 	uint8_t *prot = memregion("protection")->base();
-	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x4b98 checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i],5,6,1,0,7,3,2,4);
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8891_state,pairsten)
+void nbmj8891_state::init_pairsten()
 {
 	uint8_t *prot = memregion("protection")->base();
-	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0x8374 checksum. It's probably completely wrong! But since the
 	   game doesn't do anything else with that ROM, this is more than enough. I
 	   could just fill this are with fake data, the only thing that matters is
 	   the checksum. */
-	for (i = 0;i < 0x20000;i++)
+	for (int i = 0; i < 0x20000; i++)
 	{
 		prot[i] = bitswap<8>(prot[i + 0x20000],5,6,0,4,3,7,1,2);
 	}

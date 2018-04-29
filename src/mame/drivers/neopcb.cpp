@@ -24,9 +24,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
 
-	DECLARE_DRIVER_INIT(ms5pcb);
-	DECLARE_DRIVER_INIT(svcpcb);
-	DECLARE_DRIVER_INIT(kf2k3pcb);
+	void init_ms5pcb();
+	void init_svcpcb();
+	void init_kf2k3pcb();
 
 	void neopcb(machine_config &config);
 
@@ -488,7 +488,7 @@ void neopcb_state::install_banked_bios()
 
 }
 
-DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
+void neopcb_state::init_ms5pcb()
 {
 	install_common();
 	install_banked_bios();
@@ -507,7 +507,7 @@ DRIVER_INIT_MEMBER(neopcb_state, ms5pcb)
 }
 
 
-DRIVER_INIT_MEMBER(neopcb_state, svcpcb)
+void neopcb_state::init_svcpcb()
 {
 	install_common();
 	install_banked_bios();
@@ -526,7 +526,7 @@ DRIVER_INIT_MEMBER(neopcb_state, svcpcb)
 }
 
 
-DRIVER_INIT_MEMBER(neopcb_state, kf2k3pcb)
+void neopcb_state::init_kf2k3pcb()
 {
 	install_common();
 

@@ -2658,14 +2658,14 @@ ROM_START( toprollr )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cclimber_state,yamato)
+void cclimber_state::init_yamato()
 {
 	save_item(NAME(m_yamato_p0));
 	save_item(NAME(m_yamato_p1));
 }
 
 
-DRIVER_INIT_MEMBER(cclimber_state,toprollr)
+void cclimber_state::init_toprollr()
 {
 	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
@@ -2691,21 +2691,18 @@ DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 	save_item(NAME(m_toprollr_rombank));
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,dking)
+void cclimber_state::init_dking()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-	int i;
-	int j;
-
-	for (j=0;j<0x5000;j+=0x1000)
+	for (int j = 0; j < 0x5000; j += 0x1000)
 	{
-		for (i=0x0500;i<0x0800;i++)  rom[i+j] ^=0xff;
-		for (i=0x0d00;i<0x1000;i++)  rom[i+j] ^=0xff;
+		for (int i = 0x0500; i < 0x0800; i++)  rom[i+j] ^=0xff;
+		for (int i = 0x0d00; i < 0x1000; i++)  rom[i+j] ^=0xff;
 	}
 
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
+void cclimber_state::init_rpatrol()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 

@@ -36,7 +36,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_DRIVER_INIT(ccs300);
+	void init_ccs300();
 	DECLARE_MACHINE_RESET(ccs300);
 	DECLARE_WRITE8_MEMBER(port40_w);
 
@@ -96,7 +96,7 @@ MACHINE_RESET_MEMBER( ccs300_state, ccs300 )
 	membank("bankw0")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( ccs300_state, ccs300 )
+void ccs300_state::init_ccs300()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

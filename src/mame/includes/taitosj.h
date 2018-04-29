@@ -124,11 +124,11 @@ public:
 	DECLARE_WRITE8_MEMBER(taitosj_sndnmi_msk_w);
 	DECLARE_WRITE8_MEMBER(input_port_4_f0_w);
 	DECLARE_WRITE8_MEMBER(taitosj_dacvol_w);
-	DECLARE_DRIVER_INIT(alpinea);
-	DECLARE_DRIVER_INIT(alpine);
-	DECLARE_DRIVER_INIT(taitosj);
-	DECLARE_DRIVER_INIT(junglhbr);
-	DECLARE_DRIVER_INIT(spacecr);
+	void init_alpinea();
+	void init_alpine();
+	void init_taitosj();
+	void init_junglhbr();
+	void init_spacecr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

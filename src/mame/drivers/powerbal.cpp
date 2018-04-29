@@ -32,8 +32,8 @@ public:
 		: playmark_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_DRIVER_INIT(powerbal);
-	DECLARE_DRIVER_INIT(magicstk);
+	void init_powerbal();
+	void init_magicstk();
 
 	void magicstk(machine_config &config);
 	void powerbal(machine_config &config);
@@ -858,13 +858,13 @@ ROM_START( atombjt ) // based off bjtwina set
 ROM_END
 
 
-DRIVER_INIT_MEMBER(powerbal_state,powerbal)
+void powerbal_state::init_powerbal()
 {
 	m_bg_yoffset = 16;
 	m_yoffset = -8;
 }
 
-DRIVER_INIT_MEMBER(powerbal_state,magicstk)
+void powerbal_state::init_magicstk()
 {
 	m_bg_yoffset = 0;
 	m_yoffset = -5;

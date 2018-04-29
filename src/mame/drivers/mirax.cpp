@@ -150,7 +150,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay1_sel);
 	DECLARE_WRITE8_MEMBER(ay2_sel);
 
-	DECLARE_DRIVER_INIT(mirax);
+	void init_mirax();
 	DECLARE_PALETTE_INIT(mirax);
 	virtual void machine_start() override;
 
@@ -581,19 +581,18 @@ ROM_START( miraxa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mirax_state,mirax)
+void mirax_state::init_mirax()
 {
 	uint8_t *DATA = memregion("data_code")->base();
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
 
-	for(i=0x0000;i<0x4000;i++)
+	for (int i = 0x0000; i < 0x4000; i++)
 		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
 
-	for(i=0x4000;i<0x8000;i++)
+	for (int i = 0x4000; i < 0x8000; i++)
 		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 2, 1, 0, 6, 7, 5, 3, 4) ^ 0xff);
 
-	for(i=0x8000;i<0xc000;i++)
+	for (int i = 0x8000; i < 0xc000; i++)
 		ROM[bitswap<16>(i, 15,14,13,12,11,10,9, 5,7,6,8, 4,3,2,1,0)] = (bitswap<8>(DATA[i], 1, 3, 7, 0, 5, 6, 4, 2) ^ 0xff);
 }
 

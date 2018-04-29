@@ -38,7 +38,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_DRIVER_INIT(altos5);
+	void init_altos5();
 	void altos5(machine_config &config);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altos5);
@@ -367,7 +367,7 @@ WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
 	m_pio0->port_a_write(data);
 }
 
-DRIVER_INIT_MEMBER( altos5_state, altos5 )
+void altos5_state::init_altos5()
 {
 	m_p_prom =  memregion("proms")->base();
 

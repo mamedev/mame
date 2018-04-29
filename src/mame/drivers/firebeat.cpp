@@ -213,9 +213,9 @@ public:
 	int m_ibutton_read_subkey_ptr;
 	uint8_t m_ibutton_subkey_data[0x40];
 
-	DECLARE_DRIVER_INIT(ppd);
-	DECLARE_DRIVER_INIT(kbm);
-	DECLARE_DRIVER_INIT(ppp);
+	void init_ppd();
+	void init_kbm();
+	void init_ppp();
 	DECLARE_MACHINE_START(firebeat);
 	DECLARE_MACHINE_RESET(firebeat);
 	DECLARE_VIDEO_START(firebeat);
@@ -1492,13 +1492,13 @@ void firebeat_state::init_firebeat()
 	init_lights(write32_delegate(), write32_delegate(), write32_delegate());
 }
 
-DRIVER_INIT_MEMBER(firebeat_state,ppp)
+void firebeat_state::init_ppp()
 {
 	init_firebeat();
 	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output2_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output3_ppp_w),this));
 }
 
-DRIVER_INIT_MEMBER(firebeat_state,ppd)
+void firebeat_state::init_ppd()
 {
 	init_firebeat();
 	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output2_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output3_ppp_w),this));
@@ -1513,7 +1513,7 @@ void firebeat_state::init_keyboard()
 //  m_keyboard_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
 }
 
-DRIVER_INIT_MEMBER(firebeat_state,kbm)
+void firebeat_state::init_kbm()
 {
 	init_firebeat();
 	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_kbm_w),this), write32_delegate(), write32_delegate());

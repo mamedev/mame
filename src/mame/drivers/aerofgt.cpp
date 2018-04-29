@@ -3096,17 +3096,17 @@ ROM_START( kickball )
 	ROM_LOAD( "kickball.3", 0x000000, 0x040000, CRC(2f3ed4c1) SHA1(4688df5d420343a935d066f3b46580b77ee77b0e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(aerofgt_state, banked_oki)
+void aerofgt_state::init_banked_oki()
 {
 	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
 }
 
 
-DRIVER_INIT_MEMBER(aerofgt_state, kickball)
+void aerofgt_state::init_kickball()
 {
 	// 2 lines on 1 gfx rom are swapped, why?
-	uint8_t *src = memregion( "gfx2" )->base();
-	for (int i = 0;i < 0x80000;i++)
+	uint8_t *src = memregion("gfx2")->base();
+	for (int i = 0; i < 0x80000; i++)
 	{
 		src[i] = bitswap<8>(src[i], 7, 5, 6, 4, 3, 2, 1, 0);
 	}

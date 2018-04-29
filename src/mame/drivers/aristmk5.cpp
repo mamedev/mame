@@ -507,7 +507,7 @@ public:
 	DECLARE_READ8_MEMBER(spi_data_r);
 	DECLARE_WRITE_LINE_MEMBER(uart_irq_callback);
 
-	DECLARE_DRIVER_INIT(aristmk5);
+	void init_aristmk5();
 	void aristmk5(machine_config &config);
 	void aristmk5_touch(machine_config &config);
 	void aristmk5_usa(machine_config &config);
@@ -1853,12 +1853,11 @@ static INPUT_PORTS_START(wnpost)
 	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y) PORT_NAME("Play 5 Lines / Horse 5")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
+void aristmk5_state::init_aristmk5()
 {
 	archimedes_driver_init();
 
 	int do_debug = 0;
-
 	if (do_debug)
 	{
 		// DEBUG code for showing the range of the ROMs that get checksummed (for adding to rom loading comments)

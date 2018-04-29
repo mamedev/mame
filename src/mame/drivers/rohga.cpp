@@ -1871,27 +1871,27 @@ ROM_END
 
 /**********************************************************************************/
 
-DRIVER_INIT_MEMBER(rohga_state,rohga)
+void rohga_state::init_rohga()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
 }
 
-DRIVER_INIT_MEMBER(rohga_state,wizdfire)
+void rohga_state::init_wizdfire()
 {
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
 }
 
-DRIVER_INIT_MEMBER(rohga_state,nitrobal)
+void rohga_state::init_nitrobal()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 	deco56_decrypt_gfx(machine(), "gfx2");
 	deco74_decrypt_gfx(machine(), "gfx3");
 }
 
-DRIVER_INIT_MEMBER(rohga_state,hangzo)
+void rohga_state::init_hangzo()
 {
 	const uint8_t *src = memregion("gfx2")->base();
 	uint8_t *dst = memregion("gfx1")->base();
@@ -1900,9 +1900,9 @@ DRIVER_INIT_MEMBER(rohga_state,hangzo)
 	std::copy(&src[0x80000], &src[0xa0000], &dst[0x20000]);
 }
 
-DRIVER_INIT_MEMBER(rohga_state,schmeisr)
+void rohga_state::init_schmeisr()
 {
-	DRIVER_INIT_CALL(hangzo);
+	init_hangzo();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");

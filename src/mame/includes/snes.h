@@ -384,10 +384,10 @@ public:
 	required_device<screen_device> m_screen;
 
 
-	DECLARE_DRIVER_INIT(snes);
-	DECLARE_DRIVER_INIT(snes_hirom);
-	DECLARE_DRIVER_INIT(snes_mess);
-	DECLARE_DRIVER_INIT(snesst);
+	void init_snes();
+	void init_snes_hirom();
+	void init_snes_mess();
+	void init_snesst();
 
 	inline int dma_abus_valid(uint32_t address);
 	inline uint8_t abus_read(address_space &space, uint32_t abus);

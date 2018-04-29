@@ -783,9 +783,8 @@ ROM_START( bbonk )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
+void lazercmd_state::init_lazercmd()
 {
-	int i, y;
 	uint8_t *gfx = memregion("gfx1")->base();
 
 /******************************************************************
@@ -796,12 +795,12 @@ DRIVER_INIT_MEMBER(lazercmd_state,lazercmd)
  * character generator only contains 8 rows, so we expand the
  * font to 8x10.
  ******************************************************************/
-	for (i = 0; i < 0x40; i++)
+	for (int i = 0; i < 0x40; i++)
 	{
 		uint8_t *d = &gfx[0 * 64 * 10 + i * VERT_CHR];
 		uint8_t *s = &gfx[4 * 64 * 10 + i * VERT_FNT];
 
-		for (y = 0; y < VERT_CHR; y++)
+		for (int y = 0; y < VERT_CHR; y++)
 		{
 			d[0 * 64 * 10] = (y < VERT_FNT) ? *s++ : 0xff;
 			d[1 * 64 * 10] = (y == VERT_CHR - 1) ? 0 : *d;

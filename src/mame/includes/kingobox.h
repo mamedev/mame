@@ -54,8 +54,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kingofb_videoram2_w);
 	DECLARE_WRITE8_MEMBER(kingofb_colorram2_w);
 	DECLARE_WRITE8_MEMBER(kingofb_f800_w);
-	DECLARE_DRIVER_INIT(ringkingw);
-	DECLARE_DRIVER_INIT(ringking3);
+	void init_ringkingw();
+	void init_ringking3();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ringking_get_bg_tile_info);

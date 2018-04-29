@@ -404,7 +404,7 @@ void glass_state::ROM16_split_gfx( const char *src_reg, const char *dst_reg, int
 }
 
 
-DRIVER_INIT_MEMBER(glass_state, glass)
+void glass_state::init_glass()
 {
 	/*
 	For "gfx2" we have this memory map:

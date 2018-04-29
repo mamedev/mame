@@ -2464,16 +2464,16 @@ void kaneko16_gtmr_state::kaneko16_common_oki_bank_install(int bankno, size_t fi
 	}
 }
 
-DRIVER_INIT_MEMBER( kaneko16_state, kaneko16 )
+void kaneko16_state::init_kaneko16()
 {
 	kaneko16_unscramble_tiles("gfx2");
 	kaneko16_unscramble_tiles("gfx3");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_state, bakubrkr )
+void kaneko16_state::init_bakubrkr()
 {
 	kaneko16_common_oki_bank_install(0, 0x20000, 0x20000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 /*
@@ -2530,34 +2530,34 @@ void kaneko16_berlwall_state::patch_protection(uint32_t bra_offset,uint16_t bra_
 	ROM[0x3fffe/2] = checksum;
 }
 
-DRIVER_INIT_MEMBER(kaneko16_berlwall_state, berlwall_common)
+void kaneko16_berlwall_state::init_berlwall_common()
 {
 	kaneko16_unscramble_tiles("gfx2");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwall )
+void kaneko16_berlwall_state::init_berlwall()
 {
-	DRIVER_INIT_CALL(berlwall_common);
+	init_berlwall_common();
 	patch_protection(0x1a3ea,0x602c,0xc40d);
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallt )
+void kaneko16_berlwall_state::init_berlwallt()
 {
-	DRIVER_INIT_CALL(berlwall_common);
+	init_berlwall_common();
 	patch_protection(0x1cf48,0x602c,0xaed4);
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallk )
+void kaneko16_berlwall_state::init_berlwallk()
 {
-	DRIVER_INIT_CALL(berlwall_common);
+	init_berlwall_common();
 	patch_protection(0x1ceb0,0x602c,0x8364);
 }
 
-DRIVER_INIT_MEMBER( kaneko16_gtmr_state, gtmr )
+void kaneko16_gtmr_state::init_gtmr()
 {
 	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_install(1, 0x00000, 0x40000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 
@@ -4402,21 +4402,21 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, shogwarr )
+void kaneko16_shogwarr_state::init_shogwarr()
 {
 	// default sample banks
 	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_install(1, 0x00000, 0x40000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 
-DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
+void kaneko16_shogwarr_state::init_brapboys()
 {
 	// default sample banks
 	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
 	kaneko16_common_oki_bank_install(1, 0x20000, 0x20000);
-	DRIVER_INIT_CALL(kaneko16);
+	init_kaneko16();
 }
 
 

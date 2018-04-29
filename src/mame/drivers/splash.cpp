@@ -1046,28 +1046,28 @@ ROM_END
 
 /* DRIVER INITs */
 
-DRIVER_INIT_MEMBER(splash_state,splash)
+void splash_state::init_splash()
 {
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 8;
 }
 
-DRIVER_INIT_MEMBER(splash_state,splash10)
+void splash_state::init_splash10()
 {
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;
 }
 
-DRIVER_INIT_MEMBER(splash_state,roldfrog)
+void splash_state::init_roldfrog()
 {
-	uint8_t * ROM = (uint8_t *)memregion("audiocpu")->base();
+	uint8_t *ROM = (uint8_t*)memregion("audiocpu")->base();
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
 
 	m_bitmap_type = 1;
 	m_sprite_attr2_shift = 8;
 }
 
-DRIVER_INIT_MEMBER(splash_state,rebus)
+void splash_state::init_rebus()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
@@ -1408,7 +1408,7 @@ WRITE16_MEMBER(funystrp_state::protection_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(funystrp_state,funystrp)
+void funystrp_state::init_funystrp()
 {
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;

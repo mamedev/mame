@@ -124,10 +124,10 @@ public:
 
 	const int *cur_spri; // cfg
 
-	DECLARE_DRIVER_INIT(raidendx);
-	DECLARE_DRIVER_INIT(xsedae);
-	DECLARE_DRIVER_INIT(zeroteam);
-	DECLARE_DRIVER_INIT(raiden2);
+	void init_raidendx();
+	void init_xsedae();
+	void init_zeroteam();
+	void init_raiden2();
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);

@@ -67,7 +67,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s8a);
-	DECLARE_DRIVER_INIT(s8a);
+	void init_s8a();
 	void s8a(machine_config &config);
 	void s8a_audio_map(address_map &map);
 	void s8a_main_map(address_map &map);
@@ -278,7 +278,7 @@ MACHINE_RESET_MEMBER( s8a_state, s8a )
 {
 }
 
-DRIVER_INIT_MEMBER( s8a_state, s8a )
+void s8a_state::init_s8a()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);

@@ -11,25 +11,25 @@ INPUT_PORTS_EXTERN( mpu4 );
 #include "gamball.lh"
 
 
-DRIVER_INIT_MEMBER( mpu4_state, m4_debug_mod4yam )
+void mpu4_state::init_m4_debug_mod4yam()
 {
-	DRIVER_INIT_CALL( m4default );
+	init_m4default();
 
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
 	uint8_t *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
-	for (int j=0;j<size;j+=0x10000)
+	for (int j = 0; j < size; j += 0x10000)
 	{
-		if (size>0x10000) printf("\nblock 0x%06x:\n",j);
+		if (size > 0x10000) printf("\nblock 0x%06x:\n",j);
 		printf("\ncopyright string:\n");
-		for (int i = 0xffe0; i<0xfff0; i++)
+		for (int i = 0xffe0; i < 0xfff0; i++)
 		{
 			printf("%c", src[j+i]);
 		}
 		printf("\n\nidentification string:\n");
-		for (int i = 0xff28; i<0xff30; i++)
+		for (int i = 0xff28; i < 0xff30; i++)
 		{
 			printf("%c", src[j+i]);
 		}
@@ -37,10 +37,10 @@ DRIVER_INIT_MEMBER( mpu4_state, m4_debug_mod4yam )
 	}
 }
 
-DRIVER_INIT_MEMBER( mpu4_state, m4_showstring_mod4yam )
+void mpu4_state::init_m4_showstring_mod4yam()
 {
-	DRIVER_INIT_CALL( m4_debug_mod4yam );
-	DRIVER_INIT_CALL( m4debug );
+	init_m4_debug_mod4yam();
+	init_m4debug();
 }
 
 

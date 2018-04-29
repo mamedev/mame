@@ -90,8 +90,8 @@ public:
 		: by35_state(mconfig, type, tag, s_solenoid_features_default)
 	{ }
 
-	DECLARE_DRIVER_INIT(by35_6) { m_7d = 0; }
-	DECLARE_DRIVER_INIT(by35_7) { m_7d = 1; }
+	void init_by35_6() { m_7d = 0; }
+	void init_by35_7() { m_7d = 1; }
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
@@ -199,7 +199,7 @@ public:
 		: as2888_state(mconfig, type, tag, s_solenoid_features_default)
 	{ }
 
-	DECLARE_DRIVER_INIT(playboy);
+	void init_playboy();
 
 	void as2888(machine_config &config);
 

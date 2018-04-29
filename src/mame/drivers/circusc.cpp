@@ -591,7 +591,7 @@ ROM_START( circusce ) /* Version P */
 ROM_END
 
 
-DRIVER_INIT_MEMBER(circusc_state,circusc)
+void circusc_state::init_circusc()
 {
 }
 
