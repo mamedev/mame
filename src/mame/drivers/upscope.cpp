@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 
-	DECLARE_DRIVER_INIT(upscope);
+	void init_upscope();
 
 	void upscope(machine_config &config);
 	void a500_mem(address_map &map);
@@ -361,7 +361,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(upscope_state, upscope)
+void upscope_state::init_upscope()
 {
 	m_agnus_id = AGNUS_HR_NTSC;
 	m_denise_id = DENISE;

@@ -39,7 +39,7 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	DECLARE_DRIVER_INIT(ts802);
+	void init_ts802();
 	DECLARE_MACHINE_RESET(ts802);
 	DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
 	DECLARE_READ8_MEMBER(port0c_r) { return 1; };
@@ -172,7 +172,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 };
 #endif
 
-DRIVER_INIT_MEMBER( ts802_state, ts802 )
+void ts802_state::init_ts802()
 {
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);

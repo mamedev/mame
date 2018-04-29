@@ -430,16 +430,16 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
+void pcktgal_state::init_pcktgal()
 {
 	uint8_t *rom = memregion("gfx1")->base();
-	int len = memregion("gfx1")->bytes();
-	int i,j,temp[16];
+	const int len = memregion("gfx1")->bytes();
 
 	/* Tile graphics roms have some swapped lines, original version only */
-	for (i = 0x00000;i < len;i += 32)
+	for (int i = 0x00000; i < len; i += 32)
 	{
-		for (j=0; j<16; j++)
+		int temp[16];
+		for (int j = 0; j < 16; j++)
 		{
 			temp[j] = rom[i+j+16];
 			rom[i+j+16] = rom[i+j];

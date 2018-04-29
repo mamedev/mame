@@ -80,7 +80,7 @@ public:
 	/* keyboard state */
 	int m_keylatch;
 	int m_keyclk;
-	DECLARE_DRIVER_INIT(vcs80);
+	void init_vcs80();
 	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
 	void vcs80(machine_config &config);
 	void vcs80_bd_mem(address_map &map);

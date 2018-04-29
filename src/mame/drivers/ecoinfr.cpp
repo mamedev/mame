@@ -110,9 +110,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
 
-	DECLARE_DRIVER_INIT(ecoinfrbr);
-	DECLARE_DRIVER_INIT(ecoinfr);
-	DECLARE_DRIVER_INIT(ecoinfrmab);
+	void init_ecoinfrbr();
+	void init_ecoinfr();
+	void init_ecoinfrmab();
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
@@ -1677,17 +1677,17 @@ ROM_START( ec_unkt )
 	ROM_LOAD( "t2.bin", 0x0000, 0x000989, CRC(0992ffa6) SHA1(cffb6e0a9a72bb2bf9a6e262074062bd06cfa1fb) )
 ROM_END
 
-DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfr)
+void ecoinfr_state::init_ecoinfr()
 {
 }
 
-DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrmab)
+void ecoinfr_state::init_ecoinfrmab()
 {
 	// descramble here
 }
 
 // for the Brunel Research sets
-DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrbr)
+void ecoinfr_state::init_ecoinfrbr()
 {
 }
 

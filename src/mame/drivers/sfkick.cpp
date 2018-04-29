@@ -189,7 +189,7 @@ public:
 		m_dsw2(*this, "DSW2")
 	{ }
 
-	DECLARE_DRIVER_INIT(sfkick);
+	void init_sfkick();
 	void sfkick(machine_config &config);
 
 protected:
@@ -628,9 +628,9 @@ MACHINE_CONFIG_START(sfkick_state::sfkick)
 
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(sfkick_state,sfkick)
+void sfkick_state::init_sfkick()
 {
-	m_main_mem=std::make_unique<uint8_t[]>(0x4000);
+	m_main_mem = std::make_unique<uint8_t[]>(0x4000);
 }
 
 

@@ -43,7 +43,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	DECLARE_DRIVER_INIT(istellar);
+	void init_istellar();
 	void istellar(machine_config &config);
 private:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
@@ -351,7 +351,7 @@ ROM_START( istellar )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(istellar_state,istellar)
+void istellar_state::init_istellar()
 {
 	//m_z80_2_nmi_enable = 0;
 

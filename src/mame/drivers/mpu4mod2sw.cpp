@@ -27,30 +27,30 @@ INPUT_PORTS_EXTERN( mpu4 );
 INPUT_PORTS_EXTERN( mpu4jackpot8tkn );
 
 
-DRIVER_INIT_MEMBER( mpu4_state, m4_showstring_mod2 )
+void mpu4_state::init_m4_showstring_mod2()
 {
-	DRIVER_INIT_CALL( m4default );
+	init_m4default();
 
 	// many original barcrest / bwb sets have identification info around here
 	// this helps with sorting
-	uint8_t *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion("maincpu")->base();
 	printf("\ncopyright string:\n");
-	for (int i = 0xffe0; i<0xfff0; i++)
+	for (int i = 0xffe0; i < 0xfff0; i++)
 	{
 		printf("%c", src[i]);
 	}
 	printf("\n\nidentification string:\n");
-	for (int i = 0xff28; i<0xff30; i++)
+	for (int i = 0xff28; i < 0xff30; i++)
 	{
 		printf("%c", src[i]);
 	}
 }
 
-DRIVER_INIT_MEMBER (mpu4_state, connect4)
+void mpu4_state::init_connect4()
 {
 	m_reels = 0; //reel-free game
-	m_led_lamp=1;
-	DRIVER_INIT_CALL( m4default_banks );
+	m_led_lamp = 1;
+	init_m4default_banks();
 }
 
 
@@ -302,11 +302,11 @@ ROM_START( m4stakeua )
 	ROM_LOAD( "m400.chr", 0x0000, 0x000048, CRC(8f00f720) SHA1(ea59fa2a3b016a7ae83be3caf863de87ce7aeffa) )
 ROM_END
 
-DRIVER_INIT_MEMBER(mpu4_state,m4actpak)
+void mpu4_state::init_m4actpak()
 {
 	//Derived from Action_Pack_(Barcrest)_[C02_800_4jp].gam
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4_hopper_tubes();
+	init_m4default_reels();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -345,12 +345,12 @@ ROM_START( m4actpaka )
 	ROM_LOAD( "action.hex", 0x0000, 0x010000, CRC(c5808b5d) SHA1(577950166c91e7f1ca390ebcf34be2da945c0a5f) )
 ROM_END
 
-DRIVER_INIT_MEMBER(mpu4_state,m4alladv)
+void mpu4_state::init_m4alladv()
 {
 	//Derived from All_Cash_Advance_(Barcrest)_[C01_800_4jp].gam
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4default();
+	init_m4_hopper_tubes();
+	init_m4default_reels();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -965,12 +965,12 @@ ROM_START( m421 )
 	ROM_LOAD( "twentyone.bin", 0x0000, 0x010000, CRC(243f3bc1) SHA1(141df3dcdd8d70ad26a76ec071e0cd927357ee6e) )
 ROM_END
 
-DRIVER_INIT_MEMBER(mpu4_state,m4alpha)
+void mpu4_state::init_m4alpha()
 {
 	//Derived from Alphabet_(Barcrest)_[C03_1024_4jp].gam
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4default();
+	init_m4_hopper_tubes();
+	init_m4default_reels();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0
@@ -1242,12 +1242,12 @@ ROM_START( m4actbnkb )
 	ROM_LOAD( "abank.hex", 0x6000, 0x00a000, CRC(2cd1a269) SHA1(5ce22b2736844a2de6cda04abdd0fe435391e033) ) // split me
 ROM_END
 
-DRIVER_INIT_MEMBER(mpu4_state,m4actclb)
+void mpu4_state::init_m4actclb()
 {
 	//Derived from Action_Club_(Barcrest)_[C03_800_150jp]_[c].gam
-	DRIVER_INIT_CALL(m4default);
-	DRIVER_INIT_CALL(m4_hopper_tubes);
-	DRIVER_INIT_CALL(m4default_reels);
+	init_m4default();
+	init_m4_hopper_tubes();
+	init_m4default_reels();
 	//PCKEY =0
 	//STKEY =0
 	//JPKEY =0

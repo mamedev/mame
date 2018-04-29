@@ -787,7 +787,7 @@ void raiden_state::common_decrypt()
 }
 
 
-DRIVER_INIT_MEMBER(raiden_state,raiden)
+void raiden_state::init_raiden()
 {
 	common_decrypt();
 }

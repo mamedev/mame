@@ -1062,41 +1062,36 @@ void coolpool_state::register_state_save()
 
 
 
-DRIVER_INIT_MEMBER(coolpool_state,amerdart)
+void coolpool_state::init_amerdart()
 {
 	m_lastresult = 0xffff;
 
 	register_state_save();
 }
 
-DRIVER_INIT_MEMBER(coolpool_state,coolpool)
+void coolpool_state::init_coolpool()
 {
 	register_state_save();
 }
 
 
-DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
+void coolpool_state::init_9ballsht()
 {
-	int a, len;
-	uint16_t *rom;
-
 	/* decrypt the main program ROMs */
-	rom = (uint16_t *)memregion("maincpu")->base();
-	len = memregion("maincpu")->bytes();
-	for (a = 0;a < len/2;a++)
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+	for (int a = 0; a < len/2; a++)
 	{
-		int hi,lo,nhi,nlo;
+		int hi = rom[a] >> 8;
+		int lo = rom[a] & 0xff;
 
-		hi = rom[a] >> 8;
-		lo = rom[a] & 0xff;
-
-		nhi = bitswap<8>(hi,5,2,0,7,6,4,3,1) ^ 0x29;
+		int nhi = bitswap<8>(hi,5,2,0,7,6,4,3,1) ^ 0x29;
 		if (hi & 0x01) nhi ^= 0x03;
 		if (hi & 0x10) nhi ^= 0xc1;
 		if (hi & 0x20) nhi ^= 0x40;
 		if (hi & 0x40) nhi ^= 0x12;
 
-		nlo = bitswap<8>(lo,5,3,4,6,7,1,2,0) ^ 0x80;
+		int nlo = bitswap<8>(lo,5,3,4,6,7,1,2,0) ^ 0x80;
 		if ((lo & 0x02) && (lo & 0x04)) nlo ^= 0x01;
 		if (lo & 0x04) nlo ^= 0x0c;
 		if (lo & 0x08) nlo ^= 0x10;
@@ -1107,7 +1102,7 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 	/* decrypt the sub data ROMs */
 	rom = (uint16_t *)memregion("dspdata")->base();
 	len = memregion("dspdata")->bytes();
-	for (a = 1;a < len/2;a+=4)
+	for (int a = 1; a < len/2; a += 4)
 	{
 		/* just swap bits 1 and 2 of the address */
 		uint16_t tmp = rom[a];

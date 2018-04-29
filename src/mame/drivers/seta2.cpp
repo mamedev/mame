@@ -3044,7 +3044,7 @@ ROM_START( funcube5 )
 	ROM_LOAD( "fc51_snd-0.u47", 0x000000, 0x200000, CRC(2a504fe1) SHA1(911ad650bf48aa78d9cb3c64284aa526ceb519ba) )
 ROM_END
 
-DRIVER_INIT_MEMBER(seta2_state,funcube)
+void seta2_state::init_funcube()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -3055,7 +3055,7 @@ DRIVER_INIT_MEMBER(seta2_state,funcube)
 	sub_cpu[0x506/2] = 0x5470;  // rte -> rts
 }
 
-DRIVER_INIT_MEMBER(seta2_state,funcube2)
+void seta2_state::init_funcube2()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();
@@ -3068,7 +3068,7 @@ DRIVER_INIT_MEMBER(seta2_state,funcube2)
 	sub_cpu[0x4d4/2] = 0x5470;  // rte -> rts
 }
 
-DRIVER_INIT_MEMBER(seta2_state,funcube3)
+void seta2_state::init_funcube3()
 {
 	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
 	uint16_t *sub_cpu  = (uint16_t *) memregion("sub")->base();

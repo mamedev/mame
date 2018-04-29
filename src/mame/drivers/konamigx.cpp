@@ -3858,11 +3858,8 @@ READ32_MEMBER( konamigx_state::k_6bpp_rom_long_r )
 	return m_k056832->k_6bpp_rom_long_r(space,offset,mem_mask);
 }
 
-DRIVER_INIT_MEMBER(konamigx_state,konamigx)
+void konamigx_state::init_konamigx()
 {
-	int i, match;
-	int readback = 0;
-
 	m_gx_cfgport = -1;
 	m_last_prot_op = -1;
 	m_last_prot_clk = 0;
@@ -3873,7 +3870,7 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamigx_state::dmaend_callback),this));
 	m_boothack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamigx_state::boothack_callback),this));
 
-	i = match = 0;
+	int i = 0, match = 0, readback = 0;
 	while ((gameDefs[i].cfgport != 0xff) && (!match))
 	{
 		if (!strcmp(machine().system().name, gameDefs[i].romname))
@@ -3946,10 +3943,10 @@ DRIVER_INIT_MEMBER(konamigx_state,konamigx)
 #undef BPP66
 }
 
-DRIVER_INIT_MEMBER(konamigx_state,posthack)
+void konamigx_state::init_posthack()
 {
 	m_use_68020_post_clock_hack = 1;
-	DRIVER_INIT_CALL(konamigx);
+	init_konamigx();
 }
 
 

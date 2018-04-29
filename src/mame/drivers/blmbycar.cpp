@@ -496,13 +496,11 @@ ROM_START( watrball )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
+void blmbycar_state::init_blmbycar()
 {
 	uint16_t *RAM  = (uint16_t *) memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes() / 2;
-	int i;
-
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		uint16_t x = RAM[i];
 		x = (x & ~0x0606) | ((x & 0x0202) << 1) | ((x & 0x0404) >> 1);

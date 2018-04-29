@@ -544,13 +544,13 @@ ROM_START( natodefa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(thief_state,thief)
+void thief_state::init_thief()
 {
-	uint8_t *dest = memregion( "maincpu" )->base();
-	const uint8_t *source = memregion( "cpu1" )->base();
+	uint8_t *dest = memregion("maincpu")->base();
+	const uint8_t *source = memregion("cpu1")->base();
 
 	/* C8 is mapped (banked) in CPU1's address space; it contains Z80 code */
-	memcpy( &dest[0xe010], &source[0x290], 0x20 );
+	memcpy(&dest[0xe010], &source[0x290], 0x20);
 }
 
 

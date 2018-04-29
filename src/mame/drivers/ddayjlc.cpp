@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i8257_CH0_w);
 	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
-	DECLARE_DRIVER_INIT(ddayjlc);
+	void init_ddayjlc();
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	DECLARE_PALETTE_INIT(ddayjlc);
@@ -715,7 +715,7 @@ ROM_START( ddayjlca )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
+void ddayjlc_state::init_ddayjlc()
 {
 #define repack(n)\
 		dst[newadr+0+n] = src[oldaddr+0+n];\
@@ -752,16 +752,14 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 		dst[newadr+31+n] = src[oldaddr+7+0x2008+n];
 
 	{
-		uint32_t oldaddr, newadr, length,j;
-		uint8_t *src, *dst;
 		std::vector<uint8_t> temp(0x10000);
-		src = &temp[0];
-		dst = memregion("gfx1")->base();
-		length = memregion("gfx1")->bytes();
+		uint8_t *src = &temp[0];
+		uint8_t *dst = memregion("gfx1")->base();
+		uint32_t length = memregion("gfx1")->bytes();
 		memcpy(src, dst, length);
-		newadr = 0;
-		oldaddr = 0;
-		for (j = 0; j < length / 2; j += 32)
+		uint32_t newadr = 0;
+		uint32_t oldaddr = 0;
+		for (uint32_t j = 0; j < length / 2; j += 32)
 		{
 			repack(0);
 			repack(0x4000)

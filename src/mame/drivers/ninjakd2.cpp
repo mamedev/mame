@@ -1642,21 +1642,21 @@ void ninjakd2_state::gfx_unscramble()
 }
 
 
-DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
+void ninjakd2_state::init_ninjakd2()
 {
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_decrypted_opcodes, 0x8000);
 
 	gfx_unscramble();
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,bootleg)
+void ninjakd2_state::init_bootleg()
 {
 	memcpy(m_decrypted_opcodes, memregion("soundcpu")->base() + 0x10000, 0x8000);
 
 	gfx_unscramble();
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,mnight)
+void ninjakd2_state::init_mnight()
 {
 	gfx_unscramble();
 }
@@ -1687,12 +1687,12 @@ void ninjakd2_state::robokid_motion_error_kludge(uint16_t offset)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(offset, offset, read8_delegate(FUNC(ninjakd2_state::robokid_motion_error_verbose_r), this));
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,robokid)
+void ninjakd2_state::init_robokid()
 {
 	robokid_motion_error_kludge(0x5247);
 }
 
-DRIVER_INIT_MEMBER(ninjakd2_state,robokidj)
+void ninjakd2_state::init_robokidj()
 {
 	robokid_motion_error_kludge(0x5266);
 }

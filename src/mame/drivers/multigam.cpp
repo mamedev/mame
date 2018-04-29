@@ -183,9 +183,9 @@ public:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
-	DECLARE_DRIVER_INIT(multigmt);
-	DECLARE_DRIVER_INIT(multigam);
-	DECLARE_DRIVER_INIT(multigm3);
+	void init_multigmt();
+	void init_multigam();
+	void init_multigm3();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1403,7 +1403,7 @@ ROM_START( supergm3 )
 	ROM_LOAD( "sg3.rom17", 0x180000, 0x80000, CRC(7be7fbb8) SHA1(03cda9c098eaf21326b001d5c227ad85502b6378) )
 ROM_END
 
-DRIVER_INIT_MEMBER(multigam_state,multigam)
+void multigam_state::init_multigam()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	multigam_switch_prg_rom(space, 0x0, 0x01);
@@ -1418,7 +1418,7 @@ void multigam_state::multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* 
 	}
 }
 
-DRIVER_INIT_MEMBER(multigam_state,multigm3)
+void multigam_state::init_multigm3()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1432,39 +1432,36 @@ DRIVER_INIT_MEMBER(multigam_state,multigm3)
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
-DRIVER_INIT_MEMBER(multigam_state,multigmt)
+void multigam_state::init_multigmt()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	std::vector<uint8_t> buf(0x80000);
-	uint8_t *rom;
-	int size;
-	int i;
-	int addr;
 
-	rom = memregion("maincpu")->base();
-	size = 0x8000;
+	uint8_t *rom = memregion("maincpu")->base();
+	int size = 0x8000;
 	memcpy(&buf[0], rom, size);
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
-		addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		int addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
 
 	rom = memregion("user1")->base();
 	size = 0x80000;
 	memcpy(&buf[0], rom, size);
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
-		addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		int addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
+
 	rom = memregion("gfx1")->base();
 	size = 0x80000;
 	memcpy(&buf[0], rom, size);
-	for (i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
-		addr = bitswap<24>(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);
+		int addr = bitswap<24>(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);
 		rom[i] = bitswap<8>(buf[addr], 4, 7, 3, 2, 5, 1, 6, 0);
 	}
 

@@ -958,53 +958,51 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(toki_state,toki)
+void toki_state::init_toki()
 {
 	uint8_t *ROM = memregion("oki")->base();
-	std::vector<uint8_t> buffer(0x20000);
-	int i;
-
+	uint8_t buffer[0x20000];
 	memcpy(&buffer[0],ROM,0x20000);
-	for( i = 0; i < 0x20000; i++ )
+
+	for (int i = 0; i < 0x20000; i++)
 	{
 		ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 }
 
 
-DRIVER_INIT_MEMBER(toki_state,tokib)
+void toki_state::init_tokib()
 {
-	std::vector<uint8_t> temp(65536 * 2);
-	int i, offs, len;
-	uint8_t *rom;
+	uint8_t temp[0x20000];
 
 	/* merge background tile graphics together */
-	len = memregion("gfx3")->bytes();
-	rom = memregion("gfx3")->base();
-	for (offs = 0; offs < len; offs += 0x20000)
+	int len = memregion("gfx3")->bytes();
+	uint8_t *rom = memregion("gfx3")->base();
+	for (int offs = 0; offs < len; offs += 0x20000)
 	{
 		uint8_t *base = &rom[offs];
 		memcpy (&temp[0], base, 65536 * 2);
-		for (i = 0; i < 16; i++)
+		for (int i = 0; i < 16; i++)
 		{
-			memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
-			memcpy (&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
-			memcpy (&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
-			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
+			memcpy(&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
+			memcpy(&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
+			memcpy(&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
+			memcpy(&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
+
 	len = memregion("gfx4")->bytes();
 	rom = memregion("gfx4")->base();
-	for (offs = 0; offs < len; offs += 0x20000)
+	for (int offs = 0; offs < len; offs += 0x20000)
 	{
 		uint8_t *base = &rom[offs];
 		memcpy (&temp[0], base, 65536 * 2);
-		for (i = 0; i < 16; i++)
+		for (int i = 0; i < 16; i++)
 		{
-			memcpy (&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
-			memcpy (&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
-			memcpy (&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
-			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
+			memcpy(&base[0x00000 + i * 0x800], &temp[0x0000 + i * 0x2000], 0x800);
+			memcpy(&base[0x10000 + i * 0x800], &temp[0x0800 + i * 0x2000], 0x800);
+			memcpy(&base[0x08000 + i * 0x800], &temp[0x1000 + i * 0x2000], 0x800);
+			memcpy(&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
 
@@ -1013,32 +1011,26 @@ DRIVER_INIT_MEMBER(toki_state,tokib)
 	save_item(NAME(m_toggle));
 }
 
-DRIVER_INIT_MEMBER(toki_state,jujuba)
+void toki_state::init_jujuba()
 {
 	/* Program ROMs are bitswapped */
-	{
-		int i;
-		uint16_t *prgrom = (uint16_t*)memregion("maincpu")->base();
+	uint16_t *prgrom = (uint16_t*)memregion("maincpu")->base();
 
-		for (i = 0; i < 0x60000/2; i++)
-		{
-			prgrom[i] = bitswap<16>(prgrom[i],15,12,13,14,
-											11,10, 9, 8,
-											7, 6,  5, 3,
-											4, 2,  1, 0);
-		}
+	for (int i = 0; i < 0x60000/2; i++)
+	{
+		prgrom[i] = bitswap<16>(prgrom[i],15,12,13,14,
+										11,10, 9, 8,
+										7, 6,  5, 3,
+										4, 2,  1, 0);
 	}
 
-	{
-		uint8_t *ROM = memregion("oki")->base();
-		std::vector<uint8_t> buffer(0x20000);
-		int i;
+	uint8_t *ROM = memregion("oki")->base();
+	uint8_t buffer[0x20000];
 
-		memcpy(&buffer[0],ROM,0x20000);
-		for( i = 0; i < 0x20000; i++ )
-		{
-			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
-		}
+	memcpy(&buffer[0],ROM,0x20000);
+	for (int i = 0; i < 0x20000; i++)
+	{
+		ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 }
 

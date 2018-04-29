@@ -1378,16 +1378,13 @@ void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
 	}
 }
 
-DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
+void gladiatr_state::init_gladiatr()
 {
-	uint8_t *rom;
-	int i,j;
-
-	rom = memregion("gfx2")->base();
+	uint8_t *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
-	for (j = 3; j >= 0; j--)
+	for (int j = 3; j >= 0; j--)
 	{
-		for (i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			rom[i+(2*j+1)*0x2000] = rom[i+j*0x2000] >> 4;
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
@@ -1399,9 +1396,9 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 
 	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
-	for (j = 5; j >= 0; j--)
+	for (int j = 5; j >= 0; j--)
 	{
-		for (i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			rom[i+(2*j+1)*0x2000] = rom[i+j*0x2000] >> 4;
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
@@ -1433,23 +1430,20 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 }
 
 
-DRIVER_INIT_MEMBER(ppking_state, ppking)
+void ppking_state::init_ppking()
 {
-	uint8_t *rom;
-	int i,j;
-
-	rom = memregion("gfx2")->base();
+	uint8_t *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
-	for (i = 0; i < 0x2000; i++)
+	for (int i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
 	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
-	for (j = 1; j >= 0; j--)
+	for (int j = 1; j >= 0; j--)
 	{
-		for (i = 0; i < 0x2000; i++)
+		for (int i = 0; i < 0x2000; i++)
 		{
 			rom[i+(2*j+1)*0x2000] = rom[i+j*0x2000] >> 4;
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];

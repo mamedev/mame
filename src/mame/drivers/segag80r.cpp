@@ -1466,7 +1466,7 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segag80r_state,astrob)
+void segag80r_state::init_astrob()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1488,7 +1488,7 @@ DRIVER_INIT_MEMBER(segag80r_state,astrob)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,005)
+void segag80r_state::init_005()
 {
 	/* configure the 315-0070 security chip */
 	m_decrypt = segag80_security(70);
@@ -1504,7 +1504,7 @@ DRIVER_INIT_MEMBER(segag80r_state,005)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,spaceod)
+void segag80r_state::init_spaceod()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1528,7 +1528,7 @@ DRIVER_INIT_MEMBER(segag80r_state,spaceod)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,monsterb)
+void segag80r_state::init_monsterb()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1551,7 +1551,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monsterb)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,monster2)
+void segag80r_state::init_monster2()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1575,7 +1575,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monster2)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,pignewt)
+void segag80r_state::init_pignewt()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
@@ -1599,7 +1599,7 @@ DRIVER_INIT_MEMBER(segag80r_state,pignewt)
 }
 
 
-DRIVER_INIT_MEMBER(segag80r_state,sindbadm)
+void segag80r_state::init_sindbadm()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);

@@ -58,7 +58,7 @@ static const char *const mwa_bank_hard[4] =
 	"bank4"   /* mapped in c000-ffff */
 };
 
-DRIVER_INIT_MEMBER(vtech2_state,laser)
+void vtech2_state::init_laser()
 {
 	uint8_t *gfx = memregion("gfx2")->base();
 	int i;

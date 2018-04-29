@@ -484,7 +484,7 @@ ROM_END
 
 /* System Drivers */
 
-DRIVER_INIT_MEMBER(mpf1_state,mpf1)
+void mpf1_state::init_mpf1()
 {
 	m_program = &m_maincpu->space(AS_PROGRAM);
 }

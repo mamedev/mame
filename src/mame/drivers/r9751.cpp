@@ -111,7 +111,7 @@ public:
 	DECLARE_READ8_MEMBER(pdc_dma_r);
 	DECLARE_WRITE8_MEMBER(pdc_dma_w);
 
-	DECLARE_DRIVER_INIT(r9751);
+	void init_r9751();
 
 	void r9751(machine_config &config);
 	void r9751_mem(address_map &map);
@@ -227,7 +227,7 @@ WRITE8_MEMBER(r9751_state::pdc_dma_w)
 	if(TRACE_DMA) logerror("DMA WRITE: %08X DATA: %08X\n", address,data);
 }
 
-DRIVER_INIT_MEMBER(r9751_state,r9751)
+void r9751_state::init_r9751()
 {
 	reg_ff050004 = 0;
 	reg_fff80040 = 0;

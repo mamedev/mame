@@ -130,13 +130,13 @@ public:
 		m_meters(*this, "meters")
 	{ }
 
-	DECLARE_DRIVER_INIT(toppoker);
-	DECLARE_DRIVER_INIT(lotse_bank0);
-	DECLARE_DRIVER_INIT(nocrypt_bank0);
-	DECLARE_DRIVER_INIT(lotse);
-	DECLARE_DRIVER_INIT(clatt);
-	DECLARE_DRIVER_INIT(rou029);
-	DECLARE_DRIVER_INIT(nocrypt);
+	void init_toppoker();
+	void init_lotse_bank0();
+	void init_nocrypt_bank0();
+	void init_lotse();
+	void init_clatt();
+	void init_rou029();
+	void init_nocrypt();
 	void scorpion1_adder2(machine_config &config);
 	void scorpion1(machine_config &config);
 	void scorpion1_viper(machine_config &config);
@@ -1239,21 +1239,21 @@ int bfm_sc1_state::sc1_find_project_string( )
 
 
 
-DRIVER_INIT_MEMBER(bfm_sc1_state,toppoker)
+void bfm_sc1_state::init_toppoker()
 {
 	sc1_common_init(3,1, 3);
 	sc1_find_project_string();
 	save_state();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc1_state,lotse)
+void bfm_sc1_state::init_lotse()
 {
 	sc1_common_init(6,1, 3);
 	sc1_find_project_string();
 	save_state();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
+void bfm_sc1_state::init_lotse_bank0()
 {
 	sc1_common_init(6,1, 0);
 	sc1_find_project_string();
@@ -1261,14 +1261,14 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
 }
 
 
-DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt)
+void bfm_sc1_state::init_nocrypt()
 {
 	sc1_common_init(6,0, 3);
 	sc1_find_project_string();
 	save_state();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
+void bfm_sc1_state::init_nocrypt_bank0()
 {
 	sc1_common_init(6,0, 0);
 	sc1_find_project_string();
@@ -1278,7 +1278,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc1_state,rou029)
+void bfm_sc1_state::init_rou029()
 {
 	sc1_common_init(6,0, 3);
 	sc1_find_project_string();
@@ -1287,7 +1287,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,rou029)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
+void bfm_sc1_state::init_clatt()
 {
 	sc1_common_init(6,1, 3);
 

@@ -1511,7 +1511,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
+void zaxxon_state::init_zaxxonj()
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1559,16 +1559,13 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 
 	for (int A = 0x0000; A < 0x6000; A++)
 	{
-		int i,j;
-		uint8_t src;
-
-		src = rom[A];
+		uint8_t src = rom[A];
 
 		/* pick the translation table from bit 0 of the address */
-		i = A & 1;
+		int i = A & 1;
 
 		/* pick the offset in the table from bits 1, 3 and 5 of the source data */
-		j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
+		int j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
 		/* the bottom half of the translation table is the mirror image of the top */
 		if (src & 0x80) j = 7 - j;
 
@@ -1584,7 +1581,7 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 
 
 
-DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
+void zaxxon_state::init_razmataz()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 

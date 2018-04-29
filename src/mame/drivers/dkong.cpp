@@ -3548,26 +3548,23 @@ void dkong_state::drakton_decrypt_rom(uint8_t mod, int offs, int *bs)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(dkong_state,herodk)
+void dkong_state::init_herodk()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
 
 	/* swap data lines D3 and D4 */
-	for (A = 0;A < 0x8000;A++)
+	for (int A = 0; A < 0x8000; A++)
 	{
 		if ((A & 0x1000) == 0)
 		{
-			int v;
-
-			v = rom[A];
+			int v = rom[A];
 			rom[A] = (v & 0xe7) | ((v & 0x10) >> 1) | ((v & 0x08) << 1);
 		}
 	}
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,drakton)
+void dkong_state::init_drakton()
 {
 	int bs[4][8] = {
 			{7,6,1,3,0,4,2,5},
@@ -3589,7 +3586,7 @@ DRIVER_INIT_MEMBER(dkong_state,drakton)
 }
 
 
-DRIVER_INIT_MEMBER(dkong_state,strtheat)
+void dkong_state::init_strtheat()
 {
 	int bs[4][8] = {
 			{0,6,1,7,3,4,2,5},
@@ -3628,7 +3625,7 @@ void dkong_state::dk_braze_decrypt()
 	membank("bank2")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(dkong_state, dkonghs)
+void dkong_state::init_dkonghs()
 {
 	dk_braze_decrypt();
 
@@ -3637,7 +3634,7 @@ DRIVER_INIT_MEMBER(dkong_state, dkonghs)
 	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
 }
 
-DRIVER_INIT_MEMBER(dkong_state,dkongx)
+void dkong_state::init_dkongx()
 {
 	dk_braze_decrypt();
 
@@ -3648,7 +3645,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
 }
 
-DRIVER_INIT_MEMBER(dkong_state, dkong3hs)
+void dkong_state::init_dkong3hs()
 {
 	m_decrypted = std::make_unique<uint8_t[]>(0x10000);
 
@@ -3662,7 +3659,7 @@ DRIVER_INIT_MEMBER(dkong_state, dkong3hs)
 	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
 }
 
-DRIVER_INIT_MEMBER(dkong_state,dkingjr)
+void dkong_state::init_dkingjr()
 {
 	uint8_t *prom = memregion("proms")->base();
 	for( int i=0; i<0x200; ++i)

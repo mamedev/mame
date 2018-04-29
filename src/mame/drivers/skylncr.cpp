@@ -200,8 +200,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mbutrfly_prot_w);
 	READ_LINE_MEMBER(mbutrfly_prot_r);
 	DECLARE_READ8_MEMBER(bdream97_opcode_r);
-	DECLARE_DRIVER_INIT(miaction);
-	DECLARE_DRIVER_INIT(sonikfig);
+	void init_miaction();
+	void init_sonikfig();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
@@ -2054,7 +2054,7 @@ ROM_END
 *           Driver Init           *
 **********************************/
 
-DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
+void skylncr_state::init_sonikfig()
 /*
   Encryption: For each 8 bytes group,
   swap byte #1 with #4 and #3 with #6.
@@ -2086,7 +2086,7 @@ DRIVER_INIT_MEMBER(skylncr_state, sonikfig)
 	}
 }
 
-DRIVER_INIT_MEMBER(skylncr_state, miaction)
+void skylncr_state::init_miaction()
 /*
   Encryption:
 
@@ -2101,24 +2101,23 @@ DRIVER_INIT_MEMBER(skylncr_state, miaction)
 */
 {
 	uint8_t *const ROM = memregion("maincpu")->base();
-	int x;
 
-	for (x = 0x0007; x < 0x4485; x++)
+	for (int x = 0x0007; x < 0x4485; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x19;
 	}
 
-	for (x = 0x4486; x < 0x7fff; x++)
+	for (int x = 0x4486; x < 0x7fff; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x44;
 	}
 
-	for (x = 0xc000; x < 0xd25f; x++)
+	for (int x = 0xc000; x < 0xd25f; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x44;
 	}
 
-	for (x = 0xe000; x < 0xffff; x++)
+	for (int x = 0xe000; x < 0xffff; x++)
 	{
 		ROM[x] = ROM[x] ^ 0x19;
 	}

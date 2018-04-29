@@ -5170,7 +5170,7 @@ void cave_state::init_oki_bank(int chip)
 }
 
 
-DRIVER_INIT_MEMBER(cave_state,agallet)
+void cave_state::init_agallet()
 {
 	init_cave();
 
@@ -5183,7 +5183,7 @@ DRIVER_INIT_MEMBER(cave_state,agallet)
 	unpack_sprites(0);
 }
 
-DRIVER_INIT_MEMBER(cave_state,dfeveron)
+void cave_state::init_dfeveron()
 {
 	init_cave();
 
@@ -5191,7 +5191,7 @@ DRIVER_INIT_MEMBER(cave_state,dfeveron)
 	m_kludge = 2;
 }
 
-DRIVER_INIT_MEMBER(cave_state,feversos)
+void cave_state::init_feversos()
 {
 	init_cave();
 
@@ -5199,7 +5199,7 @@ DRIVER_INIT_MEMBER(cave_state,feversos)
 	m_kludge = 2;
 }
 
-DRIVER_INIT_MEMBER(cave_state,ddonpach)
+void cave_state::init_ddonpach()
 {
 	init_cave();
 
@@ -5208,7 +5208,7 @@ DRIVER_INIT_MEMBER(cave_state,ddonpach)
 	m_time_vblank_irq = 90;
 }
 
-DRIVER_INIT_MEMBER(cave_state,donpachi)
+void cave_state::init_donpachi()
 {
 	init_cave();
 
@@ -5218,7 +5218,7 @@ DRIVER_INIT_MEMBER(cave_state,donpachi)
 }
 
 
-DRIVER_INIT_MEMBER(cave_state,esprade)
+void cave_state::init_esprade()
 {
 	init_cave();
 
@@ -5233,7 +5233,7 @@ DRIVER_INIT_MEMBER(cave_state,esprade)
 #endif
 }
 
-DRIVER_INIT_MEMBER(cave_state,gaia)
+void cave_state::init_gaia()
 {
 	init_cave();
 
@@ -5244,7 +5244,7 @@ DRIVER_INIT_MEMBER(cave_state,gaia)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,guwange)
+void cave_state::init_guwange()
 {
 	init_cave();
 
@@ -5252,7 +5252,7 @@ DRIVER_INIT_MEMBER(cave_state,guwange)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,hotdogst)
+void cave_state::init_hotdogst()
 {
 	init_cave();
 
@@ -5264,7 +5264,7 @@ DRIVER_INIT_MEMBER(cave_state,hotdogst)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,mazinger)
+void cave_state::init_mazinger()
 {
 	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
@@ -5277,8 +5277,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	/* decrypt sprites */
 	std::vector<uint8_t> buffer(len);
 	{
-		int i;
-		for (i = 0; i < len; i++)
+		for (int i = 0; i < len; i++)
 			buffer[i ^ 0xdf88] = src[bitswap<24>(i,23,22,21,20,19,9,7,3,15,4,17,14,18,2,16,5,11,8,6,13,1,10,12,0)];
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
@@ -5289,7 +5288,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	m_time_vblank_irq = 2100;
 }
 
-DRIVER_INIT_MEMBER(cave_state,metmqstr)
+void cave_state::init_metmqstr()
 {
 	init_cave();
 
@@ -5303,7 +5302,7 @@ DRIVER_INIT_MEMBER(cave_state,metmqstr)
 	m_time_vblank_irq = 17376;
 }
 
-DRIVER_INIT_MEMBER(cave_state,ppsatan)
+void cave_state::init_ppsatan()
 {
 	init_cave();
 
@@ -5318,11 +5317,10 @@ DRIVER_INIT_MEMBER(cave_state,ppsatan)
 	save_item(NAME(m_ppsatan_io_mux));
 }
 
-DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
+void cave_state::init_pwrinst2j()
 {
 	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
-	int i, j;
 
 	init_cave();
 
@@ -5330,9 +5328,9 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 
 	std::vector<uint8_t> buffer(len);
 	{
-		for(i = 0; i < len/2; i++)
+		for(int i = 0; i < len/2; i++)
 		{
-			j = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
+			int j = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7, 2,4,6,1,5,3, 0);
 			if(((j & 6) == 0) || ((j & 6) == 6))
 				j ^= 6;
 			buffer[j ^ 7] = (src[i] >> 4) | (src[i] << 4);
@@ -5347,11 +5345,11 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,pwrinst2)
+void cave_state::init_pwrinst2()
 {
 	/* this patch fixes on of the moves, why is it needed? is the rom bad or is there another
 	   problem? does the Japan set need it or not? */
-	DRIVER_INIT_CALL(pwrinst2j);
+	init_pwrinst2j();
 
 #if 1       //ROM PATCH
 	{
@@ -5362,7 +5360,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 }
 
-DRIVER_INIT_MEMBER(cave_state,sailormn)
+void cave_state::init_sailormn()
 {
 	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
@@ -5376,8 +5374,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	/* decrypt sprites */
 	std::vector<uint8_t> buffer(len);
 	{
-		int i;
-		for (i = 0; i < len; i++)
+		for (int i = 0; i < len; i++)
 			buffer[i ^ 0x950c4] = src[bitswap<24>(i,23,22,21,20,15,10,12,6,11,1,13,3,16,17,2,5,14,7,18,8,4,19,9,0)];
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
@@ -5393,7 +5390,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	save_item(NAME(m_sailormn_tilebank));
 }
 
-DRIVER_INIT_MEMBER(cave_state,tjumpman)
+void cave_state::init_tjumpman()
 {
 	init_cave();
 
@@ -5406,7 +5403,7 @@ DRIVER_INIT_MEMBER(cave_state,tjumpman)
 	save_item(NAME(m_hopper));
 }
 
-DRIVER_INIT_MEMBER(cave_state,uopoko)
+void cave_state::init_uopoko()
 {
 	init_cave();
 
@@ -5415,7 +5412,7 @@ DRIVER_INIT_MEMBER(cave_state,uopoko)
 	m_time_vblank_irq = 2000;   /**/
 }
 
-DRIVER_INIT_MEMBER(cave_state,korokoro)
+void cave_state::init_korokoro()
 {
 	init_cave();
 

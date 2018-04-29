@@ -125,7 +125,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
 
-	DECLARE_DRIVER_INIT(jackie);
+	void init_jackie();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -569,12 +569,11 @@ static GFXDECODE_START( jackie )
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x32x6, 0, 16 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(jackie_state,jackie)
+void jackie_state::init_jackie()
 {
-	int A;
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (A = 0;A < 0xf000;A++)
+	for (int A = 0; A < 0xf000; A++)
 	{
 		rom[A] = rom[A] ^ 0x21;
 
@@ -582,7 +581,7 @@ DRIVER_INIT_MEMBER(jackie_state,jackie)
 		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
 		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
 	}
-	memset( &rom[0xf000], 0, 0x1000);
+	memset(&rom[0xf000], 0, 0x1000);
 
 	// Patch trap
 	rom[0x7e86] = 0xc3;

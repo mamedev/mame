@@ -837,30 +837,28 @@ ROM_START( ringking3 )
 	ROM_LOAD( "82s129.1a",    0x0200, 0x0100, CRC(d345cbb3) SHA1(6318022ebbbe59d4c0a207801fffed1167b98a66) )    /* blue component */
 ROM_END
 
-DRIVER_INIT_MEMBER(kingofb_state,ringking3)
+void kingofb_state::init_ringking3()
 {
-	int i;
 	uint8_t *RAM = memregion("proms")->base();
 
 	/* expand the first color PROM to look like the kingofb ones... */
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		RAM[i] = RAM[i + 0x100] >> 4;
 	m_palette->update();
 }
 
-DRIVER_INIT_MEMBER(kingofb_state,ringkingw)
+void kingofb_state::init_ringkingw()
 {
-	int i,j,k;
 	uint8_t *PROMS = memregion("proms")->base();
 	uint8_t *USER1 = memregion("user1")->base();
 
 	/* change the PROMs encode in a simple format to use kingofb decode */
-	for(i = 0, j = 0; j < 0x40; i++, j++)
+	for (int i = 0, j = 0; j < 0x40; i++, j++)
 	{
 		if((i & 0xf) == 8)
 			i += 8;
 
-		for(k = 0; k <= 3; k++)
+		for (int k = 0; k <= 3; k++)
 		{
 			PROMS[j + 0x000 + 0x40 * k] = USER1[i + 0x000 + 0x100 * k]; /* R */
 			PROMS[j + 0x100 + 0x40 * k] = USER1[i + 0x400 + 0x100 * k]; /* G */

@@ -778,7 +778,7 @@ void bebox_state::machine_start()
 {
 }
 
-DRIVER_INIT_MEMBER(bebox_state,bebox)
+void bebox_state::init_bebox()
 {
 	address_space &space_0 = m_ppc1->space(AS_PROGRAM);
 	address_space &space_1 = m_ppc2->space(AS_PROGRAM);

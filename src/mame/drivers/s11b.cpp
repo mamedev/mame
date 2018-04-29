@@ -236,13 +236,13 @@ WRITE8_MEMBER( s11b_state::pia34_pa_w )
 	set_segment2(seg);
 }
 
-DRIVER_INIT_MEMBER( s11b_state, s11b )
+void s11b_state::init_s11b()
 {
 	s11a_state::init_s11a();
 	m_invert = false;
 }
 
-DRIVER_INIT_MEMBER( s11b_state, s11b_invert )
+void s11b_state::init_s11b_invert()
 {
 	s11a_state::init_s11a();
 	m_invert = true;

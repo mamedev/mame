@@ -283,15 +283,13 @@ ROM_START( mouserc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(mouser_state,mouser)
+void mouser_state::init_mouser()
 {
 	/* Decode the opcodes */
-
-	offs_t i;
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *table = memregion("user1")->base();
 
-	for (i = 0; i < 0x6000; i++)
+	for (offs_t i = 0; i < 0x6000; i++)
 	{
 		m_decrypted_opcodes[i] = table[rom[i]];
 	}

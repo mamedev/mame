@@ -329,11 +329,11 @@ class bfm_sc2_vid_state : public bfm_sc2_state
 public:
 	using bfm_sc2_state::bfm_sc2_state;
 
-	DECLARE_DRIVER_INIT(quintoon);
-	DECLARE_DRIVER_INIT(adder_dutch);
-	DECLARE_DRIVER_INIT(pyramid);
-	DECLARE_DRIVER_INIT(sltsbelg);
-	DECLARE_DRIVER_INIT(gldncrwn);
+	void init_quintoon();
+	void init_adder_dutch();
+	void init_pyramid();
+	void init_sltsbelg();
+	void init_gldncrwn();
 	void scorpion2_vid(machine_config &config);
 	void scorpion2_vidm(machine_config &config);
 
@@ -356,7 +356,7 @@ public:
 		, m_reel(*this, "reel%u", 0)
 	{ }
 
-	DECLARE_DRIVER_INIT(drwho);
+	void init_drwho();
 
 protected:
 	template <unsigned N> DECLARE_WRITE_LINE_MEMBER(reel_optic_cb) { if (state) m_optic_pattern |= (1 << N); else m_optic_pattern &= ~(1 << N); }
@@ -365,7 +365,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(reel56_w);
 	DECLARE_READ8_MEMBER(vfd_status_r);
 
-	DECLARE_DRIVER_INIT(drwho_common);
+	void init_drwho_common();
 	virtual void save_state() override;
 	void sc2awp_common_init(int reels, int decrypt);
 	void sc2awpdmd_common_init(int reels, int decrypt);
@@ -387,10 +387,10 @@ class bfm_sc2_awp_state : public bfm_sc2_novid_state
 public:
 	using bfm_sc2_novid_state::bfm_sc2_novid_state;
 
-	DECLARE_DRIVER_INIT(bbrkfst);
-	DECLARE_DRIVER_INIT(drwhon);
-	DECLARE_DRIVER_INIT(focus);
-	DECLARE_DRIVER_INIT(bfmcgslm);
+	void init_bbrkfst();
+	void init_drwhon();
+	void init_focus();
+	void init_bfmcgslm();
 	void scorpion3(machine_config &config);
 	void scorpion2(machine_config &config);
 
@@ -404,10 +404,10 @@ class bfm_sc2_dmd_state : public bfm_sc2_novid_state
 public:
 	using bfm_sc2_novid_state::bfm_sc2_novid_state;
 
-	DECLARE_DRIVER_INIT(luvjub);
-	DECLARE_DRIVER_INIT(cpeno1);
-	DECLARE_DRIVER_INIT(ofah);
-	DECLARE_DRIVER_INIT(prom);
+	void init_luvjub();
+	void init_cpeno1();
+	void init_ofah();
+	void init_prom();
 	void scorpion2_dm01(machine_config &config);
 	void scorpion2_dm01_5m(machine_config &config);
 	void scorpion2_dm01_3m(machine_config &config);
@@ -2403,7 +2403,7 @@ void bfm_sc2_state::adder2_common_init()
 
 // UK quintoon initialisation ////////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_vid_state,quintoon)
+void bfm_sc2_vid_state::init_quintoon()
 {
 	sc2_common_init( 1);
 
@@ -2422,7 +2422,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_vid_state,quintoon)
 
 // dutch pyramid intialisation //////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_vid_state,pyramid)
+void bfm_sc2_vid_state::init_pyramid()
 {
 	sc2_common_init(1);
 	adder2_common_init();
@@ -2438,7 +2438,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_vid_state,pyramid)
 }
 // belgian slots initialisation /////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_vid_state,sltsbelg)
+void bfm_sc2_vid_state::init_sltsbelg()
 {
 	sc2_common_init(1);
 	adder2_common_init();
@@ -2451,7 +2451,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_vid_state,sltsbelg)
 
 // other dutch adder games ////////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_vid_state,adder_dutch)
+void bfm_sc2_vid_state::init_adder_dutch()
 {
 	sc2_common_init(1);
 	adder2_common_init();
@@ -2468,7 +2468,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_vid_state,adder_dutch)
 
 // golden crown //////////////////////////////////////////////////////////
 
-DRIVER_INIT_MEMBER(bfm_sc2_vid_state,gldncrwn)
+void bfm_sc2_vid_state::init_gldncrwn()
 {
 	sc2_common_init(1);
 	adder2_common_init();
@@ -3875,7 +3875,7 @@ void bfm_sc2_novid_state::sc2awpdmd_common_init(int reels, int decrypt)
 
 
 
-DRIVER_INIT_MEMBER(bfm_sc2_awp_state,bbrkfst)
+void bfm_sc2_awp_state::init_bbrkfst()
 {
 	sc2awp_common_init(5, 1);
 
@@ -3894,7 +3894,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_awp_state,bbrkfst)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_novid_state,drwho_common)
+void bfm_sc2_novid_state::init_drwho_common()
 {
 	m_has_hopper = 0;
 
@@ -3910,26 +3910,26 @@ DRIVER_INIT_MEMBER(bfm_sc2_novid_state,drwho_common)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_novid_state,drwho)
+void bfm_sc2_novid_state::init_drwho()
 {
 	sc2awp_common_init(6, 1);
-	DRIVER_INIT_CALL(drwho_common);
+	init_drwho_common();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_awp_state,drwhon)
+void bfm_sc2_awp_state::init_drwhon()
 {
 	sc2awp_common_init(4, 0);
-	DRIVER_INIT_CALL(drwho_common);
+	init_drwho_common();
 }
 
 
-DRIVER_INIT_MEMBER(bfm_sc2_awp_state,focus)
+void bfm_sc2_awp_state::init_focus()
 {
 	sc2awp_common_init(6, 1);
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_dmd_state,cpeno1)
+void bfm_sc2_dmd_state::init_cpeno1()
 {
 	sc2awpdmd_common_init(6, 1);
 
@@ -3972,7 +3972,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_dmd_state,cpeno1)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_dmd_state,ofah)
+void bfm_sc2_dmd_state::init_ofah()
 {
 	sc2awpdmd_common_init(4, 1);
 
@@ -3989,7 +3989,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_dmd_state,ofah)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_dmd_state,prom)
+void bfm_sc2_dmd_state::init_prom()
 {
 	sc2awpdmd_common_init(6, 1);
 
@@ -4006,14 +4006,14 @@ DRIVER_INIT_MEMBER(bfm_sc2_dmd_state,prom)
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_awp_state,bfmcgslm)
+void bfm_sc2_awp_state::init_bfmcgslm()
 {
 	sc2awp_common_init(6, 1);
 	m_has_hopper = 0;
 	sc2_find_project_string();
 }
 
-DRIVER_INIT_MEMBER(bfm_sc2_dmd_state,luvjub)
+void bfm_sc2_dmd_state::init_luvjub()
 {
 	sc2awpdmd_common_init(6, 1);
 

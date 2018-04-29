@@ -75,7 +75,7 @@ public:
 		, m_keyboard(*this, "X%u", 0)
 		{}
 
-	DECLARE_DRIVER_INIT(sbrain);
+	void init_sbrain();
 	DECLARE_MACHINE_RESET(sbrain);
 	DECLARE_READ8_MEMBER(ppi_pa_r);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
@@ -458,7 +458,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sbrain_state::kbd_scan)
 	m_term_data = 0xff;
 }
 
-DRIVER_INIT_MEMBER( sbrain_state, sbrain )
+void sbrain_state::init_sbrain()
 {
 	u8 *main = memregion("maincpu")->base();
 	u8 *sub = memregion("subcpu")->base();

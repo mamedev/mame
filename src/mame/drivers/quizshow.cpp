@@ -50,7 +50,7 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tape_headpos_r);
 	DECLARE_INPUT_CHANGED_MEMBER(category_select);
-	DECLARE_DRIVER_INIT(quizshow);
+	void init_quizshow();
 	void quizshow(machine_config &config);
 
 protected:
@@ -441,17 +441,15 @@ ROM_START( quizshow )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(quizshow_state,quizshow)
+void quizshow_state::init_quizshow()
 {
 	uint8_t *gfxdata = memregion("user1")->base();
 	uint8_t *dest = memregion("gfx1")->base();
 
-	int tile, line;
-
 	// convert gfx data to 8*16(actually 8*12), and 2bpp for masking inverted colors
-	for (tile = 0; tile < 0x40; tile++)
+	for (int tile = 0; tile < 0x40; tile++)
 	{
-		for (line = 2; line < 14; line ++)
+		for (int line = 2; line < 14; line ++)
 		{
 			dest[tile << 4 | line] = 0;
 			dest[tile << 4 | line | 0x400] = 0;

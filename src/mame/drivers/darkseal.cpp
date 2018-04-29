@@ -444,12 +444,10 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(darkseal_state,darkseal)
+void darkseal_state::init_darkseal()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i;
-
-	for (i=0x00000; i<0x80000; i++)
+	for (int i = 0x00000; i < 0x80000; i++)
 		RAM[i]=(RAM[i] & 0xbd) | ((RAM[i] & 0x02) << 5) | ((RAM[i] & 0x40) >> 5);
 
 }

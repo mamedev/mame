@@ -308,7 +308,7 @@ INTERRUPT_GEN_MEMBER(gsword_state::sound_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-DRIVER_INIT_MEMBER(gsword_state, gsword)
+void gsword_state::init_gsword()
 {
 #if 0
 	uint8_t *ROM2 = memregion("sub")->base();
@@ -323,7 +323,7 @@ DRIVER_INIT_MEMBER(gsword_state, gsword)
 #endif
 }
 
-DRIVER_INIT_MEMBER(gsword_state, gsword2)
+void gsword_state::init_gsword2()
 {
 #if 0
 	uint8_t *ROM2 = memregion("sub")->base();

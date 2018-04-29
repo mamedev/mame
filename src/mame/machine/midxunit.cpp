@@ -253,7 +253,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 
 /********************** Revolution X **********************/
 
-DRIVER_INIT_MEMBER(midxunit_state,revx)
+void midxunit_state::init_revx()
 {
 	/* register for state saving */
 	register_state_saving();

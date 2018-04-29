@@ -15,12 +15,12 @@
 
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(orao_state,orao)
+void orao_state::init_orao()
 {
 	memset(m_memory,0xff,0x6000);
 }
 
-DRIVER_INIT_MEMBER(orao_state,orao103)
+void orao_state::init_orao103()
 {
 	memset(m_memory,0xff,0x6000);
 }

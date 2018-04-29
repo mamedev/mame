@@ -853,16 +853,14 @@ ROM_START( skysmash )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(bloodbro_state,weststry)
+void bloodbro_state::init_weststry()
 {
 	// Patch out jp nz,$3000; no code known to exist at that address
 	memory_region *z80_rom = memregion("audiocpu");
 	z80_rom->as_u8(0x160e) = 0x00;
 	z80_rom->as_u8(0x1610) = 0x00;
 
-
 	uint8_t *sprites = memregion("gfx3")->base();
-
 	for (int i = 0; i < 0x40000; i++)
 	{
 		/* sprite roms ws25 and ws26 have 2 bits swapped

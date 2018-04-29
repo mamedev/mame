@@ -1595,21 +1595,21 @@ ROM_START( drgnbowla )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(gaiden_state,shadoww)
+void gaiden_state::init_shadoww()
 {
 	m_jumppoints = wildfang_jumppoints;
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,wildfang)
+void gaiden_state::init_wildfang()
 {
 	m_jumppoints = wildfang_jumppoints;
 	/* sprite size Y = sprite size X */
 	m_sprite_sizey = 0;
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,raiga)
+void gaiden_state::init_raiga()
 {
 	m_jumppoints = raiga_jumppoints_00;
 	/* sprite size Y independent from sprite size X */
@@ -1656,13 +1656,13 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 	}
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
+void gaiden_state::init_drgnbowl()
 {
 	m_jumppoints = wildfang_jumppoints;
 	descramble_drgnbowl(1);
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,drgnbowla)
+void gaiden_state::init_drgnbowla()
 {
 	m_jumppoints = wildfang_jumppoints;
 	descramble_drgnbowl(0);
@@ -1706,12 +1706,12 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 	}
 }
 
-DRIVER_INIT_MEMBER(gaiden_state,mastninj)
+void gaiden_state::init_mastninj()
 {
 	// rearrange the graphic roms into a format that MAME can decode
 	descramble_mastninj_gfx(memregion("gfx2")->base());
 	descramble_mastninj_gfx(memregion("gfx3")->base());
-	DRIVER_INIT_CALL(shadoww);
+	init_shadoww();
 }
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,        INIT,     MONITOR,COMPANY,   FULLNAME,FLAGS

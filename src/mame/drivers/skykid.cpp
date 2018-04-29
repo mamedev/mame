@@ -623,14 +623,11 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(skykid_state,skykid)
+void skykid_state::init_skykid()
 {
-	uint8_t *rom;
-	int i;
-
 	/* unpack the third sprite ROM */
-	rom = memregion("gfx3")->base() + 0x4000;
-	for (i = 0;i < 0x2000;i++)
+	uint8_t *rom = memregion("gfx3")->base() + 0x4000;
+	for (int i = 0;i < 0x2000;i++)
 	{
 		rom[i + 0x4000] = rom[i];       // sprite set #1, plane 3
 		rom[i + 0x6000] = rom[i] >> 4;  // sprite set #2, plane 3

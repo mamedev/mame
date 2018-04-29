@@ -46,15 +46,15 @@ public:
 	DECLARE_WRITE16_MEMBER(umk3_palette_hack_w);
 	DECLARE_WRITE16_MEMBER(wwfmania_io_0_w);
 
-	DECLARE_DRIVER_INIT(mk3r10);
-	DECLARE_DRIVER_INIT(nbahangt);
-	DECLARE_DRIVER_INIT(wwfmania);
-	DECLARE_DRIVER_INIT(umk3);
-	DECLARE_DRIVER_INIT(mk3);
-	DECLARE_DRIVER_INIT(openice);
-	DECLARE_DRIVER_INIT(rmpgwt);
-	DECLARE_DRIVER_INIT(umk3r11);
-	DECLARE_DRIVER_INIT(mk3r20);
+	void init_mk3r10();
+	void init_nbahangt();
+	void init_wwfmania();
+	void init_umk3();
+	void init_mk3();
+	void init_openice();
+	void init_rmpgwt();
+	void init_umk3r11();
+	void init_mk3r20();
 
 	DECLARE_MACHINE_RESET(midwunit);
 	DECLARE_VIDEO_START(midwunit);

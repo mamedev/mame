@@ -224,9 +224,9 @@ public:
 	required_device<cedar_magnet_plane_device> m_cedplane1;
 	required_device<cedar_magnet_sprite_device> m_cedsprite;
 
-	DECLARE_DRIVER_INIT(mag_time);
-	DECLARE_DRIVER_INIT(mag_xain);
-	DECLARE_DRIVER_INIT(mag_exzi);
+	void init_mag_time();
+	void init_mag_xain();
+	void init_mag_exzi();
 	void cedar_magnet(machine_config &config);
 	void cedar_bank0(address_map &map);
 	void cedar_magnet_io(address_map &map);
@@ -901,17 +901,17 @@ void cedar_magnet_state::mag_exzi_protection_hack()
 }
 
 
-DRIVER_INIT_MEMBER(cedar_magnet_state, mag_time)
+void cedar_magnet_state::init_mag_time()
 {
 	m_prothack = &cedar_magnet_state::mag_time_protection_hack;
 }
 
-DRIVER_INIT_MEMBER(cedar_magnet_state, mag_xain)
+void cedar_magnet_state::init_mag_xain()
 {
 	m_prothack = &cedar_magnet_state::mag_xain_protection_hack;
 }
 
-DRIVER_INIT_MEMBER(cedar_magnet_state, mag_exzi)
+void cedar_magnet_state::init_mag_exzi()
 {
 	m_prothack = &cedar_magnet_state::mag_exzi_protection_hack;
 }

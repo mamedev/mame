@@ -90,11 +90,11 @@ public:
 	DECLARE_WRITE8_MEMBER(robokid_bg1_ctrl_w);
 	DECLARE_WRITE8_MEMBER(robokid_bg2_ctrl_w);
 	DECLARE_WRITE8_MEMBER(ninjakd2_sprite_overdraw_w);
-	DECLARE_DRIVER_INIT(mnight);
-	DECLARE_DRIVER_INIT(ninjakd2);
-	DECLARE_DRIVER_INIT(bootleg);
-	DECLARE_DRIVER_INIT(robokid);
-	DECLARE_DRIVER_INIT(robokidj);
+	void init_mnight();
+	void init_ninjakd2();
+	void init_bootleg();
+	void init_robokid();
+	void init_robokidj();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjakd2_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(mnight_get_bg_tile_info);

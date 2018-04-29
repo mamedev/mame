@@ -132,11 +132,11 @@ public:
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(rom_r);
 
-	DECLARE_DRIVER_INIT(walle);
-	DECLARE_DRIVER_INIT(batman);
-	DECLARE_DRIVER_INIT(wirels60);
-	DECLARE_DRIVER_INIT(rad_skat);
-	DECLARE_DRIVER_INIT(rad_crik);
+	void init_walle();
+	void init_batman();
+	void init_wirels60();
+	void init_rad_skat();
+	void init_rad_crik();
 
 	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -225,8 +225,8 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	DECLARE_DRIVER_INIT(vii);
-	DECLARE_DRIVER_INIT(vsmile);
+	void init_vii();
+	void init_vsmile();
 
 	uint16_t do_spg243_vsmile_io(uint16_t what, int index);
 	uint16_t do_spg243_vii_io(uint16_t what, int index);
@@ -1457,25 +1457,25 @@ MACHINE_CONFIG_START(spg2xx_game_state::batman)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(spg2xx_cart_state, vii)
+void spg2xx_cart_state::init_vii()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_cart_state::do_spg243_vii_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_cart_state, vsmile)
+void spg2xx_cart_state::init_vsmile()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_cart_state::do_spg243_vsmile_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, batman)
+void spg2xx_game_state::init_batman()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, rad_skat)
+void spg2xx_game_state::init_rad_skat()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg240_rad_skat_io, this);
 	m_centered_coordinates = 1;
@@ -1490,7 +1490,7 @@ READ16_MEMBER(spg2xx_game_state::rad_crik_hack_r)
 		return 0xf854;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, rad_crik)
+void spg2xx_game_state::init_rad_crik()
 {
 	m_maincpu->space(AS_PROGRAM).install_writeonly(0x5800, 0x5bff, m_p_spriteram); // is this due to a CPU or DMA bug? 5800 == 2c00 << 1
 
@@ -1501,13 +1501,13 @@ DRIVER_INIT_MEMBER(spg2xx_game_state, rad_crik)
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, walle)
+void spg2xx_game_state::init_walle()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
 	m_centered_coordinates = 0;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state, wirels60)
+void spg2xx_game_state::init_wirels60()
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_wireless60_io, this);
 	m_centered_coordinates = 1;

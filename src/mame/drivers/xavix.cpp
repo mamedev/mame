@@ -629,21 +629,21 @@ MACHINE_CONFIG_START(xavix_state::xavixp)
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(xavix_state, xavix)
+void xavix_state::init_xavix()
 {
 	m_rgnlen = memregion("bios")->bytes();
 	m_rgn = memregion("bios")->base();
 }
 
-DRIVER_INIT_MEMBER(xavix_state, taitons1)
+void xavix_state::init_taitons1()
 {
-	DRIVER_INIT_CALL(xavix);
+	init_xavix();
 	m_alt_addressing = 1;
 }
 
-DRIVER_INIT_MEMBER(xavix_state, rad_box)
+void xavix_state::init_rad_box()
 {
-	DRIVER_INIT_CALL(xavix);
+	init_xavix();
 	m_alt_addressing = 2;
 }
 

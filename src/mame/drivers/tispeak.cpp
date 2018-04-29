@@ -439,9 +439,9 @@ public:
 
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
 
-	DECLARE_DRIVER_INIT(snspell);
-	DECLARE_DRIVER_INIT(tntell);
-	DECLARE_DRIVER_INIT(lantutor);
+	void init_snspell();
+	void init_tntell();
+	void init_lantutor();
 
 	// machine configs
 	void tms5110_route(machine_config &config);
@@ -551,19 +551,19 @@ DEVICE_IMAGE_LOAD_MEMBER(tispeak_state, tispeak_cartridge)
 }
 
 
-DRIVER_INIT_MEMBER(tispeak_state, snspell)
+void tispeak_state::init_snspell()
 {
 	m_cart_max_size = 0x4000;
 	m_cart_base = memregion("tms6100")->base() + 0x8000;
 }
 
-DRIVER_INIT_MEMBER(tispeak_state, tntell)
+void tispeak_state::init_tntell()
 {
 	m_cart_max_size = 0x4000;
 	m_cart_base = memregion("tms6100")->base() + 0x4000;
 }
 
-DRIVER_INIT_MEMBER(tispeak_state, lantutor)
+void tispeak_state::init_lantutor()
 {
 	m_cart_max_size = 0x10000;
 	m_cart_base = memregion("tms6100")->base();

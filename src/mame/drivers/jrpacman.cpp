@@ -116,7 +116,7 @@ public:
 		: pacman_state(mconfig, type, tag) { }
 	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_DRIVER_INIT(jrpacman);
+	void init_jrpacman();
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void jrpacman(machine_config &config);
 	void main_map(address_map &map);
@@ -381,7 +381,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
+void jrpacman_state::init_jrpacman()
 {
 	/* The encryption PALs garble bits 0, 2 and 7 of the ROMs. The encryption */
 	/* scheme is complex (basically it's a state machine) and can only be */
@@ -419,10 +419,8 @@ DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
 	};
 
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i, j, A;
-
-	for (i = A = 0; table[i].count; i++)
-		for (j = 0; j < table[i].count; j++)
+	for (int i = 0, A = 0; table[i].count; i++)
+		for (int j = 0; j < table[i].count; j++)
 			RAM[A++] ^= table[i].value;
 }
 

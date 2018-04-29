@@ -11764,7 +11764,7 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(seta_state,bank6502)
+void seta_state::init_bank6502()
 {
 	uint8_t *rom = memregion("sub")->base();
 	uint32_t max = (memregion("sub")->bytes() - 0xc000) / 0x4000;
@@ -11797,9 +11797,9 @@ WRITE16_MEMBER(seta_state::twineagl_200100_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(seta_state,twineagl)
+void seta_state::init_twineagl()
 {
-	DRIVER_INIT_CALL(bank6502);
+	init_bank6502();
 	/* debug? */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
 
@@ -11831,9 +11831,9 @@ WRITE16_MEMBER(seta_state::downtown_protection_w)
 	COMBINE_DATA(&m_downtown_protection[offset]);
 }
 
-DRIVER_INIT_MEMBER(seta_state,downtown)
+void seta_state::init_downtown()
 {
-	DRIVER_INIT_CALL(bank6502);
+	init_bank6502();
 
 	m_downtown_protection = make_unique_clear<uint16_t[]>(0x200/2);
 	save_pointer(NAME(m_downtown_protection.get()),0x200/2);
@@ -11856,9 +11856,9 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 	return 0;
 }
 
-DRIVER_INIT_MEMBER(seta_state,arbalest)
+void seta_state::init_arbalest()
 {
-	DRIVER_INIT_CALL(bank6502);
+	init_bank6502();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
 }
 
@@ -11885,26 +11885,22 @@ READ16_MEMBER(seta_state::metafox_protection_r)
 	return offset * 0x1f;
 }
 
-DRIVER_INIT_MEMBER(seta_state,metafox)
+void seta_state::init_metafox()
 {
-	DRIVER_INIT_CALL(bank6502);
+	init_bank6502();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(FUNC(seta_state::metafox_protection_r),this));
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,blandia)
+void seta_state::init_blandia()
 {
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
-
-	int rom_size;
-	uint8_t *rom;
-	int rpos;
-
-	rom_size = 0x80000;
+	int rom_size = 0x80000;
 	std::vector<uint8_t> buf(rom_size);
 
-	rom = memregion("gfx2")->base() + 0x40000;
+	uint8_t *rom = memregion("gfx2")->base() + 0x40000;
 
+	int rpos;
 	for (rpos = 0; rpos < rom_size/2; rpos++) {
 		buf[rpos+0x40000] = rom[rpos*2];
 		buf[rpos] = rom[rpos*2+1];
@@ -11923,13 +11919,13 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,eightfrc)
+void seta_state::init_eightfrc()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500004, 0x500005);   // watchdog??
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,kiwame)
+void seta_state::init_kiwame()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11941,12 +11937,12 @@ DRIVER_INIT_MEMBER(seta_state,kiwame)
 }
 
 
-DRIVER_INIT_MEMBER(seta_state,rezon)
+void seta_state::init_rezon()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500006, 0x500007);   // irq ack?
 }
 
-DRIVER_INIT_MEMBER(seta_state,pairlove)
+void seta_state::init_pairlove()
 {
 	m_pairslove_protram = make_unique_clear<uint16_t[]>(0x200/2);
 	m_pairslove_protram_old = make_unique_clear<uint16_t[]>(0x200/2);
@@ -11954,19 +11950,15 @@ DRIVER_INIT_MEMBER(seta_state,pairlove)
 	save_pointer(NAME(m_pairslove_protram_old.get()), 0x200/2);
 }
 
-DRIVER_INIT_MEMBER(seta_state,wiggie)
+void seta_state::init_wiggie()
 {
-	uint8_t *src;
-	int len;
 	uint8_t temp[16];
-	int i,j;
-
-	src = memregion("maincpu")->base();
-	len = memregion("maincpu")->bytes();
-	for (i = 0;i < len;i += 16)
+	uint8_t *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+	for (int i = 0;i < len;i += 16)
 	{
-		std::copy(&src[i],&src[i+16],std::begin(temp));
-		for (j = 0;j < 16;j++)
+		std::copy(&src[i], &src[i+16], std::begin(temp));
+		for (int j = 0;j < 16;j++)
 		{
 			static const int convtable[16] =
 			{
@@ -11983,7 +11975,7 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 	}
 }
 
-DRIVER_INIT_MEMBER(seta_state,crazyfgt)
+void seta_state::init_crazyfgt()
 {
 	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
@@ -11993,10 +11985,10 @@ DRIVER_INIT_MEMBER(seta_state,crazyfgt)
 	// fixed priorities?
 	m_vregs.allocate(3);
 
-	DRIVER_INIT_CALL(blandia);
+	init_blandia();
 }
 
-DRIVER_INIT_MEMBER(jockeyc_state,inttoote)
+void jockeyc_state::init_inttoote()
 {
 	// code patches due to unemulated protection (to be removed...)
 	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();

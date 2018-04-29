@@ -172,14 +172,14 @@ class a7800_ntsc_state : public a7800_state
 {
 public:
 	using a7800_state::a7800_state;
-	DECLARE_DRIVER_INIT(a7800_ntsc);
+	void init_a7800_ntsc();
 };
 
 class a7800_pal_state : public a7800_state
 {
 public:
 	using a7800_state::a7800_state;
-	DECLARE_DRIVER_INIT(a7800_pal);
+	void init_a7800_pal();
 	void a7800_pal(machine_config &config);
 
 protected:
@@ -1463,7 +1463,7 @@ ROM_END
  DRIVER INIT
  ***************************************************************************/
 
-DRIVER_INIT_MEMBER(a7800_ntsc_state, a7800_ntsc)
+void a7800_ntsc_state::init_a7800_ntsc()
 {
 	m_ispal = false;
 	m_lines = 263;
@@ -1472,7 +1472,7 @@ DRIVER_INIT_MEMBER(a7800_ntsc_state, a7800_ntsc)
 }
 
 
-DRIVER_INIT_MEMBER(a7800_pal_state, a7800_pal)
+void a7800_pal_state::init_a7800_pal()
 {
 	m_ispal = true;
 	m_lines = 313;

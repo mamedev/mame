@@ -956,33 +956,33 @@ ROM_START( cp500 )
 	ROM_LOAD( "100.105.ci36", 0x0000, 0x800, CRC(1765931e) SHA1(49176ceea6cc003efa04fad2f31829b9432fe10f))
 ROM_END
 
-DRIVER_INIT_MEMBER(trs80_state,trs80)
+void trs80_state::init_trs80()
 {
 	m_mode = 0;
 	m_model4 = 0;
 }
 
-DRIVER_INIT_MEMBER(trs80_state,trs80l2)
+void trs80_state::init_trs80l2()
 {
 	m_mode = 2;
 	m_model4 = 0;
 }
 
-DRIVER_INIT_MEMBER(trs80_state,trs80m4)
+void trs80_state::init_trs80m4()
 {
 	m_mode = 0;
 	m_model4 = 2;
 	m_p_videoram.set_target(memregion("maincpu")->base()+0x4000,m_p_videoram.bytes());
 }
 
-DRIVER_INIT_MEMBER(trs80_state,trs80m4p)
+void trs80_state::init_trs80m4p()
 {
 	m_mode = 0;
 	m_model4 = 4;
 	m_p_videoram.set_target(memregion("maincpu")->base()+0x4000,m_p_videoram.bytes());
 }
 
-DRIVER_INIT_MEMBER(trs80_state,lnw80)
+void trs80_state::init_lnw80()
 {
 	m_mode = 0;
 	m_model4 = 0;

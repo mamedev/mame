@@ -303,7 +303,7 @@ public:
 	DECLARE_WRITE8_MEMBER(output_port_b_w);
 	DECLARE_READ8_MEMBER(input_port_c_r);
 	DECLARE_WRITE8_MEMBER(output_port_c_w);
-	DECLARE_DRIVER_INIT(luckybal);
+	void init_luckybal();
 	uint8_t daclatch;
 
 	required_device<v9938_device> m_v9938;
@@ -599,14 +599,12 @@ ROM_END
 *            Driver Init            *
 ************************************/
 
-DRIVER_INIT_MEMBER(luckybal_state, luckybal)
+void luckybal_state::init_luckybal()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0;
-	int i;
-
-	for (i = start; i < size; i++)
+	for (int i = start; i < size; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 6, 7, 4, 5, 2, 3, 0, 1);
 	}

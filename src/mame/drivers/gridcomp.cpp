@@ -115,7 +115,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 
-	DECLARE_DRIVER_INIT(gridcomp);
+	void init_gridcomp();
 	DECLARE_MACHINE_START(gridcomp);
 	DECLARE_MACHINE_RESET(gridcomp);
 
@@ -285,7 +285,7 @@ uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 
 }
 
 
-DRIVER_INIT_MEMBER(gridcomp_state, gridcomp)
+void gridcomp_state::init_gridcomp()
 {
 	DBG_LOG(0, "init", ("driver_init()\n"));
 }

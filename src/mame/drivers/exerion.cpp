@@ -539,29 +539,26 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(exerion_state,exerion)
+void exerion_state::init_exerion()
 {
-	uint32_t oldaddr, newaddr, length;
-	uint8_t *src, *dst;
-
 	/* allocate some temporary space */
 	std::vector<uint8_t> temp(0x10000);
 
 	/* make a temporary copy of the character data */
-	src = &temp[0];
-	dst = memregion("gfx1")->base();
-	length = memregion("gfx1")->bytes();
+	uint8_t *src = &temp[0];
+	uint8_t *dst = memregion("gfx1")->base();
+	uint32_t length = memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
 	/* the bits in the ROM are ordered: n8-n7 n6 n5 n4-v2 v1 v0 n3-n2 n1 n0 h2 */
 	/* we want them ordered like this:  n8-n7 n6 n5 n4-n3 n2 n1 n0-v2 v1 v0 h2 */
-	for (oldaddr = 0; oldaddr < length; oldaddr++)
+	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
-					((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
-					((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
-					((oldaddr     ) & 0x0001);        /* keep h2 */
+		uint32_t newaddr = ((oldaddr     ) & 0x1f00) |       /* keep n8-n4 */
+					       ((oldaddr << 3) & 0x00f0) |       /* move n3-n0 */
+					       ((oldaddr >> 4) & 0x000e) |       /* move v2-v0 */
+					       ((oldaddr     ) & 0x0001);        /* keep h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 
@@ -574,45 +571,42 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 	/* decode the sprites */
 	/* the bits in the ROMs are ordered: n9 n8 n3 n7-n6 n5 n4 v3-v2 v1 v0 n2-n1 n0 h3 h2 */
 	/* we want them ordered like this:   n9 n8 n7 n6-n5 n4 n3 n2-n1 n0 v3 v2-v1 v0 h3 h2 */
-	for (oldaddr = 0; oldaddr < length; oldaddr++)
+	for (uint32_t oldaddr = 0; oldaddr < length; oldaddr++)
 	{
-		newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
-					((oldaddr >> 4) & 0x0200) |       /* move n3 */
-					((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
-					((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
-					((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
+		uint32_t newaddr = ((oldaddr << 1) & 0x3c00) |       /* move n7-n4 */
+					       ((oldaddr >> 4) & 0x0200) |       /* move n3 */
+					       ((oldaddr << 4) & 0x01c0) |       /* move n2-n0 */
+					       ((oldaddr >> 3) & 0x003c) |       /* move v3-v0 */
+					       ((oldaddr     ) & 0xc003);        /* keep n9-n8 h3-h2 */
 		dst[newaddr] = src[oldaddr];
 	}
 }
 
 
-DRIVER_INIT_MEMBER(exerion_state,exerionb)
+void exerion_state::init_exerionb()
 {
 	uint8_t *ram = memregion("maincpu")->base();
-	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */
-	for (addr = 0; addr < 0x6000; addr++)
+	for (int addr = 0; addr < 0x6000; addr++)
 		ram[addr] = (ram[addr] & 0xf9) | ((ram[addr] & 2) << 1) | ((ram[addr] & 4) >> 1);
 
 	/* also convert the gfx as in Exerion */
-	DRIVER_INIT_CALL(exerion);
+	init_exerion();
 }
 
-DRIVER_INIT_MEMBER(exerion_state, irion)
+void exerion_state::init_irion()
 {
 	// convert the gfx and cpu roms like in ExerionB
-	DRIVER_INIT_CALL(exerionb);
+	init_exerionb();
 
 	// a further unscramble of gfx2
 	uint8_t *ram = memregion("gfx2")->base();
-	u16 i,j;
-	u8 k;
-	for (i = 0; i < 0x4000; i += 0x400)
+	for (u16 i = 0; i < 0x4000; i += 0x400)
 	{
-		for (j = 0; j < 0x200; j++)
+		for (u16 j = 0; j < 0x200; j++)
 		{
-			k = ram[i+j];
+			u8 k = ram[i+j];
 			ram[i+j] = ram[i+j+0x200];
 			ram[i+j+0x200] = k;
 		}

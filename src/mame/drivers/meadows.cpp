@@ -844,7 +844,7 @@ ROM_END
  *************************************/
 
 /* A fake for the missing ball sprites #3 and #4 */
-DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
+void meadows_state::init_gypsyjug()
 {
 	static const uint8_t ball[16*2] =
 	{
@@ -853,7 +853,6 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 		0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 		0x01,0x80, 0x03,0xc0, 0x03,0xc0, 0x01,0x80
 	};
-	int i;
 	uint8_t *gfx2 = memregion("gfx2")->base();
 	uint8_t *gfx3 = memregion("gfx3")->base();
 	uint8_t *gfx4 = memregion("gfx4")->base();
@@ -863,7 +862,7 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 
 	memcpy(gfx3,gfx2,len3);
 
-	for (i = 0; i < len4; i += 16*2)
+	for (int i = 0; i < len4; i += 16*2)
 	{
 		memcpy(gfx4 + i, ball, sizeof(ball));
 		memcpy(gfx5 + i, ball, sizeof(ball));
@@ -872,16 +871,13 @@ DRIVER_INIT_MEMBER(meadows_state,gypsyjug)
 
 
 /* A fake for inverting the data bus */
-DRIVER_INIT_MEMBER(meadows_state,minferno)
+void meadows_state::init_minferno()
 {
-	int i, length;
-	uint8_t *mem;
-
 	/* create an inverted copy of the graphics data */
-	mem = memregion("gfx1")->base();
-	length = memregion("gfx1")->bytes();
-	for (i = 0; i < length/2; i++)
-		mem[i] = ~mem[i + length/2];
+	uint8_t *mem = memregion("gfx1")->base();
+	int length = memregion("gfx1")->bytes();
+	for (int i = 0; i < length / 2; i++)
+		mem[i] = ~mem[i + length / 2];
 }
 
 

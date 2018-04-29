@@ -1485,7 +1485,7 @@ void mcr68_state::mcr68_common_init(int clip, int xoffset)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,xenophob)
+void mcr68_state::init_xenophob()
 {
 	mcr68_common_init(0, -4);
 
@@ -1497,7 +1497,7 @@ DRIVER_INIT_MEMBER(mcr68_state,xenophob)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
+void mcr68_state::init_spyhunt2()
 {
 	mcr68_common_init(0, -6);
 
@@ -1511,7 +1511,7 @@ DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,blasted)
+void mcr68_state::init_blasted()
 {
 	mcr68_common_init(0, 0);
 
@@ -1527,7 +1527,7 @@ DRIVER_INIT_MEMBER(mcr68_state,blasted)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
-DRIVER_INIT_MEMBER(mcr68_state,intlaser)
+void mcr68_state::init_intlaser()
 {
 	mcr68_common_init(0, 0);
 
@@ -1541,7 +1541,7 @@ DRIVER_INIT_MEMBER(mcr68_state,intlaser)
 
 
 
-DRIVER_INIT_MEMBER(mcr68_state,archrivl)
+void mcr68_state::init_archrivl()
 {
 	mcr68_common_init(16, 0);
 
@@ -1563,7 +1563,7 @@ READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
 	return ioport("IN1")->read();
 }
 
-DRIVER_INIT_MEMBER(mcr68_state,archrivlb)
+void mcr68_state::init_archrivlb()
 {
 	mcr68_common_init(16, 0);
 
@@ -1582,7 +1582,7 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivlb)
 
 
 
-DRIVER_INIT_MEMBER(mcr68_state,pigskin)
+void mcr68_state::init_pigskin()
 {
 	mcr68_common_init(16, 0);
 
@@ -1593,7 +1593,7 @@ DRIVER_INIT_MEMBER(mcr68_state,pigskin)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,trisport)
+void mcr68_state::init_trisport()
 {
 	mcr68_common_init(0, 0);
 

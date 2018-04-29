@@ -228,7 +228,7 @@ public:
 	output_finder<128> m_lamps;
 	output_finder<16> m_digits;
 
-	DECLARE_DRIVER_INIT(aces1);
+	void init_aces1();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
@@ -842,7 +842,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(aces1_state,aces1)
+void aces1_state::init_aces1()
 {
 }
 

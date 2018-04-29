@@ -362,13 +362,13 @@ public:
 	required_device<segaxbd_state> m_mainpcb;
 
 	// game-specific driver init
-	DECLARE_DRIVER_INIT(generic);
-	DECLARE_DRIVER_INIT(aburner2);
-	DECLARE_DRIVER_INIT(lastsurv);
-	DECLARE_DRIVER_INIT(loffire);
-	DECLARE_DRIVER_INIT(smgp);
-	DECLARE_DRIVER_INIT(rascot);
-	DECLARE_DRIVER_INIT(gprider);
+	void init_generic();
+	void init_aburner2();
+	void init_lastsurv();
+	void init_loffire();
+	void init_smgp();
+	void init_rascot();
+	void init_gprider();
 
 	void sega_smgp_fd1094(machine_config &config);
 	void sega_lastsurv_fd1094(machine_config &config);
@@ -428,7 +428,7 @@ public:
 		}
 	}
 
-	DECLARE_DRIVER_INIT(gprider_double);
+	void init_gprider_double();
 
 	uint16_t shareram[0x800];
 	uint16_t rampage1;
@@ -4667,7 +4667,7 @@ void segaxbd_state::install_aburner2(void)
 	m_road_priority = 0;
 }
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,aburner2)
+void segaxbd_new_state::init_aburner2()
 {
 	m_mainpcb->install_aburner2();
 }
@@ -4682,7 +4682,7 @@ void segaxbd_state::install_loffire(void)
 }
 
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,loffire)
+void segaxbd_new_state::init_loffire()
 {
 	m_mainpcb->install_loffire();
 }
@@ -4693,12 +4693,12 @@ void segaxbd_state::install_smgp(void)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(FUNC(segaxbd_state::smgp_excs_r), this), write16_delegate(FUNC(segaxbd_state::smgp_excs_w), this));
 }
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,smgp)
+void segaxbd_new_state::init_smgp()
 {
 	m_mainpcb->install_smgp();
 }
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,rascot)
+void segaxbd_new_state::init_rascot()
 {
 	// patch out bootup link test
 	uint16_t *rom = reinterpret_cast<uint16_t *>(memregion("mainpcb:subcpu")->base());
@@ -4717,13 +4717,13 @@ void segaxbd_state::install_gprider(void)
 
 }
 
-DRIVER_INIT_MEMBER(segaxbd_new_state,gprider)
+void segaxbd_new_state::init_gprider()
 {
 	m_mainpcb->install_gprider();
 }
 
 
-DRIVER_INIT_MEMBER(segaxbd_new_state_double,gprider_double)
+void segaxbd_new_state_double::init_gprider_double()
 {
 	m_mainpcb->install_gprider();
 	m_subpcb->install_gprider();

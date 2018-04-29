@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(segasp_state::segasp)
 	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(segasp_state, segasp)
+void segasp_state::init_segasp()
 {
 	set_drc_options();
 }

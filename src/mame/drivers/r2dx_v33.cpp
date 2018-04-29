@@ -110,9 +110,9 @@ public:
 	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
 	DECLARE_WRITE16_MEMBER(zerotm2k_eeprom_w);
 	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
-	DECLARE_DRIVER_INIT(rdx_v33);
-	DECLARE_DRIVER_INIT(nzerotea);
-	DECLARE_DRIVER_INIT(zerotm2k);
+	void init_rdx_v33();
+	void init_nzerotea();
+	void init_zerotm2k();
 
 	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
 	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
@@ -876,7 +876,7 @@ MACHINE_CONFIG_START(r2dx_v33_state::zerotm2k)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
+void r2dx_v33_state::init_rdx_v33()
 {
 	init_blending(raiden_blended_colors);
 	static const int spri[5] = { 0, 1, 2, 3, -1 };
@@ -900,7 +900,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 
 }
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
+void r2dx_v33_state::init_nzerotea()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -909,7 +909,7 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 	zeroteam_decrypt_sprites(machine());
 }
 
-DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
+void r2dx_v33_state::init_zerotm2k()
 {
 	init_blending(zeroteam_blended_colors);
 	static const int spri[5] = { -1, 0, 1, 2, 3 };
@@ -919,11 +919,10 @@ DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 
 	// BG tile rom has 2 lines swapped
 	uint8_t *src = memregion("gfx2")->base()+0x100000;
-	int len = 0x080000;
+	const int len = 0x080000;
 
 	std::vector<uint8_t> buffer(len);
-	int i;
-	for (i = 0; i < len; i ++)
+	for (int i = 0; i < len; i ++)
 		buffer[i] = src[bitswap<32>(i,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,5,6,4,3,2,1,0)];
 	memcpy(src, &buffer[0], len);
 }

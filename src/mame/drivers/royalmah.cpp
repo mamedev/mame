@@ -205,14 +205,14 @@ public:
 	DECLARE_WRITE8_MEMBER(mjvegasa_12400_w);
 	DECLARE_READ8_MEMBER(mjvegasa_12500_r);
 
-	DECLARE_DRIVER_INIT(tahjong);
-	DECLARE_DRIVER_INIT(dynax);
-	DECLARE_DRIVER_INIT(jansou);
-	DECLARE_DRIVER_INIT(suzume);
-	DECLARE_DRIVER_INIT(ippatsu);
-	DECLARE_DRIVER_INIT(mjifb);
-	DECLARE_DRIVER_INIT(tontonb);
-	DECLARE_DRIVER_INIT(janptr96);
+	void init_tahjong();
+	void init_dynax();
+	void init_jansou();
+	void init_suzume();
+	void init_ippatsu();
+	void init_mjifb();
+	void init_tontonb();
+	void init_janptr96();
 	DECLARE_PALETTE_INIT(royalmah);
 	DECLARE_PALETTE_INIT(mjderngr);
 
@@ -5174,12 +5174,12 @@ ROM_START( rkjanoh2 )
 	ROM_LOAD( "82s123",       0x000, 0x020, CRC(74a53e94) SHA1(ca9114bd9b2b07f5abe82616b41ae9fdb9537a4f) )
 ROM_END
 
-DRIVER_INIT_MEMBER(royalmah_state, tahjong)
+void royalmah_state::init_tahjong()
 {
 	membank("mainbank")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(royalmah_state, jansou)
+void royalmah_state::init_jansou()
 {
 	save_item(NAME(m_gfx_adr_l));
 	save_item(NAME(m_gfx_adr_m));
@@ -5190,34 +5190,34 @@ DRIVER_INIT_MEMBER(royalmah_state, jansou)
 	save_item(NAME(m_jansou_colortable));
 }
 
-DRIVER_INIT_MEMBER(royalmah_state, dynax)
+void royalmah_state::init_dynax()
 {
 	membank("mainbank")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(royalmah_state, ippatsu)
+void royalmah_state::init_ippatsu()
 {
 	membank("mainbank")->set_base(memregion("maincpu")->base() + 0x8000 );
 }
 
-DRIVER_INIT_MEMBER(royalmah_state, suzume)
+void royalmah_state::init_suzume()
 {
 	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_suzume_bank));
 }
 
-DRIVER_INIT_MEMBER(royalmah_state, mjifb)
+void royalmah_state::init_mjifb()
 {
 	save_item(NAME(m_mjifb_rom_enable));
 }
 
-DRIVER_INIT_MEMBER(royalmah_state, tontonb)
+void royalmah_state::init_tontonb()
 {
 	membank("mainbank")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
 
-DRIVER_INIT_MEMBER(royalmah_state, janptr96)
+void royalmah_state::init_janptr96()
 {
 	membank("mainbank")->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x8000);
 

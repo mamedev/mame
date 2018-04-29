@@ -184,8 +184,8 @@ public:
 
 	DECLARE_MACHINE_START(pipedrm);
 	DECLARE_MACHINE_RESET(pipedrm);
-	DECLARE_DRIVER_INIT(pipedrm);
-	DECLARE_DRIVER_INIT(hatris);
+	void init_pipedrm();
+	void init_hatris();
 	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
 	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
@@ -880,7 +880,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
+void pipedrm_state::init_pipedrm()
 {
 	const memory_share *share = memshare("palette");
 	/* sprite RAM lives at the end of palette RAM */
@@ -889,7 +889,7 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 }
 
 
-DRIVER_INIT_MEMBER(pipedrm_state,hatris)
+void pipedrm_state::init_hatris()
 {
 	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(pipedrm_state::fromance_gfxreg_w),this));
 }

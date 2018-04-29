@@ -66,9 +66,9 @@ protected:
 
 	virtual void video_start() override;
 public:
-	DECLARE_DRIVER_INIT(chsuper3);
-	DECLARE_DRIVER_INIT(chmpnum);
-	DECLARE_DRIVER_INIT(chsuper2);
+	void init_chsuper3();
+	void init_chmpnum();
+	void init_chsuper2();
 };
 
 
@@ -475,21 +475,18 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
+void chsuper_state::init_chsuper2()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	m_tilexor = 0x7f00;
 
 	buffer = std::make_unique<uint8_t[]>(0x100000);
 
-	for (i=0;i<0x100000;i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
-		int j;
-
-		j = i ^ (m_tilexor << 5);
+		int j = i ^ (m_tilexor << 5);
 
 		buffer[j] = rom[i];
 	}
@@ -497,17 +494,16 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper2)
 	memcpy(rom,buffer.get(),0x100000);
 }
 
-DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
+void chsuper_state::init_chsuper3()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	m_tilexor = 0x0e00;
 
 	buffer = std::make_unique<uint8_t[]>(0x100000);
 
-	for (i=0;i<0x100000;i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
 		int j;
 
@@ -519,21 +515,18 @@ DRIVER_INIT_MEMBER(chsuper_state,chsuper3)
 	memcpy(rom,buffer.get(),0x100000);
 }
 
-DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
+void chsuper_state::init_chmpnum()
 {
 	std::unique_ptr<uint8_t[]> buffer;
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	m_tilexor = 0x1800;
 
 	buffer = std::make_unique<uint8_t[]>(0x100000);
 
-	for (i=0;i<0x100000;i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
-		int j;
-
-		j = i ^ (m_tilexor << 5);
+		int j = i ^ (m_tilexor << 5);
 
 		j = bitswap<24>(j,23,22,21,20,19,18,17,13, 15,14,16,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
 		j = bitswap<24>(j,23,22,21,20,19,18,17,14, 15,16,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);

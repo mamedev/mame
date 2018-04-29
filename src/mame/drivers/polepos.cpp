@@ -2374,7 +2374,7 @@ ROM_END
  * Initialization routines
  *********************************************************************/
 
-DRIVER_INIT_MEMBER(polepos_state,polepos2)
+void polepos_state::init_polepos2()
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));

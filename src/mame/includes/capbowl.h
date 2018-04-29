@@ -68,7 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bowlrama_blitter_w);
 	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
 
-	DECLARE_DRIVER_INIT(capbowl);
+	void init_capbowl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 

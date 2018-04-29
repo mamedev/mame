@@ -88,7 +88,7 @@ public:
 		m_sprgen(*this, "spritegen")
 	{ }
 
-	DECLARE_DRIVER_INIT(tumblep);
+	void init_tumblep();
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 	DECLARE_READ16_MEMBER(vblank_ack_r);
@@ -254,7 +254,7 @@ uint32_t supbtime_state::screen_update_tumblep(screen_device &screen, bitmap_ind
 //  MACHINE
 //**************************************************************************
 
-DRIVER_INIT_MEMBER( supbtime_state, tumblep )
+void supbtime_state::init_tumblep()
 {
 	deco56_decrypt_gfx(machine(), "tiles");
 

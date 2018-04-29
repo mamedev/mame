@@ -1044,7 +1044,7 @@ ROM_START( crazycop )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(thunderx_state, thunderx)
+void thunderx_state::init_thunderx()
 {
 	m_thunderx_firq_timer = timer_alloc(TIMER_THUNDERX_FIRQ);
 }

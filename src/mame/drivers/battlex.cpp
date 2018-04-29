@@ -390,37 +390,32 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(battlex_state,battlex)
+void battlex_state::init_battlex()
 {
 	uint8_t *colormask = memregion("user1")->base();
 	uint8_t *gfxdata = memregion("user2")->base();
 	uint8_t *dest = memregion("gfx1")->base();
 	int tile_size = memregion("gfx1")->bytes() / 32;
 
-	int tile, line, bit;
 	int offset = 0;
-
-	for (tile = 0; tile < tile_size; tile++)
+	for (int tile = 0; tile < tile_size; tile++)
 	{
-		for (line = 0; line < 8; line ++)
+		for (int line = 0; line < 8; line ++)
 		{
-			for (bit = 0; bit < 8 ; bit ++)
+			for (int bit = 0; bit < 8 ; bit ++)
 			{
+				int color = colormask[(tile << 3) | ((line & 0x6) + (bit > 3 ? 1 : 0))];
+				int data = BIT(gfxdata[(tile << 3) | line], bit);
 
-				int color = colormask[(tile << 3 )| ((line&0x6) + (bit>3?1:0))  ];
-				int data = (gfxdata[(tile << 3 )| line] >> bit) & 1;
+				if (!data)
+					color >>= 4;
 
-				if(!data){
-					color>>=4;
-				}
+				color &= 0x0f;
 
-				color&=0x0f;
-
-				if(offset&1){
-					dest[ offset>>1 ] |= color;
-				} else {
-					dest[ offset>>1 ] = color<<4;
-				}
+				if (offset&1)
+					dest[offset >> 1] |= color;
+				else
+					dest[offset >> 1] = color<<4;
 				++offset;
 			}
 		}

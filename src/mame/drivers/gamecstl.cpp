@@ -92,7 +92,7 @@ public:
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
-	DECLARE_DRIVER_INIT(gamecstl);
+	void init_gamecstl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -471,7 +471,7 @@ MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 
 MACHINE_CONFIG_END
 
-DRIVER_INIT_MEMBER(gamecstl_state,gamecstl)
+void gamecstl_state::init_gamecstl()
 {
 	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
 

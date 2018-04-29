@@ -45,11 +45,11 @@ public:
 	void hyprolyb(machine_config &config);
 	void mastkin(machine_config &config);
 
-	DECLARE_DRIVER_INIT(trackfld);
-	DECLARE_DRIVER_INIT(atlantol);
-	DECLARE_DRIVER_INIT(wizzquiz);
-	DECLARE_DRIVER_INIT(mastkin);
-	DECLARE_DRIVER_INIT(trackfldnz);
+	void init_trackfld();
+	void init_atlantol();
+	void init_wizzquiz();
+	void init_mastkin();
+	void init_trackfldnz();
 
 	void hyprolyb_sound_map(address_map &map);
 	void main_map(address_map &map);

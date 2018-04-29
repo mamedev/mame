@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port78_w);
 	DECLARE_WRITE8_MEMBER(porte0_w);
 	DECLARE_WRITE8_MEMBER(portf0_w);
-	DECLARE_DRIVER_INIT(ts816);
+	void init_ts816();
 
 	void ts816(machine_config &config);
 	void ts816_io(address_map &map);
@@ -241,7 +241,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-DRIVER_INIT_MEMBER( ts816_state, ts816 )
+void ts816_state::init_ts816()
 {
 	uint8_t *roms = memregion("roms")->base();
 	uint8_t *rams = memregion("rams")->base();

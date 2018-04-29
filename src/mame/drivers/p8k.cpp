@@ -93,7 +93,7 @@ public:
 
 	DECLARE_READ8_MEMBER(p8k_port0_r);
 	DECLARE_WRITE8_MEMBER(p8k_port0_w);
-	DECLARE_DRIVER_INIT(p8k);
+	void init_p8k();
 	DECLARE_MACHINE_RESET(p8k);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
@@ -293,7 +293,7 @@ MACHINE_RESET_MEMBER(p8k_state,p8k)
 	membank("bank15")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(p8k_state,p8k)
+void p8k_state::init_p8k()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);

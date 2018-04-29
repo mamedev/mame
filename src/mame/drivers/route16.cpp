@@ -606,7 +606,7 @@ MACHINE_START_MEMBER(route16_state, ttmahjng)
 	save_item(NAME(m_ttmahjng_port_select));
 }
 
-DRIVER_INIT_MEMBER(route16_state, route16)
+void route16_state::init_route16()
 {
 	save_item(NAME(m_protection_data));
 }

@@ -189,7 +189,7 @@ public:
 		, m_lamp(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(m3hprvpr);
+	void init_m3hprvpr();
 	void mpu3base(machine_config &config);
 
 protected:
@@ -918,7 +918,7 @@ static const mpu3_chr_table hprvpr_data[64] = {
 {0x0d, 0x04},{0x1f, 0xc0},{0x16, 0xc8},{0x05, 0x78},{0x13, 0xd4},{0x1c, 0x0c},{0x02, 0x74},{0x00, 0x00},
 };
 
-DRIVER_INIT_MEMBER(mpu3_state,m3hprvpr)
+void mpu3_state::init_m3hprvpr()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

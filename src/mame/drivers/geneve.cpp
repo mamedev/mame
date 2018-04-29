@@ -271,7 +271,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ext_ready );
 	DECLARE_WRITE_LINE_MEMBER( mapper_ready );
 
-	DECLARE_DRIVER_INIT(geneve);
+	void init_geneve();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -655,7 +655,7 @@ WRITE_LINE_MEMBER( geneve_state::dbin_line )
 	m_mapper->dbin_in(state);
 }
 
-DRIVER_INIT_MEMBER(geneve_state,geneve)
+void geneve_state::init_geneve()
 {
 }
 

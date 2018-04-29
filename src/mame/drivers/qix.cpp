@@ -1374,12 +1374,9 @@ int qix_state::kram3_decrypt(int address, int value)
 	return ((bits2 & 0xe) << 4) | ((bits1 & 0x8) << 1) | ((bits2 & 0x1) << 3) | ((bits1 & 0x7) << 0);
 }
 
-DRIVER_INIT_MEMBER(qix_state,kram3)
+void qix_state::init_kram3()
 {
 	//const uint8_t *patch;
-	uint8_t *rom, *decrypted;
-	int i;
-
 	assert(m_bank0);
 	assert(m_bank1);
 
@@ -1397,13 +1394,12 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 
 	 ********************************/
 
-	i = 0;
 	//patch = memregion("user1")->base();
-	rom = memregion("maincpu")->base();
-	decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
-	for (i = 0xa000; i < 0x10000; ++i)
+	for (int i = 0xa000; i < 0x10000; ++i)
 	{
 		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
@@ -1412,13 +1408,12 @@ DRIVER_INIT_MEMBER(qix_state,kram3)
 	m_bank0->configure_entry(1, decrypted);
 	m_bank0->set_entry(0);
 
-	i = 0;
 	//patch = memregion("user2")->base();
 	rom = memregion("videocpu")->base();
 	decrypted = auto_alloc_array(machine(), uint8_t, 0x6000);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
-	for (i = 0xa000; i < 0x10000; ++i)
+	for (int i = 0xa000; i < 0x10000; ++i)
 	{
 		decrypted[i-0xa000] = kram3_decrypt(i, rom[i]);
 	}
@@ -1439,7 +1434,7 @@ WRITE_LINE_MEMBER(qix_state::kram3_lic_videocpu_changed)
 }
 
 
-DRIVER_INIT_MEMBER(qix_state,zookeep)
+void qix_state::init_zookeep()
 {
 	/* configure the banking */
 	membank("bank1")->configure_entry(0, memregion("videocpu")->base() + 0xa000);
@@ -1448,7 +1443,7 @@ DRIVER_INIT_MEMBER(qix_state,zookeep)
 }
 
 
-DRIVER_INIT_MEMBER(qix_state,slither)
+void qix_state::init_slither()
 {
 }
 

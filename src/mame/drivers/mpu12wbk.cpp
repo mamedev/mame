@@ -232,7 +232,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(mpu12wbk_videoram_w);
 	DECLARE_WRITE8_MEMBER(mpu12wbk_colorram_w);
-	DECLARE_DRIVER_INIT(mpu12wbk);
+	void init_mpu12wbk();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mpu12wbk);
@@ -553,7 +553,7 @@ ROM_END
 *      Driver Init      *
 ************************/
 
-DRIVER_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
+void mpu12wbk_state::init_mpu12wbk()
 {
 	// just in case...
 }

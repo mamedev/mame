@@ -117,7 +117,7 @@ public:
 	void pc9821(machine_config &config);
 	void pc9801rs(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
-	DECLARE_DRIVER_INIT(pc9801_kanji);
+	void init_pc9801_kanji();
 
 protected:
 	virtual void video_start() override;

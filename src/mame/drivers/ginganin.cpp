@@ -364,12 +364,10 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(ginganin_state,ginganin)
+void ginganin_state::init_ginganin()
 {
-	uint16_t *rom;
-
 	/* main cpu patches */
-	rom = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	/* avoid writes to rom getting to the log */
 	rom[0x408 / 2] = 0x6000;
 	rom[0x40a / 2] = 0x001c;

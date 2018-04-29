@@ -6929,7 +6929,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(pacman_state,maketrax)
+void pacman_state::init_maketrax()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5004, 0x5004, write8_delegate(FUNC(pacman_state::maketrax_protection_w),this));
@@ -6941,13 +6941,13 @@ DRIVER_INIT_MEMBER(pacman_state,maketrax)
 	save_item(NAME(m_maketrax_counter));
 }
 
-DRIVER_INIT_MEMBER(pacman_state,mbrush)
+void pacman_state::init_mbrush()
 {
 	/* set up protection handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5080, 0x50ff, read8_delegate(FUNC(pacman_state::mbrush_prot_r),this));
 }
 
-DRIVER_INIT_MEMBER(pacman_state,ponpoko)
+void pacman_state::init_ponpoko()
 {
 	/* The gfx data is swapped wrt the other Pac-Man hardware games. */
 	/* Here we revert it to the usual format. */
@@ -6999,16 +6999,13 @@ void pacman_state::eyes_decode(uint8_t *data)
 	}
 }
 
-DRIVER_INIT_MEMBER(pacman_state,eyes)
+void pacman_state::init_eyes()
 {
-	int i, len;
-	uint8_t *RAM;
-
 	/* CPU ROMs */
 
 	/* Data lines D3 and D5 swapped */
-	RAM = memregion("maincpu")->base();
-	for (i = 0; i < 0x4000; i++)
+	uint8_t *RAM = memregion("maincpu")->base();
+	for (int i = 0; i < 0x4000; i++)
 	{
 		RAM[i] = bitswap<8>(RAM[i],7,6,3,4,5,2,1,0);
 	}
@@ -7018,8 +7015,8 @@ DRIVER_INIT_MEMBER(pacman_state,eyes)
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
 	RAM = memregion("gfx1")->base();
-	len = memregion("gfx1")->bytes();
-	for (i = 0;i < len;i += 8)
+	int len = memregion("gfx1")->bytes();
+	for (int i = 0; i < len; i += 8)
 		eyes_decode(&RAM[i]);
 }
 
@@ -7082,35 +7079,32 @@ void pacman_state::mspacman_install_patches(uint8_t *ROM)
 	}
 }
 
-DRIVER_INIT_MEMBER(pacman_state,mspacman)
+void pacman_state::init_mspacman()
 {
-	int i;
-	uint8_t *ROM, *DROM;
-
 	/* CPU ROMs */
 
 	/* Pac-Man code is in low bank */
-	ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* decrypted Ms. Pac-Man code is in high bank */
-	DROM = &memregion("maincpu")->base()[0x10000];
+	uint8_t *DROM = &memregion("maincpu")->base()[0x10000];
 
 	/* copy ROMs into decrypted bank */
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 	{
 		DROM[0x0000+i] = ROM[0x0000+i]; /* pacman.6e */
 		DROM[0x1000+i] = ROM[0x1000+i]; /* pacman.6f */
 		DROM[0x2000+i] = ROM[0x2000+i]; /* pacman.6h */
 		DROM[0x3000+i] = bitswap<8>(ROM[0xb000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u7 */
 	}
-	for (i = 0; i < 0x800; i++)
+	for (int i = 0; i < 0x800; i++)
 	{
 		DROM[0x8000+i] = bitswap<8>(ROM[0x8000+BITSWAP11(i,   8,7,5,9,10,6,3,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt u5 */
 		DROM[0x8800+i] = bitswap<8>(ROM[0x9800+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
 		DROM[0x9000+i] = bitswap<8>(ROM[0x9000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);  /* decrypt half of u6 */
 		DROM[0x9800+i] = ROM[0x1800+i];     /* mirror of pacman.6f high */
 	}
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 	{
 		DROM[0xa000+i] = ROM[0x2000+i];     /* mirror of pacman.6h */
 		DROM[0xb000+i] = ROM[0x3000+i];     /* mirror of pacman.6j */
@@ -7119,7 +7113,7 @@ DRIVER_INIT_MEMBER(pacman_state,mspacman)
 	mspacman_install_patches(DROM);
 
 	/* mirror Pac-Man ROMs into upper addresses of normal bank */
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 	{
 		ROM[0x8000+i] = ROM[0x0000+i];
 		ROM[0x9000+i] = ROM[0x1000+i];
@@ -7132,36 +7126,33 @@ DRIVER_INIT_MEMBER(pacman_state,mspacman)
 	membank("bank1")->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER(pacman_state, mschamp)
+void pacman_state::init_mschamp()
 {
 	save_item(NAME(m_counter));
 }
 
-DRIVER_INIT_MEMBER(pacman_state,woodpek)
+void pacman_state::init_woodpek()
 {
-	int i, len;
-	uint8_t *RAM;
-
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
-	RAM = memregion("gfx1")->base();
-	len = memregion("gfx1")->bytes();
-	for (i = 0;i < len;i += 8)
+	uint8_t *RAM = memregion("gfx1")->base();
+	int len = memregion("gfx1")->bytes();
+	for (int i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,pacplus)
+void pacman_state::init_pacplus()
 {
 	pacplus_decode();
 }
 
-DRIVER_INIT_MEMBER(pacman_state,jumpshot)
+void pacman_state::init_jumpshot()
 {
 	jumpshot_decode();
 }
 
-DRIVER_INIT_MEMBER(pacman_state,drivfrcp)
+void pacman_state::init_drivfrcp()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0 * 0x2000]);
@@ -7170,13 +7161,11 @@ DRIVER_INIT_MEMBER(pacman_state,drivfrcp)
 	membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,8bpm)
+void pacman_state::init_8bpm()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
-
 	/* Data lines D0 and D6 swapped */
-	for( i = 0; i < 0x8000; i++ )
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int i = 0; i < 0x8000; i++)
 	{
 		ROM[i] = bitswap<8>(ROM[i],7,0,5,4,3,2,1,6);
 	}
@@ -7187,13 +7176,11 @@ DRIVER_INIT_MEMBER(pacman_state,8bpm)
 	membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,porky)
+void pacman_state::init_porky()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
-
 	/* Data lines D0 and D4 swapped */
-	for(i = 0; i < 0x10000; i++)
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int i = 0; i < 0x10000; i++)
 	{
 		ROM[i] = bitswap<8>(ROM[i],7,6,5,0,3,2,1,4);
 	}
@@ -7209,7 +7196,7 @@ DRIVER_INIT_MEMBER(pacman_state,porky)
 	membank("bank4")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
+void pacman_state::init_rocktrv2()
 {
 	/* hack to pass the rom check for the bad rom */
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -7223,20 +7210,17 @@ DRIVER_INIT_MEMBER(pacman_state,rocktrv2)
 /* The encryption is provided by a 74298 sitting on top of the rom at 6f.
 The select line is tied to a2; a0 and a1 of the eprom are are left out of
 socket and run through the 74298.  Clock is tied to system clock.  */
-DRIVER_INIT_MEMBER(pacman_state,mspacmbe)
+void pacman_state::init_mspacmbe()
 {
-	uint8_t temp;
-	uint8_t *RAM = memregion("maincpu")->base();
-	int i;
-
 	/* Address lines A1 and A0 swapped if A2=0 */
-	for(i = 0x1000; i < 0x2000; i+=4)
+	uint8_t *RAM = memregion("maincpu")->base();
+	for (int i = 0x1000; i < 0x2000; i += 4)
 	{
 		if (!(i & 8))
 		{
-				temp = RAM[i+1];
-				RAM[i+1] = RAM[i+2];
-				RAM[i+2] = temp;
+			uint8_t temp = RAM[i+1];
+			RAM[i+1] = RAM[i+2];
+			RAM[i+2] = temp;
 		};
 	}
 }
@@ -7248,13 +7232,13 @@ READ8_MEMBER(pacman_state::mspacii_protection_r)
 	return (data & 0xef) | (offset << 4 & 0x10);
 }
 
-DRIVER_INIT_MEMBER(pacman_state,mspacii)
+void pacman_state::init_mspacii()
 {
 	// protection
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x504d, 0x506f, read8_delegate(FUNC(pacman_state::mspacii_protection_r), this));
 }
 
-DRIVER_INIT_MEMBER(pacman_state,superabc)
+void pacman_state::init_superabc()
 {
 	uint8_t *src = memregion("user1")->base();
 	uint8_t *dest = memregion("gfx1")->base();
@@ -7308,7 +7292,7 @@ READ8_MEMBER(pacman_state::cannonbp_protection_r)
 }
 
 
-DRIVER_INIT_MEMBER(pacman_state,cannonbp)
+void pacman_state::init_cannonbp()
 {
 	/* extra memory */
 	m_maincpu->space(AS_PROGRAM).install_ram(0x4800, 0x4bff);

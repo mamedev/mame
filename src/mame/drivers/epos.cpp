@@ -737,25 +737,24 @@ ROM_START( beastf )
 	ROM_LOAD( "beastf.nv", 0, 0x1000, CRC(98017b09) SHA1(0e2b2071bb47fc179d5bc36ef9431a9d2727d36a) )
 ROM_END
 
-DRIVER_INIT_MEMBER(epos_state,dealer)
+void epos_state::init_dealer()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int A;
 
 	/* Key 0 */
-	for (A = 0; A < 0x8000; A++)
+	for (int A = 0; A < 0x8000; A++)
 		rom[A] = bitswap<8>(rom[A] ^ 0xbd, 2,6,4,0,5,7,1,3 );
 
 	/* Key 1 */
-	for (A = 0; A < 0x8000; A++)
+	for (int A = 0; A < 0x8000; A++)
 		rom[A + 0x10000] = bitswap<8>(rom[A], 7,5,4,6,3,2,1,0 );
 
 	/* Key 2 */
-	for (A = 0; A < 0x8000; A++)
+	for (int A = 0; A < 0x8000; A++)
 		rom[A + 0x20000] = bitswap<8>(rom[A] ^ 1, 7,6,5,4,3,0,2,1 );
 
 	/* Key 3 */
-	for (A = 0; A < 0x8000; A++)
+	for (int A = 0; A < 0x8000; A++)
 		rom[A + 0x30000] = bitswap<8>(rom[A] ^ 1, 7,5,4,6,3,0,2,1 );
 
 	/*

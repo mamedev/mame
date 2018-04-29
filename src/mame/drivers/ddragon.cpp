@@ -2087,7 +2087,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon)
+void ddragon_state::init_ddragon()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_ym_irq = M6809_FIRQ_LINE;
@@ -2095,7 +2095,7 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon)
 }
 
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
+void ddragon_state::init_ddragon2()
 {
 	m_sprite_irq = INPUT_LINE_NMI;
 	m_ym_irq = 0;
@@ -2103,7 +2103,7 @@ DRIVER_INIT_MEMBER(ddragon_state,ddragon2)
 }
 
 
-DRIVER_INIT_MEMBER(darktowr_state, darktowr)
+void darktowr_state::init_darktowr()
 {
 	save_item(NAME(m_mcu_port_a_out));
 
@@ -2115,37 +2115,34 @@ DRIVER_INIT_MEMBER(darktowr_state, darktowr)
 }
 
 
-DRIVER_INIT_MEMBER(toffy_state, toffy)
+void toffy_state::init_toffy()
 {
-	int i, length;
-	uint8_t *rom;
-
 	m_ym_irq = M6809_FIRQ_LINE;
 	m_technos_video_hw = 0;
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3808, 0x3808, write8_delegate(FUNC(toffy_state::toffy_bankswitch_w), this));
 
 	/* the program rom has a simple bitswap encryption */
-	rom = memregion("maincpu")->base();
-	length = memregion("maincpu")->bytes();
-	for (i = 0; i < length; i++)
+	uint8_t *rom = memregion("maincpu")->base();
+	int length = memregion("maincpu")->bytes();
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
 	rom = memregion("gfx1")->base();
 	length = memregion("gfx1")->bytes();
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
 	rom = memregion("gfx2")->base();
 	length = memregion("gfx2")->bytes();
-	for (i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 		rom[i] = bitswap<8>(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
 	rom = memregion("gfx3")->base();
 	length = memregion("gfx3")->bytes();
-	for (i = 0; i < length / 2; i++)
+	for (int i = 0; i < length / 2; i++)
 	{
 		rom[i + 0*length/2] = bitswap<8>(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
 		rom[i + 1*length/2] = bitswap<8>(rom[i + 1*length/2], 7,6,2,4,3,5,1,0);
@@ -2154,17 +2151,14 @@ DRIVER_INIT_MEMBER(toffy_state, toffy)
 	/* should the sound rom be bitswapped too? */
 }
 
-DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
+void ddragon_state::init_ddragon6809()
 {
-	int i;
-	uint8_t *dst,*src;
+	uint8_t *src = memregion("chars")->base();
+	uint8_t *dst = memregion("gfx1")->base();
 
-	src = memregion("chars")->base();
-	dst = memregion("gfx1")->base();
-
-	for (i = 0; i < 0x8000; i++)
+	for (int i = 0; i < 0x8000; i++)
 	{
-		switch(i & 0x18)
+		switch (i & 0x18)
 		{
 			case 0x00: dst[i] = src[(i & ~0x18) | 0x18]; break;
 			case 0x08: dst[i] = src[(i & ~0x18) | 0x00]; break;

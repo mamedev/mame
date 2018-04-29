@@ -107,7 +107,7 @@ public:
 	pangofun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	DECLARE_DRIVER_INIT(pangofun);
+	void init_pangofun();
 	virtual void machine_start() override;
 	void pangofun(machine_config &config);
 	void pcat_io(address_map &map);
@@ -224,7 +224,7 @@ ROM_START(pangofun)
 					/*bank8.u19 , NOT POPULATED */
 ROM_END
 
-DRIVER_INIT_MEMBER(pangofun_state,pangofun)
+void pangofun_state::init_pangofun()
 {
 }
 

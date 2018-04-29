@@ -346,16 +346,12 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(carpolo_state,carpolo)
+void carpolo_state::init_carpolo()
 {
-	size_t i, len;
-	uint8_t *ROM;
-
-
 	/* invert gfx PROM since the bits are active LO */
-	ROM = memregion("gfx2")->base();
-	len = memregion("gfx2")->bytes();
-	for (i = 0;i < len; i++)
+	uint8_t *ROM = memregion("gfx2")->base();
+	size_t len = memregion("gfx2")->bytes();
+	for (size_t i = 0; i < len; i++)
 		ROM[i] ^= 0x0f;
 }
 

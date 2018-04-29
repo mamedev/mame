@@ -34,7 +34,7 @@ public:
 
 	void eolith16(machine_config &config);
 
-	DECLARE_DRIVER_INIT(eolith16);
+	void init_eolith16();
 
 protected:
 	virtual void video_start() override;
@@ -244,7 +244,7 @@ ROM_START( klondkp )
 	ROM_LOAD( "kd.u28", 0x000000, 0x080000, CRC(c12112a1) SHA1(729bbaca6db933a730099a4a560a10ed99cae1c3) )
 ROM_END
 
-DRIVER_INIT_MEMBER(eolith16_state,eolith16)
+void eolith16_state::init_eolith16()
 {
 	init_speedup();
 }

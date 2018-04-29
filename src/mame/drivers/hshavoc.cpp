@@ -111,7 +111,7 @@ ROM_START( hshavoc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
+void md_boot_state::init_hshavoc()
 {
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
@@ -127,7 +127,6 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 	   code in RAM.. but as of yet we can't know */
 
 	int rom_size = 0xe8000;
-
 	for (int x = 0; x < rom_size / 2; x++)
 	{
 		src[x] = bitswap<16>(src[x],
@@ -216,7 +215,7 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 		space.nop_write(0x200000, 0x201fff);
 	}
 
-	DRIVER_INIT_CALL(megadriv);
+	init_megadriv();
 
 	m_vdp->stop_timers();
 }

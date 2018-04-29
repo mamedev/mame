@@ -157,9 +157,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ts2068_port_ff_w);
 	DECLARE_WRITE8_MEMBER(tc2048_port_ff_w);
 
-	DECLARE_DRIVER_INIT(spectrum);
-	DECLARE_DRIVER_INIT(plus2);
-	DECLARE_DRIVER_INIT(plus3);
+	void init_spectrum();
+	void init_plus2();
+	void init_plus3();
 	DECLARE_MACHINE_RESET(spectrum);
 	DECLARE_VIDEO_START(spectrum);
 	DECLARE_PALETTE_INIT(spectrum);

@@ -595,7 +595,7 @@ ROM_START( blktigerb3 )
 	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
 ROM_END
 
-DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
+void blktiger_state::init_blktigerb3()
 {
 	uint8_t *src = memregion("audiocpu")->base();
 	int len = 0x8000;
@@ -603,9 +603,7 @@ DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 
 	for (int i = 0; i < len; i++)
 	{
-		int addr;
-
-		addr = bitswap<16>(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
+		int addr = bitswap<16>(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
 		buffer[i] = src[addr];
 
 	}

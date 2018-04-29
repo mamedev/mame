@@ -3631,7 +3631,7 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(dec8_state,dec8)
+void dec8_state::init_dec8()
 {
 	if (m_mainbank.found())
 	{
@@ -3642,11 +3642,11 @@ DRIVER_INIT_MEMBER(dec8_state,dec8)
 	m_latch = 0;
 }
 
-DRIVER_INIT_MEMBER(dec8_state,csilver)
+void dec8_state::init_csilver()
 {
 	uint8_t *RAM = memregion("audiocpu")->base();
 	m_soundbank->configure_entries(0, 2, &RAM[0], 0x4000);
-	DRIVER_INIT_CALL(dec8);
+	init_dec8();
 }
 
 

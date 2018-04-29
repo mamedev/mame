@@ -102,7 +102,7 @@ public:
 		m_ports(*this, "IN%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(a51site4);
+	void init_a51site4();
 	void mediagx(machine_config &config);
 
 protected:
@@ -1005,7 +1005,7 @@ static const speedup_entry a51site4_speedups[] =
 
 #endif
 
-DRIVER_INIT_MEMBER(mediagx_state,a51site4)
+void mediagx_state::init_a51site4()
 {
 	init_mediagx();
 

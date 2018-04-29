@@ -672,11 +672,10 @@ ROM_END
 
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(arcadia_state,arcadia)
+void arcadia_state::init_arcadia()
 {
-	int i;
 	uint8_t *gfx=memregion("gfx1")->base();
-	for (i=0; i<256; i++) gfx[i]=i;
+	for (int i = 0; i < 256; i++) gfx[i]=i;
 #if 0
 	// this is here to allow developement of some simple testroutines
 	// for a real console
@@ -795,12 +794,11 @@ DRIVER_INIT_MEMBER(arcadia_state,arcadia)
 		// bxa causes trap
 		};
 #if 1
-		FILE *f;
-		f=fopen("chartest.bin","wb");
+		FILE *f = fopen("chartest.bin","wb");
 		fwrite(prog, ARRAY_LENGTH(prog), sizeof(prog[0]), f);
 		fclose(f);
 #endif
-		for (i=0; i<ARRAY_LENGTH(prog); i++) rom[i]=prog[i];
+		for (int i = 0; i < ARRAY_LENGTH(prog); i++) rom[i] = prog[i];
 
 	}
 #endif

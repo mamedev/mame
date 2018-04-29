@@ -1722,7 +1722,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(astrocde_state,seawolf2)
+void astrocde_state::init_seawolf2()
 {
 	m_video_config = 0x00;
 	m_maincpu->space(AS_IO).install_write_handler(0x40, 0x40, 0, 0xff18, 0, write8_delegate(FUNC(astrocde_state::seawolf2_sound_1_w), this));
@@ -1731,7 +1731,7 @@ DRIVER_INIT_MEMBER(astrocde_state,seawolf2)
 }
 
 
-DRIVER_INIT_MEMBER(astrocde_state,ebases)
+void astrocde_state::init_ebases()
 {
 	m_video_config = AC_SOUND_PRESENT | AC_MONITOR_BW;
 	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x20, 0, 0xff07, 0, write8_delegate(FUNC(astrocde_state::ebases_coin_w), this));
@@ -1739,14 +1739,14 @@ DRIVER_INIT_MEMBER(astrocde_state,ebases)
 }
 
 
-DRIVER_INIT_MEMBER(astrocde_state,spacezap)
+void astrocde_state::init_spacezap()
 {
 	m_video_config = AC_SOUND_PRESENT | AC_MONITOR_BW;
 	m_maincpu->space(AS_IO).install_read_handler(0x13, 0x13, 0, 0xfc00, 0x0300, read8_delegate(FUNC(astrocde_state::spacezap_io_r), this));
 }
 
 
-DRIVER_INIT_MEMBER(astrocde_state,wow)
+void astrocde_state::init_wow()
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
 	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0, 0xf000, 0x0f00, read8_delegate(FUNC(astrocde_state::wow_io_r), this));
@@ -1754,7 +1754,7 @@ DRIVER_INIT_MEMBER(astrocde_state,wow)
 }
 
 
-DRIVER_INIT_MEMBER(astrocde_state,gorf)
+void astrocde_state::init_gorf()
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
 	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0, 0xf000, 0x0f00, read8_delegate(FUNC(astrocde_state::gorf_io_1_r), this));
@@ -1763,14 +1763,14 @@ DRIVER_INIT_MEMBER(astrocde_state,gorf)
 }
 
 
-DRIVER_INIT_MEMBER(astrocde_state,robby)
+void astrocde_state::init_robby()
 {
 	m_video_config = AC_SOUND_PRESENT;
 	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0, 0xf000, 0x0f00, read8_delegate(FUNC(astrocde_state::robby_io_r), this));
 }
 
 
-DRIVER_INIT_MEMBER(astrocde_state,profpac)
+void astrocde_state::init_profpac()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1784,7 +1784,7 @@ DRIVER_INIT_MEMBER(astrocde_state,profpac)
 }
 
 
-DRIVER_INIT_MEMBER(astrocde_state,demndrgn)
+void astrocde_state::init_demndrgn()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 
@@ -1800,7 +1800,7 @@ DRIVER_INIT_MEMBER(astrocde_state,demndrgn)
 }
 
 
-DRIVER_INIT_MEMBER(astrocde_state,tenpindx)
+void astrocde_state::init_tenpindx()
 {
 	m_video_config = 0x00;
 

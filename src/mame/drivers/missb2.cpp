@@ -39,7 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(missb2_oki_w);
 	DECLARE_READ8_MEMBER(missb2_oki_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_DRIVER_INIT(missb2);
+	void init_missb2();
 	DECLARE_MACHINE_START(missb2);
 	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -607,7 +607,7 @@ void missb2_state::configure_banks()
 	membank("bank3")->configure_entries(0, 7, &SUBCPU[0x9000], 0x1000);
 }
 
-DRIVER_INIT_MEMBER(missb2_state,missb2)
+void missb2_state::init_missb2()
 {
 	configure_banks();
 	m_video_enable = 0;

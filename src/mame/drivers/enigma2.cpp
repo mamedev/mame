@@ -98,7 +98,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_WRITE8_MEMBER(protection_data_w);
-	DECLARE_DRIVER_INIT(enigma2);
+	void init_enigma2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -703,12 +703,10 @@ ROM_START( enigma2b )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(enigma2_state,enigma2)
+void enigma2_state::init_enigma2()
 {
-	offs_t i;
 	uint8_t *rom = memregion("audiocpu")->base();
-
-	for(i = 0; i < 0x2000; i++)
+	for (offs_t i = 0; i < 0x2000; i++)
 	{
 		rom[i] = bitswap<8>(rom[i],4,5,6,0,7,1,3,2);
 	}

@@ -1322,26 +1322,26 @@ public:
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_a_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
-	DECLARE_DRIVER_INIT(vkdlswwh);
-	DECLARE_DRIVER_INIT(icp1db);
-	DECLARE_DRIVER_INIT(flcnw);
-	DECLARE_DRIVER_INIT(vkdlswwp);
-	DECLARE_DRIVER_INIT(vkdlsww);
-	DECLARE_DRIVER_INIT(vkdlsb);
-	DECLARE_DRIVER_INIT(vkdlsc);
-	DECLARE_DRIVER_INIT(vkdlswwl);
-	DECLARE_DRIVER_INIT(vkdlswwu);
-	DECLARE_DRIVER_INIT(vkdlswwo);
-	DECLARE_DRIVER_INIT(vkdlswwa);
-	DECLARE_DRIVER_INIT(vkdlsa);
-	DECLARE_DRIVER_INIT(vkdlswwt);
-	DECLARE_DRIVER_INIT(vkdlswwd);
-	DECLARE_DRIVER_INIT(wstrike);
-	DECLARE_DRIVER_INIT(vkdlswws);
-	DECLARE_DRIVER_INIT(vkdlswwc);
-	DECLARE_DRIVER_INIT(vkdlswwr);
-	DECLARE_DRIVER_INIT(vkdlswwv);
-	DECLARE_DRIVER_INIT(bchancep);
+	void init_vkdlswwh();
+	void init_icp1db();
+	void init_flcnw();
+	void init_vkdlswwp();
+	void init_vkdlsww();
+	void init_vkdlsb();
+	void init_vkdlsc();
+	void init_vkdlswwl();
+	void init_vkdlswwu();
+	void init_vkdlswwo();
+	void init_vkdlswwa();
+	void init_vkdlsa();
+	void init_vkdlswwt();
+	void init_vkdlswwd();
+	void init_wstrike();
+	void init_vkdlswws();
+	void init_vkdlswwc();
+	void init_vkdlswwr();
+	void init_vkdlswwv();
+	void init_bchancep();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
 	virtual void video_start() override;
@@ -11082,16 +11082,15 @@ ROM_END
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
+void goldnpkr_state::init_flcnw()
 {
 	/* Attempt to decrypt the MCU program (we're sooo close!) */
 
 	uint8_t *ROM = memregion("mcu")->base();
 	int size = memregion("mcu")->bytes();
 	int start = 0x0000;
-	int i;
 
-	for (i = start; i < size; i++)
+	for (int i = start; i < size; i++)
 	{
 		ROM[i] = ROM[i] ^ 0xa0;
 		ROM[i] = bitswap<8>(ROM[i], 7, 6, 3, 4, 5, 2, 1, 0);
@@ -11099,7 +11098,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
 }
 
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsa)
+void goldnpkr_state::init_vkdlsa()
 {
 	/* $e097-e098, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11111,7 +11110,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsa)
 	ROM[0xe098] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsb)
+void goldnpkr_state::init_vkdlsb()
 {
 	/* $e87b-e87c, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11123,7 +11122,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsb)
 	ROM[0xe87c] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsc)
+void goldnpkr_state::init_vkdlsc()
 {
 	/* $453a-453b, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11135,7 +11134,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsc)
 	ROM[0x453b] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsww)
+void goldnpkr_state::init_vkdlsww()
 {
 	/* $f2c9-f2ca, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11147,7 +11146,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsww)
 	ROM[0xf2ca] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwa)
+void goldnpkr_state::init_vkdlswwa()
 {
 	/* $df80-df81, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11159,7 +11158,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwa)
 	ROM[0xdf81] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwc)
+void goldnpkr_state::init_vkdlswwc()
 {
 	/* $e42f-e430, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11171,7 +11170,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwc)
 	ROM[0xe430] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwd)
+void goldnpkr_state::init_vkdlswwd()
 {
 	/* $e442-e443, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11183,7 +11182,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwd)
 	ROM[0xe443] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwh)
+void goldnpkr_state::init_vkdlswwh()
 {
 	/* $e4d5-e4d6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11195,7 +11194,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwh)
 	ROM[0xe4d6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwl)
+void goldnpkr_state::init_vkdlswwl()
 {
 	/* $e87c-e87d, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11207,7 +11206,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwl)
 	ROM[0xe87d] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwo)
+void goldnpkr_state::init_vkdlswwo()
 {
 	/* $e7d5-e7d6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11219,7 +11218,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwo)
 	ROM[0xe7d6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwp)
+void goldnpkr_state::init_vkdlswwp()
 {
 	/* $e7d9-e7da, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11231,7 +11230,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwp)
 	ROM[0xe7da] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwr)
+void goldnpkr_state::init_vkdlswwr()
 {
 	/* $e7f7-e7f8, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11243,7 +11242,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwr)
 	ROM[0xe7f8] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswws)
+void goldnpkr_state::init_vkdlswws()
 {
 	/* $e8a5-e8a6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11255,7 +11254,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswws)
 	ROM[0xe8a6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwt)
+void goldnpkr_state::init_vkdlswwt()
 {
 	/* $e955-e956, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11267,7 +11266,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwt)
 	ROM[0xe956] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwu)
+void goldnpkr_state::init_vkdlswwu()
 {
 	/* $ee6b-ee6c, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11279,7 +11278,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwu)
 	ROM[0xee6c] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwv)
+void goldnpkr_state::init_vkdlswwv()
 {
 	/* $f052-f053, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -11329,10 +11328,9 @@ DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwv)
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
+void goldnpkr_state::init_icp1db()
 {
 /*
-    int i;
     uint8_t *ROM = memregion("maincpu")->base();
 
     unsigned char rawData[256] = {
@@ -11354,7 +11352,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
         0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xBC, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8, 0xB8,
     };
 
-    for (i = 0; i < 0x10000; i++)
+    for (int i = 0; i < 0x10000; i++)
     {
         ROM[i] = ROM[i] ^ rawData[i & 0xff];
     }
@@ -11400,7 +11398,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state, wstrike)
+void goldnpkr_state::init_wstrike()
 {
 	/* NOPing the BNE --> $F2EA (KILL)
 	   after compare with a string inside the Dallas TK RAM
@@ -11413,16 +11411,15 @@ DRIVER_INIT_MEMBER(goldnpkr_state, wstrike)
 }
 
 
-DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
+void goldnpkr_state::init_bchancep()
 {
 	/* Attempt to invert the color data from the bipolar PROM */
 
 	uint8_t *ROM = memregion("proms")->base();
 	int size = memregion("proms")->bytes();
 	int start = 0x0000;
-	int i;
 
-	for (i = start; i < size; i++)
+	for (int i = start; i < size; i++)
 	{
 		ROM[i] = ROM[i] ^ 0x0f;
 	}

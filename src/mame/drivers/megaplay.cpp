@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(game_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
 
-	DECLARE_DRIVER_INIT(megaplay);
+	void init_megaplay();
 	DECLARE_VIDEO_START(megplay);
 	DECLARE_MACHINE_RESET(megaplay);
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -909,7 +909,7 @@ WRITE16_MEMBER(mplay_state::extra_ram_w )
 }
 
 
-DRIVER_INIT_MEMBER(mplay_state,megaplay)
+void mplay_state::init_megaplay()
 {
 	// copy game instruction rom to main map. maybe this should just be accessed
 	// through a handler instead?
@@ -928,7 +928,7 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 	m_ic36_ram = std::make_unique<uint16_t[]>(0x10000 / 2);
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
-	DRIVER_INIT_CALL(megadrij);
+	init_megadrij();
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
 

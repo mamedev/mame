@@ -1539,13 +1539,13 @@ ROM_START( survival )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(phoenix_state, coindsw)
+void phoenix_state::init_coindsw()
 {
 	/* additional inputs for coinage */
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x5000, 0x5000, "DSW1");
 }
 
-DRIVER_INIT_MEMBER(phoenix_state, oneprom)
+void phoenix_state::init_oneprom()
 {
 	uint8_t *rgn = memregion("proms")->base();
 
@@ -1557,11 +1557,11 @@ DRIVER_INIT_MEMBER(phoenix_state, oneprom)
 	}
 }
 
-DRIVER_INIT_MEMBER(phoenix_state, oneprom_coindsw)
+void phoenix_state::init_oneprom_coindsw()
 {
-	DRIVER_INIT_CALL(coindsw);
+	init_coindsw();
 
-	DRIVER_INIT_CALL(oneprom);
+	init_oneprom();
 }
 
 

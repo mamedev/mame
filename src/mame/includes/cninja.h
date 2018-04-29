@@ -78,8 +78,8 @@ public:
 	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
-	DECLARE_DRIVER_INIT(mutantf);
-	DECLARE_DRIVER_INIT(cninjabl2);
+	void init_mutantf();
+	void init_cninjabl2();
 	DECLARE_MACHINE_START(robocop2);
 	DECLARE_MACHINE_RESET(robocop2);
 	DECLARE_VIDEO_START(stoneage);

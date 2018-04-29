@@ -2340,45 +2340,45 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(segas24_state,qgh)
+void segas24_state::init_qgh()
 {
 	mlatch_table = segas24_state::qgh_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclub)
+void segas24_state::init_dcclub()
 {
 	mlatch_table = segas24_state::dcclub_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qrouka)
+void segas24_state::init_qrouka()
 {
 	mlatch_table = segas24_state::qrouka_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,quizmeku)
+void segas24_state::init_quizmeku()
 {
 	mlatch_table = segas24_state::quizmeku_mlt;
 	track_size = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn)
+void segas24_state::init_mahmajn()
 {
 	mlatch_table = segas24_state::mahmajn_mlt;
 	track_size = 0;
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,mahmajn2)
+void segas24_state::init_mahmajn2()
 {
 	mlatch_table = segas24_state::mahmajn2_mlt;
 	track_size = 0;
 	cur_input_line = 0;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,hotrod)
+void segas24_state::init_hotrod()
 {
 	mlatch_table = nullptr;
 
@@ -2393,7 +2393,7 @@ DRIVER_INIT_MEMBER(segas24_state,hotrod)
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,bnzabros)
+void segas24_state::init_bnzabros()
 {
 	mlatch_table = segas24_state::bnzabros_mlt;
 
@@ -2409,38 +2409,38 @@ DRIVER_INIT_MEMBER(segas24_state,bnzabros)
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspirits)
+void segas24_state::init_sspirits()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,sspiritj)
+void segas24_state::init_sspiritj()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2f00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,dcclubfd)
+void segas24_state::init_dcclubfd()
 {
 	mlatch_table = segas24_state::dcclub_mlt;
 	track_size = 0x2d00;
 }
 
 
-DRIVER_INIT_MEMBER(segas24_state,sgmast)
+void segas24_state::init_sgmast()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,qsww)
+void segas24_state::init_qsww()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,gground)
+void segas24_state::init_gground()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
@@ -2448,13 +2448,13 @@ DRIVER_INIT_MEMBER(segas24_state,gground)
 	m_gground_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas24_state::gground_hack_timer_callback), this));
 }
 
-DRIVER_INIT_MEMBER(segas24_state,crkdown)
+void segas24_state::init_crkdown()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
 }
 
-DRIVER_INIT_MEMBER(segas24_state,roughrac)
+void segas24_state::init_roughrac()
 {
 	mlatch_table = nullptr;
 	track_size = 0x2d00;

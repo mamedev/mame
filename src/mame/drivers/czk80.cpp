@@ -61,7 +61,7 @@ public:
 		, m_fdc(*this, "fdc")
 	{ }
 
-	DECLARE_DRIVER_INIT(czk80);
+	void init_czk80();
 	DECLARE_MACHINE_RESET(czk80);
 	TIMER_CALLBACK_MEMBER(czk80_reset);
 	DECLARE_READ8_MEMBER(port80_r);
@@ -170,7 +170,7 @@ MACHINE_RESET_MEMBER( czk80_state, czk80 )
 	membank("bankw1")->set_entry(0); // always write to ram
 }
 
-DRIVER_INIT_MEMBER( czk80_state, czk80 )
+void czk80_state::init_czk80()
 {
 	uint8_t *main = memregion("maincpu")->base();
 

@@ -436,7 +436,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(blockout_state,agress)
+void blockout_state::init_agress()
 {
 	/*
 	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it

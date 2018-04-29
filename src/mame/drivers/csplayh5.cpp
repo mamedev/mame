@@ -74,28 +74,28 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	#endif
 
-	DECLARE_DRIVER_INIT(csplayh1);
+	void init_csplayh1();
 
-	DECLARE_DRIVER_INIT(aimode);
-	DECLARE_DRIVER_INIT(bikiniko);
-	DECLARE_DRIVER_INIT(csplayh5);
-	DECLARE_DRIVER_INIT(csplayh6);
-	DECLARE_DRIVER_INIT(csplayh7);
-	DECLARE_DRIVER_INIT(fuudol);
-	DECLARE_DRIVER_INIT(junai);
-	DECLARE_DRIVER_INIT(junai2);
-	DECLARE_DRIVER_INIT(konhaji);
-	DECLARE_DRIVER_INIT(mjgalpri);
-	DECLARE_DRIVER_INIT(mjmania);
-	DECLARE_DRIVER_INIT(mogitate);
-	DECLARE_DRIVER_INIT(nichisel);
-	DECLARE_DRIVER_INIT(nuretemi);
-	DECLARE_DRIVER_INIT(pokoachu);
-	DECLARE_DRIVER_INIT(renaimj);
-	DECLARE_DRIVER_INIT(sengomjk);
-	DECLARE_DRIVER_INIT(thenanpa);
-	DECLARE_DRIVER_INIT(torarech);
-	DECLARE_DRIVER_INIT(tsuwaku);
+	void init_aimode();
+	void init_bikiniko();
+	void init_csplayh5();
+	void init_csplayh6();
+	void init_csplayh7();
+	void init_fuudol();
+	void init_junai();
+	void init_junai2();
+	void init_konhaji();
+	void init_mjgalpri();
+	void init_mjmania();
+	void init_mogitate();
+	void init_nichisel();
+	void init_nuretemi();
+	void init_pokoachu();
+	void init_renaimj();
+	void init_sengomjk();
+	void init_thenanpa();
+	void init_torarech();
+	void init_tsuwaku();
 
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
@@ -417,28 +417,28 @@ void csplayh5_state::general_init(int patchaddress, int patchvalue)
 
 }
 
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh1)  { general_init(0x6880/2, 0x6020); }
+void csplayh5_state::init_csplayh1()  { general_init(0x6880/2, 0x6020); }
 
-DRIVER_INIT_MEMBER(csplayh5_state,aimode)    { general_init(0x9cda/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,bikiniko)  { general_init(0x585c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh5)  { general_init(0x4cb4/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh6)  { general_init(0x5976/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,csplayh7)  { general_init(0x7a20/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,fuudol)    { general_init(0x9166/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,junai)     { general_init(0x679c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,junai2)    { general_init(0x6588/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,konhaji)   { general_init(0x9200/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,mjgalpri)  { general_init(0x5396/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,mjmania)   { general_init(0x6b96/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,mogitate)  { general_init(0x6ab4/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,nichisel)  { general_init(0x9cd6/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,nuretemi)  { general_init(0x8de2/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,pokoachu)  { general_init(0x7b1e/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,renaimj)   { general_init(0x568c/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,sengomjk)  { general_init(0x5226/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,torarech)  { general_init(0x9384/2, 0x6018); }
-DRIVER_INIT_MEMBER(csplayh5_state,tsuwaku)   { general_init(0x856e/2, 0x6018); }
+void csplayh5_state::init_aimode()    { general_init(0x9cda/2, 0x6018); }
+void csplayh5_state::init_bikiniko()  { general_init(0x585c/2, 0x6018); }
+void csplayh5_state::init_csplayh5()  { general_init(0x4cb4/2, 0x6018); }
+void csplayh5_state::init_csplayh6()  { general_init(0x5976/2, 0x6018); }
+void csplayh5_state::init_csplayh7()  { general_init(0x7a20/2, 0x6018); }
+void csplayh5_state::init_fuudol()    { general_init(0x9166/2, 0x6018); }
+void csplayh5_state::init_junai()     { general_init(0x679c/2, 0x6018); }
+void csplayh5_state::init_junai2()    { general_init(0x6588/2, 0x6018); }
+void csplayh5_state::init_konhaji()   { general_init(0x9200/2, 0x6018); }
+void csplayh5_state::init_mjgalpri()  { general_init(0x5396/2, 0x6018); }
+void csplayh5_state::init_mjmania()   { general_init(0x6b96/2, 0x6018); }
+void csplayh5_state::init_mogitate()  { general_init(0x6ab4/2, 0x6018); }
+void csplayh5_state::init_nichisel()  { general_init(0x9cd6/2, 0x6018); }
+void csplayh5_state::init_nuretemi()  { general_init(0x8de2/2, 0x6018); }
+void csplayh5_state::init_pokoachu()  { general_init(0x7b1e/2, 0x6018); }
+void csplayh5_state::init_renaimj()   { general_init(0x568c/2, 0x6018); }
+void csplayh5_state::init_sengomjk()  { general_init(0x5226/2, 0x6018); }
+void csplayh5_state::init_thenanpa()  { general_init(0x69ec/2, 0x6018); }
+void csplayh5_state::init_torarech()  { general_init(0x9384/2, 0x6018); }
+void csplayh5_state::init_tsuwaku()   { general_init(0x856e/2, 0x6018); }
 
 
 /*

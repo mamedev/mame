@@ -203,7 +203,7 @@ public:
 	DECLARE_WRITE16_MEMBER( vram_w );
 
 	DECLARE_MACHINE_START(nevada);
-	DECLARE_DRIVER_INIT(nevada);
+	void init_nevada();
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -663,7 +663,7 @@ ROM_END
 /*************************
 *      Driver Init       *
 *************************/
-DRIVER_INIT_MEMBER(nevada_state,nevada)
+void nevada_state::init_nevada()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 

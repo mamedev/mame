@@ -2286,7 +2286,7 @@ ROM_END
 
 /**********************************************************************************/
 
-DRIVER_INIT_MEMBER(cninja_state,cninjabl2)
+void cninja_state::init_cninjabl2()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16_delegate(FUNC(cninja_state::cninjabl2_sprite_dma_r),this));
@@ -2294,7 +2294,7 @@ DRIVER_INIT_MEMBER(cninja_state,cninjabl2)
 	m_okibank->configure_entries(0, 8, memregion("oki2")->base(), 0x10000);
 }
 
-DRIVER_INIT_MEMBER(cninja_state,mutantf)
+void cninja_state::init_mutantf()
 {
 	const uint8_t *src = memregion("gfx2")->base();
 	uint8_t *dst = memregion("gfx1")->base();

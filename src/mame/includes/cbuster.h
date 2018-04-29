@@ -49,7 +49,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(twocrude_control_w);
 	DECLARE_READ16_MEMBER(twocrude_control_r);
-	DECLARE_DRIVER_INIT(twocrude);
+	void init_twocrude();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

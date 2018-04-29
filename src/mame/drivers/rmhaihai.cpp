@@ -48,7 +48,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram") { }
 
-	DECLARE_DRIVER_INIT(rmhaihai);
+	void init_rmhaihai();
 	void rmhaihai(machine_config &config);
 
 protected:
@@ -738,21 +738,17 @@ ROM_START( themj )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
+void rmhaihai_state::init_rmhaihai()
 {
-	uint8_t *rom = memregion("gfx1")->base();
-	int size = memregion("gfx1")->bytes();
-	int a,b;
-
-	size /= 2;
-	rom += size;
+	int size = memregion("gfx1")->bytes() / 2;
+	uint8_t *rom = memregion("gfx1")->base() + size;
 
 	/* unpack the high bit of gfx */
-	for (b = size - 0x4000;b >= 0;b -= 0x4000)
+	for (int b = size - 0x4000; b >= 0; b -= 0x4000)
 	{
-		if (b) memcpy(rom + b,rom + b/2,0x2000);
+		if (b) memcpy(rom + b, rom + b/2, 0x2000);
 
-		for (a = 0;a < 0x2000;a++)
+		for (int a = 0; a < 0x2000;a++)
 		{
 			rom[a + b + 0x2000] = rom[a + b] >> 4;
 		}

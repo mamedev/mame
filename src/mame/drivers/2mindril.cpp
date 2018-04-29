@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sensors_w);
 	DECLARE_READ16_MEMBER(drill_irq_r);
 	DECLARE_WRITE16_MEMBER(drill_irq_w);
-	DECLARE_DRIVER_INIT(drill);
+	void init_drill();
 	DECLARE_MACHINE_START(drill);
 	DECLARE_MACHINE_RESET(drill);
 	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
@@ -472,9 +472,9 @@ void _2mindril_state::tile_decode()
 	}
 }
 
-DRIVER_INIT_MEMBER(_2mindril_state,drill)
+void _2mindril_state::init_drill()
 {
-	m_f3_game=TMDRILL;
+	m_f3_game = TMDRILL;
 	tile_decode();
 }
 

@@ -111,7 +111,7 @@ public:
 	DECLARE_READ8_MEMBER(sexpert_input1_r);
 	DECLARE_READ8_MEMBER(sexpert_input2_r);
 	DECLARE_MACHINE_RESET(sexpert);
-	DECLARE_DRIVER_INIT(sexpert);
+	void init_sexpert();
 	DECLARE_INPUT_CHANGED_MEMBER(sexpert_cpu_freq);
 	void sexpert_map(address_map &map);
 	void sexpert_set_cpu_freq();
@@ -458,7 +458,7 @@ MACHINE_RESET_MEMBER(novag6502_state, sexpert)
 	membank("bank1")->set_entry(0);
 }
 
-DRIVER_INIT_MEMBER(novag6502_state, sexpert)
+void novag6502_state::init_sexpert()
 {
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x8000, 0x8000);
 }

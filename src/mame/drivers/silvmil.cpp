@@ -123,7 +123,7 @@ public:
 	}
 
 
-	DECLARE_DRIVER_INIT(silvmil);
+	void init_silvmil();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
@@ -597,7 +597,7 @@ void silvmil_state::tumblepb_gfx1_rearrange()
 	}
 }
 
-DRIVER_INIT_MEMBER(silvmil_state,silvmil)
+void silvmil_state::init_silvmil()
 {
 	tumblepb_gfx1_rearrange();
 }

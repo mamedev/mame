@@ -587,14 +587,12 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(cbuster_state,twocrude)
+void cbuster_state::init_twocrude()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	uint8_t *PTR;
-	int i, j;
 
 	/* Main cpu decrypt */
-	for (i = 0x00000; i < 0x80000; i += 2)
+	for (int i = 0x00000; i < 0x80000; i += 2)
 	{
 		int h = i + NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = i + NATIVE_ENDIAN_VALUE_LE_BE(0,1);
 
@@ -607,10 +605,10 @@ DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 
 	/* Rearrange the 'extra' sprite bank to be in the same format as main sprites */
 	RAM = memregion("gfx3")->base() + 0x080000;
-	PTR = memregion("gfx3")->base() + 0x140000;
-	for (i = 0; i < 0x20000; i += 64)
+	uint8_t *PTR = memregion("gfx3")->base() + 0x140000;
+	for (int i = 0; i < 0x20000; i += 64)
 	{
-		for (j = 0; j < 16; j += 1)
+		for (int j = 0; j < 16; j += 1)
 		{ /* Copy 16 lines down */
 			RAM[i +       0 + j * 2] = PTR[i / 2 +       0 + j]; /* Pixels 0-7 for each plane */
 			RAM[i +       1 + j * 2] = PTR[i / 2 + 0x10000 + j];
@@ -618,7 +616,7 @@ DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 			RAM[i + 0xa0001 + j * 2] = PTR[i / 2 + 0x30000 + j];
 		}
 
-		for (j = 0; j < 16; j += 1)
+		for (int j = 0; j < 16; j += 1)
 		{ /* Copy 16 lines down */
 			RAM[i +    0x20 + j * 2] = PTR[i / 2 +    0x10 + j]; /* Pixels 8-15 for each plane */
 			RAM[i +    0x21 + j * 2] = PTR[i / 2 + 0x10010 + j];

@@ -525,19 +525,16 @@ ROM_START( metrocrsa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(baraduke_state,baraduke)
+void baraduke_state::init_baraduke()
 {
-	uint8_t *rom;
-	int i;
-
 	/* unpack the third tile ROM */
-	rom = memregion("gfx2")->base() + 0x8000;
-	for (i = 0x2000;i < 0x4000;i++)
+	uint8_t *rom = memregion("gfx2")->base() + 0x8000;
+	for (int i = 0x2000; i < 0x4000; i++)
 	{
 		rom[i + 0x2000] = rom[i];
 		rom[i + 0x4000] = rom[i] << 4;
 	}
-	for (i = 0;i < 0x2000;i++)
+	for (int i = 0; i < 0x2000; i++)
 	{
 		rom[i + 0x2000] = rom[i] << 4;
 	}

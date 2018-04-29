@@ -57,15 +57,13 @@ void nbmj8991_state::machine_reset()
 	}
 }
 
-DRIVER_INIT_MEMBER(nbmj8991_state,finalbny)
+void nbmj8991_state::init_finalbny()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
-
-	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
+	for (int i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
 }
 
-DRIVER_INIT_MEMBER(nbmj8991_state,galkaika)
+void nbmj8991_state::init_galkaika()
 {
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -75,7 +73,7 @@ DRIVER_INIT_MEMBER(nbmj8991_state,galkaika)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8991_state,tokyogal)
+void nbmj8991_state::init_tokyogal()
 {
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -85,7 +83,7 @@ DRIVER_INIT_MEMBER(nbmj8991_state,tokyogal)
 #endif
 }
 
-DRIVER_INIT_MEMBER(nbmj8991_state,tokimbsj)
+void nbmj8991_state::init_tokimbsj()
 {
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();

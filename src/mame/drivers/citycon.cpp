@@ -320,10 +320,9 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(citycon_state,citycon)
+void citycon_state::init_citycon()
 {
 	uint8_t *rom = memregion("gfx1")->base();
-	int i;
 
 	/*
 	  City Connection controls the text color code for each _scanline_, not
@@ -331,14 +330,12 @@ DRIVER_INIT_MEMBER(citycon_state,citycon)
 	  I convert the 2bpp char data into 5bpp, and create a virtual palette so
 	  characters can still be drawn in one pass.
 	  */
-	for (i = 0x0fff; i >= 0; i--)
+	for (int i = 0x0fff; i >= 0; i--)
 	{
-		int mask;
-
 		rom[3 * i] = rom[i];
 		rom[3 * i + 1] = 0;
 		rom[3 * i + 2] = 0;
-		mask = rom[i] | (rom[i] << 4) | (rom[i] >> 4);
+		int mask = rom[i] | (rom[i] << 4) | (rom[i] >> 4);
 		if (i & 0x01) rom[3 * i + 1] |= mask & 0xf0;
 		if (i & 0x02) rom[3 * i + 1] |= mask & 0x0f;
 		if (i & 0x04) rom[3 * i + 2] |= mask & 0xf0;

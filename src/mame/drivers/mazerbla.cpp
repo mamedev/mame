@@ -171,8 +171,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
 	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
 	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
-	DECLARE_DRIVER_INIT(mazerbla);
-	DECLARE_DRIVER_INIT(greatgun);
+	void init_mazerbla();
+	void init_greatgun();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -1173,12 +1173,12 @@ ROM_START( greatgun )
 //  ROM20.10g, ROM21.10f, ROM22.10d and ROM23.10c are unpopulated.
 ROM_END
 
-DRIVER_INIT_MEMBER(mazerbla_state,mazerbla)
+void mazerbla_state::init_mazerbla()
 {
 //  m_game_id = MAZERBLA;
 }
 
-DRIVER_INIT_MEMBER(mazerbla_state,greatgun)
+void mazerbla_state::init_greatgun()
 {
 	uint8_t *rom = memregion("sub2")->base();
 

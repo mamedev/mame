@@ -800,13 +800,13 @@ void namcofl_state::common_init()
 	save_item(NAME(m_sprbank));
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,speedrcr)
+void namcofl_state::init_speedrcr()
 {
 	common_init();
 	m_gametype = NAMCOFL_SPEED_RACER;
 }
 
-DRIVER_INIT_MEMBER(namcofl_state,finalapr)
+void namcofl_state::init_finalapr()
 {
 	common_init();
 	m_gametype = NAMCOFL_FINAL_LAP_R;

@@ -28,7 +28,7 @@ public:
 		m_gsp_vram(*this, "gsp_vram")
 	{ }
 
-	DECLARE_DRIVER_INIT(metalmx);
+	void init_metalmx();
 	void metalmx(machine_config &config);
 
 protected:

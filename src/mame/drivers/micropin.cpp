@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p50a_w);
 	DECLARE_WRITE8_MEMBER(p50b_w);
 	DECLARE_WRITE8_MEMBER(p51a_w);
-	DECLARE_DRIVER_INIT(micropin);
+	void init_micropin();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 	void pentacup2(machine_config &config);
 	void micropin(machine_config &config);
@@ -291,7 +291,7 @@ void micropin_state::machine_reset()
 		m_led_time[i] = 5;
 }
 
-DRIVER_INIT_MEMBER( micropin_state, micropin )
+void micropin_state::init_micropin()
 {
 }
 

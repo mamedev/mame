@@ -162,12 +162,12 @@ READ8_MEMBER(shangkid_state::soundlatch_r)
 
 /***************************************************************************************/
 
-DRIVER_INIT_MEMBER(shangkid_state,dynamski)
+void shangkid_state::init_dynamski()
 {
 	save_item(NAME(m_int_enable[0]));
 }
 
-DRIVER_INIT_MEMBER(shangkid_state,chinhero)
+void shangkid_state::init_chinhero()
 {
 	m_gfx_type = 0;
 
@@ -176,7 +176,7 @@ DRIVER_INIT_MEMBER(shangkid_state,chinhero)
 	save_item(NAME(m_nmi_enable));
 }
 
-DRIVER_INIT_MEMBER(shangkid_state,shangkid)
+void shangkid_state::init_shangkid()
 {
 	m_gfx_type = 1;
 

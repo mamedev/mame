@@ -64,7 +64,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_DRIVER_INIT(chinsan);
+	void init_chinsan();
 
 	void chinsan(machine_config &config);
 	void mayumi(machine_config &config);
@@ -493,7 +493,7 @@ void chinsan_state::machine_reset()
 	m_trigger = 0;
 }
 
-DRIVER_INIT_MEMBER( chinsan_state, chinsan )
+void chinsan_state::init_chinsan()
 {
 	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
 	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x18000);

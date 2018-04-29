@@ -1507,13 +1507,13 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(jack_state,jack)
+void jack_state::init_jack()
 {
 	m_timer_rate = 256;
 }
 
 
-DRIVER_INIT_MEMBER(jack_state,zzyzzyxx)
+void jack_state::init_zzyzzyxx()
 {
 	m_timer_rate = 32;
 }
@@ -1558,14 +1558,14 @@ void jack_state::treahunt_decode(  )
 	}
 }
 
-DRIVER_INIT_MEMBER(jack_state,treahunt)
+void jack_state::init_treahunt()
 {
 	m_timer_rate = 256;
 	treahunt_decode();
 }
 
 
-DRIVER_INIT_MEMBER(jack_state,loverboy)
+void jack_state::init_loverboy()
 {
 	/* this doesn't make sense.. the startup code, and irq0 have jumps to 0..
 	   I replace the startup jump with another jump to what appears to be
@@ -1586,17 +1586,15 @@ DRIVER_INIT_MEMBER(jack_state,loverboy)
 }
 
 
-DRIVER_INIT_MEMBER(jack_state,striv)
+void jack_state::init_striv()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	uint8_t data;
-	int A;
 
 	/* decrypt program rom */
 	/* thanks to David Widel to have helped with the decryption */
-	for (A = 0; A < 0x4000; A++)
+	for (int A = 0; A < 0x4000; A++)
 	{
-		data = ROM[A];
+		uint8_t data = ROM[A];
 
 		if (A & 0x1000)
 		{

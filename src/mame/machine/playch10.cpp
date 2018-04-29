@@ -375,7 +375,7 @@ void playch10_state::set_videoram_bank( int first, int count, int bank, int size
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(playch10_state,playch10)
+void playch10_state::init_playch10()
 {
 	m_vram = nullptr;
 
@@ -394,10 +394,10 @@ DRIVER_INIT_MEMBER(playch10_state,playch10)
 
 /* Gun games */
 
-DRIVER_INIT_MEMBER(playch10_state,pc_gun)
+void playch10_state::init_pc_gun()
 {
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
 	m_vram = nullptr;
@@ -409,10 +409,10 @@ DRIVER_INIT_MEMBER(playch10_state,pc_gun)
 
 /* Horizontal mirroring */
 
-DRIVER_INIT_MEMBER(playch10_state,pc_hrz)
+void playch10_state::init_pc_hrz()
 {
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 
 	/* setup mirroring */
 	m_mirroring = PPU_MIRROR_HORZ;
@@ -545,13 +545,13 @@ WRITE8_MEMBER(playch10_state::aboard_vrom_switch_w)
 	pc10_set_videorom_bank(0, 8, (data & 3), 8);
 }
 
-DRIVER_INIT_MEMBER(playch10_state,pcaboard)
+void playch10_state::init_pcaboard()
 {
 	/* switches vrom with writes to the $803e-$8041 area */
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0x8fff, write8_delegate(FUNC(playch10_state::aboard_vrom_switch_w),this));
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 
 	/* set the mirroring here */
 	m_mirroring = PPU_MIRROR_VERT;
@@ -571,7 +571,7 @@ WRITE8_MEMBER(playch10_state::bboard_rom_switch_w)
 	memcpy(&prg[0x08000], &prg[bankoffset], 0x4000);
 }
 
-DRIVER_INIT_MEMBER(playch10_state,pcbboard)
+void playch10_state::init_pcbboard()
 {
 	uint8_t *prg = memregion("cart")->base();
 
@@ -583,7 +583,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcbboard)
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::bboard_rom_switch_w),this));
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 
 	/* allocate vram */
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
@@ -602,7 +602,7 @@ WRITE8_MEMBER(playch10_state::cboard_vrom_switch_w)
 	pc10_set_videorom_bank(0, 8, ((data >> 1) & 1), 8);
 }
 
-DRIVER_INIT_MEMBER(playch10_state,pccboard)
+void playch10_state::init_pccboard()
 {
 	/* switches vrom with writes to $6000 */
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(playch10_state::cboard_vrom_switch_w),this));
@@ -611,13 +611,13 @@ DRIVER_INIT_MEMBER(playch10_state,pccboard)
 	m_vram = nullptr;
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 }
 
 /**********************************************************************************/
 /* D Board games (Rad Racer) */
 
-DRIVER_INIT_MEMBER(playch10_state,pcdboard)
+void playch10_state::init_pcdboard()
 {
 	uint8_t *prg = memregion("cart")->base();
 
@@ -632,7 +632,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcdboard)
 
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 	/* allocate vram */
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
 	/* special init */
@@ -641,13 +641,13 @@ DRIVER_INIT_MEMBER(playch10_state,pcdboard)
 
 /* D Board games with extra ram (Metroid) */
 
-DRIVER_INIT_MEMBER(playch10_state,pcdboard_2)
+void playch10_state::init_pcdboard_2()
 {
 	/* extra ram at $6000-$7fff */
 	machine().device("cart")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x7fff);
 
 	/* common init */
-	DRIVER_INIT_CALL(pcdboard);
+	init_pcdboard();
 
 	/* allocate vram */
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
@@ -727,7 +727,7 @@ WRITE8_MEMBER(playch10_state::eboard_rom_switch_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(playch10_state,pceboard)
+void playch10_state::init_pceboard()
 {
 	uint8_t *prg = memregion("cart")->base();
 
@@ -748,13 +748,13 @@ DRIVER_INIT_MEMBER(playch10_state,pceboard)
 	machine().device("cart")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x6fff);
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 }
 
 /**********************************************************************************/
 /* F Board games (Ninja Gaiden, Double Dragon) */
 
-DRIVER_INIT_MEMBER(playch10_state,pcfboard)
+void playch10_state::init_pcfboard()
 {
 	uint8_t *prg = memregion("cart")->base();
 	uint32_t len = memregion("cart")->bytes();
@@ -772,12 +772,12 @@ DRIVER_INIT_MEMBER(playch10_state,pcfboard)
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),this));
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 }
 
 /* F Board games with extra ram (Baseball Stars) */
 
-DRIVER_INIT_MEMBER(playch10_state,pcfboard_2)
+void playch10_state::init_pcfboard_2()
 {
 	/* extra ram at $6000-$6fff */
 	machine().device("cart")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x6fff);
@@ -785,7 +785,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcfboard_2)
 	m_vram = nullptr;
 
 	/* common init */
-	DRIVER_INIT_CALL(pcfboard);
+	init_pcfboard();
 }
 
 /**********************************************************************************/
@@ -942,7 +942,7 @@ WRITE8_MEMBER(playch10_state::gboard_rom_switch_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(playch10_state,pcgboard)
+void playch10_state::init_pcgboard()
 {
 	uint8_t *prg = memregion("cart")->base();
 	m_vram = nullptr;
@@ -967,16 +967,16 @@ DRIVER_INIT_MEMBER(playch10_state,pcgboard)
 	m_IRQ_count = m_IRQ_count_latch = 0;
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 
 	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
 }
 
-DRIVER_INIT_MEMBER(playch10_state,pcgboard_type2)
+void playch10_state::init_pcgboard_type2()
 {
 	m_vram = nullptr;
 	/* common init */
-	DRIVER_INIT_CALL(pcgboard);
+	init_pcgboard();
 
 	/* enable 4 screen mirror */
 	m_gboard_4screen = 1;
@@ -998,7 +998,7 @@ WRITE8_MEMBER(playch10_state::iboard_rom_switch_w)
 	memcpy(&prg[0x08000], &prg[bank * 0x8000 + 0x10000], 0x8000);
 }
 
-DRIVER_INIT_MEMBER(playch10_state,pciboard)
+void playch10_state::init_pciboard()
 {
 	uint8_t *prg = memregion("cart")->base();
 
@@ -1010,7 +1010,7 @@ DRIVER_INIT_MEMBER(playch10_state,pciboard)
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::iboard_rom_switch_w),this));
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 
 	/* allocate vram */
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
@@ -1067,7 +1067,7 @@ WRITE8_MEMBER(playch10_state::hboard_rom_switch_w)
 }
 
 
-DRIVER_INIT_MEMBER(playch10_state,pchboard)
+void playch10_state::init_pchboard()
 {
 	uint8_t *prg = memregion("cart")->base();
 	memcpy(&prg[0x08000], &prg[0x4c000], 0x4000);
@@ -1087,7 +1087,7 @@ DRIVER_INIT_MEMBER(playch10_state,pchboard)
 	m_gboard_command = 0;
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 
 	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
 }
@@ -1095,7 +1095,7 @@ DRIVER_INIT_MEMBER(playch10_state,pchboard)
 /**********************************************************************************/
 /* K Board games (Mario Open Golf) */
 
-DRIVER_INIT_MEMBER(playch10_state,pckboard)
+void playch10_state::init_pckboard()
 {
 	uint8_t *prg = memregion("cart")->base();
 
@@ -1112,7 +1112,7 @@ DRIVER_INIT_MEMBER(playch10_state,pckboard)
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),this));
 
 	/* common init */
-	DRIVER_INIT_CALL(playch10);
+	init_playch10();
 
 	/* allocate vram */
 	m_vram = std::make_unique<uint8_t[]>(0x2000);

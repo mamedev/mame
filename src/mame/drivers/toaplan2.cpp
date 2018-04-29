@@ -441,19 +441,19 @@ MACHINE_RESET_MEMBER(toaplan2_state,ghox)
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,dogyuun)
+void toaplan2_state::init_dogyuun()
 {
 	m_v25_reset_line = 0x20;
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,fixeight)
+void toaplan2_state::init_fixeight()
 {
 	m_v25_reset_line = 0x08;
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,fixeightbl)
+void toaplan2_state::init_fixeightbl()
 {
 	uint8_t *ROM = memregion("oki")->base();
 
@@ -461,13 +461,13 @@ DRIVER_INIT_MEMBER(toaplan2_state,fixeightbl)
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,vfive)
+void toaplan2_state::init_vfive()
 {
 	m_v25_reset_line = 0x10;
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
+void toaplan2_state::init_pipibibsbl()
 {
 	uint16_t *ROM = (uint16_t *)(memregion("maincpu")->base());
 
@@ -481,7 +481,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
+void toaplan2_state::init_bgaregga()
 {
 	uint8_t *Z80 = memregion("audiocpu")->base();
 
@@ -490,7 +490,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,batrider)
+void toaplan2_state::init_batrider()
 {
 	uint8_t *Z80 = memregion("audiocpu")->base();
 
@@ -499,12 +499,12 @@ DRIVER_INIT_MEMBER(toaplan2_state,batrider)
 }
 
 
-DRIVER_INIT_MEMBER(toaplan2_state,bbakraid)
+void toaplan2_state::init_bbakraid()
 {
 	m_sndirq_line = 2;
 }
 
-DRIVER_INIT_MEMBER(toaplan2_state,enmadaio)
+void toaplan2_state::init_enmadaio()
 {
 	uint8_t *ROM = memregion("oki")->base();
 

@@ -86,10 +86,10 @@ public:
 	DECLARE_READ8_MEMBER(macs_input_r);
 	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
 	DECLARE_WRITE8_MEMBER(macs_output_w);
-	DECLARE_DRIVER_INIT(macs);
-	DECLARE_DRIVER_INIT(kisekaeh);
-	DECLARE_DRIVER_INIT(kisekaem);
-	DECLARE_DRIVER_INIT(macs2);
+	void init_macs();
+	void init_kisekaeh();
+	void init_kisekaem();
+	void init_macs2();
 	DECLARE_MACHINE_RESET(macs);
 	DECLARE_MACHINE_START(macs);
 	ST0016_DMA_OFFS_CB(dma_offset);
@@ -748,28 +748,28 @@ MACHINE_RESET_MEMBER(macs_state,macs)
 }
 
 
-DRIVER_INIT_MEMBER(macs_state,macs)
+void macs_state::init_macs()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 1;
 }
 
-DRIVER_INIT_MEMBER(macs_state,macs2)
+void macs_state::init_macs2()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((10 | 0x80));
 	m_rev = 2;
 }
 
-DRIVER_INIT_MEMBER(macs_state,kisekaeh)
+void macs_state::init_kisekaeh()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((11 | 0x180));
 	m_rev = 1;
 }
 
-DRIVER_INIT_MEMBER(macs_state,kisekaem)
+void macs_state::init_kisekaem()
 {
 	m_ram1=std::make_unique<uint8_t[]>(0x20000);
 	m_maincpu->set_st0016_game_flag((10 | 0x180));

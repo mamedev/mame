@@ -22,7 +22,7 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 public:
-	DECLARE_DRIVER_INIT(alvg);
+	void init_alvg();
 };
 
 
@@ -40,7 +40,7 @@ void alvg_state::machine_reset()
 {
 }
 
-DRIVER_INIT_MEMBER(alvg_state,alvg)
+void alvg_state::init_alvg()
 {
 }
 

@@ -175,9 +175,9 @@ ROM_START( rad_ssoc )
 	ROM_LOAD( "sensiblesoccer.bin", 0x000000, 0x400000,  CRC(b8745ab3) SHA1(0ab3f26e5ffd288e5a3a5db676951b9095299eb0) ) // should be byteswapped?
 ROM_END
 
-DRIVER_INIT_MEMBER(megadriv_radica_state,megadriv_radica_6button_pal)
+void megadriv_radica_state::init_megadriv_radica_6button_pal()
 {
-	DRIVER_INIT_CALL(megadrie);
+	init_megadrie();
 	// 6 button game, so overwrite 3 button io handlers
 	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_6button),this);
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_6button),this);

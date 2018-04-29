@@ -64,7 +64,7 @@ public:
 	{ }
 
 	DECLARE_PALETTE_INIT(mrgame);
-	DECLARE_DRIVER_INIT(mrgame);
+	void init_mrgame();
 	DECLARE_WRITE8_MEMBER(ack1_w);
 	DECLARE_WRITE8_MEMBER(ack2_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
@@ -333,7 +333,7 @@ void mrgame_state::machine_reset()
 	m_row_data = 0;
 }
 
-DRIVER_INIT_MEMBER( mrgame_state, mrgame )
+void mrgame_state::init_mrgame()
 {
 }
 

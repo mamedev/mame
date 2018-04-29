@@ -1383,12 +1383,10 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
+void ampoker2_state::init_rabbitpk()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
-	int start = 0;
-	int i;
 
 	uint8_t dec_base[32] =
 	{
@@ -1398,13 +1396,13 @@ DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
 		0x02, 0x41, 0x47, 0x04, 0xc1, 0x82, 0x84, 0xc7
 	};
 
-	for (i = start; i < size; i++)
+	for (int i = 0; i < size; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
 	}
 }
 
-DRIVER_INIT_MEMBER(ampoker2_state, piccolop)
+void ampoker2_state::init_piccolop()
 {
 /*
   The protection is based on a stuck bit at RAM offset $C416.

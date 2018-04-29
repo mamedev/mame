@@ -76,7 +76,7 @@ public:
 		m_rombank(*this, "rombank")
 	{ }
 
-	DECLARE_DRIVER_INIT(virus);
+	void init_virus();
 	void virus(machine_config &config);
 
 protected:

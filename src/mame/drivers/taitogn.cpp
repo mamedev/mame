@@ -394,7 +394,7 @@ public:
 	DECLARE_READ8_MEMBER(coin_r);
 	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
 	DECLARE_READ32_MEMBER(zsg2_ext_r);
-	DECLARE_DRIVER_INIT(coh3002t_nz);
+	void init_coh3002t_nz();
 
 	void coh3002t_t2_mp(machine_config &config);
 	void coh3002t(machine_config &config);
@@ -630,7 +630,7 @@ void taitogn_state::machine_reset()
 	m_flashbank->set_bank(m_jp1->read() << 1);
 }
 
-DRIVER_INIT_MEMBER(taitogn_state,coh3002t_nz)
+void taitogn_state::init_coh3002t_nz()
 {
 	m_has_zoom = false;
 }

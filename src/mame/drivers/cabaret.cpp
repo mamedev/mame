@@ -60,7 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi2_b_w);
 	DECLARE_WRITE8_MEMBER(ppi2_c_w);
 	void show_out();
-	DECLARE_DRIVER_INIT(cabaret);
+	void init_cabaret();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_reset() override;
@@ -400,13 +400,12 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(cabaret_state,cabaret)
+void cabaret_state::init_cabaret()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
 
 	/* decrypt the program ROM */
-	for (i = 0;i < 0xf000;i++)
+	for (int i = 0; i < 0xf000; i++)
 	{
 		if ((i & 0x2206) == 0x2002) rom[i] ^= 0x01;
 	}

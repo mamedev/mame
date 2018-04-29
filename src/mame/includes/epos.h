@@ -35,7 +35,7 @@ public:
 	DECLARE_READ8_MEMBER(ay_porta_mpx_r);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(dealer_pal_w);
-	DECLARE_DRIVER_INIT(dealer);
+	void init_dealer();
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(epos);
 	DECLARE_MACHINE_START(dealer);

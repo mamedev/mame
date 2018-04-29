@@ -93,7 +93,7 @@ public:
 
 	required_ioport_array<8> m_kbdio;
 
-	DECLARE_DRIVER_INIT(poisk1);
+	void init_poisk1();
 	DECLARE_MACHINE_START(poisk1);
 	DECLARE_MACHINE_RESET(poisk1);
 
@@ -594,7 +594,7 @@ WRITE8_MEMBER(p1_state::p1_ppi_w)
  *
  **********************************************************/
 
-DRIVER_INIT_MEMBER(p1_state, poisk1)
+void p1_state::init_poisk1()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

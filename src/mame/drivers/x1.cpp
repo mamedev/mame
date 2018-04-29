@@ -2391,21 +2391,20 @@ ROM_END
 
 
 /* Convert the ROM interleaving into something usable by the write handlers */
-DRIVER_INIT_MEMBER(x1_state,x1_kanji)
+void x1_state::init_x1_kanji()
 {
-	uint32_t i,j,k,l;
 	uint8_t *kanji = memregion("kanji")->base();
 	uint8_t *raw_kanji = memregion("raw_kanji")->base();
 
-	k = 0;
-	for(l=0;l<2;l++)
+	uint32_t k = 0;
+	for (uint32_t l=0; l < 2; l++)
 	{
-		for(j=l*16;j<(l*16)+0x10000;j+=32)
+		for (uint32_t j = l*16; j < (l*16) + 0x10000; j += 32)
 		{
-			for(i=0;i<16;i++)
+			for (uint32_t i = 0; i  < 16; i++)
 			{
-				kanji[j+i] = raw_kanji[k];
-				kanji[j+i+0x10000] = raw_kanji[0x10000+k];
+				kanji[j + i] = raw_kanji[k];
+				kanji[j + i + 0x10000] = raw_kanji[0x10000 + k];
 				k++;
 			}
 		}
