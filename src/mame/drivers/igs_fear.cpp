@@ -15,11 +15,12 @@ class igs_fear_state : public driver_device
 {
 public:
 	igs_fear_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
-
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+	{
+	}
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_DRIVER_INIT(igs_fear);
@@ -98,7 +99,7 @@ MACHINE_CONFIG_START(igs_fear_state::igs_fear)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_ICS2115_ADD("ics", 0)
+	MCFG_ICS2115_ADD("ics", 33.8688_MHz_XTAL) // Unknown clock
 	MCFG_ICS2115_IRQ_CB(WRITELINE(igs_fear_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 

@@ -18,10 +18,19 @@
 DEFINE_DEVICE_TYPE(ICS2115, ics2115_device, "ics2115", "ICS2115")
 
 ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ICS2115, tag, owner, clock),
-		device_sound_interface(mconfig, *this), m_stream(nullptr),
-		m_rom(*this, DEVICE_SELF),
-		m_irq_cb(*this), m_active_osc(0), m_osc_select(0), m_reg_select(0), m_irq_enabled(0), m_irq_pending(0), m_irq_on(false), m_vmode(0)
+	: device_t(mconfig, ICS2115, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 25) // 32MB(16MB with ROMEN pin for 16 bit ROM pair)
+	, m_stream(nullptr)
+	, m_irq_cb(*this)
+	, m_sample_rate(0)
+	, m_active_osc(0)
+	, m_osc_select(0)
+	, m_reg_select(0)
+	, m_irq_enabled(0)
+	, m_irq_pending(0)
+	, m_irq_on(false)
+	, m_vmode(0)
 {
 }
 
@@ -29,7 +38,7 @@ void ics2115_device::device_start()
 {
 	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, 33075);
+	m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / (16*32));
 
 	m_irq_cb.resolve_safe();
 
@@ -103,6 +112,7 @@ void ics2115_device::device_reset()
 	m_irq_pending = 0;
 	//possible re-suss
 	m_active_osc = 31;
+	recalc_rate();
 	m_osc_select = 0;
 	m_reg_select = 0;
 	m_vmode = 0;
@@ -133,6 +143,19 @@ void ics2115_device::device_reset()
 		elem.state.value = 0;
 	}
 }
+
+
+void ics2115_device::device_post_load()
+{
+	recalc_rate();
+}
+
+
+void ics2115_device::device_clock_changed()
+{
+	recalc_rate();
+}
+
 
 //TODO: improve using next-state logic from column 126 of patent 5809466
 int ics2115_device::ics2115_voice::update_volume_envelope()
@@ -251,18 +274,22 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 		nextaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.start >> 12);
 	}
 	else
-		nextaddr = curaddr + 2;
+		nextaddr = curaddr + ((voice.osc_conf.bitflags.eightbit || voice.osc_conf.bitflags.ulaw) ? 1 : 2);
 
 
 	int16_t sample1, sample2;
-	if (voice.osc_conf.bitflags.eightbit) {
-		sample1 = ((int8_t)m_rom[curaddr]) << 8;
-		sample2 = ((int8_t)m_rom[curaddr + 1]) << 8;
+	if(voice.osc_conf.bitflags.ulaw) {
+		sample1 = m_ulaw[read_byte(curaddr)];
+		sample2 = m_ulaw[read_byte(nextaddr)];
+	}
+	else if (voice.osc_conf.bitflags.eightbit) {
+		sample1 = ((int8_t)read_byte(curaddr)) << 8;
+		sample2 = ((int8_t)read_byte(nextaddr)) << 8;
 	}
 	else {
-		sample1 = m_rom[curaddr + 0] | (((int8_t)m_rom[curaddr + 1]) << 8);
-		sample2 = m_rom[nextaddr+ 0] | (((int8_t)m_rom[nextaddr+ 1]) << 8);
-		//sample2 = m_rom[curaddr + 2] | (((int8_t)m_rom[curaddr + 3]) << 8);
+		sample1 = read_byte(curaddr + 0) | (((int8_t)read_byte(curaddr + 1)) << 8);
+		sample2 = read_byte(nextaddr+ 0) | (((int8_t)read_byte(nextaddr+ 1)) << 8);
+		//sample2 = read_byte(curaddr + 2) | (((int8_t)read_byte(curaddr + 3)) << 8);
 	}
 
 	//no need for interpolation since it's around 1 note a cycle?
@@ -319,12 +346,7 @@ int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2
 		//that the voice is pointing at is contributing to the summation.
 		//(austere note: this will of course fix some of the glitches due to multiple transition)
 		stream_sample_t sample;
-		if(voice.osc_conf.bitflags.ulaw) {
-			uint32_t curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
-			sample = m_ulaw[m_rom[curaddr]];
-		}
-		else
-			sample = get_sample(voice);
+		sample = get_sample(voice);
 
 		//15-bit volume + (5-bit worth of 32 channel sum) + 16-bit samples = 4-bit extra
 		if (!m_vmode || voice.playing()) {
@@ -361,10 +383,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 #ifdef ICS2115_DEBUG
         uint32_t curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
         stream_sample_t sample;
-        if(voice.osc_conf.bitflags.ulaw)
-            sample = m_ulaw[m_rom[curaddr]];
-        else
-            sample = get_sample(voice);
+        sample = get_sample(voice);
         printf("[%06x=%04x]", curaddr, (int16_t)sample);
 #endif
 */
@@ -421,7 +440,7 @@ uint16_t ics2115_device::reg_read() {
 			break;
 
 		case 0x01: // [osc] Wavesample frequency
-			// freq = fc*33075/1024 in 32 voices mode, fc*44100/1024 in 24 voices mode
+			// freq = fc*33075/1024 in 32 voices mode, fc*44100/1024 in 24 voices mode (if input clock is 33.8688MHz)
 			//ret = v->Osc.FC;
 			ret = voice.osc.fc;
 			break;
@@ -576,7 +595,7 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 			break;
 
 		case 0x01: // [osc] Wavesample frequency
-			// freq = fc*33075/1024 in 32 voices mode, fc*44100/1024 in 24 voices mode
+			// freq = fc*33075/1024 in 32 voices mode, fc*44100/1024 in 24 voices mode (if input clock is 33.8688MHz)
 			if(msb)
 				voice.osc.fc = (voice.osc.fc & 0x00ff) | (data << 8);
 			else
@@ -677,6 +696,7 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 			//Does this value get added to 1? Not sure. Could trace for writes of 32.
 			if(msb) {
 				m_active_osc = data & 0x1F; // & 0x1F ? (Guessing)
+				recalc_rate();
 			}
 			break;
 		//2X8 ?
@@ -816,6 +836,53 @@ WRITE8_MEMBER(ics2115_device::write)
 	}
 }
 
+READ16_MEMBER(ics2115_device::read16)
+{
+	uint16_t ret = 0;
+
+	switch(offset) {
+		case 0:
+		case 1:
+			ret = read(space,offset,mem_mask & 0xff);
+			break;
+		case 2:
+		case 3: // TODO : Unknown/Unused at 16 bit accessing?
+			ret = reg_read();
+			break;
+		default:
+#ifdef ICS2115_DEBUG
+			printf("ICS2115: Unhandled memory read at %x\n", offset);
+#endif
+			break;
+	}
+	return ret;
+}
+
+WRITE16_MEMBER(ics2115_device::write16)
+{
+	switch(offset) {
+		case 0:
+		case 1:
+			if (ACCESSING_BITS_0_7)
+				write(space,offset,mem_mask & 0xff);
+
+			break;
+		case 2:
+		case 3: // TODO : Unknown/Unused at 16 bit accessing?
+			if (ACCESSING_BITS_0_7)
+				reg_write(data & 0xff,0);
+			if (ACCESSING_BITS_8_15)
+				reg_write((data >> 8) & 0xff,1);
+
+			break;
+		default:
+#ifdef ICS2115_DEBUG
+			printf("ICS2115: Unhandled memory write %02x to %x\n", data, offset);
+#endif
+			break;
+	}
+}
+
 void ics2115_device::keyon()
 {
 #ifdef ICS2115_ISOLATE
@@ -877,7 +944,7 @@ void ics2115_device::recalc_timer(int timer)
 
 	//New formula based on O.Galibert's reverse engineering of ICS2115 card firmware
 	uint64_t period  = ((m_timer[timer].scale & 0x1f) + 1) * (m_timer[timer].preset + 1);
-	period = (period << (4 + (m_timer[timer].scale >> 5)))*78125/2646;
+	period = (period << (4 + (m_timer[timer].scale >> 5)))*78125/2646; // TODO : it's maybe related by input clock
 
 	if(m_timer[timer].period != period) {
 		m_timer[timer].period = period;
@@ -887,4 +954,10 @@ void ics2115_device::recalc_timer(int timer)
 		else // Kill the timer if length == 0
 			m_timer[timer].timer->adjust(attotime::never);
 	}
+}
+
+void ics2115_device::recalc_rate()
+{
+	m_sample_rate = clock() / (16 * (m_active_osc + 1));
+	m_stream->set_sample_rate(m_sample_rate);
 }

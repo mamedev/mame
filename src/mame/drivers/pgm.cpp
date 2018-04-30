@@ -490,7 +490,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
 {
 	int scanline = param;
 
-// already being generated  by MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
+// already being generated  by MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm_state, screen_vblank_pgm))
 //  if(scanline == 224)
 //      m_maincpu->set_input_line(6, HOLD_LINE);
 
@@ -510,12 +510,11 @@ MACHINE_RESET_MEMBER(pgm_state,pgm)
 
 MACHINE_CONFIG_START(pgm_state::pgmbase)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
+	MCFG_CPU_ADD("maincpu", M68000, 20_MHz_XTAL) /* 20 mhz! verified on real board */
 	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pgm_state,  irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm_state, pgm_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
+	MCFG_CPU_ADD("soundcpu", Z80, 33.8688_MHz_XTAL/4)
 	MCFG_CPU_PROGRAM_MAP(pgm_z80_mem)
 	MCFG_CPU_IO_MAP(pgm_z80_io)
 
@@ -548,7 +547,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_ICS2115_ADD("ics", 0)
+	MCFG_ICS2115_ADD("ics", 33.8688_MHz_XTAL)
 	MCFG_ICS2115_IRQ_CB(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
