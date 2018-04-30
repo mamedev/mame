@@ -196,26 +196,6 @@ WRITE8_MEMBER(sprint4_state::da_latch_w)
 }
 
 
-WRITE_LINE_MEMBER(sprint4_state::lamp0_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(sprint4_state::lamp1_w)
-{
-	output().set_led_value(1, state);
-}
-
-WRITE_LINE_MEMBER(sprint4_state::lamp2_w)
-{
-	output().set_led_value(2, state);
-}
-
-WRITE_LINE_MEMBER(sprint4_state::lamp3_w)
-{
-	output().set_led_value(3, state);
-}
-
 
 #ifdef UNUSED_FUNCTION
 WRITE8_MEMBER(sprint4_state::lockout_w)
@@ -424,10 +404,10 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("latch", F9334, 0) // at E11
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sprint4_state, lamp0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sprint4_state, lamp1_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sprint4_state, lamp2_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sprint4_state, lamp3_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // START LAMP 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) // START LAMP 2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) // START LAMP 3
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led3")) // START LAMP 4
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_1>))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_2>))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_3>))
