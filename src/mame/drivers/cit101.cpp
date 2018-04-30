@@ -63,11 +63,20 @@ public:
 		, m_screen(*this, "screen")
 		, m_nvr(*this, "nvr")
 		, m_chargen(*this, "chargen")
+		, m_mainram(*this, "mainram")
+		, m_extraram(*this, "extraram")
 	{ }
 
 	void cit101(machine_config &config);
+protected:
+	virtual void machine_start() override;
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER(c000_ram_r);
+	DECLARE_WRITE8_MEMBER(c000_ram_w);
+	DECLARE_READ8_MEMBER(e0_latch_r);
+	DECLARE_WRITE8_MEMBER(e0_latch_w);
 
 	DECLARE_WRITE8_MEMBER(nvr_address_w);
 	DECLARE_READ8_MEMBER(nvr_data_r);
@@ -77,18 +86,50 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
+	u8 m_e0_latch;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<er2055_device> m_nvr;
 	required_region_ptr<u8> m_chargen;
+	required_shared_ptr<u8> m_mainram;
+	required_shared_ptr<u8> m_extraram;
 };
 
+
+void cit101_state::machine_start()
+{
+	save_item(NAME(m_e0_latch));
+}
 
 u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
+
+READ8_MEMBER(cit101_state::c000_ram_r)
+{
+	if (!machine().side_effects_disabled())
+		m_e0_latch = m_extraram[offset];
+	return m_mainram[offset];
+}
+
+WRITE8_MEMBER(cit101_state::c000_ram_w)
+{
+	m_extraram[offset] = m_e0_latch;
+	m_mainram[offset] = data;
+}
+
+READ8_MEMBER(cit101_state::e0_latch_r)
+{
+	return m_e0_latch;
+}
+
+WRITE8_MEMBER(cit101_state::e0_latch_w)
+{
+	m_e0_latch = data;
+}
 
 WRITE8_MEMBER(cit101_state::nvr_address_w)
 {
@@ -114,8 +155,9 @@ WRITE8_MEMBER(cit101_state::nvr_control_w)
 void cit101_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
-	map(0x4000, 0xbfff).ram();
-	map(0xc000, 0xcfff).ram().share("videoram");
+	map(0x4000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0xbfff).ram().share("extraram"); // only 4 bits wide?
+	map(0xc000, 0xdfff).rw(this, FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
 	map(0xfc00, 0xfc00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xfc01, 0xfc01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xfc20, 0xfc20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
@@ -137,7 +179,7 @@ void cit101_state::io_map(address_map &map)
 	map(0x41, 0x41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x60, 0x63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa0).nopw(); // ?
-	map(0xe0, 0xe0).noprw(); // ?
+	map(0xe0, 0xe0).rw(this, FUNC(cit101_state::e0_latch_r), FUNC(cit101_state::e0_latch_w));
 }
 
 
