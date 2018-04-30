@@ -627,7 +627,7 @@ void grchamp_state::sub_portmap(address_map &map)
 void grchamp_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	// 2000-3fff are empty rom sockets
+	map(0x2000, 0x3005).nopr().nopw();
 	map(0x4000, 0x43ff).ram();
 	map(0x4800, 0x4801).mirror(0x07f8).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x4801, 0x4801).mirror(0x07f8).r("ay1", FUNC(ay8910_device::data_r));
@@ -955,5 +955,5 @@ ROM_END
  *************************************/
 
 GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
-GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
 GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )

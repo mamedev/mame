@@ -127,12 +127,9 @@ private:
 
 	// state
 	int m_start;
-	int m_cycle;
-	int m_step;
 	int m_address;
 	uint8_t m_sar;
 	bool m_eoc;
-	bool m_eoc_pending;
 };
 
 class adc0809_device : public adc0808_device

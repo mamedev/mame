@@ -330,11 +330,11 @@ MACHINE_CONFIG_START(starwars_state::starwars)
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 9L/M
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(starwars_state, coin1_counter_w)) // Coin counter 1
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(starwars_state, coin2_counter_w)) // Coin counter 2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(starwars_state, led3_w)) // LED 3
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(starwars_state, led2_w)) // LED 2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT // LED 3
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1")) // bank switch
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(starwars_state, prng_reset_w)) // reset PRNG
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(starwars_state, led1_w)) // LED 1
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(starwars_state, recall_w)) // NVRAM array recall
 
 	/* video hardware */

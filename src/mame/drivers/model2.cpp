@@ -1193,7 +1193,7 @@ void model2_state::model2_5881_mem(address_map &map)
 
 READ8_MEMBER( model2_state::lightgun_data_r )
 {
-	uint16_t data = m_lightgun_ports[offset].read_safe(0);
+	uint16_t data = m_lightgun_ports[offset >> 1].read_safe(0);
 	return BIT(offset, 0) ? (data >> 8) : data;
 }
 

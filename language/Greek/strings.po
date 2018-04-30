@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-04-28 15:32+1000\n"
-"PO-Revision-Date: 2018-01-29 16:00+0200\n"
+"PO-Revision-Date: 2018-04-29 16:16+0300\n"
 "Last-Translator: Mame.gr\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -2495,10 +2495,16 @@ msgid ""
 "[This option is currently mounted in the running system]\n"
 "\n"
 "Option: %1$s\n"
-"Device: %1$s\n"
+"Device: %2$s\n"
 "\n"
 "The selected option enables the following items:\n"
 msgstr ""
+"[Αυτή η επιλογή είναι αυτή τη στιγμή τοποθετημένη στο τρέχον σύστημα]\n"
+"\n"
+"Επιλογή: %1$s\n"
+"Συσκευή: %2$s\n"
+"\n"
+"Η επιλεγμένη επιλογή ενεργοποιεί τα ακόλουθα στοιχεία:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:40
 #, c-format
@@ -2506,63 +2512,69 @@ msgid ""
 "[This option is NOT currently mounted in the running system]\n"
 "\n"
 "Option: %1$s\n"
-"Device: %1$s\n"
+"Device: %2$s\n"
 "\n"
 "If you select this option, the following items will be enabled:\n"
 msgstr ""
+"[Αυτή η επιλογή ΔΕΝ είναι αυτή τη στιγμή τοποθετημένη στο τρέχον σύστημα]\n"
+"\n"
+"Επιλογή: %1$s\n"
+"Συσκευή: %2$s\n"
+"\n"
+"Αν επιλέξετε αυτήν την επιλογή, θα ενεργοποιηθούν τα ακόλουθα στοιχεία:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:48
 msgid "* CPU:\n"
-msgstr ""
+msgstr "* Επεξεργαστής:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:72 src/frontend/mame/ui/devopt.cpp:133
 #, c-format
 msgid "  %1$d×%2$s %3$d.%4$06d MHz\n"
-msgstr ""
+msgstr "  %1$d×%2$s %3$d.%4$06d MHz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:72 src/frontend/mame/ui/devopt.cpp:133
 msgid "  %1$d×%2$s %5$d.%6$03d kHz\n"
-msgstr ""
+msgstr "  %1$d×%2$s %5$d.%6$03d kHz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:73 src/frontend/mame/ui/devopt.cpp:134
 msgid "  %2$s %3$d.%4$06d MHz\n"
-msgstr ""
+msgstr "  %2$s %3$d.%4$06d MHz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:73 src/frontend/mame/ui/devopt.cpp:134
 msgid "  %2$s %5$d.%6$03d kHz\n"
-msgstr ""
+msgstr "  %2$s %5$d.%6$03d kHz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:85
 msgid "* Video:\n"
-msgstr ""
+msgstr "* Βίντεο:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:90
 #, c-format
 msgid "  Screen '%1$s': Vector\n"
-msgstr ""
+msgstr "  Οθόνη '%1$s': Διάνυσμα\n"
 
 #: src/frontend/mame/ui/devopt.cpp:99
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$f Hz\n"
-msgstr ""
+msgstr "  Οθόνη '%1$s': %2$d × %3$d (Κ) %4$f Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:100
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$f Hz\n"
-msgstr ""
+msgstr "  Οθόνη '%1$s': %2$d × %3$d (Ο) %4$f Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:113
 msgid "* Sound:\n"
-msgstr ""
+msgstr "* Ήχος:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:133
 #, c-format
 msgid "  %1$d×%2$s\n"
-msgstr ""
+msgstr "  %1$d×%2$s\n"
 
 #: src/frontend/mame/ui/devopt.cpp:134
 msgid "  %2$s\n"
-msgstr ""
+msgstr "  %2$s\n"
 
 #: src/frontend/mame/ui/devopt.cpp:164
 #, c-format
@@ -2570,86 +2582,88 @@ msgid ""
 "* BIOS settings:\n"
 "  %1$d options    [default: %2$s]\n"
 msgstr ""
+"* Ρυθμίσεις BIOS:\n"
+"  %1$d επιλογές    [προεπιλογή: %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:204 src/frontend/mame/ui/devopt.cpp:220
 #: src/frontend/mame/ui/devopt.cpp:265
 #, c-format
 msgid "  %1$s    [default: %2$s]\n"
-msgstr ""
+msgstr "  %1$s    [προεπιλογή: %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:209 src/frontend/mame/ui/devopt.cpp:225
 #, c-format
 msgid "  %1$s\n"
-msgstr ""
+msgstr "  %1$s\n"
 
 #: src/frontend/mame/ui/devopt.cpp:230
 msgid "* DIP switch settings:\n"
-msgstr ""
+msgstr "* Ρυθμίσεις μικροδιακόπτων:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:232
 msgid "* Configuration settings:\n"
-msgstr ""
+msgstr "* Ρυθμίσεις διαμόρφωσης:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:234
 msgid "* Input device(s):\n"
-msgstr ""
+msgstr "* Συσκευή(ες) εισαγωγής:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:236
 #, c-format
 msgid "  User inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Εισαγωγές χρήστη    [%1$d εισαγωγές]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:238
 #, c-format
 msgid "  Mahjong inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Εισαγωγές Mahjong    [%1$d εισαγωγές]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:240
 #, c-format
 msgid "  Hanafuda inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Εισαγωγές Hanafuda    [%1$d εισαγωγές]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:242
 #, c-format
 msgid "  Gambling inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Εισαγωγές τυχερών παιχνιδιών    [%1$d εισαγωγές]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:244
 #, c-format
 msgid "  Analog inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Εισαγωγές αναλογικές    [%1$d εισαγωγές]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:246
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Εισαγωγές ρυθμιστή    [%1$d εισαγωγές]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:248
 #, c-format
 msgid "  Keypad inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Εισαγωγές πλήκτρων    [%1$d εισαγωγές]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:250
 #, c-format
 msgid "  Keyboard inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Εισαγωγές πληκτρολογίου    [%1$d εισαγωγές]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:255
 msgid "* Media Options:\n"
-msgstr ""
+msgstr "* Επιλογές Μέσων:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:257
 #, c-format
 msgid "  %1$s    [tag: %2$s]\n"
-msgstr ""
+msgstr "  %1$s    [ετικέτα: %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:263
 msgid "* Slot Options:\n"
-msgstr ""
+msgstr "* Επιλογές Υποδοχής:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:270
 msgid "[None]\n"
-msgstr ""
+msgstr "[Καμία]\n"
 
 #: plugins/timer/init.lua:94
 msgid "Current time"
@@ -2847,7 +2861,7 @@ msgstr "Αποθήκευση τρέχουσας -- #"
 #: plugins/cheatfind/init.lua:536
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "Βρέθηκαν συνολικά %d αντιστοιχίες"
 
 #: plugins/cheatfind/init.lua:543
 msgid "Compare"
@@ -2983,6 +2997,3 @@ msgstr "Το όνομα της θύρας εισόδου αποθηκεύτηκ�
 #: plugins/portname/init.lua:138
 msgid "Input ports"
 msgstr "Θύρες εισόδου"
-
-#~ msgid " total matches found"
-#~ msgstr "  συνολικές αντιστοιχίες βρέθηκαν"

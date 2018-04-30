@@ -175,18 +175,6 @@ WRITE8_MEMBER(liberatr_state::output_latch_w)
 }
 
 
-WRITE_LINE_MEMBER(liberatr_state::start_led_1_w)
-{
-	output().set_led_value(0, !state);
-}
-
-
-WRITE_LINE_MEMBER(liberatr_state::start_led_2_w)
-{
-	output().set_led_value(1, !state);
-}
-
-
 WRITE_LINE_MEMBER(liberatr_state::coin_counter_left_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -442,8 +430,8 @@ MACHINE_CONFIG_START(liberatr_state::liberatr)
 	MCFG_DEVICE_ADD("earom", ER2055, 0)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(liberatr_state, start_led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(liberatr_state, start_led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LED1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LED2
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // TBSWP
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // SPARE
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(liberatr_state, trackball_reset_w)) // CTRLD

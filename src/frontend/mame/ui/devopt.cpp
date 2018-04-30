@@ -36,8 +36,8 @@ void menu_device_config::populate(float &customtop, float &custombottom)
 	util::stream_format(
 			str,
 			m_mounted
-				? _("[This option is currently mounted in the running system]\n\nOption: %1$s\nDevice: %1$s\n\nThe selected option enables the following items:\n")
-				: _("[This option is NOT currently mounted in the running system]\n\nOption: %1$s\nDevice: %1$s\n\nIf you select this option, the following items will be enabled:\n"),
+				? _("[This option is currently mounted in the running system]\n\nOption: %1$s\nDevice: %2$s\n\nThe selected option enables the following items:\n")
+				: _("[This option is NOT currently mounted in the running system]\n\nOption: %1$s\nDevice: %2$s\n\nIf you select this option, the following items will be enabled:\n"),
 			m_option->name(),
 			dev->name());
 

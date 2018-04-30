@@ -524,18 +524,6 @@ WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(pacman_state::led1_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(pacman_state::led2_w)
-{
-	output().set_led_value(1, state);
-}
-
-
 WRITE_LINE_MEMBER(pacman_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -3542,8 +3530,8 @@ MACHINE_CONFIG_START(pacman_state::pacman)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pacman_state, irq_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pacman_state, flipscreen_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pacman_state, led1_w))
-	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pacman_state, led2_w))
+	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
+	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
 	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pacman_state, coin_lockout_global_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pacman_state, coin_counter_w))
 // The Pacman code uses $5004 and $5005 for LED's and $5007 for coin lockout.  This hardware does not
@@ -3604,8 +3592,8 @@ MACHINE_CONFIG_START(pacman_state::birdiy)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(pacman_state, irq_mask_w))
 	//MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pacman_state, flipscreen_w))
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pacman_state, led1_w))
-	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pacman_state, led2_w))
+	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
+	//MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
 	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pacman_state, coin_lockout_global_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pacman_state, coin_counter_w))
 
@@ -3674,8 +3662,8 @@ MACHINE_CONFIG_START(pacman_state::alibaba)
 
 	MCFG_DEVICE_REMOVE("mainlatch")
 	MCFG_DEVICE_ADD("latch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pacman_state, led1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(pacman_state, led2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pacman_state, coin_lockout_global_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pacman_state, coin_counter_w))
 	MCFG_DEVICE_ADD("latch2", LS259, 0)

@@ -135,16 +135,6 @@ WRITE8_MEMBER(ultratnk_state::da_latch_w)
 }
 
 
-WRITE_LINE_MEMBER(ultratnk_state::led_1_w)
-{
-	output().set_led_value(0, state); /* left player start */
-}
-WRITE_LINE_MEMBER(ultratnk_state::led_2_w)
-{
-	output().set_led_value(1, state); /* right player start */
-}
-
-
 WRITE_LINE_MEMBER(ultratnk_state::lockout_w)
 {
 	machine().bookkeeping().coin_lockout_global_w(!state);
@@ -307,8 +297,8 @@ MACHINE_CONFIG_START(ultratnk_state::ultratnk)
 
 	MCFG_DEVICE_ADD("latch", F9334, 0) // E11
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ultratnk_state, lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ultratnk_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ultratnk_state, led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) // LED1 (left player start)
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) // LED2 (right player start)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_2>))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ULTRATNK_FIRE_EN_1>))
 

@@ -97,21 +97,6 @@ WRITE8_MEMBER(avalnche_state::catch_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-WRITE_LINE_MEMBER(avalnche_state::credit_1_lamp_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(avalnche_state::credit_2_lamp_w)
-{
-	output().set_led_value(1, state);
-}
-
-WRITE_LINE_MEMBER(avalnche_state::start_lamp_w)
-{
-	output().set_led_value(2, state);
-}
-
 void avalnche_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
@@ -240,10 +225,10 @@ MACHINE_CONFIG_START(avalnche_state::avalnche_base)
 	MCFG_CPU_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
 
 	MCFG_DEVICE_ADD("latch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(avalnche_state, credit_1_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // 1 CREDIT LAMP
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(avalnche_state, video_invert_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(avalnche_state, credit_2_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(avalnche_state, start_lamp_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // 2 CREDIT LAMP
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led2")) // START LAMP
 	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
 	MCFG_WATCHDOG_ADD("watchdog")

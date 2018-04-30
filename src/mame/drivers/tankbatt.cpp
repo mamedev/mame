@@ -74,16 +74,6 @@ void tankbatt_state::machine_start()
 	save_item(NAME(m_sound_enable));
 }
 
-WRITE_LINE_MEMBER(tankbatt_state::led0_w)
-{
-	machine().output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(tankbatt_state::led1_w)
-{
-	machine().output().set_led_value(1, state);
-}
-
 READ8_MEMBER(tankbatt_state::in0_r)
 {
 	int val;
@@ -296,8 +286,8 @@ MACHINE_CONFIG_START(tankbatt_state::tankbatt)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tankbatt_state, demo_interrupt_enable_w))
 
 	MCFG_DEVICE_ADD("outlatch", CD4099, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tankbatt_state, led0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tankbatt_state, led1_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0"))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1"))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tankbatt_state, coincounter_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tankbatt_state, coinlockout_w))
 
