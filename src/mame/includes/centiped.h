@@ -26,8 +26,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_aysnd(*this, "aysnd"),
-		m_leds(*this, "led%u", 0U) { }
+		m_aysnd(*this, "aysnd") { }
 
 	void centiped_base(machine_config &config);
 	void milliped(machine_config &config);
@@ -44,9 +43,6 @@ public:
 	DECLARE_DRIVER_INIT(multiped);
 	DECLARE_DRIVER_INIT(bullsdrt);
 
-protected:
-	virtual void machine_start() override;
-
 private:
 	optional_shared_ptr<uint8_t> m_rambase;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -60,8 +56,6 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<ay8910_device> m_aysnd;
-
-	output_finder<4> m_leds;
 
 	uint8_t m_oldpos[4];
 	uint8_t m_sign[4];
@@ -85,10 +79,6 @@ private:
 	DECLARE_READ8_MEMBER(mazeinv_input_r);
 	DECLARE_WRITE8_MEMBER(mazeinv_input_select_w);
 	DECLARE_READ8_MEMBER(bullsdrt_data_port_r);
-	DECLARE_WRITE_LINE_MEMBER(led_1_w);
-	DECLARE_WRITE_LINE_MEMBER(led_2_w);
-	DECLARE_WRITE_LINE_MEMBER(led_3_w);
-	DECLARE_WRITE_LINE_MEMBER(led_4_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);

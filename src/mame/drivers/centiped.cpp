@@ -444,15 +444,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(centiped_state::generate_interrupt)
 	m_screen->update_partial(scanline);
 }
 
-void centiped_state::machine_start()
-{
-	m_leds.resolve();
-}
-
 MACHINE_START_MEMBER(centiped_state,centiped)
 {
-	machine_start();
-
 	save_item(NAME(m_oldpos));
 	save_item(NAME(m_sign));
 	save_item(NAME(m_dsw_select));
@@ -621,30 +614,6 @@ READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(centiped_state::led_1_w)
-{
-	m_leds[0] = !state;
-}
-
-
-WRITE_LINE_MEMBER(centiped_state::led_2_w)
-{
-	m_leds[1] = !state;
-}
-
-
-WRITE_LINE_MEMBER(centiped_state::led_3_w)
-{
-	m_leds[2] = !state;
-}
-
-
-WRITE_LINE_MEMBER(centiped_state::led_4_w)
-{
-	m_leds[3] = !state;
-}
-
-
 READ8_MEMBER(centiped_state::caterplr_unknown_r)
 {
 	return machine().rand() % 0xff;
@@ -695,11 +664,11 @@ void centiped_state::centiped_base_map(address_map &map)
 	map(0x0c02, 0x0c02).r(this, FUNC(centiped_state::centiped_IN2_r));
 	map(0x0c03, 0x0c03).portr("IN3");
 	map(0x1400, 0x140f).w(this, FUNC(centiped_state::centiped_paletteram_w)).share("paletteram");
-	map(0x1600, 0x163f).w("earom", FUNC(atari_vg_earom_device::write));
+	map(0x1600, 0x163f).nopr().w("earom", FUNC(atari_vg_earom_device::write));
 	map(0x1680, 0x1680).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
 	map(0x1700, 0x173f).r("earom", FUNC(atari_vg_earom_device::read));
 	map(0x1800, 0x1800).w(this, FUNC(centiped_state::irq_ack_w));
-	map(0x1c00, 0x1c07).w("outlatch", FUNC(ls259_device::write_d7));
+	map(0x1c00, 0x1c07).nopr().w("outlatch", FUNC(ls259_device::write_d7));
 	map(0x2000, 0x2000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x2000, 0x3fff).rom();
 }
@@ -1756,8 +1725,8 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(centiped_state, coin_counter_left_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(centiped_state, coin_counter_center_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(centiped_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(centiped_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(centiped_state, led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1917,8 +1886,8 @@ MACHINE_CONFIG_START(centiped_state::warlords)
 
 	// these extra LEDs also appear on Centipede schematics
 	MCFG_DEVICE_MODIFY("outlatch") // P9
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(centiped_state, led_3_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(centiped_state, led_4_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT // LED 3
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT // LED 4
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", warlords)
@@ -1969,8 +1938,8 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(centiped_state, bullsdrt_coin_count_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(centiped_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(centiped_state, led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(centiped_state, flip_screen_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
