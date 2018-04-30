@@ -107,29 +107,47 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		case STATE_IDLE:
 			m_cycle_timer->adjust(attotime::never);
-			m_eoc = 1;
-			m_eoc_cb(m_eoc);
-			m_eoc_ff_cb(1);
 			return;
 
-		// start of conversion cycle
-		case STATE_CONVERSION_START:
+		// ready; beginning to run conversion cycle
+		case STATE_CONVERSION_READY:
 			m_state = STATE_CONVERSION_RUNNING;
-			// the conversion takes 8 steps every 8 cycles
-			m_cycle_timer->adjust(attotime::from_hz(clock()) * 63);
+
+			m_sar = m_in_cb[m_address](0);
+			m_eoc = 0;
+			m_eoc_cb(m_eoc);
+
+			// the conversion takes 8 iterations/cycles
+			m_cycle_timer->adjust(attotime::from_ticks(8, clock()));
+			return;
+
+		// start; mark ourselves as ready for conversion 1 cycle later
+		case STATE_CONVERSION_START:
+			m_state = STATE_CONVERSION_READY;
+			m_cycle_timer->adjust(attotime::from_hz(clock()));
 			return;
 
 		// end of conversion cycle
 		case STATE_CONVERSION_RUNNING:
-			m_sar = m_in_cb[m_address](0);
+		{
 			m_state = STATE_IDLE;
+			const uint8_t start_sar = m_sar;
+			m_sar = m_in_cb[m_address](0);
+
+			m_eoc = 1;
+			m_eoc_cb(m_eoc);
+			m_eoc_ff_cb(1);
 
 			if (VERBOSE)
 				logerror("Conversion finished, result %02x\n", m_sar);
 
+			if (m_sar != start_sar)
+				logerror("Conversion finished, should fail - starting value %02x, ending value %02x", start_sar, m_sar);
+
 			// eoc is delayed by one cycle
-			m_cycle_timer->adjust(attotime::from_hz(clock()));
+			m_cycle_timer->adjust(attotime::never);
 			break;
+		}
 	}
 }
 
@@ -159,16 +177,17 @@ WRITE8_MEMBER( adc0808_device::address_w )
 
 WRITE_LINE_MEMBER( adc0808_device::start_w )
 {
-	if (m_start == 1 && state == 0)
+	if (m_start == state)
+		return;
+
+	if (state && !m_start)
 	{
 		m_state = STATE_CONVERSION_START;
-		m_cycle_timer->adjust(attotime::zero);
+		m_cycle_timer->adjust(attotime::from_hz(clock()));
 	}
-	else if (m_start == 0 && state == 1)
+	else if (!state && m_start)
 	{
-		m_sar = 0;
-		m_eoc = 0;
-		m_eoc_cb(m_eoc);
+		m_cycle_timer->adjust(attotime::from_hz(clock()));
 	}
 
 	m_start = state;
