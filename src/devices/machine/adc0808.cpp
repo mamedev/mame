@@ -117,8 +117,8 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_eoc = 0;
 			m_eoc_cb(m_eoc);
 
-			// the conversion takes 8 iterations/cycles
-			m_cycle_timer->adjust(attotime::from_ticks(8, clock()));
+			// the conversion takes 8 steps per 8 cycles
+			m_cycle_timer->adjust(attotime::from_ticks(64, clock()));
 			return;
 
 		// start; mark ourselves as ready for conversion 1 cycle later
