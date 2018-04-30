@@ -741,6 +741,7 @@ files {
 	MAME_DIR .. "src/tools/imgtool/modules/hp48.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/hp9845_tape.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/hp85_tape.cpp",
+	MAME_DIR .. "src/tools/imgtool/modules/rt11.cpp",
 }
 
 configuration { "mingw*" or "vs*" }
