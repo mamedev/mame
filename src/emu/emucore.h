@@ -236,8 +236,8 @@ inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 
 
 // macros to convert radians to degrees and degrees to radians
-#define RADIAN_TO_DEGREE(x)   ((180.0 / M_PI) * (x))
-#define DEGREE_TO_RADIAN(x)   ((M_PI / 180.0) * (x))
+template <typename T> constexpr auto RADIAN_TO_DEGREE(T const &x) { return (180.0 / M_PI) * x; }
+template <typename T> constexpr auto DEGREE_TO_RADIAN(T const &x) { return (M_PI / 180.0) * x; }
 
 
 // endian-based value: first value is if 'endian' is little-endian, second is if 'endian' is big-endian

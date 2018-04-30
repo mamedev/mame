@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_DEVCB_H
 #define MAME_EMU_DEVCB_H
 
+#include <functional>
+
 
 //**************************************************************************
 //  MACROS
@@ -206,7 +208,7 @@ public:
 	devcb_base &set_callback(output_desc output) { reset(CALLBACK_OUTPUT); m_target_tag = output.m_tag; return *this; }
 	devcb_base &set_callback(constant_desc constant) { reset(CALLBACK_CONSTANT); m_target_int = constant.m_value; return *this; }
 	devcb_base &set_callback(logger_desc logger) { reset(CALLBACK_LOG); m_target_tag = logger.m_string; return *this; }
-	void reset() { reset(CALLBACK_NONE); }
+	void reset() { reset(m_owner, CALLBACK_NONE); }
 
 protected:
 	// internal helpers
@@ -215,6 +217,7 @@ protected:
 	inline u64 unshift_mask(u64 value) const { return (m_rshift < 0) ? ((value & m_mask) >> -m_rshift) : ((value & m_mask) << m_rshift); }
 	inline u64 unshift_mask_xor(u64 value) const { return (m_rshift < 0) ? (((value ^ m_xor) & m_mask) >> -m_rshift) : (((value ^ m_xor) & m_mask) << m_rshift); }
 	void reset(callback_type type);
+	void reset(device_t &base, callback_type type);
 	virtual void devcb_reset() = 0;
 	void resolve_ioport();
 	void resolve_membank();
@@ -233,12 +236,13 @@ protected:
 	};
 
 	// configuration
-	device_t &          m_device;               // reference to our owning device
+	device_t &		    m_owner;                // reference to our owning device
+	std::reference_wrapper<device_t> m_base;    // device to resolve relative to
 	callback_type       m_type;                 // type of callback registered
 	const char *        m_target_tag;           // tag of target object
 	u64                 m_target_int;           // integer value of target object
 	const char *        m_space_tag;            // tag of address space device
-	int    m_space_num;            // address space number of space device
+	int                 m_space_num;            // address space number of space device
 
 	// derived state
 	address_space *     m_space;                // target address space

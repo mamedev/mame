@@ -113,14 +113,14 @@ void device_video_interface::interface_pre_start()
 	}
 
 	// fatal error if no screen is found
-	if (!m_screen)
+	if (!m_screen && m_screen_required)
 		throw emu_fatalerror("Device '%s' requires a screen", device().tag());
 
 	// if we have a screen and it's not started, wait for it
-	device_palette_interface *palintf;
 	if (m_screen && !m_screen->started())
 	{
 		// avoid circular dependency if we are also a palette device
+		device_palette_interface *palintf;
 		if (!device().interface(palintf))
 			throw device_missing_dependencies();
 
