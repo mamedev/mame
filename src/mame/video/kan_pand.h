@@ -76,6 +76,6 @@ DECLARE_DEVICE_TYPE(KANEKO_PANDORA, kaneko_pandora_device)
 	downcast<kaneko_pandora_device &>(*device).set_offsets(_xoffs, _yoffs);
 
 #define MCFG_KANEKO_PANDORA_GFXDECODE(_gfxtag) \
-	downcast<kaneko_pandora_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<kaneko_pandora_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_KAN_PAND_H

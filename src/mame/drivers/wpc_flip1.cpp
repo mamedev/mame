@@ -173,7 +173,7 @@ MACHINE_CONFIG_START(wpc_flip1_state::wpc_flip1)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
-	MCFG_WPC_ROM_REGION(":sound1")
+	MCFG_WPC_ROM_REGION("sound1")
 	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(wpc_dot_state,wpcsnd_reply_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 

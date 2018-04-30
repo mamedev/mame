@@ -675,7 +675,7 @@ MACHINE_CONFIG_START(p1_state::poisk1)
 	MCFG_I8255_IN_PORTC_CB(READ8(p1_state, p1_ppi2_portc_r))    /*62H*/
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
+	MCFG_ISA8_CPU("maincpu")
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))

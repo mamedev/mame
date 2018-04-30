@@ -151,7 +151,7 @@ MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("v30", 0))
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("^v30")
+	MCFG_ISA8_CPU("v30")
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259", pic8259_device, ir4_w))

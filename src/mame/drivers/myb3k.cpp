@@ -987,7 +987,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 
 	/* ISA8+ Expansion bus */
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
+	MCFG_ISA8_CPU("maincpu")
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic", pic8259_device, ir2_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic", pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic", pic8259_device, ir4_w))

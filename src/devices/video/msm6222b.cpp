@@ -31,14 +31,14 @@ msm6222b_device::msm6222b_device(const machine_config &mconfig, device_type type
 msm6222b_device::msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	msm6222b_device(mconfig, MSM6222B, tag, owner, clock)
 {
-	m_cgrom.set_tag(DEVICE_SELF);
+	m_cgrom.set_tag(*this, DEVICE_SELF);
 }
 
 msm6222b_01_device::msm6222b_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	msm6222b_device(mconfig, MSM6222B_01, tag, owner, clock)
 {
 	// load the fixed cgrom
-	m_cgrom.set_tag("cgrom");
+	m_cgrom.set_tag(*this, "cgrom");
 }
 
 const tiny_rom_entry *msm6222b_01_device::device_rom_region() const

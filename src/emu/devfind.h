@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <functional>
 #include <iterator>
 #include <stdexcept>
 #include <type_traits>
@@ -259,10 +260,27 @@ public:
 	/// Allows search tag to be changed after construction.  Note that
 	/// this must be done before resolution time to take effect.  Also
 	/// note that the tag is not copied.
+	/// \param [in] base Updated search base.  The tag must be specified
+	///   relative to this device.
 	/// \param [in] tag Updated search tag.  This is not copied, it is
 	///   the caller's responsibility to ensure this pointer remains
 	///   valid until resolution time.
-	void set_tag(char const *tag) { m_tag = tag; }
+	void set_tag(device_t &base, char const *tag)
+	{
+		m_base = base;
+		m_tag = tag;
+	}
+
+	/// \brief Set search tag
+	///
+	/// Allows search tag to be changed after construction.  Note that
+	/// this must be done before resolution time to take effect.  Also
+	/// note that the tag is not copied.
+	/// \param [in] tag Updated search tag relative to the current
+	///   device being configured.  This is not copied, it is the
+	///   caller's responsibility to ensure this pointer remains valid
+	///   until resolution time.
+	void set_tag(char const *tag);
 
 	/// \brief Is the object to be resolved before memory maps?
 	///
@@ -375,7 +393,7 @@ protected:
 	finder_base *const m_next;
 
 	/// \brief Base device to search from
-	device_t &m_base;
+	std::reference_wrapper<device_t> m_base;
 
 	/// \brief Object tag to search for
 	char const *m_tag;
@@ -494,7 +512,7 @@ private:
 	///   is found, false otherwise.
 	virtual bool findit(bool isvalidation) override
 	{
-		device_t *const device = this->m_base.subdevice(this->m_tag);
+		device_t *const device = this->m_base.get().subdevice(this->m_tag);
 		this->m_target = dynamic_cast<DeviceClass *>(device);
 		if (device && !this->m_target)
 			this->printf_warning("Device '%s' found but is of incorrect type (actual type is %s)\n", this->m_tag, device->name());
@@ -560,7 +578,7 @@ private:
 	virtual bool findit(bool isvalidation) override
 	{
 		if (isvalidation) return this->validate_memregion(0, Required);
-		this->m_target = this->m_base.memregion(this->m_tag);
+		this->m_target = this->m_base.get().memregion(this->m_tag);
 		return this->report_missing("memory region");
 	}
 };
@@ -620,7 +638,7 @@ public:
 	virtual bool findit(bool isvalidation) override
 	{
 		if (isvalidation) return true;
-		this->m_target = this->m_base.membank(this->m_tag);
+		this->m_target = this->m_base.get().membank(this->m_tag);
 		return this->report_missing("memory bank");
 	}
 };
@@ -691,7 +709,7 @@ private:
 	virtual bool findit(bool isvalidation) override
 	{
 		if (isvalidation) return true;
-		this->m_target = this->m_base.ioport(this->m_tag);
+		this->m_target = this->m_base.get().ioport(this->m_tag);
 		return this->report_missing("I/O port");
 	}
 };
@@ -863,7 +881,7 @@ public:
 		m_allocated.resize(entries);
 		this->m_target = &m_allocated[0];
 		m_bytes = entries * sizeof(PointerType);
-		this->m_base.save_item(m_allocated, this->m_tag);
+		this->m_base.get().save_item(m_allocated, this->m_tag);
 	}
 
 private:
