@@ -104,7 +104,8 @@ void cit101_state::machine_start()
 
 u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int char_width = 9;
+	// TODO: 9 for 132-column mode
+	int char_width = 10;
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
@@ -113,7 +114,10 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		u16 rowaddr = m_mainram[row * 2] | (m_extraram[row * 2] & 0x3f) << 8;
 
 		int c = 0;
+		u8 attr = m_extraram[rowaddr];
 		u8 char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
+		if (line == 9 && BIT(attr, 0))
+			char_data ^= 0xff;
 		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
 		{
 			if (x >= cliprect.left() && x <= cliprect.right())
@@ -124,7 +128,11 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 			else
 			{
 				c = 0;
-				char_data = m_chargen[(m_mainram[++rowaddr] << 4) | line];
+				rowaddr++;
+				attr = m_extraram[rowaddr];
+				char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
+				if (line == 9 && BIT(attr, 0))
+					char_data ^= 0xff;
 			}
 		}
 	}
