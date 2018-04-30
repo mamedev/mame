@@ -104,6 +104,31 @@ void cit101_state::machine_start()
 
 u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	int char_width = 9;
+
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		int row = (y / 10) + 1;
+		int line = y % 10;
+		u16 rowaddr = m_mainram[row * 2] | (m_extraram[row * 2] & 0x3f) << 8;
+
+		int c = 0;
+		u8 char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
+		{
+			if (x >= cliprect.left() && x <= cliprect.right())
+				bitmap.pix32(y, x) = BIT(char_data, 7) ? rgb_t::white() : rgb_t::black();
+
+			if (++c < char_width)
+				char_data = (char_data << 1) | (char_data & 1);
+			else
+			{
+				c = 0;
+				char_data = m_chargen[(m_mainram[++rowaddr] << 4) | line];
+			}
+		}
+	}
+
 	return 0;
 }
 
