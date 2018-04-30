@@ -45,7 +45,7 @@ adc0808_device::adc0808_device(const machine_config &mconfig, device_type type, 
 	m_in_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 	m_state(STATE_IDLE),
 	m_cycle_timer(nullptr),
-	m_start(0), m_cycle(0), m_step(0), m_address(0), m_sar(0xff), m_eoc(true), m_eoc_pending(false)
+	m_start(0), m_address(0), m_sar(0xff), m_eoc(1)
 {
 }
 
@@ -92,12 +92,9 @@ void adc0808_device::device_start()
 	// register for save states
 	save_item(NAME(m_state));
 	save_item(NAME(m_start));
-	save_item(NAME(m_cycle));
-	save_item(NAME(m_step));
 	save_item(NAME(m_address));
 	save_item(NAME(m_sar));
 	save_item(NAME(m_eoc));
-	save_item(NAME(m_eoc_pending));
 }
 
 //-------------------------------------------------
@@ -106,37 +103,34 @@ void adc0808_device::device_start()
 
 void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// eoc is delayed one cycle
-	if (m_eoc_pending)
+	switch (m_state)
 	{
-		m_eoc = true;
-		m_eoc_cb(1);
-		m_eoc_ff_cb(1);
-		m_eoc_pending = false;
-	}
+		case STATE_IDLE:
+			m_cycle_timer->adjust(attotime::never);
+			m_eoc = 1;
+			m_eoc_cb(m_eoc);
+			m_eoc_ff_cb(1);
+			return;
 
-	// start of conversion cycle
-	if (m_cycle == 0 && m_state == STATE_CONVERSION_START)
-		m_state = STATE_CONVERSION_RUNNING;
+		// start of conversion cycle
+		case STATE_CONVERSION_START:
+			m_state = STATE_CONVERSION_RUNNING;
+			// the conversion takes 8 steps every 8 cycles
+			m_cycle_timer->adjust(attotime::from_hz(clock()) * 63);
+			return;
 
-	// end of conversion cycle
-	if (m_cycle == 7 && m_state == STATE_CONVERSION_RUNNING)
-	{
-		// the conversion takes 8 steps every 8 cycles
-		if (m_step++ == 7)
-		{
-			m_step = 0;
+		// end of conversion cycle
+		case STATE_CONVERSION_RUNNING:
 			m_sar = m_in_cb[m_address](0);
-			m_eoc_pending = true;
 			m_state = STATE_IDLE;
 
 			if (VERBOSE)
 				logerror("Conversion finished, result %02x\n", m_sar);
-		}
-	}
 
-	// next cycle
-	m_cycle = (m_cycle + 1) & 7;
+			// eoc is delayed by one cycle
+			m_cycle_timer->adjust(attotime::from_hz(clock()));
+			break;
+	}
 }
 
 
@@ -168,13 +162,13 @@ WRITE_LINE_MEMBER( adc0808_device::start_w )
 	if (m_start == 1 && state == 0)
 	{
 		m_state = STATE_CONVERSION_START;
+		m_cycle_timer->adjust(attotime::zero);
 	}
 	else if (m_start == 0 && state == 1)
 	{
 		m_sar = 0;
-		m_eoc = false;
-		m_eoc_cb(0);
-		m_eoc_pending = false;
+		m_eoc = 0;
+		m_eoc_cb(m_eoc);
 	}
 
 	m_start = state;
@@ -182,7 +176,7 @@ WRITE_LINE_MEMBER( adc0808_device::start_w )
 
 READ_LINE_MEMBER( adc0808_device::eoc_r )
 {
-	return m_eoc ? 1 : 0;
+	return m_eoc;
 }
 
 WRITE8_MEMBER( adc0808_device::address_offset_start_w )
