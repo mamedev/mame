@@ -1085,6 +1085,61 @@ void abc806_state::machine_reset()
 }
 
 
+QUICKLOAD_LOAD_MEMBER( abc800_state, bac )
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	std::vector<uint8_t> data;
+	data.resize(quickload_size);
+	image.fread(&data[0], quickload_size);
+
+	uint8_t prstat = data[2];
+	uint16_t prgsz = (data[5] << 8) | data[4];
+	uint16_t varsz = (data[7] << 8) | data[6];
+	uint16_t varad = (data[9] << 8) | data[8];
+	uint16_t comsz = (data[13] << 8) | data[12];
+	uint16_t comcs = (data[14] << 8) | data[15];
+	uint16_t comtop = 0x8000 + comsz;
+	uint16_t vartb = comtop;
+
+	uint16_t heap = 0x8000 + comsz + varad;
+	uint16_t bofa = 0xf169 - prgsz - 8;
+	uint16_t eofa = bofa;
+
+	for (int i = 0; i < prgsz; i++) {
+		space.write_byte(eofa++, data[i]);
+	}
+	eofa--;
+
+	for (int i = prgsz; i < quickload_size; i++) {
+		space.write_byte(heap++, data[i]);
+	}
+	heap = 0x8000 + comsz + varsz;
+
+	space.write_byte(0xff06, bofa & 0xff);
+	space.write_byte(0xff07, bofa >> 8);
+
+	space.write_byte(0xff08, eofa & 0xff);
+	space.write_byte(0xff09, eofa >> 8);
+
+	space.write_byte(0xff0a, heap & 0xff);
+	space.write_byte(0xff0b, heap >> 8);
+
+	space.write_byte(0xff26, prstat);
+
+	space.write_byte(0xff2c, vartb & 0xff);
+	space.write_byte(0xff2d, vartb >> 8);
+
+	space.write_byte(0xff30, comtop & 0xff);
+	space.write_byte(0xff31, comtop >> 8);
+
+	space.write_byte(0xff32, comcs & 0xff);
+	space.write_byte(0xff33, comcs >> 8);
+
+	return image_init_result::PASS;
+}
+
+
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -1239,6 +1294,8 @@ MACHINE_CONFIG_START(abc800m_state::abc800m)
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "abc800")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "abc800_hdd")
+
+	MCFG_QUICKLOAD_ADD("quickload", abc800_state, bac, "bac", 2)
 MACHINE_CONFIG_END
 
 
