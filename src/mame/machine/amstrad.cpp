@@ -2936,7 +2936,7 @@ void amstrad_state::enumerate_roms()
 	if (m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000)
 	{
 		uint8_t *crt = m_region_cart->base();
-		int bank_mask = (m_cart->get_rom_size() / 0x4000) - 1;
+		int bank_num = (m_cart->get_rom_size() / 0x4000);
 
 		/* ROMs are stored on the inserted cartridge in the Plus/GX4000 */
 		for (int i = 0; i < 128; i++) // fill ROM table
@@ -2946,7 +2946,7 @@ void amstrad_state::enumerate_roms()
 
 		for(int i = 128; i < 160; i++)
 		{
-			m_Amstrad_ROM_Table[i] = &crt[((i - 128) & bank_mask) * 0x4000];
+			m_Amstrad_ROM_Table[i] = &crt[((i - 128) % bank_num) * 0x4000];
 		}
 		m_Amstrad_ROM_Table[7] = &crt[0xc000];
 		slot7 = true;
