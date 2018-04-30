@@ -7,6 +7,15 @@
 //
 //Use tab size = 4 for your viewing pleasure.
 
+/*
+	TODO:
+		Wavetable RAM support
+		Verify 16 bit ROM accessing
+		Timer is maybe input clock related
+		MPU-401/6850 emulation registers
+		DMA
+*/
+
 #include "emu.h"
 #include "ics2115.h"
 #include <cmath>
@@ -560,6 +569,10 @@ uint16_t ics2115_device::reg_read() {
 		case 0x43: // Timer status
 			ret = m_irq_pending & 3;
 			break;
+			
+		//case 0x47: break;// DMA Status
+		//case 0x48: break;// Accumulator Monitor Status
+		//case 0x49: break;// Accumulator Monitor Data
 
 		case 0x4A: // IRQ Pending
 			ret = m_irq_pending;
@@ -572,6 +585,18 @@ uint16_t ics2115_device::reg_read() {
 		case 0x4C: // Chip Revision
 			ret = revision;
 			break;
+			
+		//case 0x4D: break;// System Control
+		//case 0x4F: break;// Oscillator Address being Programmed
+		
+		//case 0x50: break;// MIDI Data Register
+		//case 0x51: break;// MIDI Control/Status Register
+		//case 0x52: break;// Host Data Register
+		//case 0x53: break;// Host Control/Status Register
+		//case 0x54: break;// MIDI Emulation interrupt Control
+		//case 0x55: break;// Host Emulation interrupt Control
+		//case 0x56: break;// Host/MIDI Emulation Interrupt
+		//case 0x57: break;// Emulation Mode
 
 		default:
 #ifdef ICS2115_DEBUG
@@ -756,6 +781,11 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 				recalc_timer(m_reg_select & 0x1);
 			}
 			break;
+			
+		//case 0x44: break;// DMA Start Address Low
+		//case 0x45: break;// DMA Start Address Medium
+		//case 0x46: break;// DMA Start Address High
+		//case 0x47: break;// DMA Control
 
 		case 0x4A: // IRQ Enable
 			if(!msb) {
@@ -763,12 +793,25 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 				recalc_irq();
 			}
 			break;
+			
+		//case 0x4C: break;// Memory Config
+		//case 0x4D: break;// System Control
 
 		case 0x4F: // Oscillator Address being Programmed
 			if(!msb) {
 				m_osc_select = data % (1+m_active_osc);
 			}
 			break;
+			
+		//case 0x50: break;// MIDI Data Register
+		//case 0x51: break;// MIDI Control/Status Register
+		//case 0x52: break;// Host Data Register
+		//case 0x53: break;// Host Control/Status Register
+		//case 0x54: break;// MIDI Emulation interrupt Control
+		//case 0x55: break;// Host Emulation interrupt Control
+		//case 0x56: break;// Host/MIDI Emulation Interrupt
+		//case 0x57: break;// Emulation Mode
+
 		default:
 #ifdef ICS2115_DEBUG
 			printf("ICS2115: Unhandled write %x onto %x(%d) [voice = %d]\n", data, m_reg_select, msb, m_osc_select);
@@ -861,7 +904,6 @@ READ16_MEMBER(ics2115_device::read16)
 WRITE16_MEMBER(ics2115_device::write16)
 {
 	switch(offset) {
-		case 0:
 		case 1:
 			if (ACCESSING_BITS_0_7)
 				write(space,offset,mem_mask & 0xff);
