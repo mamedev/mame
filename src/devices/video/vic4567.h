@@ -237,7 +237,7 @@ DECLARE_DEVICE_TYPE(VIC3, vic3_device)
 
 
 #define MCFG_VIC3_CPU(tag) \
-	downcast<vic3_device &>(*device).set_cpu_tag(("^" tag));
+	downcast<vic3_device &>(*device).set_cpu_tag(tag);
 
 #define MCFG_VIC3_TYPE(type) \
 	downcast<vic3_device &>(*device).set_vic3_type((vic3_device::vic3_type::type));

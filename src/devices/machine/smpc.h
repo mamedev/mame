@@ -24,7 +24,7 @@
 	MCFG_DEVICE_ADD((tag), SMPC_HLE, (clock))
 
 #define MCFG_SMPC_HLE_SCREEN(screen_tag) \
-	downcast<smpc_hle_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<smpc_hle_device &>(*device).set_screen_tag(screen_tag);
 
 #define MCFG_SMPC_HLE_CONTROL_PORTS(ctrl1_tag, ctrl2_tag) \
 	downcast<smpc_hle_device &>(*device).set_control_port_tags(ctrl1_tag, ctrl2_tag);

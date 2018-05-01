@@ -16288,7 +16288,7 @@
 				<rom name="prg" size="131072" crc="770c360a" sha1="5c38f60a98ac8452206562c7eea2c18bd66e2c57" offset="00000" />
 			</dataarea> <!-- real label: カルチヤ prg -->
 			<dataarea name="chr" size="131072">
-				<rom name=" chr" size="131072" crc="5482f0c6" sha1="f92a4fa4635a66a82a4e5b64f893075993df1181" offset="00000" />
+				<rom name="chr" size="131072" crc="5482f0c6" sha1="f92a4fa4635a66a82a4e5b64f893075993df1181" offset="00000" />
 			</dataarea> <!-- real label: カルチヤ chr -->
 			<!-- 128k WRAM on cartridge -->
 			<dataarea name="wram" size="131072">

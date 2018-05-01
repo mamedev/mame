@@ -151,8 +151,6 @@ void starwars_state::run_mproc()
 	int IP15_8, IP7, IP6_0; /* Instruction PROM values */
 	int mptime;
 
-	logerror("Running Matrix Processor...\n");
-
 	mptime = 0;
 	m_math_run = 1;
 

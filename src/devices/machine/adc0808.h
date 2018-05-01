@@ -119,6 +119,7 @@ private:
 	{
 		STATE_IDLE,
 		STATE_CONVERSION_START,
+		STATE_CONVERSION_READY,
 		STATE_CONVERSION_RUNNING
 	};
 	state m_state;
@@ -127,12 +128,9 @@ private:
 
 	// state
 	int m_start;
-	int m_cycle;
-	int m_step;
 	int m_address;
 	uint8_t m_sar;
 	bool m_eoc;
-	bool m_eoc_pending;
 };
 
 class adc0809_device : public adc0808_device

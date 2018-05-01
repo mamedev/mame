@@ -207,7 +207,7 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 		// find a device with the requested tag
 		const device_t *target = device().siblingdevice(route->m_target.c_str());
 		if (target == nullptr)
-			osd_printf_error("Attempting to route sound to non-existant device '%s'\n", route->m_target.c_str());
+			osd_printf_error("Attempting to route sound to non-existent device '%s'\n", route->m_target.c_str());
 
 		// if it's not a speaker or a sound device, error
 		const device_sound_interface *sound;

@@ -2077,7 +2077,7 @@ MACHINE_CONFIG_START(harddriv_new_state::racedriv_panorama_machine)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_DEVICE_MODIFY("mainpcb:duartn68681")
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, harddriv_new_state,tx_a))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(harddriv_new_state, tx_a))
 
 	// boots with 'PROGRAM OK' when using standard Hard Drivin' board type (needs 137412-115 slapstic)
 	MCFG_DEVICE_MODIFY("mainpcb:slapstic")

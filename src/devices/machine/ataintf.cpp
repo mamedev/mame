@@ -246,21 +246,23 @@ void abstract_ata_interface_device::device_start()
 		m_pdiag[i] = 0;
 
 		device_ata_interface *dev = m_slot[i]->dev();
-		if (dev != nullptr)
+		if (dev)
 		{
+			// FIXME: the const_cast is nasty, need a better way that bypasses the tag lookup
+			machine_config::token const tok(const_cast<machine_config &>(mconfig()).begin_configuration(*this));
 			if (i == 0)
 			{
-				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, irq0_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dmarq0_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dasp0_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, pdiag0_write_line));
+				dev->m_irq_handler.set_callback(DEVCB_WRITELINE(abstract_ata_interface_device, irq0_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB_WRITELINE(abstract_ata_interface_device, dmarq0_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB_WRITELINE(abstract_ata_interface_device, dasp0_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB_WRITELINE(abstract_ata_interface_device, pdiag0_write_line));
 			}
 			else
 			{
-				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, irq1_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dmarq1_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dasp1_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, pdiag1_write_line));
+				dev->m_irq_handler.set_callback(DEVCB_WRITELINE(abstract_ata_interface_device, irq1_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB_WRITELINE(abstract_ata_interface_device, dmarq1_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB_WRITELINE(abstract_ata_interface_device, dasp1_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB_WRITELINE(abstract_ata_interface_device, pdiag1_write_line));
 			}
 
 			dev->write_csel(i);

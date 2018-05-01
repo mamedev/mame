@@ -59,7 +59,7 @@
 #define MCFG_PPU2C0X_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_PPU2C0X_CPU(_tag) \
-	downcast<ppu2c0x_device &>(*device).set_cpu_tag("^" _tag);
+	downcast<ppu2c0x_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_PPU2C0X_COLORBASE(_color) \
 	downcast<ppu2c0x_device &>(*device).set_color_base(_color);

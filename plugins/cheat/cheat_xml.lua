@@ -69,10 +69,14 @@ function xml.conv_cheat(data)
 				fullspace = "data"
 			elseif space == "i" then
 				fullspace = "io"
-			elseif space == "r" or space == "o" then
+			elseif space == "r" then
 				fullspace = "program"
 				mod = "direct_"
 				space = "p"
+			elseif space == "o" then
+				fullspace = "decrypted_opcodes"
+				mod = "direct_"
+				space = "o"
 			end
 			if width == "b" then
 				width = "u8"

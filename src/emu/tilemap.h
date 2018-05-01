@@ -370,7 +370,7 @@ enum tilemap_standard_mapper
 #define MCFG_TILEMAP_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TILEMAP, 0)
 #define MCFG_TILEMAP_GFXDECODE(_gfxtag) \
-	downcast<tilemap_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<tilemap_device &>(*device).set_gfxdecode_tag(_gfxtag);
 #define MCFG_TILEMAP_BYTES_PER_ENTRY(_bpe) \
 	downcast<tilemap_device &>(*device).set_bytes_per_entry(_bpe);
 #define MCFG_TILEMAP_INFO_CB_DRIVER(_class, _method) \

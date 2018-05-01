@@ -10,7 +10,7 @@
 typedef device_delegate<void (int&, int&, int&, int&)> snk68_tile_indirection_delegate;
 
 #define MCFG_SNK68_SPR_GFXDECODE(_gfxtag) \
-	downcast<snk68_spr_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<snk68_spr_device &>(*device).set_gfxdecode_tag(_gfxtag);
 #define MCFG_SNK68_SPR_SET_TILE_INDIRECT( _class, _method) \
 	downcast<snk68_spr_device &>(*device).set_tile_indirect_cb(snk68_tile_indirection_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 #define MCFG_SNK68_SPR_NO_PARTIAL \

@@ -223,6 +223,6 @@ DECLARE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device)
 DECLARE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device)
 
 #define MCFG_SEGA_32X_PALETTE(_palette_tag) \
-	downcast<sega_32x_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<sega_32x_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_MACHINE_MEGA32X_H

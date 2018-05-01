@@ -64,7 +64,7 @@
 //**************************************************************************
 
 #define MCFG_CPU_AVR8_EEPROM(_tag) \
-	downcast<avr8_device &>(*device).set_eeprom_tag("^" _tag);
+	downcast<avr8_device &>(*device).set_eeprom_tag(_tag);
 
 
 //**************************************************************************
