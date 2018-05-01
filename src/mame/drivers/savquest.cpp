@@ -835,7 +835,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	/* sound hardware */
 
 	MCFG_DEVICE_ADD("isa", ISA16, 0)
-	MCFG_ISA16_CPU(":maincpu")
+	MCFG_ISA16_CPU("maincpu")
 	MCFG_ISA16_SLOT_ADD("isa", "isa1", savquest_isa16_cards, "sb16", false)
 
 	/* video hardware */

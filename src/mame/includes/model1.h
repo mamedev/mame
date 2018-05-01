@@ -50,7 +50,6 @@ public:
 		, m_display_list0(*this, "display_list0")
 		, m_display_list1(*this, "display_list1")
 		, m_color_xlat(*this, "color_xlat")
-		, m_dpram(*this, "dpram")
 		, m_paletteram16(*this, "palette")
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
@@ -229,7 +228,9 @@ private:
 	// Machine
 	void irq_raise(int level);
 	void irq_init();
+	DECLARE_WRITE8_MEMBER(irq_control_w);
 
+	uint8_t m_irq_status;
 	int m_last_irq;
 
 	// Devices
@@ -251,7 +252,6 @@ private:
 	required_shared_ptr<uint16_t> m_display_list0;
 	required_shared_ptr<uint16_t> m_display_list1;
 	required_shared_ptr<uint16_t> m_color_xlat;
-	required_shared_ptr<uint16_t> m_dpram;
 
 	// Sound
 	int m_sound_irq;

@@ -136,7 +136,7 @@ void hprot1_state::i80c31_io(address_map &map)
 	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_read));
 	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_read));
 /*TODO: attach the watchdog/brownout reset device:
-    AM_RANGE(0xe000,0xe0??) AM_MIRROR(?) AM_DEVREAD("adm965an", adm965an_device, data_read) */
+    map(0xe000,0xe0??).mirror(?).r("adm965an", FUNC(adm965an_device::data_read)); */
 }
 
 static INPUT_PORTS_START( hprot1 )

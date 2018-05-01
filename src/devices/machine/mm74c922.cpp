@@ -19,7 +19,7 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(MM74C922, mm74c922_device, "mm74c922", "MM74C923 16/20-Key Encoder")
-const device_type MM74C923 = MM74C922;
+decltype(MM74C922) MM74C923 = MM74C922;
 
 
 

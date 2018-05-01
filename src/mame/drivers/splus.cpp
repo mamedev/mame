@@ -112,7 +112,7 @@ private:
 	uint8_t m_stop_pos[5];
 
 	virtual void machine_start() override
-	{ 
+	{
 		m_digits.resolve();
 		m_leds.resolve();
 	}

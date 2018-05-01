@@ -270,20 +270,6 @@ READ8_MEMBER(gridlee_state::random_num_r)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(gridlee_state::led_0_w)
-{
-	output().set_led_value(0, state);
-	logerror("LED 0 %s\n", state ? "on" : "off");
-}
-
-
-WRITE_LINE_MEMBER(gridlee_state::led_1_w)
-{
-	output().set_led_value(1, state);
-	logerror("LED 1 %s\n", state ? "on" : "off");
-}
-
-
 WRITE_LINE_MEMBER(gridlee_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -421,8 +407,8 @@ MACHINE_CONFIG_START(gridlee_state::gridlee)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // type can only be guessed
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gridlee_state, led_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gridlee_state, led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0"))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1"))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gridlee_state, coin_counter_w))
 	// Q6 unknown - only written to at startup
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gridlee_state, cocktail_flip_w))

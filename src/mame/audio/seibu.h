@@ -182,10 +182,10 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 #define MCFG_SEIBU_SOUND_CPU(_audiocputag) \
-	downcast<seibu_sound_device &>(*device).set_cpu_tag("^" _audiocputag);
+	downcast<seibu_sound_device &>(*device).set_cpu_tag(_audiocputag);
 
 #define MCFG_SEIBU_SOUND_ROMBANK(_banktag) \
-	downcast<seibu_sound_device &>(*device).set_rombank_tag("^" _banktag);
+	downcast<seibu_sound_device &>(*device).set_rombank_tag(_banktag);
 
 #define MCFG_SEIBU_SOUND_YM_READ_CB(_devcb) \
 	devcb = &downcast<seibu_sound_device &>(*device).set_ym_read_callback(DEVCB_##_devcb);

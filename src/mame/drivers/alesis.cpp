@@ -45,15 +45,15 @@ READ8_MEMBER( alesis_state::kb_r )
 
 WRITE8_MEMBER( alesis_state::led_w )
 {
-	m_patt_led		= BIT(data, 0) ? 1 : 0;
-	m_song_led		= BIT(data, 0) ? 0 : 1;
-	m_play_led		= BIT(data, 1) ? 0 : 1;
-	m_record_led	= BIT(data, 2) ? 0 : 1;
-	m_voice_led		= BIT(data, 3) ? 0 : 1;
-	m_tune_led		= BIT(data, 4) ? 0 : 1;
-	m_mix_led		= BIT(data, 5) ? 0 : 1;
-	m_tempo_led		= BIT(data, 6) ? 0 : 1;
-	m_midi_led		= BIT(data, 7) ? 0 : 1;
+	m_patt_led      = BIT(data, 0) ? 1 : 0;
+	m_song_led      = BIT(data, 0) ? 0 : 1;
+	m_play_led      = BIT(data, 1) ? 0 : 1;
+	m_record_led    = BIT(data, 2) ? 0 : 1;
+	m_voice_led     = BIT(data, 3) ? 0 : 1;
+	m_tune_led      = BIT(data, 4) ? 0 : 1;
+	m_mix_led       = BIT(data, 5) ? 0 : 1;
+	m_tempo_led     = BIT(data, 6) ? 0 : 1;
+	m_midi_led      = BIT(data, 7) ? 0 : 1;
 }
 
 READ8_MEMBER( alesis_state::p3_r )
@@ -77,13 +77,13 @@ WRITE8_MEMBER( alesis_state::sr16_lcd_w )
 
 WRITE8_MEMBER( alesis_state::mmt8_led_w )
 {
-	m_play_led		= BIT(data, 0) ? 0 : 1;
-	m_record_led	= BIT(data, 1) ? 0 : 1;
-	m_part_led		= BIT(data, 2) ? 0 : 1;
-	m_edit_led		= BIT(data, 3) ? 0 : 1;
-	m_song_led		= BIT(data, 4) ? 0 : 1;
-	m_echo_led		= BIT(data, 5) ? 0 : 1;
-	m_loop_led		= BIT(data, 6) ? 0 : 1;
+	m_play_led      = BIT(data, 0) ? 0 : 1;
+	m_record_led    = BIT(data, 1) ? 0 : 1;
+	m_part_led      = BIT(data, 2) ? 0 : 1;
+	m_edit_led      = BIT(data, 3) ? 0 : 1;
+	m_song_led      = BIT(data, 4) ? 0 : 1;
+	m_echo_led      = BIT(data, 5) ? 0 : 1;
+	m_loop_led      = BIT(data, 6) ? 0 : 1;
 
 	m_leds = data;
 }

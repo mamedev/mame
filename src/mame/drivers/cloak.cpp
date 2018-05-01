@@ -133,16 +133,6 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cloak_state::start_led_1_w)
-{
-	output().set_led_value(0, !state);
-}
-
-WRITE_LINE_MEMBER(cloak_state::start_led_2_w)
-{
-	output().set_led_value(1, !state);
-}
-
 WRITE_LINE_MEMBER(cloak_state::coin_counter_l_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -343,8 +333,8 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cloak_state, coin_counter_l_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cloak_state, cocktail_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)    // ???
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(cloak_state, start_led_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(cloak_state, start_led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LED 2
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LED 1
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

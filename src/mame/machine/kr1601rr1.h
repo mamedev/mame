@@ -6,13 +6,13 @@
 
     Same geometry as GI ER2401, but not pin-compatible.
 
-	CS ER PR RD Ax
-	-- -- -- -- --
-	 0  x  x  x  x  idle
-	 1  0  1  0  x  erase all
-	 1  0  0  0  A  erase single
-	 1  1  0  0  A  write
-	 1  1  1  1  A  read
+    CS ER PR RD Ax
+    -- -- -- -- --
+     0  x  x  x  x  idle
+     1  0  1  0  x  erase all
+     1  0  0  0  A  erase single
+     1  1  0  0  A  write
+     1  1  1  1  A  read
 
 ****************************************************************************
                             _____   _____

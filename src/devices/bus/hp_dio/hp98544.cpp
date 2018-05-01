@@ -81,12 +81,18 @@ void dio16_98544_device::device_start()
 	m_rom = device().machine().root_device().memregion(this->subtag(HP98544_ROM_REGION).c_str())->base();
 
 	m_vram.resize(VRAM_SIZE);
-	m_dio->install_memory(0x200000, 0x2fffff, read16_delegate(FUNC(dio16_98544_device::vram_r), this),
-							write16_delegate(FUNC(dio16_98544_device::vram_w), this));
-	m_dio->install_memory(0x560000, 0x563fff, read16_delegate(FUNC(dio16_98544_device::rom_r), this),
-							write16_delegate(FUNC(dio16_98544_device::rom_w), this));
-	m_dio->install_memory(0x564000, 0x567fff, read16_delegate(FUNC(dio16_98544_device::ctrl_r), this),
-							write16_delegate(FUNC(dio16_98544_device::ctrl_w), this));
+	m_dio->install_memory(
+			0x200000, 0x2fffff,
+			read16_delegate(FUNC(dio16_98544_device::vram_r), this),
+			write16_delegate(FUNC(dio16_98544_device::vram_w), this));
+	m_dio->install_memory(
+			0x560000, 0x563fff,
+			read16_delegate(FUNC(dio16_98544_device::rom_r), this),
+			write16_delegate(FUNC(dio16_98544_device::rom_w), this));
+	m_dio->install_memory(
+			0x564000, 0x567fff,
+			read16_delegate(FUNC(dio16_98544_device::ctrl_r), this),
+			write16_delegate(FUNC(dio16_98544_device::ctrl_w), this));
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dio16_98544_device::cursor_callback),this));
 	m_cursor_timer->adjust(attotime::from_hz(3));
 }
@@ -106,7 +112,7 @@ void dio16_98544_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(dio16_98544_device::cursor_callback)
 {
-        m_cursor_timer->adjust(attotime::from_hz(5));
+	m_cursor_timer->adjust(attotime::from_hz(5));
 	m_cursor_state ^= true;
 
 	if (m_cursor_ctrl & 0x02) {
@@ -138,7 +144,7 @@ READ16_MEMBER(dio16_98544_device::vram_r)
 
 WRITE16_MEMBER(dio16_98544_device::vram_w)
 {
-//	execute_rule(data, (replacement_rule_t)m_pixel_replacement_rule, &data);
+//  execute_rule(data, (replacement_rule_t)m_pixel_replacement_rule, &data);
 	COMBINE_DATA(&m_vram[offset]);
 }
 

@@ -42,16 +42,17 @@ DEFINE_DEVICE_TYPE(BUDDHA, buddha_device, "buddha", "Buddha IDE controller")
 //  mmio_map - device-specific memory mapped I/O
 //-------------------------------------------------
 
-ADDRESS_MAP_START(buddha_device::mmio_map)
-	AM_RANGE(0x7fe, 0x7ff) AM_READWRITE(speed_r, speed_w)
-	AM_RANGE(0x800, 0x8ff) AM_READWRITE(ide_0_cs0_r, ide_0_cs0_w)
-	AM_RANGE(0x900, 0x9ff) AM_READWRITE(ide_0_cs1_r, ide_0_cs1_w)
-	AM_RANGE(0xa00, 0xaff) AM_READWRITE(ide_1_cs0_r, ide_1_cs0_w)
-	AM_RANGE(0xb00, 0xbff) AM_READWRITE(ide_1_cs1_r, ide_1_cs1_w)
-	AM_RANGE(0xf00, 0xf3f) AM_READ(ide_0_interrupt_r)
-	AM_RANGE(0xf40, 0xf7f) AM_READ(ide_1_interrupt_r)
-	AM_RANGE(0xfc0, 0xfff) AM_WRITE(ide_interrupt_enable_w)
-ADDRESS_MAP_END
+void buddha_device::mmio_map(address_map &map)
+{
+	map(0x7fe, 0x7ff).rw(this, FUNC(buddha_device::speed_r), FUNC(buddha_device::speed_w));
+	map(0x800, 0x8ff).rw(this, FUNC(buddha_device::ide_0_cs0_r), FUNC(buddha_device::ide_0_cs0_w));
+	map(0x900, 0x9ff).rw(this, FUNC(buddha_device::ide_0_cs1_r), FUNC(buddha_device::ide_0_cs1_w));
+	map(0xa00, 0xaff).rw(this, FUNC(buddha_device::ide_1_cs0_r), FUNC(buddha_device::ide_1_cs0_w));
+	map(0xb00, 0xbff).rw(this, FUNC(buddha_device::ide_1_cs1_r), FUNC(buddha_device::ide_1_cs1_w));
+	map(0xf00, 0xf3f).r(this, FUNC(buddha_device::ide_0_interrupt_r));
+	map(0xf40, 0xf7f).r(this, FUNC(buddha_device::ide_1_interrupt_r));
+	map(0xfc0, 0xfff).w(this, FUNC(buddha_device::ide_interrupt_enable_w));
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

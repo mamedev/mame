@@ -61,9 +61,10 @@ void msm6255_device::map(address_map &map)
 }
 
 // default address map
-ADDRESS_MAP_START(msm6255_device::msm6255)
-	AM_RANGE(0x00000, 0xfffff) AM_RAM
-ADDRESS_MAP_END
+void msm6255_device::msm6255(address_map &map)
+{
+	map(0x00000, 0xfffff).ram();
+}
 
 
 

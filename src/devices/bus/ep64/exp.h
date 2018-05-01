@@ -68,7 +68,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(ep64_expansion_bus_cards, _def_slot, false)
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_DAVE(_tag) \
-	downcast<ep64_expansion_bus_slot_device &>(*device).set_dave_tag("^" _tag);
+	downcast<ep64_expansion_bus_slot_device &>(*device).set_dave_tag(_tag);
 
 #define MCFG_EP64_EXPANSION_BUS_SLOT_IRQ_CALLBACK(_write) \
 	devcb = &downcast<ep64_expansion_bus_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);

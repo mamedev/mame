@@ -419,12 +419,12 @@ MACHINE_CONFIG_START(midway_ssio_device::device_add_mconfig)
 	MCFG_SOUND_ADD("ay0", AY8910, SSIO_CLOCK/2/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta0_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb0_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 0)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.33, 0)
 
 	MCFG_SOUND_ADD("ay1", AY8910, SSIO_CLOCK/2/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(midway_ssio_device, porta1_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(midway_ssio_device, portb1_w))
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.33, 1)
+	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.33, 1)
 MACHINE_CONFIG_END
 
 
@@ -599,7 +599,7 @@ MACHINE_CONFIG_START(midway_sounds_good_device::device_add_mconfig)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_sounds_good_device, irq_w))
 
-	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0) /// ad7533jn.u10
+	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0) /// ad7533jn.u10
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -754,7 +754,7 @@ MACHINE_CONFIG_START(midway_turbo_cheap_squeak_device::device_add_mconfig)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(midway_turbo_cheap_squeak_device, irq_w))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(midway_turbo_cheap_squeak_device, irq_w))
 
-	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.0)
+	MCFG_SOUND_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -932,14 +932,15 @@ void midway_squawk_n_talk_device::squawkntalk_map(address_map &map)
 // alternate address map if the ROM jumpers are changed to support a smaller
 // ROM size of 2k
 #ifdef UNUSED_FUNCTION
-ADDRESS_MAP_START(midway_squawk_n_talk_device::squawkntalk_alt_map)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x007f) AM_RAM     // internal RAM
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE(dac_w)
-	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x6000) AM_ROM
-ADDRESS_MAP_END
+void midway_squawk_n_talk_device::squawkntalk_alt_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x007f).ram();     // internal RAM
+	map(0x0080, 0x0083).mirror(0x676c).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).mirror(0x676c).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0800, 0x0fff).mirror(0x6000).w(this, FUNC(midway_squawk_n_talk_device::dac_w));
+	map(0x8000, 0x9fff).mirror(0x6000).rom();
+}
 #endif
 
 
@@ -964,7 +965,7 @@ MACHINE_CONFIG_START(midway_squawk_n_talk_device::device_add_mconfig)
 
 	// only used on Discs of Tron, which is stereo
 	MCFG_SOUND_ADD("tms5200", TMS5200, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.60)
 
 	// the board also supports an AY-8912 and/or an 8-bit DAC, neither of
 	// which are populated on the Discs of Tron board

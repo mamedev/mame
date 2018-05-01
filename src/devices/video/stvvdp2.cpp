@@ -2244,7 +2244,8 @@ uint8_t saturn_state::stv_vdp2_is_rotation_applied(void)
 			RP.dx == _FIXED_1 &&
 			RP.dy == _FIXED_0 &&
 			RP.kx == _FIXED_1 &&
-			RP.ky == _FIXED_1 )
+			RP.ky == _FIXED_1 && 
+			STV_VDP2_RPMD < 2) // disable optimizations if roz mode is 2 or 3
 	{
 		return 0;
 	}
@@ -4194,14 +4195,14 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		// store map information
 		stv_vdp2_layer_data_placement.map_offset_min = 0x7fffffff;
 		stv_vdp2_layer_data_placement.map_offset_max = 0x00000000;
-		
+
 		for (i = 0; i < stv2_current_tilemap.map_count; i++)
 		{
 			uint32_t max_base;
-			
+
 			if ( base[i] < stv_vdp2_layer_data_placement.map_offset_min )
 				stv_vdp2_layer_data_placement.map_offset_min = base[i];
-			
+
 			// Head On in Sega Memorial Collection 1 cares (uses RBG0 with all map regs equal to 0x20)
 			max_base = (base[i] + plsize_bytes/4);
 			if (  max_base > stv_vdp2_layer_data_placement.map_offset_max )
@@ -4783,7 +4784,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 				if ( x & clipxmask || y & clipymask ) continue;
 				if ( stv_vdp2_roz_window(hcnt, vcnt) == false )
 					continue;
-				
+
 				if ( stv2_current_tilemap.roz_mode3 == true )
 				{
 					if( stv_vdp2_roz_mode3_window(hcnt, vcnt, iRP-1) == false )
@@ -4952,7 +4953,7 @@ inline bool saturn_state::stv_vdp2_roz_window(int x, int y)
 	uint8_t w1_enable = STV_VDP2_R0W1E;
 	uint8_t w0_area = STV_VDP2_R0W0A;
 	uint8_t w1_area = STV_VDP2_R0W1A;
-	
+
 	if (w0_enable == 0 &&
 		w1_enable == 0)
 		return true;
@@ -5508,29 +5509,29 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 	{
 		stv2_current_tilemap.scrollx = stv_current_rotation_parameter_table.mx >> 16;
 		stv2_current_tilemap.scrolly = stv_current_rotation_parameter_table.my >> 16;
-		
+
 		if(stv2_current_tilemap.roz_mode3 == true)
 		{
 			// TODO: Cotton 2 enables mode 3 without an actual RP window enabled
-			//       Technically you could use split screen effect without rotation applied, 
+			//       Technically you could use split screen effect without rotation applied,
 			//       which will be annoying to emulate with this video structure.
 			//       Let's see if anything will do it ...
 			if(STV_VDP2_RPW0E || STV_VDP2_RPW1E)
 				popmessage("ROZ Mode 3 window enabled without zooming, contact MAMEdev!");
-			
+
 			if(iRP == 2)
 				return;
 		}
-		
+
 		// TODO: legacy code, to be removed
 		stv2_current_tilemap.window_control.logic = STV_VDP2_R0LOG;
 		stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_R0W0E;
 		stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_R0W1E;
-//  	stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
+//      stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
 		stv2_current_tilemap.window_control.area[0] = STV_VDP2_R0W0A;
 		stv2_current_tilemap.window_control.area[1] = STV_VDP2_R0W1A;
-//  	stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
-		
+//      stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
+
 		rectangle mycliprect = cliprect;
 
 		if ( stv2_current_tilemap.window_control.enabled[0] || stv2_current_tilemap.window_control.enabled[1] )
@@ -5540,7 +5541,7 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			stv2_current_tilemap.window_control.enabled[0] = 0;
 			stv2_current_tilemap.window_control.enabled[1] = 0;
 		}
-		
+
 		stv_vdp2_check_tilemap(bitmap,mycliprect);
 	}
 	else

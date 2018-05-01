@@ -23,7 +23,6 @@ Notes:
 
 #include "emu.h"
 #include "includes/nbmj9195.h"
-#include "includes/nb1413m3.h"      // needed for mahjong input controller
 
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"

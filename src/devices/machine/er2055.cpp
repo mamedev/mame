@@ -21,9 +21,10 @@
 // device type definition
 DEFINE_DEVICE_TYPE(ER2055, er2055_device, "er2055", "ER2055 EAROM")
 
-ADDRESS_MAP_START(er2055_device::er2055_map)
-	AM_RANGE(0x0000, 0x003f) AM_RAM
-ADDRESS_MAP_END
+void er2055_device::er2055_map(address_map &map)
+{
+	map(0x0000, 0x003f).ram();
+}
 
 
 

@@ -557,7 +557,7 @@ WRITE8_MEMBER(xavix_state::irq_source_w)
 
 void xavix_state::machine_start()
 {
-	
+
 }
 
 void xavix_state::machine_reset()

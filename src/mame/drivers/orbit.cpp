@@ -72,18 +72,6 @@ WRITE_LINE_MEMBER(orbit_state::coin_lockout_w)
 }
 
 
-WRITE_LINE_MEMBER(orbit_state::heat_rst_led_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(orbit_state::hyper_led_w)
-{
-	output().set_led_value(1, state);
-}
-
-
 
 /*************************************
  *
@@ -295,8 +283,8 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(orbit_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(orbit_state, heat_rst_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(orbit_state, hyper_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0"))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led1"))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ORBIT_WARNING_EN>))
 
 	MCFG_WATCHDOG_ADD("watchdog")

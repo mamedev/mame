@@ -307,28 +307,6 @@ WRITE8_MEMBER(sbrkout_state::output_latch_w)
 }
 
 
-WRITE_LINE_MEMBER(sbrkout_state::start_1_led_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(sbrkout_state::start_2_led_w)
-{
-	output().set_led_value(1, state);
-}
-
-
-WRITE_LINE_MEMBER(sbrkout_state::serve_led_w)
-{
-	output().set_led_value(0, !state);
-}
-
-WRITE_LINE_MEMBER(sbrkout_state::serve_2_led_w)
-{
-	output().set_led_value(1, !state);
-}
-
 WRITE_LINE_MEMBER(sbrkout_state::coincount_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -585,12 +563,15 @@ MACHINE_CONFIG_START(sbrkout_state::sbrkout)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // H8
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sbrkout_state, serve_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sbrkout_state, start_1_led_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sbrkout_state, start_2_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // SERV LED (active low)
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("lamp0")) // LAMP1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("lamp1")) // LAMP2
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sbrkout_state, pot_mask1_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sbrkout_state, pot_mask2_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(sbrkout_state, coincount_w))
+	// Note that connecting pin 15 to a pullup, as shown on the schematics, may result in spurious
+	// coin counter activity as stated in Atari bulletin B-0054 (which recommends tying it to the
+	// CPU reset line instead).
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -617,7 +598,7 @@ MACHINE_CONFIG_START(sbrkoutct_state::sbrkoutct)
 	sbrkout(config);
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(sbrkoutct_state, serve_2_led_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // 2nd serve LED
 MACHINE_CONFIG_END
 
 /*************************************

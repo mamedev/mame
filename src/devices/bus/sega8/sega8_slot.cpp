@@ -561,6 +561,10 @@ int sega8_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len) cons
 		}
 	}
 
+	// Lode Runner Japan Europe
+	if (len == 0x8000 && !strncmp((const char *)&ROM[0x226c], "LICENSEDFROMBRODERBUND@SOFTWARE@INC", 35))
+		type = SEGA8_BASE_ROM;
+
 	// Terebi Oekaki (TV Draw)
 	if (len >= 0x13b3 + 7 && !strncmp((const char *)&ROM[0x13b3], "annakmn", 7))
 		type = SEGA8_TEREBIOEKAKI;

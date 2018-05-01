@@ -17,17 +17,17 @@
 
     banking:
     - 0x1c = 0
-    AM_RANGE(0x0000,0x1fff) ROM
-    AM_RANGE(0x2000,0xdfff) NOP
-    AM_RANGE(0xe000,0xffff) RAM
+    map(0x0000,0x1fff).rom()
+    map(0x2000,0xdfff).noprw()
+    map(0xe000,0xffff).ram()
     - 0x1c = 1 0x20 = 1
-    AM_RANGE(0x0000,0x7fff) RAM (0x18 selects bank)
-    AM_RANGE(0x8000,0x87ff) CMOS
-    AM_RANGE(0x8800,0xdfff) NOP or previous bank?
-    AM_RANGE(0xe000,0xffff) RAM
+    map(0x0000,0x7fff).ram() (0x18 selects bank)
+    map(0x8000,0x87ff) CMOS
+    map(0x8800,0xdfff).noprw() or previous bank?
+    map(0xe000,0xffff).ram()
     - 0x1c = 1 0x20 = 0
-    AM_RANGE(0x0000,0xdfff) RAM (0x18 selects bank)
-    AM_RANGE(0xe000,0xffff) RAM
+    map(0x0000,0xdfff).ram() (0x18 selects bank)
+    map(0xe000,0xffff).ram()
 ****************************************************************************/
 
 
@@ -568,12 +568,12 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x30, 0x33).rw(this, FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
 	map(0x34, 0x35).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-//  AM_RANGE(0x3a, 0x3a) GDC zoom
-//  AM_RANGE(0x3b, 0x3b) GDC light pen req
+//  map(0x3a, 0x3a) GDC zoom
+//  map(0x3b, 0x3b) GDC light pen req
 	map(0x3c, 0x3d).rw(this, FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
 	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x50, 0x5f).rw(m_dma_2, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-//  AM_RANGE(0xfc, 0xfd) Multi-Font comms
+//  map(0xfc, 0xfd) Multi-Font comms
 }
 
 /* Input ports */

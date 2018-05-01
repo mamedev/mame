@@ -106,7 +106,7 @@ protected:
 };
 
 // device type definition
-extern const device_type APRICOT_EXPANSION_SLOT;
+DECLARE_DEVICE_TYPE(APRICOT_EXPANSION_SLOT, apricot_expansion_slot_device)
 
 
 // ======================> apricot_expansion_bus_device

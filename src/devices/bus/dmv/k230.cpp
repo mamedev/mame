@@ -46,18 +46,20 @@ void dmv_k230_device::k230_io(address_map &map)
 	map(0x00, 0xff).rw(this, FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
 }
 
-ADDRESS_MAP_START(dmv_k230_device::k234_mem)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00000, 0x7ffff ) AM_READWRITE(program_r, program_w)
-	AM_RANGE( 0xfff00, 0xfffff ) AM_READWRITE(io_r, io_w)
-ADDRESS_MAP_END
+void dmv_k230_device::k234_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00000, 0x7ffff).rw(this, FUNC(dmv_k230_device::program_r), FUNC(dmv_k230_device::program_w));
+	map(0xfff00, 0xfffff).rw(this, FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
+}
 
-ADDRESS_MAP_START(dmv_k230_device::k235_io)
-	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(io_r, io_w)
-	AM_RANGE( 0x90, 0x91 ) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-ADDRESS_MAP_END
+void dmv_k230_device::k235_io(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(this, FUNC(dmv_k230_device::io_r), FUNC(dmv_k230_device::io_w));
+	map(0x90, 0x91).rw("pic8259", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+}
 
 static INPUT_PORTS_START( dmv_k235 )
 	PORT_START("DSW")

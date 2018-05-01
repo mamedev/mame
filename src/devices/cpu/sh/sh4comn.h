@@ -36,7 +36,7 @@
 #define FP_XFS2(r) *( (float  *)(m_sh2_state->m_xf+((r) ^ m_sh2_state->m_fpu_pr)) )
 #endif
 
-#define FPSCR 			mem(&m_sh2_state->m_fpscr)
+#define FPSCR           mem(&m_sh2_state->m_fpscr)
 #define FPS32(reg)      m_fs_regmap[reg]
 #define FPD32(reg)      m_fd_regmap[reg & 14]
 enum

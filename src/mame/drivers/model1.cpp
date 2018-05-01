@@ -585,6 +585,7 @@ Notes:
 
 #include "cpu/i386/i386.h"
 #include "machine/clock.h"
+#include "machine/mb8421.h"
 #include "machine/model1io.h"
 #include "speaker.h"
 
@@ -593,16 +594,6 @@ Notes:
 // On the real system, another 315-5338A is acting as slave
 // and writes the data to the dual port RAM. This isn't
 // emulated yet, data just gets written to RAM.
-
-READ8_MEMBER( model1_state::io_r )
-{
-	return m_dpram[offset];
-}
-
-WRITE8_MEMBER( model1_state::io_w )
-{
-	m_dpram[offset] = data;
-}
 
 WRITE8_MEMBER( model1_state::vf_outputs_w )
 {
@@ -713,15 +704,39 @@ WRITE16_MEMBER(model1_state::bank_w)
 void model1_state::irq_raise(int level)
 {
 	//  logerror("irq: raising %d\n", level);
-	//  irq_status |= (1 << level);
-	m_last_irq = level;
-	m_maincpu->set_input_line(0, HOLD_LINE);
+	m_irq_status |= (1 << level);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
 {
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_irq_status, i))
+		{
+			m_last_irq = i;
+			break;
+		}
+
 	return m_last_irq;
 }
+
+WRITE8_MEMBER(model1_state::irq_control_w)
+{
+	switch (data)
+	{
+	case 0x10:
+		m_irq_status = 0;
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
+
+	case 0x20:
+		m_irq_status &= ~(1 << m_last_irq);
+		if (m_irq_status == 0)
+			m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
+	}
+}
+
 // vf
 // 1 = fe3ed4
 // 3 = fe3f5c
@@ -856,7 +871,7 @@ void model1_state::model1_mem(address_map &map)
 	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
 	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	map(0xc00000, 0xc007ff).ram().share("dpram"); // 2k*8-bit dual port ram
+	map(0xc00000, 0xc00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask16(0x00ff); // 2k*8-bit dual port ram
 
 	map(0xc40000, 0xc40000).rw(m_m1uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc40002, 0xc40002).rw(m_m1uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -866,7 +881,7 @@ void model1_state::model1_mem(address_map &map)
 	map(0xd80000, 0xd80003).w(this, FUNC(model1_state::v60_copro_fifo_w)).mirror(0x10);
 	map(0xdc0000, 0xdc0003).r(this, FUNC(model1_state::fifoin_status_r));
 
-	map(0xe00000, 0xe00001).nopw();        // Watchdog?  IRQ ack? Always 0x20, usually on irq
+	map(0xe00000, 0xe00000).w(this, FUNC(model1_state::irq_control_w));
 	map(0xe00004, 0xe00005).w(this, FUNC(model1_state::bank_w));
 	map(0xe0000c, 0xe0000f).nopw();
 
@@ -1067,15 +1082,15 @@ INPUT_PORTS_END
 	ROM_REGION32_LE( 0x40000, "copro_tables", 0 ) \
 	ROM_LOAD32_WORD("opr14742.bin",  0x000000,  0x20000, CRC(446a1085) SHA1(51b3f4d3a35a36087ea0ba4e26d6e7d17b6418e2) ) \
 	ROM_LOAD32_WORD("opr14743.bin",  0x000002,  0x20000, CRC(e8953554) SHA1(1499f8e30ac15affc66e6f04ae031bb8680d9260) ) \
-    \
+	\
 	ROM_REGION32_LE( 0x80000, "other_data", 0 ) \
-	/* 1/x table */	\
+	/* 1/x table */ \
 	ROM_LOAD32_WORD("opr-14744.58",   0x000000,  0x20000, CRC(730ea9e0) SHA1(651f1db4089a400d073b19ada299b4b08b08f372) ) \
 	ROM_LOAD32_WORD("opr-14745.59",   0x000002,  0x20000, CRC(4c934d96) SHA1(e3349ece0e47f684d61ad11bfea4a90602287350) ) \
 	/* 1/sqrt(x) table */ \
 	ROM_LOAD32_WORD("opr-14746.62",   0x040000,  0x20000, CRC(2a266cbd) SHA1(34e047a93459406c22acf4c25089d1a4955f94ca) ) \
 	ROM_LOAD32_WORD("opr-14747.63",   0x040002,  0x20000, CRC(a4ad5e19) SHA1(7d7ec300eeb9a8de1590011e37108688c092f329) ) \
-    \
+	\
 	ROM_REGION16_LE( 0x20000, "other_other_data", 0 ) \
 	/* 1/(1+x) again, but bottom 16 bits only */ \
 	ROM_LOAD("opr14748.bin",   0x000000,  0x20000, CRC(4a532cb8) SHA1(23280ebbcd6b2bc8a8e643a2d07a58d6598301b8) ) \
@@ -1574,10 +1589,12 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
-	MCFG_MODEL1IO_READ_CB(READ8(model1_state, io_r))
-	MCFG_MODEL1IO_WRITE_CB(WRITE8(model1_state, io_w))
+	MCFG_MODEL1IO_READ_CB(DEVREAD8("dpram", mb8421_device, left_r))
+	MCFG_MODEL1IO_WRITE_CB(DEVWRITE8("dpram", mb8421_device, left_w))
 	MCFG_MODEL1IO_IN0_CB(IOPORT("IN.0"))
 	MCFG_MODEL1IO_IN1_CB(IOPORT("IN.1"))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")

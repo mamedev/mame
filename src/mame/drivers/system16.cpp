@@ -147,7 +147,7 @@ void segas1x_bootleg_state::shinobib_map(address_map &map)
 	map(0x412000, 0x412fff).ram().share("bg1_tileram");
 	map(0x440000, 0x440fff).ram().share("sprites");
 	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
-//  AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_irq_w)
+//  map(0xc40000, 0xc40001).w(this, FUNC(segas1x_bootleg_state::sound_command_irq_w));
 
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc41002, 0xc41003).portr("P1");
@@ -1148,7 +1148,7 @@ void segas1x_bootleg_state::shdancbla_map(address_map &map)
 	map(0xe41002, 0xe41003).portr("P1");
 	map(0xe41004, 0xe41005).portr("P2");
 
-	//AM_RANGE(0xff8038, 0xff8039) AM_READ(shdancbla_ff8038_r)
+//  map(0xff8038, 0xff8039).r(this, FUNC(segas1x_bootleg_state::shdancbla_ff8038_r));
 	map(0xffc000, 0xffffff).ram();
 }
 /***************************************************************************
@@ -1290,16 +1290,16 @@ void segas1x_bootleg_state::mwalkbl_map(address_map &map)
 	map(0x840000, 0x840fff).ram().w(this, FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 
 	/* bootleg video regs */
-	/*AM_RANGE(0xc00000, 0xc00001) AM_NOP
-	AM_RANGE(0xc00002, 0xc00003) AM_NOP
-	AM_RANGE(0xc00004, 0xc00005) AM_NOP // tile bank?
-	AM_RANGE(0xc00006, 0xc00007) AM_NOP
-	AM_RANGE(0xc44000, 0xc44001) AM_NOP
-	AM_RANGE(0xc46000, 0xc46001) AM_NOP
-	AM_RANGE(0xc46200, 0xc46201) AM_NOP
-	AM_RANGE(0xc46400, 0xc464ff) AM_NOP // scroll?
-	AM_RANGE(0xc46500, 0xc465ff) AM_NOP // scroll?
-	*/
+/*  map(0xc00000, 0xc00001).nop();
+    map(0xc00002, 0xc00003).nop();
+    map(0xc00004, 0xc00005).nop(); // tile bank?
+    map(0xc00006, 0xc00007).nop();
+    map(0xc44000, 0xc44001).nop();
+    map(0xc46000, 0xc46001).nop();
+    map(0xc46200, 0xc46201).nop();
+    map(0xc46400, 0xc464ff).nop(); // scroll?
+    map(0xc46500, 0xc465ff).nop(); // scroll?
+    */
 
 	map(0xc40000, 0xc40001).portr("COINAGE");
 	map(0xc40002, 0xc40003).portr("DSW1");

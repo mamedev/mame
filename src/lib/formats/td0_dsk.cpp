@@ -911,7 +911,7 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			break;
 		case 5:
 			if (form_factor != floppy_image::FF_8)
-				return false;	// 8" drive form factor is expected
+				return false;   // 8" drive form factor is expected
 			break;
 	}
 

@@ -803,6 +803,19 @@
 		</part>
 	</software>
 
+	<software name="zaor">
+		<description>Zombies Ate Our Roadies!</description>
+		<year>2017</year>
+		<publisher>Acorn Electron Today</publisher>
+		<info name="author" value="Stuart Johns" />
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="204800">
+				<rom name="zoar-dfs_e.ssd" size="204800" crc="3aca76fd" sha1="b022ffe0f6e3d0e3a4b17b984a4acc1fce26a93b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="adfse00">
 		<description>P.R.E.S. ADFS E00</description>
 		<year>1987</year>

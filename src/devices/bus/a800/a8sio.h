@@ -116,7 +116,7 @@ protected:
 
 
 // device type definition
-extern const device_type A8SIO;
+DECLARE_DEVICE_TYPE(A8SIO, a8sio_device)
 
 
 class device_a8sio_card_interface : public device_slot_card_interface

@@ -47,6 +47,7 @@
 #define CENTRONICS_TAG  "centronics"
 #define RS232_TAG       "rs232"
 #define WANGPC_KEYBOARD_TAG "wangpckb"
+#define LED_DIAGNOSTIC  "led0"
 
 class wangpc_state : public driver_device
 {
@@ -70,6 +71,7 @@ public:
 		m_cent_data_out(*this, "cent_data_out"),
 		m_bus(*this, WANGPC_BUS_TAG),
 		m_sw(*this, "SW"),
+		m_led_diagnostic(*this, LED_DIAGNOSTIC),
 		m_timer2_irq(1),
 		m_centronics_ack(1),
 		m_dav(1),
@@ -89,6 +91,9 @@ public:
 	{
 	}
 
+	void wangpc(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
@@ -105,6 +110,7 @@ public:
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<wangpcbus_device> m_bus;
 	required_ioport m_sw;
+	output_finder<> m_led_diagnostic;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -189,6 +195,9 @@ public:
 	image_init_result on_disk1_load(floppy_image_device *image);
 	void on_disk1_unload(floppy_image_device *image);
 
+	void wangpc_io(address_map &map);
+	void wangpc_mem(address_map &map);
+
 	uint8_t m_dma_page[4];
 	int m_dack;
 
@@ -214,9 +223,6 @@ public:
 	int m_ds2;
 
 	int m_led[6];
-	void wangpc(machine_config &config);
-	void wangpc_io(address_map &map);
-	void wangpc_mem(address_map &map);
 };
 
 
@@ -226,11 +232,6 @@ public:
 //**************************************************************************
 
 #define LOG 0
-
-enum
-{
-	LED_DIAGNOSTIC = 0
-};
 
 
 
@@ -511,7 +512,7 @@ READ8_MEMBER( wangpc_state::led_on_r )
 {
 	if (LOG) logerror("%s: Diagnostic LED on\n", machine().describe_context());
 
-	output().set_led_value(LED_DIAGNOSTIC, 1);
+	m_led_diagnostic = 1;
 
 	return 0xff;
 }
@@ -675,7 +676,7 @@ READ8_MEMBER( wangpc_state::led_off_r )
 {
 	if (LOG) logerror("%s: Diagnostic LED off\n", machine().describe_context());
 
-	output().set_led_value(LED_DIAGNOSTIC, 0);
+	m_led_diagnostic = 0;
 
 	return 0xff;
 }
@@ -1187,6 +1188,8 @@ void wangpc_state::machine_start()
 	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk0_unload, this));
 	m_floppy1->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
 	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
+
+	m_led_diagnostic.resolve();
 
 	// state saving
 	save_item(NAME(m_dma_page));

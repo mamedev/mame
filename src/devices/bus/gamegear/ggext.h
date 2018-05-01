@@ -46,8 +46,7 @@
 
 class device_gg_ext_port_interface;
 
-class gg_ext_port_device : public device_t,
-								public device_slot_interface
+class gg_ext_port_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -113,10 +112,10 @@ protected:
 
 
 // device type definition
-extern const device_type GG_EXT_PORT;
+DECLARE_DEVICE_TYPE(GG_EXT_PORT, gg_ext_port_device)
 
 
-SLOT_INTERFACE_EXTERN( gg_ext_port_devices );
+SLOT_INTERFACE_EXTERN(gg_ext_port_devices);
 
 
 #endif // MAME_BUS_GAMEGEAR_GGEXT_H

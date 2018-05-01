@@ -1423,7 +1423,7 @@ void stvcd_device::cd_exec_command()
 			cr_standard_return(cd_stat);
 			hirqreg |= (CMOK|MPED);
 			break;
-			
+
 		// following are MPEG commands, enough to get Sport Fishing to do something
 		// MPEG Get Status
 		case 0x90:
@@ -1456,7 +1456,7 @@ void stvcd_device::cd_exec_command()
 			cr4 = 0;
 			break;
 
-			
+
 		default:
 			LOG("Unknown command %04x\n", cr1>>8);
 			popmessage("CD Block unknown command %02x, contact MAMEdev",cr1>>8);

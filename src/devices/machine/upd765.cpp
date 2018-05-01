@@ -28,10 +28,11 @@ void upd765a_device::map(address_map &map)
 	map(0x1, 0x1).rw(this, FUNC(upd765a_device::fifo_r), FUNC(upd765a_device::fifo_w));
 }
 
-ADDRESS_MAP_START(upd765b_device::map)
-	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
-ADDRESS_MAP_END
+void upd765b_device::map(address_map &map)
+{
+	map(0x0, 0x0).r(this, FUNC(upd765b_device::msr_r));
+	map(0x1, 0x1).rw(this, FUNC(upd765b_device::fifo_r), FUNC(upd765b_device::fifo_w));
+}
 
 void i8272a_device::map(address_map &map)
 {
@@ -45,10 +46,11 @@ void upd72065_device::map(address_map &map)
 	map(0x1, 0x1).rw(this, FUNC(upd72065_device::fifo_r), FUNC(upd72065_device::fifo_w));
 }
 
-ADDRESS_MAP_START(i82072_device::map)
-	AM_RANGE(0x0, 0x0) AM_READWRITE(msr_r, dsr_w)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
-ADDRESS_MAP_END
+void i82072_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(this, FUNC(i82072_device::msr_r), FUNC(i82072_device::dsr_w));
+	map(0x1, 0x1).rw(this, FUNC(i82072_device::fifo_r), FUNC(i82072_device::fifo_w));
+}
 
 void smc37c78_device::map(address_map &map)
 {
@@ -103,25 +105,28 @@ void pc8477a_device::map(address_map &map)
 	map(0x7, 0x7).rw(this, FUNC(pc8477a_device::dir_r), FUNC(pc8477a_device::ccr_w));
 }
 
-ADDRESS_MAP_START(wd37c65c_device::map)
-	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
-	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
-ADDRESS_MAP_END
+void wd37c65c_device::map(address_map &map)
+{
+	map(0x0, 0x0).r(this, FUNC(wd37c65c_device::msr_r));
+	map(0x1, 0x1).rw(this, FUNC(wd37c65c_device::fifo_r), FUNC(wd37c65c_device::fifo_w));
+}
 
-ADDRESS_MAP_START(mcs3201_device::map)
-	AM_RANGE(0x0, 0x0) AM_READ(input_r)
-	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
-	AM_RANGE(0x4, 0x4) AM_READ(msr_r)
-	AM_RANGE(0x5, 0x5) AM_READWRITE(fifo_r, fifo_w)
-	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
-ADDRESS_MAP_END
+void mcs3201_device::map(address_map &map)
+{
+	map(0x0, 0x0).r(this, FUNC(mcs3201_device::input_r));
+	map(0x2, 0x2).w(this, FUNC(mcs3201_device::dor_w));
+	map(0x4, 0x4).r(this, FUNC(mcs3201_device::msr_r));
+	map(0x5, 0x5).rw(this, FUNC(mcs3201_device::fifo_r), FUNC(mcs3201_device::fifo_w));
+	map(0x7, 0x7).rw(this, FUNC(mcs3201_device::dir_r), FUNC(mcs3201_device::ccr_w));
+}
 
-ADDRESS_MAP_START(tc8566af_device::map)
-	AM_RANGE(0x2, 0x2) AM_WRITE(dor_w)
-	AM_RANGE(0x3, 0x3) AM_WRITE(cr1_w)
-	AM_RANGE(0x4, 0x4) AM_READ(msr_r)
-	AM_RANGE(0x5, 0x5) AM_READWRITE(fifo_r, fifo_w)
-ADDRESS_MAP_END
+void tc8566af_device::map(address_map &map)
+{
+	map(0x2, 0x2).w(this, FUNC(tc8566af_device::dor_w));
+	map(0x3, 0x3).w(this, FUNC(tc8566af_device::cr1_w));
+	map(0x4, 0x4).r(this, FUNC(tc8566af_device::msr_r));
+	map(0x5, 0x5).rw(this, FUNC(tc8566af_device::fifo_r), FUNC(tc8566af_device::fifo_w));
+}
 
 
 constexpr int upd765_family_device::rates[4];

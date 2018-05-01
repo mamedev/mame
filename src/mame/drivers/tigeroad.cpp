@@ -13,12 +13,12 @@ Please contact Phil Stroffolino (phil@maya.com) if there are any questions
 regarding this driver.
 
 TODO:
-- F1 Dream throws an address error if player wins all the races (i.e. when the 
+- F1 Dream throws an address error if player wins all the races (i.e. when the
   game is supposed to give an ending):
   010C68: 102E 001C      move.b  ($1c,A6), D0       ; reads 0xf from work RAM (misaligned)
   010C6C: 207B 000E      movea.l ($e,PC,D0.w), A0   ; table from 0x10c7c onward
   010C70: 4E90           jsr     (A0)               ; throws address error here
-  None of the available 5 vectors seems to fit here, btanb? 
+  None of the available 5 vectors seems to fit here, btanb?
 
 **************************************************************************
 

@@ -386,7 +386,7 @@ private:
 DECLARE_DEVICE_TYPE(MC68328, mc68328_device)
 
 #define MCFG_MC68328_CPU(_tag) \
-	downcast<mc68328_device &>(*device).set_cpu_tag("^" _tag);
+	downcast<mc68328_device &>(*device).set_cpu_tag(_tag);
 
 #define MCFG_MC68328_OUT_PORT_A_CB(_devcb) \
 	devcb = &downcast<mc68328_device &>(*device).set_out_port_a_callback(DEVCB_##_devcb);

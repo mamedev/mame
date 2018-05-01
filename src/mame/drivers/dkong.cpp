@@ -2439,6 +2439,32 @@ ROM_START( dkongjr )
 	ROM_LOAD( "djr1-v-2n.2n",     0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
 ROM_END
 
+ROM_START( dkongjr2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0",            0x0000, 0x2000, CRC(dc1f1d12) SHA1(d0faac0310b0273429ccb3387b914792d1a312eb) )
+	ROM_LOAD( "1",            0x2000, 0x2000, CRC(f1f286d0) SHA1(cd87770c968d10623f312f651955ad9b1f85c6df) )
+	ROM_LOAD( "2",            0x4000, 0x2000, CRC(4cb856c4) SHA1(e5ac7155b13cac2c201fa733f5061fb4a0ceafa4) )
+	ROM_LOAD( "diag.bin",     0x8000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x1000, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "8",            0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "9",            0x0000, 0x1000, CRC(8d51aca9) SHA1(64887564b079d98e98aafa53835e398f34fe4e3f) )
+	ROM_LOAD( "10",           0x1000, 0x1000, CRC(4ef64ba5) SHA1(41a7a4005087951f57f62c9751d62a8c495e6bb3) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 ) // not dumped for this set
+	ROM_LOAD( "v_7c.bin",     0x0000, 0x0800, CRC(dc7f4164) SHA1(07a6242e95b5c3b8dfdcd4b4950f463dba16dd77) )
+	ROM_LOAD( "v_7d.bin",     0x0800, 0x0800, CRC(0ce7dcf6) SHA1(0654b77526c49f0dfa077ac4f1f69cf5cb2e2f64) )
+	ROM_LOAD( "v_7e.bin",     0x1000, 0x0800, CRC(24d1ff17) SHA1(696854bf3dc5447d33b4815db357e6ce3834d867) )
+	ROM_LOAD( "v_7f.bin",     0x1800, 0x0800, CRC(0f8c083f) SHA1(0b688ae9da296b2447fffa5e135fd6a56ec3e790) )
+
+	ROM_REGION( 0x0300, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "c-2e.bpr",  0x0000, 0x0100, CRC(463dc7ad) SHA1(b2c9f22facc8885be2d953b056eb8dcddd4f34cb) )   /* palette low 4 bits (inverted) */
+	ROM_LOAD( "c-2f.bpr",  0x0100, 0x0100, CRC(47ba0042) SHA1(dbec3f4b8013628c5b8f83162e5f8b1f82f6ee5f) )   /* palette high 4 bits (inverted) */
+	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )   /* character color codes on a per-column basis */
+ROM_END
+
 ROM_START( dkongjrj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c_5ba.bin",    0x0000, 0x1000, CRC(50a015ce) SHA1(edcafdf8f989dd25bb142817084d270a6942577a) )
@@ -3675,6 +3701,7 @@ GAME( 2006, dkongx11,  dkong,    dk_braze,  dkongx,   dkong_state, dkongx,   ROT
 GAME( 2013, dkongpe,   dkong,    dkong2b,   dkong,    dkong_state, 0,        ROT270, "hack (Clay Cowgill and Mike Mika)", "Donkey Kong: Pauline Edition Rev 5 (2013-04-22)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, dkongjr,   0,        dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "Nintendo of America", "Donkey Kong Junior (US set F-2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dkongjr2,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "Nintendo of America", "Donkey Kong Junior (US, bootleg?)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrj,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "Nintendo",            "Donkey Kong Jr. (Japan)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjnrj, dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "Nintendo",            "Donkey Kong Junior (Japan set F-1)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, dkongjrb,  dkongjr,  dkongjr,   dkongjr,  dkong_state, 0,        ROT270, "bootleg",             "Donkey Kong Jr. (bootleg)",                    MACHINE_SUPPORTS_SAVE )

@@ -5,8 +5,10 @@
 --   "ports":{
 --     "<ioport name>":{
 --       "labels":{
---         "player":<int player number>,
---         "name":"<field label>"
+--         "<field mask>":{
+--           "player":<int player number>,
+--           "name":"<field label>"
+--         }
 --     },{
 --       ...
 --     }
@@ -72,14 +74,22 @@ function portname.startplugin()
 			local ports = {}
 			for pname, port in pairs(manager:machine():ioport().ports) do
 				local labels = {}
-				ports[pname] = { labels = labels }
+				local sort = {}
 				for fname, field in pairs(port.fields) do
 					local mask = tostring(field.mask)
 					if not labels[mask] then
+						sort[#sort + 1] = mask
 						labels[mask] = { name = fname, player = field.player }
 						setmetatable(labels[mask], { __tojson = function(v,s)
+							local label = { name = v.name, player = v.player }
+							setmetatable(label, { __jsonorder = { "player", "name" }})
 							return json.stringify({ name = v.name, player = v.player }) end })
 					end
+				end
+				if #sort > 0 then
+					table.sort(sort, function(i, j) return tonumber(i) < tonumber(j) end)
+					setmetatable(labels, { __jsonorder = sort })
+					ports[pname] = { labels = labels }
 				end
 			end
 			local function check_path(path)
@@ -117,6 +127,7 @@ function portname.startplugin()
 			if emu.softname() ~= "" then
 				ctable.softname = emu.softname()
 			end
+			setmetatable(ctable, { __jsonorder = { "romname", "softname", "ports" }})
 			file:write(json.stringify(ctable, { indent = true }))
 			file:close()
 			manager:machine():popmessage(string.format(_("Input port name file saved to %s"), ctrlrpath .. "/portname/" .. filename))

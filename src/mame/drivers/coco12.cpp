@@ -38,6 +38,7 @@
 #include "bus/coco/coco_t4426.h"
 
 #include "cpu/m6809/m6809.h"
+#include "cpu/m6809/hd6309.h"
 #include "imagedev/cassette.h"
 #include "sound/volt_reg.h"
 
@@ -504,6 +505,14 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("dragon_cart_list", "dragon_cart")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(coco12_state::cocoh)
+	coco(config);
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(coco_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(coco12_state::cocoe)
 	coco(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
@@ -513,6 +522,14 @@ MACHINE_CONFIG_START(coco12_state::cocoe)
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 	MCFG_COCO_VHD_ADD(VHD0_TAG)
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(coco12_state::cocoeh)
+	cocoe(config);
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(coco_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::coco2)
@@ -526,6 +543,14 @@ MACHINE_CONFIG_START(coco12_state::coco2)
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(coco12_state::coco2h)
+	coco2(config);
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(coco_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(coco12_state::coco2b)
 	coco2(config);
 	MCFG_DEVICE_REMOVE(VDG_TAG)
@@ -533,6 +558,14 @@ MACHINE_CONFIG_START(coco12_state::coco2b)
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(coco12_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(coco12_state, field_sync))
 	MCFG_MC6847_INPUT_CALLBACK(DEVREAD8(SAM_TAG, sam6883_device, display_read))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(coco12_state::coco2bh)
+	coco2b(config);
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(coco_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::cp400)
@@ -631,15 +664,24 @@ ROM_START(cd6809)
 	ROMX_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175), ROM_BIOS(2))
 ROM_END
 
+#define rom_cocoh rom_coco
+#define rom_cocoeh rom_cocoe
+#define rom_coco2h rom_coco2
+#define rom_coco2bh rom_coco2b
+
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //     YEAR     NAME        PARENT  COMPAT  MACHINE  INPUT     STATE         INIT  COMPANY                         FULLNAME                               FLAGS
 COMP(  1980,    coco,       0,      0,      coco,    coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer",                      0 )
+COMP(  19??,    cocoh,      coco,   0,      cocoh,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_UNOFFICIAL )
 COMP(  1981,    cocoe,      coco,   0,      cocoe,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", 0 )
+COMP(  19??,    cocoeh,     coco,   0,      cocoeh,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_UNOFFICIAL )
 COMP(  1983,    coco2,      coco,   0,      coco2,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2",                    0 )
+COMP(  19??,    coco2h,     coco,   0,      coco2h,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_UNOFFICIAL )
 COMP(  1985?,   coco2b,     coco,   0,      coco2b,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2B",                   0 )
+COMP(  19??,    coco2bh,    coco,   0,      coco2bh, coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_UNOFFICIAL )
 COMP(  1983,    cp400,      coco,   0,      cp400,   coco,     coco12_state, 0,    "Prológica",                    "CP400",                               0 )
 COMP(  1985,    cp400c2,    coco,   0,      cp400,   cp400c2,  coco12_state, 0,    "Prológica",                    "CP400 Color II",                      0 )
 COMP(  1983,    lzcolor64,  coco,   0,      coco,    coco,     coco12_state, 0,    "Novo Tempo / LZ Equipamentos", "Color64",                             0 )

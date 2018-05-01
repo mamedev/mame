@@ -32,9 +32,9 @@ TODO:
 //**************************************************************************
 
 #define MCFG_CDISLAVE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MACHINE_CDISLAVE, 0)
+	MCFG_DEVICE_ADD(_tag, CDISLAVE, 0)
 #define MCFG_CDISLAVE_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDISLAVE, 0)
+	MCFG_DEVICE_REPLACE(_tag, CDISLAVE, 0)
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -107,6 +107,6 @@ private:
 
 
 // device type definition
-extern const device_type MACHINE_CDISLAVE;
+DECLARE_DEVICE_TYPE(CDISLAVE, cdislave_device)
 
 #endif // __CDISLAVE_H__

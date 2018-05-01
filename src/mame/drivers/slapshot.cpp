@@ -261,7 +261,7 @@ void slapshot_state::opwolf3_map(address_map &map)
 	map(0xc00020, 0xc0002f).r(this, FUNC(slapshot_state::service_input_r));   /* service mirror */
 	map(0xd00000, 0xd00003).rw(this, FUNC(slapshot_state::msb_sound_r), FUNC(slapshot_state::msb_sound_w));
 	map(0xe00000, 0xe0000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0xff00);
-//	map(0xe80000, 0xe80001) // gun recoil here?
+//  map(0xe80000, 0xe80001) // gun recoil here?
 }
 
 

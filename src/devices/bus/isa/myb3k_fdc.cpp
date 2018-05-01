@@ -51,19 +51,21 @@
 DEFINE_DEVICE_TYPE(ISA8_MYB3K_FDC4710, isa8_myb3k_fdc4710_device, "isa8_myb3k_fdc4710", "FDC4710 SSDD Floppy Disk Controller")
 DEFINE_DEVICE_TYPE(ISA8_MYB3K_FDC4711, isa8_myb3k_fdc4711_device, "isa8_myb3k_fdc4711", "FDC4711 DSDD Floppy Disk Controller")
 
-ADDRESS_MAP_START(isa8_myb3k_fdc4710_device::map)
+void isa8_myb3k_fdc4710_device::map(address_map &map)
+{
 //  AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", mb8876_device, read, write) AM_MIRROR(0x500)
-	AM_RANGE(0x00, 0x03) AM_READ(myb3k_inv_fdc_data_r) AM_WRITE(myb3k_inv_fdc_data_w) AM_MIRROR(0x500)
-	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_fdc_command) AM_MIRROR(0x500)
-	AM_RANGE(0x05, 0x05) AM_READ(myb3k_fdc_status) AM_MIRROR(0x500)
-ADDRESS_MAP_END
+	map(0x00, 0x03).r(this, FUNC(isa8_myb3k_fdc4710_device::myb3k_inv_fdc_data_r)).w(this, FUNC(isa8_myb3k_fdc4710_device::myb3k_inv_fdc_data_w)).mirror(0x500);
+	map(0x04, 0x04).w(this, FUNC(isa8_myb3k_fdc4710_device::myb3k_fdc_command)).mirror(0x500);
+	map(0x05, 0x05).r(this, FUNC(isa8_myb3k_fdc4710_device::myb3k_fdc_status)).mirror(0x500);
+}
 
-ADDRESS_MAP_START(isa8_myb3k_fdc4711_device::map)
+void isa8_myb3k_fdc4711_device::map(address_map &map)
+{
 //  AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("fdc", fd1791_device, read, write) AM_MIRROR(0x500)
-	AM_RANGE(0x00, 0x03) AM_READ(myb3k_inv_fdc_data_r) AM_WRITE(myb3k_inv_fdc_data_w) AM_MIRROR(0x500)
-	AM_RANGE(0x04, 0x04) AM_WRITE(myb3k_fdc_command) AM_MIRROR(0x500)
-	AM_RANGE(0x05, 0x05) AM_READ(myb3k_fdc_status) AM_MIRROR(0x500)
-ADDRESS_MAP_END
+	map(0x00, 0x03).r(this, FUNC(isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_r)).w(this, FUNC(isa8_myb3k_fdc4711_device::myb3k_inv_fdc_data_w)).mirror(0x500);
+	map(0x04, 0x04).w(this, FUNC(isa8_myb3k_fdc4711_device::myb3k_fdc_command)).mirror(0x500);
+	map(0x05, 0x05).r(this, FUNC(isa8_myb3k_fdc4711_device::myb3k_fdc_status)).mirror(0x500);
+}
 
 FLOPPY_FORMATS_MEMBER( isa8_myb3k_fdc4710_device::myb3k_floppy_formats )
 	FLOPPY_IMD_FORMAT

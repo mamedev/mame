@@ -24,14 +24,15 @@ INPUT_PORTS_START( jasmin )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Boot") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHANGED_MEMBER(DEVICE_SELF, jasmin_device, boot_pressed, nullptr)
 INPUT_PORTS_END
 
-ADDRESS_MAP_START(jasmin_device::map)
-	AM_RANGE(0x3f4, 0x3f7) AM_DEVREADWRITE("fdc", wd1770_device, read, write)
-	AM_RANGE(0x3f8, 0x3f8) AM_WRITE(side_sel_w)
-	AM_RANGE(0x3f9, 0x3f9) AM_WRITE(fdc_reset_w)
-	AM_RANGE(0x3fa, 0x3fa) AM_WRITE(ram_access_w)
-	AM_RANGE(0x3fb, 0x3fb) AM_WRITE(rom_access_w)
-	AM_RANGE(0x3fc, 0x3ff) AM_WRITE(select_w)
-ADDRESS_MAP_END
+void jasmin_device::map(address_map &map)
+{
+	map(0x3f4, 0x3f7).rw("fdc", FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0x3f8, 0x3f8).w(this, FUNC(jasmin_device::side_sel_w));
+	map(0x3f9, 0x3f9).w(this, FUNC(jasmin_device::fdc_reset_w));
+	map(0x3fa, 0x3fa).w(this, FUNC(jasmin_device::ram_access_w));
+	map(0x3fb, 0x3fb).w(this, FUNC(jasmin_device::rom_access_w));
+	map(0x3fc, 0x3ff).w(this, FUNC(jasmin_device::select_w));
+}
 
 jasmin_device::jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	oricext_device(mconfig, JASMIN, tag, owner, clock),

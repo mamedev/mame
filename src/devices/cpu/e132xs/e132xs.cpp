@@ -162,35 +162,41 @@
 
 // 4Kb IRAM (On-Chip Memory)
 
-ADDRESS_MAP_START(hyperstone_device::e116_4k_iram_map)
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_MIRROR(0x1ffff000)
-ADDRESS_MAP_END
+void hyperstone_device::e116_4k_iram_map(address_map &map)
+{
+	map(0xc0000000, 0xc0000fff).ram().mirror(0x1ffff000);
+}
 
-ADDRESS_MAP_START(hyperstone_device::e132_4k_iram_map)
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_MIRROR(0x1ffff000)
-ADDRESS_MAP_END
+void hyperstone_device::e132_4k_iram_map(address_map &map)
+{
+	map(0xc0000000, 0xc0000fff).ram().mirror(0x1ffff000);
+}
 
 
 // 8Kb IRAM (On-Chip Memory)
 
-ADDRESS_MAP_START(hyperstone_device::e116_8k_iram_map)
-	AM_RANGE(0xc0000000, 0xc0001fff) AM_RAM AM_MIRROR(0x1fffe000)
-ADDRESS_MAP_END
+void hyperstone_device::e116_8k_iram_map(address_map &map)
+{
+	map(0xc0000000, 0xc0001fff).ram().mirror(0x1fffe000);
+}
 
-ADDRESS_MAP_START(hyperstone_device::e132_8k_iram_map)
-	AM_RANGE(0xc0000000, 0xc0001fff) AM_RAM AM_MIRROR(0x1fffe000)
-ADDRESS_MAP_END
+void hyperstone_device::e132_8k_iram_map(address_map &map)
+{
+	map(0xc0000000, 0xc0001fff).ram().mirror(0x1fffe000);
+}
 
 
 // 16Kb IRAM (On-Chip Memory)
 
-ADDRESS_MAP_START(hyperstone_device::e116_16k_iram_map)
-	AM_RANGE(0xc0000000, 0xc0003fff) AM_RAM AM_MIRROR(0x1fffc000)
-ADDRESS_MAP_END
+void hyperstone_device::e116_16k_iram_map(address_map &map)
+{
+	map(0xc0000000, 0xc0003fff).ram().mirror(0x1fffc000);
+}
 
-ADDRESS_MAP_START(hyperstone_device::e132_16k_iram_map)
-	AM_RANGE(0xc0000000, 0xc0003fff) AM_RAM AM_MIRROR(0x1fffc000)
-ADDRESS_MAP_END
+void hyperstone_device::e132_16k_iram_map(address_map &map)
+{
+	map(0xc0000000, 0xc0003fff).ram().mirror(0x1fffc000);
+}
 
 
 //-------------------------------------------------

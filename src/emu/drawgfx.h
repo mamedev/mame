@@ -449,7 +449,7 @@ constexpr u32 alpha_blend_r32(u32 d, u32 s, u8 level)
 // ======================> gfxdecode_device
 
 // device type definition
-extern const device_type GFXDECODE;
+DECLARE_DEVICE_TYPE(GFXDECODE, gfxdecode_device)
 
 class gfxdecode_device : public device_t, public device_gfx_interface
 {

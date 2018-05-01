@@ -280,18 +280,20 @@ READ16_MEMBER( sns_rom_setadsp_device::setadsp_data_r )
 //  ADDRESS_MAP( st01x_prg_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(sns_rom_setadsp_device::st01x_prg_map)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(setadsp_prg_r)
-ADDRESS_MAP_END
+void sns_rom_setadsp_device::st01x_prg_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(this, FUNC(sns_rom_setadsp_device::setadsp_prg_r));
+}
 
 
 //-------------------------------------------------
 //  ADDRESS_MAP( st01x_data_map )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(sns_rom_setadsp_device::st01x_data_map)
-	AM_RANGE(0x0000, 0x07ff) AM_READ(setadsp_data_r)
-ADDRESS_MAP_END
+void sns_rom_setadsp_device::st01x_data_map(address_map &map)
+{
+	map(0x0000, 0x07ff).r(this, FUNC(sns_rom_setadsp_device::setadsp_data_r));
+}
 
 
 //-------------------------------------------------

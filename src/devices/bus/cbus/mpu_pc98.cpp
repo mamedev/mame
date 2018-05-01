@@ -61,9 +61,10 @@ mpu_pc98_device::mpu_pc98_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-ADDRESS_MAP_START(mpu_pc98_device::map)
-	AM_RANGE(0, 3) AM_DEVREADWRITE8(MPU_CORE_TAG, mpu401_device, mpu_r, mpu_w, 0xff)
-ADDRESS_MAP_END
+void mpu_pc98_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(MPU_CORE_TAG, FUNC(mpu401_device::mpu_r), FUNC(mpu401_device::mpu_w));
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

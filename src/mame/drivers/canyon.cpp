@@ -101,16 +101,6 @@ WRITE8_MEMBER(canyon_state::output_latch_w)
 	m_outlatch->write_bit((offset & 0x180) >> 6 | BIT(offset, 0), BIT(offset, 1));
 }
 
-WRITE_LINE_MEMBER(canyon_state::led1_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(canyon_state::led2_w)
-{
-	output().set_led_value(1, state);
-}
-
 
 
 
@@ -258,8 +248,8 @@ MACHINE_CONFIG_START(canyon_state::canyon)
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // C7
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE1_EN>))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_WHISTLE2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(canyon_state, led1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(canyon_state, led2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led0")) // 1 PLAYER LAMP
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // 2 PLAYER LAMP
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT1_EN>))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<CANYON_ATTRACT2_EN>))
 

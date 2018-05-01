@@ -40,24 +40,28 @@ DEFINE_DEVICE_TYPE(NEC_D552,  upd552_cpu_device,  "upd552",  "NEC uPD552") // 42
 
 
 // internal memory maps
-ADDRESS_MAP_START(ucom4_cpu_device::program_1k)
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
+void ucom4_cpu_device::program_1k(address_map &map)
+{
+	map(0x0000, 0x03ff).rom();
+}
 
-ADDRESS_MAP_START(ucom4_cpu_device::program_2k)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+void ucom4_cpu_device::program_2k(address_map &map)
+{
+	map(0x0000, 0x07ff).rom();
+}
 
 
-ADDRESS_MAP_START(ucom4_cpu_device::data_64x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
+void ucom4_cpu_device::data_64x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+}
 
-ADDRESS_MAP_START(ucom4_cpu_device::data_96x4)
-	AM_RANGE(0x00, 0x3f) AM_RAM
-	AM_RANGE(0x40, 0x4f) AM_RAM
-	AM_RANGE(0x70, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void ucom4_cpu_device::data_96x4(address_map &map)
+{
+	map(0x00, 0x3f).ram();
+	map(0x40, 0x4f).ram();
+	map(0x70, 0x7f).ram();
+}
 
 
 // device definitions
