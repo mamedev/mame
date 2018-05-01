@@ -1069,8 +1069,8 @@ void twinkle_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, in
 void twinkle_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE( 0, "^^^^speakerleft", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "^^^^speakerright", 1.0 )
+	MCFG_SOUND_ROUTE( 0, "^^speakerleft", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "^^speakerright", 1.0 )
 }
 
 MACHINE_CONFIG_START(twinkle_state::twinkle)

@@ -20,6 +20,7 @@
 #include <functional>
 #include <iterator>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 
 //**************************************************************************
@@ -249,6 +250,15 @@ public:
 	///   otherwise.
 	virtual bool findit(bool isvalidation = false) = 0;
 
+	/// \brief Clear temporary binding from configuration
+	///
+	/// Concrete derived classes must implement this member function.
+	/// Object finders may allow temporary binding to the anticipated
+	/// target during configuration.  This needs to be cleared to ensure
+	/// the correct target is found if a device further up the hierarchy
+	/// subsequently removes or replaces devices.
+	virtual void end_configuration() = 0;
+
 	/// \brief Get search tag
 	///
 	/// Returns the search tag.
@@ -287,10 +297,8 @@ public:
 	/// Some objects must be resolved before memory maps are loaded
 	/// (devices for instance), some after (memory shares for
 	/// instance).
-	///
 	/// \return True if the target object has to be resolved before
-	/// memory maps are loaded
-
+	///   memory maps are loaded
 	virtual bool is_pre_map() const { return false; }
 
 	/// \brief Dummy tag always treated as not found
@@ -412,6 +420,14 @@ template <class ObjectClass, bool Required>
 class object_finder_base : public finder_base
 {
 public:
+	/// \brief Clear temporary binding from configuration
+	///
+	/// Object finders may allow temporary binding to the anticipated
+	/// target during configuration.  This needs to be cleared to ensure
+	/// the correct target is found if a device further up the hierarchy
+	/// subsequently removes or replaces devices.
+	virtual void end_configuration() override { m_target = nullptr; }
+
 	/// \brief Get pointer to target object
 	/// \return Pointer to target object if found, or nullptr otherwise.
 	ObjectClass *target() const { return m_target; }
@@ -494,12 +510,53 @@ public:
 	/// Some objects must be resolved before memory maps are loaded
 	/// (devices for instance), some after (memory shares for
 	/// instance).
-	///
 	/// \return True if the target object has to be resolved before
-	/// memory maps are loaded
+	///   memory maps are loaded.
 	virtual bool is_pre_map() const override { return true; }
 
+	/// \brief Set target during configuration
+	///
+	/// During configuration, device_finder instances may be assigned
+	/// a reference to the anticipated target device to avoid the need
+	/// for tempories during configuration.  Normal resolution will
+	/// still happen after machine configuration is completed to ensure 
+	/// device removal/replacement is handled properly.
+	/// \param [in] device Reference to anticipated target device.
+	/// \return The same reference supplied by the caller.
+	template <typename T>
+	std::enable_if_t<std::is_convertible<T *, DeviceClass *>::value, T &> operator=(T &device)
+	{
+		assert(is_expected_tag(device));
+		this->m_target = &device;
+		return device;
+	}
+
 private:
+	template <typename T> struct is_device_implementation
+	{ static constexpr bool value = std::is_base_of<device_t, T>::value; };
+	template <typename T> struct is_device_interface
+	{ static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value; };
+
+	/// \brief Check that device implementation has expected tag
+	/// \param [in] device Reference to device.
+	/// \return True if supplied device matches the configured target
+	///   tag, or false otherwise.
+	template <typename T>
+	std::enable_if_t<is_device_implementation<T>::value, bool> is_expected_tag(T const &device) const
+	{
+		return this->m_base.get().subtag(this->m_tag) == device.tag();
+	}
+
+	/// \brief Check that device mixin has expected tag
+	/// \param [in] device Reference to interface/mixin.
+	/// \return True if supplied mixin matches the configured target
+	///   tag, or false otherwise.
+	template <typename T>
+	std::enable_if_t<is_device_interface<T>::value, bool> is_expected_tag(T const &interface) const
+	{
+		return this->m_base.get().subtag(this->m_tag) == interface.device().tag();
+	}
+
 	/// \brief Find device
 	///
 	/// Find device of desired type with requested tag.  If a device
