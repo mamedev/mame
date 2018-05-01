@@ -11663,6 +11663,9 @@ quarterhb                       // (c) 1983 Electro-Sports
 @source:dynadice.cpp
 dynadice                        // ?
 
+@source:dynamoah.cpp
+dynamoah                        //
+
 @source:dynax.cpp
 7jigen                          // "37" 7jigen no Youseitachi 1990 Dynax
 blktouch                        // (c) Yang Gi Co Ltd.
