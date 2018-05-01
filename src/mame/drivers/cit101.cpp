@@ -118,6 +118,8 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 		u8 char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
 		if (line == 9 && BIT(attr, 0))
 			char_data ^= 0xff;
+		if (BIT(attr, 1))
+			char_data ^= 0xff;
 		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
 		{
 			if (x >= cliprect.left() && x <= cliprect.right())
@@ -132,6 +134,8 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 				attr = m_extraram[rowaddr];
 				char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
 				if (line == 9 && BIT(attr, 0))
+					char_data ^= 0xff;
+				if (BIT(attr, 1))
 					char_data ^= 0xff;
 			}
 		}
