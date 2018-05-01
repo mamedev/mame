@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- The BBC Bridge Companion only used a cartridge slot for software -->
-<softwarelist name="bbcbc" description="BBC Bridge Companion cartridges">
+
+<!-- The Acorn BBC Bridge Companion only used a cartridge slot for software -->
+
+<softwarelist name="bbcbc" description="Acorn BBC Bridge Companion cartridges">
 	<software name="advbidng">
 		<description>Advanced Bidding</description>
 		<year>198?</year>
