@@ -213,6 +213,8 @@ CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 	return retval[port != nullptr ? port->read() & 7 : 0];
 }
 
+// TODO: proper motorcpu hook-up
+
 READ16_MEMBER(topspeed_state::motor_r)
 {
 	switch (offset)
@@ -683,6 +685,9 @@ ROM_START( topspeed )
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) // Banked stuff
 
+	ROM_REGION( 0x8000, "motorcpu", 0 )
+	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
+
 	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
 	ROM_LOAD16_BYTE( "b14-07.54",   0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
 	ROM_LOAD16_BYTE( "b14-06.52",   0x00001, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
@@ -733,6 +738,9 @@ ROM_START( topspeedu )
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) // Banked stuff
 
+	ROM_REGION( 0x8000, "motorcpu", 0 )
+	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
+
 	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
 	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
 	ROM_LOAD16_BYTE( "b14-06.52", 0x00001, 0x20000, CRC(b4e2536e) SHA1(c1960ee25b37b1444ec99082521c4858edcf3484) )
@@ -767,6 +775,9 @@ ROM_START( fullthrl )
 	ROM_REGION( 0x1c000, "audiocpu", 0 ) // Z80 sound CPU
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 ) // Banked stuff
+
+	ROM_REGION( 0x8000, "motorcpu", 0 )
+	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) // SCR tiles
 	ROM_LOAD16_BYTE( "b14-07.54", 0x00000, 0x20000, CRC(c6025fff) SHA1(439ed85b0160bfd6c06fd42990124a292b2e3c14) )
