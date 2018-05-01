@@ -4667,8 +4667,11 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 			clipxmask = clipymask = 0;
 			break;
 		case 1:
-			/* screen over pattern, not supported */
-			clipxmask = clipymask = 0;
+			/* screen over pattern */
+			// TODO: not supported, cfr. STV_VDP2_OVPNRA / STV_VDP2_OVPNRB
+			// D-Xhird uses this on practice stage
+			clipxmask = ~planesizex;
+			clipymask = ~planesizey;
 			break;
 		case 2:
 			/* outside display area, scroll screen is transparent */
