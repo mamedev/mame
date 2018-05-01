@@ -284,7 +284,7 @@ MACHINE_CONFIG_START(jrpacman_state::jrpacman)
 
 	MCFG_DEVICE_ADD("latch1", LS259, 0) // 5P
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(jrpacman_state, irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, pacman_sound_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("namco", namco_device, sound_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(jrpacman_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(jrpacman_state, coin_counter_w))
 
