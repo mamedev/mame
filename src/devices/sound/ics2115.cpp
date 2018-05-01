@@ -250,7 +250,7 @@ int ics2115_device::ics2115_voice::update_oscillator()
 		if(osc_conf.bitflags.loop_bidir)
 			osc_conf.bitflags.invert = !osc_conf.bitflags.invert;
 		//else
-		//    printf("click!\n");
+		//    logerror("click!\n");
 
 		if(osc_conf.bitflags.invert) {
 			osc.acc = osc.end + osc.left;
@@ -279,7 +279,7 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 
 	if (voice.state.bitflags.on && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
 			(voice.osc.left < (voice.osc.fc <<2))) {
-		//printf("C?[%x:%x]", voice.osc.left, voice.osc.acc);
+		//logerror("C?[%x:%x]", voice.osc.left, voice.osc.acc);
 		nextaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.start >> 12);
 	}
 	else
@@ -393,7 +393,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
         uint32_t curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
         stream_sample_t sample;
         sample = get_sample(voice);
-        printf("[%06x=%04x]", curaddr, (int16_t)sample);
+        logerror("[%06x=%04x]", curaddr, (int16_t)sample);
 #endif
 */
 		if(fill_output(voice, outputs, samples))
@@ -401,12 +401,12 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 #ifdef ICS2115_DEBUG
 		if(voice.playing()) {
-			printf("%d", osc);
+			logerror("%d", osc);
 			if (voice.osc_conf.bitflags.invert)
-				printf("+");
+				logerror("+");
 			else if ((voice.osc.fc >> 1) > 0x1ff)
-				printf("*");
-			printf(" ");
+				logerror("*");
+			logerror(" ");
 
 			/*int min = 0x7fffffff, max = 0x80000000;
 			double average = 0;
@@ -417,13 +417,13 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			}
 			average /= samples;
 			average /= 1 << 16;
-			printf("<Mi:%d Mx:%d Av:%g>", min >> 16, max >> 16, average);*/
+			logerror("<Mi:%d Mx:%d Av:%g>", min >> 16, max >> 16, average);*/
 		}
 #endif
 	}
 
 #ifdef ICS2115_DEBUG
-	printf("|");
+	logerror("|\n");
 #endif
 
 	//rescale
@@ -600,7 +600,7 @@ uint16_t ics2115_device::reg_read() {
 
 		default:
 #ifdef ICS2115_DEBUG
-			printf("ICS2115: Unhandled read %x\n", m_reg_select);
+			logerror("ICS2115: Unhandled read %x\n", m_reg_select);
 #endif
 			ret = 0;
 			break;
@@ -628,14 +628,14 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 				voice.osc.fc = (voice.osc.fc & 0xff00) | (data & 0xfe);
 			break;
 
-		case 0x02: // [osc] Wavesample loop start high
+		case 0x02: // [osc] Wavesample loop start high (16 Integer)
 			if(msb)
 				voice.osc.start = (voice.osc.start & 0x00ffffff) | (data << 24);
 			else
 				voice.osc.start = (voice.osc.start & 0xff00ffff) | (data << 16);
 			break;
 
-		case 0x03: // [osc] Wavesample loop start low
+		case 0x03: // [osc] Wavesample loop start low (4 Integer, 4 Fraction)
 			if(msb)
 				voice.osc.start = (voice.osc.start & 0xffff00ff) | (data << 8);
 			// This is unused?
@@ -643,14 +643,14 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 				//voice.osc.start = (voice.osc.start & 0xffffff00) | (data & 0);
 			break;
 
-		case 0x04: // [osc] Wavesample loop end high
+		case 0x04: // [osc] Wavesample loop end high (16 Integer)
 			if(msb)
 				voice.osc.end = (voice.osc.end & 0x00ffffff) | (data << 24);
 			else
 				voice.osc.end = (voice.osc.end & 0xff00ffff) | (data << 16);
 			break;
 
-		case 0x05: // [osc] Wavesample loop end low
+		case 0x05: // [osc] Wavesample loop end low (4 Integer, 4 Fraction)
 			if(msb)
 				voice.osc.end = (voice.osc.end & 0xffff00ff) | (data << 8);
 			// lsb is unused?
@@ -679,12 +679,12 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 			voice.vol.acc = voice.vol.regacc << 10;
 			break;
 
-		case 0x0A: // [osc] Wavesample address high
+		case 0x0A: // [osc] Wavesample address high (16 Integer)
 #ifdef ICS2115_DEBUG
 #ifdef ICS2115_ISOLATE
 			if(m_osc_select == ICS2115_ISOLATE)
 #endif
-				printf("<%d:oa:H[%d]=%x>", m_osc_select, msb, data);
+				logerror("<%d:oa:H[%d]=%x>\n", m_osc_select, msb, data);
 #endif
 			if(msb)
 				voice.osc.acc = (voice.osc.acc & 0x00ffffff) | (data << 24);
@@ -692,12 +692,12 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 				voice.osc.acc = (voice.osc.acc & 0xff00ffff) | (data << 16);
 			break;
 
-		case 0x0B: // [osc] Wavesample address low
+		case 0x0B: // [osc] Wavesample address low (4 Integer, 9 Fraction)
 #ifdef ICS2115_DEBUG
 #ifdef ICS2115_ISOLATE
 			if(m_osc_select == ICS2115_ISOLATE)
 #endif
-				printf("<%d:oa:L[%d]=%x>", m_osc_select, msb, data);
+				logerror("<%d:oa:L[%d]=%x>\n", m_osc_select, msb, data);
 #endif
 			if(msb)
 				voice.osc.acc = (voice.osc.acc & 0xffff00ff) | (data << 8);
@@ -740,7 +740,7 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 					if (m_osc_select == ICS2115_ISOLATE)
 #endif
 					if (!voice.osc_conf.bitflags.stop || !voice.vol_ctrl.bitflags.stop)
-						printf("[%02d STOP]\n", m_osc_select);
+						logerror("[%02d STOP]\n", m_osc_select);
 #endif
 					if (!m_vmode) {
 						voice.osc_conf.bitflags.stop = true;
@@ -751,7 +751,7 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 				}
 #ifdef ICS2115_DEBUG
 				else
-					printf("ICS2115: Unhandled* data write %d onto 0x10.\n", data);
+					logerror("ICS2115: Unhandled* data write %d onto 0x10.\n", data);
 #endif
 			}
 			break;
@@ -814,7 +814,7 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 
 		default:
 #ifdef ICS2115_DEBUG
-			printf("ICS2115: Unhandled write %x onto %x(%d) [voice = %d]\n", data, m_reg_select, msb, m_osc_select);
+			logerror("ICS2115: Unhandled write %x onto %x(%d) [voice = %d]\n", data, m_reg_select, msb, m_osc_select);
 #endif
 			break;
 	}
@@ -852,7 +852,7 @@ READ8_MEMBER(ics2115_device::read)
 			break;
 		default:
 #ifdef ICS2115_DEBUG
-			printf("ICS2115: Unhandled memory read at %x\n", offset);
+			logerror("ICS2115: Unhandled memory read at %x\n", offset);
 #endif
 			break;
 	}
@@ -873,7 +873,7 @@ WRITE8_MEMBER(ics2115_device::write)
 			break;
 		default:
 #ifdef ICS2115_DEBUG
-			printf("ICS2115: Unhandled memory write %02x to %x\n", data, offset);
+			logerror("ICS2115: Unhandled memory write %02x to %x\n", data, offset);
 #endif
 			break;
 	}
@@ -894,7 +894,7 @@ READ16_MEMBER(ics2115_device::read16)
 			break;
 		default:
 #ifdef ICS2115_DEBUG
-			printf("ICS2115: Unhandled memory read at %x\n", offset);
+			logerror("ICS2115: Unhandled memory read at %x\n", offset);
 #endif
 			break;
 	}
@@ -919,7 +919,7 @@ WRITE16_MEMBER(ics2115_device::write16)
 			break;
 		default:
 #ifdef ICS2115_DEBUG
-			printf("ICS2115: Unhandled memory write %02x to %x\n", data, offset);
+			logerror("ICS2115: Unhandled memory write %02x to %x\n", data, offset);
 #endif
 			break;
 	}
@@ -937,7 +937,7 @@ void ics2115_device::keyon()
 	m_voice[m_osc_select].state.bitflags.ramp = 0x40;
 
 #ifdef ICS2115_DEBUG
-	printf("[%02d vs:%04x ve:%04x va:%04x vi:%02x vc:%02x os:%06x oe:%06x oa:%06x of:%04x SA:%02x oc:%02x][%04x]\n", m_osc_select,
+	logerror("[%02d vs:%04x ve:%04x va:%04x vi:%02x vc:%02x os:%06x oe:%06x oa:%06x of:%04x SA:%02x oc:%02x][%04x]\n", m_osc_select,
 			m_voice[m_osc_select].vol.start >> 10,
 			m_voice[m_osc_select].vol.end >> 10,
 			m_voice[m_osc_select].vol.acc >> 10,
@@ -953,7 +953,7 @@ void ics2115_device::keyon()
 			);
 #endif
 	//testing memory corruption issue with mame stream
-	//printf("m_volume[0x%x]=0x%x\n", mastervolume, m_volume[mastervolume]);
+	//logerror("m_volume[0x%x]=0x%x\n", mastervolume, m_volume[mastervolume]);
 }
 
 void ics2115_device::recalc_irq()
