@@ -8,7 +8,7 @@
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_flop_68000" description="Acorn Casper 68000 2nd Processor discs">
+<softwarelist name="bbc_flop_68000" description="Casper 68000 2nd Processor discs">
 
 	<software name="casper">
 		<description>Casper Support Discs</description>
