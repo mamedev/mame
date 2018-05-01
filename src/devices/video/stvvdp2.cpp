@@ -1468,10 +1468,12 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 	#define STV_VDP2_KTCTL  (m_vdp2_regs[0x0b4/2])
+	#define STV_VDP2_RBUNK  ((STV_VDP2_KTCTL & 0x6000) >> 13)
 	#define STV_VDP2_RBKLCE ((STV_VDP2_KTCTL & 0x1000) >> 12)
 	#define STV_VDP2_RBKMD  ((STV_VDP2_KTCTL & 0x0c00) >> 10)
 	#define STV_VDP2_RBKDBS ((STV_VDP2_KTCTL & 0x0200) >> 9)
 	#define STV_VDP2_RBKTE  ((STV_VDP2_KTCTL & 0x0100) >> 8)
+	#define STV_VDP2_RAUNK  ((STV_VDP2_KTCTL & 0x0060) >> 5)
 	#define STV_VDP2_RAKLCE ((STV_VDP2_KTCTL & 0x0010) >> 4)
 	#define STV_VDP2_RAKMD  ((STV_VDP2_KTCTL & 0x000c) >> 2)
 	#define STV_VDP2_RAKDBS ((STV_VDP2_KTCTL & 0x0002) >> 1)
@@ -2160,26 +2162,32 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 	switch(rot_parameter)
 	{
 		case 1:
-			if(!STV_VDP2_RAXSTRE)
-				stv_current_rotation_parameter_table.xst = 0;
+			// TODO: disable read control if these undocumented bits are on (Radiant Silvergun Xiga final boss)
+			if(!STV_VDP2_RAUNK)
+			{
+				if(!STV_VDP2_RAXSTRE)
+					stv_current_rotation_parameter_table.xst = 0;
 
-			if(!STV_VDP2_RAYSTRE)
-				stv_current_rotation_parameter_table.yst = 0;
+				if(!STV_VDP2_RAYSTRE)
+					stv_current_rotation_parameter_table.yst = 0;
 
-			if(!STV_VDP2_RAKASTRE)
-				stv_current_rotation_parameter_table.dkax = 0;
-
+				if(!STV_VDP2_RAKASTRE)
+					stv_current_rotation_parameter_table.dkax = 0;
+			}
 			break;
 		case 2:
-			if(!STV_VDP2_RBXSTRE)
-				stv_current_rotation_parameter_table.xst = 0;
+			// same as above
+			if(!STV_VDP2_RBUNK)
+			{
+				if(!STV_VDP2_RBXSTRE)
+					stv_current_rotation_parameter_table.xst = 0;
 
-			if(!STV_VDP2_RBYSTRE)
-				stv_current_rotation_parameter_table.yst = 0;
+				if(!STV_VDP2_RBYSTRE)
+					stv_current_rotation_parameter_table.yst = 0;
 
-			if(!STV_VDP2_RBKASTRE)
-				stv_current_rotation_parameter_table.dkax = 0;
-
+				if(!STV_VDP2_RBKASTRE)
+					stv_current_rotation_parameter_table.dkax = 0;
+			}
 			break;
 	}
 
@@ -4958,10 +4966,10 @@ inline bool saturn_state::stv_vdp2_roz_window(int x, int y)
 		w1_enable == 0)
 		return true;
 
-	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y, y);
 	w0_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
 
-	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y, y);
 	w1_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
 
 	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix));
@@ -4976,15 +4984,15 @@ inline bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parame
 	uint8_t w1_enable = STV_VDP2_RPW1E;
 	uint8_t w0_area = STV_VDP2_RPW0A;
 	uint8_t w1_area = STV_VDP2_RPW1A;
-
+	
 	if (w0_enable == 0 &&
 		w1_enable == 0)
 		return rot_parameter ^ 1;
 
-	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y, y);
 	w0_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
 
-	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y, y);
 	w1_pix = get_roz_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
 
 	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix)) ^ rot_parameter;
@@ -6408,7 +6416,7 @@ void saturn_state::stv_vdp2_fade_effects( void )
 	//popmessage("%04x %04x %04x %04x %04x %04x",STV_VDP2_COAR,STV_VDP2_COAG,STV_VDP2_COAB,STV_VDP2_COBR,STV_VDP2_COBG,STV_VDP2_COBB);
 }
 
-void saturn_state::stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y)
+void saturn_state::stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y)
 {
 	/*W0*/
 	switch(STV_VDP2_LSMD & 3)
@@ -6424,36 +6432,51 @@ void saturn_state::stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y
 			*e_y = ((STV_VDP2_W0EY & 0x7ff) >> 0);
 			break;
 	}
-	switch(STV_VDP2_HRES & 6)
+	// check if line window is enabled
+	if(STV_VDP2_W0LWE)
 	{
-		/*Normal*/
-		case 0:
-			*s_x = ((STV_VDP2_W0SX & 0x3fe) >> 1);
-			*e_x = ((STV_VDP2_W0EX & 0x3fe) >> 1);
-			break;
-		/*Hi-Res*/
-		case 2:
-			*s_x = ((STV_VDP2_W0SX & 0x3ff) >> 0);
-			*e_x = ((STV_VDP2_W0EX & 0x3ff) >> 0);
-			break;
-		/*Exclusive Normal*/
-		case 4:
-			*s_x = ((STV_VDP2_W0SX & 0x1ff) >> 0);
-			*e_x = ((STV_VDP2_W0EX & 0x1ff) >> 0);
-			*s_y = ((STV_VDP2_W0SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
-			break;
-		/*Exclusive Hi-Res*/
-		case 6:
-			*s_x = ((STV_VDP2_W0SX & 0x1ff) << 1);
-			*e_x = ((STV_VDP2_W0EX & 0x1ff) << 1);
-			*s_y = ((STV_VDP2_W0SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
-			break;
+		uint32_t base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+		uint32_t address = (STV_VDP2_W0LWTA & base_mask) * 2;
+		// double density makes the line window to fetch data every two lines
+		uint8_t interlace = (STV_VDP2_LSMD == 3);
+		uint32_t vram_data = m_vdp2_vram[(address >> 2)+(y >> interlace)];
+		
+		*s_x = (vram_data >> 16) & 0x3ff;
+		*e_x = (vram_data & 0x3ff);
+	}
+	else
+	{
+		switch(STV_VDP2_HRES & 6)
+		{
+			/*Normal*/
+			case 0:
+				*s_x = ((STV_VDP2_W0SX & 0x3fe) >> 1);
+				*e_x = ((STV_VDP2_W0EX & 0x3fe) >> 1);
+				break;
+			/*Hi-Res*/
+			case 2:
+				*s_x = ((STV_VDP2_W0SX & 0x3ff) >> 0);
+				*e_x = ((STV_VDP2_W0EX & 0x3ff) >> 0);
+				break;
+			/*Exclusive Normal*/
+			case 4:
+				*s_x = ((STV_VDP2_W0SX & 0x1ff) >> 0);
+				*e_x = ((STV_VDP2_W0EX & 0x1ff) >> 0);
+				*s_y = ((STV_VDP2_W0SY & 0x3ff) >> 0);
+				*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
+				break;
+			/*Exclusive Hi-Res*/
+			case 6:
+				*s_x = ((STV_VDP2_W0SX & 0x1ff) << 1);
+				*e_x = ((STV_VDP2_W0EX & 0x1ff) << 1);
+				*s_y = ((STV_VDP2_W0SY & 0x3ff) >> 0);
+				*e_y = ((STV_VDP2_W0EY & 0x3ff) >> 0);
+				break;
+		}
 	}
 }
 
-void saturn_state::stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y)
+void saturn_state::stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y, int y)
 {
 	/*W1*/
 	switch(STV_VDP2_LSMD & 3)
@@ -6469,34 +6492,48 @@ void saturn_state::stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y
 			*e_y = ((STV_VDP2_W1EY & 0x7ff) >> 0);
 			break;
 	}
-	switch(STV_VDP2_HRES & 6)
+	// check if line window is enabled
+	if(STV_VDP2_W1LWE)
 	{
-		/*Normal*/
-		case 0:
-			*s_x = ((STV_VDP2_W1SX & 0x3fe) >> 1);
-			*e_x = ((STV_VDP2_W1EX & 0x3fe) >> 1);
-			break;
-		/*Hi-Res*/
-		case 2:
-			*s_x = ((STV_VDP2_W1SX & 0x3ff) >> 0);
-			*e_x = ((STV_VDP2_W1EX & 0x3ff) >> 0);
-			break;
-		/*Exclusive Normal*/
-		case 4:
-			*s_x = ((STV_VDP2_W1SX & 0x1ff) >> 0);
-			*e_x = ((STV_VDP2_W1EX & 0x1ff) >> 0);
-			*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
-			break;
-		/*Exclusive Hi-Res*/
-		case 6:
-			*s_x = ((STV_VDP2_W1SX & 0x1ff) << 1);
-			*e_x = ((STV_VDP2_W1EX & 0x1ff) << 1);
-			*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
-			*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
-			break;
+		uint32_t base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+		uint32_t address = (STV_VDP2_W1LWTA & base_mask) * 2;
+		// double density makes the line window to fetch data every two lines
+		uint8_t interlace = (STV_VDP2_LSMD == 3);
+		uint32_t vram_data = m_vdp2_vram[(address >> 2)+(y >> interlace)];
+		
+		*s_x = (vram_data >> 16) & 0x3ff;
+		*e_x = (vram_data & 0x3ff);
 	}
-
+	else
+	{
+		switch(STV_VDP2_HRES & 6)
+		{
+			/*Normal*/
+			case 0:
+				*s_x = ((STV_VDP2_W1SX & 0x3fe) >> 1);
+				*e_x = ((STV_VDP2_W1EX & 0x3fe) >> 1);
+				break;
+			/*Hi-Res*/
+			case 2:
+				*s_x = ((STV_VDP2_W1SX & 0x3ff) >> 0);
+				*e_x = ((STV_VDP2_W1EX & 0x3ff) >> 0);
+				break;
+			/*Exclusive Normal*/
+			case 4:
+				*s_x = ((STV_VDP2_W1SX & 0x1ff) >> 0);
+				*e_x = ((STV_VDP2_W1EX & 0x1ff) >> 0);
+				*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
+				*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
+				break;
+			/*Exclusive Hi-Res*/
+			case 6:
+				*s_x = ((STV_VDP2_W1SX & 0x1ff) << 1);
+				*e_x = ((STV_VDP2_W1EX & 0x1ff) << 1);
+				*s_y = ((STV_VDP2_W1SY & 0x3ff) >> 0);
+				*e_y = ((STV_VDP2_W1EY & 0x3ff) >> 0);
+				break;
+		}
+	}
 }
 
 int saturn_state::get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t win_num)
@@ -6524,10 +6561,10 @@ inline int saturn_state::stv_vdp2_window_process(int x,int y)
 		stv2_current_tilemap.window_control.enabled[1] == 0)
 		return 1;
 
-	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y, y);
 	w0_pix = get_window_pixel(s_x,e_x,s_y,e_y,x,y,0);
 
-	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y, y);
 	w1_pix = get_window_pixel(s_x,e_x,s_y,e_y,x,y,1);
 
 	return stv2_current_tilemap.window_control.logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix);
@@ -6541,7 +6578,7 @@ int saturn_state::stv_vdp2_apply_window_on_layer(rectangle &cliprect)
 	if ( stv2_current_tilemap.window_control.enabled[0] && (!stv2_current_tilemap.window_control.area[0]))
 	{
 		/* w0, transparent outside supported */
-		stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+		stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y, 0);
 
 		if ( s_x > cliprect.min_x ) cliprect.min_x = s_x;
 		if ( e_x < cliprect.max_x ) cliprect.max_x = e_x;
@@ -6553,7 +6590,7 @@ int saturn_state::stv_vdp2_apply_window_on_layer(rectangle &cliprect)
 	else if (  stv2_current_tilemap.window_control.enabled[1] && (!stv2_current_tilemap.window_control.area[1]) )
 	{
 		/* w1, transparent outside supported */
-		stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+		stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y, 0);
 
 		if ( s_x > cliprect.min_x ) cliprect.min_x = s_x;
 		if ( e_x < cliprect.max_x ) cliprect.max_x = e_x;
