@@ -1359,7 +1359,7 @@ REF: 950906
 | A                       |                         |                        |
 |                         |-------------------------|                        |
 |                                                                            |
-|                                       62256                       62256    |
+|   IC1* IC7*                           62256                       62256    |
 |---                                    62256                       62256    |
    |  DSW1                                            40.000MHz              |
 |---  DSW2                         |-----------|                             |
@@ -1371,8 +1371,9 @@ REF: 950906
 
 Notes
 -----
-IC68 - 42 pin 32M socket - not populated
-JP6: 50 pin connector for duaghter card - Not populated
+IC1, IC7 - 8 pin sockets marked "TLC548" - Not populated
+IC68 - 42 pin 32M socket - Not populated
+JP6: 50 pin connector for daughter card - Not populated
 POT1: Volume adjust for cabinet 1
 POT2: Volume adjust for cabinet 2
 
@@ -1933,7 +1934,7 @@ REF: 950510
 
 Notes
 -----
-JP1 on duaghter card connects through the 50 pin connector JP6 on main PCB
+JP1 on daughter card connects through the 50 pin connector JP6 on main PCB
 All ROMs are type 27C040
 
 POT1: Volume adjust for cabinet 1
@@ -2037,7 +2038,7 @@ REF: 950510-1
 | A                       |  62256  DS5002  BATT_3V |                62256   |
 |                         |                         |                        |
 |                         |-------------------------|                        |
-|    TLC569   TLC569                                                         |
+|    TLC549   TLC549                                                         |
 |---                                    62256                                |
    |                                    62256                                |
    |  DSW1                                                                   |
@@ -2057,10 +2058,10 @@ Gaelco's mask ROMs:
  WR2 IC69 42pin 32Mbit mask read as 27C332 (Graphics & Sound)
  WR2 IC68 32pin  8Mbit mask read as 27C801 (Graphics)
 
-JP6: 50 pin connector for duaghter card - Not populated
+JP6: 50 pin connector for daughter card - Not populated
 
 TI F20L8 is a Texas Ins. DIP24 (may be a PAL). Is marked as F 406 XF 21869 F20L8-25CNT
-TLC569 (IC2 and IC7) is a 8-bit serial ADC
+TLC549 (IC2 and IC7) is a 8-bit serial ADC
 
 Also known to come with a GAE1 with various production codes including 449, 501 & 506
 
