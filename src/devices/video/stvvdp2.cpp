@@ -6837,6 +6837,14 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 							continue;
 						};
 
+						// Pretty Fighter X, Game Tengoku shadows
+						// TODO: former doesn't read what's behind, VDP1 bug?
+						if(pix & 0x8000 && STV_VDP2_SDCTL & 0x100)
+						{
+							rgb_t p = bitmap_line[x];
+							bitmap_line[x] = rgb_t(p.r() >> 1, p.g() >> 1, p.b() >> 1);
+						}
+						else
 						{
 							pix &= sprite_colormask;
 							if ( pix == (sprite_colormask - 1) )
@@ -6855,10 +6863,11 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 								pix &= 0x7ff;
 								pix += color_offset_pal;
 								bitmap_line[x] = m_palette->pen( pix );
+								
 							}
 						}
 
-						/* TODO: I don't think this one makes much logic ... (1) */
+						/* TODO: I don't think this one makes much sense ... (1) */
 						if ( pix & sprite_shadow )
 						{
 							if ( pix & ~sprite_shadow )

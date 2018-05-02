@@ -939,7 +939,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				transmask = 0xf;
 				break;
 			case 0x0008: // mode 1 16 colour lookup table mode (4bits)
-				// shienryu explosisons (and some enemies) use this mode
+				// shienryu explosions (and some enemies) use this mode
 				pix2 = m_vdp1.gfx_decode[(patterndata+offsetcnt/2) & 0xfffff];
 				pix2 = offsetcnt&1 ? (pix2 & 0x0f) : ((pix2 & 0xf0)>>4);
 				pix = pix2&1 ?
@@ -1100,6 +1100,12 @@ void saturn_state::stv_vdp1_set_drawpixel( void )
 		return;
 	}
 
+	if(stv2_current_sprite.CMDPMOD & 0x8000)
+	{
+		drawpixel = &saturn_state::drawpixel_generic;
+		return;
+	}
+	
 	// polygon / polyline / line with replace case
 	if (sprite_type & 4 && ((stv2_current_sprite.CMDPMOD & 0x7) == 0))
 	{
@@ -1831,7 +1837,7 @@ void saturn_state::stv_vdp1_process_list( void )
 	/*Set CEF bit to 0*/
 	CEF_0;
 
-	// TODO: is there a
+	// TODO: is there an actual limit for this?
 	while (spritecount<10000) // if its drawn this many sprites something is probably wrong or sega were crazy ;-)
 	{
 		int draw_this_sprite;
