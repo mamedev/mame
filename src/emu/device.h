@@ -265,6 +265,7 @@ class device_type_impl : public device_type_impl_base
 public:
 	using device_type_impl_base::device_type_impl_base;
 	template <typename... Params> DeviceClass &operator()(machine_config &config, char const *tag, Params &&... args) const;
+	template <typename Exposed, bool Required, typename... Params> DeviceClass &operator()(machine_config &config, device_finder<Exposed, Required> &finder, Params &&... args) const;
 };
 
 

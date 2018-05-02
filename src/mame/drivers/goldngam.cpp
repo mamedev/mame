@@ -273,6 +273,8 @@ private:
 	optional_device_array<mc68681_device, 2> m_duart;
 };
 
+constexpr int goldngam_state::MOVIECRD_DUART1_IRQ;
+constexpr int goldngam_state::MOVIECRD_DUART2_IRQ;
 
 /*************************
 *     Video Hardware     *

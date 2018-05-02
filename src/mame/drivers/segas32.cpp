@@ -2466,8 +2466,8 @@ void segas32_state::system32_cd_map(address_map &map)
 void segas32_cd_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 0.30 )
-	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 0.30 )
+	MCFG_SOUND_ROUTE( 0, "^^lspeaker", 0.30 )
+	MCFG_SOUND_ROUTE( 1, "^^rspeaker", 0.30 )
 }
 
 MACHINE_CONFIG_START(segas32_cd_state::device_add_mconfig)

@@ -1163,8 +1163,8 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 void firebeat_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
 static SLOT_INTERFACE_START(firebeat_ata_devices)

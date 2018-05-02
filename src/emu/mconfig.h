@@ -128,17 +128,6 @@ private:
 };
 
 
-namespace emu { namespace detail {
-
-template <class DeviceClass> template <typename... Params>
-DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &config, char const *tag, Params &&... args) const
-{
-	return dynamic_cast<DeviceClass &>(*config.device_add(tag, *this, std::forward<Params>(args)...));
-}
-
-} } // namespace emu::detail
-
-
 //*************************************************************************/
 /** @name Machine config start/end macros */
 //*************************************************************************/

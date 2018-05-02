@@ -1959,7 +1959,7 @@ bool render_target::load_layout_file(const char *dirname, util::xml::data_node c
 	{
 		m_filelist.emplace_back(m_manager.machine(), rootnode, dirname);
 	}
-	catch (emu_fatalerror)
+	catch (emu_fatalerror &)
 	{
 		return false;
 	}

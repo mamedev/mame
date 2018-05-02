@@ -906,7 +906,7 @@ WRITE16_MEMBER(ics2115_device::write16)
 	switch(offset) {
 		case 1:
 			if (ACCESSING_BITS_0_7)
-				write(space,offset,mem_mask & 0xff);
+				write(space,offset,data & 0xff,mem_mask & 0xff);
 
 			break;
 		case 2:

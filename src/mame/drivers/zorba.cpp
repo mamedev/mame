@@ -63,7 +63,7 @@ ToDo:
 #include "cpu/m6805/m68705.h"
 
 #include "machine/input_merger.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 #include "machine/pit8253.h"
 
 #include "screen.h"
@@ -197,12 +197,12 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 
 	// IEEE488 interface
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r)) // TODO: gated with PB1
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w)) // TODO: gated with PB1
+	MCFG_PIA_READPA_HANDLER(DEVREAD8(m_ieee, ieee488_device, dio_r)) // TODO: gated with PB1
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8(m_ieee, ieee488_device, dio_w)) // TODO: gated with PB1
 	MCFG_PIA_READPB_HANDLER(READ8(zorba_state, pia1_portb_r))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zorba_state, pia1_portb_w))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(m_ieee, ieee488_device, ifc_w))
+	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(m_ieee, ieee488_device, ren_w))
 	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("irq1", input_merger_device, in_w<0>))
 	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("irq1", input_merger_device, in_w<1>))
 
@@ -212,16 +212,16 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_PIT8253_CLK1(24_MHz_XTAL / 3)
 	MCFG_PIT8253_CLK2(24_MHz_XTAL / 3)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(zorba_state, br1_w))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("uart2", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(m_uart1, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(m_uart1, i8251_device, write_rxc))
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE(m_uart2, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(m_uart2, i8251_device, write_rxc))
 
 	// CRTC
 	MCFG_DEVICE_ADD("crtc", I8275, 14.318'181_MHz_XTAL / 7)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
+	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE(m_dma, z80dma_device, rdy_w))
 	MCFG_I8275_IRQ_CALLBACK(DEVWRITELINE("irq0", input_merger_device, in_w<1>))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
@@ -236,30 +236,30 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 
 	// J1 IEEE-488
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia1", pia6821_device, ca2_w)) // TODO: gated with PB1 from PIA
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(m_pia1, pia6821_device, ca2_w)) // TODO: gated with PB1 from PIA
 
 	// J2 EIA RS232/internal modem
 	// TODO: this has additional lines compared to a regular RS232 port (TxC in, RxC in, RxC out, speaker in, power)
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart0", i8251_device, write_rxd)) // TODO: this line has a LED attached
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart0", i8251_device, write_cts)) // TODO: this line has a LED attached
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart0", i8251_device, write_dsr))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(m_uart0, i8251_device, write_rxd)) // TODO: this line has a LED attached
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(m_uart0, i8251_device, write_cts)) // TODO: this line has a LED attached
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(m_uart0, i8251_device, write_dsr))
 
 	// J3 Parallel printer
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("parprndata", "parprn")
 	MCFG_CENTRONICS_ADD("parprn", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_dsr)) // TODO: shared with serial CTS
+	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(m_uart1, i8251_device, write_cts))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(m_uart1, i8251_device, write_dsr)) // TODO: shared with serial CTS
 	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(zorba_state, printer_fault_w))
 	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(zorba_state, printer_select_w))
 
 	// J3 Serial printer
 	MCFG_RS232_PORT_ADD("serprn", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", i8251_device, write_rxd)) // TODO: this line has a LED attached
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(m_uart1, i8251_device, write_rxd)) // TODO: this line has a LED attached
 
 	// J6 TTL-level serial keyboard
 	MCFG_DEVICE_ADD("keyboard", ZORBA_KEYBOARD, 0)
-	MCFG_ZORBA_KEYBOARD_RXD_CB(DEVWRITELINE("uart2", i8251_device, write_rxd))
+	MCFG_ZORBA_KEYBOARD_RXD_CB(DEVWRITELINE(m_uart2, i8251_device, write_rxd))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "zorba")
 MACHINE_CONFIG_END

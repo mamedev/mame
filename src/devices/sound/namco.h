@@ -21,6 +21,8 @@ public:
 	void set_voices(int voices) { m_voices = voices; }
 	void set_stereo(int stereo) { m_stereo = stereo; }
 
+	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
+
 protected:
 	static constexpr unsigned MAX_VOICES = 8;
 	static constexpr unsigned MAX_VOLUME = 16;
@@ -62,7 +64,7 @@ protected:
 
 	/* global sound parameters */
 	int m_wave_size;
-	int32_t m_sound_enable;
+	bool m_sound_enable;
 	sound_stream *m_stream;
 	int m_namco_clock;
 	int m_sample_rate;
@@ -82,7 +84,6 @@ class namco_device : public namco_audio_device
 public:
 	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(pacman_sound_enable_w);
 	DECLARE_WRITE8_MEMBER(pacman_sound_w);
 
 	void polepos_sound_enable(int enable);
