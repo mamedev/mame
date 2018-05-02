@@ -11,14 +11,13 @@
     such as Arena(in editmode).
 
     TODO:
-    - verify irq/beeper timing
 	- scorpio68 internal artwork
     - RS232 port
 
 ******************************************************************************
 
 Diablo 68000:
-- M68000 @ 16MHz, IRQ ~256Hz
+- M68000 @ 16MHz, IPL1 256Hz, IPL2 from ACIA IRQ(always high)
 - 2*8KB RAM TC5565 battery-backed, 2*32KB hashtable RAM TC55257 3*32KB ROM
 - HD44780 LCD controller (16x1)
 - R65C51P2 ACIA @ 1.8432MHz, RS232
@@ -48,6 +47,9 @@ public:
 		: novagbase_state(mconfig, type, tag)
 	{ }
 
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
+	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); }
+
 	// Diablo 68000
 	DECLARE_WRITE8_MEMBER(diablo68k_control_w);
 	DECLARE_WRITE8_MEMBER(diablo68k_lcd_data_w);
@@ -75,8 +77,10 @@ public:
 
 WRITE8_MEMBER(novag68k_state::diablo68k_control_w)
 {
-	// d0: HD44780 E?
+	// d0: HD44780 E
 	// d1: HD44780 RS
+	if (m_lcd_control & ~data & 1)
+		m_lcd->write(space, m_lcd_control >> 1 & 1, m_lcd_data);
 	m_lcd_control = data & 3;
 
 	// d7: enable beeper
@@ -91,7 +95,7 @@ WRITE8_MEMBER(novag68k_state::diablo68k_control_w)
 WRITE8_MEMBER(novag68k_state::diablo68k_lcd_data_w)
 {
 	// d0-d7: HD44780 data
-	m_lcd->write(space, m_lcd_control >> 1 & 1, data);
+	m_lcd_data = data;
 }
 
 WRITE8_MEMBER(novag68k_state::diablo68k_leds_w)
@@ -121,8 +125,10 @@ READ8_MEMBER(novag68k_state::diablo68k_input2_r)
 
 WRITE8_MEMBER(novag68k_state::scorpio68k_control_w)
 {
-	// d0: HD44780 E?
+	// d0: HD44780 E
 	// d1: HD44780 RS
+	if (m_lcd_control & ~data & 1)
+		m_lcd->write(space, m_lcd_control >> 1 & 1, m_lcd_data);
 	m_lcd_control = data & 3;
 
 	// d7: enable beeper
@@ -231,8 +237,10 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
-	MCFG_CPU_PERIODIC_INT_DRIVER(novag68k_state, irq2_line_hold, 256) // guessed
 	MCFG_CPU_PROGRAM_MAP(diablo68k_map)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag68k_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(1100)) // active for 1.1us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag68k_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
 	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
@@ -259,7 +267,7 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1024) // guessed
+	MCFG_SOUND_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

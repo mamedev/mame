@@ -143,6 +143,7 @@ void novagbase_state::machine_start()
 	m_led_select = 0;
 	m_led_data = 0;
 	m_lcd_control = 0;
+	m_lcd_data = 0;
 
 	// register for savestates
 	save_item(NAME(m_display_maxy));
@@ -157,6 +158,7 @@ void novagbase_state::machine_start()
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_lcd_control));
+	save_item(NAME(m_lcd_data));
 }
 
 void novagbase_state::machine_reset()
@@ -401,14 +403,15 @@ WRITE8_MEMBER(novag6502_state::sexpert_lcd_control_w)
 	// d0: HD44780 RS
 	// d1: HD44780 R/W
 	// d2: HD44780 E
+	if (m_lcd_control & ~data & 4 && ~data & 2)
+		m_lcd->write(space, m_lcd_control & 1, m_lcd_data);
 	m_lcd_control = data & 7;
 }
 
 WRITE8_MEMBER(novag6502_state::sexpert_lcd_data_w)
 {
 	// d0-d7: HD44780 data
-	if (m_lcd_control & 4 && ~m_lcd_control & 2)
-		m_lcd->write(space, m_lcd_control & 1, data);
+	m_lcd_data = data;
 }
 
 WRITE8_MEMBER(novag6502_state::sexpert_leds_w)
