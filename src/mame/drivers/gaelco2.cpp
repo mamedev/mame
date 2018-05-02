@@ -1851,8 +1851,6 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_clk))                             /* ADCs clock-in line */
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
 
-	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
-
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
