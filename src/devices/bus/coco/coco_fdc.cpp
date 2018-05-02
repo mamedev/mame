@@ -66,6 +66,10 @@
 #define CLOUD9_TAG              "cloud9"
 
 
+template class device_finder<coco_family_fdc_device_base, false>;
+template class device_finder<coco_family_fdc_device_base, true>;
+
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -421,7 +425,7 @@ namespace
 
 }
 
-DEFINE_DEVICE_TYPE(COCO_FDC, coco_fdc_device, "coco_fdc", "CoCo FDC")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC, coco_family_fdc_device_base, coco_fdc_device, "coco_fdc", "CoCo FDC")
 
 
 //**************************************************************************
@@ -456,7 +460,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(COCO_FDC_V11, coco_fdc_v11_device, "coco_fdc_v11", "CoCo FDC v1.1")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_FDC_V11, coco_family_fdc_device_base, coco_fdc_v11_device, "coco_fdc_v11", "CoCo FDC v1.1")
 
 
 //**************************************************************************
@@ -491,7 +495,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(COCO3_HDB1, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO3_HDB1, coco_family_fdc_device_base, coco3_hdb1_device, "coco3_hdb1", "CoCo3 HDB-DOS")
 
 //**************************************************************************
 //              COCO-2 HDB-DOS
@@ -525,7 +529,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(COCO2_HDB1, coco2_hdb1_device, "coco2_hdb1", "CoCo2 HDB-DOS")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO2_HDB1, coco_family_fdc_device_base, coco2_hdb1_device, "coco2_hdb1", "CoCo2 HDB-DOS")
 
 //**************************************************************************
 //              Prológica CP-450 BASIC Disco V. 1.0 (1984)
@@ -561,7 +565,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(CP450_FDC, cp450_fdc_device, "cp450_fdc", "Prológica CP-450 BASIC Disco V. 1.0 (1984)")
+DEFINE_DEVICE_TYPE_PRIVATE(CP450_FDC, coco_family_fdc_device_base, cp450_fdc_device, "cp450_fdc", "Prológica CP-450 BASIC Disco V. 1.0 (1984)")
 
 //**************************************************************************
 //              Codimex CD-6809 FDC (1986)
@@ -595,4 +599,4 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(CD6809_FDC, cd6809_fdc_device, "cd6809_fdc", "Codimex CD-6809 Disk BASIC (1986)")
+DEFINE_DEVICE_TYPE_PRIVATE(CD6809_FDC, coco_family_fdc_device_base, cd6809_fdc_device, "cd6809_fdc", "Codimex CD-6809 Disk BASIC (1986)")

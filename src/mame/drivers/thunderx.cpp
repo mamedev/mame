@@ -1052,7 +1052,7 @@ DRIVER_INIT_MEMBER(thunderx_state, thunderx)
 /***************************************************************************/
 
 GAME( 1988, scontra,   0,        scontra,  scontra,  thunderx_state, 0,        ROT90, "Konami", "Super Contra",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, scontraj,  scontra,  scontra,  scontra,  thunderx_state, 0,        ROT90, "Konami", "Super Contra (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, scontraj,  scontra,  scontra,  scontra,  thunderx_state, 0,        ROT90, "Konami", "Super Contra - Alien no Gyakushuu (Japan)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, thunderx, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )

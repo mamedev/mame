@@ -161,14 +161,13 @@ Remaining Video issues
  - is the use of the 'scroll' registers 100% correct? (related to above?)
  - Sometimes the 'sprites' in mushisam lag by a frame vs the 'backgrounds' is this a timing problem, does the real game do it?
 
-Speedups
- - Blitter is already tightly optimized
- - Need SH3 recompiler?
-
 Blitter Timing
  - Correct slowdown emulation and flags (depends on blit mode, and speed of RAM) - could do with the recompiler or alt idle skips on the busy flag wait loops
  - End of Blit IRQ? (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
 
+Common game codes:
+ - During boot hold P1 Right+A+B+C and P2 Left+A+B+C - Forcibly initialise non-volatile data (EEPROM or NAND settings area)
+ - During boot hold P1 A and P2 A - Reset random numbers generator at each game start. Probably was used during testing or/and competition events.
 */
 
 #include "emu.h"

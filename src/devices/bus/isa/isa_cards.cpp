@@ -34,6 +34,7 @@
 #include "aha1542.h"
 #include "wd1002a_wx1.h"
 #include "mcd.h"
+#include "lbaenhancer.h"
 
 // sound
 #include "adlib.h"
@@ -106,6 +107,7 @@ SLOT_INTERFACE_START( pc_isa8_cards )
 	SLOT_INTERFACE("wd1002a_wx1", ISA8_WD1002A_WX1)
 	SLOT_INTERFACE("dectalk", ISA8_DECTALK)
 	SLOT_INTERFACE("pds", ISA8_PDS)
+	SLOT_INTERFACE("lba_enhancer", ISA8_LBA_ENHANCER)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( pc_isa16_cards )
@@ -141,6 +143,7 @@ SLOT_INTERFACE_START( pc_isa16_cards )
 	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
 	SLOT_INTERFACE("dectalk", ISA8_DECTALK)
 	SLOT_INTERFACE("pds", ISA8_PDS)
+	SLOT_INTERFACE("lba_enhancer", ISA8_LBA_ENHANCER)
 	// 16-bit
 	SLOT_INTERFACE("ide", ISA16_IDE)
 	SLOT_INTERFACE("ne2000", NE2000)

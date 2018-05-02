@@ -11,7 +11,7 @@
 #include "formats/asst128_dsk.h"
 
 
-extern const device_type ASST128_MOTHERBOARD;
+DECLARE_DEVICE_TYPE(ASST128_MOTHERBOARD, asst128_mb_device)
 
 class asst128_mb_device : public ibm5150_mb_device
 {
@@ -105,7 +105,7 @@ MACHINE_CONFIG_START(asst128_state::asst128)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", ASST128_MOTHERBOARD, 0)
-	downcast<asst128_mb_device &>(*device).set_cputag("^maincpu");
+	downcast<asst128_mb_device &>(*device).set_cputag("maincpu");
 	MCFG_DEVICE_INPUT_DEFAULTS(asst128)
 
 	MCFG_DEVICE_MODIFY("mb:cassette")

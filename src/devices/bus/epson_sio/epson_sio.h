@@ -44,8 +44,8 @@ public:
 	virtual ~epson_sio_device();
 
 	// callbacks
-	template<class _rx> devcb_base &set_rx_callback(_rx rx) { return m_write_rx.set_callback(rx); }
-	template<class _pin> devcb_base &set_pin_callback(_pin pin) { return m_write_pin.set_callback(pin); }
+	template <class Object> devcb_base &set_rx_callback(Object &&rx) { return m_write_rx.set_callback(std::forward<Object>(rx)); }
+	template <class Object> devcb_base &set_pin_callback(Object &&pin) { return m_write_pin.set_callback(std::forward<Object>(pin)); }
 
 	// called from owner
 	DECLARE_WRITE_LINE_MEMBER( tx_w );

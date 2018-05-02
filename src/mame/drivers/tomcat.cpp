@@ -63,8 +63,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(adcon_w);
 	DECLARE_READ16_MEMBER(tomcat_inputs_r);
 	DECLARE_WRITE16_MEMBER(main_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_WRITE_LINE_MEMBER(led2_w);
 	DECLARE_WRITE_LINE_MEMBER(lnkmode_w);
 	DECLARE_WRITE_LINE_MEMBER(err_w);
 	DECLARE_WRITE_LINE_MEMBER(ack_w);
@@ -117,18 +115,6 @@ WRITE16_MEMBER(tomcat_state::main_latch_w)
 {
 	// A1-A3 = address, A4 = data
 	m_mainlatch->write_bit(offset & 7, BIT(offset, 3));
-}
-
-WRITE_LINE_MEMBER(tomcat_state::led1_w)
-{
-	// Low = ON, High = OFF
-	output().set_led_value(1, !state);
-}
-
-WRITE_LINE_MEMBER(tomcat_state::led2_w)
-{
-	// Low = ON, High = OFF
-	output().set_led_value(2, !state);
 }
 
 WRITE_LINE_MEMBER(tomcat_state::lnkmode_w)
@@ -360,8 +346,8 @@ MACHINE_CONFIG_START(tomcat_state::tomcat)
 	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tomcat_state, led1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(tomcat_state, led2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tomcat_state, mres_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tomcat_state, sndres_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(tomcat_state, lnkmode_w))

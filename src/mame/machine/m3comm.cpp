@@ -404,10 +404,10 @@ WRITE16_MEMBER(m3comm_device::naomi_w)
 	{
 	case 0:         // 5F7018
 					// bit 0: access RAM is 0 - communication RAM / 1 - M68K RAM
-					// bit 1: comm RAM bank ??? (not really used)
+					// bit 1: comm RAM bank (seems R/O for SH4)
 					// bit 5: M68K Reset
 					// bit 6: ???
-					// bit 7: ???
+					// bit 7: ??? nlCbIntr reset this bit at each VBLANK-IN during game run (but not during handshake), might be M68K IRQ 5 or 2
 					// bit 14: G1 DMA bus master 0 - active / 1 - disabled
 					// bit 15: 0 - enable / 1 - disable this device ???
 //      LOG("M3COMM control write %04x\n", data);

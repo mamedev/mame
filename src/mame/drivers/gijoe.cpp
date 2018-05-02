@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(gijoe_state::gijoe)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

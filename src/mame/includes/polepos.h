@@ -94,7 +94,6 @@ public:
 	DECLARE_READ8_MEMBER(polepos_adc_r);
 	DECLARE_READ8_MEMBER(polepos_ready_r);
 	DECLARE_WRITE_LINE_MEMBER(iosel_w);
-	DECLARE_WRITE_LINE_MEMBER(clson_w);
 	DECLARE_WRITE_LINE_MEMBER(gasel_w);
 	DECLARE_WRITE_LINE_MEMBER(sb0_w);
 	DECLARE_WRITE_LINE_MEMBER(chacl_w);
@@ -113,7 +112,6 @@ public:
 	DECLARE_READ8_MEMBER(polepos_view_r);
 	DECLARE_WRITE8_MEMBER(polepos_view_w);
 	DECLARE_WRITE16_MEMBER(polepos_view16_hscroll_w);
-	DECLARE_WRITE8_MEMBER(polepos_chacl_w);
 	DECLARE_READ16_MEMBER(polepos_alpha16_r);
 	DECLARE_WRITE16_MEMBER(polepos_alpha16_w);
 	DECLARE_READ8_MEMBER(polepos_alpha_r);
@@ -170,8 +168,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( polepos_engine_sound_lsb_w );
-	DECLARE_WRITE8_MEMBER( polepos_engine_sound_msb_w );
+	DECLARE_WRITE_LINE_MEMBER(clson_w);
+	DECLARE_WRITE8_MEMBER(polepos_engine_sound_lsb_w);
+	DECLARE_WRITE8_MEMBER(polepos_engine_sound_msb_w);
 
 private:
 	uint32_t m_current_position;

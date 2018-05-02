@@ -202,21 +202,6 @@ WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
 	}
 }
 
-WRITE_LINE_MEMBER(warpwarp_state::lamp_1_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(warpwarp_state::lamp_2_w)
-{
-	output().set_led_value(1, state);
-}
-
-WRITE_LINE_MEMBER(warpwarp_state::lamp_3_w)
-{
-	output().set_led_value(2, state);
-}
-
 WRITE_LINE_MEMBER(warpwarp_state::counter_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -736,9 +721,9 @@ MACHINE_CONFIG_START(warpwarp_state::geebee)
 	MCFG_CPU_IO_MAP(geebee_port_map)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 5N
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(warpwarp_state, lamp_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(warpwarp_state, lamp_3_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // LAMP 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) // LAMP 2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) // LAMP 3
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(warpwarp_state, counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(warpwarp_state, lock_out_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(warpwarp_state, geebee_bgw_w))
@@ -802,9 +787,9 @@ MACHINE_CONFIG_START(warpwarp_state::bombbee)
 	MCFG_CPU_PROGRAM_MAP(bombbee_map)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 6L on Warp Warp
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(warpwarp_state, lamp_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(warpwarp_state, lamp_3_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // LAMP 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) // LAMP 2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) // LAMP 3
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // n.c.
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(warpwarp_state, lock_out_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(warpwarp_state, counter_w))

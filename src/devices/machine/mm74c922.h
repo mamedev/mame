@@ -130,6 +130,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(MM74C922, mm74c922_device)
-extern const device_type MM74C923;
+DECLARE_DEVICE_TYPE(MM74C923, mm74c922_device)
 
 #endif // MAME_MACHINE_MM74C922_H

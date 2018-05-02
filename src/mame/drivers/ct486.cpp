@@ -145,7 +145,7 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)
-	MCFG_ISA16_CPU(":maincpu")
+	MCFG_ISA16_CPU("maincpu")
 	MCFG_ISA_BUS_IOCHCK(DEVWRITELINE("cs4031", cs4031_device, iochck_w))
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("cs4031", cs4031_device, irq09_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("cs4031", cs4031_device, irq03_w))

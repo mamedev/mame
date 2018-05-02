@@ -451,7 +451,7 @@ ROM_START( bionicc ) /* "Not for use in Japan" */
 	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "d8751h.bin",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
+	ROM_LOAD( "ts.2f",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "tsu_08.8l",   0x00000, 0x8000, CRC(9bf0b7a2) SHA1(1361335c3c2c8a9c6a7d99566048d8aac99e7c8f) )    /* VIDEORAM (text layer) tiles */
@@ -495,7 +495,7 @@ ROM_START( bionicc1 ) /* "Not for use outside of USA or Canada" revision B */
 	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "d8751h.bin",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
+	ROM_LOAD( "ts.2f",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "tsu_08.8l",   0x00000, 0x8000, CRC(9bf0b7a2) SHA1(1361335c3c2c8a9c6a7d99566048d8aac99e7c8f) )    /* VIDEORAM (text layer) tiles */
@@ -539,7 +539,7 @@ ROM_START( bionicc2 ) /* "Not for use outside of USA or Canada" 1st release */
 	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "d8751h.bin",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
+	ROM_LOAD( "ts.2f",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "tsu_08.8l",   0x00000, 0x8000, CRC(9bf0b7a2) SHA1(1361335c3c2c8a9c6a7d99566048d8aac99e7c8f) )    /* VIDEORAM (text layer) tiles */
@@ -583,7 +583,7 @@ ROM_START( topsecrt ) /* "Not for use in any other country but Japan" */
 	ROM_LOAD( "ts_01.4e",    0x00000, 0x8000, CRC(8ea07917) SHA1(e9ace70d89482fc3669860450a41aacacbee9083) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "d8751h.bin",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
+	ROM_LOAD( "ts.2f",     0x0000, 0x1000, CRC(3ed7f0be) SHA1(db9e972065c8e60b5d74762dc3424271ea9524cb) )  /* from 'topsecrt' bootleg, but appears to be original */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "ts_08.8l",    0x00000, 0x8000, CRC(96ad379e) SHA1(accd3a560b259c186bc28cdc004ed8de0b12f9d5) )    /* VIDEORAM (text layer) tiles */

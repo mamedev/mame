@@ -13,7 +13,7 @@ typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k05
 	downcast<k056832_device &>(*device).set_k056832_callback(k056832_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K056832_CONFIG(_gfx_reg, _bpp, _big, _djmain_hack, _k055555) \
-	downcast<k056832_device &>(*device).set_config("^" _gfx_reg, _bpp, _big, _djmain_hack, _k055555);
+	downcast<k056832_device &>(*device).set_config(_gfx_reg, _bpp, _big, _djmain_hack, _k055555);
 
 
 #define K056832_PAGE_COUNT 16

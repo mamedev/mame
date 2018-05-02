@@ -76,7 +76,7 @@ private:
 DECLARE_DEVICE_TYPE(UPD71071, upd71071_device)
 
 #define MCFG_UPD71071_CPU(tag) \
-	downcast<upd71071_device &>(*device).set_cpu_tag(("^" tag));
+	downcast<upd71071_device &>(*device).set_cpu_tag(tag);
 
 #define MCFG_UPD71071_CLOCK(clk) \
 	downcast<upd71071_device &>(*device).set_clock((clk));

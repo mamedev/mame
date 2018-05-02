@@ -38,6 +38,6 @@ private:
 	required_device<psx_controller_port_device> m_portd;
 };
 
-extern const device_type PSX_MULTITAP;
+DECLARE_DEVICE_TYPE(PSX_MULTITAP, psx_multitap_device)
 
 #endif // MAME_BUS_PSX_MULTITAP_H

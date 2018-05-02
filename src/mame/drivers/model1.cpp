@@ -585,6 +585,7 @@ Notes:
 
 #include "cpu/i386/i386.h"
 #include "machine/clock.h"
+#include "machine/mb8421.h"
 #include "machine/model1io.h"
 #include "speaker.h"
 
@@ -593,16 +594,6 @@ Notes:
 // On the real system, another 315-5338A is acting as slave
 // and writes the data to the dual port RAM. This isn't
 // emulated yet, data just gets written to RAM.
-
-READ8_MEMBER( model1_state::io_r )
-{
-	return m_dpram[offset];
-}
-
-WRITE8_MEMBER( model1_state::io_w )
-{
-	m_dpram[offset] = data;
-}
 
 WRITE8_MEMBER( model1_state::vf_outputs_w )
 {
@@ -713,15 +704,39 @@ WRITE16_MEMBER(model1_state::bank_w)
 void model1_state::irq_raise(int level)
 {
 	//  logerror("irq: raising %d\n", level);
-	//  irq_status |= (1 << level);
-	m_last_irq = level;
-	m_maincpu->set_input_line(0, HOLD_LINE);
+	m_irq_status |= (1 << level);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
 {
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_irq_status, i))
+		{
+			m_last_irq = i;
+			break;
+		}
+
 	return m_last_irq;
 }
+
+WRITE8_MEMBER(model1_state::irq_control_w)
+{
+	switch (data)
+	{
+	case 0x10:
+		m_irq_status = 0;
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
+
+	case 0x20:
+		m_irq_status &= ~(1 << m_last_irq);
+		if (m_irq_status == 0)
+			m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
+	}
+}
+
 // vf
 // 1 = fe3ed4
 // 3 = fe3f5c
@@ -856,7 +871,7 @@ void model1_state::model1_mem(address_map &map)
 	map(0x900000, 0x903fff).ram().w(this, FUNC(model1_state::p_w)).share("palette");
 	map(0x910000, 0x91bfff).ram().share("color_xlat");
 
-	map(0xc00000, 0xc007ff).ram().share("dpram"); // 2k*8-bit dual port ram
+	map(0xc00000, 0xc00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask16(0x00ff); // 2k*8-bit dual port ram
 
 	map(0xc40000, 0xc40000).rw(m_m1uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xc40002, 0xc40002).rw(m_m1uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
@@ -866,7 +881,7 @@ void model1_state::model1_mem(address_map &map)
 	map(0xd80000, 0xd80003).w(this, FUNC(model1_state::v60_copro_fifo_w)).mirror(0x10);
 	map(0xdc0000, 0xdc0003).r(this, FUNC(model1_state::fifoin_status_r));
 
-	map(0xe00000, 0xe00001).nopw();        // Watchdog?  IRQ ack? Always 0x20, usually on irq
+	map(0xe00000, 0xe00000).w(this, FUNC(model1_state::irq_control_w));
 	map(0xe00004, 0xe00005).w(this, FUNC(model1_state::bank_w));
 	map(0xe0000c, 0xe0000f).nopw();
 
@@ -1574,10 +1589,12 @@ MACHINE_CONFIG_START(model1_state::model1)
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 
 	MCFG_DEVICE_ADD("ioboard", SEGA_MODEL1IO, 0)
-	MCFG_MODEL1IO_READ_CB(READ8(model1_state, io_r))
-	MCFG_MODEL1IO_WRITE_CB(WRITE8(model1_state, io_w))
+	MCFG_MODEL1IO_READ_CB(DEVREAD8("dpram", mb8421_device, left_r))
+	MCFG_MODEL1IO_WRITE_CB(DEVWRITE8("dpram", mb8421_device, left_w))
 	MCFG_MODEL1IO_IN0_CB(IOPORT("IN.0"))
 	MCFG_MODEL1IO_IN1_CB(IOPORT("IN.1"))
+
+	MCFG_DEVICE_ADD("dpram", MB8421, 0)
 
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
 	MCFG_S24TILE_DEVICE_PALETTE("palette")

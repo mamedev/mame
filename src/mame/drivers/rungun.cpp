@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(rungun_state::rng)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, rungun_k054539_map)

@@ -117,26 +117,26 @@ to implement the card in both systems.
 #define MCFG_INTELLEC4_UNIV_SLOT_ADD(bus_tag, slot_tag, clock, slot_intf, def_slot) \
 		MCFG_DEVICE_ADD(slot_tag, INTELLEC4_UNIV_SLOT, clock) \
 		MCFG_DEVICE_SLOT_INTERFACE(slot_intf, def_slot, false) \
-		downcast<bus::intellec4::univ_slot_device &>(*device).set_bus_tag("^" bus_tag);
+		downcast<bus::intellec4::univ_slot_device &>(*device).set_bus_tag(bus_tag);
 
 #define MCFG_INTELLEC4_UNIV_SLOT_REMOVE(slot_tag) \
 		MCFG_DEVICE_REMOVE(slot_tag)
 
 
 #define MCFG_INTELLEC4_UNIV_BUS_ROM_SPACE(tag, space) \
-		downcast<bus::intellec4::univ_bus_device &>(*device).set_rom_space("^" tag, space);
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_rom_space(tag, space);
 
 #define MCFG_INTELLEC4_UNIV_BUS_ROM_PORTS_SPACE(tag, space) \
-		downcast<bus::intellec4::univ_bus_device &>(*device).set_rom_ports_space("^" tag, space);
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_rom_ports_space(tag, space);
 
 #define MCFG_INTELLEC4_UNIV_BUS_MEMORY_SPACE(tag, space) \
-		downcast<bus::intellec4::univ_bus_device &>(*device).set_memory_space("^" tag, space);
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_memory_space(tag, space);
 
 #define MCFG_INTELLEC4_UNIV_BUS_STATUS_SPACE(tag, space) \
-		downcast<bus::intellec4::univ_bus_device &>(*device).set_status_space("^" tag, space);
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_status_space(tag, space);
 
 #define MCFG_INTELLEC4_UNIV_BUS_RAM_PORTS_SPACE(tag, space) \
-		downcast<bus::intellec4::univ_bus_device &>(*device).set_ram_ports_space("^" tag, space);
+		downcast<bus::intellec4::univ_bus_device &>(*device).set_ram_ports_space(tag, space);
 
 #define MCFG_INTELLEC4_UNIV_BUS_TEST_CB(obj) \
 		downcast<bus::intellec4::univ_bus_device &>(*device).set_test_out_cb(DEVCB_##obj);

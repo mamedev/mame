@@ -32,263 +32,49 @@
         Z - Deck Electronics
 
     TODO:
-    - Module W has a NEC D8041AHC which has not yet been dumped. A dump
-      will be necessary to properly emulate the player.
-    - Driver currently fails the initial self-test with code 053. Per
-      the service manual, code 053 means "no lead-in code at start-up of
-      player (diagnostics)".
+    - Driver currently fails the initial self-test with code 073. Per
+      the service manual, code 73 means "a/d converted mirror pos. min.
+      (out of field of view)".
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "screen.h"
+#include "includes/vp415.h"
 
-#include "cpu/mcs51/mcs51.h"
-#include "cpu/mcs48/mcs48.h"
-#include "cpu/z80/z80.h"
-
-#include "machine/i8155.h"
-#include "machine/i8255.h"
-#include "machine/ncr5385.h"
-#include "machine/saa1043.h"
-#include "video/mb88303.h"
-
-class vp415_state : public driver_device
-{
-public:
-	vp415_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_datacpu(*this, Z80CPU_TAG)
-		, m_scsi(*this, SCSI_TAG)
-		, m_drivecpu(*this, DRIVECPU_TAG)
-		, m_ctrlcpu(*this, CTRLCPU_TAG)
-		, m_ctrlmcu(*this, CTRLMCU_TAG)
-		, m_chargen(*this, CHARGEN_TAG)
-		, m_mainram(*this, Z80RAM_TAG)
-		, m_ctrlram(*this, CTRLRAM_TAG)
-		, m_switches(*this, SWITCHES_TAG)
-	{ }
-
-	void vp415(machine_config &config);
-
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	DECLARE_WRITE_LINE_MEMBER(cpu_int1_w);
-
-	DECLARE_WRITE8_MEMBER(sel34_w);
-	DECLARE_READ8_MEMBER(sel37_r);
-
-	DECLARE_WRITE8_MEMBER(ctrl_regs_w);
-	DECLARE_READ8_MEMBER(ctrl_regs_r);
-	DECLARE_WRITE8_MEMBER(ctrl_cpu_port1_w);
-	DECLARE_READ8_MEMBER(ctrl_cpu_port1_r);
-	DECLARE_WRITE8_MEMBER(ctrl_cpu_port3_w);
-	DECLARE_READ8_MEMBER(ctrl_cpu_port3_r);
-
-	DECLARE_WRITE8_MEMBER(ctrl_mcu_port1_w);
-	DECLARE_READ8_MEMBER(ctrl_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(ctrl_mcu_port2_w);
-	DECLARE_READ8_MEMBER(ctrl_mcu_port2_r);
-
-	DECLARE_READ8_MEMBER(drive_i8155_pb_r);
-	DECLARE_READ8_MEMBER(drive_i8155_pc_r);
-
-	DECLARE_WRITE8_MEMBER(drive_i8255_pa_w);
-	DECLARE_WRITE8_MEMBER(drive_i8255_pb_w);
-	DECLARE_READ8_MEMBER(drive_i8255_pc_r);
-	DECLARE_WRITE8_MEMBER(drive_cpu_port1_w);
-	DECLARE_WRITE8_MEMBER(drive_cpu_port3_w);
-
-	DECLARE_WRITE_LINE_MEMBER(refv_w);
-
-	static const char* Z80CPU_TAG;
-	static const char* Z80RAM_TAG;
-	static const char* SCSI_TAG;
-	static const char* CTRLCPU_TAG;
-	static const char* CTRLMCU_TAG;
-	static const char* CTRLRAM_TAG;
-	static const char* DRIVECPU_TAG;
-	static const char* DESCRAMBLE_ROM_TAG;
-	static const char* SYNC_ROM_TAG;
-	static const char* DRIVE_ROM_TAG;
-	static const char* CONTROL_ROM_TAG;
-	static const char* SWITCHES_TAG;
-	static const char* I8155_TAG;
-	static const char* I8255_TAG;
-	static const char* CHARGEN_TAG;
-	static const char* SYNCGEN_TAG;
-
-	static const device_timer_id DRIVE_2PPR_ID;
-
-protected:
-	// CPU Board enums
-	enum
-	{
-		SEL34_INTR_N = 0x01,
-		SEL34_RES    = 0x20,
-		SEL34_ERD    = 0x40,
-		SEL34_ENW    = 0x80,
-		SEL34_INTR_N_BIT = 0,
-		SEL34_RES_BIT    = 5,
-		SEL34_ERD_BIT    = 6,
-		SEL34_ENW_BIT    = 7,
-	};
-
-	enum
-	{
-		SEL37_ID0   = 0x01,
-		SEL37_ID1   = 0x02,
-		SEL37_BRD   = 0x10,
-		SEL37_MON_N = 0x20,
-		SEL37_SK1c  = 0x40,
-		SEL37_SK1d  = 0x40,
-
-		SEL37_ID0_BIT   = 0,
-		SEL37_ID1_BIT   = 1,
-		SEL37_BRD_BIT   = 4,
-		SEL37_MON_N_BIT = 5,
-		SEL37_SK1c_BIT  = 6,
-		SEL37_SK1d_BIT  = 7,
-	};
-
-	// Control Board enums
-	enum
-	{
-		CTRL_P3_INT1 = 0x08,
-
-		CTRL_P3_INT1_BIT = 3
-	};
-
-	// Drive Board enums
-	enum
-	{
-		I8255PC_NOT_FOCUSED     = 0x02,
-		I8255PC_0RPM_N          = 0x08,
-		I8255PC_DISC_REFLECTION = 0x10,
-	};
-
-	enum
-	{
-		I8255PB_COMM1    = 0x01,
-		I8255PB_COMM2    = 0x02,
-		I8255PB_COMM3    = 0x04,
-		I8255PB_COMM4    = 0x08,
-		I8255PB_RLS_N    = 0x10,
-		I8255PB_SL_PWR   = 0x20,
-		I8255PB_RAD_FS_N = 0x40,
-		I8255PB_STR1     = 0x80,
-
-		I8255PB_COMM1_BIT    = 0,
-		I8255PB_COMM2_BIT    = 1,
-		I8255PB_COMM3_BIT    = 2,
-		I8255PB_COMM4_BIT    = 3,
-		I8255PB_RLS_N_BIT    = 4,
-		I8255PB_SL_PWR_BIT   = 5,
-		I8255PB_RAD_FS_N_BIT = 6,
-		I8255PB_STR1_BIT     = 7,
-	};
-
-	enum
-	{
-		I8155PB_2PPR    = 0x01,
-		I8155PB_RAD_MIR = 0x04,
-		I8155PB_FRLOCK  = 0x08,
-
-		I8155PB_2PPR_BIT    = 0,
-		I8155PB_RAD_MIR_BIT = 2,
-		I8155PB_FRLOCK_BIT  = 3,
-	};
-
-	enum
-	{
-		DRIVE_P1_CP1    = 0x01,
-		DRIVE_P1_CP2    = 0x02,
-		DRIVE_P1_LDI    = 0x04,
-		DRIVE_P1_ATN_N  = 0x08,
-		DRIVE_P1_TX     = 0x10,
-		DRIVE_P1_STB_N  = 0x20,
-		DRIVE_P1_STR0_N = 0x40,
-		DRIVE_P1_TP2    = 0x80,
-
-		DRIVE_P1_CP1_BIT    = 0,
-		DRIVE_P1_CP2_BIT    = 1,
-		DRIVE_P1_LDI_BIT    = 2,
-		DRIVE_P1_ATN_N_BIT  = 3,
-		DRIVE_P1_TX_BIT     = 4,
-		DRIVE_P1_STB_N_BIT  = 5,
-		DRIVE_P1_STR0_N_BIT = 6,
-		DRIVE_P1_TP2_BIT    = 7
-	};
-
-	virtual void video_start() override;
-
-	void z80_program_map(address_map &map);
-	void z80_io_map(address_map &map);
-	void set_int_line(uint8_t line, uint8_t value);
-	void update_cpu_int();
-
-	void ctrl_program_map(address_map &map);
-	void ctrl_io_map(address_map &map);
-	void ctrlmcu_program_map(address_map &map);
-	void sd_w(uint8_t data);
-	uint8_t sd_r();
-
-	void drive_program_map(address_map &map);
-	void drive_io_map(address_map &map);
-
-	required_device<z80_device> m_datacpu;
-	required_device<ncr5385_device> m_scsi;
-	required_device<i8031_device> m_drivecpu;
-	required_device<i8031_device> m_ctrlcpu;
-	required_device<i8041_device> m_ctrlmcu;
-	required_device<mb88303_device> m_chargen;
-	required_shared_ptr<uint8_t> m_mainram;
-	required_shared_ptr<uint8_t> m_ctrlram;
-	required_ioport m_switches;
-
-	uint8_t m_sel34;
-	uint8_t m_sel37;
-
-	uint8_t m_int_lines[2];
-
-	uint8_t m_refv;
-
-	uint8_t m_ctrl_cpu_p1;
-	uint8_t m_ctrl_cpu_p3;
-	uint8_t m_ctrl_mcu_p1;
-	uint8_t m_ctrl_mcu_p2;
-
-	uint8_t m_drive_p1;
-	uint8_t m_drive_pc_bits;
-
-	uint8_t m_drive_rad_mir_dac;
-	uint8_t m_drive_i8255_pb;
-	emu_timer *m_drive_2ppr_timer;
-	uint8_t m_drive_2ppr;
-};
-
-/*static*/ const char* vp415_state::Z80CPU_TAG = "z80cpu";
-/*static*/ const char* vp415_state::Z80RAM_TAG = "z80ram";
-/*static*/ const char* vp415_state::SCSI_TAG = "ncr5385";
-/*static*/ const char* vp415_state::CTRLCPU_TAG = "ctrlcpu";
-/*static*/ const char* vp415_state::CTRLMCU_TAG = "ctrlmcu";
-/*static*/ const char* vp415_state::CTRLRAM_TAG = "ctrlram";
-/*static*/ const char* vp415_state::DRIVECPU_TAG = "drivecpu";
-/*static*/ const char* vp415_state::DESCRAMBLE_ROM_TAG = "descramblerom";
-/*static*/ const char* vp415_state::SYNC_ROM_TAG = "syncrom";
-/*static*/ const char* vp415_state::DRIVE_ROM_TAG = "driverom";
-/*static*/ const char* vp415_state::CONTROL_ROM_TAG = "controlrom";
-/*static*/ const char* vp415_state::SWITCHES_TAG = "SWITCHES";
-/*static*/ const char* vp415_state::I8155_TAG = "i8155";
-/*static*/ const char* vp415_state::I8255_TAG = "i8255";
-/*static*/ const char* vp415_state::CHARGEN_TAG = "mb88303";
-/*static*/ const char* vp415_state::SYNCGEN_TAG = "saa1043";
+/*static*/ const char *const vp415_state::DATACPU_TAG = "datacpu";
+/*static*/ const char *const vp415_state::DATAMCU_TAG = "datamcu";
+/*static*/ const char *const vp415_state::DATARAM_TAG = "dataram";
+/*static*/ const char *const vp415_state::SCSI_TAG = "ncr5385";
+/*static*/ const char *const vp415_state::CTRLCPU_TAG = "ctrlcpu";
+/*static*/ const char *const vp415_state::CTRLMCU_TAG = "ctrlmcu";
+/*static*/ const char *const vp415_state::CTRLRAM_TAG = "ctrlram";
+/*static*/ const char *const vp415_state::DRIVECPU_TAG = "drivecpu";
+/*static*/ const char *const vp415_state::DESCRAMBLE_ROM_TAG = "descramblerom";
+/*static*/ const char *const vp415_state::SYNC_ROM_TAG = "syncrom";
+/*static*/ const char *const vp415_state::DRIVE_ROM_TAG = "driverom";
+/*static*/ const char *const vp415_state::CONTROL_ROM_TAG = "controlrom";
+/*static*/ const char *const vp415_state::SWITCHES_TAG = "SWITCHES";
+/*static*/ const char *const vp415_state::I8155_TAG = "i8155";
+/*static*/ const char *const vp415_state::I8255_TAG = "i8255";
+/*static*/ const char *const vp415_state::CHARGEN_TAG = "mb88303";
+/*static*/ const char *const vp415_state::SYNCGEN_TAG = "saa1043";
 
 /*static*/ const device_timer_id vp415_state::DRIVE_2PPR_ID = 0;
+
+vp415_state::vp415_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag)
+	, m_datacpu(*this, DATACPU_TAG)
+	, m_datamcu(*this, DATAMCU_TAG)
+	, m_scsi(*this, SCSI_TAG)
+	, m_drivecpu(*this, DRIVECPU_TAG)
+	, m_ctrlcpu(*this, CTRLCPU_TAG)
+	, m_ctrlmcu(*this, CTRLMCU_TAG)
+	, m_chargen(*this, CHARGEN_TAG)
+	, m_mainram(*this, DATARAM_TAG)
+	, m_ctrlram(*this, CTRLRAM_TAG)
+	, m_switches(*this, SWITCHES_TAG)
+{
+}
 
 void vp415_state::machine_reset()
 {
@@ -311,12 +97,12 @@ void vp415_state::machine_reset()
 	m_drive_rad_mir_dac = 0;
 
 	m_drive_2ppr = 0;
-	m_drive_2ppr_timer = timer_alloc(DRIVE_2PPR_ID);
 	m_drive_2ppr_timer->adjust(attotime::from_msec(10));
 }
 
 void vp415_state::machine_start()
 {
+	m_drive_2ppr_timer = timer_alloc(DRIVE_2PPR_ID);
 }
 
 void vp415_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -379,10 +165,32 @@ void vp415_state::update_cpu_int()
 	m_datacpu->set_input_line(0, (m_sel37 & (SEL37_ID0 | SEL37_ID1)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+WRITE8_MEMBER(vp415_state::data_mcu_port1_w)
+{
+	logerror("%s: data_mcu_port1_w: %02x\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(vp415_state::data_mcu_port1_r)
+{
+	logerror("%s: data_mcu_port1_r: %02x\n", machine().describe_context(), 0);
+	return 0;
+}
+
+WRITE8_MEMBER(vp415_state::data_mcu_port2_w)
+{
+	logerror("%s: data_mcu_port2_w: %02x\n", machine().describe_context(), data);
+}
+
+READ8_MEMBER(vp415_state::data_mcu_port2_r)
+{
+	logerror("%s: data_mcu_port2_r: %02x\n", machine().describe_context(), 0);
+	return 0;
+}
+
 void vp415_state::z80_program_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region(Z80CPU_TAG, 0);
-	map(0xa000, 0xfeff).ram().share(Z80RAM_TAG);
+	map(0x0000, 0x7fff).rom().region(DATACPU_TAG, 0);
+	map(0xa000, 0xfeff).ram().share(DATARAM_TAG);
 }
 
 void vp415_state::z80_io_map(address_map &map)
@@ -392,6 +200,11 @@ void vp415_state::z80_io_map(address_map &map)
 	// 0x20, 0x21: Connected to A0 + D0..D7 of SLAVE i8041
 	map(0x34, 0x34).w(this, FUNC(vp415_state::sel34_w));
 	map(0x37, 0x37).r(this, FUNC(vp415_state::sel37_r));
+}
+
+void vp415_state::datamcu_program_map(address_map &map)
+{
+	map(0x0000, 0x03ff).rom().region(DATAMCU_TAG, 0);
 }
 
 
@@ -678,9 +491,16 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vp415_state::vp415)
 	// Module W: CPU Datagrabber
-	MCFG_CPU_ADD(Z80CPU_TAG, Z80, XTAL(8'000'000)/2) // 8MHz through a /2 flip-flop divider, per schematic
+	MCFG_CPU_ADD(DATACPU_TAG, Z80, XTAL(8'000'000)/2) // 8MHz through a /2 flip-flop divider, per schematic
 	MCFG_CPU_PROGRAM_MAP(z80_program_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
+
+	MCFG_CPU_ADD(DATAMCU_TAG, I8041, XTAL(4'000'000)) // Verified on schematic
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(vp415_state, data_mcu_port1_r));
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vp415_state, data_mcu_port1_w));
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(vp415_state, data_mcu_port2_r));
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vp415_state, data_mcu_port2_w));
+	MCFG_CPU_PROGRAM_MAP(datamcu_program_map)
 
 	MCFG_DEVICE_ADD(SCSI_TAG, NCR5385, XTAL(8'000'000)/2) // Same clock signal as above, per schematic
 	MCFG_NCR5385_INT_CB(WRITELINE(vp415_state, cpu_int1_w))
@@ -694,14 +514,14 @@ MACHINE_CONFIG_START(vp415_state::vp415)
 	MCFG_CPU_PROGRAM_MAP(ctrl_program_map)
 	MCFG_CPU_IO_MAP(ctrl_io_map)
 
-	// Module R: Drive
-	MCFG_CPU_ADD(CTRLMCU_TAG, I8041, XTAL(4'000'000))
+	MCFG_CPU_ADD(CTRLMCU_TAG, I8041, XTAL(4'000'000)) // Verified on schematic
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(vp415_state, ctrl_mcu_port1_r));
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vp415_state, ctrl_mcu_port1_w));
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(vp415_state, ctrl_mcu_port2_r));
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vp415_state, ctrl_mcu_port2_w));
 	MCFG_CPU_PROGRAM_MAP(ctrlmcu_program_map)
 
+	// Module R: Drive
 	MCFG_CPU_ADD(DRIVECPU_TAG, I8031, XTAL(12'000'000)) // 12MHz, per schematic
 	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(vp415_state, drive_cpu_port1_w));
 	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(vp415_state, drive_cpu_port3_w));
@@ -741,10 +561,10 @@ ROM_START(vp415)
 	ROM_LOAD( "s.3104 103 6804.9_control.ic2", 0x0000, 0x10000, CRC(10564765) SHA1(8eb6cff7ca7cbfcb3db8b04b697cdd7e364be805) )
 
 	ROM_REGION(0x400, vp415_state::CTRLMCU_TAG, 0)
-	ROM_LOAD( "d8041ahc 152.ic11", 0x000, 0x400, CRC(02b6a9b2) SHA1(4123690c3fb4cc987c2ea2dd878e39c8bf0cb4ea) )
+	ROM_LOAD( "d8041ahc 152.7252", 0x000, 0x400, CRC(2972d4b2) SHA1(e08086714fa5be1a67feac8f64210b21bb410dd3) )
 
 	/* Module W */
-	ROM_REGION(0x8000, vp415_state::Z80CPU_TAG, 0)
+	ROM_REGION(0x8000, vp415_state::DATACPU_TAG, 0)
 	ROM_LOAD( "w.3104 103 6805.3_cpu", 0x0000, 0x4000, CRC(c2cf4f25) SHA1(e55e1ac917958eb42244bff17a0016b74627c8fa) ) // Version 1.3
 	ROM_LOAD( "w.3104 103 6806.3_cpu", 0x4000, 0x4000, CRC(14a45ea0) SHA1(fa028d01094be91e3480c9ad35d46b5546f9ff0f) ) // Version 1.4
 
@@ -753,6 +573,9 @@ ROM_START(vp415)
 
 	ROM_REGION(0x4000, vp415_state::SYNC_ROM_TAG, 0)
 	ROM_LOAD( "w.3104 103 6808.0_cpu", 0x0000, 0x4000, CRC(bdb601e0) SHA1(4f769aa62b756b157ba9ac8d3ae8bd1228821ff9) ) // Version 1.0
+
+	ROM_REGION(0x400, vp415_state::DATAMCU_TAG, 0)
+	ROM_LOAD( "d8041ahc 152.7211", 0x000, 0x400, CRC(2972d4b2) SHA1(e08086714fa5be1a67feac8f64210b21bb410dd3) ) // Same contents as 7252; this is intentional!
 ROM_END
 
 CONS( 1983, vp415, 0, 0, vp415, vp415, vp415_state, 0, "Philips", "VP415", MACHINE_IS_SKELETON )

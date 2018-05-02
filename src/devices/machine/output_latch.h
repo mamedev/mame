@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_MACHINE_LATCH_H
-#define MAME_MACHINE_LATCH_H
+#ifndef MAME_MACHINE_OUTPUT_LATCH_H
+#define MAME_MACHINE_OUTPUT_LATCH_H
 
 #pragma once
 
@@ -41,16 +41,15 @@ public:
 	DECLARE_WRITE8_MEMBER(write) { write(data); }
 
 protected:
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 private:
 	devcb_write_line m_bit_handlers[8];
 
 	int m_bits[8];
-
-	bool m_resolved;
 };
 
 DECLARE_DEVICE_TYPE(OUTPUT_LATCH, output_latch_device)
 
-#endif // MAME_MACHINE_LATCH_H
+#endif // MAME_MACHINE_OUTPUT_LATCH_H

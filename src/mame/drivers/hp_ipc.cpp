@@ -371,6 +371,8 @@ Software to look for
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "video/hp1ll3.h"
+#include "machine/tms9914.h"
+#include "bus/ieee488/ieee488.h"
 
 #include "rendlay.h"
 
@@ -415,9 +417,16 @@ public:
 
 	emu_timer *m_bus_error_timer;
 
+	void hp_ipc_base(machine_config &config);
 	void hp_ipc(machine_config &config);
-	void hp_ipc_mem_inner(address_map &map);
+
+	void hp_ipc_mem_inner_base(address_map &map);
+	void hp_ipc_mem_inner_9807a(address_map &map);
 	void hp_ipc_mem_outer(address_map &map);
+
+	void hp9808a(machine_config &config);
+	void hp_ipc_mem_inner_9808a(address_map &map);
+
 private:
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
@@ -469,7 +478,7 @@ void hp_ipc_state::hp_ipc_mem_outer(address_map &map)
 	map(0x000000, 0xFFFFFF).rw(this, FUNC(hp_ipc_state::mem_r), FUNC(hp_ipc_state::mem_w));
 }
 
-void hp_ipc_state::hp_ipc_mem_inner(address_map &map)
+void hp_ipc_state::hp_ipc_mem_inner_base(address_map &map)
 {
 // bus error handler
 	map(0x0000000, 0x1FFFFFF).rw(this, FUNC(hp_ipc_state::trap_r), FUNC(hp_ipc_state::trap_w));
@@ -477,6 +486,7 @@ void hp_ipc_state::hp_ipc_mem_inner(address_map &map)
 // user mode
 	map(0x1000000, 0x17FFFFF).rw(this, FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
 	map(0x1800000, 0x187FFFF).rom().region("maincpu", 0);
+	map(0x1E00000, 0x1E0FFFF).rw(this, FUNC(hp_ipc_state::mmu_r), FUNC(hp_ipc_state::mmu_w));
 	map(0x1E20000, 0x1E2000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
 	map(0x1E40000, 0x1E4002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
 
@@ -488,15 +498,24 @@ void hp_ipc_state::hp_ipc_mem_inner(address_map &map)
 	map(0x0610000, 0x0610007).rw(this, FUNC(hp_ipc_state::floppy_id_r), FUNC(hp_ipc_state::floppy_id_w)).umask16(0x00ff);
 	map(0x0610008, 0x061000F).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x0620000, 0x062000F).rw("gpu", FUNC(hp1ll3_device::read), FUNC(hp1ll3_device::write)).umask16(0x00ff);
-	map(0x0630000, 0x063FFFF).noprw();       // AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
+	map(0x0630000, 0x063FFFF).mask(0xf).rw("hpib" , FUNC(tms9914_device::reg8_r) , FUNC(tms9914_device::reg8_w)).umask16(0x00ff);
 	map(0x0640000, 0x064002F).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
-	map(0x0650000, 0x065FFFF).noprw();       // HP-IL Printer (optional; ROM sets _desktop to 0 if not mapped) -- sys/lpint.h
 	map(0x0660000, 0x06600FF).rw("mlc", FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write)).umask16(0x00ff);  // 'caravan', scrn/caravan.h
 	map(0x0670000, 0x067FFFF).noprw();       // Speaker (NatSemi COP 452)
 	map(0x0680000, 0x068FFFF).noprw();       // 'SIMON (98628) fast HP-IB card' -- sys/simon.h
 	map(0x0700000, 0x07FFFFF).unmaprw();     // External I/O
 	map(0x0800000, 0x0FFFFFF).rw(this, FUNC(hp_ipc_state::ram_r), FUNC(hp_ipc_state::ram_w));
+}
 
+void hp_ipc_state::hp_ipc_mem_inner_9807a(address_map &map)
+{
+	hp_ipc_mem_inner_base(map);
+	map(0x0650000, 0x065FFFF).noprw();       // HP-IL Printer (optional; ROM sets _desktop to 0 if not mapped) -- sys/lpint.h
+}
+
+void hp_ipc_state::hp_ipc_mem_inner_9808a(address_map &map)
+{
+	hp_ipc_mem_inner_base(map);
 }
 
 static INPUT_PORTS_START(hp_ipc)
@@ -597,7 +616,8 @@ READ8_MEMBER(hp_ipc_state::floppy_id_r)
 {
 	uint8_t data = 0;
 
-	data = (m_fdc->intrq_r() << 6);
+	// TODO: fix sys controller switch
+	data = (m_fdc->intrq_r() << 6) | 0x80;
 
 	if (m_floppy)
 	{
@@ -687,7 +707,7 @@ void hp_ipc_state::machine_start()
 	m_bankdev->set_bank(1);
 
 	m_lowest_ram_addr = 0x3c0000 - (m_ram->size() >> 1);
-	m_internal_ram = (uint16_t *) m_ram->pointer();
+	m_internal_ram = (uint16_t *)m_ram->pointer();
 }
 
 void hp_ipc_state::machine_reset()
@@ -715,30 +735,9 @@ SLOT_INTERFACE_END
  *  2   HP-HIL devices (keyboard, mouse)
  *  1   Real-time clock
  */
-MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
+MACHINE_CONFIG_START(hp_ipc_state::hp_ipc_base)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(15'920'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(hp_ipc_mem_outer)
-
-	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_inner)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(25)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
-
-	// horizontal time = 60 us (min)
-	// ver.refresh period = ~300 us
-	// ver.period = 16.7ms (~60 hz)
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
-	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 512, 278, 0, 256)
-//  when _desktop == 0:
-//  MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 640, 480, 0, 400)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_HP1LL3_ADD("gpu")
 //  MCFG_HP1LL3_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_4))
@@ -761,16 +760,103 @@ MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
 	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(hp_ipc_state, irq_7))
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
 
+	MCFG_DEVICE_ADD("hpib" , TMS9914 , XTAL(4000000))
+	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(hp_ipc_state, irq_3))
+	MCFG_TMS9914_DIO_READWRITE_CB(DEVREAD8(IEEE488_TAG , ieee488_device , dio_r) , DEVWRITE8(IEEE488_TAG , ieee488_device , dio_w))
+	MCFG_TMS9914_EOI_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , eoi_w))
+	MCFG_TMS9914_DAV_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , dav_w))
+	MCFG_TMS9914_NRFD_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , nrfd_w))
+	MCFG_TMS9914_NDAC_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , ndac_w))
+	MCFG_TMS9914_IFC_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , ifc_w))
+	MCFG_TMS9914_SRQ_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , srq_w))
+	MCFG_TMS9914_ATN_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , atn_w))
+	MCFG_TMS9914_REN_WRITE_CB(DEVWRITELINE(IEEE488_TAG , ieee488_device , ren_w))
+	MCFG_IEEE488_BUS_ADD()
+	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , atn_w))
+	MCFG_IEEE488_REN_CALLBACK(DEVWRITELINE("hpib" , tms9914_device , ren_w))
+	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
+
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
+	hp_ipc_base(config);
+
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_inner_9807a)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(25)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+
+	// horizontal time = 60 us (min)
+	// ver.refresh period = ~300 us
+	// ver.period = 16.7ms (~60 hz)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
+	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 512, 278, 0, 256)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(hp_ipc_state::hp9808a)
+	hp_ipc_base(config);
+
+	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_inner_9808a)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(25)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
+	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 640, 480, 0, 400)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w))
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
+
+	MCFG_SCREEN_PALETTE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
+MACHINE_CONFIG_END
+
 
 ROM_START(hp_ipc)
-	ROM_REGION(0x100000, "maincpu" , 0)
-	ROM_LOAD("hp ipc os 82991a.bin", 0x00000, 0x80000, BAD_DUMP CRC(df45a37b) SHA1(476af9923bca0d2d0f40aeb81be5145ca76fddf5)) // Should be spread across 4 x 128K ROMs
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("v50")
+
+	ROM_SYSTEM_BIOS(0, "v10", "HP-UX 1.0")
+	ROMX_LOAD("00095-60006.bin", 0x00000, 0x80000, NO_DUMP, ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(1, "v50", "HP-UX 5.0")
+	// Should be spread across 4 x 128K ROMs
+	ROMX_LOAD("hp ipc os 82991a.bin", 0x00000, 0x80000, BAD_DUMP CRC(df45a37b) SHA1(476af9923bca0d2d0f40aeb81be5145ca76fddf5), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(2, "diaga", "Diag ROM A")
+	ROMX_LOAD("boarda_u1.bin", 0x00001, 0x4000, CRC(f40e1434) SHA1(a4f633f3e0971ba3ff218c6d6f777b8253bade8c), ROM_BIOS(3)|ROM_SKIP(1))
+	ROMX_LOAD("boarda_u2.bin", 0x00000, 0x4000, CRC(80f6eb08) SHA1(ea943f72d37b43b5ba06b8e6f11824601109497c), ROM_BIOS(3)|ROM_SKIP(1))
+	ROMX_LOAD("boarda_u3.bin", 0x40001, 0x4000, CRC(0f2fd4d5) SHA1(9ed41fca947d58d7f4159336421601963e3cae17), ROM_BIOS(3)|ROM_SKIP(1))
+	ROMX_LOAD("boarda_u4.bin", 0x40000, 0x4000, CRC(d6741772) SHA1(1574a52d6658f9a7beace6572bea11ee923fc1bf), ROM_BIOS(3)|ROM_SKIP(1))
+
+	ROM_SYSTEM_BIOS(3, "diagb", "Diag ROM B")
+	ROMX_LOAD("boardb_u1.bin", 0x00001, 0x4000, CRC(597777d9) SHA1(24671499e4685f306b1b37a071adc0634f9f1e4e), ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("boardb_u2.bin", 0x00000, 0x4000, CRC(bc2ada19) SHA1(efebab335ca8a57e77b1076050e861a3a0eb09fc), ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("boardb_u3.bin", 0x40001, 0x2000, CRC(c227622a) SHA1(99747945dc6efaa45ce8d7d3c58830dbe46b651a), ROM_BIOS(4)|ROM_SKIP(1))
+	ROMX_LOAD("boardb_u4.bin", 0x40000, 0x2000, CRC(d99efe90) SHA1(345437007f8d728ceafc5cd97414ef94ce38e363), ROM_BIOS(4)|ROM_SKIP(1))
 ROM_END
 
+#define rom_hp9808a rom_hp_ipc
 
-COMP(1985, hp_ipc, 0, 0, hp_ipc, hp_ipc, hp_ipc_state, 0, "HP", "Integral Personal Computer", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+//    YEAR  NAME        PARENT   COMPAT  MACHINE        INPUT           STATE          INIT  COMPANY             FULLNAME  FLAGS
+COMP( 1985, hp_ipc,     0,       0,      hp_ipc,        hp_ipc,         hp_ipc_state,   0  , "Hewlett-Packard",  "Integral Personal Computer 9807A", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1985, hp9808a,    0,       0,      hp9808a,       hp_ipc,         hp_ipc_state,   0  , "Hewlett-Packard",  "Integral Personal Computer 9808A", MACHINE_NOT_WORKING)

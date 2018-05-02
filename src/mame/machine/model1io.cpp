@@ -141,6 +141,8 @@ MACHINE_CONFIG_START( model1io_device::device_add_mconfig )
 	MCFG_315_5338A_IN1_CB(READ8(model1io_device, in1_r))
 	MCFG_315_5338A_IN2_CB(READ8(model1io_device, in2_r))
 	MCFG_315_5338A_IN3_CB(READ8(model1io_device, in3_r))
+	MCFG_315_5338A_IN4_CB(READ8(model1io_device, in4_r))
+	MCFG_315_5338A_OUT4_CB(WRITE8(model1io_device, out4_w))
 	MCFG_315_5338A_OUT5_CB(WRITE8(model1io_device, out5_w))
 	MCFG_315_5338A_IN6_CB(READ8(model1io_device, in6_r))
 
@@ -166,6 +168,7 @@ model1io_device::model1io_device(const machine_config &mconfig, const char *tag,
 	m_buttons(*this, "buttons"),
 	m_read_cb(*this), m_write_cb(*this),
 	m_in_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
+	m_drive_read_cb(*this), m_drive_write_cb(*this),
 	m_an_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 	m_output_cb(*this),
 	m_secondary_controls(false)
@@ -184,6 +187,9 @@ void model1io_device::device_start()
 
 	for (unsigned i = 0; i < 6; i++)
 		m_in_cb[i].resolve_safe(0xff);
+
+	m_drive_read_cb.resolve_safe(0xff);
+	m_drive_write_cb.resolve_safe();
 
 	for (unsigned i = 0; i < 8; i++)
 		m_an_cb[i].resolve_safe(0xff);
@@ -236,6 +242,16 @@ READ8_MEMBER( model1io_device::in2_r )
 READ8_MEMBER( model1io_device::in3_r )
 {
 	return m_secondary_controls ? m_in_cb[5](0) : m_in_cb[2](0);
+}
+
+READ8_MEMBER( model1io_device::in4_r )
+{
+	return m_drive_read_cb(0);
+}
+
+WRITE8_MEMBER( model1io_device::out4_w )
+{
+	m_drive_write_cb(data);
 }
 
 WRITE8_MEMBER( model1io_device::out5_w )

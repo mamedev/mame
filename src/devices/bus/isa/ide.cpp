@@ -49,8 +49,8 @@ WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 void isa16_ide_device::cdrom_headphones(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^lheadphone", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^rheadphone", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lheadphone", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rheadphone", 1.0)
 }
 
 static INPUT_PORTS_START( ide )

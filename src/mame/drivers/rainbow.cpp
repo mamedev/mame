@@ -1678,7 +1678,7 @@ void rainbow_state::hdc_reset()
 
 // Return 'hard_disk_file' object for harddisk 1 (fixed).
 // < nullptr if geometry is insane or other errors occured >
-hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
+hard_disk_file *rainbow_state::rainbow_hdc_file(int drv)
 {
 	m_hdc_drive_ready = false;
 

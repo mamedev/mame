@@ -231,53 +231,352 @@ Notes:
 
 
 ****************************************************************************
+Guru-Readme for Chase HQ (Taito 1988)
 
-ChaseHQ (Guru)
--------
-
-Video board
------------
-                 Pal  b52-28d  b52-28b
-                 Pal      17d      17b
-                 Pal      28c      28a
-                 Pal      77c      17a
-
-b52-30
-    34
-    31
-    35
-    32                     b52-27  pal20       TC020VAR  b52-03  b52-127
-    36                         51                        b52-126  b52-124 Pal
-                               50
-                               49                  Pal   b52-125
-    33   Pal  b52-19                                      Pal   b52-25
-    37    38                 b52-18b                      Pal   122
-         Pal      Pal        b52-18a                      Pal   123
-         b52-20   b52-21     b52-18
-
-
-CPU board
+CPU Board
 ---------
-                                                    b52-119 Pal
-                                                    b52-118 Pal
-                                68000-12
-                            b52-131    129
-b52-113                     b52-130    136
-b52-114
-b52-115                 TC0140SYT
-b52-116
 
-             YM2610                          b52-29
-                                                      26.686MHz
-                                                      24 MHz
-           16MHz                             TC0100SCN
+K1100357A
+J1100157A CPU PCB
+K1100357A CHASE HQ UP (sticker for upright)
+M4300099A CHASE HQ DX (sticker for DX cabinet)
+|------------------------------------------------------------------------|
+|  B52-113.IC73     |---------|                     B52-119.IC20(PAL20L8)|
+|                   |TAITO    |           68000-12  B52-118.IC21(PAL20L8)|
+|  B52-114.IC72     |TC0140SYT|                                          |-|
+|M                  |         |      B52-131.IC37 B52-129.IC30           | |
+|  B52-115.IC71     |---------|      B52-130.IC36 B52-136.IC29           | |
+|                                       TMM2063     TMM2063              | |
+|  B52-116.IC70      Z80                                                 | |
+|                    B52-137.IC51         B52-29.IC27         26.686MHz  | |
+| TD62003                                  |---------|        24MHz      | |
+|V           YM2610                        |TAITO    |                   | |
+|                                          |TC0100SCN|      43256        |-|
+|             16MHz                        |         |                   |
+|                           TMM2063        |---------|      43256        |
+|          TC0050DCA                   |---------|                       |-|
+|            Y3016-F        TMM2063    |TAITO    | |------|              | |
+|                                      |TC0170ABT| |TAITO |              | |
+|        TL074 TL074                   |         | |TC0110|   B52-01.IC7 | |
+|  MB3735  VOLUME B52-121.IC57(PAL20L8)|---------| |PCR   |              | |
+|G    PC050CM     B52-120.IC56(PAL16L8)            |------|              | |
+|  |---------|       68000-12       |---------|  B52-06.IC24 B52-28.IC4  | |
+|  |TCOO40IOC|    B52-133.IC55      |TAITO    |       TMM2063   TMM2063  | |
+|  |---------|        B52-132.IC39  |TC0150ROD|       TMM2063   TMM2063  |-|
+| MB3771                            |         |                          |
+| DIPSWB DIPSWA   TMM2063  TMM2063  |---------|           TC0070RGB      |
+|------------------------------------------------------------------------|
+Notes:
+      68000 - Motorola MC68000P12 CPUs, clock input 12.000MHz [24/2]
+        Z80 - Zilog Z0840004PSC Z80 CPU, clock input 4.000MHz [16/4]
+     YM2610 - Yamaha YM2610 sound chip, clock input 8.000MHz [16/2]
+    Y3016-F - Yamaha Y3016-F 2-Channel Serial & Binary Input Floating D/A Converter (SOIC16)
+              Clock input 2.66666MHz (16/2/3, source = pin 64 of YM2610)
+    TMM2063 - Toshiba TMM2063AP-70 8k x8-bit SRAM (DIP28)
+      43256 - NEC D43256AC-10L 32k x8-bit SRAM (DIP28)
+     MB3771 - Fujitsu MB3771 System Reset IC (DIP8)
+     MB3735 - Fujitsu MB3735 20w BTL Mono Power AMP. Note this amp chip has one input and one output, so sound
+              is mono. Where two speakers are present (cockpit/DX) the same sounds are output to both speakers
+              because the edge connector pins 10+L and 11+M are hard-wired together.
+      TL074 - Texas Instruments TL074 JFET Low-Noise Quad OP Amp
+    TD62003 - Toshiba TD62003 PNP 50V 0.5A Quad Darlington Switch (for driving CPU-controlled lamps via 2x NEC 2SB1150 PNP Darlington Transistors)
+          G - 28-Way Connector (Not JAMMA, but power/ground pins are the same as JAMMA)
+          V - 5-pin video connector
+          M - 50-pin flat cable connector. Only populated on the moving cabinet version. This is used to connect the motor PCB to the
+              main PCB. This connector and some adjacent 74LS244/245 logic chips are not populated on the upright PCB version.
 
-       Pal b52-121
-       Pal b52-120                      TC0170ABT   TC0110PCR    b52-01
-          68000-12
-                                        b52-06
-         TC0040IOC  b52-133 b52-132  TC0150ROD    b52-28
+      Syncs - Horizontal: 15.675kHz
+              Vertical: 60.0554Hz
 
+       ROMs -
+              B52-137.IC51 - Z80 Sound Program
+
+              B52-131.IC37 \
+              B52-129.IC30 | Main 68k Program (27C1001 EPROMs)
+              B52-130.IC36 |
+              B52-136.IC29 /
+
+              B52-133.IC55 \ Sub 68k Program (27C512 EPROMs)
+              B52-132.IC39 /
+
+              B52-29.IC27  - Tilemaps (23C4000 mask ROM)
+
+              B52-01.IC7   - Road/Sprite Priority & Palette Select (MMI63S141 BI-POLAR PROM)
+
+              B52-06.IC24  - Road A/B Internal Priority (MMI63S141 BI-POLAR PROM)
+
+              B52-28.IC4   - TC0150ROD ROM for Road data (23C4000 mask ROM)
+
+              Note: These ROMs match the World ROM-set in MAME ('chasehq'). These are the same ROMs found on a Chase HQ DX cabinet
+                    board-set which suggests any/all Chase HQ ROM-sets will work with the deluxe motion cabinet providing the Motor
+                    PCB is present and working.
+
+Taito custom ICs -
+                  TC0070RGB - 5-bit RGB Video Mixer/RGB DAC (Ceramic Flat Pack SIL25)
+                  PC050CM   - Coin/Counter/Lockout Functions
+                  TC0060DCA - 2-Channel Digital to Analog Conversion for Audio (Ceramic Flat Pack SIL20)
+                              Note: 2 channel audio from the YM2610 is input and output separately here but on the output it is
+                              merged via 2x 2.7k resistors to a single audio signal and fed to the MB3735 AMP chip on pin 1.
+                              The output from the MB3735 is mono.
+                  TC0140SYT - Sound Communication
+                  TC0040IOC - I/O Controls (start/shift/wheel/accelerator etc) and DIP switch management.
+                              This chip provides the master reset output on pin 2.
+                              On the upright cabinet, the accelerate pedal is a normally open switch (it is either off or on).
+                              The shift lever is a normally open switch (off/on). When open it is set to low gear and when closed
+                              (i.e. when pin 20 of connector G is grounded) it is set to high gear.
+                              The steering wheel hardware on Chase HQ uses one half of a trackball mechanism (left/right only)
+                              which is basically like a spinner. There is a segmented disc with optical sensor and another optical
+                              sensor to detect the wheel center position. The wheel returns to the center position with the help of
+                              a centering spring. The cockpit & DX cabs use 5k pots for the steering and accelerator, although
+                              micro-switches will also work fine with the correct control mechanisms.
+                  TC0110PCR - Palette Generator
+                  TC0100SCN - Tilemap Generator
+                  TC0150ROD - Road Generator
+                  TC0170ABT - Motion Object Generator
+
+
+Edge Connector Pinouts (NOTE! This is correct as per schematics. Pinout found on the internet is not accurate)
+----------------------
+
+            COMPONENT  |  SOLDER                       Video Connector (NOTE: when facing the edge connector, pin 5 is on the left)
+           ------------+------------                   ---------------
+               GND | 1 | A | GND                       1 GROUND
+               GND | 2 | B | GND                       2 RED
+               +5V | 3 | C | +5V                       3 GREEN
+               +5V | 4 | D | +5V                       4 BLUE
+               -5V | 5 | E | -5V                       5 SYNC
+              +12V | 6 | F | +12V
+               KEY |   |   | KEY
+         Counter 1 | 8 | J | Counter 2
+         Lockout 1 | 9 | K | Lockout 2                 Connector "H" (on video board. Note the PCB will work without this connector wired up)
+       Speaker 1 + |10---L | Speaker 2 + (cockpit/DX   -------------
+       Speaker 1 - |11---M | Speaker 2 - (cockpit/DX)  1  GND
+          Volume 1 |12 | N | Volume 2 (cockpit/DX)     2  GND
+               N/C |13 | P |                           3  GND
+               GND |14 | R | Service Coin              4  GND
+               GND |15 | S | Brake                     5  +5V
+            Coin 1 |16 | T | Coin 2                    6  +5V
+                   |17 | U |                           7  +5V
+             Nitro |18 | V | Tilt                      8  +5V
+Wheel Center Sense |19 | W | Start                     9  N/C
+             Shift |20 | X | Accelerate                10 N/C
+                   |21 | Y |                           11 N/C
+            Lamp 1 |22 | Z | Lamp 2                    12 N/C
+               N/C |23 | a |
+                   |24 | b |
+                   |25 | c |
+     Steering Left |26 | d | Steering Right
+               GND |27 | e | GND
+               GND |28 | f | GND
+
+Note:
+      - 22 & Z are used to drive CPU-controlled lamps in the top header.
+      - N/C means there is no trace connected to this edge connector pad.
+      - Speaker 1 and 2 are hard-wired together at the edge connector and
+        the PCB has a single mono amp chip so sound is mono regardless
+        of how many speakers are in the cabinet.
+
+
+Connector "M" (to Motor Control PCB, using standard 50-pin flat cable)
+Note the labels shown are the signals.
+
+  ------------+--------------
+   /MTRES | A | 1 | MTA0  \
+      GND | B | 2 | MTA1  |
+      GND | C | 3 | MTA2  |
+      GND | D | 4 | MTA3  |
+      GND | E | 5 | MTA4  |
+      GND | F | 6 | MTA5  | 11-bit Address Bus to/from Motor PCB
+      GND | H | 7 | MTA6  |
+      GND | J | 8 | MTA7  |
+      GND | K | 9 | MTA8  |
+      GND | L | 10| MTA9  |
+      GND | M | 11| MTA10 /
+      GND | N | 12| MTD0  \
+      GND | P | 13| MTD1  |
+      GND | R | 14| MTD2  |
+      GND | S | 15| MTD3  |
+      GND | T | 16| MTD4  | 8-bit Data Bus to/from Motor PCB
+      GND | U | 17| MTD5  |
+      GND | V | 18| MTD6  |
+      GND | W | 19| MTD7  /
+      GND | X | 20| MTR/W   Read/Write to/from Motor PCB
+      GND | Y | 21| MOTOR   Motor On/Off Signal?
+      GND | Z | 22| MTDTA   Acknowledge Signal?
+      GND | a | 23| GND
+      GND | b | 24| MTCK    Z80 clock from main board = 3.000MHz (24/8)
+      GND | c | 25| GND
+
+/MTRES is the Z80 reset signal. This stays low in upright cabinet mode, but when the
+cabinet DIPs are set to deluxe this will go high to reset the Z80 on the motor PCB.
+If the motor PCB is not present the signal will toggle low then high trying to reset
+the Z80 until an acknowledge/ready signal (possibly MTDTA) comes back from the motor PCB.
+Note none of these signals are present at the edge connector "M" if the 4 IC's at
+IC78, IC79, IC80 & IC81 are not populated (i.e. if it's an upright PCB version).
+Also note all these signals are present somewhere on the main PCB even if those logic chips
+are not populated and regardless of the ROM set used. Most likely any ROM set will work
+as a Deluxe version if the Motor PCB is present and working.
+
+
+DIP Switches
+------------
+
+DIPSWA
+|--------------------------------|---------------|-------------------------------|
+| 1   2   3   4   5   6   7   8  | Function      | Option                        |
+|--------------------------------|---------------|-------------------------------|
+|OFF OFF                         | Cabinet       | Upright / Steering Lock*      |
+|ON  OFF                         |               | Upright / Free Steering       |
+|OFF ON                          |               | Cockpit / Steering Lock       |
+|ON  ON                          |               | Deluxe  / Free Steering       |
+|--------------------------------|---------------|-------------------------------|
+|        OFF                     | Test Mode     | Game*                         |
+|        ON                      |               | Test                          |
+|--------------------------------|---------------|-------------------------------|
+|            OFF                 | Demo Sounds   | On*                           |
+|            ON                  |               | Off                           |
+|--------------------------------|---------------|-------------------------------|
+|                OFF OFF         | Coin A        | 1 Coin 1 Credit*              |
+|                ON  OFF         |               | 2 Coins 1 Credit              |
+|                OFF ON          |               | 3 Coins 1 Credit              |
+|                ON  ON          |               | 4 Coins 1 Credit              |
+|--------------------------------|---------------|-------------------------------|
+|                        OFF OFF | Coin B        | 1 Coin 2 Credits*             |
+|                        ON  OFF |               | 1 Coin 3 Credits              |
+|                        OFF ON  |               | 1 Coin 4 Credits              |
+|                        ON  ON  |               | 1 Coin 6 Credits              |
+|--------------------------------|---------------|-------------------------------|
+Notes:
+* = Factory default setting
+
+Coinage varies by region. Coinage shown is World Coinage.
+
+DIPSWA 1 & 2 must be set to upright/cockpit cabinets otherwise there is an error on boot-up.
+If both SW1 & SW2 are on, it enables the deluxe motion cabinet and the Motor PCB must be
+present and working otherwise the game will complain with an error on boot-up "DIPSW A INITIAL ERROR!"
+
+Upright uses digital pedals. Digital Pedals means pedals are micro-switch (on/off only)
+Cockpit/Deluxe uses analog pedals. Analog Pedals means pedals use 5k-ohm potentiometers.
+Steering Lock means steering wheel uses 5k-ohm potentiometers and restricted wheel movement.
+Free Steering means steering wheel uses spinner-like mechanism with additional sensor for center position and spring to re-center the wheel.
+
+DIPSWB
+|--------------------------------|----------------|-------------------------------|
+| 1   2   3   4   5   6   7   8  | Function       | Option                        |
+|--------------------------------|----------------|-------------------------------|
+|OFF OFF                         | Difficulty     | Medium*                       |
+|ON  OFF                         |                | Easy                          |
+|OFF ON                          |                | Hard                          |
+|ON  ON                          |                | Hardest                       |
+|--------------------------------|----------------|-------------------------------|
+|        OFF OFF                 | Timer          | 60 Seconds*                   |
+|        ON  OFF                 |                | 70 Seconds                    |
+|        OFF ON                  |                | 65 Seconds                    |
+|        ON  ON                  |                | 55 Seconds                    |
+|--------------------------------|----------------|-------------------------------|
+|                OFF             | Number of      | 3*                            |
+|                ON              | Nitros         | 5                             |
+|--------------------------------|----------------|-------------------------------|
+|                    OFF         | Discount On    | Yes. 1 Coin To Continue*      |
+|                    ON          | Continue       | No Discount To Continue       |
+|--------------------------------|----------------|-------------------------------|
+|                        OFF     | Criminal Damage| Clear*                        |
+|                        ON      | On Continue    | Carry Over To Continued Game  |
+|--------------------------------|----------------|-------------------------------|
+|                            OFF | Allow Continue | Yes*                          |
+|                            ON  |                | No                            |
+|--------------------------------|----------------|-------------------------------|
+* = Factory default setting
+
+
+Video Board
+-----------
+
+K1100358A
+J1100158A VIDEO PCB
+K1100358A CHASE HQ CP (sticker)
+|------------------------------------------------------------------------|
+|         B52-26.IC15 B52-26.IC52                                        |
+|         B52-17.IC16 B52-17.IC53                                        |
+| H       B52-26.IC17 B52-26.IC54                                        |-|
+|         B52-17.IC18 B52-17.IC55                                        | |
+|                                                                        | |
+|                     62256 62256 62256 62256 62256 62256 62256 62256    | |
+|                                                                        | |
+|                     62256 62256 62256 62256 62256 62256 62256 62256    | |
+|                                                                        | |
+|  B52-30.IC4                          |---------|     B52-127.IC156     | |
+|                                      |TAITO    |                       |-|
+|  B52-34.IC5                          |TC0020VAR|                       |
+|                                      |         | B52-03.IC135          |
+|  B52-31.IC6                          |---------| B52-126.IC136         |-|
+|                          B52-27.IC64                      B52-124.IC180| |
+|  B52-35.IC7              B52-51.IC65                                   | |
+|                          B52-50.IC66            B52-25.IC123           | |
+|  B52-32.IC8                       B52-125.IC112 B52-122.IC124          | |
+|                          B52-49.IC68            B52-123.IC125          | |
+|  B52-36.IC9                                                            | |
+|                                B52-16.IC92                             | |
+|  B52-33.IC10 B52-19.IC33       B52-18.IC93                             |-|
+|              B52-38.IC34       B52-16.IC94                       2018  |
+|  B52-37.IC11 B52-20.IC35 B52-21.IC51                             2018  |
+|------------------------------------------------------------------------|
+Notes:
+      2018                       - 2k x8-bit SRAM
+      62256                      - 32k x8-bit SRAM
+      IC4/5/6                    - MB834100 Mask ROM
+      IC7/8/9/10/11/34           - 23C4000 Mask ROM
+      IC15/16/17/18/52/53/54/55  - PAL20R8
+      IC33/35/51/112/124/125/180 - PAL16L8
+      IC92/93/94                 - 63S141 Bi-Polar PROM
+      IC64/IC123                 - PAL20L8
+      IC135/136/156              - 63S441 Bi-Polar PROM
+      IC68                       - 27C64 EPROM
+      IC65/66                    - 27C512 EPROM
+      TC0020VAR                  - Taito custom IC Sprite Generator
+
+
+Motor PCB (only for full motion DX cabinet)
+---------
+
+J9100093A
+K9100120A
+DRIVE LOGIC P.C.B.
+|-----------------------------------------------|
+|                       BRT BRY T1 T2 Y1 Y2 OPT | <-- 7 LEDs
+|                                               |
+|             B14-32.IC27  HC14                 |
+|     4584    B14-33.IC26  LS07   TL081 TL081   |
+|1    4584                 LS02               b1|
+|8              D4701      LS32   TL081 TL081   |
+|W    TLP521-4             LS139                |
+|A              D4701      LS74   TL081 TL081   |
+|Y                         LS393              b2|
+|           LS273          LS393                |
+|           LS273 LS161    LS30                 |
+|           LS273 LS161    LS04                 |
+|   LS244   LS273 LS161    LS138                |
+|   LS245   LS245 LS161                         |
+|   LS157   2016                                |
+|                    2016                       |
+|R  LS157   LS138  27C256.IC17                  |
+|                                               |
+|   LS157  B14-34.IC6  Z80                      |
+|                                               |
+|-----------------------------------------------|
+Notes: (all IC's shown)
+         R        - 50 pin flat cable connector joining to main board connector M
+         18WAY    - 36 pin card edge connector joining to numerous sensors and switches on the DX cabinet
+         b1/b2    - 20 pin flat cable joining 2x Motor Power PCBs to Drive Logic PCB
+         Z80      - Z80A CPU. Clock input 3.000MHz from main board (24/8)
+         27C256   - 32k x8-bit EPROM
+         TLP521-4 - Toshiba TLP521-4 Photocoupler With 4 Isolated Channels
+         D4701    - NEC D4701 Incremental Encoder Counter
+         TL081    - Texas Instruments TL081 JFET-Input Operational Amplifier
+         4584     - Hex Schmitt Trigger Logic IC
+         2016     - 2k x8-bit SRAM
+         B14-*    - PAL16L8. Note the PALs and this Drive Logic PCB come from a Top Speed DX.
+                    The Chase HQ DX cabs are just converted Top Speed DX cabs.
 
 
 ****************************************************************************
@@ -1199,6 +1498,8 @@ READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 
 	return 0x00;
 }
+
+// TODO: proper motorcpu hook-up
 
 
 READ16_MEMBER(taitoz_state::chasehq_motor_r)
@@ -3862,6 +4163,9 @@ ROM_START( chasehq )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b52-137.51",   0x00000, 0x10000, CRC(37abb74a) SHA1(1feb1e49102c13a90e02c150472545cd9f6334da) )
 
+	ROM_REGION( 0x8000, "motorcpu", 0 )
+	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
+
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8 */
 
@@ -3940,6 +4244,9 @@ ROM_START( chasehqj )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b52-134.51",    0x00000, 0x10000, CRC(91faac7f) SHA1(05f00e0909444566877d0ef678bae49f107e1628) )
+
+	ROM_REGION( 0x8000, "motorcpu", 0 )
+	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8*/
@@ -4100,6 +4407,9 @@ ROM_START( chasehqu )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b52-137.51",   0x00000, 0x10000, CRC(37abb74a) SHA1(1feb1e49102c13a90e02c150472545cd9f6334da) )
+
+	ROM_REGION( 0x8000, "motorcpu", 0 )
+	ROM_LOAD( "27c256.ic17",   0x0000, 0x8000, CRC(e52dfee1) SHA1(6e58e18eb2de3c899b950a4307ea21cd23683657) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b52-29.27", 0x00000, 0x80000, CRC(8366d27c) SHA1(d7c5f588b39742927228ce73e5d69bda1e903df6) ) /* SCR 8x8*/

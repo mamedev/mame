@@ -1357,7 +1357,7 @@ Compiled by K1W1
 		<part name="cart" interface="a8bit_cart">
 			<feature name="slot" value="a800_16k" />
 			<dataarea name="rom" size="16384">
-				<rom name="carnival massacre (earlier version).rom " size="16384" crc="ea764851" sha1="41ee0cfcc3dd9fc850bb9639a12674774966160e" offset="0" /> <!-- Verified -->
+				<rom name="carnival massacre (earlier version).rom" size="16384" crc="ea764851" sha1="41ee0cfcc3dd9fc850bb9639a12674774966160e" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>

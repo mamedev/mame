@@ -38,6 +38,8 @@ Sound: AY-3-8912A
 
 void usgames_state::machine_start()
 {
+	m_leds.resolve();
+
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
@@ -49,11 +51,8 @@ WRITE8_MEMBER(usgames_state::rombank_w)
 WRITE8_MEMBER(usgames_state::lamps1_w)
 {
 	/* button lamps */
-	output().set_led_value(0,data & 0x01);
-	output().set_led_value(1,data & 0x02);
-	output().set_led_value(2,data & 0x04);
-	output().set_led_value(3,data & 0x08);
-	output().set_led_value(4,data & 0x10);
+	for (int i = 0; i < 4; i++)
+		m_leds[i] = BIT(data, i);
 
 	/* bit 5 toggles all the time - extra lamp? */
 }
