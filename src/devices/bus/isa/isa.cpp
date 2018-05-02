@@ -31,7 +31,7 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, const char *ta
 isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
-	m_owner(nullptr), m_isa_tag(nullptr)
+	m_isa_bus(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -41,15 +41,15 @@ isa8_slot_device::isa8_slot_device(const machine_config &mconfig, device_type ty
 
 void isa8_slot_device::device_start()
 {
-	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
+	device_isa8_card_interface *const dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
 	const device_isa16_card_interface *intf;
-	device_t *isadev = m_owner->subdevice(m_isa_tag);
 	if (get_card_device() && get_card_device()->interface(intf))
 		fatalerror("ISA16 device in ISA8 slot\n");
 
-	if (dev) dev->set_isabus(isadev);
+	if (dev) dev->set_isabus(m_isa_bus);
+
 	// tell isa bus that there is one slot with the specified tag
-	dynamic_cast<isa8_device *>(isadev)->add_slot(tag());
+	downcast<isa8_device &>(*m_isa_bus).add_slot(tag());
 }
 
 
@@ -78,11 +78,10 @@ isa16_slot_device::isa16_slot_device(const machine_config &mconfig, const char *
 
 void isa16_slot_device::device_start()
 {
-	device_isa8_card_interface *dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
-	device_t *isadev = m_owner->subdevice(m_isa_tag);
-	if (dev) dev->set_isabus(isadev);
+	device_isa8_card_interface *const dev = dynamic_cast<device_isa8_card_interface *>(get_card_device());
+	if (dev) dev->set_isabus(m_isa_bus);
 	// tell isa bus that there is one slot with the specified tag
-	dynamic_cast<isa8_device *>(isadev)->add_slot(tag());
+	dynamic_cast<isa8_device &>(*m_isa_bus).add_slot(tag());
 }
 
 

@@ -14,7 +14,7 @@
 #pragma once
 
 #define MCFG_EF936X_PALETTE(palette_tag) \
-		downcast<ef9365_device &>(*device).set_palette_tag(("^" palette_tag));
+		downcast<ef9365_device &>(*device).set_palette_tag(palette_tag);
 
 #define MCFG_EF936X_BITPLANES_CNT(bitplanes_number) \
 		downcast<ef9365_device &>(*device).set_nb_bitplanes((bitplanes_number));

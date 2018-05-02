@@ -215,8 +215,8 @@ MACHINE_CONFIG_START(subs_state::subs)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // C9
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(subs_state, lamp1_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(subs_state, lamp2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LAMP 1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LAMP 2
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_SONAR2_EN>))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_SONAR1_EN>))
 	// Schematics show crash and explode reversed.  But this is proper.

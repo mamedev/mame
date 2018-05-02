@@ -508,7 +508,7 @@ MACHINE_CONFIG_START(at_state::neat)
 	MCFG_CPU_IO_MAP(neat_io)
 	MCFG_DEVICE_REMOVE("mb:rtc")  // TODO: move this into the cs8221
 	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
 MACHINE_CONFIG_END
@@ -633,7 +633,7 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 
 	// on board devices
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)
-	MCFG_ISA16_CPU(":maincpu")
+	MCFG_ISA16_CPU("maincpu")
 	MCFG_ISA_BUS_IOCHCK(DEVWRITELINE("wd7600", wd7600_device, iochck_w))
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("wd7600", wd7600_device, irq09_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("wd7600", wd7600_device, irq03_w))
@@ -743,7 +743,7 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 
 	MCFG_DEVICE_REMOVE("mb:rtc")
 	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	MCFG_RAM_ADD(RAM_TAG)

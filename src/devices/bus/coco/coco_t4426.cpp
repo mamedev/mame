@@ -45,7 +45,6 @@
 #include "emu.h"
 #include "coco_t4426.h"
 
-#include "cococart.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
 #include "machine/mc14411.h"
@@ -226,7 +225,9 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(COCO_T4426, coco_t4426_device, "coco_t4426", "Terco CNC Programming Station 4426 multi cart")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_T4426, device_cococart_interface, coco_t4426_device, "coco_t4426", "Terco CNC Programming Station 4426 multi cart")
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
 
 //**************************************************************************
 //  LIVE DEVICE

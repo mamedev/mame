@@ -66,9 +66,6 @@ public:
 	//geebee and navarone
 	DECLARE_READ8_MEMBER(geebee_in_r);
 	DECLARE_WRITE8_MEMBER(geebee_out6_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_1_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_2_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_3_w);
 	DECLARE_WRITE_LINE_MEMBER(counter_w);
 	DECLARE_WRITE_LINE_MEMBER(lock_out_w);
 	DECLARE_WRITE_LINE_MEMBER(geebee_bgw_w);

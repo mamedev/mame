@@ -222,26 +222,6 @@ WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
 }
 
 
-WRITE_LINE_MEMBER(sprint2_state::lamp1_w)
-{
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(sprint2_state::lamp2_w)
-{
-	output().set_led_value(1, state);
-}
-
-WRITE_LINE_MEMBER(sprint2_state::lamp3_w)
-{
-	output().set_led_value(2, state);
-}
-
-WRITE_LINE_MEMBER(sprint2_state::lamp4_w)
-{
-	output().set_led_value(3, state);
-}
-
 void sprint2_state::sprint2_map(address_map &map)
 {
 	map.global_mask(0x3fff);
@@ -541,8 +521,8 @@ MACHINE_CONFIG_START(sprint2_state::sprint2)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT2_ATTRACT_EN>)) // also DOMINOS_ATTRACT_EN
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT2_SKIDSND1_EN>)) // also DOMINOS_TUMBLE_EN
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT2_SKIDSND2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(sprint2_state, lamp1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sprint2_state, lamp2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) // START LAMP1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) // START LAMP2
 	//MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sprint2_state, sprint2_spare_w))
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
@@ -586,8 +566,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sprint2_state::dominos4)
 	dominos(config);
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(sprint2_state, lamp3_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sprint2_state, lamp4_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led2")) // START LAMP3
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led3")) // START LAMP4
 MACHINE_CONFIG_END
 
 ROM_START( sprint1 )

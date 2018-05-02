@@ -64,8 +64,7 @@ public:
 		m_tms(*this, "tms"),
 		m_nvram_1c(*this, "nvram_1c"),
 		m_nvram_1d(*this, "nvram_1d"),
-		m_mainbank(*this, "mainbank"),
-		m_leds(*this, "led%u", 0U)
+		m_mainbank(*this, "mainbank")
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(mainflag_r);
@@ -95,10 +94,6 @@ protected:
 	DECLARE_WRITE8_MEMBER(main_irq_clear_w);
 	DECLARE_WRITE8_MEMBER(main_firq_clear_w);
 	DECLARE_WRITE8_MEMBER(self_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(led0_w);
-	DECLARE_WRITE_LINE_MEMBER(led1_w);
-	DECLARE_WRITE_LINE_MEMBER(led2_w);
-	DECLARE_WRITE_LINE_MEMBER(led3_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
 	DECLARE_READ8_MEMBER(riot_porta_r);
@@ -133,8 +128,6 @@ private:
 	required_device<x2212_device> m_nvram_1d;
 
 	required_memory_bank m_mainbank;
-
-	output_finder<4> m_leds;
 
 	int m_n_disc_lock;
 	int m_n_disc_data;
@@ -441,26 +434,6 @@ WRITE8_MEMBER(firefox_state::self_reset_w)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(firefox_state::led0_w)
-{
-	m_leds[0] = !state;
-}
-
-WRITE_LINE_MEMBER(firefox_state::led1_w)
-{
-	m_leds[1] = !state;
-}
-
-WRITE_LINE_MEMBER(firefox_state::led2_w)
-{
-	m_leds[2] = !state;
-}
-
-WRITE_LINE_MEMBER(firefox_state::led3_w)
-{
-	m_leds[3] = !state;
-}
-
 WRITE_LINE_MEMBER(firefox_state::coin_counter_right_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -481,8 +454,6 @@ void firefox_state::firq_gen(phillips_22vp931_device &laserdisc, int state)
 
 void firefox_state::machine_start()
 {
-	m_leds.resolve();
-
 	m_mainbank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x1000);
 
 	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(&firefox_state::firq_gen, this));
@@ -708,10 +679,10 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_DEVICE_ADD("latch1", LS259, 0) // 1F
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(firefox_state, coin_counter_right_w))   // COIN COUNTERR
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(firefox_state, coin_counter_left_w))    // COIN COUNTERL
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(firefox_state, led0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(firefox_state, led1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(firefox_state, led2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(firefox_state, led3_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led2")) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led3")) MCFG_DEVCB_INVERT
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_XTAL/8/16/16/16/16))

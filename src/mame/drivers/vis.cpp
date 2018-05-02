@@ -239,7 +239,6 @@ private:
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	std::string m_screen_tag;
 	int m_extcnt;
 	uint8_t m_extreg;
 	uint8_t m_interlace;
@@ -250,12 +249,11 @@ private:
 
 DEFINE_DEVICE_TYPE(VIS_VGA, vis_vga_device, "vis_vga", "vis_vga")
 
-vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, VIS_VGA, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this),
-	m_screen_tag(subtag("screen"))
+vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	svga_device(mconfig, VIS_VGA, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this)
 {
-	set_screen(m_screen_tag.c_str());
+	set_screen(*this, "screen");
 }
 
 MACHINE_CONFIG_START(vis_vga_device::device_add_mconfig)

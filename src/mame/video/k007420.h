@@ -42,7 +42,7 @@ DECLARE_DEVICE_TYPE(K007420, k007420_device)
 	MCFG_DEVICE_ADD(_tag, K007420, 0)
 
 #define MCFG_K007420_PALETTE(_palette_tag) \
-	downcast<k007420_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<k007420_device &>(*device).set_palette_tag(_palette_tag);
 
 #define MCFG_K007420_BANK_LIMIT(_limit) \
 	downcast<k007420_device &>(*device).set_bank_limit(_limit);

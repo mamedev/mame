@@ -2042,6 +2042,8 @@ files {
 createMESSProjects(_target, _subtarget, "fairlight")
 files {
 	MAME_DIR .. "src/mame/drivers/cmi.cpp",
+	MAME_DIR .. "src/mame/audio/cmi01a.cpp",
+	MAME_DIR .. "src/mame/audio/cmi01a.h",
 }
 
 createMESSProjects(_target, _subtarget, "fidelity")

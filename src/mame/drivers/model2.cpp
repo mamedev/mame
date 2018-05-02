@@ -1193,7 +1193,7 @@ void model2_state::model2_5881_mem(address_map &map)
 
 READ8_MEMBER( model2_state::lightgun_data_r )
 {
-	uint16_t data = m_lightgun_ports[offset].read_safe(0);
+	uint16_t data = m_lightgun_ports[offset >> 1].read_safe(0);
 	return BIT(offset, 0) ? (data >> 8) : data;
 }
 
@@ -1322,7 +1322,7 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00200000, 0x0021ffff).ram();
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
 	map(0x00980004, 0x00980007).r(this, FUNC(model2o_state::fifo_control_2o_r));
-	map(0x01c00000, 0x01c007ff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
+	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
 	// intercept reads for the lightgun ports
 	// needs to be done because the vcop ioboard isn't emulated
 	// can be removed once that's done (837-11130 + 837-11131)
@@ -2805,8 +2805,8 @@ MACHINE_CONFIG_START(model2c_state::model2c)
 	MCFG_CPU_ADD("copro_tgpx4", MB86235, 40000000)
 	MCFG_CPU_PROGRAM_MAP(copro_tgpx4_map)
 	MCFG_CPU_DATA_MAP(copro_tgpx4_data_map)
-	MCFG_MB86235_FIFOIN(":copro_fifo_in")
-	MCFG_MB86235_FIFOOUT0(":copro_fifo_out")
+	MCFG_MB86235_FIFOIN("copro_fifo_in")
+	MCFG_MB86235_FIFOOUT0("copro_fifo_out")
 
 	MCFG_DEVICE_ADD("copro_fifo_in", GENERIC_FIFO_U32, 0)
 	MCFG_DEVICE_ADD("copro_fifo_out", GENERIC_FIFO_U32, 0)

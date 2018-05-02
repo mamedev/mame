@@ -360,7 +360,7 @@ DECLARE_DEVICE_TYPE(I8051, i8051_device)
 DECLARE_DEVICE_TYPE(I8751, i8751_device)
 /* variants 8k internal rom and 256 byte internal memory and more registers */
 DECLARE_DEVICE_TYPE(I8052, i8052_device)
-DECLARE_DEVICE_TYPE(I8752, i8751_device)
+DECLARE_DEVICE_TYPE(I8752, i8752_device)
 /* cmos variants */
 DECLARE_DEVICE_TYPE(I80C31, i80c31_device)
 DECLARE_DEVICE_TYPE(I80C51, i80c51_device)

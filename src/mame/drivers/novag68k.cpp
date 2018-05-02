@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:yoyo_chessboard
 /******************************************************************************
 
     Novag generic 68000 based chess computer driver
@@ -11,6 +12,7 @@
 
     TODO:
     - verify irq/beeper timing
+	- scorpio68 internal artwork
     - RS232 port
 
 ******************************************************************************
@@ -21,6 +23,8 @@ Diablo 68000:
 - HD44780 LCD controller (16x1)
 - R65C51P2 ACIA @ 1.8432MHz, RS232
 - magnetic sensors, 8*8 chessboard leds
+
+Scorpio 68000 hardware is very similar, but with chessboard buttons and side leds.
 
 ******************************************************************************/
 
@@ -52,6 +56,11 @@ public:
 	DECLARE_READ8_MEMBER(diablo68k_input2_r);
 	void diablo68k_map(address_map &map);
 	void diablo68k(machine_config &config);
+
+	// Scorpio 68000
+	DECLARE_WRITE8_MEMBER(scorpio68k_control_w);
+	void scorpio68k_map(address_map &map);
+	void scorpio68k(machine_config &config);
 };
 
 
@@ -66,9 +75,9 @@ public:
 
 WRITE8_MEMBER(novag68k_state::diablo68k_control_w)
 {
+	// d0: HD44780 E?
 	// d1: HD44780 RS
-	// other: ?
-	m_lcd_control = data & 7;
+	m_lcd_control = data & 3;
 
 	// d7: enable beeper
 	m_beeper->set_state(data >> 7 & 1);
@@ -107,10 +116,31 @@ READ8_MEMBER(novag68k_state::diablo68k_input2_r)
 
 
 /******************************************************************************
+    Scorpio 68000
+******************************************************************************/
+
+WRITE8_MEMBER(novag68k_state::scorpio68k_control_w)
+{
+	// d0: HD44780 E?
+	// d1: HD44780 RS
+	m_lcd_control = data & 3;
+
+	// d7: enable beeper
+	m_beeper->set_state(data >> 7 & 1);
+
+	// d4-d6: input mux, led select
+	// d2,d3: led data
+	m_inp_mux = 1 << (data >> 4 & 0x7) & 0xff;
+	display_matrix(2, 8, ~data >> 2 & 3, m_inp_mux);
+}
+
+
+
+/******************************************************************************
     Address Maps
 ******************************************************************************/
 
-// Diablo 68000
+// Diablo 68000 / Scorpio 68000
 
 void novag68k_state::diablo68k_map(address_map &map)
 {
@@ -126,15 +156,20 @@ void novag68k_state::diablo68k_map(address_map &map)
 	map(0xff8000, 0xffbfff).ram().share("nvram");
 }
 
+void novag68k_state::scorpio68k_map(address_map &map)
+{
+	diablo68k_map(map);
+	map(0x380000, 0x380000).w(this, FUNC(novag68k_state::scorpio68k_control_w));
+	map(0x3c0000, 0x3c0001).nopw();
+}
+
 
 
 /******************************************************************************
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( diablo68k )
-	PORT_INCLUDE( novag_cb_magnets )
-
+static INPUT_PORTS_START( diablo68k_sidepanel )
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Go")
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Take Back / Analyze Games")
@@ -174,6 +209,16 @@ static INPUT_PORTS_START( diablo68k )
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("New Game")
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Player/Player / Gambit Book / King")
 	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("Print Board / Interface")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( diablo68k )
+	PORT_INCLUDE( novag_cb_magnets )
+	PORT_INCLUDE( diablo68k_sidepanel )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( scorpio68k )
+	PORT_INCLUDE( novag_cb_buttons )
+	PORT_INCLUDE( diablo68k_sidepanel )
 INPUT_PORTS_END
 
 
@@ -218,6 +263,16 @@ MACHINE_CONFIG_START(novag68k_state::diablo68k)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(novag68k_state::scorpio68k)
+	diablo68k(config);
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(scorpio68k_map)
+
+	//MCFG_DEFAULT_LAYOUT(layout_novag_scorpio68k)
+MACHINE_CONFIG_END
+
 
 
 /******************************************************************************
@@ -228,7 +283,15 @@ ROM_START( diablo68 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("evenurom.bin", 0x00000, 0x8000, CRC(03477746) SHA1(8bffcb159a61e59bfc45411e319aea6501ebe2f9) )
 	ROM_LOAD16_BYTE("oddlrom.bin",  0x00001, 0x8000, CRC(e182dbdd) SHA1(24dacbef2173fa737636e4729ff22ec1e6623ca5) )
-	ROM_LOAD16_BYTE("book.bin", 0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
+	ROM_LOAD16_BYTE("book.bin",     0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
+ROM_END
+
+
+ROM_START( scorpio68 )
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("s_evn_904.u3", 0x00000, 0x8000, CRC(a8f63245) SHA1(0ffdc6eb8ecad730440b0bfb2620fb00820e1aea) )
+	ROM_LOAD16_BYTE("s_odd_c18.u2", 0x00001, 0x8000, CRC(4f033319) SHA1(fce228b1705b7156d4d01ef92b22a875d0f6f321) )
+	ROM_LOAD16_BYTE("502.u4",       0x10000, 0x8000, CRC(553a5c8c) SHA1(ccb5460ff10766a5ca8008ae2cffcff794318108) ) // no odd rom
 ROM_END
 
 
@@ -237,5 +300,6 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT CMP MACHINE    INPUT      STATE        INIT  COMPANY, FULLNAME, FLAGS
-CONS( 1991, diablo68, 0,      0, diablo68k, diablo68k, novag68k_state, 0, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+//    YEAR  NAME       PARENT CMP MACHINE     INPUT       STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1991, diablo68,  0,      0, diablo68k,  diablo68k,  novag68k_state, 0, "Novag", "Diablo 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1991, scorpio68, 0,      0, scorpio68k, scorpio68k, novag68k_state, 0, "Novag", "Scorpio 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

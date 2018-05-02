@@ -60,10 +60,23 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
 		, m_digits(*this, "digit%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 		{ }
+
+	void _30test(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
+	output_finder<72> m_digits;
+	output_finder<8> m_lamps;
 
 	uint8_t m_mux_data;
 	uint8_t m_oki_bank;
+
 	DECLARE_WRITE8_MEMBER(namco_30test_led_w);
 	DECLARE_WRITE8_MEMBER(namco_30test_led_rank_w);
 	DECLARE_WRITE8_MEMBER(namco_30test_lamps_w);
@@ -72,14 +85,9 @@ public:
 	DECLARE_WRITE8_MEMBER(hc11_mux_w);
 	DECLARE_READ8_MEMBER(hc11_okibank_r);
 	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki;
-	void _30test(machine_config &config);
+
 	void namco_30test_io(address_map &map);
 	void namco_30test_map(address_map &map);
-	output_finder<72> m_digits;
 };
 
 
@@ -105,7 +113,7 @@ WRITE8_MEMBER(namco_30test_state::namco_30test_lamps_w)
 {
 	// d0-d5: ranking, d6: game over, d7: assume marquee lamp
 	for (int i = 0; i < 8; i++)
-		output().set_lamp_value(i, data >> i & 1);
+		m_lamps[i] = BIT(data, i);
 }
 
 READ8_MEMBER(namco_30test_state::namco_30test_mux_r)
@@ -240,14 +248,10 @@ INPUT_PORTS_END
 void namco_30test_state::machine_start()
 {
 	m_digits.resolve();
+	m_lamps.resolve();
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_oki_bank));
 }
-
-void namco_30test_state::machine_reset()
-{
-}
-
 
 MACHINE_CONFIG_START(namco_30test_state::_30test)
 

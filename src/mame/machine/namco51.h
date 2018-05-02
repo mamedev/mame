@@ -12,7 +12,7 @@
 	MCFG_DEVICE_ADD(_tag, NAMCO_51XX, _clock)
 
 #define MCFG_NAMCO_51XX_SCREEN(screen_tag) \
-	downcast<namco_51xx_device &>(*device).set_screen_tag(("^" screen_tag));
+	downcast<namco_51xx_device &>(*device).set_screen_tag(screen_tag);
 
 #define MCFG_NAMCO_51XX_INPUT_0_CB(_devcb) \
 	devcb = &downcast<namco_51xx_device &>(*device).set_input_callback<0>(DEVCB_##_devcb);

@@ -2248,8 +2248,8 @@ MACHINE_CONFIG_END
 void pc9801_state::cdrom_headphones(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^lheadphone", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^rheadphone", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lheadphone", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rheadphone", 1.0)
 }
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_ide)
@@ -2679,13 +2679,16 @@ ROM_START( pc9801vm )
 	// contains some 8x16 chars
     ROM_LOAD( "main_board_8h_d23256ac.bin", 0x002000, 0x008000, CRC(62a32ba6) SHA1(cdab480ae0dad9d128e52afb15e6c0b2b122cc3f) )
 
-	ROM_REGION( 0x40000, "unk", 0 )
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
 	// on main board, uPD23100 type roms
 	// probably kanji roms by judging the size of them
-	ROM_LOAD( "231000-1-535", 0x00000, 0x20000, NO_DUMP )
-	ROM_LOAD( "231000-1-536", 0x20000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "main_board_12h_231000.bin", 0x00000, 0x20000, CRC(ecc2c062) SHA1(36c935c0f26c02a2b1ea46f5b6cd03fc11c7b003) )
+	ROM_LOAD16_BYTE( "main_board_10h_231000.bin", 0x00001, 0x20000, CRC(91d78281) SHA1(85a18ad40e281e68071f91800201e43d78fb4f1c) )
+
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 	
-	LOAD_KANJI_ROMS
+//	LOAD_KANJI_ROMS
 //  LOAD_IDE_ROM
 ROM_END
 

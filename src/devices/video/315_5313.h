@@ -36,7 +36,7 @@
 	downcast<sega315_5313_device &>(*device).set_palwrite_base(_data);
 
 #define MCFG_SEGA315_5313_PALETTE(_palette_tag) \
-	downcast<sega315_5313_device &>(*device).set_palette_tag("^" _palette_tag);
+	downcast<sega315_5313_device &>(*device).set_palette_tag(_palette_tag);
 
 
 // Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP

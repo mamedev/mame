@@ -57,18 +57,6 @@ WRITE8_MEMBER(dragrace_state::speed2_w)
 	output().set_value("tachometer2", freq);
 }
 
-WRITE_LINE_MEMBER(dragrace_state::p1_start_w)
-{
-	// set Player 1 Start Lamp
-	output().set_led_value(0, state);
-}
-
-WRITE_LINE_MEMBER(dragrace_state::p2_start_w)
-{
-	// set Player 2 Start Lamp
-	output().set_led_value(1, state);
-}
-
 READ8_MEMBER(dragrace_state::dragrace_input_r)
 {
 	int val = ioport("IN2")->read();
@@ -325,7 +313,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<DRAGRACE_MOTOR1_EN>)) // Motor1 enable
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<DRAGRACE_ATTRACT_EN>)) // Attract enable
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<DRAGRACE_LOTONE_EN>)) // LoTone enable
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dragrace_state, p1_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led0")) // Player 1 Start Lamp
 
 	MCFG_DEVICE_ADD("latch_h5", F9334, 0) // H5
 	MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(dragrace_state, speed2_w)) MCFG_DEVCB_MASK(0x1f) // set 3SPEED2-7SPEED2
@@ -336,7 +324,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<DRAGRACE_KLEXPL2_EN>)) // KLEXPL2 enable
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<DRAGRACE_MOTOR2_EN>)) // Motor2 enable
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<DRAGRACE_HITONE_EN>)) // HiTone enable
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(dragrace_state, p2_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led1")) // Player 2 Start Lamp
 MACHINE_CONFIG_END
 
 

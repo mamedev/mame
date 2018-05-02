@@ -63,6 +63,6 @@ DECLARE_DEVICE_TYPE(MB60553, mb60553_zooming_tilemap_device)
 	downcast<mb60553_zooming_tilemap_device &>(*device).set_gfx_region(_region);
 
 #define MCFG_MB60553_GFXDECODE(_gfxtag) \
-	downcast<mb60553_zooming_tilemap_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<mb60553_zooming_tilemap_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_MB60533_H

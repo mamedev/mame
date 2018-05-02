@@ -435,13 +435,6 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 }
 
 
-template<int n>
-WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp_w)
-{
-	m_spyhunt_lamp[n] = state;
-}
-
-
 
 /*************************************
  *
@@ -1195,14 +1188,14 @@ MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("lamplatch", CD4099, 0) // U1 on Lamp Driver Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<4>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<5>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<6>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<7>))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("lamp0"))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("lamp1"))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("lamp2"))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("lamp3"))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("lamp4"))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("lamp5"))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("lamp6"))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("lamp7"))
 MACHINE_CONFIG_END
 
 
@@ -1640,8 +1633,6 @@ DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
 	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
 
-	m_spyhunt_lamp.resolve();
-
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
 }
@@ -1663,8 +1654,6 @@ DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
 	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
 	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
-
-	m_spyhunt_lamp.resolve();
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 88;

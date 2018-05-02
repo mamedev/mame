@@ -27,7 +27,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "bus/s100/s100.h"
+#include "seals8k.h"
 
 
 //**************************************************************************
@@ -80,8 +80,10 @@ protected:
 	virtual void nvram_default() override;
 };
 
-DEFINE_DEVICE_TYPE(S100_8K_SC, s100_8k_sc_device, "s100_8k_sc", "Seals 8K SC Memory Board")
-DEFINE_DEVICE_TYPE(S100_8K_SC_BB, s100_8k_sc_bb_device, "s100_8k_sc_bb", "Seals 8K SC Memory Board with Battery Backup")
+DEFINE_DEVICE_TYPE_PRIVATE(S100_8K_SC, device_s100_card_interface, s100_8k_sc_device, "s100_8k_sc", "Seals 8K SC Memory Board")
+DEFINE_DEVICE_TYPE_PRIVATE(S100_8K_SC_BB, device_s100_card_interface, s100_8k_sc_bb_device, "s100_8k_sc_bb", "Seals 8K SC Memory Board with Battery Backup")
+template class device_finder<device_s100_card_interface, false>;
+template class device_finder<device_s100_card_interface, true>;
 
 
 //**************************************************************************

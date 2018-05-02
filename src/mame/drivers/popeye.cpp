@@ -310,7 +310,7 @@ public:
 	virtual void config(machine_config &config) override
 	{
 		T::config(config);
-		config.device_add(this, "eeprom", EEPROM_SERIAL_93C46_8BIT, 0);
+		config.device_add("eeprom", EEPROM_SERIAL_93C46_8BIT, 0);
 	}
 
 protected:

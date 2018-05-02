@@ -9569,6 +9569,7 @@ centiped                        // 136001           (c) 1980
 centiped1                       // 136001           (c) 1980
 centiped2                       // 136001           (c) 1980
 centiped3                       // 136001           (c) 1980
+centipedj                       // C2-00158
 magworm                         // (bootleg)
 magworma                        // (bootleg)
 mazeinv                         // (proto)          (c) 1982
@@ -11435,6 +11436,7 @@ dkongjnrj                       // (c) 1982 Nintendo
 dkongjo                         // (c) 1981 Nintendo
 dkongjo1                        // (c) 1981 Nintendo
 dkongjr                         // (c) 1982 Nintendo of America
+dkongjr2                        // (c) 1982 Nintendo of America / bootleg ?
 dkongjrb                        // bootleg
 dkongjre                        // (c) 1982 Nintendo of America
 dkongjrj                        // (c) 1982 Nintendo
@@ -14312,6 +14314,8 @@ gradius3js                      // GX945 (c) 1989 (Japan, split)
 
 @source:grchamp.cpp
 grchamp                         // GM  (c) 1981 Taito Corporation
+grchampa                        // GM  (c) 1981 Taito Corporation
+grchampb                        // GM  (c) 1981 Taito Corporation
 
 @source:grfd2301.cpp
 grfd2301                        //
@@ -29405,6 +29409,7 @@ nascom2c                        // 1980 Nascom 2 (CP/M)
 @source:naughtyb.cpp
 naughtyb                        // (c) 1982 Jaleco
 naughtyba                       // bootleg
+naughtybb                       // bootleg
 naughtybc                       // (c) 1982 Jaleco + Cinematronics
 popflame                        // (c) 1982 Jaleco
 popflamea                       // (c) 1982 Jaleco
@@ -30201,6 +30206,7 @@ supercon                        //
 
 @source:novag68k.cpp
 diablo68                        //
+scorpio68                       //
 
 @source:novagf8.cpp
 ccdelta1                        //

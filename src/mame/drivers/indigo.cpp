@@ -580,7 +580,7 @@ INPUT_PORTS_END
 void indigo_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^mono", 1.0)
 }
 
 MACHINE_CONFIG_START(indigo_state::indigo3k)

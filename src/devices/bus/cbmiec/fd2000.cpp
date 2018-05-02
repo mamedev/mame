@@ -275,9 +275,9 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: fd2000_device(mconfig, FD4000, tag, owner, clock)
 {
-	m_maincpu.set_tag(R65C02P4_TAG);
-	m_fdc.set_tag(PC8477AV1_TAG);
-	m_floppy0.set_tag(PC8477AV1_TAG":0");
+	m_maincpu.set_tag(*this, R65C02P4_TAG);
+	m_fdc.set_tag(*this, PC8477AV1_TAG);
+	m_floppy0.set_tag(*this, PC8477AV1_TAG":0");
 }
 
 

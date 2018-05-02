@@ -528,9 +528,9 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_txd))
+	MCFG_PSX_SIO_DTR_HANDLER(DEVWRITELINE("controllers", psxcontrollerports_device, write_dtr))
+	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE("controllers", psxcontrollerports_device, write_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("controllers", psxcontrollerports_device, write_txd))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
@@ -578,9 +578,9 @@ MACHINE_CONFIG_START(psx1_state::pse)
 	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_txd))
+	MCFG_PSX_SIO_DTR_HANDLER(DEVWRITELINE("controllers", psxcontrollerports_device, write_dtr))
+	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE("controllers", psxcontrollerports_device, write_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("controllers", psxcontrollerports_device, write_txd))
 
 	/* video hardware */
 	/* TODO: visible area and refresh rate */

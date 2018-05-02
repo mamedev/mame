@@ -406,18 +406,6 @@ READ8_MEMBER(atarisy1_state::via_pb_r)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(atarisy1_state::led_1_w)
-{
-	machine().output().set_led_value(0, !state);
-}
-
-
-WRITE_LINE_MEMBER(atarisy1_state::led_2_w)
-{
-	machine().output().set_led_value(1, !state);
-}
-
-
 WRITE_LINE_MEMBER(atarisy1_state::coin_counter_right_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -750,8 +738,8 @@ MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 15H (TTL) or 14F (LSI)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("ymsnd", ym2151_device, reset_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(atarisy1_state, led_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(atarisy1_state, led_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // J106 pin 4
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // J106 pin 3
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(atarisy1_state, coin_counter_right_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(atarisy1_state, coin_counter_left_w))
 

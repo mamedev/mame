@@ -68,7 +68,6 @@
 #include "emu.h"
 #include "dragon_fdc.h"
 
-#include "cococart.h"
 #include "coco_fdc.h"
 #include "imagedev/flopdrv.h"
 #include "machine/wd_fdc.h"
@@ -85,6 +84,10 @@
 #define LOG_FDC                 0
 #define WD2791_TAG              "wd2791"
 #define WD2797_TAG              "wd2797"
+
+
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
 
 
 /***************************************************************************
@@ -399,7 +402,7 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(DRAGON_FDC, dragon_fdc_device, "dragon_fdc", "Dragon FDC")
+DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_FDC, device_cococart_interface, dragon_fdc_device, "dragon_fdc", "Dragon FDC")
 
 
 //**************************************************************************
@@ -431,7 +434,7 @@ namespace
 	};
 };
 
-DEFINE_DEVICE_TYPE(PREMIER_FDC, premier_fdc_device, "premier_fdc", "Premier FDC")
+DEFINE_DEVICE_TYPE_PRIVATE(PREMIER_FDC, device_cococart_interface, premier_fdc_device, "premier_fdc", "Premier FDC")
 
 
 //**************************************************************************
@@ -463,4 +466,4 @@ namespace
 	};
 }
 
-DEFINE_DEVICE_TYPE(SDTANDY_FDC, sdtandy_fdc_device, "sdtandy_fdc", "SDTANDY FDC")
+DEFINE_DEVICE_TYPE_PRIVATE(SDTANDY_FDC, device_cococart_interface, sdtandy_fdc_device, "sdtandy_fdc", "SDTANDY FDC")

@@ -82,7 +82,7 @@
 #define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	downcast<isa8_slot_device &>(*device).set_isa8_slot(this, _isatag);
+	downcast<isa8_slot_device &>(*device).set_isa8_slot(_isatag);
 #define MCFG_ISA16_CPU(_cputag) \
 	downcast<isa8_device &>(*device).set_cputag(_cputag);
 #define MCFG_ISA16_BUS_CUSTOM_SPACES() \
@@ -90,7 +90,7 @@
 #define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	downcast<isa16_slot_device &>(*device).set_isa16_slot(this, _isatag);
+	downcast<isa16_slot_device &>(*device).set_isa16_slot(_isatag);
 
 #define MCFG_ISA_BUS_IOCHCK(_iochck) \
 	devcb = &downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
@@ -168,14 +168,13 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	void set_isa8_slot(device_t *owner, const char *isa_tag) { m_owner = owner; m_isa_tag = isa_tag; }
+	void set_isa8_slot(const char *isa_tag) { m_isa_bus.set_tag(isa_tag); }
 
 protected:
 	isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	device_t *m_owner;
-	const char *m_isa_tag;
+	required_device<device_t> m_isa_bus;
 };
 
 // device type definition
@@ -348,7 +347,7 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	void set_isa16_slot(device_t *owner, const char *isa_tag) { m_owner = owner; m_isa_tag = isa_tag; }
+	void set_isa16_slot(const char *isa_tag) { m_isa_bus.set_tag(isa_tag); }
 };
 
 

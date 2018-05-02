@@ -575,7 +575,8 @@ configuration { "Debug" }
 
 if _OPTIONS["FASTDEBUG"]=="1" then
 	defines {
-		"MAME_DEBUG_FAST"
+		"MAME_DEBUG_FAST",
+		"NDEBUG",
 	}
 end
 

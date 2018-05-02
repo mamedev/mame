@@ -227,7 +227,6 @@ MACHINE_CONFIG_START(pooyan_state::pooyan)
 	/* sound hardware */
 
 	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
 MACHINE_CONFIG_END
 
 

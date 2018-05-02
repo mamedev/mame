@@ -153,6 +153,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(I8255, i8255_device)
-extern const device_type I8255A;
+DECLARE_DEVICE_TYPE(I8255A, i8255_device)
 
 #endif // MAME_MACHINE_I8255_H
