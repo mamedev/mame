@@ -109,7 +109,7 @@ static ADDRESS_MAP_START(smioc_mem, AS_PROGRAM, 8, smioc_device)
 	AM_RANGE(0xC00B0, 0xC00BF) AM_DEVREADWRITE("dma8237_4", am9517a_device, read, write) // Serial DMA
 	AM_RANGE(0xC00C0, 0xC00CF) AM_DEVREADWRITE("dma8237_5", am9517a_device, read, write) // Serial DMA
 	AM_RANGE(0xC0100, 0xC011F) AM_READWRITE(boardlogic_mmio_r, boardlogic_mmio_w)
-	AM_RANGE(0xC0200, 0xC023F) AM_READWRITE(scc2698b_mmio_r, scc2698b_mmio_w) // Future: Emulate the SCC2698B UART as a separate component
+	AM_RANGE(0xC0200, 0xC023F) AM_DEVREADWRITE("scc2698b", scc2698b_device, read, write)
 	AM_RANGE(0xF8000, 0xFFFFF) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
@@ -131,6 +131,10 @@ MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* Port 1: Console */
 	for (required_device<rs232_port_device> &rs232_port : m_rs232_p)
 		RS232_PORT(config, rs232_port, default_rs232_devices, nullptr);
+
+	/* SCC2698B */
+	MCFG_DEVICE_ADD("scc2698b", SCC2698B, XTAL(10'000'000))
+
 MACHINE_CONFIG_END
 
 //**************************************************************************
@@ -146,6 +150,7 @@ smioc_device::smioc_device(const machine_config &mconfig, const char *tag, devic
 	m_smioccpu(*this, I188_TAG),
 	m_dma8237(*this, "dma8237_%u", 1),
 	m_rs232_p(*this, "rs232_p%u", 1),
+	m_scc2698b(*this, "scc2698b"),
 	m_smioc_ram(*this, "smioc_ram"),
 	m_dma_timer(nullptr),
 	m_m68k_r_cb(*this),
@@ -368,16 +373,6 @@ WRITE8_MEMBER(smioc_device::boardlogic_mmio_w)
 }
 
 
-
-READ8_MEMBER(smioc_device::scc2698b_mmio_r)
-{
-	return 0;
-}
-
-WRITE8_MEMBER(smioc_device::scc2698b_mmio_w)
-{
-	
-}
 
 // The logic on the SMIOC board somehow proxies the UART's information about what channels are ready into the DMA DREQ lines.
 // It's not 100% clear how this works, but a rough guess is it's providing !(RDYN) & (!DACK).

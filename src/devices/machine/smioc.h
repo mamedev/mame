@@ -14,6 +14,7 @@
 #include "cpu/i86/i186.h"
 #include "machine/am9517a.h"
 #include "bus/rs232/rs232.h"
+#include "machine/scc2698b.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -43,9 +44,6 @@ public:
 
 	DECLARE_READ8_MEMBER(boardlogic_mmio_r);
 	DECLARE_WRITE8_MEMBER(boardlogic_mmio_w);
-
-	DECLARE_READ8_MEMBER(scc2698b_mmio_r);
-	DECLARE_WRITE8_MEMBER(scc2698b_mmio_w);
 
 	DECLARE_WRITE_LINE_MEMBER(dma8237_2_hreq_w);
 
@@ -86,6 +84,8 @@ private:
 	required_device_array<am9517a_device, 5> m_dma8237;
 
 	required_device_array<rs232_port_device, 8> m_rs232_p;
+
+	required_device<scc2698b_device> m_scc2698b;
 
 	required_shared_ptr<uint8_t> m_smioc_ram;
 
