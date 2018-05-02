@@ -10,6 +10,7 @@
         * Speed Up
         * Surf Planet
         * Radikal Bikers
+        * Football Power
 
     Known bugs:
         * EEPROM interface not right

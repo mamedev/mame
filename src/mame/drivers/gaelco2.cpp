@@ -1426,10 +1426,10 @@ ROM_START( touchgo ) /* REF: 950906 */
 	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
-ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America Notice */
+ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America Notice, also found on REF: 950510-1 with daughterboard */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "tg56.bin", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) )
-	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
+	ROM_LOAD16_BYTE( "1.ic63", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
+	ROM_LOAD16_BYTE( "2.ic64", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -1455,8 +1455,8 @@ ROM_END
 
 ROM_START( touchgoe ) /* REF: 950510-1 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "tg56", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) )
-	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
+	ROM_LOAD16_BYTE( "tg56.ic63", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
+	ROM_LOAD16_BYTE( "tg57.ic64", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -1482,8 +1482,8 @@ ROM_END
 
 ROM_START( touchgok ) /* REF: 950510-1 - ds5002fp unpopulated, game is unprotected */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "56.ic56", 0x000000, 0x080000, CRC(cbb87505) SHA1(f19832af60fb6273c3263ebdd93bb7705ab61e20) )
-	ROM_LOAD16_BYTE( "57.ic57", 0x000001, 0x080000, CRC(36bcc7e7) SHA1(2fff881ba0a99ebcfe3c03fdc61f4bf40e152c7f))
+	ROM_LOAD16_BYTE( "56.ic56", 0x000000, 0x080000, CRC(cbb87505) SHA1(f19832af60fb6273c3263ebdd93bb7705ab61e20) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
+	ROM_LOAD16_BYTE( "57.ic57", 0x000001, 0x080000, CRC(36bcc7e7) SHA1(2fff881ba0a99ebcfe3c03fdc61f4bf40e152c7f) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
