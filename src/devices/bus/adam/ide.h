@@ -13,7 +13,7 @@
 
 #include "exp.h"
 #include "machine/ataintf.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 
 
 
