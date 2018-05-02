@@ -89,6 +89,8 @@ private:
 
 	required_shared_ptr<uint8_t> m_smioc_ram;
 
+	void smioc_mem(address_map &map);
+
 	void update_and_log(u16& reg, u16 newValue, const char* register_name);
 
 	emu_timer *m_dma_timer;

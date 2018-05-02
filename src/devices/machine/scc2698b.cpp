@@ -31,9 +31,10 @@ DEFINE_DEVICE_TYPE(SCC2698B_CHANNEL, scc2698b_channel, "scc2698b_channel", "UART
 #define TRACE_REGISTER_READ(ofs, data, reg_name)	if(TRACE_ENABLE) { log_register_access((ofs), (data), ">>", (reg_name)); }
 
 
-DEVICE_ADDRESS_MAP_START(map, 8, scc2698b_device)
-AM_RANGE(0x0, 0x3F) AM_READWRITE(read, write)
-ADDRESS_MAP_END
+void scc2698b_device::map(address_map &map)
+{
+	map(0x0, 0x3F).rw(this, FUNC(scc2698b_device::read), FUNC(scc2698b_device::write));
+}
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"

@@ -98,20 +98,20 @@ const tiny_rom_entry *smioc_device::device_rom_region() const
 //-------------------------------------------------
 //  ADDRESS_MAP( smioc_mem )
 //-------------------------------------------------
-
-static ADDRESS_MAP_START(smioc_mem, AS_PROGRAM, 8, smioc_device)
-	AM_RANGE(0x00000, 0x07FFF) AM_RAM AM_SHARE("smioc_ram")
-	AM_RANGE(0x40000, 0x4FFFF) AM_READWRITE(ram2_mmio_r, ram2_mmio_w)
-	AM_RANGE(0x50000, 0x5FFFF) AM_READWRITE(dma68k_r, dma68k_w)
-	AM_RANGE(0xC0080, 0xC008F) AM_DEVREADWRITE("dma8237_1", am9517a_device, read, write) // Probably RAM DMA
-	AM_RANGE(0xC0090, 0xC009F) AM_DEVREADWRITE("dma8237_2", am9517a_device, read, write) // Serial DMA
-	AM_RANGE(0xC00A0, 0xC00AF) AM_DEVREADWRITE("dma8237_3", am9517a_device, read, write) // Serial DMA
-	AM_RANGE(0xC00B0, 0xC00BF) AM_DEVREADWRITE("dma8237_4", am9517a_device, read, write) // Serial DMA
-	AM_RANGE(0xC00C0, 0xC00CF) AM_DEVREADWRITE("dma8237_5", am9517a_device, read, write) // Serial DMA
-	AM_RANGE(0xC0100, 0xC011F) AM_READWRITE(boardlogic_mmio_r, boardlogic_mmio_w)
-	AM_RANGE(0xC0200, 0xC023F) AM_DEVREADWRITE("scc2698b", scc2698b_device, read, write)
-	AM_RANGE(0xF8000, 0xFFFFF) AM_ROM AM_REGION("rom", 0)
-ADDRESS_MAP_END
+void smioc_device::smioc_mem(address_map &map)
+{
+	map(0x00000, 0x07FFF).ram().share("smioc_ram");
+	map(0x40000, 0x4FFFF).rw(this, FUNC(smioc_device::ram2_mmio_r), FUNC(smioc_device::ram2_mmio_w));
+	map(0x50000, 0x5FFFF).rw(this, FUNC(smioc_device::dma68k_r), FUNC(smioc_device::dma68k_w));
+	map(0xC0080, 0xC008F).rw("dma8237_1", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Probably RAM DMA
+	map(0xC0090, 0xC009F).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC00A0, 0xC00AF).rw("dma8237_3", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC00B0, 0xC00BF).rw("dma8237_4", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC00C0, 0xC00CF).rw("dma8237_5", FUNC(am9517a_device::read), FUNC(am9517a_device::write)); // Serial DMA
+	map(0xC0100, 0xC011F).rw(this, FUNC(smioc_device::boardlogic_mmio_r), FUNC(smioc_device::boardlogic_mmio_w));
+	map(0xC0200, 0xC023F).rw("scc2698b", FUNC(scc2698b_device::read), FUNC(scc2698b_device::write));
+	map(0xF8000, 0xFFFFF).rom().region("rom", 0);
+}
 
 MACHINE_CONFIG_START(smioc_device::device_add_mconfig)
 	/* CPU - Intel 80C188 */
