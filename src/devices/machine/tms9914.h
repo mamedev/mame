@@ -275,6 +275,7 @@ private:
 	bool listener_reset() const;
 	bool talker_reset() const;
 	bool controller_reset() const;
+	bool sh_active() const;
 	void update_fsm();
 	bool is_my_address(uint8_t addr);
 	void do_LAF();

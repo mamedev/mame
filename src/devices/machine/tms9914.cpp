@@ -292,8 +292,12 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 			} else if (m_t_eoi_state == FSM_T_ENAS) {
 				m_t_eoi_state = FSM_T_ENIS;
 			}
+			bool update = sh_active();
 			if (m_sh_shfs) {
 				m_sh_shfs = false;
+				update = true;
+			}
+			if (update) {
 				update_fsm();
 			}
 		}
@@ -549,6 +553,11 @@ bool tms9914_device::controller_reset() const
 	return m_swrst || get_ifcin();
 }
 
+bool tms9914_device::sh_active() const
+{
+	return m_sh_state == FSM_SH_SDYS || m_sh_state == FSM_SH_STRS || m_sh_state == FSM_SH_SERS;
+}
+
 void tms9914_device::update_fsm()
 {
 	if (m_no_reflection) {
@@ -654,7 +663,7 @@ void tms9914_device::update_fsm()
 		bool eoi_signal = false;
 		uint8_t dio_byte = 0;
 		set_signal(IEEE_488_DAV , m_sh_state == FSM_SH_STRS);
-		if (m_sh_state == FSM_SH_SDYS || m_sh_state == FSM_SH_STRS) {
+		if (sh_active()) {
 			dio_byte = m_t_state == FSM_T_SPAS ? m_reg_serial_p : m_reg_do;
 			eoi_signal = m_t_eoi_state == FSM_T_ERAS || m_t_eoi_state == FSM_T_ENAS;
 		}
@@ -1193,7 +1202,7 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_GTS:
-		if (m_c_state == FSM_C_CACS && m_sh_state != FSM_SH_SDYS && m_sh_state != FSM_SH_STRS) {
+		if (m_c_state == FSM_C_CACS && !sh_active()) {
 			m_c_state = FSM_C_CSBS;
 			m_ext_state_change = true;
 			// This ensures a BO interrupt is generated if TACS is active
@@ -1206,7 +1215,10 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		if (m_c_state == FSM_C_CSBS) {
 			m_c_state = FSM_C_CSHS;
 			m_ext_state_change = true;
-			m_c_dly_timer->adjust(clocks_to_attotime(8));
+			// Manual says delay is 8 clock cycles, but 10 at least are needed
+			// to pass diagb hpib diagnostic
+			//m_c_dly_timer->adjust(clocks_to_attotime(8));
+			m_c_dly_timer->adjust(clocks_to_attotime(10));
 			update_fsm();
 		}
 		break;
