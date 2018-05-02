@@ -2790,7 +2790,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_PALETTE_ADD("palette16_1", 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("fm", YM3438, 16000000 / 2) // actual clock speed unknown
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(towns_state, towns_fm_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
@@ -2798,8 +2798,8 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 
 	MCFG_RF5C68_ADD("pcm", 16000000 / 2)  // actual clock speed unknown
 	MCFG_RF5C68_SAMPLE_END_CB(towns_state, towns_pcm_irq)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 2.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 2.00)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 3.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 3.00)
 	MCFG_SOUND_ADD("cdda",CDDA,0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
