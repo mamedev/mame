@@ -724,7 +724,7 @@ void seta2_state::telpacfl_map(address_map &map)
 	MCFG_DEVICE_ADD( _tag, FUNCUBE_TOUCHSCREEN, _clock )
 
 #define MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(_devcb) \
-	devcb = &funcube_touchscreen_device::set_tx_cb(*device, DEVCB_##_devcb);
+	devcb = &downcast<funcube_touchscreen_device &>(*device).set_tx_cb(DEVCB_##_devcb);
 
 class funcube_touchscreen_device : public device_t,
 									public device_serial_interface
@@ -733,7 +733,7 @@ public:
 	funcube_touchscreen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
-	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<funcube_touchscreen_device &>(device).m_tx_cb.set_callback(object); }
+	template <class Object> devcb_base &set_tx_cb(Object &&cb) { return m_tx_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_start() override;

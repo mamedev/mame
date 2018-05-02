@@ -732,7 +732,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 		int j = (quick_addr + i);
 		if (image.fread(&ch, 1) != 1)
 		{
-			char message[256];
+			char message[512];
 			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 			image.message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);

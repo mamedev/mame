@@ -7,7 +7,7 @@
 #pragma once
 
 #include "machine/buffer.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 
 #define SCSI_PORT_DEVICE1 "1"
 #define SCSI_PORT_DEVICE2 "2"

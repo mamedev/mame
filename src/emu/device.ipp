@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DEVICE_IPP__
-#define __DEVICE_IPP__
+#ifndef MAME_EMU_DEVICE_IPP
+#define MAME_EMU_DEVICE_IPP
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -23,9 +23,30 @@
 
 typedef device_delegate<void (u32)> clock_update_delegate;
 
+
 //**************************************************************************
 //  MEMBER TEMPLATES
 //**************************************************************************
+
+namespace emu { namespace detail {
+
+template <class DeviceClass> template <typename... Params>
+DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &config, char const *tag, Params &&... args) const
+{
+	return dynamic_cast<DeviceClass &>(*config.device_add(tag, *this, std::forward<Params>(args)...));
+}
+
+template <class DeviceClass> template <typename Exposed, bool Required, typename... Params>
+DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &config, device_finder<Exposed, Required> &finder, Params &&... args) const
+{
+	std::pair<device_t &, char const *> const target(finder.finder_target());
+	assert(&config.current_device() == &target.first);
+	DeviceClass &result(dynamic_cast<DeviceClass &>(*config.device_add(target.second, *this, std::forward<Params>(args)...)));
+	return finder = result;
+}
+
+} } // namespace emu::detail
+
 
 template <typename Format, typename... Params>
 inline void device_t::popmessage(Format &&fmt, Params &&... args) const
@@ -54,4 +75,4 @@ inline void device_t::logerror(Format &&fmt, Params &&... args) const
 	}
 }
 
-#endif // __DEVICE_IPP__
+#endif // MAME_EMU_DEVICE_IPP

@@ -1328,7 +1328,7 @@ MACHINE_CONFIG_START(mappy_state::superpac_common)
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2M on CPU board
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mappy_state, int_on_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, mappy_sound_enable))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, sound_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
@@ -1443,7 +1443,7 @@ MACHINE_CONFIG_START(mappy_state::phozon)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mappy_state, int_on_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mappy_state, int_on_3_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, mappy_sound_enable))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, sound_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("namcoio_1", namco58xx_device, set_reset_line)) MCFG_DEVCB_INVERT
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("namcoio_2", namco56xx_device, set_reset_line)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
@@ -1506,7 +1506,7 @@ MACHINE_CONFIG_START(mappy_state::mappy_common)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mappy_state, int_on_2_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mappy_state, int_on_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mappy_state, mappy_flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, mappy_sound_enable))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("namco", namco_15xx_device, sound_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("namcoio_1", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("namcoio_2", namcoio_device, set_reset_line)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
