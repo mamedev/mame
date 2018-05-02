@@ -343,6 +343,7 @@ public:
 		uint8_t   linescroll_interval;
 		uint32_t  linescroll_table_address;
 		uint8_t   vertical_linescroll_enable;
+		uint8_t   vertical_cell_scroll_enable;
 		uint8_t   linezoom_enable;
 
 		uint8_t  plane_size;

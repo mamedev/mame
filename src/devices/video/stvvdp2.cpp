@@ -1354,7 +1354,6 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_VCSTAL (m_vdp2_regs[0x09e/2])
 
-
 /* 1800a0 - LSTA0U - Line Scroll Table Address (NBG0)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
@@ -4450,13 +4449,73 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 
 	if ( stv2_current_tilemap.linescroll_enable ||
 			stv2_current_tilemap.vertical_linescroll_enable ||
-			stv2_current_tilemap.linezoom_enable )
+			stv2_current_tilemap.linezoom_enable || 
+			stv2_current_tilemap.vertical_cell_scroll_enable)
 	{
-		stv_vdp2_check_tilemap_with_linescroll(bitmap, cliprect);
+		// check for vertical cell scroll enable (Sonic Jam)
+		// TODO: it is unknown how this works with vertical linescroll enable too (probably it doesn't?)
+		if(stv2_current_tilemap.vertical_cell_scroll_enable)
+		{
+			uint32_t vcsc_address;
+			uint32_t base_mask;
+			int base_offset, base_multiplier;
+			int16_t base_scrollx, base_scrolly;
+			//uint32_t base_incx, base_incy;
+			int cur_char = 0;
+			
+			base_mask = STV_VDP2_VRAMSZ ? 0x7ffff : 0x3ffff;
+			vcsc_address = (((STV_VDP2_VCSTAU << 16) | STV_VDP2_VCSTAL) & base_mask) * 2;
+			vcsc_address >>= 2;
+			
+			base_offset = 0;
+			base_multiplier = 1;
+			// offset for both enabled
+			if(STV_VDP2_N0VCSC && STV_VDP2_N1VCSC)
+			{
+				// NBG1
+				if(stv2_current_tilemap.layer_name & 1)
+					base_offset = 1;
+				
+				base_multiplier = 2;
+			}
+			
+			base_scrollx = stv2_current_tilemap.scrollx;
+			base_scrolly = stv2_current_tilemap.scrolly;
+			//base_incx = stv2_current_tilemap.incx;
+			//base_incy = stv2_current_tilemap.incy;
+			
+			while(cur_char <= cliprect.max_x)
+			{
+				mycliprect.min_x = cur_char;
+				mycliprect.max_x = cur_char + 8 - 1;
+				
+				uint32_t cur_address;
+				int16_t char_scroll;
+				
+				cur_address = vcsc_address;
+				cur_address += ((cur_char >> 3) * base_multiplier) + base_offset;
+				
+				char_scroll = m_vdp2_vram[ cur_address ] >> 16;
+				char_scroll &= 0x07ff;
+				if ( char_scroll & 0x0400 ) char_scroll |= 0xf800;
+				stv2_current_tilemap.scrollx = base_scrollx;
+				stv2_current_tilemap.scrolly = base_scrolly + (char_scroll);
+				//stv2_current_tilemap.incx = base_incx;
+				//stv2_current_tilemap.incy = base_incy;
+
+				stv_vdp2_check_tilemap_with_linescroll(bitmap, mycliprect);
+			
+				// TODO: + 16 for tilemap and char size = 16?
+				cur_char += 8;
+
+			}
+		}
+		else
+			stv_vdp2_check_tilemap_with_linescroll(bitmap, cliprect);
+		
 		return;
 	}
-
-
+	
 	if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
 	{
 		stv_vdp2_draw_basic_bitmap(bitmap, mycliprect);
@@ -5090,6 +5149,7 @@ void saturn_state::stv_vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = (((STV_VDP2_LSTA0U << 16) | STV_VDP2_LSTA0L) & base_mask) * 2;
 	stv2_current_tilemap.vertical_linescroll_enable = STV_VDP2_N0LSCY;
 	stv2_current_tilemap.linezoom_enable = STV_VDP2_N0LZMX;
+	stv2_current_tilemap.vertical_cell_scroll_enable = STV_VDP2_N0VCSC;
 
 	stv2_current_tilemap.plane_size = (STV_VDP2_R1ON) ? STV_VDP2_RBPLSZ : STV_VDP2_N0PLSZ;
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_N0CAOS;
@@ -5190,6 +5250,7 @@ void saturn_state::stv_vdp2_draw_NBG1(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = (((STV_VDP2_LSTA1U << 16) | STV_VDP2_LSTA1L) & base_mask) * 2;
 	stv2_current_tilemap.vertical_linescroll_enable = STV_VDP2_N1LSCY;
 	stv2_current_tilemap.linezoom_enable = STV_VDP2_N1LZMX;
+	stv2_current_tilemap.vertical_cell_scroll_enable = STV_VDP2_N1VCSC;
 
 	stv2_current_tilemap.plane_size = STV_VDP2_N1PLSZ;
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_N1CAOS;
@@ -5292,6 +5353,7 @@ void saturn_state::stv_vdp2_draw_NBG2(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = 0;
 	stv2_current_tilemap.vertical_linescroll_enable = 0;
 	stv2_current_tilemap.linezoom_enable = 0;
+	stv2_current_tilemap.vertical_cell_scroll_enable = 0;
 
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_N2CAOS;
 	stv2_current_tilemap.fade_control = (STV_VDP2_N2COEN * 1) | (STV_VDP2_N2COSL * 2);
@@ -5395,6 +5457,7 @@ void saturn_state::stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = 0;
 	stv2_current_tilemap.vertical_linescroll_enable = 0;
 	stv2_current_tilemap.linezoom_enable = 0;
+	stv2_current_tilemap.vertical_cell_scroll_enable = 0;
 
 	stv2_current_tilemap.colour_ram_address_offset = STV_VDP2_N3CAOS;
 	stv2_current_tilemap.fade_control = (STV_VDP2_N3COEN * 1) | (STV_VDP2_N3COSL * 2);
@@ -5713,6 +5776,7 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.linescroll_table_address = 0;
 	stv2_current_tilemap.vertical_linescroll_enable = 0;
 	stv2_current_tilemap.linezoom_enable = 0;
+	stv2_current_tilemap.vertical_cell_scroll_enable = 0;
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_R0LCEN;
 	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_R0MZE;
