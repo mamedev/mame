@@ -23,6 +23,7 @@
 #include "emu.h"
 #include "includes/tranz330.h"
 
+#include "machine/input_merger.h"
 #include "speaker.h"
 
 #include "tranz330.lh"
@@ -141,7 +142,7 @@ static const z80_daisy_config tranz330_daisy_chain[] =
 // ? - check purported RS232 hookup, inconsistent information found at the relevant webpage vs. user-submitted errata
 void tranz330_state::tranz330(machine_config &config)
 {
-	m_cpu = Z80(config, CPU_TAG, XTAL(7'159'090)/2); //*
+	Z80(config, m_cpu, XTAL(7'159'090)/2); //*
 	m_cpu->set_addrmap(AS_PROGRAM, address_map_constructor(&tranz330_state::tranz330_mem, tag(), this));
 	m_cpu->set_addrmap(AS_IO, address_map_constructor(&tranz330_state::tranz330_io, tag(), this));
 	m_cpu->set_daisy_config(tranz330_daisy_chain);
@@ -151,31 +152,34 @@ void tranz330_state::tranz330(machine_config &config)
 
 	MSM6242(config, RTC_TAG, XTAL(32'768));
 
-	m_pio = Z80PIO(config, PIO_TAG, XTAL(7'159'090)/2); //*
-	m_pio->set_out_int_callback(DEVCB_INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0)); //*
+	INPUT_MERGER_ANY_HIGH(config, "irq", 0)
+			.set_output_handler(DEVCB_INPUTLINE(m_cpu, INPUT_LINE_IRQ0));
+
+	Z80PIO(config, m_pio, XTAL(7'159'090)/2); //*
+	m_pio->set_out_int_callback(DEVCB_DEVWRITELINE("irq", input_merger_device, in_w<0>)); //*
 	m_pio->set_out_pa_callback(DEVCB_WRITE8(tranz330_state, pio_a_w));
 	m_pio->set_in_pa_callback(DEVCB_READ8(tranz330_state, card_r));
 	m_pio->set_in_pb_callback(DEVCB_READ8(tranz330_state, pio_b_r));
 
-	m_dart = Z80DART(config, DART_TAG, XTAL(7'159'090)/2); //*
+	Z80DART(config, m_dart, XTAL(7'159'090)/2); //*
 	m_dart->set_out_syncb_callback(DEVCB_WRITELINE(tranz330_state, syncb_w));
-	m_dart->set_out_txdb_callback(DEVCB_DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd)); //?
-	m_dart->set_out_dtrb_callback(DEVCB_DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr)); //?
-	m_dart->set_out_rtsb_callback(DEVCB_DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts)); //?
-	m_dart->set_out_int_callback(DEVCB_INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0));
+	m_dart->set_out_txdb_callback(DEVCB_DEVWRITELINE(m_rs232, rs232_port_device, write_txd)); //?
+	m_dart->set_out_dtrb_callback(DEVCB_DEVWRITELINE(m_rs232, rs232_port_device, write_dtr)); //?
+	m_dart->set_out_rtsb_callback(DEVCB_DEVWRITELINE(m_rs232, rs232_port_device, write_rts)); //?
+	m_dart->set_out_int_callback(DEVCB_DEVWRITELINE("irq", input_merger_device, in_w<1>));
 
-	m_ctc = Z80CTC(config, CTC_TAG, XTAL(7'159'090)/2); //*
+	Z80CTC(config, m_ctc, XTAL(7'159'090)/2); //*
 	m_ctc->set_zc_callback<2>(DEVCB_WRITELINE(tranz330_state, sound_w));
-	m_ctc->set_intr_callback(DEVCB_INPUTLINE(CPU_TAG, INPUT_LINE_IRQ0));
+	m_ctc->set_intr_callback(DEVCB_DEVWRITELINE("irq", input_merger_device, in_w<2>));
 
-	m_rs232 = RS232_PORT(config, RS232_TAG, 0);
+	RS232_PORT(config, m_rs232, 0);
 	m_rs232->option_reset();
 	slot_options_default_rs232_devices(m_rs232);
 	m_rs232->set_default_option(nullptr);
 	m_rs232->set_fixed(false);
-	m_rs232->set_rxd_handler(DEVCB_DEVWRITELINE(DART_TAG, z80dart_device, rxb_w));
-	m_rs232->set_dcd_handler(DEVCB_DEVWRITELINE(DART_TAG, z80dart_device, dcdb_w));
-	m_rs232->set_cts_handler(DEVCB_DEVWRITELINE(DART_TAG, z80dart_device, ctsb_w));
+	m_rs232->set_rxd_handler(DEVCB_DEVWRITELINE(m_dart, z80dart_device, rxb_w));
+	m_rs232->set_dcd_handler(DEVCB_DEVWRITELINE(m_dart, z80dart_device, dcdb_w));
+	m_rs232->set_cts_handler(DEVCB_DEVWRITELINE(m_dart, z80dart_device, ctsb_w));
 
 	// video
 	MIC10937(config, VFD_TAG, 60).set_port_value(0);

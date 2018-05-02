@@ -72,7 +72,7 @@ public:
 	// construction/destruction
 	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _inst> void set_inst_callback(_inst inst) { m_write_inst.set_callback(inst); }
+	template <class Object> void set_inst_callback(Object &&inst) { m_write_inst.set_callback(std::forward<Object>(inst)); }
 
 	// computer interface
 	uint8_t in_r();

@@ -37,9 +37,9 @@ void msx_slot_rom_device::device_start()
 
 READ8_MEMBER(msx_slot_rom_device::read)
 {
-	if ( offset >= m_start_address && offset < m_end_address )
+	if (offset >= m_start_address && offset < m_end_address)
 	{
-		return m_rom[ offset - m_start_address ];
+		return m_rom[offset - m_start_address];
 	}
 	return 0xFF;
 }

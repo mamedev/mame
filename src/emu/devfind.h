@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -263,7 +264,14 @@ public:
 	///
 	/// Returns the search tag.
 	/// \return The object tag this helper will search for.
-	const char *finder_tag() const { return m_tag; }
+	char const *finder_tag() const { return m_tag; }
+
+	/// \brief Get search target
+	///
+	/// Returns the search base device and tag.
+	/// \return a pair consisting of a reference to the device to search
+	///   relative to and the relative tag.
+	std::pair<device_t &, char const *> finder_target() const { return std::make_pair(m_base, m_tag); }
 
 	/// \brief Set search tag
 	///
@@ -519,7 +527,7 @@ public:
 	/// During configuration, device_finder instances may be assigned
 	/// a reference to the anticipated target device to avoid the need
 	/// for tempories during configuration.  Normal resolution will
-	/// still happen after machine configuration is completed to ensure 
+	/// still happen after machine configuration is completed to ensure
 	/// device removal/replacement is handled properly.
 	/// \param [in] device Reference to anticipated target device.
 	/// \return The same reference supplied by the caller.
