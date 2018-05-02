@@ -2746,8 +2746,8 @@ static const gfx_layout fnt_chars_16x16 =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
 	16*16
 };
 
@@ -2757,8 +2757,8 @@ static const gfx_layout text_chars =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(0,1), },
+	{ STEP16(0,1) },
 	8*16
 };
 
@@ -2790,18 +2790,22 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_PALETTE_ADD("palette16_1", 16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("fm", YM3438, 16000000 / 2) // actual clock speed unknown
 	MCFG_YM2612_IRQ_HANDLER(WRITELINE(towns_state, towns_fm_irq))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	MCFG_RF5C68_ADD("pcm", 16000000 / 2)  // actual clock speed unknown
 	MCFG_RF5C68_SAMPLE_END_CB(towns_state, towns_pcm_irq)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 3.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 3.00)
 	MCFG_SOUND_ADD("cdda",CDDA,0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND,0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(307200)
