@@ -63,7 +63,7 @@ ToDo:
 #include "cpu/m6805/m68705.h"
 
 #include "machine/input_merger.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 #include "machine/pit8253.h"
 
 #include "screen.h"

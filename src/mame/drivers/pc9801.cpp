@@ -2248,8 +2248,8 @@ MACHINE_CONFIG_END
 void pc9801_state::cdrom_headphones(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^lheadphone", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^rheadphone", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lheadphone", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rheadphone", 1.0)
 }
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_ide)

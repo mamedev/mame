@@ -2067,8 +2067,8 @@ ADC083X_INPUT_CB(ksys573_state::analogue_inputs_callback)
 void ksys573_state::cr589_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 0, "^^lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "^^rspeaker", 1.0 )
 }
 
 MACHINE_CONFIG_START(ksys573_state::konami573)

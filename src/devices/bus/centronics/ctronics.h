@@ -11,7 +11,7 @@
 #pragma once
 
 #include "machine/buffer.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 
 
 #define MCFG_CENTRONICS_ADD(_tag, _slot_intf, _def_slot) \

@@ -16,7 +16,7 @@
 #include "machine/buffer.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"

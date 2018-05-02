@@ -96,7 +96,7 @@
             3   e-kara Web /TAKARA/Japan                                                                        -           -               -           -               -                   -                       -
             4   Doraemon TV computer /EPOCH/Japan                                                               -           -               -           -               -                   -                       -
             5   Exciting stadium DX, Hansin Tigers version /EPOCH/Japan                                         -           -               -           -               -                   -                       -
-            6   Dragon Quest /SQUARE ENIX/Japan                                                                 -           -               -           -               -                   -                       -
+            6   Dragon Quest /SQUARE ENIX/Japan                                                                 -           -               -           8M              -                   SSD 2000?               dumped
             7   Croquette! Win a medal! /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
             8   Taiko Popira /TAKARA/Japan                                                                      -           -               -           -               -                   -                       -
             9   Together Minimoni, Dancing' Stage! plus /EPOCH/Japan                                            -           -               -           -               -                   -                       -
@@ -863,9 +863,15 @@ ROM_START( ttv_mx )
 	ROM_LOAD( "mxdirtrebel.bin", 0x000000, 0x800000, CRC(e64bf1a1) SHA1(137f97d7d857697a13e0c8984509994dc7bc5fc5) )
 ROM_END
 
+ROM_START( drgqst )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "dragonquest.bin", 0x000000, 0x800000, CRC(3d24413f) SHA1(1677e81cedcf349de7bf091a232dc82c6424efba) )	                                      
+ROM_END
+
 
 CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
 
 CONS( 2005, ttv_sw,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
 CONS( 2005, ttv_lotr,  0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
 CONS( 2005, ttv_mx,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
+CONS( 2003, drgqst,    0,   0,  xavix,  xavix, xavix_state, xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_IS_SKELETON )

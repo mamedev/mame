@@ -225,6 +225,9 @@ class software_list_loader;
 class sound_manager;
 class sound_stream;
 
+// declared in speaker.h
+class speaker_device;
+
 // declared in tilemap.h
 class tilemap_device;
 class tilemap_manager;

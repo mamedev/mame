@@ -326,8 +326,8 @@ void konamigv_state::driver_start()
 void konamigv_state::cdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
 MACHINE_CONFIG_START(konamigv_state::konamigv)
