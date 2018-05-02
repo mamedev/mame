@@ -4526,7 +4526,8 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		stv_vdp2_draw_basic_tilemap(bitmap, mycliprect);
 	}
 
-	/* post-processing functions (TODO: needs layer bitmaps to be individual planes to work correctly) */
+	/* post-processing functions */
+	// (TODO: needs layer bitmaps to be individual planes to work correctly)
 	if(stv2_current_tilemap.line_screen_enabled && TEST_FUNCTIONS)
 		stv_vdp2_draw_line(bitmap,cliprect);
 
@@ -6838,7 +6839,8 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						};
 
 						// Pretty Fighter X, Game Tengoku shadows
-						// TODO: former doesn't read what's behind, VDP1 bug?
+						// TODO: Pretty Fighter X doesn't read what's behind on title screen, VDP1 bug?
+						// TODO: seldomly Game Tengoku shadows aren't drawn properly
 						if(pix & 0x8000 && STV_VDP2_SDCTL & 0x100)
 						{
 							rgb_t p = bitmap_line[x];

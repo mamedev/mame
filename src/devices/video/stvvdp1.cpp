@@ -947,6 +947,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				((((m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0xffff0000) >> 16);
 
 				//mode = 5;
+				// TODO: transparency code wrong for after burner 2
 				transmask = 0xffff;
 
 				if ( !spd )
@@ -965,7 +966,8 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
 				//mode = 2;
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xffc0);
-				transmask = 0x3f;
+				// disable transmask since transparent pen is checked below (sasissu racing stage background clouds)
+				transmask = 0xffff;
 
 				// Scud: the disposable assassin wants transparent pen on 0
 				if ( !spd )
@@ -993,15 +995,23 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				//mode = 4;
 				break;
 			case 0x0028: // mode 5 32,768 colour RGB mode (16bits)
-				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt*2+1) & 0xfffff] | (m_vdp1.gfx_decode[(patterndata+offsetcnt*2) & 0xfffff]<<8) ;
+				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt*2+1) & 0xfffff] | (m_vdp1.gfx_decode[(patterndata+offsetcnt*2) & 0xfffff]<<8);
 				//mode = 5;
-				transmask = -1; /* TODO: check me */
+				// TODO: check transmask
+				transmask = -1;
+				break;
+			case 0x0038: // invalid
+				// game tengoku uses this on hi score screen (tate mode)
+				// according to Charles, reads from VRAM address 0
+				pix = m_vdp1.gfx_decode[1] | (m_vdp1.gfx_decode[0]<<8) ;
+				// TODO: check transmask
+				transmask = -1;
 				break;
 			default: // other settings illegal
 				pix = machine().rand();
 				//mode = 0;
 				transmask = 0xff;
-				popmessage("Illegal Sprite Mode, contact MAMEdev");
+				popmessage("Illegal Sprite Mode %02x, contact MAMEdev",stv2_current_sprite.CMDPMOD&0x0038);
 		}
 
 
