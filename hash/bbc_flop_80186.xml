@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro - 80186 Co-Processor Discs -->
+<!-- Acorn BBC Master - 80186 Co-Processor discs -->
 
-<softwarelist name="bbc_flop_80186" description="80186 Co-Processor Discs">
+<softwarelist name="bbc_flop_80186" description="Acorn 80186 Co-Processor discs">
 
 	<software name="m512sys">
 		<description>BBC Master 512 System Discs</description>

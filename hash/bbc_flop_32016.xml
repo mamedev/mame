@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro - 32016 Co-Processor Discs -->
+<!-- Acorn BBC Micro - 32016 Co-Processor Discs -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_flop_32016" description="32016 Co-Processor Discs">
+<softwarelist name="bbc_flop_32016" description="Acorn 32016 Co-Processor discs">
 
 	<software name="panos11" cloneof="panos14" supported="no">
 		<description>PanOS Version 1.10 System Disks</description>
