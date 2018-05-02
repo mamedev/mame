@@ -1038,8 +1038,10 @@ end
 			if (version >= 80000) then
 				buildoptions {
 					"-Wno-format-overflow", -- try machine/bfm_sc45_helper.cpp in GCC 8.0.1, among others
-					"-Wno-class-memaccess", -- many instances in ImGui and BGFX
 					"-Wno-stringop-truncation", -- ImGui again
+				}
+				buildoptions_cpp {
+					"-Wno-class-memaccess", -- many instances in ImGui and BGFX
 				}
 			end
 		end
