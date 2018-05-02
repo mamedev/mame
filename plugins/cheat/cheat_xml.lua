@@ -54,22 +54,21 @@ local function xml_parse(data)
 	return xml_table
 end
 
-local cpu_spaces = {}
-
-for tag, device in pairs(manager:machine().devices) do
-	local sp
-	for name, space in pairs(device.spaces) do
-		if not sp then
-			sp = {}
-			cpu_spaces[tag] = sp
-		end
-		sp[space.index] = space.name
-	end
-end
-
 function xml.conv_cheat(data)
 	local spaces, regions, output
 	data = xml_parse(data)
+	local cpu_spaces = {}
+
+	for tag, device in pairs(manager:machine().devices) do
+		local sp
+		for name, space in pairs(device.spaces) do
+			if not sp then
+				sp = {}
+				cpu_spaces[tag] = sp
+			end
+			sp[space.index] = space.name
+		end
+	end
 
 	local function convert_expr(data)
 		local write = false
