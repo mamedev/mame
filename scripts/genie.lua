@@ -1035,6 +1035,13 @@ end
 					-- array bounds checking seems to be buggy in 4.8.1 (try it on video/stvvdp1.c and video/model1.c without -Wno-array-bounds)
 					"-Wno-array-bounds",
 				}
+			if (version >= 80000) then
+				buildoptions {
+					"-Wno-format-overflow", -- try machine/bfm_sc45_helper.cpp in GCC 8.0.1, among others
+					"-Wno-class-memaccess", -- many instances in ImGui and BGFX
+					"-Wno-stringop-truncation", -- ImGui again
+				}
+			end
 		end
 	end
 
