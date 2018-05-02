@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_MACHINE_LATCH_H
-#define MAME_MACHINE_LATCH_H
+#ifndef MAME_MACHINE_OUTPUT_LATCH_H
+#define MAME_MACHINE_OUTPUT_LATCH_H
 
 #pragma once
 
@@ -52,4 +52,4 @@ private:
 
 DECLARE_DEVICE_TYPE(OUTPUT_LATCH, output_latch_device)
 
-#endif // MAME_MACHINE_LATCH_H
+#endif // MAME_MACHINE_OUTPUT_LATCH_H
