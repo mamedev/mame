@@ -36,6 +36,14 @@ INTERRUPT_GEN_MEMBER(asteroid_state::llander_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+WRITE_LINE_MEMBER(asteroid_state::cocktail_inv_w)
+{
+	// Inverter circuit is only hooked up for Cocktail Asteroids
+	int flip = state && m_cocktail->read();
+	m_dvg->set_flip_x(flip);
+	m_dvg->set_flip_y(flip);
+}
+
 READ8_MEMBER(asteroid_state::asteroid_IN0_r)
 {
 	int res = ioport("IN0")->read();
