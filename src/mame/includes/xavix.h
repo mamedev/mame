@@ -4,6 +4,7 @@
 #define MAME_INCLUDES_XAVIX_H
 
 #include "cpu/m6502/xavix.h"
+#include "cpu/m6502/xavix2000.h"
 #include "machine/timer.h"
 #include "screen.h"
 #include "speaker.h"
@@ -41,6 +42,7 @@ public:
 
 	void xavix(machine_config &config);
 	void xavixp(machine_config &config);
+	void xavix2000(machine_config &config);
 
 	void xavix_map(address_map &map);
 	void xavix_lowbus_map(address_map &map);

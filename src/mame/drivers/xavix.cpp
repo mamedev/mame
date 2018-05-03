@@ -629,6 +629,20 @@ MACHINE_CONFIG_START(xavix_state::xavixp)
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(xavix_state::xavix2000)
+	xavix(config);
+
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_CPU_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(xavix_map)
+	MCFG_M6502_DISABLE_DIRECT()
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
+
+MACHINE_CONFIG_END
+
+
 DRIVER_INIT_MEMBER(xavix_state, xavix)
 {
 	m_rgnlen = memregion("bios")->bytes();
@@ -869,9 +883,9 @@ ROM_START( drgqst )
 ROM_END
 
 
-CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
+CONS( 2004, xavtenni,  0,   0,  xavix2000,  xavix, xavix_state, xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
 
-CONS( 2005, ttv_sw,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_lotr,  0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_mx,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
-CONS( 2003, drgqst,    0,   0,  xavix,  xavix, xavix_state, xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_sw,    0,   0,  xavix2000,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_lotr,  0,   0,  xavix2000,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_mx,    0,   0,  xavix2000,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
+CONS( 2003, drgqst,    0,   0,  xavix2000,  xavix, xavix_state, xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_IS_SKELETON )
