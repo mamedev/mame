@@ -989,7 +989,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 	}
 	else //compatible mode
 	{
-		switch (data & 0x0300)
+		switch (offset & 0x0300)
 		{
 		case 0x0000:
 			x1_pal_b_w(space, offset & 0x00ff, data);
