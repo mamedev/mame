@@ -7583,9 +7583,6 @@ DRIVER_INIT_MEMBER( galaxian_state, froggrs )
 
 DRIVER_INIT_MEMBER(galaxian_state,jungsub)
 {
-	/* todo, decrypt program rom */
-	// seems slightly address dependent based on text strings
-
 	decode_mooncrst(0x4000, memregion("maincpu")->base());
 
 	/* video extensions */
