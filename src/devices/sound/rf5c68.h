@@ -32,7 +32,8 @@
 // ======================> rf5c68_device
 
 class rf5c68_device : public device_t,
-						public device_sound_interface
+						public device_sound_interface,
+						public device_rom_interface
 {
 public:
 	typedef device_delegate<void (int channel)> sample_end_cb_delegate;
@@ -72,10 +73,9 @@ private:
 
 	sound_stream*        m_stream;
 	pcm_channel          m_chan[NUM_CHANNELS];
-	uint8_t                m_cbank;
-	uint8_t                m_wbank;
-	uint8_t                m_enable;
-	uint8_t                m_data[0x10000];
+	uint8_t              m_cbank;
+	uint16_t             m_wbank;
+	uint8_t              m_enable;
 
 	sample_end_cb_delegate m_sample_end_cb;
 };
