@@ -233,11 +233,54 @@ WRITE8_MEMBER(xavix_state::main_w)
 	}
 }
 
+/* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably
+   the CPU 0 page memory and stack are still at 0 but ROM must be in the 3xxx range (game hasn't got far enough to call this yet to help either)
+
+   the maximum romsize appears to be 0x800000 so presumably the high bit being set has some additional meaning
+
+   for now treat it as a swapped arrangement vs. the reads from the lower range, except where page 0 ram would map, it's also possible that
+   vram etc. is completely unavailable if executing from these addresses, there isn't much evidence at the moment
+
+   note, many DMA operations and tile bank redirects etc. have the high bit set too, so that could be significant if it defines how it accesses
+   memory in those cases too
+
+*/
+READ8_MEMBER(xavix_state::main2_r)
+{
+	if (offset & 0x8000)
+	{
+		return m_lowbus->read8(space, offset&0x7fff);
+	}
+	else
+	{
+		if (offset>0x200)
+			return  m_rgn[(offset) & (m_rgnlen - 1)];
+		else
+			return m_lowbus->read8(space, offset&0x7fff);
+	}
+}
+
+WRITE8_MEMBER(xavix_state::main2_w)
+{
+	if (offset & 0x8000)
+	{
+		m_lowbus->write8(space, offset & 0x7fff, data);
+	}
+	else
+	{
+		if (offset>0x200)
+			logerror("write to ROM area?\n");
+		else
+			m_lowbus->write8(space, offset & 0x7fff, data);
+	}
+}
+
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
 void xavix_state::xavix_map(address_map &map)
 {
-	map(0x000000, 0xffffff).rw(this, FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
+	map(0x000000, 0x7fffff).rw(this, FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
+	map(0x800000, 0xffffff).rw(this, FUNC(xavix_state::main2_r), FUNC(xavix_state::main2_w));
 }
 
 void xavix_state::xavix_lowbus_map(address_map &map)
