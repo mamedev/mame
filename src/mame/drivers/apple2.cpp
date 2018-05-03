@@ -1327,6 +1327,7 @@ SLOT_INTERFACE_END
 static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("diskii", A2BUS_DISKII)  /* Disk II Controller Card */
 	SLOT_INTERFACE("diskiing", A2BUS_DISKIING)  /* Disk II Controller Card, cycle-accurate version */
+	SLOT_INTERFACE("diskiing13", A2BUS_DISKIING13)  /* Disk II Controller Card, cycle-accurate version */
 	SLOT_INTERFACE("mockingboard", A2BUS_MOCKINGBOARD)  /* Sweet Micro Systems Mockingboard */
 	SLOT_INTERFACE("phasor", A2BUS_PHASOR)  /* Applied Engineering Phasor */
 	SLOT_INTERFACE("cffa2", A2BUS_CFFA2)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
