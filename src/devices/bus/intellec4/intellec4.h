@@ -286,6 +286,6 @@ private:
 DECLARE_DEVICE_TYPE_NS(INTELLEC4_UNIV_SLOT, bus::intellec4, univ_slot_device)
 DECLARE_DEVICE_TYPE_NS(INTELLEC4_UNIV_BUS,  bus::intellec4, univ_bus_device)
 
-SLOT_INTERFACE_EXTERN( intellec4_univ_cards );
+void intellec4_univ_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_INTELLEC4_INTELLEC4_H

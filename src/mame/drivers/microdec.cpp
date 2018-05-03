@@ -173,9 +173,10 @@ void microdec_state::machine_reset()
 	m_maincpu->set_input_line_vector(0, 0x7f);
 }
 
-static SLOT_INTERFACE_START( microdec_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void microdec_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 DRIVER_INIT_MEMBER( microdec_state, microdec )
 {

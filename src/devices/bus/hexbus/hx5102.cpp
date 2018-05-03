@@ -614,9 +614,10 @@ FLOPPY_FORMATS_END
     Only one fixed floppy drive in the device.
     External connectors are available, though.
 */
-static SLOT_INTERFACE_START( hx5102_drive )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void hx5102_drive(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 /*
     HX5102 configuration

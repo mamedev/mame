@@ -416,9 +416,10 @@ void at_state::cfg_single_360K(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-static SLOT_INTERFACE_START( pci_devices )
-	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
-SLOT_INTERFACE_END
+static void pci_devices(device_slot_interface &device)
+{
+	device.option_add_internal("vt82c505", VT82C505);
+}
 
 MACHINE_CONFIG_START(at_state::ibm5170)
 	/* basic machine hardware */

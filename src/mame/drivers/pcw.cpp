@@ -1240,9 +1240,10 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT( 0xff, 0x00,    IPT_UNUSED)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START( pcw_floppies )
-	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
-SLOT_INTERFACE_END
+static void pcw_floppies(device_slot_interface &device)
+{
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
 
 /* PCW8256, PCW8512, PCW9256 */
 MACHINE_CONFIG_START(pcw_state::pcw)

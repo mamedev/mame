@@ -934,20 +934,23 @@ WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
 	m_centronics->write_strobe(!state);
 }
 
-static SLOT_INTERFACE_START( bullet_525_floppies )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void bullet_525_floppies(device_slot_interface &device)
+{
+	device.option_add("525sd", FLOPPY_525_SD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
-static SLOT_INTERFACE_START( bullet_8_floppies )
-	SLOT_INTERFACE( "8dssd", FLOPPY_8_DSSD )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void bullet_8_floppies(device_slot_interface &device)
+{
+	device.option_add("8dssd", FLOPPY_8_DSSD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
-static SLOT_INTERFACE_START( bullet_35_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void bullet_35_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 WRITE_LINE_MEMBER( bullet_state::fdc_drq_w )
 {
@@ -1165,7 +1168,7 @@ MACHINE_CONFIG_START(bullet_state::bullet)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
@@ -1246,7 +1249,7 @@ MACHINE_CONFIG_START(bulletf_state::bulletf)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))

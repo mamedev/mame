@@ -469,9 +469,10 @@ WRITE_LINE_MEMBER(osbexec_state::comm_clk_a_w)
  *
  */
 
-static SLOT_INTERFACE_START( osborne2_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void osborne2_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 
 TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)

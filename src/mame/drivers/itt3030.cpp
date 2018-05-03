@@ -661,10 +661,11 @@ FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
 FLOPPY_FORMATS_END
 
 
-static SLOT_INTERFACE_START( itt3030_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void itt3030_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 

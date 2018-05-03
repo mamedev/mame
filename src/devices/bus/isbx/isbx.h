@@ -147,7 +147,7 @@ protected:
 DECLARE_DEVICE_TYPE(ISBX_SLOT, isbx_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( isbx_cards );
+void isbx_cards(device_slot_interface &device);
 
 
 #endif // MAME_BUS_ISBX_ISBX_SLOT_H

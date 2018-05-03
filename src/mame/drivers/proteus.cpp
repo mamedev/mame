@@ -313,9 +313,10 @@ FLOPPY_FORMATS_MEMBER(proteus_state::floppy_formats)
 	FLOPPY_POLY_CPM_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(proteus_floppies)
-	SLOT_INTERFACE("8dssd", FLOPPY_8_DSSD) // Shugart SA-860
-SLOT_INTERFACE_END
+static void proteus_floppies(device_slot_interface &device)
+{
+	device.option_add("8dssd", FLOPPY_8_DSSD); // Shugart SA-860
+}
 
 
 MACHINE_CONFIG_START(proteus_state::proteus)

@@ -113,7 +113,7 @@ MACHINE_CONFIG_START(ss50_mpc_device::device_add_mconfig)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(WRITELINE(ss50_mpc_device, serial_input_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_INPUT_MERGER_ALL_HIGH("outgate")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))

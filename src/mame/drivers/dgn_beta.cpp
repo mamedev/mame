@@ -314,9 +314,10 @@ FLOPPY_FORMATS_MEMBER(dgn_beta_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( dgnbeta_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void dgnbeta_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	/* basic machine hardware */

@@ -686,9 +686,10 @@ void c1pmf_state::machine_start()
 
 // disk format: 1 head, 36 tracks (? - manual displays a directory listing with 40 tracks),
 // 10 sectors, 256 byte sector length, first sector id 0
-static SLOT_INTERFACE_START( osi_floppies )
-	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
-SLOT_INTERFACE_END
+static void osi_floppies(device_slot_interface &device)
+{
+	device.option_add("ssdd", FLOPPY_525_SSDD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout osi_charlayout =

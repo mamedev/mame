@@ -175,9 +175,10 @@ void magtouch_state::machine_start()
 	machine().device<nvram_device>("nvram")->set_base(memshare("nvram")->ptr(), 0x2000);
 }
 
-static SLOT_INTERFACE_START( magtouch_isa8_cards )
-	SLOT_INTERFACE("sb15",  ISA8_SOUND_BLASTER_1_5)
-SLOT_INTERFACE_END
+static void magtouch_isa8_cards(device_slot_interface &device)
+{
+	device.option_add("sb15",  ISA8_SOUND_BLASTER_1_5);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( magtouch_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
@@ -224,8 +225,8 @@ MACHINE_CONFIG_START(magtouch_state::magtouch)
 	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
 
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", magtouch_isa8_cards, "sb15", true)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("sb15", magtouch_sb_def)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("sb15", magtouch_sb_conf)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("sb15", magtouch_sb_def)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("sb15", magtouch_sb_conf)
 MACHINE_CONFIG_END
 
 

@@ -141,13 +141,15 @@ static INPUT_PORTS_START( pcat_dyn )
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_COIN1)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(pcat_dyn_com)
-	SLOT_INTERFACE("msmouse", MSYSTEM_SERIAL_MOUSE)
-SLOT_INTERFACE_END
+static void pcat_dyn_com(device_slot_interface &device)
+{
+	device.option_add("msmouse", MSYSTEM_SERIAL_MOUSE);
+}
 
-static SLOT_INTERFACE_START( pcat_dyn_isa8_cards )
-	SLOT_INTERFACE("sb15",  ISA8_SOUND_BLASTER_1_5)
-SLOT_INTERFACE_END
+static void pcat_dyn_isa8_cards(device_slot_interface &device)
+{
+	device.option_add("sb15",  ISA8_SOUND_BLASTER_1_5);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( pcat_dyn_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
@@ -215,8 +217,8 @@ MACHINE_CONFIG_START(pcat_dyn_state::pcat_dyn)
 	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
 
 	MCFG_ISA8_SLOT_ADD("isa", "isa1", pcat_dyn_isa8_cards, "sb15", true)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("sb15", pcat_dyn_sb_def)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("sb15", pcat_dyn_sb_conf)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("sb15", pcat_dyn_sb_def)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("sb15", pcat_dyn_sb_conf)
 MACHINE_CONFIG_END
 
 /***************************************

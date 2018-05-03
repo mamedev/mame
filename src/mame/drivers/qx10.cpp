@@ -381,9 +381,10 @@ QUICKLOAD_LOAD_MEMBER( qx10_state, qx10 )
     FDD
 */
 
-static SLOT_INTERFACE_START( qx10_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void qx10_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
 {
@@ -721,9 +722,10 @@ void qx10_state::upd7220_map(address_map &map)
 	map(0x00000, 0x3ffff).rw(this, FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w));
 }
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("qx10", QX10_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("qx10", QX10_KEYBOARD);
+}
 
 MACHINE_CONFIG_START(qx10_state::qx10)
 	/* basic machine hardware */

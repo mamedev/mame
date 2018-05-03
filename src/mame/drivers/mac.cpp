@@ -884,39 +884,43 @@ static const applefdc_interface mac_iwm_interface =
 	sony_read_status
 };
 
-static SLOT_INTERFACE_START(mac_nubus_cards)
-	SLOT_INTERFACE("m2video", NUBUS_M2VIDEO)    /* Apple Macintosh II Video Card */
-	SLOT_INTERFACE("48gc", NUBUS_48GC)      /* Apple 4*8 Graphics Card */
-	SLOT_INTERFACE("824gc", NUBUS_824GC)    /* Apple 8*24 Graphics Card */
-	SLOT_INTERFACE("cb264", NUBUS_CB264)    /* RasterOps ColorBoard 264 */
-	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)    /* Moniterm Viking board */
-	SLOT_INTERFACE("image", NUBUS_IMAGE)    /* Disk Image Pseudo-Card */
-	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)    /* SuperMac Spectrum PDQ */
-	SLOT_INTERFACE("m2hires", NUBUS_M2HIRES)    /* Apple Macintosh II Hi-Resolution Card */
-	SLOT_INTERFACE("spec8s3", NUBUS_SPEC8S3)    /* SuperMac Spectrum/8 Series III */
-//  SLOT_INTERFACE("thundergx", NUBUS_THUNDERGX)        /* Radius Thunder GX (not yet) */
-	SLOT_INTERFACE("radiustpd", NUBUS_RADIUSTPD)        /* Radius Two Page Display */
-	SLOT_INTERFACE("asmc3nb", NUBUS_ASNTMC3NB)  /* Asante MC3NB Ethernet card */
-	SLOT_INTERFACE("portrait", NUBUS_WSPORTRAIT)    /* Apple Macintosh II Portrait video card */
-	SLOT_INTERFACE("enetnb", NUBUS_APPLEENET)   /* Apple NuBus Ethernet */
-	SLOT_INTERFACE("bootbug", NUBUS_BOOTBUG)    /* Brigent BootBug debugger card */
-	SLOT_INTERFACE("quadralink", NUBUS_QUADRALINK)  /* AE Quadralink serial card */
-SLOT_INTERFACE_END
+static void mac_nubus_cards(device_slot_interface &device)
+{
+	device.option_add("m2video", NUBUS_M2VIDEO);    /* Apple Macintosh II Video Card */
+	device.option_add("48gc", NUBUS_48GC);      /* Apple 4*8 Graphics Card */
+	device.option_add("824gc", NUBUS_824GC);    /* Apple 8*24 Graphics Card */
+	device.option_add("cb264", NUBUS_CB264);    /* RasterOps ColorBoard 264 */
+	device.option_add("vikbw", NUBUS_VIKBW);    /* Moniterm Viking board */
+	device.option_add("image", NUBUS_IMAGE);    /* Disk Image Pseudo-Card */
+	device.option_add("specpdq", NUBUS_SPECPDQ);    /* SuperMac Spectrum PDQ */
+	device.option_add("m2hires", NUBUS_M2HIRES);    /* Apple Macintosh II Hi-Resolution Card */
+	device.option_add("spec8s3", NUBUS_SPEC8S3);    /* SuperMac Spectrum/8 Series III */
+//  device.option_add("thundergx", NUBUS_THUNDERGX);        /* Radius Thunder GX (not yet) */
+	device.option_add("radiustpd", NUBUS_RADIUSTPD);        /* Radius Two Page Display */
+	device.option_add("asmc3nb", NUBUS_ASNTMC3NB);  /* Asante MC3NB Ethernet card */
+	device.option_add("portrait", NUBUS_WSPORTRAIT);    /* Apple Macintosh II Portrait video card */
+	device.option_add("enetnb", NUBUS_APPLEENET);   /* Apple NuBus Ethernet */
+	device.option_add("bootbug", NUBUS_BOOTBUG);    /* Brigent BootBug debugger card */
+	device.option_add("quadralink", NUBUS_QUADRALINK);  /* AE Quadralink serial card */
+}
 
-static SLOT_INTERFACE_START(mac_pds030_cards)
-	SLOT_INTERFACE("cb264", PDS030_CB264SE30)   // RasterOps Colorboard 264/SE30
-	SLOT_INTERFACE("pc816", PDS030_PROCOLOR816) // Lapis ProColor Server 8*16 PDS
-	SLOT_INTERFACE("lview", PDS030_LVIEW)       // Sigma Designs L-View
-	SLOT_INTERFACE("30hr",  PDS030_XCEED30HR)   // Micron/XCEED Technology Color 30HR
-	SLOT_INTERFACE("mc30",  PDS030_XCEEDMC30)   // Micron/XCEED Technology MacroColor 30
-SLOT_INTERFACE_END
+static void mac_pds030_cards(device_slot_interface &device)
+{
+	device.option_add("cb264", PDS030_CB264SE30);   // RasterOps Colorboard 264/SE30
+	device.option_add("pc816", PDS030_PROCOLOR816); // Lapis ProColor Server 8*16 PDS
+	device.option_add("lview", PDS030_LVIEW);       // Sigma Designs L-View
+	device.option_add("30hr",  PDS030_XCEED30HR);   // Micron/XCEED Technology Color 30HR
+	device.option_add("mc30",  PDS030_XCEEDMC30);   // Micron/XCEED Technology MacroColor 30
+}
 
-static SLOT_INTERFACE_START(mac_sepds_cards)
-	SLOT_INTERFACE("radiusfpd", PDS_SEDISPLAY)  // Radius Full Page Display card for SE
-SLOT_INTERFACE_END
+static void mac_sepds_cards(device_slot_interface &device)
+{
+	device.option_add("radiusfpd", PDS_SEDISPLAY);  // Radius Full Page Display card for SE
+}
 
-static SLOT_INTERFACE_START(mac_lcpds_cards)
-SLOT_INTERFACE_END
+static void mac_lcpds_cards(device_slot_interface &device)
+{
+}
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -954,7 +958,7 @@ MACHINE_CONFIG_START(mac_state::mac512ke)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_PWM, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // 2 x ls161
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))

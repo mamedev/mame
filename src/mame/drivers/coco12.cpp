@@ -350,30 +350,32 @@ INPUT_PORTS_END
 //  SLOT_INTERFACE_START(coco_cart)
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( coco_cart )
-	SLOT_INTERFACE("fdc", COCO_FDC)
-	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
-	SLOT_INTERFACE("cc2hdb1", COCO2_HDB1)
-	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
-	SLOT_INTERFACE("cp450_fdc", CP450_FDC)
-	SLOT_INTERFACE("cd6809_fdc", CD6809_FDC)
-	SLOT_INTERFACE("rs232", COCO_RS232)
-	SLOT_INTERFACE("dcmodem", COCO_DCMODEM)
-	SLOT_INTERFACE("orch90", COCO_ORCH90)
-	SLOT_INTERFACE("ssc", COCO_SSC)                 MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
-	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
-	SLOT_INTERFACE("pak", COCO_PAK)
-	SLOT_INTERFACE("multi", COCO_MULTIPAK)          MCFG_SLOT_OPTION_CLOCK("multi", DERIVED_CLOCK(1, 1))
-SLOT_INTERFACE_END
+void coco_cart(device_slot_interface &device)
+{
+	device.option_add("fdc", COCO_FDC);
+	device.option_add("fdcv11", COCO_FDC_V11);
+	device.option_add("cc2hdb1", COCO2_HDB1);
+	device.option_add("cc3hdb1", COCO3_HDB1);
+	device.option_add("cp450_fdc", CP450_FDC);
+	device.option_add("cd6809_fdc", CD6809_FDC);
+	device.option_add("rs232", COCO_RS232);
+	device.option_add("dcmodem", COCO_DCMODEM);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("ssc", COCO_SSC).clock(DERIVED_CLOCK(1, 1));
+	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("banked_16k", COCO_PAK_BANKED);
+	device.option_add("pak", COCO_PAK);
+	device.option_add("multi", COCO_MULTIPAK).clock(DERIVED_CLOCK(1, 1));
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE_START(t4426_cart)
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( t4426_cart )
-	SLOT_INTERFACE("t4426", COCO_T4426)
-SLOT_INTERFACE_END
+void t4426_cart(device_slot_interface &device)
+{
+	device.option_add("t4426", COCO_T4426);
+}
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_START( coco_sound )
@@ -385,7 +387,7 @@ MACHINE_CONFIG_START(coco_state::coco_sound)
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
 	MCFG_SOUND_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// Single-bit sound: R22 = 10K
 	MCFG_SOUND_ADD("sbs", DAC_1BIT, 0)
@@ -471,7 +473,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "printer")
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(PIA1_TAG, pia6821_device, ca1_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("printer", printer)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("printer", printer)
 
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "pak")
 	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))

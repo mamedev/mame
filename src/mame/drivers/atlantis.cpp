@@ -880,7 +880,7 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, dsr_w))
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, cts_w))
-	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("com1", mwskins_comm)
+	//MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("com1", mwskins_comm)
 
 	MCFG_RS232_PORT_ADD("com2", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2", ins8250_uart_device, rx_w))

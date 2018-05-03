@@ -179,6 +179,6 @@ protected:
 DECLARE_DEVICE_TYPE(PLUS4_EXPANSION_SLOT, plus4_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( plus4_expansion_cards );
+void plus4_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_PLUS4_EXP_H

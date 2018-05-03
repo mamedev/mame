@@ -419,9 +419,10 @@ WRITE_LINE_MEMBER( aussiebyte_state::fdc_drq_w )
 		m_dma->rdy_w(state);
 }
 
-static SLOT_INTERFACE_START( aussiebyte_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void aussiebyte_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 /***********************************************************

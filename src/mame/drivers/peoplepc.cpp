@@ -218,17 +218,19 @@ void peoplepc_state::peoplepc_io(address_map &map)
 	map(0x0070, 0x0070).w(this, FUNC(peoplepc_state::dmapg_w));
 }
 
-static SLOT_INTERFACE_START( peoplepc_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void peoplepc_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 FLOPPY_FORMATS_MEMBER( peoplepc_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-SLOT_INTERFACE_START( peoplepc_keyboard_devices )
-	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
-SLOT_INTERFACE_END
+void peoplepc_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("keyboard", SERIAL_KEYBOARD);
+}
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
@@ -296,7 +298,7 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 
 	MCFG_RS232_PORT_ADD("kbd", peoplepc_keyboard_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_0", i8251_device, write_rxd))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
 MACHINE_CONFIG_END

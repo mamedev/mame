@@ -179,9 +179,10 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static SLOT_INTERFACE_START( pulsar_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pulsar_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( pulsar )
@@ -236,7 +237,7 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart", z80dart_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart", z80dart_device, ctsa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800))
 	// Schematic has the labels for FT and FR the wrong way around, but the pin numbers are correct.

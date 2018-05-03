@@ -1169,17 +1169,20 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 //  FLOPPY - Drive definitions
 //**************************************************************************
 
-static SLOT_INTERFACE_START( alphatp2_floppies ) // two BASF 2471 drives
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
-SLOT_INTERFACE_END
+static void alphatp2_floppies(device_slot_interface &device) // two BASF 2471 drives
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
-static SLOT_INTERFACE_START( alphatp2su_floppies )
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void alphatp2su_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START( alphatp3_floppies ) // P3:  two BASF 6106 drives
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)       // P30: two Shugart SA465-3AA drives
-SLOT_INTERFACE_END
+static void alphatp3_floppies(device_slot_interface &device) // P3:  two BASF 6106 drives
+{
+	device.option_add("525qd", FLOPPY_525_QD);       // P30: two Shugart SA465-3AA drives
+}
 
 //**************************************************************************
 //  MACHINE - Alphatronic P1, P2, P2S, P2U and Hell 2069

@@ -486,10 +486,11 @@ void pcxt_state::machine_reset()
 	m_lastvalue = -1;
 }
 
-static SLOT_INTERFACE_START( filetto_isa8_cards )
-	SLOT_INTERFACE_INTERNAL("filetto",  ISA8_CGA_FILETTO)
-	SLOT_INTERFACE_INTERNAL("tetriskr", ISA8_CGA_TETRISKR)
-SLOT_INTERFACE_END
+static void filetto_isa8_cards(device_slot_interface &device)
+{
+	device.option_add_internal("filetto",  ISA8_CGA_FILETTO);
+	device.option_add_internal("tetriskr", ISA8_CGA_TETRISKR);
+}
 
 
 MACHINE_CONFIG_START(pcxt_state::filetto)

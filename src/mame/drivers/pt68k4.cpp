@@ -156,9 +156,10 @@ FLOPPY_FORMATS_MEMBER( pt68k4_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pt68k_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void pt68k_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 // XT keyboard interface - done in TTL instead of an 804x
 WRITE_LINE_MEMBER(pt68k4_state::keyboard_clock_w)
@@ -389,16 +390,17 @@ WRITE_LINE_MEMBER(pt68k4_state::duart2_irq)
 }
 
 // these are cards supported by the HUMBUG and Monk BIOSes
-SLOT_INTERFACE_START( pt68k4_isa8_cards )
-	SLOT_INTERFACE("mda", ISA8_MDA)
-	SLOT_INTERFACE("cga", ISA8_CGA)
-	SLOT_INTERFACE("ega", ISA8_EGA) // Monk only
-	SLOT_INTERFACE("vga", ISA8_VGA) // Monk only
-	SLOT_INTERFACE("fdc_at", ISA8_FDC_AT)
-	SLOT_INTERFACE("wdxt_gen", ISA8_WDXT_GEN)
-	SLOT_INTERFACE("lpt", ISA8_LPT)
-	SLOT_INTERFACE("xtide", ISA8_XTIDE) // Monk only
-SLOT_INTERFACE_END
+void pt68k4_isa8_cards(device_slot_interface &device)
+{
+	device.option_add("mda", ISA8_MDA);
+	device.option_add("cga", ISA8_CGA);
+	device.option_add("ega", ISA8_EGA); // Monk only
+	device.option_add("vga", ISA8_VGA); // Monk only
+	device.option_add("fdc_at", ISA8_FDC_AT);
+	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
+	device.option_add("lpt", ISA8_LPT);
+	device.option_add("xtide", ISA8_XTIDE); // Monk only
+}
 
 MACHINE_CONFIG_START(pt68k4_state::pt68k2)
 	/* basic machine hardware */

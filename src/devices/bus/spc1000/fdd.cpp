@@ -71,9 +71,10 @@ void spc1000_fdd_exp_device::sd725_io(address_map &map)
 	map(0xfc, 0xff).rw("d8255_master", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-static SLOT_INTERFACE_START( sd725_floppies )
-	SLOT_INTERFACE("sd320", EPSON_SD_320)
-SLOT_INTERFACE_END
+static void sd725_floppies(device_slot_interface &device)
+{
+	device.option_add("sd320", EPSON_SD_320);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig

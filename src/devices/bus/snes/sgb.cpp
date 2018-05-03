@@ -154,10 +154,11 @@ WRITE8_MEMBER( sns_rom_sgb_device::gb_timer_callback )
 }
 
 
-static SLOT_INTERFACE_START(supergb_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  GB_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_mbc1",  GB_ROM_MBC1)
-SLOT_INTERFACE_END
+static void supergb_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  GB_STD_ROM);
+	device.option_add_internal("rom_mbc1",  GB_ROM_MBC1);
+}
 
 
 MACHINE_CONFIG_START(sns_rom_sgb1_device::device_add_mconfig)

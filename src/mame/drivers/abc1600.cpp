@@ -775,9 +775,10 @@ WRITE8_MEMBER( abc1600_state::cio_pc_w )
 	m_nvram->sk_w(clock);
 }
 
-static SLOT_INTERFACE_START( abc1600_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void abc1600_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 WRITE_LINE_MEMBER( abc1600_state::fdc_drq_w )
 {

@@ -105,11 +105,12 @@ PALETTE_INIT_MEMBER(wscolor_state, wscolor)
 	}
 }
 
-static SLOT_INTERFACE_START(wswan_cart)
-	SLOT_INTERFACE_INTERNAL("ws_rom",     WS_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("ws_sram",    WS_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("ws_eeprom",  WS_ROM_EEPROM)
-SLOT_INTERFACE_END
+static void wswan_cart(device_slot_interface &device)
+{
+	device.option_add_internal("ws_rom",     WS_ROM_STD);
+	device.option_add_internal("ws_sram",    WS_ROM_SRAM);
+	device.option_add_internal("ws_eeprom",  WS_ROM_EEPROM);
+}
 
 MACHINE_CONFIG_START(wswan_state::wswan)
 	/* Basic machine hardware */

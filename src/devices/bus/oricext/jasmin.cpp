@@ -15,9 +15,10 @@ FLOPPY_FORMATS_MEMBER( jasmin_device::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( jasmin_floppies )
-	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
-SLOT_INTERFACE_END
+static void jasmin_floppies(device_slot_interface &device)
+{
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
 
 INPUT_PORTS_START( jasmin )
 	PORT_START("JASMIN")

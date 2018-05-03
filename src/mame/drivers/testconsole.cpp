@@ -185,16 +185,16 @@ MACHINE_CONFIG_START(whouse_testcons_state::whousetc)
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 
-	MCFG_DEVICE_ADD("dsp0", DL1416B, 0)
+	MCFG_DEVICE_ADD("dsp0", DL1416B, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<0>))
 
-	MCFG_DEVICE_ADD("dsp1", DL1416B, 0)
+	MCFG_DEVICE_ADD("dsp1", DL1416B, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<1>))
 
-	MCFG_DEVICE_ADD("dsp2", DL1416B, 0)
+	MCFG_DEVICE_ADD("dsp2", DL1416B, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<2>))
 
-	MCFG_DEVICE_ADD("dsp3", DL1416B, 0)
+	MCFG_DEVICE_ADD("dsp3", DL1416B, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(whouse_testcons_state, update_dsp<3>))
 
 	MCFG_DEFAULT_LAYOUT(layout_whousetc)

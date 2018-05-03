@@ -664,15 +664,16 @@ WRITE_LINE_MEMBER( mpz80_state::s100_nmi_w )
 //#include "bus/s100/nsmdsad.h"
 #include "bus/s100/wunderbus.h"
 
-static SLOT_INTERFACE_START( mpz80_s100_cards )
-	SLOT_INTERFACE("mm65k16s", S100_MM65K16S)
-	SLOT_INTERFACE("wunderbus", S100_WUNDERBUS)
-	SLOT_INTERFACE("dj2db", S100_DJ2DB)
-	SLOT_INTERFACE("djdma", S100_DJDMA)
-//  SLOT_INTERFACE("multio", S100_MULTIO)
-//  SLOT_INTERFACE("hdcdma", S100_HDCDMA)
-//  SLOT_INTERFACE("hdca", S100_HDCA)
-SLOT_INTERFACE_END
+static void mpz80_s100_cards(device_slot_interface &device)
+{
+	device.option_add("mm65k16s", S100_MM65K16S);
+	device.option_add("wunderbus", S100_WUNDERBUS);
+	device.option_add("dj2db", S100_DJ2DB);
+	device.option_add("djdma", S100_DJDMA);
+//  device.option_add("multio", S100_MULTIO);
+//  device.option_add("hdcdma", S100_HDCDMA);
+//  device.option_add("hdca", S100_HDCA);
+}
 
 
 

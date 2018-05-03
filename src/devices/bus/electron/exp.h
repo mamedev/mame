@@ -176,7 +176,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(ELECTRON_EXPANSION_SLOT, electron_expansion_slot_device)
 
-SLOT_INTERFACE_EXTERN( electron_expansion_devices );
+void electron_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_ELECTRON_EXP_H

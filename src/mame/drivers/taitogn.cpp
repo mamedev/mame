@@ -686,12 +686,13 @@ void taitogn_state::taitogn_mp_map(address_map &map)
 	map(0x1fa10100, 0x1fa10100).r(this, FUNC(taitogn_state::gnet_mahjong_panel_r));
 }
 
-SLOT_INTERFACE_START(slot_ataflash)
-	SLOT_INTERFACE("taitopccard1", TAITO_PCCARD1)
-	SLOT_INTERFACE("taitopccard2", TAITO_PCCARD2)
-	SLOT_INTERFACE("taitocf", TAITO_COMPACT_FLASH)
-	SLOT_INTERFACE("ataflash", ATA_FLASH_PCCARD)
-SLOT_INTERFACE_END
+void slot_ataflash(device_slot_interface &device)
+{
+	device.option_add("taitopccard1", TAITO_PCCARD1);
+	device.option_add("taitopccard2", TAITO_PCCARD2);
+	device.option_add("taitocf", TAITO_COMPACT_FLASH);
+	device.option_add("ataflash", ATA_FLASH_PCCARD);
+}
 
 MACHINE_CONFIG_START(taitogn_state::coh3002t)
 

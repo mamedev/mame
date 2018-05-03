@@ -480,9 +480,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 
 
 
-static SLOT_INTERFACE_START( mycom_floppies )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
-SLOT_INTERFACE_END
+static void mycom_floppies(device_slot_interface &device)
+{
+	device.option_add("525sd", FLOPPY_525_SD);
+}
 
 void mycom_state::machine_start()
 {

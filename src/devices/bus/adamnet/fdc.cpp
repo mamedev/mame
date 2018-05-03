@@ -117,9 +117,10 @@ FLOPPY_FORMATS_MEMBER( adam_fdc_device::floppy_formats )
 	FLOPPY_ADAM_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( adam_fdc_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void adam_fdc_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 
 //-------------------------------------------------

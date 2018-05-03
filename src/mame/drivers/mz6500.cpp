@@ -134,9 +134,10 @@ void mz6500_state::fdc_drq(bool state)
 	//printf("%02x DRQ\n",state);
 }
 
-static SLOT_INTERFACE_START( mz6500_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void mz6500_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 void mz6500_state::upd7220_map(address_map &map)
 {

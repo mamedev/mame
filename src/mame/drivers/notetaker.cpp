@@ -732,9 +732,10 @@ void notetaker_state::ep_io(address_map &map)
 /* Input ports */
 
 /* Floppy Image Interface */
-static SLOT_INTERFACE_START( notetaker_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void notetaker_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 /* Machine Start; allocate timers and savestate stuff */
 void notetaker_state::machine_start()
@@ -857,7 +858,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	// TODO: hook DAC up to two HA2425 (sample and hold) chips and hook those up to the speakers
 	MCFG_SOUND_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(notetaker_state,notetakr)

@@ -410,9 +410,10 @@ WRITE8_MEMBER( c2040_device::via_pb_w )
 //  SLOT_INTERFACE( c2040_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c2040_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
-SLOT_INTERFACE_END
+static void c2040_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
 
 
 //-------------------------------------------------

@@ -439,9 +439,10 @@ FLOPPY_FORMATS_MEMBER(ti_fdc_device::floppy_formats)
 	FLOPPY_TI99_TDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( tifdc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void tifdc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 ROM_START( ti_fdc )
 	ROM_REGION(0x2000, TI99_DSRROM, 0)

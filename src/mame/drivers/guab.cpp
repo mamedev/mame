@@ -458,9 +458,10 @@ FLOPPY_FORMATS_MEMBER( guab_state::floppy_formats )
 	FLOPPY_GUAB_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( guab_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void guab_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 
 //**************************************************************************
@@ -532,7 +533,7 @@ MACHINE_CONFIG_START(guab_state::guab)
 	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", acia_1_rs232_defaults)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", acia_1_rs232_defaults)
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600) // source? the ptm doesn't seem to output any common baud values
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_txc))

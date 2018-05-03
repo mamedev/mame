@@ -445,9 +445,10 @@ static INPUT_PORTS_START( goupil_g1 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START( goupil_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void goupil_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 void goupil_g1_state::machine_start()
 {

@@ -621,10 +621,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
 	m_ctc->trg2(0);
 }
 
-static SLOT_INTERFACE_START( trs80m2_floppies )
-	SLOT_INTERFACE( "8ssdd", FLOPPY_8_SSDD ) // Shugart SA-800
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD ) // Shugart SA-850
-SLOT_INTERFACE_END
+static void trs80m2_floppies(device_slot_interface &device)
+{
+	device.option_add("8ssdd", FLOPPY_8_SSDD); // Shugart SA-800
+	device.option_add("8dsdd", FLOPPY_8_DSDD); // Shugart SA-850
+}
 
 
 //-------------------------------------------------

@@ -178,7 +178,7 @@ MACHINE_CONFIG_START(mice_state::mice)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
 
 	MCFG_DEVICE_ADD("rpt", I8155, 6.144_MHz_XTAL / 2)
 	MCFG_I8155_IN_PORTC_CB(IOPORT("BAUD"))
@@ -195,7 +195,7 @@ MACHINE_CONFIG_START(mice_state::mice2)
 	MCFG_CPU_IO_MAP(mice2_io)
 
 	MCFG_DEVICE_MODIFY("rs232")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", mice2_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", mice2_terminal)
 
 	MCFG_DEVICE_ADD("rttppi1", I8255, 0)
 	MCFG_DEVICE_ADD("rttppi2", I8255, 0)

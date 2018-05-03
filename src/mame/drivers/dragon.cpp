@@ -164,16 +164,17 @@ MC6847_GET_CHARROM_MEMBER( dragon200e_state::char_rom_r )
 	return m_char_rom->base()[(ch * 12 + line) & 0xfff];
 }
 
-SLOT_INTERFACE_START( dragon_cart )
-	SLOT_INTERFACE("dragon_fdc", DRAGON_FDC)
-	SLOT_INTERFACE("premier_fdc", PREMIER_FDC)
-	SLOT_INTERFACE("sdtandy_fdc", SDTANDY_FDC)
-	SLOT_INTERFACE("jcbsnd", DRAGON_JCBSND)     MCFG_SLOT_OPTION_CLOCK("jcbsnd", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE("ssc", COCO_SSC)             MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE("orch90", COCO_ORCH90)
-	SLOT_INTERFACE("gmc", COCO_PAK_GMC)
-	SLOT_INTERFACE("pak", COCO_PAK)
-SLOT_INTERFACE_END
+void dragon_cart(device_slot_interface &device)
+{
+	device.option_add("dragon_fdc", DRAGON_FDC);
+	device.option_add("premier_fdc", PREMIER_FDC);
+	device.option_add("sdtandy_fdc", SDTANDY_FDC);
+	device.option_add("jcbsnd", DRAGON_JCBSND).clock(DERIVED_CLOCK(1, 1));
+	device.option_add("ssc", COCO_SSC).clock(DERIVED_CLOCK(1, 1));
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("gmc", COCO_PAK_GMC);
+	device.option_add("pak", COCO_PAK);
+}
 
 FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
 	FLOPPY_VDK_FORMAT,
@@ -181,9 +182,10 @@ FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
 	FLOPPY_SDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( dragon_alpha_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void dragon_alpha_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 MACHINE_CONFIG_START(dragon_state::dragon_base)
 	MCFG_DEVICE_MODIFY(":")

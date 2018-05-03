@@ -26,11 +26,6 @@ namespace emu { namespace detail {
 
 template <typename Delegate> struct devcb_delegate_initialiser
 {
-	template <typename T> struct is_device_implementation
-	{ static constexpr bool value = std::is_base_of<device_t, T>::value; };
-	template <typename T> struct is_device_interface
-	{ static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value; };
-
 	devcb_delegate_initialiser(char const *tag, Delegate &&delegate) : m_base(nullptr), m_delegate(std::move(delegate))
 	{
 	}
@@ -53,9 +48,9 @@ template <typename Delegate> struct devcb_delegate_initialiser
 
 inline char const *devcb_delegate_get_tag(char const *tag) { return tag; }
 template <typename T>
-inline std::enable_if_t<devcb_delegate_initialiser<bool>::is_device_implementation<T>::value, char const *> devcb_delegate_get_tag(T &device) { return DEVICE_SELF; }
+inline std::enable_if_t<is_device_implementation<T>::value, char const *> devcb_delegate_get_tag(T &device) { return DEVICE_SELF; }
 template <typename T>
-inline std::enable_if_t<devcb_delegate_initialiser<bool>::is_device_interface<T>::value, char const *> devcb_delegate_get_tag(T &interface) { return DEVICE_SELF; }
+inline std::enable_if_t<is_device_interface<T>::value, char const *> devcb_delegate_get_tag(T &interface) { return DEVICE_SELF; }
 template <typename DeviceClass, bool Required>
 inline char const *devcb_delegate_get_tag(device_finder<DeviceClass, Required> const &finder) { return finder.finder_tag(); }
 
@@ -191,14 +186,12 @@ protected:
 
 	template <callback_type Type> struct tag_desc
 	{
-		constexpr tag_desc(device_t *base, char const *tag) : m_base(base), m_tag(tag) { }
 		device_t *m_base;
 		char const *m_tag;
 	};
 
 	template <callback_type Type> struct line_desc
 	{
-		constexpr line_desc(device_t *base, char const *tag, int inputnum) : m_base(base), m_tag(tag), m_inputnum(inputnum) { }
 		device_t *m_base;
 		char const *m_tag;
 		int m_inputnum;

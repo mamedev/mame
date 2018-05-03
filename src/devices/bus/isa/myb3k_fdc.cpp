@@ -76,18 +76,21 @@ FLOPPY_FORMATS_MEMBER( isa8_myb3k_fdc4711_device::myb3k_floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( myb3k_sd_floppies )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
-SLOT_INTERFACE_END
+static void myb3k_sd_floppies(device_slot_interface &device)
+{
+	device.option_add("525sd", FLOPPY_525_SD);
+}
 
-static SLOT_INTERFACE_START( myb3k_qd_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void myb3k_qd_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 #if 0
-static SLOT_INTERFACE_START( myb3k_8inch_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void myb3k_8inch_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 #endif
 
 //-------------------------------------------------

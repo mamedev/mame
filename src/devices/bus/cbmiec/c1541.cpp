@@ -754,9 +754,10 @@ WRITE_LINE_MEMBER( c1541_device_base::byte_w )
 //  SLOT_INTERFACE( c1540_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c1540_floppies )
-	SLOT_INTERFACE( "525ssqd", ALPS_3255190X )
-SLOT_INTERFACE_END
+static void c1540_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", ALPS_3255190X);
+}
 
 
 //-------------------------------------------------

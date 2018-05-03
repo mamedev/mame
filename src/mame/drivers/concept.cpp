@@ -201,11 +201,12 @@ INPUT_PORTS_END
 /* init with simple, fixed, B/W palette */
 /* Is the palette black on white or white on black??? */
 
-SLOT_INTERFACE_START( concept_a2_cards )
-	SLOT_INTERFACE("fchdd", A2BUS_CORVUS)  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
-	SLOT_INTERFACE("fdc01", A2BUS_CORVFDC01)    /* Corvus WD1793 floppy controller */
-	SLOT_INTERFACE("fdc02", A2BUS_CORVFDC02)    /* Corvus NEC765 buffered floppy controller */
-SLOT_INTERFACE_END
+void concept_a2_cards(device_slot_interface &device)
+{
+	device.option_add("fchdd", A2BUS_CORVUS);       // Corvus flat-cable HDD interface (see notes in a2corvus.c)
+	device.option_add("fdc01", A2BUS_CORVFDC01);    // Corvus WD1793 floppy controller
+	device.option_add("fdc02", A2BUS_CORVFDC02);    // Corvus NEC765 buffered floppy controller
+}
 
 
 

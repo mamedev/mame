@@ -219,12 +219,13 @@ void fdc37c93x_device::update_dreq_mapping(int dreq, int logical)
 	dreq_mapping[dreq] = logical;
 }
 
-static SLOT_INTERFACE_START(pc_hd_floppies)
-	SLOT_INTERFACE("525hd", FLOPPY_525_HD)
-	SLOT_INTERFACE("35hd", FLOPPY_35_HD)
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void pc_hd_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 FLOPPY_FORMATS_MEMBER(fdc37c93x_device::floppy_formats)
 	FLOPPY_PC_FORMAT,

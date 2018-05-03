@@ -189,15 +189,16 @@ void mtxl_state::machine_reset()
 }
 
 #ifndef REAL_PCI_CHIPSET
-static SLOT_INTERFACE_START(mt6k_ata_devices)
-	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
-SLOT_INTERFACE_END
+static void mt6k_ata_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+}
 
 void mtxl_state::cdrom(device_t *device)
 {
 	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
 	ide0->option_reset();
-	SLOT_INTERFACE_NAME(mt6k_ata_devices)(device->subdevice("ide:0"));
+	mt6k_ata_devices(*ide0);
 	ide0->set_default_option("cdrom");
 	ide0->set_fixed(true);
 

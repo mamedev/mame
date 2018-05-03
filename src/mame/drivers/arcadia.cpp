@@ -464,10 +464,11 @@ void arcadia_state::machine_start()
 	}
 }
 
-static SLOT_INTERFACE_START(arcadia_cart)
-	SLOT_INTERFACE_INTERNAL("std",      ARCADIA_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("golf",     ARCADIA_ROM_GOLF)
-SLOT_INTERFACE_END
+static void arcadia_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",      ARCADIA_ROM_STD);
+	device.option_add_internal("golf",     ARCADIA_ROM_GOLF);
+}
 
 
 MACHINE_CONFIG_START(arcadia_state::arcadia)

@@ -760,9 +760,10 @@ QUICKLOAD_LOAD_MEMBER( tvc_state, tvc64)
 }
 
 
-extern SLOT_INTERFACE_START(tvc_exp)
-	SLOT_INTERFACE("hbf", TVC_HBF)          // Videoton HBF floppy interface
-SLOT_INTERFACE_END
+void tvc_exp(device_slot_interface &device)
+{
+	device.option_add("hbf", TVC_HBF);      // Videoton HBF floppy interface
+}
 
 
 MACHINE_CONFIG_START(tvc_state::tvc)

@@ -1167,9 +1167,10 @@ void firebeat_state::cdrom_config(device_t *device)
 	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
-static SLOT_INTERFACE_START(firebeat_ata_devices)
-	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
-SLOT_INTERFACE_END
+static void firebeat_ata_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+}
 
 MACHINE_CONFIG_START(firebeat_state::firebeat)
 
@@ -1191,7 +1192,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, ata_interrupt))
 
 	MCFG_DEVICE_MODIFY("ata:1")
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "cdrom", cdrom_config )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
@@ -1248,7 +1249,7 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(firebeat_state, ata_interrupt))
 
 	MCFG_DEVICE_MODIFY("ata:1")
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "cdrom", cdrom_config )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")

@@ -216,6 +216,6 @@ protected:
 };
 
 
-SLOT_INTERFACE_EXTERN( centronics_devices );
+void centronics_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_CENTRONICS_CTRONICS_H

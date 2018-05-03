@@ -471,10 +471,11 @@ FLOPPY_FORMATS_MEMBER(interpro_state::floppy_formats)
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(interpro_floppies)
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("35hd", FLOPPY_35_HD)
-SLOT_INTERFACE_END
+static void interpro_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 MACHINE_CONFIG_START(interpro_state::interpro_scc1)
 	MCFG_DEVICE_MODIFY(INTERPRO_SCC1_TAG)
@@ -511,18 +512,21 @@ MACHINE_CONFIG_START(interpro_state::interpro_scc2)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INTERPRO_SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
-static SLOT_INTERFACE_START(interpro_scsi_devices)
-	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
-	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
-SLOT_INTERFACE_END
+static void interpro_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM);
+}
 
-static SLOT_INTERFACE_START(turquoise_scsi_devices)
-	SLOT_INTERFACE_INTERNAL(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A)
-SLOT_INTERFACE_END
+static void turquoise_scsi_devices(device_slot_interface &device)
+{
+	device.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A);
+}
 
-static SLOT_INTERFACE_START(sapphire_scsi_devices)
-	SLOT_INTERFACE_INTERNAL(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94)
-SLOT_INTERFACE_END
+static void sapphire_scsi_devices(device_slot_interface &device)
+{
+	device.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94);
+}
 
 void interpro_state::interpro_scsi_adapter(device_t *device)
 {
@@ -645,7 +649,7 @@ MACHINE_CONFIG_START(turquoise_state::turquoise)
 
 	// scsi controller
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", turquoise_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
 
 	// ethernet controller
 	MCFG_DEVICE_ADD(INTERPRO_ETH_TAG, I82586, 0)
@@ -697,7 +701,7 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 
 	// scsi controller
 	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", sapphire_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
 
 	// ethernet controller
 	MCFG_DEVICE_ADD(INTERPRO_ETH_TAG, I82596_LE16, XTAL(20'000'000))

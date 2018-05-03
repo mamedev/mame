@@ -1827,15 +1827,17 @@ const tiny_rom_entry *sega_network_board::device_rom_region() const
 	return ROM_NAME(seganetw);
 }
 
-static SLOT_INTERFACE_START(ide_baseboard)
-	SLOT_INTERFACE("bb", IDE_BASEBOARD)
-SLOT_INTERFACE_END
+static void ide_baseboard(device_slot_interface &device)
+{
+	device.option_add("bb", IDE_BASEBOARD);
+}
 
-SLOT_INTERFACE_START(usb_baseboard)
-	SLOT_INTERFACE("an2131qc", OHCI_HLEAN2131QC)
-	SLOT_INTERFACE("an2131sc", OHCI_HLEAN2131SC)
-	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
-SLOT_INTERFACE_END
+void usb_baseboard(device_slot_interface &device)
+{
+	device.option_add("an2131qc", OHCI_HLEAN2131QC);
+	device.option_add("an2131sc", OHCI_HLEAN2131SC);
+	device.option_add("xbox_controller", OHCI_GAME_CONTROLLER);
+}
 
 void chihiro_state::an2131qc_configuration(device_t *device)
 {

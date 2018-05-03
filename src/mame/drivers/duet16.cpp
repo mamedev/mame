@@ -333,13 +333,15 @@ static GFXDECODE_START(duet16)
 GFXDECODE_END
 
 
-static SLOT_INTERFACE_START( duet16_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void duet16_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
-SLOT_INTERFACE_START(duet16_keyboard_devices)
-	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
-SLOT_INTERFACE_END
+void duet16_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("keyboard", SERIAL_KEYBOARD);
+}
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
@@ -396,7 +398,7 @@ MACHINE_CONFIG_START(duet16_state::duet16)
 
 	MCFG_RS232_PORT_ADD("kbd", duet16_keyboard_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_rxd))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("pic", pic8259_device, ir5_w)) // INT2

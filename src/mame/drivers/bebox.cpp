@@ -116,9 +116,10 @@ FLOPPY_FORMATS_MEMBER( bebox_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( bebox_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void bebox_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 void bebox_state::mpc105_config(device_t *device)
 {
@@ -138,10 +139,11 @@ WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 	m_pic8259_1->ir1_w(state);
 }
 
-static SLOT_INTERFACE_START( pci_devices )
-	SLOT_INTERFACE_INTERNAL("mpc105", MPC105)
-	SLOT_INTERFACE("cirrus", PCI_CIRRUS_SVGA)
-SLOT_INTERFACE_END
+static void pci_devices(device_slot_interface &device)
+{
+	device.option_add("mpc105", MPC105);
+	device.option_add("cirrus", PCI_CIRRUS_SVGA);
+}
 
 MACHINE_CONFIG_START(bebox_state::bebox)
 	/* basic machine hardware */

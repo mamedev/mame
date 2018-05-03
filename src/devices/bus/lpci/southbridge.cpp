@@ -496,11 +496,12 @@ WRITE8_MEMBER( southbridge_device::at_dma8237_2_w )
   Extended Southbridge Device
 ***************************************************************************/
 
-static SLOT_INTERFACE_START(pc_isa_onboard)
-	SLOT_INTERFACE("comat", ISA8_COM_AT)
-	SLOT_INTERFACE("lpt", ISA8_LPT)
-	SLOT_INTERFACE("fdcsmc", ISA8_FDC_SMC)
-SLOT_INTERFACE_END
+static void pc_isa_onboard(device_slot_interface &device)
+{
+	device.option_add("comat", ISA8_COM_AT);
+	device.option_add("lpt", ISA8_LPT);
+	device.option_add("fdcsmc", ISA8_FDC_SMC);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

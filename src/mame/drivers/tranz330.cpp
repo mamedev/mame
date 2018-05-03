@@ -172,21 +172,17 @@ void tranz330_state::tranz330(machine_config &config)
 	m_ctc->set_zc_callback<2>(DEVCB_WRITELINE(tranz330_state, sound_w));
 	m_ctc->set_intr_callback(DEVCB_DEVWRITELINE("irq", input_merger_device, in_w<2>));
 
-	RS232_PORT(config, m_rs232, 0);
-	m_rs232->option_reset();
-	slot_options_default_rs232_devices(m_rs232);
-	m_rs232->set_default_option(nullptr);
-	m_rs232->set_fixed(false);
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->set_rxd_handler(DEVCB_DEVWRITELINE(m_dart, z80dart_device, rxb_w));
 	m_rs232->set_dcd_handler(DEVCB_DEVWRITELINE(m_dart, z80dart_device, dcdb_w));
 	m_rs232->set_cts_handler(DEVCB_DEVWRITELINE(m_dart, z80dart_device, ctsb_w));
 
 	// video
-	MIC10937(config, VFD_TAG, 60).set_port_value(0);
+	MIC10937(config, VFD_TAG).set_port_value(0);
 	config.m_default_layout = &layout_tranz330;
 
 	// sound
-	SPEAKER(config, "mono", 0).set_position(0.0, 0.0, 1.0);
+	SPEAKER(config, "mono", 0).standard_mono();
 	SPEAKER_SOUND(config, "speaker", 0)
 			.add_route(ALL_OUTPUTS, "mono", 0.25);
 }

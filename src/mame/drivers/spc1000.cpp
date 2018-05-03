@@ -458,10 +458,11 @@ WRITE_LINE_MEMBER( spc1000_state::irq_w )
 //  address maps
 //-------------------------------------------------
 
-extern SLOT_INTERFACE_START(spc1000_exp)
-	SLOT_INTERFACE("fdd", SPC1000_FDD_EXP)
-	SLOT_INTERFACE("vdp", SPC1000_VDP_EXP)
-SLOT_INTERFACE_END
+void spc1000_exp(device_slot_interface &device)
+{
+	device.option_add("fdd", SPC1000_FDD_EXP);
+	device.option_add("vdp", SPC1000_VDP_EXP);
+}
 
 MACHINE_CONFIG_START(spc1000_state::spc1000)
 	/* basic machine hardware */

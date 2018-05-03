@@ -194,13 +194,15 @@ WRITE8_MEMBER( fd2000_device::via_pb_w )
 	*/
 }
 
-static SLOT_INTERFACE_START( fd2000_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD ) // TEAC FD-235HF
-SLOT_INTERFACE_END
+static void fd2000_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD); // TEAC FD-235HF
+}
 
-static SLOT_INTERFACE_START( fd4000_floppies )
-	SLOT_INTERFACE( "35ed", FLOPPY_35_ED ) // TEAC FD-235J
-SLOT_INTERFACE_END
+static void fd4000_floppies(device_slot_interface &device)
+{
+	device.option_add("35ed", FLOPPY_35_ED); // TEAC FD-235J
+}
 /*
 FLOPPY_FORMATS_MEMBER( fd2000_device::floppy_formats )
     FLOPPY_D81_FORMAT

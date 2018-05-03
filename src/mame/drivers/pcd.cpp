@@ -478,10 +478,11 @@ void pcd_state::pcx_io(address_map &map)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static SLOT_INTERFACE_START( pcd_floppies )
-	SLOT_INTERFACE("55f", TEAC_FD_55F) // 80 tracks
-	SLOT_INTERFACE("55g", TEAC_FD_55G) // 77 tracks
-SLOT_INTERFACE_END
+static void pcd_floppies(device_slot_interface &device)
+{
+	device.option_add("55f", TEAC_FD_55F); // 80 tracks
+	device.option_add("55g", TEAC_FD_55G); // 77 tracks
+}
 
 FLOPPY_FORMATS_MEMBER( pcd_state::floppy_formats )
 	FLOPPY_PC_FORMAT

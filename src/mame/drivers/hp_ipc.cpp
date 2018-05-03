@@ -720,9 +720,10 @@ FLOPPY_FORMATS_MEMBER( hp_ipc_state::floppy_formats )
 	FLOPPY_HP_IPC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( hp_ipc_floppies )
-	SLOT_INTERFACE( "35dd", SONY_OA_D32W )
-SLOT_INTERFACE_END
+static void hp_ipc_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", SONY_OA_D32W);
+}
 
 /*
  *  IRQ levels (page 5-4)

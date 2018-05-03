@@ -411,10 +411,11 @@ QUICKLOAD_LOAD_MEMBER( dmv_state, dmv )
 	return image_init_result::PASS;
 }
 
-static SLOT_INTERFACE_START( dmv_floppies )
-		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-		SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void dmv_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 void dmv_state::ifsel_r(address_space &space, int ifsel, offs_t offset, uint8_t &data)
@@ -727,38 +728,43 @@ FLOPPY_FORMATS_MEMBER( dmv_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 
-static SLOT_INTERFACE_START(dmv_slot1)
-	SLOT_INTERFACE("k200", DMV_K200)            // K200 64K RAM expansion
-	SLOT_INTERFACE("k202", DMV_K202)            // K202 192K RAM expansion
-	SLOT_INTERFACE("k208", DMV_K208)            // K208 448K RAM expansion
-SLOT_INTERFACE_END
+static void dmv_slot1(device_slot_interface &device)
+{
+	device.option_add("k200", DMV_K200);        // K200 64K RAM expansion
+	device.option_add("k202", DMV_K202);        // K202 192K RAM expansion
+	device.option_add("k208", DMV_K208);        // K208 448K RAM expansion
+}
 
-static SLOT_INTERFACE_START(dmv_slot2_6)
-	SLOT_INTERFACE("k210", DMV_K210)            // K210 Centronics
-	SLOT_INTERFACE("k211", DMV_K211)            // K211 RS-232 Communications Interface
-	SLOT_INTERFACE("k212", DMV_K212)            // K212 RS-232 Printer Interface
-	SLOT_INTERFACE("k213", DMV_K213)            // K213 RS-232 Plotter Interface
-	SLOT_INTERFACE("k233", DMV_K233)            // K233 16K Shared RAM
-	SLOT_INTERFACE("k801", DMV_K801)            // K801 RS-232 Switchable Interface
-	SLOT_INTERFACE("k803", DMV_K803)            // K803 RTC module
-	SLOT_INTERFACE("k806", DMV_K806)            // K806 Mouse module
-SLOT_INTERFACE_END
+static void dmv_slot2_6(device_slot_interface &device)
+{
+	device.option_add("k210", DMV_K210);        // K210 Centronics
+	device.option_add("k211", DMV_K211);        // K211 RS-232 Communications Interface
+	device.option_add("k212", DMV_K212);        // K212 RS-232 Printer Interface
+	device.option_add("k213", DMV_K213);        // K213 RS-232 Plotter Interface
+	device.option_add("k233", DMV_K233);        // K233 16K Shared RAM
+	device.option_add("k801", DMV_K801);        // K801 RS-232 Switchable Interface
+	device.option_add("k803", DMV_K803);        // K803 RTC module
+	device.option_add("k806", DMV_K806);        // K806 Mouse module
+}
 
-static SLOT_INTERFACE_START(dmv_slot7)
-	SLOT_INTERFACE("k220", DMV_K220)            // K220 Diagnostic Module
-	SLOT_INTERFACE("k231", DMV_K231)            // K231 External 8088 module without interrupt controller
-	SLOT_INTERFACE("k234", DMV_K234)            // K234 External 68008 module
-SLOT_INTERFACE_END
+static void dmv_slot7(device_slot_interface &device)
+{
+	device.option_add("k220", DMV_K220);        // K220 Diagnostic Module
+	device.option_add("k231", DMV_K231);        // K231 External 8088 module without interrupt controller
+	device.option_add("k234", DMV_K234);        // K234 External 68008 module
+}
 
 
-static SLOT_INTERFACE_START(dmv_slot2a)
+static void dmv_slot2a(device_slot_interface &device)
+{
 
-SLOT_INTERFACE_END
+}
 
-static SLOT_INTERFACE_START(dmv_slot7a)
-	SLOT_INTERFACE("k230", DMV_K230)            // K230 Internal 8088 module without interrupt controller
-	SLOT_INTERFACE("k235", DMV_K235)            // K235 Internal 8088 module with interrupt controller
-SLOT_INTERFACE_END
+static void dmv_slot7a(device_slot_interface &device)
+{
+	device.option_add("k230", DMV_K230);        // K230 Internal 8088 module without interrupt controller
+	device.option_add("k235", DMV_K235);        // K235 Internal 8088 module with interrupt controller
+}
 
 MACHINE_CONFIG_START(dmv_state::dmv)
 	/* basic machine hardware */

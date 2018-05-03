@@ -330,8 +330,9 @@ WRITE16_MEMBER (hk68v10_state::vme_a16_w){
  * Original HBUG configuration word: 0x003D = 0000 0000 0011 1101
  */
 
-static SLOT_INTERFACE_START(hk68_vme_cards)
-SLOT_INTERFACE_END
+static void hk68_vme_cards(device_slot_interface &device)
+{
+}
 
 /*
  * Machine configuration

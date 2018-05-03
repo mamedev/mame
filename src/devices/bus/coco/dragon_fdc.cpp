@@ -143,9 +143,10 @@ namespace
     LOCAL VARIABLES
 ***************************************************************************/
 
-static SLOT_INTERFACE_START(dragon_fdc_device_base)
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void dragon_fdc_drives(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(dragon_fdc_device_base::device_add_mconfig)
@@ -154,13 +155,13 @@ MACHINE_CONFIG_START(dragon_fdc_device_base::device_add_mconfig)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":0", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":1", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":2", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG ":3", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
@@ -169,13 +170,13 @@ MACHINE_CONFIG_START(premier_fdc_device_base::device_add_mconfig)
 	MCFG_WD2791_ADD(WD2791_TAG, XTAL(2'000'000) / 2)
 	MCFG_WD_FDC_FORCE_READY
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":0", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":0", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":1", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":1", dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":2", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":2", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":3", dragon_fdc_device_base, "", dragon_fdc_device_base::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":3", dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 

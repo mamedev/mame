@@ -513,9 +513,10 @@ FLOPPY_FORMATS_MEMBER( samcoupe_state::floppy_formats )
 	FLOPPY_MGT_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( samcoupe_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void samcoupe_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 
 MACHINE_CONFIG_START(samcoupe_state::samcoupe)

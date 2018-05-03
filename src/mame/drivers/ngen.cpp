@@ -916,13 +916,15 @@ void ngen_state::ngen386_io(address_map &map)
 static INPUT_PORTS_START( ngen )
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("ngen", NGEN_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("ngen", NGEN_KEYBOARD);
+}
 
-static SLOT_INTERFACE_START( ngen_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void ngen_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 MACHINE_CONFIG_START(ngen_state::ngen)
 	// basic machine hardware

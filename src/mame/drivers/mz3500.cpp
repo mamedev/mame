@@ -808,9 +808,10 @@ void mz3500_state::upd7220_2_map(address_map &map)
 	map(0x00000, 0x3ffff).ram(); // AM_SHARE("video_ram_2")
 }
 
-static SLOT_INTERFACE_START( mz3500_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void mz3500_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 /* TODO: clocks */
 MACHINE_CONFIG_START(mz3500_state::mz3500)

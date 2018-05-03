@@ -1466,9 +1466,10 @@ static const floppy_format_type ibmpc_floppy_formats[] = {
 	nullptr
 };
 
-static SLOT_INTERFACE_START( ibmpc_floppies )
-		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ibmpc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(nc_state::nc200)
 	nc100(config);

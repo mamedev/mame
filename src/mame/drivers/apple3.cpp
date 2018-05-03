@@ -36,16 +36,18 @@ void apple3_state::apple3_map(address_map &map)
 	map(0x0000, 0xffff).rw(this, FUNC(apple3_state::apple3_memory_r), FUNC(apple3_state::apple3_memory_w));
 }
 
-static SLOT_INTERFACE_START(apple3_cards)
-	SLOT_INTERFACE("cffa2", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
-	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
-	SLOT_INTERFACE("thclock", A2BUS_THUNDERCLOCK)    /* ThunderWare ThunderClock Plus - driver assumes slot 2 by default */
-	SLOT_INTERFACE("mouse", A2BUS_MOUSE)    /* Apple II Mouse Card */
-SLOT_INTERFACE_END
+static void apple3_cards(device_slot_interface &device)
+{
+	device.option_add("cffa2", A2BUS_CFFA2_6502);       // CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware
+	device.option_add("applicard", A2BUS_APPLICARD);    // PCPI Applicard
+	device.option_add("thclock", A2BUS_THUNDERCLOCK);   // ThunderWare ThunderClock Plus - driver assumes slot 2 by default
+	device.option_add("mouse", A2BUS_MOUSE);            // Apple II Mouse Card
+}
 
-static SLOT_INTERFACE_START( a3_floppies )
-	SLOT_INTERFACE( "525", FLOPPY_525_SD )
-SLOT_INTERFACE_END
+static void a3_floppies(device_slot_interface &device)
+{
+	device.option_add("525", FLOPPY_525_SD);
+}
 
 FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
 	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT
@@ -148,8 +150,8 @@ MACHINE_CONFIG_START(apple3_state::apple3)
 	MCFG_SOUND_ADD("bell", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_SOUND_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "bell", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "bell", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("c040", apple3_state, apple3_c040_tick, attotime::from_hz(2000))
 

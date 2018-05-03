@@ -101,9 +101,10 @@ FLOPPY_FORMATS_MEMBER( altos486_state::floppy_formats )
 	FLOPPY_TD0_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( altos486_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void altos486_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 void altos486_state::altos486_mem(address_map &map)
 {
@@ -186,7 +187,7 @@ MACHINE_CONFIG_START(altos486_state::altos486)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio0", z80dart_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio0", z80dart_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio0", z80dart_device, ctsa_w))
-	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", altos486_terminal)
+	//MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", altos486_terminal)
 
 	MCFG_RS232_PORT_ADD("rs232b", default_rs232_devices, NULL)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio0", z80dart_device, rxb_w))

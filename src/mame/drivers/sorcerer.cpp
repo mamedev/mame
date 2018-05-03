@@ -447,7 +447,7 @@ MACHINE_CONFIG_START(sorcerer_state::sorcerer)
 	MCFG_AY31015_AUTO_RDAV(true)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "covox")

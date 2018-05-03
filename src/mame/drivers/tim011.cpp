@@ -115,9 +115,10 @@ READ8_MEMBER(tim011_state::scroll_r)
 	return m_scroll;
 }
 
-static SLOT_INTERFACE_START( tim011_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void tim011_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 static const floppy_format_type tim011_floppy_formats[] = {
 	FLOPPY_IMD_FORMAT,

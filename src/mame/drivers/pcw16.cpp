@@ -930,9 +930,10 @@ FLOPPY_FORMATS_MEMBER( pcw16_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pcw16_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void pcw16_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 
 void pcw16_state::pcw16_io(address_map &map)
@@ -1004,9 +1005,10 @@ static INPUT_PORTS_START(pcw16)
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(pcw16_com)
-	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
-SLOT_INTERFACE_END
+static void pcw16_com(device_slot_interface &device)
+{
+	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+}
 
 MACHINE_CONFIG_START(pcw16_state::pcw16)
 	/* basic machine hardware */

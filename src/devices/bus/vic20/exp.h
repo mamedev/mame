@@ -164,6 +164,6 @@ protected:
 DECLARE_DEVICE_TYPE(VIC20_EXPANSION_SLOT, vic20_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( vic20_expansion_cards );
+void vic20_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_VIC20_EXP_H

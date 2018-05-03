@@ -853,15 +853,16 @@ MACHINE_CONFIG_START(sat_console_state::saturn)
 	MCFG_SATURN_CONTROL_PORT_ADD("ctrl2", saturn_controls, "joypad")
 MACHINE_CONFIG_END
 
-static SLOT_INTERFACE_START(saturn_cart)
-	SLOT_INTERFACE_INTERNAL("rom",    SATURN_ROM)
-	SLOT_INTERFACE_INTERNAL("ram8",   SATURN_DRAM_8MB)
-	SLOT_INTERFACE_INTERNAL("ram32",  SATURN_DRAM_32MB)
-	SLOT_INTERFACE_INTERNAL("bram4",  SATURN_BRAM_4MB)
-	SLOT_INTERFACE_INTERNAL("bram8",  SATURN_BRAM_8MB)
-	SLOT_INTERFACE_INTERNAL("bram16", SATURN_BRAM_16MB)
-	SLOT_INTERFACE_INTERNAL("bram32", SATURN_BRAM_32MB)
-SLOT_INTERFACE_END
+static void saturn_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",    SATURN_ROM);
+	device.option_add_internal("ram8",   SATURN_DRAM_8MB);
+	device.option_add_internal("ram32",  SATURN_DRAM_32MB);
+	device.option_add_internal("bram4",  SATURN_BRAM_4MB);
+	device.option_add_internal("bram8",  SATURN_BRAM_8MB);
+	device.option_add_internal("bram16", SATURN_BRAM_16MB);
+	device.option_add_internal("bram32", SATURN_BRAM_32MB);
+}
 
 
 MACHINE_CONFIG_START(sat_console_state::saturnus)

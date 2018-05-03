@@ -195,12 +195,13 @@ std::string omti8621_device::cpu_context() const
 	return string_format("%d.%03d %s", s, ms, machine().describe_context());
 }
 
-static SLOT_INTERFACE_START( pc_hd_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void pc_hd_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( omti8621_device::floppy_formats )
 	FLOPPY_APOLLO_FORMAT,

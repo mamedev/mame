@@ -981,15 +981,17 @@ FLOPPY_FORMATS_MEMBER( next_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( next_floppies )
-	SLOT_INTERFACE( "35ed", FLOPPY_35_ED )
-SLOT_INTERFACE_END
+static void next_floppies(device_slot_interface &device)
+{
+	device.option_add("35ed", FLOPPY_35_ED);
+}
 
-static SLOT_INTERFACE_START( next_scsi_devices )
-	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
-	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
-	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
-SLOT_INTERFACE_END
+static void next_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add_internal("ncr5390", NCR5390);
+}
 
 void next_state::ncr5390(device_t *device)
 {
@@ -1028,7 +1030,7 @@ MACHINE_CONFIG_START(next_state::next_base)
 	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", ncr5390)
 
 	MCFG_DEVICE_ADD("net", MB8795, 0)
 	MCFG_MB8795_TX_IRQ_CALLBACK(WRITELINE(next_state, net_tx_irq))

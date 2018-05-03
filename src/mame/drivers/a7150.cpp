@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(a7150_state::a7150)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", kbd_rs232_defaults)
 
 	MCFG_ISBC_215_ADD("isbc_215g", 0x4a, "maincpu")
 	MCFG_ISBC_215_IRQ(DEVWRITELINE("pic8259", pic8259_device, ir5_w))

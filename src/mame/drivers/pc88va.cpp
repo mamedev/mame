@@ -1774,9 +1774,10 @@ FLOPPY_FORMATS_MEMBER( pc88va_state::floppy_formats )
 	FLOPPY_XDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pc88va_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pc88va_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 READ8_MEMBER(pc88va_state::dma_memr_cb)
 {

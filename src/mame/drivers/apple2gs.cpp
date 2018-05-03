@@ -286,31 +286,32 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
 	apple2_update_memory();
 }
 
-static SLOT_INTERFACE_START(apple2_cards)
-	SLOT_INTERFACE("diskii", A2BUS_DISKII)  /* Disk II Controller Card */
-	SLOT_INTERFACE("mockingboard", A2BUS_MOCKINGBOARD)  /* Sweet Micro Systems Mockingboard */
-	SLOT_INTERFACE("phasor", A2BUS_PHASOR)  /* Applied Engineering Phasor */
-	SLOT_INTERFACE("cffa2", A2BUS_CFFA2)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
-	SLOT_INTERFACE("cffa202", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
-	SLOT_INTERFACE("memexp", A2BUS_MEMEXP)  /* Apple II Memory Expansion Card */
-	SLOT_INTERFACE("ramfactor", A2BUS_RAMFACTOR)    /* Applied Engineering RamFactor */
-	SLOT_INTERFACE("thclock", A2BUS_THUNDERCLOCK)    /* ThunderWare ThunderClock Plus */
-	SLOT_INTERFACE("ssc", A2BUS_SSC)    /* Apple Super Serial Card */
-	SLOT_INTERFACE("sam", A2BUS_SAM)    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
-	SLOT_INTERFACE("alfam2", A2BUS_ALFAM2)    /* ALF Apple Music II */
-	SLOT_INTERFACE("echoii", A2BUS_ECHOII)    /* Street Electronics Echo II */
-	SLOT_INTERFACE("arcbd", A2BUS_ARCADEBOARD)    /* Third Millenium Engineering Arcade Board */
-	SLOT_INTERFACE("midi", A2BUS_MIDI)  /* Generic 6840+6850 MIDI board */
-	SLOT_INTERFACE("vulcan", A2BUS_VULCAN)  /* AE Vulcan IDE card */
-	SLOT_INTERFACE("vulcangold", A2BUS_VULCANGOLD)  /* AE Vulcan Gold IDE card */
-	SLOT_INTERFACE("zipdrive", A2BUS_ZIPDRIVE)  /* ZIP Technologies IDE card */
-	SLOT_INTERFACE("echoiiplus", A2BUS_ECHOPLUS)    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
-//  SLOT_INTERFACE("mdturbo", A2BUS_UDRIVE_TURBO)  /* ///SHH Systeme MicroDrive Turbo IDE card */
+static void apple2_cards(device_slot_interface &device)
+{
+	device.option_add("diskii", A2BUS_DISKII);  /* Disk II Controller Card */
+	device.option_add("mockingboard", A2BUS_MOCKINGBOARD);  /* Sweet Micro Systems Mockingboard */
+	device.option_add("phasor", A2BUS_PHASOR);  /* Applied Engineering Phasor */
+	device.option_add("cffa2", A2BUS_CFFA2);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
+	device.option_add("cffa202", A2BUS_CFFA2_6502);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
+	device.option_add("memexp", A2BUS_MEMEXP);  /* Apple II Memory Expansion Card */
+	device.option_add("ramfactor", A2BUS_RAMFACTOR);    /* Applied Engineering RamFactor */
+	device.option_add("thclock", A2BUS_THUNDERCLOCK);    /* ThunderWare ThunderClock Plus */
+	device.option_add("ssc", A2BUS_SSC);    /* Apple Super Serial Card */
+	device.option_add("sam", A2BUS_SAM);    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
+	device.option_add("alfam2", A2BUS_ALFAM2);    /* ALF Apple Music II */
+	device.option_add("echoii", A2BUS_ECHOII);    /* Street Electronics Echo II */
+	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
+	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
+	device.option_add("vulcan", A2BUS_VULCAN);  /* AE Vulcan IDE card */
+	device.option_add("vulcangold", A2BUS_VULCANGOLD);  /* AE Vulcan Gold IDE card */
+	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
+	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
+//  device.option_add("mdturbo", A2BUS_UDRIVE_TURBO);  /* ///SHH Systeme MicroDrive Turbo IDE card */
 
-//    SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */  // appears not to be IIgs compatible?
-	SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
-	SLOT_INTERFACE("hsscsi", A2BUS_HSSCSI)  /* Apple II High-Speed SCSI Card */
-SLOT_INTERFACE_END
+//    device.option_add("softcard", A2BUS_SOFTCARD);  /* Microsoft SoftCard */  // appears not to be IIgs compatible?
+	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
+	device.option_add("hsscsi", A2BUS_HSSCSI);  /* Apple II High-Speed SCSI Card */
+}
 
 MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	/* basic machine hardware */

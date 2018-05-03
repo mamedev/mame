@@ -494,9 +494,10 @@ FLOPPY_FORMATS_MEMBER( pyl601_state::floppy_formats )
 	FLOPPY_PYLDIN_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pyl601_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pyl601_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout pyl601_charlayout =

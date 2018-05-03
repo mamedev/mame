@@ -137,7 +137,8 @@ void newbrain_expansion_slot_device::iorq_w(address_space &space, offs_t offset,
 #include "eim.h"
 #include "fdc.h"
 
-SLOT_INTERFACE_START( newbrain_expansion_cards )
-	SLOT_INTERFACE("eim", NEWBRAIN_EIM)
-	SLOT_INTERFACE("fdc", NEWBRAIN_FDC)
-SLOT_INTERFACE_END
+void newbrain_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("eim", NEWBRAIN_EIM);
+	device.option_add("fdc", NEWBRAIN_FDC);
+}

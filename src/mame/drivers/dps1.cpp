@@ -188,9 +188,10 @@ DRIVER_INIT_MEMBER( dps1_state, dps1 )
 static INPUT_PORTS_START( dps1 )
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START( floppies )
-	SLOT_INTERFACE( "floppy0", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void floppies(device_slot_interface &device)
+{
+	device.option_add("floppy0", FLOPPY_8_DSDD);
+}
 
 MACHINE_CONFIG_START(dps1_state::dps1)
 	// basic machine hardware

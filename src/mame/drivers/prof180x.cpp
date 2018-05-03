@@ -207,9 +207,10 @@ INPUT_PORTS_END
 
 /* Video */
 
-static SLOT_INTERFACE_START( prof180x_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void prof180x_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 /*
 static RTC8583_INTERFACE( rtc_intf )

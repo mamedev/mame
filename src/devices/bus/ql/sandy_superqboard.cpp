@@ -64,10 +64,11 @@ const tiny_rom_entry *sandy_superqboard_device::device_rom_region() const
 //  SLOT_INTERFACE( sandy_superqboard_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( sandy_superqboard_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void sandy_superqboard_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 
 //-------------------------------------------------

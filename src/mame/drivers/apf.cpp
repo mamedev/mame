@@ -502,16 +502,18 @@ static INPUT_PORTS_START( apfimag )
 INPUT_PORTS_END
 
 
-static SLOT_INTERFACE_START( apf_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void apf_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_SSDD);
+}
 
 
-static SLOT_INTERFACE_START(apf_cart)
-	SLOT_INTERFACE_INTERNAL("std",       APF_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("basic",     APF_ROM_BASIC)
-	SLOT_INTERFACE_INTERNAL("spacedst",  APF_ROM_SPACEDST)
-SLOT_INTERFACE_END
+static void apf_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",       APF_ROM_STD);
+	device.option_add_internal("basic",     APF_ROM_BASIC);
+	device.option_add_internal("spacedst",  APF_ROM_SPACEDST);
+}
 
 
 MACHINE_CONFIG_START(apf_state::apfm1000)

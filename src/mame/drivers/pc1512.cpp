@@ -1026,17 +1026,19 @@ WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_fault )
 //  isa8bus_interface isabus_intf
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( pc1640_isa8_cards )
-	SLOT_INTERFACE_INTERNAL("iga", ISA8_PC1640_IGA)
-SLOT_INTERFACE_END
+void pc1640_isa8_cards(device_slot_interface &device)
+{
+	device.option_add_internal("iga", ISA8_PC1640_IGA);
+}
 
 FLOPPY_FORMATS_MEMBER( pc1512_base_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pc1512_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD ) // Tandon TM65-2L
-SLOT_INTERFACE_END
+static void pc1512_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD); // Tandon TM65-2L
+}
 
 
 

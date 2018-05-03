@@ -960,11 +960,12 @@ static const ay8910_interface ay8910_config =
 };
 #endif
 
-static SLOT_INTERFACE_START(bml3_cards)
-	SLOT_INTERFACE("bml3mp1802", BML3BUS_MP1802)  /* MP-1802 Floppy Controller Card */
-	SLOT_INTERFACE("bml3mp1805", BML3BUS_MP1805)  /* MP-1805 Floppy Controller Card */
-	SLOT_INTERFACE("bml3kanji",  BML3BUS_KANJI)
-SLOT_INTERFACE_END
+static void bml3_cards(device_slot_interface &device)
+{
+	device.option_add("bml3mp1802", BML3BUS_MP1802); // MP-1802 Floppy Controller Card
+	device.option_add("bml3mp1805", BML3BUS_MP1805); // MP-1805 Floppy Controller Card
+	device.option_add("bml3kanji",  BML3BUS_KANJI);
+}
 
 
 MACHINE_CONFIG_START(bml3_state::bml3_common)

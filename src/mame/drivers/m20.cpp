@@ -772,18 +772,20 @@ void m20_state::machine_reset()
 }
 
 
-static SLOT_INTERFACE_START( m20_floppies )
-	SLOT_INTERFACE( "5dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void m20_floppies(device_slot_interface &device)
+{
+	device.option_add("5dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( m20_state::floppy_formats )
 	FLOPPY_M20_FORMAT,
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("m20", M20_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("m20", M20_KEYBOARD);
+}
 
 MACHINE_CONFIG_START(m20_state::m20)
 	/* basic machine hardware */

@@ -406,9 +406,10 @@ static const z80_daisy_config x1_daisy[] =
 	{ nullptr }
 };
 
-static SLOT_INTERFACE_START( x1_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void x1_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */

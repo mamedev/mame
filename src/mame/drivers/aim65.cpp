@@ -194,15 +194,15 @@ MACHINE_CONFIG_START(aim65_state::aim65)
 	MCFG_DEFAULT_LAYOUT(layout_aim65)
 
 	/* alpha-numeric display */
-	MCFG_DEVICE_ADD("ds1", DL1416T, 0)
+	MCFG_DEVICE_ADD("ds1", DL1416T, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<1>))
-	MCFG_DEVICE_ADD("ds2", DL1416T, 0)
+	MCFG_DEVICE_ADD("ds2", DL1416T, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<2>))
-	MCFG_DEVICE_ADD("ds3", DL1416T, 0)
+	MCFG_DEVICE_ADD("ds3", DL1416T, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<3>))
-	MCFG_DEVICE_ADD("ds4", DL1416T, 0)
+	MCFG_DEVICE_ADD("ds4", DL1416T, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<4>))
-	MCFG_DEVICE_ADD("ds5", DL1416T, 0)
+	MCFG_DEVICE_ADD("ds5", DL1416T, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(aim65_state, aim65_update_ds<5>))
 
 	/* Sound - wave sound only */

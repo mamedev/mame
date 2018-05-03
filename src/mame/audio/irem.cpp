@@ -419,27 +419,27 @@ MACHINE_CONFIG_START(m62_audio_device::device_add_mconfig)
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
 
 	MCFG_SOUND_ADD("ay_45l", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(irem_audio_device, ay8910_45L_porta_w))
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 5)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 3)
+	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 4)
+	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 5)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(384'000)) /* verified on pcb */
 	MCFG_MSM5205_VCK_CALLBACK(INPUTLINE("iremsound", INPUT_LINE_NMI)) // driven through NPN inverter
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("msm2", msm5205_device, vclk_w)) // the first MSM5205 clocks the second
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 6)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 6)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(384'000)) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 7)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 7)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
@@ -489,18 +489,18 @@ MACHINE_CONFIG_START(m52_soundc_audio_device::device_add_mconfig)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
-	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "filtermix", 1.0, 0)
 
 	MCFG_SOUND_ADD("ay_45l", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(irem_audio_device, ay8910_45L_porta_w))
-	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
+	MCFG_SOUND_ROUTE(0, "filtermix", 1.0, 1)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(384'000)) /* verified on pcb */
 	MCFG_MSM5205_VCK_CALLBACK(INPUTLINE("iremsound", INPUT_LINE_NMI)) // driven through NPN inverter
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
-	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "filtermix", 1.0, 2)
 
 	MCFG_SOUND_ADD("filtermix", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(m52_sound_c)

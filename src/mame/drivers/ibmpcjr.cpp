@@ -501,15 +501,17 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 }
 
 
-static SLOT_INTERFACE_START( pcjr_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void pcjr_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
-static SLOT_INTERFACE_START(pcjr_com)
-	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
-	SLOT_INTERFACE("mousesys_mouse", MSYSTEM_SERIAL_MOUSE)
-SLOT_INTERFACE_END
+static void pcjr_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
+	device.option_add("mousesys_mouse", MSYSTEM_SERIAL_MOUSE);
+}
 
 static const gfx_layout pc_8_charlayout =
 {

@@ -73,7 +73,8 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 
 		if (selval && *selval)
 		{
-			device_slot_option const *const option = slot.option(selval);
+			// TODO: make this thing more self-contained so it can apply itself - shouldn't need to know all this here
+			device_slot_interface::slot_option const *option = slot.option(selval);
 			if (option && (is_default || option->selectable()))
 			{
 				// create the device
@@ -115,11 +116,11 @@ machine_config::~machine_config()
 
 
 //-------------------------------------------------
-//  device_add - configuration helper to add a
-//  new device
+//  resolve_owner - get the actual owner and base
+//  tag given tag relative to current context
 //-------------------------------------------------
 
-device_t *machine_config::device_add(const char *tag, device_type type, u32 clock)
+std::pair<const char *, device_t *> machine_config::resolve_owner(const char *tag) const
 {
 	assert(bool(m_current_device) == bool(m_root_device));
 	char const *const orig_tag = tag;
@@ -145,25 +146,48 @@ device_t *machine_config::device_add(const char *tag, device_type type, u32 cloc
 	}
 	assert(tag[0] != '\0');
 
+	return std::make_pair(tag, owner);
+}
+
+
+//-------------------------------------------------
+//  add_device - add a new device at the correct
+//  point in the hierarchy
+//-------------------------------------------------
+
+device_t *machine_config::add_device(std::unique_ptr<device_t> &&device, device_t *owner)
+{
 	current_device_stack context(*this);
 	if (owner)
 	{
 		// allocate the new device and append it to the owner's list
-		device_t *const device = &owner->subdevices().m_list.append(*type(*this, tag, owner, clock).release());
-		device->add_machine_configuration(*this);
-		return device;
+		device_t *const result = &owner->subdevices().m_list.append(*device.release());
+		result->add_machine_configuration(*this);
+		return result;
 	}
 	else
 	{
 		// allocate the root device directly
 		assert(!m_root_device);
-		m_root_device = type(*this, tag, nullptr, clock);
+		m_root_device = std::move(device);
 		driver_device *driver = dynamic_cast<driver_device *>(m_root_device.get());
 		if (driver)
 			driver->set_game_driver(m_gamedrv);
 		m_root_device->add_machine_configuration(*this);
 		return m_root_device.get();
 	}
+}
+
+
+//-------------------------------------------------
+//  device_add - configuration helper to add a
+//  new device
+//-------------------------------------------------
+
+device_t *machine_config::device_add(const char *tag, device_type type, u32 clock)
+{
+	std::pair<const char *, device_t *> const owner(resolve_owner(tag));
+	return add_device(type(*this, owner.first, owner.second, clock), owner.second);
 }
 
 

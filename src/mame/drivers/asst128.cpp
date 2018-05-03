@@ -86,9 +86,10 @@ void asst128_state::asst128_io(address_map &map)
 	map(0x03f4, 0x03f5).m("fdc:upd765", FUNC(upd765a_device::map));
 }
 
-static SLOT_INTERFACE_START( asst128_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
-SLOT_INTERFACE_END
+static void asst128_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
 
 FLOPPY_FORMATS_MEMBER( asst128_state::asst128_formats )
 	FLOPPY_ASST128_FORMAT

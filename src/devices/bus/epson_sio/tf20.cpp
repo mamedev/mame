@@ -81,9 +81,10 @@ ioport_constructor epson_tf20_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( tf20_floppies )
-	SLOT_INTERFACE( "sd320", EPSON_SD_320 )
-SLOT_INTERFACE_END
+static void tf20_floppies(device_slot_interface &device)
+{
+	device.option_add("sd320", EPSON_SD_320);
+}
 
 MACHINE_CONFIG_START(epson_tf20_device::device_add_mconfig)
 	MCFG_CPU_ADD("19b", Z80, XTAL_CR1 / 2) /* uPD780C */

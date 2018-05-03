@@ -121,9 +121,10 @@ FLOPPY_FORMATS_MEMBER( coco_family_fdc_device_base::floppy_formats )
 	FLOPPY_SDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( coco_fdc_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void coco_fdc_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 MACHINE_CONFIG_START(coco_fdc_device_base::device_add_mconfig)
 	MCFG_WD1773_ADD(WD_TAG, XTAL(8'000'000))

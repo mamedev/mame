@@ -1344,10 +1344,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineR)
 #endif
 
 
-static SLOT_INTERFACE_START(vboy_cart)
-	SLOT_INTERFACE_INTERNAL("vb_rom",    VBOY_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("vb_eeprom", VBOY_ROM_EEPROM)
-SLOT_INTERFACE_END
+static void vboy_cart(device_slot_interface &device)
+{
+	device.option_add_internal("vb_rom",    VBOY_ROM_STD);
+	device.option_add_internal("vb_eeprom", VBOY_ROM_EEPROM);
+}
 
 MACHINE_CONFIG_START(vboy_state::vboy)
 
@@ -1389,7 +1390,7 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_VBOYSND_ADD("vbsnd")
+	MCFG_DEVICE_ADD("vbsnd", VBOYSND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

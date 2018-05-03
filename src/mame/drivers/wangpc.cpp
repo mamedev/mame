@@ -1094,9 +1094,10 @@ WRITE_LINE_MEMBER( wangpc_state::epci_irq_w )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( wangpc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void wangpc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( wangpc_state::floppy_formats )
 	FLOPPY_PC_FORMAT

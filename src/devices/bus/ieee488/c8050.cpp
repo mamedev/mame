@@ -462,9 +462,10 @@ WRITE8_MEMBER( c8050_device::via_pb_w )
 //  SLOT_INTERFACE( c8050_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c8050_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
-SLOT_INTERFACE_END
+static void c8050_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
 
 
 //-------------------------------------------------
@@ -480,18 +481,20 @@ FLOPPY_FORMATS_END
 //  SLOT_INTERFACE( c8250_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c8250_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void c8250_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( sfd1001_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( sfd1001_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Matsushita JU-570 / JU-570-2
-SLOT_INTERFACE_END
+static void sfd1001_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD); // Matsushita JU-570 / JU-570-2
+}
 
 
 //-------------------------------------------------

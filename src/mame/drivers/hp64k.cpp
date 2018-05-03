@@ -1376,9 +1376,10 @@ static INPUT_PORTS_START(hp64k)
 	PORT_DIPSETTING(0x1e , "19200")
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(hp64k_floppies)
-	SLOT_INTERFACE("525dd" , FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void hp64k_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd" , FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_CPU_ADD("cpu" , HP_5061_3011 , 6250000)

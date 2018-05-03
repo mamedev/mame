@@ -429,9 +429,9 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 
 	/* serial debug port */
 	MCFG_RS232_PORT_ADD ("debug_serial", default_rs232_devices, nullptr)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", debug_serial)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", debug_serial)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("pty", debug_serial)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("null_modem", debug_serial)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", debug_serial)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("pty", debug_serial)
 
 	MCFG_DEVICE_MODIFY("debug_serial")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu:sci2", h8_sci_device, rx_w))

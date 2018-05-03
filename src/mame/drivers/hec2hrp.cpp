@@ -404,9 +404,10 @@ FLOPPY_FORMATS_MEMBER( hec2hrp_state::minidisc_formats )
 	FLOPPY_HMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( minidisc_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void minidisc_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 
 /******************************************************************************/
@@ -479,9 +480,10 @@ MACHINE_CONFIG_START(hec2hrp_state::hec2hrp)
 
 MACHINE_CONFIG_END
 
-static SLOT_INTERFACE_START( hector_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void hector_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /*****************************************************************************/
 MACHINE_CONFIG_START(hec2hrp_state::hec2mx40)

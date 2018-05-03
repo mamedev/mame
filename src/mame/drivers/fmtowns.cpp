@@ -2736,9 +2736,10 @@ FLOPPY_FORMATS_MEMBER( towns_state::floppy_formats )
 	FLOPPY_FMTOWNS_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( towns_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void towns_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 static const gfx_layout fnt_chars_16x16 =
 {

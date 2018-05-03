@@ -1960,26 +1960,28 @@ READ8_MEMBER(pc9801_state::unk_r)
 *
 ****************************************/
 
-static SLOT_INTERFACE_START( pc9801_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void pc9801_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
-static SLOT_INTERFACE_START( pc9801_cbus )
+static void pc9801_cbus_devices(device_slot_interface &device)
+{
 //  PC-9801-14
-	SLOT_INTERFACE( "pc9801_26", PC9801_26 )
-	SLOT_INTERFACE( "pc9801_86", PC9801_86 )
+	device.option_add("pc9801_26", PC9801_26);
+	device.option_add("pc9801_86", PC9801_86);
 //  PC-9801-86
 //  PC-9801-26 + PC-9801-86 (?)
 //  PC-9801-86 + Chibi-Oto
-	SLOT_INTERFACE( "pc9801_118", PC9801_118 )
+	device.option_add("pc9801_118", PC9801_118);
 //  Speak Board
 //  Spark Board
 //  AMD-98 (AmuseMent boarD)
-	SLOT_INTERFACE( "pc9801_amd98", PC9801_AMD98 )
-	SLOT_INTERFACE( "mpu_pc98", MPU_PC98 )
-SLOT_INTERFACE_END
+	device.option_add("pc9801_amd98", PC9801_AMD98);
+	device.option_add("mpu_pc98", MPU_PC98);
+}
 
 //  Jast Sound, could be put independently
 
@@ -2197,9 +2199,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
 	}
 }
 
-SLOT_INTERFACE_START(pc9801_atapi_devices)
-	SLOT_INTERFACE("pc9801_cd", PC9801_CD)
-SLOT_INTERFACE_END
+void pc9801_atapi_devices(device_slot_interface &device)
+{
+	device.option_add("pc9801_cd", PC9801_CD);
+}
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_keyboard)
 	MCFG_DEVICE_ADD("keyb", PC9801_KBD, 53)
@@ -2219,8 +2222,8 @@ MACHINE_CONFIG_START(pc9801_state::pc9801_mouse)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pc9801_state::pc9801_cbus)
-	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26")
-	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, nullptr)
+	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus_devices, "pc9801_26")
+	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus_devices, nullptr)
 //  TODO: six max slots
 MACHINE_CONFIG_END
 

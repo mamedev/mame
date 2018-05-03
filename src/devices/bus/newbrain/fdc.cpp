@@ -94,9 +94,10 @@ void newbrain_fdc_device::newbrain_fdc_io(address_map &map)
 //  newbrain_floppies
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( newbrain_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void newbrain_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 //-------------------------------------------------

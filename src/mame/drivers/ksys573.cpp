@@ -2417,7 +2417,7 @@ MACHINE_CONFIG_START(ksys573_state::hyperbbc)
 	cassy(config); // The game doesn't check the security chip
 
 	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", hyperbbc_cassette_install )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", hyperbbc_cassette_install )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::hypbbc2p)
@@ -2425,7 +2425,7 @@ MACHINE_CONFIG_START(ksys573_state::hypbbc2p)
 	cassy(config);
 
 	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", hypbbc2p_cassette_install )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", hypbbc2p_cassette_install )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::salarymc)
@@ -2433,7 +2433,7 @@ MACHINE_CONFIG_START(ksys573_state::salarymc)
 	cassyi(config);
 
 	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", salarymc_cassette_install )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", salarymc_cassette_install )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::gchgchmp)
@@ -2451,7 +2451,7 @@ MACHINE_CONFIG_START(ksys573_state::pnchmn)
 	pccard1_32mb(config);
 
 	MCFG_DEVICE_MODIFY( "cassette" )
-	MCFG_DEVICE_CARD_MACHINE_CONFIG( "game", punchmania_cassette_install )
+	MCFG_SLOT_OPTION_MACHINE_CONFIG( "game", punchmania_cassette_install )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ksys573_state::pnchmn2)

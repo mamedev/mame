@@ -108,9 +108,10 @@ INPUT_PORTS_START( zorba )
 INPUT_PORTS_END
 
 
-SLOT_INTERFACE_START( zorba_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+void zorba_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 // F4 Character Displayer
@@ -136,7 +137,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(zorba_state::zorba)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
+	MCFG_CPU_ADD(m_maincpu, Z80, 24_MHz_XTAL / 6)
 	MCFG_CPU_PROGRAM_MAP(zorba_mem)
 	MCFG_CPU_IO_MAP(zorba_io)
 
@@ -145,11 +146,11 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zorba)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT(m_palette)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800) // should be horizontal frequency / 16, so depends on CRTC parameters
+	MCFG_SOUND_ADD(m_beep, BEEP, 800) // should be horizontal frequency / 16, so depends on CRTC parameters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq0")
@@ -160,7 +161,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(zorba_state, irq_w<2>))
 
 	/* devices */
-	MCFG_DEVICE_ADD("dma", Z80DMA, 24_MHz_XTAL / 6)
+	MCFG_DEVICE_ADD(m_dma, Z80DMA, 24_MHz_XTAL / 6)
 	// busack on cpu connects to bai pin
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(zorba_state, busreq_w))  //connects to busreq on cpu
 	MCFG_Z80DMA_OUT_INT_CB(DEVWRITELINE("irq0", input_merger_device, in_w<0>))
@@ -170,33 +171,33 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(zorba_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(zorba_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("uart0", I8251, 0) // U32 COM port J2
+	MCFG_DEVICE_ADD(m_uart0, I8251, 0) // U32 COM port J2
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd)) // TODO: this line has a LED attached
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(zorba_state, tx_rx_rdy_w<1>))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(zorba_state, tx_rx_rdy_w<0>))
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0) // U31 printer port J3
+	MCFG_DEVICE_ADD(m_uart1, I8251, 0) // U31 printer port J3
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("serprn", rs232_port_device, write_txd))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("serprn", rs232_port_device, write_rts))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(zorba_state, tx_rx_rdy_w<3>))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(zorba_state, tx_rx_rdy_w<2>))
 
-	MCFG_DEVICE_ADD("uart2", I8251, 0) // U30 serial keyboard J6
+	MCFG_DEVICE_ADD(m_uart2, I8251, 0) // U30 serial keyboard J6
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("keyboard", zorba_keyboard_device, txd_w))
 	MCFG_I8251_RXRDY_HANDLER(WRITELINE(zorba_state, tx_rx_rdy_w<5>))
 	MCFG_I8251_TXRDY_HANDLER(WRITELINE(zorba_state, tx_rx_rdy_w<4>))
 
 	// port A - disk select etc, beeper
 	// port B - parallel interface
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
+	MCFG_DEVICE_ADD(m_pia0, PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zorba_state, pia0_porta_w))
 	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("parprndata", output_latch_device, write))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("parprn", centronics_device, write_strobe))
 
 	// IEEE488 interface
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
+	MCFG_DEVICE_ADD(m_pia1, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(DEVREAD8(m_ieee, ieee488_device, dio_r)) // TODO: gated with PB1
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8(m_ieee, ieee488_device, dio_w)) // TODO: gated with PB1
 	MCFG_PIA_READPB_HANDLER(READ8(zorba_state, pia1_portb_r))
@@ -218,7 +219,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(m_uart2, i8251_device, write_rxc))
 
 	// CRTC
-	MCFG_DEVICE_ADD("crtc", I8275, 14.318'181_MHz_XTAL / 7)
+	MCFG_DEVICE_ADD(m_crtc, I8275, 14.318'181_MHz_XTAL / 7)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE(m_dma, z80dma_device, rdy_w))
@@ -226,12 +227,12 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// Floppies
-	MCFG_FD1793_ADD("fdc", 24_MHz_XTAL / 24)
+	MCFG_FD1793_ADD(m_fdc, 24_MHz_XTAL / 24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("irq2", input_merger_device, in_w<0>))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("irq2", input_merger_device, in_w<1>))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy0, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(m_floppy1, zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// J1 IEEE-488

@@ -222,9 +222,10 @@ INPUT_PORTS_END
 //  FLOPPY
 //**************************************************************************
 
-static SLOT_INTERFACE_START( kdt6_floppies )
-	SLOT_INTERFACE("fd55f", TEAC_FD_55F)
-SLOT_INTERFACE_END
+static void kdt6_floppies(device_slot_interface &device)
+{
+	device.option_add("fd55f", TEAC_FD_55F);
+}
 
 WRITE8_MEMBER( kdt6_state::fdc_tc_w )
 {

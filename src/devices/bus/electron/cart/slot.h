@@ -212,7 +212,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(ELECTRON_CARTSLOT, electron_cartslot_device)
 
-SLOT_INTERFACE_EXTERN(electron_cart);
+void electron_cart(device_slot_interface &device);
 
 
 #endif // MAME_BUS_ELECTRON_CARTSLOT_H

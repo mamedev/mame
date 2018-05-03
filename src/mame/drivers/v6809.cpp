@@ -270,9 +270,10 @@ WRITE_LINE_MEMBER( v6809_state::speaker_w )
 //      m_speaker->level_w(data);
 }
 
-static SLOT_INTERFACE_START( v6809_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void v6809_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 // *** Machine ****

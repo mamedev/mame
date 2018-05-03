@@ -251,14 +251,14 @@ MACHINE_CONFIG_START(esqkt_state::kt)
 	MCFG_ES5506_CHANNELS(4)          /* channels */
 	MCFG_ES5506_IRQ_CB(WRITELINE(esqkt_state, esq5506_otto_irq)) /* irq */
 	MCFG_ES5506_READ_PORT_CB(READ16(esqkt_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 
 	MCFG_SOUND_ADD("ensoniq2", ES5506, XTAL(16'000'000))
 	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
@@ -266,14 +266,14 @@ MACHINE_CONFIG_START(esqkt_state::kt)
 	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
 	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
 	MCFG_ES5506_CHANNELS(4)          /* channels */
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 
 MACHINE_CONFIG_END
 

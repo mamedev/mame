@@ -577,9 +577,10 @@ FLOPPY_FORMATS_MEMBER( sun3x_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( sun_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void sun_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 MACHINE_CONFIG_START(sun3x_state::sun3_80)
 	/* basic machine hardware */

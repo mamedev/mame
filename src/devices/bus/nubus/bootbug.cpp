@@ -18,10 +18,11 @@
 #include "bus/rs232/null_modem.h"
 #include "screen.h"
 
-static SLOT_INTERFACE_START(isa_com)
-		SLOT_INTERFACE("terminal", SERIAL_TERMINAL)
-		SLOT_INTERFACE("null_modem", NULL_MODEM)
-SLOT_INTERFACE_END
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+}
 
 #define BOOTBUG_ROM_REGION  "btbug_rom"
 

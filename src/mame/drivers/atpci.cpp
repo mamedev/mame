@@ -72,15 +72,17 @@ void at586_state::superio_config(device_t *device)
 }
 
 
-static SLOT_INTERFACE_START( isa_internal_devices )
-	SLOT_INTERFACE("fdc37c93x", FDC37C93X)
-SLOT_INTERFACE_END
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("fdc37c93x", FDC37C93X);
+}
 
-static SLOT_INTERFACE_START( pci_devices )
-	SLOT_INTERFACE_INTERNAL("i82439tx", I82439TX)
-	SLOT_INTERFACE_INTERNAL("i82371ab", I82371AB)
-	SLOT_INTERFACE_INTERNAL("i82371sb", I82371SB)
-SLOT_INTERFACE_END
+static void pci_devices(device_slot_interface &device)
+{
+	device.option_add_internal("i82439tx", I82439TX);
+	device.option_add_internal("i82371ab", I82371AB);
+	device.option_add_internal("i82371sb", I82371SB);
+}
 
 void at586_state::at586_map(address_map &map)
 {

@@ -75,23 +75,25 @@ static const z80_daisy_config kc85_daisy_chain[] =
 	{ nullptr }
 };
 
-extern SLOT_INTERFACE_START(kc85_cart)
-	SLOT_INTERFACE("standard", KC_STANDARD) // standard 8KB ROM module
-	SLOT_INTERFACE("m006", KC_M006)         // BASIC
-	SLOT_INTERFACE("m011", KC_M011)         // 64KB RAM
-	SLOT_INTERFACE("m022", KC_M022)         // 16KB RAM
-	SLOT_INTERFACE("m032", KC_M032)         // 256KB segmented RAM
-	SLOT_INTERFACE("m033", KC_M033)         // TypeStar
-	SLOT_INTERFACE("m034", KC_M034)         // 512KB segmented RAM
-	SLOT_INTERFACE("m035", KC_M035)         // 1MB segmented RAM
-	SLOT_INTERFACE("m036", KC_M036)         // 128KB segmented RAM
-SLOT_INTERFACE_END
+void kc85_cart(device_slot_interface &device)
+{
+	device.option_add("standard", KC_STANDARD); // standard 8KB ROM module
+	device.option_add("m006", KC_M006);         // BASIC
+	device.option_add("m011", KC_M011);         // 64KB RAM
+	device.option_add("m022", KC_M022);         // 16KB RAM
+	device.option_add("m032", KC_M032);         // 256KB segmented RAM
+	device.option_add("m033", KC_M033);         // TypeStar
+	device.option_add("m034", KC_M034);         // 512KB segmented RAM
+	device.option_add("m035", KC_M035);         // 1MB segmented RAM
+	device.option_add("m036", KC_M036);         // 128KB segmented RAM
+}
 
-extern SLOT_INTERFACE_START(kc85_exp)
-	SLOT_INTERFACE("d002", KC_D002)         // D002 Bus Driver
-	SLOT_INTERFACE("d004", KC_D004)         // D004 Floppy Disk Interface
-	SLOT_INTERFACE("d004gide", KC_D004_GIDE) // D004 Floppy Disk + GIDE Interface
-SLOT_INTERFACE_END
+void kc85_exp(device_slot_interface &device)
+{
+	device.option_add("d002", KC_D002);         // D002 Bus Driver
+	device.option_add("d004", KC_D004);         // D004 Floppy Disk Interface
+	device.option_add("d004gide", KC_D004_GIDE); // D004 Floppy Disk + GIDE Interface
+}
 
 
 MACHINE_CONFIG_START(kc_state::kc85_3)

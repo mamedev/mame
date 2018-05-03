@@ -455,9 +455,10 @@ FLOPPY_FORMATS_END
     floppy_interface sf7000_floppy_interface
 -------------------------------------------------*/
 
-static SLOT_INTERFACE_START( sf7000_floppies )
-	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
-SLOT_INTERFACE_END
+static void sf7000_floppies(device_slot_interface &device)
+{
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+}
 
 /*-------------------------------------------------
     MACHINE_START( sg1000 )

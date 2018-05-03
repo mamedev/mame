@@ -199,9 +199,10 @@ void mzr8105_state::mzr8105_mem(address_map &map)
 static INPUT_PORTS_START (mzr8105)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(mzr8105_vme_cards)
-	SLOT_INTERFACE("mzr8300", VME_MZR8300)
-SLOT_INTERFACE_END
+static void mzr8105_vme_cards(device_slot_interface &device)
+{
+	device.option_add("mzr8300", VME_MZR8300);
+}
 
 /*
  * Machine configuration

@@ -980,14 +980,16 @@ FLOPPY_FORMATS_MEMBER( m5_state::floppy_formats )
 	FLOPPY_M5_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( m5_floppies )
-		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void m5_floppies(device_slot_interface &device)
+{
+		device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START(m5_cart)
-	SLOT_INTERFACE_INTERNAL("std",  M5_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("ram",  M5_ROM_RAM)
-SLOT_INTERFACE_END
+static void m5_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",  M5_ROM_STD);
+	device.option_add_internal("ram",  M5_ROM_RAM);
+}
 
 //-------------------------------------------------
 //  z80_daisy_config m5_daisy_chain
@@ -1211,9 +1213,10 @@ FLOPPY_FORMATS_MEMBER( brno_state::floppy_formats )
 	FLOPPY_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( brno_floppies )
-		SLOT_INTERFACE("35hd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void brno_floppies(device_slot_interface &device)
+{
+		device.option_add("35hd", FLOPPY_35_DD);
+}
 
 
 //**************************************************************************

@@ -1365,9 +1365,10 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static SLOT_INTERFACE_START( amiga_floppies )
-	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void amiga_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 // basic elements common to all amigas
 MACHINE_CONFIG_START(amiga_state::amiga_base)

@@ -600,9 +600,10 @@ FLOPPY_FORMATS_MEMBER( trs80_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( trs80_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void trs80_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I, with no extras

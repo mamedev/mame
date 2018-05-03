@@ -274,6 +274,10 @@ mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+mb86235_device::~mb86235_device()
+{
+}
+
 device_memory_interface::space_config_vector mb86235_device::memory_space_config() const
 {
 	return space_config_vector {

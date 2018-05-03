@@ -204,7 +204,8 @@ device_tiki100bus_card_interface::device_tiki100bus_card_interface(const machine
 #include "8088.h"
 #include "hdc.h"
 
-SLOT_INTERFACE_START( tiki100_cards )
-	SLOT_INTERFACE("8088", TIKI100_8088)
-	SLOT_INTERFACE("hdc", TIKI100_HDC)
-SLOT_INTERFACE_END
+void tiki100_cards(device_slot_interface &device)
+{
+	device.option_add("8088", TIKI100_8088);
+	device.option_add("hdc", TIKI100_HDC);
+}

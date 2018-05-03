@@ -128,7 +128,7 @@ MACHINE_CONFIG_START(acs8600_ics_device::device_add_mconfig)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio1", z80sio_device, dcda_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio1", z80sio_device, ctsa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", altos8600_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", altos8600_terminal)
 
 	MCFG_RS232_PORT_ADD("rs2321b", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio1", z80sio_device, rxb_w))

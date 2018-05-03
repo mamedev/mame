@@ -437,9 +437,10 @@ FLOPPY_FORMATS_MEMBER( nanos_state::floppy_formats )
 	FLOPPY_NANOS_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( nanos_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void nanos_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout nanos_charlayout =

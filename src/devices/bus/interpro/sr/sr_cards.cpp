@@ -18,10 +18,11 @@
 // other
 
 
-SLOT_INTERFACE_START(sr_cards)
-	SLOT_INTERFACE("mpcb963", MPCB963)
-	SLOT_INTERFACE("mpcba79", MPCBA79)
-	SLOT_INTERFACE("mpcb070", MPCB070)
-	SLOT_INTERFACE("mpcb071", MPCB071)
-	SLOT_INTERFACE("mpcb081", MPCB081)
-SLOT_INTERFACE_END
+void sr_cards(device_slot_interface &device)
+{
+	device.option_add("mpcb963", MPCB963);
+	device.option_add("mpcba79", MPCBA79);
+	device.option_add("mpcb070", MPCB070);
+	device.option_add("mpcb071", MPCB071);
+	device.option_add("mpcb081", MPCB081);
+}

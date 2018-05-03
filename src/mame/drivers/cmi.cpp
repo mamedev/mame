@@ -2166,10 +2166,11 @@ WRITE_LINE_MEMBER( cmi_state::cmi_iix_vblank )
 	}
 }
 
-static SLOT_INTERFACE_START( cmi2x_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-	SLOT_INTERFACE( "8dssd", FLOPPY_8_DSSD )
-SLOT_INTERFACE_END
+static void cmi2x_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+	device.option_add("8dssd", FLOPPY_8_DSSD);
+}
 
 MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_CPU_ADD("maincpu1", MC6809E, Q209_CPU_CLOCK)
@@ -2196,11 +2197,11 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_CPU_PROGRAM_MAP(cmi07cpu_map)
 
 	/* alpha-numeric display */
-	MCFG_DEVICE_ADD("dp1", DL1416T, 0)
+	MCFG_DEVICE_ADD("dp1", DL1416T, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<0>))
-	MCFG_DEVICE_ADD("dp2", DL1416T, 0)
+	MCFG_DEVICE_ADD("dp2", DL1416T, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<1>))
-	MCFG_DEVICE_ADD("dp3", DL1416T, 0)
+	MCFG_DEVICE_ADD("dp3", DL1416T, u32(0))
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp<2>))
 
 	/* video hardware */

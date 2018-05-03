@@ -391,12 +391,13 @@ READ8_MEMBER(hp9k3xx_state::iocpu_test0_r)
 	return !m_mlc->get_int();
 }
 
-static SLOT_INTERFACE_START(dio16_cards)
-	SLOT_INTERFACE("98544", HPDIO_98544) /* 98544 High Resolution Monochrome Card */
-	SLOT_INTERFACE("98603a", HPDIO_98603A) /* 98603A ROM BASIC (4.0) */
-	SLOT_INTERFACE("98603b", HPDIO_98603B) /* 98603B ROM BASIC (5.1) */
-	SLOT_INTERFACE("98644", HPDIO_98644) /* 98644 Async serial interface */
-SLOT_INTERFACE_END
+static void dio16_cards(device_slot_interface &device)
+{
+	device.option_add("98544", HPDIO_98544); /* 98544 High Resolution Monochrome Card */
+	device.option_add("98603a", HPDIO_98603A); /* 98603A ROM BASIC (4.0) */
+	device.option_add("98603b", HPDIO_98603B); /* 98603B ROM BASIC (5.1) */
+	device.option_add("98644", HPDIO_98644); /* 98644 Async serial interface */
+}
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	/* basic machine hardware */

@@ -410,17 +410,20 @@ WRITE8_MEMBER( olyboss_state::fdcctrl85_w )
 		m_fdd1->get_device()->mon_w(!(data & 0x80));
 }
 
-static SLOT_INTERFACE_START( bossa_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void bossa_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
-static SLOT_INTERFACE_START( bossb_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void bossb_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START( bosscd_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void bosscd_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 //**************************************************************************
 //  MACHINE CONFIGURATION
