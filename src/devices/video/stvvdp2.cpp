@@ -1544,7 +1544,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_WPSY0 (m_vdp2_regs[0x0c2/2])
 
-	#define STV_VDP2_W0SY ((STV_VDP2_WPSY0 & 0x03ff) >> 0)
+	#define STV_VDP2_W0SY ((STV_VDP2_WPSY0 & 0x07ff) >> 0)
 
 /* 1800c4 - Window Position (W0, Horizontal End Point)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1566,7 +1566,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_WPEY0 (m_vdp2_regs[0x0c6/2])
 
-	#define STV_VDP2_W0EY ((STV_VDP2_WPEY0 & 0x03ff) >> 0)
+	#define STV_VDP2_W0EY ((STV_VDP2_WPEY0 & 0x07ff) >> 0)
 
 /* 1800c8 - Window Position (W1, Horizontal Start Point)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1588,7 +1588,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_WPSY1 (m_vdp2_regs[0x0ca/2])
 
-	#define STV_VDP2_W1SY ((STV_VDP2_WPSY1 & 0x03ff) >> 0)
+	#define STV_VDP2_W1SY ((STV_VDP2_WPSY1 & 0x07ff) >> 0)
 
 /* 1800cc - Window Position (W1, Horizontal End Point)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1610,7 +1610,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_WPEY1 (m_vdp2_regs[0x0ce/2])
 
-	#define STV_VDP2_W1EY ((STV_VDP2_WPEY1 & 0x03ff) >> 0)
+	#define STV_VDP2_W1EY ((STV_VDP2_WPEY1 & 0x07ff) >> 0)
 
 /* 1800d0 - Window Control (NBG0, NBG1)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1758,7 +1758,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |  SPCLMD  | SPWINEN  |  SPTYPE3 |  SPTYPE2 |  SPTYPE1 |  SPTYPE0 |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
-	#define STV_VDP2_SPCTL  (m_vdp2_regs[0xe0/2])
+	#define STV_VDP2_SPCTL  (m_vdp2_regs[0x0e0/2])
 	#define STV_VDP2_SPCCCS     ((STV_VDP2_SPCTL & 0x3000) >> 12)
 	#define STV_VDP2_SPCCN      ((STV_VDP2_SPCTL & 0x700) >> 8)
 	#define STV_VDP2_SPCLMD     ((STV_VDP2_SPCTL & 0x20) >> 5)
