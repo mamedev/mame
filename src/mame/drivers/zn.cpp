@@ -378,7 +378,7 @@ void zn_state::zn_map(address_map &map)
 MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
+	MCFG_CPU_ADD( m_maincpu, CXD8530CQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -424,7 +424,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zn_state::zn2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL(100'000'000) )
+	MCFG_CPU_ADD( m_maincpu, CXD8661R, XTAL(100'000'000) )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(zn_state::coh1000c)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
+	MCFG_CPU_ADD(m_audiocpu, Z80, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
@@ -659,9 +659,9 @@ MACHINE_CONFIG_START(zn_state::coh1000c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -676,7 +676,7 @@ MACHINE_CONFIG_START(zn_state::coh1002c)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
+	MCFG_CPU_ADD(m_audiocpu, Z80, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
@@ -685,9 +685,9 @@ MACHINE_CONFIG_START(zn_state::coh1002c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -838,7 +838,7 @@ MACHINE_CONFIG_START(zn_state::coh3002c)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
+	MCFG_CPU_ADD(m_audiocpu, Z80, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
@@ -847,9 +847,9 @@ MACHINE_CONFIG_START(zn_state::coh3002c)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c)
 
 	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_DEVICE_ADD("qsound", QSOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1135,14 +1135,14 @@ MACHINE_CONFIG_START(zn_state::coh1000ta)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000ta_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)    /* 4 MHz */
+	MCFG_CPU_ADD(m_audiocpu, Z80, XTAL(16'000'000) / 4)    /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(fx1a_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1000ta)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL(16'000'000)/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE(m_audiocpu, 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
@@ -1680,7 +1680,7 @@ MACHINE_CONFIG_START(zn_state::coh1002e)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002e_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(12'000'000))
+	MCFG_CPU_ADD(m_audiocpu, M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(psarc_snd_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002e)
@@ -1696,7 +1696,7 @@ MACHINE_CONFIG_START(zn_state::beastrzrb)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002e_map)
 
-	MCFG_CPU_ADD("audiocpu", AT89C4051, XTAL(12'000'000)) // clock unverified
+	MCFG_CPU_ADD(m_audiocpu, AT89C4051, XTAL(12'000'000)) // clock unverified
 	MCFG_CPU_PROGRAM_MAP(beastrzrb_snd_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1002e)
@@ -2380,17 +2380,17 @@ MACHINE_CONFIG_START(zn_state::coh1001l)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1001l_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL(10'000'000))
+	MCFG_CPU_ADD(m_audiocpu, M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(atlus_snd_map)
 
 	MCFG_MACHINE_START_OVERRIDE(zn_state, coh1001l)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch16")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 3))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(m_audiocpu, 3))
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("audiocpu", 2))
+	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE(m_audiocpu, 2))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END
@@ -2683,7 +2683,7 @@ MACHINE_CONFIG_START(zn_state::coh1002msnd)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002msnd_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
+	MCFG_CPU_ADD(m_audiocpu, Z80, XTAL(32'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(cbaj_z80_map)
 	MCFG_CPU_IO_MAP(cbaj_z80_port_map)
 
