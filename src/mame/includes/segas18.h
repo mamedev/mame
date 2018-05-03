@@ -41,6 +41,7 @@ public:
 		, m_workram(*this, "workram")
 		, m_sprites_region(*this, "sprites")
 		, m_soundbank(*this, "soundbank")
+		, m_gun_recoil(*this, "P%u_Gun_Recoil", 1U)
 		, m_romboard(ROM_BOARD_INVALID)
 		, m_grayscale_enable(false)
 		, m_vdp_enable(false)
@@ -155,6 +156,8 @@ protected:
 
 	required_memory_region m_sprites_region;
 	optional_memory_bank m_soundbank;
+
+	output_finder<3> m_gun_recoil;
 
 	// configuration
 	segas18_rom_board   m_romboard;

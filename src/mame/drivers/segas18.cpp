@@ -165,6 +165,7 @@ void segas18_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void segas18_state::machine_start()
 {
+	m_gun_recoil.resolve(); // lghost
 	m_soundbank->configure_entries(0, 256, memregion("soundcpu")->base(), 0x2000);
 }
 
@@ -564,9 +565,10 @@ WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 
 WRITE8_MEMBER( segas18_state::lghost_gun_recoil_w )
 {
-	output().set_value("P1_Gun_Recoil", (~data & 0x01));
-	output().set_value("P2_Gun_Recoil", (~data & 0x02)>>1);
-	output().set_value("P3_Gun_Recoil", (~data & 0x04)>>2);
+	for (int i = 0; i < 3; i++)
+	{
+		m_gun_recoil[i] = (~data & (1<<i))>>i;
+	}
 }
 
 
