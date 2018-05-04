@@ -502,6 +502,10 @@ public:
 	void su9(machine_config &config);
 	void rsc(machine_config &config);
 
+	// PC
+	void pc_map(address_map &map);
+	void pc(machine_config &config);
+
 	// EAS, EAG
 	void eas_prepare_display();
 	DECLARE_WRITE8_MEMBER(eas_segment_w);
@@ -721,6 +725,16 @@ WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
 	m_led_select = (m_led_select & ~8) | (state ? 8 : 0);
 	csc_prepare_display();
 }
+
+
+
+/******************************************************************************
+    PC
+******************************************************************************/
+
+// TTL/generic
+
+//x
 
 
 
@@ -1182,6 +1196,18 @@ void fidel6502_state::rsc_map(address_map &map)
 }
 
 
+// PC
+
+void fidel6502_state::pc_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x0fff).ram();
+	//map(0x2000, 0x5fff).r(this, FUNC(fidel6502_state::cartridge_r));
+	map(0x8000, 0x9fff).ram();
+	map(0xb000, 0xffff).rom();
+}
+
+
 // EAS, EAG
 
 void fidel6502_state::eas_map(address_map &map)
@@ -1206,7 +1232,7 @@ void fidel6502_state::eag_map(address_map &map)
 	map(0x7020, 0x7027).w(this, FUNC(fidel6502_state::eas_segment_w)).nopr();
 	map(0x7030, 0x7037).w(this, FUNC(fidel6502_state::eas_led_w)).nopr();
 	map(0x7050, 0x7050).r(this, FUNC(fidel6502_state::eas_input_r));
-	map(0x8000, 0xffff).rom(); //AM_WRITENOP
+	map(0x8000, 0xffff).rom(); //.nopw()
 }
 
 
@@ -1256,7 +1282,7 @@ void fidel6502_state::fexcel_map(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x3800).ram();
 	map(0x4000, 0x4007).mirror(0x3ff8).rw(this, FUNC(fidel6502_state::fexcel_ttl_r), FUNC(fidel6502_state::fexcel_ttl_w));
-	//AM_RANGE(0x8000, 0x8000) AM_READNOP // checks for opening book module, but hw doesn't have a module slot
+	//map(0x8000, 0x8000).nopr(); // checks for opening book module, but hw doesn't have a module slot
 	map(0xc000, 0xffff).rom();
 }
 
@@ -1740,6 +1766,35 @@ MACHINE_CONFIG_START(fidel6502_state::su9)
 	MCFG_DEFAULT_LAYOUT(layout_fidel_su9)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(fidel6502_state::pc)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", R65C02, 4_MHz_XTAL)
+	MCFG_CPU_PROGRAM_MAP(pc_map)
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
+
+	//MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelbase_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fidel_eas)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
+	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidel6502_state, csc_speech_r))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
+
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+
+	/* cartridge */
+	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
+	MCFG_GENERIC_EXTENSIONS("bin,dat")
+	MCFG_GENERIC_LOAD(fidelbase_state, scc_cartridge)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "fidel_scc")
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* basic machine hardware */
@@ -2162,6 +2217,20 @@ ROM_START( super9ccfr )
 ROM_END
 
 
+ROM_START( fpres )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(dea8091d) SHA1(1d94a90ae076215c2c009e78ec4919dbd8467ef8) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-32107", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
+	ROM_RELOAD(           0x1000, 0x1000)
+ROM_END
+
+
 ROM_START( feasbu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("eli_bu.6", 0x8000, 0x0800, CRC(93dcc23b) SHA1(2eb8c5a85e566948bc256d6b1804694e6b0ffa6f) ) // ST M27C64A, unknown label
@@ -2502,6 +2571,8 @@ CONS( 1983, super9cc,   0,        0, su9,       su9,       fidel6502_state, 0,  
 CONS( 1983, super9ccsp, super9cc, 0, su9,       su9sp,     fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1983, super9ccg,  super9cc, 0, su9,       su9g,      fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1983, super9ccfr, super9cc, 0, su9,       su9fr,     fidel6502_state, 0,        "Fidelity Electronics", "Super 9 Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+
+CONS( 1982, fpres,      0,        0, pc,        eas,       fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1983, feasbu,     0,        0, eas,       eas,       fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1983, feasbusp,   feasbu,   0, eas,       eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
