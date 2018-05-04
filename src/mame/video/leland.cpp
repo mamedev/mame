@@ -14,10 +14,8 @@
 
 
 /* constants */
-#define VRAM_SIZE       (0x10000)
-#define QRAM_SIZE       (0x10000)
-
-#define VIDEO_WIDTH     (320)
+static constexpr int VRAM_SIZE = 0x10000;
+static constexpr int QRAM_SIZE = 0x10000;
 
 
 /* debugging */
@@ -36,10 +34,10 @@ TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
 
 	/* update the DACs */
 	if (!(m_dac_control & 0x01))
-		m_dac0->write(m_video_ram[(m_last_scanline) * 256 + 160]);
+		m_dac[0]->write(m_video_ram[(m_last_scanline) * 256 + 160]);
 
 	if (!(m_dac_control & 0x02))
-		m_dac1->write(m_video_ram[(m_last_scanline) * 256 + 161]);
+		m_dac[1]->write(m_video_ram[(m_last_scanline) * 256 + 161]);
 
 	m_last_scanline = scanline;
 
@@ -406,22 +404,18 @@ READ8_MEMBER(leland_state::ataxx_svram_port_r)
 
 uint32_t leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *bg_prom = memregion("user1")->base();
-	const uint8_t *bg_gfx = memregion("gfx1")->base();
-	offs_t bg_gfx_bank_page_size = memregion("gfx1")->bytes() / 3;
-	offs_t char_bank = (((m_gfxbank >> 4) & 0x03) * 0x2000) & (bg_gfx_bank_page_size - 1);
-	offs_t prom_bank = ((m_gfxbank >> 3) & 0x01) * 0x2000;
+	offs_t bg_gfx_bank_page_size = m_bg_gfxrom.bytes() / 3;
+	offs_t char_bank = (((m_gfxbank >> 4) & 0x03) << 13) & (bg_gfx_bank_page_size - 1);
+	offs_t prom_bank = ((m_gfxbank >> 3) & 0x01) << 13;
 
 	/* for each scanline in the visible region */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint8_t fg_data = 0;
-
 		uint16_t *dst = &bitmap.pix16(y);
 		uint8_t *fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
-		for (int x = 0; x < VIDEO_WIDTH; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* compute the effective scrolled pixel coordinates */
 			uint16_t sx = (x + m_xscroll) & 0x07ff;
@@ -434,26 +428,23 @@ uint32_t leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 
 									((sy << 6) & 0x1c000);
 
 			offs_t bg_gfx_offs = (sy & 0x07) |
-									(bg_prom[bg_prom_offs] << 3) |
+									(m_bg_prom[bg_prom_offs] << 3) |
 									((sy << 2) & 0x1800) |
 									char_bank;
 
 			/* build the pen, background is d0-d5 */
-			pen_t pen = (((bg_gfx[bg_gfx_offs + (2 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 7) |    /* d0 */
-						(((bg_gfx[bg_gfx_offs + (1 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 6) |    /* d1 */
-						(((bg_gfx[bg_gfx_offs + (0 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 5) |    /* d2 */
-						((bg_prom[bg_prom_offs] & 0xe0) >> 2);                                                  /* d3-d5 */
+			pen_t pen = (((m_bg_gfxrom[bg_gfx_offs + (2 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 7) |    /* d0 */
+						(((m_bg_gfxrom[bg_gfx_offs + (1 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 6) |    /* d1 */
+						(((m_bg_gfxrom[bg_gfx_offs + (0 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 5) |    /* d2 */
+						((m_bg_prom[bg_prom_offs] & 0xe0) >> 2);                                                  /* d3-d5 */
 
 			/* foreground is d6-d9 */
 			if (x & 0x01)
-				pen = pen | ((fg_data & 0x0f) << 6);
+				pen = pen | ((fg_src[x >> 1] & 0x0f) << 6);
 			else
-			{
-				fg_data = *fg_src++;
-				pen = pen | ((fg_data & 0xf0) << 2);
-			}
+				pen = pen | ((fg_src[x >> 1] & 0xf0) << 2);
 
-			*dst++ = pen;
+			dst[x] = pen;
 		}
 	}
 
@@ -470,20 +461,17 @@ uint32_t leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 
 
 uint32_t leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t *bg_gfx = memregion("gfx1")->base();
-	offs_t bg_gfx_bank_page_size = memregion("gfx1")->bytes() / 6;
+	offs_t bg_gfx_bank_page_size = m_bg_gfxrom.bytes() / 6;
 	offs_t bg_gfx_offs_mask = bg_gfx_bank_page_size - 1;
 
 	/* for each scanline in the visible region */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint8_t fg_data = 0;
-
 		uint16_t *dst = &bitmap.pix16(y);
 		uint8_t *fg_src = &m_video_ram[y << 8];
 
 		/* for each pixel on the scanline */
-		for (int x = 0; x < VIDEO_WIDTH; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			/* compute the effective scrolled pixel coordinates */
 			uint16_t sx = (x + m_xscroll) & 0x07ff;
@@ -499,23 +487,20 @@ uint32_t leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &
 									((m_ataxx_qram[0x4000 | qram_offs] & 0x7f) << 11)) & bg_gfx_offs_mask;
 
 			/* build the pen, background is d0-d5 */
-			pen_t pen = (((bg_gfx[bg_gfx_offs + (0 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 7) |    /* d0 */
-						(((bg_gfx[bg_gfx_offs + (1 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 6) |    /* d1 */
-						(((bg_gfx[bg_gfx_offs + (2 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 5) |    /* d2 */
-						(((bg_gfx[bg_gfx_offs + (3 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 4) |    /* d3 */
-						(((bg_gfx[bg_gfx_offs + (4 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 3) |    /* d4 */
-						(((bg_gfx[bg_gfx_offs + (5 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 2);     /* d5 */
+			pen_t pen = (((m_bg_gfxrom[bg_gfx_offs + (0 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 7) |    /* d0 */
+						(((m_bg_gfxrom[bg_gfx_offs + (1 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 6) |    /* d1 */
+						(((m_bg_gfxrom[bg_gfx_offs + (2 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 5) |    /* d2 */
+						(((m_bg_gfxrom[bg_gfx_offs + (3 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 4) |    /* d3 */
+						(((m_bg_gfxrom[bg_gfx_offs + (4 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 3) |    /* d4 */
+						(((m_bg_gfxrom[bg_gfx_offs + (5 * bg_gfx_bank_page_size)] << (sx & 0x07)) & 0x80) >> 2);     /* d5 */
 
 			/* foreground is d6-d9 */
 			if (x & 0x01)
-				pen = pen | ((fg_data & 0x0f) << 6);
+				pen = pen | ((fg_src[x >> 1] & 0x0f) << 6);
 			else
-			{
-				fg_data = *fg_src++;
-				pen = pen | ((fg_data & 0xf0) << 2);
-			}
+				pen = pen | ((fg_src[x >> 1] & 0xf0) << 2);
 
-			*dst++ = pen;
+			dst[x] = pen;
 		}
 	}
 
