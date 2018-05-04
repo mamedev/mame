@@ -233,11 +233,54 @@ WRITE8_MEMBER(xavix_state::main_w)
 	}
 }
 
+/* rad_madf has callf #$8f3f21 in various places, and expects to jump to code in ROM, it is unclear how things map in this case, as presumably
+   the CPU 0 page memory and stack are still at 0 but ROM must be in the 3xxx range (game hasn't got far enough to call this yet to help either)
+
+   the maximum romsize appears to be 0x800000 so presumably the high bit being set has some additional meaning
+
+   for now treat it as a swapped arrangement vs. the reads from the lower range, except where page 0 ram would map, it's also possible that
+   vram etc. is completely unavailable if executing from these addresses, there isn't much evidence at the moment
+
+   note, many DMA operations and tile bank redirects etc. have the high bit set too, so that could be significant if it defines how it accesses
+   memory in those cases too
+
+*/
+READ8_MEMBER(xavix_state::main2_r)
+{
+	if (offset & 0x8000)
+	{
+		return m_lowbus->read8(space, offset&0x7fff);
+	}
+	else
+	{
+		if (offset>0x200)
+			return  m_rgn[(offset) & (m_rgnlen - 1)];
+		else
+			return m_lowbus->read8(space, offset&0x7fff);
+	}
+}
+
+WRITE8_MEMBER(xavix_state::main2_w)
+{
+	if (offset & 0x8000)
+	{
+		m_lowbus->write8(space, offset & 0x7fff, data);
+	}
+	else
+	{
+		if (offset>0x200)
+			logerror("write to ROM area?\n");
+		else
+			m_lowbus->write8(space, offset & 0x7fff, data);
+	}
+}
+
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram' (this is handled in the CPU core)
 
 void xavix_state::xavix_map(address_map &map)
 {
-	map(0x000000, 0xffffff).rw(this, FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
+	map(0x000000, 0x7fffff).rw(this, FUNC(xavix_state::main_r), FUNC(xavix_state::main_w));
+	map(0x800000, 0xffffff).rw(this, FUNC(xavix_state::main2_r), FUNC(xavix_state::main2_w));
 }
 
 void xavix_state::xavix_lowbus_map(address_map &map)
@@ -629,6 +672,20 @@ MACHINE_CONFIG_START(xavix_state::xavixp)
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(xavix_state::xavix2000)
+	xavix(config);
+
+	MCFG_DEVICE_REMOVE("maincpu")
+
+	MCFG_CPU_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(xavix_map)
+	MCFG_M6502_DISABLE_DIRECT()
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
+
+MACHINE_CONFIG_END
+
+
 DRIVER_INIT_MEMBER(xavix_state, xavix)
 {
 	m_rgnlen = memregion("bios")->bytes();
@@ -869,9 +926,9 @@ ROM_START( drgqst )
 ROM_END
 
 
-CONS( 2004, xavtenni,  0,   0,  xavix,  xavix, xavix_state, xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
+CONS( 2004, xavtenni,  0,   0,  xavix2000,  xavix, xavix_state, xavix, "SSD Company LTD",         "XaviX Tennis (XaviXPORT)", MACHINE_IS_SKELETON )
 
-CONS( 2005, ttv_sw,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_lotr,  0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
-CONS( 2005, ttv_mx,    0,   0,  xavix,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
-CONS( 2003, drgqst,    0,   0,  xavix,  xavix, xavix_state, xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_sw,    0,   0,  xavix2000,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_lotr,  0,   0,  xavix2000,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_IS_SKELETON )
+CONS( 2005, ttv_mx,    0,   0,  xavix2000,  xavix, xavix_state, xavix, "Tiger / SSD Company LTD", "MX Dirt Rebel", MACHINE_IS_SKELETON )
+CONS( 2003, drgqst,    0,   0,  xavix2000,  xavix, xavix_state, xavix, "Square Enix / SSD Company LTD", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken", MACHINE_IS_SKELETON )
