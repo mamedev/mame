@@ -1376,9 +1376,10 @@ static INPUT_PORTS_START(hp64k)
 	PORT_DIPSETTING(0x1e , "19200")
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(hp64k_floppies)
-	SLOT_INTERFACE("525dd" , FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void hp64k_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd" , FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_CPU_ADD("cpu" , HP_5061_3011 , 6250000)
@@ -1477,7 +1478,7 @@ MACHINE_CONFIG_START(hp64k_state::hp64k)
 	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE("phi" , phi_device , atn_w))
 	MCFG_IEEE488_REN_CALLBACK(DEVWRITELINE("phi" , phi_device , ren_w))
 	MCFG_IEEE488_DIO_CALLBACK(DEVWRITE8("phi" , phi_device , bus_dio_w))
-	// Feel so lonely here... waiting for the 488 remotizer ;)
+	MCFG_IEEE488_SLOT_ADD("ieee_rem" , 0 , remote488_devices , nullptr)
 MACHINE_CONFIG_END
 
 ROM_START(hp64k)

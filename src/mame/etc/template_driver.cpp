@@ -52,13 +52,15 @@ uint32_t xxx_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-ADDRESS_MAP_START(xxx_state::xxx_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void xxx_state::xxx_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(xxx_state::xxx_io)
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+void xxx_state::xxx_io(address_map &map)
+{
+	map.global_mask(0xff);
+}
 
 static INPUT_PORTS_START( xxx )
 	/* dummy active high structure */

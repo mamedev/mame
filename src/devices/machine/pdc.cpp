@@ -226,20 +226,22 @@ INPUT_PORTS_END
 //  SLOT_INTERFACE( pdc_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( pdc_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void pdc_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( pdc_harddisks )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( pdc_harddisks )
-	SLOT_INTERFACE( "generic", MFMHD_GENERIC )    // Generic hard disk (self-adapting to image)
-	SLOT_INTERFACE( "st213", MFMHD_ST213 )        // Seagate ST-213 (10 MB)
-	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 (20 MB)
-	SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
-SLOT_INTERFACE_END
+static void pdc_harddisks(device_slot_interface &device)
+{
+	device.option_add("generic", MFMHD_GENERIC);    // Generic hard disk (self-adapting to image)
+	device.option_add("st213", MFMHD_ST213);        // Seagate ST-213 (10 MB)
+	device.option_add("st225", MFMHD_ST225);        // Seagate ST-225 (20 MB)
+	device.option_add("st251", MFMHD_ST251);        // Seagate ST-251 (40 MB)
+}
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )

@@ -39,13 +39,20 @@ II Plus: RAM options reduced to 16/32/48 KB.
 ************************************************************************/
 
 #include "emu.h"
-#include "includes/apple2.h"
 #include "video/apple2.h"
+
+#include "cpu/m6502/m6502.h"
+
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 
 #include "machine/74259.h"
 #include "machine/bankdev.h"
+#include "machine/kb3600.h"
+#include "machine/ram.h"
 #include "machine/timer.h"
-#include "imagedev/flopdrv.h"
+
+#include "sound/spkrdev.h"
 
 #include "bus/a2bus/a2alfam2.h"
 #include "bus/a2bus/a2applicard.h"
@@ -1312,57 +1319,60 @@ static INPUT_PORTS_START( apple2p )
 	PORT_DIPSETTING( 0x00, "RESET" )
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(apple2_slot0_cards)
-	SLOT_INTERFACE("lang", A2BUS_RAMCARD16K)      /* Apple II RAM Language Card */
-	SLOT_INTERFACE("ssram", A2BUS_RAMCARD128K)    /* Saturn Systems 128K extended language card */
-SLOT_INTERFACE_END
+static void apple2_slot0_cards(device_slot_interface &device)
+{
+	device.option_add("lang", A2BUS_RAMCARD16K);      /* Apple II RAM Language Card */
+	device.option_add("ssram", A2BUS_RAMCARD128K);    /* Saturn Systems 128K extended language card */
+}
 
-static SLOT_INTERFACE_START(apple2_cards)
-	SLOT_INTERFACE("diskii", A2BUS_DISKII)  /* Disk II Controller Card */
-	SLOT_INTERFACE("diskiing", A2BUS_DISKIING)  /* Disk II Controller Card, cycle-accurate version */
-	SLOT_INTERFACE("mockingboard", A2BUS_MOCKINGBOARD)  /* Sweet Micro Systems Mockingboard */
-	SLOT_INTERFACE("phasor", A2BUS_PHASOR)  /* Applied Engineering Phasor */
-	SLOT_INTERFACE("cffa2", A2BUS_CFFA2)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
-	SLOT_INTERFACE("cffa202", A2BUS_CFFA2_6502)  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
-	SLOT_INTERFACE("memexp", A2BUS_MEMEXP)  /* Apple II Memory Expansion Card */
-	SLOT_INTERFACE("ramfactor", A2BUS_RAMFACTOR)    /* Applied Engineering RamFactor */
-	SLOT_INTERFACE("thclock", A2BUS_THUNDERCLOCK)    /* ThunderWare ThunderClock Plus */
-	SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */
-	SLOT_INTERFACE("videoterm", A2BUS_VIDEOTERM)    /* Videx VideoTerm */
-	SLOT_INTERFACE("ssc", A2BUS_SSC)    /* Apple Super Serial Card */
-	SLOT_INTERFACE("swyft", A2BUS_SWYFT)    /* IAI SwyftCard */
-	SLOT_INTERFACE("themill", A2BUS_THEMILL)    /* Stellation Two The Mill (6809 card) */
-	SLOT_INTERFACE("sam", A2BUS_SAM)    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
-	SLOT_INTERFACE("alfam2", A2BUS_ALFAM2)    /* ALF Apple Music II */
-	SLOT_INTERFACE("echoii", A2BUS_ECHOII)    /* Street Electronics Echo II */
-	SLOT_INTERFACE("ap16", A2BUS_IBSAP16)    /* IBS AP16 (German VideoTerm clone) */
-	SLOT_INTERFACE("ap16alt", A2BUS_IBSAP16ALT)    /* IBS AP16 (German VideoTerm clone), alternate revision */
-	SLOT_INTERFACE("vtc1", A2BUS_VTC1)    /* Unknown VideoTerm clone #1 */
-	SLOT_INTERFACE("vtc2", A2BUS_VTC2)    /* Unknown VideoTerm clone #2 */
-	SLOT_INTERFACE("arcbd", A2BUS_ARCADEBOARD)    /* Third Millenium Engineering Arcade Board */
-	SLOT_INTERFACE("midi", A2BUS_MIDI)  /* Generic 6840+6850 MIDI board */
-	SLOT_INTERFACE("zipdrive", A2BUS_ZIPDRIVE)  /* ZIP Technologies IDE card */
-	SLOT_INTERFACE("echoiiplus", A2BUS_ECHOPLUS)    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
-	SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
-	SLOT_INTERFACE("applicard", A2BUS_APPLICARD)    /* PCPI Applicard */
-	SLOT_INTERFACE("aesms", A2BUS_AESMS)    /* Applied Engineering Super Music Synthesizer */
-	SLOT_INTERFACE("ultraterm", A2BUS_ULTRATERM)    /* Videx UltraTerm (original) */
-	SLOT_INTERFACE("ultratermenh", A2BUS_ULTRATERMENH)    /* Videx UltraTerm (enhanced //e) */
-	SLOT_INTERFACE("aevm80", A2BUS_AEVIEWMASTER80)    /* Applied Engineering ViewMaster 80 */
-	SLOT_INTERFACE("parallel", A2BUS_PIC)   /* Apple Parallel Interface Card */
-	SLOT_INTERFACE("corvus", A2BUS_CORVUS)  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
-	SLOT_INTERFACE("mcms1", A2BUS_MCMS1)  /* Mountain Computer Music System, card 1 of 2 */
-	SLOT_INTERFACE("mcms2", A2BUS_MCMS2)  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
-	SLOT_INTERFACE("dx1", A2BUS_DX1)    /* Decillonix DX-1 sampler card */
-	SLOT_INTERFACE("tm2ho", A2BUS_TIMEMASTERHO) /* Applied Engineering TimeMaster II H.O. */
-	SLOT_INTERFACE("mouse", A2BUS_MOUSE)    /* Apple II Mouse Card */
-	SLOT_INTERFACE("ezcgi", A2BUS_EZCGI)    /* E-Z Color Graphics Interface */
-	SLOT_INTERFACE("ezcgi9938", A2BUS_EZCGI_9938)   /* E-Z Color Graphics Interface (TMS9938) */
-	SLOT_INTERFACE("ezcgi9958", A2BUS_EZCGI_9958)   /* E-Z Color Graphics Interface (TMS9958) */
-	SLOT_INTERFACE("ssprite", A2BUS_SSPRITE)    /* Synetix SuperSprite Board */
-	SLOT_INTERFACE("ssbapple", A2BUS_SSBAPPLE)  /* SSB Apple speech board */
-//  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
-SLOT_INTERFACE_END
+static void apple2_cards(device_slot_interface &device)
+{
+	device.option_add("diskii", A2BUS_DISKII);  /* Disk II Controller Card */
+	device.option_add("diskiing", A2BUS_DISKIING);  /* Disk II Controller Card, cycle-accurate version */
+	device.option_add("diskiing13", A2BUS_DISKIING13);  /* Disk II Controller Card, cycle-accurate version */
+	device.option_add("mockingboard", A2BUS_MOCKINGBOARD);  /* Sweet Micro Systems Mockingboard */
+	device.option_add("phasor", A2BUS_PHASOR);  /* Applied Engineering Phasor */
+	device.option_add("cffa2", A2BUS_CFFA2);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 65C02/65816 firmware */
+	device.option_add("cffa202", A2BUS_CFFA2_6502);  /* CFFA2000 Compact Flash for Apple II (www.dreher.net), 6502 firmware */
+	device.option_add("memexp", A2BUS_MEMEXP);  /* Apple II Memory Expansion Card */
+	device.option_add("ramfactor", A2BUS_RAMFACTOR);    /* Applied Engineering RamFactor */
+	device.option_add("thclock", A2BUS_THUNDERCLOCK);    /* ThunderWare ThunderClock Plus */
+	device.option_add("softcard", A2BUS_SOFTCARD);  /* Microsoft SoftCard */
+	device.option_add("videoterm", A2BUS_VIDEOTERM);    /* Videx VideoTerm */
+	device.option_add("ssc", A2BUS_SSC);    /* Apple Super Serial Card */
+	device.option_add("swyft", A2BUS_SWYFT);    /* IAI SwyftCard */
+	device.option_add("themill", A2BUS_THEMILL);    /* Stellation Two The Mill (6809 card) */
+	device.option_add("sam", A2BUS_SAM);    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
+	device.option_add("alfam2", A2BUS_ALFAM2);    /* ALF Apple Music II */
+	device.option_add("echoii", A2BUS_ECHOII);    /* Street Electronics Echo II */
+	device.option_add("ap16", A2BUS_IBSAP16);    /* IBS AP16 (German VideoTerm clone) */
+	device.option_add("ap16alt", A2BUS_IBSAP16ALT);    /* IBS AP16 (German VideoTerm clone), alternate revision */
+	device.option_add("vtc1", A2BUS_VTC1);    /* Unknown VideoTerm clone #1 */
+	device.option_add("vtc2", A2BUS_VTC2);    /* Unknown VideoTerm clone #2 */
+	device.option_add("arcbd", A2BUS_ARCADEBOARD);    /* Third Millenium Engineering Arcade Board */
+	device.option_add("midi", A2BUS_MIDI);  /* Generic 6840+6850 MIDI board */
+	device.option_add("zipdrive", A2BUS_ZIPDRIVE);  /* ZIP Technologies IDE card */
+	device.option_add("echoiiplus", A2BUS_ECHOPLUS);    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
+	device.option_add("scsi", A2BUS_SCSI);  /* Apple II SCSI Card */
+	device.option_add("applicard", A2BUS_APPLICARD);    /* PCPI Applicard */
+	device.option_add("aesms", A2BUS_AESMS);    /* Applied Engineering Super Music Synthesizer */
+	device.option_add("ultraterm", A2BUS_ULTRATERM);    /* Videx UltraTerm (original) */
+	device.option_add("ultratermenh", A2BUS_ULTRATERMENH);    /* Videx UltraTerm (enhanced //e) */
+	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
+	device.option_add("parallel", A2BUS_PIC);   /* Apple Parallel Interface Card */
+	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
+	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
+	device.option_add("mcms2", A2BUS_MCMS2);  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
+	device.option_add("dx1", A2BUS_DX1);    /* Decillonix DX-1 sampler card */
+	device.option_add("tm2ho", A2BUS_TIMEMASTERHO); /* Applied Engineering TimeMaster II H.O. */
+	device.option_add("mouse", A2BUS_MOUSE);    /* Apple II Mouse Card */
+	device.option_add("ezcgi", A2BUS_EZCGI);    /* E-Z Color Graphics Interface */
+	device.option_add("ezcgi9938", A2BUS_EZCGI_9938);   /* E-Z Color Graphics Interface (TMS9938) */
+	device.option_add("ezcgi9958", A2BUS_EZCGI_9958);   /* E-Z Color Graphics Interface (TMS9958) */
+	device.option_add("ssprite", A2BUS_SSPRITE);    /* Synetix SuperSprite Board */
+	device.option_add("ssbapple", A2BUS_SSBAPPLE);  /* SSB Apple speech board */
+//  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
+}
 
 MACHINE_CONFIG_START(napple2_state::apple2_common)
 	/* basic machine hardware */

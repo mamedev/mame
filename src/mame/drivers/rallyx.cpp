@@ -254,18 +254,6 @@ WRITE_LINE_MEMBER(rallyx_state::flip_screen_w)
 }
 
 
-WRITE_LINE_MEMBER(rallyx_state::led_0_w)
-{
-	output().set_led_value(0, state);
-}
-
-
-WRITE_LINE_MEMBER(rallyx_state::led_1_w)
-{
-	output().set_led_value(1, state);
-}
-
-
 WRITE_LINE_MEMBER(rallyx_state::coin_lockout_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
@@ -838,8 +826,8 @@ MACHINE_CONFIG_START(rallyx_state::rallyx)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rallyx_state, irq_mask_w)) // INT ON
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(rallyx_state, sound_on_w)) // SOUND ON
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rallyx_state, flip_screen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rallyx_state, led_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(rallyx_state, led_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led0"))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led1"))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rallyx_state, coin_lockout_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(rallyx_state, coin_counter_1_w))
 
@@ -918,8 +906,7 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-	downcast<timeplt_audio_device *>(device)->locomotn_sound(config);
+	MCFG_SOUND_ADD("timeplt_audio", LOCOMOTN_AUDIO, 0)
 MACHINE_CONFIG_END
 
 

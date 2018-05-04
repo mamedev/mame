@@ -525,9 +525,10 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static SLOT_INTERFACE_START( rc759_floppies )
-	SLOT_INTERFACE("hd", FLOPPY_525_HD)
-SLOT_INTERFACE_END
+static void rc759_floppies(device_slot_interface &device)
+{
+	device.option_add("hd", FLOPPY_525_HD);
+}
 
 MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_CPU_ADD("maincpu", I80186, 6000000)

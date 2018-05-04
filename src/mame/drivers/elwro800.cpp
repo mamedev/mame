@@ -542,9 +542,10 @@ INTERRUPT_GEN_MEMBER(elwro800_state::elwro800jr_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static SLOT_INTERFACE_START( elwro800jr_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void elwro800jr_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout elwro800_charlayout =

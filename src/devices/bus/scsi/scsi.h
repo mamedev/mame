@@ -7,7 +7,7 @@
 #pragma once
 
 #include "machine/buffer.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 
 #define SCSI_PORT_DEVICE1 "1"
 #define SCSI_PORT_DEVICE2 "2"
@@ -217,7 +217,7 @@ private:
 	int m_data7_out;
 };
 
-extern const device_type SCSI_PORT;
+DECLARE_DEVICE_TYPE(SCSI_PORT, scsi_port_device)
 
 class scsi_port_interface;
 

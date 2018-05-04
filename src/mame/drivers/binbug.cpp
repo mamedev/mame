@@ -320,7 +320,7 @@ MACHINE_CONFIG_START(binbug_state::binbug)
 
 	/* Keyboard */
 	MCFG_RS232_PORT_ADD("keyboard", default_rs232_devices, "keyboard")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	/* Cassette */
 	MCFG_CASSETTE_ADD( "cassette" )

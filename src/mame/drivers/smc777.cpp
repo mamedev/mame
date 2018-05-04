@@ -101,7 +101,7 @@ public:
 	DECLARE_WRITE8_MEMBER(floppy_select_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	
+
 	DECLARE_QUICKLOAD_LOAD_MEMBER(smc777);
 
 	void smc777(machine_config &config);
@@ -1016,9 +1016,10 @@ INTERRUPT_GEN_MEMBER(smc777_state::vblank_irq)
 }
 
 
-static SLOT_INTERFACE_START( smc777_floppies )
-	SLOT_INTERFACE("ssdd", FLOPPY_35_SSDD)
-SLOT_INTERFACE_END
+static void smc777_floppies(device_slot_interface &device)
+{
+	device.option_add("ssdd", FLOPPY_35_SSDD);
+}
 
 
 MACHINE_CONFIG_START(smc777_state::smc777)

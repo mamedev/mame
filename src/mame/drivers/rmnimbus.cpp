@@ -28,13 +28,15 @@
 #include "formats/pc_dsk.h"
 
 
-static SLOT_INTERFACE_START(rmnimbus_floppies)
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void rmnimbus_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("rmnkbd", RMNIMBUS_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("rmnkbd", RMNIMBUS_KEYBOARD);
+}
 
 void rmnimbus_state::nimbus_mem(address_map &map)
 {

@@ -628,11 +628,12 @@ FLOPPY_FORMATS_MEMBER( tiki100_state::floppy_formats )
 	FLOPPY_TIKI100_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( tiki100_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD ) // Tead FD-55A
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Teac FD-55F
-SLOT_INTERFACE_END
+static void tiki100_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd", FLOPPY_525_DD); // Tead FD-55A
+	device.option_add("525qd", FLOPPY_525_QD); // Teac FD-55F
+}
 
 /* AY-3-8912 Interface */
 

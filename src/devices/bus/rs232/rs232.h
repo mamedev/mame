@@ -119,12 +119,20 @@
 
 class device_rs232_port_interface;
 
-class rs232_port_device : public device_t,
-	public device_slot_interface
+class rs232_port_device : public device_t, public device_slot_interface
 {
 	friend class device_rs232_port_interface;
 
 public:
+	template <typename T>
+	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: rs232_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~rs232_port_device();
 
@@ -313,6 +321,6 @@ protected:
 
 DECLARE_DEVICE_TYPE(RS232_PORT, rs232_port_device)
 
-SLOT_INTERFACE_EXTERN( default_rs232_devices );
+void default_rs232_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_RS232_RS232_H

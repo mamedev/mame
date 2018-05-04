@@ -69,9 +69,10 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fr_w )
 	// S1602 RRC/TRC
 }
 
-static SLOT_INTERFACE_START( s100_dj2db_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void s100_dj2db_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 {

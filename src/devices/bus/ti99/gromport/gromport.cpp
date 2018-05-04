@@ -285,13 +285,15 @@ void cartridge_connector_device::device_config_complete()
 
 } } } // end namespace bus::ti99::gromport
 
-SLOT_INTERFACE_START( gromport4 )
-	SLOT_INTERFACE("single",   TI99_GROMPORT_SINGLE)
-	SLOT_INTERFACE("multi",    TI99_GROMPORT_MULTI)
-	SLOT_INTERFACE("gkracker", TI99_GROMPORT_GK)
-SLOT_INTERFACE_END
+void gromport4(device_slot_interface &device)
+{
+	device.option_add("single",   TI99_GROMPORT_SINGLE);
+	device.option_add("multi",    TI99_GROMPORT_MULTI);
+	device.option_add("gkracker", TI99_GROMPORT_GK);
+}
 
-SLOT_INTERFACE_START( gromport8 )
-	SLOT_INTERFACE("single", TI99_GROMPORT_SINGLE)
-	SLOT_INTERFACE("multi",  TI99_GROMPORT_MULTI)
-SLOT_INTERFACE_END
+void gromport8(device_slot_interface &device)
+{
+	device.option_add("single", TI99_GROMPORT_SINGLE);
+	device.option_add("multi",  TI99_GROMPORT_MULTI);
+}

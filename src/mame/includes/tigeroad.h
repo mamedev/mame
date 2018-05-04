@@ -6,6 +6,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 
 #include "machine/gen_latch.h"
 
@@ -39,19 +40,16 @@ public:
 	int m_bgcharbank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	DECLARE_WRITE16_MEMBER(f1dream_control_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_soundcmd_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_videoram_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_videoctrl_w);
 	DECLARE_WRITE16_MEMBER(tigeroad_scroll_w);
 	DECLARE_WRITE8_MEMBER(msm5205_w);
-	DECLARE_DRIVER_INIT(f1dream);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
 	virtual void video_start() override;
 	uint32_t screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void f1dream_protection_w(address_space &space);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<msm5205_device> m_msm;
@@ -113,4 +111,31 @@ protected:
 	u16     m_host_latch, m_mcu_latch;
 	u16     m_mcu_output;
 	u8      m_mcu_latch_ctl;
+};
+
+class f1dream_state : public tigeroad_state
+{
+public:
+	f1dream_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tigeroad_state(mconfig, type, tag)
+		, m_mcu(*this, "mcu")
+		, m_old_p3(0xff)
+	{
+	}
+
+	void f1dream(machine_config &config);
+	void f1dream_map(address_map &map);
+	void f1dream_mcu_io(address_map &map);
+
+private:
+	DECLARE_WRITE8_MEMBER(out1_w);
+	DECLARE_WRITE8_MEMBER(out3_w);
+
+	DECLARE_READ8_MEMBER(mcu_shared_r);
+	DECLARE_WRITE8_MEMBER(mcu_shared_w);
+
+	DECLARE_WRITE16_MEMBER(blktiger_to_mcu_w);
+
+	required_device<cpu_device> m_mcu;
+	uint8_t m_old_p3;
 };

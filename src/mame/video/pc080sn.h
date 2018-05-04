@@ -85,6 +85,6 @@ DECLARE_DEVICE_TYPE(PC080SN, pc080sn_device)
 	downcast<pc080sn_device &>(*device).set_dblwidth(_dbl);
 
 #define MCFG_PC080SN_GFXDECODE(_gfxtag) \
-	downcast<pc080sn_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<pc080sn_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_PC080SN_H

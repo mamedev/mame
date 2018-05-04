@@ -916,9 +916,10 @@ static const floppy_format_type apc_floppy_formats[] = {
 	nullptr
 };
 
-static SLOT_INTERFACE_START( apc_floppies )
-	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void apc_floppies(device_slot_interface &device)
+{
+	device.option_add("8", FLOPPY_8_DSDD);
+}
 
 MACHINE_CONFIG_START(apc_state::apc)
 

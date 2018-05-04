@@ -16,9 +16,10 @@ TODO:
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 
-static SLOT_INTERFACE_START(isa8_myb3k_com)
-	SLOT_INTERFACE("null_modem", NULL_MODEM)
-SLOT_INTERFACE_END
+static void isa8_myb3k_com(device_slot_interface &device)
+{
+	device.option_add("null_modem", NULL_MODEM);
+}
 
 
 //**************************************************************************

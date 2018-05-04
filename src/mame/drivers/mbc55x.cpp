@@ -233,11 +233,12 @@ FLOPPY_FORMATS_END
 // MBC-555-2 : 2 x 5.25" disk-drive (360 KB)
 // MBC-555-3 : 2 x 5.25" disk-drive (720 KB)
 
-static SLOT_INTERFACE_START( mbc55x_floppies )
-	SLOT_INTERFACE("ssdd", FLOPPY_525_SSDD)
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void mbc55x_floppies(device_slot_interface &device)
+{
+	device.option_add("ssdd", FLOPPY_525_SSDD);
+	device.option_add("dd", FLOPPY_525_DD);
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(mbc55x_state::mbc55x)

@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(moo_state::moo)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

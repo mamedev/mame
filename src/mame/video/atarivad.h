@@ -26,7 +26,7 @@
 #define MCFG_ATARI_VAD_PLAYFIELD(_class, _gfxtag, _getinfo) \
 	{ std::string fulltag(device->tag()); fulltag.append(":playfield"); device_t *device; \
 	MCFG_TILEMAP_ADD(fulltag.c_str()) \
-	MCFG_TILEMAP_GFXDECODE("^" _gfxtag) \
+	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
 	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
 	MCFG_TILEMAP_TILE_SIZE(8,8) \
@@ -35,7 +35,7 @@
 #define MCFG_ATARI_VAD_PLAYFIELD2(_class, _gfxtag, _getinfo) \
 	{ std::string fulltag(device->tag()); fulltag.append(":playfield2"); device_t *device; \
 	MCFG_TILEMAP_ADD(fulltag.c_str()) \
-	MCFG_TILEMAP_GFXDECODE("^" _gfxtag) \
+	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
 	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
 	MCFG_TILEMAP_TILE_SIZE(8,8) \
@@ -45,7 +45,7 @@
 #define MCFG_ATARI_VAD_ALPHA(_class, _gfxtag, _getinfo) \
 	{ std::string fulltag(device->tag()); fulltag.append(":alpha"); device_t *device; \
 	MCFG_TILEMAP_ADD(fulltag.c_str()) \
-	MCFG_TILEMAP_GFXDECODE("^" _gfxtag) \
+	MCFG_TILEMAP_GFXDECODE(_gfxtag) \
 	MCFG_TILEMAP_BYTES_PER_ENTRY(2) \
 	MCFG_TILEMAP_INFO_CB_DEVICE(DEVICE_SELF_OWNER, _class, _getinfo) \
 	MCFG_TILEMAP_TILE_SIZE(8,8) \
@@ -54,8 +54,8 @@
 
 #define MCFG_ATARI_VAD_MOB(_config, _gfxtag) \
 	{ std::string fulltag(device->tag()); fulltag.append(":mob"); device_t *device; \
-	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag.c_str(), "^^screen", _config) \
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("^" _gfxtag) }
+	MCFG_ATARI_MOTION_OBJECTS_ADD(fulltag.c_str(), "screen", _config) \
+	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE(_gfxtag) }
 
 
 

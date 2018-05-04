@@ -22,9 +22,10 @@ FLOPPY_FORMATS_MEMBER( sv801_device::floppy_formats )
 	FLOPPY_SVI_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( svi_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void svi_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

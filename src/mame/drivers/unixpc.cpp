@@ -317,9 +317,10 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START( unixpc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void unixpc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(unixpc_state::unixpc)
 	// basic machine hardware

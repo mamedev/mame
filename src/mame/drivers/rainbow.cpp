@@ -862,12 +862,13 @@ FLOPPY_IMD_FORMAT,
 FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START(rainbow_floppies)
-SLOT_INTERFACE("525qd", FLOPPY_525_QD) // QD means 80 tracks with DD data rate (single or double sided).
-SLOT_INTERFACE("525dd", FLOPPY_525_DD) // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
-SLOT_INTERFACE("35dd", FLOPPY_35_DD) // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
-SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD) // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster
-SLOT_INTERFACE_END
+static void rainbow_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD); // QD means 80 tracks with DD data rate (single or double sided).
+	device.option_add("525dd", FLOPPY_525_DD); // mimic a 5.25" PC (40 track) drive. Requires IDrive5.SYS.
+	device.option_add("35dd", FLOPPY_35_DD); // mimic 3.5" PC drive (720K, double density). Use Impdrv3.SYS.
+	device.option_add("525ssdd", FLOPPY_525_SSDD); // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster
+}
 
 void rainbow_state::machine_start()
 {
@@ -1678,7 +1679,7 @@ void rainbow_state::hdc_reset()
 
 // Return 'hard_disk_file' object for harddisk 1 (fixed).
 // < nullptr if geometry is insane or other errors occured >
-hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
+hard_disk_file *rainbow_state::rainbow_hdc_file(int drv)
 {
 	m_hdc_drive_ready = false;
 

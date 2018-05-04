@@ -43,10 +43,11 @@ FLOPPY_FORMATS_MEMBER( compis_fdc_device::floppy_formats )
 	FLOPPY_CPIS_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( compis_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void compis_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 
 //-------------------------------------------------

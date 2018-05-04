@@ -72,9 +72,10 @@ void electron_state::video_start()
 	m_scanline_timer->adjust( m_screen->time_until_pos(0), 0, m_screen->scan_period() );
 }
 
-inline uint8_t electron_state::read_vram(  uint16_t addr )
+inline uint8_t electron_state::read_vram( uint16_t addr )
 {
-	return m_ula.vram[ addr % m_ula.screen_size ];
+	if ( addr & 0x8000 ) addr -= m_ula.screen_size;
+	return m_ram->read( addr );
 }
 
 inline void electron_state::electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
@@ -84,7 +85,9 @@ inline void electron_state::electron_plot_pixel(bitmap_ind16 &bitmap, int x, int
 
 uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x = 0;
+	int min_x = screen.visible_area().min_x;
+	int min_y = screen.visible_area().min_y;
+	int x = min_x;
 	int pal[16];
 	int scanline = screen.vpos();
 	rectangle r = cliprect;
@@ -114,7 +117,7 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 	case 0:
 		for( int i = 0; i < 80; i++ )
 		{
-			uint8_t pattern = read_vram( m_ula.screen_addr + (i << 3) );
+			uint8_t pattern = read_vram( m_ula.screen_addr + i * 8 );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)& 1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>6)& 1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>5)& 1] );
@@ -125,7 +128,7 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)& 1] );
 		}
 		m_ula.screen_addr++;
-		if ( ( scanline & 0x07 ) == 7 )
+		if ( ( ( scanline - min_y ) & 0x07 ) == 7 )
 			m_ula.screen_addr += 0x278;
 		break;
 
@@ -143,7 +146,7 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map4[pattern>>0]] );
 		}
 		m_ula.screen_addr++;
-		if ( ( scanline & 0x07 ) == 7 )
+		if ( ( ( scanline - min_y ) & 0x07 ) == 7 )
 			m_ula.screen_addr += 0x278;
 		break;
 
@@ -161,12 +164,12 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map16[pattern>>0]] );
 		}
 		m_ula.screen_addr++;
-		if ( ( scanline & 0x07 ) == 7 )
+		if ( ( ( scanline - min_y ) & 0x07 ) == 7 )
 			m_ula.screen_addr += 0x278;
 		break;
 
 	case 3:
-		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) )
+		if ( ( ( scanline - min_y ) > 249 ) || ( ( scanline - min_y ) % 10 >= 8 ) )
 			bitmap.fill(7, r );
 		else
 		{
@@ -184,7 +187,7 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 			}
 			m_ula.screen_addr++;
 		}
-		if ( scanline % 10 == 9 )
+		if ( ( scanline - min_y ) % 10 == 9 )
 			m_ula.screen_addr += 0x278;
 		break;
 
@@ -211,7 +214,7 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)&1] );
 		}
 		m_ula.screen_addr++;
-		if ( ( scanline & 0x07 ) == 7 )
+		if ( ( ( scanline - min_y ) & 0x07 ) == 7 )
 			m_ula.screen_addr += 0x138;
 		break;
 
@@ -237,12 +240,12 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map4[pattern>>0]] );
 		}
 		m_ula.screen_addr++;
-		if ( ( scanline & 0x07 ) == 7 )
+		if ( ( ( scanline - min_y ) & 0x07 ) == 7 )
 			m_ula.screen_addr += 0x138;
 		break;
 
 	case 6:
-		if ( ( scanline > 249 ) || ( scanline % 10 >= 8 ) )
+		if ( ( ( scanline - min_y ) > 249) || ( ( scanline - min_y ) % 10 >= 8 ) )
 			bitmap.fill(7, r );
 		else
 		{
@@ -267,11 +270,13 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>0)&1] );
 			}
 			m_ula.screen_addr++;
-			if ( ( scanline % 10 ) == 7 )
+			if ( ( ( scanline - min_y ) % 10 ) == 7 )
 				m_ula.screen_addr += 0x138;
 		}
 		break;
 	}
+	if ( m_ula.screen_addr & 0x8000 )
+		m_ula.screen_addr -= m_ula.screen_size;
 
 	return 0;
 }
@@ -280,14 +285,16 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_scanline_interrupt)
 {
 	switch (m_screen->vpos())
 	{
-	case 43:
+	case 99:
 		electron_interrupt_handler( INT_SET, INT_RTC );
 		break;
-	case 199:
-		electron_interrupt_handler( INT_SET, INT_DISPLAY_END );
+	case 249:
+	case 255:
+		if ( m_screen->vpos() == m_ula.screen_dispend )
+			electron_interrupt_handler( INT_SET, INT_DISPLAY_END );
 		break;
-	case 256:
-		m_ula.screen_addr = m_ula.screen_start - m_ula.screen_base;
+	case 311:
+		m_ula.screen_addr = m_ula.screen_start;
 		break;
 	}
 }

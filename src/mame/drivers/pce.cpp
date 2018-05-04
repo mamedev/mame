@@ -305,13 +305,14 @@ uint32_t pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-static SLOT_INTERFACE_START(pce_cart)
-	SLOT_INTERFACE_INTERNAL("rom", PCE_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("cdsys3u", PCE_ROM_CDSYS3)
-	SLOT_INTERFACE_INTERNAL("cdsys3j", PCE_ROM_CDSYS3)
-	SLOT_INTERFACE_INTERNAL("populous", PCE_ROM_POPULOUS)
-	SLOT_INTERFACE_INTERNAL("sf2", PCE_ROM_SF2)
-SLOT_INTERFACE_END
+static void pce_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom", PCE_ROM_STD);
+	device.option_add_internal("cdsys3u", PCE_ROM_CDSYS3);
+	device.option_add_internal("cdsys3j", PCE_ROM_CDSYS3);
+	device.option_add_internal("populous", PCE_ROM_POPULOUS);
+	device.option_add_internal("sf2", PCE_ROM_SF2);
+}
 
 MACHINE_CONFIG_START(pce_state::pce_common)
 	/* basic machine hardware */

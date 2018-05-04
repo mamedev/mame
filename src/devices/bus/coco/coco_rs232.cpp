@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "coco_rs232.h"
 
-#include "cococart.h"
 #include "machine/mos6551.h"
 #include "bus/rs232/rs232.h"
 
@@ -32,8 +31,8 @@
 namespace
 {
 	class coco_rs232_device :
-		public device_t,
-		public device_cococart_interface
+			public device_t,
+			public device_cococart_interface
 	{
 	public:
 		// construction/destruction
@@ -112,4 +111,6 @@ const tiny_rom_entry *coco_rs232_device::device_rom_region() const
 //  DEVICE DECLARATION
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(COCO_RS232, coco_rs232_device, "coco_rs232", "CoCo Deluxe RS-232 PAK")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_RS232, device_cococart_interface, coco_rs232_device, "coco_rs232", "CoCo Deluxe RS-232 PAK")
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;

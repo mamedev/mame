@@ -1599,19 +1599,21 @@ WRITE_LINE_MEMBER( c128_state::exp_reset_w )
 //  SLOT_INTERFACE( c128dcr_iec_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( c128dcr_iec_devices )
-	SLOT_INTERFACE("c1571", C1571)
-	SLOT_INTERFACE("c1571cr", C1571CR)
-SLOT_INTERFACE_END
+void c128dcr_iec_devices(device_slot_interface &device)
+{
+	device.option_add("c1571", C1571);
+	device.option_add("c1571cr", C1571CR);
+}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( c128d81_iec_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( c128d81_iec_devices )
-	SLOT_INTERFACE("c1563", C1563)
-SLOT_INTERFACE_END
+void c128d81_iec_devices(device_slot_interface &device)
+{
+	device.option_add("c1563", C1563);
+}
 
 
 

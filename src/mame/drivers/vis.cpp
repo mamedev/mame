@@ -140,8 +140,8 @@ MACHINE_CONFIG_START(vis_audio_device::device_add_mconfig)
 	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
 	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 READ8_MEMBER(vis_audio_device::pcm_r)
@@ -239,7 +239,6 @@ private:
 	rgb_t yuv_to_rgb(int y, int u, int v) const;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	std::string m_screen_tag;
 	int m_extcnt;
 	uint8_t m_extreg;
 	uint8_t m_interlace;
@@ -250,12 +249,11 @@ private:
 
 DEFINE_DEVICE_TYPE(VIS_VGA, vis_vga_device, "vis_vga", "vis_vga")
 
-vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: svga_device(mconfig, VIS_VGA, tag, owner, clock),
-	device_isa16_card_interface(mconfig, *this),
-	m_screen_tag(subtag("screen"))
+vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	svga_device(mconfig, VIS_VGA, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this)
 {
-	set_screen(m_screen_tag.c_str());
+	set_screen(*this, "screen");
 }
 
 MACHINE_CONFIG_START(vis_vga_device::device_add_mconfig)
@@ -859,10 +857,11 @@ void vis_state::at16_io(address_map &map)
 	map(0x031a, 0x031a).r(this, FUNC(vis_state::unk3_r));
 }
 
-static SLOT_INTERFACE_START(vis_cards)
-	SLOT_INTERFACE("visaudio", VIS_AUDIO)
-	SLOT_INTERFACE("visvga", VIS_VGA)
-SLOT_INTERFACE_END
+static void vis_cards(device_slot_interface &device)
+{
+	device.option_add("visaudio", VIS_AUDIO);
+	device.option_add("visvga", VIS_VGA);
+}
 
 // TODO: other buttons
 static INPUT_PORTS_START(vis)

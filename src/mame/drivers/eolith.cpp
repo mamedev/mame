@@ -231,13 +231,14 @@ void eolith_state::eolith_map(address_map &map)
 	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
 }
 
-ADDRESS_MAP_START(eolith_state::hidctch3_map)
-	AM_IMPORT_FROM(eolith_map)
-	AM_RANGE(0xfc200000, 0xfc200003) AM_WRITENOP // this generates pens vibration
+void eolith_state::hidctch3_map(address_map &map)
+{
+	eolith_map(map);
+	map(0xfc200000, 0xfc200003).nopw(); // this generates pens vibration
 	// It is not clear why the first reads are needed too
-	AM_RANGE(0xfce00000, 0xfce00003) AM_MIRROR(0x00080000) AM_READ(hidctch3_pen_r<0>)
-	AM_RANGE(0xfcf00000, 0xfcf00003) AM_MIRROR(0x00080000) AM_READ(hidctch3_pen_r<1>)
-ADDRESS_MAP_END
+	map(0xfce00000, 0xfce00003).mirror(0x00080000).r(this, FUNC(eolith_state::hidctch3_pen_r<0>));
+	map(0xfcf00000, 0xfcf00003).mirror(0x00080000).r(this, FUNC(eolith_state::hidctch3_pen_r<1>));
+}
 
 
 /*************************************

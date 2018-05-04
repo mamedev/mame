@@ -27,10 +27,11 @@ DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "Texas Instruments TP032
 
 
 // internal memory maps
-ADDRESS_MAP_START(tp0320_cpu_device::data_192x4)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-	AM_RANGE(0x80, 0xbf) AM_RAM AM_MIRROR(0x40) // DAM
-ADDRESS_MAP_END
+void tp0320_cpu_device::data_192x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+	map(0x80, 0xbf).ram().mirror(0x40); // DAM
+}
 
 
 // device definitions

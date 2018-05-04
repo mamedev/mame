@@ -168,12 +168,13 @@ void miniforce_state::machine_reset()
 static INPUT_PORTS_START (miniforce)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(miniforce_vme_cards)
-	SLOT_INTERFACE("fccpu21", VME_FCCPU21)
-	SLOT_INTERFACE("fcisio", VME_FCISIO1)
-	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
-	SLOT_INTERFACE("hcpu30", VME_HCPU30)
-SLOT_INTERFACE_END
+static void miniforce_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fccpu21", VME_FCCPU21);
+	device.option_add("fcisio", VME_FCISIO1);
+	device.option_add("fcscsi", VME_FCSCSI1);
+	device.option_add("hcpu30", VME_HCPU30);
+}
 
 /*
  * Machine configuration

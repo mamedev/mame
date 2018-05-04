@@ -83,10 +83,11 @@ void slicer_state::slicer_io(address_map &map)
 	map(0x0185, 0x0185).r("sasi_ctrl_in", FUNC(input_buffer_device::read));
 }
 
-static SLOT_INTERFACE_START( slicer_floppies )
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("8dsdd", FLOPPY_8_DSDD)
-SLOT_INTERFACE_END
+static void slicer_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 MACHINE_CONFIG_START(slicer_state::slicer)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000) / 2)

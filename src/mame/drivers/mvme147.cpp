@@ -640,9 +640,10 @@ WRITE16_MEMBER (mvme147_state::vme_a16_w){
 }
 #endif
 
-static SLOT_INTERFACE_START(mvme147_vme_cards)
-	SLOT_INTERFACE("mvme350", VME_MVME350)
-SLOT_INTERFACE_END
+static void mvme147_vme_cards(device_slot_interface &device)
+{
+	device.option_add("mvme350", VME_MVME350);
+}
 
 /*
  * Machine configuration

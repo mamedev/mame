@@ -695,9 +695,10 @@ image_init_result atom_state::load_cart(device_image_interface &image, generic_s
 	return image_init_result::PASS;
 }
 
-static SLOT_INTERFACE_START(atom_floppies)
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void atom_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+}
 
 FLOPPY_FORMATS_MEMBER(atom_state::floppy_formats)
 	FLOPPY_ATOM_FORMAT

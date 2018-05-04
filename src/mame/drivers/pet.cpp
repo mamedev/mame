@@ -1584,9 +1584,10 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 //  SLOT_INTERFACE( cbm8296d_ieee488_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( cbm8296d_ieee488_devices )
-	SLOT_INTERFACE("c8250lp", C8250LP)
-SLOT_INTERFACE_END
+void cbm8296d_ieee488_devices(device_slot_interface &device)
+{
+	device.option_add("c8250lp", C8250LP);
+}
 
 
 

@@ -54,7 +54,6 @@ private:
 	int m_enable;                   // mask which tones to play
 };
 
-[[deprecated("Use TMS36XX instead")]]
-extern const device_type TMS3615;
+DECLARE_DEVICE_TYPE(TMS3615, tms3615_device)
 
 #endif // MAME_SOUND_TMS3615_H

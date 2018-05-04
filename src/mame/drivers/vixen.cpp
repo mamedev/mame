@@ -667,9 +667,10 @@ WRITE_LINE_MEMBER( vixen_state::atn_w )
 	update_interrupt();
 }
 
-static SLOT_INTERFACE_START( vixen_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void vixen_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 WRITE_LINE_MEMBER( vixen_state::fdc_intrq_w )
 {

@@ -955,9 +955,10 @@ MC6845_UPDATE_ROW( fanucspmg_state::crtc_update_row_mono )
 	}
 }
 
-static SLOT_INTERFACE_START( fanuc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void fanuc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT

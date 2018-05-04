@@ -284,9 +284,10 @@ WRITE_LINE_MEMBER( c2031_device::byte_w )
 //  SLOT_INTERFACE( c2031_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c2031_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
-SLOT_INTERFACE_END
+static void c2031_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
 
 
 //-------------------------------------------------

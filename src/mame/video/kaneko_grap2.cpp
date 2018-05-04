@@ -14,22 +14,23 @@
 #include "emu.h"
 #include "kaneko_grap2.h"
 
-ADDRESS_MAP_START(kaneko_grap2_device::grap2_map)
-	AM_RANGE(0x000000, 0x0003ff) AM_READWRITE(unk1_r, unk1_w)
-	AM_RANGE(0x000400, 0x000401) AM_WRITE(framebuffer1_scrollx_w)
-	AM_RANGE(0x000800, 0x000bff) AM_READWRITE(unk2_r, unk2_w)
-	AM_RANGE(0x000c00, 0x000c01) AM_WRITE(framebuffer1_scrolly_w)
-	AM_RANGE(0x000c02, 0x000c03) AM_WRITE(framebuffer1_enable_w)
-	AM_RANGE(0x000c06, 0x000c07) AM_WRITE(framebuffer1_bgcol_w)
-	AM_RANGE(0x000c10, 0x000c11) AM_READWRITE(framebuffer1_fbbright1_r, framebuffer1_fbbright1_w )
-	AM_RANGE(0x000c12, 0x000c13) AM_READWRITE(framebuffer1_fbbright2_r, framebuffer1_fbbright2_w )
-	AM_RANGE(0x000c18, 0x000c1b) AM_WRITE(regs1_address_w)
-	AM_RANGE(0x000c1c, 0x000c1d) AM_WRITE(regs2_w)
-	AM_RANGE(0x000c1e, 0x000c1f) AM_WRITE(regs1_go_w)
-	AM_RANGE(0x000c00, 0x000c1f) AM_READ(regs1_r)
-	AM_RANGE(0x080000, 0x0801ff) AM_READWRITE( pal_r, framebuffer1_palette_w )
-	AM_RANGE(0x100000, 0x17ffff) AM_READWRITE( framebuffer_r, framebuffer_w )
-ADDRESS_MAP_END
+void kaneko_grap2_device::grap2_map(address_map &map)
+{
+	map(0x000000, 0x0003ff).rw(this, FUNC(kaneko_grap2_device::unk1_r), FUNC(kaneko_grap2_device::unk1_w));
+	map(0x000400, 0x000401).w(this, FUNC(kaneko_grap2_device::framebuffer1_scrollx_w));
+	map(0x000800, 0x000bff).rw(this, FUNC(kaneko_grap2_device::unk2_r), FUNC(kaneko_grap2_device::unk2_w));
+	map(0x000c00, 0x000c01).w(this, FUNC(kaneko_grap2_device::framebuffer1_scrolly_w));
+	map(0x000c02, 0x000c03).w(this, FUNC(kaneko_grap2_device::framebuffer1_enable_w));
+	map(0x000c06, 0x000c07).w(this, FUNC(kaneko_grap2_device::framebuffer1_bgcol_w));
+	map(0x000c10, 0x000c11).rw(this, FUNC(kaneko_grap2_device::framebuffer1_fbbright1_r), FUNC(kaneko_grap2_device::framebuffer1_fbbright1_w));
+	map(0x000c12, 0x000c13).rw(this, FUNC(kaneko_grap2_device::framebuffer1_fbbright2_r), FUNC(kaneko_grap2_device::framebuffer1_fbbright2_w));
+	map(0x000c18, 0x000c1b).w(this, FUNC(kaneko_grap2_device::regs1_address_w));
+	map(0x000c1c, 0x000c1d).w(this, FUNC(kaneko_grap2_device::regs2_w));
+	map(0x000c1e, 0x000c1f).w(this, FUNC(kaneko_grap2_device::regs1_go_w));
+	map(0x000c00, 0x000c1f).r(this, FUNC(kaneko_grap2_device::regs1_r));
+	map(0x080000, 0x0801ff).rw(this, FUNC(kaneko_grap2_device::pal_r), FUNC(kaneko_grap2_device::framebuffer1_palette_w));
+	map(0x100000, 0x17ffff).rw(this, FUNC(kaneko_grap2_device::framebuffer_r), FUNC(kaneko_grap2_device::framebuffer_w));
+}
 
 DEFINE_DEVICE_TYPE(KANEKO_GRAP2, kaneko_grap2_device, "kaneko_grap2", "Kaneko GRAP2")
 

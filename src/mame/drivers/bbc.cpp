@@ -764,17 +764,19 @@ FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats_bbc )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( bbc_floppies_525 )
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
-	SLOT_INTERFACE("525sd",   FLOPPY_525_SD)
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
-	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
-	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void bbc_floppies_525(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+	device.option_add("525sd",   FLOPPY_525_SD);
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd",   FLOPPY_525_DD);
+	device.option_add("525qd",   FLOPPY_525_QD);
+}
 
-static SLOT_INTERFACE_START( bbc_floppies_35 )
-	SLOT_INTERFACE("35dd",   FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void bbc_floppies_35(device_slot_interface &device)
+{
+	device.option_add("35dd",   FLOPPY_35_DD);
+}
 
 
 static const char *const bbc_sample_names[] =
@@ -848,11 +850,7 @@ MACHINE_CONFIG_START(bbc_state::bbca)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz, 1024, 0, 640, 312, 0, 256)
-	MCFG_SCREEN_SIZE(640, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
+	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DEVICE("hd6845", hd6845_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 16)
@@ -1319,10 +1317,7 @@ MACHINE_CONFIG_START(bbc_state::bbcm)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(128))
-	MCFG_SCREEN_SIZE(640, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
+	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DEVICE("hd6845", hd6845_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 16)

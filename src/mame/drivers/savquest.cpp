@@ -807,9 +807,10 @@ WRITE_LINE_MEMBER(savquest_state::vblank_assert)
 {
 }
 
-SLOT_INTERFACE_START( savquest_isa16_cards )
-	SLOT_INTERFACE("sb16", ISA16_SOUND_BLASTER_16)
-SLOT_INTERFACE_END
+void savquest_isa16_cards(device_slot_interface &device)
+{
+	device.option_add("sb16", ISA16_SOUND_BLASTER_16);
+}
 
 MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
@@ -835,7 +836,7 @@ MACHINE_CONFIG_START(savquest_state::savquest)
 	/* sound hardware */
 
 	MCFG_DEVICE_ADD("isa", ISA16, 0)
-	MCFG_ISA16_CPU(":maincpu")
+	MCFG_ISA16_CPU("maincpu")
 	MCFG_ISA16_SLOT_ADD("isa", "isa1", savquest_isa16_cards, "sb16", false)
 
 	/* video hardware */

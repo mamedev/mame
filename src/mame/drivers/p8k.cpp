@@ -259,9 +259,10 @@ DECLARE_WRITE_LINE_MEMBER( p8k_state::fdc_irq )
 	m_pio2->port_b_write(state ? 0x10 : 0x00);
 }
 
-static SLOT_INTERFACE_START( p8k_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void p8k_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( p8k )

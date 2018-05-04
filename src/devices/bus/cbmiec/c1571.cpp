@@ -564,9 +564,10 @@ WRITE_LINE_MEMBER( c1571_device::byte_w )
 //  SLOT_INTERFACE( c1571_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c1571_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void c1571_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 //-------------------------------------------------
@@ -594,9 +595,10 @@ FLOPPY_FORMATS_END
 //  isa8bus_interface isabus_intf
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( mini_chief_isa8_cards )
-	SLOT_INTERFACE("wd1002a_wx1", ISA8_WD1002A_WX1)
-SLOT_INTERFACE_END
+static void mini_chief_isa8_cards(device_slot_interface &device)
+{
+	device.option_add("wd1002a_wx1", ISA8_WD1002A_WX1);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -739,7 +741,7 @@ MACHINE_CONFIG_START(mini_chief_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1571_floppies, "525qd", c1571_device::floppy_formats)
 
 	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU("^" M6502_TAG)
+	MCFG_ISA8_CPU(M6502_TAG)
 	MCFG_ISA8_SLOT_ADD(ISA_BUS_TAG, "isa1", mini_chief_isa8_cards, "wd1002a_wx1", false)
 MACHINE_CONFIG_END
 

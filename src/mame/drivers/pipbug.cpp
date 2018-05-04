@@ -168,7 +168,7 @@ MACHINE_CONFIG_START(pipbug_state::pipbug)
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", S2650_SENSE_LINE))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", pipbug_state, pipbug, "pgm", 1)

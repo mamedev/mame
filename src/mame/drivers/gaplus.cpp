@@ -190,7 +190,7 @@ WRITE8_MEMBER(gaplus_state::sreset_w)
 	int bit = !BIT(offset, 11);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-	m_namco_15xx->mappy_sound_enable(bit);
+	m_namco_15xx->sound_enable_w(bit);
 }
 
 WRITE8_MEMBER(gaplus_state::freset_w)

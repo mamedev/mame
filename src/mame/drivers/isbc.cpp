@@ -380,7 +380,7 @@ MACHINE_CONFIG_START(isbc_state::isbc86)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(isbc_state::rpc86)
@@ -414,7 +414,7 @@ MACHINE_CONFIG_START(isbc_state::rpc86)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
 	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
 	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir3_w))
@@ -535,7 +535,7 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8274", i8274_new_device, ctsb_w))
 #endif
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
 	MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_1", pic8259_device, ir3_w))

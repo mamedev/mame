@@ -155,16 +155,17 @@ DEVICE_INPUT_DEFAULTS_END
 #include "bus/s100/seals8k.h"
 //#include "bus/s100/wunderbus.h"
 
-static SLOT_INTERFACE_START( horizon_s100_cards )
-	SLOT_INTERFACE("mdsa", S100_MDS_A)
-	SLOT_INTERFACE("mdsad", S100_MDS_AD)
-	//SLOT_INTERFACE("hram", S100_HRAM)
-	//SLOT_INTERFACE("ram32a", S100_RAM32A)
-	//SLOT_INTERFACE("ram16a", S100_RAM16A)
-	//SLOT_INTERFACE("fpb", S100_FPB)
-	SLOT_INTERFACE("8ksc", S100_8K_SC)
-	SLOT_INTERFACE("8kscbb", S100_8K_SC_BB)
-SLOT_INTERFACE_END
+static void horizon_s100_cards(device_slot_interface &device)
+{
+	device.option_add("mdsa", S100_MDS_A);
+	device.option_add("mdsad", S100_MDS_AD);
+	//device.option_add("hram", S100_HRAM);
+	//device.option_add("ram32a", S100_RAM32A);
+	//device.option_add("ram16a", S100_RAM16A);
+	//device.option_add("fpb", S100_FPB);
+	device.option_add("8ksc", S100_8K_SC);
+	device.option_add("8kscbb", S100_8K_SC_BB);
+}
 
 
 
@@ -191,7 +192,7 @@ MACHINE_CONFIG_START(horizon_state::horizon)
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_L_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_L_TAG, i8251_device, write_dsr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD(I8251_R_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))

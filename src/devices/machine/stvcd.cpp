@@ -1417,6 +1417,13 @@ void stvcd_device::cd_exec_command()
 			status_type = 0;
 			break;
 
+		// Get MPEG Card Boot ROM
+		// TODO: incomplete, needs to actually retrieve from MPEG ROM, just silence popmessage for now.
+		case 0xe2:
+			cr_standard_return(cd_stat);
+			hirqreg |= (CMOK|MPED);
+			break;
+
 		// following are MPEG commands, enough to get Sport Fishing to do something
 		// MPEG Get Status
 		case 0x90:
@@ -1448,6 +1455,7 @@ void stvcd_device::cd_exec_command()
 			cr3 = 0;
 			cr4 = 0;
 			break;
+
 
 		default:
 			LOG("Unknown command %04x\n", cr1>>8);

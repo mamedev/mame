@@ -913,9 +913,10 @@ void pasopia7_state::fdc_irq(bool state)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static SLOT_INTERFACE_START( pasopia7_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pasopia7_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	/* basic machine hardware */

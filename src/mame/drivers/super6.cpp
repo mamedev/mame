@@ -395,9 +395,10 @@ WRITE8_MEMBER(super6_state::io_write_byte)
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( super6_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void super6_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_QD);
+}
 
 WRITE_LINE_MEMBER( super6_state::fdc_intrq_w )
 {
@@ -519,7 +520,7 @@ MACHINE_CONFIG_START(super6_state::super6)
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxa_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))

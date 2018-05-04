@@ -89,6 +89,6 @@ DECLARE_DEVICE_TYPE(ABC_KEYBOARD_PORT, abc_keyboard_port_device)
 
 
 // supported devices
-SLOT_INTERFACE_EXTERN( abc_keyboard_devices );
+void abc_keyboard_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_ABCKB_ABCKB_H

@@ -437,7 +437,7 @@ MACHINE_CONFIG_START(sgi_ip2_state::sgi_ip2)
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681a", mc68681_device, rx_b_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", ip2_terminal)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( sgi_ip2 )

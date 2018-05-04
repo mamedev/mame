@@ -85,27 +85,14 @@ u32 v100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	unsigned row0 = cliprect.top() / 10;
 	unsigned x0 = cliprect.left();
 	unsigned px0 = x0 % CHAR_WIDTH;
+	unsigned columns = screen.visible_area().width() / CHAR_WIDTH;
 
 	u16 start = 0;
 	unsigned y = 0;
 	for (unsigned row = 0; y <= cliprect.bottom(); row++)
 	{
 		start = m_videoram[start] | (m_videoram[(start + 1) & 0xfff] << 8);
-		u16 end = start + 0x50;
-		switch (start & 0xf000)
-		{
-		case 0x1000:
-			end = start + 0x29;
-			break;
-		case 0x3000:
-			end = start + 0x6e;
-			break;
-		case 0xc000:
-			end = start + 0x50;
-			break;
-		default:
-			break;
-		}
+		u16 end = start + ((start & 0x3000) != 0 ? (columns / 2) + 1 : columns);
 		start &= 0xfff;
 		end &= 0xfff;
 

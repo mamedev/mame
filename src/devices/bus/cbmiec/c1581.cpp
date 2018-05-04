@@ -248,9 +248,10 @@ WRITE8_MEMBER( c1581_device::cia_pb_w )
 //  SLOT_INTERFACE( c1581_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c1581_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // Chinon F-354-E
-SLOT_INTERFACE_END
+static void c1581_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD); // Chinon F-354-E
+}
 
 
 //-------------------------------------------------

@@ -522,6 +522,7 @@ MACHINES["NETLIST"] = true
 MACHINES["NMC9306"] = true
 --MACHINES["NSC810"] = true
 MACHINES["NSCSI"] = true
+MACHINES["OUTPUT_LATCH"] = true
 MACHINES["PC_FDC"] = true
 MACHINES["PC_LPT"] = true
 --MACHINES["PCCARD"] = true
@@ -2910,10 +2911,12 @@ files {
 	MAME_DIR .. "src/mame/audio/wiping.cpp",
 	MAME_DIR .. "src/mame/audio/wiping.h",
 	MAME_DIR .. "src/mame/video/wiping.cpp",
+	MAME_DIR .. "src/mame/machine/nb1412m2.cpp",
+	MAME_DIR .. "src/mame/machine/nb1412m2.h",
 	MAME_DIR .. "src/mame/machine/nb1413m3.cpp",
-	MAME_DIR .. "src/mame/includes/nb1413m3.h",
+	MAME_DIR .. "src/mame/machine/nb1413m3.h",
 	MAME_DIR .. "src/mame/machine/nb1414m4.cpp",
-	MAME_DIR .. "src/mame/includes/nb1414m4.h",
+	MAME_DIR .. "src/mame/machine/nb1414m4.h",
 }
 
 createMAMEProjects(_target, _subtarget, "nintendo")
@@ -3367,8 +3370,12 @@ files {
 	MAME_DIR .. "src/mame/video/zaxxon.cpp",
 	MAME_DIR .. "src/mame/machine/315_5296.cpp",
 	MAME_DIR .. "src/mame/machine/315_5296.h",
-	MAME_DIR .. "src/mame/machine/m1io.cpp",
-	MAME_DIR .. "src/mame/machine/m1io.h",
+	MAME_DIR .. "src/mame/machine/315_5338a.cpp",
+	MAME_DIR .. "src/mame/machine/315_5338a.h",
+	MAME_DIR .. "src/mame/machine/315_5649.cpp",
+	MAME_DIR .. "src/mame/machine/315_5649.h",
+	MAME_DIR .. "src/mame/machine/model1io.cpp",
+	MAME_DIR .. "src/mame/machine/model1io.h",
 	MAME_DIR .. "src/mame/machine/fd1089.cpp",
 	MAME_DIR .. "src/mame/machine/fd1089.h",
 	MAME_DIR .. "src/mame/machine/fd1094.cpp",
@@ -4532,6 +4539,7 @@ files {
 	MAME_DIR .. "src/mame/video/dribling.cpp",
 	MAME_DIR .. "src/mame/drivers/dwarfd.cpp",
 	MAME_DIR .. "src/mame/drivers/dynadice.cpp",
+	MAME_DIR .. "src/mame/drivers/dynamoah.cpp",
 	MAME_DIR .. "src/mame/drivers/ecoinfr.cpp",
 	MAME_DIR .. "src/mame/drivers/ecoinf1.cpp",
 	MAME_DIR .. "src/mame/drivers/ecoinf2.cpp",

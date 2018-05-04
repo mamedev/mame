@@ -369,7 +369,7 @@ Part No.: E192
 * Denotes unpopulated sockets
 
 Although this version of Maniac Square use the same PCB as Snow Board Championship, there are some minor
-omponent changes:
+component changes:
 
  Slower OSC clocks
    30.000MHz down from 34.000MHz
@@ -378,6 +378,15 @@ omponent changes:
 The CG-1V 366 has been upgraded to a CG-1V 427
 
 Game configuration is store in 93C66 EEPROM as this PCB doesn't have dipswitches
+
+This PCB has a large number of unpopulated ICs and connectors at the bottom left, apparently for extra
+digital and analog inputs not required by Maniac Square or Snow Board Championship:
+
+  1x 74LS14 (IC20)
+  3x 74LS245 (IC26, IC27, IC28)
+  4x TLC549 (IC9, IC10, IC21, IC22)
+  4x 6-pin headers (JP2, JP3, JP5, JP6)
+  2x 15-pin headers (JP4, JP7)
 
 */
 
@@ -1297,17 +1306,16 @@ PCB Layout:
 
 REF: 950510-1
 ------------------------------------------------------------------------------
-|                POT1                        KM428C256J-6 (x4)               |
-|                POT2                                                        |
-|                                            ----------------------------    |
-|                                            | (Plug-In Daughterboard)  |    |
-|                                            |                          |    |
-|---                                         |     IC66        IC67     |    |
-   |                                         |                          |    |
-   |                                         |                          |    |
-|---                                         |     IC65        IC69     |    |
-|                                            |                          |    |
-|                                            ----------------------------    |
+|                POT1          PAL20L8       KM428C256J-6 (x4)               |
+|                POT2                          +--------------------------+  |
+|                                              | (Plug-In Daughterboard)  |  |
+|                                              |                          |  |
+|---                                           |     IC66        IC67     |  |
+   |                                           |                          |  |
+   |                                           |                          |  |
+|---                                           |     IC65        IC69     |  |
+|                                              |                          |  |
+|                                              +--------------------------+  |
 |                                                                            |
 |                                            |----------|                    |
 | J                                          |          |                    |
@@ -1317,28 +1325,84 @@ REF: 950510-1
 | M                                          |----------|                    |
 |                                                                            |
 | M                       |-------------------------|                        |
-|                         |                         |  40.000MHz     62256   |
-| A                       |  62256  DS5002  BATT_3V |                62256   |
+|                         |                         |  40.000MHz    CY7C199  |
+| A                       |  62256  DS5002  BATT_3V |               CY7C199  |
 |                         |                         |                        |
 |                         |-------------------------|                        |
 |                                                                            |
-|---                                    62256                                |
-   |                                    62256                                |
-   |  DSW1                                                                   |
-|---  DSW2                                                                   |
-|                                                                            |
-|                                32.000MHz      MC68000P16      TG57         |
-| CONN1                                                         TG56         |
-|                                                                            |
-| CONN4    CONN2    CONN3                                                    |
+|---                                                                         |
+   |                                   CY7C199-20PC                          |
+   |  DSW1                             CY7C199-20PC                          |
+|---  DSW2             PAL16L8                                               |
+| J J                                                                        |
+| P P                            32.000MHz      MC68000P16        1.IC63     |
+| 1 4                                                             2.IC64     |
+|      JP2   JP3                                                             |
 -----------------------------------------------------------------------------|
+
+REF: 950906
+------------------------------------------------------------------------------
+|                POT1                        KM428C256J-6 (x4)               |
+|                POT2                                                        |
+|                                                                            |
+|                                             |----------|    TG IC65.IC65 |-|
+|---                                          |          |                 | |
+   |                                          | GAE1 506 |    TG IC66.IC66 | |
+|---                                          | (QFP208) |                 |J|
+|                                             |          |    TG IC67.IC67 |P|
+|                                      6264   |----------|                 |6|
+|                                      6264                         IC68*  | |
+| J                                                                        | |
+| A                       |-------------------------|         TG IC69.IC69 |-|
+| M                       |                         |                        |
+| M                       |  62256  DS5002  BATT_3V |                        |
+| A                       |                         |                        |
+|                         |-------------------------|                        |
+|                                                                            |
+|   IC1* IC7*                           62256                       62256    |
+|---                                    62256                       62256    |
+   |  DSW1                                            40.000MHz              |
+|---  DSW2                         |-----------|                             |
+|                                  |           |                             |
+| J J                32.000MHz     |MC68000FN16|    TG 57.IC57               |
+| P P                              |           |    TG 56.IC56               |
+| 1 4  JP2   JP3                   |-----------|                             |
+-----------------------------------------------------------------------------|
+
+Notes
+-----
+IC1, IC7 - 8 pin sockets marked "TLC548" - Not populated
+IC68 - 42 pin 32M socket - Not populated
+JP6: 50 pin connector for daughter card - Not populated
+POT1: Volume adjust for cabinet 1
+POT2: Volume adjust for cabinet 2
+
+JP1: 6 pin connector - Video signals for cabinet 2
+  1| Video
+  2| No Connection
+  3| Video GND
+  4| Video Blue
+  5| Video Green
+  6| Video Red
+JP4: 4 pin connector - Sound for cabinet 2
+  1| Speaker (+)
+  2| Speaker (-)
+  3| No Connection
+  4| Audio GND
+JP2: 15 pin connector - pin out unknown - Players 3 & 4 controls for cabinet 2
+JP3: 15 pin connector - pin out unknown - Players 3 & 4 controls for cabinet 2
+
+NOTE: It's unknown if Player 1 & Player 2 controls are connected through the JAMMA harness for cabinet 1
+      and controls for Player 3 & Player 4 are connected through JP2 & JP3 and what the pin outs are.
+
+Wires run to male JAMMA board with corresponding JP1, JP2, JP3 & JP4 connectors for cabinet 2 JAMMA harness
 */
 
 
 ROM_START( touchgo ) /* REF: 950906 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "tg_56", 0x000000, 0x080000, CRC(8ab065f3) SHA1(7664abd7e5f66ffca4a2865bba56ac36bd04f4e9) )
-	ROM_LOAD16_BYTE( "tg_57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
+	ROM_LOAD16_BYTE( "tg_56.ic56", 0x000000, 0x080000, CRC(8ab065f3) SHA1(7664abd7e5f66ffca4a2865bba56ac36bd04f4e9) )
+	ROM_LOAD16_BYTE( "tg_57.ic57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -1353,19 +1417,19 @@ ROM_START( touchgo ) /* REF: 950906 */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
-	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
-	ROM_FILL(          0x0600000, 0x0200000, 0x00 )          /* Empty */
-	ROM_LOAD( "ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          /* Empty */
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
-ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America Notice */
+ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America Notice, also found on REF: 950510-1 with daughterboard */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "tg56.bin", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) )
-	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
+	ROM_LOAD16_BYTE( "1.ic63", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
+	ROM_LOAD16_BYTE( "2.ic64", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -1380,19 +1444,19 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
-	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
-	ROM_FILL(          0x0600000, 0x0200000, 0x00 )          /* Empty */
-	ROM_LOAD( "ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          /* Empty */
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
 ROM_START( touchgoe ) /* REF: 950510-1 */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "tg56", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) )
-	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
+	ROM_LOAD16_BYTE( "tg56.ic63", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
+	ROM_LOAD16_BYTE( "tg57.ic64", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -1407,29 +1471,29 @@ ROM_START( touchgoe ) /* REF: 950510-1 */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
-	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
-	ROM_FILL(          0x0600000, 0x0200000, 0x00 )          /* Empty */
-	ROM_LOAD( "ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          /* Empty */
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
 ROM_START( touchgok ) /* REF: 950510-1 - ds5002fp unpopulated, game is unprotected */
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE( "56.ic56", 0x000000, 0x080000, CRC(cbb87505) SHA1(f19832af60fb6273c3263ebdd93bb7705ab61e20) )
-	ROM_LOAD16_BYTE( "57.ic57", 0x000001, 0x080000, CRC(36bcc7e7) SHA1(2fff881ba0a99ebcfe3c03fdc61f4bf40e152c7f))
+	ROM_LOAD16_BYTE( "56.ic56", 0x000000, 0x080000, CRC(cbb87505) SHA1(f19832af60fb6273c3263ebdd93bb7705ab61e20) ) /* IC63 for REF: 950510-1, IC56 for REF: 950906 */
+	ROM_LOAD16_BYTE( "57.ic57", 0x000001, 0x080000, CRC(36bcc7e7) SHA1(2fff881ba0a99ebcfe3c03fdc61f4bf40e152c7f) ) /* IC64 for REF: 950510-1, IC57 for REF: 950906 */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 ) /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) /* GFX only */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
-	ROM_LOAD( "ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
-	ROM_FILL(          0x0600000, 0x0200000, 0x00 )          /* Empty */
-	ROM_LOAD( "ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) /* GFX only */
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) /* Sound only */
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          /* Empty */
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) /* GFX only */
 ROM_END
 
 /*============================================================================
@@ -1778,7 +1842,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(34'000'000) / 4) /* 8.5MHz? (or 13MHz - 26MHz/2) - Not verified */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(26'000'000) / 2) /* 13 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
@@ -1786,8 +1850,6 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_clk))                             /* ADCs clock-in line */
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
-
-	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1832,17 +1894,16 @@ PCB Layout:
 
 REF: 950510
 ------------------------------------------------------------------------------
-|                POT1                        KM428C256J-6 (x4)               |
-|                POT2                                                        |
-|                                            ----------------------------    |
-|                                            | (Plug-In Daughterboard)  |    |
-|                                            | WR2.1   WR2.9    WR2.16  |    |
-|---                                         | WR2.2   WR2.10   WR2.17  |    |
-   |                                         |         WR2.11   WR2.18  |    |
-   |                                         |         WR2.12   WR2.19  |    |
-|---                                         |         WR2.13   WR2.20  |    |
-|                                            |         WR2.14   WR2.21  |    |
-|                                            ----------------------------    |
+|                POT1          PAL20L8       KM428C256J-6 (x4)               |
+|                POT1                        ------------------------------  |
+|                                            | (Plug-In Daughterboard)  | |  |
+|                                            | WR2.1   WR2.9    WR2.16  | |  |
+|                                            | WR2.2   WR2.10   WR2.17  |J|  |
+|---                                         |         WR2.11   WR2.18  |P|  |
+   |                                         |         WR2.12   WR2.19  |1|  |
+   |                                         |         WR2.13   WR2.20  | |  |
+|---                                         |         WR2.14   WR2.21  | |  |
+|                                            ------------------------------  |
 |                                                                            |
 |                                            |----------|                    |
 | J                                          |          |                    |
@@ -1861,75 +1922,146 @@ REF: 950510
    |                                    62256                                |
    |  DSW1                                                                   |
 |---  DSW2                                                                   |
-|                                                                            |
-|                                26.000MHz      MC68000P12      WR2.63       |
-| CONN1                                                         WR2.64       |
-|                                                                            |
-| CONN2    CONN3                                                             |
+|                       PAL16L8                                              |
+| J J                                                                        |
+| P P                            26.000MHz      MC68000P12      WR2 63.IC63  |
+| 1 4                                                           WR2 64.IC64  |
+|      JP2   JP3                                                             |
 -----------------------------------------------------------------------------|
 
 
 Notes
 -----
+JP1 on daughter card connects through the 50 pin connector JP6 on main PCB
 All ROMs are type 27C040
-CONN1: RGBSync OUT (additional to JAMMA RGBSync)
-CONN2: Right speaker sound OUT (for second cabinat)
-CONN3: For connection of wheel etc
-POT1/2: Volume adjust of left/right channel
+
+POT1: Volume adjust for cabinet 1
+POT2: Volume adjust for cabinet 2
+
+JP1: 6 pin connector - Video signals for cabinet 2
+  1| Video
+  2| No Connection
+  3| Video GND
+  4| Video Blue
+  5| Video Green
+  6| Video Red
+JP4: 4 pin connector - Sound for cabinet 2
+  1| Speaker (+)
+  2| Speaker (-)
+  3| No Connection
+  4| Audio GND
+JP2: 15 pin connector - Inputs for Player 2 / Cabinet 2
+  1| Coin
+  2| Potentiometer VCC
+  3| Left
+  4| Right
+  5| Up
+  6| Down
+  7| Accelerator
+  8| Shift Lever
+  9| No Connection
+ 10| Start
+ 11| Service
+ 12| Potentiometer Top
+ 13| Coin Counter
+ 14| GND
+ 15| GND
+JP3: 15 pin connector - Not populated (used on Touch and Go PCBs)
+
+Wires run to male JAMMA board with corresponding JP1, JP2, JP3 & JP4 connectors for cabinet 2 JAMMA harness
+
+Controls:
+    8-Way Joystick - optional 270 Degree Steering Wheel (Potentiometer 5K)
+    Accelerator button
+    Shift Lever
+
+            PCB Conector JAMMA for Cabinet 1 and Cabinet 2
+                          Main Jamma Connector
+            Solder Side          |             Parts Side
+------------------------------------------------------------------
+             GND             | A | 1 |             GND
+             GND             | B | 2 |             GND
+             +5              | C | 3 |             +5
+             +5              | D | 4 |             +5
+                             | E | 5 |
+             +12             | F | 6 |             +12
+------------ KEY ------------| H | 7 |------------ KEY -----------
+                             | J | 8 |      Coin Counter # 1
+                             | K | 9 |
+        Speaker (-)          | L | 10|        Speaker (+)
+                             | M | 11|
+        Video Green          | N | 12|        Video Red
+        Video Sync           | P | 13|        Video Blue
+       Service Switch        | R | 14|        Video GND
+                             | S | 15|        Test Switch
+                             | T | 16|        Coin Switch
+                             | U | 17|        Start
+                             | V | 18|        Up
+                             | W | 19|        Down
+                             | X | 20|        Left
+                             | Y | 21|        Right
+                             | Z | 22|        Accelerator
+                             | a | 23|        Shift Lever
+                             | b | 24|
+      Potentiometer VCC      | c | 25|        Potentiometer Top
+                             | d | 26|
+             GND             | e | 27|             GND
+             GND             | f | 28|             GND
 
 PCB Layout:
 
-REF: 950510-1
 
+REF: 950510-1
 ------------------------------------------------------------------------------
- |         POT1              TI F20LB         KM428C256J-6 (x4)               |
- |         POT2                                                               |
- |                                                                            |
- |                                                                            |
- |                                               WR2-IC68                     |
- |---                                            WR2-IC69                     |
-    |                                            WR2-IC70                     |
-    |                                                                         |
- |---                                                                         |
- |                                                                            |
- |                                                                            |
- |                                                                            |
- |                                            |----------|                    |
- | J                                          |          |                    |
- |                                            | GAE1 506 |                    |
- | A                              65764       | (QFP160) |                    |
- |                                65764       |          |                    |
- | M                                          |----------|                    |
- |                                                                            |
- | M                       |-------------------------|                        |
- |                         |                         |  34.000MHz     62256   |
- | A                       |  62256  DS5002  BATT_3V |                62256   |
- |                         |                         |                        |
- |                         |-------------------------|                        |
- |    TLC569   TLC569                                                         |
- |---                                    62256                                |
-    |                                    62256                                |
-    |  DSW1                                                                   |
- |---  DSW2                                                                   |
- |                                                                            |
- |                                26.000MHz      MC68000P12      WR2.63       |
- | CONN1                                                         WR2.64       |
- |                                                                            |
- | CONN2    CONN3                                                             |
- -----------------------------------------------------------------------------|
+|         POT1                 PAL20L8       KM428C256J-6                    |
+|         POT2                                                               |
+|                                            KM428C256J-6                  |-|
+|                                                                          | |
+|                                            KM428C256J-6    WR2 IC68.IC68 | |
+|---                                                                       |J|
+   |                                         KM428C256J-6    WR2 IC69.IC69 |P|
+   |                                                                       |6|
+|---                                                         WR2 IC70.IC70 | |
+|                                                                          | |
+|                                                                          |-|
+|                                            |----------|                    |
+| J                                          |          |                    |
+|                                            | GAE1 506 |                    |
+| A                              65764       | (QFP160) |                    |
+|                                65764       |          |                    |
+| M                                          |----------|                    |
+|                                                                            |
+| M                       |-------------------------|                        |
+|                         |                         |  34.000MHz     62256   |
+| A                       |  62256  DS5002  BATT_3V |                62256   |
+|                         |                         |                        |
+|                         |-------------------------|                        |
+|    TLC549   TLC549                                                         |
+|---                                    62256                                |
+   |                                    62256                                |
+   |  DSW1                                                                   |
+|---  DSW2                                                                   |
+|                        PAL16L8                                             |
+| J J                                                                        |
+| P P                            26.000MHz      MC68000P12      WR2 63.IC63  |
+| 1 4                                                           WR2 64.IC64  |
+|      JP2   JP3                                                             |
+-----------------------------------------------------------------------------|
 
 
 Notes
 -----
-Gaelco's MASK ROMs:
- WR2 IC70 42pin 16Mbit MASK read as 27C160 (Graphics)
- WR2 IC69 42pin 32Mbit MASK read as 27C332 (Graphics & Sound)
- WR2 IC68 32pin  8Mbit MASK read as 27C801 (Graphics)
+Gaelco's mask ROMs:
+ WR2 IC70 42pin 16Mbit mask read as 27C160 (Graphics)
+ WR2 IC69 42pin 32Mbit mask read as 27C332 (Graphics & Sound)
+ WR2 IC68 32pin  8Mbit mask read as 27C801 (Graphics)
+
+JP6: 50 pin connector for daughter card - Not populated
 
 TI F20L8 is a Texas Ins. DIP24 (may be a PAL). Is marked as F 406 XF 21869 F20L8-25CNT
-TLC569 (IC2 and IC7) is a 8-bit serial ADC
+TLC549 (IC2 and IC7) is a 8-bit serial ADC
 
-Also known to come with the GAE1 449 istead of the GAE1 506
+Also known to come with a GAE1 with various production codes including 449, 501 & 506
 
 */
 
@@ -2054,7 +2186,7 @@ GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touc
 GAME( 1995, touchgoe, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
 GAME( 1995, touchgok, touchgo,  touchgo,           touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (MASK ROM version)", 0 )
+GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, wrally2,  ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
 GAME( 1995, wrally2a, wrally2,  wrally2,           wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions

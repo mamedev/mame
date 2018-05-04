@@ -182,9 +182,10 @@ FLOPPY_FORMATS_MEMBER( b2m_state::b2m_floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( b2m_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void b2m_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 /* Machine driver */

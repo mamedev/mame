@@ -885,9 +885,10 @@ usb_rom_sound_device::usb_rom_sound_device(const machine_config &mconfig, const 
 {
 }
 
-ADDRESS_MAP_START(usb_sound_device::usb_map_rom)
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(":usbcpu", 0)
-ADDRESS_MAP_END
+void usb_sound_device::usb_map_rom(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region(":usbcpu", 0);
+}
 
 MACHINE_CONFIG_START(usb_rom_sound_device::device_add_mconfig)
 	usb_sound_device::device_add_mconfig(config);

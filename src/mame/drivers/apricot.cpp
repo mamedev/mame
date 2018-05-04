@@ -250,10 +250,11 @@ FLOPPY_FORMATS_MEMBER( apricot_state::floppy_formats )
 	FLOPPY_APRIDISK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( apricot_floppies )
-	SLOT_INTERFACE("d31v", SONY_OA_D31V)
-	SLOT_INTERFACE("d32w", SONY_OA_D32W)
-SLOT_INTERFACE_END
+static void apricot_floppies(device_slot_interface &device)
+{
+	device.option_add("d31v", SONY_OA_D31V);
+	device.option_add("d32w", SONY_OA_D32W);
+}
 
 
 //**************************************************************************

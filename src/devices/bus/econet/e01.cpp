@@ -173,9 +173,10 @@ FLOPPY_FORMATS_MEMBER( econet_e01_device::floppy_formats_afs )
 	FLOPPY_AFS_FORMAT
 FLOPPY_FORMATS_END0
 
-static SLOT_INTERFACE_START( e01_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // NEC FD1036 A
-SLOT_INTERFACE_END
+static void e01_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD); // NEC FD1036 A
+}
 
 WRITE_LINE_MEMBER( econet_e01_device::fdc_irq_w )
 {

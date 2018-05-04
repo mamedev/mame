@@ -86,9 +86,10 @@ FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( orion_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void orion_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 /* Machine driver */
 MACHINE_CONFIG_START(orion_state::orion128)

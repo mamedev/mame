@@ -576,8 +576,8 @@ INPUT_PORTS_END
 void dc_cons_state::gdrom_config(device_t *device)
 {
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
 MACHINE_CONFIG_START(dc_cons_state::dc)

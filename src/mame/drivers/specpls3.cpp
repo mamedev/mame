@@ -348,9 +348,10 @@ DRIVER_INIT_MEMBER(spectrum_state,plus2)
 	m_floppy = 0;
 }
 
-static SLOT_INTERFACE_START( specpls3_floppies )
-	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
-SLOT_INTERFACE_END
+static void specpls3_floppies(device_slot_interface &device)
+{
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =

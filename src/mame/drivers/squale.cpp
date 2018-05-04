@@ -739,9 +739,10 @@ static INPUT_PORTS_START( squale )
 
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START( squale_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void squale_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 void squale_state::machine_start()
 {

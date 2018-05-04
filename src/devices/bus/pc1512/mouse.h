@@ -133,6 +133,6 @@ DECLARE_DEVICE_TYPE(PC1512_MOUSE,      pc1512_mouse_device)
 
 
 // slot devices
-SLOT_INTERFACE_EXTERN( pc1512_mouse_port_devices );
+void pc1512_mouse_port_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_PC1512_MOUSE_H

@@ -158,14 +158,16 @@ void xbox_state::machine_reset()
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 }
 
-SLOT_INTERFACE_START(usb_xbox)
-	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
-SLOT_INTERFACE_END
+void usb_xbox(device_slot_interface &device)
+{
+	device.option_add("xbox_controller", OHCI_GAME_CONTROLLER);
+}
 
-SLOT_INTERFACE_START(xbox_ata_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)
-	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
-SLOT_INTERFACE_END
+void xbox_ata_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", IDE_HARDDISK);
+	device.option_add("cdrom", ATAPI_CDROM);
+}
 
 MACHINE_CONFIG_START(xbox_state::xbox)
 	xbox_base(config);

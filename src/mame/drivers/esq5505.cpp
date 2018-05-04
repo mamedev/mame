@@ -249,9 +249,10 @@ FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
 	FLOPPY_ESQIMG_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ensoniq_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ensoniq_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 {
@@ -650,14 +651,14 @@ MACHINE_CONFIG_START(esq5505_state::vfx)
 	MCFG_ES5505_CHANNELS(4)          /* channels */
 	MCFG_ES5505_IRQ_CB(WRITELINE(esq5505_state, esq5505_otis_irq)) /* irq */
 	MCFG_ES5505_READ_PORT_CB(READ16(esq5505_state, analog_r)) /* ADC */
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esq5505_state::eps)
@@ -729,14 +730,14 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 	MCFG_ES5505_CHANNELS(4)          /* channels */
 	MCFG_ES5505_IRQ_CB(WRITELINE(esq5505_state, esq5505_otis_irq)) /* irq */
 	MCFG_ES5505_READ_PORT_CB(READ16(esq5505_state, analog_r)) /* ADC */
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 
 	MCFG_WD1772_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)

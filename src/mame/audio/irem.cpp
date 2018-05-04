@@ -358,32 +358,36 @@ DISCRETE_SOUND_END
 
 /* complete address map verified from Moon Patrol/10 Yard Fight schematics */
 /* large map uses 8k ROMs, small map uses 4k ROMs; this is selected via a jumper */
-ADDRESS_MAP_START(irem_audio_device::m52_small_sound_map)
-	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(m52_adpcm_w)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x2000, 0x7fff) AM_ROM
-ADDRESS_MAP_END
+void irem_audio_device::m52_small_sound_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x0fff).w(this, FUNC(irem_audio_device::m52_adpcm_w));
+	map(0x1000, 0x1fff).w(this, FUNC(irem_audio_device::sound_irq_ack_w));
+	map(0x2000, 0x7fff).rom();
+}
 
-ADDRESS_MAP_START(irem_audio_device::m52_large_sound_map)
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(m52_adpcm_w)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void irem_audio_device::m52_large_sound_map(address_map &map)
+{
+	map(0x0000, 0x1fff).w(this, FUNC(irem_audio_device::m52_adpcm_w));
+	map(0x2000, 0x3fff).w(this, FUNC(irem_audio_device::sound_irq_ack_w));
+	map(0x4000, 0xffff).rom();
+}
 
 
 /* complete address map verified from Kid Niki schematics */
-ADDRESS_MAP_START(irem_audio_device::m62_sound_map)
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_WRITE(m62_adpcm_w)
-	AM_RANGE(0x4000, 0xffff) AM_ROM
-ADDRESS_MAP_END
+void irem_audio_device::m62_sound_map(address_map &map)
+{
+	map(0x0800, 0x0800).mirror(0xf7fc).w(this, FUNC(irem_audio_device::sound_irq_ack_w));
+	map(0x0801, 0x0802).mirror(0xf7fc).w(this, FUNC(irem_audio_device::m62_adpcm_w));
+	map(0x4000, 0xffff).rom();
+}
 
 
-ADDRESS_MAP_START(irem_audio_device::irem_sound_portmap)
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(m6803_port1_r, m6803_port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
-ADDRESS_MAP_END
+void irem_audio_device::irem_sound_portmap(address_map &map)
+{
+	map(M6801_PORT1, M6801_PORT1).rw(this, FUNC(irem_audio_device::m6803_port1_r), FUNC(irem_audio_device::m6803_port1_w));
+	map(M6801_PORT2, M6801_PORT2).rw(this, FUNC(irem_audio_device::m6803_port2_r), FUNC(irem_audio_device::m6803_port2_w));
+}
 
 /*
  * Original recordings:
@@ -415,27 +419,27 @@ MACHINE_CONFIG_START(m62_audio_device::device_add_mconfig)
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
 
 	MCFG_SOUND_ADD("ay_45l", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
 	MCFG_AY8910_RES_LOADS(2000.0, 2000.0, 2000.0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(irem_audio_device, ay8910_45L_porta_w))
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(1, "snd_nl", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(2, "snd_nl", 1.0, 5)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 3)
+	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 4)
+	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 5)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(384'000)) /* verified on pcb */
 	MCFG_MSM5205_VCK_CALLBACK(INPUTLINE("iremsound", INPUT_LINE_NMI)) // driven through NPN inverter
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("msm2", msm5205_device, vclk_w)) // the first MSM5205 clocks the second
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 6)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 6)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(384'000)) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      /* default to 4KHz, but can be changed at run time, slave */
-	MCFG_SOUND_ROUTE_EX(0, "snd_nl", 1.0, 7)
+	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 7)
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
@@ -485,18 +489,18 @@ MACHINE_CONFIG_START(m52_soundc_audio_device::device_add_mconfig)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(irem_audio_device, soundlatch_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(irem_audio_device, ay8910_45M_portb_w))
-	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "filtermix", 1.0, 0)
 
 	MCFG_SOUND_ADD("ay_45l", AY8910, XTAL(3'579'545)/4) /* verified on pcb */
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(470, 0, 0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(irem_audio_device, ay8910_45L_porta_w))
-	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
+	MCFG_SOUND_ROUTE(0, "filtermix", 1.0, 1)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(384'000)) /* verified on pcb */
 	MCFG_MSM5205_VCK_CALLBACK(INPUTLINE("iremsound", INPUT_LINE_NMI)) // driven through NPN inverter
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* default to 4KHz, but can be changed at run time */
-	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "filtermix", 1.0, 2)
 
 	MCFG_SOUND_ADD("filtermix", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(m52_sound_c)

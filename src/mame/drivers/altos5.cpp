@@ -357,9 +357,10 @@ QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
 }
 
 
-static SLOT_INTERFACE_START( altos5_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void altos5_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
 {

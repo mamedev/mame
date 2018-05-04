@@ -110,7 +110,7 @@ MACHINE_CONFIG_START(tricep_state::tricep)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("pci0", mc2661_device, dsr_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("pci0", mc2661_device, dcd_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("pci0", mc2661_device, cts_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 MACHINE_CONFIG_END
 
 /* ROM definition */

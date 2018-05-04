@@ -722,15 +722,16 @@ void laser2001_state::machine_start()
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START(crvision_cart)
-	SLOT_INTERFACE_INTERNAL("crv_rom4k",  CRVISION_ROM_4K)
-	SLOT_INTERFACE_INTERNAL("crv_rom6k",  CRVISION_ROM_6K)
-	SLOT_INTERFACE_INTERNAL("crv_rom8k",  CRVISION_ROM_8K)
-	SLOT_INTERFACE_INTERNAL("crv_rom10k", CRVISION_ROM_10K)
-	SLOT_INTERFACE_INTERNAL("crv_rom12k", CRVISION_ROM_12K)
-	SLOT_INTERFACE_INTERNAL("crv_rom16k", CRVISION_ROM_16K)
-	SLOT_INTERFACE_INTERNAL("crv_rom18k", CRVISION_ROM_18K)
-SLOT_INTERFACE_END
+static void crvision_cart(device_slot_interface &device)
+{
+	device.option_add_internal("crv_rom4k",  CRVISION_ROM_4K);
+	device.option_add_internal("crv_rom6k",  CRVISION_ROM_6K);
+	device.option_add_internal("crv_rom8k",  CRVISION_ROM_8K);
+	device.option_add_internal("crv_rom10k", CRVISION_ROM_10K);
+	device.option_add_internal("crv_rom12k", CRVISION_ROM_12K);
+	device.option_add_internal("crv_rom16k", CRVISION_ROM_16K);
+	device.option_add_internal("crv_rom18k", CRVISION_ROM_18K);
+}
 
 /*-------------------------------------------------
     MACHINE_CONFIG_START( creativision )

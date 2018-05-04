@@ -74,6 +74,7 @@ Notes:
 *********************************************************************/
 
 #include "emu.h"
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
@@ -87,42 +88,52 @@ class pasha2_state : public driver_device
 {
 public:
 	pasha2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_wram(*this, "wram"),
-		m_paletteram(*this, "paletteram"),
-		m_maincpu(*this, "maincpu"),
-		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2"),
-		m_palette(*this, "palette")  { }
+		: driver_device(mconfig, type, tag)
+		, m_wram(*this, "wram")
+		, m_paletteram(*this, "paletteram")
+		, m_mainbank(*this, "mainbank")
+		, m_lamps_r(*this, "lamp_p%u_r", 1U)
+		, m_lamps_g(*this, "lamp_p%u_g", 1U)
+		, m_lamps_b(*this, "lamp_p%u_b", 1U)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_oki(*this, "oki%u", 1U)
+		, m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_wram;
 	required_shared_ptr<uint16_t> m_paletteram;
 
+	required_memory_bank m_mainbank;
+
+	output_finder<3> m_lamps_r;
+	output_finder<3> m_lamps_g;
+	output_finder<3> m_lamps_b;
+
 	/* video-related */
 	int m_vbuffer;
 
 	/* memory */
-	uint16_t       m_bitmap0[0x40000/2];
-	uint16_t       m_bitmap1[0x40000/2];
+	std::unique_ptr<uint8_t[]> m_bitmap0[2];
+	std::unique_ptr<uint8_t[]> m_bitmap1[2];
 	DECLARE_WRITE16_MEMBER(pasha2_misc_w);
 	DECLARE_WRITE16_MEMBER(pasha2_palette_w);
 	DECLARE_WRITE16_MEMBER(vbuffer_set_w);
 	DECLARE_WRITE16_MEMBER(vbuffer_clear_w);
-	DECLARE_WRITE16_MEMBER(bitmap_0_w);
-	DECLARE_WRITE16_MEMBER(bitmap_1_w);
+	DECLARE_WRITE8_MEMBER(bitmap_0_w);
+	DECLARE_WRITE8_MEMBER(bitmap_1_w);
 	DECLARE_WRITE16_MEMBER(pasha2_lamps_w);
 	DECLARE_READ16_MEMBER(pasha2_speedup_r);
-	DECLARE_WRITE16_MEMBER(oki1_bank_w);
-	DECLARE_WRITE16_MEMBER(oki2_bank_w);
+	template<int Chip> DECLARE_WRITE16_MEMBER(oki_bank_w);
 	DECLARE_DRIVER_INIT(pasha2);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki1;
-	required_device<okim6295_device> m_oki2;
+	required_device<i80c52_device> m_audiocpu;
+	required_device_array<okim6295_device, 2> m_oki;
 	required_device<palette_device> m_palette;
 	void pasha2(machine_config &config);
 	void pasha2_io(address_map &map);
@@ -146,7 +157,7 @@ WRITE16_MEMBER(pasha2_state::pasha2_misc_w)
 				case 0xb000:
 				case 0xc000:
 				case 0xd000:
-					membank("bank1")->set_entry((bank - 0x8000)>>12); break;
+					m_mainbank->set_entry((bank>>12) & 7); break;
 			}
 		}
 	}
@@ -177,60 +188,35 @@ WRITE16_MEMBER(pasha2_state::vbuffer_clear_w)
 	m_vbuffer = 0;
 }
 
-WRITE16_MEMBER(pasha2_state::bitmap_0_w)
+WRITE8_MEMBER(pasha2_state::bitmap_0_w)
 {
-	COMBINE_DATA(&m_bitmap0[offset + m_vbuffer * 0x20000 / 2]);
+	COMBINE_DATA(&m_bitmap0[m_vbuffer][offset]);
 }
 
-WRITE16_MEMBER(pasha2_state::bitmap_1_w)
+WRITE8_MEMBER(pasha2_state::bitmap_1_w)
 {
 	// handle overlapping pixels without writing them
-	switch (mem_mask)
-	{
-		case 0xffff:
-			bitmap_1_w(space, offset, data, 0xff00);
-			bitmap_1_w(space, offset, data, 0x00ff);
-			return;
+	if ((data & 0xff) == 0xff)
+		return;
 
-		case 0xff00:
-			if ((data & 0xff00) == 0xff00)
-				return;
-		break;
-
-		case 0x00ff:
-			if ((data & 0x00ff) == 0x00ff)
-				return;
-		break;
-	}
-
-	COMBINE_DATA(&m_bitmap1[offset + m_vbuffer * 0x20000 / 2]);
+	COMBINE_DATA(&m_bitmap1[m_vbuffer][offset]);
 }
 
-WRITE16_MEMBER(pasha2_state::oki1_bank_w)
+template<int Chip>
+WRITE16_MEMBER(pasha2_state::oki_bank_w)
 {
 	if (offset)
-		m_oki1->set_rom_bank(data & 1);
-}
-
-WRITE16_MEMBER(pasha2_state::oki2_bank_w)
-{
-	if (offset)
-		m_oki2->set_rom_bank(data & 1);
+		m_oki[Chip]->set_rom_bank(data & 1);
 }
 
 WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 {
-	machine().output().set_value("lamp_p1_r", BIT(data,  0));
-	machine().output().set_value("lamp_p1_g", BIT(data,  1));
-	machine().output().set_value("lamp_p1_b", BIT(data,  2));
-
-	machine().output().set_value("lamp_p2_r", BIT(data,  4));
-	machine().output().set_value("lamp_p2_g", BIT(data,  5));
-	machine().output().set_value("lamp_p2_b", BIT(data,  6));
-
-	machine().output().set_value("lamp_p3_r", BIT(data,  8));
-	machine().output().set_value("lamp_p3_g", BIT(data,  9));
-	machine().output().set_value("lamp_p3_b", BIT(data, 10));
+	for (int p = 0; p < 3; p++)
+	{
+		m_lamps_r[p] = BIT(data, (p << 2) | 0);
+		m_lamps_g[p] = BIT(data, (p << 2) | 1);
+		m_lamps_b[p] = BIT(data, (p << 2) | 2);
+	}
 }
 
 void pasha2_state::pasha2_map(address_map &map)
@@ -245,9 +231,9 @@ void pasha2_state::pasha2_map(address_map &map)
 	map(0x40070000, 0x40070001).w(this, FUNC(pasha2_state::vbuffer_clear_w));
 	map(0x40074000, 0x40074001).w(this, FUNC(pasha2_state::vbuffer_set_w));
 	map(0x40078000, 0x40078001).nopw(); //once at startup -> to disable the eeprom?
-	map(0x80000000, 0x803fffff).bankr("bank1");
+	map(0x80000000, 0x803fffff).bankr("mainbank");
 	map(0xe0000000, 0xe00003ff).ram().w(this, FUNC(pasha2_state::pasha2_palette_w)).share("paletteram"); //tilemap? palette?
-	map(0xfff80000, 0xffffffff).rom().region("user1", 0);
+	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0);
 }
 
 void pasha2_state::pasha2_io(address_map &map)
@@ -260,10 +246,10 @@ void pasha2_state::pasha2_io(address_map &map)
 	map(0x80, 0x83).portr("INPUTS");
 	map(0xa0, 0xa3).nopw(); //soundlatch?
 	map(0xc0, 0xc3).w(this, FUNC(pasha2_state::pasha2_misc_w));
-	map(0xe3, 0xe3).rw(m_oki1, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe7, 0xe7).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe8, 0xeb).w(this, FUNC(pasha2_state::oki1_bank_w));
-	map(0xec, 0xef).w(this, FUNC(pasha2_state::oki2_bank_w));
+	map(0xe3, 0xe3).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe7, 0xe7).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xe8, 0xeb).w(this, FUNC(pasha2_state::oki_bank_w<0>));
+	map(0xec, 0xef).w(this, FUNC(pasha2_state::oki_bank_w<1>));
 }
 
 static INPUT_PORTS_START( pasha2 )
@@ -355,8 +341,13 @@ INPUT_PORTS_END
 
 void pasha2_state::video_start()
 {
-	save_item(NAME(m_bitmap0));
-	save_item(NAME(m_bitmap1));
+	for (int i = 0; i < 2; i++)
+	{
+		m_bitmap0[i] = make_unique_clear<uint8_t[]>(0x20000);
+		m_bitmap1[i] = make_unique_clear<uint8_t[]>(0x20000);
+		save_pointer(NAME(m_bitmap0[i].get()), 0x20000, i);
+		save_pointer(NAME(m_bitmap1[i].get()), 0x20000, i);
+	}
 }
 
 uint32_t pasha2_state::screen_update_pasha2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -366,41 +357,24 @@ uint32_t pasha2_state::screen_update_pasha2(screen_device &screen, bitmap_ind16 
 
 	/* 2 512x256 bitmaps */
 
-	count = 0;
-	for (y = 0; y <= cliprect.max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = 0; x < 512 / 2; x++)
+		count = cliprect.min_x | (y << 9);
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if (x * 2 < cliprect.max_x)
-			{
-				color = (m_bitmap0[count + (m_vbuffer ^ 1) * 0x20000 / 2] & 0xff00) >> 8;
-				bitmap.pix16(y, x * 2 + 0) = color + 0x100;
-
-				color = m_bitmap0[count + (m_vbuffer ^ 1) * 0x20000 / 2] & 0xff;
-				bitmap.pix16(y, x * 2 + 1) = color + 0x100;
-			}
-
-			count++;
+			bitmap.pix16(y, x) = m_bitmap0[(m_vbuffer ^ 1)][count++] | 0x100;
 		}
 	}
 
-	count = 0;
-	for (y = 0; y <= cliprect.max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (x = 0; x < 512 / 2; x++)
+		count = cliprect.min_x | (y << 9);
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if (x * 2 < cliprect.max_x)
-			{
-				color = m_bitmap1[count + (m_vbuffer ^ 1) * 0x20000 / 2] & 0xff;
-				if (color != 0)
-					bitmap.pix16(y, x * 2 + 1) = color;
+			color = m_bitmap1[(m_vbuffer ^ 1)][count++];
+			if (color != 0)
+				bitmap.pix16(y, x) = color;
 
-				color = (m_bitmap1[count + (m_vbuffer ^ 1) * 0x20000 / 2] & 0xff00) >> 8;
-				if (color != 0)
-					bitmap.pix16(y, x * 2 + 0) = color;
-			}
-
-			count++;
 		}
 	}
 
@@ -409,6 +383,9 @@ uint32_t pasha2_state::screen_update_pasha2(screen_device &screen, bitmap_ind16 
 
 void pasha2_state::machine_start()
 {
+	m_lamps_r.resolve();
+	m_lamps_g.resolve();
+	m_lamps_b.resolve();
 	save_item(NAME(m_vbuffer));
 }
 
@@ -425,6 +402,9 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_CPU_IO_MAP(pasha2_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasha2_state,  irq0_line_hold)
 
+	MCFG_CPU_ADD("audiocpu", I80C52, 12000000)     /* actually AT89C52; clock from docs */
+	/* TODO : ports are unimplemented; P0,P1,P2,P3 and Serial Port Used */
+
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	/* video hardware */
@@ -437,7 +417,6 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x200)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -452,21 +431,20 @@ MACHINE_CONFIG_START(pasha2_state::pasha2)
 MACHINE_CONFIG_END
 
 ROM_START( pasha2 )
-	ROM_REGION16_BE( 0x80000, "user1", 0 ) /* Hyperstone CPU Code */
+	ROM_REGION16_BE( 0x80000, "maincpu", 0 ) /* Hyperstone CPU Code */
 	ROM_LOAD( "pp2.u3",       0x00000, 0x80000, CRC(1c701273) SHA1(f465323a1d3f2fd752c51c178fafe4cc866e28d6) )
 
-	ROM_REGION16_BE( 0x400000*6, "user2", ROMREGION_ERASEFF ) /* data roms */
+	ROM_REGION16_BE( 0x400000*6, "bankeddata", ROMREGION_ERASEFF ) /* data roms */
 	ROM_LOAD16_BYTE( "pp2-u2.u101",  0x000000, 0x200000, CRC(85c4a2d0) SHA1(452b24b74bd0b65d2d6852486e2917f94e21ecc8) )
 	ROM_LOAD16_BYTE( "pp2-u1.u101",  0x000001, 0x200000, CRC(96cbd04e) SHA1(a4e7dd61194584b3c4217674d78ab2fd96b7b2e0) )
 	ROM_LOAD16_BYTE( "pp2-u2.u102",  0x400000, 0x200000, CRC(2097d88c) SHA1(7597578e6ddca00909feac35d9d7331f783b2bd6) )
 	ROM_LOAD16_BYTE( "pp2-u1.u102",  0x400001, 0x200000, CRC(7a3492fb) SHA1(de72c4d10e17eaf2b7531f637b42cbb3d07819b5) )
 	// empty space, but no empty sockets on the pcb
 
-	// not hooked up yet
-	ROM_REGION( 0x2000, "cpu1", 0 ) /* AT89C52 */
-	ROM_LOAD( "89c52.bin",  0x0000, 0x2000, CRC(9ce43ce4) SHA1(8027a3549b38e9a2e7bb8f518a0defcaf9743371) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) /* AT89C52 */
+	ROM_LOAD( "89c52.bin",  0x0000, 0x2000, CRC(9ce43ce4) SHA1(8027a3549b38e9a2e7bb8f518a0defcaf9743371) ) // music play 1.0
 
-	ROM_REGION( 0x80000, "user3", 0 ) /* SAM9773 sound data */
+	ROM_REGION( 0x80000, "sam9773", 0 ) /* SAM9773 sound data */
 	ROM_LOAD( "pp2.um2",      0x00000, 0x80000, CRC(86814b37) SHA1(70f8a94410e362669570c39e00492c0d69de6b17) )
 
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
@@ -488,8 +466,8 @@ DRIVER_INIT_MEMBER(pasha2_state,pasha2)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), this));
 
-	membank("bank1")->configure_entries(0, 6, memregion("user2")->base(), 0x400000);
-	membank("bank1")->set_entry(0);
+	m_mainbank->configure_entries(0, 6, memregion("bankeddata")->base(), 0x400000);
+	m_mainbank->set_entry(0);
 }
 
 GAMEL( 1998, pasha2, 0, pasha2, pasha2, pasha2_state, pasha2, ROT0, "Dong Sung", "Pasha Pasha 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_pasha2 )

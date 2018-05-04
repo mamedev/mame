@@ -483,7 +483,7 @@ MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("usart", i8251_device, write_dsr)) // actually from pin 11, "Reverse Channel Transmit"
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
 MACHINE_CONFIG_END
 
 /* ROM definition */

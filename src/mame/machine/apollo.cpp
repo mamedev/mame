@@ -1048,11 +1048,12 @@ void apollo_ni::set_node_id_from_disk()
 #undef VERBOSE
 #define VERBOSE 0
 
-static SLOT_INTERFACE_START(apollo_isa_cards)
-	SLOT_INTERFACE("wdc", ISA16_OMTI8621_APOLLO)   // Combo ESDI/AT floppy controller
-	SLOT_INTERFACE("ctape", ISA8_SC499)     // Archive SC499 cartridge tape
-	SLOT_INTERFACE("3c505", ISA16_3C505)   // 3Com 3C505 Ethernet card
-SLOT_INTERFACE_END
+static void apollo_isa_cards(device_slot_interface &device)
+{
+	device.option_add("wdc", ISA16_OMTI8621_APOLLO);    // Combo ESDI/AT floppy controller
+	device.option_add("ctape", ISA8_SC499);             // Archive SC499 cartridge tape
+	device.option_add("3c505", ISA16_3C505);            // 3Com 3C505 Ethernet card
+}
 
 MACHINE_CONFIG_START(apollo_state::common)
 	// configuration MUST be reset first !
@@ -1181,7 +1182,7 @@ MACHINE_CONFIG_START(apollo_state::apollo_terminal)
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_b_w))
 
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", apollo_terminal)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(apollo_state,apollo)

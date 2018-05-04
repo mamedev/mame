@@ -187,9 +187,10 @@ MACHINE_RESET_MEMBER( tavernie_state, ivg09)
 	m_pia_ivg->cb1_w(1);
 }
 
-static SLOT_INTERFACE_START( ifd09_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ifd09_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 // can support 3 drives
 WRITE8_MEMBER( tavernie_state::ds_w )

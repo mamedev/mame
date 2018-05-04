@@ -288,9 +288,10 @@ static INPUT_PORTS_START( wicat )
 
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(wicat_floppies)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void wicat_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 void wicat_state::driver_start()
 {

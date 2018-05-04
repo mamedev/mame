@@ -125,9 +125,10 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-static SLOT_INTERFACE_START( ampro_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ampro_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( ampro )

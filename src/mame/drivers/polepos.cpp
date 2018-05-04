@@ -295,16 +295,6 @@ WRITE_LINE_MEMBER(polepos_state::iosel_w)
 //          polepos_mcu_enable_w(offset,data);
 }
 
-WRITE_LINE_MEMBER(polepos_state::clson_w)
-{
-	m_namco_sound->polepos_sound_enable(state);
-	if (!state)
-	{
-		machine().device<polepos_sound_device>("polepos")->polepos_engine_sound_lsb_w(machine().dummy_space(), 0, 0);
-		machine().device<polepos_sound_device>("polepos")->polepos_engine_sound_msb_w(machine().dummy_space(), 0, 0);
-	}
-}
-
 WRITE_LINE_MEMBER(polepos_state::gasel_w)
 {
 	m_adc_input = state;
@@ -313,11 +303,6 @@ WRITE_LINE_MEMBER(polepos_state::gasel_w)
 WRITE_LINE_MEMBER(polepos_state::sb0_w)
 {
 	m_auto_start_mask = !state;
-}
-
-WRITE_LINE_MEMBER(polepos_state::chacl_w)
-{
-	polepos_chacl_w(machine().dummy_space(), 0, state);
 }
 
 template<bool sub1> WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
@@ -914,7 +899,8 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	MCFG_DEVICE_ADD("latch", LS259, 0) // at 8E on polepos
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(CLEARLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(polepos_state, iosel_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(polepos_state, clson_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("namco", namco_device, sound_enable_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("polepos", polepos_sound_device, clson_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(polepos_state, gasel_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
@@ -1026,7 +1012,8 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_DEVICE_ADD("latch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(CLEARLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(polepos_state, iosel_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(polepos_state, clson_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("namco", namco_device, sound_enable_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("polepos", polepos_sound_device, clson_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(polepos_state, gasel_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(INPUTLINE("sub2", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
@@ -1065,7 +1052,7 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.12)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(polepos_state::polepos2bi)

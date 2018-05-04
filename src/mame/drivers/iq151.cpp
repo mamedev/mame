@@ -371,20 +371,21 @@ uint32_t iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-static SLOT_INTERFACE_START(iq151_cart)
-	SLOT_INTERFACE("video32", IQ151_VIDEO32)            // video32
-	SLOT_INTERFACE("video64", IQ151_VIDEO64)            // video64
-	SLOT_INTERFACE("grafik" , IQ151_GRAFIK)             // Grafik
-	SLOT_INTERFACE("disc2"  , IQ151_DISC2)              // Disc 2
-	SLOT_INTERFACE("minigraf" , IQ151_MINIGRAF)         // Aritma Minigraf 0507
-	SLOT_INTERFACE("ms151a" , IQ151_MS151A)             // MS151A XY Plotter
-	SLOT_INTERFACE("staper" , IQ151_STAPER)             // STAPER
-	SLOT_INTERFACE("basic6" , IQ151_BASIC6)             // BASIC6
-	SLOT_INTERFACE("basicg" , IQ151_BASICG)             // BASICG
-	SLOT_INTERFACE("amos1"  , IQ151_AMOS1)              // AMOS cart 1
-	SLOT_INTERFACE("amos2"  , IQ151_AMOS2)              // AMOS cart 2
-	SLOT_INTERFACE("amos3"  , IQ151_AMOS3)              // AMOS cart 3
-SLOT_INTERFACE_END
+static void iq151_cart(device_slot_interface &device)
+{
+	device.option_add("video32",  IQ151_VIDEO32);       // video32
+	device.option_add("video64",  IQ151_VIDEO64);       // video64
+	device.option_add("grafik",   IQ151_GRAFIK);        // Grafik
+	device.option_add("disc2",    IQ151_DISC2);         // Disc 2
+	device.option_add("minigraf", IQ151_MINIGRAF);      // Aritma Minigraf 0507
+	device.option_add("ms151a",   IQ151_MS151A);        // MS151A XY Plotter
+	device.option_add("staper",   IQ151_STAPER);        // STAPER
+	device.option_add("basic6",   IQ151_BASIC6);        // BASIC6
+	device.option_add("basicg",   IQ151_BASICG);        // BASICG
+	device.option_add("amos1",    IQ151_AMOS1);         // AMOS cart 1
+	device.option_add("amos2",    IQ151_AMOS2);         // AMOS cart 2
+	device.option_add("amos3",    IQ151_AMOS3);         // AMOS cart 3
+}
 
 MACHINE_CONFIG_START(iq151_state::iq151)
 	/* basic machine hardware */

@@ -362,12 +362,13 @@ void trs80m16_state::m16_z80_io(address_map &map)
 //  ADDRESS_MAP( m68000_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(trs80m2_state::m68000_mem)
+void trs80m2_state::m68000_mem(address_map &map)
+{
 //  AM_RANGE(0x7800d0, 0x7800d1) 9519A (C/D = UDS)
 //  AM_RANGE(0x7800d2, 0x7800d3) limit/offset 2
 //  AM_RANGE(0x7800d4, 0x7800d5) limit/offset 1
 //  AM_RANGE(0x7800d6, 0x7800d7) Z80 IRQ
-ADDRESS_MAP_END
+}
 
 
 
@@ -620,10 +621,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_state::ctc_tick)
 	m_ctc->trg2(0);
 }
 
-static SLOT_INTERFACE_START( trs80m2_floppies )
-	SLOT_INTERFACE( "8ssdd", FLOPPY_8_SSDD ) // Shugart SA-800
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD ) // Shugart SA-850
-SLOT_INTERFACE_END
+static void trs80m2_floppies(device_slot_interface &device)
+{
+	device.option_add("8ssdd", FLOPPY_8_SSDD); // Shugart SA-800
+	device.option_add("8dsdd", FLOPPY_8_DSDD); // Shugart SA-850
+}
 
 
 //-------------------------------------------------

@@ -120,6 +120,6 @@ DECLARE_DEVICE_TYPE(IMI7000_SLOT, imi7000_slot_device)
 
 
 // slot interface
-SLOT_INTERFACE_EXTERN( imi7000_devices );
+void imi7000_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_IMI7000_IMI7000_H

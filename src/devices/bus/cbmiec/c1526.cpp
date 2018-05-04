@@ -78,9 +78,10 @@ const tiny_rom_entry *c4023_device::device_rom_region() const
 //  ADDRESS_MAP( c1526_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c1526_device_base::c1526_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
-ADDRESS_MAP_END
+void c1526_device_base::c1526_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region(M6504_TAG, 0);
+}
 
 
 //-------------------------------------------------

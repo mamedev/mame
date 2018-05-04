@@ -338,7 +338,7 @@ private:
 DECLARE_DEVICE_TYPE(TMSPROM, tmsprom_device)
 
 #define MCFG_TMSPROM_REGION(_region) \
-	downcast<tmsprom_device &>(*device).set_region("^" _region);
+	downcast<tmsprom_device &>(*device).set_region(_region);
 
 #define MCFG_TMSPROM_ROM_SIZE(_size) \
 	downcast<tmsprom_device &>(*device).set_rom_size(_size);

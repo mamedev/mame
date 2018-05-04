@@ -720,9 +720,10 @@ void altos8600_state::dmac_io(address_map &map)
 	map(0x0400, 0x05ff).rw(this, FUNC(altos8600_state::mmuaddr_r), FUNC(altos8600_state::mmuaddr_w));
 }
 
-static SLOT_INTERFACE_START(altos8600_floppies)
-	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void altos8600_floppies(device_slot_interface &device)
+{
+	device.option_add("8dd", FLOPPY_8_DSDD);
+}
 
 MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_CPU_ADD("maincpu", I8086, 5_MHz_XTAL)

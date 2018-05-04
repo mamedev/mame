@@ -15,7 +15,7 @@
 #include "speaker.h"
 
 
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
+void cpc_exp_cards(device_slot_interface &device);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

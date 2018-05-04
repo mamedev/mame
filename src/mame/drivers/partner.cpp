@@ -145,9 +145,10 @@ FLOPPY_FORMATS_MEMBER( partner_state::floppy_formats )
 	FLOPPY_SMX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( partner_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void partner_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout partner_charlayout =

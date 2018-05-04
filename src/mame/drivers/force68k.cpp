@@ -528,10 +528,11 @@ image_init_result force68k_state::force68k_load_cart(device_image_interface &ima
 }
 
 
-static SLOT_INTERFACE_START(fccpu1_vme_cards)
-	SLOT_INTERFACE("fcisio", VME_FCISIO1)
-	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
-SLOT_INTERFACE_END
+static void fccpu1_vme_cards(device_slot_interface &device)
+{
+	device.option_add("fcisio", VME_FCISIO1);
+	device.option_add("fcscsi", VME_FCSCSI1);
+}
 
 /*
  * Machine configuration

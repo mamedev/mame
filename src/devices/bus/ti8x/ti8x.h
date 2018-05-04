@@ -200,6 +200,6 @@ private:
 };
 
 
-SLOT_INTERFACE_EXTERN( default_ti8x_link_devices );
+void default_ti8x_link_devices(device_slot_interface &device);
 
 #endif // MAME_DEVICES_BUS_TI8X_TI8X_H

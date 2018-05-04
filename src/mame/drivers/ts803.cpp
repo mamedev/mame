@@ -183,9 +183,10 @@ INPUT_PORTS_END
 
 /* disk drive */
 
-static SLOT_INTERFACE_START( ts803_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ts803_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 WRITE8_MEMBER( ts803_state::disk_0_control_w )
 {

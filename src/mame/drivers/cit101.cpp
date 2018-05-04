@@ -63,11 +63,20 @@ public:
 		, m_screen(*this, "screen")
 		, m_nvr(*this, "nvr")
 		, m_chargen(*this, "chargen")
+		, m_mainram(*this, "mainram")
+		, m_extraram(*this, "extraram")
 	{ }
 
 	void cit101(machine_config &config);
+protected:
+	virtual void machine_start() override;
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER(c000_ram_r);
+	DECLARE_WRITE8_MEMBER(c000_ram_w);
+	DECLARE_READ8_MEMBER(e0_latch_r);
+	DECLARE_WRITE8_MEMBER(e0_latch_w);
 
 	DECLARE_WRITE8_MEMBER(nvr_address_w);
 	DECLARE_READ8_MEMBER(nvr_data_r);
@@ -77,18 +86,87 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
+	u8 m_e0_latch;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<er2055_device> m_nvr;
 	required_region_ptr<u8> m_chargen;
+	required_shared_ptr<u8> m_mainram;
+	required_shared_ptr<u8> m_extraram;
 };
 
 
+void cit101_state::machine_start()
+{
+	save_item(NAME(m_e0_latch));
+}
+
 u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// TODO: 9 for 132-column mode
+	int char_width = 10;
+
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		int row = (y / 10) + 1;
+		int line = y % 10;
+		u16 rowaddr = m_mainram[row * 2] | (m_extraram[row * 2] & 0x3f) << 8;
+
+		int c = 0;
+		u8 attr = m_extraram[rowaddr];
+		u8 char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
+		if (line == 9 && BIT(attr, 0))
+			char_data ^= 0xff;
+		if (BIT(attr, 1))
+			char_data ^= 0xff;
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
+		{
+			if (x >= cliprect.left() && x <= cliprect.right())
+				bitmap.pix32(y, x) = BIT(char_data, 7) ? rgb_t::white() : rgb_t::black();
+
+			if (++c < char_width)
+				char_data = (char_data << 1) | (char_data & 1);
+			else
+			{
+				c = 0;
+				rowaddr++;
+				attr = m_extraram[rowaddr];
+				char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
+				if (line == 9 && BIT(attr, 0))
+					char_data ^= 0xff;
+				if (BIT(attr, 1))
+					char_data ^= 0xff;
+			}
+		}
+	}
+
 	return 0;
 }
 
+
+READ8_MEMBER(cit101_state::c000_ram_r)
+{
+	if (!machine().side_effects_disabled())
+		m_e0_latch = m_extraram[offset];
+	return m_mainram[offset];
+}
+
+WRITE8_MEMBER(cit101_state::c000_ram_w)
+{
+	m_extraram[offset] = m_e0_latch;
+	m_mainram[offset] = data;
+}
+
+READ8_MEMBER(cit101_state::e0_latch_r)
+{
+	return m_e0_latch;
+}
+
+WRITE8_MEMBER(cit101_state::e0_latch_w)
+{
+	m_e0_latch = data;
+}
 
 WRITE8_MEMBER(cit101_state::nvr_address_w)
 {
@@ -114,8 +192,9 @@ WRITE8_MEMBER(cit101_state::nvr_control_w)
 void cit101_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
-	map(0x4000, 0xbfff).ram();
-	map(0xc000, 0xcfff).ram().share("videoram");
+	map(0x4000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0xbfff).ram().share("extraram"); // only 4 bits wide?
+	map(0xc000, 0xdfff).rw(this, FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
 	map(0xfc00, 0xfc00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xfc01, 0xfc01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xfc20, 0xfc20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
@@ -137,7 +216,7 @@ void cit101_state::io_map(address_map &map)
 	map(0x41, 0x41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x60, 0x63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa0).nopw(); // ?
-	map(0xe0, 0xe0).noprw(); // ?
+	map(0xe0, 0xe0).rw(this, FUNC(cit101_state::e0_latch_r), FUNC(cit101_state::e0_latch_w));
 }
 
 
@@ -190,11 +269,17 @@ MACHINE_CONFIG_START(cit101_state::cit101)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("comuart", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("comuart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbduart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("kbduart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(cit101_state, nvr_address_w))

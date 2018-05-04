@@ -1420,7 +1420,7 @@ INPUT_PORTS_END
 
 void x68k_state::floppy_load_unload(bool load, floppy_image_device *dev)
 {
-	dev->mon_w(m_fdc.motor && !load);
+	dev->mon_w(!(m_fdc.motor && load));
 	if(m_ioc.irqstatus & 0x02)
 	{
 		m_current_vector[1] = 0x61;
@@ -1468,11 +1468,12 @@ WRITE_LINE_MEMBER(x68k_state::x68k_irq4_line)
 	logerror("EXP: IRQ4 set to %i (vector %02x)\n",state,m_current_vector[4]);
 }
 
-static SLOT_INTERFACE_START(x68000_exp_cards)
-	SLOT_INTERFACE("neptunex",X68K_NEPTUNEX) // Neptune-X ethernet adapter (ISA NE2000 bridge)
-	SLOT_INTERFACE("cz6bs1",X68K_SCSIEXT)  // Sharp CZ-6BS1 SCSI-1 controller
-	SLOT_INTERFACE("x68k_midi",X68K_MIDI)  // X68000 MIDI interface
-SLOT_INTERFACE_END
+static void x68000_exp_cards(device_slot_interface &device)
+{
+	device.option_add("neptunex", X68K_NEPTUNEX);   // Neptune-X ethernet adapter (ISA NE2000 bridge)
+	device.option_add("cz6bs1", X68K_SCSIEXT);      // Sharp CZ-6BS1 SCSI-1 controller
+	device.option_add("x68k_midi", X68K_MIDI);      // X68000 MIDI interface
+}
 
 void x68k_state::machine_reset()
 {
@@ -1624,13 +1625,15 @@ FLOPPY_FORMATS_MEMBER( x68k_state::floppy_formats )
 	FLOPPY_DIM_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( x68k_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void x68k_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
-static SLOT_INTERFACE_START(keyboard)
-	SLOT_INTERFACE("x68k", X68K_KEYBOARD)
-SLOT_INTERFACE_END
+static void keyboard(device_slot_interface &device)
+{
+	device.option_add("x68k", X68K_KEYBOARD);
+}
 
 MACHINE_CONFIG_START(x68k_state::x68000)
 	/* basic machine hardware */

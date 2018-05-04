@@ -138,9 +138,10 @@ WRITE8_MEMBER( ts802_state::io_write_byte )
 	m_io->write_byte(offset, data);
 }
 
-static SLOT_INTERFACE_START( ts802_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ts802_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_RESET_MEMBER( ts802_state, ts802 )
 {

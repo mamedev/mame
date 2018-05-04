@@ -54,28 +54,30 @@ uint32_t korgm1_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-ADDRESS_MAP_START(korgm1_state::korgm1_map)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM // 64 KB
-//  AM_RANGE(0x50000, 0x57fff) AM_RAM // memory card 32 KB
-	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
-ADDRESS_MAP_END
+void korgm1_state::korgm1_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).ram(); // 64 KB
+//  map(0x50000, 0x57fff).ram(); // memory card 32 KB
+	map(0xe0000, 0xfffff).rom().region("ipl", 0);
+}
 
-ADDRESS_MAP_START(korgm1_state::korgm1_io)
-//  AM_RANGE(0x0000, 0x00ff) internal peripheral (?)
-//  AM_RANGE(0x0100, 0x01ff) VDF 1 (MB87404)
-//  AM_RANGE(0x0200, 0x02ff) VDF 2 (MB87404)
-//  AM_RANGE(0x0500, 0x0503) MDE (MB87405)
-//  AM_RANGE(0x0600, 0x0601) OPZ 1 (8-bit port)
-//  AM_RANGE(0x0700, 0x0701) OPZ 2 (8-bit port)
-//  AM_RANGE(0x0800, 0x0801) SCAN (8-bit port) (keyboard)
-//  AM_RANGE(0x0900, 0x0900) ADC (M58990P, compatible with ADC0808; Joystick, "value" and After Touch routes here)
-//  AM_RANGE(0x0a00, 0x0a07) PIO (CXD1095Q; LCD, LED and SW routes here; also controls ADC channel select and TG/VDF/MDE reset line)
-//  AM_RANGE(0x0b00, 0x0b01) LCDC (8-bit port)
-//  AM_RANGE(0x1000, 0x11ff) TG (MB87402)
-//  AM_RANGE(0x2000, 0x23ff) SCSI
-//  AM_RANGE(0x3000, 0x33ff) FDC
+void korgm1_state::korgm1_io(address_map &map)
+{
+//  map(0x0000, 0x00ff); internal peripheral (?)
+//  map(0x0100, 0x01ff); VDF 1 (MB87404)
+//  map(0x0200, 0x02ff); VDF 2 (MB87404)
+//  map(0x0500, 0x0503); MDE (MB87405)
+//  map(0x0600, 0x0601); OPZ 1 (8-bit port)
+//  map(0x0700, 0x0701); OPZ 2 (8-bit port)
+//  map(0x0800, 0x0801); SCAN (8-bit port) (keyboard)
+//  map(0x0900, 0x0900); ADC (M58990P, compatible with ADC0808; Joystick, "value" and After Touch routes here)
+//  map(0x0a00, 0x0a07); PIO (CXD1095Q; LCD, LED and SW routes here; also controls ADC channel select and TG/VDF/MDE reset line)
+//  map(0x0b00, 0x0b01); LCDC (8-bit port)
+//  map(0x1000, 0x11ff); TG (MB87402)
+//  map(0x2000, 0x23ff); SCSI
+//  map(0x3000, 0x33ff); FDC
 //  TG 2?
-ADDRESS_MAP_END
+}
 
 static INPUT_PORTS_START( korgm1 )
 	/* dummy active high structure */

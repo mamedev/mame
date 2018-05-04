@@ -61,9 +61,10 @@ const tiny_rom_entry *epson_pf10_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( pf10_floppies )
-	SLOT_INTERFACE( "smd165", EPSON_SMD_165 )
-SLOT_INTERFACE_END
+static void pf10_floppies(device_slot_interface &device)
+{
+	device.option_add("smd165", EPSON_SMD_165);
+}
 
 MACHINE_CONFIG_START(epson_pf10_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", HD6303Y, XTAL(4'915'200)) // HD63A03XF

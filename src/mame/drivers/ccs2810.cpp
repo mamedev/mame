@@ -896,11 +896,12 @@ DRIVER_INIT_MEMBER( ccs_state, ccs2422 )
 //
 //*************************************
 
-static SLOT_INTERFACE_START( ccs_floppies )
-	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
-SLOT_INTERFACE_END
+static void ccs_floppies(device_slot_interface &device)
+{
+	device.option_add("8sssd", FLOPPY_8_SSSD);
+}
 
-	//SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	//device.option_add("525dd", FLOPPY_525_DD);
 
 MACHINE_CONFIG_START(ccs_state::ccs2810)
 	/* basic machine hardware */

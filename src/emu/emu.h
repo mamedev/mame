@@ -111,4 +111,4 @@ class address_map; // Forward declaration
 // member templates that don't like incomplete types
 #include "device.ipp"
 
-#endif  /* __EMU_H__ */
+#endif // __EMU_H__

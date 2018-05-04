@@ -374,9 +374,10 @@ FLOPPY_FORMATS_MEMBER( ms0515_state::floppy_formats )
 	FLOPPY_MS0515_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ms0515_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void ms0515_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

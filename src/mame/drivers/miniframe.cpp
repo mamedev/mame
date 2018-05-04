@@ -217,9 +217,10 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START( miniframe_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void miniframe_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(miniframe_state::miniframe)
 	// basic machine hardware

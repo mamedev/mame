@@ -410,9 +410,10 @@ FLOPPY_FORMATS_MEMBER( z80ne_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( z80ne_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void z80ne_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_SSSD);
+}
 
 MACHINE_CONFIG_START(z80ne_state::z80ne)
 	/* basic machine hardware */

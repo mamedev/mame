@@ -34,9 +34,10 @@ FLOPPY_FORMATS_MEMBER( a2bus_corvfdc02_device::corv_floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( corv_floppies )
-	SLOT_INTERFACE( "525dsqd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void corv_floppies(device_slot_interface &device)
+{
+	device.option_add("525dsqd", FLOPPY_525_QD);
+}
 
 ROM_START( fdc02 )
 	ROM_REGION(0x20, FDC02_ROM_REGION, 0)

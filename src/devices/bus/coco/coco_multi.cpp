@@ -156,27 +156,29 @@ namespace
     IMPLEMENTATION
 ***************************************************************************/
 
-static SLOT_INTERFACE_START(coco_cart_slot1_3)
-	SLOT_INTERFACE("rs232", COCO_RS232)
-	SLOT_INTERFACE("dcmodem", COCO_DCMODEM)
-	SLOT_INTERFACE("orch90", COCO_ORCH90)
-	SLOT_INTERFACE("ssc", COCO_SSC)                 MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
-	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
-	SLOT_INTERFACE("pak", COCO_PAK)
-SLOT_INTERFACE_END
-static SLOT_INTERFACE_START(coco_cart_slot4)
-	SLOT_INTERFACE("cc2hdb1", COCO2_HDB1)
-	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
-	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
-	SLOT_INTERFACE("rs232", COCO_RS232)
-	SLOT_INTERFACE("dcmodem", COCO_DCMODEM)
-	SLOT_INTERFACE("orch90", COCO_ORCH90)
-	SLOT_INTERFACE("ssc", COCO_SSC)                 MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
-	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
-	SLOT_INTERFACE("pak", COCO_PAK)
-SLOT_INTERFACE_END
+static void coco_cart_slot1_3(device_slot_interface &device)
+{
+	device.option_add("rs232", COCO_RS232);
+	device.option_add("dcmodem", COCO_DCMODEM);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("ssc", COCO_SSC).clock(DERIVED_CLOCK(1, 1));
+	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("banked_16k", COCO_PAK_BANKED);
+	device.option_add("pak", COCO_PAK);
+}
+static void coco_cart_slot4(device_slot_interface &device)
+{
+	device.option_add("cc2hdb1", COCO2_HDB1);
+	device.option_add("cc3hdb1", COCO3_HDB1);
+	device.option_add("fdcv11", COCO_FDC_V11);
+	device.option_add("rs232", COCO_RS232);
+	device.option_add("dcmodem", COCO_DCMODEM);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("ssc", COCO_SSC).clock(DERIVED_CLOCK(1, 1));
+	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("banked_16k", COCO_PAK_BANKED);
+	device.option_add("pak", COCO_PAK);
+}
 
 
 MACHINE_CONFIG_START(coco_multipak_device::device_add_mconfig)
@@ -211,7 +213,9 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(COCO_MULTIPAK, coco_multipak_device, "coco_multipack", "CoCo Multi-Pak Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(COCO_MULTIPAK, device_cococart_interface, coco_multipak_device, "coco_multipack", "CoCo Multi-Pak Interface")
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
 
 
 

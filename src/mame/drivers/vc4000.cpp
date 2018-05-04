@@ -517,12 +517,13 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 	return result;
 }
 
-static SLOT_INTERFACE_START(vc4000_cart)
-	SLOT_INTERFACE_INTERNAL("std",      VC4000_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("rom4k",    VC4000_ROM_ROM4K)
-	SLOT_INTERFACE_INTERNAL("ram1k",    VC4000_ROM_RAM1K)
-	SLOT_INTERFACE_INTERNAL("chess2",   VC4000_ROM_CHESS2)
-SLOT_INTERFACE_END
+static void vc4000_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",      VC4000_ROM_STD);
+	device.option_add_internal("rom4k",    VC4000_ROM_ROM4K);
+	device.option_add_internal("ram1k",    VC4000_ROM_RAM1K);
+	device.option_add_internal("chess2",   VC4000_ROM_CHESS2);
+}
 
 
 MACHINE_CONFIG_START(vc4000_state::vc4000)

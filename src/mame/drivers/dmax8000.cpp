@@ -143,9 +143,10 @@ DRIVER_INIT_MEMBER( dmax8000_state, dmax8000 )
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
 }
 
-static SLOT_INTERFACE_START( floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 
 MACHINE_CONFIG_START(dmax8000_state::dmax8000)

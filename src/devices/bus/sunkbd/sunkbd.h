@@ -76,6 +76,6 @@ protected:
 DECLARE_DEVICE_TYPE(SUNKBD_PORT, sun_keyboard_port_device)
 
 
-SLOT_INTERFACE_EXTERN( default_sun_keyboard_devices );
+void default_sun_keyboard_devices(device_slot_interface &device);
 
 #endif // MAME_DEVICES_SUNKBD_SUNKBD_H

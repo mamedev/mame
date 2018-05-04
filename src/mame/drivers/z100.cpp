@@ -666,9 +666,10 @@ void z100_state::machine_reset()
 	}
 }
 
-static SLOT_INTERFACE_START( z100_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void z100_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(z100_state::z100)
 	/* basic machine hardware */

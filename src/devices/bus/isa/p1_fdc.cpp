@@ -35,9 +35,10 @@ FLOPPY_FORMATS_MEMBER( p1_fdc_device::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( poisk1_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void poisk1_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 //-------------------------------------------------
 //  ROM( p1_fdc )

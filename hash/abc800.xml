@@ -42,7 +42,7 @@
 	<software name="ord800">
 		<description>ORD 800 v2.4 (Swe)</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>P-Data</publisher>
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="65069">
@@ -66,7 +66,7 @@
 	<software name="red800">
 		<description>Bokföring 800 v2.0 (Swe)</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>P-Data</publisher>
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="141304">
@@ -78,7 +78,7 @@
 	<software name="sana800">
 		<description>Sana 800 v2.3 (Fin)</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>P-Data</publisher>
 		<info name="serial" value="68 20037-56" />
 
 		<part name="flop" interface="floppy_5_25">

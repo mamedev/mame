@@ -565,14 +565,15 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START( einstein_floppies )
-	SLOT_INTERFACE("3ss", TEAC_FD_30A)
-	SLOT_INTERFACE("3ds", FLOPPY_3_DSDD)
-	SLOT_INTERFACE("525ssqd", FLOPPY_525_SSQD)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-	SLOT_INTERFACE("35ssdd", FLOPPY_35_SSDD)
-	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void einstein_floppies(device_slot_interface &device)
+{
+	device.option_add("3ss", TEAC_FD_30A);
+	device.option_add("3ds", FLOPPY_3_DSDD);
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("35ssdd", FLOPPY_35_SSDD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 MACHINE_CONFIG_START(einstein_state::einstein)
 	/* basic machine hardware */

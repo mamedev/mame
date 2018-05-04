@@ -119,15 +119,14 @@ private:
 		uint8_t rompage;
 		uint16_t screen_start;
 		uint16_t screen_base;
-		int screen_size;
+		uint16_t screen_size;
 		uint16_t screen_addr;
-		uint8_t *vram;
+		int screen_dispend;
 		int current_pal[16];
 		int communication_mode;
 		int screen_mode;
 		int cassette_motor_mode;
 		int capslock_mode;
-		//  int scanline;
 		/* tape reading related */
 		uint32_t tape_value;
 		int tape_steps;

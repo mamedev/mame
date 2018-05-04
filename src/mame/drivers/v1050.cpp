@@ -929,10 +929,11 @@ void v1050_state::update_fdc()
 
 // disk format: 80 tracks, 1 head, 10 sectors, 512 bytes sector length, first sector id 1
 
-static SLOT_INTERFACE_START( v1050_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD ) // Teac FD 55E-02-U
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Teac FD 55-FV-35-U
-SLOT_INTERFACE_END
+static void v1050_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD); // Teac FD 55E-02-U
+	device.option_add("525qd", FLOPPY_525_QD); // Teac FD 55-FV-35-U
+}
 
 WRITE_LINE_MEMBER( v1050_state::fdc_intrq_w )
 {

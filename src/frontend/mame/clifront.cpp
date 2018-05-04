@@ -679,13 +679,14 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 	if (iswild || first)
 	{
 		machine_config config(GAME_NAME(___empty), m_options);
+		machine_config::token const tok(config.begin_configuration(config.root_device()));
 		for (device_type type : registered_device_types)
 		{
 			if (included(type.shortname()))
 			{
-				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+				device_t *const dev = config.device_add("_tmp", type, 0);
 				list_system_roms(*dev, "device");
-				config.device_remove(&config.root_device(), "_tmp");
+				config.device_remove("_tmp");
 
 				// if it wasn't a wildcard, there can only be one
 				if (!iswild)
@@ -859,13 +860,13 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 			if (slot.fixed()) continue;
 
 			// build a list of user-selectable options
-			std::vector<device_slot_option *> option_list;
+			std::vector<device_slot_interface::slot_option const *> option_list;
 			for (auto &option : slot.option_list())
 				if (option.second->selectable())
 					option_list.push_back(option.second.get());
 
 			// sort them by name
-			std::sort(option_list.begin(), option_list.end(), [](device_slot_option *opt1, device_slot_option *opt2) {
+			std::sort(option_list.begin(), option_list.end(), [](device_slot_interface::slot_option const *opt1, device_slot_interface::slot_option const *opt2) {
 				return strcmp(opt1->name(), opt2->name()) < 0;
 			});
 
@@ -876,7 +877,7 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 			bool first_option = true;
 
 			// get the options and print them
-			for (device_slot_option *opt : option_list)
+			for (device_slot_interface::slot_option const *opt : option_list)
 			{
 				if (first_option)
 					printf("%-16s %s\n", opt->name(), opt->devtype().fullname());
@@ -1017,12 +1018,13 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 	if (iswild || !matchcount)
 	{
 		machine_config config(GAME_NAME(___empty), m_options);
+		machine_config::token const tok(config.begin_configuration(config.root_device()));
 		for (device_type type : registered_device_types)
 		{
 			if (included(type.shortname()))
 			{
 				// audit the ROMs in this set
-				device_t *const dev = config.device_add(&config.root_device(), "_tmp", type, 0);
+				device_t *const dev = config.device_add("_tmp", type, 0);
 				media_auditor::summary summary = auditor.audit_device(*dev, AUDIT_VALIDATE_FAST);
 
 				print_summary(
@@ -1030,7 +1032,7 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 						"rom", dev->shortname(), nullptr,
 						correct, incorrect, notfound,
 						summary_string);
-				config.device_remove(&config.root_device(), "_tmp");
+				config.device_remove("_tmp");
 
 				// if it wasn't a wildcard, there can only be one
 				if (!iswild)

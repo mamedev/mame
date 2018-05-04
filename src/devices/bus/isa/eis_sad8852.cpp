@@ -36,7 +36,7 @@
  Nokia Data -  marked TVK 119 5211 R3, rev date 9127, assembled in 1991 indicated by chip dates
  ICL        -  marked TVK 119 5211 R3, rev date 9343, assembled in 1993 indicated by chip dates
  +--------------------------------------------------------------------------------------+ ___
- |	     IC18  IC24  +----------+                                                   ||
+ |       IC18  IC24  +----------+                                                   ||
  | IC1  IC9              |IC31 EPROM|  +--------------+   IC44                          ||
  |           IC19  IC25  |27128     |  | IC35 i8274   |         IC51                    ||
  | IC2  IC10             +----------+  | MPSC serial  |  IC45                           ||
@@ -149,13 +149,15 @@ const tiny_rom_entry *isa16_sad8852_device::device_rom_region() const
 //-------------------------------------------------
 //  ADDRESS maps
 //-------------------------------------------------
-ADDRESS_MAP_START(isa16_sad8852_device::sad8852_mem)
-	AM_RANGE(0x00000, 0x80000) AM_RAM
-	AM_RANGE(0xfc000, 0xfffff) AM_ROM AM_REGION(I80188_TAG, 0)
-ADDRESS_MAP_END
+void isa16_sad8852_device::sad8852_mem(address_map &map)
+{
+	map(0x00000, 0x80000).ram();
+	map(0xfc000, 0xfffff).rom().region(I80188_TAG, 0);
+}
 
-ADDRESS_MAP_START(isa16_sad8852_device::sad8852_io)
-ADDRESS_MAP_END
+void isa16_sad8852_device::sad8852_io(address_map &map)
+{
+}
 
 //----------------------------------------------------------
 //  UI I/O
@@ -231,9 +233,10 @@ void isa16_sad8852_device::device_reset()
 {
 	if (!m_installed)
 	{
-		m_isa->install_device(0x378, 0x378, // Wrong, need to find real i/o addresses
-				      read8_delegate(FUNC( isa16_sad8852_device::sad8852_r ), this),
-				      write8_delegate(FUNC( isa16_sad8852_device::sad8852_w ), this) );
+		m_isa->install_device(
+				0x378, 0x378, // Wrong, need to find real i/o addresses
+				read8_delegate(FUNC( isa16_sad8852_device::sad8852_r ), this),
+				write8_delegate(FUNC( isa16_sad8852_device::sad8852_w ), this));
 		m_irq = m_isairq->read();
 		m_installed = true;
 	}

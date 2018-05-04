@@ -554,9 +554,10 @@ FLOPPY_FORMATS_MEMBER( a5105_state::floppy_formats )
 	FLOPPY_A5105_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( a5105_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void a5105_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 static const z80_daisy_config a5105_daisy_chain[] =
 {

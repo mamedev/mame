@@ -33,6 +33,29 @@ TODO: Emulated sound
 
  so despite the fact that 'gotya' might look like its a bootleg of thehand,
  its more likely just a prototype / alternate version, its hard to tell
+ 
+ ----
+According to Andrew Welburn:
+ 
+'The Hand' is the original game, GAT licensed it for US manufacture.
+It wasn't a runaway seller, they didn't make many, but they had to
+change certain aspect of the game to 'localise' it and re-badge it as
+their own. There are at least 3-4 scans of manuals online, if it was
+proto, a full manual would be rare, and then having several independent
+people find and scan the manual would be super rare.
+
+The hand labelling of ROMs is entirely normal for small-run games. The
+wire patching is on the underside and is minor tracking changes, common
+on small-runs of PCBs.
+
+The games themselves show the most obvious changes. The classic layout
+at the top of the screen for 'The hand' with the 'hi-score' is replaced
+with 'Got-Ya' in text, a fairly minor hack. The Copyright symbol is
+still there in Got-Ya but with the company name scrubbed out.
+
+All in all, Got-Ya should NOT be marked as a prototype in MAME, its a
+US territory license hack of another game 'The Hand'. Nothing about it
+says prototype, and the original base game is 'The Hand'.
 ****************************************************************************/
 
 #include "emu.h"
@@ -281,4 +304,4 @@ ROM_START( gotya )
 ROM_END
 
 GAME( 1981, thehand, 0,       gotya, gotya, gotya_state, 0, ROT270, "T.I.C.",      "The Hand",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, 0, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981, prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, gotya,   thehand, gotya, gotya, gotya_state, 0, ROT270, "Game-A-Tron", "Got-Ya (12/24/1981)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -37,7 +37,7 @@ void lemmings_state::video_start()
 
 	m_vram_tilemap->set_transparent_pen(0);
 	m_bitmap0.fill(0x100);
-	
+
 	m_vram_buffer = make_unique_clear<uint8_t[]>(2048 * 64); // 64 bytes per VRAM character
 	m_gfxdecode->gfx(2)->set_source(m_vram_buffer.get());
 

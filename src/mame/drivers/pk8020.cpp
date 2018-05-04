@@ -171,9 +171,10 @@ FLOPPY_FORMATS_MEMBER( pk8020_state::floppy_formats )
 	FLOPPY_PK8020_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pk8020_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void pk8020_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 /* Machine driver */

@@ -588,10 +588,11 @@ static INPUT_PORTS_START( apple1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(apple1_cards)
-	SLOT_INTERFACE("cassette", A1BUS_CASSETTE)
-	SLOT_INTERFACE("cffa", A1BUS_CFFA)
-SLOT_INTERFACE_END
+static void apple1_cards(device_slot_interface &device)
+{
+	device.option_add("cassette", A1BUS_CASSETTE);
+	device.option_add("cffa", A1BUS_CFFA);
+}
 
 MACHINE_CONFIG_START(apple1_state::apple1)
 	MCFG_CPU_ADD(A1_CPU_TAG, M6502, 960000)        // effective CPU speed

@@ -2078,9 +2078,10 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 }
 
 
-static SLOT_INTERFACE_START( mz2500_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void mz2500_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 
 MACHINE_CONFIG_START(mz2500_state::mz2500)

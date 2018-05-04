@@ -280,13 +280,15 @@ READ8_MEMBER(pg685_state::f9f3f_r)
 //  FLOPPY
 //**************************************************************************
 
-static SLOT_INTERFACE_START( pg675_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void pg675_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-static SLOT_INTERFACE_START( pg685_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void pg685_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 READ8_MEMBER(pg685_state::f9f24_r)

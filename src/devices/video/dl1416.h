@@ -21,9 +21,9 @@
     DEVICE TYPES
 ***************************************************************************/
 
-extern device_type const DL1414T;
-extern device_type const DL1416B;
-extern device_type const DL1416T;
+DECLARE_DEVICE_TYPE(DL1414T, dl1414_device)
+DECLARE_DEVICE_TYPE(DL1416B, dl1416_device)
+DECLARE_DEVICE_TYPE(DL1416T, dl1416_device)
 
 
 /***************************************************************************

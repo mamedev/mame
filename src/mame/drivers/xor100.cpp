@@ -424,9 +424,10 @@ WRITE_LINE_MEMBER( xor100_state::ctc_z2_w )
 
 /* WD1795-02 Interface */
 
-static SLOT_INTERFACE_START( xor100_floppies )
-	SLOT_INTERFACE( "8ssdd", FLOPPY_8_SSDD ) // Shugart SA-100
-SLOT_INTERFACE_END
+static void xor100_floppies(device_slot_interface &device)
+{
+	device.option_add("8ssdd", FLOPPY_8_SSDD); // Shugart SA-100
+}
 
 void xor100_state::fdc_intrq_w(bool state)
 {
@@ -461,8 +462,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static SLOT_INTERFACE_START( xor100_s100_cards )
-SLOT_INTERFACE_END
+static void xor100_s100_cards(device_slot_interface &device)
+{
+}
 
 /* Machine Initialization */
 
@@ -530,7 +532,7 @@ MACHINE_CONFIG_START(xor100_state::xor100)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_B_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_B_TAG, i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251_B_TAG, i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD(COM5016_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(I8251_A_TAG, i8251_device, write_txc))

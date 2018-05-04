@@ -8,7 +8,7 @@
 #include "ddi1.h"
 #include "softlist.h"
 
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
+void cpc_exp_cards(device_slot_interface &device);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -16,9 +16,10 @@ SLOT_INTERFACE_EXTERN(cpc_exp_cards);
 
 DEFINE_DEVICE_TYPE(CPC_DDI1, cpc_ddi1_device, "cpc_ddi1", "Amstrad DDI-1")
 
-static SLOT_INTERFACE_START( ddi1_floppies )
-	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
-SLOT_INTERFACE_END
+static void ddi1_floppies(device_slot_interface &device)
+{
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+}
 
 //-------------------------------------------------
 //  Device ROM definition

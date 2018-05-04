@@ -296,7 +296,7 @@ private:
 //  VARIATIONS
 //**************************************************************************
 
-extern const device_type GIME_NTSC;
-extern const device_type GIME_PAL;
+DECLARE_DEVICE_TYPE(GIME_NTSC, gime_device)
+DECLARE_DEVICE_TYPE(GIME_PAL, gime_device)
 
 #endif //MAME_VIDEO_GIME_H
