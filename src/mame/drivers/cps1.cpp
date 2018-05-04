@@ -549,8 +549,8 @@ void cps_state::main_map(address_map &map)
 	/* CPS-B custom is mapped by the PAL IOB2 on the B-board. SF2 revision "E" World and USA 910228 has it at a different
 	   address, see DRIVER_INIT */
 	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
-	map(0x800180, 0x800180).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)).mirror(7);    /* Sound command */
-	map(0x800188, 0x800189).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)).mirror(6).umask16(0x00ff);   /* Sound timer fade */
+	map(0x800180, 0x800181).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16).mirror(6);    /* Sound command */
+	map(0x800188, 0x800189).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)).umask16(0x00ff).mirror(6);   /* Sound timer fade */
 	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram"); /* SF2CE executes code from here */
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
@@ -647,8 +647,8 @@ void cps_state::sf2m3_map(address_map &map)
 	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
 	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");   /* CPS-B custom */
 	map(0x800186, 0x800187).r(this, FUNC(cps_state::cps1_in2_r));            /* Buttons 4,5,6 for both players */
-	map(0x800190, 0x800190).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)).mirror(7);    /* Sound command */
-	map(0x800198, 0x800199).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)).mirror(6).umask16(0x00ff);   /* Sound timer fade */
+	map(0x800190, 0x800191).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16).mirror(6);    /* Sound command */
+	map(0x800198, 0x800199).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)).umask16(0x00ff).mirror(6);   /* Sound timer fade */
 	map(0x8001a0, 0x8001c3).w(this, FUNC(cps_state::cps1_cps_a_w));
 	map(0x8001c4, 0x8001c5).w(this, FUNC(cps_state::sf2m3_layer_w));
 	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
@@ -664,8 +664,8 @@ void cps_state::sf2m10_map(address_map &map)
 	map(0x800030, 0x800037).w(this, FUNC(cps_state::cps1_coinctrl_w));
 	map(0x800100, 0x80013f).w(this, FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");
 	map(0x800140, 0x80017f).rw(this, FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
-	map(0x800180, 0x800180).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)).mirror(7);
-	map(0x800188, 0x800189).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)).mirror(6).umask16(0x00ff);
+	map(0x800180, 0x800181).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)).umask16(0x00ff).cswidth(16).mirror(6);
+	map(0x800188, 0x800189).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)).umask16(0x00ff).mirror(6);
 	map(0x8001a2, 0x8001b3).w(this, FUNC(cps_state::cps1_cps_a_w)); // make 8001b2 point at 800110
 	map(0x8001fe, 0x8001ff).nopw(); // writes FFFF here a lot
 	map(0x900000, 0x92ffff).ram().w(this, FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
