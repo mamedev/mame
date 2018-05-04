@@ -21,6 +21,9 @@
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
     - granits gives error beeps at start, need to press clear to play
     - finish fphantom emulation
+	- PC reset button maps where?
+	- PC has 14KB RAM. 0000-0fff and 8000-9fff is certain, where does the remaining map to?
+	- PC add its own internal layout(panel is on the right side instead of bottom)
 
 ******************************************************************************
 
@@ -207,6 +210,10 @@ PCB photos show only a 3MHz XTAL.
 A condensator keeps RAM contents alive for a few hours when powered off.
 
 Elite Avant Garde (models 6081,6088,6089) is on the same hardware.
+
+Prestige Challenger (PC) hardware is very similar. They stripped the 8255 PPI,
+and added more RAM(7*TMM2016P). Some were released at 3.6MHz instead of 4MHz,
+perhaps due to hardware instability?
 
 
 ******************************************************************************
@@ -2350,6 +2357,42 @@ ROM_START( fpres )
 	ROM_RELOAD(           0x1000, 0x1000)
 ROM_END
 
+ROM_START( fpressp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(dea8091d) SHA1(1d94a90ae076215c2c009e78ec4919dbd8467ef8) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
+ROM_END
+
+ROM_START( fpresg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(dea8091d) SHA1(1d94a90ae076215c2c009e78ec4919dbd8467ef8) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( fpresfr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(03fac294) SHA1(5a9d72978318c61185efd4bc9e4a868c226465b8) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(5d049d5e) SHA1(c7359bead92729e8a92d6cf1789d87ae43d23cbf) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(98bd01b7) SHA1(48cc560c4ca736f54e30d757990ff403c05c39ae) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(6f18115f) SHA1(a08b3a66bfdc23f3400e03fe253a8b9a4967d14f) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(dea8091d) SHA1(1d94a90ae076215c2c009e78ec4919dbd8467ef8) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64105", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
+ROM_END
+
 ROM_START( fpresbu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
@@ -2361,6 +2404,42 @@ ROM_START( fpresbu )
 	ROM_REGION( 0x2000, "speech", 0 )
 	ROM_LOAD("101-32107", 0x0000, 0x1000, BAD_DUMP CRC(f35784f9) SHA1(348e54a7fa1e8091f89ac656b4da22f28ca2e44d) ) // taken from csc, assume correct
 	ROM_RELOAD(           0x1000, 0x1000)
+ROM_END
+
+ROM_START( fpresbusp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(dae4d8e4) SHA1(f06dbb643f0324c0bddaaae9537d5829768bda22) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(5fb67708) SHA1(1e9ee724c2be38daf39d5cf37b0ae587e408777c) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64106", 0x0000, 0x2000, BAD_DUMP CRC(8766e128) SHA1(78c7413bf240159720b131ab70bfbdf4e86eb1e9) ) // taken from vcc/fexcelv, assume correct
+ROM_END
+
+ROM_START( fpresbug )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(dae4d8e4) SHA1(f06dbb643f0324c0bddaaae9537d5829768bda22) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(5fb67708) SHA1(1e9ee724c2be38daf39d5cf37b0ae587e408777c) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64101", 0x0000, 0x2000, BAD_DUMP CRC(6c85e310) SHA1(20d1d6543c1e6a1f04184a2df2a468f33faec3ff) ) // taken from fexcelv, assume correct
+ROM_END
+
+ROM_START( fpresbufr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("u09_yellow", 0xb000, 0x1000, CRC(bb1cb486) SHA1(b83f50a3ef361d254b88eefaa5aac657aaa72375) )
+	ROM_LOAD("u10_green",  0xc000, 0x1000, CRC(af0aec0e) SHA1(8293d00a12efa1c142b9e37bc7786012250536d9) )
+	ROM_LOAD("u11_black",  0xd000, 0x1000, CRC(214a91cc) SHA1(aab07ecdd66ac208874f4053fc4b0b0659b017aa) )
+	ROM_LOAD("u12_blue",   0xe000, 0x1000, CRC(dae4d8e4) SHA1(f06dbb643f0324c0bddaaae9537d5829768bda22) )
+	ROM_LOAD("u13_red",    0xf000, 0x1000, CRC(5fb67708) SHA1(1e9ee724c2be38daf39d5cf37b0ae587e408777c) )
+
+	ROM_REGION( 0x2000, "speech", 0 )
+	ROM_LOAD("101-64105", 0x0000, 0x2000, BAD_DUMP CRC(fe8c5c18) SHA1(2b64279ab3747ee81c86963c13e78321c6cfa3a3) ) // taken from fexcelv, assume correct
 ROM_END
 
 
@@ -2584,7 +2663,13 @@ CONS( 1984, feasglag,   feasbu,   0, eas,       easg,      fidel6502_state, 0,  
 CONS( 1984, feasglafr,  feasbu,   0, eas,       easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Elite A/S Challenger (Glasgow program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1982, fpres,      0,        0, pc,        eas,       fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpressp,    fpres,    0, pc,        eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresg,     fpres,    0, pc,        easg,      fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresfr,    fpres,    0, pc,        easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (original program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1983, fpresbu,    fpres,    0, pc,        eas,       fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbusp,  fpres,    0, pc,        eassp,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbug,   fpres,    0, pc,        easg,      fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
+CONS( 1983, fpresbufr,  fpres,    0, pc,        easfr,     fidel6502_state, 0,        "Fidelity Electronics", "Prestige Challenger (Budapest program, French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 
 CONS( 1986, feag2100,   0,        0, eag,       eag,       fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 CONS( 1986, feag2100sp, feag2100, 0, eag,       eagsp,     fidel6502_state, 0,        "Fidelity Electronics", "Elite Avant Garde 2100 (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS )

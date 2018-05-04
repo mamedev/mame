@@ -12696,7 +12696,13 @@ fexcelpb                        //
 fexcelv                         //
 fphantom                        //
 fpres                           //
+fpressp                         //
+fpresg                          //
+fpresfr                         //
 fpresbu                         //
+fpresbusp                       //
+fpresbug                        //
+fpresbufr                       //
 fscc9                           //
 fscc9b                          //
 fscc9c                          //
