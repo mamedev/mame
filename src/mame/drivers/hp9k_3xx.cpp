@@ -59,6 +59,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/6840ptm.h"
+#include "machine/tms9914.h"
 #include "sound/sn76496.h"
 #include "bus/hp_dio/hp_dio.h"
 #include "bus/hp_dio/hp98544.h"
@@ -67,6 +68,7 @@
 #include "bus/hp_dio/hp98603a.h"
 #include "bus/hp_dio/hp98603b.h"
 #include "bus/hp_dio/hp98644.h"
+#include "bus/ieee488/ieee488.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -87,6 +89,7 @@ public:
 		m_iocpu(*this, IOCPU_TAG),
 		m_mlc(*this, MLC_TAG),
 		m_sound(*this, SN76494_TAG),
+		m_tms9914(*this, "tms9914"),
 		m_vram16(*this, "vram16"),
 		m_vram(*this, "vram")
 		{ }
@@ -95,6 +98,7 @@ public:
 	optional_device<i8042_device> m_iocpu;
 	optional_device<hp_hil_mlc_device> m_mlc;
 	optional_device<sn76494_device> m_sound;
+	optional_device<tms9914_device> m_tms9914;
 	virtual void machine_reset() override;
 
 	optional_shared_ptr<uint16_t> m_vram16;
@@ -117,6 +121,7 @@ public:
 	DECLARE_READ8_MEMBER(gpib_r);
 	DECLARE_WRITE8_MEMBER(gpib_w);
 
+	DECLARE_WRITE_LINE_MEMBER(gpib_irq);
 	DECLARE_WRITE32_MEMBER(led_w)
 	{
 		if (mem_mask != 0x000000ff)
@@ -162,6 +167,7 @@ private:
 	uint8_t m_hil_data;
 	uint8_t m_latch_data;
 	uint32_t m_lastpc;
+	bool gpib_irq_line;
 };
 
 uint32_t hp9k3xx_state::hp_medres_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -209,7 +215,8 @@ void hp9k3xx_state::hp9k310_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom().region("maincpu", 0).nopw();  // writes to 1fffc are the LED
 
-	map(0x00428000, 0x00428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
+	map(0x428000, 0x428003).rw(m_iocpu, FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
+	map(0x478000, 0x47800f).rw(this, FUNC(hp9k3xx_state::gpib_r), FUNC(hp9k3xx_state::gpib_w)).umask16(0x00ff);
 
 	map(0x510000, 0x510003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Alpha display"
 	map(0x538000, 0x538003).rw(this, FUNC(hp9k3xx_state::buserror16_r), FUNC(hp9k3xx_state::buserror16_w));   // no "Graphics"
@@ -304,15 +311,45 @@ void hp9k3xx_state::machine_reset()
 {
 }
 
+WRITE_LINE_MEMBER(hp9k3xx_state::gpib_irq)
+{
+	gpib_irq_line = state;
+	m_maincpu->set_input_line(M68K_IRQ_3, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
 WRITE8_MEMBER(hp9k3xx_state::gpib_w)
 {
-	LOG("%s: 0x%02x = 0x%02x\n", __FUNCTION__, offset ,data);
+	if (offset >= 0x08) {
+		m_tms9914->reg8_w(space, offset & 0x07, data);
+		return;
+	}
+	LOG("gpib_w: %s %02X = %02X\n", machine().describe_context().c_str(), offset, data);
 }
 
 READ8_MEMBER(hp9k3xx_state::gpib_r)
 {
-	LOG("%s: 0x%02x\n", __FUNCTION__, offset);
-	return 0xff;
+	uint8_t data = 0xff;
+
+	if (offset >= 0x8) {
+		data = m_tms9914->reg8_r(space, offset & 0x07);
+		return data;
+	}
+
+	switch(offset) {
+	case 0: /* ID */
+		data = 0x80;
+		break;
+	case 1:
+		/* Int control */
+		data = 0x80 | (gpib_irq_line ? 0x40 : 0);
+		break;
+	case 2:
+		/* Address */
+		data = (m_tms9914->cont_r() ? 0x0 : 0x40) | 0x81;
+		break;
+	}
+	LOG("gpib_r: %s %02X = %02X\n", machine().describe_context().c_str(), offset, data);
+	return data;
 }
 
 READ16_MEMBER(hp9k3xx_state::buserror16_r)
@@ -427,6 +464,31 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603b", true)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, "98644", true)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl4", dio16_cards, nullptr, false)
+
+	MCFG_DEVICE_ADD("tms9914", TMS9914, XTAL(4000000))
+	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(hp9k3xx_state, gpib_irq));
+	MCFG_TMS9914_DIO_READWRITE_CB(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r), DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_TMS9914_EOI_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
+	MCFG_TMS9914_DAV_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_TMS9914_NRFD_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
+	MCFG_TMS9914_NDAC_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
+	MCFG_TMS9914_IFC_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
+	MCFG_TMS9914_SRQ_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_TMS9914_ATN_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, atn_w))
+	MCFG_TMS9914_REN_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
+
+	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9895")
+	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
+	MCFG_IEEE488_BUS_ADD()
+
+	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, atn_w))
+	MCFG_IEEE488_REN_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, ren_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
@@ -457,6 +519,31 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl2", dio16_cards, "98603b", true)
 	MCFG_DIO16_SLOT_ADD("diobus", "sl3", dio16_cards, "98644", true)
 	MCFG_DIO32_SLOT_ADD("diobus", "sl4", dio16_cards, nullptr, false)
+
+	MCFG_DEVICE_ADD("tms9914", TMS9914, XTAL(4000000))
+	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(hp9k3xx_state, gpib_irq));
+	MCFG_TMS9914_DIO_READWRITE_CB(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r), DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_TMS9914_EOI_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
+	MCFG_TMS9914_DAV_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_TMS9914_NRFD_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
+	MCFG_TMS9914_NDAC_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
+	MCFG_TMS9914_IFC_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
+	MCFG_TMS9914_SRQ_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_TMS9914_ATN_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, atn_w))
+	MCFG_TMS9914_REN_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
+
+	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9895")
+	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
+	MCFG_IEEE488_BUS_ADD()
+
+	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, atn_w))
+	MCFG_IEEE488_REN_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, ren_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k330)
@@ -493,6 +580,31 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	MCFG_SCREEN_SIZE(512,390)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 390-1)
 	MCFG_SCREEN_REFRESH_RATE(70)
+
+	MCFG_DEVICE_ADD("tms9914", TMS9914, XTAL(4000000))
+	MCFG_TMS9914_INT_WRITE_CB(WRITELINE(hp9k3xx_state, gpib_irq));
+	MCFG_TMS9914_DIO_READWRITE_CB(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r), DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
+	MCFG_TMS9914_EOI_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, eoi_w))
+	MCFG_TMS9914_DAV_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, dav_w))
+	MCFG_TMS9914_NRFD_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, nrfd_w))
+	MCFG_TMS9914_NDAC_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ndac_w))
+	MCFG_TMS9914_IFC_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ifc_w))
+	MCFG_TMS9914_SRQ_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, srq_w))
+	MCFG_TMS9914_ATN_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, atn_w))
+	MCFG_TMS9914_REN_WRITE_CB(DEVWRITELINE(IEEE488_TAG, ieee488_device, ren_w))
+
+	MCFG_IEEE488_SLOT_ADD("ieee0", 0, hp_ieee488_devices, "hp9895")
+	MCFG_IEEE488_SLOT_ADD("ieee_rem", 0, remote488_devices, nullptr)
+	MCFG_IEEE488_BUS_ADD()
+
+	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, eoi_w))
+	MCFG_IEEE488_DAV_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, dav_w))
+	MCFG_IEEE488_NRFD_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, nrfd_w))
+	MCFG_IEEE488_NDAC_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, ndac_w))
+	MCFG_IEEE488_IFC_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, ifc_w))
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, atn_w))
+	MCFG_IEEE488_REN_CALLBACK(DEVWRITELINE("tms9914", tms9914_device, ren_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9k3xx_state::hp9k340)
