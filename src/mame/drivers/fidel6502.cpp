@@ -219,7 +219,7 @@ with magnet sensors and came with CB9 and CB16.
 
 8*(8+1) buttons, 8*8+1 LEDs
 36-pin edge connector, assume same as SC12
-4KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
+2KB RAM(TMM2016P), 2*8KB ROM(HN48364P)
 R6502-13, 1.4MHz from resonator, another pcb with the same resonator was measured 1.49MHz*
 PCB label 510-1046C01 2-1-82
 
