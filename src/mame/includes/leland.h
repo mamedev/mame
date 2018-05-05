@@ -79,7 +79,6 @@ public:
 	uint8_t m_gfx_control;
 	uint8_t m_wcol_enable;
 	emu_timer *m_master_int_timer;
-	uint32_t m_slave_base.length();
 	int m_dangerz_x;
 	int m_dangerz_y;
 	uint8_t m_analog_result;
