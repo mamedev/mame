@@ -1248,7 +1248,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000) / 2)         /* 16 MHz */
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000) / 2) /* 16 MHz */
 	MCFG_DEVICE_PROGRAM_MAP(touchgo_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
@@ -1297,7 +1297,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco2_state::touchgo_d5002fp)
 	touchgo(config);
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(40'000'000) / 4) /* 10MHz? - Not verified */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(32'000'000) / 2) /* 16 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
