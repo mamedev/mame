@@ -1209,8 +1209,8 @@ ROM_START( keirinou )
 	ROM_CONTINUE(             0x4000, 0x04000 )
 	ROM_CONTINUE(             0xc000, 0x04000 )
 
-	ROM_REGION( 0x100, "prom", 0 )
-	ROM_LOAD( "7052.r8",      0x000000, 0x000100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) )
+	ROM_REGION( 0x100, "prom", 0 ) /* Same data as the Witch set, currently unused, unknown use */
+	ROM_LOAD( "n82s129an.r8",      0x000000, 0x000100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* N82S129AN BPROM stamped  K  */
 ROM_END
 
 DRIVER_INIT_MEMBER(witch_state,witch)
