@@ -46,11 +46,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pit(*this, "pit")
 		, m_usart(*this, "usart")
+		, m_rs232(*this, "rs232")
 		, m_dsw(*this, "DSW%u", 1)
 		, m_jumpers(*this, "JUMPERS")
 		, m_cpu_speed(*this, "SPEED")
 		, m_eprom(*this, "maincpu")
 		, m_p_ram(*this, "ram")
+		, m_rts(true)
 	{ }
 
 	void qtsbc(machine_config &config);
@@ -61,18 +63,21 @@ private:
 	DECLARE_WRITE8_MEMBER(memory_w);
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
+	DECLARE_WRITE_LINE_MEMBER(rts_loopback_w);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8251_device> m_usart;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport_array<3> m_dsw;
 	required_ioport m_jumpers;
 	required_ioport m_cpu_speed;
 	required_region_ptr<u8> m_eprom;
 	required_shared_ptr<u8> m_p_ram;
 	bool m_power_on;
+	bool m_rts;
 };
 
 
@@ -197,6 +202,16 @@ WRITE8_MEMBER(qtsbc_state::io_w)
 		// TODO: S-100 bus (no address mirroring)
 
 		logerror("Output %02X to %04X\n", data, offset);
+	}
+}
+
+WRITE_LINE_MEMBER(qtsbc_state::rts_loopback_w)
+{
+	// Filtered through this routine to avoid infinite loops
+	if (state != bool(m_rts))
+	{
+		m_rts = state;
+		m_rs232->write_rts(m_rts);
 	}
 }
 
@@ -440,9 +455,10 @@ INPUT_PORTS_END
 
 void qtsbc_state::machine_start()
 {
-	subdevice<i8251_device>("usart")->write_cts(0);
+	m_usart->write_cts(0);
 
 	save_item(NAME(m_power_on));
+	save_item(NAME(m_rts));
 }
 
 void qtsbc_state::machine_reset()
@@ -476,12 +492,11 @@ MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 
 	MCFG_DEVICE_ADD("usart", I8251, 0) // U8
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("usart", i8251_device, write_dsr)) // actually from pin 11, "Reverse Channel Transmit"
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(qtsbc_state, rts_loopback_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
 MACHINE_CONFIG_END
