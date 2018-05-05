@@ -105,6 +105,7 @@
 #define ROM2_TAG      "u29_rom"
 
 #define MOTOR_TIMER 1
+#define UNDEF -1
 
 DEFINE_DEVICE_TYPE_NS(HX5102, bus::hexbus, hx5102_device, "ti_hx5102", "TI Hexbus Floppy Drive")
 
@@ -135,6 +136,9 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 	m_dack(false),
 	m_dacken(false),
 	m_wait(false),
+	m_current_floppy(nullptr),
+	m_floppy_select(0),
+	m_floppy_select_last(UNDEF),
 	m_hexbus_ctrl(*this, IBC_TAG),
 	m_floppy_ctrl(*this, FDC_TAG),
 	m_motormf(*this, MTRD_TAG),
@@ -343,7 +347,9 @@ WRITE_LINE_MEMBER( hx5102_device::motor_w )
 {
 	m_motor_on = (state==ASSERT_LINE);
 	LOGMASKED(LOG_MOTOR, "Motor %s\n", m_motor_on? "start" : "stop");
-	m_floppy->mon_w(m_motor_on? 0 : 1);
+
+	if (m_floppy[0] != nullptr) m_floppy[0]->mon_w(m_motor_on? 0 : 1);
+	if (m_floppy[1] != nullptr) m_floppy[1]->mon_w(m_motor_on? 0 : 1);
 	update_readyff_input();
 }
 
@@ -493,7 +499,7 @@ WRITE8_MEMBER(hx5102_device::cruwrite)
 		break;
 	case 3:
 		LOGMASKED(LOG_CRU, "Set step direction = %d\n", data);
-		m_floppy->dir_w((data==0)? 1 : 0);
+		if (m_current_floppy != nullptr) m_current_floppy->dir_w((data==0)? 1 : 0);
 		break;
 	case 4:
 		if (data==1)
@@ -507,7 +513,7 @@ WRITE8_MEMBER(hx5102_device::cruwrite)
 		{
 			LOGMASKED(LOG_CRU, "Step pulse\n");
 		}
-		m_floppy->stp_w((data==0)? 1 : 0);
+		if (m_current_floppy != nullptr) m_current_floppy->stp_w((data==0)? 1 : 0);
 		break;
 	case 6:
 		if (data==1)
@@ -525,11 +531,13 @@ WRITE8_MEMBER(hx5102_device::cruwrite)
 		break;
 	case 8:
 		LOGMASKED(LOG_CRU, "Set drive select 0 to %d\n", data);
-		m_floppy_ctrl->set_floppy((data==1)? m_floppy : nullptr);
+		if (data == 1) m_floppy_select |= 1;
+		else m_floppy_select &= ~1;
 		break;
 	case 9:
-		// External drive; not implemented
 		LOGMASKED(LOG_CRU, "Set drive select 1 to %d\n", data);
+		if (data == 1) m_floppy_select |= 2;
+		else m_floppy_select &= ~2;
 		break;
 	case 10:
 		// External drive; not implemented
@@ -555,6 +563,22 @@ WRITE8_MEMBER(hx5102_device::cruwrite)
 		LOGMASKED(LOG_CRU, "Set CRU bit 15 to %d (unused)\n", data);
 		break;
 	}
+
+	if (m_floppy_select != m_floppy_select_last)
+	{
+		if (m_floppy_select == 1)
+			m_current_floppy = m_floppy[0];
+		else
+		{
+			if (m_floppy_select == 2)
+				m_current_floppy = m_floppy[1];
+			else
+				m_current_floppy = nullptr;
+		}
+
+		m_floppy_ctrl->set_floppy(m_current_floppy);
+		m_floppy_select_last = m_floppy_select;
+	}
 }
 
 /*
@@ -562,7 +586,10 @@ WRITE8_MEMBER(hx5102_device::cruwrite)
 */
 void hx5102_device::device_start()
 {
-	m_floppy = static_cast<floppy_image_device*>(subdevice("d0")->subdevices().first());
+	m_floppy[0] = m_floppy[1] = nullptr;
+
+	if (subdevice("d0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("d0")->subdevices().first());
+	if (subdevice("d1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("d1")->subdevices().first());
 
 	m_rom1 = (uint8_t*)memregion(DSR_TAG)->base();
 	m_rom2 = (uint8_t*)memregion(DSR_TAG)->base() + 0x2000;
@@ -644,6 +671,8 @@ MACHINE_CONFIG_START(hx5102_device::device_add_mconfig)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(hx5102_device, fdc_irq_w))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(hx5102_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("d0", hx5102_drive, "525dd", hx5102_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("d1", hx5102_drive, nullptr, hx5102_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// Monoflops
