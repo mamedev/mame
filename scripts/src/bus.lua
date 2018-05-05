@@ -2561,6 +2561,8 @@ end
 if (BUSES["TI99"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/ti99/ti99defs.h",
+		MAME_DIR .. "src/devices/bus/ti99/internal/992board.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/internal/992board.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/998board.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/internal/998board.h",
 		MAME_DIR .. "src/devices/bus/ti99/internal/datamux.cpp",
