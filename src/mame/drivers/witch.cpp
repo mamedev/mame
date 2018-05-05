@@ -228,6 +228,7 @@ TODO :
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "sound/ay8910.h"
 #include "sound/2203intf.h"
 #include "sound/es8712.h"
 
@@ -238,6 +239,7 @@ TODO :
 #define MAIN_CLOCK        XTAL(12'000'000)
 #define CPU_CLOCK         MAIN_CLOCK / 4
 #define YM2203_CLOCK      MAIN_CLOCK / 4
+#define AY8910_CLOCK      MAIN_CLOCK / 8
 #define MSM5202_CLOCK     384_kHz_XTAL
 
 #define HOPPER_PULSE      50          // time between hopper pulses in milliseconds (not right for attendant pay)
@@ -680,8 +682,8 @@ void witch_state::map_sub(address_map &map)
 void keirinou_state::keirinou_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa008, 0xa008).w(this, FUNC(witch_state::main_write_a008));
@@ -700,9 +702,8 @@ void keirinou_state::keirinou_main_map(address_map &map)
 void keirinou_state::keirinou_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x8001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x8002, 0x8003).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//	map(0x8010, 0x8016).rw("essnd", FUNC(es8712_device::read), FUNC(es8712_device::write));
+	map(0x8000, 0x8001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x8002, 0x8003).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa008, 0xa008).w(this, FUNC(witch_state::sub_write_a008));
@@ -1082,23 +1083,33 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(keirinou_state::keirinou)
 	witch(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(keirinou_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(keirinou_main_map)
 	
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(keirinou_sub_map)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD("palette", 0x200)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
-	MCFG_DEVICE_MODIFY("ppi1")
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(keirinou_state, write_keirinou_a002))
+	MCFG_DEVICE_MODIFY("ppi1") // Keirin Ou does have two individual PPIs (NEC D8255AC-2)
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, keirinou_state, write_keirinou_a002))
 
-	// TODO: ay8910 instead of ym2203
-	
+	MCFG_DEVICE_ADD("ay1", AY8910, AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM_PortA"))
+	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM_PortB"))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	MCFG_DEVICE_ADD("ay2", AY8910, AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, witch_state, xscroll_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, witch_state, yscroll_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
 	MCFG_DEVICE_REMOVE("essnd")
 	MCFG_DEVICE_REMOVE("msm")
+	MCFG_DEVICE_REMOVE("ym1")
+	MCFG_DEVICE_REMOVE("ym2")
 MACHINE_CONFIG_END
 
 ROM_START( witch )
