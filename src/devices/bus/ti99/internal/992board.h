@@ -72,7 +72,6 @@ private:
 	rgb_t       m_background_color;
 	rgb_t       m_text_color;
 
-	bool        m_holdcpu;
 	bool        m_videna;
 
 	attotime    m_hold_time;

@@ -123,7 +123,6 @@ video992_device::video992_device(const machine_config &mconfig, device_type type
 	  m_mem_read_cb(*this),
 	  m_hold_cb(*this),
 	  m_int_cb(*this),
-	  m_holdcpu(false),
 	  m_videna(true)
 {
 }
