@@ -325,9 +325,10 @@ void c1551_device::c1551_mem(address_map &map)
 //  SLOT_INTERFACE( c1551_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c1551_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
-SLOT_INTERFACE_END
+static void c1551_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
 
 
 //-------------------------------------------------

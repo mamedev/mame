@@ -214,7 +214,7 @@ NETDEV_LOGIC_CALLBACK_MEMBER(prodigy_state::bcd_bit7_cb) { if (data != 0) m_digi
 
 void prodigy_state::device_start()
 {
-	m_digits.resolve(); 
+	m_digits.resolve();
 	memset(m_line, 0, sizeof(m_line));
 #if HTTPUI
 	m_server =  machine().manager().http();

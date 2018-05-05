@@ -5836,9 +5836,9 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_1x_ay8910)
 	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(galaxian_state, frogger_sound_timer_r))
-	MCFG_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "konami", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "konami", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "konami", 1.0, 2)
 
 	MCFG_SOUND_ADD("konami", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(konami_sound)
@@ -5861,16 +5861,16 @@ MACHINE_CONFIG_START(galaxian_state::konami_sound_2x_ay8910)
 	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(galaxian_state, konami_sound_timer_r))
-	MCFG_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
+	MCFG_SOUND_ROUTE(0, "konami", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "konami", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "konami", 1.0, 2)
 
 	MCFG_SOUND_ADD("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(RES_K(5.1), RES_K(5.1), RES_K(5.1))
-	MCFG_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
+	MCFG_SOUND_ROUTE(0, "konami", 1.0, 3)
+	MCFG_SOUND_ROUTE(1, "konami", 1.0, 4)
+	MCFG_SOUND_ROUTE(2, "konami", 1.0, 5)
 
 	MCFG_SOUND_ADD("konami", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(konami_sound)
@@ -6101,7 +6101,7 @@ MACHINE_CONFIG_START(galaxian_state::kingball)
 	/* sound hardware */
 	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.53) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -6318,7 +6318,7 @@ MACHINE_CONFIG_START(galaxian_state::sfx)
 	/* DAC for the sample player */
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // 16-pin IC (not identified by schematics)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -7583,9 +7583,6 @@ DRIVER_INIT_MEMBER( galaxian_state, froggrs )
 
 DRIVER_INIT_MEMBER(galaxian_state,jungsub)
 {
-	/* todo, decrypt program rom */
-	// seems slightly address dependent based on text strings
-
 	decode_mooncrst(0x4000, memregion("maincpu")->base());
 
 	/* video extensions */

@@ -3788,6 +3788,21 @@ ROM_START( realpunc )
 	ROM_LOAD( "d76_01.93", 0x000000, 0x200000, CRC(2bc265f2) SHA1(409b822989e2aad50872f80f5160d4909c42206c) )
 ROM_END
 
+ROM_START( realpuncj )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 1024k for 68000 code */
+	ROM_LOAD16_BYTE( "d76_05.47", 0x00000, 0x80000, CRC(879b7e6a) SHA1(2b06fb4b92d4c23edba97974161da1cb88e0daf5) )
+	ROM_LOAD16_BYTE( "d76_04.48", 0x00001, 0x80000, CRC(bb8ab32d) SHA1(60e04d406bbd3e1b66edde15c6e8d4df4d32703b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for Z80 code */
+	ROM_LOAD( "d76_06.106",0x00000, 0x10000, CRC(72c799fd) SHA1(ab086be38b890152b33f0c4e33d0f02d0a5321bc) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD( "d76_02.76", 0x000000, 0x100000, CRC(57691b93) SHA1(570dbefda40f8be5f1da58c5433b8a8084f49cac) )
+	ROM_LOAD( "d76_03.45", 0x200000, 0x100000, CRC(9f0aefd8) SHA1(d516c64baabd268f99dc5e67b7adf135b4eb45fd) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )      /* ADPCM samples */
+	ROM_LOAD( "d76_01.93", 0x000000, 0x200000, CRC(2bc265f2) SHA1(409b822989e2aad50872f80f5160d4909c42206c) )
+ROM_END
 
 DRIVER_INIT_MEMBER(taitob_state,taito_b)
 {
@@ -3850,4 +3865,5 @@ GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, taito_b, ROT0,
 */
 GAME( 1990, sbm,      0,       sbm,      sbm,       taitob_state,   taito_b, ROT0,   "Taito Corporation",       "Sonic Blast Man (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 GAME( 1990, sbmj,     sbm,     sbm,      sbm,       taitob_state,   taito_b, ROT0,   "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
-GAME( 1994, realpunc, 0,       realpunc, realpunc,  taitob_c_state, taito_b, ROT0,   "Taito Corporation Japan", "Real Puncher",            MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1994, realpunc, 0,       realpunc, realpunc,  taitob_c_state, taito_b, ROT0,   "Taito Corporation Japan", "Real Puncher (World, v2.12O)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1994, realpuncj,realpunc,realpunc, realpunc,  taitob_c_state, taito_b, ROT0,   "Taito Corporation Japan", "Real Puncher (Japan, v2.12J)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )

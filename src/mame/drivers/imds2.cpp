@@ -753,9 +753,10 @@ static GFXDECODE_START(imds2)
 	GFXDECODE_ENTRY("gfx1" , 0x0000 , imds2_charlayout , 0 , 1)
 GFXDECODE_END
 
-static SLOT_INTERFACE_START( imds2_floppies )
-	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
-SLOT_INTERFACE_END
+static void imds2_floppies(device_slot_interface &device)
+{
+	device.option_add("8sssd", FLOPPY_8_SSSD);
+}
 
 MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_CPU_ADD("ipccpu" , I8085A , IPC_XTAL_Y2 / 2)  // 4 MHz

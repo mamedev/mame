@@ -875,9 +875,10 @@ void ibm6580_state::video_start()
 	memset(m_p_videoram, 0x0, 0x1000);
 }
 
-static SLOT_INTERFACE_START( dw_floppies )
-	SLOT_INTERFACE( "8sssd", IBM_6360 )
-SLOT_INTERFACE_END
+static void dw_floppies(device_slot_interface &device)
+{
+	device.option_add("8sssd", IBM_6360);
+}
 
 MACHINE_CONFIG_START(ibm6580_state::ibm6580)
 	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600)/3)

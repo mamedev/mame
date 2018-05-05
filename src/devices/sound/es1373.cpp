@@ -77,9 +77,10 @@ MACHINE_CONFIG_END
 
 DEFINE_DEVICE_TYPE(ES1373, es1373_device, "es1373", "Creative Labs Ensoniq AudioPCI97 ES1373")
 
-ADDRESS_MAP_START(es1373_device::map)
-	AM_RANGE(0x00, 0x3f) AM_READWRITE  (reg_r,  reg_w)
-ADDRESS_MAP_END
+void es1373_device::map(address_map &map)
+{
+	map(0x00, 0x3f).rw(this, FUNC(es1373_device::reg_r), FUNC(es1373_device::reg_w));
+}
 
 es1373_device::es1373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, ES1373, tag, owner, clock),

@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(snk6502_state::fantasy)
 	// otherwise it is using the VCO for the envelope, but the VCO is not hooked up
 	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                   // envelope 1, 2
 	MCFG_SN76477_ENABLE(0)                               // enable
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(fantasy)

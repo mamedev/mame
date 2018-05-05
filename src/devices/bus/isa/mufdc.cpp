@@ -33,12 +33,13 @@ FLOPPY_FORMATS_MEMBER( mufdc_device::floppy_formats )
 	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( drives )
-	SLOT_INTERFACE("525hd", FLOPPY_525_HD)
-	SLOT_INTERFACE("35hd", FLOPPY_35_HD)
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void drives(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

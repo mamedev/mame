@@ -297,9 +297,10 @@ static GFXDECODE_START( dim68k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dim68k_charlayout, 0, 1 )
 GFXDECODE_END
 
-static SLOT_INTERFACE_START( dim68k_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void dim68k_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 void dim68k_state::kbd_put(u8 data)
 {

@@ -508,17 +508,19 @@ void bw12_state::machine_reset()
 	}
 }
 
-static SLOT_INTERFACE_START( bw12_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void bw12_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_SSDD);
+}
 
 FLOPPY_FORMATS_MEMBER( bw12_state::bw12_floppy_formats )
 	FLOPPY_BW12_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( bw14_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void bw14_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 FLOPPY_FORMATS_MEMBER( bw12_state::bw14_floppy_formats )
 	FLOPPY_BW12_FORMAT
@@ -571,7 +573,7 @@ MACHINE_CONFIG_START(bw12_state::common)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // ls273.ic5 + mc1408.ic4
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)

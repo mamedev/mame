@@ -97,9 +97,10 @@ FLOPPY_FORMATS_MEMBER( enmirage_state::floppy_formats )
 	FLOPPY_ESQ8IMG_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ensoniq_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ensoniq_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 WRITE_LINE_MEMBER(enmirage_state::mirage_doc_irq)
 {

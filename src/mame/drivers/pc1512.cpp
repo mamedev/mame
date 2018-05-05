@@ -1026,17 +1026,19 @@ WRITE_LINE_MEMBER( pc1512_base_state::write_centronics_fault )
 //  isa8bus_interface isabus_intf
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( pc1640_isa8_cards )
-	SLOT_INTERFACE_INTERNAL("iga", ISA8_PC1640_IGA)
-SLOT_INTERFACE_END
+void pc1640_isa8_cards(device_slot_interface &device)
+{
+	device.option_add_internal("iga", ISA8_PC1640_IGA);
+}
 
 FLOPPY_FORMATS_MEMBER( pc1512_base_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pc1512_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD ) // Tandon TM65-2L
-SLOT_INTERFACE_END
+static void pc1512_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD); // Tandon TM65-2L
+}
 
 
 
@@ -1238,7 +1240,7 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 
 	// ISA8 bus
 	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(":" I8086_TAG)
+	MCFG_ISA8_CPU(I8086_TAG)
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
@@ -1372,7 +1374,7 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 
 	// ISA8 bus
 	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(":" I8086_TAG)
+	MCFG_ISA8_CPU(I8086_TAG)
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE(I8259A2_TAG, pic8259_device, ir4_w))

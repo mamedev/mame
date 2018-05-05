@@ -1887,15 +1887,17 @@ FLOPPY_FORMATS_MEMBER( sun4_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( sun_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
-SLOT_INTERFACE_END
+static void sun_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
 
-static SLOT_INTERFACE_START( sun_scsi_devices )
-	SLOT_INTERFACE("cdrom", NSCSI_CDROM)
-	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
-	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
-SLOT_INTERFACE_END
+static void sun_scsi_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", NSCSI_CDROM);
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add_internal("ncr5390", NCR5390);
+}
 
 void sun4_state::ncr5390(device_t *device)
 {
@@ -1968,7 +1970,7 @@ MACHINE_CONFIG_START(sun4_state::sun4)
 	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", ncr5390)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sun4_state::sun4c)
@@ -2033,7 +2035,7 @@ MACHINE_CONFIG_START(sun4_state::sun4c)
 	MCFG_NSCSI_ADD("scsibus:5", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", sun_scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", sun_scsi_devices, "ncr5390", true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5390", ncr5390)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", ncr5390)
 
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(sun4_state, bw2_update)

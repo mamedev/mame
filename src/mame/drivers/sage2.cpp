@@ -341,9 +341,10 @@ WRITE_LINE_MEMBER( sage2_state::br2_w )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( sage2_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Mitsubishi M4859
-SLOT_INTERFACE_END
+static void sage2_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD); // Mitsubishi M4859
+}
 
 void sage2_state::update_fdc_int()
 {
@@ -454,7 +455,7 @@ MACHINE_CONFIG_START(sage2_state::sage2)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_dsr))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251_0_TAG, i8251_device, write_cts))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD(I8251_1_TAG, I8251, 0)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))

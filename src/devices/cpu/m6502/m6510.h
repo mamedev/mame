@@ -27,9 +27,9 @@ public:
 	uint8_t get_port();
 	void set_pulls(uint8_t pullup, uint8_t pulldown);
 
-	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
-		read_port.set_callback(rd);
-		write_port.set_callback(wr);
+	template <class Read, class Write> void set_callbacks(Read &&rd, Write &&wr) {
+		read_port.set_callback(std::forward<Read>(rd));
+		write_port.set_callback(std::forward<Write>(wr));
 	}
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

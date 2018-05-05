@@ -403,9 +403,10 @@ static const z80_daisy_config daisy_chain[] =
 
 /* WD1793 Interface */
 
-static SLOT_INTERFACE_START( bigbord2_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void bigbord2_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 
 /* Machine Initialization */

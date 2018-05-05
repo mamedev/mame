@@ -57,6 +57,6 @@ private:
 DECLARE_DEVICE_TYPE(C6280, c6280_device)
 
 #define MCFG_C6280_CPU(tag) \
-	downcast<c6280_device &>(*device).set_devicecpu_tag(("^" tag));
+	downcast<c6280_device &>(*device).set_devicecpu_tag(tag);
 
 #endif // MAME_SOUND_C6280_H

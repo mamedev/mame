@@ -1049,9 +1049,10 @@ static const z80_daisy_config attache_daisy_chain[] =
 	{ nullptr }
 };
 
-static SLOT_INTERFACE_START( attache_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void attache_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 void attache_state::driver_start()
 {
@@ -1175,6 +1176,7 @@ MACHINE_CONFIG_START(attache_state::attache)
 	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000 / 8)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1265,6 +1267,7 @@ MACHINE_CONFIG_START(attache816_state::attache816)
 	MCFG_DEVICE_ADD("crtc", TMS9927, 12324000)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("ctc", z80ctc_device, trg2))
+	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

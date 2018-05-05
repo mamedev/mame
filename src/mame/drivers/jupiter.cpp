@@ -236,9 +236,10 @@ uint32_t jupiter3_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-static SLOT_INTERFACE_START( jupiter_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void jupiter_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 
 //**************************************************************************

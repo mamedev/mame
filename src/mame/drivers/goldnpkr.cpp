@@ -1869,7 +1869,7 @@ void goldnpkr_state::witchcrd_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(this, FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
-//  AM_RANGE(0x2108, 0x210b) AM_NOP /* unknown 40-pin device */
+//  map(0x2108, 0x210b).noprw(); /* unknown 40-pin device */
 	map(0x2800, 0x2fff).ram();
 	map(0x4000, 0x7fff).rom();
 }
@@ -4626,8 +4626,8 @@ void blitz_state::megadpkr_map(address_map &map)
 /*  There is another set of PIAs controlled by the code.
     Maybe they are just mirrors...
 
-    AM_RANGE(0x10f4, 0x10f7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-    AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+    map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+    map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 */
 	map(0x1000, 0x13ff).ram().w(this, FUNC(blitz_state::goldnpkr_videoram_w)).share("videoram");
 	map(0x1800, 0x1bff).ram().w(this, FUNC(blitz_state::goldnpkr_colorram_w)).share("colorram");

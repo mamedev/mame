@@ -1410,23 +1410,24 @@ void gba_state::machine_start()
 }
 
 
-static SLOT_INTERFACE_START(gba_cart)
-	SLOT_INTERFACE_INTERNAL("gba_rom",          GBA_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("gba_sram",         GBA_ROM_SRAM)
-	SLOT_INTERFACE_INTERNAL("gba_drilldoz",     GBA_ROM_DRILLDOZ)   // Rumble output unemulated
-	SLOT_INTERFACE_INTERNAL("gba_wariotws",     GBA_ROM_WARIOTWS)   // Rumble output unemulated
-	SLOT_INTERFACE_INTERNAL("gba_eeprom",       GBA_ROM_EEPROM)
-	SLOT_INTERFACE_INTERNAL("gba_eeprom_4k",    GBA_ROM_EEPROM)
-	SLOT_INTERFACE_INTERNAL("gba_yoshiug",      GBA_ROM_YOSHIUG)
-	SLOT_INTERFACE_INTERNAL("gba_eeprom_64k",   GBA_ROM_EEPROM64)
-	SLOT_INTERFACE_INTERNAL("gba_boktai",       GBA_ROM_BOKTAI)
-	SLOT_INTERFACE_INTERNAL("gba_flash",        GBA_ROM_FLASH)   // Panasonic
-	SLOT_INTERFACE_INTERNAL("gba_flash_rtc",    GBA_ROM_FLASH_RTC)   // Panasonic
-	SLOT_INTERFACE_INTERNAL("gba_flash_512",    GBA_ROM_FLASH)   // Panasonic
-	SLOT_INTERFACE_INTERNAL("gba_flash_1m",     GBA_ROM_FLASH1M) // Sanyo
-	SLOT_INTERFACE_INTERNAL("gba_flash_1m_rtc", GBA_ROM_FLASH1M_RTC) // Sanyo
-	SLOT_INTERFACE_INTERNAL("gba_3dmatrix",     GBA_ROM_3DMATRIX)
-SLOT_INTERFACE_END
+static void gba_cart(device_slot_interface &device)
+{
+	device.option_add_internal("gba_rom",          GBA_ROM_STD);
+	device.option_add_internal("gba_sram",         GBA_ROM_SRAM);
+	device.option_add_internal("gba_drilldoz",     GBA_ROM_DRILLDOZ);       // Rumble output unemulated
+	device.option_add_internal("gba_wariotws",     GBA_ROM_WARIOTWS);       // Rumble output unemulated
+	device.option_add_internal("gba_eeprom",       GBA_ROM_EEPROM);
+	device.option_add_internal("gba_eeprom_4k",    GBA_ROM_EEPROM);
+	device.option_add_internal("gba_yoshiug",      GBA_ROM_YOSHIUG);
+	device.option_add_internal("gba_eeprom_64k",   GBA_ROM_EEPROM64);
+	device.option_add_internal("gba_boktai",       GBA_ROM_BOKTAI);
+	device.option_add_internal("gba_flash",        GBA_ROM_FLASH);          // Panasonic
+	device.option_add_internal("gba_flash_rtc",    GBA_ROM_FLASH_RTC);      // Panasonic
+	device.option_add_internal("gba_flash_512",    GBA_ROM_FLASH);          // Panasonic
+	device.option_add_internal("gba_flash_1m",     GBA_ROM_FLASH1M);        // Sanyo
+	device.option_add_internal("gba_flash_1m_rtc", GBA_ROM_FLASH1M_RTC);    // Sanyo
+	device.option_add_internal("gba_3dmatrix",     GBA_ROM_3DMATRIX);
+}
 
 
 MACHINE_CONFIG_START(gba_state::gbadv)
@@ -1451,10 +1452,10 @@ MACHINE_CONFIG_START(gba_state::gbadv)
 	MCFG_SOUND_ADD("ldacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
 	MCFG_SOUND_ADD("rdacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "ldacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gba")

@@ -222,9 +222,10 @@ INPUT_PORTS_END
 //
 //
 
-static SLOT_INTERFACE_START( rm380z_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void rm380z_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_SSSD);
+}
 
 uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

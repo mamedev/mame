@@ -533,10 +533,11 @@ FLOPPY_FORMATS_MEMBER( gimix_state::floppy_formats )
 	FLOPPY_FLEX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( gimix_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void gimix_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("8dd", FLOPPY_8_DSDD);
+}
 
 #define MCFG_ADDRESS_BANK(tag) \
 MCFG_DEVICE_ADD(tag, ADDRESS_MAP_BANK, 0) \

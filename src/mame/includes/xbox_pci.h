@@ -28,7 +28,7 @@ private:
 	cpu_device *cpu;
 };
 
-extern const device_type NV2A_HOST;
+DECLARE_DEVICE_TYPE(NV2A_HOST, nv2a_host_device)
 
 #define MCFG_NV2A_HOST_ADD(_tag, _cpu_tag)  MCFG_PCI_HOST_ADD(_tag, NV2A_HOST, 0x10de02a5, 0, 0) \
 	downcast<nv2a_host_device *>(device)->set_cpu_tag(_cpu_tag);
@@ -48,7 +48,7 @@ protected:
 	DECLARE_WRITE32_MEMBER(config_register_w);
 };
 
-extern const device_type NV2A_RAM;
+DECLARE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device)
 
 /*
  * LPC Bus
@@ -69,7 +69,7 @@ private:
 	void lpc_io(address_map &map);
 };
 
-extern const device_type MCPX_LPC;
+DECLARE_DEVICE_TYPE(MCPX_LPC, mcpx_lpc_device)
 
 /*
  * SMBus
@@ -106,7 +106,7 @@ private:
 	void smbus_io2(address_map &map);
 };
 
-extern const device_type MCPX_SMBUS;
+DECLARE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device)
 
 #define MCFG_MCPX_SMBUS_INTERRUPT_HANDLER(_devcb) \
 	devcb = &downcast<mcpx_smbus_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
@@ -145,7 +145,7 @@ private:
 	int connecteds_count;
 };
 
-extern const device_type MCPX_OHCI;
+DECLARE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device)
 
 #define MCFG_MCPX_OHCI_INTERRUPT_HANDLER(_devcb) \
 	devcb = &downcast<mcpx_ohci_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);
@@ -172,7 +172,7 @@ private:
 	void eth_io(address_map &map);
 };
 
-extern const device_type MCPX_ETH;
+DECLARE_DEVICE_TYPE(MCPX_ETH, mcpx_eth_device)
 
 /*
  * Audio Processing Unit
@@ -219,7 +219,7 @@ private:
 	void apu_mmio(address_map &map);
 };
 
-extern const device_type MCPX_APU;
+DECLARE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device)
 
 #define MCFG_MCPX_APU_ADD(_tag, _cpu_tag)   MCFG_PCI_DEVICE_ADD(_tag, MCPX_APU, 0x10de01b0, 0, 0, 0) \
 	downcast<mcpx_apu_device *>(device)->set_cpu_tag(_cpu_tag);
@@ -253,7 +253,7 @@ private:
 	void ac97_io1(address_map &map);
 };
 
-extern const device_type MCPX_AC97_AUDIO;
+DECLARE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device)
 
 /*
  * AC97 Modem Controller
@@ -264,7 +264,7 @@ public:
 	mcpx_ac97_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type MCPX_AC97_MODEM;
+DECLARE_DEVICE_TYPE(MCPX_AC97_MODEM, mcpx_ac97_modem_device)
 
 /*
  * IDE Controller
@@ -287,7 +287,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 };
 
-extern const device_type MCPX_IDE;
+DECLARE_DEVICE_TYPE(MCPX_IDE, mcpx_ide_device)
 
 #define MCFG_MCPX_IDE_INTERRUPT_HANDLER(_devcb) \
 	devcb = &downcast<mcpx_ide_device &>(*device).set_interrupt_handler(DEVCB_##_devcb);

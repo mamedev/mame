@@ -278,9 +278,10 @@ WRITE8_MEMBER( c8280_device::riot1_pb_w )
 	machine().output().set_led_value(LED_ERR, BIT(data, 5));
 }
 
-static SLOT_INTERFACE_START( c8280_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void c8280_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 FLOPPY_FORMATS_MEMBER( c8280_device::floppy_formats )
 	FLOPPY_C8280_FORMAT

@@ -830,9 +830,10 @@ FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( telestrat_floppies )
-	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
-SLOT_INTERFACE_END
+static void telestrat_floppies(device_slot_interface &device)
+{
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
 
 MACHINE_CONFIG_START(telestrat_state::telstrat)
 	oric(config);

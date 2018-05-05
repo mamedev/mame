@@ -1720,8 +1720,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 		}
 		if (operand32 != 0)  // if 32-bit
 		{
-			uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-			if(i386_limit_check(SS, offset - 8))
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) - 8 : (REG16(SP) - 8) & 0xffff);
+			if(i386_limit_check(SS, offset))
 			{
 				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
@@ -1729,8 +1729,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 		}
 		else
 		{
-			uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-			if(i386_limit_check(SS, (offset - 4) & 0xffff))
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) - 4 : (REG16(SP) - 4) & 0xffff);
+			if(i386_limit_check(SS, offset))
 			{
 				logerror("CALL (%08x): Stack has no room for return address.\n",m_pc);
 				FAULT(FAULT_SS,0)  // #SS(0)
@@ -1980,8 +1980,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 					/* same privilege */
 					if (operand32 != 0)  // if 32-bit
 					{
-						uint32_t stkoff = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-						if(i386_limit_check(SS, stkoff - 8))
+						uint32_t stkoff = (STACK_32BIT ? REG32(ESP) - 8 : (REG16(SP) - 8) & 0xffff);
+						if(i386_limit_check(SS, stkoff))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)
@@ -1991,8 +1991,8 @@ void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indir
 					}
 					else
 					{
-						uint32_t stkoff = (STACK_32BIT ? REG32(ESP) : REG16(SP));
-						if(i386_limit_check(SS, (stkoff - 4) & 0xffff))
+						uint32_t stkoff = (STACK_32BIT ? REG32(ESP) - 4 : (REG16(SP) - 4) & 0xffff);
+						if(i386_limit_check(SS, stkoff))
 						{
 							logerror("CALL: Stack has no room for return address.\n");
 							FAULT(FAULT_SS,0) // #SS(0)

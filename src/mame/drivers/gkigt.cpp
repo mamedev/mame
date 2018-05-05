@@ -619,7 +619,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	MCFG_RS232_PORT_ADD("diag", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("quart1", sc28c94_device, rx_d_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igt_gameking)
 

@@ -187,9 +187,6 @@
     - Steel Worker, Space Combat
         Holding down the coin button causes the credits to rapidly increase.
 
-    - Solfight
-        On the stage with rolling balls, lots of random dashes appear.
-
 
 *****************************************************************************/
 
@@ -1585,7 +1582,7 @@ MACHINE_CONFIG_START(_8080bw_state::schaser)
 	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                   // mixer A, B, C
 	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                   // envelope 1, 2
 	MCFG_SN76477_ENABLE(1)                               // enable
-	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(schaser)
@@ -1617,7 +1614,19 @@ void _8080bw_state::schasercv_io_map(address_map &map)
 	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::schasercv_sh_port_1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
 	map(0x05, 0x05).w(this, FUNC(_8080bw_state::schasercv_sh_port_2_w));
+	//map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
+
+void _8080bw_state::crashrd_io_map(address_map &map)
+{
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(this, FUNC(_8080bw_state::crashrd_port03_w));
+	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x05, 0x05).w(this, FUNC(_8080bw_state::crashrd_port05_w));
+	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+}
+
 
 
 static INPUT_PORTS_START( schasercv )
@@ -1692,6 +1701,12 @@ MACHINE_CONFIG_START(_8080bw_state::schasercv)
 
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(_8080bw_state::crashrd)
+	schaser(config);
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(crashrd_io_map)
 MACHINE_CONFIG_END
 
 
@@ -3830,7 +3845,8 @@ ROM_START( spcewars )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sanritsu.1",   0x0000, 0x0400, CRC(ca331679) SHA1(5c362c3d1c721d293bcddbef4033533769c8f0e0) )
 	ROM_LOAD( "sanritsu.2",   0x0400, 0x0400, CRC(48dc791c) SHA1(91a98205c83ca38961e6ba2ac43a41e6e8bc2675) )
-	ROM_LOAD( "ic35.bin",     0x0800, 0x0800, CRC(40c2d55b) SHA1(b641b63046d242ad23911143ed840011fc98eaff) )
+	ROM_LOAD( "sanritsu.3",   0x0800, 0x0400, CRC(c34842cb) SHA1(6565ff760909f9339194b7ea45aa8c4e871b9f56) )
+	ROM_LOAD( "sanritsu.4",   0x0c00, 0x0400, CRC(a7fdfd0e) SHA1(d8501881ce38d7bca29010debf34a8b996f1f103) )
 	ROM_LOAD( "sanritsu.5",   0x1000, 0x0400, CRC(77475431) SHA1(15a04a2655847ee462be65d1065d643c872bb47c) )
 	ROM_LOAD( "sanritsu.6",   0x1400, 0x0400, CRC(392ef82c) SHA1(77c98c11ee727ed3ed6e118f13d97aabdb555540) )
 	ROM_LOAD( "sanritsu.7",   0x1800, 0x0400, CRC(b3a93df8) SHA1(3afc96814149d4d5343fe06eac09f808384d02c4) )
@@ -5207,7 +5223,7 @@ GAME( 1979, schaserb,   schaser,  schaser,   schaser,   _8080bw_state,  0,      
 GAME( 1979, schaserc,   schaser,  schaser,   schaser,   _8080bw_state,  0,        ROT270, "Taito", "Space Chaser (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 GAME( 1979, schasercv,  schaser,  schasercv, schasercv, _8080bw_state,  0,        ROT270, "Taito", "Space Chaser (CV version - set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
 GAME( 1979, schaserm,   schaser,  schaser,   schaserm,  _8080bw_state,  0,        ROT270, "bootleg (Model Racing)", "Space Chaser (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE ) // on original Taito PCB, hacked to be harder?
-GAME( 1979, crashrd,    schaser,  schaser,   schaserm,  _8080bw_state,  0,        ROT270, "bootleg (Centromatic)", "Crash Road (bootleg of Space Chaser)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // PCB marked 'Imbader'; "Taito Corporation" on title screen replaced with a Spanish phone number
+GAME( 1979, crashrd,    schaser,  crashrd,   schaserm,  _8080bw_state,  0,        ROT270, "bootleg (Centromatic)", "Crash Road (bootleg of Space Chaser)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND  | MACHINE_NO_COCKTAIL ) // PCB marked 'Imbader'; "Taito Corporation" on title screen replaced with a Spanish phone number
 
 GAME( 1979, sflush,     0,        sflush,    sflush,    _8080bw_state,  0,        ROT270, "Taito", "Straight Flush", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL)
 

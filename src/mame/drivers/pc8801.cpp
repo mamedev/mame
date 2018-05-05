@@ -2247,9 +2247,10 @@ GFXDECODE_END
 
 /* Floppy Configuration */
 
-static SLOT_INTERFACE_START( pc88_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pc88_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 #if 0
 /* Cassette Configuration */

@@ -26,7 +26,7 @@
   with the Bulgarian players. Improved versions were developed and were sold in Russia, Austria,
   Brazil, Argentina and the Balkan peninsular.
 
-  In 1995, Fortex, first of all Bulgarian games manufacturers, exibited at the Plovdiv Fair a com-
+  In 1995, Fortex, first of all Bulgarian games manufacturers, exhibited at the Plovdiv Fair a com-
   puter based version of Forte Card. The following years were times of hard teamwork, which resul-
   ted in a variety of products: centralized cash desk, on-line jackpot and a network control and
   management system for game centers.
@@ -340,24 +340,34 @@ public:
 		m_vram(*this, "vram"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_lamps(*this, "lamp%u", 0U) { }
 
+	void fortecar(machine_config &config);
+
+	DECLARE_DRIVER_INIT(fortecar);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_shared_ptr<uint8_t> m_vram;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<8> m_lamps;
+
 	DECLARE_WRITE8_MEMBER(ppi0_portc_w);
 	DECLARE_READ8_MEMBER(ppi0_portc_r);
 	DECLARE_WRITE8_MEMBER(ayporta_w);
 	DECLARE_WRITE8_MEMBER(ayportb_w);
-	DECLARE_DRIVER_INIT(fortecar);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+
 	DECLARE_PALETTE_INIT(fortecar);
-	uint32_t screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	void fortecar(machine_config &config);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void fortecar_map(address_map &map);
 	void fortecar_ports(address_map &map);
 };
@@ -367,24 +377,22 @@ public:
 *         Video Hardware           *
 ***********************************/
 
-void fortecar_state::video_start()
+void fortecar_state::machine_start()
 {
+	m_lamps.resolve();
 }
 
-uint32_t fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fortecar_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, count;
-	count = 0;
+	int count = 0;
 
-	for (y = 0; y < 0x1e; y++)
+	for (int y = 0; y < 0x1e; y++)
 	{
-		for(x = 0; x < 0x4b; x++)
+		for(int x = 0; x < 0x4b; x++)
 		{
-			int tile, color, bpp;
-
-			tile = (m_vram[(count*4)+1] | (m_vram[(count*4)+2]<<8)) & 0xfff;
-			color = m_vram[(count*4)+3] & 0x1f;
-			bpp = (m_vram[(count*4)+3] & 0x20) >> 5;
+			int tile = (m_vram[(count*4)+1] | (m_vram[(count*4)+2]<<8)) & 0xfff;
+			int color = m_vram[(count*4)+3] & 0x1f;
+			int bpp = (m_vram[(count*4)+3] & 0x20) >> 5;
 
 			if(bpp)
 				color &= 0x3;
@@ -414,7 +422,6 @@ O8 (LS374) R220 BLUE
 
 R = 82 Ohms Pull Down.
 */
-	int i;
 	static const int resistances_rg[3] = { 1000, 510, 220 };
 	static const int resistances_b [2] = { 510, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
@@ -424,7 +431,7 @@ R = 82 Ohms Pull Down.
 			3,  resistances_rg, weights_g,  82, 0,
 			2,  resistances_b,  weights_b,  82, 0);
 
-	for (i = 0; i < 512; i++)
+	for (int i = 0; i < 512; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -500,10 +507,8 @@ WRITE8_MEMBER(fortecar_state::ayporta_w)
     0x20 (hold1): IRQ test
     0x40 (black): Stack RAM check
 */
-	int i;
-
-	for(i = 0; i < 8; i++)
-		output().set_lamp_value(i, (data >> i) & 1);
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = BIT(data, i);
 }
 
 
@@ -516,7 +521,7 @@ Bit7 of port B is a watchdog.
 
 A square wave is fed to through resistor R to capacitor C, with a constant charge/discharge
 time relative to the value of resistor R and value of capacitor C. If the square wave halts,
-capacitor C will charge beyond the hysteresis threshhold of the TL7705 (leg 6), causing it to
+capacitor C will charge beyond the hysteresis threshold of the TL7705 (leg 6), causing it to
 trigger a reset.
 
 Seems to work properly, but must be checked closely...
@@ -665,10 +670,8 @@ GFXDECODE_END
 
 void fortecar_state::machine_reset()
 {
-	int i;
-
-	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorythm) */
-	for(i = 0; i < m_vram.bytes(); i++)
+	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorithm) */
+	for (int i = 0; i < m_vram.bytes(); i++)
 		m_vram[i] = machine().rand();
 }
 
@@ -694,7 +697,7 @@ MACHINE_CONFIG_START(fortecar_state::fortecar)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 600-1, 0, 240-1)    /* driven by CRTC */
-	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update_fortecar)
+	MCFG_SCREEN_UPDATE_DRIVER(fortecar_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
@@ -760,7 +763,7 @@ ROM_START( fortecar )
 	ROM_LOAD( "fortecar.u39", 0x10000, 0x10000, CRC(fc3ddf4f) SHA1(4a95b24c4edb67f6d59f795f86dfbd12899e01b0) )
 	ROM_LOAD( "fortecar.u40", 0x20000, 0x10000, CRC(9693bb83) SHA1(e3e3bc750c89a1edd1072ce3890b2ce498dec633) )
 
-	/* took from the Spanish version, these are likely to be identical anyway */
+	/* taken from the Spanish version, these are likely to be identical anyway */
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "fortecrd_nvram.u6", 0x0000, 0x0800, BAD_DUMP CRC(7d3e7eb5) SHA1(788fe7adc381bcc6eaefed33f5aa1081340608a0) )
 

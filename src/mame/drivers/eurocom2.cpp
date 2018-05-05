@@ -427,10 +427,11 @@ FLOPPY_FORMATS_MEMBER( eurocom2_state::floppy_formats )
 	FLOPPY_PPG_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( eurocom_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void eurocom_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 MACHINE_CONFIG_START(eurocom2_state::eurocom2)
 	MCFG_CPU_ADD("maincpu", MC6809, XTAL(10'717'200)/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz

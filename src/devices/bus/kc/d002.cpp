@@ -46,8 +46,9 @@ static INPUT_PORTS_START( kc_d002 )
 INPUT_PORTS_END
 
 // defined in drivers/kc.c
-SLOT_INTERFACE_EXTERN(kc85_cart);
-SLOT_INTERFACE_EXTERN(kc85_exp);
+// FIXME: if src/devices depends on src/mame, you're doing it wrong!
+void kc85_cart(device_slot_interface &device);
+void kc85_exp(device_slot_interface &device);
 
 WRITE_LINE_MEMBER(kc_d002_device::out_irq_w)
 {

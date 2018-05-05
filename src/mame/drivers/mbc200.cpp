@@ -257,9 +257,10 @@ void mbc200_state::machine_reset()
 	memcpy(main, roms, 0x1000);
 }
 
-static SLOT_INTERFACE_START( mbc200_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void mbc200_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 MC6845_UPDATE_ROW( mbc200_state::update_row )
 {

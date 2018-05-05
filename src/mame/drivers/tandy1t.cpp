@@ -648,7 +648,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_DEVICE_ADD("mb", T1000_MOTHERBOARD, 0)
-	downcast<t1000_mb_device &>(*device).set_cputag("^maincpu");
+	downcast<t1000_mb_device &>(*device).set_cputag("maincpu");
 
 	/* video hardware */
 	MCFG_PCVIDEO_T1000_ADD("pcvideo_t1000")

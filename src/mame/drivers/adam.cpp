@@ -1074,7 +1074,8 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL(7'159'090)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
+	// TODO: enable when Z80 has better WAIT pin emulation
+	//MCFG_SN76496_READY_HANDLER(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
 
 	// devices
 	MCFG_ADAMNET_BUS_ADD()
@@ -1083,7 +1084,7 @@ MACHINE_CONFIG_START(adam_state::adam)
 	MCFG_ADAMNET_SLOT_ADD("net3", adamnet_devices, "ddp")
 	MCFG_ADAMNET_SLOT_ADD("net4", adamnet_devices, "fdc")
 	MCFG_ADAMNET_SLOT_ADD("net5", adamnet_devices, "fdc")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("fdc", drive2)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("fdc", drive2)
 	MCFG_ADAMNET_SLOT_ADD("net6", adamnet_devices, nullptr)
 	MCFG_ADAMNET_SLOT_ADD("net7", adamnet_devices, nullptr)
 	MCFG_ADAMNET_SLOT_ADD("net8", adamnet_devices, nullptr)

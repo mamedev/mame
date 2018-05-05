@@ -686,12 +686,13 @@ void taitogn_state::taitogn_mp_map(address_map &map)
 	map(0x1fa10100, 0x1fa10100).r(this, FUNC(taitogn_state::gnet_mahjong_panel_r));
 }
 
-SLOT_INTERFACE_START(slot_ataflash)
-	SLOT_INTERFACE("taitopccard1", TAITO_PCCARD1)
-	SLOT_INTERFACE("taitopccard2", TAITO_PCCARD2)
-	SLOT_INTERFACE("taitocf", TAITO_COMPACT_FLASH)
-	SLOT_INTERFACE("ataflash", ATA_FLASH_PCCARD)
-SLOT_INTERFACE_END
+void slot_ataflash(device_slot_interface &device)
+{
+	device.option_add("taitopccard1", TAITO_PCCARD1);
+	device.option_add("taitopccard2", TAITO_PCCARD2);
+	device.option_add("taitocf", TAITO_COMPACT_FLASH);
+	device.option_add("ataflash", ATA_FLASH_PCCARD);
+}
 
 MACHINE_CONFIG_START(taitogn_state::coh3002t)
 
@@ -703,8 +704,8 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, taitogn_state, sio0_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, taitogn_state, sio0_txd))
+	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE(taitogn_state, sio0_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE(taitogn_state, sio0_txd))
 
 	MCFG_DEVICE_ADD("cat702_1", CAT702, 0)
 	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(taitogn_state, cat702_1_dataout))
@@ -757,7 +758,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_TAITO_ZOOM_USE_FLASH
 
 	MCFG_DEVICE_MODIFY("taito_zoom:zsg2")
-	MCFG_ZSG2_EXT_READ_HANDLER(DEVREAD32(DEVICE_SELF_OWNER, taitogn_state, zsg2_ext_r))
+	MCFG_ZSG2_EXT_READ_HANDLER(READ32(taitogn_state, zsg2_ext_r))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taitogn_state::coh3002t_t1)

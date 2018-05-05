@@ -700,9 +700,10 @@ FLOPPY_FORMATS_MEMBER( tandy2k_state::floppy_formats )
 	FLOPPY_TANDY_2000_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( tandy2k_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void tandy2k_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 // Keyboard
 

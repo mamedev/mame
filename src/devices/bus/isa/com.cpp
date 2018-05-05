@@ -14,12 +14,13 @@
 #include "bus/rs232/null_modem.h"
 #include "machine/ins8250.h"
 
-static SLOT_INTERFACE_START(isa_com)
-	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
-	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
-	SLOT_INTERFACE("terminal", SERIAL_TERMINAL)
-	SLOT_INTERFACE("null_modem", NULL_MODEM)
-SLOT_INTERFACE_END
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEM_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+}
 
 
 //**************************************************************************

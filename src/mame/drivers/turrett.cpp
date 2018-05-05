@@ -341,9 +341,10 @@ public:
 
 DEFINE_DEVICE_TYPE(TURRETT_HARDDISK, turrett_hdd, "turrett_hdd", "Turret Tower HDD")
 
-SLOT_INTERFACE_START(turrett_devices)
-	SLOT_INTERFACE("hdd", TURRETT_HARDDISK)
-SLOT_INTERFACE_END
+void turrett_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", TURRETT_HARDDISK);
+}
 
 /*************************************
  *

@@ -702,7 +702,7 @@ MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	MCFG_AY51013_AUTO_RDAV(true) // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
 
 	MCFG_RS232_PORT_ADD("v24", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

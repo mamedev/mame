@@ -287,13 +287,14 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static SLOT_INTERFACE_START( abc_floppies )
-	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void abc_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+	device.option_add("525sd", FLOPPY_525_SD);
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 FLOPPY_FORMATS_MEMBER( luxor_55_10828_device::floppy_formats )
 	FLOPPY_ABC800_FORMAT

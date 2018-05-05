@@ -122,9 +122,10 @@ static GFXDECODE_START( ax20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ax20_charlayout, 0, 1 )
 GFXDECODE_END
 
-static SLOT_INTERFACE_START( ax20_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ax20_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(ax20_state::ax20)
 	/* basic machine hardware */

@@ -923,11 +923,12 @@ WRITE_LINE_MEMBER (myb3k_state::centronics_select_w){
 		LOGCENT("%s %d - not used by machine\n", FUNCNAME, state);
 }
 
-static SLOT_INTERFACE_START(stepone_isa_cards)
-	SLOT_INTERFACE("myb3k_com", ISA8_MYB3K_COM)
-	SLOT_INTERFACE("myb3k_fdc4710", ISA8_MYB3K_FDC4710)
-	SLOT_INTERFACE("myb3k_fdc4711", ISA8_MYB3K_FDC4711)
-SLOT_INTERFACE_END
+static void stepone_isa_cards(device_slot_interface &device)
+{
+	device.option_add("myb3k_com", ISA8_MYB3K_COM);
+	device.option_add("myb3k_fdc4710", ISA8_MYB3K_FDC4710);
+	device.option_add("myb3k_fdc4711", ISA8_MYB3K_FDC4711);
+}
 
 MACHINE_CONFIG_START(myb3k_state::myb3k)
 	/* basic machine hardware */
@@ -987,7 +988,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 
 	/* ISA8+ Expansion bus */
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
+	MCFG_ISA8_CPU("maincpu")
 	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic", pic8259_device, ir2_w))
 	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic", pic8259_device, ir3_w))
 	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic", pic8259_device, ir4_w))

@@ -53,7 +53,10 @@ public:
 	virtual ~speaker_device();
 
 	// inline configuration helpers
-	void set_position(double x, double y, double z) { m_x = x; m_y = y; m_z = z; }
+	speaker_device &set_position(double x, double y, double z) { m_x = x; m_y = y; m_z = z; return *this; }
+	speaker_device &standard_mono() { set_position(0.0, 0.0, 1.0); return *this; }
+	speaker_device &standard_left() { set_position(-0.2, 0.0, 1.0); return *this; }
+	speaker_device &standard_right() { set_position(0.2, 0.0, 1.0); return *this; }
 
 	// internally for use by the sound system
 	void mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);
@@ -80,4 +83,4 @@ protected:
 typedef device_type_iterator<speaker_device> speaker_device_iterator;
 
 
-#endif  /* MAME_EMU_SPEAKER_H */
+#endif // MAME_EMU_SPEAKER_H

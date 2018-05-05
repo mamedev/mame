@@ -240,9 +240,10 @@ FLOPPY_FORMATS_MEMBER( excali64_state::floppy_formats )
 	FLOPPY_EXCALI64_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( excali64_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void excali64_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 // pulses from port E4 bit 5 restart the 74123. After 3.6 secs without a pulse, the motor gets turned off.
 WRITE_LINE_MEMBER( excali64_state::motor_w )

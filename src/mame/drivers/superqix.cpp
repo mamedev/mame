@@ -979,15 +979,16 @@ MACHINE_START_MEMBER(hotsmash_state, pbillian)
 }
 
 
-ADDRESS_MAP_START(superqix_state_base::main_map)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+void superqix_state_base::main_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
 	// the following four ranges are part of a single 6264 64Kibit SRAM chip, called 'VRAM' in POST
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe100, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(superqix_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+	map(0xe000, 0xe0ff).ram().share("spriteram");
+	map(0xe100, 0xe7ff).ram();
+	map(0xe800, 0xefff).ram().w(this, FUNC(superqix_state_base::superqix_videoram_w)).share("videoram");
+	map(0xf000, 0xffff).ram();
+}
 
 void hotsmash_state::pbillian_port_map(address_map &map)
 { // used by both pbillian and hotsmash

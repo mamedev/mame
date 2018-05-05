@@ -38,6 +38,7 @@
 #include "bus/coco/coco_t4426.h"
 
 #include "cpu/m6809/m6809.h"
+#include "cpu/m6809/hd6309.h"
 #include "imagedev/cassette.h"
 #include "sound/volt_reg.h"
 
@@ -349,30 +350,32 @@ INPUT_PORTS_END
 //  SLOT_INTERFACE_START(coco_cart)
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( coco_cart )
-	SLOT_INTERFACE("fdc", COCO_FDC)
-	SLOT_INTERFACE("fdcv11", COCO_FDC_V11)
-	SLOT_INTERFACE("cc2hdb1", COCO2_HDB1)
-	SLOT_INTERFACE("cc3hdb1", COCO3_HDB1)
-	SLOT_INTERFACE("cp450_fdc", CP450_FDC)
-	SLOT_INTERFACE("cd6809_fdc", CD6809_FDC)
-	SLOT_INTERFACE("rs232", COCO_RS232)
-	SLOT_INTERFACE("dcmodem", COCO_DCMODEM)
-	SLOT_INTERFACE("orch90", COCO_ORCH90)
-	SLOT_INTERFACE("ssc", COCO_SSC)                 MCFG_SLOT_OPTION_CLOCK("ssc", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE("games_master", COCO_PAK_GMC)
-	SLOT_INTERFACE("banked_16k", COCO_PAK_BANKED)
-	SLOT_INTERFACE("pak", COCO_PAK)
-	SLOT_INTERFACE("multi", COCO_MULTIPAK)          MCFG_SLOT_OPTION_CLOCK("multi", DERIVED_CLOCK(1, 1))
-SLOT_INTERFACE_END
+void coco_cart(device_slot_interface &device)
+{
+	device.option_add("fdc", COCO_FDC);
+	device.option_add("fdcv11", COCO_FDC_V11);
+	device.option_add("cc2hdb1", COCO2_HDB1);
+	device.option_add("cc3hdb1", COCO3_HDB1);
+	device.option_add("cp450_fdc", CP450_FDC);
+	device.option_add("cd6809_fdc", CD6809_FDC);
+	device.option_add("rs232", COCO_RS232);
+	device.option_add("dcmodem", COCO_DCMODEM);
+	device.option_add("orch90", COCO_ORCH90);
+	device.option_add("ssc", COCO_SSC).clock(DERIVED_CLOCK(1, 1));
+	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("banked_16k", COCO_PAK_BANKED);
+	device.option_add("pak", COCO_PAK);
+	device.option_add("multi", COCO_MULTIPAK).clock(DERIVED_CLOCK(1, 1));
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE_START(t4426_cart)
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( t4426_cart )
-	SLOT_INTERFACE("t4426", COCO_T4426)
-SLOT_INTERFACE_END
+void t4426_cart(device_slot_interface &device)
+{
+	device.option_add("t4426", COCO_T4426);
+}
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_START( coco_sound )
@@ -384,7 +387,7 @@ MACHINE_CONFIG_START(coco_state::coco_sound)
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
 	MCFG_SOUND_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// Single-bit sound: R22 = 10K
 	MCFG_SOUND_ADD("sbs", DAC_1BIT, 0)
@@ -470,7 +473,7 @@ MACHINE_CONFIG_START(coco12_state::coco)
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, "printer")
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(PIA1_TAG, pia6821_device, ca1_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("printer", printer)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("printer", printer)
 
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_cart, "pak")
 	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
@@ -504,6 +507,14 @@ MACHINE_CONFIG_START(coco12_state::coco)
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("dragon_cart_list", "dragon_cart")
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(coco12_state::cocoh)
+	coco(config);
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(coco_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(coco12_state::cocoe)
 	coco(config);
 	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
@@ -513,6 +524,14 @@ MACHINE_CONFIG_START(coco12_state::cocoe)
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 	MCFG_COCO_VHD_ADD(VHD0_TAG)
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(coco12_state::cocoeh)
+	cocoe(config);
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(coco_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::coco2)
@@ -526,6 +545,14 @@ MACHINE_CONFIG_START(coco12_state::coco2)
 	MCFG_COCO_VHD_ADD(VHD1_TAG)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(coco12_state::coco2h)
+	coco2(config);
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(coco_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(coco12_state::coco2b)
 	coco2(config);
 	MCFG_DEVICE_REMOVE(VDG_TAG)
@@ -533,6 +560,14 @@ MACHINE_CONFIG_START(coco12_state::coco2b)
 	MCFG_MC6847_HSYNC_CALLBACK(WRITELINE(coco12_state, horizontal_sync))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(coco12_state, field_sync))
 	MCFG_MC6847_INPUT_CALLBACK(DEVREAD8(SAM_TAG, sam6883_device, display_read))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(coco12_state::coco2bh)
+	coco2b(config);
+	MCFG_CPU_REPLACE(MAINCPU_TAG, HD6309E, DERIVED_CLOCK(1, 1))
+	MCFG_CPU_PROGRAM_MAP(coco_mem)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coco12_state::cp400)
@@ -631,15 +666,24 @@ ROM_START(cd6809)
 	ROMX_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175), ROM_BIOS(2))
 ROM_END
 
+#define rom_cocoh rom_coco
+#define rom_cocoeh rom_cocoe
+#define rom_coco2h rom_coco2
+#define rom_coco2bh rom_coco2b
+
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //     YEAR     NAME        PARENT  COMPAT  MACHINE  INPUT     STATE         INIT  COMPANY                         FULLNAME                               FLAGS
 COMP(  1980,    coco,       0,      0,      coco,    coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer",                      0 )
+COMP(  19??,    cocoh,      coco,   0,      cocoh,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_UNOFFICIAL )
 COMP(  1981,    cocoe,      coco,   0,      cocoe,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", 0 )
+COMP(  19??,    cocoeh,     coco,   0,      cocoeh,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_UNOFFICIAL )
 COMP(  1983,    coco2,      coco,   0,      coco2,   coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2",                    0 )
+COMP(  19??,    coco2h,     coco,   0,      coco2h,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_UNOFFICIAL )
 COMP(  1985?,   coco2b,     coco,   0,      coco2b,  coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2B",                   0 )
+COMP(  19??,    coco2bh,    coco,   0,      coco2bh, coco,     coco12_state, 0,    "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_UNOFFICIAL )
 COMP(  1983,    cp400,      coco,   0,      cp400,   coco,     coco12_state, 0,    "Prológica",                    "CP400",                               0 )
 COMP(  1985,    cp400c2,    coco,   0,      cp400,   cp400c2,  coco12_state, 0,    "Prológica",                    "CP400 Color II",                      0 )
 COMP(  1983,    lzcolor64,  coco,   0,      coco,    coco,     coco12_state, 0,    "Novo Tempo / LZ Equipamentos", "Color64",                             0 )

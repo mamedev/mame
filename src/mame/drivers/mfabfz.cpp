@@ -143,7 +143,7 @@ MACHINE_CONFIG_START(mfabfz_state::mfabfz85)
 	MCFG_I8085A_SID(DEVREADLINE("rs232", rs232_port_device, rxd_r))
 	MCFG_I8085A_SOD(DEVWRITELINE("rs232", rs232_port_device, write_txd)) MCFG_DEVCB_INVERT
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 	MCFG_DEVICE_ADD("uart2", I8251, 0)
 MACHINE_CONFIG_END
 

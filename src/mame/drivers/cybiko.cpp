@@ -397,8 +397,8 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	MCFG_CPU_IO_MAP( cybikov1_io )
 
 	MCFG_DEVICE_MODIFY("maincpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, si_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, sck_w))
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("flash1", at45db041_device, si_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE("flash1", at45db041_device, sck_w))
 
 	// screen
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -429,14 +429,14 @@ MACHINE_CONFIG_START(cybiko_state::cybikov1)
 
 	/* serial debug port */
 	MCFG_RS232_PORT_ADD ("debug_serial", default_rs232_devices, nullptr)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("null_modem", debug_serial)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", debug_serial)
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("pty", debug_serial)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("null_modem", debug_serial)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", debug_serial)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("pty", debug_serial)
 
 	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(":maincpu:sci2", h8_sci_device, rx_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu:sci2", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("debug_serial", rs232_port_device, write_txd))
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cybiko_state, cybiko, "bin,nv", 0)
@@ -450,8 +450,8 @@ MACHINE_CONFIG_START(cybiko_state::cybikov2)
 	MCFG_CPU_IO_MAP(cybikov2_io)
 
 	MCFG_DEVICE_MODIFY("maincpu:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, si_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE("^flash1", at45db041_device, sck_w))
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("flash1", at45db041_device, si_w))
+	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE("flash1", at45db041_device, sck_w))
 
 	// machine
 	MCFG_SST_39VF020_ADD("flash2")
@@ -463,9 +463,9 @@ MACHINE_CONFIG_START(cybiko_state::cybikov2)
 
 	/* serial debug port */
 	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(":maincpu:sci2", h8_sci_device, rx_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu:sci2", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("debug_serial", rs232_port_device, write_txd))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(cybiko_state::cybikoxt)
@@ -485,9 +485,9 @@ MACHINE_CONFIG_START(cybiko_state::cybikoxt)
 
 	/* serial debug port */
 	MCFG_DEVICE_MODIFY("debug_serial")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(":maincpu:sci2", h8_sci_device, rx_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu:sci2", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("maincpu:sci2")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":debug_serial", rs232_port_device, write_txd))
+	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE("debug_serial", rs232_port_device, write_txd))
 
 	/* quickload */
 	MCFG_DEVICE_REMOVE("quickload")

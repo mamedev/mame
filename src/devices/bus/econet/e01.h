@@ -17,7 +17,7 @@
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "machine/buffer.h"
-#include "machine/latch.h"
+#include "machine/output_latch.h"
 #include "machine/mc146818.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"

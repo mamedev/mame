@@ -100,7 +100,7 @@ public:
 
 		clear();
 		m_size = size;
-	}		
+	}
 
 	/* Generic push/pop */
 	T pop();
@@ -216,7 +216,7 @@ public:
 	DECLARE_READ32_MEMBER(read) { return read_gen<u32>(); }
 	DECLARE_WRITE32_MEMBER(write) { write_gen(data); }
 };
-	
+
 DECLARE_DEVICE_TYPE(GENERIC_FIFO_U32, generic_fifo_u32_device)
 
 #endif

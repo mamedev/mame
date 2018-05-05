@@ -85,6 +85,6 @@ private:
 };
 
 // device type definition
-extern const device_type INTERPRO_ARBGA;
+DECLARE_DEVICE_TYPE(INTERPRO_ARBGA, interpro_arbga_device)
 
 #endif // MAME_MACHINE_INTERPRO_ARBGA_H

@@ -869,9 +869,10 @@ void hp9895_device::z80_io_map(address_map &map)
 	map(0x67, 0x67).r(this, FUNC(hp9895_device::switches2_r));
 }
 
-static SLOT_INTERFACE_START(hp9895_floppies)
-	SLOT_INTERFACE("8dsdd" , FLOPPY_8_DSDD)
-SLOT_INTERFACE_END
+static void hp9895_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd" , FLOPPY_8_DSDD);
+}
 
 static const floppy_format_type hp9895_floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,

@@ -137,9 +137,9 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(SPECTRUM_EXPANSION_SLOT, spectrum_expansion_slot_device)
 
-SLOT_INTERFACE_EXTERN( spectrum_expansion_devices );
-SLOT_INTERFACE_EXTERN( spec128_expansion_devices );
-SLOT_INTERFACE_EXTERN( specpls3_expansion_devices );
+void spectrum_expansion_devices(device_slot_interface &device);
+void spec128_expansion_devices(device_slot_interface &device);
+void specpls3_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SPECTRUM_EXP_H

@@ -64,19 +64,19 @@ void mtx_state::mtx_io(address_map &map)
 	map(0x04, 0x04).r(this, FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x05, 0x05).rw(this, FUNC(mtx_state::mtx_key_lo_r), FUNC(mtx_state::mtx_sense_w));
 	map(0x06, 0x06).rw(this, FUNC(mtx_state::mtx_key_hi_r), FUNC(mtx_state::mtx_sound_latch_w));
-//  AM_RANGE(0x07, 0x07) PIO
+//  map(0x07, 0x07) PIO
 	map(0x08, 0x0b).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1f, 0x1f).w(this, FUNC(mtx_state::mtx_cst_motor_w));
 	map(0x30, 0x31).w(this, FUNC(mtx_state::hrx_address_w));
 	map(0x32, 0x32).rw(this, FUNC(mtx_state::hrx_data_r), FUNC(mtx_state::hrx_data_w));
 	map(0x33, 0x33).rw(this, FUNC(mtx_state::hrx_attr_r), FUNC(mtx_state::hrx_attr_w));
-//  AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-//  AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-/*  AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY(FD1791_TAG, wd17xx_r, wd17xx_w)
-    AM_RANGE(0x44, 0x44) AM_READWRITE(fdx_status_r, fdx_control_w)
-    AM_RANGE(0x45, 0x45) AM_WRITE(fdx_drv_sel_w)
-    AM_RANGE(0x46, 0x46) AM_WRITE(fdx_dma_lo_w)
-    AM_RANGE(0x47, 0x47) AM_WRITE(fdx_dma_hi_w)*/
+//  map(0x38, 0x38).w(MC6845_TAG, FUNC(mc6845_device::address_w));
+//  map(0x39, 0x39).rw(MC6845_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+/*  map(0x40, 0x43).rw(FD1791_TAG, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
+    map(0x44, 0x44).rw(this, FUNC(mtx_state::fdx_status_r), FUNC(mtx_state::fdx_control_w));
+    map(0x45, 0x45).w(this, FUNC(mtx_state::fdx_drv_sel_w));
+    map(0x46, 0x46).w(this, FUNC(mtx_state::fdx_dma_lo_w));
+    map(0x47, 0x47).w(this, FUNC(mtx_state::fdx_dma_hi_w);*/
 }
 
 /*-------------------------------------------------

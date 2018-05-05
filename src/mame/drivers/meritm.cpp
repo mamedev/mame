@@ -1346,6 +1346,25 @@ ROM_START( pbss330 ) /* Dallas DS1204V security key attached to CRT-254 connecte
 	ROM_LOAD( "qs9233-01_u5-r0",  0x80000, 0x40000, CRC(740b1274) SHA1(14eab68fc137b905a5a2739c7081900a48cba562) )
 ROM_END
 
+ROM_START( pbss330ca ) /* Dallas DS1204V security key attached to CRT-254 connected to J2 connector labeled 9233-06 U1-RO C1993 MII - California version */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9233-00-06_u9-r0a",  0x00000, 0x10000, CRC(0aaa94e3) SHA1(915a0d4643a781b39730c64dfcaa7599e5a0c447) ) /* 9233-00-06  081293 */
+	ROM_LOAD( "9233-00-06_u10-r0a", 0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) // matches pbss330
+	ROM_LOAD( "9233-00-06_u11-r0a", 0x20000, 0x10000, CRC(94cfb8b1) SHA1(bf2baf1fe9bd87abec353ec8402370e12809030a) )
+	ROM_LOAD( "9233-00-06_u12-r0a", 0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) // matches pbss330
+	ROM_LOAD( "9233-00-06_u13-r0a", 0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pbss330
+	ROM_LOAD( "9233-00-06_u14-r0a", 0x50000, 0x10000, CRC(2aa38f55) SHA1(c1d80b619b7b6506d457ceb6aa267e5ef7c3bdf2) )
+	ROM_LOAD( "9233-00-06_u15-r0a", 0x60000, 0x10000, CRC(e3ce9cde) SHA1(54b25e0f2715e2b112916b80b918a0191bf87a48) )
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9233-06_u1-r0_c1993_mii", 0x000000, 0x000022, BAD_DUMP CRC(93459659) SHA1(73ad4c3a7c52d3db3acb43662c535f8c2ed2376a) )
+
+	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
+	ROM_LOAD( "qs9233-01_u7-r0",  0x00000, 0x40000, CRC(176dd688) SHA1(306cf78101219ef1122023a01d16dff5e9f2aecf) ) /* These 3 roms are on CRT-256 sattalite PCB */
+	ROM_LOAD( "qs9233-01_u6-r0",  0x40000, 0x40000, CRC(59c85a0a) SHA1(ef7f45c4e032d9dd14c4f5237f5b3c487be0cb2f) )
+	ROM_LOAD( "qs9233-01_u5-r0",  0x80000, 0x40000, CRC(740b1274) SHA1(14eab68fc137b905a5a2739c7081900a48cba562) )
+ROM_END
+
 /*
 Basically this Pit Boss Megatouch set is Pit Boss Supertouch 30 v2.0 but marks the first time Merit
  started using the Megatouch name.
@@ -2342,7 +2361,8 @@ GAME( 1994, pbst30,    0,        meritm_crt250_crt252_crt258, pbst30,     meritm
 GAME( 1993, pbst30a,   pbst30,   meritm_crt250_crt252_crt258, pbst30,     meritm_state, 0,  ROT0, "Merit", "Pit Boss Supertouch 30 (9234-00-01)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-250 + CRT-254 + CRT-256 */
-GAME( 1993, pbss330,   0,        meritm_crt250_questions, pbss330,  meritm_state, 0, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, pbss330,   0,        meritm_crt250_questions, pbss330,  meritm_state, 0, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-01, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, pbss330ca, pbss330,  meritm_crt250_questions, pbss330,  meritm_state, 0, ROT0, "Merit", "Pit Boss Superstar III 30 (9233-00-06, California version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossm,  0,        meritm_crt250_questions, pitbossm, meritm_state, 0, ROT0, "Merit", "Pit Boss Megastar (9244-00-01)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, pitbossma, pitbossm, meritm_crt250_questions, pitbossa, meritm_state, 0, ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", MACHINE_IMPERFECT_GRAPHICS )
 

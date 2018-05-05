@@ -438,13 +438,14 @@ QUICKLOAD_LOAD_MEMBER( xerox820_state, xerox820 )
 
 /* WD1771 Interface */
 
-static SLOT_INTERFACE_START( xerox820_floppies )
-	SLOT_INTERFACE( "sa400", FLOPPY_525_SSSD_35T ) // Shugart SA-400, 35 trk drive
-	SLOT_INTERFACE( "sa400l", FLOPPY_525_SSSD ) // Shugart SA-400, 40 trk drive
-	SLOT_INTERFACE( "sa450", FLOPPY_525_DD ) // Shugart SA-450
-	SLOT_INTERFACE( "sa800", FLOPPY_8_SSDD ) // Shugart SA-800
-	SLOT_INTERFACE( "sa850", FLOPPY_8_DSDD ) // Shugart SA-850
-SLOT_INTERFACE_END
+static void xerox820_floppies(device_slot_interface &device)
+{
+	device.option_add("sa400", FLOPPY_525_SSSD_35T); // Shugart SA-400, 35 trk drive
+	device.option_add("sa400l", FLOPPY_525_SSSD); // Shugart SA-400, 40 trk drive
+	device.option_add("sa450", FLOPPY_525_DD); // Shugart SA-450
+	device.option_add("sa800", FLOPPY_8_SSDD); // Shugart SA-800
+	device.option_add("sa850", FLOPPY_8_DSDD); // Shugart SA-850
+}
 
 void xerox820_state::update_nmi()
 {

@@ -371,11 +371,12 @@ static INPUT_PORTS_START( pico )
 INPUT_PORTS_END
 
 
-static SLOT_INTERFACE_START(pico_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_sram",  MD_ROM_SRAM)   // not sure these are needed...
-	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)   // not sure these are needed...
-SLOT_INTERFACE_END
+static void pico_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  MD_STD_ROM);
+	device.option_add_internal("rom_sram",  MD_ROM_SRAM);   // not sure these are needed...
+	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);   // not sure these are needed...
+}
 
 MACHINE_START_MEMBER(pico_state,pico)
 {
@@ -582,11 +583,12 @@ void copera_state::copera_mem(address_map &map)
 
 
 
-static SLOT_INTERFACE_START(copera_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_sram",  MD_ROM_SRAM)   // not sure these are needed...
-	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)   // not sure these are needed...
-SLOT_INTERFACE_END
+static void copera_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  MD_STD_ROM);
+	device.option_add_internal("rom_sram",  MD_ROM_SRAM);   // not sure these are needed...
+	device.option_add_internal("rom_sramsafe",  MD_ROM_SRAM);   // not sure these are needed...
+}
 
 MACHINE_START_MEMBER(copera_state,copera)
 {

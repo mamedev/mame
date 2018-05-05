@@ -1441,8 +1441,9 @@ void lua_engine::initialize()
 			"write_direct_u32", &addr_space::direct_mem_write<uint32_t>,
 			"write_direct_i64", &addr_space::direct_mem_write<int64_t>,
 			"write_direct_u64", &addr_space::direct_mem_write<uint64_t>,
-			"name", sol::property(&addr_space::name),
+			"name", sol::property([](addr_space &sp) { return sp.space.name(); }),
 			"shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }),
+			"index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }),
 			"map", sol::property([this](addr_space &sp) {
 					address_space &space = sp.space;
 					sol::table map = sol().create_table();

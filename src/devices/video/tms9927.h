@@ -20,7 +20,7 @@
 	downcast<tms9927_device &>(*device).set_char_width(_pixels);
 
 #define MCFG_TMS9927_REGION(_tag) \
-	downcast<tms9927_device &>(*device).set_region_tag("^" _tag);
+	downcast<tms9927_device &>(*device).set_region_tag(_tag);
 
 #define MCFG_TMS9927_OVERSCAN(_left, _right, _top, _bottom) \
 	downcast<tms9927_device &>(*device).set_overscan(_left, _right, _top, _bottom);

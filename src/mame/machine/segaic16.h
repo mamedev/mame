@@ -22,7 +22,7 @@
 //**************************************************************************
 
 #define MCFG_SEGA_315_5195_CPU(_cputag) \
-	downcast<sega_315_5195_mapper_device &>(*device).set_cputag("^" _cputag);
+	downcast<sega_315_5195_mapper_device &>(*device).set_cputag(_cputag);
 #define MCFG_SEGA_315_5195_MAPPER_HANDLER(_class, _mapper) \
 	downcast<sega_315_5195_mapper_device &>(*device).set_mapper(sega_315_5195_mapper_device::mapper_delegate(&_class::_mapper, #_class "::" #_mapper, nullptr, (_class *)nullptr));
 #define MCFG_SEGA_315_5195_PBF_CALLBACK(_devcb) \
@@ -183,8 +183,8 @@ private:
 	// internal state
 	address_space *             m_space;
 	address_space *             m_decrypted_space;
-	uint8_t                       m_regs[0x20];
-	uint8_t                       m_curregion;
+	uint8_t                     m_regs[0x20];
+	uint8_t                     m_curregion;
 	decrypt_bank                m_banks[8];
 
 	// communication registers

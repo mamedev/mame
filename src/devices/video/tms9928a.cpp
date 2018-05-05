@@ -49,10 +49,11 @@ DEFINE_DEVICE_TYPE(TMS9129,  tms9129_device,  "tms9129",  "TMS9129 VDP")
 /*
     The TMS9928 has an own address space.
 */
-ADDRESS_MAP_START(tms9928a_device::memmap)
-	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
-ADDRESS_MAP_END
+void tms9928a_device::memmap(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x3fff).ram();
+}
 
 tms9928a_device::tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_50hz, bool is_reva, bool is_99)
 	: device_t(mconfig, type, tag, owner, clock)

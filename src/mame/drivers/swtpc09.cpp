@@ -147,15 +147,16 @@ FLOPPY_FORMATS_MEMBER( swtpc09_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 // todo: implement floppy controller cards as slot devices and do this properly
-static SLOT_INTERFACE_START( swtpc09_floppies )
-	SLOT_INTERFACE("sssd",   FLOPPY_525_SSSD)     // flex 40 trks ss sd 5.25
-	SLOT_INTERFACE("sssd35", FLOPPY_525_SSSD_35T) // flex 35 trks ss sd 5.25
-	SLOT_INTERFACE("ssdd",   FLOPPY_525_SSDD)     // flex 40 trks ss dd 5.25
-	SLOT_INTERFACE("dd",     FLOPPY_525_DD)       // flex 40 trks ds dd 5.25
-	SLOT_INTERFACE("8dssd",  FLOPPY_8_DSSD)       // UNIFlex 8 inch ds sd
-	SLOT_INTERFACE("8dsdd",  FLOPPY_8_DSDD)       // UNIFlex 8 inch ds dd
-	SLOT_INTERFACE("35hd",   FLOPPY_35_HD)        // flex 1.44mb disk from swtpc emu (emulator only?)
-SLOT_INTERFACE_END
+static void swtpc09_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd",   FLOPPY_525_SSSD);     // flex 40 trks ss sd 5.25
+	device.option_add("sssd35", FLOPPY_525_SSSD_35T); // flex 35 trks ss sd 5.25
+	device.option_add("ssdd",   FLOPPY_525_SSDD);     // flex 40 trks ss dd 5.25
+	device.option_add("dd",     FLOPPY_525_DD);       // flex 40 trks ds dd 5.25
+	device.option_add("8dssd",  FLOPPY_8_DSSD);       // UNIFlex 8 inch ds sd
+	device.option_add("8dsdd",  FLOPPY_8_DSDD);       // UNIFlex 8 inch ds dd
+	device.option_add("35hd",   FLOPPY_35_HD);        // flex 1.44mb disk from swtpc emu (emulator only?)
+}
 
 
 /***************************************************************************

@@ -647,15 +647,16 @@ static GFXDECODE_START( scv )
 GFXDECODE_END
 
 
-static SLOT_INTERFACE_START(scv_cart)
-	SLOT_INTERFACE_INTERNAL("rom8k",       SCV_ROM8K)
-	SLOT_INTERFACE_INTERNAL("rom16k",      SCV_ROM16K)
-	SLOT_INTERFACE_INTERNAL("rom32k",      SCV_ROM32K)
-	SLOT_INTERFACE_INTERNAL("rom32k_ram",  SCV_ROM32K_RAM8K)
-	SLOT_INTERFACE_INTERNAL("rom64k",      SCV_ROM64K)
-	SLOT_INTERFACE_INTERNAL("rom128k",     SCV_ROM128K)
-	SLOT_INTERFACE_INTERNAL("rom128k_ram", SCV_ROM128K_RAM4K)
-SLOT_INTERFACE_END
+static void scv_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom8k",       SCV_ROM8K);
+	device.option_add_internal("rom16k",      SCV_ROM16K);
+	device.option_add_internal("rom32k",      SCV_ROM32K);
+	device.option_add_internal("rom32k_ram",  SCV_ROM32K_RAM8K);
+	device.option_add_internal("rom64k",      SCV_ROM64K);
+	device.option_add_internal("rom128k",     SCV_ROM128K);
+	device.option_add_internal("rom128k_ram", SCV_ROM128K_RAM4K);
+}
 
 MACHINE_CONFIG_START(scv_state::scv)
 

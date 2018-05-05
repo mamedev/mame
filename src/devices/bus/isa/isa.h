@@ -67,6 +67,7 @@
 
 #pragma once
 
+#include <forward_list>
 
 
 //**************************************************************************
@@ -81,7 +82,7 @@
 #define MCFG_ISA8_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA8_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	downcast<isa8_slot_device &>(*device).set_isa8_slot(this, _isatag);
+	downcast<isa8_slot_device &>(*device).set_isa8_slot(_isatag);
 #define MCFG_ISA16_CPU(_cputag) \
 	downcast<isa8_device &>(*device).set_cputag(_cputag);
 #define MCFG_ISA16_BUS_CUSTOM_SPACES() \
@@ -89,7 +90,7 @@
 #define MCFG_ISA16_SLOT_ADD(_isatag, _tag, _slot_intf, _def_slot, _fixed) \
 	MCFG_DEVICE_ADD(_tag, ISA16_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed) \
-	downcast<isa16_slot_device &>(*device).set_isa16_slot(this, _isatag);
+	downcast<isa16_slot_device &>(*device).set_isa16_slot(_isatag);
 
 #define MCFG_ISA_BUS_IOCHCK(_iochck) \
 	devcb = &downcast<isa8_device *>(device)->set_iochck_callback(DEVCB_##_iochck);
@@ -167,14 +168,13 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	void set_isa8_slot(device_t *owner, const char *isa_tag) { m_owner = owner; m_isa_tag = isa_tag; }
+	void set_isa8_slot(const char *isa_tag) { m_isa_bus.set_tag(isa_tag); }
 
 protected:
 	isa8_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	device_t *m_owner;
-	const char *m_isa_tag;
+	required_device<device_t> m_isa_bus;
 };
 
 // device type definition
@@ -256,6 +256,10 @@ public:
 
 	virtual void set_dma_channel(uint8_t channel, device_isa8_card_interface *dev, bool do_eop);
 
+	void add_slot(const char *tag);
+	void add_slot(device_slot_interface *slot);
+	virtual void remap(int space_id, offs_t start, offs_t end);
+
 	const address_space_config m_mem_config, m_io_config, m_mem16_config, m_io16_config;
 
 protected:
@@ -288,6 +292,7 @@ protected:
 	device_isa8_card_interface *m_dma_device[8];
 	bool                        m_dma_eop[8];
 	bool                        m_nmi_enabled;
+	std::forward_list<device_slot_interface *> m_slot_list;
 
 private:
 	devcb_write_line m_write_iochck;
@@ -316,6 +321,8 @@ public:
 	virtual void dack_w(int line,uint8_t data);
 	virtual void eop_w(int state);
 
+	virtual void remap(int space_id, offs_t start, offs_t end) {}
+
 	// inline configuration
 	void set_isabus(device_t *isa_device) { m_isa_dev = isa_device; }
 
@@ -340,7 +347,7 @@ public:
 	virtual void device_start() override;
 
 	// inline configuration
-	void set_isa16_slot(device_t *owner, const char *isa_tag) { m_owner = owner; m_isa_tag = isa_tag; }
+	void set_isa16_slot(const char *isa_tag) { m_isa_bus.set_tag(isa_tag); }
 };
 
 
@@ -382,6 +389,7 @@ public:
 
 	uint16_t dack16_r(int line);
 	void dack16_w(int line,uint16_t data);
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	// 16 bit accessors for ISA-defined address spaces
 	DECLARE_READ16_MEMBER(mem16_r);

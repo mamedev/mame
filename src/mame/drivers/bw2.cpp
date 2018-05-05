@@ -530,9 +530,10 @@ FLOPPY_FORMATS_MEMBER( bw2_state::floppy_formats )
 	FLOPPY_BW2_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( bw2_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // Teac FD-35
-SLOT_INTERFACE_END
+static void bw2_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD); // Teac FD-35
+}
 
 
 

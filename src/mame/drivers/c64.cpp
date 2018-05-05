@@ -1242,9 +1242,10 @@ WRITE_LINE_MEMBER( c64_state::exp_reset_w )
 //  SLOT_INTERFACE( sx1541_iec_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( sx1541_iec_devices )
-	SLOT_INTERFACE("sx1541", SX1541)
-SLOT_INTERFACE_END
+void sx1541_iec_devices(device_slot_interface &device)
+{
+	device.option_add("sx1541", SX1541);
+}
 
 
 

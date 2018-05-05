@@ -322,9 +322,10 @@ void rc702_state::kbd_put(u8 data)
 	m_pio->strobe_a(1);
 }
 
-static SLOT_INTERFACE_START( floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 MACHINE_CONFIG_START(rc702_state::rc702)
 	/* basic machine hardware */

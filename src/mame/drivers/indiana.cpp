@@ -71,15 +71,16 @@ DRIVER_INIT_MEMBER(indiana_state,indiana)
 {
 }
 
-SLOT_INTERFACE_START( indiana_isa_cards )
+void indiana_isa_cards(device_slot_interface &device)
+{
 	// 8-bit
-	SLOT_INTERFACE("fdc_at", ISA8_FDC_AT)
-	SLOT_INTERFACE("comat", ISA8_COM_AT)
-	SLOT_INTERFACE("vga", ISA8_VGA)
+	device.option_add("fdc_at", ISA8_FDC_AT);
+	device.option_add("comat", ISA8_COM_AT);
+	device.option_add("vga", ISA8_VGA);
 
 	// 16-bit
-	SLOT_INTERFACE("ide", ISA16_IDE)
-SLOT_INTERFACE_END
+	device.option_add("ide", ISA16_IDE);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
@@ -95,7 +96,7 @@ MACHINE_CONFIG_START(indiana_state::indiana)
 	MCFG_CPU_PROGRAM_MAP(indiana_mem)
 
 	MCFG_DEVICE_ADD(ISABUS_TAG, ISA16, 0)
-	MCFG_ISA16_CPU(":" M68K_TAG)
+	MCFG_ISA16_CPU(M68K_TAG)
 	MCFG_ISA16_BUS_CUSTOM_SPACES()
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa1", indiana_isa_cards, "vga", false)
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa2", indiana_isa_cards, "fdc_at", false)
@@ -110,7 +111,7 @@ MACHINE_CONFIG_START(indiana_state::indiana)
 
 	MCFG_RS232_PORT_ADD("keyboard", default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(MFP_TAG, mc68901_device, write_rx))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 MACHINE_CONFIG_END
 
 /* ROM definition */

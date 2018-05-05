@@ -129,7 +129,7 @@ MACHINE_CONFIG_START(microkit_state::microkit)
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", COSMAC_INPUT_LINE_EF4))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", serial_keyb)
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", serial_keyb)
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 MACHINE_CONFIG_END
 

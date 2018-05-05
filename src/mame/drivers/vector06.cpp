@@ -152,9 +152,10 @@ FLOPPY_FORMATS_MEMBER( vector06_state::floppy_formats )
 	FLOPPY_VECTOR06_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( vector06_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void vector06_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 /* Machine driver */

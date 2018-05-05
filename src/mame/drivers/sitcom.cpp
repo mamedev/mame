@@ -371,9 +371,9 @@ MACHINE_CONFIG_START(sitcom_state::sitcom)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("PORTC"))
 
 	// video hardware
-	MCFG_DEVICE_ADD("ds0", DL1414T, 0) // left display
+	MCFG_DEVICE_ADD("ds0", DL1414T, u32(0)) // left display
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_state, update_ds<0>))
-	MCFG_DEVICE_ADD("ds1", DL1414T, 0) // right display
+	MCFG_DEVICE_ADD("ds1", DL1414T, u32(0)) // right display
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_state, update_ds<1>))
 
 	// host interface
@@ -388,7 +388,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sitcom_timer_state::sitcomtmr)
 	sitcom(config);
 
-	MCFG_DEVICE_ADD("ds2", DL1414T, 0) // remote display
+	MCFG_DEVICE_ADD("ds2", DL1414T, u32(0)) // remote display
 	MCFG_DL1414_UPDATE_HANDLER(WRITE16(sitcom_timer_state, update_ds<2>))
 
 	MCFG_DEFAULT_LAYOUT(layout_sitcomtmr)

@@ -194,14 +194,15 @@ void sg1000_state::sc3000_io_map(address_map &map)
 }
 
 /* This is how the I/O ports are really mapped, but MAME does not support overlapping ranges
-ADDRESS_MAP_START(sg1000_state::sc3000_io_map)
-    ADDRESS_MAP_GLOBAL_MASK(0xff)
-    map(0x00, 0x00) AM_MIRROR(0xdf) AM_DEVREADWRITE(UPD9255_TAG, i8255_device, read, write)
-    map(0x00, 0x00) AM_MIRROR(0x7f) AM_DEVWRITE(SN76489AN_TAG, sn76489a_device, write)
-    map(0x00, 0x00) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, vram_read, vram_write)
-    map(0x01, 0x01) AM_MIRROR(0xae) AM_DEVREADWRITE(TMS9918A_TAG, tms9918a_device, register_read, register_write)
-    map(0x60, 0x60) AM_MIRROR(0x9f) AM_READ(sc3000_r_r)
-ADDRESS_MAP_END
+void sg1000_state::sc3000_io_map(address_map &map)
+{
+    map.global_mask(0xff);
+    map(0x00, 0x00).mirror(0xdf).rw(UPD9255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
+    map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+    map(0x00, 0x00).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
+    map(0x01, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
+    map(0x60, 0x60).mirror(0x9f).r(this, FUNC(sg1000_state::sc3000_r_r));
+}
 */
 
 /*-------------------------------------------------
@@ -454,9 +455,10 @@ FLOPPY_FORMATS_END
     floppy_interface sf7000_floppy_interface
 -------------------------------------------------*/
 
-static SLOT_INTERFACE_START( sf7000_floppies )
-	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
-SLOT_INTERFACE_END
+static void sf7000_floppies(device_slot_interface &device)
+{
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+}
 
 /*-------------------------------------------------
     MACHINE_START( sg1000 )

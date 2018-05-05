@@ -989,7 +989,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 	}
 	else //compatible mode
 	{
-		switch (data & 0x0300)
+		switch (offset & 0x0300)
 		{
 		case 0x0000:
 			x1_pal_b_w(space, offset & 0x00ff, data);
@@ -2194,9 +2194,10 @@ FLOPPY_FORMATS_MEMBER( x1_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( x1_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void x1_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(x1_state::x1)
 	/* basic machine hardware */

@@ -60,9 +60,10 @@ FLOPPY_FORMATS_MEMBER(bbc_opus3_device::floppy_formats)
 	FLOPPY_OPUS_DDCPM_FORMAT
 FLOPPY_FORMATS_END0
 
-SLOT_INTERFACE_START(bbc_floppies)
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+void bbc_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 ROM_START( opus3 )

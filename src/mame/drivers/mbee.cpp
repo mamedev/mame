@@ -638,10 +638,11 @@ static GFXDECODE_START( premium )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 8 )
 GFXDECODE_END
 
-static SLOT_INTERFACE_START( mbee_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void mbee_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(mbee_state::mbee)

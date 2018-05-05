@@ -475,9 +475,10 @@ void _4enlinea_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-SLOT_INTERFACE_START( 4enlinea_isa8_cards )
-	SLOT_INTERFACE_INTERNAL("4enlinea",  ISA8_CGA_4ENLINEA)
-SLOT_INTERFACE_END
+void _4enlinea_isa8_cards(device_slot_interface &device)
+{
+	device.option_add_internal("4enlinea",  ISA8_CGA_4ENLINEA);
+}
 
 /* TODO: irq sources are unknown */
 INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
@@ -513,8 +514,8 @@ MACHINE_CONFIG_START(_4enlinea_state::_4enlinea)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_4enlinea_state, _4enlinea_audio_irq, 60) //TODO
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA8_SLOT_ADD("isa", "isa1", 4enlinea_isa8_cards, "4enlinea", true)
+	MCFG_ISA8_CPU("maincpu")
+	MCFG_ISA8_SLOT_ADD("isa", "isa1", _4enlinea_isa8_cards, "4enlinea", true)
 
 
 /*  6845 clock is a guess, since it's a UM6845R embedded in the UM487F.

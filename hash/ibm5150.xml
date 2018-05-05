@@ -8344,7 +8344,8 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="lombrall">
+	<!-- black square glitches behind sprites -->
+	<software name="lombrall" supported="partial">
 		<description>Lombard RAC Rally</description>
 		<year>1989</year>
 		<publisher>Mandarin Software</publisher>

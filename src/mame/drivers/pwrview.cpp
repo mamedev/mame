@@ -397,9 +397,10 @@ void pwrview_state::pwrview_io(address_map &map)
 	map(0xc2e6, 0xc2e6).r(this, FUNC(pwrview_state::pitclock_r));
 }
 
-static SLOT_INTERFACE_START(pwrview_floppies)
-	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void pwrview_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(pwrview_state::pwrview)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))

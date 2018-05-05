@@ -195,8 +195,6 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(C64_EXPANSION_SLOT, c64_expansion_slot_device)
 
-SLOT_INTERFACE_EXTERN( c64_expansion_cards );
-
-
+void c64_expansion_cards(device_slot_interface &device);
 
 #endif

@@ -189,15 +189,16 @@ void mtxl_state::machine_reset()
 }
 
 #ifndef REAL_PCI_CHIPSET
-static SLOT_INTERFACE_START(mt6k_ata_devices)
-	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
-SLOT_INTERFACE_END
+static void mt6k_ata_devices(device_slot_interface &device)
+{
+	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+}
 
 void mtxl_state::cdrom(device_t *device)
 {
 	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
 	ide0->option_reset();
-	SLOT_INTERFACE_NAME(mt6k_ata_devices)(device->subdevice("ide:0"));
+	mt6k_ata_devices(*ide0);
 	ide0->set_default_option("cdrom");
 	ide0->set_fixed(true);
 
@@ -232,7 +233,7 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	MCFG_AD1848_DRQ_CALLBACK(DEVWRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
 
 	MCFG_DEVICE_MODIFY("mb:dma8237_1")
-	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("^cs4231", ad1848_device, dack_w))
+	MCFG_I8237_OUT_IOW_1_CB(DEVWRITE8("cs4231", ad1848_device, dack_w))
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	MCFG_DEVICE_REMOVE("mb:keybc");
@@ -244,7 +245,7 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
 	MCFG_DEVICE_REMOVE("mb:rtc")
 	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("mb:pic8259_slave", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 #endif
 	/* internal ram */
@@ -266,7 +267,7 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 
 #ifdef REAL_PCI_CHIPSET
 	/* PCI root */
-	MCFG_PCI_ROOT_ADD( ":pci")
+	MCFG_PCI_ROOT_ADD(":pci")
 	MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
 MACHINE_CONFIG_END

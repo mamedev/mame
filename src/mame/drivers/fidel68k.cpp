@@ -27,8 +27,10 @@ HD68HC000P12 CPU, 12MHz XTAL
 PCB label 510-1129A01
 PCB has edge connector for module, but no external slot
 
-There's room for 2 SIMMs at U22 and U23. Unpopulated in Excel 68000, used for
-128KB hashtable RAM in Mach II. Mach III has wire mods to U8/U9(2*8KB + 2*32KB piggybacked).
+There's room for 2 SIMMs at U22 and U23, unpopulated in Excel 68000 and Mach III.
+Mach II has 2*64KB DRAM with a MB1422A DRAM controller @ 25MHz.
+Mach III has wire mods from U22/U23 to U8/U9(2*8KB + 2*32KB piggybacked).
+Mach IV has 2*256KB DRAM, and a daughterboard(510.1123B01) for the 68020.
 
 I/O is via TTL, overall very similar to EAG.
 
@@ -571,7 +573,7 @@ MACHINE_CONFIG_START(fidel68k_state::fex68k)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel68k_state::fex68km2)
@@ -607,7 +609,7 @@ MACHINE_CONFIG_START(fidel68k_state::fdes2265)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel68k_state::fdes2325)
@@ -642,7 +644,7 @@ MACHINE_CONFIG_START(fidel68k_state::eag)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fidel_scc")
@@ -715,8 +717,8 @@ ROM_END
 
 ROM_START( fex68km2 ) // model 6097, PCB label 510.1120B01
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("fex68km2.u6", 0x00000, 0x08000, CRC(2e65e7ad) SHA1(4f3aec12041c9014d5d700909bac66bae1f9eadf) )
-	ROM_LOAD16_BYTE("fex68km2.u7", 0x00001, 0x08000, CRC(4c20334a) SHA1(2e575b88c41505cc89599d2fc13e1e84fe474469) )
+	ROM_LOAD16_BYTE("e6_yellow.u6", 0x00000, 0x08000, CRC(2e65e7ad) SHA1(4f3aec12041c9014d5d700909bac66bae1f9eadf) ) // 27c256
+	ROM_LOAD16_BYTE("o7_red.u7",    0x00001, 0x08000, CRC(4c20334a) SHA1(2e575b88c41505cc89599d2fc13e1e84fe474469) ) // "
 ROM_END
 
 ROM_START( fex68km3 ) // model 6098, PCB label 510.1120B01

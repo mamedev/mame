@@ -866,9 +866,10 @@ FLOPPY_FORMATS_MEMBER( mz2000_state::floppy_formats )
 	FLOPPY_2D_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( mz2000_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void mz2000_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 
 MACHINE_CONFIG_START(mz2000_state::mz2000)

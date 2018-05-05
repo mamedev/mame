@@ -838,9 +838,10 @@ FLOPPY_FORMATS_MEMBER( camplynx_state::camplynx_floppy_formats )
 	FLOPPY_CAMPLYNX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( camplynx_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void camplynx_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 MACHINE_CONFIG_START(camplynx_state::lynx_common)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
@@ -849,7 +850,7 @@ MACHINE_CONFIG_START(camplynx_state::lynx_common)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.02)
 MACHINE_CONFIG_END

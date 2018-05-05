@@ -92,8 +92,8 @@ protected:
 
 } } } // end namespace bus::ti99::gromport
 
-SLOT_INTERFACE_EXTERN(gromport4);
-SLOT_INTERFACE_EXTERN(gromport8);
+void gromport4(device_slot_interface &device);
+void gromport8(device_slot_interface &device);
 
 #define MCFG_GROMPORT4_ADD( _tag )   \
 	MCFG_DEVICE_ADD(_tag, TI99_GROMPORT, 0) \

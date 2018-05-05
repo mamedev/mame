@@ -446,14 +446,14 @@ void sol20_state::sol20_io(address_map &map)
 	map(0xfd, 0xfd).rw(this, FUNC(sol20_state::sol20_fd_r), FUNC(sol20_state::sol20_fd_w));
 	map(0xfe, 0xfe).w(this, FUNC(sol20_state::sol20_fe_w));
 	map(0xff, 0xff).portr("S2");
-/*  AM_RANGE(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
-    AM_RANGE(0xf9, 0xf9) serial data in, out
-    AM_RANGE(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
-    AM_RANGE(0xfb, 0xfb) tape
-    AM_RANGE(0xfc, 0xfc) keyboard data in
-    AM_RANGE(0xfd, 0xfd) parallel data in, out
-    AM_RANGE(0xfe, 0xfe) scroll register
-    AM_RANGE(0xff, 0xff) sense switches */
+/*  map(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
+    map(0xf9, 0xf9) serial data in, out
+    map(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
+    map(0xfb, 0xfb) tape
+    map(0xfc, 0xfc) keyboard data in
+    map(0xfd, 0xfd) parallel data in, out
+    map(0xfe, 0xfe) scroll register
+    map(0xff, 0xff) sense switches */
 }
 
 /* Input ports */

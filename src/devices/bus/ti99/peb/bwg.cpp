@@ -682,11 +682,12 @@ FLOPPY_FORMATS_MEMBER(snug_bwg_device::floppy_formats)
 	FLOPPY_TI99_TDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( bwg_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )        // 40 tracks
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )        // 80 tracks
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )          // 80 tracks
-SLOT_INTERFACE_END
+static void bwg_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);  // 40 tracks
+	device.option_add("525qd", FLOPPY_525_QD);  // 80 tracks
+	device.option_add("35dd", FLOPPY_35_DD);    // 80 tracks
+}
 
 ROM_START( bwg_fdc )
 	ROM_REGION(0x8000, TI99_DSRROM, 0)

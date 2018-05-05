@@ -128,7 +128,7 @@ void unsp_device::WRITE16(uint32_t address, uint16_t data)
 
 void unsp_device::device_start()
 {
-	memset(m_r, 0, sizeof(uint16_t) * UNSP_GPR_COUNT);
+	memset(m_r, 0, sizeof(uint16_t) * 16);
 	m_irq = 0;
 	m_fiq = 0;
 	m_curirq = 0;
@@ -182,7 +182,7 @@ void unsp_device::state_import(const device_state_entry &entry)
 
 void unsp_device::device_reset()
 {
-	memset(m_r, 0, sizeof(uint16_t) * UNSP_GPR_COUNT);
+	memset(m_r, 0, sizeof(uint16_t) * 16);
 
 	UNSP_REG(PC) = READ16(0xfff7);
 	m_irq = 0;

@@ -144,10 +144,11 @@ void victor_9000_fdc_device::unload1_cb(floppy_image_device *device)
 	m_via4->write_cb1(1);
 }
 
-static SLOT_INTERFACE_START( victor9k_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD ) // Tandon TM100-3 with custom electronics
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Tandon TM100-4 with custom electronics
-SLOT_INTERFACE_END
+static void victor9k_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD); // Tandon TM100-3 with custom electronics
+	device.option_add("525qd", FLOPPY_525_QD); // Tandon TM100-4 with custom electronics
+}
 
 FLOPPY_FORMATS_MEMBER( victor_9000_fdc_device::floppy_formats )
 	FLOPPY_VICTOR_9000_FORMAT

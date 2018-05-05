@@ -183,9 +183,10 @@ DRIVER_INIT_MEMBER( czk80_state, czk80 )
 	membank("bankw1")->configure_entry(0, &main[0xe000]);
 }
 
-static SLOT_INTERFACE_START( czk80_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void czk80_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 void czk80_state::kbd_put(u8 data)
 {

@@ -2052,9 +2052,10 @@ void fm7_state::machine_reset()
 }
 
 
-static SLOT_INTERFACE_START( fm7_floppies )
-	SLOT_INTERFACE("qd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void fm7_floppies(device_slot_interface &device)
+{
+	device.option_add("qd", FLOPPY_525_QD);
+}
 
 
 #define MCFG_ADDRESS_BANK(tag) \

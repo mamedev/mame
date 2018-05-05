@@ -56,9 +56,10 @@ FLOPPY_FORMATS_MEMBER( kc_d004_device::floppy_formats )
 	FLOPPY_KC85_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( kc_d004_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void kc_d004_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 static const z80_daisy_config kc_d004_daisy_chain[] =
 {

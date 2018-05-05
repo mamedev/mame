@@ -248,9 +248,10 @@ uint32_t tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  SLOT_INTERFACE( tdv2324_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( tdv2324_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void tdv2324_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 
 

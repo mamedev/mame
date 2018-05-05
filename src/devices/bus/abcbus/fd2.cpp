@@ -223,9 +223,10 @@ static const z80_daisy_config daisy_chain[] =
 //  SLOT_INTERFACE( abc_fd2_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( abc_fd2_floppies )
-	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
-SLOT_INTERFACE_END
+static void abc_fd2_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+}
 
 FLOPPY_FORMATS_MEMBER( abc_fd2_device::floppy_formats )
 	FLOPPY_ABC_FD2_FORMAT

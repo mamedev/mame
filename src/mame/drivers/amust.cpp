@@ -198,9 +198,10 @@ void amust_state::io_map(address_map &map)
 	map(0x14, 0x17).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 }
 
-static SLOT_INTERFACE_START( amust_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void amust_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 /* Input ports */
 static INPUT_PORTS_START( amust )

@@ -270,9 +270,10 @@ void tutor_state::machine_reset()
 	m_tape_interrupt_enable = 0;
 	m_centronics_busy = 0;
 
-	// Enable auto wait states by lowering READY during reset
-	m_maincpu->ready_line(CLEAR_LINE);
+	// Disable auto wait states; with enabled wait states, cassette loading fails
+	m_maincpu->ready_line(ASSERT_LINE);
 	m_maincpu->reset_line(ASSERT_LINE);
+	m_maincpu->hold_line(CLEAR_LINE);
 }
 
 /*

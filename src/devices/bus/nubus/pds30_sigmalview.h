@@ -48,7 +48,6 @@ private:
 	uint32_t m_palette[256];
 	emu_timer *m_timer;
 	int m_protstate;
-	const std::string m_assembled_tag;
 };
 
 

@@ -121,9 +121,10 @@ WRITE8_MEMBER(ht68k_state::duart_output)
 	if (m_floppy) {m_floppy->ss_w(BIT(data,3) ? 0 : 1);}
 }
 
-static SLOT_INTERFACE_START( ht68k_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ht68k_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 
 MACHINE_CONFIG_START(ht68k_state::ht68k)

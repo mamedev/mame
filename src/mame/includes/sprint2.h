@@ -59,10 +59,6 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint2_steering_reset2_w);
 	DECLARE_WRITE8_MEMBER(sprint2_wram_w);
 	DECLARE_WRITE8_MEMBER(output_latch_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp1_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp2_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp3_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp4_w);
 	DECLARE_READ8_MEMBER(sprint2_collision1_r);
 	DECLARE_READ8_MEMBER(sprint2_collision2_r);
 	DECLARE_WRITE8_MEMBER(sprint2_collision_reset1_w);

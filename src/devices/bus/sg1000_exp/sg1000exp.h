@@ -84,7 +84,7 @@ protected:
 DECLARE_DEVICE_TYPE(SG1000_EXPANSION_SLOT, sg1000_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( sg1000_expansion_devices );
+void sg1000_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_SG1000_EXP_SG1000EXP_H
