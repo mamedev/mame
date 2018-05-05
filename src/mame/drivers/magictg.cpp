@@ -148,12 +148,17 @@ class magictg_state : public driver_device
 {
 public:
 	magictg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_mips(*this, "mips"),
-		m_adsp(*this, "adsp"),
-		m_pci(*this, "pcibus"),
-		m_adsp_pram(*this, "adsp_pram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_mips(*this, "mips")
+		, m_adsp(*this, "adsp")
+		, m_pci(*this, "pcibus")
+		, m_adsp_pram(*this, "adsp_pram")
+		, m_voodoo(*this, "voodoo_%u", 0U)
+	{ }
 
+	void magictg(machine_config &config);
+
+private:
 	required_device<cpu_device>         m_mips;
 	required_device<adsp2181_device>    m_adsp;
 	required_device<pci_bus_legacy_device>      m_pci;
@@ -182,7 +187,7 @@ public:
 
 
 	/* 3Dfx Voodoo */
-	voodoo_device*                           m_voodoo[2];
+	required_device_array<voodoo_device, 2> m_voodoo;
 
 	struct
 	{
@@ -226,7 +231,6 @@ public:
 
 	void zr36120_reset();
 
-	void magictg(machine_config &config);
 	void adsp_data_map(address_map &map);
 	void adsp_io_map(address_map &map);
 	void adsp_program_map(address_map &map);
@@ -259,8 +263,6 @@ public:
 
 void magictg_state::machine_start()
 {
-	m_voodoo[0] = (voodoo_device*)machine().device("voodoo_0");
-	m_voodoo[1] = (voodoo_device*)machine().device("voodoo_1");
 }
 
 
