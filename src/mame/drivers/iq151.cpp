@@ -72,18 +72,20 @@ class iq151_state : public driver_device
 {
 public:
 	iq151_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_pic(*this, "pic8259"),
-			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pic(*this, "pic8259")
+		, m_speaker(*this, "speaker")
+		, m_cassette(*this, "cassette")
+		, m_carts(*this, "slot%u", 1U)
+		, m_boot_bank(*this, "boot")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<pic8259_device> m_pic;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<cassette_image_device> m_cassette;
+	void iq151(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
+
+private:
 	DECLARE_READ8_MEMBER(keyboard_row_r);
 	DECLARE_READ8_MEMBER(keyboard_column_r);
 	DECLARE_READ8_MEMBER(ppi_portc_r);
@@ -93,20 +95,25 @@ public:
 	DECLARE_WRITE8_MEMBER(cartslot_w);
 	DECLARE_READ8_MEMBER(cartslot_io_r);
 	DECLARE_WRITE8_MEMBER(cartslot_io_w);
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
+	void iq151_io(address_map &map);
+	void iq151_mem(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<pic8259_device> m_pic;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
+	required_device_array<iq151cart_slot_device, 5> m_carts;
+	required_memory_bank m_boot_bank;
 
 	uint8_t m_vblank_irq_state;
 	uint8_t m_cassette_clk;
 	uint8_t m_cassette_data;
-	iq151cart_slot_device * m_carts[5];
-	DECLARE_DRIVER_INIT(iq151);
-	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
-	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
-	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
-	void iq151(machine_config &config);
-	void iq151_io(address_map &map);
-	void iq151_mem(address_map &map);
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -166,7 +173,7 @@ WRITE8_MEMBER(iq151_state::ppi_portc_w)
 
 WRITE8_MEMBER(iq151_state::boot_bank_w)
 {
-	membank("boot")->set_entry(data & 1);
+	m_boot_bank->set_entry(data & 1);
 }
 
 
@@ -339,23 +346,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
 	m_cassette->output((m_cassette_data & 1) ^ (m_cassette_clk & 1) ? +1 : -1);
 }
 
-DRIVER_INIT_MEMBER(iq151_state,iq151)
+void iq151_state::machine_start()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	membank("boot")->configure_entry(0, RAM + 0xf800);
-	membank("boot")->configure_entry(1, RAM + 0x0000);
-
-	// keep machine pointers to slots
-	m_carts[0] = machine().device<iq151cart_slot_device>("slot1");
-	m_carts[1] = machine().device<iq151cart_slot_device>("slot2");
-	m_carts[2] = machine().device<iq151cart_slot_device>("slot3");
-	m_carts[3] = machine().device<iq151cart_slot_device>("slot4");
-	m_carts[4] = machine().device<iq151cart_slot_device>("slot5");
+	m_boot_bank->configure_entry(0, RAM + 0xf800);
+	m_boot_bank->configure_entry(1, RAM + 0x0000);
 }
 
 void iq151_state::machine_reset()
 {
-	membank("boot")->set_entry(0);
+	m_boot_bank->set_entry(0);
 
 	m_vblank_irq_state = 0;
 }
@@ -490,4 +490,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY         FULLNAME  FLAGS
-COMP( 198?, iq151, 0,      0,      iq151,   iq151, iq151_state, iq151, "ZPA Novy Bor", "IQ-151", 0 )
+COMP( 198?, iq151, 0,      0,      iq151,   iq151, iq151_state, 0,     "ZPA Novy Bor", "IQ-151", 0 )
