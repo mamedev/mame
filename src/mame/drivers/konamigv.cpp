@@ -143,46 +143,66 @@ class konamigv_state : public driver_device
 {
 public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_am53cf96(*this, "am53cf96"),
-		m_btc_trackball(*this, "upd%u", 1),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_am53cf96(*this, "am53cf96")
+		, m_btc_trackball(*this, "upd%u", 1)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
-	DECLARE_READ16_MEMBER(flash_r);
-	DECLARE_WRITE16_MEMBER(flash_w);
-	DECLARE_WRITE16_MEMBER(btc_trackball_w);
-	DECLARE_READ16_MEMBER(tokimeki_serial_r);
-	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
-	DECLARE_DRIVER_INIT(simpbowl);
-	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
-
-	static void cdrom_config(device_t *device);
 	void tmosh(machine_config &config);
-	void simpbowl(machine_config &config);
 	void kdeadeye(machine_config &config);
 	void btchamp(machine_config &config);
 	void konamigv(machine_config &config);
-	void btchamp_map(address_map &map);
-	void kdeadeye_map(address_map &map);
-	void konamigv_map(address_map &map);
-	void simpbowl_map(address_map &map);
-	void tmosh_map(address_map &map);
+
 protected:
-	virtual void driver_start() override;
+	virtual void machine_start() override;
+
+	void konamigv_map(address_map &map);
 
 private:
+	DECLARE_WRITE16_MEMBER(btc_trackball_w);
+	DECLARE_READ16_MEMBER(tokimeki_serial_r);
+	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
+	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+
+	void btchamp_map(address_map &map);
+	void kdeadeye_map(address_map &map);
+	void tmosh_map(address_map &map);
+
+	static void cdrom_config(device_t *device);
+
 	required_device<am53cf96_device> m_am53cf96;
 	optional_device_array<upd4701_device, 2> m_btc_trackball;
 
-	uint32_t m_flash_address;
-
-	fujitsu_29f016a_device *m_flash8[4];
-
 	uint8_t m_sector_buffer[ 4096 ];
 	required_device<cpu_device> m_maincpu;
+};
+
+class simpbowl_state : public konamigv_state
+{
+public:
+	simpbowl_state(const machine_config &mconfig, device_type type, const char *tag)
+		: konamigv_state(mconfig, type, tag)
+		, m_flash8(*this, "flash%u", 0)
+	{
+	}
+
+	void simpbowl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	DECLARE_READ16_MEMBER(flash_r);
+	DECLARE_WRITE16_MEMBER(flash_w);
+
+	void simpbowl_map(address_map &map);
+
+	required_device_array<fujitsu_29f016a_device, 4> m_flash8;
+
+	uint32_t m_flash_address;
 };
 
 void konamigv_state::konamigv_map(address_map &map)
@@ -196,11 +216,11 @@ void konamigv_state::konamigv_map(address_map &map)
 	map(0x1f780000, 0x1f780003).nopw(); /* watchdog? */
 }
 
-void konamigv_state::simpbowl_map(address_map &map)
+void simpbowl_state::simpbowl_map(address_map &map)
 {
 	konamigv_map(map);
 
-	map(0x1f680080, 0x1f68008f).rw(this, FUNC(konamigv_state::flash_r), FUNC(konamigv_state::flash_w));
+	map(0x1f680080, 0x1f68008f).rw(this, FUNC(simpbowl_state::flash_r), FUNC(simpbowl_state::flash_w));
 	map(0x1f6800c0, 0x1f6800c7).r("upd", FUNC(upd4701_device::read_xy)).umask32(0xff00ff00);
 	map(0x1f6800c9, 0x1f6800c9).r("upd", FUNC(upd4701_device::reset_xy));
 }
@@ -317,9 +337,14 @@ void konamigv_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, i
 	}
 }
 
-void konamigv_state::driver_start()
+void konamigv_state::machine_start()
 {
 	save_item(NAME(m_sector_buffer));
+}
+
+void simpbowl_state::machine_start()
+{
+	konamigv_state::machine_start();
 	save_item(NAME(m_flash_address));
 }
 
@@ -430,7 +455,7 @@ INPUT_PORTS_END
 
 /* Simpsons Bowling */
 
-READ16_MEMBER(konamigv_state::flash_r)
+READ16_MEMBER(simpbowl_state::flash_r)
 {
 	if (offset == 4)   // set odd address
 	{
@@ -452,7 +477,7 @@ READ16_MEMBER(konamigv_state::flash_r)
 	return 0;
 }
 
-WRITE16_MEMBER(konamigv_state::flash_w)
+WRITE16_MEMBER(simpbowl_state::flash_w)
 {
 	int chip;
 
@@ -481,15 +506,7 @@ WRITE16_MEMBER(konamigv_state::flash_w)
 	}
 }
 
-DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
-{
-	m_flash8[0] = machine().device<fujitsu_29f016a_device>("flash0");
-	m_flash8[1] = machine().device<fujitsu_29f016a_device>("flash1");
-	m_flash8[2] = machine().device<fujitsu_29f016a_device>("flash2");
-	m_flash8[3] = machine().device<fujitsu_29f016a_device>("flash3");
-}
-
-MACHINE_CONFIG_START(konamigv_state::simpbowl)
+MACHINE_CONFIG_START(simpbowl_state::simpbowl)
 	konamigv(config);
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( simpbowl_map )
@@ -845,4 +862,4 @@ GAME( 1997, tmoshsp,  konamigv, tmosh,    konamigv, konamigv_state, 0,        RO
 GAME( 1997, tmoshspa, tmoshsp,  tmosh,    konamigv, konamigv_state, 0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, 0,        ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, 0,        ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, konamigv_state, simpbowl, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, simpbowl_state, 0,        ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
