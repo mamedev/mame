@@ -2170,7 +2170,8 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9821)
 
 WRITE_LINE_MEMBER(pc9801_state::vrtc_irq)
 {
-	m_pic1->ir2_w(state);
+	if(state)
+		m_pic1->ir2_w(1);
 }
 
 
