@@ -433,6 +433,10 @@ ROM_START( pwrflip ) /* Updated version of Grand Cross Pinball or semi-sequel? *
 
 	ROM_REGION( 0x200000, "essnd", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
 	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 MASK ROM */
+
+	ROM_REGION( 0x000400, "plds", 0 ) /* 2x TIBPAL16L8-15CN */
+	ROM_LOAD( "a.u72", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "b.u73", 0x200, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( gcpinbal )
@@ -457,6 +461,10 @@ ROM_START( gcpinbal )
 
 	ROM_REGION( 0x200000, "essnd", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
 	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 MASK ROM */
+
+	ROM_REGION( 0x000400, "plds", 0 ) /* 2x TIBPAL16L8-15CN */
+	ROM_LOAD( "a.u72", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "b.u73", 0x200, 0x104, NO_DUMP )
 ROM_END
 
 
