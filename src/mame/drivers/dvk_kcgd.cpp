@@ -347,8 +347,8 @@ static GFXDECODE_START( kcgd )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(kcgd_state::kcgd)
-	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL(30'800'000)/4)
-	MCFG_CPU_PROGRAM_MAP(kcgd_mem)
+	MCFG_DEVICE_ADD("maincpu", K1801VM2, XTAL(30'800'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(kcgd_mem)
 	MCFG_T11_INITIAL_MODE(0100000)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", kcgd_state, scanline_callback, attotime::from_hz(50*28*11)) // XXX verify
@@ -367,10 +367,10 @@ MACHINE_CONFIG_START(kcgd_state::kcgd)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kcgd)
 #if 0
 	MCFG_DEVICE_ADD("ms7004", MS7004, 0)
-	MCFG_MS7004_TX_HANDLER(DEVWRITELINE("i8251kbd", i8251_device, write_rxd))
+	MCFG_MS7004_TX_HANDLER(WRITELINE("i8251kbd", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(kcgd_state, write_keyboard_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, kcgd_state, write_keyboard_clock))
 #endif
 MACHINE_CONFIG_END
 

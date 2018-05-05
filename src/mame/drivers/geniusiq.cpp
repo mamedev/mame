@@ -695,9 +695,9 @@ DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
 
 MACHINE_CONFIG_START(geniusiq_state::iq128)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // The main crystal is at 32MHz, not sure whats the CPU freq
-	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)  // the internal clock is increased by 1 sec every 125 interrupts
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // The main crystal is at 32MHz, not sure whats the CPU freq
+	MCFG_DEVICE_PROGRAM_MAP(geniusiq_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)  // the internal clock is increased by 1 sec every 125 interrupts
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

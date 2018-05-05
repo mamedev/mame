@@ -560,10 +560,10 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(mil4000_state::mil4000)
-	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mil4000_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -588,9 +588,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mil4000_state::chewheel)
 	mil4000(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, CPU_CLOCK) /* 2MHz */
-	MCFG_CPU_PROGRAM_MAP(chewheel_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, CPU_CLOCK) /* 2MHz */
+	MCFG_DEVICE_PROGRAM_MAP(chewheel_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mil4000_state,  irq5_line_hold)
 MACHINE_CONFIG_END
 
 

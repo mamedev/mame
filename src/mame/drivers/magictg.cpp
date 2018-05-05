@@ -911,22 +911,22 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(magictg_state::magictg)
-	MCFG_CPU_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
+	MCFG_DEVICE_ADD("mips", R5000BE, 150000000) /* TODO: CPU type and clock are unknown */
 	//MCFG_MIPS3_ICACHE_SIZE(16384) /* TODO: Unknown */
 	//MCFG_MIPS3_DCACHE_SIZE(16384) /* TODO: Unknown */
-	MCFG_CPU_PROGRAM_MAP(magictg_map)
+	MCFG_DEVICE_PROGRAM_MAP(magictg_map)
 
-	MCFG_CPU_ADD("adsp", ADSP2181, 16000000)
-	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
-	MCFG_CPU_DATA_MAP(adsp_data_map)
-	MCFG_CPU_IO_MAP(adsp_io_map)
+	MCFG_DEVICE_ADD("adsp", ADSP2181, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(adsp_program_map)
+	MCFG_DEVICE_DATA_MAP(adsp_data_map)
+	MCFG_DEVICE_IO_MAP(adsp_io_map)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)

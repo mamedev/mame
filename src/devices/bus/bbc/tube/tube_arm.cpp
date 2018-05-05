@@ -51,11 +51,11 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_tube_arm_device::device_add_mconfig)
-	MCFG_CPU_ADD("arm", ARM, XTAL(20'000'000) / 3)
-	MCFG_CPU_PROGRAM_MAP(tube_arm_mem)
+	MCFG_DEVICE_ADD("arm", ARM, XTAL(20'000'000) / 3)
+	MCFG_DEVICE_PROGRAM_MAP(tube_arm_mem)
 
 	MCFG_TUBE_ADD("ula")
-	MCFG_TUBE_HIRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
+	MCFG_TUBE_HIRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_tube_slot_device, irq_w))
 	MCFG_TUBE_PNMI_HANDLER(INPUTLINE("arm", ARM_FIRQ_LINE))
 	MCFG_TUBE_PIRQ_HANDLER(INPUTLINE("arm", ARM_IRQ_LINE))
 

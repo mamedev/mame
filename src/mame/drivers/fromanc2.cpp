@@ -504,17 +504,17 @@ void fromanc2_state::machine_reset()
 MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_CPU_IO_MAP(fromanc2_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
 
-	MCFG_CPU_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sub_map)
-	MCFG_CPU_IO_MAP(fromanc2_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sub_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sub_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc2)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
@@ -564,17 +564,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fromanc2_state::fromancr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromancr_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromancr_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_CPU_IO_MAP(fromanc2_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
 
-	MCFG_CPU_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sub_map)
-	MCFG_CPU_IO_MAP(fromanc2_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sub_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sub_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
@@ -614,7 +614,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromancr)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
@@ -624,13 +624,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)      /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc4_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)      /* 16.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc4_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4)        /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_CPU_IO_MAP(fromanc2_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4)        /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
+	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc4)
 
@@ -638,8 +638,8 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_2))
-	//MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("link", rs232_port_device, write_rts))
+	//MCFG_INS8250_OUT_TX_CB(WRITELINE("link", rs232_port_device, write_txd))
+	//MCFG_INS8250_OUT_RTS_CB(WRITELINE("link", rs232_port_device, write_rts))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "lpalette", fromancr)
@@ -675,7 +675,7 @@ MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)

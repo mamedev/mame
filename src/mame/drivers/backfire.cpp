@@ -422,8 +422,8 @@ void backfire_state::machine_start()
 MACHINE_CONFIG_START(backfire_state::backfire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
-	MCFG_CPU_PROGRAM_MAP(backfire_map)
+	MCFG_DEVICE_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
+	MCFG_DEVICE_PROGRAM_MAP(backfire_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -445,7 +445,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(backfire_state, screen_update_left)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(backfire_state, deco32_vbl_interrupt))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, backfire_state, deco32_vbl_interrupt))
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(backfire_state::backfire)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 28000000 / 2)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 28000000 / 2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

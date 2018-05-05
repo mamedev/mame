@@ -394,15 +394,15 @@ static const char *const natodef_sample_names[] =
 
 
 MACHINE_CONFIG_START(thief_state::thief)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(thief_main_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(thief_state, iack)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(thief_main_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(thief_state, iack)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(thief_state, thief_input_select_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(thief_state, thief_io_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(thief_state, tape_control_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, thief_state, thief_input_select_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, thief_state, thief_io_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, thief_state, tape_control_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -418,13 +418,13 @@ MACHINE_CONFIG_START(thief_state::thief)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(8'000'000)/2/4)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(8'000'000)/2/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(8'000'000)/2/4)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(8'000'000)/2/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_NAMES(thief_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -432,8 +432,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(thief_state::sharkatt)
 	thief(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sharkatt_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sharkatt_main_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)

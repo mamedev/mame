@@ -284,11 +284,11 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(osborne1_state::osborne1)
-	MCFG_CPU_ADD(m_maincpu, Z80, MAIN_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(osborne1_mem)
-	MCFG_CPU_OPCODES_MAP(osborne1_op)
-	MCFG_CPU_IO_MAP(osborne1_io)
-	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(osborne1_state, irqack_w))
+	MCFG_DEVICE_ADD(m_maincpu, Z80, MAIN_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(osborne1_mem)
+	MCFG_DEVICE_OPCODES_MAP(osborne1_op)
+	MCFG_DEVICE_IO_MAP(osborne1_io)
+	MCFG_Z80_SET_IRQACK_CALLBACK(WRITELINE(*this, osborne1_state, irqack_w))
 
 	MCFG_SCREEN_ADD_MONOCHROME(m_screen, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(osborne1_state, screen_update)
@@ -298,37 +298,37 @@ MACHINE_CONFIG_START(osborne1_state::osborne1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(m_speaker, SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD(m_speaker, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD(m_pia0, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(DEVREAD8(m_ieee, ieee488_device, dio_r))
-	MCFG_PIA_READPB_HANDLER(READ8(osborne1_state, ieee_pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8(m_ieee, ieee488_device, dio_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osborne1_state, ieee_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE(m_ieee, ieee488_device, ifc_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE(m_ieee, ieee488_device, ren_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, ieee_pia_irq_a_func))
+	MCFG_PIA_READPA_HANDLER(READ8(m_ieee, ieee488_device, dio_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, osborne1_state, ieee_pia_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(m_ieee, ieee488_device, dio_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, osborne1_state, ieee_pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(m_ieee, ieee488_device, ifc_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(m_ieee, ieee488_device, ren_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, osborne1_state, ieee_pia_irq_a_func))
 
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(m_pia0, pia6821_device, ca2_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(m_pia0, pia6821_device, ca2_w))
 
 	MCFG_DEVICE_ADD(m_pia1, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(osborne1_state, video_pia_port_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(osborne1_state, video_pia_port_b_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(osborne1_state, video_pia_out_cb2_dummy))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(osborne1_state, video_pia_irq_a_func))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, osborne1_state, video_pia_port_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, osborne1_state, video_pia_port_b_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, osborne1_state, video_pia_out_cb2_dummy))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, osborne1_state, video_pia_irq_a_func))
 
 	MCFG_DEVICE_ADD(m_acia, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(osborne1_state, serial_acia_irq_func))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, osborne1_state, serial_acia_irq_func))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(m_acia, acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(m_acia, acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(m_acia, acia6850_device, write_cts))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE(m_pia1, pia6821_device, ca2_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(m_acia, acia6850_device, write_rxd))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(m_acia, acia6850_device, write_dcd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(m_acia, acia6850_device, write_cts))
+	MCFG_RS232_RI_HANDLER(WRITELINE(m_pia1, pia6821_device, ca2_w))
 
 	MCFG_DEVICE_ADD(m_fdc, MB8877, MAIN_CLOCK/16)
 	MCFG_WD_FDC_FORCE_READY
@@ -344,8 +344,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(osborne1nv_state::osborne1nv)
 	osborne1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(osborne1nv_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(osborne1nv_io)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_NO_PALETTE

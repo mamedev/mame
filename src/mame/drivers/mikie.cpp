@@ -261,19 +261,19 @@ WRITE_LINE_MEMBER(mikie_state::vblank_irq)
 MACHINE_CONFIG_START(mikie_state::mikie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, OSC/12) // 9A (surface scratched)
-	MCFG_CPU_PROGRAM_MAP(mikie_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, OSC/12) // 9A (surface scratched)
+	MCFG_DEVICE_PROGRAM_MAP(mikie_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, CLK) // 4E (surface scratched)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, CLK) // 4E (surface scratched)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 6I
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mikie_state, coin_counter_1_w)) // COIN1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mikie_state, coin_counter_2_w)) // COIN2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mikie_state, sh_irqtrigger_w)) // SOUNDON
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mikie_state, coin_counter_1_w)) // COIN1
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mikie_state, coin_counter_2_w)) // COIN2
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mikie_state, sh_irqtrigger_w)) // SOUNDON
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // END (not used?)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mikie_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mikie_state, irq_mask_w)) // INT
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mikie_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mikie_state, irq_mask_w)) // INT
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mikie_state, screen_update_mikie)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mikie_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mikie_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mikie)
 	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
@@ -297,10 +297,10 @@ MACHINE_CONFIG_START(mikie_state::mikie)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL/8)
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, CLK)
+	MCFG_DEVICE_ADD("sn2", SN76489A, CLK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

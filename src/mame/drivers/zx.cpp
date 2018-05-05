@@ -327,11 +327,11 @@ PALETTE_INIT_MEMBER(zx_state, zx)
 
 MACHINE_CONFIG_START(zx_state::zx80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'500'000)/2)
-	MCFG_CPU_PROGRAM_MAP(zx80_map)
-	MCFG_CPU_IO_MAP(zx80_io_map)
-	MCFG_CPU_OPCODES_MAP(ula_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(zx_state, refresh_w))
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(6'500'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(zx80_map)
+	MCFG_DEVICE_IO_MAP(zx80_io_map)
+	MCFG_DEVICE_OPCODES_MAP(ula_map)
+	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(*this, zx_state, refresh_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(XTAL(6'500'000)/2/64159.0) // 54223 for NTSC
@@ -361,9 +361,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zx_state::zx81)
 	zx80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(zx81_map)
-	MCFG_CPU_IO_MAP(zx81_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(zx81_map)
+	MCFG_DEVICE_IO_MAP(zx81_io_map)
 
 	MCFG_CASSETTE_MODIFY( "cassette" )
 	MCFG_CASSETTE_FORMATS(zx81_cassette_formats)
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(zx_state::zx81_spk )
 	/* sound hardware */
 	/* Used by pc8300/lambda/pow3000 */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -406,8 +406,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zx_state::pc8300)
 	zx81_spk(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(pc8300_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(pc8300_io_map)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -416,8 +416,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zx_state::pow3000)
 	zx81_spk(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(pow3000_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(pow3000_io_map)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

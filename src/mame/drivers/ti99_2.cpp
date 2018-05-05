@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	// We have no lines connected yet
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 10700000, ti99_2_memmap, ti99_2_io)
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ti99_2_state,  ti99_2_vblank_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ti99_2_state,  ti99_2_vblank_interrupt)
 
 	/* video hardware */
 	/*MCFG_TMS9928A( &tms9918_interface )*/

@@ -365,9 +365,9 @@ void gcpinbal_state::machine_reset()
 MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(gcpinbal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(gcpinbal_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -396,11 +396,11 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 
 	MCFG_ES8712_ADD("essnd", 0)
 	MCFG_ES8712_RESET_HANDLER(INPUTLINE("maincpu", 3))
-	MCFG_ES8712_MSM_WRITE_CALLBACK(DEVWRITE8("msm", msm6585_device, data_w))
+	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm6585_device, data_w))
 	MCFG_ES8712_MSM_TAG("msm")
 
-	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL)
-	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("essnd", es8712_device, msm_int))
+	MCFG_DEVICE_ADD("msm", MSM6585, 640_kHz_XTAL)
+	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* 16 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

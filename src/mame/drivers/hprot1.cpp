@@ -243,12 +243,12 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 
 MACHINE_CONFIG_START(hprot1_state::hprot1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("inputs"))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(hprot1_state, henry_p1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(hprot1_state, henry_p3_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, hprot1_state, henry_p1_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, hprot1_state, henry_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -275,13 +275,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hprot1_state::hprotr8a)
 	hprot1(config);
-	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip)
@@ -292,13 +292,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hprot1_state::hprot2r6)
 	hprot1(config);
-	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip) */

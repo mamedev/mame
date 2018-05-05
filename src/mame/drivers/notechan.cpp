@@ -500,10 +500,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(notechan_state::notechan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // unknown...
-	MCFG_CPU_PROGRAM_MAP(notechan_map)
-	MCFG_CPU_IO_MAP(notechan_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(driver_device, irq0_line_hold, 60)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)  // unknown...
+	MCFG_DEVICE_PROGRAM_MAP(notechan_map)
+	MCFG_DEVICE_IO_MAP(notechan_port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device, irq0_line_hold, 60)
 
 	/* NO VIDEO */
 

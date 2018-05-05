@@ -437,13 +437,13 @@ void mcatadv_state::machine_start()
 MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mcatadv_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcatadv_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mcatadv_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mcatadv_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mcatadv_sound_map)
-	MCFG_CPU_IO_MAP(mcatadv_sound_io_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(mcatadv_sound_map)
+	MCFG_DEVICE_IO_MAP(mcatadv_sound_io_map)
 
 
 	/* video hardware */
@@ -453,7 +453,7 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcatadv_state, screen_update_mcatadv)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mcatadv_state, screen_vblank_mcatadv))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mcatadv_state, screen_vblank_mcatadv))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcatadv)
@@ -472,7 +472,7 @@ MACHINE_CONFIG_START(mcatadv_state::mcatadv)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.32)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
@@ -482,11 +482,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mcatadv_state::nost)
 	mcatadv(config);
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(nost_sound_map)
-	MCFG_CPU_IO_MAP(nost_sound_io_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(nost_sound_map)
+	MCFG_DEVICE_IO_MAP(nost_sound_io_map)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_REPLACE("ymsnd", YM2610, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.2)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)

@@ -107,8 +107,8 @@ AC RETURNS (pins 3,4) - adaptor. A total of 6W may be drawn from these lines as 
 
 #define MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(_def_slot) \
 	MCFG_ELECTRON_EXPANSION_SLOT_ADD(ELECTRON_EXPANSION_SLOT_TAG, electron_expansion_devices, _def_slot, false) \
-	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, irq_w)) \
-	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, nmi_w))
+	MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, irq_w)) \
+	MCFG_ELECTRON_EXPANSION_SLOT_NMI_HANDLER(WRITELINE(DEVICE_SELF_OWNER, electron_expansion_slot_device, nmi_w))
 
 #define MCFG_ELECTRON_EXPANSION_SLOT_IRQ_HANDLER(_devcb) \
 	devcb = &downcast<electron_expansion_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);

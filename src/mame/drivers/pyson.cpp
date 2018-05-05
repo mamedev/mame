@@ -197,10 +197,10 @@ static INPUT_PORTS_START( pyson )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pyson_state::pyson)
-	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // imported from namcops2.c driver
+	MCFG_DEVICE_ADD("maincpu", R5000LE, 294000000) // imported from namcops2.c driver
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_CPU_PROGRAM_MAP(ps2_map)
+	MCFG_DEVICE_PROGRAM_MAP(ps2_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

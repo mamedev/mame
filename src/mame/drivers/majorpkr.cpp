@@ -996,10 +996,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
-	MCFG_CPU_PROGRAM_MAP(map)
-	MCFG_CPU_IO_MAP(portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", majorpkr_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
+	MCFG_DEVICE_PROGRAM_MAP(map)
+	MCFG_DEVICE_IO_MAP(portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", majorpkr_state, irq0_line_hold)
 
 	MCFG_DEVICE_ADD("palette_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(palettebanks)

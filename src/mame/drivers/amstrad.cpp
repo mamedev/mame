@@ -909,10 +909,10 @@ void amstrad_centronics_devices(device_slot_interface &device)
 
 MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	/* Machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
-	MCFG_CPU_IO_MAP(amstrad_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
+	MCFG_DEVICE_PROGRAM_MAP(amstrad_mem)
+	MCFG_DEVICE_IO_MAP(amstrad_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -920,16 +920,16 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, amstrad )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amstrad_state, amstrad_ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amstrad_state, amstrad_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amstrad_state, amstrad_ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(amstrad_state, amstrad_ppi_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amstrad_state, amstrad_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, amstrad_state, amstrad_ppi_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amstrad_state, amstrad_ppi_portc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( XTAL(16'000'000), 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(amstrad_state, screen_vblank_amstrad))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, amstrad_state, screen_vblank_amstrad))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -939,10 +939,10 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_MC6845_ADD("mc6845", HD6845, nullptr, XTAL(16'000'000) / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_de_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(amstrad_state, amstrad_hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amstrad_state, amstrad_vsync_changed))
-	MCFG_MC6845_OUT_CUR_CB(DEVWRITELINE("exp", cpc_expansion_slot_device, cursor_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, amstrad_state, amstrad_de_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_vsync_changed))
+	MCFG_MC6845_OUT_CUR_CB(WRITELINE("exp", cpc_expansion_slot_device, cursor_w))
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
@@ -950,13 +950,13 @@ MACHINE_CONFIG_START(amstrad_state::amstrad_base)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay", AY8912, XTAL(16'000'000) / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
+	MCFG_DEVICE_ADD("ay", AY8912, XTAL(16'000'000) / 16)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", amstrad_centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amstrad_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amstrad_state, write_centronics_busy))
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
@@ -976,8 +976,8 @@ MACHINE_CONFIG_START(amstrad_state::cpc464)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc464_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(amstrad_state,rom_select))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -996,8 +996,8 @@ MACHINE_CONFIG_START(amstrad_state::cpc664)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(amstrad_state,rom_select))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1016,8 +1016,8 @@ MACHINE_CONFIG_START(amstrad_state::cpc6128)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(amstrad_state,rom_select))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1038,10 +1038,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	/* Machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(40'000'000) / 10)
-	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
-	MCFG_CPU_IO_MAP(amstrad_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(40'000'000) / 10)
+	MCFG_DEVICE_PROGRAM_MAP(amstrad_mem)
+	MCFG_DEVICE_IO_MAP(amstrad_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1049,16 +1049,16 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, plus )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amstrad_state, amstrad_ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amstrad_state, amstrad_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amstrad_state, amstrad_ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(amstrad_state, amstrad_ppi_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amstrad_state, amstrad_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, amstrad_state, amstrad_ppi_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amstrad_state, amstrad_ppi_portc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( ( XTAL(40'000'000) * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(amstrad_state, screen_vblank_amstrad))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, amstrad_state, screen_vblank_amstrad))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1068,9 +1068,9 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, XTAL(40'000'000) / 40)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_plus_de_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(amstrad_state, amstrad_plus_hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amstrad_state, amstrad_plus_vsync_changed))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, amstrad_state, amstrad_plus_de_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_vsync_changed))
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
@@ -1078,13 +1078,13 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay", AY8912, XTAL(40'000'000) / 40)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
+	MCFG_DEVICE_ADD("ay", AY8912, XTAL(40'000'000) / 40)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(amstrad_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, amstrad_state, write_centronics_busy))
 
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
@@ -1105,8 +1105,8 @@ MACHINE_CONFIG_START(amstrad_state::cpcplus)
 	MCFG_DEVICE_SLOT_INTERFACE(cpcplus_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(amstrad_state,rom_select))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1117,10 +1117,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(amstrad_state::gx4000)
 	/* Machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(40'000'000) / 10)
-	MCFG_CPU_PROGRAM_MAP(amstrad_mem)
-	MCFG_CPU_IO_MAP(amstrad_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(40'000'000) / 10)
+	MCFG_DEVICE_PROGRAM_MAP(amstrad_mem)
+	MCFG_DEVICE_IO_MAP(amstrad_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(amstrad_state,amstrad_cpu_acknowledge_int)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1128,16 +1128,16 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, gx4000 )
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(amstrad_state, amstrad_ppi_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amstrad_state, amstrad_ppi_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(amstrad_state, amstrad_ppi_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(amstrad_state, amstrad_ppi_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, amstrad_state, amstrad_ppi_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amstrad_state, amstrad_ppi_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, amstrad_state, amstrad_ppi_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amstrad_state, amstrad_ppi_portc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( ( XTAL(40'000'000) * 2 ) / 5, 1024, 32, 32 + 640 + 64, 312, 56 + 15, 200 + 15 )
 	MCFG_SCREEN_UPDATE_DRIVER(amstrad_state, screen_update_amstrad)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(amstrad_state, screen_vblank_amstrad))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, amstrad_state, screen_vblank_amstrad))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1147,16 +1147,16 @@ MACHINE_CONFIG_START(amstrad_state::gx4000)
 	MCFG_MC6845_ADD("mc6845", AMS40489, nullptr, XTAL(40'000'000) / 40)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(amstrad_state, amstrad_plus_de_changed))
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(amstrad_state, amstrad_plus_hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(amstrad_state, amstrad_plus_vsync_changed))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, amstrad_state, amstrad_plus_de_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amstrad_state, amstrad_plus_vsync_changed))
 
 	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay", AY8912, XTAL(40'000'000) / 40)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
+	MCFG_DEVICE_ADD("ay", AY8912, XTAL(40'000'000) / 40)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	cpcplus_cartslot(config);
@@ -1172,8 +1172,8 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state,aleste)
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state,aleste)
 
-	MCFG_SOUND_REPLACE("ay", AY8912, XTAL(16'000'000) / 16)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(amstrad_state, amstrad_psg_porta_read)) /* portA read */
+	MCFG_DEVICE_REPLACE("ay", AY8912, XTAL(16'000'000) / 16)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, amstrad_state, amstrad_psg_porta_read)) /* portA read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_PALETTE_MODIFY("palette")
@@ -1189,8 +1189,8 @@ MACHINE_CONFIG_START(amstrad_state::aleste)
 	MCFG_DEVICE_SLOT_INTERFACE(aleste_exp_cards, nullptr, false)
 	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(INPUTLINE("maincpu", 0))
 	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(amstrad_state, cpc_romdis))  // ROMDIS
-	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(amstrad_state,rom_select))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE(*this, amstrad_state, cpc_romdis))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_ROM_SELECT(WRITE8(*this, amstrad_state,rom_select))
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", aleste_floppies, "35dd", amstrad_state::aleste_floppy_formats)

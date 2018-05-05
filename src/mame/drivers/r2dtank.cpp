@@ -441,11 +441,11 @@ INPUT_PORTS_END
  *************************************/
 
 MACHINE_CONFIG_START(r2dtank_state::r2dtank)
-	MCFG_CPU_ADD("maincpu", M6809,3000000)       /* ?? too fast ? */
-	MCFG_CPU_PROGRAM_MAP(r2dtank_main_map)
+	MCFG_DEVICE_ADD("maincpu", M6809,3000000)       /* ?? too fast ? */
+	MCFG_DEVICE_PROGRAM_MAP(r2dtank_main_map)
 
-	MCFG_CPU_ADD("audiocpu", M6802,3000000)         /* ?? */
-	MCFG_CPU_PROGRAM_MAP(r2dtank_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802,3000000)         /* ?? */
+	MCFG_DEVICE_PROGRAM_MAP(r2dtank_audio_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -460,7 +460,7 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(r2dtank_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("74123", ttl74123_device, a_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE("74123", ttl74123_device, a_w))
 
 	/* 74LS123 */
 
@@ -471,21 +471,21 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(r2dtank_state, ttl74123_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, r2dtank_state, ttl74123_output_changed))
 
 	MCFG_DEVICE_ADD("pia_main", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(r2dtank_state, flipscreen_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(r2dtank_state, main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(r2dtank_state, main_cpu_irq))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, r2dtank_state, flipscreen_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, r2dtank_state, main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, r2dtank_state, main_cpu_irq))
 
 	MCFG_DEVICE_ADD("pia_audio", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(r2dtank_state, AY8910_port_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(r2dtank_state, AY8910_port_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(r2dtank_state, AY8910_select_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(r2dtank_state, main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(r2dtank_state, main_cpu_irq))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, r2dtank_state, AY8910_port_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, r2dtank_state, AY8910_port_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, r2dtank_state, AY8910_select_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, r2dtank_state, main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, r2dtank_state, main_cpu_irq))
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -493,11 +493,11 @@ MACHINE_CONFIG_START(r2dtank_state::r2dtank)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, (4000000 / 4))
+	MCFG_DEVICE_ADD("ay1", AY8910, (4000000 / 4))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, (4000000 / 4))
+	MCFG_DEVICE_ADD("ay2", AY8910, (4000000 / 4))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWA"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

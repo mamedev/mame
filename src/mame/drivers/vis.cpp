@@ -132,13 +132,13 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 MACHINE_CONFIG_START(vis_audio_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymf262", YMF262, XTAL(14'318'181))
+	MCFG_DEVICE_ADD("ymf262", YMF262, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
-	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
@@ -886,11 +886,11 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vis_state::vis)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL(12'000'000) )
-	MCFG_CPU_PROGRAM_MAP(at16_map)
-	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(12'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP(at16_map)
+	MCFG_DEVICE_IO_MAP(at16_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(WRITELINE("mb", at_mb_device, shutdown))
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	// this doesn't have a real keyboard controller
@@ -901,11 +901,12 @@ MACHINE_CONFIG_START(vis_state::vis)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
 	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
-	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
+	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
 
-	MCFG_ISA16_SLOT_ADD("mb:isabus", "mcd", pc_isa16_cards, "mcd", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus", "visaudio", vis_cards, "visaudio", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus", "visvga", vis_cards, "visvga", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("mcd",      ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "mcd",      true)
+	MCFG_DEVICE_ADD("visaudio", ISA16_SLOT, 0, "mb:isabus", vis_cards,      "visaudio", true)
+	MCFG_DEVICE_ADD("visvga",   ISA16_SLOT, 0, "mb:isabus", vis_cards,      "visvga",   true)
 MACHINE_CONFIG_END
 
 ROM_START(vis)

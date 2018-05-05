@@ -1329,9 +1329,9 @@ void hp85_state::rombank_mem_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(hp85_state::hp85)
-	MCFG_CPU_ADD("cpu" , HP_CAPRICORN , MASTER_CLOCK / 16)
-	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)
+	MCFG_DEVICE_ADD("cpu" , HP_CAPRICORN , MASTER_CLOCK / 16)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_mem_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)
 
 	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rombank_mem_map)
@@ -1343,7 +1343,7 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_SCREEN_ADD("screen" , RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)
 	MCFG_SCREEN_UPDATE_DRIVER(hp85_state , screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp85_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp85_state, vblank_w))
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_TIMER_DRIVER_ADD("vm_timer", hp85_state, vm_timer)
 
@@ -1357,12 +1357,12 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 
 	// Beeper
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac" , DAC_1BIT , 0)
+	MCFG_DEVICE_ADD("dac" , DAC_1BIT , 0)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
 	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ADD("beeper" , BEEP , MASTER_CLOCK / 8192)
+	MCFG_DEVICE_ADD("beeper" , BEEP , MASTER_CLOCK / 8192)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
 
 	// Tape drive
@@ -1384,17 +1384,17 @@ MACHINE_CONFIG_START(hp85_state::hp85)
 
 	// I/O slots
 	MCFG_HP80_IO_SLOT_ADD("slot1" , 0)
-	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
+	MCFG_HP80_IO_IRL_CB(WRITE8(*this, hp85_state , irl_w))
+	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
 	MCFG_HP80_IO_SLOT_ADD("slot2" , 1)
-	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
+	MCFG_HP80_IO_IRL_CB(WRITE8(*this, hp85_state , irl_w))
+	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
 	MCFG_HP80_IO_SLOT_ADD("slot3" , 2)
-	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
+	MCFG_HP80_IO_IRL_CB(WRITE8(*this, hp85_state , irl_w))
+	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
 	MCFG_HP80_IO_SLOT_ADD("slot4" , 3)
-	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
+	MCFG_HP80_IO_IRL_CB(WRITE8(*this, hp85_state , irl_w))
+	MCFG_HP80_IO_HALT_CB(WRITE8(*this, hp85_state , halt_w))
 
 	// Printer output
 	MCFG_DEVICE_ADD("prt_graphic", BITBANGER, 0)

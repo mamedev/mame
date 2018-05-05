@@ -630,10 +630,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(xavix_state::xavix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",XAVIX,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(xavix_map)
+	MCFG_DEVICE_ADD("maincpu",XAVIX,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
 	MCFG_M6502_DISABLE_DIRECT()
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xavix_state, scanline_cb, "screen", 0, 1)
@@ -677,10 +677,10 @@ MACHINE_CONFIG_START(xavix_state::xavix2000)
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(xavix_map)
+	MCFG_DEVICE_ADD("maincpu",XAVIX2000,MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(xavix_map)
 	MCFG_M6502_DISABLE_DIRECT()
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", xavix_state,  interrupt)
 	MCFG_XAVIX_VECTOR_CALLBACK(xavix_state, get_vectors)
 
 MACHINE_CONFIG_END

@@ -776,14 +776,14 @@ void witch_state::machine_reset()
 
 MACHINE_CONFIG_START(witch_state::witch)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(map_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(map_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
 
 	/* 2nd z80 */
-	MCFG_CPU_ADD("sub", Z80, CPU_CLOCK)    /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(map_sub)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("sub", Z80, CPU_CLOCK)    /* 3 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(map_sub)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -793,14 +793,14 @@ MACHINE_CONFIG_START(witch_state::witch)
 
 	// 82C255 (actual chip on PCB) is equivalent to two 8255s
 	MCFG_DEVICE_ADD("ppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(witch_state, read_a000))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, witch_state, read_a000))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("UNK"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(witch_state, write_a002))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, witch_state, write_a002))
 
 	MCFG_DEVICE_ADD("ppi2", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("A004"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("A005"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(witch_state, write_a006))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, witch_state, write_a006))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -819,22 +819,22 @@ MACHINE_CONFIG_START(witch_state::witch)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_MSM_WRITE_CALLBACK(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm5205_device, data_w))
 	MCFG_ES8712_MSM_TAG("msm")
 
-	MCFG_SOUND_ADD("msm", MSM5205, MSM5202_CLOCK)   /* actually MSM5202 */
-	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("essnd", es8712_device, msm_int))
+	MCFG_DEVICE_ADD("msm", MSM5205, MSM5202_CLOCK)   /* actually MSM5202 */
+	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S48_4B)         /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym1", YM2203, YM2203_CLOCK)     /* 3 MHz */
+	MCFG_DEVICE_ADD("ym1", YM2203, YM2203_CLOCK)     /* 3 MHz */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM_PortA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM_PortB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("ym2", YM2203, YM2203_CLOCK)     /* 3 MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(witch_state, xscroll_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(witch_state, yscroll_w))
+	MCFG_DEVICE_ADD("ym2", YM2203, YM2203_CLOCK)     /* 3 MHz */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, witch_state, xscroll_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, witch_state, yscroll_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 MACHINE_CONFIG_END

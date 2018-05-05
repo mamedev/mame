@@ -649,9 +649,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(asteroid_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt, CLOCK_3KHZ/12)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(asteroid_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(asteroid_state, asteroid_interrupt, CLOCK_3KHZ/12)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -662,10 +662,10 @@ MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 	MCFG_OUTPUT_LATCH_BIT1_HANDLER(OUTPUT("led0")) MCFG_DEVCB_INVERT // 1 PLYR START LAMP
 	MCFG_OUTPUT_LATCH_BIT2_HANDLER(MEMBANK("ram1")) // RAMSEL
 	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(asteroid_state, cocktail_inv_w))
-	MCFG_OUTPUT_LATCH_BIT3_HANDLER(WRITELINE(asteroid_state, coin_counter_left_w)) // COIN CNTRL
-	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(asteroid_state, coin_counter_center_w)) // COIN CNTRC
-	MCFG_OUTPUT_LATCH_BIT5_HANDLER(WRITELINE(asteroid_state, coin_counter_right_w)) // COIN CNTRR
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, asteroid_state, cocktail_inv_w))
+	MCFG_OUTPUT_LATCH_BIT3_HANDLER(WRITELINE(*this, asteroid_state, coin_counter_left_w)) // COIN CNTRL
+	MCFG_OUTPUT_LATCH_BIT4_HANDLER(WRITELINE(*this, asteroid_state, coin_counter_center_w)) // COIN CNTRC
+	MCFG_OUTPUT_LATCH_BIT5_HANDLER(WRITELINE(*this, asteroid_state, coin_counter_right_w)) // COIN CNTRR
 
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
@@ -690,8 +690,8 @@ MACHINE_CONFIG_START(asteroid_state::asterock)
 	asteroid(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, asterock_interrupt, CLOCK_3KHZ/12)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(asteroid_state, asterock_interrupt, CLOCK_3KHZ/12)
 MACHINE_CONFIG_END
 
 
@@ -699,15 +699,15 @@ MACHINE_CONFIG_START(asteroid_state::astdelux)
 	asteroid_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(astdelux_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(astdelux_map)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* sound hardware */
 	astdelux_sound(config);
 
-	MCFG_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -718,10 +718,10 @@ MACHINE_CONFIG_START(asteroid_state::astdelux)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START2
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("ram1")) // RAMSEL
 	MCFG_DEVCB_CHAIN_OUTPUT(MEMBANK("ram2"))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(asteroid_state, cocktail_inv_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(asteroid_state, coin_counter_left_w)) // LEFT COIN
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(asteroid_state, coin_counter_center_w)) // CENTER COIN
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(asteroid_state, coin_counter_right_w)) // RIGHT COIN
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, asteroid_state, cocktail_inv_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, asteroid_state, coin_counter_left_w)) // LEFT COIN
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, asteroid_state, coin_counter_center_w)) // CENTER COIN
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, asteroid_state, coin_counter_right_w)) // RIGHT COIN
 MACHINE_CONFIG_END
 
 
@@ -729,9 +729,9 @@ MACHINE_CONFIG_START(asteroid_state::llander)
 	asteroid_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(llander_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  MASTER_CLOCK/4096/12)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(llander_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(asteroid_state, llander_interrupt,  MASTER_CLOCK/4096/12)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(CLOCK_3KHZ/12/6)

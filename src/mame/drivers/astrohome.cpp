@@ -199,9 +199,9 @@ static void astrocade_exp(device_slot_interface &device)
 
 MACHINE_CONFIG_START(astrocde_mess_state::astrocde)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
-	MCFG_CPU_PROGRAM_MAP(astrocade_mem)
-	MCFG_CPU_IO_MAP(astrocade_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)        /* 1.789 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(astrocade_mem)
+	MCFG_DEVICE_IO_MAP(astrocade_io)
 
 	MCFG_MACHINE_START_OVERRIDE(astrocde_mess_state, astrocde)
 
@@ -216,7 +216,7 @@ MACHINE_CONFIG_START(astrocde_mess_state::astrocde)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
+	MCFG_DEVICE_ADD("astrocade1", ASTROCADE, ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* expansion port */

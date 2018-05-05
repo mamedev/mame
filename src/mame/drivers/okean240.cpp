@@ -505,34 +505,34 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(okean240_state::okean240t)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(12'000'000) / 6)
-	MCFG_CPU_PROGRAM_MAP(okean240_mem)
-	MCFG_CPU_IO_MAP(okean240t_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(12'000'000) / 6)
+	MCFG_DEVICE_PROGRAM_MAP(okean240_mem)
+	MCFG_DEVICE_IO_MAP(okean240t_io)
 
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 
 	MCFG_DEVICE_ADD("ppikbd", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(okean240_state, okean240_port40_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(okean240_state, okean240_port41_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(okean240_state, okean240_port42_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, okean240_state, okean240_port40_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, okean240_state, okean240_port41_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, okean240_state, okean240_port42_w))
 
 	MCFG_DEVICE_ADD("ppic", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(okean240_state, scroll_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, okean240_state, scroll_w))
 
 	MCFG_DEVICE_ADD("ppie", I8255, 0)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK1(3072000) // artificial rate
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("pic", PIC8259, 0)
 
@@ -550,19 +550,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(okean240_state::okean240a)
 	okean240t(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(okean240a_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(okean240a_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240a)
 	MCFG_DEVICE_REMOVE("rs232")
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
 
 	MCFG_DEVICE_MODIFY("ppikbd")
-	MCFG_I8255_IN_PORTA_CB(READ8(okean240_state, okean240a_port40_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(okean240_state, okean240a_port41_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(okean240_state, okean240a_port42_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, okean240_state, okean240a_port40_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, okean240_state, okean240a_port41_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, okean240_state, okean240a_port42_r))
 
 	MCFG_DEVICE_MODIFY("pit")
 	MCFG_PIT8253_CLK1(1536000) // artificial rate
@@ -570,8 +570,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(okean240_state::okean240)
 	okean240t(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(okean240_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(okean240_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)
 	MCFG_DEVICE_REMOVE("uart")
 	MCFG_DEVICE_REMOVE("rs232")

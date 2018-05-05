@@ -52,9 +52,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(astropc_state::astropc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 40000000 ) // ??
-	MCFG_CPU_PROGRAM_MAP(astropc_map)
-	MCFG_CPU_IO_MAP(astropc_io)
+	MCFG_DEVICE_ADD("maincpu", I486, 40000000 ) // ??
+	MCFG_DEVICE_PROGRAM_MAP(astropc_map)
+	MCFG_DEVICE_IO_MAP(astropc_io)
 MACHINE_CONFIG_END
 
 

@@ -1000,8 +1000,8 @@ void tek4052_state::machine_start()
 
 MACHINE_CONFIG_START(tek4051_state::tek4051)
 	// basic machine hardware
-	MCFG_CPU_ADD(MC6800_TAG, M6800, XTAL(12'500'000)/15)
-	MCFG_CPU_PROGRAM_MAP(tek4051_mem)
+	MCFG_DEVICE_ADD(MC6800_TAG, M6800, XTAL(12'500'000)/15)
+	MCFG_DEVICE_PROGRAM_MAP(tek4051_mem)
 
 	// video hardware
 	MCFG_VECTOR_ADD("vector")
@@ -1016,79 +1016,79 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", tek4051_state, keyboard_tick, attotime::from_hz(XTAL(12'500'000)/15/4))
 
 	MCFG_DEVICE_ADD(MC6820_X_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tek4051_state, x_pia_pa_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, x_pia_pa_r))
 	// CB1 viewcause
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, x_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, x_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(tek4051_state, adot_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(tek4051_state, bufclk_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, x_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, x_pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, x_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, x_pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, adot_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, tek4051_state, bufclk_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, x_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, x_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_Y_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tek4051_state, sa_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, sa_r))
 	// CA1 rdbyte
 	// CB1 mdata
 	// CB2 fmark
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, y_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, sb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(tek4051_state, sot_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, y_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, y_pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, y_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, sb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, sot_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, y_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, y_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_KB_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tek4051_state, kb_pia_pa_r))
-	MCFG_PIA_READPB_HANDLER(READ8(tek4051_state, kb_pia_pb_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, kb_pia_pa_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, kb_pia_pb_r))
 	// CA1 key
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, kb_pia_pb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(tek4051_state, kb_halt_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, kb_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, kb_pia_irqb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, kb_pia_pb_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, tek4051_state, kb_halt_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, kb_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, kb_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_TAPE_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tek4051_state, tape_pia_pa_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tek4051_state, tape_pia_pa_r))
 	// CA1 rmark
 	// CB1 lohole
 	// CA2 filfnd
 	// CB2 uphole
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, tape_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, tape_pia_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, tape_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, tape_pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, tape_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, tape_pia_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, tape_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, tape_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_GPIB_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(DEVREAD8(IEEE488_TAG, ieee488_device, dio_r))
-	MCFG_PIA_READPB_HANDLER(READ8(tek4051_state, gpib_pia_pb_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, dio_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, gpib_pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(tek4051_state, talk_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, gpib_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, gpib_pia_irqb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(IEEE488_TAG, ieee488_device, dio_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, gpib_pia_pb_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, dio_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, gpib_pia_pb_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, tek4051_state, talk_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, gpib_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, gpib_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6820_COM_TAG, PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(tek4051_state, com_pia_pb_r))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, tek4051_state, com_pia_pb_r))
 	//CA1 - SRX (RS-232 pin 12)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tek4051_state, com_pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tek4051_state, com_pia_pb_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(tek4051_state, com_pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(tek4051_state, com_pia_irqb_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tek4051_state, com_pia_pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tek4051_state, com_pia_pb_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, tek4051_state, com_pia_irqa_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, tek4051_state, com_pia_irqb_w))
 
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(tek4051_state, acia_irq_w))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, tek4051_state, acia_irq_w))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 38400)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(tek4051_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, tek4051_state, write_acia_clock))
 
 	MCFG_IEEE488_BUS_ADD()
-	MCFG_IEEE488_EOI_CALLBACK(DEVWRITELINE(MC6820_GPIB_TAG, pia6821_device, ca1_w))
-	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(MC6820_GPIB_TAG, pia6821_device, cb1_w))
+	MCFG_IEEE488_EOI_CALLBACK(WRITELINE(MC6820_GPIB_TAG, pia6821_device, ca1_w))
+	MCFG_IEEE488_SRQ_CALLBACK(WRITELINE(MC6820_GPIB_TAG, pia6821_device, cb1_w))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1107,8 +1107,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tek4052_state::tek4052)
 	// basic machine hardware
-	MCFG_CPU_ADD(AM2901A_TAG, M6800, 1000000) // should be 4x AM2901A + AM2911
-	MCFG_CPU_PROGRAM_MAP(tek4052_mem)
+	MCFG_DEVICE_ADD(AM2901A_TAG, M6800, 1000000) // should be 4x AM2901A + AM2911
+	MCFG_DEVICE_PROGRAM_MAP(tek4052_mem)
 
 	// video hardware
 	MCFG_VECTOR_ADD("vector")
@@ -1123,7 +1123,7 @@ MACHINE_CONFIG_START(tek4052_state::tek4052)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// internal ram

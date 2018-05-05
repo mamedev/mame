@@ -107,8 +107,8 @@ void acvirus_state::virus_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(acvirus_state::virus)
-	MCFG_CPU_ADD("maincpu", I8052, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(virus_map)
+	MCFG_DEVICE_ADD("maincpu", I8052, XTAL(12'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(virus_map)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_CONFIG_END

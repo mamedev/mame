@@ -595,8 +595,8 @@ static void apple1_cards(device_slot_interface &device)
 }
 
 MACHINE_CONFIG_START(apple1_state::apple1)
-	MCFG_CPU_ADD(A1_CPU_TAG, M6502, 960000)        // effective CPU speed
-	MCFG_CPU_PROGRAM_MAP(apple1_map)
+	MCFG_DEVICE_ADD(A1_CPU_TAG, M6502, 960000)        // effective CPU speed
+	MCFG_DEVICE_PROGRAM_MAP(apple1_map)
 
 	// video timings are identical to the Apple II, unsurprisingly
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -607,9 +607,9 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD( A1_PIA_TAG, PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(apple1_state, pia_keyboard_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(apple1_state, pia_display_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(apple1_state, pia_display_gate_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, apple1_state, pia_keyboard_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, apple1_state, pia_display_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, apple1_state, pia_display_gate_w))
 
 	MCFG_DEVICE_ADD(A1_BUS_TAG, A1BUS, 0)
 	MCFG_A1BUS_CPU("maincpu")

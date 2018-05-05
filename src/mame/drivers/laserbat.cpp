@@ -466,11 +466,11 @@ void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int
 MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 
 	// basic machine hardware
-	MCFG_CPU_ADD(m_maincpu, S2650, XTAL(14'318'181)/4)
-	MCFG_CPU_PROGRAM_MAP(laserbat_map)
-	MCFG_CPU_IO_MAP(laserbat_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE(m_screen, screen_device, vblank))
+	MCFG_DEVICE_ADD(m_maincpu, S2650, XTAL(14'318'181)/4)
+	MCFG_DEVICE_PROGRAM_MAP(laserbat_map)
+	MCFG_DEVICE_IO_MAP(laserbat_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE(m_screen, screen_device, vblank))
 
 	// video hardware
 	MCFG_SCREEN_ADD(m_screen, RASTER)
@@ -506,7 +506,7 @@ MACHINE_CONFIG_START(laserbat_state::laserbat)
 	// sound board devices
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD(m_csg, SN76477, 0) // audio output not used
+	MCFG_DEVICE_ADD(m_csg, SN76477) // audio output not used
 	MCFG_SN76477_NOISE_PARAMS(RES_K(47), RES_K(270), CAP_P(1000)) // R21, switchable R30/R23/R24/R25/R29/R28/R27/R26, C21
 	MCFG_SN76477_DECAY_RES(RES_INF)                 // NC
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_INF)          // NC, NC
@@ -538,7 +538,7 @@ MACHINE_CONFIG_START(catnmous_state::catnmous)
 
 	// sound board devices
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD(m_audiopcb, ZACCARIA_1B11107, 0)
+	MCFG_DEVICE_ADD(m_audiopcb, ZACCARIA_1B11107)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 MACHINE_CONFIG_END

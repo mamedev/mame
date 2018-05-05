@@ -147,10 +147,10 @@ void mod8_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(mod8_state::mod8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8008, 800000)
-	MCFG_CPU_PROGRAM_MAP(mod8_mem)
-	MCFG_CPU_IO_MAP(mod8_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",I8008, 800000)
+	MCFG_DEVICE_PROGRAM_MAP(mod8_mem)
+	MCFG_DEVICE_IO_MAP(mod8_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mod8_state,mod8_irq_callback)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TELEPRINTER_TAG, TELEPRINTER, 0)

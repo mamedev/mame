@@ -74,17 +74,17 @@ void dynamoah_state::i8031_ext_mem(address_map &map)
 }
 
 MACHINE_CONFIG_START(dynamoah_state::dynamoah)
-	MCFG_CPU_ADD("maincpu", I80C31, 6'144'000) // SC80C31BCCN40
+	MCFG_DEVICE_ADD("maincpu", I80C31, 6'144'000) // SC80C31BCCN40
 	// clock needs verification, being the XTAL value from a different board
-	MCFG_CPU_PROGRAM_MAP(i8031_mem)
-	MCFG_CPU_IO_MAP(i8031_ext_mem)
-	MCFG_MCS51_PORT_P1_IN_CB(DEVREADLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVICE_PROGRAM_MAP(i8031_mem)
+	MCFG_DEVICE_IO_MAP(i8031_ext_mem)
+	MCFG_MCS51_PORT_P1_IN_CB(READLINE("eeprom", eeprom_serial_93cxx_device, do_read)) MCFG_DEVCB_BIT(7)
 	MCFG_DEVCB_CHAIN_INPUT(CONSTANT(0x7f))
-	MCFG_MCS51_PORT_P1_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITE8(dynamoah_state, p1_w)) MCFG_DEVCB_MASK(0x1f)
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(dynamoah_state, p3_w))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(7)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write)) MCFG_DEVCB_BIT(6)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITE8(*this, dynamoah_state, p1_w)) MCFG_DEVCB_MASK(0x1f)
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, dynamoah_state, p3_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END

@@ -84,8 +84,8 @@ isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, const char
 
 MACHINE_CONFIG_START(isa8_fdc_xt_device::device_add_mconfig)
 	MCFG_PC_FDC_XT_ADD("fdc")
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_dd_floppies, "525dd", isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -97,8 +97,8 @@ isa8_fdc_at_device::isa8_fdc_at_device(const machine_config &mconfig, const char
 
 MACHINE_CONFIG_START(isa8_fdc_at_device::device_add_mconfig)
 	MCFG_PC_FDC_AT_ADD("fdc")
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
+	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
+	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -109,8 +109,8 @@ isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const ch
 
 MACHINE_CONFIG_START(isa8_fdc_smc_device::device_add_mconfig)
 	MCFG_SMC37C78_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -121,8 +121,8 @@ isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const ch
 
 MACHINE_CONFIG_START(isa8_fdc_ps2_device::device_add_mconfig)
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -133,8 +133,8 @@ isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, 
 
 MACHINE_CONFIG_START(isa8_fdc_superio_device::device_add_mconfig)
 	MCFG_PC_FDC_SUPERIO_ADD("fdc")
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isa8_fdc_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(isa8_fdc_device, drq_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, isa8_fdc_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END

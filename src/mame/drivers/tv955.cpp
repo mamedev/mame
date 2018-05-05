@@ -83,13 +83,13 @@ static INPUT_PORTS_START( tv955 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tv955_state::tv955)
-	MCFG_CPU_ADD("maincpu", M65C02, 19.3396_MHz_XTAL / 9)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, 19.3396_MHz_XTAL / 9)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", m6502_device::IRQ_LINE))
 
-	MCFG_CPU_ADD("keyboard", I8049, 5.7143_MHz_XTAL)
+	MCFG_DEVICE_ADD("keyboard", I8049, 5.7143_MHz_XTAL)
 
 	MCFG_NVRAM_ADD_0FILL("nvram") // HM6116LP-4 + 3.2V battery
 
@@ -108,15 +108,15 @@ MACHINE_CONFIG_START(tv955_state::tv955)
 
 	MCFG_DEVICE_ADD("hostuart", MOS6551, 0)
 	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL)
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("printuart", MOS6551, 0)
 	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2)
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("keybuart", MOS6551, 0)
 	MCFG_MOS6551_XTAL(3.6864_MHz_XTAL / 2)
-	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<2>))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE("mainirq", input_merger_device, in_w<2>))
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

@@ -357,8 +357,8 @@ void konamigv_state::cdrom_config(device_t *device)
 
 MACHINE_CONFIG_START(konamigv_state::konamigv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( konamigv_map )
+	MCFG_DEVICE_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( konamigv_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -375,7 +375,7 @@ MACHINE_CONFIG_START(konamigv_state::konamigv)
 
 	MCFG_DEVICE_ADD("am53cf96", AM53CF96, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
+	MCFG_AM53CF96_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin10))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL(53'693'175) )
@@ -508,8 +508,8 @@ WRITE16_MEMBER(simpbowl_state::flash_w)
 
 MACHINE_CONFIG_START(simpbowl_state::simpbowl)
 	konamigv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( simpbowl_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( simpbowl_map )
 
 	MCFG_FUJITSU_29F016A_ADD("flash0")
 	MCFG_FUJITSU_29F016A_ADD("flash1")
@@ -548,8 +548,8 @@ WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 
 MACHINE_CONFIG_START(konamigv_state::btchamp)
 	konamigv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( btchamp_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( btchamp_map )
 
 	MCFG_SHARP_LH28F400_ADD("flash")
 
@@ -606,8 +606,8 @@ WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
 
 MACHINE_CONFIG_START(konamigv_state::tmosh)
 	konamigv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( tmosh_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( tmosh_map )
 MACHINE_CONFIG_END
 
 /*
@@ -622,8 +622,8 @@ CD:
 
 MACHINE_CONFIG_START(konamigv_state::kdeadeye)
 	konamigv(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( kdeadeye_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( kdeadeye_map )
 
 	MCFG_SHARP_LH28F400_ADD("flash")
 MACHINE_CONFIG_END

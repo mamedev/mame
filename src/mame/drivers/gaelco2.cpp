@@ -179,9 +179,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(26'000'000) / 2)     /* 13 MHz? */
-	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(26'000'000) / 2)     /* 13 MHz? */
+	MCFG_DEVICE_PROGRAM_MAP(maniacsq_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -192,7 +192,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
@@ -606,9 +606,9 @@ ROM_END
 
 MACHINE_CONFIG_START(gaelco2_state::play2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200))     /* or from the 34MHz? (34MHz drives the CG-1V-149 PLD?) */
-	MCFG_CPU_PROGRAM_MAP(play2000_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(11'059'200))     /* or from the 34MHz? (34MHz drives the CG-1V-149 PLD?) */
+	MCFG_DEVICE_PROGRAM_MAP(play2000_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	// MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(11'059'200)) /* 11.0592MHz */
 	// MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
@@ -622,7 +622,7 @@ MACHINE_CONFIG_START(gaelco2_state::play2000)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
@@ -704,18 +704,18 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bang_state::bang)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 2) /* 15 MHz */
-	MCFG_CPU_PROGRAM_MAP(bang_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'000'000) / 2) /* 15 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(bang_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bang_state, bang_irq, "screen", 0, 1)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -726,7 +726,7 @@ MACHINE_CONFIG_START(bang_state::bang)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0200000)
@@ -950,9 +950,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(alighunt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(alighunt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -963,7 +963,7 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
@@ -1248,15 +1248,15 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000) / 2)         /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(touchgo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000) / 2)         /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(touchgo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC6
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco2_state, coin3_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(gaelco2_state, coin4_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco2_state, coin3_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gaelco2_state, coin4_counter_w))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1278,7 +1278,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2_dual)
@@ -1551,18 +1551,18 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 2)         /* 15 MHz */
-	MCFG_CPU_PROGRAM_MAP(snowboar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'000'000) / 2)         /* 15 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(snowboar_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1573,7 +1573,7 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0400000)
@@ -1593,18 +1593,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz - see PCB layout above with ROM set */
-	MCFG_CPU_PROGRAM_MAP(snowboar_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz - see PCB layout above with ROM set */
+	MCFG_DEVICE_PROGRAM_MAP(snowboar_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1615,7 +1615,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	MCFG_SCREEN_SIZE(64*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
@@ -1838,18 +1838,18 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(wrally2_state::wrally2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(26'000'000) / 2) /* 13 MHz */
-	MCFG_CPU_PROGRAM_MAP(wrally2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(26'000'000) / 2) /* 13 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(wrally2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
 	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(26'000'000) / 2) /* 13 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_clk))                             /* ADCs clock-in line */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wrally2_state, wrally2_adc_clk))                             /* ADCs clock-in line */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wrally2_state, wrally2_adc_cs))                              /* ADCs chip select line */
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -1871,7 +1871,7 @@ MACHINE_CONFIG_START(wrally2_state::wrally2)
 	MCFG_SCREEN_SIZE(384, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 16, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 

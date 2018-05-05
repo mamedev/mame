@@ -522,21 +522,21 @@ INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
 MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(kyugo_main_map)
-	MCFG_CPU_IO_MAP(kyugo_main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kyugo_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(kyugo_main_map)
+	MCFG_DEVICE_IO_MAP(kyugo_main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kyugo_state,  vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(gyrodine_sub_map)
-	MCFG_CPU_IO_MAP(gyrodine_sub_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kyugo_state, irq0_line_hold, 4*60)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(gyrodine_sub_map)
+	MCFG_DEVICE_IO_MAP(gyrodine_sub_portmap)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kyugo_state, irq0_line_hold, 4*60)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kyugo_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kyugo_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, kyugo_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, kyugo_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	/* video hardware */
@@ -554,12 +554,12 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -567,44 +567,44 @@ MACHINE_CONFIG_START(kyugo_state::gyrodine)
 	kyugo_base(config);
 	/* add watchdog */
 	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gyrodine_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gyrodine_main_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kyugo_state::repulse)
 	kyugo_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(repulse_sub_map)
-	MCFG_CPU_IO_MAP(repulse_sub_portmap)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(repulse_sub_map)
+	MCFG_DEVICE_IO_MAP(repulse_sub_portmap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kyugo_state::srdmissn)
 	kyugo_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(srdmissn_sub_map)
-	MCFG_CPU_IO_MAP(srdmissn_sub_portmap)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(srdmissn_sub_map)
+	MCFG_DEVICE_IO_MAP(srdmissn_sub_portmap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kyugo_state::flashgala)
 	kyugo_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(flashgala_sub_map)
-	MCFG_CPU_IO_MAP(flashgala_sub_portmap)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(flashgala_sub_map)
+	MCFG_DEVICE_IO_MAP(flashgala_sub_portmap)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(kyugo_state::legend)
 	kyugo_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(legend_sub_map)
-	MCFG_CPU_IO_MAP(srdmissn_sub_portmap)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(legend_sub_map)
+	MCFG_DEVICE_IO_MAP(srdmissn_sub_portmap)
 MACHINE_CONFIG_END
 
 

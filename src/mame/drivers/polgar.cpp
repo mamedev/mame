@@ -482,9 +482,9 @@ void mephisto_academy_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(mephisto_polgar_state::polgar)
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'915'200))
-	MCFG_CPU_PROGRAM_MAP(polgar_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_polgar_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
+	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'915'200))
+	MCFG_DEVICE_PROGRAM_MAP(polgar_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_polgar_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -495,17 +495,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_polgar_state::polgar10)
 	polgar(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL(10'000'000) )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK( XTAL(10'000'000) )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_risc_state::mrisc)
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL(10'000'000) / 4)     // G65SC02
-	MCFG_CPU_PROGRAM_MAP(mrisc_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_risc_state, irq0_line_hold, XTAL(10'000'000) / (1 << 14))
+	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(10'000'000) / 4)     // G65SC02
+	MCFG_DEVICE_PROGRAM_MAP(mrisc_mem)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(mephisto_risc_state, irq0_line_hold, XTAL(10'000'000) / (1 << 14))
 
-	MCFG_CPU_ADD("subcpu", ARM, XTAL(14'000'000))             // VY86C010
-	MCFG_CPU_PROGRAM_MAP(mrisc_arm_mem)
+	MCFG_DEVICE_ADD("subcpu", ARM, XTAL(14'000'000))             // VY86C010
+	MCFG_DEVICE_PROGRAM_MAP(mrisc_arm_mem)
 	MCFG_ARM_COPRO(VL86C020)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -522,8 +522,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_milano_state::milano)
 	polgar(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(milano_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(milano_mem)
 
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
@@ -533,18 +533,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_academy_state::academy)
 	polgar(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(academy_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(academy_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_academy)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_modena_state::modena)
 	polgar(config);
-	MCFG_CPU_MODIFY("maincpu")          // W65C02SP
-	MCFG_CPU_CLOCK(XTAL(4'194'304))
-	MCFG_CPU_PROGRAM_MAP(modena_mem)
-	MCFG_CPU_PERIODIC_INT_REMOVE()
+	MCFG_DEVICE_MODIFY("maincpu")          // W65C02SP
+	MCFG_DEVICE_CLOCK(XTAL(4'194'304))
+	MCFG_DEVICE_PROGRAM_MAP(modena_mem)
+	MCFG_DEVICE_PERIODIC_INT_REMOVE()
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_on", mephisto_modena_state, nmi_on, attotime::from_hz(XTAL(4'194'304) / (1 << 13)))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(4'194'304) / (1 << 13)) - attotime::from_usec(975))  // active for 975us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_off", mephisto_modena_state, nmi_off, attotime::from_hz(XTAL(4'194'304) / (1 << 13)))
@@ -557,7 +557,7 @@ MACHINE_CONFIG_START(mephisto_modena_state::modena)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

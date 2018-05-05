@@ -410,9 +410,9 @@ void cmmb_state::machine_reset()
 MACHINE_CONFIG_START(cmmb_state::cmmb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, MAIN_CLOCK/5) // Unknown clock, but chip rated for 14MHz
-	MCFG_CPU_PROGRAM_MAP(cmmb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cmmb_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", M65SC02, MAIN_CLOCK/5) // Unknown clock, but chip rated for 14MHz
+	MCFG_DEVICE_PROGRAM_MAP(cmmb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cmmb_state, vblank_irq)
 
 	MCFG_AT29C020_ADD("at29c020")
 
@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(cmmb_state::cmmb)
 
 	/* sound hardware */
 //  MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
+//  MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

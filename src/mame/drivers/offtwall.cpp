@@ -338,8 +338,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(offtwall_state::offtwall)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)

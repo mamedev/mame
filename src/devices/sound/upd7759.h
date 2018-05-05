@@ -13,11 +13,11 @@
    software.
 */
 
-#define UPD7759_STANDARD_CLOCK      XTAL(640'000)
-
 class upd775x_device : public device_t, public device_sound_interface
 {
 public:
+	enum : u32 { STANDARD_CLOCK = 640'000 };
+
 	template <class Object> devcb_base &set_drq_callback(Object &&cb) { return m_drqcallback.set_callback(std::forward<Object>(cb)); }
 
 	void set_bank_base(offs_t base);
@@ -107,7 +107,7 @@ protected:
 class upd7759_device : public upd775x_device
 {
 public:
-	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 
 	DECLARE_WRITE_LINE_MEMBER( start_w );
 
@@ -130,7 +130,7 @@ protected:
 class upd7756_device : public upd775x_device
 {
 public:
-	upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = STANDARD_CLOCK);
 
 	DECLARE_WRITE_LINE_MEMBER( start_w );
 

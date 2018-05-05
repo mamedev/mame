@@ -88,9 +88,9 @@ READ8_MEMBER(n2a03_device::apu_read_mem)
 }
 
 MACHINE_CONFIG_START(n2a03_device::device_add_mconfig)
-	MCFG_SOUND_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
-	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(n2a03_device, apu_irq))
-	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(n2a03_device, apu_read_mem))
+	MCFG_DEVICE_ADD("nesapu", NES_APU, DERIVED_CLOCK(1,1) )
+	MCFG_NES_APU_IRQ_HANDLER(WRITELINE(*this, n2a03_device, apu_irq))
+	MCFG_NES_APU_MEM_READ_CALLBACK(READ8(*this, n2a03_device, apu_read_mem))
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 0.50)
 

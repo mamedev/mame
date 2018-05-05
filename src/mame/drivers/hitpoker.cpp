@@ -459,9 +459,9 @@ static GFXDECODE_START( hitpoker )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(hitpoker_state::hitpoker)
-	MCFG_CPU_ADD("maincpu", MC68HC11,1000000)
-	MCFG_CPU_PROGRAM_MAP(hitpoker_map)
-	MCFG_CPU_IO_MAP(hitpoker_io)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11,1000000)
+	MCFG_DEVICE_PROGRAM_MAP(hitpoker_map)
+	MCFG_DEVICE_IO_MAP(hitpoker_io)
 	MCFG_MC68HC11_CONFIG(0, 0x100, 0x01)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -478,14 +478,14 @@ MACHINE_CONFIG_START(hitpoker_state::hitpoker)
 	MCFG_MC6845_ADD("crtc", H46505, "screen", CRTC_CLOCK/2)  /* hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(hitpoker_state, hitpoker_irq))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hitpoker_state, hitpoker_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hitpoker)
 	MCFG_PALETTE_ADD("palette", 0x800)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 1500000)
+	MCFG_DEVICE_ADD("aysnd", YM2149, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

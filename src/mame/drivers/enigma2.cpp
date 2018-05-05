@@ -602,12 +602,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(enigma2_state::enigma2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(enigma2_main_cpu_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2_main_cpu_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(enigma2_audio_cpu_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2_audio_cpu_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 
 	/* video hardware */
@@ -620,9 +620,9 @@ MACHINE_CONFIG_START(enigma2_state::enigma2)
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(enigma2_state, protection_data_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -630,13 +630,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(enigma2_state::enigma2a)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(enigma2a_main_cpu_map)
-	MCFG_CPU_IO_MAP(enigma2a_main_cpu_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2a_main_cpu_map)
+	MCFG_DEVICE_IO_MAP(enigma2a_main_cpu_io_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(enigma2_audio_cpu_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(enigma2_audio_cpu_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
 
 
 	/* video hardware */
@@ -647,9 +647,9 @@ MACHINE_CONFIG_START(enigma2_state::enigma2a)
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(enigma2_state, protection_data_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

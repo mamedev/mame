@@ -193,12 +193,12 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(tryout_state::tryout)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000)     /* ? */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	MCFG_DEVICE_ADD("maincpu", M6502, 2000000)     /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)    /* ? */
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tryout_state, nmi_line_pulse, 1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)    /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tryout_state, nmi_line_pulse, 1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -218,7 +218,7 @@ MACHINE_CONFIG_START(tryout_state::tryout)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

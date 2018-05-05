@@ -380,24 +380,24 @@ void wink_state::machine_reset()
 
 MACHINE_CONFIG_START(wink_state::wink)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12000000 / 4)
-	MCFG_CPU_PROGRAM_MAP(wink_map)
-	MCFG_CPU_IO_MAP(wink_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12000000 / 4)
+	MCFG_DEVICE_PROGRAM_MAP(wink_map)
+	MCFG_DEVICE_IO_MAP(wink_io)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wink_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(wink_state, player_mux_w))      //??? no mux on the pcb.
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wink_state, tile_banking_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, wink_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, wink_state, player_mux_w))      //??? no mux on the pcb.
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, wink_state, tile_banking_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP)                //?
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)                //cab Knocker like in q-bert!
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wink_state, coin_counter_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(wink_state, coin_counter_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(wink_state, coin_counter_w<2>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, wink_state, coin_counter_w<0>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, wink_state, coin_counter_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, wink_state, coin_counter_w<2>))
 
-	MCFG_CPU_ADD("audiocpu", Z80, 12000000 / 8)
-	MCFG_CPU_PROGRAM_MAP(wink_sound_map)
-	MCFG_CPU_IO_MAP(wink_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000 / 8)
+	MCFG_DEVICE_PROGRAM_MAP(wink_sound_map)
+	MCFG_DEVICE_IO_MAP(wink_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(wink_state, wink_sound,  15625)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -409,7 +409,7 @@ MACHINE_CONFIG_START(wink_state::wink)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(wink_state, screen_update_wink)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wink_state, nmi_clock_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, wink_state, nmi_clock_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wink)
 	MCFG_PALETTE_ADD("palette", 16)
@@ -421,8 +421,8 @@ MACHINE_CONFIG_START(wink_state::wink)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 12000000 / 8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(wink_state, sound_r))
+	MCFG_DEVICE_ADD("aysnd", AY8912, 12000000 / 8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, wink_state, sound_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

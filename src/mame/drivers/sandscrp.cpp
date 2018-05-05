@@ -467,13 +467,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000N-12 */
-	MCFG_CPU_PROGRAM_MAP(sandscrp)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sandscrp_state,  interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68000,12000000)    /* TMP68HC000N-12 */
+	MCFG_DEVICE_PROGRAM_MAP(sandscrp)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sandscrp_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)   /* Z8400AB1, Reads the DSWs: it can't be disabled */
-	MCFG_CPU_PROGRAM_MAP(sandscrp_soundmem)
-	MCFG_CPU_IO_MAP(sandscrp_soundport)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)   /* Z8400AB1, Reads the DSWs: it can't be disabled */
+	MCFG_DEVICE_PROGRAM_MAP(sandscrp_soundmem)
+	MCFG_DEVICE_IO_MAP(sandscrp_soundport)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(3))  /* a guess, and certainly wrong */
@@ -485,7 +485,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sandscrp_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sandscrp_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sandscrp)
@@ -515,7 +515,7 @@ MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* YM3014B + YM2203C */
-	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))

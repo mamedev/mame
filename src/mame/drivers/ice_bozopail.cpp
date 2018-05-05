@@ -59,8 +59,8 @@ void ice_bozopail_state::machine_reset()
 MACHINE_CONFIG_START(ice_bozopail_state::ice_bozo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC68HC11, 8000000) // unknown clock
-	MCFG_CPU_PROGRAM_MAP(ice_bozo_map)
+	MCFG_DEVICE_ADD("maincpu", MC68HC11, 8000000) // unknown clock
+	MCFG_DEVICE_PROGRAM_MAP(ice_bozo_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

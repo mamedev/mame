@@ -177,10 +177,10 @@ WRITE16_MEMBER(taito_zoom_device::reg_address_w)
 
 MACHINE_CONFIG_START(taito_zoom_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mn10200", MN1020012A, XTAL(25'000'000)/2)
-	MCFG_MN10200_READ_PORT_CB(1, DEVREAD8(DEVICE_SELF, taito_zoom_device, tms_ctrl_r))
-	MCFG_MN10200_WRITE_PORT_CB(1, DEVWRITE8(DEVICE_SELF, taito_zoom_device, tms_ctrl_w))
-	MCFG_CPU_PROGRAM_MAP(taitozoom_mn_map)
+	MCFG_DEVICE_ADD("mn10200", MN1020012A, XTAL(25'000'000)/2)
+	MCFG_MN10200_READ_PORT_CB(1, READ8(DEVICE_SELF, taito_zoom_device, tms_ctrl_r))
+	MCFG_MN10200_WRITE_PORT_CB(1, WRITE8(DEVICE_SELF, taito_zoom_device, tms_ctrl_w))
+	MCFG_DEVICE_PROGRAM_MAP(taitozoom_mn_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 

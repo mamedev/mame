@@ -478,26 +478,26 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL) // Mostek MK3880
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4_MHz_XTAL) // Mostek MK3880
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0) // U9
 	MCFG_PIT8253_CLK0(4_MHz_XTAL / 2) /* Timer 0: baud rate gen for 8251 */
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("usart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("usart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("usart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("usart", i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(4_MHz_XTAL / 2)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk2))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit", pit8253_device, write_clk2))
 
 	MCFG_DEVICE_ADD("usart", I8251, 0) // U8
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("usart", i8251_device, write_dsr)) // actually from pin 11, "Reverse Channel Transmit"
-	MCFG_RS232_CTS_HANDLER(WRITELINE(qtsbc_state, rts_loopback_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr)) // actually from pin 11, "Reverse Channel Transmit"
+	MCFG_RS232_CTS_HANDLER(WRITELINE(*this, qtsbc_state, rts_loopback_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal) // must be exactly here
 MACHINE_CONFIG_END
 
