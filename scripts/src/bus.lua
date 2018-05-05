@@ -333,6 +333,8 @@ if (BUSES["BBC_USERPORT"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/userport/userport.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/userport/userport.h",
+		MAME_DIR .. "src/devices/bus/bbc/userport/pointer.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/userport/pointer.h",
 		MAME_DIR .. "src/devices/bus/bbc/userport/cfa3000kbd.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/userport/cfa3000kbd.h",
 	}
