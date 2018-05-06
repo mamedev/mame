@@ -757,10 +757,10 @@ const tiny_rom_entry *hp98035_io_card_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(hp98035_io_card_device::device_add_mconfig)
-	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL(1'000'000))
-	MCFG_CPU_PROGRAM_MAP(np_program_map)
-	MCFG_CPU_IO_MAP(np_io_map)
-	MCFG_HP_NANO_DC_CHANGED(WRITE8(hp98035_io_card_device , dc_w))
+	MCFG_DEVICE_ADD("np" , HP_NANOPROCESSOR , XTAL(1'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(np_program_map)
+	MCFG_DEVICE_IO_MAP(np_io_map)
+	MCFG_HP_NANO_DC_CHANGED(WRITE8(*this, hp98035_io_card_device , dc_w))
 MACHINE_CONFIG_END
 
 // device type definition

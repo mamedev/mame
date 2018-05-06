@@ -23,9 +23,10 @@ DEFINE_DEVICE_TYPE(COMPUCOLOR_FLOPPY,      compucolor_floppy_device,      "compc
 //  SLOT_INTERFACE( compucolor_floppy_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( compucolor_floppy_port_devices )
-	SLOT_INTERFACE("floppy", COMPUCOLOR_FLOPPY)
-SLOT_INTERFACE_END
+void compucolor_floppy_port_devices(device_slot_interface &device)
+{
+	device.option_add("floppy", COMPUCOLOR_FLOPPY);
+}
 
 
 //-------------------------------------------------
@@ -41,9 +42,10 @@ FLOPPY_FORMATS_END
 //  SLOT_INTERFACE( compucolor_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( compucolor_floppies )
-	SLOT_INTERFACE_INTERNAL( "525sssd", FLOPPY_525_SSSD )
-SLOT_INTERFACE_END
+static void compucolor_floppies(device_slot_interface &device)
+{
+	device.option_add_internal("525sssd", FLOPPY_525_SSSD);
+}
 
 
 //-------------------------------------------------

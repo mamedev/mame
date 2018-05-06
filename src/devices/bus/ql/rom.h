@@ -117,6 +117,6 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_slot_device)
 
-SLOT_INTERFACE_EXTERN( ql_rom_cartridge_cards );
+void ql_rom_cartridge_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_QL_ROM_H

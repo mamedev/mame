@@ -249,9 +249,10 @@ FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
 	FLOPPY_ESQIMG_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( ensoniq_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void ensoniq_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 {
@@ -615,60 +616,60 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 #endif
 
 MACHINE_CONFIG_START(esq5505_state::vfx)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(vfx_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vfx_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
-	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
-	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
+	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 
 	MCFG_DEVICE_ADD("duart", MC68681, 4000000)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, esq5505_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, esq5505_state, duart_tx_a))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, esq5505_state, duart_tx_b))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, esq5505_state, duart_output))
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(WRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(10'000'000) / (16 * 21))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(10'000'000) / (16 * 21))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("otis", ES5505, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("otis", ES5505, XTAL(10'000'000))
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
-	MCFG_ES5505_IRQ_CB(WRITELINE(esq5505_state, esq5505_otis_irq)) /* irq */
-	MCFG_ES5505_READ_PORT_CB(READ16(esq5505_state, analog_r)) /* ADC */
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_ES5505_IRQ_CB(WRITELINE(*this, esq5505_state, esq5505_otis_irq)) /* irq */
+	MCFG_ES5505_READ_PORT_CB(READ16(*this, esq5505_state, analog_r)) /* ADC */
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esq5505_state::eps)
 	vfx(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(eps_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(eps_map)
 
 	MCFG_ESQPANEL2X40_VFX_REMOVE("panel")
 	MCFG_ESQPANEL1X22_ADD("panel")
-	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
-	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
+	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 
 	MCFG_WD1772_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
@@ -677,16 +678,16 @@ MACHINE_CONFIG_START(esq5505_state::eps)
 	MCFG_HD63450_CPU("maincpu") // CPU - 68000
 	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
 	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
-	MCFG_HD63450_DMA_END_CB(WRITE8(esq5505_state, dma_end))
-	MCFG_HD63450_DMA_ERROR_CB(WRITE8(esq5505_state, dma_error))
-	MCFG_HD63450_DMA_READ_0_CB(READ8(esq5505_state, fdc_read_byte))  // ch 0 = fdc, ch 1 = 340001 (ADC?)
-	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(esq5505_state, fdc_write_byte))
+	MCFG_HD63450_DMA_END_CB(WRITE8(*this, esq5505_state, dma_end))
+	MCFG_HD63450_DMA_ERROR_CB(WRITE8(*this, esq5505_state, dma_error))
+	MCFG_HD63450_DMA_READ_0_CB(READ8(*this, esq5505_state, fdc_read_byte))  // ch 0 = fdc, ch 1 = 340001 (ADC?)
+	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(*this, esq5505_state, fdc_write_byte))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esq5505_state::vfxsd)
 	vfx(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(vfxsd_map)
 
 	MCFG_WD1772_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
@@ -694,49 +695,49 @@ MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
 MACHINE_CONFIG_START(esq5505_state::vfx32)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'476'100) / 2)
-	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(vfxsd_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
+	MCFG_DEVICE_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
-	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
-	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
+	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 
 	MCFG_DEVICE_ADD("duart", MC68681, 4000000)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(esq5505_state, duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, esq5505_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, esq5505_state, duart_tx_a))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, esq5505_state, duart_tx_b))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, esq5505_state, duart_output))
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
+	MCFG_MIDI_RX_HANDLER(WRITELINE("duart", mc68681_device, rx_a_w)) // route MIDI Tx send directly to 68681 channel A Rx
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
+	MCFG_DEVICE_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("otis", ES5505, XTAL(30'476'100) / 2)
+	MCFG_DEVICE_ADD("otis", ES5505, XTAL(30'476'100) / 2)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
-	MCFG_ES5505_IRQ_CB(WRITELINE(esq5505_state, esq5505_otis_irq)) /* irq */
-	MCFG_ES5505_READ_PORT_CB(READ16(esq5505_state, analog_r)) /* ADC */
-	MCFG_SOUND_ROUTE_EX(0, "pump", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "pump", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "pump", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "pump", 1.0, 3)
-	MCFG_SOUND_ROUTE_EX(4, "pump", 1.0, 4)
-	MCFG_SOUND_ROUTE_EX(5, "pump", 1.0, 5)
-	MCFG_SOUND_ROUTE_EX(6, "pump", 1.0, 6)
-	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
+	MCFG_ES5505_IRQ_CB(WRITELINE(*this, esq5505_state, esq5505_otis_irq)) /* irq */
+	MCFG_ES5505_READ_PORT_CB(READ16(*this, esq5505_state, analog_r)) /* ADC */
+	MCFG_SOUND_ROUTE(0, "pump", 1.0, 0)
+	MCFG_SOUND_ROUTE(1, "pump", 1.0, 1)
+	MCFG_SOUND_ROUTE(2, "pump", 1.0, 2)
+	MCFG_SOUND_ROUTE(3, "pump", 1.0, 3)
+	MCFG_SOUND_ROUTE(4, "pump", 1.0, 4)
+	MCFG_SOUND_ROUTE(5, "pump", 1.0, 5)
+	MCFG_SOUND_ROUTE(6, "pump", 1.0, 6)
+	MCFG_SOUND_ROUTE(7, "pump", 1.0, 7)
 
 	MCFG_WD1772_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
@@ -744,13 +745,13 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(esq5505_state::sq1)
 	vfx(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(sq1_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(sq1_map)
 
 	MCFG_ESQPANEL2X40_VFX_REMOVE("panel")
 	MCFG_ESQPANEL2X16_SQ1_ADD("panel")
-	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
-	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
+	MCFG_ESQPANEL_TX_CALLBACK(WRITELINE("duart", mc68681_device, rx_b_w))
+	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(*this, esq5505_state, analog_w))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( vfx )

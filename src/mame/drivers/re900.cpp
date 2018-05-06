@@ -383,10 +383,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(re900_state::re900)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_CPU_IO_MAP(mem_io)
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(re900_state, cpu_port_0_w))
+	MCFG_DEVICE_ADD("maincpu", I8051, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
+	MCFG_DEVICE_IO_MAP(mem_io)
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, re900_state, cpu_port_0_w))
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9128", TMS9128, XTAL(10'738'635) / 2 )   /* TMS9128NL on the board */
@@ -399,11 +399,11 @@ MACHINE_CONFIG_START(re900_state::re900)
 
 	/* sound hardware   */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay_re900", AY8910, TMS_CLOCK) /* From TMS9128NL - Pin 37 (GROMCLK) */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(re900_state, re_psg_portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(re900_state, re_psg_portB_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(re900_state, re_mux_port_A_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(re900_state, re_mux_port_B_w))
+	MCFG_DEVICE_ADD("ay_re900", AY8910, TMS_CLOCK) /* From TMS9128NL - Pin 37 (GROMCLK) */
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, re900_state, re_psg_portA_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, re900_state, re_psg_portB_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, re900_state, re_mux_port_A_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, re900_state, re_mux_port_B_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(re900_state::bs94)
 	re900(config);
 
 	/* sound hardware   */
-	MCFG_SOUND_MODIFY("ay_re900")
+	MCFG_DEVICE_MODIFY("ay_re900")
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_AY8910_PORT_A_WRITE_CB(NOOP)

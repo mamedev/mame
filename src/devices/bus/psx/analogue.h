@@ -7,8 +7,8 @@
 
 #include "ctlrport.h"
 
-extern const device_type PSX_DUALSHOCK;
-extern const device_type PSX_ANALOG_JOYSTICK;
+DECLARE_DEVICE_TYPE(PSX_DUALSHOCK, psx_dualshock_device)
+DECLARE_DEVICE_TYPE(PSX_ANALOG_JOYSTICK, psx_analog_joystick_device)
 
 class psx_analog_controller_device :    public device_t,
 										public device_psx_controller_interface

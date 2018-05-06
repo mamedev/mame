@@ -494,22 +494,22 @@ void suprgolf_state::machine_reset()
 MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) /* guess */
-	MCFG_CPU_PROGRAM_MAP(suprgolf_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprgolf_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/2) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(suprgolf_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suprgolf_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(suprgolf_state, p1_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(suprgolf_state, p2_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(suprgolf_state, pedal_extra_bits_r))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, suprgolf_state, p1_r))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, suprgolf_state, p2_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, suprgolf_state, pedal_extra_bits_r))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("SYSTEM"))
-	MCFG_I8255_IN_PORTB_CB(READ8(suprgolf_state, rom_bank_select_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(suprgolf_state, rom_bank_select_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(suprgolf_state, vregs_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(suprgolf_state, vregs_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, suprgolf_state, rom_bank_select_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, suprgolf_state, rom_bank_select_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, suprgolf_state, vregs_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, suprgolf_state, vregs_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -526,16 +526,16 @@ MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/4) /* guess */
+	MCFG_DEVICE_ADD("ymsnd", YM2203, MASTER_CLOCK/4) /* guess */
 	//MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suprgolf_state, writeA))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suprgolf_state, writeB))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suprgolf_state, writeA))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suprgolf_state, writeB))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* guess */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(suprgolf_state, adpcm_int))      /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* guess */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, suprgolf_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

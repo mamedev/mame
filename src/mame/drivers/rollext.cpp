@@ -541,14 +541,14 @@ void rollext_state::machine_start()
 
 
 MACHINE_CONFIG_START(rollext_state::rollext)
-	MCFG_CPU_ADD("maincpu", TMS32082_MP, 60000000)
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", rollext_state, vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(rollext_state, irq1_line_assert, 60)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(rollext_state, irq3_line_assert, 500)
+	MCFG_DEVICE_ADD("maincpu", TMS32082_MP, 60000000)
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rollext_state, vblank_interrupt)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(rollext_state, irq1_line_assert, 60)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(rollext_state, irq3_line_assert, 500)
 
-	MCFG_CPU_ADD("pp0", TMS32082_PP, 60000000)
-	MCFG_CPU_PROGRAM_MAP(memmap);
+	MCFG_DEVICE_ADD("pp0", TMS32082_PP, 60000000)
+	MCFG_DEVICE_PROGRAM_MAP(memmap);
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(100))
 

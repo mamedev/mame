@@ -714,10 +714,10 @@ void sol20_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(sol20_state::sol20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(14'318'181) / 7) // divider selectable as 5, 6 or 7 through jumpers
-	MCFG_CPU_PROGRAM_MAP(sol20_mem)
-	MCFG_CPU_IO_MAP(sol20_io)
-	MCFG_I8085A_INTE(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(14'318'181) / 7) // divider selectable as 5, 6 or 7 through jumpers
+	MCFG_DEVICE_PROGRAM_MAP(sol20_mem)
+	MCFG_DEVICE_IO_MAP(sol20_io)
+	MCFG_I8085A_INTE(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -733,7 +733,7 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) // music board
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05) // cass1 speaker
@@ -752,13 +752,13 @@ MACHINE_CONFIG_START(sol20_state::sol20)
 	MCFG_CASSETTE_INTERFACE("sol20_cass")
 
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // TMS6011NC
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_AY51013_READ_SI_CB(READLINE("rs232", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_AY51013_TX_CLOCK(4800.0)
 	MCFG_AY51013_RX_CLOCK(4800.0)
 	MCFG_AY51013_AUTO_RDAV(true) // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 
 	MCFG_DEVICE_ADD("uart_s", AY51013, 0) // TMS6011NC
 	MCFG_AY51013_TX_CLOCK(4800.0)

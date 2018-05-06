@@ -529,16 +529,16 @@ void dassault_state::machine_reset()
 MACHINE_CONFIG_START(dassault_state::dassault)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
-	MCFG_CPU_PROGRAM_MAP(dassault_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
-	MCFG_CPU_PROGRAM_MAP(dassault_sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
+	MCFG_DEVICE_ADD("sub", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(dassault_sub_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/8)    /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/8)    /* Accurate */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
@@ -608,13 +608,13 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // IRQ1
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
 	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(dassault_state,sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, dassault_state,sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 

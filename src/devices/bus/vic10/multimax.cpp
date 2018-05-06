@@ -15,7 +15,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MULTIMAX, multimax_t, "multimax", "MultiMAX Cartridge")
+DEFINE_DEVICE_TYPE(VIC10_MULTIMAX, vic10_multimax_device, "vic10_multimax", "VIC-10 MultiMAX Cartridge")
 
 
 
@@ -24,11 +24,11 @@ DEFINE_DEVICE_TYPE(MULTIMAX, multimax_t, "multimax", "MultiMAX Cartridge")
 //**************************************************************************
 
 //-------------------------------------------------
-//  multimax_t - constructor
+//  vic10_multimax_device - constructor
 //-------------------------------------------------
 
-multimax_t::multimax_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MULTIMAX, tag, owner, clock), device_vic10_expansion_card_interface(mconfig, *this),
+vic10_multimax_device::vic10_multimax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VIC10_MULTIMAX, tag, owner, clock), device_vic10_expansion_card_interface(mconfig, *this),
 	m_latch(0)
 {
 }
@@ -38,7 +38,7 @@ multimax_t::multimax_t(const machine_config &mconfig, const char *tag, device_t 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void multimax_t::device_start()
+void vic10_multimax_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_latch));
@@ -49,7 +49,7 @@ void multimax_t::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void multimax_t::device_reset()
+void vic10_multimax_device::device_reset()
 {
 	m_latch = 0;
 }
@@ -59,7 +59,7 @@ void multimax_t::device_reset()
 //  vic10_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t multimax_t::vic10_cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram)
+uint8_t vic10_multimax_device::vic10_cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram)
 {
 	if (!lorom)
 	{
@@ -85,7 +85,7 @@ uint8_t multimax_t::vic10_cd_r(address_space &space, offs_t offset, uint8_t data
 //  vic10_cd_w - cartridge data write
 //-------------------------------------------------
 
-void multimax_t::vic10_cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram)
+void vic10_multimax_device::vic10_cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram)
 {
 	if (!exram)
 	{

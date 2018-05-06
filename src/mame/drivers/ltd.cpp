@@ -528,8 +528,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
 
 MACHINE_CONFIG_START(ltd_state::ltd3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(ltd3_map)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(3'579'545))
+	MCFG_DEVICE_PROGRAM_MAP(ltd3_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -544,9 +544,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ltd_state::ltd4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL(3'579'545)) // guess, no details available
-	MCFG_CPU_PROGRAM_MAP(ltd4_map)
-	MCFG_CPU_IO_MAP(ltd4_io)
+	MCFG_DEVICE_ADD("maincpu", M6803, XTAL(3'579'545)) // guess, no details available
+	MCFG_DEVICE_PROGRAM_MAP(ltd4_map)
+	MCFG_DEVICE_IO_MAP(ltd4_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -557,9 +557,9 @@ MACHINE_CONFIG_START(ltd_state::ltd4)
 	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
+	MCFG_DEVICE_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
-	MCFG_SOUND_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
+	MCFG_DEVICE_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
 MACHINE_CONFIG_END
 

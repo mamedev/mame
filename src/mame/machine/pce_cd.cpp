@@ -247,15 +247,15 @@ void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("pce_cdrom")
 
-	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
-	MCFG_MSM5205_VCLK_CB(WRITELINE(pce_cd_device, msm5205_int)) /* interrupt function */
+	MCFG_DEVICE_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, pce_cd_device, msm5205_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 1/48 prescaler, 4bit data */
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:lspeaker", 0.50 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^:rspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^lspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "^rspeaker", 0.50 )
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "^:lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "^:rspeaker", 1.00 )
+	MCFG_DEVICE_ADD( "cdda", CDDA )
+	MCFG_SOUND_ROUTE( 0, "^lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "^rspeaker", 1.00 )
 MACHINE_CONFIG_END
 
 

@@ -432,9 +432,9 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(gp_1_state::gp_1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2457600)
-	MCFG_CPU_PROGRAM_MAP(gp_1_map)
-	MCFG_CPU_IO_MAP(gp_1_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2457600)
+	MCFG_DEVICE_PROGRAM_MAP(gp_1_map)
+	MCFG_DEVICE_IO_MAP(gp_1_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -447,9 +447,9 @@ MACHINE_CONFIG_START(gp_1_state::gp_1)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(gp_1_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(gp_1_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gp_1_state, portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, gp_1_state, porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, gp_1_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gp_1_state, portc_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 2457600 )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // Todo: absence of ints will cause a watchdog reset
@@ -459,7 +459,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gp_1_state::gp_1s)
 	gp_1(config);
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_DEVICE_ADD("snsnd", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                         // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, 0)                  // attack_decay_cap + attack_res: N/C
@@ -477,9 +477,9 @@ MACHINE_CONFIG_START(gp_1_state::gp_1s)
 
 	MCFG_DEVICE_REMOVE("ppi")
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(gp_1_state, portas_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(gp_1_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gp_1_state, portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, gp_1_state, portas_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, gp_1_state, portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gp_1_state, portc_w))
 MACHINE_CONFIG_END
 
 

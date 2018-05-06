@@ -499,41 +499,43 @@ static INPUT_PORTS_START( gameboy )
 
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(gb_cart)
-	SLOT_INTERFACE_INTERNAL("rom",         GB_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_mbc1",    GB_ROM_MBC1)
-	SLOT_INTERFACE_INTERNAL("rom_mbc1col", GB_ROM_MBC1)
-	SLOT_INTERFACE_INTERNAL("rom_mbc2",    GB_ROM_MBC2)
-	SLOT_INTERFACE_INTERNAL("rom_mbc3",    GB_ROM_MBC3)
-	SLOT_INTERFACE_INTERNAL("rom_huc1",    GB_ROM_MBC3)
-	SLOT_INTERFACE_INTERNAL("rom_huc3",    GB_ROM_MBC3)
-	SLOT_INTERFACE_INTERNAL("rom_mbc5",    GB_ROM_MBC5)
-	SLOT_INTERFACE_INTERNAL("rom_mbc6",    GB_ROM_MBC6)
-	SLOT_INTERFACE_INTERNAL("rom_mbc7",    GB_ROM_MBC7)
-	SLOT_INTERFACE_INTERNAL("rom_tama5",   GB_ROM_TAMA5)
-	SLOT_INTERFACE_INTERNAL("rom_mmm01",   GB_ROM_MMM01)
-	SLOT_INTERFACE_INTERNAL("rom_m161",    GB_ROM_M161)
-	SLOT_INTERFACE_INTERNAL("rom_sachen1", GB_ROM_SACHEN1)
-	SLOT_INTERFACE_INTERNAL("rom_sachen2", GB_ROM_SACHEN2)
-	SLOT_INTERFACE_INTERNAL("rom_wisdom",  GB_ROM_WISDOM)
-	SLOT_INTERFACE_INTERNAL("rom_yong",    GB_ROM_YONG)
-	SLOT_INTERFACE_INTERNAL("rom_lasama",  GB_ROM_LASAMA)
-	SLOT_INTERFACE_INTERNAL("rom_atvrac",  GB_ROM_ATVRAC)
-	SLOT_INTERFACE_INTERNAL("rom_camera",  GB_ROM_CAMERA)
-	SLOT_INTERFACE_INTERNAL("rom_188in1",  GB_ROM_188IN1)
-	SLOT_INTERFACE_INTERNAL("rom_sintax",  GB_ROM_SINTAX)
-	SLOT_INTERFACE_INTERNAL("rom_chong",   GB_ROM_CHONGWU)
-	SLOT_INTERFACE_INTERNAL("rom_licheng", GB_ROM_LICHENG)
-	SLOT_INTERFACE_INTERNAL("rom_digimon", GB_ROM_DIGIMON)
-	SLOT_INTERFACE_INTERNAL("rom_rock8",   GB_ROM_ROCKMAN8)
-	SLOT_INTERFACE_INTERNAL("rom_sm3sp",   GB_ROM_SM3SP)
-//  SLOT_INTERFACE_INTERNAL("rom_dkong5",  GB_ROM_DKONG5)
-//  SLOT_INTERFACE_INTERNAL("rom_unk01",   GB_ROM_UNK01)
-SLOT_INTERFACE_END
+static void gb_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",         GB_STD_ROM);
+	device.option_add_internal("rom_mbc1",    GB_ROM_MBC1);
+	device.option_add_internal("rom_mbc1col", GB_ROM_MBC1);
+	device.option_add_internal("rom_mbc2",    GB_ROM_MBC2);
+	device.option_add_internal("rom_mbc3",    GB_ROM_MBC3);
+	device.option_add_internal("rom_huc1",    GB_ROM_MBC3);
+	device.option_add_internal("rom_huc3",    GB_ROM_MBC3);
+	device.option_add_internal("rom_mbc5",    GB_ROM_MBC5);
+	device.option_add_internal("rom_mbc6",    GB_ROM_MBC6);
+	device.option_add_internal("rom_mbc7",    GB_ROM_MBC7);
+	device.option_add_internal("rom_tama5",   GB_ROM_TAMA5);
+	device.option_add_internal("rom_mmm01",   GB_ROM_MMM01);
+	device.option_add_internal("rom_m161",    GB_ROM_M161);
+	device.option_add_internal("rom_sachen1", GB_ROM_SACHEN1);
+	device.option_add_internal("rom_sachen2", GB_ROM_SACHEN2);
+	device.option_add_internal("rom_wisdom",  GB_ROM_WISDOM);
+	device.option_add_internal("rom_yong",    GB_ROM_YONG);
+	device.option_add_internal("rom_lasama",  GB_ROM_LASAMA);
+	device.option_add_internal("rom_atvrac",  GB_ROM_ATVRAC);
+	device.option_add_internal("rom_camera",  GB_ROM_CAMERA);
+	device.option_add_internal("rom_188in1",  GB_ROM_188IN1);
+	device.option_add_internal("rom_sintax",  GB_ROM_SINTAX);
+	device.option_add_internal("rom_chong",   GB_ROM_CHONGWU);
+	device.option_add_internal("rom_licheng", GB_ROM_LICHENG);
+	device.option_add_internal("rom_digimon", GB_ROM_DIGIMON);
+	device.option_add_internal("rom_rock8",   GB_ROM_ROCKMAN8);
+	device.option_add_internal("rom_sm3sp",   GB_ROM_SM3SP);
+//  device.option_add_internal("rom_dkong5",  GB_ROM_DKONG5);
+//  device.option_add_internal("rom_unk01",   GB_ROM_UNK01);
+}
 
-static SLOT_INTERFACE_START(megaduck_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  MEGADUCK_ROM)
-SLOT_INTERFACE_END
+static void megaduck_cart(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  MEGADUCK_ROM);
+}
 
 
 
@@ -611,9 +613,9 @@ PALETTE_INIT_MEMBER(megaduck_state, megaduck)
 MACHINE_CONFIG_START(gb_state::gameboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, XTAL(4'194'304))
-	MCFG_CPU_PROGRAM_MAP(gameboy_map)
-	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
+	MCFG_DEVICE_ADD("maincpu", LR35902, XTAL(4'194'304))
+	MCFG_DEVICE_PROGRAM_MAP(gameboy_map)
+	MCFG_LR35902_TIMER_CB( WRITE8( *this, gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
 	/* video hardware */
@@ -636,7 +638,7 @@ MACHINE_CONFIG_START(gb_state::gameboy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", DMG_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("apu", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -650,9 +652,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gb_state::supergb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
-	MCFG_CPU_PROGRAM_MAP(sgb_map)
-	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
+	MCFG_DEVICE_ADD("maincpu", LR35902, 4295454) /* 4.295454 MHz, derived from SNES xtal */
+	MCFG_DEVICE_PROGRAM_MAP(sgb_map)
+	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
@@ -677,7 +679,7 @@ MACHINE_CONFIG_START(gb_state::supergb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", DMG_APU, 4295454)
+	MCFG_DEVICE_ADD("apu", DMG_APU, 4295454)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -692,8 +694,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gb_state::supergb2)
 	gameboy(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sgb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sgb_map)
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb)
@@ -728,9 +730,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gb_state::gbcolor)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, XTAL(4'194'304)) // todo XTAL(8'388'000)
-	MCFG_CPU_PROGRAM_MAP(gbc_map)
-	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
+	MCFG_DEVICE_ADD("maincpu", LR35902, XTAL(4'194'304)) // todo XTAL(8'388'000)
+	MCFG_DEVICE_PROGRAM_MAP(gbc_map)
+	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
@@ -756,7 +758,7 @@ MACHINE_CONFIG_START(gb_state::gbcolor)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", CGB04_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("apu", CGB04_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -774,9 +776,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(megaduck_state::megaduck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", LR35902, XTAL(4'194'304)) /* 4.194304 MHz */
-	MCFG_CPU_PROGRAM_MAP(megaduck_map)
-	MCFG_LR35902_TIMER_CB( WRITE8(gb_state, gb_timer_callback ) )
+	MCFG_DEVICE_ADD("maincpu", LR35902, XTAL(4'194'304)) /* 4.194304 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(megaduck_map)
+	MCFG_LR35902_TIMER_CB( WRITE8(*this, gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 
 	/* video hardware */
@@ -802,7 +804,7 @@ MACHINE_CONFIG_START(megaduck_state::megaduck)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("apu", DMG_APU, XTAL(4'194'304))
+	MCFG_DEVICE_ADD("apu", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

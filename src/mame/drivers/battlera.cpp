@@ -273,12 +273,12 @@ uint32_t battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 MACHINE_CONFIG_START(battlera_state::battlera)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280,21477200/3)
-	MCFG_CPU_PROGRAM_MAP(battlera_map)
-	MCFG_CPU_IO_MAP(battlera_portmap)
+	MCFG_DEVICE_ADD("maincpu", H6280,21477200/3)
+	MCFG_DEVICE_PROGRAM_MAP(battlera_map)
+	MCFG_DEVICE_IO_MAP(battlera_portmap)
 
-	MCFG_CPU_ADD("audiocpu", H6280,21477200/3)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280,21477200/3)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -287,10 +287,10 @@ MACHINE_CONFIG_START(battlera_state::battlera)
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
 	MCFG_DEVICE_ADD( "huc6260", HUC6260, MAIN_CLOCK )
-	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(DEVREAD16("huc6270", huc6270_device, next_pixel))
-	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(DEVREAD16("huc6270", huc6270_device, time_until_next_event))
-	MCFG_HUC6260_VSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, vsync_changed))
-	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6270", huc6270_device, hsync_changed))
+	MCFG_HUC6260_NEXT_PIXEL_DATA_CB(READ16("huc6270", huc6270_device, next_pixel))
+	MCFG_HUC6260_TIME_TIL_NEXT_EVENT_CB(READ16("huc6270", huc6270_device, time_until_next_event))
+	MCFG_HUC6260_VSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, vsync_changed))
+	MCFG_HUC6260_HSYNC_CHANGED_CB(WRITELINE("huc6270", huc6270_device, hsync_changed))
 
 	MCFG_DEVICE_ADD( "huc6270", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x20000)
@@ -301,15 +301,15 @@ MACHINE_CONFIG_START(battlera_state::battlera)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000 / 8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(battlera_state, adpcm_int)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, battlera_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 
-	MCFG_SOUND_ADD("c6280", C6280, 21477270/6)
+	MCFG_DEVICE_ADD("c6280", C6280, 21477270/6)
 	MCFG_C6280_CPU("audiocpu")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END

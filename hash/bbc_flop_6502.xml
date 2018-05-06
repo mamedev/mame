@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro - 6502 2nd Processor Discs -->
+<!-- Acorn BBC Micro - 6502 2nd Processor Discs -->
 
 <!-- Loading Instructions:
 
       Hold down the SHIFT key and press and release the BREAK key.
 -->
 
-<softwarelist name="bbc_flop_6502" description="6502 2nd Processor Discs">
+<softwarelist name="bbc_flop_6502" description="Acorn 6502 2nd Processor discs">
 
 	<software name="6502dev">
 		<description>6502 Development Package</description>

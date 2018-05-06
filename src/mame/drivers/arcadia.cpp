@@ -464,18 +464,19 @@ void arcadia_state::machine_start()
 	}
 }
 
-static SLOT_INTERFACE_START(arcadia_cart)
-	SLOT_INTERFACE_INTERNAL("std",      ARCADIA_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("golf",     ARCADIA_ROM_GOLF)
-SLOT_INTERFACE_END
+static void arcadia_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",      ARCADIA_ROM_STD);
+	device.option_add_internal("golf",     ARCADIA_ROM_GOLF);
+}
 
 
 MACHINE_CONFIG_START(arcadia_state::arcadia)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
-	MCFG_CPU_PROGRAM_MAP(arcadia_mem)
-	MCFG_S2650_SENSE_INPUT(READLINE(arcadia_state, vsync_r))
-	MCFG_CPU_PERIODIC_INT_DRIVER(arcadia_state, video_line,  262*60)
+	MCFG_DEVICE_ADD("maincpu", S2650, 3580000/4)        /* 0.895 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(arcadia_mem)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, arcadia_state, vsync_r))
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(arcadia_state, video_line,  262*60)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -487,14 +488,14 @@ MACHINE_CONFIG_START(arcadia_state::arcadia)
 	MCFG_SCREEN_UPDATE_DRIVER(arcadia_state, screen_update_arcadia)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadia )
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", arcadia)
 	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(arcadia_palette))
 	MCFG_PALETTE_INDIRECT_ENTRIES(8)
 	MCFG_PALETTE_INIT_OWNER(arcadia_state, arcadia)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_ARCADIA_SOUND_ADD("custom")
+	MCFG_DEVICE_ADD("custom", ARCADIA_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */

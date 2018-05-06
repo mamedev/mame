@@ -380,9 +380,9 @@ void unior_state::machine_reset()
 
 MACHINE_CONFIG_START(unior_state::unior)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(20'000'000) / 9)
-	MCFG_CPU_PROGRAM_MAP(unior_mem)
-	MCFG_CPU_IO_MAP(unior_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(20'000'000) / 9)
+	MCFG_DEVICE_PROGRAM_MAP(unior_mem)
+	MCFG_DEVICE_IO_MAP(unior_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -396,7 +396,7 @@ MACHINE_CONFIG_START(unior_state::unior)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -405,34 +405,34 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(20'000'000) / 12)
 	MCFG_PIT8253_CLK1(XTAL(20'000'000) / 9)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("uart", i8251_device, write_rxc))
 	MCFG_PIT8253_CLK2(XTAL(16'000'000) / 9 / 64) // unknown frequency
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("ppi0", I8255, 0)
 	// ports a & c connect to an external slot
-	MCFG_I8255_IN_PORTB_CB(READ8(unior_state, ppi0_b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(unior_state, ppi0_b_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, unior_state, ppi0_b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, unior_state, ppi0_b_w))
 
 	MCFG_DEVICE_ADD("ppi1", I8255, 0)
 	// ports a & b are for the keyboard
 	// port c operates various control lines for mostly unknown purposes
-	MCFG_I8255_IN_PORTA_CB(READ8(unior_state, ppi1_a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(unior_state, ppi1_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(unior_state, ppi1_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(unior_state, ppi1_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(unior_state, ppi1_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, unior_state, ppi1_a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, unior_state, ppi1_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, unior_state, ppi1_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, unior_state, ppi1_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, unior_state, ppi1_c_w))
 
 	MCFG_DEVICE_ADD("dma", I8257, XTAL(20'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(unior_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(unior_state, dma_r))
-	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, unior_state, hrq_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, unior_state, dma_r))
+	MCFG_I8257_OUT_IOW_2_CB(WRITE8("crtc", i8275_device, dack_w))
 
 	MCFG_DEVICE_ADD("crtc", I8275, XTAL(20'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(unior_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma",i8257_device, dreq2_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma",i8257_device, dreq2_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 MACHINE_CONFIG_END
 

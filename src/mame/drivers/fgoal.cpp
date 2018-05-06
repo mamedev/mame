@@ -368,8 +368,8 @@ void fgoal_state::machine_reset()
 MACHINE_CONFIG_START(fgoal_state::fgoal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, 10065000 / 10) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 
 	/* add shifter */

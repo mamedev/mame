@@ -488,7 +488,7 @@ void hikaru_state::hikaru_map_slave(address_map &map)
 
 MACHINE_CONFIG_START(hikaru_state::hikaru)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", SH4LE, CPU_CLOCK)
 //  MCFG_SH4_MD0(1)
 //  MCFG_SH4_MD1(0)
 //  MCFG_SH4_MD2(1)
@@ -499,13 +499,13 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 //  MCFG_SH4_MD7(1)
 //  MCFG_SH4_MD8(0)
 //  MCFG_SH4_CLOCK(CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(hikaru_map)
-//  MCFG_CPU_IO_MAP(hikaru_port)
+	MCFG_DEVICE_PROGRAM_MAP(hikaru_map)
+//  MCFG_DEVICE_IO_MAP(hikaru_port)
 	MCFG_CPU_FORCE_NO_DRC()
 //  MCFG_CPU_VBLANK_INT("screen", hikaru,vblank)
 
-	MCFG_CPU_ADD("slave", SH4LE, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(hikaru_map_slave)
+	MCFG_DEVICE_ADD("slave", SH4LE, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(hikaru_map_slave)
 	MCFG_CPU_FORCE_NO_DRC()
 
 
@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(hikaru_state::hikaru)
 
 
 //  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MCFG_SOUND_ADD("aica", AICA, 0)
+//  MCFG_DEVICE_ADD("aica", AICA, 0)
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
 //  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END

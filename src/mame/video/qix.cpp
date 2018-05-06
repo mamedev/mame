@@ -381,8 +381,8 @@ void qix_state::slither_video_map(address_map &map)
  *************************************/
 
 MACHINE_CONFIG_START(qix_state::qix_video)
-	MCFG_CPU_ADD("videocpu", MC6809E, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
-	MCFG_CPU_PROGRAM_MAP(qix_video_map)
+	MCFG_DEVICE_ADD("videocpu", MC6809E, MAIN_CLOCK_OSC/4/4) /* 1.25 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(qix_video_map)
 
 	MCFG_VIDEO_START_OVERRIDE(qix_state,qix)
 
@@ -391,8 +391,8 @@ MACHINE_CONFIG_START(qix_state::qix_video)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(qix_state, crtc_begin_update)
 	MCFG_MC6845_UPDATE_ROW_CB(qix_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE(qix_state, display_enable_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(qix_state, qix_vsync_changed))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, qix_state, display_enable_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, qix_state, qix_vsync_changed))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100) /* from CRTC */
@@ -401,20 +401,20 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(qix_state::kram3_video)
-	MCFG_CPU_MODIFY("videocpu")
-	MCFG_CPU_PROGRAM_MAP(kram3_video_map)
-	MCFG_MC6809E_LIC_CB(WRITELINE(qix_state, kram3_lic_videocpu_changed))
+	MCFG_DEVICE_MODIFY("videocpu")
+	MCFG_DEVICE_PROGRAM_MAP(kram3_video_map)
+	MCFG_MC6809E_LIC_CB(WRITELINE(*this, qix_state, kram3_lic_videocpu_changed))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(qix_state::zookeep_video)
-	MCFG_CPU_MODIFY("videocpu")
-	MCFG_CPU_PROGRAM_MAP(zookeep_video_map)
+	MCFG_DEVICE_MODIFY("videocpu")
+	MCFG_DEVICE_PROGRAM_MAP(zookeep_video_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(qix_state::slither_video)
-	MCFG_CPU_MODIFY("videocpu")
-	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
-	MCFG_CPU_PROGRAM_MAP(slither_video_map)
+	MCFG_DEVICE_MODIFY("videocpu")
+	MCFG_DEVICE_CLOCK(SLITHER_CLOCK_OSC/4/4)   /* 1.34 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(slither_video_map)
 MACHINE_CONFIG_END

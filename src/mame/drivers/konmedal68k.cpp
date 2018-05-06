@@ -294,8 +294,8 @@ void konmedal68k_state::machine_reset()
 
 MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(33'868'800)/4 )    // 33.8688 MHz crystal verified on PCB
-	MCFG_CPU_PROGRAM_MAP(kzaurus_main)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(33'868'800)/4 )    // 33.8688 MHz crystal verified on PCB
+	MCFG_DEVICE_PROGRAM_MAP(kzaurus_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal68k_state, scanline, "screen", 0, 1)
 
 	/* video hardware */

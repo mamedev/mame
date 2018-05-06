@@ -51,11 +51,11 @@ const tiny_rom_entry *ibm_pc_83_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(ibm_pc_83_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, MCS48_LC_CLOCK(IND_U(47), CAP_P(20)))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ibm_pc_83_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(ibm_pc_83_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ibm_pc_83_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(ibm_pc_83_keyboard_device, t0_r))
+	MCFG_DEVICE_ADD(I8048_TAG, I8048, MCS48_LC_CLOCK(IND_U(47), CAP_P(20)))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, ibm_pc_83_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, ibm_pc_83_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ibm_pc_83_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, ibm_pc_83_keyboard_device, t0_r))
 MACHINE_CONFIG_END
 
 

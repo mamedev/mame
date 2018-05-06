@@ -291,11 +291,11 @@ void fcombat_state::machine_reset()
 MACHINE_CONFIG_START(fcombat_state::fcombat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 10000000/3)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 10000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 10000000/3)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/3)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 
 	/* video hardware */
@@ -314,13 +314,13 @@ MACHINE_CONFIG_START(fcombat_state::fcombat)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1500000)
+	MCFG_DEVICE_ADD("ay3", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 MACHINE_CONFIG_END
 

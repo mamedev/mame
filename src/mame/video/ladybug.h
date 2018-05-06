@@ -9,7 +9,7 @@
 
 
 #define MCFG_LADYBUG_VIDEO_GFXDECODE(tag) \
-	downcast<ladybug_video_device &>(*device).set_gfxdecode_tag("^" tag);
+	downcast<ladybug_video_device &>(*device).set_gfxdecode_tag(tag);
 
 
 // used by ladybug and sraider

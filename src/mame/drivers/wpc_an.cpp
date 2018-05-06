@@ -325,16 +325,16 @@ DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(8'000'000) / 4) // 68B09E
-	MCFG_CPU_PROGRAM_MAP(wpc_an_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(8'000'000) / 4) // 68B09E
+	MCFG_DEVICE_PROGRAM_MAP(wpc_an_map)
 
 	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(wpc_an_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(wpc_an_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(wpc_an_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(wpc_an_state,wpc_sound_ctrl_r),WRITE8(wpc_an_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(wpc_an_state,wpc_sound_data_r),WRITE8(wpc_an_state,wpc_sound_data_w))
-	MCFG_WPC_SOUND_S11C(WRITE8(wpc_an_state,wpc_sound_s11_w))
+	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_an_state,wpc_irq_w))
+	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_an_state,wpc_firq_w))
+	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_an_state,wpc_rombank_w))
+	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_an_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_an_state,wpc_sound_ctrl_w))
+	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_an_state,wpc_sound_data_r),WRITE8(*this, wpc_an_state,wpc_sound_data_w))
+	MCFG_WPC_SOUND_S11C(WRITE8(*this, wpc_an_state,wpc_sound_s11_w))
 
 	MCFG_DEFAULT_LAYOUT(layout_wpc_an)
 MACHINE_CONFIG_END
@@ -343,9 +343,9 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an)
 	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("wpcsnd", WPCSND, 0)
-	MCFG_WPC_ROM_REGION(":sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(wpc_an_state,wpcsnd_reply_w))
+	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
+	MCFG_WPC_ROM_REGION("sound1")
+	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_an_state,wpcsnd_reply_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -353,7 +353,7 @@ MACHINE_CONFIG_START(wpc_an_state::wpc_an_dd)
 	wpc_an_base(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("bg", S11C_BG, 0)
+	MCFG_DEVICE_ADD("bg", S11C_BG)
 	MCFG_S11C_BG_ROM_REGION(":sound1")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

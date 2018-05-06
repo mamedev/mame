@@ -192,14 +192,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(horse_state::horse)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(horse_map)
-	MCFG_CPU_IO_MAP(horse_io_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(12'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(horse_map)
+	MCFG_DEVICE_IO_MAP(horse_io_map)
 
 	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 4) // port A input, B output, C output but unused
-	MCFG_I8155_IN_PORTA_CB(READ8(horse_state, input_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(horse_state, output_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	MCFG_I8155_IN_PORTA_CB(READ8(*this, horse_state, input_r))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, horse_state, output_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -214,7 +214,7 @@ MACHINE_CONFIG_START(horse_state::horse)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

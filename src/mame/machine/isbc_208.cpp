@@ -23,23 +23,24 @@ FLOPPY_FORMATS_MEMBER( isbc_208_device::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( isbc_208_floppies )
-	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void isbc_208_floppies(device_slot_interface &device)
+{
+	device.option_add("8dd", FLOPPY_8_DSDD);
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(isbc_208_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL(8'000'000)/4)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(isbc_208_device, hreq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(isbc_208_device, out_eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(isbc_208_device, dma_read_byte))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(isbc_208_device, dma_write_byte))
-	MCFG_I8237_IN_IOR_0_CB(DEVREAD8("fdc", i8272a_device, mdma_r))
-	MCFG_I8237_OUT_IOW_0_CB(DEVWRITE8("fdc", i8272a_device, mdma_w))
+	MCFG_I8237_OUT_HREQ_CB(WRITELINE(*this, isbc_208_device, hreq_w))
+	MCFG_I8237_OUT_EOP_CB(WRITELINE(*this, isbc_208_device, out_eop_w))
+	MCFG_I8237_IN_MEMR_CB(READ8(*this, isbc_208_device, dma_read_byte))
+	MCFG_I8237_OUT_MEMW_CB(WRITE8(*this, isbc_208_device, dma_write_byte))
+	MCFG_I8237_IN_IOR_0_CB(READ8("fdc", i8272a_device, mdma_r))
+	MCFG_I8237_OUT_IOW_0_CB(WRITE8("fdc", i8272a_device, mdma_w))
 
 	MCFG_I8272A_ADD("fdc", true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(isbc_208_device, irq_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", am9517a_device, dreq0_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, isbc_208_device, irq_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("dmac", am9517a_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", isbc_208_floppies, "525dd", isbc_208_device::floppy_formats)
 MACHINE_CONFIG_END

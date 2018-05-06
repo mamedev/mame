@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(SEGA_FM_UNIT, sega_fm_unit_device, "sega_fm_unit", "SG-1000 F
 
 
 MACHINE_CONFIG_START(sega_fm_unit_device::device_add_mconfig)
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(10'738'635)/3)
+	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(10'738'635)/3)
 	// if this output gain is changed, the gain set when unmute the output need
 	// to be changed too, probably along the gain set for SMSJ/SMSKRFM drivers.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":mono", 1.00)

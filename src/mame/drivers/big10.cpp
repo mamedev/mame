@@ -230,9 +230,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(big10_state::big10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_io)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -243,10 +243,10 @@ MACHINE_CONFIG_START(big10_state::big10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* guess */
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* guess */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(big10_state, mux_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, big10_state, mux_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )

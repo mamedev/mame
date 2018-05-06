@@ -91,6 +91,10 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 {
 }
 
+adsp21062_device::~adsp21062_device()
+{
+}
+
 device_memory_interface::space_config_vector adsp21062_device::memory_space_config() const
 {
 	return space_config_vector {

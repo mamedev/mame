@@ -197,13 +197,13 @@ INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1200000) /* 1.2 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(ssozumo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssozumo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, 1200000) /* 1.2 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(ssozumo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ssozumo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 975000)         /* 975 kHz ?? */
-	MCFG_CPU_PROGRAM_MAP(ssozumo_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ssozumo_state, sound_timer_irq, 272/16*57) // guess, assume to be the same as tagteam
+	MCFG_DEVICE_ADD("audiocpu", M6502, 975000)         /* 975 kHz ?? */
+	MCFG_DEVICE_PROGRAM_MAP(ssozumo_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ssozumo_state, sound_timer_irq, 272/16*57) // guess, assume to be the same as tagteam
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -226,15 +226,15 @@ MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 
-	MCFG_SOUND_ADD("ay1", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("ay2", YM2149, 1500000)
+	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

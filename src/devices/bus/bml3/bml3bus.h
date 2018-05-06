@@ -21,7 +21,7 @@
 //**************************************************************************
 
 #define MCFG_BML3BUS_CPU(_cputag) \
-	downcast<bml3bus_device &>(*device).set_cputag("^" _cputag);
+	downcast<bml3bus_device &>(*device).set_cputag(_cputag);
 
 #define MCFG_BML3BUS_OUT_NMI_CB(_devcb) \
 	devcb = &downcast<bml3bus_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);

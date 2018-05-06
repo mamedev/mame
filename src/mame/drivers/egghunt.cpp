@@ -427,13 +427,13 @@ void egghunt_state::machine_reset()
 MACHINE_CONFIG_START(egghunt_state::egghunt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)      /* 6 MHz ?*/
-	MCFG_CPU_PROGRAM_MAP(egghunt_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", egghunt_state,  irq0_line_hold) // or 2 like mitchell.c?
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)      /* 6 MHz ?*/
+	MCFG_DEVICE_PROGRAM_MAP(egghunt_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", egghunt_state,  irq0_line_hold) // or 2 like mitchell.c?
 
-	MCFG_CPU_ADD("audiocpu", Z80,12000000/2)         /* 6 MHz ?*/
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,12000000/2)         /* 6 MHz ?*/
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */

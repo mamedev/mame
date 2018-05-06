@@ -218,8 +218,8 @@ MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
 MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_cave)
 	pgmbase(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(cavepgm_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type1_state, pgm_arm_type1 )
 
@@ -229,23 +229,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1_sim)
 	pgm_arm_type1_cave(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov_sim_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kov_sim_map)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000 )   // 55857E?
-	MCFG_CPU_PROGRAM_MAP(_55857E_arm7_map)
+	MCFG_DEVICE_ADD("prot", ARM7, 20000000 )   // 55857E?
+	MCFG_DEVICE_PROGRAM_MAP(_55857E_arm7_map)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pgm_arm_type1_state::pgm_arm_type1)
 	pgm_arm_type1_cave(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kov_map)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)    // 55857E?
-	MCFG_CPU_PROGRAM_MAP(_55857E_arm7_map)
+	MCFG_DEVICE_ADD("prot", ARM7, 20000000)    // 55857E?
+	MCFG_DEVICE_PROGRAM_MAP(_55857E_arm7_map)
 MACHINE_CONFIG_END
 
 void pgm_arm_type1_state::pgm_arm7_type1_latch_init()

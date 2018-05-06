@@ -27,7 +27,7 @@ MACHINE_CONFIG_START(spc1000_vdp_exp_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("tms", TMS9928A, XTAL(10'738'635) / 2) // TODO: which clock?
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(spc1000_vdp_exp_device, vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, spc1000_vdp_exp_device, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC("tms_screen")
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms9928a_device, screen_update)
 MACHINE_CONFIG_END

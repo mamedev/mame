@@ -570,9 +570,9 @@ void mwarr_state::machine_reset()
 MACHINE_CONFIG_START(mwarr_state::mwarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(mwarr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mwarr_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(mwarr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mwarr_state,  irq4_line_hold)
 
 
 	/* video hardware */

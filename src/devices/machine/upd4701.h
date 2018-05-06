@@ -32,9 +32,9 @@
 ***************************************************************************/
 
 #define MCFG_UPD4701_PORTX(_tag) \
-	downcast<upd4701_device &>(*device).set_portx_tag("^" _tag);
+	downcast<upd4701_device &>(*device).set_portx_tag(_tag);
 #define MCFG_UPD4701_PORTY(_tag) \
-	downcast<upd4701_device &>(*device).set_porty_tag("^" _tag);
+	downcast<upd4701_device &>(*device).set_porty_tag(_tag);
 #define MCFG_UPD4701_CF_CALLBACK(_devcb) \
 	devcb = downcast<upd4701_device &>(*device).set_cf_cb(DEVCB_##_devcb);
 #define MCFG_UPD4701_SF_CALLBACK(_devcb) \

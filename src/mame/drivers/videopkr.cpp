@@ -1262,24 +1262,24 @@ void videopkr_state::machine_start()
 MACHINE_CONFIG_START(videopkr_state::videopkr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8039, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(i8039_map)
-	MCFG_CPU_IO_MAP(i8039_io_port)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(videopkr_state, videopkr_p1_data_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(videopkr_state, videopkr_p1_data_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(videopkr_state, videopkr_p2_data_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(videopkr_state, videopkr_p2_data_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(videopkr_state, prog_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(videopkr_state, videopkr_t0_latch))
+	MCFG_DEVICE_ADD("maincpu", I8039, CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(i8039_map)
+	MCFG_DEVICE_IO_MAP(i8039_io_port)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, videopkr_state, videopkr_p1_data_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, videopkr_state, videopkr_p1_data_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, videopkr_p2_data_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, videopkr_p2_data_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, videopkr_state, prog_w))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, videopkr_state, videopkr_t0_latch))
 
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", videopkr_state,  irq0_line_assert)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", videopkr_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("soundcpu", I8039, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(i8039_sound_mem)
-	MCFG_CPU_IO_MAP(i8039_sound_port)
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(videopkr_state, sound_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(videopkr_state, sound_p2_w))
+	MCFG_DEVICE_ADD("soundcpu", I8039, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(i8039_sound_mem)
+	MCFG_DEVICE_IO_MAP(i8039_sound_port)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, videopkr_state, sound_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, sound_p2_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1302,9 +1302,9 @@ MACHINE_CONFIG_START(videopkr_state::videopkr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275)
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1324,8 +1324,8 @@ MACHINE_CONFIG_START(videopkr_state::videodad)
 	videopkr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(CPU_CLOCK_ALT)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(CPU_CLOCK_ALT)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1341,20 +1341,20 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	videopkr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(CPU_CLOCK_ALT)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(CPU_CLOCK_ALT)
 	/* most likely romless or eprom */
-	MCFG_CPU_REPLACE("soundcpu", I8031, CPU_CLOCK )
-	MCFG_CPU_PROGRAM_MAP(i8051_sound_mem)
-	MCFG_CPU_IO_MAP(i8051_sound_port)
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(videopkr_state, baby_sound_p0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(videopkr_state, baby_sound_p0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(videopkr_state, baby_sound_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(videopkr_state, baby_sound_p1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(videopkr_state, baby_sound_p2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(videopkr_state, baby_sound_p2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(videopkr_state, baby_sound_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(videopkr_state, baby_sound_p3_w))
+	MCFG_DEVICE_REPLACE("soundcpu", I8031, CPU_CLOCK )
+	MCFG_DEVICE_PROGRAM_MAP(i8051_sound_mem)
+	MCFG_DEVICE_IO_MAP(i8051_sound_port)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, videopkr_state, baby_sound_p0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, videopkr_state, baby_sound_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p1_w))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, videopkr_state, baby_sound_p2_r))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, videopkr_state, baby_sound_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, videopkr_state, baby_sound_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1366,7 +1366,7 @@ MACHINE_CONFIG_START(videopkr_state::babypkr)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", videodad)
 	MCFG_VIDEO_START_OVERRIDE(videopkr_state,vidadcba)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */
+	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK / 6) /* no ports used */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
@@ -1374,8 +1374,8 @@ MACHINE_CONFIG_START(videopkr_state::fortune1)
 	videopkr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(CPU_CLOCK_ALT)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(CPU_CLOCK_ALT)
 
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(videopkr_state,fortune1)
@@ -1383,9 +1383,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(videopkr_state::bpoker)
 	babypkr(config);
-	MCFG_CPU_REPLACE("maincpu", I8751, XTAL(6'000'000))
-	MCFG_CPU_PROGRAM_MAP(i8751_map)
-	MCFG_CPU_IO_MAP(i8751_io_port)
+	MCFG_DEVICE_REPLACE("maincpu", I8751, XTAL(6'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(i8751_map)
+	MCFG_DEVICE_IO_MAP(i8751_io_port)
 	MCFG_MCS51_PORT_P0_IN_CB(NOOP) // ???
 	MCFG_MCS51_PORT_P1_IN_CB(NOOP) // ???
 	MCFG_MCS51_PORT_P1_OUT_CB(NOOP) // ???

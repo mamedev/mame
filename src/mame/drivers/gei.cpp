@@ -971,9 +971,9 @@ INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 
 
 MACHINE_CONFIG_START(gei_state::getrivia)
-	MCFG_CPU_ADD("maincpu",Z80,4000000) /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(getrivia_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gei_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu",Z80,4000000) /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(getrivia_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gei_state, vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -991,40 +991,40 @@ MACHINE_CONFIG_START(gei_state::getrivia)
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSWA"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, sound_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, sound_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(gei_state, lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, lamps2_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, gei_state, lamps_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, lamps2_w))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::findout)
 	getrivia(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(findout_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(findout_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(gei_state, lamps_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(gei_state, portC_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, gei_state, lamps_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, gei_state, portC_r))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::quizvid)
 	findout(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(quizvid_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(quizvid_map)
 
 	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_3BIT_GRB("palette")
@@ -1037,8 +1037,8 @@ MACHINE_CONFIG_START(gei_state::gselect)
 
 	MCFG_DEVICE_REMOVE("ticket")
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gselect_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
 
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_DEVICE_REMOVE("ppi8255_1")
@@ -1046,13 +1046,13 @@ MACHINE_CONFIG_START(gei_state::gselect)
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSWA"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, sound2_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, sound2_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(gei_state, lamps_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, gei_state, lamps_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gei_state, nmi_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, nmi_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::jokpokera)
@@ -1062,8 +1062,8 @@ MACHINE_CONFIG_START(gei_state::jokpokera)
 
 	MCFG_DEVICE_REMOVE("ticket")
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gselect_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::amuse)
@@ -1071,8 +1071,8 @@ MACHINE_CONFIG_START(gei_state::amuse)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(amuse_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(amuse_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::gepoker)
@@ -1080,29 +1080,29 @@ MACHINE_CONFIG_START(gei_state::gepoker)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gepoker_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gepoker_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::amuse1)
 	getrivia(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(amuse1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(amuse1_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::suprpokr)
 	getrivia(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(suprpokr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(suprpokr_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gei_state::sprtauth)
 	getrivia(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sprtauth_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sprtauth_map)
 MACHINE_CONFIG_END
 
 

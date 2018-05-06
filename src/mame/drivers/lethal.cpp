@@ -492,12 +492,12 @@ void lethal_state::machine_reset()
 MACHINE_CONFIG_START(lethal_state::lethalen)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(le_main)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lethal_state,  lethalen_interrupt)
+	MCFG_DEVICE_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(le_main)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lethal_state,  lethalen_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(le_sound)
+	MCFG_DEVICE_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(le_sound)
 
 	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
@@ -537,7 +537,7 @@ MACHINE_CONFIG_START(lethal_state::lethalen)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_NMI))

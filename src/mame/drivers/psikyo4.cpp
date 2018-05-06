@@ -654,9 +654,9 @@ void psikyo4_state::machine_reset()
 MACHINE_CONFIG_START(psikyo4_state::ps4big)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(ps4_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
+	MCFG_DEVICE_ADD("maincpu", SH2, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(ps4_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", psikyo4_state,  psikyosh_interrupt)
 
 
 	MCFG_EEPROM_SERIAL_93C56_8BIT_ADD("eeprom")
@@ -690,7 +690,7 @@ MACHINE_CONFIG_START(psikyo4_state::ps4big)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("ymf", YMF278B, MASTER_CLOCK/2)
 	MCFG_DEVICE_ADDRESS_MAP(0, ps4_ymf_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 12))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)

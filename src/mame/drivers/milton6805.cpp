@@ -118,8 +118,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(milton_state::milton)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, 3120000) // MC6805P2, needs a CPU core
-	MCFG_CPU_PROGRAM_MAP(prg_map)
+	MCFG_DEVICE_ADD("maincpu", M6805, 3120000) // MC6805P2, needs a CPU core
+	MCFG_DEVICE_PROGRAM_MAP(prg_map)
 
 	MCFG_DEVICE_ADD("grom3", TMC0430, 3120000 / 8)
 	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x0000, 0);
@@ -128,7 +128,7 @@ MACHINE_CONFIG_START(milton_state::milton)
 	downcast<tmc0430_device &>(*device).set_region_and_ident("groms", 0x2000, 1);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("sp0250", SP0250, 3120000)
+	MCFG_DEVICE_ADD("sp0250", SP0250, 3120000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

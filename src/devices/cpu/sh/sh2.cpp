@@ -159,6 +159,10 @@ sh2_device::sh2_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+sh2_device::~sh2_device()
+{
+}
+
 
 void sh2_device::device_stop()
 {

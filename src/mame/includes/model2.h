@@ -49,10 +49,8 @@ public:
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
 		m_copro_data(*this, "copro_data"),
-		m_in(*this, "IN%u", 0),
-		m_dsw(*this, "DSW"),
+		m_in0(*this, "IN0"),
 		m_gears(*this, "GEARS"),
-		m_analog_ports(*this, "ANA%u", 0),
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
 	{ }
 
@@ -67,7 +65,6 @@ public:
 
 	/* Public for access by the ioports */
 	DECLARE_CUSTOM_INPUT_MEMBER(daytona_gearbox_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 
 	/* Public for access by MCFG */
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
@@ -109,10 +106,8 @@ protected:
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 	optional_memory_region m_copro_data;
 
-	optional_ioport_array<5> m_in;
-	optional_ioport m_dsw;
+	required_ioport m_in0;
 	optional_ioport m_gears;
-	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
 
 	uint32_t m_timervals[4];
@@ -120,7 +115,6 @@ protected:
 	int m_timerrun[4];
 	timer_device *m_timers[4];
 	int m_ctrlmode;
-	int m_analog_channel;
 	uint16_t m_cmd_data;
 	uint8_t m_driveio_comm_data;
 	int m_iop_write_num;
@@ -154,23 +148,24 @@ protected:
 	DECLARE_WRITE32_MEMBER(geo_w);
 
 	// Everything else
-	DECLARE_READ8_MEMBER(model2_crx_in_r);
 	DECLARE_READ32_MEMBER(timers_r);
 	DECLARE_WRITE32_MEMBER(timers_w);
 	DECLARE_READ16_MEMBER(palette_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(colorxlat_r);
 	DECLARE_WRITE16_MEMBER(colorxlat_w);
-	DECLARE_WRITE32_MEMBER(ctrl0_w);
-	DECLARE_WRITE32_MEMBER(analog_2b_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_READ8_MEMBER(in0_r);
 	DECLARE_READ32_MEMBER(fifo_control_2a_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
-	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
-	DECLARE_WRITE32_MEMBER(srallyc_devices_w);
-	DECLARE_READ8_MEMBER(lightgun_coords_r);
-	DECLARE_READ8_MEMBER(lightgun_offscreen_r);
+	DECLARE_READ8_MEMBER(rchase2_drive_board_r);
+	DECLARE_WRITE8_MEMBER(rchase2_drive_board_w);
+	DECLARE_WRITE8_MEMBER(drive_board_w);
+	DECLARE_READ8_MEMBER(lightgun_data_r);
+	DECLARE_READ8_MEMBER(lightgun_mux_r);
 	DECLARE_WRITE8_MEMBER(lightgun_mux_w);
+	DECLARE_READ8_MEMBER(lightgun_offscreen_r);
 	DECLARE_READ32_MEMBER(irq_request_r);
 	DECLARE_WRITE32_MEMBER(irq_ack_w);
 	DECLARE_READ32_MEMBER(irq_enable_r);
@@ -239,12 +234,6 @@ protected:
 	uint32_t m_intena;
 	uint32_t m_coproctl;
 	uint32_t m_coprocnt;
-
-	int m_port_1c00004;
-	int m_port_1c00006;
-	int m_port_1c00010;
-	int m_port_1c00012;
-	int m_port_1c00014;
 
 	virtual void copro_halt() = 0;
 	virtual void copro_boot() = 0;
@@ -321,7 +310,6 @@ public:
 	{}
 
 	DECLARE_MACHINE_START(model2_tgp);
-	DECLARE_MACHINE_START(srallyc);
 
 protected:
 	required_device<mb86234_device> m_copro_tgp;
@@ -382,8 +370,7 @@ class model2o_state : public model2_tgp_state
 {
 public:
 	model2o_state(const machine_config &mconfig, device_type type, const char *tag)
-		: model2_tgp_state(mconfig, type, tag),
-		  m_dpram(*this, "dpram")
+		: model2_tgp_state(mconfig, type, tag)
 	{}
 
 	DECLARE_MACHINE_RESET(model2o);
@@ -394,18 +381,12 @@ public:
 	void vcop(machine_config &config);
 
 protected:
-	DECLARE_READ32_MEMBER(dpram_r);
-	DECLARE_WRITE32_MEMBER(dpram_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_READ32_MEMBER(fifo_control_2o_r);
 	DECLARE_WRITE8_MEMBER(daytona_output_w);
 	DECLARE_WRITE8_MEMBER(desert_output_w);
 	DECLARE_WRITE8_MEMBER(vcop_output_w);
 
 	void model2o_mem(address_map &map);
-
-	required_shared_ptr<uint32_t> m_dpram;
 };
 
 /*****************************
@@ -471,6 +452,9 @@ public:
 	void model2a_0229(machine_config &config);
 	void model2a_5881(machine_config &config);
 	void srallyc(machine_config &config);
+	void vcop2(machine_config &config);
+	void skytargt(machine_config &config);
+	void zeroguna(machine_config &config);
 
 protected:
 	void model2a_crx_mem(address_map &map);
@@ -493,13 +477,15 @@ public:
 
 	DECLARE_MACHINE_RESET(model2b);
 	DECLARE_MACHINE_START(model2b);
-	DECLARE_MACHINE_START(srallyc);
 
 	void model2b(machine_config &config);
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
 	void indy500(machine_config &config);
 	void rchase2(machine_config &config);
+	void gunblade(machine_config &config);
+	void dynabb(machine_config &config);
+	void zerogun(machine_config &config);
 
 protected:
 	required_device<adsp21062_device> m_copro_adsp;
@@ -540,12 +526,17 @@ public:
 
 	DECLARE_MACHINE_RESET(model2c);
 	DECLARE_MACHINE_START(model2c);
-	DECLARE_MACHINE_START(srallyc);
 
 	void model2c(machine_config &config);
 	void model2c_5881(machine_config &config);
-	void overrev2c(machine_config &config);
+	void skisuprg(machine_config &config);
 	void stcc(machine_config &config);
+	void waverunr(machine_config &config);
+	void bel(machine_config &config);
+	void hotd(machine_config &config);
+	void overrev2c(machine_config &config);
+	void segawski(machine_config &config);
+	void topskatr(machine_config &config);
 
 protected:
 	required_device<mb86235_device> m_copro_tgpx4;

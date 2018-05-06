@@ -272,9 +272,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12.096_MHz_XTAL/6)        /* ??? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tunhunt_state, irq0_line_hold,  4*60)  /* 48V, 112V, 176V, 240V */
+	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL/6)        /* ??? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(tunhunt_state, irq0_line_hold,  4*60)  /* 48V, 112V, 176V, 240V */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -293,19 +293,19 @@ MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, 12.096_MHz_XTAL/10)
+	MCFG_DEVICE_ADD("pokey1", POKEY, 12.096_MHz_XTAL/10)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, 12.096_MHz_XTAL/10)
+	MCFG_DEVICE_ADD("pokey2", POKEY, 12.096_MHz_XTAL/10)
 	MCFG_POKEY_POT0_R_CB(IOPORT("IN1"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("IN2"))
-	MCFG_POKEY_POT2_R_CB(READ8(tunhunt_state, dsw2_0r))
-	MCFG_POKEY_POT3_R_CB(READ8(tunhunt_state, dsw2_1r))
-	MCFG_POKEY_POT4_R_CB(READ8(tunhunt_state, dsw2_2r))
-	MCFG_POKEY_POT5_R_CB(READ8(tunhunt_state, dsw2_3r))
-	MCFG_POKEY_POT6_R_CB(READ8(tunhunt_state, dsw2_4r))
+	MCFG_POKEY_POT2_R_CB(READ8(*this, tunhunt_state, dsw2_0r))
+	MCFG_POKEY_POT3_R_CB(READ8(*this, tunhunt_state, dsw2_1r))
+	MCFG_POKEY_POT4_R_CB(READ8(*this, tunhunt_state, dsw2_2r))
+	MCFG_POKEY_POT5_R_CB(READ8(*this, tunhunt_state, dsw2_3r))
+	MCFG_POKEY_POT6_R_CB(READ8(*this, tunhunt_state, dsw2_4r))
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

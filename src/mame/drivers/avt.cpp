@@ -960,10 +960,10 @@ WRITE_LINE_MEMBER( avt_state::avtbingo_w )
 
 MACHINE_CONFIG_START(avt_state::avt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(avt_map)
-	MCFG_CPU_IO_MAP(avt_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(avt_map)
+	MCFG_DEVICE_IO_MAP(avt_portmap)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -981,18 +981,18 @@ MACHINE_CONFIG_START(avt_state::avt)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc0", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(avt_state, avtbingo_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("ctc0", z80ctc_device, trg3))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, avt_state, avtbingo_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2)    /* 1.25 MHz.?? */
+	MCFG_DEVICE_ADD("aysnd", AY8910, CPU_CLOCK/2)    /* 1.25 MHz.?? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// device never addressed by cpu
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, CPU_CLOCK) // U27
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc0", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc0", z80ctc_device, trg1))
 	// ZC1 not connected
 	// TRG2 to TP18; ZC2 to TP9; TRG3 to VSYNC; TRG0 to cpu_clock/4
 
@@ -1021,8 +1021,8 @@ MACHINE_CONFIG_START(avt_state::avtnfl)
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("ctc0", z80ctc_device, trg3))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(avt_state, avtnfl_w))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE("ctc0", z80ctc_device, trg3))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, avt_state, avtnfl_w))
 MACHINE_CONFIG_END
 
 /*********************************************

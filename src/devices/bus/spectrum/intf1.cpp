@@ -41,11 +41,11 @@ ROM_END
 
 MACHINE_CONFIG_START(spectrum_intf1_device::device_add_mconfig)
 	/* rs232 */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
 
 	/* microdrive */
 	MCFG_MICRODRIVE_ADD("mdv1")
-	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE("mdv2", microdrive_image_device, comms_in_w))
+	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(WRITELINE("mdv2", microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD("mdv2")
 
 	/* passthru */

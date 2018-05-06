@@ -1114,9 +1114,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(berzerk_state::berzerk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(berzerk_map)
-	MCFG_CPU_IO_MAP(berzerk_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(berzerk_map)
+	MCFG_DEVICE_IO_MAP(berzerk_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1131,9 +1131,9 @@ MACHINE_CONFIG_START(berzerk_state::berzerk)
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
+	MCFG_DEVICE_ADD("speech", S14001A, S14001_CLOCK/16/8) /* placeholder - the clock is software controllable */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("exidy", EXIDY, 0)
+	MCFG_DEVICE_ADD("exidy", EXIDY, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
@@ -1142,8 +1142,8 @@ MACHINE_CONFIG_START(berzerk_state::frenzy)
 	berzerk(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(frenzy_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(frenzy_map)
 MACHINE_CONFIG_END
 
 

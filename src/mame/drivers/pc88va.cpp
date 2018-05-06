@@ -1774,9 +1774,10 @@ FLOPPY_FORMATS_MEMBER( pc88va_state::floppy_formats )
 	FLOPPY_XDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( pc88va_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pc88va_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 READ8_MEMBER(pc88va_state::dma_memr_cb)
 {
@@ -1792,16 +1793,16 @@ printf("%08x %02x\n",offset,data);
 
 MACHINE_CONFIG_START(pc88va_state::pc88va)
 
-	MCFG_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(pc88va_map)
-	MCFG_CPU_IO_MAP(pc88va_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc88va_state, pc88va_vrtc_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)        /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pc88va_map)
+	MCFG_DEVICE_IO_MAP(pc88va_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc88va_state, pc88va_vrtc_irq)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
 
 #if TEST_SUBFDC
-	MCFG_CPU_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */
-	MCFG_CPU_PROGRAM_MAP(pc88va_z80_map)
-	MCFG_CPU_IO_MAP(pc88va_z80_io_map)
+	MCFG_DEVICE_ADD("fdccpu", Z80, 8000000)        /* 8 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pc88va_z80_map)
+	MCFG_DEVICE_IO_MAP(pc88va_z80_io_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 #endif
@@ -1817,57 +1818,57 @@ MACHINE_CONFIG_START(pc88va_state::pc88va)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pc88va )
 
 	MCFG_DEVICE_ADD("d8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_2s", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_2s", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pc88va_state, cpu_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc88va_state, cpu_8255_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2s", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(READ8("d8255_2s", i8255_device, pa_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, cpu_8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, cpu_8255_c_w))
 
 	MCFG_DEVICE_ADD("d8255_3", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pc88va_state, r232_ctrl_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pc88va_state, r232_ctrl_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pc88va_state, r232_ctrl_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pc88va_state, r232_ctrl_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pc88va_state, r232_ctrl_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc88va_state, r232_ctrl_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, pc88va_state, r232_ctrl_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pc88va_state, r232_ctrl_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, pc88va_state, r232_ctrl_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pc88va_state, r232_ctrl_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, r232_ctrl_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, r232_ctrl_portc_w))
 
 	MCFG_DEVICE_ADD("d8255_2s", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_2", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_2", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pc88va_state, fdc_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc88va_state, fdc_8255_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8("d8255_2", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(READ8("d8255_2", i8255_device, pa_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc88va_state, fdc_8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc88va_state, fdc_8255_c_w))
 
 	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(pc88va_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, pc88va_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_master", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("dmac", AM9517A, 8000000) /* ch2 is FDC, ch0/3 are "user". ch1 is unused */
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(pc88va_state, pc88va_hlda_w))
-	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(pc88va_state, pc88va_tc_w))
-	MCFG_AM9517A_IN_IOR_2_CB(READ8(pc88va_state, fdc_dma_r))
-	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(pc88va_state, fdc_dma_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(pc88va_state, dma_memr_cb))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(pc88va_state, dma_memw_cb))
+	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(*this, pc88va_state, pc88va_hlda_w))
+	MCFG_AM9517A_OUT_EOP_CB(WRITELINE(*this, pc88va_state, pc88va_tc_w))
+	MCFG_AM9517A_IN_IOR_2_CB(READ8(*this, pc88va_state, fdc_dma_r))
+	MCFG_AM9517A_OUT_IOW_2_CB(WRITE8(*this, pc88va_state, fdc_dma_w))
+	MCFG_AM9517A_IN_MEMR_CB(READ8(*this, pc88va_state, dma_memr_cb))
+	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(*this, pc88va_state, dma_memw_cb))
 
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_irq))
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pc88va_state, fdc_drq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_irq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pc88va_state, fdc_drq))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", pc88va_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", pc88va_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(8000000) /* general purpose timer 1 */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(pc88va_state, pc88va_pit_out0_changed))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pc88va_state, pc88va_pit_out0_changed))
 	MCFG_PIT8253_CLK1(8000000) /* BEEP frequency setting */
 	MCFG_PIT8253_CLK2(8000000) /* RS232C baud rate setting */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym", YM2203, 3993600) //unknown clock / divider
+	MCFG_DEVICE_ADD("ym", YM2203, 3993600) //unknown clock / divider
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

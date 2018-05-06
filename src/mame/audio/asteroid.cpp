@@ -318,27 +318,27 @@ WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)
 MACHINE_CONFIG_START(asteroid_state::asteroid_sound)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(asteroid)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 
 	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SND_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_FIRE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SEL>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_SHIP_FIRE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_LIFE_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SND_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_FIRE_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SAUCER_SEL>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_SHIP_FIRE_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_LIFE_EN>))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(asteroid_state::astdelux_sound)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(astdelux)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // M10
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE("discrete", discrete_device, write_line<ASTEROID_THRUST_EN>))
 MACHINE_CONFIG_END

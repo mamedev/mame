@@ -541,9 +541,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bzone_state::bzone_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(bzone_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
+	MCFG_DEVICE_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(bzone_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -577,8 +577,8 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	bzone_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(redbaron_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(redbaron_map)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
@@ -590,11 +590,11 @@ MACHINE_CONFIG_START(redbaron_state::redbaron)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey", POKEY, 1500000)
-	MCFG_POKEY_ALLPOT_R_CB(READ8(redbaron_state, redbaron_joy_r))
+	MCFG_DEVICE_ADD("pokey", POKEY, 1500000)
+	MCFG_POKEY_ALLPOT_R_CB(READ8(*this, redbaron_state, redbaron_joy_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("custom", REDBARON, 0)
+	MCFG_DEVICE_ADD("custom", REDBARON, 0)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

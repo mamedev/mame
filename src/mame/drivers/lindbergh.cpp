@@ -391,7 +391,7 @@ void lindbergh_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(lindbergh_state::lindbergh)
-	MCFG_CPU_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
+	MCFG_DEVICE_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
 	MCFG_I82875P_HOST_ADD(            ":pci:00.0",                        0x103382c0, ":maincpu", 512*1024*1024)

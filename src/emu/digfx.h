@@ -140,7 +140,7 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 //**************************************************************************
 
 #define MCFG_GFXDECODE_ADD(_tag, _palette_tag, _info) \
-	MCFG_DEVICE_ADD(_tag, GFXDECODE, 0) \
+	MCFG_DEVICE_ADD(_tag, GFXDECODE) \
 	MCFG_GFX_PALETTE(_palette_tag) \
 	MCFG_GFX_INFO(_info)
 

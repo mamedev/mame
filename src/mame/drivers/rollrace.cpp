@@ -252,21 +252,21 @@ INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 MACHINE_CONFIG_START(rollrace_state::rollrace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(24'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rollrace_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(24'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rollrace_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rollrace_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(rollrace_state, sound_timer_irq, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rollrace_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(rollrace_state, sound_timer_irq, 4*60)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(rollrace_state, flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rollrace_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(rollrace_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rollrace_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rollrace_state, charbank_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(rollrace_state, charbank_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rollrace_state, spritebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, rollrace_state, flipx_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, rollrace_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, rollrace_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, rollrace_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, rollrace_state, charbank_0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, rollrace_state, charbank_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, rollrace_state, spritebank_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -276,7 +276,7 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 	MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
 	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rollrace_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rollrace_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rollrace)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -287,13 +287,13 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay1", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ay2", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay2", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ay3", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
+	MCFG_DEVICE_ADD("ay3", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 MACHINE_CONFIG_END
 

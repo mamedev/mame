@@ -68,8 +68,8 @@ void konami_pc_state::machine_reset()
 MACHINE_CONFIG_START(konami_pc_state::konami_pc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // not correct, but why bother?
-	MCFG_CPU_PROGRAM_MAP(konami_pc_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // not correct, but why bother?
+	MCFG_DEVICE_PROGRAM_MAP(konami_pc_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

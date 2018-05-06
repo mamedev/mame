@@ -494,12 +494,12 @@ MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
 MACHINE_CONFIG_START(lasso_state::base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 11289000/16) /* guess */
-	MCFG_CPU_PROGRAM_MAP(lasso_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6502, 11289000/16) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(lasso_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 600000)
-	MCFG_CPU_PROGRAM_MAP(lasso_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 600000)
+	MCFG_DEVICE_PROGRAM_MAP(lasso_audio_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -519,10 +519,10 @@ MACHINE_CONFIG_START(lasso_state::base)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn76489.1", SN76489, 2000000)
+	MCFG_DEVICE_ADD("sn76489.1", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("sn76489.2", SN76489, 2000000)
+	MCFG_DEVICE_ADD("sn76489.2", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -530,8 +530,8 @@ MACHINE_CONFIG_START(lasso_state::lasso)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("blitter", M6502, 11289000/16) /* guess */
-	MCFG_CPU_PROGRAM_MAP(lasso_coprocessor_map)
+	MCFG_DEVICE_ADD("blitter", M6502, 11289000/16) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(lasso_coprocessor_map)
 
 	MCFG_PALETTE_ADD("palette", 0x40)
 	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
@@ -541,11 +541,11 @@ MACHINE_CONFIG_START(lasso_state::chameleo)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(chameleo_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(chameleo_main_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(chameleo_audio_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(chameleo_audio_map)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 0x40)
@@ -559,11 +559,11 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wwjgtin_main_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wwjgtin_main_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(wwjgtin_audio_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(wwjgtin_audio_map)
 
 	MCFG_MACHINE_START_OVERRIDE(lasso_state,wwjgtin)
 	MCFG_MACHINE_RESET_OVERRIDE(lasso_state,wwjgtin)
@@ -580,22 +580,22 @@ MACHINE_CONFIG_START(lasso_state::wwjgtin)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,wwjgtin)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(lasso_state::pinbo)
 	base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6502, XTAL(18'000'000)/24)
-	MCFG_CPU_PROGRAM_MAP(pinbo_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, XTAL(18'000'000)/24)
+	MCFG_DEVICE_PROGRAM_MAP(pinbo_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lasso_state,  irq0_line_hold)
 
-	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL(18'000'000)/6)
-	MCFG_CPU_PROGRAM_MAP(pinbo_audio_map)
-	MCFG_CPU_IO_MAP(pinbo_audio_io_map)
+	MCFG_DEVICE_REPLACE("audiocpu", Z80, XTAL(18'000'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(pinbo_audio_map)
+	MCFG_DEVICE_IO_MAP(pinbo_audio_io_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pinbo)
@@ -609,10 +609,10 @@ MACHINE_CONFIG_START(lasso_state::pinbo)
 	MCFG_DEVICE_REMOVE("sn76489.1")
 	MCFG_DEVICE_REMOVE("sn76489.2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'000'000)/12)
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(18'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'000'000)/12)
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(18'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.55)
 MACHINE_CONFIG_END
 

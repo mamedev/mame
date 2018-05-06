@@ -296,18 +296,18 @@ PALETTE_INIT_MEMBER(molecula_state, molecula)
 MACHINE_CONFIG_START(molecula_state::molecula)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("filecpu",Z80,Z80_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(molecula_file_map)
-	MCFG_CPU_IO_MAP(molecula_file_io)
+	MCFG_DEVICE_ADD("filecpu",Z80,Z80_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(molecula_file_map)
+	MCFG_DEVICE_IO_MAP(molecula_file_io)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("appcpu",Z80,Z80_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(molecula_app_map)
-	MCFG_CPU_IO_MAP(molecula_app_io)
+	MCFG_DEVICE_ADD("appcpu",Z80,Z80_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(molecula_app_map)
+	MCFG_DEVICE_IO_MAP(molecula_app_io)
 
-//  MCFG_CPU_ADD("sub",I8086,I86_CLOCK/2)
-//  MCFG_CPU_PROGRAM_MAP(molecula_map)
-//  MCFG_CPU_IO_MAP(molecula_io)
+//  MCFG_DEVICE_ADD("sub",I8086,I86_CLOCK/2)
+//  MCFG_DEVICE_PROGRAM_MAP(molecula_map)
+//  MCFG_DEVICE_IO_MAP(molecula_io)
 //  MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -326,7 +326,7 @@ MACHINE_CONFIG_START(molecula_state::molecula)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

@@ -38,25 +38,26 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/vp415.h"
 
-/*static*/ const char* vp415_state::DATACPU_TAG = "datacpu";
-/*static*/ const char* vp415_state::DATAMCU_TAG = "datamcu";
-/*static*/ const char* vp415_state::DATARAM_TAG = "dataram";
-/*static*/ const char* vp415_state::SCSI_TAG = "ncr5385";
-/*static*/ const char* vp415_state::CTRLCPU_TAG = "ctrlcpu";
-/*static*/ const char* vp415_state::CTRLMCU_TAG = "ctrlmcu";
-/*static*/ const char* vp415_state::CTRLRAM_TAG = "ctrlram";
-/*static*/ const char* vp415_state::DRIVECPU_TAG = "drivecpu";
-/*static*/ const char* vp415_state::DESCRAMBLE_ROM_TAG = "descramblerom";
-/*static*/ const char* vp415_state::SYNC_ROM_TAG = "syncrom";
-/*static*/ const char* vp415_state::DRIVE_ROM_TAG = "driverom";
-/*static*/ const char* vp415_state::CONTROL_ROM_TAG = "controlrom";
-/*static*/ const char* vp415_state::SWITCHES_TAG = "SWITCHES";
-/*static*/ const char* vp415_state::I8155_TAG = "i8155";
-/*static*/ const char* vp415_state::I8255_TAG = "i8255";
-/*static*/ const char* vp415_state::CHARGEN_TAG = "mb88303";
-/*static*/ const char* vp415_state::SYNCGEN_TAG = "saa1043";
+/*static*/ const char *const vp415_state::DATACPU_TAG = "datacpu";
+/*static*/ const char *const vp415_state::DATAMCU_TAG = "datamcu";
+/*static*/ const char *const vp415_state::DATARAM_TAG = "dataram";
+/*static*/ const char *const vp415_state::SCSI_TAG = "ncr5385";
+/*static*/ const char *const vp415_state::CTRLCPU_TAG = "ctrlcpu";
+/*static*/ const char *const vp415_state::CTRLMCU_TAG = "ctrlmcu";
+/*static*/ const char *const vp415_state::CTRLRAM_TAG = "ctrlram";
+/*static*/ const char *const vp415_state::DRIVECPU_TAG = "drivecpu";
+/*static*/ const char *const vp415_state::DESCRAMBLE_ROM_TAG = "descramblerom";
+/*static*/ const char *const vp415_state::SYNC_ROM_TAG = "syncrom";
+/*static*/ const char *const vp415_state::DRIVE_ROM_TAG = "driverom";
+/*static*/ const char *const vp415_state::CONTROL_ROM_TAG = "controlrom";
+/*static*/ const char *const vp415_state::SWITCHES_TAG = "SWITCHES";
+/*static*/ const char *const vp415_state::I8155_TAG = "i8155";
+/*static*/ const char *const vp415_state::I8255_TAG = "i8255";
+/*static*/ const char *const vp415_state::CHARGEN_TAG = "mb88303";
+/*static*/ const char *const vp415_state::SYNCGEN_TAG = "saa1043";
 
 /*static*/ const device_timer_id vp415_state::DRIVE_2PPR_ID = 0;
 
@@ -490,57 +491,57 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vp415_state::vp415)
 	// Module W: CPU Datagrabber
-	MCFG_CPU_ADD(DATACPU_TAG, Z80, XTAL(8'000'000)/2) // 8MHz through a /2 flip-flop divider, per schematic
-	MCFG_CPU_PROGRAM_MAP(z80_program_map)
-	MCFG_CPU_IO_MAP(z80_io_map)
+	MCFG_DEVICE_ADD(DATACPU_TAG, Z80, XTAL(8'000'000)/2) // 8MHz through a /2 flip-flop divider, per schematic
+	MCFG_DEVICE_PROGRAM_MAP(z80_program_map)
+	MCFG_DEVICE_IO_MAP(z80_io_map)
 
-	MCFG_CPU_ADD(DATAMCU_TAG, I8041, XTAL(4'000'000)) // Verified on schematic
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(vp415_state, data_mcu_port1_r));
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vp415_state, data_mcu_port1_w));
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(vp415_state, data_mcu_port2_r));
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vp415_state, data_mcu_port2_w));
-	MCFG_CPU_PROGRAM_MAP(datamcu_program_map)
+	MCFG_DEVICE_ADD(DATAMCU_TAG, I8041, XTAL(4'000'000)) // Verified on schematic
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, vp415_state, data_mcu_port1_r));
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, vp415_state, data_mcu_port1_w));
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, vp415_state, data_mcu_port2_r));
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, vp415_state, data_mcu_port2_w));
+	MCFG_DEVICE_PROGRAM_MAP(datamcu_program_map)
 
 	MCFG_DEVICE_ADD(SCSI_TAG, NCR5385, XTAL(8'000'000)/2) // Same clock signal as above, per schematic
-	MCFG_NCR5385_INT_CB(WRITELINE(vp415_state, cpu_int1_w))
+	MCFG_NCR5385_INT_CB(WRITELINE(*this, vp415_state, cpu_int1_w))
 
 	// Module S: Control
-	MCFG_CPU_ADD(CTRLCPU_TAG, I8031, XTAL(11'059'200)) // 11.059MHz, per schematic
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(vp415_state, ctrl_cpu_port1_w));
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(vp415_state, ctrl_cpu_port1_r));
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(vp415_state, ctrl_cpu_port3_w));
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(vp415_state, ctrl_cpu_port3_r));
-	MCFG_CPU_PROGRAM_MAP(ctrl_program_map)
-	MCFG_CPU_IO_MAP(ctrl_io_map)
+	MCFG_DEVICE_ADD(CTRLCPU_TAG, I8031, XTAL(11'059'200)) // 11.059MHz, per schematic
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, vp415_state, ctrl_cpu_port1_w));
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, vp415_state, ctrl_cpu_port1_r));
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, vp415_state, ctrl_cpu_port3_w));
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, vp415_state, ctrl_cpu_port3_r));
+	MCFG_DEVICE_PROGRAM_MAP(ctrl_program_map)
+	MCFG_DEVICE_IO_MAP(ctrl_io_map)
 
-	MCFG_CPU_ADD(CTRLMCU_TAG, I8041, XTAL(4'000'000)) // Verified on schematic
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(vp415_state, ctrl_mcu_port1_r));
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vp415_state, ctrl_mcu_port1_w));
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(vp415_state, ctrl_mcu_port2_r));
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vp415_state, ctrl_mcu_port2_w));
-	MCFG_CPU_PROGRAM_MAP(ctrlmcu_program_map)
+	MCFG_DEVICE_ADD(CTRLMCU_TAG, I8041, XTAL(4'000'000)) // Verified on schematic
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, vp415_state, ctrl_mcu_port1_r));
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, vp415_state, ctrl_mcu_port1_w));
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, vp415_state, ctrl_mcu_port2_r));
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, vp415_state, ctrl_mcu_port2_w));
+	MCFG_DEVICE_PROGRAM_MAP(ctrlmcu_program_map)
 
 	// Module R: Drive
-	MCFG_CPU_ADD(DRIVECPU_TAG, I8031, XTAL(12'000'000)) // 12MHz, per schematic
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(vp415_state, drive_cpu_port1_w));
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(vp415_state, drive_cpu_port3_w));
-	MCFG_CPU_PROGRAM_MAP(drive_program_map)
-	MCFG_CPU_IO_MAP(drive_io_map)
+	MCFG_DEVICE_ADD(DRIVECPU_TAG, I8031, XTAL(12'000'000)) // 12MHz, per schematic
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, vp415_state, drive_cpu_port1_w));
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, vp415_state, drive_cpu_port3_w));
+	MCFG_DEVICE_PROGRAM_MAP(drive_program_map)
+	MCFG_DEVICE_IO_MAP(drive_io_map)
 
 	MCFG_DEVICE_ADD(I8155_TAG, I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(DEVWRITE8(CHARGEN_TAG, mb88303_device, da_w))
-	MCFG_I8155_IN_PORTB_CB(READ8(vp415_state, drive_i8155_pb_r))
-	MCFG_I8155_IN_PORTC_CB(READ8(vp415_state, drive_i8155_pc_r))
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(CHARGEN_TAG, mb88303_device, da_w))
+	MCFG_I8155_IN_PORTB_CB(READ8(*this, vp415_state, drive_i8155_pb_r))
+	MCFG_I8155_IN_PORTC_CB(READ8(*this, vp415_state, drive_i8155_pc_r))
 
 	MCFG_DEVICE_ADD(I8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(vp415_state, drive_i8255_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(vp415_state, drive_i8255_pb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(vp415_state, drive_i8255_pc_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vp415_state, drive_i8255_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vp415_state, drive_i8255_pb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, vp415_state, drive_i8255_pc_r))
 
 	MCFG_DEVICE_ADD(CHARGEN_TAG, MB88303, 0)
 
 	MCFG_DEVICE_ADD(SYNCGEN_TAG, SAA1043, XTAL(5'000'000))
-	MCFG_SAA1043_V2_CALLBACK(WRITELINE(vp415_state, refv_w))
+	MCFG_SAA1043_V2_CALLBACK(WRITELINE(*this, vp415_state, refv_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

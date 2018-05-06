@@ -156,6 +156,6 @@ protected:
 DECLARE_DEVICE_TYPE(PORTFOLIO_EXPANSION_SLOT, portfolio_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( portfolio_expansion_cards );
+void portfolio_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_POFO_EXP_H

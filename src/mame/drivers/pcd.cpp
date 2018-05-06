@@ -478,10 +478,11 @@ void pcd_state::pcx_io(address_map &map)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static SLOT_INTERFACE_START( pcd_floppies )
-	SLOT_INTERFACE("55f", TEAC_FD_55F) // 80 tracks
-	SLOT_INTERFACE("55g", TEAC_FD_55G) // 77 tracks
-SLOT_INTERFACE_END
+static void pcd_floppies(device_slot_interface &device)
+{
+	device.option_add("55f", TEAC_FD_55F); // 80 tracks
+	device.option_add("55g", TEAC_FD_55G); // 77 tracks
+}
 
 FLOPPY_FORMATS_MEMBER( pcd_state::floppy_formats )
 	FLOPPY_PC_FORMAT
@@ -496,19 +497,19 @@ static INPUT_PORTS_START(pcx)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pcd_state::pcd)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(pcd_map)
-	MCFG_CPU_IO_MAP(pcd_io)
-	MCFG_80186_TMROUT1_HANDLER(WRITELINE(pcd_state, i186_timer1_w))
-	MCFG_80186_IRQ_SLAVE_ACK(READ8(pcd_state, irq_callback))
+	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(pcd_map)
+	MCFG_DEVICE_IO_MAP(pcd_io)
+	MCFG_80186_TMROUT1_HANDLER(WRITELINE(*this, pcd_state, i186_timer1_w))
+	MCFG_80186_IRQ_SLAVE_ACK(READ8(*this, pcd_state, irq_callback))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL(16'000'000) / 24)) // adjusted to pass post
 
 	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int0_w))
 
 	MCFG_DEVICE_ADD("pic2", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int1_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("maincpu", i80186_cpu_device, int1_w))
 
 	MCFG_DEVICE_ADD("video", PCD_VIDEO, 0)
 
@@ -520,8 +521,8 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 
 	// floppy disk controller
 	MCFG_WD2793_ADD("fdc", XTAL(16'000'000) / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic1", pic8259_device, ir6_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("pic1", pic8259_device, ir6_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq1_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
 
 	// floppy drives
@@ -530,46 +531,46 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 
 	// usart
 	MCFG_DEVICE_ADD("usart1", MC2661, XTAL(4'915'200))
-	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
-	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
+	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir3_w))
+	MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir3_w))
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232_1", rs232_port_device, write_txd))
 	MCFG_DEVICE_ADD("usart2", MC2661, XTAL(4'915'200))
-	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w))
-	//MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("keyboard", pcd_keyboard_device, t0_w))
+	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir2_w))
+	//MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("keyboard", pcd_keyboard_device, t0_w))
 	MCFG_DEVICE_ADD("usart3", MC2661, XTAL(4'915'200))
-	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
-	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
+	MCFG_MC2661_RXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir4_w))
+	MCFG_MC2661_TXRDY_HANDLER(WRITELINE("pic1", pic8259_device, ir4_w))
+	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232_2", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232_1", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart1", mc2661_device, rx_w))
-	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart3", mc2661_device, rx_w))
+	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("usart1", mc2661_device, rx_w))
+	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("usart3", mc2661_device, rx_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// rtc
 	MCFG_MC146818_ADD("rtc", XTAL(32'768))
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir7_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("pic1", pic8259_device, ir7_w))
 	MCFG_MC146818_BINARY(true)
 	MCFG_MC146818_BINARY_YEAR(true)
 	MCFG_MC146818_EPOCH(1900)
 	MCFG_MC146818_24_12(true)
 
 	MCFG_DEVICE_ADD("keyboard", PCD_KEYBOARD, 0)
-	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE("usart2", mc2661_device, rx_w))
+	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(WRITELINE("usart2", mc2661_device, rx_w))
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSI_DATA_INPUT_BUFFER("scsi_data_in")
-	MCFG_SCSI_MSG_HANDLER(WRITELINE(pcd_state, write_scsi_msg))
-	MCFG_SCSI_BSY_HANDLER(WRITELINE(pcd_state, write_scsi_bsy))
-	MCFG_SCSI_IO_HANDLER(WRITELINE(pcd_state, write_scsi_io))
-	MCFG_SCSI_CD_HANDLER(WRITELINE(pcd_state, write_scsi_cd))
-	MCFG_SCSI_REQ_HANDLER(WRITELINE(pcd_state, write_scsi_req))
+	MCFG_SCSI_MSG_HANDLER(WRITELINE(*this, pcd_state, write_scsi_msg))
+	MCFG_SCSI_BSY_HANDLER(WRITELINE(*this, pcd_state, write_scsi_bsy))
+	MCFG_SCSI_IO_HANDLER(WRITELINE(*this, pcd_state, write_scsi_io))
+	MCFG_SCSI_CD_HANDLER(WRITELINE(*this, pcd_state, write_scsi_cd))
+	MCFG_SCSI_REQ_HANDLER(WRITELINE(*this, pcd_state, write_scsi_req))
 
 	MCFG_SCSI_OUTPUT_LATCH_ADD("scsi_data_out", "scsi")
 	MCFG_DEVICE_ADD("scsi_data_in", INPUT_BUFFER, 0)
@@ -578,14 +579,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcd_state::pcx)
 	pcd(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(pcx_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(pcx_io)
 
 	MCFG_DEVICE_REPLACE("video", PCX_VIDEO, 0)
-	MCFG_PCX_VIDEO_TXD_HANDLER(DEVWRITELINE("keyboard", pcd_keyboard_device, t0_w))
+	MCFG_PCX_VIDEO_TXD_HANDLER(WRITELINE("keyboard", pcd_keyboard_device, t0_w))
 
 	MCFG_DEVICE_MODIFY("keyboard")
-	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(DEVWRITELINE("video", pcx_video_device, rx_w))
+	MCFG_PCD_KEYBOARD_OUT_TX_HANDLER(WRITELINE("video", pcx_video_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("usart2")
 	MCFG_MC2661_TXD_HANDLER(NOOP)

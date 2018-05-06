@@ -39,13 +39,14 @@ FLOPPY_FORMATS_MEMBER( bbc_opusfdc_device::floppy_formats )
 	FLOPPY_OPUS_DDCPM_FORMAT
 FLOPPY_FORMATS_END0
 
-static SLOT_INTERFACE_START( bbc_floppies_525 )
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
-	SLOT_INTERFACE("525sd",   FLOPPY_525_SD)
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
-	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
-	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void bbc_floppies_525(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+	device.option_add("525sd",   FLOPPY_525_SD);
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd",   FLOPPY_525_DD);
+	device.option_add("525qd",   FLOPPY_525_QD);
+}
 
 ROM_START( opus8272 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
@@ -90,7 +91,7 @@ ROM_END
 
 MACHINE_CONFIG_START(bbc_opus8272_device::device_add_mconfig)
 	MCFG_I8272A_ADD("i8272", true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(bbc_opus8272_device, fdc_intrq_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, bbc_opus8272_device, fdc_intrq_w))
 	MCFG_FLOPPY_DRIVE_ADD("i8272:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("i8272:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
@@ -99,8 +100,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bbc_opus2791_device::device_add_mconfig)
 	MCFG_WD2791_ADD("fdc", XTAL(16'000'000) / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_opusfdc_device, motor_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, motor_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
@@ -109,8 +110,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bbc_opus2793_device::device_add_mconfig)
 	MCFG_WD2793_ADD("fdc", XTAL(16'000'000) / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_opusfdc_device, motor_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, motor_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
@@ -119,7 +120,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bbc_opus1770_device::device_add_mconfig)
 	MCFG_WD1770_ADD("fdc", XTAL(16'000'000) / 2)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bbc_opusfdc_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)

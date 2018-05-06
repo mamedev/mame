@@ -403,9 +403,9 @@ static const char *const tattack_sample_names[] =
 MACHINE_CONFIG_START(tattack_state::tattack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(tattack_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tattack_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000 / 2)   /* 4 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(tattack_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tattack_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -422,13 +422,13 @@ MACHINE_CONFIG_START(tattack_state::tattack)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(4)
 	MCFG_SAMPLES_NAMES(tattack_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
 	/* Discrete ???? */
-//  MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+//  MCFG_DEVICE_ADD("discrete", DISCRETE)
 //  MCFG_DISCRETE_INTF(tattack)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

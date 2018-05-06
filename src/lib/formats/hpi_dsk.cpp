@@ -373,7 +373,7 @@ bool hpi_format::get_next_sector(const uint8_t *bitstream , int bitstream_size ,
 			}
 		}
 		// Then for DATA block
-		int data_pos;
+		int data_pos = 0;
 		block = get_next_id_n_block(bitstream , bitstream_size , pos , data_pos);
 		if (block.size() == 0) {
 			return false;

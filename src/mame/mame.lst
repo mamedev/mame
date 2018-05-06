@@ -915,6 +915,7 @@ karatblz                        // (c) 1991 Video System Co.
 karatblza                       // (c) 1991 Video System Co.
 karatblzbl                      // bootleg
 karatblzj                       // (c) 1991 Video System / Tecmo (Japan)
+karatblzt                       // (c) 1991 Video System Co. / Tecmo
 karatblzu                       // (c) 1991 Video System Co. (US)
 pspikes                         // (c) 1991 Video System Co. (World)
 pspikesb                        // bootleg
@@ -1138,6 +1139,7 @@ am_mg34i                        // (c) Amatic
 am_mg35i                        // (c) Amatic
 am_mg3a                         // (c) 2000 Amatic
 am_mg4v                         // (c) 2000 Amatic
+am_mg5hu                        // (c) Amatic
 suprstar                        // (c) 1996 Amatic
 
 @source:ambush.cpp
@@ -2579,6 +2581,7 @@ atomeb                          // 1979 Acorn Atom with Eprom Box
 @source:atpci.cpp
 at586                           // 19?? AT 586
 at586x3                         // 19?? AT 586
+m55hipl                         // 19?? Micronics M55HI-Plus
 ficvt503                        // 1997 FIC VT-503
 
 @source:atronic.cpp
@@ -9567,6 +9570,7 @@ centiped                        // 136001           (c) 1980
 centiped1                       // 136001           (c) 1980
 centiped2                       // 136001           (c) 1980
 centiped3                       // 136001           (c) 1980
+centipedj                       // C2-00158
 magworm                         // (bootleg)
 magworma                        // (bootleg)
 mazeinv                         // (proto)          (c) 1982
@@ -9875,6 +9879,10 @@ coco                            // Color Computer
 coco2                           // Color Computer 2
 coco2b                          // Color Computer 2B (uses M6847T1 video chip)
 cocoe                           // Color Computer (Extended BASIC 1.0)
+cocoh                           // Color Computer with HD6309 CPU
+coco2h                          // Color Computer 2 with HD6309 CPU
+coco2bh                         // Color Computer 2B (uses M6847T1 video chip) with HD6309 CPU
+cocoeh                          // Color Computer (Extended BASIC 1.0) with HD6309 CPU
 cp400                           // Prológica CP400
 cp400c2                         // Prológica CP400 Color II
 lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
@@ -11429,6 +11437,7 @@ dkongjnrj                       // (c) 1982 Nintendo
 dkongjo                         // (c) 1981 Nintendo
 dkongjo1                        // (c) 1981 Nintendo
 dkongjr                         // (c) 1982 Nintendo of America
+dkongjr2                        // (c) 1982 Nintendo of America / bootleg ?
 dkongjrb                        // bootleg
 dkongjre                        // (c) 1982 Nintendo of America
 dkongjrj                        // (c) 1982 Nintendo
@@ -11653,6 +11662,9 @@ quarterhb                       // (c) 1983 Electro-Sports
 
 @source:dynadice.cpp
 dynadice                        // ?
+
+@source:dynamoah.cpp
+dynamoah                        //
 
 @source:dynax.cpp
 7jigen                          // "37" 7jigen no Youseitachi 1990 Dynax
@@ -12683,6 +12695,14 @@ fexcelp                         //
 fexcelpb                        //
 fexcelv                         //
 fphantom                        //
+fpres                           //
+fpressp                         //
+fpresg                          //
+fpresfr                         //
+fpresbu                         //
+fpresbusp                       //
+fpresbug                        //
+fpresbufr                       //
 fscc9                           //
 fscc9b                          //
 fscc9c                          //
@@ -14306,6 +14326,8 @@ gradius3js                      // GX945 (c) 1989 (Japan, split)
 
 @source:grchamp.cpp
 grchamp                         // GM  (c) 1981 Taito Corporation
+grchampa                        // GM  (c) 1981 Taito Corporation
+grchampb                        // GM  (c) 1981 Taito Corporation
 
 @source:grfd2301.cpp
 grfd2301                        //
@@ -20869,6 +20891,7 @@ megat6                          // (c) 1998 Merit
 meritjp                         // (c) 1987 Merit
 mtjpoker                        // (c) 1994 Merit
 pbss330                         // (c) 1994 Merit
+pbss330ca                       // (c) 1994 Merit
 pbst30                          // (c) 1994 Merit
 pbst30a                         // (c) 1993 Merit
 pitboss2                        // (c) 1988 Merit
@@ -29399,6 +29422,7 @@ nascom2c                        // 1980 Nascom 2 (CP/M)
 @source:naughtyb.cpp
 naughtyb                        // (c) 1982 Jaleco
 naughtyba                       // bootleg
+naughtybb                       // bootleg
 naughtybc                       // (c) 1982 Jaleco + Cinematronics
 popflame                        // (c) 1982 Jaleco
 popflamea                       // (c) 1982 Jaleco
@@ -30195,6 +30219,7 @@ supercon                        //
 
 @source:novag68k.cpp
 diablo68                        //
+scorpio68                       //
 
 @source:novagf8.cpp
 ccdelta1                        //
@@ -30721,6 +30746,7 @@ pc9801rs                        // 1989
 pc9801rx                        // 1988
 pc9801ux                        // 1987
 pc9801vm                        // 1985
+pc9801vm11
 pc9821                          //
 pc9821ap2                       //
 pc9821as                        //
@@ -36155,6 +36181,7 @@ rambo3p                         // B93 (c) 1989 Taito Europe Corporation (Europe
 rambo3u                         // B93 (c) 1989 Taito America Corporation (US)
 rastsag2                        // B81 (c) 1988 Taito Corporation (Japan)
 realpunc                        // D76 (c) 1994 Taito Corporation (Japan)
+realpuncj                       // D76 (c) 1994 Taito Corporation (Japan)
 ryujin                          // ??? (c) 1993 Taito Corporation (Japan)
 sbm                             // C69 (c) 1990 Taito America Corporation (US)
 sbmj                            // C69 (c) 1990 Taito Corporation (Japan)
@@ -38731,6 +38758,7 @@ pbchmp95                        // (c) 1995 Veltmeijer Automaten
 witch                           // (c) 1992 Excellent System
 witchb                          // (c) 1992 Excellent System
 witchs                          // (c) 1992 Sega / Vic Tokai license
+keirinou
 
 @source:wiz.cpp
 kungfut                         // (c) 1984 Seibu Kaihatsu
@@ -39126,6 +39154,7 @@ xavtenni                        //
 ttv_sw                          //
 ttv_lotr                        //
 ttv_mx                          //
+drgqst                          //
 
 @source:xbox.cpp
 xbox                            //
@@ -39181,6 +39210,9 @@ xybotsg                         // 136054           (c) 1987
 
 @source:xyonix.cpp
 xyonix                          // [1989 Philko]
+
+@source:y2.cpp
+kof2002um                       // (c)2009 SNK Playmore / New Channel
 
 @source:yiear.cpp
 yiear                           // GX407 (c) 1985

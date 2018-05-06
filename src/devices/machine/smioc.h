@@ -43,20 +43,9 @@ private:
 	/* Attached devices */
 	required_device<cpu_device> m_smioccpu;
 
-	required_device<am9517a_device> m_dma8237_1;
-	required_device<am9517a_device> m_dma8237_2;
-	required_device<am9517a_device> m_dma8237_3;
-	required_device<am9517a_device> m_dma8237_4;
-	required_device<am9517a_device> m_dma8237_5;
+	required_device_array<am9517a_device, 5> m_dma8237;
 
-	required_device<rs232_port_device> m_rs232_p1;
-	required_device<rs232_port_device> m_rs232_p2;
-	required_device<rs232_port_device> m_rs232_p3;
-	required_device<rs232_port_device> m_rs232_p4;
-	required_device<rs232_port_device> m_rs232_p5;
-	required_device<rs232_port_device> m_rs232_p6;
-	required_device<rs232_port_device> m_rs232_p7;
-	required_device<rs232_port_device> m_rs232_p8;
+	required_device_array<rs232_port_device, 8> m_rs232_p;
 
 	required_shared_ptr<uint8_t> m_smioc_ram;
 

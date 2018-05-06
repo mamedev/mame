@@ -305,8 +305,8 @@ DRIVER_INIT_MEMBER(juicebox_state,juicebox)
 }
 
 MACHINE_CONFIG_START(juicebox_state::juicebox)
-	MCFG_CPU_ADD("maincpu", ARM7, 66000000)
-	MCFG_CPU_PROGRAM_MAP(juicebox_map)
+	MCFG_DEVICE_ADD("maincpu", ARM7, 66000000)
+	MCFG_DEVICE_PROGRAM_MAP(juicebox_map)
 
 	MCFG_PALETTE_ADD("palette", 32768)
 
@@ -320,14 +320,14 @@ MACHINE_CONFIG_START(juicebox_state::juicebox)
 	MCFG_SCREEN_UPDATE_DEVICE("s3c44b0", s3c44b0_device, video_update)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("s3c44b0", S3C44B0, 10000000)
-	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(juicebox_state, s3c44b0_gpio_port_r))
-	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(juicebox_state, s3c44b0_gpio_port_w))
-	MCFG_S3C44B0_I2S_DATA_W_CB(DEVWRITE16("dac", dac_word_interface, write))
+	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(*this, juicebox_state, s3c44b0_gpio_port_r))
+	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(*this, juicebox_state, s3c44b0_gpio_port_w))
+	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16("dac", dac_word_interface, write))
 
 	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
 

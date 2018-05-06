@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /***********************************************************************************************************************************
 
-Skeleton driver for first-generation C. Itoh video terminals.
+Preliminary driver for first-generation C. Itoh video terminals.
 
 CIT-101 (released December 1980)
     C. Itoh's first terminal, based on DEC VT100. ANSI X3.64 and V52 compatible.
@@ -41,6 +41,14 @@ CIG-267
     Plug-in color graphics card for CIT-161.
     Compatible with Tektronix 4027A.
 
+Special SET-UP control codes:
+* CTRL+S: Save settings to NVR
+* CTRL+R: Recall settings from NVR
+* CTRL+D: Restore default NVR settings
+* CTRL+A: Set answerback message
+* CTRL+X: Enable/disable Bidirectional Auxiliary I/O Channel and SET-UP D Mode
+          (undocumented; SET-UP B Mode only)
+
 ************************************************************************************************************************************/
 
 #include "emu.h"
@@ -53,6 +61,8 @@ CIG-267
 #include "machine/i8255.h"
 #include "screen.h"
 
+#include "machine/cit101_kbd.h"
+
 
 class cit101_state : public driver_device
 {
@@ -63,11 +73,23 @@ public:
 		, m_screen(*this, "screen")
 		, m_nvr(*this, "nvr")
 		, m_chargen(*this, "chargen")
+		, m_mainram(*this, "mainram")
+		, m_extraram(*this, "extraram")
 	{ }
 
 	void cit101(machine_config &config);
+protected:
+	virtual void machine_start() override;
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER(c000_ram_r);
+	DECLARE_WRITE8_MEMBER(c000_ram_w);
+	DECLARE_READ8_MEMBER(e0_latch_r);
+	DECLARE_WRITE8_MEMBER(e0_latch_w);
+
+	DECLARE_WRITE8_MEMBER(screen_control_w);
+	DECLARE_WRITE8_MEMBER(brightness_w);
 
 	DECLARE_WRITE8_MEMBER(nvr_address_w);
 	DECLARE_READ8_MEMBER(nvr_data_r);
@@ -77,18 +99,122 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
+	u8 m_e0_latch;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<er2055_device> m_nvr;
 	required_region_ptr<u8> m_chargen;
+	required_shared_ptr<u8> m_mainram;
+	required_shared_ptr<u8> m_extraram;
 };
 
 
+void cit101_state::machine_start()
+{
+	subdevice<i8251_device>("comuart")->write_cts(0);
+	subdevice<i8251_device>("kbduart")->write_cts(0);
+
+	save_item(NAME(m_e0_latch));
+}
+
 u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const int char_width = BIT(m_extraram[0], 1) ? 10 : 9;
+	const u16 ptrbase = m_mainram[0];
+
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		const int row = y / 10;
+		u16 rowaddr = m_mainram[row * 2 + ptrbase + 1] | (m_extraram[row * 2 + ptrbase + 1] & 0x3f) << 8;
+		const u16 rowattr = m_mainram[row * 2 + ptrbase] | m_extraram[row * 2 + ptrbase] << 8;
+		const int line = ((y % 10) / (BIT(rowattr, 8) ? 2 : 1) + (rowattr & 0x000f)) & 0xf;
+
+		int c = 0;
+		u8 attr = m_extraram[rowaddr];
+		u8 char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
+		if (line == 9 && BIT(attr, 0))
+			char_data ^= 0xff;
+		if (BIT(attr, 1))
+			char_data ^= 0xff;
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
+		{
+			if (x >= cliprect.left() && x <= cliprect.right())
+				bitmap.pix32(y, x) = BIT(char_data, 7) ? rgb_t::white() : rgb_t::black();
+
+			c++;
+			if (!BIT(rowattr, 9) || !BIT(c, 0))
+			{
+				if (c < (BIT(rowattr, 9) ? char_width << 1 : char_width))
+					char_data = (char_data << 1) | (char_data & 1);
+				else
+				{
+					c = 0;
+					rowaddr++;
+					attr = m_extraram[rowaddr];
+					char_data = m_chargen[(m_mainram[rowaddr] << 4) | line];
+					if (line == 9 && BIT(attr, 0))
+						char_data ^= 0xff;
+					if (BIT(attr, 1))
+						char_data ^= 0xff;
+				}
+			}
+		}
+	}
+
 	return 0;
 }
 
+
+READ8_MEMBER(cit101_state::c000_ram_r)
+{
+	if (!machine().side_effects_disabled())
+		m_e0_latch = m_extraram[offset];
+	return m_mainram[offset];
+}
+
+WRITE8_MEMBER(cit101_state::c000_ram_w)
+{
+	m_extraram[offset] = m_e0_latch;
+	m_mainram[offset] = data;
+}
+
+READ8_MEMBER(cit101_state::e0_latch_r)
+{
+	return m_e0_latch;
+}
+
+WRITE8_MEMBER(cit101_state::e0_latch_w)
+{
+	m_e0_latch = data;
+}
+
+WRITE8_MEMBER(cit101_state::screen_control_w)
+{
+	if ((m_extraram[0] & 0x06) != (data & 0x06))
+	{
+		const int height = BIT(data, 2) ? 312 : 260;
+		const attoseconds_t frame_period = HZ_TO_ATTOSECONDS(BIT(data, 2) ? 50 : 60);
+		if (BIT(data, 1))
+		{
+			const rectangle visarea(0, 799, 0, 239);
+			m_screen->set_unscaled_clock(14.976_MHz_XTAL);
+			m_screen->configure(960, height, visarea, frame_period);
+		}
+		else
+		{
+			const rectangle visarea(0, 1187, 0, 239);
+			m_screen->set_unscaled_clock(22.464_MHz_XTAL);
+			m_screen->configure(1440, height, visarea, frame_period);
+		}
+	}
+
+	m_extraram[0] = data;
+}
+
+WRITE8_MEMBER(cit101_state::brightness_w)
+{
+}
 
 WRITE8_MEMBER(cit101_state::nvr_address_w)
 {
@@ -114,8 +240,10 @@ WRITE8_MEMBER(cit101_state::nvr_control_w)
 void cit101_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
-	map(0x4000, 0xbfff).ram();
-	map(0xc000, 0xcfff).ram().share("videoram");
+	map(0x4000, 0x7fff).ram().share("mainram");
+	map(0x8000, 0xbfff).ram().share("extraram"); // only 4 bits wide?
+	map(0x8000, 0x8000).w(this, FUNC(cit101_state::screen_control_w));
+	map(0xc000, 0xdfff).rw(this, FUNC(cit101_state::c000_ram_r), FUNC(cit101_state::c000_ram_w));
 	map(0xfc00, 0xfc00).rw("auxuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xfc01, 0xfc01).rw("auxuart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xfc20, 0xfc20).rw("comuart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
@@ -136,8 +264,8 @@ void cit101_state::io_map(address_map &map)
 	map(0x40, 0x40).rw("kbduart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0x41, 0x41).rw("kbduart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0x60, 0x63).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa0, 0xa0).nopw(); // ?
-	map(0xe0, 0xe0).noprw(); // ?
+	map(0xa0, 0xa0).w(this, FUNC(cit101_state::brightness_w));
+	map(0xe0, 0xe0).rw(this, FUNC(cit101_state::e0_latch_r), FUNC(cit101_state::e0_latch_w));
 }
 
 
@@ -146,65 +274,73 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(cit101_state::cit101)
-	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240)
-	//MCFG_SCREEN_RAW_PARAMS(22.464_MHz_XTAL, 1440, 0, 1188, 260, 0, 240)
+	//MCFG_SCREEN_RAW_PARAMS(14.976_MHz_XTAL, 960, 0, 800, 260, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(22.464_MHz_XTAL, 1440, 0, 1188, 260, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(cit101_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
 
 	MCFG_DEVICE_ADD("comuart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("comm", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<0>))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<2>))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("comm", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("comm", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("comm", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<0>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<2>))
 
-	MCFG_RS232_PORT_ADD("comm", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("comuart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("comuart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("comuart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("comuart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("comuart", i8251_device, write_dsr))
+	// CTS can be disabled in SET-UP Mode C
+	// DSR, CD, SI, RI are examined only during the modem test, not "always ignored" as the User's Manual claims
 
 	MCFG_DEVICE_ADD("auxuart", I8251, 6.144_MHz_XTAL / 2)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("printer", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<1>))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("uartint", input_merger_device, in_w<3>))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("printer", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<1>))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE("uartint", input_merger_device, in_w<3>))
 
-	MCFG_RS232_PORT_ADD("printer", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("auxuart", i8251_device, write_cts))
+	MCFG_DEVICE_ADD("printer", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("auxuart", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("auxuart", i8251_device, write_cts))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("uartint")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", I8085_RST55_LINE))
 
 	MCFG_DEVICE_ADD("kbduart", I8251, 6.144_MHz_XTAL / 2)
+	MCFG_I8251_TXD_HANDLER(WRITELINE("keyboard", cit101_hle_keyboard_device, write_rxd))
 	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", I8085_RST65_LINE))
+
+	MCFG_DEVICE_ADD("keyboard", CIT101_HLE_KEYBOARD, 0)
+	MCFG_CIT101_HLE_KEYBOARD_TXD_CALLBACK(WRITELINE("kbduart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("pit0", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("auxuart", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("auxuart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("pit1", PIT8253, 0)
 	MCFG_PIT8253_CLK0(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK1(6.144_MHz_XTAL / 4)
 	MCFG_PIT8253_CLK2(6.144_MHz_XTAL / 4)
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("comuart", i8251_device, write_txc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("comuart", i8251_device, write_rxc))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("kbduart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("kbduart", i8251_device, write_rxc))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(cit101_state, nvr_address_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(cit101_state, nvr_data_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(cit101_state, nvr_data_w))
-	MCFG_I8255_IN_PORTC_CB(DEVREADLINE("comm", rs232_port_device, cts_r)) MCFG_DEVCB_BIT(0)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, dcd_r)) MCFG_DEVCB_BIT(1) // tied to DSR for loopback test
-	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, ri_r)) MCFG_DEVCB_BIT(2) // tied to CTS for loopback test
-	MCFG_DEVCB_CHAIN_INPUT(DEVREADLINE("comm", rs232_port_device, si_r)) MCFG_DEVCB_BIT(3) // tied to CTS for loopback test
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(cit101_state, nvr_control_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, cit101_state, nvr_address_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, cit101_state, nvr_data_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cit101_state, nvr_data_w))
+	MCFG_I8255_IN_PORTC_CB(READLINE("comm", rs232_port_device, cts_r)) MCFG_DEVCB_BIT(0)
+	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, dcd_r)) MCFG_DEVCB_BIT(1) // tied to DSR for loopback test
+	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, ri_r)) MCFG_DEVCB_BIT(2) // tied to CTS for loopback test
+	MCFG_DEVCB_CHAIN_INPUT(READLINE("comm", rs232_port_device, si_r)) MCFG_DEVCB_BIT(3) // tied to CTS for loopback test
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cit101_state, nvr_control_w))
 
 	MCFG_DEVICE_ADD("nvr", ER2055, 0)
 MACHINE_CONFIG_END
@@ -234,4 +370,4 @@ ROM_START( cit101 )
 	ROM_LOAD( "5g_=7f00=.bin", 0x160, 0x020, NO_DUMP ) // position labeled TBP18S030
 ROM_END
 
-COMP( 1980, cit101, 0, 0, cit101, cit101, cit101_state, 0, "C. Itoh Electronics", "CIT-101", MACHINE_IS_SKELETON )
+COMP( 1980, cit101, 0, 0, cit101, cit101, cit101_state, 0, "C. Itoh Electronics", "CIT-101", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
