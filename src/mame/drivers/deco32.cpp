@@ -2095,7 +2095,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 	//MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2227,7 +2227,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 
-	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM32)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)

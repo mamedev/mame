@@ -1695,7 +1695,7 @@ MACHINE_CONFIG_START(x68k_state::x68000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YM2151_ADD("ym2151", 4000000)
+	MCFG_DEVICE_ADD("ym2151", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, x68k_state,x68k_fm_irq))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, x68k_state,x68k_ct_w))  // CT1, CT2 from YM2151 port 0x1b
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

@@ -1764,12 +1764,12 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
-	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("pcm", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1949,7 +1949,7 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
-	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("pcm2", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
@@ -1990,7 +1990,7 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
-	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("pcm2", SEGAPCM, SOUND_CLOCK/4)
 	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)

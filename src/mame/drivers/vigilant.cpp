@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(vigilant_state::vigilant)
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
-	MCFG_YM2151_ADD("ymsnd", 3579645)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579645)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
@@ -636,7 +636,7 @@ MACHINE_CONFIG_START(vigilant_state::kikcubic)
 
 	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
 
-	MCFG_YM2151_ADD("ymsnd", 3579645)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3579645)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)

@@ -357,8 +357,8 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", boogwing)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram1")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram1", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DECO_ACE_ADD("deco_ace")
 	MCFG_DECO_ACE_PALETTE("palette")

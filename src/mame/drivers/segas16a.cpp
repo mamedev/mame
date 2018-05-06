@@ -2019,7 +2019,7 @@ MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, segas16a_state, n7751_control_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.43)
 

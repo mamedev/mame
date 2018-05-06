@@ -264,7 +264,7 @@ MACHINE_CONFIG_START(exzisus_state::exzisus)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)

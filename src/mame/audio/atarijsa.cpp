@@ -706,7 +706,7 @@ MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(0, *this, 0.60, 0)
@@ -836,7 +836,7 @@ MACHINE_CONFIG_START(atari_jsa_ii_device::device_add_mconfig)
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.60, 0)
@@ -918,7 +918,7 @@ MACHINE_CONFIG_START(atari_jsa_iii_device::device_add_mconfig)
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(*this, atari_jsa_base_device, main_int_write_line))
 
-	MCFG_YM2151_ADD("ym2151", JSA_MASTER_CLOCK)
+	MCFG_DEVICE_ADD("ym2151", YM2151, JSA_MASTER_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundcomm", atari_sound_comm_device, ym2151_irq_gen))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, atari_jsa_base_device, ym2151_port_w))
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, *this, 0.60, 0)

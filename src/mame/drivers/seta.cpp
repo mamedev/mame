@@ -9345,7 +9345,7 @@ MACHINE_CONFIG_START(seta_state::thunderlbl)
 	/* the sound hardware / program is ripped from Tetris (S16B) */
 	MCFG_DEVICE_REMOVE("x1snd")
 
-	MCFG_YM2151_ADD("ymsnd", 10000000/2)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 10000000/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
