@@ -322,7 +322,8 @@ class keirinou_state : public witch_state
 {
 public:
 	keirinou_state(const machine_config &mconfig, device_type type, const char *tag)
-		: witch_state(mconfig, type, tag)
+		: witch_state(mconfig, type, tag),
+		m_paletteram(*this, "paletteram")
 	{ }
 	
 	void keirinou_main_map(address_map &map);
@@ -330,6 +331,7 @@ public:
 
 	void keirinou(machine_config &config);
 	DECLARE_WRITE8_MEMBER(write_keirinou_a002);
+	DECLARE_WRITE8_MEMBER(palette_w);
 	TILE_GET_INFO_MEMBER(get_keirinou_gfx1_tile_info);
 
 protected:
@@ -337,6 +339,8 @@ protected:
 
 private:
 	uint8_t m_bg_bank;
+	required_shared_ptr<uint8_t> m_paletteram;
+
 };
 
 
@@ -447,7 +451,8 @@ void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i,sx,sy,tileno,flags,color;
 	int flipx=0;
-	int flipy=0;	
+	int flipy=0;
+	int region = has_spr_rom_bank == true ? 2 : 1;
 
 	for(i=0;i<0x800;i+=0x20) {
 		sx     = m_sprite_ram[i+1];
@@ -464,22 +469,22 @@ void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			color  =  (flags & 0x0f);
 
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,
 				tileno, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8*flipy,0);
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,
 				tileno+1, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8*flipy,0);
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,
 				tileno+2, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8-8*flipy,0);
 
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,
 				tileno+3, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8-8*flipy,0);
@@ -641,6 +646,42 @@ WRITE8_MEMBER(witch_state::yscroll_w)
 	m_scrolly=data;
 }
 
+WRITE8_MEMBER(keirinou_state::palette_w)
+{
+	int r,g,b;
+
+	m_paletteram[offset] = data;
+
+	// TODO: bit 0?
+	r = ((m_paletteram[offset] & 0xe)>>1);
+	g = ((m_paletteram[offset] & 0x30)>>4);
+	b = ((m_paletteram[offset] & 0xc0)>>6);
+
+	m_palette->set_pen_color(offset, pal3bit(r), pal2bit(g), pal2bit(b));
+	
+	// sprite palette uses an indirect table
+	// sprites are only used to draw cyclists, and pens 0x01-0x05 are directly tied to a specific sprite entry.
+	// this probably translates in HW by selecting a specific pen for the lowest bit in GFX roms instead of the typical color entry offset.
+
+	// we do some massaging of the data here, the alternative is to use custom drawing code but that quite doesn't fit with witch
+	if((offset & 0x1f0) == 0x00)
+	{
+		int i;
+		
+		if(offset > 5)
+		{
+			for(i=0;i<0x80;i+=0x10)
+				m_palette->set_pen_color(offset+0x200+i, pal3bit(r), pal2bit(g), pal2bit(b));
+		}
+		else
+		{
+			for(i=(offset & 7) * 0x10;i<((offset & 7) * 0x10)+8;i++)
+				m_palette->set_pen_color(0x200+i, pal3bit(r), pal2bit(g), pal2bit(b));
+		}
+	}
+}
+
+
 void witch_state::map_main(address_map &map)
 {
 	map(0x0000, UNBANKED_SIZE-1).rom();
@@ -694,7 +735,7 @@ void keirinou_state::keirinou_main_map(address_map &map)
 	map(0xc800, 0xcbff).rw(this, FUNC(witch_state::gfx1_vram_r), FUNC(witch_state::gfx1_vram_w)).share("gfx1_vram");
 	map(0xcc00, 0xcfff).rw(this, FUNC(witch_state::gfx1_cram_r), FUNC(witch_state::gfx1_cram_w)).share("gfx1_cram");
 	map(0xd000, 0xd7ff).ram().share("sprite_ram");
-	map(0xd800, 0xd9ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xd800, 0xd9ff).ram().w(this, FUNC(keirinou_state::palette_w)).share("paletteram");
 	map(0xe000, 0xe7ff).ram();//.share("share1");
 	map(0xe800, 0xefff).ram().share("nvram");
 }
@@ -1010,6 +1051,12 @@ static GFXDECODE_START( witch )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( keirinou )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0x200, 8 )
+GFXDECODE_END
+
 void witch_state::machine_reset()
 {
 	// Keep track of the "Hopper Active" DSW value because the program will use it
@@ -1090,8 +1137,10 @@ MACHINE_CONFIG_START(keirinou_state::keirinou)
 	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
 
 	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	MCFG_PALETTE_ADD("palette", 0x200+0x80)
+	MCFG_GFXDECODE_MODIFY("gfxdecode", keirinou)
+
+//	MCFG_PALETTE_FORMAT(IIBBGGRR)
 
 	MCFG_DEVICE_MODIFY("ppi1") // Keirin Ou does have two individual PPIs (NEC D8255AC-2)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, keirinou_state, write_keirinou_a002))
@@ -1232,7 +1281,7 @@ DRIVER_INIT_MEMBER(witch_state,witch)
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 }
 
-GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, 0,     ROT0, "Excellent System",     "Keirin Ou", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, 0,     ROT0, "Excellent System",     "Keirin Ou", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, witch,    0,     witch,    witch,    witch_state,    witch, ROT0, "Excellent System",     "Witch", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    witch, ROT0, "Excellent System",     "Witch (With ranking)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)",  MACHINE_SUPPORTS_SAVE )

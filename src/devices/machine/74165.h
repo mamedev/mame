@@ -30,9 +30,6 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_TTL165_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TTL165, 0)
-
 #define MCFG_TTL165_DATA_CB(_devcb) \
 	devcb = &downcast<ttl165_device &>(*device).set_data_callback(DEVCB_##_devcb);
 
@@ -48,7 +45,7 @@ class ttl165_device : public device_t
 {
 public:
 	// construction/destruction
-	ttl165_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl165_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	template <class Object> devcb_base &set_data_callback(Object &&cb)

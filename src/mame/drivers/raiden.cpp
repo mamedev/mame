@@ -349,7 +349,7 @@ MACHINE_CONFIG_START(raiden_state::raiden)
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.60) /* verified on pcb */

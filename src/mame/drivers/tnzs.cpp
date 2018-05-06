@@ -1735,7 +1735,7 @@ MACHINE_CONFIG_START(jpopnics_state::jpopnics)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
 	/* sound hardware */
-	MCFG_YM2151_ADD("ymsnd", XTAL(12'000'000)/4) /* Not verified - Main board Crystal is 12MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(12'000'000)/4) /* Not verified - Main board Crystal is 12MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 

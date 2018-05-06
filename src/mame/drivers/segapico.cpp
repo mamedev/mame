@@ -404,7 +404,7 @@ MACHINE_CONFIG_START(pico_state::pico)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq))
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
@@ -425,7 +425,7 @@ MACHINE_CONFIG_START(pico_state::picopal)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pico")
 
 	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK*2)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq))
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, pico_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
@@ -620,7 +620,7 @@ MACHINE_CONFIG_START(copera_state::copera)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","copera")
 
 	MCFG_DEVICE_ADD("315_5641", SEGA_315_5641_PCM, upd7759_device::STANDARD_CLOCK)
-	MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, copera_state,sound_cause_irq))
+	//MCFG_UPD7759_DRQ_CALLBACK(WRITELINE(*this, copera_state,sound_cause_irq)) FIXME: this never worked - the MAME 315_5641 doesn't support slave mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.16)
 MACHINE_CONFIG_END
