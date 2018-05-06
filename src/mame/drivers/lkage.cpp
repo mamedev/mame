@@ -490,13 +490,13 @@ void lkage_state::machine_reset()
 MACHINE_CONFIG_START(lkage_state::lkage)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_map_mcu)
-	MCFG_CPU_IO_MAP(lkage_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_map_mcu)
+	MCFG_DEVICE_IO_MAP(lkage_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU,MCU_CLOCK)
@@ -520,19 +520,19 @@ MACHINE_CONFIG_START(lkage_state::lkage)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK )
+	MCFG_DEVICE_ADD("ym1", YM2203, AUDIO_CLOCK )
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, AUDIO_CLOCK )
+	MCFG_DEVICE_ADD("ym2", YM2203, AUDIO_CLOCK )
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -543,13 +543,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(lkage_state::lkageb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_map_boot)
-	MCFG_CPU_IO_MAP(lkage_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_map_boot)
+	MCFG_DEVICE_IO_MAP(lkage_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lkage_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(lkage_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
 
@@ -571,19 +571,19 @@ MACHINE_CONFIG_START(lkage_state::lkageb)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
 
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK)
+	MCFG_DEVICE_ADD("ym1", YM2203, AUDIO_CLOCK)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, AUDIO_CLOCK)
+	MCFG_DEVICE_ADD("ym2", YM2203, AUDIO_CLOCK)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)

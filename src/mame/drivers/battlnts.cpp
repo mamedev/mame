@@ -234,11 +234,11 @@ void battlnts_state::machine_reset()
 MACHINE_CONFIG_START(battlnts_state::battlnts)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL(24'000'000) / 2 /* 3000000*4? */)
-	MCFG_CPU_PROGRAM_MAP(battlnts_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309, XTAL(24'000'000) / 2 /* 3000000*4? */)
+	MCFG_DEVICE_PROGRAM_MAP(battlnts_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000) / 6 /* 3579545? */)
-	MCFG_CPU_PROGRAM_MAP(battlnts_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(24'000'000) / 6 /* 3579545? */)
+	MCFG_DEVICE_PROGRAM_MAP(battlnts_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -250,7 +250,7 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(battlnts_state, screen_update_battlnts)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(battlnts_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, battlnts_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlnts)
 	MCFG_PALETTE_ADD("palette", 128)
@@ -271,10 +271,10 @@ MACHINE_CONFIG_START(battlnts_state::battlnts)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM3812, XTAL(24'000'000) / 8)
+	MCFG_DEVICE_ADD("ym1", YM3812, XTAL(24'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(24'000'000) / 8)
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(24'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

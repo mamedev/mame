@@ -88,13 +88,13 @@ DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(mpu401_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
-	MCFG_CPU_PROGRAM_MAP(mpu401_map)
-	MCFG_CPU_IO_MAP(mpu401_io_map)
-	MCFG_M6801_SER_TX(DEVWRITELINE(MIDIOUT_TAG, midi_port_device, write_txd))
+	MCFG_DEVICE_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
+	MCFG_DEVICE_PROGRAM_MAP(mpu401_map)
+	MCFG_DEVICE_IO_MAP(mpu401_io_map)
+	MCFG_M6801_SER_TX(WRITELINE(MIDIOUT_TAG, midi_port_device, write_txd))
 
 	MCFG_MIDI_PORT_ADD(MIDIIN_TAG, midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(DEVICE_SELF, mpu401_device, midi_rx_w))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(DEVICE_SELF, mpu401_device, midi_rx_w))
 
 	MCFG_MIDI_PORT_ADD(MIDIOUT_TAG, midiout_slot, "midiout")
 MACHINE_CONFIG_END

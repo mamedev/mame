@@ -290,13 +290,13 @@ GFXDECODE_END
 MACHINE_CONFIG_START(aquarium_state::aquarium)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // clock not verified on pcb
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) // clock not verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aquarium_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/6) // clock not verified on pcb
-	MCFG_CPU_PROGRAM_MAP(snd_map)
-	MCFG_CPU_IO_MAP(snd_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/6) // clock not verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(snd_map)
+	MCFG_DEVICE_IO_MAP(snd_portmap)
 
 	// Is this the actual IC type? Some other Excellent games from this period use a MAX693.
 	MCFG_DEVICE_ADD("watchdog", MB3773, 0)

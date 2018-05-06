@@ -223,6 +223,6 @@ private:
 };
 
 
-SLOT_INTERFACE_EXTERN( wangpc_cards );
+void wangpc_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_WANGPC_WANGPC_H

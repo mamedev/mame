@@ -25354,7 +25354,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			<dataarea name="rom" size="1048576">
 				<rom name="game boy camera (usa, europe).bin" size="1048576" crc="4640909f" sha1="461c3c37ed270681e3e94053efb21504b600aef5" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="131072">
+			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -25371,7 +25371,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			<dataarea name="rom" size="1048576">
 				<rom name="pocket camera (japan) (rev a).bin" size="1048576" crc="73e8ef96" sha1="912205ea22e1dd735ed4f41d247039eebf39dddc" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="131072">
+			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -25385,7 +25385,7 @@ patch the rom to 0x00 and 0x00....and at 0x0B3D also patch it to
 			<dataarea name="rom" size="1048576">
 				<rom name="game boy camera gold (usa).bin" size="1048576" crc="a1a3f786" sha1="53a0dd6de3ebd0d3495f8bdc377ab08e5074c0ef" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="131072">
+			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>

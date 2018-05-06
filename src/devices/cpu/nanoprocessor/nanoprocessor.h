@@ -133,6 +133,6 @@ private:
 	void dc_clr(unsigned bit_no);
 };
 
-extern const device_type HP_NANOPROCESSOR;
+DECLARE_DEVICE_TYPE(HP_NANOPROCESSOR, hp_nanoprocessor_device)
 
 #endif /* _NANOPROCESSOR_H_ */

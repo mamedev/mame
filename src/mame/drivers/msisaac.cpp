@@ -449,17 +449,17 @@ void msisaac_state::machine_reset()
 MACHINE_CONFIG_START(msisaac_state::msisaac)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(msisaac_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(msisaac_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(msisaac_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)    /* source of IRQs is unknown */
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(msisaac_sound_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msisaac_state,  irq0_line_hold)    /* source of IRQs is unknown */
 
 #ifdef USE_MCU
-	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
+	MCFG_DEVICE_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(buggychl_mcu_map)
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 #endif
 
@@ -484,15 +484,15 @@ MACHINE_CONFIG_START(msisaac_state::msisaac)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_TA7630_ADD("ta7630")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
 	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
 	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_DEVICE_ADD("msm", MSM5232, 2000000)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6) /* 0.65 (???) uF capacitors (match the sample, not verified) */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1

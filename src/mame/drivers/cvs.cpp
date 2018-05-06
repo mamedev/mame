@@ -965,24 +965,24 @@ MACHINE_RESET_MEMBER(cvs_state,cvs)
 MACHINE_CONFIG_START(cvs_state::cvs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'318'181)/16)
-	MCFG_CPU_PROGRAM_MAP(cvs_main_cpu_map)
-	MCFG_CPU_IO_MAP(cvs_main_cpu_io_map)
-	MCFG_CPU_DATA_MAP(cvs_main_cpu_data_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cvs_state, cvs_main_cpu_interrupt)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'318'181)/16)
+	MCFG_DEVICE_PROGRAM_MAP(cvs_main_cpu_map)
+	MCFG_DEVICE_IO_MAP(cvs_main_cpu_io_map)
+	MCFG_DEVICE_DATA_MAP(cvs_main_cpu_data_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cvs_state, cvs_main_cpu_interrupt)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cvs_state, write_s2650_flag))
 
-	MCFG_CPU_ADD("audiocpu", S2650, XTAL(14'318'181)/16)
-	MCFG_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
+	MCFG_DEVICE_ADD("audiocpu", S2650, XTAL(14'318'181)/16)
+	MCFG_DEVICE_PROGRAM_MAP(cvs_dac_cpu_map)
 	/* doesn't look like it is used at all */
-	//MCFG_S2650_SENSE_INPUT(READLINE(cvs_state, cvs_393hz_clock_r))
+	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
 
-	MCFG_CPU_ADD("speechcpu", S2650, XTAL(14'318'181)/16)
-	MCFG_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
+	MCFG_DEVICE_ADD("speechcpu", S2650, XTAL(14'318'181)/16)
+	MCFG_DEVICE_PROGRAM_MAP(cvs_speech_cpu_map)
 	/* romclk is much more probable, 393 Hz results in timing issues */
-	//MCFG_S2650_SENSE_INPUT(READLINE(cvs_state, cvs_393hz_clock_r))
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("tms", tms5110_device, romclk_hack_r))
+	//MCFG_S2650_SENSE_INPUT(READLINE(*this, cvs_state, cvs_393hz_clock_r))
+	MCFG_S2650_SENSE_INPUT(READLINE("tms", tms5110_device, romclk_hack_r))
 
 	MCFG_MACHINE_START_OVERRIDE(cvs_state,cvs)
 	MCFG_MACHINE_RESET_OVERRIDE(cvs_state,cvs)
@@ -1019,16 +1019,16 @@ MACHINE_CONFIG_START(cvs_state::cvs)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_SOUND_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_DEVICE_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac3", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_ADD("tms", TMS5100, XTAL(640'000))
-	MCFG_TMS5110_DATA_CB(READLINE(cvs_state, speech_rom_read_bit))
+	MCFG_DEVICE_ADD("tms", TMS5100, XTAL(640'000))
+	MCFG_TMS5110_DATA_CB(READLINE(*this, cvs_state, speech_rom_read_bit))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

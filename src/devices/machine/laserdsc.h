@@ -77,7 +77,7 @@ enum laserdisc_field_code
 #define MCFG_LASERDISC_OVERLAY_SCALE(_scalex, _scaley) \
 	downcast<laserdisc_device &>(*device).set_overlay_scale(_scalex, _scaley);
 #define MCFG_LASERDISC_OVERLAY_PALETTE(_palette_tag) \
-	downcast<laserdisc_device &>(*device).set_overlay_palette("^" _palette_tag);
+	downcast<laserdisc_device &>(*device).set_overlay_palette(_palette_tag);
 
 // use these to add laserdisc screens with proper video update parameters
 // TODO: actually move these SCREEN_RAW_PARAMS to a common screen info header

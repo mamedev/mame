@@ -663,91 +663,91 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ecoinf3_state::ecoinf3_pyramid)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
+	MCFG_DEVICE_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
 
-	MCFG_CPU_PROGRAM_MAP(pyramid_memmap)
-	MCFG_CPU_IO_MAP(pyramid_portmap)
+	MCFG_DEVICE_PROGRAM_MAP(pyramid_memmap)
+	MCFG_DEVICE_IO_MAP(pyramid_portmap)
 
 	MCFG_DEFAULT_LAYOUT(layout_ecoinf3)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 
-	MCFG_SOUND_ADD("sn1", SN76489, 4000000) // no idea what the sound chip is, this sounds terrible
+	MCFG_DEVICE_ADD("sn1", SN76489, 4000000) // no idea what the sound chip is, this sounds terrible
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DEVICE_ADD("ppi8255_a", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_a_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_a_strobedat0))
-	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_a_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_b_strobedat1))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_a_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_a_write_c_strobe))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_a_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_a_write_a_strobedat0))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_a_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_a_write_b_strobedat1))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_a_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_a_write_c_strobe))
 
 	MCFG_DEVICE_ADD("ppi8255_b", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_b_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_b_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_b_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_b_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_b_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_b_write_c))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_b_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_b_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_b_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_b_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_b_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_b_write_c))
 
 	MCFG_DEVICE_ADD("ppi8255_c", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_c_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_c_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_c_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_c_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_c_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_c_write_c))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_c_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_c_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_c_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_c_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_c_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_c_write_c))
 
 	MCFG_DEVICE_ADD("ppi8255_d", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_d_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_d_write_a_reel01))
-	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_d_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_d_write_b_reel23))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_d_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_d_write_c))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_d_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_d_write_a_reel01))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_d_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_d_write_b_reel23))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_d_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_d_write_c))
 
 	MCFG_DEVICE_ADD("ppi8255_e", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_e_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_a_alpha_display))    // alpha display characters
-	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_e_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_b))  // not written at an appropriate time for it to be a 'send' address for the text
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_e_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_e_write_c))  // not written at an appropriate time for it to be a 'send' address for the text
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_e_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_e_write_a_alpha_display))    // alpha display characters
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_e_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_e_write_b))  // not written at an appropriate time for it to be a 'send' address for the text
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_e_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_e_write_c))  // not written at an appropriate time for it to be a 'send' address for the text
 
 	MCFG_DEVICE_ADD("ppi8255_f", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_f_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_f_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_f_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_f_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_f_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_f_write_c))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_f_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_f_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_f_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_f_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_f_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_f_write_c))
 
 	MCFG_DEVICE_ADD("ppi8255_g", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_g_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_g_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_g_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_g_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_g_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_g_write_c))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_g_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_g_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_g_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_g_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_g_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_g_write_c))
 
 	MCFG_DEVICE_ADD("ppi8255_h", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(ecoinf3_state, ppi8255_intf_h_read_a))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(ecoinf3_state, ppi8255_intf_h_write_a))
-	MCFG_I8255_IN_PORTB_CB(READ8(ecoinf3_state, ppi8255_intf_h_read_b))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(ecoinf3_state, ppi8255_intf_h_write_b))
-	MCFG_I8255_IN_PORTC_CB(READ8(ecoinf3_state, ppi8255_intf_h_read_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(ecoinf3_state, ppi8255_intf_h_write_c))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, ecoinf3_state, ppi8255_intf_h_read_a))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_h_write_a))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, ecoinf3_state, ppi8255_intf_h_read_b))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_h_write_b))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, ecoinf3_state, ppi8255_intf_h_read_c))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, ecoinf3_state, ppi8255_intf_h_write_c))
 
 	MCFG_ECOIN_200STEP_ADD("reel0")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel_optic_cb<0>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<0>))
 	MCFG_ECOIN_200STEP_ADD("reel1")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel_optic_cb<1>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<1>))
 	MCFG_ECOIN_200STEP_ADD("reel2")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel_optic_cb<2>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<2>))
 	MCFG_ECOIN_200STEP_ADD("reel3")
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(ecoinf3_state, reel_optic_cb<3>))
+	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, ecoinf3_state, reel_optic_cb<3>))
 MACHINE_CONFIG_END
 
 

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro - Z80 2nd Processor Discs -->
+<!-- Acorn BBC Micro - Z80 2nd Processor discs -->
 
 <!-- Loading CP/M:
 
       Reset with Z80 co-processor enabled and Acorn CP/M System Disc 1 in drive 0.
 -->
 
-<softwarelist name="bbc_flop_z80" description="Z80 2nd Processor Discs">
+<softwarelist name="bbc_flop_z80" description="Acorn Z80 2nd Processor discs">
 
 	<software name="cpmsys">
 		<description>Acorn CP/M System Discs</description>

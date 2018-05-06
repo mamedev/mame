@@ -375,10 +375,10 @@ void segald_state::machine_start()
 MACHINE_CONFIG_START(segald_state::astron)
 
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(mainmem)
-	MCFG_CPU_IO_MAP(mainport)
-	MCFG_CPU_PERIODIC_INT_DRIVER(segald_state, nmi_line_pulse,  1000.0/59.94)
+	MCFG_DEVICE_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(mainmem)
+	MCFG_DEVICE_IO_MAP(mainport)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(segald_state, nmi_line_pulse,  1000.0/59.94)
 
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
@@ -394,7 +394,7 @@ MACHINE_CONFIG_START(segald_state::astron)
 	/* sound hardare */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -309,7 +309,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(nibble_state::nibble)
 
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, MASTER_CLOCK/4, nibble_map, nibble_cru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nibble_state,  nibble_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

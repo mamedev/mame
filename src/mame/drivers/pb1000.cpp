@@ -482,15 +482,15 @@ void pb1000_state::machine_start()
 
 MACHINE_CONFIG_START(pb1000_state::pb1000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD61700, 910000)
-	MCFG_CPU_PROGRAM_MAP(pb1000_mem)
-	MCFG_HD61700_LCD_CTRL_CB(WRITE8(pb1000_state, lcd_control))
-	MCFG_HD61700_LCD_READ_CB(READ8(pb1000_state, lcd_data_r))
-	MCFG_HD61700_LCD_WRITE_CB(WRITE8(pb1000_state, lcd_data_w))
-	MCFG_HD61700_KB_READ_CB(READ16(pb1000_state, pb1000_kb_r))
-	MCFG_HD61700_KB_WRITE_CB(WRITE8(pb1000_state, kb_matrix_w))
-	MCFG_HD61700_PORT_READ_CB(READ8(pb1000_state, pb1000_port_r))
-	MCFG_HD61700_PORT_WRITE_CB(WRITE8(pb1000_state, port_w))
+	MCFG_DEVICE_ADD("maincpu", HD61700, 910000)
+	MCFG_DEVICE_PROGRAM_MAP(pb1000_mem)
+	MCFG_HD61700_LCD_CTRL_CB(WRITE8(*this, pb1000_state, lcd_control))
+	MCFG_HD61700_LCD_READ_CB(READ8(*this, pb1000_state, lcd_data_r))
+	MCFG_HD61700_LCD_WRITE_CB(WRITE8(*this, pb1000_state, lcd_data_w))
+	MCFG_HD61700_KB_READ_CB(READ16(*this, pb1000_state, pb1000_kb_r))
+	MCFG_HD61700_KB_WRITE_CB(WRITE8(*this, pb1000_state, kb_matrix_w))
+	MCFG_HD61700_PORT_READ_CB(READ8(*this, pb1000_state, pb1000_port_r))
+	MCFG_HD61700_PORT_WRITE_CB(WRITE8(*this, pb1000_state, port_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -514,17 +514,17 @@ MACHINE_CONFIG_START(pb1000_state::pb1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pb1000_state::pb2000c)
 	pb1000(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pb2000c_mem)
-	MCFG_HD61700_KB_READ_CB(READ16(pb1000_state, pb2000c_kb_r))
-	MCFG_HD61700_PORT_READ_CB(READ8(pb1000_state, pb2000c_port_r))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pb2000c_mem)
+	MCFG_HD61700_KB_READ_CB(READ16(*this, pb1000_state, pb2000c_kb_r))
+	MCFG_HD61700_PORT_READ_CB(READ8(*this, pb1000_state, pb2000c_port_r))
 
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot1", generic_plain_slot, "pb2000c_card")
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot2", generic_plain_slot, "pb2000c_card")

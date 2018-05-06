@@ -277,7 +277,7 @@ void dreamwld_state::video_start()
 			m_tilemap[layer][size]->set_scroll_cols(1);
 		}
 	}
-	
+
 	m_spritebuf[0] = std::make_unique<uint32_t[]>(0x2000 / 4);
 	m_spritebuf[1] = std::make_unique<uint32_t[]>(0x2000 / 4);
 	m_lineram16 = make_unique_clear<uint16_t[]>(0x400 / 2);
@@ -749,9 +749,9 @@ void dreamwld_state::machine_reset()
 MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz verified */
-	MCFG_CPU_PROGRAM_MAP(baryon_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz verified */
+	MCFG_DEVICE_PROGRAM_MAP(baryon_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -760,7 +760,7 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 	MCFG_SCREEN_SIZE(512,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dreamwld_state, screen_vblank_dreamwld))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dreamwld_state, screen_vblank_dreamwld))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
@@ -781,9 +781,9 @@ MACHINE_CONFIG_START(dreamwld_state::dreamwld)
 	baryon(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dreamwld_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dreamwld_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
 	MCFG_OKIM6295_ADD("oki2", XTAL(32'000'000)/32, PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

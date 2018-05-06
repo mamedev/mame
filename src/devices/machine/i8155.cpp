@@ -110,9 +110,10 @@ enum
 //**************************************************************************
 
 // default address map
-ADDRESS_MAP_START(i8155_device::i8155)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void i8155_device::i8155(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 
 

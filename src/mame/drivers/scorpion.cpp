@@ -291,10 +291,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(scorpion_state::scorpion)
 	spectrum_128(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(scorpion_mem)
-	MCFG_CPU_IO_MAP(scorpion_io)
-	MCFG_CPU_OPCODES_MAP(scorpion_switch)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(scorpion_mem)
+	MCFG_DEVICE_IO_MAP(scorpion_io)
+	MCFG_DEVICE_OPCODES_MAP(scorpion_switch)
 
 	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
 	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )

@@ -60,6 +60,6 @@ protected:
 
 DECLARE_DEVICE_TYPE(INTERPRO_KEYBOARD_PORT, interpro_keyboard_port_device)
 
-SLOT_INTERFACE_EXTERN(interpro_keyboard_devices);
+void interpro_keyboard_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_INTERPRO_KEYBOARD_KEYBOARD_H

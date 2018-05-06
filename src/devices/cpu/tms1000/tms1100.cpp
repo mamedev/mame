@@ -22,13 +22,15 @@ DEFINE_DEVICE_TYPE(TMS1370, tms1370_cpu_device, "tms1370", "Texas Instruments TM
 
 
 // internal memory maps
-ADDRESS_MAP_START(tms1100_cpu_device::program_11bit_8)
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+void tms1100_cpu_device::program_11bit_8(address_map &map)
+{
+	map(0x000, 0x7ff).rom();
+}
 
-ADDRESS_MAP_START(tms1100_cpu_device::data_128x4)
-	AM_RANGE(0x00, 0x7f) AM_RAM
-ADDRESS_MAP_END
+void tms1100_cpu_device::data_128x4(address_map &map)
+{
+	map(0x00, 0x7f).ram();
+}
 
 
 // device definitions

@@ -644,10 +644,10 @@ INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
 
 MACHINE_CONFIG_START(ttchamp_state::ttchamp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ttchamp_map)
-	MCFG_CPU_IO_MAP(ttchamp_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ttchamp_state,  irq)
+	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ttchamp_map)
+	MCFG_DEVICE_IO_MAP(ttchamp_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ttchamp_state,  irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

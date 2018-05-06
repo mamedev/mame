@@ -191,14 +191,15 @@ void channelf_state::machine_start()
 	}
 }
 
-static SLOT_INTERFACE_START(cf_cart)
-	SLOT_INTERFACE_INTERNAL("std",      CHANF_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("maze",     CHANF_ROM_MAZE)
-	SLOT_INTERFACE_INTERNAL("hangman",  CHANF_ROM_HANGMAN)
-	SLOT_INTERFACE_INTERNAL("chess",    CHANF_ROM_CHESS)
-	SLOT_INTERFACE_INTERNAL("multi_old",CHANF_ROM_MULTI_OLD)
-	SLOT_INTERFACE_INTERNAL("multi",    CHANF_ROM_MULTI_FINAL)
-SLOT_INTERFACE_END
+static void cf_cart(device_slot_interface &device)
+{
+	device.option_add_internal("std",      CHANF_ROM_STD);
+	device.option_add_internal("maze",     CHANF_ROM_MAZE);
+	device.option_add_internal("hangman",  CHANF_ROM_HANGMAN);
+	device.option_add_internal("chess",    CHANF_ROM_CHESS);
+	device.option_add_internal("multi_old",CHANF_ROM_MULTI_OLD);
+	device.option_add_internal("multi",    CHANF_ROM_MULTI_FINAL);
+}
 
 
 MACHINE_CONFIG_START(channelf_state::channelf_cart)
@@ -211,9 +212,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::channelf)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
-	MCFG_CPU_PROGRAM_MAP(channelf_map)
-	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_DEVICE_ADD("maincpu", F8, 3579545/2)        /* Colorburst/2 */
+	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
+	MCFG_DEVICE_IO_MAP(channelf_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -230,7 +231,7 @@ MACHINE_CONFIG_START(channelf_state::channelf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
+	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	channelf_cart(config);
@@ -238,9 +239,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::sabavdpl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MCFG_CPU_PROGRAM_MAP(channelf_map)
-	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_DEVICE_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
+	MCFG_DEVICE_IO_MAP(channelf_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
@@ -257,7 +258,7 @@ MACHINE_CONFIG_START(channelf_state::sabavdpl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
+	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	channelf_cart(config);
@@ -266,9 +267,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::channlf2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
-	MCFG_CPU_PROGRAM_MAP(channelf_map)
-	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_DEVICE_ADD("maincpu", F8, 3579545/2)        /* Colorburst / 2 */
+	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
+	MCFG_DEVICE_IO_MAP(channelf_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -285,7 +286,7 @@ MACHINE_CONFIG_START(channelf_state::channlf2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
+	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	channelf_cart(config);
@@ -294,9 +295,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(channelf_state::sabavpl2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
-	MCFG_CPU_PROGRAM_MAP(channelf_map)
-	MCFG_CPU_IO_MAP(channelf_io)
+	MCFG_DEVICE_ADD("maincpu", F8, MASTER_CLOCK_PAL)        /* PAL speed */
+	MCFG_DEVICE_PROGRAM_MAP(channelf_map)
+	MCFG_DEVICE_IO_MAP(channelf_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
 	/* video hardware */
@@ -313,7 +314,7 @@ MACHINE_CONFIG_START(channelf_state::sabavpl2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", CHANNELF_SOUND, 0)
+	MCFG_DEVICE_ADD("custom", CHANNELF_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	channelf_cart(config);

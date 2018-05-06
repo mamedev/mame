@@ -87,8 +87,8 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device)
 
-SLOT_INTERFACE_EXTERN(ti99_io_port);
-SLOT_INTERFACE_EXTERN(ti99_io_port_ev);
+void ti99_io_port(device_slot_interface &device);
+void ti99_io_port_ev(device_slot_interface &device);
 
 #define MCFG_IOPORT_ADD( _tag )  \
 	MCFG_DEVICE_ADD(_tag, TI99_IOPORT, 0) \

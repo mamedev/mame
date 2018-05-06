@@ -17,6 +17,8 @@
 #ifndef MAME_EMU_DISOUND_H
 #define MAME_EMU_DISOUND_H
 
+#include <functional>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -31,21 +33,9 @@ constexpr int AUTO_ALLOC_INPUT  = 65535;
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_SOUND_ADD(_tag, _type, _clock) \
-	MCFG_DEVICE_ADD(_tag, _type, _clock)
-#define MCFG_SOUND_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
+#define MCFG_SOUND_ROUTE(_output, _target, ...) \
+	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, __VA_ARGS__);
 
-#define MCFG_SOUND_CLOCK(_clock) \
-	MCFG_DEVICE_CLOCK(_clock)
-
-#define MCFG_SOUND_REPLACE(_tag, _type, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, _type, _clock)
-
-#define MCFG_SOUND_ROUTE(_output, _target, _gain) \
-	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain);
-#define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
-	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain, _input);
 #define MCFG_SOUND_ROUTES_RESET() \
 	dynamic_cast<device_sound_interface &>(*device).reset_routes();
 
@@ -66,13 +56,12 @@ public:
 	class sound_route
 	{
 	public:
-		sound_route(int output, int input, float gain, const char *target, u32 mixoutput);
-
-		u32              m_output;           // output index, or ALL_OUTPUTS
-		u32              m_input;            // target input index
-		u32              m_mixoutput;        // target mixer output
-		float            m_gain;             // gain
-		std::string      m_target;           // target tag
+		u32                                 m_output;           // output index, or ALL_OUTPUTS
+		u32                                 m_input;            // target input index
+		u32                                 m_mixoutput;        // target mixer output
+		float                               m_gain;             // gain
+		std::reference_wrapper<device_t>    m_base;             // target search base
+		std::string                         m_target;           // target tag
 	};
 
 	// construction/destruction
@@ -82,14 +71,13 @@ public:
 	virtual bool issound() { return true; } /// HACK: allow devices to hide from the ui
 
 	// configuration access
-	const std::vector<std::unique_ptr<sound_route>> &routes() const { return m_route_list; }
+	std::vector<sound_route> const &routes() const { return m_route_list; }
 
-	// inline configuration helpers
-	void add_route(u32 output, const char *target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0)
-	{
-		m_route_list.push_back(std::make_unique<sound_route>(output, input, gain, target, mixoutput));
-	}
-	void reset_routes() { m_route_list.clear(); }
+	// configuration helpers
+	device_sound_interface &add_route(u32 output, const char *target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
+	device_sound_interface &add_route(u32 output, device_sound_interface &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
+	device_sound_interface &add_route(u32 output, speaker_device &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
+	device_sound_interface &reset_routes() { m_route_list.clear(); return *this; }
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
@@ -107,6 +95,9 @@ public:
 	int inputnum_from_device(device_t &device, int outputnum = 0) const;
 
 protected:
+	// configuration access
+	std::vector<sound_route> &routes() { return m_route_list; }
+
 	// optional operation overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;
@@ -114,7 +105,7 @@ protected:
 	virtual void interface_pre_reset() override;
 
 	// internal state
-	std::vector<std::unique_ptr<sound_route>> m_route_list;      // list of sound routes
+	std::vector<sound_route> m_route_list;      // list of sound routes
 	int             m_outputs;                  // number of outputs from this instance
 	int             m_auto_allocated_inputs;    // number of auto-allocated inputs targeting us
 };
@@ -151,4 +142,4 @@ protected:
 typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
 
 
-#endif  /* MAME_EMU_DISOUND_H */
+#endif // MAME_EMU_DISOUND_H

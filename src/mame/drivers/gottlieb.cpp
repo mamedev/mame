@@ -675,7 +675,7 @@ static const char *const qbert_knocker_names[] =
 MACHINE_CONFIG_START(gottlieb_state::qbert_knocker)
 	MCFG_SPEAKER_ADD("knocker", 0.0, 0.0, 1.0)
 
-	MCFG_SOUND_ADD("knocker_sam", SAMPLES, 0)
+	MCFG_DEVICE_ADD("knocker_sam", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(qbert_knocker_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "knocker", 1.0)
@@ -1769,9 +1769,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gottlieb_state::gottlieb_core)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(gottlieb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gottlieb_state,  gottlieb_interrupt)
+	MCFG_DEVICE_ADD("maincpu", I8088, CPU_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(gottlieb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gottlieb_state,  gottlieb_interrupt)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1793,21 +1793,21 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gottlieb_state::gottlieb1)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
+	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(gottlieb_state::gottlieb2)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(gottlieb_state::g2laser)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
@@ -1833,7 +1833,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gottlieb_state::gottlieb1_votrax)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_VOTRAX, 0)
+	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_VOTRAX)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -1842,8 +1842,8 @@ MACHINE_CONFIG_START(gottlieb_state::reactor)
 	gottlieb1_votrax(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(reactor_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(reactor_map)
 
 	MCFG_DEVICE_REMOVE("nvram")
 MACHINE_CONFIG_END
@@ -1870,7 +1870,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gottlieb_state::cobram3)
 	gottlieb_core(config);
-	MCFG_SOUND_ADD("r2sound", GOTTLIEB_SOUND_REV2, 0)
+	MCFG_DEVICE_ADD("r2sound", GOTTLIEB_SOUND_REV2)
 	MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS()
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
@@ -1886,9 +1886,9 @@ MACHINE_CONFIG_START(gottlieb_state::cobram3)
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	/* sound hardware */
-	MCFG_SOUND_MODIFY("r2sound:dac")
+	MCFG_DEVICE_MODIFY("r2sound:dac")
 	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "r2sound", 1.00)
 MACHINE_CONFIG_END
 
 

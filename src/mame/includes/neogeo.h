@@ -84,6 +84,7 @@ protected:
 	uint32_t screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual DECLARE_WRITE8_MEMBER(io_control_w);
+	DECLARE_WRITE8_MEMBER(audio_command_w);
 	DECLARE_WRITE_LINE_MEMBER(set_use_cart_vectors);
 	DECLARE_WRITE_LINE_MEMBER(set_use_cart_audio);
 	DECLARE_READ16_MEMBER(banked_vectors_r);
@@ -207,6 +208,9 @@ private:
 
 class ngarcade_base_state : public neogeo_base_state
 {
+public:
+	DECLARE_CUSTOM_INPUT_MEMBER(startsel_edge_joy_r);
+
 protected:
 	ngarcade_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: neogeo_base_state(mconfig, type, tag)

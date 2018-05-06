@@ -298,8 +298,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(irobot_state::irobot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(irobot_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(irobot_map)
 
 	MCFG_DEVICE_ADD("adc", ADC0809, MAIN_CLOCK / 16)
 	MCFG_ADC0808_IN0_CB(IOPORT("AN0"))
@@ -329,17 +329,17 @@ MACHINE_CONFIG_START(irobot_state::irobot)
 	/* FIXME: I-Robot has all channels of the quad-pokey tied together
 	 *        This needs to be taken into account in the design.
 	 */
-	MCFG_SOUND_ADD("pokey1", POKEY, MAIN_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, MAIN_CLOCK / 8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, MAIN_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, MAIN_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey3", POKEY, MAIN_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey3", POKEY, MAIN_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("pokey4", POKEY, MAIN_CLOCK / 8)
+	MCFG_DEVICE_ADD("pokey4", POKEY, MAIN_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -695,9 +695,10 @@ image_init_result atom_state::load_cart(device_image_interface &image, generic_s
 	return image_init_result::PASS;
 }
 
-static SLOT_INTERFACE_START(atom_floppies)
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void atom_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+}
 
 FLOPPY_FORMATS_MEMBER(atom_state::floppy_formats)
 	FLOPPY_ATOM_FORMAT
@@ -709,45 +710,45 @@ FLOPPY_FORMATS_END0
 
 MACHINE_CONFIG_START(atom_state::atom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
-	MCFG_CPU_PROGRAM_MAP(atom_mem)
+	MCFG_DEVICE_ADD(SY6502_TAG, M6502, X2/4)
+	MCFG_DEVICE_PROGRAM_MAP(atom_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
 	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(atom_state, vdg_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(atom_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(atom_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(atom_state, ppi_pc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, atom_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, atom_state, ppi_pb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, atom_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, atom_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(I8271_TAG, I8271 , 0)
-	MCFG_I8271_IRQ_CALLBACK(WRITELINE(atom_state, atom_8271_interrupt_callback))
-	MCFG_I8271_HDL_CALLBACK(WRITELINE(atom_state, motor_w))
+	MCFG_I8271_IRQ_CALLBACK(WRITELINE(*this, atom_state, atom_8271_interrupt_callback))
+	MCFG_I8271_HDL_CALLBACK(WRITELINE(*this, atom_state, motor_w))
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":0", atom_floppies, "525sssd", atom_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD(I8271_TAG ":1", atom_floppies, "525sssd", atom_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -786,8 +787,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atomeb_state::atomeb)
 	atom(config);
-	MCFG_CPU_MODIFY(SY6502_TAG)
-	MCFG_CPU_PROGRAM_MAP(atomeb_mem)
+	MCFG_DEVICE_MODIFY(SY6502_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(atomeb_mem)
 
 	/* cartridges */
 	MCFG_DEVICE_REMOVE("cartslot")
@@ -819,37 +820,37 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(atom_state::atombb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
-	MCFG_CPU_PROGRAM_MAP(atombb_mem)
+	MCFG_DEVICE_ADD(SY6502_TAG, M6502, X2/4)
+	MCFG_DEVICE_PROGRAM_MAP(atombb_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
 
 	MCFG_DEVICE_ADD(MC6847_TAG, MC6847_PAL, XTAL(4'433'619))
-	MCFG_MC6847_INPUT_CALLBACK(READ8(atom_state, vdg_videoram_r))
+	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, atom_state, vdg_videoram_r))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
 
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
-	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(atom_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(atom_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(atom_state, ppi_pc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, atom_state, ppi_pa_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, atom_state, ppi_pb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, atom_state, ppi_pc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, atom_state, ppi_pc_w))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_ca1))
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(R6522_TAG, via6522_device, write_pa7))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_ca1))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(R6522_TAG, via6522_device, write_pa7))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 
@@ -872,8 +873,8 @@ MACHINE_CONFIG_END
 //static MACHINE_CONFIG_START( prophet2 )
 //  atom(config);
 //  /* basic machine hardware */
-//  MCFG_CPU_MODIFY(SY6502_TAG)
-//  MCFG_CPU_PROGRAM_MAP(prophet_mem)
+//  MCFG_DEVICE_MODIFY(SY6502_TAG)
+//  MCFG_DEVICE_PROGRAM_MAP(prophet_mem)
 //
 //  /* fdc */
 //  MCFG_DEVICE_REMOVE(I8271_TAG)
@@ -896,8 +897,8 @@ MACHINE_CONFIG_END
 //static MACHINE_CONFIG_START( prophet3 )
 //  atom(config);
 //  /* basic machine hardware */
-//  MCFG_CPU_MODIFY(SY6502_TAG)
-//  MCFG_CPU_PROGRAM_MAP(prophet_mem)
+//  MCFG_DEVICE_MODIFY(SY6502_TAG)
+//  MCFG_DEVICE_PROGRAM_MAP(prophet_mem)
 //
 //  /* internal ram */
 //  MCFG_RAM_MODIFY(RAM_TAG)

@@ -600,17 +600,18 @@ FLOPPY_FORMATS_MEMBER( trs80_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( trs80_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_QD)
-SLOT_INTERFACE_END
+static void trs80_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I, with no extras
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 10.6445_MHz_XTAL / 6) // "a little over 1.774 MHz"
+	MCFG_DEVICE_ADD("maincpu", Z80, 10.6445_MHz_XTAL / 6) // "a little over 1.774 MHz"
 	// MAME driver previously configured CPU at "1.796 MHz"; where did this number come from?
-	MCFG_CPU_PROGRAM_MAP(trs80_map)
-	MCFG_CPU_IO_MAP(trs80_io)
+	MCFG_DEVICE_PROGRAM_MAP(trs80_map)
+	MCFG_DEVICE_IO_MAP(trs80_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -623,7 +624,7 @@ MACHINE_CONFIG_START(trs80_state::trs80)       // the original model I, level I,
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
@@ -634,10 +635,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	trs80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(model1_map)
-	MCFG_CPU_IO_MAP(model1_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  40)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(model1_map)
+	MCFG_DEVICE_IO_MAP(model1_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt,  40)
 
 	/* devices */
 	MCFG_CASSETTE_MODIFY("cassette")
@@ -647,7 +648,7 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 0.5)
 
 	MCFG_FD1793_ADD("fdc", 4_MHz_XTAL / 4) // todo: should be fd1771
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(trs80_state,trs80_fdc_intrq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, trs80_state,trs80_fdc_intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -657,10 +658,10 @@ MACHINE_CONFIG_START(trs80_state::model1)      // model I, level II
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", trs80_floppies, "", trs80_state::floppy_formats)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_PERROR_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit6))
-	MCFG_CENTRONICS_SELECT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_FAULT_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit4))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
 
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
@@ -674,11 +675,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model3)
 	model1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(20.2752_MHz_XTAL / 10)
-	MCFG_CPU_PROGRAM_MAP(model3_map)
-	MCFG_CPU_IO_MAP(model3_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt, 20.2752_MHz_XTAL / 10 / 67584)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(20.2752_MHz_XTAL / 10)
+	MCFG_DEVICE_PROGRAM_MAP(model3_map)
+	MCFG_DEVICE_IO_MAP(model3_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, trs80_rtc_interrupt, 20.2752_MHz_XTAL / 10 / 67584)
 
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, trs80m4)
 
@@ -691,20 +692,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model4)
 	model3(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(model4_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(model4_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::model4p)
 	model3(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(model4p_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(model4p_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::sys80)
 	model1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(sys80_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(sys80_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::ht1080z)
@@ -716,10 +717,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::lnw80)
 	model1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(16_MHz_XTAL / 4) // or 16MHz / 9; 4MHz or 1.77MHz operation selected by HI/LO switch
-	MCFG_CPU_PROGRAM_MAP(lnw80_map)
-	MCFG_CPU_IO_MAP(lnw80_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(16_MHz_XTAL / 4) // or 16MHz / 9; 4MHz or 1.77MHz operation selected by HI/LO switch
+	MCFG_DEVICE_PROGRAM_MAP(lnw80_map)
+	MCFG_DEVICE_IO_MAP(lnw80_io)
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode",lnw80)
@@ -735,10 +736,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::radionic)
 	model1(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(12_MHz_XTAL / 6) // or 3.579MHz / 2 (selectable?)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(12_MHz_XTAL / 6) // or 3.579MHz / 2 (selectable?)
 	// Komtek I "User Friendly Manual" calls for "Z80 running at 1.97 MHz." Schematics mark XTAL as 12 MHz, but is that rounded off?
-	MCFG_CPU_PERIODIC_INT_DRIVER(trs80_state, nmi_line_pulse, 12_MHz_XTAL / 12 / 16384)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(trs80_state, nmi_line_pulse, 12_MHz_XTAL / 12 / 16384)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL, 768, 0, 512, 312, 0, 256)
@@ -748,9 +749,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::meritum)
 	sys80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(meritum_map)
-	MCFG_CPU_IO_MAP(meritum_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(meritum_map)
+	MCFG_DEVICE_IO_MAP(meritum_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(trs80_state, screen_update_meritum)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", meritum)
@@ -758,8 +759,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trs80_state::cp500)
 	model3(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(cp500_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(cp500_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, cp500)
 MACHINE_CONFIG_END

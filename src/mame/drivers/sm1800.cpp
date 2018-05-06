@@ -160,11 +160,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(sm1800_state::sm1800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(sm1800_mem)
-	MCFG_CPU_IO_MAP(sm1800_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sm1800_state,  sm1800_vblank_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(sm1800_state,sm1800_irq_callback)
+	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(sm1800_mem)
+	MCFG_DEVICE_IO_MAP(sm1800_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sm1800_state,  sm1800_vblank_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(sm1800_state,sm1800_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -180,10 +180,10 @@ MACHINE_CONFIG_START(sm1800_state::sm1800)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(sm1800_state, sm1800_8255_porta_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(sm1800_state, sm1800_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(sm1800_state, sm1800_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(sm1800_state, sm1800_8255_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, sm1800_state, sm1800_8255_porta_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, sm1800_state, sm1800_8255_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, sm1800_state, sm1800_8255_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sm1800_state, sm1800_8255_portc_w))
 
 	MCFG_DEVICE_ADD("i8275", I8275, 2000000)
 	MCFG_I8275_CHARACTER_WIDTH(8)

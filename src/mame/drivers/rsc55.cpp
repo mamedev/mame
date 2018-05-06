@@ -70,9 +70,9 @@ void sc55_state::sc55_io(address_map &map)
 }
 
 MACHINE_CONFIG_START(sc55_state::sc55)
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL(20'000'000) )    // probably not?
-	MCFG_CPU_PROGRAM_MAP( sc55_map )
-	MCFG_CPU_IO_MAP( sc55_io )
+	MCFG_DEVICE_ADD( "maincpu", P8098, XTAL(20'000'000) )    // probably not?
+	MCFG_DEVICE_PROGRAM_MAP( sc55_map )
+	MCFG_DEVICE_IO_MAP( sc55_io )
 MACHINE_CONFIG_END
 
 ROM_START( sc55 )

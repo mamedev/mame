@@ -201,9 +201,9 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(capr1_state::cspin2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) // clock frequency unknown
-	MCFG_CPU_PROGRAM_MAP(cspin2_map)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(capr1_state, nmi_line_pulse, 20)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000) // clock frequency unknown
+	MCFG_DEVICE_PROGRAM_MAP(cspin2_map)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(capr1_state, nmi_line_pulse, 20)
 
 	MCFG_DEVICE_ADD("te7750", TE7750, 0) // guess
 	MCFG_TE7750_IOS_CB(CONSTANT(7))
@@ -215,14 +215,14 @@ MACHINE_CONFIG_START(capr1_state::cspin2)
 	MCFG_TE7750_IN_PORT6_CB(IOPORT("IN6"))
 	MCFG_TE7750_IN_PORT7_CB(IOPORT("IN7"))
 	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN8"))
-	MCFG_TE7750_OUT_PORT9_CB(WRITE8(capr1_state, output_w))
+	MCFG_TE7750_OUT_PORT9_CB(WRITE8(*this, capr1_state, output_w))
 
 	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym", YM2203, 4000000) // clock frequency unknown
+	MCFG_DEVICE_ADD("ym", YM2203, 4000000) // clock frequency unknown
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("INB"))

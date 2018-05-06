@@ -42,13 +42,15 @@
 DEFINE_DEVICE_TYPE(MB86235, mb86235_device, "mb86235", "Fujitsu MB86235 \"TGPx4\"")
 
 
-ADDRESS_MAP_START(mb86235_device::internal_abus)
-	AM_RANGE(0x000000, 0x0003ff) AM_RAM
-ADDRESS_MAP_END
+void mb86235_device::internal_abus(address_map &map)
+{
+	map(0x000000, 0x0003ff).ram();
+}
 
-ADDRESS_MAP_START(mb86235_device::internal_bbus)
-	AM_RANGE(0x000000, 0x0003ff) AM_RAM
-ADDRESS_MAP_END
+void mb86235_device::internal_bbus(address_map &map)
+{
+	map(0x000000, 0x0003ff).ram();
+}
 
 
 
@@ -269,6 +271,10 @@ mb86235_device::mb86235_device(const machine_config &mconfig, const char *tag, d
 	, m_cache(CACHE_SIZE + sizeof(mb86235_internal_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
+{
+}
+
+mb86235_device::~mb86235_device()
 {
 }
 

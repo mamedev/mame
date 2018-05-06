@@ -384,7 +384,7 @@ MACHINE_CONFIG_START(md_cons_state::ms_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(md_cons_state::ms_megadpal)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 //  has SD card slot instead?
 //  MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, nullptr)
@@ -613,19 +613,19 @@ MACHINE_CONFIG_START(md_cons_state::genesis_32x)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("snsnd")
 
-	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
+	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
@@ -654,19 +654,19 @@ MACHINE_CONFIG_START(md_cons_state::mdj_32x)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("snsnd")
 
-	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
+	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
@@ -695,19 +695,19 @@ MACHINE_CONFIG_START(md_cons_state::md_32x)
 	MCFG_SEGA_32X_PALETTE("gen_vdp:palette")
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
 	MCFG_DEVICE_REMOVE("ymsnd")
 	MCFG_DEVICE_REMOVE("snsnd")
 
-	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_DEVICE_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
 	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
+	MCFG_DEVICE_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
@@ -760,7 +760,7 @@ MACHINE_CONFIG_START(md_cons_state::genesis_scd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
 	MCFG_GFX_PALETTE("gen_vdp:palette")
@@ -778,7 +778,7 @@ MACHINE_CONFIG_START(md_cons_state::md_scd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
 	MCFG_GFX_PALETTE("gen_vdp:palette")
@@ -796,7 +796,7 @@ MACHINE_CONFIG_START(md_cons_state::mdj_scd)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(md_cons_state, screen_vblank_console))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, md_cons_state, screen_vblank_console))
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
 	MCFG_GFX_PALETTE("gen_vdp:palette")

@@ -746,9 +746,9 @@ static GFXDECODE_START( drwrt400 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(nakajies_state::nakajies210)
-	MCFG_CPU_ADD( "v20hl", V20, X301 / 2 )
-	MCFG_CPU_PROGRAM_MAP( nakajies_map)
-	MCFG_CPU_IO_MAP( nakajies_io_map)
+	MCFG_DEVICE_ADD( "v20hl", V20, X301 / 2 )
+	MCFG_DEVICE_PROGRAM_MAP( nakajies_map)
+	MCFG_DEVICE_IO_MAP( nakajies_io_map)
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_REFRESH_RATE( 50 )  /* Wild guess */
@@ -764,7 +764,7 @@ MACHINE_CONFIG_START(nakajies_state::nakajies210)
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )
+	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* rtc */

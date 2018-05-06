@@ -325,9 +325,10 @@ void c1551_device::c1551_mem(address_map &map)
 //  SLOT_INTERFACE( c1551_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( c1551_floppies )
-	SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
-SLOT_INTERFACE_END
+static void c1551_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssqd", FLOPPY_525_SSQD);
+}
 
 
 //-------------------------------------------------
@@ -345,28 +346,28 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c1551_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6510T_TAG, M6510T, XTAL(16'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(c1551_mem)
-	MCFG_M6510T_PORT_CALLBACKS(READ8(c1551_device, port_r), WRITE8(c1551_device, port_w))
+	MCFG_DEVICE_ADD(M6510T_TAG, M6510T, XTAL(16'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(c1551_mem)
+	MCFG_M6510T_PORT_CALLBACKS(READ8(*this, c1551_device, port_r), WRITE8(*this, c1551_device, port_w))
 	MCFG_QUANTUM_PERFECT_CPU(M6510T_TAG)
 
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_DEVICE_ADD(M6523_0_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(READ8(c1551_device, tcbm_data_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(c1551_device, tcbm_data_w))
-	MCFG_TPI6525_IN_PB_CB(DEVREAD8(C64H156_TAG, c64h156_device, yb_r))
-	MCFG_TPI6525_OUT_PB_CB(DEVWRITE8(C64H156_TAG, c64h156_device, yb_w))
-	MCFG_TPI6525_IN_PC_CB(READ8(c1551_device, tpi0_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(c1551_device, tpi0_pc_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(*this, c1551_device, tcbm_data_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, c1551_device, tcbm_data_w))
+	MCFG_TPI6525_IN_PB_CB(READ8(C64H156_TAG, c64h156_device, yb_r))
+	MCFG_TPI6525_OUT_PB_CB(WRITE8(C64H156_TAG, c64h156_device, yb_w))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, c1551_device, tpi0_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, c1551_device, tpi0_pc_w))
 	MCFG_DEVICE_ADD(M6523_1_TAG, TPI6525, 0)
-	MCFG_TPI6525_IN_PA_CB(READ8(c1551_device, tcbm_data_r))
-	MCFG_TPI6525_OUT_PA_CB(WRITE8(c1551_device, tcbm_data_w))
-	MCFG_TPI6525_IN_PB_CB(READ8(c1551_device, tpi1_pb_r))
-	MCFG_TPI6525_IN_PC_CB(READ8(c1551_device, tpi1_pc_r))
-	MCFG_TPI6525_OUT_PC_CB(WRITE8(c1551_device, tpi1_pc_w))
+	MCFG_TPI6525_IN_PA_CB(READ8(*this, c1551_device, tcbm_data_r))
+	MCFG_TPI6525_OUT_PA_CB(WRITE8(*this, c1551_device, tcbm_data_w))
+	MCFG_TPI6525_IN_PB_CB(READ8(*this, c1551_device, tpi1_pb_r))
+	MCFG_TPI6525_IN_PC_CB(READ8(*this, c1551_device, tpi1_pc_r))
+	MCFG_TPI6525_OUT_PC_CB(WRITE8(*this, c1551_device, tpi1_pc_w))
 
 	MCFG_DEVICE_ADD(C64H156_TAG, C64H156, XTAL(16'000'000))
-	MCFG_64H156_BYTE_CALLBACK(DEVWRITELINE(C64H156_TAG, c64h156_device, atni_w))
+	MCFG_64H156_BYTE_CALLBACK(WRITELINE(C64H156_TAG, c64h156_device, atni_w))
 	MCFG_FLOPPY_DRIVE_ADD_FIXED(C64H156_TAG":0", c1551_floppies, "525ssqd", c1551_device::floppy_formats)
 
 	MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD()

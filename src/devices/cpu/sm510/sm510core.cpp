@@ -20,18 +20,20 @@ DEFINE_DEVICE_TYPE(SM510, sm510_device, "sm510", "Sharp SM510") // 2.7Kx8 ROM, 1
 
 
 // internal memory maps
-ADDRESS_MAP_START(sm510_device::program_2_7k)
-	AM_RANGE(0x0000, 0x02bf) AM_ROM
-	AM_RANGE(0x0400, 0x06bf) AM_ROM
-	AM_RANGE(0x0800, 0x0abf) AM_ROM
-	AM_RANGE(0x0c00, 0x0ebf) AM_ROM
-ADDRESS_MAP_END
+void sm510_device::program_2_7k(address_map &map)
+{
+	map(0x0000, 0x02bf).rom();
+	map(0x0400, 0x06bf).rom();
+	map(0x0800, 0x0abf).rom();
+	map(0x0c00, 0x0ebf).rom();
+}
 
-ADDRESS_MAP_START(sm510_device::data_96_32x4)
-	AM_RANGE(0x00, 0x5f) AM_RAM
-	AM_RANGE(0x60, 0x6f) AM_RAM AM_SHARE("lcd_ram_a")
-	AM_RANGE(0x70, 0x7f) AM_RAM AM_SHARE("lcd_ram_b")
-ADDRESS_MAP_END
+void sm510_device::data_96_32x4(address_map &map)
+{
+	map(0x00, 0x5f).ram();
+	map(0x60, 0x6f).ram().share("lcd_ram_a");
+	map(0x70, 0x7f).ram().share("lcd_ram_b");
+}
 
 
 // device definitions

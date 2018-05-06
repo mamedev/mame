@@ -178,6 +178,24 @@ WRITE_LINE_MEMBER(docastle_state::docastle_tint)
 	}
 }
 
+WRITE_LINE_MEMBER(docastle_state::stx_on_w)
+{
+	if (state)
+	{
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_cpu3->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	}
+}
+
+WRITE_LINE_MEMBER(docastle_state::stx_off_w)
+{
+	if (!state)
+	{
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		m_cpu3->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
 WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 {
 	if (m_adpcm_pos >= memregion("adpcm")->bytes())
@@ -581,17 +599,15 @@ void docastle_state::machine_start()
 MACHINE_CONFIG_START(docastle_state::docastle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(docastle_map)
-	MCFG_CPU_IO_MAP(docastle_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(docastle_map)
+	MCFG_DEVICE_IO_MAP(docastle_io_map)
 
-	MCFG_CPU_ADD("slave", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(docastle_map2)
+	MCFG_DEVICE_ADD("slave", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(docastle_map2)
 
-	MCFG_CPU_ADD("cpu3", Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(docastle_map3)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
+	MCFG_DEVICE_ADD("cpu3", Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(docastle_map3)
 
 	MCFG_DEVICE_ADD("inp1", TMS1025, 0)
 	MCFG_TMS1025_READ_PORT_CB(PORT1, IOPORT("DSW2"))
@@ -620,7 +636,9 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_VISAREA_ADJUST(8,-8,0,0)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(docastle_state, docastle_tint))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, docastle_state, docastle_tint))
+	MCFG_MC6845_OUT_CUR_CB(WRITELINE(*this, docastle_state, stx_on_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE(*this, docastle_state, stx_off_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
@@ -634,16 +652,16 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("sn2", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn3", SN76489A, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("sn3", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn4", SN76489A, XTAL(4'000'000))
+	MCFG_DEVICE_ADD("sn4", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -651,11 +669,11 @@ MACHINE_CONFIG_START(docastle_state::dorunrun)
 	docastle(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dorunrun_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dorunrun_map)
 
-	MCFG_CPU_MODIFY("slave")
-	MCFG_CPU_PROGRAM_MAP(dorunrun_map2)
+	MCFG_DEVICE_MODIFY("slave")
+	MCFG_DEVICE_PROGRAM_MAP(dorunrun_map2)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
@@ -665,8 +683,8 @@ MACHINE_CONFIG_START(docastle_state::idsoccer)
 	docastle(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(idsoccer_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(idsoccer_map)
 
 	MCFG_DEVICE_MODIFY("inp1")
 	MCFG_TMS1025_READ_PORT_CB(PORT4, IOPORT("JOYS_RIGHT"))
@@ -678,8 +696,8 @@ MACHINE_CONFIG_START(docastle_state::idsoccer)
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* Crystal verified on American Soccer board. */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(docastle_state, idsoccer_adpcm_int)) // interrupt function
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* Crystal verified on American Soccer board. */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, docastle_state, idsoccer_adpcm_int)) // interrupt function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)      // 6 kHz    ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END

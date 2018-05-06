@@ -82,7 +82,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_FDC_SLOT, bbc_fdc_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbc_fdc_devices );
+void bbc_fdc_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_FDC_FDC_H

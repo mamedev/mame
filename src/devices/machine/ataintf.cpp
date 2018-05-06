@@ -204,10 +204,11 @@ WRITE_LINE_MEMBER( abstract_ata_interface_device::write_dmack )
 			elem->dev()->write_dmack(state);
 }
 
-SLOT_INTERFACE_START(ata_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)
-	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
-SLOT_INTERFACE_END
+void ata_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", IDE_HARDDISK);
+	device.option_add("cdrom", ATAPI_CDROM);
+}
 
 abstract_ata_interface_device::abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -246,21 +247,21 @@ void abstract_ata_interface_device::device_start()
 		m_pdiag[i] = 0;
 
 		device_ata_interface *dev = m_slot[i]->dev();
-		if (dev != nullptr)
+		if (dev)
 		{
 			if (i == 0)
 			{
-				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, irq0_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dmarq0_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dasp0_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, pdiag0_write_line));
+				dev->m_irq_handler.set_callback(DEVCB_WRITELINE(*this, abstract_ata_interface_device, irq0_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB_WRITELINE(*this, abstract_ata_interface_device, dmarq0_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB_WRITELINE(*this, abstract_ata_interface_device, dasp0_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB_WRITELINE(*this, abstract_ata_interface_device, pdiag0_write_line));
 			}
 			else
 			{
-				dev->m_irq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, irq1_write_line));
-				dev->m_dmarq_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dmarq1_write_line));
-				dev->m_dasp_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, dasp1_write_line));
-				dev->m_pdiag_handler.set_callback(DEVCB_DEVWRITELINE("^", abstract_ata_interface_device, pdiag1_write_line));
+				dev->m_irq_handler.set_callback(DEVCB_WRITELINE(*this, abstract_ata_interface_device, irq1_write_line));
+				dev->m_dmarq_handler.set_callback(DEVCB_WRITELINE(*this, abstract_ata_interface_device, dmarq1_write_line));
+				dev->m_dasp_handler.set_callback(DEVCB_WRITELINE(*this, abstract_ata_interface_device, dasp1_write_line));
+				dev->m_pdiag_handler.set_callback(DEVCB_WRITELINE(*this, abstract_ata_interface_device, pdiag1_write_line));
 			}
 
 			dev->write_csel(i);

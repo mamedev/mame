@@ -356,16 +356,16 @@ void wc90b_state::machine_start()
 MACHINE_CONFIG_START(wc90b_state::wc90b)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wc90b_map1)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wc90b_map1)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("sub", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wc90b_map2)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("sub", Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wc90b_map2)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wc90b_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu)
 	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
@@ -387,14 +387,14 @@ MACHINE_CONFIG_START(wc90b_state::wc90b)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd1", YM2203, YM2203_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd1", YM2203, YM2203_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ymsnd2", YM2203, YM2203_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd2", YM2203, YM2203_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(wc90b_state, adpcm_int))      /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, MSM5205_CLOCK)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, wc90b_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END

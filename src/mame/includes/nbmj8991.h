@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 
-#include "includes/nb1413m3.h"
+#include "machine/nb1413m3.h"
 #include "machine/gen_latch.h"
 #include "screen.h"
 

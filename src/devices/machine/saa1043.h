@@ -4,8 +4,8 @@
 
     Philips SAA1043 Universal Sync Generator emulation
 
-	TODO:
-	- Everything.
+    TODO:
+    - Everything.
 
 ************************************************************************
                             _____   _____

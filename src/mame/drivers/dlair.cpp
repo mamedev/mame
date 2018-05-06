@@ -732,14 +732,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(dlair_state::dlair_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
-	MCFG_CPU_PROGRAM_MAP(dlus_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
+	MCFG_DEVICE_PROGRAM_MAP(dlus_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
@@ -767,14 +767,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
 	MCFG_Z80_DAISY_CHAIN(dleuro_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(dleuro_map)
-	MCFG_CPU_IO_MAP(dleuro_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(dleuro_map)
+	MCFG_DEVICE_IO_MAP(dleuro_io_map)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(dlair_state, write_speaker))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, dlair_state, write_speaker))
 
 	MCFG_DEVICE_ADD("sio", Z80SIO, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -798,11 +798,11 @@ MACHINE_CONFIG_START(dlair_state::dleuro)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MCFG_SOUND_MODIFY("ld_22vp932")
+	MCFG_DEVICE_MODIFY("ld_22vp932")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

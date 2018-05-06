@@ -58,18 +58,20 @@ void psxcontrollerports_device::device_start()
 
 // add controllers to define so they can be connected to the multitap
 #define PSX_CONTROLLERS \
-		SLOT_INTERFACE("digital_pad", PSX_STANDARD_CONTROLLER) \
-		SLOT_INTERFACE("dualshock_pad", PSX_DUALSHOCK) \
-		SLOT_INTERFACE("analog_joystick", PSX_ANALOG_JOYSTICK)
+		device.option_add("digital_pad", PSX_STANDARD_CONTROLLER); \
+		device.option_add("dualshock_pad", PSX_DUALSHOCK); \
+		device.option_add("analog_joystick", PSX_ANALOG_JOYSTICK);
 
-SLOT_INTERFACE_START(psx_controllers)
+void psx_controllers(device_slot_interface &device)
+{
 	PSX_CONTROLLERS
-	SLOT_INTERFACE("multitap", PSX_MULTITAP)
-SLOT_INTERFACE_END
+	device.option_add("multitap", PSX_MULTITAP);
+}
 
-SLOT_INTERFACE_START(psx_controllers_nomulti)
+void psx_controllers_nomulti(device_slot_interface &device)
+{
 	PSX_CONTROLLERS
-SLOT_INTERFACE_END
+}
 
 WRITE_LINE_MEMBER(psxcontrollerports_device::write_dtr)
 {

@@ -1183,12 +1183,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", T11, MASTER_CLOCK/2)
+	MCFG_DEVICE_ADD("maincpu", T11, MASTER_CLOCK/2)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
@@ -1224,7 +1224,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MCFG_SCREEN_UPDATE_DRIVER(atarisy2_state, screen_update_atarisy2)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(atarisy2_state, vblank_int))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, atarisy2_state, vblank_int))
 
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
@@ -1242,15 +1242,15 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MCFG_SOUND_ADD("pokey1", POKEY, SOUND_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey1", POKEY, SOUND_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW0"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.35)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, SOUND_CLOCK/8)
+	MCFG_DEVICE_ADD("pokey2", POKEY, SOUND_CLOCK/8)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.35)
 
-	MCFG_SOUND_ADD("tms", TMS5220C, MASTER_CLOCK/4/4/2)
+	MCFG_DEVICE_ADD("tms", TMS5220C, MASTER_CLOCK/4/4/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
@@ -1432,9 +1432,9 @@ ROM_END
 
 Paperboy prototype pcb
 
-brown in colour, A042571-01 rev 2 
+brown in colour, A042571-01 rev 2
 handwritten in red '#10'
-sticky label with '10' on it. 
+sticky label with '10' on it.
 Had a tag attatched saying 'suspect reset problem'
 
 SOUND section:
@@ -1444,9 +1444,9 @@ There is a 6502 next to the quad pokey. 3 roms are nearby, with the naming conve
 CPU section:
 one empty 40pin socket, looks like the main cpu.
 
-There are no designations for IC location, only a 
+There are no designations for IC location, only a
 handwritten column of letters to denote the left/right.
-I am guessing at the up/down by making up my own numbers, 
+I am guessing at the up/down by making up my own numbers,
 as atari used to start the numbers from furthest away from the edge connector first.
 
 All IC's and components on this pcb are hand soldered-in
@@ -1456,21 +1456,21 @@ So bear this in mind, there may be a few bytes out here and there.
 *********************************************************************************************
 
 
-Label 		    Loc. 	Type 	File
-FIX-LOW CA50	5P	    27128	fix-low.bin
-FIX-HI 0AB3	    5M	    27128	fix-hi.bin
-L-0 208E	    7T	    27128	l-0.bin
-H-0 9C75	    6T	    27128	h-0.bin
-PAGROM L-1	    6R/S	27128	pagroml-1.bin
-H-1	  	        5T	    27128	h-1.bin
-PAGROM L-2	    7R/S	27128	pagroml-2.bin
-PAGROM H-2	    4T	    27128	pagromh-2.bin
-LOW-3		    5R/S	27128	low-3.bin
-HI-3		    4R/S	27128	hi-3.bin
+Label           Loc.    Type    File
+FIX-LOW CA50    5P      27128   fix-low.bin
+FIX-HI 0AB3     5M      27128   fix-hi.bin
+L-0 208E        7T      27128   l-0.bin
+H-0 9C75        6T      27128   h-0.bin
+PAGROM L-1      6R/S    27128   pagroml-1.bin
+H-1             5T      27128   h-1.bin
+PAGROM L-2      7R/S    27128   pagroml-2.bin
+PAGROM H-2      4T      27128   pagromh-2.bin
+LOW-3           5R/S    27128   low-3.bin
+HI-3            4R/S    27128   hi-3.bin
 
-PAPTST 4000	    2A	    27128	paptst4000.bin
-PAPTST 8000	    2C	    27128	paptst8000.bin
-PAPTST c000	    2G	    27128	paptstc000.bin
+PAPTST 4000     2A      27128   paptst4000.bin
+PAPTST 8000     2C      27128   paptst8000.bin
+PAPTST c000     2G      27128   paptstc000.bin
 
 */
 

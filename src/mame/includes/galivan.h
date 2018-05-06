@@ -6,7 +6,8 @@
 
 ***************************************************************************/
 
-#include "includes/nb1414m4.h"
+#include "machine/nb1412m2.h"
+#include "machine/nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 
@@ -82,4 +83,19 @@ public:
 	void ninjemak_map(address_map &map);
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
+};
+
+class dangarj_state : public galivan_state
+{
+public:
+	dangarj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galivan_state(mconfig, type, tag),
+		m_prot(*this, "prot_chip")
+		{}
+	void dangarj(machine_config &config);
+
+private:
+	required_device<nb1412m2_device> m_prot;
+
+	void dangarj_io_map(address_map &map);
 };

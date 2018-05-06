@@ -408,9 +408,9 @@ PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 }
 
 MACHINE_CONFIG_START(sbowling_state::sbowling)
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(19'968'000)/10)   /* ? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(port_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(19'968'000)/10)   /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(port_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, interrupt, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -431,7 +431,7 @@ MACHINE_CONFIG_START(sbowling_state::sbowling)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(19'968'000)/16)  /* ? */
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(19'968'000)/16)  /* ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

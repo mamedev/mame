@@ -215,7 +215,7 @@ INPUT_CHANGED_MEMBER( gts3_state::test_inp )
 	m_u4->write_ca1(newval);
 }
 
-// This trampoline needed; DEVWRITELINE("maincpu", m65c02_device, nmi_line) does not work
+// This trampoline needed; WRITELINE("maincpu", m65c02_device, nmi_line) does not work
 WRITE_LINE_MEMBER( gts3_state::nmi_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
@@ -283,8 +283,8 @@ DRIVER_INIT_MEMBER( gts3_state, gts3 )
 
 MACHINE_CONFIG_START(gts3_state::gts3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(gts3_map)
+	MCFG_DEVICE_ADD("maincpu", M65C02, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(gts3_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Video */
@@ -295,20 +295,20 @@ MACHINE_CONFIG_START(gts3_state::gts3)
 
 	MCFG_DEVICE_ADD("u4", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
-	MCFG_VIA6522_READPA_HANDLER(READ8(gts3_state, u4a_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(gts3_state, u4b_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3_state, u4b_w))
-	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3_state, u4ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3_state, nmi_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, gts3_state, u4a_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, gts3_state, u4b_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, gts3_state, u4b_w))
+	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gts3_state, u4ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, gts3_state, nmi_w))
 
 	MCFG_DEVICE_ADD("u5", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
-	//MCFG_VIA6522_READPA_HANDLER(READ8(gts3_state, u5a_r))
-	//MCFG_VIA6522_READPB_HANDLER(READ8(gts3_state, u5b_r))
-	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gts3_state, u5b_w))
-	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3_state, u5ca2_w))
-	//MCFG_VIA6522_CB1_HANDLER(WRITELINE(gts3_state, u5cb1_w))
-	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3_state, u5cb2_w))
+	//MCFG_VIA6522_READPA_HANDLER(READ8(*this, gts3_state, u5a_r))
+	//MCFG_VIA6522_READPB_HANDLER(READ8(*this, gts3_state, u5b_r))
+	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, gts3_state, u5b_w))
+	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, gts3_state, u5ca2_w))
+	//MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, gts3_state, u5cb1_w))
+	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, gts3_state, u5cb2_w))
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------
