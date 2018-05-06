@@ -437,7 +437,7 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* Verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(14'318'181)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -462,7 +462,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(silvmil_state::puzzlovek)
 	puzzlove(config);
 	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(15'000'000)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", AUDIO_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, AUDIO_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, blockout_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)

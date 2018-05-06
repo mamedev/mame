@@ -74,7 +74,7 @@ MACHINE_CONFIG_START(wpcsnd_device::device_add_mconfig)
 	MCFG_DEVICE_PROGRAM_MAP(wpcsnd_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_YM2151_ADD("ym2151", 3580000)
+	MCFG_DEVICE_ADD("ym2151", YM2151, 3580000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, wpcsnd_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 0.25)
 

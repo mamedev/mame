@@ -1485,7 +1485,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 3.579'545_MHz_XTAL)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 3.579'545_MHz_XTAL)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -1499,7 +1499,7 @@ MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 16_MHz_XTAL/4)  /* 4MHz (16MHz/4 for most, 8Mhz/2 for Super-X) */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, 16_MHz_XTAL/4)  /* 4MHz (16MHz/4 for most, 8Mhz/2 for Super-X) */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -1523,7 +1523,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
 
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1575,7 +1575,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
 	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1614,7 +1614,7 @@ MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
 	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1652,7 +1652,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1692,7 +1692,7 @@ MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM8)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1778,7 +1778,7 @@ MACHINE_CONFIG_START(rshark_state::dooyong_68k)
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1830,7 +1830,7 @@ MACHINE_CONFIG_START(popbingo_state::popbingo)
 	MCFG_DEVICE_PROGRAM_MAP(bluehawk_sound_map)
 
 	// video hardware
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
