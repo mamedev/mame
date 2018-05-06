@@ -46,8 +46,8 @@ Sound: AY-3-8910
        TC5514P-1 1KBx4 SRAM x 4
   DSW: 3 8-switch dipswitches
   VR1: Volume pot
-Other: HD6821P Hitatchi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
-       NEC uPA200C Darlington Array
+Other: Hitatchi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
+       NEC uPA2003C Darlington Array
        3.6v Battery
        D1 - Power On Diode
        44 pin edge connector
