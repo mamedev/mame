@@ -542,18 +542,18 @@ void smsmfg_state::machine_reset()
 }
 
 MACHINE_CONFIG_START(smsmfg_state::sms)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sms_map)
+	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(24'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sms_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, XTAL(16'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(smsmfg_state, ppi0_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(smsmfg_state, ppi0_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(smsmfg_state, ppi0_c_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, smsmfg_state, ppi0_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, smsmfg_state, ppi0_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, smsmfg_state, ppi0_c_r))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -576,15 +576,15 @@ MACHINE_CONFIG_START(smsmfg_state::sms)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(16'000'000)/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(16'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(smsmfg_state::sureshot)
 	sms(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sureshot_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sureshot_map)
 
 	MCFG_MACHINE_START_OVERRIDE(smsmfg_state,sureshot)
 MACHINE_CONFIG_END

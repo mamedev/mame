@@ -364,15 +364,15 @@ PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
 MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(spartanxtec_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80,4000000)
-	MCFG_CPU_PROGRAM_MAP(spartanxtec_sound_map)
-	MCFG_CPU_IO_MAP(spartanxtec_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
+	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_sound_map)
+	MCFG_DEVICE_IO_MAP(spartanxtec_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
 
 	/* video hardware */
 	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
@@ -395,11 +395,11 @@ MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1000000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay2", AY8912, 1000000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay3", AY8912, 1000000)
+	MCFG_DEVICE_ADD("ay3", AY8912, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END

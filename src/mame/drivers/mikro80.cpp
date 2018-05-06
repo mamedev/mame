@@ -166,14 +166,14 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(mikro80_state::mikro80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 2000000)
-	MCFG_CPU_PROGRAM_MAP(mikro80_mem)
-	MCFG_CPU_IO_MAP(mikro80_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(mikro80_mem)
+	MCFG_DEVICE_IO_MAP(mikro80_io)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mikro80_state, mikro80_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mikro80_state, mikro80_8255_portb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(mikro80_state, mikro80_8255_portc_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mikro80_state, mikro80_8255_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mikro80_state, mikro80_8255_portb_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mikro80_state, mikro80_8255_portc_r))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -203,18 +203,18 @@ MACHINE_CONFIG_START(mikro80_state::radio99)
 	mikro80(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(radio99_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(radio99_io)
 
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mikro80_state::kristall)
 	mikro80(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(kristall_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(kristall_io)
 MACHINE_CONFIG_END
 
 

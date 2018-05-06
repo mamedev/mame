@@ -118,14 +118,14 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(daruma_state::daruma)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32,11059200) //verified on pcb
-	MCFG_CPU_PROGRAM_MAP(mem_prg)
-	MCFG_CPU_IO_MAP(mem_io)
+	MCFG_DEVICE_ADD("maincpu", I80C32,11059200) //verified on pcb
+	MCFG_DEVICE_PROGRAM_MAP(mem_prg)
+	MCFG_DEVICE_IO_MAP(mem_io)
 	// TODO: ports
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(0, "mono", 1.00)
 
 /*  TODO:

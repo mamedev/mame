@@ -744,13 +744,13 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 MACHINE_CONFIG_START(liberate_state::liberate_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
-	MCFG_CPU_PROGRAM_MAP(liberate_map)
-	MCFG_CPU_IO_MAP(deco16_io_map)
+	MCFG_DEVICE_ADD("maincpu",DECO16, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(liberate_map)
+	MCFG_DEVICE_IO_MAP(deco16_io_map)
 
-	MCFG_CPU_ADD("audiocpu",DECO_222, 1500000) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
-	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
+	MCFG_DEVICE_ADD("audiocpu",DECO_222, 1500000) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -765,7 +765,7 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_liberate)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(liberate_state, deco16_interrupt))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", liberate)
 	MCFG_PALETTE_ADD("palette", 33)
@@ -778,25 +778,25 @@ MACHINE_CONFIG_START(liberate_state::liberate_base)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::liberate)
 	liberate_base(config);
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::liberatb)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
-	MCFG_CPU_PROGRAM_MAP(liberatb_map)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(liberatb_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(liberate_state::boomrang)
@@ -811,14 +811,14 @@ MACHINE_CONFIG_START(liberate_state::prosoccr)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(10000000/8) //xtal is unknown?
-	MCFG_CPU_PROGRAM_MAP(prosoccr_map)
-	MCFG_CPU_IO_MAP(prosoccr_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(10000000/8) //xtal is unknown?
+	MCFG_DEVICE_PROGRAM_MAP(prosoccr_map)
+	MCFG_DEVICE_IO_MAP(prosoccr_io_map)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
-	MCFG_CPU_PROGRAM_MAP(prosoccr_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_CLOCK(10000000/8) //xtal is 12 Mhz, divider is unknown
+	MCFG_DEVICE_PROGRAM_MAP(prosoccr_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -834,13 +834,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(liberate_state::prosport)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO16, 2000000)
-	MCFG_CPU_PROGRAM_MAP(prosport_map)
-	MCFG_CPU_IO_MAP(deco16_io_map)
+	MCFG_DEVICE_ADD("maincpu", DECO16, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(prosport_map)
+	MCFG_DEVICE_IO_MAP(deco16_io_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000/2) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
-	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
+	MCFG_DEVICE_ADD("audiocpu", DECO_222, 1500000/2) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
+	MCFG_DEVICE_PROGRAM_MAP(liberate_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -855,7 +855,7 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_prosport)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(liberate_state, deco16_interrupt))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, liberate_state, deco16_interrupt))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", prosport)
 	MCFG_PALETTE_ADD("palette", 256)
@@ -868,10 +868,10 @@ MACHINE_CONFIG_START(liberate_state::prosport)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
+	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

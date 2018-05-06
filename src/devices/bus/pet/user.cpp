@@ -125,9 +125,10 @@ device_pet_user_port_interface::~device_pet_user_port_interface()
 #include "cb2snd.h"
 #include "2joysnd.h"
 
-SLOT_INTERFACE_START( pet_user_port_cards )
-	SLOT_INTERFACE("diag", PET_USERPORT_DIAGNOSTIC_CONNECTOR)
-	SLOT_INTERFACE("petuja", PET_USERPORT_JOYSTICK_ADAPTER)
-	SLOT_INTERFACE("cb2snd", PET_USERPORT_CB2_SOUND_DEVICE)
-	SLOT_INTERFACE("2joysnd", PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE)
-SLOT_INTERFACE_END
+void pet_user_port_cards(device_slot_interface &device)
+{
+	device.option_add("diag", PET_USERPORT_DIAGNOSTIC_CONNECTOR);
+	device.option_add("petuja", PET_USERPORT_JOYSTICK_ADAPTER);
+	device.option_add("cb2snd", PET_USERPORT_CB2_SOUND_DEVICE);
+	device.option_add("2joysnd", PET_USERPORT_JOYSTICK_AND_SOUND_DEVICE);
+}

@@ -277,9 +277,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(silkroad_state::silkroad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

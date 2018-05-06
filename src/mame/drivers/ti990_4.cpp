@@ -293,19 +293,19 @@ MACHINE_CONFIG_START(ti990_4_state::ti990_4)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti990_4_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti990_4_state, interrupt_level) )
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti990_4_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti990_4_state, interrupt_level) )
 
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
 	MCFG_DEVICE_ADD("asr733", ASR733, 0)
-	MCFG_ASR733_KEYINT_HANDLER(WRITELINE(ti990_4_state, asrkey_interrupt))
-	MCFG_ASR733_LINEINT_HANDLER(WRITELINE(ti990_4_state, line_interrupt))
+	MCFG_ASR733_KEYINT_HANDLER(WRITELINE(*this, ti990_4_state, asrkey_interrupt))
+	MCFG_ASR733_LINEINT_HANDLER(WRITELINE(*this, ti990_4_state, line_interrupt))
 
 	// Floppy controller
 	MCFG_DEVICE_ADD("fd800", TI99X_FD800, 0)
-	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
+	MCFG_FD800_INT_HANDLER(WRITELINE(*this, ti990_4_state, fd_interrupt))
 
 //  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END
@@ -314,18 +314,18 @@ MACHINE_CONFIG_START(ti990_4_state::ti990_4v)
 	/* basic machine hardware */
 	/* TMS9900 CPU @ 3.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map_v)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti990_4_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti990_4_state, interrupt_level) )
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti990_4_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti990_4_state, interrupt_level) )
 	MCFG_MACHINE_RESET_OVERRIDE(ti990_4_state, ti990_4 )
 
 	// Terminal
 	MCFG_DEVICE_ADD("vdt911", VDT911, 0)
-	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(ti990_4_state, vdtkey_interrupt))
-	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(ti990_4_state, line_interrupt))
+	MCFG_VDT911_KEYINT_HANDLER(WRITELINE(*this, ti990_4_state, vdtkey_interrupt))
+	MCFG_VDT911_LINEINT_HANDLER(WRITELINE(*this, ti990_4_state, line_interrupt))
 
 	// Floppy controller
 	MCFG_DEVICE_ADD("fd800", TI99X_FD800, 0)
-	MCFG_FD800_INT_HANDLER(WRITELINE(ti990_4_state, fd_interrupt))
+	MCFG_FD800_INT_HANDLER(WRITELINE(*this, ti990_4_state, fd_interrupt))
 
 //  MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(ti990_4_floppy_interface)
 MACHINE_CONFIG_END

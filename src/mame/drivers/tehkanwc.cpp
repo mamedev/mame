@@ -668,18 +668,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18432000/4)    /* 18.432000 / 4 */
-	MCFG_CPU_PROGRAM_MAP(main_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/4)    /* 18.432000 / 4 */
+	MCFG_DEVICE_PROGRAM_MAP(main_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 18432000/4)
-	MCFG_CPU_PROGRAM_MAP(sub_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("sub", Z80, 18432000/4)
+	MCFG_DEVICE_PROGRAM_MAP(sub_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 18432000/4)
-	MCFG_CPU_PROGRAM_MAP(sound_mem)
-	MCFG_CPU_IO_MAP(sound_port)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 18432000/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
+	MCFG_DEVICE_IO_MAP(sound_port)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tehkanwc_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
@@ -705,32 +705,32 @@ MACHINE_CONFIG_START(tehkanwc_state::tehkanwc)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, portB_w))
+	MCFG_DEVICE_ADD("ay1", YM2149, 18432000/12)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", YM2149, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(tehkanwc_state, portB_r))
+	MCFG_DEVICE_ADD("ay2", YM2149, 18432000/12)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(tehkanwc_state, adpcm_int)) /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, tehkanwc_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tehkanwc_state::tehkanwcb)
 	tehkanwc(config);
-	MCFG_SOUND_REPLACE("ay1", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, portB_w))
+	MCFG_DEVICE_REPLACE("ay1", AY8910, 18432000/12)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, tehkanwc_state, portA_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, tehkanwc_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_REPLACE("ay2", AY8910, 18432000/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(tehkanwc_state, portA_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(tehkanwc_state, portB_r))
+	MCFG_DEVICE_REPLACE("ay2", AY8910, 18432000/12)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, tehkanwc_state, portA_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, tehkanwc_state, portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

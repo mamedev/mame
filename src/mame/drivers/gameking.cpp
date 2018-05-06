@@ -283,9 +283,9 @@ INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bi
 
 MACHINE_CONFIG_START(gameking_state::gameking)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 6000000)
-	MCFG_CPU_PROGRAM_MAP(gameking_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gameking_state,  gameking_frame_int)
+	MCFG_DEVICE_ADD("maincpu", R65C02, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(gameking_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gameking_state,  gameking_frame_int)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

@@ -46,19 +46,19 @@ MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
 	// RS232 serial ports
 	// The console terminal (com1) operates at 38400 baud
 	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL(7'372'800).value(), XTAL(7'372'800).value(), 0, XTAL(7'372'800).value(), 0)
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(iteagle_fpga_device, serial_interrupt))
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(COM2_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(COM1_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, iteagle_fpga_device, serial_interrupt))
+	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(COM2_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(COM1_TAG, rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD(COM1_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, ctsb_w))
+	MCFG_DEVICE_ADD(COM1_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, ctsb_w))
 
-	MCFG_RS232_PORT_ADD(COM2_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(AM85C30_TAG, scc85c30_device, ctsa_w))
+	MCFG_DEVICE_ADD(COM2_TAG, RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE(AM85C30_TAG, scc85c30_device, ctsa_w))
 MACHINE_CONFIG_END
 
 void iteagle_fpga_device::device_start()

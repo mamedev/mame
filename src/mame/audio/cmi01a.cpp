@@ -28,29 +28,29 @@ cmi01a_device::cmi01a_device(const machine_config &mconfig, const char *tag, dev
 
 MACHINE_CONFIG_START(cmi01a_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("cmi01a_pia_0", PIA6821, 0) // pia_cmi01a_1_config
-	MCFG_PIA_READCB1_HANDLER(READLINE(cmi01a_device, tri_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, ws_dir_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi01a_device, rp_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(cmi01a_device, pia_0_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(cmi01a_device, pia_0_cb2_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("cmi01a_irq", input_merger_device, in_w<0>))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("cmi01a_irq", input_merger_device, in_w<1>))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, cmi01a_device, tri_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi01a_device, ws_dir_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi01a_device, rp_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, cmi01a_device, pia_0_ca2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, cmi01a_device, pia_0_cb2_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("cmi01a_irq", input_merger_device, in_w<0>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("cmi01a_irq", input_merger_device, in_w<1>))
 
 	MCFG_DEVICE_ADD("cmi01a_pia_1", PIA6821, 0) // pia_cmi01a_2_config
-	MCFG_PIA_READCA1_HANDLER(READLINE(cmi01a_device, zx_r))
-	MCFG_PIA_READCA2_HANDLER(READLINE(cmi01a_device, eosi_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(cmi01a_device, pia_1_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi01a_device, pia_1_b_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("cmi01a_irq", input_merger_device, in_w<2>))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("cmi01a_irq", input_merger_device, in_w<3>))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, cmi01a_device, zx_r))
+	MCFG_PIA_READCA2_HANDLER(READLINE(*this, cmi01a_device, eosi_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, cmi01a_device, pia_1_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, cmi01a_device, pia_1_b_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE("cmi01a_irq", input_merger_device, in_w<2>))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("cmi01a_irq", input_merger_device, in_w<3>))
 
 	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 2000000) // ptm_cmi01a_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
-	MCFG_PTM6840_O1_CB(WRITELINE(cmi01a_device, ptm_o1))
-	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("cmi01a_irq", input_merger_device, in_w<4>))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, cmi01a_device, ptm_o1))
+	MCFG_PTM6840_IRQ_CB(WRITELINE("cmi01a_irq", input_merger_device, in_w<4>))
 
 	MCFG_INPUT_MERGER_ANY_HIGH("cmi01a_irq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(cmi01a_device, cmi01a_irq))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cmi01a_device, cmi01a_irq))
 MACHINE_CONFIG_END
 
 

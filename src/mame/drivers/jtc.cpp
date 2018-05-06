@@ -727,15 +727,15 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(jtc_state::basic)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(UB8830D_TAG, UB8830D, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(jtc_mem)
-	MCFG_Z8_PORT_P2_WRITE_CB(WRITE8(jtc_state, p2_w))
-	MCFG_Z8_PORT_P3_READ_CB(READ8(jtc_state, p3_r))
-	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(jtc_state, p3_w))
+	MCFG_DEVICE_ADD(UB8830D_TAG, UB8830D, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jtc_mem)
+	MCFG_Z8_PORT_P2_WRITE_CB(WRITE8(*this, jtc_state, p2_w))
+	MCFG_Z8_PORT_P3_READ_CB(READ8(*this, jtc_state, p3_r))
+	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(*this, jtc_state, p3_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
@@ -747,7 +747,7 @@ MACHINE_CONFIG_START(jtc_state::basic)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(jtc_state, write_centronics_busy))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, jtc_state, write_centronics_busy))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(jtc_state::jtc)
@@ -771,8 +771,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jtces88_state::jtces88)
 	jtc(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(UB8830D_TAG)
-	MCFG_CPU_PROGRAM_MAP(jtc_es1988_mem)
+	MCFG_DEVICE_MODIFY(UB8830D_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(jtc_es1988_mem)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -782,8 +782,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jtces23_state::jtces23)
 	basic(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(UB8830D_TAG)
-	MCFG_CPU_PROGRAM_MAP(jtc_es23_mem)
+	MCFG_DEVICE_MODIFY(UB8830D_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(jtc_es23_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -805,8 +805,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(jtces40_state::jtces40)
 	basic(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(UB8830D_TAG)
-	MCFG_CPU_PROGRAM_MAP(jtc_es40_mem)
+	MCFG_DEVICE_MODIFY(UB8830D_TAG)
+	MCFG_DEVICE_PROGRAM_MAP(jtc_es40_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)

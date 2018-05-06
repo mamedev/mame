@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Micro Model B (German) Tapes -->
+<!-- Acorn BBC Micro Model B (German) Tapes -->
 
 <!-- I believe all the Cassette images here are original, so some require the manuals for additional copy protection -->
 
@@ -12,7 +12,7 @@
       To start/stop the tape you must use the MAME UI, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
 -->
 
-<softwarelist name="bbcb_cass_de" description="BBC Micro Model B (German) cassettes">
+<softwarelist name="bbcb_cass_de" description="Acorn BBC Micro Model B (German) cassettes">
 
 	<!-- Games -->
 

@@ -258,9 +258,9 @@ DECLARE_DEVICE_TYPE(IEEE488,      ieee488_device)
 DECLARE_DEVICE_TYPE(IEEE488_SLOT, ieee488_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
-SLOT_INTERFACE_EXTERN( hp_ieee488_devices );
-SLOT_INTERFACE_EXTERN( remote488_devices );
+void cbm_ieee488_devices(device_slot_interface &device);
+void hp_ieee488_devices(device_slot_interface &device);
+void remote488_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_IEEE488_IEEE488_H

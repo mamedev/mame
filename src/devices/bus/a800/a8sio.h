@@ -142,6 +142,6 @@ public:
 };
 
 
-SLOT_INTERFACE_EXTERN(a8sio_cards);
+void a8sio_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_A800_A8SIO_H

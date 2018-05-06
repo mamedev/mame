@@ -126,9 +126,9 @@ void abc_cadmouse_device::abc_cadmouse_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc_cadmouse_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(abc_cadmouse_mem)
-	MCFG_CPU_IO_MAP(abc_cadmouse_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(abc_cadmouse_mem)
+	MCFG_DEVICE_IO_MAP(abc_cadmouse_io)
 MACHINE_CONFIG_END
 
 //**************************************************************************

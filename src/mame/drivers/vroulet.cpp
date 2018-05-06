@@ -278,10 +278,10 @@ WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
 
 MACHINE_CONFIG_START(vroulet_state::vroulet)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   //???
-	MCFG_CPU_PROGRAM_MAP(vroulet_map)
-	MCFG_CPU_IO_MAP(vroulet_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vroulet_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   //???
+	MCFG_DEVICE_PROGRAM_MAP(vroulet_map)
+	MCFG_DEVICE_IO_MAP(vroulet_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vroulet_state,  irq0_line_hold)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -291,9 +291,9 @@ MACHINE_CONFIG_START(vroulet_state::vroulet)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(vroulet_state, ppi8255_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(vroulet_state, ppi8255_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(vroulet_state, ppi8255_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, vroulet_state, ppi8255_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, vroulet_state, ppi8255_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, vroulet_state, ppi8255_c_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(vroulet_state::vroulet)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

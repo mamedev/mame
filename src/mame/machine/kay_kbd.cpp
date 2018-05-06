@@ -350,16 +350,16 @@ tiny_rom_entry const *kaypro_10_keyboard_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(kaypro_10_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", I8049, 6_MHz_XTAL)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(kaypro_10_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(kaypro_10_keyboard_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(kaypro_10_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(kaypro_10_keyboard_device, t1_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(kaypro_10_keyboard_device, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(kaypro_10_keyboard_device, bus_w))
+	MCFG_DEVICE_ADD("mcu", I8049, 6_MHz_XTAL)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, kaypro_10_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, kaypro_10_keyboard_device, p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, kaypro_10_keyboard_device, p2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, kaypro_10_keyboard_device, t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, kaypro_10_keyboard_device, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, kaypro_10_keyboard_device, bus_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("keyboard")
-	MCFG_SOUND_ADD("bell", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("bell", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "keyboard", 0.25)
 MACHINE_CONFIG_END
 

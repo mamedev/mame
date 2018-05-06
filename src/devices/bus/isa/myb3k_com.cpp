@@ -16,9 +16,10 @@ TODO:
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
 
-static SLOT_INTERFACE_START(isa8_myb3k_com)
-	SLOT_INTERFACE("null_modem", NULL_MODEM)
-SLOT_INTERFACE_END
+static void isa8_myb3k_com(device_slot_interface &device)
+{
+	device.option_add("null_modem", NULL_MODEM);
+}
 
 
 //**************************************************************************
@@ -32,26 +33,26 @@ DEFINE_DEVICE_TYPE(ISA8_MYB3K_COM, isa8_myb3k_com_device, "isa8_myb3k_com", "ADP
 //-------------------------------------------------
 MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
 	MCFG_DEVICE_ADD( "usart", I8251, XTAL(15'974'400) / 8 )
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("com1", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("com1", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("com1", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(isa8_myb3k_com_device, com_int_rx))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(isa8_myb3k_com_device, com_int_tx))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("com1", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(WRITELINE("com1", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(WRITELINE("com1", rs232_port_device, write_rts))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, com_int_rx))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, com_int_tx))
 
-	MCFG_RS232_PORT_ADD( "com1", isa8_myb3k_com, nullptr )
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("usart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("usart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("usart", i8251_device, write_cts))
-	MCFG_RS232_RI_HANDLER(WRITELINE(isa8_myb3k_com_device, ri_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(isa8_myb3k_com_device, dcd_w))
+	MCFG_DEVICE_ADD( "com1", RS232_PORT, isa8_myb3k_com, nullptr )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("usart", i8251_device, write_rxd))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("usart", i8251_device, write_dsr))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("usart", i8251_device, write_cts))
+	MCFG_RS232_RI_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, ri_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, dcd_w))
 	// TODO: configure RxC and TxC from RS232 connector when these are defined is rs232.h
 
 	/* Timer chip */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(15'974'400) / 8 ) /* TxC */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(isa8_myb3k_com_device, pit_txc))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, pit_txc))
 	MCFG_PIT8253_CLK1(XTAL(15'974'400) / 8 ) /* RxC */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(isa8_myb3k_com_device, pit_rxc))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, isa8_myb3k_com_device, pit_rxc))
 	// Timer 2 is not used/connected to anything on the schematics
 MACHINE_CONFIG_END
 

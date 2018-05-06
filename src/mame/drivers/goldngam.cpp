@@ -273,6 +273,8 @@ private:
 	optional_device_array<mc68681_device, 2> m_duart;
 };
 
+constexpr int goldngam_state::MOVIECRD_DUART1_IRQ;
+constexpr int goldngam_state::MOVIECRD_DUART2_IRQ;
 
 /*************************
 *     Video Hardware     *
@@ -593,8 +595,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(goldngam_state::swisspkr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(swisspkr_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(swisspkr_map)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 2'000'000)
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_2))
@@ -619,7 +621,7 @@ MACHINE_CONFIG_START(goldngam_state::swisspkr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("aysnd", AY8912, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -628,9 +630,9 @@ MACHINE_CONFIG_START(goldngam_state::moviecrd)
 	swisspkr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(moviecrd_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(goldngam_state, moviecrd_irq_ack)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(moviecrd_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(goldngam_state, moviecrd_irq_ack)
 
 	MCFG_DEVICE_MODIFY("ptm")
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_1))
@@ -643,7 +645,7 @@ MACHINE_CONFIG_START(goldngam_state::moviecrd)
 	MCFG_DEVICE_ADD("duart2", MC68681, 3'686'400)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", MOVIECRD_DUART2_IRQ))
 
-	MCFG_SOUND_REPLACE("aysnd", YM2149, MASTER_CLOCK/4)
+	MCFG_DEVICE_REPLACE("aysnd", YM2149, MASTER_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

@@ -238,9 +238,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(gumbo_state::gumbo)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(14'318'181)/2)
-	MCFG_CPU_PROGRAM_MAP(gumbo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(14'318'181)/2)
+	MCFG_DEVICE_PROGRAM_MAP(gumbo_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gumbo_state,  irq1_line_hold) // all the same
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gumbo)
 
@@ -265,15 +265,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gumbo_state::mspuzzle)
 	gumbo(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mspuzzle_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mspuzzle_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(gumbo_state::dblpoint)
 	gumbo(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dblpoint_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(dblpoint_map)
 MACHINE_CONFIG_END
 
 ROM_START( gumbo )

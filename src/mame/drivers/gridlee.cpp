@@ -399,8 +399,8 @@ static const char *const sample_names[] =
 MACHINE_CONFIG_START(gridlee_state::gridlee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -409,9 +409,9 @@ MACHINE_CONFIG_START(gridlee_state::gridlee)
 	MCFG_DEVICE_ADD("latch", LS259, 0) // type can only be guessed
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0"))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1"))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gridlee_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, gridlee_state, coin_counter_w))
 	// Q6 unknown - only written to at startup
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gridlee_state, cocktail_flip_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, gridlee_state, cocktail_flip_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -425,10 +425,10 @@ MACHINE_CONFIG_START(gridlee_state::gridlee)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("gridlee", GRIDLEE, 0)
+	MCFG_DEVICE_ADD("gridlee", GRIDLEE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(8)
 	MCFG_SAMPLES_NAMES(sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

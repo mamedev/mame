@@ -287,13 +287,14 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static SLOT_INTERFACE_START( abc_floppies )
-	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
-	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void abc_floppies(device_slot_interface &device)
+{
+	device.option_add("525sssd", FLOPPY_525_SSSD);
+	device.option_add("525sd", FLOPPY_525_SD);
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 FLOPPY_FORMATS_MEMBER( luxor_55_10828_device::floppy_formats )
 	FLOPPY_ABC800_FORMAT
@@ -320,21 +321,21 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(luxor_55_10828_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(luxor_55_10828_mem)
-	MCFG_CPU_IO_MAP(luxor_55_10828_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(luxor_55_10828_mem)
+	MCFG_DEVICE_IO_MAP(luxor_55_10828_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(4'000'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(luxor_55_10828_device, pio_pa_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(luxor_55_10828_device, pio_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(luxor_55_10828_device, pio_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(luxor_55_10828_device, pio_pb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, luxor_55_10828_device, pio_pa_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, luxor_55_10828_device, pio_pa_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, luxor_55_10828_device, pio_pb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, luxor_55_10828_device, pio_pb_w))
 
 	MCFG_MB8876_ADD(MB8876_TAG, XTAL(4'000'000)/4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(luxor_55_10828_device, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, luxor_55_10828_device, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, luxor_55_10828_device, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525ssdd", luxor_55_10828_device::floppy_formats)

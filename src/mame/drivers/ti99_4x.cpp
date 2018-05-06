@@ -843,33 +843,33 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4x_state, interrupt_level) )
-	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(ti99_4x_state, clock_out) )
-	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(ti99_4x_state, dbin_line) )
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4x_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4x_state, interrupt_level) )
+	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
+	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4x_state, dbin_line) )
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4 )
 
 	// Main board
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( ti99_4x_state, handset_ack) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4x_state, keyC0) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_4x_state, keyC1) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( ti99_4x_state, keyC2) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( ti99_4x_state, cs1_motor) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( ti99_4x_state, cs2_motor) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( ti99_4x_state, audio_gate) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, ti99_4x_state, read_by_9901) )
+	MCFG_TMS9901_P0_HANDLER( WRITELINE( *this, ti99_4x_state, handset_ack) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, ti99_4x_state, keyC0) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, ti99_4x_state, keyC1) )
+	MCFG_TMS9901_P4_HANDLER( WRITELINE( *this, ti99_4x_state, keyC2) )
+	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, ti99_4x_state, cs1_motor) )
+	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, ti99_4x_state, cs2_motor) )
+	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, ti99_4x_state, audio_gate) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, ti99_4x_state, cassette_output) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_4x_state, tms9901_interrupt) )
 
 	MCFG_DEVICE_ADD( TI99_DATAMUX_TAG, TI99_DATAMUX, 0)
-	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
+	MCFG_DMUX_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_dmux) )
 
 	MCFG_GROMPORT4_ADD( TI99_GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
-	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
+	MCFG_GROMPORT_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_cart) )
+	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(*this, ti99_4x_state, console_reset) )
 
 	// Scratch pad RAM 256 bytes
 	MCFG_RAM_ADD(TI99_PADRAM_TAG)
@@ -886,14 +886,14 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 
 	// Input/output port
 	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
-	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_4x_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
+	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(*this, ti99_4x_state, extint) )
+	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_sound) )
+	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_sound) )
 
 	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
@@ -904,13 +904,13 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// GROM devices
-	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM1_TAG, 1, TI99_CONSOLEGROM, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( TI99_GROM1_TAG, 1, TI99_CONSOLEGROM, 0x2000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4_ADD( TI_JOYPORT_TAG )
-	MCFG_JOYPORT_INT_HANDLER( WRITELINE(ti99_4x_state, handset_interrupt_in) )
+	MCFG_JOYPORT_INT_HANDLER( WRITELINE(*this, ti99_4x_state, handset_interrupt_in) )
 MACHINE_CONFIG_END
 
 /*
@@ -920,8 +920,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4_60hz)
 	ti99_4(config);
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(*this, ti99_4x_state, gromclk_in))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -933,8 +933,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4_50hz)
 	ti99_4(config);
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(*this, ti99_4x_state, gromclk_in))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -962,33 +962,33 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4x_state, interrupt_level) )
-	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(ti99_4x_state, clock_out) )
-	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(ti99_4x_state, dbin_line) )
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4x_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4x_state, interrupt_level) )
+	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
+	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4x_state, dbin_line) )
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4a )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4a )
 
 	// Main board
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4x_state, keyC0) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_4x_state, keyC1) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( ti99_4x_state, keyC2) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( ti99_4x_state, alphaW) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( ti99_4x_state, cs1_motor) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( ti99_4x_state, cs2_motor) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( ti99_4x_state, audio_gate) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, ti99_4x_state, read_by_9901) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, ti99_4x_state, keyC0) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, ti99_4x_state, keyC1) )
+	MCFG_TMS9901_P4_HANDLER( WRITELINE( *this, ti99_4x_state, keyC2) )
+	MCFG_TMS9901_P5_HANDLER( WRITELINE( *this, ti99_4x_state, alphaW) )
+	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, ti99_4x_state, cs1_motor) )
+	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, ti99_4x_state, cs2_motor) )
+	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, ti99_4x_state, audio_gate) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, ti99_4x_state, cassette_output) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_4x_state, tms9901_interrupt) )
 
 	MCFG_DEVICE_ADD( TI99_DATAMUX_TAG, TI99_DATAMUX, 0)
-	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
+	MCFG_DMUX_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_dmux) )
 
 	MCFG_GROMPORT4_ADD( TI99_GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
-	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
+	MCFG_GROMPORT_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_cart) )
+	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(*this, ti99_4x_state, console_reset) )
 
 	// Scratch pad RAM 256 bytes
 	MCFG_RAM_ADD(TI99_PADRAM_TAG)
@@ -1005,14 +1005,14 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 
 	// Input/output port
 	MCFG_IOPORT_ADD( TI99_IOPORT_TAG )
-	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_4x_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
+	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(*this, ti99_4x_state, extint) )
+	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("sound_out")
-	MCFG_SOUND_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_sound) )
+	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_sound) )
 
 	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
@@ -1023,9 +1023,9 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// GROM devices
-	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM1_TAG, 1, TI99_CONSOLEGROM, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( TI99_GROM1_TAG, 1, TI99_CONSOLEGROM, 0x2000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )
@@ -1038,8 +1038,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a_60hz)
 	ti99_4a(config);
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(*this, ti99_4x_state, gromclk_in))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -1051,8 +1051,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4a_50hz)
 	ti99_4a(config);
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(*this, ti99_4x_state, gromclk_in))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -1086,8 +1086,8 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4qi_60hz)
 	ti99_4qi(config);
 	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))
-	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, ti99_4x_state, video_interrupt_in))
+	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(*this, ti99_4x_state, gromclk_in))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TI_VDP_TAG, tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -1123,32 +1123,32 @@ MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
-	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(ti99_4x_state, interrupt_level) )
-	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(ti99_4x_state, clock_out) )
-	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(ti99_4x_state, dbin_line) )
+	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(*this, ti99_4x_state, external_operation) )
+	MCFG_TMS99xx_INTLEVEL_HANDLER( READ8(*this, ti99_4x_state, interrupt_level) )
+	MCFG_TMS99xx_CLKOUT_HANDLER( WRITELINE(*this, ti99_4x_state, clock_out) )
+	MCFG_TMS99xx_DBIN_HANDLER( WRITELINE(*this, ti99_4x_state, dbin_line) )
 
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4ev )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_4x_state, ti99_4ev )
 
 	// Main board
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_4x_state, read_by_9901) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( ti99_4x_state, keyC0) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( ti99_4x_state, keyC1) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( ti99_4x_state, keyC2) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( ti99_4x_state, alphaW) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( ti99_4x_state, cs1_motor) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( ti99_4x_state, cs2_motor) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( ti99_4x_state, audio_gate) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( ti99_4x_state, cassette_output) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( ti99_4x_state, tms9901_interrupt) )
+	MCFG_TMS9901_READBLOCK_HANDLER( READ8(*this, ti99_4x_state, read_by_9901) )
+	MCFG_TMS9901_P2_HANDLER( WRITELINE( *this, ti99_4x_state, keyC0) )
+	MCFG_TMS9901_P3_HANDLER( WRITELINE( *this, ti99_4x_state, keyC1) )
+	MCFG_TMS9901_P4_HANDLER( WRITELINE( *this, ti99_4x_state, keyC2) )
+	MCFG_TMS9901_P5_HANDLER( WRITELINE( *this, ti99_4x_state, alphaW) )
+	MCFG_TMS9901_P6_HANDLER( WRITELINE( *this, ti99_4x_state, cs1_motor) )
+	MCFG_TMS9901_P7_HANDLER( WRITELINE( *this, ti99_4x_state, cs2_motor) )
+	MCFG_TMS9901_P8_HANDLER( WRITELINE( *this, ti99_4x_state, audio_gate) )
+	MCFG_TMS9901_P9_HANDLER( WRITELINE( *this, ti99_4x_state, cassette_output) )
+	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( *this, ti99_4x_state, tms9901_interrupt) )
 
 	MCFG_DEVICE_ADD( TI99_DATAMUX_TAG, TI99_DATAMUX, 0)
-	MCFG_DMUX_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_dmux) )
+	MCFG_DMUX_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_dmux) )
 	MCFG_GROMPORT4_ADD( TI99_GROMPORT_TAG )
-	MCFG_GROMPORT_READY_HANDLER( WRITELINE(ti99_4x_state, console_ready_cart) )
-	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_4x_state, console_reset) )
+	MCFG_GROMPORT_READY_HANDLER( WRITELINE(*this, ti99_4x_state, console_ready_cart) )
+	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(*this, ti99_4x_state, console_reset) )
 
 	// Scratch pad RAM 256 bytes
 	MCFG_RAM_ADD(TI99_PADRAM_TAG)
@@ -1161,15 +1161,15 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	MCFG_RAM_DEFAULT_VALUE(0)
 
 	// EVPC connector
-	MCFG_ADD_EVPC_CONNECTOR( TI99_EVPC_CONN_TAG, WRITELINE( ti99_4x_state, video_interrupt_evpc_in ) )
+	MCFG_ADD_EVPC_CONNECTOR( TI99_EVPC_CONN_TAG, WRITELINE( *this, ti99_4x_state, video_interrupt_evpc_in ) )
 
 	// Software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
 
 	// Input/output port
 	MCFG_IOPORT_ADD_WITH_PEB( TI99_IOPORT_TAG )
-	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(ti99_4x_state, extint) )
-	MCFG_IOPORT_READY_HANDLER( DEVWRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
+	MCFG_IOPORT_EXTINT_HANDLER( WRITELINE(*this, ti99_4x_state, extint) )
+	MCFG_IOPORT_READY_HANDLER( WRITELINE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, ready_line) )
 
 	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
@@ -1180,9 +1180,9 @@ MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// GROM devices
-	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM1_TAG, 1, TI99_CONSOLEGROM, 0x2000, WRITELINE(ti99_4x_state, console_ready_grom))
-	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( TI99_GROM0_TAG, 0, TI99_CONSOLEGROM, 0x0000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( TI99_GROM1_TAG, 1, TI99_CONSOLEGROM, 0x2000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
+	MCFG_GROM_ADD( TI99_GROM2_TAG, 2, TI99_CONSOLEGROM, 0x4000, WRITELINE(*this, ti99_4x_state, console_ready_grom))
 
 	// Joystick port
 	MCFG_TI_JOYPORT4A_ADD( TI_JOYPORT_TAG )

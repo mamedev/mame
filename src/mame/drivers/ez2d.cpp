@@ -88,8 +88,8 @@ void ez2d_state::machine_reset()
 MACHINE_CONFIG_START(ez2d_state::ez2d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 533 MHz
-	MCFG_CPU_PROGRAM_MAP(ez2d_map)
+	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 533 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ez2d_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

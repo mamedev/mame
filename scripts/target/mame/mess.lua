@@ -514,6 +514,7 @@ MACHINES["NMC9306"] = true
 MACHINES["NSC810"] = true
 MACHINES["NSCSI"] = true
 MACHINES["OMTI5100"] = true
+MACHINES["OUTPUT_LATCH"] = true
 MACHINES["PC_FDC"] = true
 MACHINES["PC_LPT"] = true
 MACHINES["PCCARD"] = true
@@ -3568,6 +3569,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/cd2650.cpp",
 	MAME_DIR .. "src/mame/drivers/cdc721.cpp",
 	MAME_DIR .. "src/mame/drivers/cit101.cpp",
+	MAME_DIR .. "src/mame/machine/cit101_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/cit101_kbd.h",
 	MAME_DIR .. "src/mame/drivers/cit220.cpp",
 	MAME_DIR .. "src/mame/drivers/codata.cpp",
 	MAME_DIR .. "src/mame/drivers/controlid.cpp",

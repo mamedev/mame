@@ -169,11 +169,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 			}
 		}
 
-		// FIXME: do this is a less horrid way
-		{
-			machine_config::token const tok(const_cast<machine_config &>(mconfig()).begin_configuration(*this));
-			m_cartridge->set_out_irq_cb(DEVCB_WRITELINE(msx_slot_cartridge_device, irq_out));
-		}
+		m_cartridge->set_out_irq_cb(DEVCB_WRITELINE(*this, msx_slot_cartridge_device, irq_out));
 		m_cartridge->initialize_cartridge();
 
 		if (m_cartridge->get_sram_size() > 0)
@@ -367,9 +363,5 @@ void msx_slot_yamaha_expansion_device::device_start()
 	m_irq_handler.resolve_safe();
 	m_cartridge = dynamic_cast<msx_cart_interface *>(get_card_device());
 	if (m_cartridge)
-	{
-		// FIXME: do this is a less horrid way
-		machine_config::token const tok(const_cast<machine_config &>(mconfig()).begin_configuration(*this));
-		m_cartridge->set_out_irq_cb(DEVCB_WRITELINE(msx_slot_cartridge_device, irq_out));
-	}
+		m_cartridge->set_out_irq_cb(DEVCB_WRITELINE(*this, msx_slot_cartridge_device, irq_out));
 }

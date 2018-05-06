@@ -155,25 +155,25 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tourtabl_state::tourtabl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 3)    /* actually M6507 */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("riot1", RIOT6532, MASTER_CLOCK / 3)
 	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT0_SWA"))
 	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT0_SWB"))
-	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("watchdog", watchdog_timer_device, reset_w))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8("watchdog", watchdog_timer_device, reset_w))
 
 	MCFG_DEVICE_ADD("riot2", RIOT6532, MASTER_CLOCK / 3)
 	MCFG_RIOT6532_IN_PA_CB(IOPORT("RIOT1_SWA"))
 	MCFG_RIOT6532_IN_PB_CB(IOPORT("RIOT1_SWB"))
-	MCFG_RIOT6532_OUT_PB_CB(WRITE8(tourtabl_state, tourtabl_led_w))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8(*this, tourtabl_state, tourtabl_led_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("tia_video", TIA_NTSC_VIDEO, 0)
-	MCFG_TIA_READ_INPUT_PORT_CB(READ16(tourtabl_state, tourtabl_read_input_port))
-	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(tourtabl_state, tourtabl_get_databus_contents))
+	MCFG_TIA_READ_INPUT_PORT_CB(READ16(*this, tourtabl_state, tourtabl_read_input_port))
+	MCFG_TIA_DATABUS_CONTENTS_CB(READ8(*this, tourtabl_state, tourtabl_get_databus_contents))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )

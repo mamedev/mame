@@ -334,16 +334,16 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(spacefb_state::spacefb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, SPACEFB_MAIN_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(spacefb_main_map)
-	MCFG_CPU_IO_MAP(spacefb_main_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, SPACEFB_MAIN_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(spacefb_main_map)
+	MCFG_DEVICE_IO_MAP(spacefb_main_io_map)
 
-	MCFG_CPU_ADD("audiocpu", I8035, SPACEFB_AUDIO_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(spacefb_audio_map)
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(spacefb_state, audio_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(spacefb_state, audio_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(spacefb_state, audio_t1_r))
+	MCFG_DEVICE_ADD("audiocpu", I8035, SPACEFB_AUDIO_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(spacefb_audio_map)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, spacefb_state, audio_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, spacefb_state, audio_t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, spacefb_state, audio_t1_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(180))
 

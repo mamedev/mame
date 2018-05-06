@@ -218,17 +218,19 @@ void peoplepc_state::peoplepc_io(address_map &map)
 	map(0x0070, 0x0070).w(this, FUNC(peoplepc_state::dmapg_w));
 }
 
-static SLOT_INTERFACE_START( peoplepc_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void peoplepc_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 FLOPPY_FORMATS_MEMBER( peoplepc_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-SLOT_INTERFACE_START( peoplepc_keyboard_devices )
-	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
-SLOT_INTERFACE_END
+void peoplepc_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("keyboard", SERIAL_KEYBOARD);
+}
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
@@ -240,26 +242,26 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600)/3)
-	MCFG_CPU_PROGRAM_MAP(peoplepc_map)
-	MCFG_CPU_IO_MAP(peoplepc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_0", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(14'745'600)/3)
+	MCFG_DEVICE_PROGRAM_MAP(peoplepc_map)
+	MCFG_DEVICE_IO_MAP(peoplepc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_0", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(14'745'600)/6)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(peoplepc_state, kbd_clock_tick_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, peoplepc_state, kbd_clock_tick_w))
 	MCFG_PIT8253_CLK1(XTAL(14'745'600)/6)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(peoplepc_state, tty_clock_tick_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, peoplepc_state, tty_clock_tick_w))
 	MCFG_PIT8253_CLK2(XTAL(14'745'600)/6)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259_0", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pic8259_0", pic8259_device, ir0_w))
 
 	MCFG_DEVICE_ADD("pic8259_0", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 	MCFG_PIC8259_IN_SP_CB(VCC)
-	MCFG_PIC8259_CASCADE_ACK_CB(READ8(peoplepc_state, get_slave_ack))
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(*this, peoplepc_state, get_slave_ack))
 
 	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_0", pic8259_device, ir7_w))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE("pic8259_0", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
@@ -277,26 +279,26 @@ MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	MCFG_MC6845_UPDATE_ROW_CB(peoplepc_state, update_row)
 
 	MCFG_DEVICE_ADD("i8257", I8257, XTAL(14'745'600)/3)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(peoplepc_state, hrq_w))
-	MCFG_I8257_OUT_TC_CB(WRITELINE(peoplepc_state, tc_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(peoplepc_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(peoplepc_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_0_CB(DEVREAD8("upd765", upd765a_device, mdma_r))
-	MCFG_I8257_OUT_IOW_0_CB(DEVWRITE8("upd765", upd765a_device, mdma_w))
+	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, peoplepc_state, hrq_w))
+	MCFG_I8257_OUT_TC_CB(WRITELINE(*this, peoplepc_state, tc_w))
+	MCFG_I8257_IN_MEMR_CB(READ8(*this, peoplepc_state, memory_read_byte))
+	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, peoplepc_state, memory_write_byte))
+	MCFG_I8257_IN_IOR_0_CB(READ8("upd765", upd765a_device, mdma_r))
+	MCFG_I8257_OUT_IOW_0_CB(WRITE8("upd765", upd765a_device, mdma_w))
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_0", pic8259_device, ir2_w))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("i8257", i8257_device, dreq0_w))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE("pic8259_0", pic8259_device, ir2_w))
+	MCFG_UPD765_DRQ_CALLBACK(WRITELINE("i8257", i8257_device, dreq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", peoplepc_floppies, "525qd", peoplepc_state::floppy_formats)
 
 	MCFG_DEVICE_ADD("i8251_0", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic8259_1", pic8259_device, ir1_w))
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("kbd", rs232_port_device, write_txd))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic8259_1", pic8259_device, ir1_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE("kbd", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("kbd", peoplepc_keyboard_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251_0", i8251_device, write_rxd))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	MCFG_DEVICE_ADD("kbd", RS232_PORT, peoplepc_keyboard_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("i8251_0", i8251_device, write_rxd))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
 
 	MCFG_DEVICE_ADD("i8251_1", I8251, 0)
 MACHINE_CONFIG_END

@@ -228,6 +228,10 @@ hyperstone_device::hyperstone_device(const machine_config &mconfig, const char *
 {
 }
 
+hyperstone_device::~hyperstone_device()
+{
+}
+
 
 //-------------------------------------------------
 //  e116t_device - constructor

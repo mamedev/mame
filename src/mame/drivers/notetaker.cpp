@@ -732,9 +732,10 @@ void notetaker_state::ep_io(address_map &map)
 /* Input ports */
 
 /* Floppy Image Interface */
-static SLOT_INTERFACE_START( notetaker_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void notetaker_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 /* Machine Start; allocate timers and savestate stuff */
 void notetaker_state::machine_start()
@@ -794,20 +795,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
-	MCFG_CPU_ADD("iop_cpu", I8086, XTAL(24'000'000)/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
-	MCFG_CPU_PROGRAM_MAP(iop_mem)
-	MCFG_CPU_IO_MAP(iop_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("iop_pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("iop_cpu", I8086, XTAL(24'000'000)/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
+	MCFG_DEVICE_PROGRAM_MAP(iop_mem)
+	MCFG_DEVICE_IO_MAP(iop_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("iop_pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("iop_pic8259", PIC8259, 0) // iP8259A-2 @ E6
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iop_cpu", 0))
 
 	/* Emulator CPU: 8086@5MHz */
-	MCFG_CPU_ADD("ep_cpu", I8086, XTAL(15'000'000)/3)
+	MCFG_DEVICE_ADD("ep_cpu", I8086, XTAL(15'000'000)/3)
 	MCFG_DEVICE_DISABLE() // TODO: implement the cpu control bits so this doesn't execute garbage/zeroes before its firmware gets loaded
-	MCFG_CPU_PROGRAM_MAP(ep_mem)
-	MCFG_CPU_IO_MAP(ep_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("ep_pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_PROGRAM_MAP(ep_mem)
+	MCFG_DEVICE_IO_MAP(ep_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("ep_pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("ep_pic8259", PIC8259, 0) // iP8259A-2 @ E6
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("ep_cpu", 0))
@@ -837,7 +838,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in iop_reset();
 	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
 	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
-	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("iop_pic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
+	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("iop_pic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
@@ -855,9 +856,9 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	// TODO: hook DAC up to two HA2425 (sample and hold) chips and hook those up to the speakers
-	MCFG_SOUND_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(notetaker_state,notetakr)

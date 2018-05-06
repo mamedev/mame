@@ -1950,14 +1950,14 @@ void dec8_state::machine_reset()
 MACHINE_CONFIG_START(dec8_state::lastmisn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(lastmisn_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(lastmisn_map)
 
-	MCFG_CPU_ADD("sub", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(lastmisn_sub_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(lastmisn_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
-	MCFG_CPU_PROGRAM_MAP(ym3526_s_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -1989,13 +1989,13 @@ MACHINE_CONFIG_START(dec8_state::lastmisn)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -2003,29 +2003,29 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec8_state::shackled)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(shackled_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(shackled_map)
 
-	MCFG_CPU_ADD("sub", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(shackled_sub_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, 2000000)
+	MCFG_DEVICE_PROGRAM_MAP(shackled_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
-	MCFG_CPU_PROGRAM_MAP(ym3526_s_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, shackled_mcu_to_main_w))
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, shackled_mcu_to_main_w))
 	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(100000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // needs heavy sync, otherwise one of the two CPUs will miss an irq and makes the game to hang
 
 	MCFG_INPUT_MERGER_ANY_LOW("coin")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(dec8_state, shackled_coin_irq))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, dec8_state, shackled_coin_irq))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2054,13 +2054,13 @@ MACHINE_CONFIG_START(dec8_state::shackled)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -2068,19 +2068,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec8_state::gondo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E,3000000) /* HD63C09EP */
-	MCFG_CPU_PROGRAM_MAP(gondo_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309E,3000000) /* HD63C09EP */
+	MCFG_DEVICE_PROGRAM_MAP(gondo_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
-	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, gondo_mcu_to_main_w))
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, gondo_mcu_to_main_w))
 	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
 
 	/* video hardware */
@@ -2097,8 +2097,8 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_gondo)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("nmigate", input_merger_device, in_w<1>))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dec8_state, screen_vblank_dec8))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("nmigate", input_merger_device, in_w<1>))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
@@ -2115,13 +2115,13 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -2129,19 +2129,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec8_state::garyoret)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E,3000000) /* HD63C09EP */
-	MCFG_CPU_PROGRAM_MAP(garyoret_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309E,3000000) /* HD63C09EP */
+	MCFG_DEVICE_PROGRAM_MAP(garyoret_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
-	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, gondo_mcu_to_main_w))
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, gondo_mcu_to_main_w))
 	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
 
 	/* video hardware */
@@ -2158,8 +2158,8 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_garyoret)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("nmigate", input_merger_device, in_w<1>))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dec8_state, screen_vblank_dec8))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("nmigate", input_merger_device, in_w<1>))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_INPUT_MERGER_ALL_HIGH("nmigate")
@@ -2176,13 +2176,13 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -2190,19 +2190,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec8_state::ghostb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, 3000000)  /* HD63C09EP */
-	MCFG_CPU_PROGRAM_MAP(meikyuh_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309E, 3000000)  /* HD63C09EP */
+	MCFG_DEVICE_PROGRAM_MAP(meikyuh_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
-	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
+	MCFG_DEVICE_ADD("audiocpu", DECO_222, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, 3000000*4)
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(dec8_state, i8751_port1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(dec8_state, i8751_port1_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, gondo_mcu_to_main_w))
+	MCFG_DEVICE_ADD("mcu", I8751, 3000000*4)
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, dec8_state, i8751_port1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, dec8_state, i8751_port1_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, gondo_mcu_to_main_w))
 	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
 
 	/* video hardware */
@@ -2223,8 +2223,8 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_RAW_PARAMS_DATA_EAST
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_ghostb)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dec8_state, screen_vblank_dec8))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(dec8_state, ghostb_nmi_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dec8_state, screen_vblank_dec8))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(*this, dec8_state, ghostb_nmi_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ghostb)
@@ -2236,34 +2236,34 @@ MACHINE_CONFIG_START(dec8_state::ghostb)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dec8_state::meikyuh)
 	ghostb(config);
-	MCFG_CPU_REPLACE("audiocpu", M6502, 1500000)
-	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
+	MCFG_DEVICE_REPLACE("audiocpu", M6502, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(dec8_s_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dec8_state::csilver)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(csilver_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(csilver_map)
 
-	MCFG_CPU_ADD("sub", MC6809E, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(csilver_sub_map)
+	MCFG_DEVICE_ADD("sub", MC6809E, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(csilver_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(csilver_s_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(csilver_s_map)
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -2296,18 +2296,18 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dec8_state, csilver_adpcm_int))  /* interrupt function */
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dec8_state, csilver_adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.88)
 MACHINE_CONFIG_END
@@ -2315,19 +2315,19 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec8_state::oscar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL(12'000'000)/2) /* PCB seen both HD6309 or MC6809, clock verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(oscar_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309, XTAL(12'000'000)/2) /* PCB seen both HD6309 or MC6809, clock verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(oscar_map)
 
-	MCFG_CPU_ADD("sub", HD6309, XTAL(12'000'000)/2) /* PCB seen both HD6309 or MC6809, clock verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(oscar_sub_map)
+	MCFG_DEVICE_ADD("sub", HD6309, XTAL(12'000'000)/2) /* PCB seen both HD6309 or MC6809, clock verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(oscar_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, XTAL(12'000'000)/8) // IC labeled "C10707-1"
-	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
+	MCFG_DEVICE_ADD("audiocpu", DECO_222, XTAL(12'000'000)/8) // IC labeled "C10707-1"
+	MCFG_DEVICE_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
 
 	MCFG_INPUT_MERGER_ANY_LOW("coin") // 1S1588 x3 (D1-D3) + RCDM-I5
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(dec8_state, oscar_coin_irq))
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, dec8_state, oscar_coin_irq))
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2361,13 +2361,13 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::NMI_LINE))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -2375,17 +2375,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec8_state::srdarwin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  /* MC68A09EP */
-	MCFG_CPU_PROGRAM_MAP(srdarwin_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)  /* MC68A09EP */
+	MCFG_DEVICE_PROGRAM_MAP(srdarwin_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
-	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
+	MCFG_DEVICE_ADD("audiocpu", DECO_222, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000)) /* unknown frequency */
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(dec8_state, i8751_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(dec8_state, i8751_port0_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(dec8_state, srdarwin_mcu_to_main_w))
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000)) /* unknown frequency */
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, dec8_state, i8751_port0_r))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, dec8_state, i8751_port0_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, dec8_state, srdarwin_mcu_to_main_w))
 	MCFG_MCS51_PORT_P3_IN_CB(IOPORT("I8751"))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
@@ -2414,13 +2414,13 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -2428,11 +2428,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec8_state::cobracom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)  /* MC68B09EP */
-	MCFG_CPU_PROGRAM_MAP(cobra_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)  /* MC68B09EP */
+	MCFG_DEVICE_PROGRAM_MAP(cobra_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
-	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)
+	MCFG_DEVICE_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
 	/* video hardware */
@@ -2471,13 +2471,13 @@ MACHINE_CONFIG_START(dec8_state::cobracom)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.53)
 	MCFG_SOUND_ROUTE(1, "mono", 0.53)
 	MCFG_SOUND_ROUTE(2, "mono", 0.53)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END

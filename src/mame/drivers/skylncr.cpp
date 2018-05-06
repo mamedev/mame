@@ -1637,10 +1637,10 @@ INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 MACHINE_CONFIG_START(skylncr_state::skylncr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(mem_map_skylncr)
-	MCFG_CPU_IO_MAP(io_map_skylncr)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skylncr_state,  skylncr_vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(mem_map_skylncr)
+	MCFG_DEVICE_IO_MAP(io_map_skylncr)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skylncr_state,  skylncr_vblank_interrupt)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1677,7 +1677,7 @@ MACHINE_CONFIG_START(skylncr_state::skylncr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1687,8 +1687,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(skylncr_state::mbutrfly)
 	skylncr(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(io_map_mbutrfly)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(io_map_mbutrfly)
 MACHINE_CONFIG_END
 
 
@@ -1696,7 +1696,7 @@ MACHINE_CONFIG_START(skylncr_state::neraidou)
 	skylncr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_GFXDECODE_MODIFY("gfxdecode", neraidou)
 MACHINE_CONFIG_END
 
@@ -1705,7 +1705,7 @@ MACHINE_CONFIG_START(skylncr_state::sstar97)
 	skylncr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_GFXDECODE_MODIFY("gfxdecode", sstar97)
 MACHINE_CONFIG_END
 
@@ -1714,8 +1714,8 @@ MACHINE_CONFIG_START(skylncr_state::bdream97)
 	skylncr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(bdream97_opcode_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_OPCODES_MAP(bdream97_opcode_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bdream97)
 MACHINE_CONFIG_END

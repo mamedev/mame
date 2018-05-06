@@ -1912,20 +1912,20 @@ GFXDECODE_END
 MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(rallybik_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(rallybik_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(rallybik_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(rallybik_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_DEVICE_ADD("coinlatch", LS259, 0) // 19L
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_lockout_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(toaplan1_rallybik_state, coin_lockout_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, toaplan1_rallybik_state, coin_lockout_2_w))
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,toaplan1)
 
@@ -1934,7 +1934,7 @@ MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_rallybik_state, screen_update_rallybik)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_rallybik_state, screen_vblank_rallybik))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_rallybik_state, screen_vblank_rallybik))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_TOAPLAN_SCU_ADD("scu", "palette", 31, 15)
@@ -1948,7 +1948,7 @@ MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1957,12 +1957,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::truxton)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(truxton_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(truxton_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(truxton_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(truxton_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -1973,7 +1973,7 @@ MACHINE_CONFIG_START(toaplan1_state::truxton)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
@@ -1985,7 +1985,7 @@ MACHINE_CONFIG_START(toaplan1_state::truxton)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1994,12 +1994,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::hellfire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(hellfire_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(hellfire_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(hellfire_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(hellfire_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2010,7 +2010,7 @@ MACHINE_CONFIG_START(toaplan1_state::hellfire)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
@@ -2022,7 +2022,7 @@ MACHINE_CONFIG_START(toaplan1_state::hellfire)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2031,12 +2031,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::zerowing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(zerowing_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(zerowing_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(zerowing_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2047,7 +2047,7 @@ MACHINE_CONFIG_START(toaplan1_state::zerowing)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
@@ -2059,7 +2059,7 @@ MACHINE_CONFIG_START(toaplan1_state::zerowing)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2068,17 +2068,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::demonwld)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(demonwld_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(demonwld_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(demonwld_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(demonwld_sound_io_map)
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL(28'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
-	MCFG_CPU_IO_MAP(DSP_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(toaplan1_state, demonwld_BIO_r))
+	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(28'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(DSP_program_map)
+	MCFG_DEVICE_IO_MAP(DSP_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, toaplan1_state, demonwld_BIO_r))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2089,7 +2089,7 @@ MACHINE_CONFIG_START(toaplan1_state::demonwld)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND+16, VBSTART+16)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
@@ -2101,7 +2101,7 @@ MACHINE_CONFIG_START(toaplan1_state::demonwld)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2110,12 +2110,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::samesame)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(samesame_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(samesame_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
-	MCFG_CPU_PROGRAM_MAP(samesame_hd647180_mem_map)
-	MCFG_CPU_IO_MAP(samesame_hd647180_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
+	MCFG_DEVICE_PROGRAM_MAP(samesame_hd647180_mem_map)
+	MCFG_DEVICE_IO_MAP(samesame_hd647180_io_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -2126,7 +2126,7 @@ MACHINE_CONFIG_START(toaplan1_state::samesame)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_samesame))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_samesame))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
@@ -2138,7 +2138,7 @@ MACHINE_CONFIG_START(toaplan1_state::samesame)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2147,12 +2147,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::outzone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(outzone_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(outzone_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(outzone_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(outzone_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2163,7 +2163,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzone)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
@@ -2175,7 +2175,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzone)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2184,12 +2184,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(outzonecv_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(outzonecv_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
-	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(toaplan1_sound_map)
+	MCFG_DEVICE_IO_MAP(zerowing_sound_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -2200,7 +2200,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
@@ -2212,7 +2212,7 @@ MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -2221,12 +2221,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(toaplan1_state::vimana)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(vimana_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(vimana_main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
-	MCFG_CPU_PROGRAM_MAP(vimana_hd647180_mem_map)
-	MCFG_CPU_IO_MAP(vimana_hd647180_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
+	MCFG_DEVICE_PROGRAM_MAP(vimana_hd647180_mem_map)
+	MCFG_DEVICE_IO_MAP(vimana_hd647180_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600)) // GUESSED
 
@@ -2237,7 +2237,7 @@ MACHINE_CONFIG_START(toaplan1_state::vimana)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(toaplan1_state, screen_update_toaplan1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(toaplan1_state, screen_vblank_toaplan1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, toaplan1_state, screen_vblank_toaplan1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toaplan1)
@@ -2249,7 +2249,7 @@ MACHINE_CONFIG_START(toaplan1_state::vimana)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)   /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)   /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

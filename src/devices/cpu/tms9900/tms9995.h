@@ -175,7 +175,6 @@ private:
 	bool    m_nmi_active;
 	bool    m_int1_active;
 	bool    m_int4_active;
-	bool    m_int_decrementer;
 	bool    m_int_overflow;
 
 	bool    m_reset;

@@ -188,10 +188,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cmulti8_state::cmulti8)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1070, 250000) // approximation - RC osc. R=56K, C=68pf
-	MCFG_TMS1XXX_READ_K_CB(READ8(cmulti8_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cmulti8_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cmulti8_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1070, 250000) // approximation - RC osc. R=56K, C=68pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, cmulti8_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, cmulti8_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, cmulti8_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_cmulti8)
@@ -405,10 +405,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tisr16_state::tisr16)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
-	MCFG_TMS1XXX_READ_K_CB(READ8(tisr16_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tisr16_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tisr16_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tisr16_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tisr16_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tisr16_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tisr16)
@@ -545,10 +545,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ti1250_state::ti1250)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0950, 200000) // approximation - RC osc. R=68K, C=68pf
-	MCFG_TMS1XXX_READ_K_CB(READ8(ti1250_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1250_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1250_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS0950, 200000) // approximation - RC osc. R=68K, C=68pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ti1250_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ti1250_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ti1250_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti1250)
@@ -560,10 +560,10 @@ MACHINE_CONFIG_START(ti1250_state::ti1270)
 	ti1250(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", TMS0970, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(ti1250_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1250_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1250_state, write_r))
+	MCFG_DEVICE_REPLACE("maincpu", TMS0970, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ti1250_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ti1250_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ti1250_state, write_r))
 
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
 MACHINE_CONFIG_END
@@ -673,10 +673,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ti25503_state::ti25503)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(ti25503_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti25503_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti25503_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1000, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ti25503_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ti25503_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ti25503_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti25503)
@@ -774,10 +774,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ti1000_state::ti1000)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(ti1000_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1000_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1000_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1990, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ti1000_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ti1000_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ti1000_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti1270)
@@ -875,10 +875,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(wizatron_state::wizatron)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(wizatron_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(wizatron_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(wizatron_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS0970, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, wizatron_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, wizatron_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, wizatron_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
@@ -950,10 +950,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(lilprof_state::lilprof)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0970, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(lilprof_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(lilprof_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(wizatron_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS0970, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, lilprof_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, lilprof_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, wizatron_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
@@ -1061,10 +1061,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(lilprof78_state::lilprof78)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1990, 250000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(lilprof78_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(lilprof78_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(lilprof78_state, write_r))
+	MCFG_DEVICE_ADD("maincpu", TMS1990, 250000) // approximation
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, lilprof78_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, lilprof78_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, lilprof78_state, write_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_wizatron)
@@ -1174,11 +1174,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(dataman_state::dataman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // patent says 300kHz
-	MCFG_TMS1XXX_READ_K_CB(READ8(dataman_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(dataman_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(dataman_state, write_r))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
+	MCFG_DEVICE_ADD("maincpu", TMS1980, 300000) // patent says 300kHz
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, dataman_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, dataman_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, dataman_state, write_r))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_dataman)
@@ -1242,18 +1242,18 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mathmarv_state::mathmarv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // assume same as dataman
-	MCFG_TMS1XXX_READ_K_CB(READ8(dataman_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(dataman_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mathmarv_state, write_r))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
+	MCFG_DEVICE_ADD("maincpu", TMS1980, 300000) // assume same as dataman
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, dataman_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, dataman_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, mathmarv_state, write_r))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mathmarv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1503,11 +1503,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ti30_state::ti30)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0980, 400000) // guessed
-	MCFG_TMS1XXX_READ_K_CB(READ8(ti30_state, read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti30_state, write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti30_state, write_r))
-	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
+	MCFG_DEVICE_ADD("maincpu", TMS0980, 400000) // guessed
+	MCFG_TMS1XXX_READ_K_CB(READ8(*this, ti30_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, ti30_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, ti30_state, write_r))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(*this, hh_tms1k_state, auto_power_off))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ti30)

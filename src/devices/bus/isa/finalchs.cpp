@@ -72,8 +72,8 @@ DEFINE_DEVICE_TYPE(ISA8_FINALCHS, isa8_finalchs_device, "isa_finalchs", "Final C
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa8_finalchs_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu",M65C02,5000000)
-	MCFG_CPU_PROGRAM_MAP(finalchs_mem)
+	MCFG_DEVICE_ADD("maincpu",M65C02,5000000)
+	MCFG_DEVICE_PROGRAM_MAP(finalchs_mem)
 MACHINE_CONFIG_END
 
 //**************************************************************************

@@ -493,11 +493,11 @@ DRIVER_INIT_MEMBER( wmg_state, wmg )
 MACHINE_CONFIG_START(wmg_state::wmg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
-	MCFG_CPU_PROGRAM_MAP(wmg_cpu1)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
+	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu1)
 
-	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(wmg_cpu2)
+	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu2)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
 	MCFG_MACHINE_RESET_OVERRIDE(wmg_state, wmg)
@@ -519,26 +519,26 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(wmg_state, wmg_port_select_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, wmg_state, wmg_port_select_w))
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state, williams_snd_cmd_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state, williams_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state, williams_main_irq))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams_state, williams_snd_cmd_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
 
 /*************************************

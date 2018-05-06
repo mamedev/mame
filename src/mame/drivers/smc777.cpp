@@ -1016,17 +1016,18 @@ INTERRUPT_GEN_MEMBER(smc777_state::vblank_irq)
 }
 
 
-static SLOT_INTERFACE_START( smc777_floppies )
-	SLOT_INTERFACE("ssdd", FLOPPY_35_SSDD)
-SLOT_INTERFACE_END
+static void smc777_floppies(device_slot_interface &device)
+{
+	device.option_add("ssdd", FLOPPY_35_SSDD);
+}
 
 
 MACHINE_CONFIG_START(smc777_state::smc777)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(smc777_mem)
-	MCFG_CPU_IO_MAP(smc777_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", smc777_state, vblank_irq)
+	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(smc777_mem)
+	MCFG_DEVICE_IO_MAP(smc777_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", smc777_state, vblank_irq)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1048,8 +1049,8 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 
 	// floppy controller
 	MCFG_MB8876_ADD("fdc", XTAL(1'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(smc777_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(smc777_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, smc777_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, smc777_state, fdc_drq_w))
 
 	// does it really support 16 of them?
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats)
@@ -1061,10 +1062,10 @@ MACHINE_CONFIG_START(smc777_state::smc777)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
+	MCFG_DEVICE_ADD("sn1", SN76489A, MASTER_CLOCK) // unknown clock / divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 300) // TODO: correct frequency
+	MCFG_DEVICE_ADD("beeper", BEEP, 300) // TODO: correct frequency
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", smc777_state, keyboard_callback, attotime::from_hz(240/32))

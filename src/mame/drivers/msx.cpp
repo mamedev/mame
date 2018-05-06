@@ -1283,10 +1283,11 @@ FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )
 	FLOPPY_DMK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( msx_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-	SLOT_INTERFACE( "35ssdd", FLOPPY_35_SSDD )
-SLOT_INTERFACE_END
+static void msx_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35ssdd", FLOPPY_35_SSDD);
+}
 
 MACHINE_CONFIG_START(msx_state::msx_fd1793)
 	MCFG_FD1793_ADD("fdc", XTAL(4'000'000) / 4)
@@ -1336,7 +1337,7 @@ MACHINE_CONFIG_START(msx_state::msx_2_35_dd_drive)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx_ym2413)
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(21'477'272)/6)
+	MCFG_DEVICE_ADD("ym2413", YM2413, XTAL(21'477'272)/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
 MACHINE_CONFIG_END
 
@@ -1347,42 +1348,42 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)         /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(msx_memory_map)
-	MCFG_CPU_IO_MAP(msx_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt) /* Needed for mouse updates */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'738'635)/3)         /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
+	MCFG_DEVICE_IO_MAP(msx_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", msx_state,  msx_interrupt) /* Needed for mouse updates */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(msx_state, msx_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(msx_state, msx_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, msx_state, msx_ppi_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, msx_state, msx_ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(msx_state, msx_psg_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(msx_state, msx_psg_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(msx_state, msx_psg_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(msx_state, msx_psg_port_b_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, msx_state, msx_psg_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, msx_state, msx_psg_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, msx_state, msx_psg_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, msx_state, msx_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -1400,7 +1401,7 @@ MACHINE_CONFIG_START(msx_state::msx_ntsc)
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1411,7 +1412,7 @@ MACHINE_CONFIG_START(msx_state::msx_tms9118)
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9118, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1422,7 +1423,7 @@ MACHINE_CONFIG_START(msx_state::msx_tms9128)
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1433,7 +1434,7 @@ MACHINE_CONFIG_START(msx_state::msx_tms9918)
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9918, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1444,7 +1445,7 @@ MACHINE_CONFIG_START(msx_state::msx_tms9918a)
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9918A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1455,7 +1456,7 @@ MACHINE_CONFIG_START(msx_state::msx_tms9928)
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1466,7 +1467,7 @@ MACHINE_CONFIG_START(msx_state::msx_pal)
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1477,7 +1478,7 @@ MACHINE_CONFIG_START(msx_state::msx_tms9129)
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9129, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1488,7 +1489,7 @@ MACHINE_CONFIG_START(msx_state::msx_tms9929)
 	/* Video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9928a", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
@@ -1496,46 +1497,46 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6)       /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(msx_memory_map)
-	MCFG_CPU_IO_MAP(msx2_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)       /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
+	MCFG_DEVICE_IO_MAP(msx2_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(msx_state, msx_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(msx_state, msx_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, msx_state, msx_ppi_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, msx_state, msx_ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", 0x20000, XTAL(21'477'272))
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", XTAL(21'477'272))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(21'477'272)/6/2)
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(21'477'272)/6/2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(msx_state, msx_psg_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(msx_state, msx_psg_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(msx_state, msx_psg_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(msx_state, msx_psg_port_b_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, msx_state, msx_psg_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, msx_state, msx_psg_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, msx_state, msx_psg_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, msx_state, msx_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -1554,46 +1555,46 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(msx_state::msx2p)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6)       /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(msx_memory_map)
-	MCFG_CPU_IO_MAP(msx2p_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)       /* 3.579545 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(msx_memory_map)
+	MCFG_DEVICE_IO_MAP(msx2p_io_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(msx_state, msx_ppi_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(msx_state, msx_ppi_port_b_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(msx_state, msx_ppi_port_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, msx_state, msx_ppi_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, msx_state, msx_ppi_port_b_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, msx_state, msx_ppi_port_c_w))
 
 	/* video hardware */
 	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272))
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_irq_source0))
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, msx_state,msx_irq_source0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(21'477'272)/6/2)
+	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(21'477'272)/6/2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(msx_state, msx_psg_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(msx_state, msx_psg_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(msx_state, msx_psg_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(msx_state, msx_psg_port_b_w))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, msx_state, msx_psg_port_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, msx_state, msx_psg_port_b_r))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, msx_state, msx_psg_port_a_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, msx_state, msx_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE("cent_status_in", input_buffer_device, write_bit1))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit1))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
 
 	MCFG_DEVICE_ADD("cent_ctrl_out", OUTPUT_LATCH, 0)
-	MCFG_OUTPUT_LATCH_BIT1_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
+	MCFG_OUTPUT_LATCH_BIT1_HANDLER(WRITELINE("centronics", centronics_device, write_strobe))
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
@@ -8017,7 +8018,7 @@ MACHINE_CONFIG_START(msx_state::fsa1fx)
 	MCFG_MSX_LAYOUT_ROM("cock", 3, 3, 1, 2, "maincpu", 0x18000)
 
 	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
-	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(msx_state, turbo_w))
+	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(*this, msx_state, turbo_w))
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
@@ -8063,7 +8064,7 @@ MACHINE_CONFIG_START(msx_state::fsa1wsx)
 	MCFG_MSX_LAYOUT_PANASONIC08("firm", 3, 3, 0, 4, "maincpu", 0x1c000)
 
 	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
-	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(msx_state, turbo_w))
+	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(*this, msx_state, turbo_w))
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
@@ -8111,7 +8112,7 @@ MACHINE_CONFIG_START(msx_state::fsa1wx)
 	MCFG_MSX_LAYOUT_PANASONIC08("firm", 3, 3, 0, 4, "maincpu", 0x1c000)
 
 	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
-	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(msx_state, turbo_w))
+	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(*this, msx_state, turbo_w))
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 
@@ -8157,7 +8158,7 @@ MACHINE_CONFIG_START(msx_state::fsa1wxa)
 	MCFG_MSX_LAYOUT_PANASONIC08("firm", 3, 3, 0, 4, "maincpu", 0x1c000)
 
 	MCFG_MSX_MATSUSHITA_ADD( "matsushita" )
-	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(msx_state, turbo_w))
+	MCFG_MSX_MATSUSHITA_TURBO_CB(WRITELINE(*this, msx_state, turbo_w))
 
 	MCFG_MSX_SYSTEMFLAGS_ADD("sysflags", 0xff)
 

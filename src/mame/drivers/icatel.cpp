@@ -251,14 +251,14 @@ HD44780_PIXEL_UPDATE(icatel_state::icatel_pixel_update)
 
 MACHINE_CONFIG_START(icatel_state::icatel)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(2'097'152))
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_DATA_MAP(i80c31_data)
-	MCFG_CPU_IO_MAP(i80c31_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(icatel_state, i80c31_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(icatel_state, i80c31_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(icatel_state, i80c31_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(icatel_state, i80c31_p3_w))
+	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(2'097'152))
+	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
+	MCFG_DEVICE_DATA_MAP(i80c31_data)
+	MCFG_DEVICE_IO_MAP(i80c31_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, icatel_state, i80c31_p1_r))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, icatel_state, i80c31_p1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, icatel_state, i80c31_p3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, icatel_state, i80c31_p3_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

@@ -1714,7 +1714,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(centiped_state::centiped_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000/8)  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
+	MCFG_DEVICE_ADD("maincpu", M6502, 12096000/8)  /* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
 
 	MCFG_MACHINE_START_OVERRIDE(centiped_state,centiped)
 	MCFG_MACHINE_RESET_OVERRIDE(centiped_state,centiped)
@@ -1722,9 +1722,9 @@ MACHINE_CONFIG_START(centiped_state::centiped_base)
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(centiped_state, coin_counter_left_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(centiped_state, coin_counter_center_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(centiped_state, coin_counter_right_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, centiped_state, coin_counter_left_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, centiped_state, coin_counter_center_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, centiped_state, coin_counter_right_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // LED 1
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // LED 2
 
@@ -1750,11 +1750,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(centiped_state::centiped)
 	centiped_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(centiped_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(centiped_map)
 
 	MCFG_DEVICE_MODIFY("outlatch") // M10
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(centiped_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1769,24 +1769,24 @@ MACHINE_CONFIG_START(centiped_state::centipedj)
 	centiped(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(centipedj_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(centipedj_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(centiped_state::caterplr)
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(caterplr_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(caterplr_map)
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(centiped_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12096000/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 12096000/8)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -1796,17 +1796,17 @@ MACHINE_CONFIG_START(centiped_state::centipdb)
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(centipdb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(centipdb_map)
 
 	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(centiped_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12096000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(centiped_state, caterplr_unknown_r))
+	MCFG_DEVICE_ADD("aysnd", AY8910, 12096000/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, centiped_state, caterplr_unknown_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -1815,17 +1815,17 @@ MACHINE_CONFIG_START(centiped_state::magworm)
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(magworm_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(magworm_map)
 	MCFG_MACHINE_RESET_OVERRIDE(centiped_state,magworm)
 
 	MCFG_DEVICE_MODIFY("outlatch") // 12A
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(centiped_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 12096000/8) // AY-3-8912 at 2/3H
+	MCFG_DEVICE_ADD("aysnd", AY8912, 12096000/8) // AY-3-8912 at 2/3H
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 MACHINE_CONFIG_END
@@ -1835,13 +1835,13 @@ MACHINE_CONFIG_START(centiped_state::milliped)
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(milliped_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(milliped_map)
 
 	MCFG_DEVICE_MODIFY("outlatch") // 12E
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(centiped_state, input_select_w)) // TBEN
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(centiped_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(centiped_state, control_select_w)) // CNTRLSEL
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, centiped_state, input_select_w)) // TBEN
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, control_select_w)) // CNTRLSEL
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", milliped)
@@ -1869,8 +1869,8 @@ MACHINE_CONFIG_START(centiped_state::multiped)
 	milliped(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(multiped_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(multiped_map)
 
 	MCFG_DEVICE_REMOVE("earom")
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
@@ -1881,8 +1881,8 @@ MACHINE_CONFIG_START(centiped_state::warlords)
 	centiped_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(warlords_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(warlords_map)
 
 	// these extra LEDs also appear on Centipede schematics
 	MCFG_DEVICE_MODIFY("outlatch") // P9
@@ -1915,8 +1915,8 @@ MACHINE_CONFIG_START(centiped_state::mazeinv)
 	milliped(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mazeinv_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mazeinv_map)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)
@@ -1929,18 +1929,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(centiped_state::bullsdrt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 12096000/8)
-	MCFG_CPU_PROGRAM_MAP(bullsdrt_map)
-	MCFG_CPU_IO_MAP(bullsdrt_port_map)
-	MCFG_CPU_DATA_MAP(bullsdrt_data_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, 12096000/8)
+	MCFG_DEVICE_PROGRAM_MAP(bullsdrt_map)
+	MCFG_DEVICE_IO_MAP(bullsdrt_port_map)
+	MCFG_DEVICE_DATA_MAP(bullsdrt_data_map)
 
 	MCFG_ATARIVGEAROM_ADD("earom")
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(centiped_state, bullsdrt_coin_count_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, centiped_state, bullsdrt_coin_count_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(centiped_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, centiped_state, flip_screen_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1960,7 +1960,7 @@ MACHINE_CONFIG_START(centiped_state::bullsdrt)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76496, 12096000/8)
+	MCFG_DEVICE_ADD("snsnd", SN76496, 12096000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

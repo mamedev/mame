@@ -365,12 +365,12 @@ void oneshot_state::machine_reset()
 MACHINE_CONFIG_START(oneshot_state::oneshot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(oneshot_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", oneshot_state,  irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(oneshot_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", oneshot_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 5000000)
-	MCFG_CPU_PROGRAM_MAP(oneshot_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 5000000)
+	MCFG_DEVICE_PROGRAM_MAP(oneshot_sound_map)
 
 
 	/* video hardware */
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(oneshot_state::oneshot)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3500000)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 3500000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

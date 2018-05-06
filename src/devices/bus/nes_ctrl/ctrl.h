@@ -93,11 +93,11 @@ DECLARE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device)
 	downcast<nes_control_port_device &>(*device).set_brightpixel_callback(nesctrl_brightpixel_delegate(&_class::_method, #_class "::" #_method, this));
 
 
-SLOT_INTERFACE_EXTERN( nes_control_port1_devices );
-SLOT_INTERFACE_EXTERN( nes_control_port2_devices );
-SLOT_INTERFACE_EXTERN( fc_control_port1_devices );
-SLOT_INTERFACE_EXTERN( fc_control_port2_devices );
-SLOT_INTERFACE_EXTERN( fc_expansion_devices );
+void nes_control_port1_devices(device_slot_interface &device);
+void nes_control_port2_devices(device_slot_interface &device);
+void fc_control_port1_devices(device_slot_interface &device);
+void fc_control_port2_devices(device_slot_interface &device);
+void fc_expansion_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_NES_CTRL_CTRL_H

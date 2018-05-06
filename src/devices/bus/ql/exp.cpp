@@ -89,23 +89,24 @@ void ql_expansion_slot_device::device_start()
 #include "sandy_superqboard.h"
 #include "trumpcard.h"
 
-SLOT_INTERFACE_START( ql_expansion_cards )
-	SLOT_INTERFACE("qdisc", CST_QL_DISC_INTERFACE)
-	SLOT_INTERFACE("qplus4", CST_Q_PLUS4)
-	SLOT_INTERFACE("cumanafdi", CUMANA_FLOPPY_DISK_INTERFACE)
-	SLOT_INTERFACE("kdi", KEMPSTON_DISK_INTERFACE)
-	SLOT_INTERFACE("mpfdi", MICRO_PERIPHERALS_FLOPPY_DISK_INTERFACE)
-	SLOT_INTERFACE("gold", MIRACLE_GOLD_CARD)
-	SLOT_INTERFACE("pcmlqdi", PCML_Q_DISK_INTERFACE)
-	SLOT_INTERFACE("qubide", QUBIDE)
-	SLOT_INTERFACE("sdisk", SANDY_SUPER_DISK)
-	SLOT_INTERFACE("sqboard", SANDY_SUPERQBOARD)
-	SLOT_INTERFACE("sqboard512k", SANDY_SUPERQBOARD_512K)
-	SLOT_INTERFACE("sqmouse", SANDY_SUPERQMOUSE)
-	SLOT_INTERFACE("sqmouse512k", SANDY_SUPERQMOUSE_512K)
-	SLOT_INTERFACE("opdbasic", OPD_BASIC_MASTER)
-	SLOT_INTERFACE("trump", QL_TRUMP_CARD)
-	SLOT_INTERFACE("trump256k", QL_TRUMP_CARD_256K)
-	SLOT_INTERFACE("trump512k", QL_TRUMP_CARD_512K)
-	SLOT_INTERFACE("trump768k", QL_TRUMP_CARD_768K)
-SLOT_INTERFACE_END
+void ql_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("qdisc", CST_QL_DISC_INTERFACE);
+	device.option_add("qplus4", CST_Q_PLUS4);
+	device.option_add("cumanafdi", CUMANA_FLOPPY_DISK_INTERFACE);
+	device.option_add("kdi", KEMPSTON_DISK_INTERFACE);
+	device.option_add("mpfdi", MICRO_PERIPHERALS_FLOPPY_DISK_INTERFACE);
+	device.option_add("gold", MIRACLE_GOLD_CARD);
+	device.option_add("pcmlqdi", PCML_Q_DISK_INTERFACE);
+	device.option_add("qubide", QUBIDE);
+	device.option_add("sdisk", SANDY_SUPER_DISK);
+	device.option_add("sqboard", SANDY_SUPERQBOARD);
+	device.option_add("sqboard512k", SANDY_SUPERQBOARD_512K);
+	device.option_add("sqmouse", SANDY_SUPERQMOUSE);
+	device.option_add("sqmouse512k", SANDY_SUPERQMOUSE_512K);
+	device.option_add("opdbasic", OPD_BASIC_MASTER);
+	device.option_add("trump", QL_TRUMP_CARD);
+	device.option_add("trump256k", QL_TRUMP_CARD_256K);
+	device.option_add("trump512k", QL_TRUMP_CARD_512K);
+	device.option_add("trump768k", QL_TRUMP_CARD_768K);
+}

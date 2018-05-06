@@ -18,6 +18,13 @@
 #ifndef MAME_EMU_MCONFIG_H
 #define MAME_EMU_MCONFIG_H
 
+#include <cassert>
+#include <memory>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
+
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -103,11 +110,26 @@ public:
 		return token(*this, device);
 	}
 	device_t *device_add(const char *tag, device_type type, u32 clock);
-	template <typename... Params>
-	device_t *device_add(const char *tag, device_type type, const XTAL &clock, Params &&... args)
+	template <typename Creator>
+	device_t *device_add(const char *tag, Creator &&type, u32 clock)
+	{
+		return device_add(tag, device_type(type), clock);
+	}
+	template <typename Creator, typename... Params>
+	auto device_add(const char *tag, Creator &&type, Params &&... args)
+	{
+		std::pair<const char *, device_t *> const owner(resolve_owner(tag));
+		auto device(type.create(*this, owner.first, owner.second, std::forward<Params>(args)...));
+		auto &result(*device);
+		assert(type.type() == typeid(result));
+		add_device(std::move(device), owner.second);
+		return &result;
+	}
+	template <typename Creator, typename... Params>
+	auto device_add(const char *tag, Creator &&type, XTAL clock, Params &&... args)
 	{
 		clock.validate(std::string("Instantiating device ") + tag);
-		return device_add(tag, type, clock.value(), std::forward<Params>(args)...);
+		return device_add(tag, std::forward<Creator>(type), clock.value(), std::forward<Params>(args)...);
 	}
 	device_t *device_replace(const char *tag, device_type type, u32 clock);
 	device_t *device_replace(const char *tag, device_type type, const XTAL &xtal);
@@ -118,6 +140,8 @@ private:
 	class current_device_stack;
 
 	// internal helpers
+	std::pair<const char *, device_t *> resolve_owner(const char *tag) const;
+	device_t *add_device(std::unique_ptr<device_t> &&device, device_t *owner);
 	void remove_references(ATTR_UNUSED device_t &device);
 
 	// internal state
@@ -130,10 +154,15 @@ private:
 
 namespace emu { namespace detail {
 
-template <class DeviceClass> template <typename... Params>
-DeviceClass &device_type_impl<DeviceClass>::operator()(machine_config &config, char const *tag, Params &&... args) const
+template <typename Tag, typename Creator, typename... Params>
+inline std::enable_if_t<emu::detail::is_device_implementation<typename std::remove_reference_t<Creator>::exposed_type>::value, typename std::remove_reference_t<Creator>::exposed_type *> device_add_impl(machine_config &mconfig, Tag &&tag, Creator &&type, Params &&... args)
 {
-	return dynamic_cast<DeviceClass &>(*config.device_add(tag, *this, std::forward<Params>(args)...));
+	return &type(mconfig, std::forward<Tag>(tag), std::forward<Params>(args)...);
+}
+template <typename Tag, typename Creator, typename... Params>
+inline std::enable_if_t<emu::detail::is_device_interface<typename std::remove_reference_t<Creator>::exposed_type>::value, device_t *> device_add_impl(machine_config &mconfig, Tag &&tag, Creator &&type, Params &&... args)
+{
+	return &type(mconfig, std::forward<Tag>(tag), std::forward<Params>(args)...).device();
 }
 
 } } // namespace emu::detail
@@ -180,8 +209,8 @@ Ends a machine_config.
 	config.m_default_layout = &(_layout);
 
 // add/remove devices
-#define MCFG_DEVICE_ADD(_tag, _type, _clock) \
-	device = config.device_add(_tag, _type, _clock);
+#define MCFG_DEVICE_ADD(_tag, ...) \
+	device = emu::detail::device_add_impl(config, _tag, __VA_ARGS__);
 #define MCFG_DEVICE_REPLACE(_tag, _type, _clock) \
 	device = config.device_replace(_tag, _type, _clock);
 #define MCFG_DEVICE_REMOVE(_tag) \

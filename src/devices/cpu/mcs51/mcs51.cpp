@@ -2152,6 +2152,7 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_DPH, "DPH", DPH).noshow();
 	state_add( MCS51_DPL, "DPL", DPL).noshow();
 	state_add( MCS51_IE,  "IE", IE).formatstr("%02X");
+	state_add( MCS51_IP,  "IP", IP).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P1,  "P1", [this](){ return P1; }, [this](uint8_t p){ SET_P1(p); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_P2,  "P2", [this](){ return P2; }, [this](uint8_t p){ SET_P2(p); }).formatstr("%02X");
@@ -2165,6 +2166,12 @@ void mcs51_cpu_device::device_start()
 	state_add<uint8_t>( MCS51_R6,  "R6", [this](){ return R_REG(6); }, [this](uint8_t r){ SET_REG(6, r); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_R7,  "R7", [this](){ return R_REG(7); }, [this](uint8_t r){ SET_REG(7, r); }).formatstr("%02X");
 	state_add<uint8_t>( MCS51_RB,  "RB", [this](){ return (PSW & 0x18)>>3; }, [this](uint8_t rb){ SET_RS(rb); }).mask(0x03).formatstr("%02X");
+	state_add( MCS51_TCON, "TCON", TCON).formatstr("%02X");
+	state_add( MCS51_TMOD, "TMOD", TMOD).formatstr("%02X");
+	state_add( MCS51_TL0,  "TL0",  TL0).formatstr("%02X");
+	state_add( MCS51_TH0,  "TH0",  TH0).formatstr("%02X");
+	state_add( MCS51_TL1,  "TL1",  TL1).formatstr("%02X");
+	state_add( MCS51_TH1,  "TH1",  TH1).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();

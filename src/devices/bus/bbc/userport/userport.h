@@ -106,7 +106,7 @@ protected:
 DECLARE_DEVICE_TYPE(BBC_USERPORT_SLOT, bbc_userport_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( bbc_userport_devices );
+void bbc_userport_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_USERPORT_USERPORT_H
