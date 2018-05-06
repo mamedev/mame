@@ -355,14 +355,12 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248) // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(boogwing_state, screen_update_boogwing)
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", boogwing)
+	MCFG_GFXDECODE_ADD("gfxdecode", "deco_ace", boogwing)
 
 	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
 	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DECO_ACE_ADD("deco_ace")
-	MCFG_DECO_ACE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)

@@ -2325,7 +2325,6 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
 
 	MCFG_DECO_ACE_ADD("deco_ace")
-	MCFG_DECO_ACE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2367,8 +2366,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tattass)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_GFXDECODE_ADD("gfxdecode", "deco_ace", tattass)
 
 	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("IN0"))
@@ -2406,7 +2404,6 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
 
 	MCFG_DECO_ACE_ADD("deco_ace")
-	MCFG_DECO_ACE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2448,8 +2445,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nslasher)
-	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_GFXDECODE_ADD("gfxdecode", "deco_ace", nslasher)
 
 	MCFG_VIDEO_START_OVERRIDE(nslasher_state, nslasher)
 
