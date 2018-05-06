@@ -3544,6 +3544,8 @@ files {
 	MAME_DIR .. "src/mame/includes/spiders.h",
 	MAME_DIR .. "src/mame/audio/spiders.cpp",
 	MAME_DIR .. "src/mame/drivers/sub.cpp",
+	MAME_DIR .. "src/mame/includes/sub.h",
+	MAME_DIR .. "src/mame/video/sub.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "snk")
