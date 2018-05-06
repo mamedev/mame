@@ -20,7 +20,7 @@ struct namco_06xx_config
 	MCFG_DEVICE_ADD(_tag, NAMCO_06XX, _clock)
 
 #define MCFG_NAMCO_06XX_MAINCPU(_tag) \
-	downcast<namco_06xx_device &>(*device).set_maincpu("^" _tag);
+	downcast<namco_06xx_device &>(*device).set_maincpu(_tag);
 
 #define MCFG_NAMCO_06XX_READ_0_CB(_devcb) \
 	devcb = &downcast<namco_06xx_device &>(*device).set_read_callback<0>(DEVCB_##_devcb);

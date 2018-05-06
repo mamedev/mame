@@ -135,20 +135,21 @@ device_memory_interface::space_config_vector g65816_device::memory_space_config(
 }
 
 
-ADDRESS_MAP_START(_5a22_device::_5a22_map)
-	AM_RANGE(0x4202, 0x4202) AM_MIRROR(0xbf0000) AM_WRITE(wrmpya_w)
-	AM_RANGE(0x4203, 0x4203) AM_MIRROR(0xbf0000) AM_WRITE(wrmpyb_w)
-	AM_RANGE(0x4204, 0x4204) AM_MIRROR(0xbf0000) AM_WRITE(wrdivl_w)
-	AM_RANGE(0x4205, 0x4205) AM_MIRROR(0xbf0000) AM_WRITE(wrdivh_w)
-	AM_RANGE(0x4206, 0x4206) AM_MIRROR(0xbf0000) AM_WRITE(wrdvdd_w)
+void _5a22_device::_5a22_map(address_map &map)
+{
+	map(0x4202, 0x4202).mirror(0xbf0000).w(this, FUNC(_5a22_device::wrmpya_w));
+	map(0x4203, 0x4203).mirror(0xbf0000).w(this, FUNC(_5a22_device::wrmpyb_w));
+	map(0x4204, 0x4204).mirror(0xbf0000).w(this, FUNC(_5a22_device::wrdivl_w));
+	map(0x4205, 0x4205).mirror(0xbf0000).w(this, FUNC(_5a22_device::wrdivh_w));
+	map(0x4206, 0x4206).mirror(0xbf0000).w(this, FUNC(_5a22_device::wrdvdd_w));
 
-	AM_RANGE(0x420d, 0x420d) AM_MIRROR(0xbf0000) AM_WRITE(memsel_w)
+	map(0x420d, 0x420d).mirror(0xbf0000).w(this, FUNC(_5a22_device::memsel_w));
 
-	AM_RANGE(0x4214, 0x4214) AM_MIRROR(0xbf0000) AM_READ(rddivl_r)
-	AM_RANGE(0x4215, 0x4215) AM_MIRROR(0xbf0000) AM_READ(rddivh_r)
-	AM_RANGE(0x4216, 0x4216) AM_MIRROR(0xbf0000) AM_READ(rdmpyl_r)
-	AM_RANGE(0x4217, 0x4217) AM_MIRROR(0xbf0000) AM_READ(rdmpyh_r)
-ADDRESS_MAP_END
+	map(0x4214, 0x4214).mirror(0xbf0000).r(this, FUNC(_5a22_device::rddivl_r));
+	map(0x4215, 0x4215).mirror(0xbf0000).r(this, FUNC(_5a22_device::rddivh_r));
+	map(0x4216, 0x4216).mirror(0xbf0000).r(this, FUNC(_5a22_device::rdmpyl_r));
+	map(0x4217, 0x4217).mirror(0xbf0000).r(this, FUNC(_5a22_device::rdmpyh_r));
+}
 
 
 _5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

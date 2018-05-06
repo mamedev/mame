@@ -103,29 +103,29 @@ private:
 
 class roc10937_device : public rocvfd_device {
 public:
-	roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	roc10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 };
 
 class msc1937_device : public rocvfd_device {
 public:
-	msc1937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	msc1937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 };
 
 class mic10937_device : public rocvfd_device {
 public:
-	mic10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mic10937_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 };
 
 class roc10957_device : public rocvfd_device {
 public:
-	roc10957_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	roc10957_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 
 	void write_char(int data);
 };
 
 class s16lf01_device : public rocvfd_device {
 public:
-	s16lf01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s16lf01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 60);
 };
 
 

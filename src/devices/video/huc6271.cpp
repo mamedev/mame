@@ -27,9 +27,10 @@ DEFINE_DEVICE_TYPE(HUC6271, huc6271_device, "huc6271", "Hudson HuC6271 \"Rainbow
 //  huc6271_device - constructor
 //-------------------------------------------------
 
-ADDRESS_MAP_START(huc6271_device::data_map)
-	AM_RANGE(0x000000, 0x0fffff) AM_RAM
-ADDRESS_MAP_END
+void huc6271_device::data_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram();
+}
 
 huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HUC6271, tag, owner, clock)
@@ -40,14 +41,15 @@ huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, d
 
 
 
-ADDRESS_MAP_START(huc6271_device::regs)
-	AM_RANGE(0x00, 0x01) AM_WRITENOP // hscroll
-	AM_RANGE(0x02, 0x03) AM_WRITENOP // control
-	AM_RANGE(0x04, 0x05) AM_WRITENOP // hsync
-	AM_RANGE(0x06, 0x07) AM_WRITENOP // base Y
-	AM_RANGE(0x08, 0x09) AM_WRITENOP // base U
-	AM_RANGE(0x0a, 0x0b) AM_WRITENOP // base V
-ADDRESS_MAP_END
+void huc6271_device::regs(address_map &map)
+{
+	map(0x00, 0x01).nopw(); // hscroll
+	map(0x02, 0x03).nopw(); // control
+	map(0x04, 0x05).nopw(); // hsync
+	map(0x06, 0x07).nopw(); // base Y
+	map(0x08, 0x09).nopw(); // base U
+	map(0x0a, 0x0b).nopw(); // base V
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

@@ -70,25 +70,29 @@
 
 DEFINE_DEVICE_TYPE(VRC4373, vrc4373_device, "vrc4373", "NEC VRC4373 System Controller")
 
-ADDRESS_MAP_START(vrc4373_device::config_map)
-	AM_IMPORT_FROM(pci_bridge_device::config_map)
-	AM_RANGE(0x40, 0x43) AM_READWRITE  (pcictrl_r,  pcictrl_w)
-ADDRESS_MAP_END
+void vrc4373_device::config_map(address_map &map)
+{
+	pci_bridge_device::config_map(map);
+	map(0x40, 0x43).rw(this, FUNC(vrc4373_device::pcictrl_r), FUNC(vrc4373_device::pcictrl_w));
+}
 
 // cpu i/f map
-ADDRESS_MAP_START(vrc4373_device::cpu_map)
-	AM_RANGE(0x00000000, 0x0000007b) AM_READWRITE(    cpu_if_r,          cpu_if_w)
-ADDRESS_MAP_END
+void vrc4373_device::cpu_map(address_map &map)
+{
+	map(0x00000000, 0x0000007b).rw(this, FUNC(vrc4373_device::cpu_if_r), FUNC(vrc4373_device::cpu_if_w));
+}
 
 // Target Window 1 map
-ADDRESS_MAP_START(vrc4373_device::target1_map)
-	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target1_r,          target1_w)
-ADDRESS_MAP_END
+void vrc4373_device::target1_map(address_map &map)
+{
+	map(0x00000000, 0xFFFFFFFF).rw(this, FUNC(vrc4373_device::target1_r), FUNC(vrc4373_device::target1_w));
+}
 
 // Target Window 2 map
-ADDRESS_MAP_START(vrc4373_device::target2_map)
-	AM_RANGE(0x00000000, 0xFFFFFFFF) AM_READWRITE(    target2_r,          target2_w)
-ADDRESS_MAP_END
+void vrc4373_device::target2_map(address_map &map)
+{
+	map(0x00000000, 0xFFFFFFFF).rw(this, FUNC(vrc4373_device::target2_r), FUNC(vrc4373_device::target2_w));
+}
 
 vrc4373_device::vrc4373_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, VRC4373, tag, owner, clock),

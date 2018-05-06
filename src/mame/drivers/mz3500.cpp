@@ -808,28 +808,29 @@ void mz3500_state::upd7220_2_map(address_map &map)
 	map(0x00000, 0x3ffff).ram(); // AM_SHARE("video_ram_2")
 }
 
-static SLOT_INTERFACE_START( mz3500_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
-SLOT_INTERFACE_END
+static void mz3500_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
 
 /* TODO: clocks */
 MACHINE_CONFIG_START(mz3500_state::mz3500)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master",Z80,MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(mz3500_master_map)
-	MCFG_CPU_IO_MAP(mz3500_master_io)
+	MCFG_DEVICE_ADD("master",Z80,MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(mz3500_master_map)
+	MCFG_DEVICE_IO_MAP(mz3500_master_io)
 
-	MCFG_CPU_ADD("slave",Z80,MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(mz3500_slave_map)
-	MCFG_CPU_IO_MAP(mz3500_slave_io)
+	MCFG_DEVICE_ADD("slave",Z80,MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(mz3500_slave_map)
+	MCFG_DEVICE_IO_MAP(mz3500_slave_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
 	MCFG_DEVICE_ADD("i8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz3500_state, mz3500_pa_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz3500_state, mz3500_pb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz3500_state, mz3500_pc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz3500_state, mz3500_pa_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz3500_state, mz3500_pb_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz3500_state, mz3500_pc_w))
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("master", INPUT_LINE_IRQ0))
@@ -841,7 +842,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, MAIN_CLOCK/5)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(mz3500_state, hgdc_draw_text)
-	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
+	MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_gfx", UPD7220, MAIN_CLOCK/5)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
@@ -862,7 +863,7 @@ MACHINE_CONFIG_START(mz3500_state::mz3500)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("beeper", BEEP, 2400)
+	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 

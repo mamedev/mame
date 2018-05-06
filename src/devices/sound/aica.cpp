@@ -77,6 +77,18 @@
 #define EFSDL(slot)     ((m_EFSPAN[slot*4]>>8)&0x000f)
 #define EFPAN(slot)     ((m_EFSPAN[slot*4]>>0)&0x001f)
 
+//Unimplemented
+#define Q(slot)         ((slot->udata.data[0x28/2]>>0x0)&0x001F) // (0.75 × register value - 3)
+#define FLV0(slot)      ((slot->udata.data[0x2c/2]>>0x0)&0x1FFF)
+#define FLV1(slot)      ((slot->udata.data[0x30/2]>>0x0)&0x1FFF)
+#define FLV2(slot)      ((slot->udata.data[0x34/2]>>0x0)&0x1FFF)
+#define FLV3(slot)      ((slot->udata.data[0x38/2]>>0x0)&0x1FFF)
+#define FLV4(slot)      ((slot->udata.data[0x3c/2]>>0x0)&0x1FFF)
+#define FAR(slot)       ((slot->udata.data[0x40/2]>>0x8)&0x001F)
+#define FD1R(slot)      ((slot->udata.data[0x40/2]>>0x0)&0x001F)
+#define FD2R(slot)      ((slot->udata.data[0x44/2]>>0x8)&0x001F)
+#define FRR(slot)       ((slot->udata.data[0x44/2]>>0x0)&0x001F)
+
 //Envelope times in ms
 static constexpr double ARTimes[64]={100000/*infinity*/,100000/*infinity*/,8100.0,6900.0,6000.0,4800.0,4000.0,3400.0,3000.0,2400.0,2000.0,1700.0,1500.0,
 					1200.0,1000.0,860.0,760.0,600.0,500.0,430.0,380.0,300.0,250.0,220.0,190.0,150.0,130.0,110.0,95.0,
@@ -87,7 +99,7 @@ static constexpr double DRTimes[64]={100000/*infinity*/,100000/*infinity*/,11820
 					920.0,790.0,690.0,550.0,460.0,390.0,340.0,270.0,230.0,200.0,170.0,140.0,110.0,98.0,85.0,68.0,57.0,49.0,43.0,34.0,
 					28.0,25.0,22.0,18.0,14.0,12.0,11.0,8.5,7.1,6.1,5.4,4.3,3.6,3.1};
 
-#define MEM4B(aica)     ((m_udata.data[0]>>0x0)&0x0200)
+#define MEM8MB(aica)    ((m_udata.data[0]>>0x0)&0x0200)
 #define DAC18B(aica)    ((m_udata.data[0]>>0x0)&0x0100)
 #define MVOL(aica)      ((m_udata.data[0]>>0x0)&0x000F)
 #define RBL(aica)       ((m_udata.data[2]>>0xD)&0x0003)

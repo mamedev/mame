@@ -93,6 +93,7 @@ public:
 	int      m_cred2;
 	int      m_credits;
 	int      m_latch;
+	bool     m_coin_state;
 	int      m_snd;
 	int      m_msm5205next;
 	int      m_toggle;
@@ -108,7 +109,6 @@ public:
 	DECLARE_READ8_MEMBER(gondo_player_2_r);
 	DECLARE_WRITE8_MEMBER(dec8_i8751_w);
 	DECLARE_WRITE8_MEMBER(lastmisn_i8751_w);
-	DECLARE_WRITE8_MEMBER(shackled_i8751_w);
 	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
 	DECLARE_WRITE8_MEMBER(dec8_bank_w);
 	DECLARE_WRITE8_MEMBER(ghostb_bank_w);
@@ -117,14 +117,19 @@ public:
 	DECLARE_WRITE8_MEMBER(dec8_sound_w);
 	DECLARE_WRITE8_MEMBER(csilver_adpcm_data_w);
 	DECLARE_WRITE8_MEMBER(csilver_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(oscar_int_w);
-	DECLARE_WRITE8_MEMBER(shackled_int_w);
+	DECLARE_WRITE8_MEMBER(main_irq_on_w);
+	DECLARE_WRITE8_MEMBER(main_irq_off_w);
+	DECLARE_WRITE8_MEMBER(main_firq_off_w);
+	DECLARE_WRITE8_MEMBER(sub_irq_on_w);
+	DECLARE_WRITE8_MEMBER(sub_irq_off_w);
+	DECLARE_WRITE8_MEMBER(sub_firq_off_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_READ8_MEMBER(i8751_port0_r);
 	DECLARE_WRITE8_MEMBER(i8751_port0_w);
 	DECLARE_READ8_MEMBER(i8751_port1_r);
 	DECLARE_WRITE8_MEMBER(i8751_port1_w);
 	DECLARE_WRITE8_MEMBER(gondo_mcu_to_main_w);
+	DECLARE_WRITE8_MEMBER(shackled_mcu_to_main_w);
 	DECLARE_WRITE8_MEMBER(srdarwin_mcu_to_main_w);
 	DECLARE_WRITE8_MEMBER(dec8_bg_data_w);
 	DECLARE_READ8_MEMBER(dec8_bg_data_r);
@@ -170,7 +175,9 @@ public:
 	uint32_t screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dec8);
-	INTERRUPT_GEN_MEMBER(oscar_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(oscar_coin_irq);
+	DECLARE_WRITE8_MEMBER(oscar_coin_clear_w);
+	DECLARE_WRITE_LINE_MEMBER(shackled_coin_irq);
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
 

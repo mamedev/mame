@@ -17,9 +17,10 @@
 DEFINE_DEVICE_TYPE(TMS57002, tms57002_device, "tms57002", "Texas Instruments TMS57002 \"DASP\"")
 
 // Can't use a DEVICE_ADDRESS_MAP, not yet anyway
-ADDRESS_MAP_START(tms57002_device::internal_pgm)
-	AM_RANGE(0x00, 0xff) AM_RAM
-ADDRESS_MAP_END
+void tms57002_device::internal_pgm(address_map &map)
+{
+	map(0x00, 0xff).ram();
+}
 
 tms57002_device::tms57002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, TMS57002, tag, owner, clock)

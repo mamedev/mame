@@ -901,9 +901,9 @@ INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 }
 
 MACHINE_CONFIG_START(rabbit_state::rabbit)
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(24'000'000))
-	MCFG_CPU_PROGRAM_MAP(rabbit_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(24'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(rabbit_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

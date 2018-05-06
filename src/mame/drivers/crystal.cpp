@@ -1487,10 +1487,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(crystal_state::crystal)
 
-	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
-	MCFG_CPU_PROGRAM_MAP(crystal_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", crystal_state,  crystal_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(crystal_state, icallback)
+	MCFG_DEVICE_ADD("maincpu", SE3208, 43000000)
+	MCFG_DEVICE_PROGRAM_MAP(crystal_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", crystal_state,  crystal_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(crystal_state, icallback)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1500,7 +1500,7 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(crystal_state, screen_update_crystal)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(crystal_state, screen_vblank_crystal))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, crystal_state, screen_vblank_crystal))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vr0", VIDEO_VRENDER0, 0)
@@ -1521,20 +1521,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(crystal_state::trivrus)
 	crystal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trivrus_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(trivrus_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(crystal_state::crospuzl)
 	crystal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(crospuzl_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(crospuzl_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(crystal_state::crzyddz2)
 	crystal(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(crzyddz2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(crzyddz2_mem)
 MACHINE_CONFIG_END
 
 

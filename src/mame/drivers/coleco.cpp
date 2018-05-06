@@ -377,22 +377,23 @@ void coleco_state::machine_reset()
 MACHINE_CONFIG_START(coleco_state::coleco)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
-	MCFG_CPU_PROGRAM_MAP(coleco_map)
-	MCFG_CPU_IO_MAP(coleco_io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
+	MCFG_DEVICE_PROGRAM_MAP(coleco_map)
+	MCFG_DEVICE_IO_MAP(coleco_io_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) // 3.579545 MHz
+	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) // 3.579545 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SN76496_READY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
+	// TODO: enable when Z80 has better WAIT pin emulation, this currently breaks pitfall2 for example
+	//MCFG_SN76496_READY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT)) MCFG_DEVCB_INVERT
 
 	/* cartridge */
 	MCFG_COLECOVISION_CARTRIDGE_SLOT_ADD(COLECOVISION_CARTRIDGE_SLOT_TAG, colecovision_cartridges, nullptr)
@@ -412,7 +413,7 @@ MACHINE_CONFIG_START(coleco_state::colecop)
 
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
@@ -421,8 +422,8 @@ MACHINE_CONFIG_START(coleco_state::czz50)
 	coleco(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
-	MCFG_CPU_PROGRAM_MAP(czz50_map)
+	MCFG_DEVICE_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
+	MCFG_DEVICE_PROGRAM_MAP(czz50_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(coleco_state::dina)
@@ -434,7 +435,7 @@ MACHINE_CONFIG_START(coleco_state::dina)
 
 	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(coleco_state, coleco_vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, coleco_state, coleco_vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END

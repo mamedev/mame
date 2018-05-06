@@ -31,18 +31,19 @@ DEFINE_DEVICE_TYPE(TMS5501, tms5501_device, "tms5501", "TMS5501 Multifunction I/
 
 
 // I/O address map
-ADDRESS_MAP_START(tms5501_device::io_map)
-	AM_RANGE(0x00, 0x00) AM_READ(rb_r)
-	AM_RANGE(0x01, 0x01) AM_READ(xi_r)
-	AM_RANGE(0x02, 0x02) AM_READ(rst_r)
-	AM_RANGE(0x03, 0x03) AM_READ(sta_r)
-	AM_RANGE(0x04, 0x04) AM_WRITE(cmd_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(rr_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(tb_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(xo_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(mr_w)
-	AM_RANGE(0x09, 0x0d) AM_WRITE(tmr_w)
-ADDRESS_MAP_END
+void tms5501_device::io_map(address_map &map)
+{
+	map(0x00, 0x00).r(this, FUNC(tms5501_device::rb_r));
+	map(0x01, 0x01).r(this, FUNC(tms5501_device::xi_r));
+	map(0x02, 0x02).r(this, FUNC(tms5501_device::rst_r));
+	map(0x03, 0x03).r(this, FUNC(tms5501_device::sta_r));
+	map(0x04, 0x04).w(this, FUNC(tms5501_device::cmd_w));
+	map(0x05, 0x05).w(this, FUNC(tms5501_device::rr_w));
+	map(0x06, 0x06).w(this, FUNC(tms5501_device::tb_w));
+	map(0x07, 0x07).w(this, FUNC(tms5501_device::xo_w));
+	map(0x08, 0x08).w(this, FUNC(tms5501_device::mr_w));
+	map(0x09, 0x0d).w(this, FUNC(tms5501_device::tmr_w));
+}
 
 
 

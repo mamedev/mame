@@ -464,17 +464,17 @@ INTERRUPT_GEN_MEMBER(sub_state::sound_irq)
 MACHINE_CONFIG_START(sub_state::sub)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(subm_map)
-	MCFG_CPU_IO_MAP(subm_io)
+	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(subm_map)
+	MCFG_DEVICE_IO_MAP(subm_io)
 
-	MCFG_CPU_ADD("soundcpu", Z80,MASTER_CLOCK/6)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(subm_sound_map)
-	MCFG_CPU_IO_MAP(subm_sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sub_state, sound_irq,  120) //???
+	MCFG_DEVICE_ADD("soundcpu", Z80,MASTER_CLOCK/6)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(subm_sound_map)
+	MCFG_DEVICE_IO_MAP(subm_sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(sub_state, sound_irq,  120) //???
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sub_state, int_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, sub_state, int_mask_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // same as Q0?
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(sub_state::sub)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sub_state, main_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sub_state, main_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sub)
 	MCFG_PALETTE_ADD("palette", 0x400)
@@ -504,10 +504,10 @@ MACHINE_CONFIG_START(sub_state::sub)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
+	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
+	MCFG_DEVICE_ADD("ay2", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 

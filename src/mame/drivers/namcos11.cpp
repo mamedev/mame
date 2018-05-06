@@ -607,16 +607,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
 }
 
 MACHINE_CONFIG_START(namcos11_state::coh110)
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( namcos11_map )
+	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( namcos11_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("c76", NAMCO_C76, 16934400)
-	MCFG_CPU_PROGRAM_MAP(c76_map)
-	MCFG_CPU_IO_MAP(c76_io_map)
+	MCFG_DEVICE_ADD("c76", NAMCO_C76, 16934400)
+	MCFG_DEVICE_PROGRAM_MAP(c76_map)
+	MCFG_DEVICE_IO_MAP(c76_io_map)
 	/* TODO: irq generation for these */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcos11_state, mcu_irq0_cb, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcos11_state, mcu_irq2_cb, attotime::from_hz(60))
@@ -637,8 +637,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::coh100)
 	coh110(config);
-	MCFG_CPU_REPLACE( "maincpu", CXD8530AQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( namcos11_map )
+	MCFG_DEVICE_REPLACE( "maincpu", CXD8530AQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( namcos11_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -648,8 +648,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::tekken)
 	coh100(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	// TODO: either allow optional devices in memory maps, add another memory map without keycus or add a dummy keycus for tekken
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
@@ -657,64 +657,64 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::tekken2o)
 	coh100(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::tekken2)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::souledge)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C409, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::dunkmnia)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C410, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::primglex)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C411, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::xevi3dg)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C430, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::danceyes)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C431, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::pocketrc)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C432, 0 )
 MACHINE_CONFIG_END
@@ -726,16 +726,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::myangel3)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_64_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( rom8_64_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos11_state::ptblank2ua)
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( ptblank2ua_map )
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP( ptblank2ua_map )
 
 	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
 MACHINE_CONFIG_END

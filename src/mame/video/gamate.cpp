@@ -31,19 +31,21 @@
 
 DEFINE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device, "gamate_vid", "Gamate Video Hardware")
 
-ADDRESS_MAP_START(gamate_video_device::regs_map)
-	AM_RANGE(0x01,0x01) AM_WRITE(lcdcon_w)
-	AM_RANGE(0x02,0x02) AM_WRITE(xscroll_w)
-	AM_RANGE(0x03,0x03) AM_WRITE(yscroll_w)
-	AM_RANGE(0x04,0x04) AM_WRITE(xpos_w)
-	AM_RANGE(0x05,0x05) AM_WRITE(ypos_w)
-	AM_RANGE(0x06,0x06) AM_READ(vram_r)
-	AM_RANGE(0x07,0x07) AM_WRITE(vram_w)
-ADDRESS_MAP_END
+void gamate_video_device::regs_map(address_map &map)
+{
+	map(0x01, 0x01).w(this, FUNC(gamate_video_device::lcdcon_w));
+	map(0x02, 0x02).w(this, FUNC(gamate_video_device::xscroll_w));
+	map(0x03, 0x03).w(this, FUNC(gamate_video_device::yscroll_w));
+	map(0x04, 0x04).w(this, FUNC(gamate_video_device::xpos_w));
+	map(0x05, 0x05).w(this, FUNC(gamate_video_device::ypos_w));
+	map(0x06, 0x06).r(this, FUNC(gamate_video_device::vram_r));
+	map(0x07, 0x07).w(this, FUNC(gamate_video_device::vram_w));
+}
 
-ADDRESS_MAP_START(gamate_video_device::vram_map)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("vram") // 2x 8KB SRAMs
-ADDRESS_MAP_END
+void gamate_video_device::vram_map(address_map &map)
+{
+	map(0x0000, 0x3fff).ram().share("vram"); // 2x 8KB SRAMs
+}
 
 gamate_video_device::gamate_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GAMATE_VIDEO, tag, owner, clock),

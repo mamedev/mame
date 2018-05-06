@@ -1356,9 +1356,9 @@ DRIVER_INIT_MEMBER( inder_state, inder1 )
 
 MACHINE_CONFIG_START(inder_state::brvteam)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(brvteam_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(brvteam_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1368,15 +1368,15 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 	/* Sound */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("snvol")
-	MCFG_SOUND_ADD("sn", SN76489, XTAL(8'000'000) / 2) // jumper choice of 2 or 4 MHz
+	MCFG_DEVICE_ADD("sn", SN76489, XTAL(8'000'000) / 2) // jumper choice of 2 or 4 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::canasta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(canasta_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(canasta_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1386,18 +1386,18 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	/* Sound */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay", AY8910, XTAL(4'000'000) / 2)
+	MCFG_DEVICE_ADD("ay", AY8910, XTAL(4'000'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::lapbylap)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(lapbylap_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(2'000'000))
-	MCFG_CPU_PROGRAM_MAP(lapbylap_sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(lapbylap_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(2'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(lapbylap_sub_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1407,21 +1407,21 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	/* Sound */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
-	MCFG_AY8910_PORT_A_READ_CB(READ8(inder_state, sndcmd_r))
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, inder_state, sndcmd_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::inder)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(inder_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(inder_sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(inder_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(inder_sub_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1431,65 +1431,65 @@ MACHINE_CONFIG_START(inder_state::inder)
 	/* Sound */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("9a", ttl7474_device, clock_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("9b", ttl7474_device, clock_w)) // order of writes is sensitive
+	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE("9a", ttl7474_device, clock_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("9b", ttl7474_device, clock_w)) // order of writes is sensitive
 
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("ppi60", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi60a_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi60a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi60b_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi60b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(inder_state, sw_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi60c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi60a_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi60a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi60b_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi60b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, sw_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi60c_w))
 
 	MCFG_DEVICE_ADD("ppi64", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi64a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi64a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi64b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi64b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppi64c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi64c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi64a_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi64a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi64b_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi64b_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi64c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi64c_w))
 
 	MCFG_DEVICE_ADD("ppi68", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi68a_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi68a_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi68b_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi68b_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppi68c_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi68c_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi68a_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi68a_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi68b_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi68b_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi68c_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi68c_w))
 
 	MCFG_DEVICE_ADD("ppi6c", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppi6ca_r))
-	//MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppi6ca_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppi6cb_r))
-	//MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppi6cb_w))
-	//MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppi6cc_r))
-	//MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppi6cc_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppi6ca_r))
+	//MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppi6ca_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppi6cb_r))
+	//MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppi6cb_w))
+	//MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppi6cc_r))
+	//MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppi6cc_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	//MCFG_I8255_IN_PORTA_CB(READ8(inder_state, ppia_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(inder_state, ppia_w))
-	//MCFG_I8255_IN_PORTB_CB(READ8(inder_state, ppib_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(inder_state, ppib_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(inder_state, ppic_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(inder_state, ppic_w))
+	//MCFG_I8255_IN_PORTA_CB(READ8(*this, inder_state, ppia_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, inder_state, ppia_w))
+	//MCFG_I8255_IN_PORTB_CB(READ8(*this, inder_state, ppib_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, inder_state, ppib_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, inder_state, ppic_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, inder_state, ppic_w))
 
 	MCFG_DEVICE_ADD("7a", TTL7474, 0)
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc7a_w))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, inder_state, qc7a_w))
 
 	MCFG_DEVICE_ADD("9a", TTL7474, 0) // HCT74
-	MCFG_7474_OUTPUT_CB(WRITELINE(inder_state, q9a_w))
+	MCFG_7474_OUTPUT_CB(WRITELINE(*this, inder_state, q9a_w))
 
 	MCFG_DEVICE_ADD("9b", TTL7474, 0) // HCT74
-	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc9b_w))
+	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(*this, inder_state, qc9b_w))
 
 	MCFG_DEVICE_ADD("13", HCT157, 0)
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
 

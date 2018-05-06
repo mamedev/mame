@@ -508,14 +508,14 @@ void imolagp_state::machine_reset()
 MACHINE_CONFIG_START(imolagp_state::imolagp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
-	MCFG_CPU_PROGRAM_MAP(imolagp_master_map)
-	MCFG_CPU_IO_MAP(imolagp_master_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
+	MCFG_DEVICE_PROGRAM_MAP(imolagp_master_map)
+	MCFG_DEVICE_IO_MAP(imolagp_master_io)
 	MCFG_TIMER_DRIVER_ADD("pot", imolagp_state, imolagp_pot_callback) // maincpu nmi
 
-	MCFG_CPU_ADD("slave", Z80, 4000000) // ?
-	MCFG_CPU_PROGRAM_MAP(imolagp_slave_map)
-	MCFG_CPU_IO_MAP(imolagp_slave_io)
+	MCFG_DEVICE_ADD("slave", Z80, 4000000) // ?
+	MCFG_DEVICE_PROGRAM_MAP(imolagp_slave_map)
+	MCFG_DEVICE_IO_MAP(imolagp_slave_io)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -535,14 +535,14 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	MCFG_SCREEN_UPDATE_DRIVER(imolagp_state, screen_update_imolagp)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(imolagp_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, imolagp_state, vblank_irq))
 
 	MCFG_PALETTE_ADD("palette", 0x20)
 	MCFG_PALETTE_INIT_OWNER(imolagp_state, imolagp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000) // ?
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

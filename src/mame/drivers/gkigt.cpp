@@ -608,18 +608,18 @@ DEVICE_INPUT_DEFAULTS_END
 MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I960, XTAL(24'000'000))
-	MCFG_CPU_PROGRAM_MAP(igt_gameking_map)
+	MCFG_DEVICE_ADD("maincpu", I960, XTAL(24'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(igt_gameking_map)
 
 	MCFG_SC28C94_ADD("quart1", XTAL(24'000'000) / 6)
-	MCFG_SC28C94_D_TX_CALLBACK(DEVWRITELINE("diag", rs232_port_device, write_txd))
+	MCFG_SC28C94_D_TX_CALLBACK(WRITELINE("diag", rs232_port_device, write_txd))
 
 	MCFG_SC28C94_ADD("quart2", XTAL(24'000'000) / 6)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I960_IRQ0))
 
-	MCFG_RS232_PORT_ADD("diag", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("quart1", sc28c94_device, rx_d_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("diag", RS232_PORT, default_rs232_devices, nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("quart1", sc28c94_device, rx_d_w))
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igt_gameking)
 
@@ -630,7 +630,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(igt_gameking_state, screen_update_igt_gameking)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igt_gameking_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, igt_gameking_state, vblank_irq))
 	// Xilinx used as video chip XTAL(26'666'666) on board
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -640,7 +640,7 @@ MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -648,8 +648,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(igt_gameking_state::igt_ms72c)
 	igt_gameking(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(igt_ms72c_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(igt_ms72c_map)
 MACHINE_CONFIG_END
 
 ROM_START( ms3 )

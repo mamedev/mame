@@ -955,18 +955,18 @@ PALETTE_INIT_MEMBER(decocass_state, decocass)
 MACHINE_CONFIG_START(decocass_state::decocass)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
-	MCFG_CPU_PROGRAM_MAP(decocass_map)
+	MCFG_DEVICE_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
+	MCFG_DEVICE_PROGRAM_MAP(decocass_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
-	MCFG_CPU_PROGRAM_MAP(decocass_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
+	MCFG_DEVICE_PROGRAM_MAP(decocass_sound_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", decocass_state, decocass_audio_nmi_gen, "screen", 0, 8)
 
-	MCFG_CPU_ADD("mcu", I8041, HCLK)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(decocass_state, i8041_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(decocass_state, i8041_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(decocass_state, i8041_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(decocass_state, i8041_p2_w))
+	MCFG_DEVICE_ADD("mcu", I8041, HCLK)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, decocass_state, i8041_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, decocass_state, i8041_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, decocass_state, i8041_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, decocass_state, i8041_p2_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(4200))              /* interleave CPUs */
 
@@ -991,10 +991,10 @@ MACHINE_CONFIG_START(decocass_state::decocass)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
+	MCFG_DEVICE_ADD("ay1", AY8910, HCLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ay2", AY8910, HCLK2)
+	MCFG_DEVICE_ADD("ay2", AY8910, HCLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

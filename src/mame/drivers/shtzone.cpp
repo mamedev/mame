@@ -99,8 +99,8 @@ uint32_t shtzone_state::screen_update_shtzone(screen_device &screen, bitmap_ind1
 MACHINE_CONFIG_START(shtzone_state::shtzone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("timercpu", Z80,10738000/4)
-	MCFG_CPU_PROGRAM_MAP(shtzone_map)
+	MCFG_DEVICE_ADD("timercpu", Z80,10738000/4)
+	MCFG_DEVICE_PROGRAM_MAP(shtzone_map)
 
 	/* + SMS CPU */
 

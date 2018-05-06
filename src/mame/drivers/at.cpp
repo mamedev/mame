@@ -416,26 +416,28 @@ void at_state::cfg_single_360K(device_t *device)
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
 }
 
-static SLOT_INTERFACE_START( pci_devices )
-	SLOT_INTERFACE_INTERNAL("vt82c505", VT82C505)
-SLOT_INTERFACE_END
+static void pci_devices(device_slot_interface &device)
+{
+	device.option_add_internal("vt82c505", VT82C505);
+}
 
 MACHINE_CONFIG_START(at_state::ibm5170)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL(12'000'000)/2 /*6000000*/)
-	MCFG_CPU_PROGRAM_MAP(at16_map)
-	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(12'000'000)/2 /*6000000*/)
+	MCFG_DEVICE_PROGRAM_MAP(at16_map)
+	MCFG_DEVICE_IO_MAP(at16_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(WRITELINE("mb", at_mb_device, shutdown))
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	downcast<at_mb_device *>(device)->at_softlists(config);
 
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "ega", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, "fdc", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, "comat", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, "ide", false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ega", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdc", false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
@@ -446,14 +448,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ibm5170a)
 	ibm5170(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(16'000'000)/2)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(16'000'000)/2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ews286)
 	ibm5170(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(16'000'000)/2) // Exact crystal needs to be verified, 8 MHz according to specification
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(16'000'000)/2) // Exact crystal needs to be verified, 8 MHz according to specification
 
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K) // From pictures but also with a 3.5" as second floppy
@@ -466,14 +468,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ec1842)
 	ibm5170(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(12000000)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(12000000)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ibm5162)
 	ibm5170(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "cga", false)
 MACHINE_CONFIG_END
@@ -481,10 +483,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(at_state::ibmps1)
 	ibm5170(config);
 	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(at16l_map)
-	MCFG_CPU_IO_MAP(ps1_16_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(10'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(at16l_map)
+	MCFG_DEVICE_IO_MAP(ps1_16_io)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", true)
 	MCFG_DEVICE_MODIFY("kbd")
@@ -493,64 +495,64 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::atvga)
 	ibm5170(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(12000000)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(12000000)
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "svga_et4k", false)
 	MCFG_DEVICE_MODIFY("kbd")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false) // FIXME: determine ISA bus clock
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::neat)
 	atvga(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(neat_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(neat_io)
 	MCFG_DEVICE_REMOVE("mb:rtc")  // TODO: move this into the cs8221
 	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "bios")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::xb42639)
 	atvga(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(12500000)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(12500000)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::k286i)
 	ibm5162(config);
 	MCFG_DEVICE_MODIFY("kbd")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa6", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa7", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa8", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa6", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa7", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa8", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::at386)
-	MCFG_CPU_ADD("maincpu", I386, 12000000)
-	MCFG_CPU_PROGRAM_MAP(at32_map)
-	MCFG_CPU_IO_MAP(at32_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I386, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(at32_map)
+	MCFG_DEVICE_IO_MAP(at32_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	downcast<at_mb_device *>(device)->at_softlists(config);
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	// on board devices
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdcsmc", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "ide", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board4", pc_isa16_cards, "lpt", true)
+	// on-board devices
+	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: deteremine ISA bus clock
+	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", true)
+	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true)
+	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "lpt", true)
 	// ISA cards
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_et4k", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
@@ -561,44 +563,44 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::at386l)
 	at386(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(at32l_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(at32l_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::at486)
 	at386(config);
-	MCFG_CPU_REPLACE("maincpu", I486, 25000000)
-	MCFG_CPU_PROGRAM_MAP(at32_map)
-	MCFG_CPU_IO_MAP(at32_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_REPLACE("maincpu", I486, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(at32_map)
+	MCFG_DEVICE_IO_MAP(at32_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::at486l)
 	at486(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(at32l_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(at32l_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::at386sx)
 	atvga(config);
-	MCFG_CPU_REPLACE("maincpu", I386SX, 16000000)     /* 386SX */
-	MCFG_CPU_PROGRAM_MAP(at16_map)
-	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_REPLACE("maincpu", I386SX, 16000000)     /* 386SX */
+	MCFG_DEVICE_PROGRAM_MAP(at16_map)
+	MCFG_DEVICE_IO_MAP(at16_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ct386sx)
 	at386sx(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(neat_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(neat_io)
 	MCFG_CS8221_ADD("cs8221", "maincpu", "mb:isa", "maincpu")
 MACHINE_CONFIG_END
 
 // Commodore PC 30-III
 MACHINE_CONFIG_START(at_state::pc30iii)
 	ibm5170(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be ATI EGA Wonder 800+
 MACHINE_CONFIG_END
@@ -606,70 +608,70 @@ MACHINE_CONFIG_END
 // Commodore PC 40-III
 MACHINE_CONFIG_START(at_state::pc40iii)
 	ibm5170(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be onboard Paradise VGA, see ROM declarations
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megapc_state::megapc)
-	MCFG_CPU_ADD("maincpu", I386SX, XTAL(50'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(megapc_map)
-	MCFG_CPU_IO_MAP(megapc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
+	MCFG_DEVICE_ADD("maincpu", I386SX, XTAL(50'000'000) / 2)
+	MCFG_DEVICE_PROGRAM_MAP(megapc_map)
+	MCFG_DEVICE_IO_MAP(megapc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 
 	MCFG_WD7600_ADD("wd7600",XTAL(50'000'000) / 2, ":maincpu", ":isa", ":bios", ":keybc")
-	MCFG_WD7600_HOLD(WRITELINE(megapc_state, wd7600_hold));
+	MCFG_WD7600_HOLD(WRITELINE(*this, megapc_state, wd7600_hold));
 	MCFG_WD7600_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
 	MCFG_WD7600_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
 	MCFG_WD7600_CPURESET(INPUTLINE("maincpu", INPUT_LINE_RESET));
 	MCFG_WD7600_A20M(INPUTLINE("maincpu", INPUT_LINE_A20));
 	// isa dma
-	MCFG_WD7600_IOR(READ16(megapc_state, wd7600_ior))
-	MCFG_WD7600_IOW(WRITE16(megapc_state, wd7600_iow))
-	MCFG_WD7600_TC(WRITE8(megapc_state, wd7600_tc))
+	MCFG_WD7600_IOR(READ16(*this, megapc_state, wd7600_ior))
+	MCFG_WD7600_IOW(WRITE16(*this, megapc_state, wd7600_iow))
+	MCFG_WD7600_TC(WRITE8(*this, megapc_state, wd7600_tc))
 	// speaker
-	MCFG_WD7600_SPKR(WRITELINE(megapc_state, wd7600_spkr))
+	MCFG_WD7600_SPKR(WRITELINE(*this, megapc_state, wd7600_spkr))
 
 	// on board devices
 	MCFG_DEVICE_ADD("isabus", ISA16, 0)
-	MCFG_ISA16_CPU(":maincpu")
-	MCFG_ISA_BUS_IOCHCK(DEVWRITELINE("wd7600", wd7600_device, iochck_w))
-	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("wd7600", wd7600_device, irq09_w))
-	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("wd7600", wd7600_device, irq03_w))
-	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("wd7600", wd7600_device, irq04_w))
-	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("wd7600", wd7600_device, irq05_w))
-	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("wd7600", wd7600_device, irq06_w))
-	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("wd7600", wd7600_device, irq07_w))
-	MCFG_ISA_OUT_IRQ10_CB(DEVWRITELINE("wd7600", wd7600_device, irq10_w))
-	MCFG_ISA_OUT_IRQ11_CB(DEVWRITELINE("wd7600", wd7600_device, irq11_w))
-	MCFG_ISA_OUT_IRQ12_CB(DEVWRITELINE("wd7600", wd7600_device, irq12_w))
-	MCFG_ISA_OUT_IRQ14_CB(DEVWRITELINE("wd7600", wd7600_device, irq14_w))
-	MCFG_ISA_OUT_IRQ15_CB(DEVWRITELINE("wd7600", wd7600_device, irq15_w))
-	MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("wd7600", wd7600_device, dreq0_w))
-	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("wd7600", wd7600_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("wd7600", wd7600_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("wd7600", wd7600_device, dreq3_w))
-	MCFG_ISA_OUT_DRQ5_CB(DEVWRITELINE("wd7600", wd7600_device, dreq5_w))
-	MCFG_ISA_OUT_DRQ6_CB(DEVWRITELINE("wd7600", wd7600_device, dreq6_w))
-	MCFG_ISA_OUT_DRQ7_CB(DEVWRITELINE("wd7600", wd7600_device, dreq7_w))
-	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa16_cards, "fdcsmc", true)
-	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa16_cards, "comat", true)
-	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa16_cards, "ide", true)
-	MCFG_ISA16_SLOT_ADD("isabus","board4", pc_isa16_cards, "lpt", true)
-	MCFG_ISA16_SLOT_ADD("isabus","board5", pc_isa16_cards, "vga", true)
+	MCFG_ISA16_CPU("maincpu")
+	MCFG_ISA_BUS_IOCHCK(WRITELINE("wd7600", wd7600_device, iochck_w))
+	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("wd7600", wd7600_device, irq09_w))
+	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("wd7600", wd7600_device, irq03_w))
+	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("wd7600", wd7600_device, irq04_w))
+	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("wd7600", wd7600_device, irq05_w))
+	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("wd7600", wd7600_device, irq06_w))
+	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("wd7600", wd7600_device, irq07_w))
+	MCFG_ISA_OUT_IRQ10_CB(WRITELINE("wd7600", wd7600_device, irq10_w))
+	MCFG_ISA_OUT_IRQ11_CB(WRITELINE("wd7600", wd7600_device, irq11_w))
+	MCFG_ISA_OUT_IRQ12_CB(WRITELINE("wd7600", wd7600_device, irq12_w))
+	MCFG_ISA_OUT_IRQ14_CB(WRITELINE("wd7600", wd7600_device, irq14_w))
+	MCFG_ISA_OUT_IRQ15_CB(WRITELINE("wd7600", wd7600_device, irq15_w))
+	MCFG_ISA_OUT_DRQ0_CB(WRITELINE("wd7600", wd7600_device, dreq0_w))
+	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("wd7600", wd7600_device, dreq1_w))
+	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("wd7600", wd7600_device, dreq2_w))
+	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("wd7600", wd7600_device, dreq3_w))
+	MCFG_ISA_OUT_DRQ5_CB(WRITELINE("wd7600", wd7600_device, dreq5_w))
+	MCFG_ISA_OUT_DRQ6_CB(WRITELINE("wd7600", wd7600_device, dreq6_w))
+	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("wd7600", wd7600_device, dreq7_w))
+	MCFG_DEVICE_ADD("board1",ISA16_SLOT, 0, "isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("board2",ISA16_SLOT, 0, "isabus", pc_isa16_cards, "comat", true)
+	MCFG_DEVICE_ADD("board3",ISA16_SLOT, 0, "isabus", pc_isa16_cards, "ide", true)
+	MCFG_DEVICE_ADD("board4",ISA16_SLOT, 0, "isabus", pc_isa16_cards, "lpt", true)
+	MCFG_DEVICE_ADD("board5",ISA16_SLOT, 0, "isabus", pc_isa16_cards, "vga", true)
 	// ISA cards
-	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
 
 	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(DEVWRITELINE("wd7600", wd7600_device, kbrst_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(DEVWRITELINE("wd7600", wd7600_device, gatea20_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("wd7600", wd7600_device, irq01_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(DEVWRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
+	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(WRITELINE("wd7600", wd7600_device, kbrst_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(WRITELINE("wd7600", wd7600_device, gatea20_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("wd7600", wd7600_device, irq01_w))
+	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
+	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
 	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(DEVWRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
+	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
+	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
 	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
@@ -679,7 +681,7 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// video hardware
@@ -691,17 +693,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megapc_state::megapcpl)
 	megapc(config);
-	MCFG_CPU_REPLACE("maincpu", I486, 66000000 / 2)
-	MCFG_CPU_PROGRAM_MAP(megapcpl_map)
-	MCFG_CPU_IO_MAP(megapcpl_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
+	MCFG_DEVICE_REPLACE("maincpu", I486, 66000000 / 2)
+	MCFG_DEVICE_PROGRAM_MAP(megapcpl_map)
+	MCFG_DEVICE_IO_MAP(megapcpl_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::megapcpla)
-	MCFG_CPU_ADD("maincpu", I486, 66000000 / 2)  // 486SLC
-	MCFG_CPU_PROGRAM_MAP(at32l_map)
-	MCFG_CPU_IO_MAP(at32_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I486, 66000000 / 2)  // 486SLC
+	MCFG_DEVICE_PROGRAM_MAP(at32l_map)
+	MCFG_DEVICE_IO_MAP(at32_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
@@ -710,16 +712,16 @@ MACHINE_CONFIG_START(at_state::megapcpla)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// on board devices
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdcsmc", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "ide", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board4", pc_isa16_cards, "lpt", true)
+	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", true)
+	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true)
+	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "lpt", true)
 	// ISA cards
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_dm", false)  // closest to the CL-GD5420
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_dm", false)  // closest to the CL-GD5420
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */
@@ -732,10 +734,10 @@ MACHINE_CONFIG_START(at_state::megapcpla)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::ficpio2)
-	MCFG_CPU_ADD("maincpu", I486, 25000000)
-	MCFG_CPU_PROGRAM_MAP(ficpio_map)
-	MCFG_CPU_IO_MAP(ficpio_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I486, 25000000)
+	MCFG_DEVICE_PROGRAM_MAP(ficpio_map)
+	MCFG_DEVICE_IO_MAP(ficpio_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -743,7 +745,7 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 
 	MCFG_DEVICE_REMOVE("mb:rtc")
 	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w)) // this is in :mb
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -751,21 +753,21 @@ MACHINE_CONFIG_START(at_state::ficpio2)
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M")
 
 	// on board devices
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdcsmc", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "lpt", true)
+	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", true)
+	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "lpt", true)
 
 	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("mb:pic8259_slave", pic8259_device, ir6_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir6_w))
 	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, "cdrom", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("mb:pic8259_slave", pic8259_device, ir7_w))
+	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir7_w))
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "vt82c505", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_et4k", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	MCFG_VT82C496_ADD("chipset")
@@ -776,23 +778,24 @@ MACHINE_CONFIG_END
 // Compaq Portable III
 MACHINE_CONFIG_START(at_state::comportiii)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, 48_MHz_XTAL/4 /*12000000*/)
-	MCFG_CPU_PROGRAM_MAP(at16_map)
-	MCFG_CPU_IO_MAP(at16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+	MCFG_DEVICE_ADD("maincpu", I80286, 48_MHz_XTAL/4 /*12000000*/)
+	MCFG_DEVICE_PROGRAM_MAP(at16_map)
+	MCFG_DEVICE_IO_MAP(at16_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(WRITELINE("mb", at_mb_device, shutdown))
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	downcast<at_mb_device *>(device)->at_softlists(config);
 
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdc", true)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdc", true)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "hdc", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board4", pc_isa16_cards, "cga_cportiii", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", true)
+	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "hdc", true)
+	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "cga_cportiii", true)
+	MCFG_DEVICE_ADD("isa1",   ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa2",   ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
@@ -804,8 +807,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(at_state::comportii)
 	ibm5170(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(48_MHz_XTAL/6)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(48_MHz_XTAL/6)
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_360K)
 	MCFG_DEVICE_MODIFY("isa4")

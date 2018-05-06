@@ -203,9 +203,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pda600_state::pda600)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z180, XTAL(14'318'181))
-	MCFG_CPU_PROGRAM_MAP(pda600_mem)
-	MCFG_CPU_IO_MAP(pda600_io)
+	MCFG_DEVICE_ADD("maincpu",Z180, XTAL(14'318'181))
+	MCFG_DEVICE_PROGRAM_MAP(pda600_mem)
+	MCFG_DEVICE_IO_MAP(pda600_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

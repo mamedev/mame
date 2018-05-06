@@ -121,8 +121,8 @@ void gokidetor_state::sound_map(address_map &map)
 
 
 MACHINE_CONFIG_START(gokidetor_state::gokidetor)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4) // divider not verified
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4) // divider not verified
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	// IRQ from ???
 	// NMI related to E002 input and TE7750 port 7
 
@@ -131,16 +131,16 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 	MCFG_TE7750_IN_PORT1_CB(IOPORT("IN1"))
 	MCFG_TE7750_IN_PORT2_CB(IOPORT("IN2"))
 	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3"))
-	MCFG_TE7750_OUT_PORT4_CB(WRITE8(gokidetor_state, out4_w))
-	MCFG_TE7750_OUT_PORT5_CB(WRITE8(gokidetor_state, out5_w))
-	MCFG_TE7750_OUT_PORT6_CB(WRITE8(gokidetor_state, out6_w))
-	MCFG_TE7750_OUT_PORT7_CB(WRITE8(gokidetor_state, out7_w))
+	MCFG_TE7750_OUT_PORT4_CB(WRITE8(*this, gokidetor_state, out4_w))
+	MCFG_TE7750_OUT_PORT5_CB(WRITE8(*this, gokidetor_state, out5_w))
+	MCFG_TE7750_OUT_PORT6_CB(WRITE8(*this, gokidetor_state, out6_w))
+	MCFG_TE7750_OUT_PORT7_CB(WRITE8(*this, gokidetor_state, out7_w))
 	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN8"))
-	MCFG_TE7750_OUT_PORT8_CB(WRITE8(gokidetor_state, out8_w))
-	MCFG_TE7750_OUT_PORT9_CB(WRITE8(gokidetor_state, out9_w))
+	MCFG_TE7750_OUT_PORT8_CB(WRITE8(*this, gokidetor_state, out8_w))
+	MCFG_TE7750_OUT_PORT9_CB(WRITE8(*this, gokidetor_state, out9_w))
 
-	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
 	MCFG_PC060HA_MASTER_CPU("maincpu")
@@ -148,9 +148,9 @@ MACHINE_CONFIG_START(gokidetor_state::gokidetor)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gokidetor_state, ym_porta_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, gokidetor_state, ym_porta_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)

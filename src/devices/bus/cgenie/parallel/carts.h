@@ -12,6 +12,6 @@
 #pragma once
 
 
-SLOT_INTERFACE_EXTERN( cg_parallel_slot_carts );
+void cg_parallel_slot_carts(device_slot_interface &device);
 
 #endif // MAME_BUS_CGENIE_PARALLEL_CARTS_H

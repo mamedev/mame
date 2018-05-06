@@ -9,8 +9,6 @@ Driver by Nicola Salmoria and Ernesto Corvi
 TODO:
 - Who generates IRQ and NMI? How many should there be per frame?
 
-- Sound chip is a UM3567. Is this compatible to something already in MAME? yes, YM2413
-
 - Coin 2 doesn't work? DIP switch setting?
 
 - Protection:
@@ -271,19 +269,19 @@ static INPUT_PORTS_START( grndtour )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// in Level test mode the following select the start level, do they have any effect during normal gameplay?
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "Level Test +1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "Level Test +2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "Level Test +4" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "Level Test +8" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Level Test +16" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc0, 0xc0, "Test Mode" )
@@ -344,16 +342,16 @@ GFXDECODE_END
 MACHINE_CONFIG_START(iqblock_state::iqblock)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2) /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", iqblock_state, irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(iqblock_state, port_C_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, iqblock_state, port_C_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,7 +369,7 @@ MACHINE_CONFIG_START(iqblock_state::iqblock)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -384,45 +382,23 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /*
-IQ Block
-IGS, 1996
+IQ-Block
+IGS 1993
 
-PCB Layout
-----------
+PCB 0036-5
+                              SW1     SW2
 
-IGS PCB N0- 0131-4
-|---------------------------------------|
-|uPD1242H     VOL    U3567   3.579545MHz|
-|                               AR17961 |
-|   HD64180RP8                          |
-|  16MHz                         BATTERY|
-|                                       |
-|                         SPEECH.U17    |
-|                                       |
-|J                        6264          |
-|A                                      |
-|M      8255              V.U18         |
-|M                                      |
-|A                                      |
-|                                       |
-|                                       |
-|                      |-------|        |
-|                      |       |        |
-|       CG.U7          |IGS017 |        |
-|                      |       |        |
-|       TEXT.U8        |-------|   PAL  |
-|            22MHz               61256  |
-|                   DSW1  DSW2  DSW3    |
-|---------------------------------------|
-Notes:
-      HD64180RP8 - Hitachi HD64180 CPU. Clocks 16MHz (pins 2 & 3), 8MHz (pin 64)
-      61256   - 32k x8 SRAM (DIP28)
-      6264    - 8k x8 SRAM (DIP28)
-      IGS017  - Custom IGS IC (QFP208)
-      AR17961 - == Oki M6295 (QFP44). Clock 1.000MHz [16/16]. pin 7 = high
-      U3567   - == YM2413. Clock 3.579545MHz
-      VSync   - 60Hz
-      HSync   - 15.31kHz
+  12MHz         W2466             8255
+
+          IGS002   U24.5
+                   U25.4   AMT001  6116-45
+                                   6116-45
+  Z80              U26.3
+                   U27.2
+  U7.V5            U28.1
+  U8.6
+  W2466
+                              UMC UM3567
 */
 
 ROM_START( iqblock )
@@ -538,5 +514,5 @@ DRIVER_INIT_MEMBER(iqblock_state,grndtour)
 
 
 
-GAME( 1993, iqblock,  0, iqblock,  iqblock, iqblock_state, iqblock,  ROT0, "IGS", "IQ-Block", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, grndtour, 0, iqblock,  grndtour,iqblock_state, grndtour, ROT0, "IGS", "Grand Tour", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, iqblock,  0, iqblock,  iqblock, iqblock_state, iqblock,  ROT0, "IGS", "IQ-Block (V100U)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1993, grndtour, 0, iqblock,  grndtour,iqblock_state, grndtour, ROT0, "IGS", "Grand Tour (V100U)", MACHINE_SUPPORTS_SAVE )

@@ -1265,7 +1265,7 @@ static const z80_daisy_config tenpin_daisy_chain[] =
 MACHINE_CONFIG_START(astrocde_state::astrocade_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
+	MCFG_DEVICE_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
 	/* each game has its own map */
 
 	/* video hardware */
@@ -1340,14 +1340,14 @@ MACHINE_CONFIG_START(astrocde_state::seawolf2)
 	astrocade_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(seawolf2_map)
-	MCFG_CPU_IO_MAP(port_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(seawolf2_map)
+	MCFG_DEVICE_IO_MAP(port_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(10) /* 5*2 channels */
 	MCFG_SAMPLES_NAMES(seawolf_sample_names)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
@@ -1368,9 +1368,9 @@ MACHINE_CONFIG_START(astrocde_state::ebases)
 	astrocade_mono_sound(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ebases_map)
-	MCFG_CPU_IO_MAP(port_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ebases_map)
+	MCFG_DEVICE_IO_MAP(port_map)
 MACHINE_CONFIG_END
 
 
@@ -1379,9 +1379,9 @@ MACHINE_CONFIG_START(astrocde_state::spacezap)
 	astrocade_mono_sound(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spacezap_map)
-	MCFG_CPU_IO_MAP(port_map_mono_pattern)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spacezap_map)
+	MCFG_DEVICE_IO_MAP(port_map_mono_pattern)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(astrocde_state::wow)
@@ -1389,9 +1389,9 @@ MACHINE_CONFIG_START(astrocde_state::wow)
 	astrocade_stereo_sound(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wow_map)
-	MCFG_CPU_IO_MAP(port_map_stereo_pattern)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wow_map)
+	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1401,7 +1401,7 @@ MACHINE_CONFIG_START(astrocde_state::wow)
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
 
-	MCFG_SOUND_ADD("votrax", VOTRAX_SC01, 720000)
+	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
 MACHINE_CONFIG_END
 
@@ -1410,9 +1410,9 @@ MACHINE_CONFIG_START(astrocde_state::gorf)
 	astrocade_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(wow_map)
-	MCFG_CPU_IO_MAP(port_map_stereo_pattern)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(wow_map)
+	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1428,7 +1428,7 @@ MACHINE_CONFIG_START(astrocde_state::gorf)
 	MCFG_ASTROCADE_ADD("astrocade2", ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
-	MCFG_SOUND_ADD("votrax", VOTRAX_SC01, 720000)
+	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
 MACHINE_CONFIG_END
 
@@ -1438,9 +1438,9 @@ MACHINE_CONFIG_START(astrocde_state::robby)
 	astrocade_stereo_sound(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(robby_map)
-	MCFG_CPU_IO_MAP(port_map_stereo_pattern)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(robby_map)
+	MCFG_DEVICE_IO_MAP(port_map_stereo_pattern)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
@@ -1451,9 +1451,9 @@ MACHINE_CONFIG_START(astrocde_state::profpac)
 	astrocade_stereo_sound(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(profpac_map)
-	MCFG_CPU_IO_MAP(port_map_16col_pattern)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
+	MCFG_DEVICE_IO_MAP(port_map_16col_pattern)
 
 	MCFG_DEVICE_MODIFY("bank4000")
 	MCFG_DEVICE_PROGRAM_MAP(profpac_bank4000_map)
@@ -1465,9 +1465,9 @@ MACHINE_CONFIG_START(astrocde_state::demndrgn)
 	astrocade_16color_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(demndrgn_map)
-	MCFG_CPU_IO_MAP(port_map_16col_pattern_nosound)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(demndrgn_map)
+	MCFG_DEVICE_IO_MAP(port_map_16col_pattern_nosound)
 MACHINE_CONFIG_END
 
 
@@ -1475,14 +1475,14 @@ MACHINE_CONFIG_START(astrocde_state::tenpindx)
 	astrocade_16color_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(profpac_map)
-	MCFG_CPU_IO_MAP(port_map_16col_pattern_tenpindx)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(profpac_map)
+	MCFG_DEVICE_IO_MAP(port_map_16col_pattern_tenpindx)
 
-	MCFG_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
+	MCFG_DEVICE_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
 	MCFG_Z80_DAISY_CHAIN(tenpin_daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(tenpin_sub_map)
-	MCFG_CPU_IO_MAP(tenpin_sub_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(tenpin_sub_map)
+	MCFG_DEVICE_IO_MAP(tenpin_sub_io_map)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, ASTROCADE_CLOCK/4 /* same as "sub" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("sub", INPUT_LINE_IRQ0))
@@ -1493,7 +1493,7 @@ MACHINE_CONFIG_START(astrocde_state::tenpindx)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)  /* real clock unknown */
+	MCFG_DEVICE_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)  /* real clock unknown */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DIPSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END

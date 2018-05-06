@@ -190,11 +190,12 @@ WRITE8_MEMBER( ecbbus_device::io_w )
 // slot devices
 #include "grip.h"
 
-SLOT_INTERFACE_START( ecbbus_cards )
-	SLOT_INTERFACE("grip21", ECB_GRIP21)
-/*  SLOT_INTERFACE("grip25", ECB_GRIP25)
-    SLOT_INTERFACE("grip26", ECB_GRIP26)
-    SLOT_INTERFACE("grip31", ECB_GRIP31)
-    SLOT_INTERFACE("grip562", ECB_GRIP562)
-    SLOT_INTERFACE("grips115", ECB_GRIPS115)*/
-SLOT_INTERFACE_END
+void ecbbus_cards(device_slot_interface &device)
+{
+	device.option_add("grip21", ECB_GRIP21);
+/*  device.option_add("grip25", ECB_GRIP25);
+    device.option_add("grip26", ECB_GRIP26);
+    device.option_add("grip31", ECB_GRIP31);
+    device.option_add("grip562", ECB_GRIP562);
+    device.option_add("grips115", ECB_GRIPS115);*/
+}

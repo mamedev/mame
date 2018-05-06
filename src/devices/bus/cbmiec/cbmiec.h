@@ -204,7 +204,6 @@ DECLARE_DEVICE_TYPE(CBM_IEC,      cbm_iec_device)
 DECLARE_DEVICE_TYPE(CBM_IEC_SLOT, cbm_iec_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( cbm_iec_devices );
-
+void cbm_iec_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_CBMIEC_CBMIEC_H

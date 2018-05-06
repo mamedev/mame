@@ -335,7 +335,7 @@ protected:
 /*----------- defined in machine/amstrad.c -----------*/
 
 
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
-SLOT_INTERFACE_EXTERN(cpcplus_exp_cards);
+void cpc_exp_cards(device_slot_interface &device);
+void cpcplus_exp_cards(device_slot_interface &device);
 
 #endif // MAME_INCLUDES_AMSTRAD_H

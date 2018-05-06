@@ -1240,33 +1240,34 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT( 0xff, 0x00,    IPT_UNUSED)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START( pcw_floppies )
-	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
-SLOT_INTERFACE_END
+static void pcw_floppies(device_slot_interface &device)
+{
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
 
 /* PCW8256, PCW8512, PCW9256 */
 MACHINE_CONFIG_START(pcw_state::pcw)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
-	MCFG_CPU_PROGRAM_MAP(pcw_map)
-	MCFG_CPU_IO_MAP(pcw_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)       /* clock supplied to chip, but in reality it is 3.4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pcw_map)
+	MCFG_DEVICE_IO_MAP(pcw_io)
 
-	MCFG_CPU_ADD("printer_mcu", I8041, 11000000)  // 11MHz
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(pcw_state, mcu_printer_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcw_state, mcu_printer_p2_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcw_state, mcu_printer_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pcw_state, mcu_printer_p1_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcw_state, mcu_printer_t1_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pcw_state, mcu_printer_t0_r))
+	MCFG_DEVICE_ADD("printer_mcu", I8041, 11000000)  // 11MHz
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, pcw_state, mcu_printer_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcw_state, mcu_printer_p2_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcw_state, mcu_printer_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, pcw_state, mcu_printer_p1_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcw_state, mcu_printer_t1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, pcw_state, mcu_printer_t0_r))
 
-	MCFG_CPU_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcw_state, mcu_kb_scan_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pcw_state, mcu_kb_scan_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(pcw_state, mcu_kb_scan_high_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcw_state, mcu_kb_scan_high_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcw_state, mcu_kb_t1_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(pcw_state, mcu_kb_t0_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pcw_state, mcu_kb_data_r))
+	MCFG_DEVICE_ADD("keyboard_mcu", I8048, 5000000) // 5MHz
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, pcw_state, mcu_kb_scan_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, pcw_state, mcu_kb_scan_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, pcw_state, mcu_kb_scan_high_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, pcw_state, mcu_kb_scan_high_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, pcw_state, mcu_kb_t1_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, pcw_state, mcu_kb_t0_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, pcw_state, mcu_kb_data_r))
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(50))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1286,11 +1287,11 @@ MACHINE_CONFIG_START(pcw_state::pcw)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3750)
+	MCFG_DEVICE_ADD("beeper", BEEP, 3750)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(pcw_state, pcw_fdc_interrupt))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, pcw_state, pcw_fdc_interrupt))
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", floppy_image_device::default_floppy_formats)
@@ -1336,8 +1337,8 @@ MACHINE_CONFIG_END
 /* PCW9512, PCW9512+, PCW10 */
 MACHINE_CONFIG_START(pcw_state::pcw9512)
 	pcw(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP(pcw9512_io)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_IO_MAP(pcw9512_io)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

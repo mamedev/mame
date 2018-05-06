@@ -56,17 +56,17 @@ const tiny_rom_entry *compis_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(compis_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8748_TAG, I8748, 2016000) // XTAL(4'032'000)/2 ???
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(compis_keyboard_device, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(compis_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(compis_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(compis_keyboard_device, p2_r))
+	MCFG_DEVICE_ADD(I8748_TAG, I8748, 2016000) // XTAL(4'032'000)/2 ???
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, compis_keyboard_device, bus_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, compis_keyboard_device, bus_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, compis_keyboard_device, p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, compis_keyboard_device, p2_r))
 	MCFG_MCS48_PORT_T0_IN_CB(NOOP) // ???
 	MCFG_MCS48_PORT_T1_IN_CB(NOOP) // ???
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -22,9 +22,10 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-ADDRESS_MAP_START(at28c16_device::at28c16_map8)
-	AM_RANGE(0x0000, 0x081f) AM_RAM
-ADDRESS_MAP_END
+void at28c16_device::at28c16_map8(address_map &map)
+{
+	map(0x0000, 0x081f).ram();
+}
 
 
 

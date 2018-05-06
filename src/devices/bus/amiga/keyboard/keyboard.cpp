@@ -104,16 +104,17 @@ device_amiga_keyboard_interface::~device_amiga_keyboard_interface()
 //  SLOT INTERFACE
 //**************************************************************************
 
-SLOT_INTERFACE_START( amiga_keyboard_devices )
-	SLOT_INTERFACE("a500_us", A500_KBD_US)
-	SLOT_INTERFACE("a500_de", A500_KBD_DE)
-	SLOT_INTERFACE("a500_fr", A500_KBD_FR)
-	SLOT_INTERFACE("a500_it", A500_KBD_IT)
-	SLOT_INTERFACE("a500_se", A500_KBD_SE)
-	SLOT_INTERFACE("a500_es", A500_KBD_ES)
-	SLOT_INTERFACE("a500_dk", A500_KBD_DK)
-	SLOT_INTERFACE("a500_ch", A500_KBD_CH)
-	SLOT_INTERFACE("a500_no", A500_KBD_NO)
-	SLOT_INTERFACE("a500_gb", A500_KBD_GB)
-	SLOT_INTERFACE("a1200_us", A1200_KBD)
-SLOT_INTERFACE_END
+void amiga_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("a500_us", A500_KBD_US);
+	device.option_add("a500_de", A500_KBD_DE);
+	device.option_add("a500_fr", A500_KBD_FR);
+	device.option_add("a500_it", A500_KBD_IT);
+	device.option_add("a500_se", A500_KBD_SE);
+	device.option_add("a500_es", A500_KBD_ES);
+	device.option_add("a500_dk", A500_KBD_DK);
+	device.option_add("a500_ch", A500_KBD_CH);
+	device.option_add("a500_no", A500_KBD_NO);
+	device.option_add("a500_gb", A500_KBD_GB);
+	device.option_add("a1200_us", A1200_KBD);
+}

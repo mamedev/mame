@@ -250,13 +250,13 @@ void amspdwy_state::machine_reset()
 MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_map)
-	MCFG_CPU_IO_MAP(amspdwy_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
+	MCFG_DEVICE_ADD("maincpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_map)
+	MCFG_DEVICE_IO_MAP(amspdwy_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)
-	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(amspdwy_sound_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

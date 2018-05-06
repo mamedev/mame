@@ -2078,44 +2078,45 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 }
 
 
-static SLOT_INTERFACE_START( mz2500_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_35_DD)
-SLOT_INTERFACE_END
+static void mz2500_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_35_DD);
+}
 
 
 MACHINE_CONFIG_START(mz2500_state::mz2500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(mz2500_map)
-	MCFG_CPU_IO_MAP(mz2500_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000)
+	MCFG_DEVICE_PROGRAM_MAP(mz2500_map)
+	MCFG_DEVICE_IO_MAP(mz2500_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mz2500_state,  mz2500_vbl)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(mz2500_state,mz2500_irq_ack)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(mz2500_state, mz2500_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz2500_state, mz2500_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mz2500_state, mz2500_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(mz2500_state, mz2500_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(mz2500_state, mz2500_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz2500_state, mz2500_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(*this, mz2500_state, mz2500_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz2500_state, mz2500_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz2500_state, mz2500_portb_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mz2500_state, mz2500_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz2500_state, mz2500_portc_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz2500_state, mz2500_portc_w))
 
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, 6000000)
-	MCFG_Z80PIO_IN_PA_CB(READ8(mz2500_state, mz2500_pio1_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz2500_state, mz2500_pio1_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mz2500_state, mz2500_pio1_porta_r))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz2500_state, mz2500_pio1_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mz2500_state, mz2500_pio1_porta_r))
 
 	MCFG_DEVICE_ADD("z80sio", Z80SIO, 6000000)
 
 	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
-	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))
+	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(*this, mz2500_state, mz2500_rtc_alarm_irq))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(31250)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz2500_state, pit8253_clk0_irq))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz2500_state, pit8253_clk0_irq))
 	// TODO: is this really right?
 	MCFG_PIT8253_CLK1(0)
 	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk1))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit", pit8253_device, write_clk1))
 
 	MCFG_MB8877_ADD("mb8877a", XTAL(1'000'000))
 
@@ -2140,16 +2141,16 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym", YM2203, 2000000) //unknown clock / divider
-	MCFG_AY8910_PORT_A_READ_CB(READ8(mz2500_state, opn_porta_r))  // read A
+	MCFG_DEVICE_ADD("ym", YM2203, 2000000) //unknown clock / divider
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mz2500_state, opn_porta_r))  // read A
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))   // read B
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(mz2500_state, opn_porta_w))  // write A
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mz2500_state, opn_porta_w))  // write A
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 4096)
+	MCFG_DEVICE_ADD("beeper", BEEP, 4096)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

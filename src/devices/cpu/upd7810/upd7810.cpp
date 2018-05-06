@@ -384,13 +384,15 @@ DEFINE_DEVICE_TYPE(UPD78C05, upd78c05_device, "upd78c05", "NEC uPD78C05")
 DEFINE_DEVICE_TYPE(UPD78C06, upd78c06_device, "upd78c06", "NEC uPD78C06")
 
 
-ADDRESS_MAP_START(upd7810_device::upd_internal_128_ram_map)
-	AM_RANGE(0xff80, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void upd7810_device::upd_internal_128_ram_map(address_map &map)
+{
+	map(0xff80, 0xffff).ram();
+}
 
-ADDRESS_MAP_START(upd7810_device::upd_internal_256_ram_map)
-	AM_RANGE(0xff00, 0xffff) AM_RAM
-ADDRESS_MAP_END
+void upd7810_device::upd_internal_256_ram_map(address_map &map)
+{
+	map(0xff00, 0xffff).ram();
+}
 
 upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)

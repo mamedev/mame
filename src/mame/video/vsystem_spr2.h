@@ -15,7 +15,7 @@ typedef device_delegate<uint32_t (uint32_t)> vsystem_tile2_indirection_delegate;
 #define MCFG_VSYSTEM_SPR2_SET_OFFSETS(_xoffs, _yoffs) \
 	downcast<vsystem_spr2_device &>(*device).set_offsets(_xoffs,_yoffs);
 #define MCFG_VSYSTEM_SPR2_GFXDECODE(_gfxtag) \
-	downcast<vsystem_spr2_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<vsystem_spr2_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 class vsystem_spr2_device : public device_t
 {

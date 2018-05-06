@@ -366,9 +366,9 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 MACHINE_CONFIG_START(vg5k_state::vg5k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(vg5k_mem)
-	MCFG_CPU_IO_MAP(vg5k_io)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vg5k_mem)
+	MCFG_DEVICE_IO_MAP(vg5k_io)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vg5k_scanline", vg5k_state, vg5k_scanline, "screen", 0, 10)
 
@@ -390,9 +390,9 @@ MACHINE_CONFIG_START(vg5k_state::vg5k)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cassette */
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")

@@ -73,7 +73,7 @@ static INPUT_PORTS_START( blocktax )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(blocktax_state::blocktax)
-	MCFG_CPU_ADD("maincpu", I80C51, 30_MHz_XTAL/2) /* P89C51RD2HBA (80C51 with internal flash rom) */
+	MCFG_DEVICE_ADD("maincpu", I80C51, 30_MHz_XTAL/2) /* P89C51RD2HBA (80C51 with internal flash rom) */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -298,20 +298,20 @@ WRITE_LINE_MEMBER(hyperspt_state::vblank_irq)
 MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/12)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hyperspt_map)
+	MCFG_DEVICE_ADD("maincpu", KONAMI1, XTAL(18'432'000)/12)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hyperspt_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hyperspt_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hyperspt_sound_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // F2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(hyperspt_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w)) // SOUND ON
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, hyperspt_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w)) // SOUND ON
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // END
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(hyperspt_state, coin_counter_1_w)) // COIN 1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hyperspt_state, coin_counter_2_w)) // COIN 2
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, hyperspt_state, coin_counter_1_w)) // COIN 1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, hyperspt_state, coin_counter_2_w)) // COIN 2
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // SA
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(hyperspt_state, irq_mask_w)) // INT
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, hyperspt_state, irq_mask_w)) // INT
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -325,7 +325,7 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hyperspt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hyperspt_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hyperspt_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperspt)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
@@ -337,16 +337,16 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76496, XTAL(14'318'181)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("snsnd", SN76496, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
+	MCFG_DEVICE_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -378,18 +378,18 @@ MACHINE_CONFIG_START(hyperspt_state::hypersptb)
 	hyperspt(config);
 	MCFG_DEVICE_REMOVE("vlm")
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(soundb_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(soundb_map)
 
-	MCFG_CPU_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
-	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
+	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
@@ -398,13 +398,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(hyperspt_state::roadf)
 	hyperspt(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(roadf_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(roadf_map)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", roadf)
 	MCFG_VIDEO_START_OVERRIDE(hyperspt_state,roadf)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(roadf_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(roadf_sound_map)
 	MCFG_DEVICE_REMOVE("vlm")
 MACHINE_CONFIG_END
 

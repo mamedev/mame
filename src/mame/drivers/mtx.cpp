@@ -64,19 +64,19 @@ void mtx_state::mtx_io(address_map &map)
 	map(0x04, 0x04).r(this, FUNC(mtx_state::mtx_prt_r)).w("cent_data_out", FUNC(output_latch_device::write));
 	map(0x05, 0x05).rw(this, FUNC(mtx_state::mtx_key_lo_r), FUNC(mtx_state::mtx_sense_w));
 	map(0x06, 0x06).rw(this, FUNC(mtx_state::mtx_key_hi_r), FUNC(mtx_state::mtx_sound_latch_w));
-//  AM_RANGE(0x07, 0x07) PIO
+//  map(0x07, 0x07) PIO
 	map(0x08, 0x0b).rw(m_z80ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1f, 0x1f).w(this, FUNC(mtx_state::mtx_cst_motor_w));
 	map(0x30, 0x31).w(this, FUNC(mtx_state::hrx_address_w));
 	map(0x32, 0x32).rw(this, FUNC(mtx_state::hrx_data_r), FUNC(mtx_state::hrx_data_w));
 	map(0x33, 0x33).rw(this, FUNC(mtx_state::hrx_attr_r), FUNC(mtx_state::hrx_attr_w));
-//  AM_RANGE(0x38, 0x38) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
-//  AM_RANGE(0x39, 0x39) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_r, register_w)
-/*  AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY(FD1791_TAG, wd17xx_r, wd17xx_w)
-    AM_RANGE(0x44, 0x44) AM_READWRITE(fdx_status_r, fdx_control_w)
-    AM_RANGE(0x45, 0x45) AM_WRITE(fdx_drv_sel_w)
-    AM_RANGE(0x46, 0x46) AM_WRITE(fdx_dma_lo_w)
-    AM_RANGE(0x47, 0x47) AM_WRITE(fdx_dma_hi_w)*/
+//  map(0x38, 0x38).w(MC6845_TAG, FUNC(mc6845_device::address_w));
+//  map(0x39, 0x39).rw(MC6845_TAG, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+/*  map(0x40, 0x43).rw(FD1791_TAG, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
+    map(0x44, 0x44).rw(this, FUNC(mtx_state::fdx_status_r), FUNC(mtx_state::fdx_control_w));
+    map(0x45, 0x45).w(this, FUNC(mtx_state::fdx_drv_sel_w));
+    map(0x46, 0x46).w(this, FUNC(mtx_state::fdx_dma_lo_w));
+    map(0x47, 0x47).w(this, FUNC(mtx_state::fdx_dma_hi_w);*/
 }
 
 /*-------------------------------------------------
@@ -286,9 +286,9 @@ WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
 MACHINE_CONFIG_START(mtx_state::mtx512)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mtx_mem)
-	MCFG_CPU_IO_MAP(mtx_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(mtx_mem)
+	MCFG_DEVICE_IO_MAP(mtx_io)
 	MCFG_Z80_DAISY_CHAIN(mtx_daisy_chain)
 
 	MCFG_MACHINE_START_OVERRIDE(mtx_state,mtx512)
@@ -297,28 +297,28 @@ MACHINE_CONFIG_START(mtx_state::mtx512)
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9929a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(mtx_state, mtx_tms9929a_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, mtx_state, mtx_tms9929a_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9929a", tms9929a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SN76489A_TAG, SN76489A, XTAL(4'000'000))
+	MCFG_DEVICE_ADD(SN76489A_TAG, SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(mtx_state, ctc_trg1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(mtx_state, ctc_trg2_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, mtx_state, ctc_trg1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, mtx_state, ctc_trg2_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL(4'000'000)/13))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(mtx_state, write_centronics_busy))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(mtx_state, write_centronics_fault))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(mtx_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(mtx_state, write_centronics_select))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, mtx_state, write_centronics_busy))
+	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, mtx_state, write_centronics_fault))
+	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, mtx_state, write_centronics_perror))
+	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, mtx_state, write_centronics_select))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -371,8 +371,8 @@ MACHINE_CONFIG_START(mtx_state::rs128)
 	mtx512(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_IO_MAP(rs128_io)
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_IO_MAP(rs128_io)
 	MCFG_Z80_DAISY_CHAIN(rs128_daisy_chain)
 
 	/* devices */

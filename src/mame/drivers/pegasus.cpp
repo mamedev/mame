@@ -486,8 +486,8 @@ DRIVER_INIT_MEMBER(pegasus_state, pegasus)
 
 MACHINE_CONFIG_START(pegasus_state::pegasus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
-	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
+	MCFG_DEVICE_PROGRAM_MAP(pegasus_mem)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pegasus_firq", pegasus_state, pegasus_firq, attotime::from_hz(400))
 
@@ -509,13 +509,13 @@ MACHINE_CONFIG_START(pegasus_state::pegasus)
 
 	/* devices */
 	MCFG_DEVICE_ADD("pia_s", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(pegasus_state, pegasus_keyboard_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(pegasus_state, pegasus_cassette_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(pegasus_state, pegasus_keyboard_irq))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(pegasus_state, pegasus_keyboard_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(pegasus_state, pegasus_controls_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(pegasus_state, pegasus_cassette_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(pegasus_state, pegasus_firq_clr))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, pegasus_state, pegasus_keyboard_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, pegasus_state, pegasus_cassette_r))
+	MCFG_PIA_READCB1_HANDLER(READLINE(*this, pegasus_state, pegasus_keyboard_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, pegasus_state, pegasus_keyboard_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, pegasus_state, pegasus_controls_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, pegasus_state, pegasus_cassette_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, pegasus_state, pegasus_firq_clr))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -547,8 +547,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pegasus_state::pegasusm)
 	pegasus(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(pegasusm_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(pegasusm_mem)
 MACHINE_CONFIG_END
 
 

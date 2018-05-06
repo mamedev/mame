@@ -1033,13 +1033,13 @@ MACHINE_CONFIG_START(ngcd_state::neocd)
 	neogeo_base(config);
 	neogeo_stereo(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ngcd_state,neocd_int_callback)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(neocd_main_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ngcd_state,neocd_int_callback)
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(neocd_audio_map)
-	MCFG_CPU_IO_MAP(neocd_audio_io_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(neocd_audio_map)
+	MCFG_DEVICE_IO_MAP(neocd_audio_io_map)
 
 	MCFG_DEVICE_MODIFY("systemlatch")
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(LOGGER("NeoCD: write to regular vector change address?")) // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?

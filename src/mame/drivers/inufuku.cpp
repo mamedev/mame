@@ -336,13 +336,13 @@ void inufuku_state::machine_reset()
 MACHINE_CONFIG_START(inufuku_state::inufuku)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(inufuku_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", inufuku_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32000000/2) /* 16.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(inufuku_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", inufuku_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32000000/4)       /* 8.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(inufuku_sound_map)
-	MCFG_CPU_IO_MAP(inufuku_sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 32000000/4)       /* 8.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(inufuku_sound_map)
+	MCFG_DEVICE_IO_MAP(inufuku_sound_io_map)
 								/* IRQs are triggered by the YM2610 */
 
 
@@ -355,7 +355,7 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 	MCFG_SCREEN_SIZE(2048, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 	MCFG_SCREEN_UPDATE_DRIVER(inufuku_state, screen_update_inufuku)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(inufuku_state, screen_vblank_inufuku))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, inufuku_state, screen_vblank_inufuku))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr", VSYSTEM_SPR, 0)
@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(inufuku_state::inufuku)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 32000000/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 32000000/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)

@@ -83,19 +83,21 @@ DEFINE_DEVICE_TYPE(TMS32016, tms32016_device, "tms32016", "Texas Instruments TMS
  *  TMS32010 Internal Memory Map
  ****************************************************************************/
 
-ADDRESS_MAP_START(tms32010_device::tms32010_ram)
-	AM_RANGE(0x00, 0x7f) AM_RAM     /* Page 0 */
-	AM_RANGE(0x80, 0x8f) AM_RAM     /* Page 1 */
-ADDRESS_MAP_END
+void tms32010_device::tms32010_ram(address_map &map)
+{
+	map(0x00, 0x7f).ram();     /* Page 0 */
+	map(0x80, 0x8f).ram();     /* Page 1 */
+}
 
 /****************************************************************************
  *  TMS32015/6 Internal Memory Map
  ****************************************************************************/
 
-ADDRESS_MAP_START(tms32010_device::tms32015_ram)
-	AM_RANGE(0x00, 0x7f) AM_RAM     /* Page 0 */
-	AM_RANGE(0x80, 0xff) AM_RAM     /* Page 1 */
-ADDRESS_MAP_END
+void tms32010_device::tms32015_ram(address_map &map)
+{
+	map(0x00, 0x7f).ram();     /* Page 0 */
+	map(0x80, 0xff).ram();     /* Page 1 */
+}
 
 
 tms32010_device::tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -838,18 +838,19 @@ FLOPPY_FORMATS_MEMBER( camplynx_state::camplynx_floppy_formats )
 	FLOPPY_CAMPLYNX_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( camplynx_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void camplynx_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 MACHINE_CONFIG_START(camplynx_state::lynx_common)
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.02)
 MACHINE_CONFIG_END
@@ -865,9 +866,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(camplynx_state::lynx48k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
-	MCFG_CPU_PROGRAM_MAP(lynx48k_mem)
-	MCFG_CPU_IO_MAP(lynx48k_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
+	MCFG_DEVICE_PROGRAM_MAP(lynx48k_mem)
+	MCFG_DEVICE_IO_MAP(lynx48k_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx48k)
 
@@ -897,8 +898,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(camplynx_state::lynx96k)
 	lynx48k(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(lynx96k_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(lynx96k_io)
 
 	lynx_disk(config);
 
@@ -910,9 +911,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(camplynx_state::lynx128k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 24_MHz_XTAL / 4)
-	MCFG_CPU_PROGRAM_MAP(lynx128k_mem)
-	MCFG_CPU_IO_MAP(lynx128k_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 24_MHz_XTAL / 4)
+	MCFG_DEVICE_PROGRAM_MAP(lynx128k_mem)
+	MCFG_DEVICE_IO_MAP(lynx128k_io)
 
 	MCFG_MACHINE_RESET_OVERRIDE(camplynx_state, lynx128k)
 

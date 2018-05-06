@@ -493,12 +493,12 @@ void exprraid_state::machine_reset()
 MACHINE_CONFIG_START(exprraid_state::exprraid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO16, XTAL(12'000'000) / 8)
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_CPU_IO_MAP(master_io_map)
+	MCFG_DEVICE_ADD("maincpu", DECO16, XTAL(12'000'000) / 8)
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_IO_MAP(master_io_map)
 
-	MCFG_CPU_ADD("slave", MC6809, XTAL(12'000'000) / 2) // MC68B09P
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_ADD("slave", MC6809, XTAL(12'000'000) / 2) // MC68B09P
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 	/* IRQs are caused by the YM3526 */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
@@ -522,19 +522,19 @@ MACHINE_CONFIG_START(exprraid_state::exprraid)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("slave", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000) / 4)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(exprraid_state, irqhandler))
+	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(12'000'000) / 4)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, exprraid_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(exprraid_state::exprboot)
 	exprraid(config);
 
-	MCFG_CPU_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_DEVICE_REPLACE("maincpu", M6502, 1500000)        /* 1.5 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(master_map)
 MACHINE_CONFIG_END
 
 

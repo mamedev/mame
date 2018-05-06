@@ -202,8 +202,8 @@ void fastlane_state::machine_start()
 MACHINE_CONFIG_START(fastlane_state::fastlane)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL(24'000'000)/2) // 3MHz(XTAL(24'000'000)/8) internally
-	MCFG_CPU_PROGRAM_MAP(fastlane_map)
+	MCFG_DEVICE_ADD("maincpu", HD6309, XTAL(24'000'000)/2) // 3MHz(XTAL(24'000'000)/8) internally
+	MCFG_DEVICE_PROGRAM_MAP(fastlane_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastlane_state, fastlane_scanline, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -230,13 +230,13 @@ MACHINE_CONFIG_START(fastlane_state::fastlane)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("k007232_1", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(fastlane_state, volume_callback0))
+	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, fastlane_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(fastlane_state, volume_callback1))
+	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545))
+	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, fastlane_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 MACHINE_CONFIG_END

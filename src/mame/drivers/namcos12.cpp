@@ -1722,19 +1722,19 @@ DRIVER_INIT_MEMBER(namcos12_state,golgo13)
 MACHINE_CONFIG_START(namcos12_state::namcos12_mobo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
-	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
-	MCFG_CPU_IO_MAP(s12h8iomap)
+	MCFG_DEVICE_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
+	MCFG_DEVICE_PROGRAM_MAP(s12h8rwmap)
+	MCFG_DEVICE_IO_MAP(s12h8iomap)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
 	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
-	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("sub:sci1", h8_sci_device, rx_w))
+	MCFG_RTC4543_DATA_CALLBACK(WRITELINE("sub:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("sub:sci1")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":namco_settings", namco_settings_device, data_w))
-	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(":namco_settings", namco_settings_device, clk_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("namco_settings", namco_settings_device, data_w))
+	MCFG_H8_SCI_CLK_CALLBACK(WRITELINE("rtc", rtc4543_device, clk_w)) MCFG_DEVCB_INVERT
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("namco_settings", namco_settings_device, clk_w))
 
 	MCFG_AT28C16_ADD("at28c16", nullptr)
 
@@ -1752,8 +1752,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos12_state::coh700)
 	namcos12_mobo(config);
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL(100'000'000))
-	MCFG_CPU_PROGRAM_MAP( namcos12_map)
+	MCFG_DEVICE_ADD("maincpu", CXD8661R, XTAL(100'000'000))
+	MCFG_DEVICE_PROGRAM_MAP( namcos12_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -1769,8 +1769,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos12_state::coh716)
 	namcos12_mobo(config);
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CXD8606BQ, XTAL(100'000'000))
-	MCFG_CPU_PROGRAM_MAP( namcos12_map)
+	MCFG_DEVICE_ADD("maincpu", CXD8606BQ, XTAL(100'000'000))
+	MCFG_DEVICE_PROGRAM_MAP( namcos12_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("16M")
@@ -1786,24 +1786,24 @@ MACHINE_CONFIG_START(namcos12_boothack_state::ptblank2)
 	coh700(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( ptblank2_map )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( ptblank2_map )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos12_boothack_state::tektagt)
 	coh700(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP( tektagt_map )
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP( tektagt_map )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos12_boothack_state::golgo13)
 	coh700(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_IO_MAP(golgo13_h8iomap)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_IO_MAP(golgo13_h8iomap)
 MACHINE_CONFIG_END
 
 #define JVSCLOCK    (XTAL(14'745'600))
@@ -1821,17 +1821,17 @@ void namcos12_state::jvsiomap(address_map &map)
 MACHINE_CONFIG_START(namcos12_boothack_state::truckk)
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY(":sub:sci0")
+	MCFG_DEVICE_MODIFY("sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( jvsmap )
-	MCFG_CPU_IO_MAP( jvsiomap )
+	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( jvsmap )
+	MCFG_DEVICE_IO_MAP( jvsiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":sub:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("sub:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
@@ -1895,22 +1895,22 @@ void namcos12_state::plarailjvsiomap(address_map &map)
 MACHINE_CONFIG_START(namcos12_boothack_state::technodr)
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY(":sub:sci0")
+	MCFG_DEVICE_MODIFY("sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
 	// modify H8/3002 map to omit direct-connected controls
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(s12h8rwjvsmap)
-	MCFG_CPU_IO_MAP(s12h8jvsiomap)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(s12h8rwjvsmap)
+	MCFG_DEVICE_IO_MAP(s12h8jvsiomap)
 
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( tdjvsmap )
-	MCFG_CPU_IO_MAP( tdjvsiomap )
+	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( tdjvsmap )
+	MCFG_DEVICE_IO_MAP( tdjvsiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":sub:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("sub:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
@@ -1918,22 +1918,22 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(namcos12_boothack_state::aplarail)
 	coh700(config);
 	// Timer at 115200*16 for the jvs serial clock
-	MCFG_DEVICE_MODIFY(":sub:sci0")
+	MCFG_DEVICE_MODIFY("sub:sci0")
 	MCFG_H8_SCI_SET_EXTERNAL_CLOCK_PERIOD(attotime::from_hz(JVSCLOCK/8))
 
 	// modify H8/3002 map to omit direct-connected controls
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(s12h8rwjvsmap)
-	MCFG_CPU_IO_MAP(s12h8railiomap)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_PROGRAM_MAP(s12h8rwjvsmap)
+	MCFG_DEVICE_IO_MAP(s12h8railiomap)
 
-	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
-	MCFG_CPU_PROGRAM_MAP( plarailjvsmap )
-	MCFG_CPU_IO_MAP( plarailjvsiomap )
+	MCFG_DEVICE_ADD("iocpu", H83334, JVSCLOCK )
+	MCFG_DEVICE_PROGRAM_MAP( plarailjvsmap )
+	MCFG_DEVICE_IO_MAP( plarailjvsiomap )
 
 	MCFG_DEVICE_MODIFY("iocpu:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":sub:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("sub:sci0", h8_sci_device, rx_w))
 	MCFG_DEVICE_MODIFY("sub:sci0")
-	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
+	MCFG_H8_SCI_TX_CALLBACK(WRITELINE("iocpu:sci0", h8_sci_device, rx_w))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END

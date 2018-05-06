@@ -432,14 +432,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(kangaroo_state::nomcu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/8)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
 
 
 	/* video hardware */
@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(kangaroo_state::nomcu)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(kangaroo_state::mcu)
 
 	MCFG_MACHINE_START_OVERRIDE(kangaroo_state,kangaroo_mcu)
 
-	MCFG_CPU_ADD("mcu", MB8841, MASTER_CLOCK/4/2)
+	MCFG_DEVICE_ADD("mcu", MB8841, MASTER_CLOCK/4/2)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 

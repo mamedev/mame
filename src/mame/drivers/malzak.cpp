@@ -302,11 +302,11 @@ void malzak_state::machine_reset()
 MACHINE_CONFIG_START(malzak_state::malzak)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 3800000/4)
-	MCFG_CPU_PROGRAM_MAP(malzak_map)
-	MCFG_CPU_IO_MAP(malzak_io_map)
-	MCFG_CPU_DATA_MAP(malzak_data_map)
-	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
+	MCFG_DEVICE_ADD("maincpu", S2650, 3800000/4)
+	MCFG_DEVICE_PROGRAM_MAP(malzak_map)
+	MCFG_DEVICE_IO_MAP(malzak_io_map)
+	MCFG_DEVICE_DATA_MAP(malzak_data_map)
+	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -329,13 +329,13 @@ MACHINE_CONFIG_START(malzak_state::malzak)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_DEVICE_ADD("saa5050", SAA5050, 6000000)
-	MCFG_SAA5050_D_CALLBACK(READ8(malzak_state, videoram_r))
+	MCFG_SAA5050_D_CALLBACK(READ8(*this, malzak_state, videoram_r))
 	MCFG_SAA5050_SCREEN_SIZE(42, 24, 64)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76477, 0)
+	MCFG_DEVICE_ADD("sn1", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -351,7 +351,7 @@ MACHINE_CONFIG_START(malzak_state::malzak)
 	MCFG_SN76477_ENABLE(1)                              // enable
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn2", SN76477, 0)
+	MCFG_DEVICE_ADD("sn2", SN76477)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
 	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
 	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
@@ -372,8 +372,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(malzak_state::malzak2)
 	malzak(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(malzak2_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(malzak2_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

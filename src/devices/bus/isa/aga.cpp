@@ -284,8 +284,8 @@ MACHINE_CONFIG_START(isa8_aga_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(isa8_aga_device, aga_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_aga_device, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_aga_device, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, isa8_aga_device, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, isa8_aga_device, vsync_changed))
 MACHINE_CONFIG_END
 
 

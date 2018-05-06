@@ -322,14 +322,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(espial_state::espial)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(espial_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(espial_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", espial_state, espial_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000)  /* 2 MHz?????? */
-	MCFG_CPU_PROGRAM_MAP(espial_sound_map)
-	MCFG_CPU_IO_MAP(espial_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(espial_state, espial_sound_nmi_gen, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 3072000)  /* 2 MHz?????? */
+	MCFG_DEVICE_PROGRAM_MAP(espial_sound_map)
+	MCFG_DEVICE_IO_MAP(espial_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(espial_state, espial_sound_nmi_gen, 4*60)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -352,7 +352,7 @@ MACHINE_CONFIG_START(espial_state::espial)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -361,8 +361,8 @@ MACHINE_CONFIG_START(espial_state::netwars)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(netwars_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(netwars_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

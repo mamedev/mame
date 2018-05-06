@@ -79,9 +79,9 @@ void s100_djdma_device::djdma_io(address_map &map)
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(s100_djdma_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(djdma_mem)
-	MCFG_CPU_IO_MAP(djdma_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(djdma_mem)
+	MCFG_DEVICE_IO_MAP(djdma_io)
 MACHINE_CONFIG_END
 
 

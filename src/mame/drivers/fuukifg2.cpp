@@ -448,13 +448,12 @@ void fuuki16_state::machine_reset()
 MACHINE_CONFIG_START(fuuki16_state::fuuki16)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000) / 2) /* 16 MHz */
-	MCFG_CPU_PROGRAM_MAP(fuuki16_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000) / 2) /* 16 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fuuki16_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000) / 2) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(fuuki16_sound_map)
-	MCFG_CPU_IO_MAP(fuuki16_sound_io_map)
-
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000) / 2) /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(fuuki16_sound_map)
+	MCFG_DEVICE_IO_MAP(fuuki16_sound_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -465,29 +464,26 @@ MACHINE_CONFIG_START(fuuki16_state::fuuki16)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fuuki16)
-	MCFG_PALETTE_ADD("palette", 0x800*4)
+	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("fuukivid", FUUKI_VIDEO, 0)
 	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(28'640'000) / 8) /* 3.58 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.15)
+	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(28'640'000) / 8) /* 3.58 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL(28'640'000) / 8) /* 3.58 MHz */
+	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(28'640'000) / 8) /* 3.58 MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000) / 32, PIN7_HIGH) /* 1 Mhz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
 

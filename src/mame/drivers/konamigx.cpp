@@ -1612,20 +1612,20 @@ WRITE_LINE_MEMBER(konamigx_state::hblank_irq_ack_w)
 
 MACHINE_CONFIG_START(konamigx_state::konamigx)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(gx_type2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamigx_state, konamigx_type2_vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(gx_type2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konamigx_state, konamigx_type2_vblank_irq)
 
-	MCFG_CPU_ADD("soundcpu", M68000, SUB_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(gxsndmap)
+	MCFG_DEVICE_ADD("soundcpu", M68000, SUB_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(gxsndmap)
 
-	MCFG_CPU_ADD("dasp", TMS57002, MASTER_CLOCK/2)
-	MCFG_CPU_DATA_MAP(gxtmsmap)
+	MCFG_DEVICE_ADD("dasp", TMS57002, MASTER_CLOCK/2)
+	MCFG_DEVICE_DATA_MAP(gxtmsmap)
 
 	MCFG_DEVICE_ADD("k053252", K053252, MASTER_CLOCK/4)
 	MCFG_K053252_OFFSETS(24, 16)
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(konamigx_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(konamigx_state, hblank_irq_ack_w))
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, konamigx_state, vblank_irq_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, konamigx_state, hblank_irq_ack_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -1685,16 +1685,16 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ROM("k054539")
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(konamigx_state, k054539_irq_gen))
-	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.5, 0)
-	MCFG_SOUND_ROUTE_EX(1, "dasp", 0.5, 1)
+	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, konamigx_state, k054539_irq_gen))
+	MCFG_SOUND_ROUTE(0, "dasp", 0.5, 0)
+	MCFG_SOUND_ROUTE(1, "dasp", 0.5, 1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ROM("k054539")
-	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.5, 2)
-	MCFG_SOUND_ROUTE_EX(1, "dasp", 0.5, 3)
+	MCFG_SOUND_ROUTE(0, "dasp", 0.5, 2)
+	MCFG_SOUND_ROUTE(1, "dasp", 0.5, 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1788,8 +1788,8 @@ MACHINE_CONFIG_START(konamigx_state::opengolf)
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX6, -53, -23)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gx_type1_map)
 
 	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
 	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
@@ -1813,8 +1813,8 @@ MACHINE_CONFIG_START(konamigx_state::racinfrc)
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -53, -23)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gx_type1_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gx_type1_map)
 
 	MCFG_DEVICE_ADD("adc0834", ADC0834, 0)
 	MCFG_ADC083X_INPUT_CB(konamigx_state, adc0834_callback)
@@ -1824,7 +1824,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype3)
 	konamigx(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gx_type3_map)
+	MCFG_DEVICE_PROGRAM_MAP(gx_type3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type4_scanline, "screen", 0, 1)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -1865,7 +1865,7 @@ MACHINE_CONFIG_START(konamigx_state::gxtype4)
 	konamigx(config);
 
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gx_type4_map)
+	MCFG_DEVICE_PROGRAM_MAP(gx_type4_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konamigx_state, konamigx_type4_scanline, "screen", 0, 1)
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)

@@ -420,18 +420,18 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL(8'000'000) / 4)       // KR580VM80A
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD(I8080_TAG, I8080, XTAL(8'000'000) / 4)       // KR580VM80A
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_ADD("ppi0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(istrebiteli_state, sound_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, istrebiteli_state, sound_w))
 
 	MCFG_DEVICE_ADD("ppi1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(istrebiteli_state, spr0_ctrl_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(istrebiteli_state, spr1_ctrl_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, istrebiteli_state, spr0_ctrl_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, istrebiteli_state, spr1_ctrl_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
+	MCFG_DEVICE_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

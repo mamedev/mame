@@ -70,6 +70,6 @@ DECLARE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device)
 	downcast<tc0180vcu_device &>(*device).set_tx_colorbase(_color);
 
 #define MCFG_TC0180VCU_GFXDECODE(_gfxtag) \
-	downcast<tc0180vcu_device &>(*device).set_gfxdecode_tag("^" _gfxtag);
+	downcast<tc0180vcu_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_TC0180VCU_H

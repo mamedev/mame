@@ -250,9 +250,9 @@ uint32_t murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 MACHINE_CONFIG_START(murogem_state::murogem)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 8000000)      /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(murogem_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", murogem_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M6802, 8000000)      /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(murogem_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", murogem_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -273,9 +273,9 @@ MACHINE_CONFIG_START(murogem_state::murogem)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375)
+	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.375)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

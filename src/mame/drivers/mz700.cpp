@@ -375,9 +375,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(mz_state::mz700)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(17'734'470)/5)
-	MCFG_CPU_PROGRAM_MAP(mz700_mem)
-	MCFG_CPU_IO_MAP(mz700_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(17'734'470)/5)
+	MCFG_DEVICE_PROGRAM_MAP(mz700_mem)
+	MCFG_DEVICE_IO_MAP(mz700_io)
 	MCFG_DEVICE_ADD("banke", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mz700_banke)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* ne556 timers */
@@ -410,17 +410,17 @@ MACHINE_CONFIG_START(mz_state::mz700)
 	/* devices */
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(17'734'470)/20)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mz_state, pit_out0_changed))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, mz_state, pit_out0_changed))
 	MCFG_PIT8253_CLK1(15611.0)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pit8253", pit8253_device, write_clk2))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk2))
 	MCFG_PIT8253_CLK2(0)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mz_state, pit_irq_2))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mz_state, pit_irq_2))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(mz_state, pio_port_a_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(mz_state, pio_port_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(mz_state, pio_port_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(mz_state, pio_port_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mz_state, pio_port_a_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(*this, mz_state, pio_port_b_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, mz_state, pio_port_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mz_state, pio_port_c_w))
 
 	MCFG_DEVICE_ADD("ls145", TTL74145, 0)
 
@@ -442,9 +442,9 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_DEVICE_REMOVE("banke")
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mz800_mem)
-	MCFG_CPU_IO_MAP(mz800_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mz800_mem)
+	MCFG_DEVICE_IO_MAP(mz800_io)
 	MCFG_DEVICE_ADD("bankf", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mz800_bankf)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
@@ -458,7 +458,7 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz_state, screen_update_mz800)
 
-	MCFG_SOUND_ADD("sn76489n", SN76489, XTAL(17'734'470)/5)
+	MCFG_DEVICE_ADD("sn76489n", SN76489, XTAL(17'734'470)/5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REMOVE("cass_list")
@@ -469,10 +469,10 @@ MACHINE_CONFIG_START(mz_state::mz800)
 	MCFG_PIT8253_CLK0(XTAL(17'734'470)/16)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(17'734'470)/5)
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(mz_state, mz800_z80pio_irq))
-	MCFG_Z80PIO_IN_PA_CB(READ8(mz_state, mz800_z80pio_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mz_state, mz800_z80pio_port_a_w))
-	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, mz_state, mz800_z80pio_irq))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, mz_state, mz800_z80pio_port_a_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, mz_state, mz800_z80pio_port_a_w))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8("cent_data_out", output_latch_device, write))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
 

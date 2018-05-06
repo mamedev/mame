@@ -128,39 +128,39 @@ void xmen_state::_6p_main_map(address_map &map)
 	map(0x10a006, 0x10a007).portr("P5_P6");
 	map(0x10a00c, 0x10a00d).r(m_k053246, FUNC(k053247_device::k053246_word_r)); /* sprites */
 	map(0x110000, 0x113fff).ram();     /* main RAM */
-/*  AM_RANGE(0x18c000, 0x197fff) AM_DEVWRITE("k052109", k052109_device, lsb_w) AM_SHARE("tilemapleft") */
+/*  map(0x18c000, 0x197fff).w("k052109", FUNC(k052109_device:lsb_w)).share("tilemapleft"); */
 	map(0x18c000, 0x197fff).ram().share("tilemapleft"); /* left tilemap (p1,p2,p3 counters) */
 	map(0x18fa00, 0x18fa01).w(this, FUNC(xmen_state::xmen_18fa00_w));
 /*
-    AM_RANGE(0x1ac000, 0x1af7ff) AM_READONLY
-    AM_RANGE(0x1ac000, 0x1af7ff) AM_WRITEONLY
+    map(0x1ac000, 0x1af7ff).readonly();
+    map(0x1ac000, 0x1af7ff).writeonly();
 
-    AM_RANGE(0x1b0000, 0x1b37ff) AM_READONLY
-    AM_RANGE(0x1b0000, 0x1b37ff) AM_WRITEONLY
+    map(0x1b0000, 0x1b37ff).readonly();
+    map(0x1b0000, 0x1b37ff).writeonly();
 
-    AM_RANGE(0x1b4000, 0x1b77ff) AM_READONLY
-    AM_RANGE(0x1b4000, 0x1b77ff) AM_WRITEONLY
+    map(0x1b4000, 0x1b77ff).readonly();
+    map(0x1b4000, 0x1b77ff).writeonly();
 */
 	map(0x1ac000, 0x1b7fff).ram().share("tilemapright"); /* right tilemap */
 
 	/* what are the regions below buffers? (used by hw or software?) */
 /*
-    AM_RANGE(0x1cc000, 0x1cf7ff) AM_READONLY
-    AM_RANGE(0x1cc000, 0x1cf7ff) AM_WRITEONLY
+    map(0x1cc000, 0x1cf7ff).readonly();
+    map(0x1cc000, 0x1cf7ff).writeonly();
 
-    AM_RANGE(0x1d0000, 0x1d37ff) AM_READONLY
-    AM_RANGE(0x1d0000, 0x1d37ff) AM_WRITEONLY
+    map(0x1d0000, 0x1d37ff).readonly();
+    map(0x1d0000, 0x1d37ff).writeonly();
 */
 	map(0x1cc000, 0x1d7fff).ram(); /* tilemap ? */
 
 	/* whats the stuff below, buffers? */
 /*
-    AM_RANGE(0x1ec000, 0x1ef7ff) AM_READONLY
-    AM_RANGE(0x1ec000, 0x1ef7ff) AM_WRITEONLY
-    AM_RANGE(0x1f0000, 0x1f37ff) AM_READONLY
-    AM_RANGE(0x1f0000, 0x1f37ff) AM_WRITEONLY
-    AM_RANGE(0x1f4000, 0x1f77ff) AM_READONLY
-    AM_RANGE(0x1f4000, 0x1f77ff) AM_WRITEONLY
+    map(0x1ec000, 0x1ef7ff).readonly();
+    map(0x1ec000, 0x1ef7ff).writeonly();
+    map(0x1f0000, 0x1f37ff).readonly();
+    map(0x1f0000, 0x1f37ff).writeonly();
+    map(0x1f4000, 0x1f77ff).readonly();
+    map(0x1f4000, 0x1f77ff).writeonly();
 */
 	map(0x1ec000, 0x1f7fff).ram(); /* tilemap ? */
 }
@@ -300,12 +300,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 MACHINE_CONFIG_START(xmen_state::xmen)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
@@ -338,7 +338,7 @@ MACHINE_CONFIG_START(xmen_state::xmen)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
@@ -352,12 +352,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(_6p_main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(_6p_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(16*8, 52*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(xmen_state, screen_update_xmen6p_right)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(xmen_state, screen_vblank_xmen6p))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xmen_state, screen_vblank_xmen6p))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(xmen_state,xmen6p)
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	MCFG_K053251_ADD("k053251")
 
-	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
+	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
