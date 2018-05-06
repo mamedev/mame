@@ -2523,10 +2523,10 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 }
 
 MACHINE_CONFIG_START(seta2_state::seta2)
-	MCFG_CPU_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
-	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_PROGRAM_MAP(mj4simai_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
 	MCFG_TMP68301_CPU("maincpu")
@@ -2540,7 +2540,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta2_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", seta2)
@@ -2550,7 +2550,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(50'000'000)/3)   // clock?
+	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(50'000'000)/3)   // clock?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2564,12 +2564,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::gundamex)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gundamex_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(gundamex_map)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_IN_PARALLEL_CB(READ16(seta2_state, gundamex_eeprom_r))
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta2_state, gundamex_eeprom_w))
+	MCFG_TMP68301_IN_PARALLEL_CB(READ16(*this, seta2_state, gundamex_eeprom_r))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, gundamex_eeprom_w))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -2581,8 +2581,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::grdians)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(grdians_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(grdians_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2592,8 +2592,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::myangel)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(myangel_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(myangel_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2605,8 +2605,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::myangel2)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(myangel2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(myangel2_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2618,8 +2618,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::pzlbowl)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pzlbowl_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pzlbowl_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2629,8 +2629,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::penbros)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(penbros_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(penbros_map)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2639,20 +2639,20 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::ablastb)
 	penbros(config);
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000P-16
-	MCFG_CPU_PROGRAM_MAP(ablastb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000P-16
+	MCFG_DEVICE_PROGRAM_MAP(ablastb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
 
 	MCFG_DEVICE_REMOVE("tmp68301")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::reelquak)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(reelquak_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(reelquak_map)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(seta2_state, reelquak_leds_w))
+	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta2_state, reelquak_leds_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_TICKET_DISPENSER_ADD("dispenser", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
@@ -2667,9 +2667,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::samshoot)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(samshoot_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(samshoot_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta2_state, samshoot_interrupt, 60)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
 	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("DSW2"))
@@ -2684,8 +2684,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(staraudi_state::staraudi)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(staraudi_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(staraudi_map)
 
 	MCFG_SHARP_LH28F016S_16BIT_ADD("flash")
 	MCFG_UPD4992_ADD("rtc")
@@ -2701,8 +2701,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::telpacfl)
 	seta2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(telpacfl_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(telpacfl_map)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
 	MCFG_TMP68301_IN_PARALLEL_CB(IOPORT("KNOB"))
@@ -2748,18 +2748,18 @@ MACHINE_RESET_MEMBER(seta2_state, funcube)
 
 MACHINE_CONFIG_START(seta2_state::funcube)
 
-	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL(25'447'000))
-	MCFG_CPU_PROGRAM_MAP(funcube_map)
+	MCFG_DEVICE_ADD("maincpu", MCF5206E, XTAL(25'447'000))
+	MCFG_DEVICE_PROGRAM_MAP(funcube_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta2_state, funcube_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(funcube_sub_map)
-	MCFG_CPU_IO_MAP(funcube_sub_io)
+	MCFG_DEVICE_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(funcube_sub_map)
+	MCFG_DEVICE_IO_MAP(funcube_sub_io)
 
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	MCFG_FUNCUBE_TOUCHSCREEN_ADD("touchscreen", 200)
-	MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(DEVWRITELINE(":sub:sci1", h8_sci_device, rx_w))
+	MCFG_FUNCUBE_TOUCHSCREEN_TX_CALLBACK(WRITELINE(":sub:sci1", h8_sci_device, rx_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -2775,7 +2775,7 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x0+1, 0x140-1+1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta2_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)
@@ -2793,11 +2793,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(seta2_state::funcube2)
 	funcube(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(funcube2_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(funcube2_map)
 
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_IO_MAP(funcube2_sub_io)
+	MCFG_DEVICE_MODIFY("sub")
+	MCFG_DEVICE_IO_MAP(funcube2_sub_io)
 
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
@@ -2814,10 +2814,10 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seta2_state::namcostr)
-	MCFG_CPU_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
-	MCFG_CPU_PROGRAM_MAP(namcostr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
+	MCFG_DEVICE_PROGRAM_MAP(namcostr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)  // does this have a ticket dispenser?
 	MCFG_TMP68301_CPU("maincpu")
@@ -2829,7 +2829,7 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	MCFG_SCREEN_SIZE(0x200, 0x200)
 	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 	MCFG_SCREEN_UPDATE_DRIVER(seta2_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(seta2_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta2_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", funcube)

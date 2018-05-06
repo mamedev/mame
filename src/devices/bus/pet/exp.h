@@ -133,6 +133,6 @@ protected:
 DECLARE_DEVICE_TYPE(PET_EXPANSION_SLOT, pet_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( pet_expansion_cards );
+void pet_expansion_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_PET_EXP_H

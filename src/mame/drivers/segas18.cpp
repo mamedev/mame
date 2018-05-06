@@ -1310,13 +1310,13 @@ WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
 MACHINE_CONFIG_START(segas18_state::system18)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system18_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system18_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1329,19 +1329,19 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	MCFG_315_5296_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_315_5296_IN_PORTB_CB(IOPORT("P2"))
 	MCFG_315_5296_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_315_5296_OUT_PORTD_CB(WRITE8(segas18_state, misc_outputs_w))
+	MCFG_315_5296_OUT_PORTD_CB(WRITE8(*this, segas18_state, misc_outputs_w))
 	MCFG_315_5296_IN_PORTE_CB(IOPORT("SERVICE"))
 	MCFG_315_5296_IN_PORTF_CB(IOPORT("COINAGE"))
 	MCFG_315_5296_IN_PORTG_CB(IOPORT("DSW"))
-	MCFG_315_5296_OUT_PORTH_CB(WRITE8(segas18_state, rom_5874_bank_w))
-	MCFG_315_5296_OUT_CNT1_CB(DEVWRITELINE("segaic16vid", segaic16_video_device, set_display_enable))
-	MCFG_315_5296_OUT_CNT2_CB(WRITELINE(segas18_state, set_vdp_enable))
+	MCFG_315_5296_OUT_PORTH_CB(WRITE8(*this, segas18_state, rom_5874_bank_w))
+	MCFG_315_5296_OUT_CNT1_CB(WRITELINE("segaic16vid", segaic16_video_device, set_display_enable))
+	MCFG_315_5296_OUT_CNT2_CB(WRITELINE(*this, segas18_state, set_vdp_enable))
 
 	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 0)
 	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_sndirqline_callback_s18));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv6irqline_callback_s18));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(segas18_state, vdp_lv4irqline_callback_s18));
+	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_sndirqline_callback_s18));
+	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_lv6irqline_callback_s18));
+	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_lv4irqline_callback_s18));
 	MCFG_SEGA315_5313_ALT_TIMING(1);
 	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x2000);
 	MCFG_SEGA315_5313_PALETTE("palette")
@@ -1366,11 +1366,11 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM3438, 8000000)
+	MCFG_DEVICE_ADD("ym1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_IRQ0))
 
-	MCFG_SOUND_ADD("ym2", YM3438, 8000000)
+	MCFG_DEVICE_ADD("ym2", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_RF5C68_ADD("rfsnd", 10000000)
@@ -1383,10 +1383,10 @@ MACHINE_CONFIG_START(segas18_state::system18_fd1094)
 	system18(config);
 
 	// basic machine hardware
-	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
-	MCFG_CPU_PROGRAM_MAP(system18_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
+	MCFG_DEVICE_REPLACE("maincpu", FD1094, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(system18_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas18_state::lghost_fd1094)
@@ -1394,7 +1394,7 @@ MACHINE_CONFIG_START(segas18_state::lghost_fd1094)
 
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
+	MCFG_315_5296_OUT_PORTC_CB(WRITE8(*this, segas18_state, lghost_gun_recoil_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas18_state::lghost)
@@ -1402,7 +1402,7 @@ MACHINE_CONFIG_START(segas18_state::lghost)
 
 	// basic machine hardware
 	MCFG_DEVICE_MODIFY("io")
-	MCFG_315_5296_OUT_PORTC_CB(WRITE8(segas18_state, lghost_gun_recoil_w))
+	MCFG_315_5296_OUT_PORTC_CB(WRITE8(*this, segas18_state, lghost_gun_recoil_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(segas18_state::wwally_fd1094)
@@ -1439,14 +1439,14 @@ MACHINE_CONFIG_START(segas18_state::system18_i8751)
 	system18(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
 	MCFG_DEVICE_MODIFY("mapper")
 	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
 
-	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
 MACHINE_CONFIG_END
 
@@ -1454,14 +1454,14 @@ MACHINE_CONFIG_START(segas18_state::system18_fd1094_i8751)
 	system18_fd1094(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_VBLANK_INT_REMOVE()
 
 	MCFG_DEVICE_MODIFY("mapper")
 	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
 
-	MCFG_CPU_ADD("mcu", I8751, 8000000)
-	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
+	MCFG_DEVICE_IO_MAP(mcu_io_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
 MACHINE_CONFIG_END
 

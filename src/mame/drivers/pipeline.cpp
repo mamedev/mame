@@ -359,16 +359,16 @@ PALETTE_INIT_MEMBER(pipeline_state, pipeline)
 MACHINE_CONFIG_START(pipeline_state::pipeline)
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("maincpu", Z80, 7372800/2)
-	MCFG_CPU_PROGRAM_MAP(cpu0_mem)
+	MCFG_DEVICE_ADD("maincpu", Z80, 7372800/2)
+	MCFG_DEVICE_PROGRAM_MAP(cpu0_mem)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 7372800/2)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 7372800/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
-	MCFG_CPU_PROGRAM_MAP(cpu1_mem)
-	MCFG_CPU_IO_MAP(sound_port)
+	MCFG_DEVICE_PROGRAM_MAP(cpu1_mem)
+	MCFG_DEVICE_IO_MAP(sound_port)
 
-	MCFG_CPU_ADD("mcu", M68705R3, 7372800/2)
-	MCFG_M68705_PORTA_W_CB(WRITE8(pipeline_state, mcu_portA_w))
+	MCFG_DEVICE_ADD("mcu", M68705R3, 7372800/2)
+	MCFG_M68705_PORTA_W_CB(WRITE8(*this, pipeline_state, mcu_portA_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 7372800/2 /* same as "audiocpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
@@ -376,13 +376,13 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
 	// PORT B Write - related to sound/music : check code at 0x1c0a
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pipeline_state, vidctrl_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pipeline_state, vidctrl_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTC_CB(READ8(pipeline_state, protection_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pipeline_state, protection_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pipeline_state, protection_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pipeline_state, protection_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0)
 
@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(pipeline_state::pipeline)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 7372800/4)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 7372800/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 MACHINE_CONFIG_END

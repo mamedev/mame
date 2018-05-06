@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpc_rs232.h"
 
-SLOT_INTERFACE_EXTERN(cpc_exp_cards);
+void cpc_exp_cards(device_slot_interface &device);
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -38,27 +38,27 @@ MACHINE_CONFIG_START(cpc_rs232_device::device_add_mconfig)
 	MCFG_PIT8253_CLK0(2000000)
 	MCFG_PIT8253_CLK1(2000000)
 	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(cpc_rs232_device, pit_out0_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(cpc_rs232_device, pit_out1_w))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(cpc_rs232_device, pit_out2_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out0_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out1_w))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, cpc_rs232_device, pit_out2_w))
 
 	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(4'000'000))
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232",default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart",z80dart_device,rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("dart",z80dart_device,dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart",z80dart_device,ctsa_w))
-//  MCFG_RS232_RI_HANDLER(DEVWRITELINE("dart",z80dart_device,ria_w))
+	MCFG_DEVICE_ADD("rs232",RS232_PORT,default_rs232_devices,nullptr)
+	MCFG_RS232_RXD_HANDLER(WRITELINE("dart",z80dart_device,rxa_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("dart",z80dart_device,dcda_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("dart",z80dart_device,ctsa_w))
+//  MCFG_RS232_RI_HANDLER(WRITELINE("dart",z80dart_device,ria_w))
 
 	// pass-through
 	MCFG_DEVICE_ADD("exp", CPC_EXPANSION_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(cpc_exp_cards, nullptr, false)
-	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(DEVWRITELINE("^", cpc_expansion_slot_device, irq_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(DEVWRITELINE("^", cpc_expansion_slot_device, nmi_w))
-	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
+	MCFG_CPC_EXPANSION_SLOT_OUT_IRQ_CB(WRITELINE("^", cpc_expansion_slot_device, irq_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_NMI_CB(WRITELINE("^", cpc_expansion_slot_device, nmi_w))
+	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(WRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
 
 MACHINE_CONFIG_END
 

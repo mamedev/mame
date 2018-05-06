@@ -123,8 +123,8 @@ MACHINE_CONFIG_START(jvh_state::jvh)
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, escape_io)
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
+	MCFG_DEVICE_ADD("soundcpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jvh_sub_map)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4) // MC6802 E clock
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))
@@ -134,8 +134,8 @@ MACHINE_CONFIG_START(jvh_state::jvh2)
 	// CPU TMS9980At; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 1000000, jvh_map, movmastr_io)
 
-	MCFG_CPU_ADD("soundcpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(jvh_sub_map)
+	MCFG_DEVICE_ADD("soundcpu", M6802, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(jvh_sub_map)
 
 	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("soundcpu", M6802_IRQ_LINE))

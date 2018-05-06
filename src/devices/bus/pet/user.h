@@ -226,6 +226,6 @@ protected:
 };
 
 
-SLOT_INTERFACE_EXTERN( pet_user_port_cards );
+void pet_user_port_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_PET_USER_H

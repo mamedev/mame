@@ -91,9 +91,9 @@ uint32_t vt320_state::screen_update_vt320(screen_device &screen, bitmap_ind16 &b
 
 MACHINE_CONFIG_START(vt320_state::vt320)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8051, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(vt320_mem)
-	MCFG_CPU_IO_MAP(vt320_io)
+	MCFG_DEVICE_ADD("maincpu", I8051, XTAL(16'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(vt320_mem)
+	MCFG_DEVICE_IO_MAP(vt320_io)
 
 
 	/* video hardware */

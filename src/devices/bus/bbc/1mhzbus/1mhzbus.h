@@ -96,8 +96,8 @@
 
 #define MCFG_BBC_PASSTHRU_1MHZBUS_SLOT_ADD() \
 	MCFG_BBC_1MHZBUS_SLOT_ADD(BBC_1MHZBUS_SLOT_TAG, bbc_1mhzbus_devices, nullptr) \
-	MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_1mhzbus_slot_device, irq_w)) \
-	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, bbc_1mhzbus_slot_device, nmi_w))
+	MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_1mhzbus_slot_device, irq_w)) \
+	MCFG_BBC_1MHZBUS_SLOT_NMI_HANDLER(WRITELINE(DEVICE_SELF_OWNER, bbc_1mhzbus_slot_device, nmi_w))
 
 #define MCFG_BBC_1MHZBUS_SLOT_IRQ_HANDLER(_devcb) \
 	devcb = &downcast<bbc_1mhzbus_slot_device &>(*device).set_irq_handler(DEVCB_##_devcb);
@@ -163,7 +163,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_1MHZBUS_SLOT, bbc_1mhzbus_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbc_1mhzbus_devices );
+void bbc_1mhzbus_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_1MHZBUS_1MHZBUS_H

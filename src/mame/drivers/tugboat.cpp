@@ -362,15 +362,15 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(tugboat_state::tugboat)
-	MCFG_CPU_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, 2000000) /* 2 MHz ???? */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tugboat_state,input_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tugboat_state,input_r))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tugboat_state, ctrl_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tugboat_state, ctrl_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(tugboat_state::tugboat)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(10'000'000)/8)
+	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 

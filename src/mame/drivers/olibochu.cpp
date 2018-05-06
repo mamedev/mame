@@ -465,13 +465,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::olibochu_scanline)
 MACHINE_CONFIG_START(olibochu_state::olibochu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz ?? */
-	MCFG_CPU_PROGRAM_MAP(olibochu_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz ?? */
+	MCFG_DEVICE_PROGRAM_MAP(olibochu_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", olibochu_state, olibochu_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ?? */
-	MCFG_CPU_PROGRAM_MAP(olibochu_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(olibochu_state, irq0_line_hold, 60) //???
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ?? */
+	MCFG_DEVICE_PROGRAM_MAP(olibochu_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(olibochu_state, irq0_line_hold, 60) //???
 
 //  MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -494,7 +494,7 @@ MACHINE_CONFIG_START(olibochu_state::olibochu)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

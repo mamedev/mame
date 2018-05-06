@@ -27,9 +27,10 @@ DEFINE_DEVICE_TYPE(A2BUS_DISKIING13, a2bus_diskiing13_device, "diskii13", "Apple
 #define WOZFDC_TAG         "wozfdc"
 #define DISKII_ROM_REGION  "diskii_rom"
 
-static SLOT_INTERFACE_START( a2_floppies )
-	SLOT_INTERFACE( "525", FLOPPY_525_SD )
-SLOT_INTERFACE_END
+static void a2_floppies(device_slot_interface &device)
+{
+	device.option_add("525", FLOPPY_525_SD);
+}
 
 ROM_START( diskiing )
 	ROM_REGION(0x100, DISKII_ROM_REGION, 0)

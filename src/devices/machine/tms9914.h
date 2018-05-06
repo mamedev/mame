@@ -69,6 +69,10 @@
 #define MCFG_TMS9914_INT_WRITE_CB(_write)                               \
 	downcast<tms9914_device &>(*device).set_int_write_cb(DEVCB_##_write);
 
+// Set write callback for ACCRQ signal
+#define MCFG_TMS9914_ACCRQ_WRITE_CB(_write)                               \
+	downcast<tms9914_device &>(*device).set_accrq_write_cb(DEVCB_##_write);
+
 class tms9914_device : public device_t
 {
 public:
@@ -100,6 +104,9 @@ public:
 	template <class Object> devcb_base& set_int_write_cb(Object &&cb)
 	{ return m_int_write_func.set_callback(std::forward<Object>(cb)); }
 
+	template <class Object> devcb_base& set_accrq_write_cb(Object &&cb)
+	{ return m_accrq_write_func.set_callback(std::forward<Object>(cb)); }
+
 	DECLARE_WRITE_LINE_MEMBER(eoi_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
 	DECLARE_WRITE_LINE_MEMBER(nrfd_w);
@@ -112,6 +119,9 @@ public:
 	DECLARE_WRITE8_MEMBER(reg8_w);
 	DECLARE_READ8_MEMBER(reg8_r);
 
+	// CONT output: true when 9914 is current controller-in-charge
+	DECLARE_READ_LINE_MEMBER(cont_r);
+
 private:
 	// device-level overrides
 	virtual void device_start() override;
@@ -122,7 +132,9 @@ private:
 	devcb_write8 m_dio_write_func;
 	devcb_write_line m_signal_wr_fns[ IEEE_488_SIGNAL_COUNT ];
 	devcb_write_line m_int_write_func;
+	devcb_write_line m_accrq_write_func;
 	bool m_int_line;
+	bool m_accrq_line;
 
 	uint8_t m_dio;
 	bool m_signals[ IEEE_488_SIGNAL_COUNT ];
@@ -288,6 +300,7 @@ private:
 	void update_int();
 	void update_ifc();
 	void update_ren();
+	void set_accrq(bool state);
 };
 
 // device type definition

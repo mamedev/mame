@@ -373,8 +373,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 MACHINE_CONFIG_START(dfruit_state::dfruit)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
-	MCFG_CPU_PROGRAM_MAP(dfruit_map)
+	MCFG_DEVICE_ADD("maincpu",Z80,MASTER_CLOCK/2) //!!! TC0091LVC !!!
+	MCFG_DEVICE_PROGRAM_MAP(dfruit_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dfruit_state, dfruit_irq_scanline, "screen", 0, 1)
 
 	//MCFG_MACHINE_START_OVERRIDE(dfruit_state,4enraya)
@@ -387,7 +387,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dfruit_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dfruit_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dfruit_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dfruit )
@@ -403,7 +403,7 @@ MACHINE_CONFIG_START(dfruit_state::dfruit)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("opn", YM2203, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN4"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN5"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

@@ -568,21 +568,21 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(ie15_device::ie15core)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", IE15_CPU, XTAL(30'800'000)/10)
-	MCFG_CPU_PROGRAM_MAP(ie15_mem)
-	MCFG_CPU_IO_MAP(ie15_io)
+	MCFG_DEVICE_ADD("maincpu", IE15_CPU, XTAL(30'800'000)/10)
+	MCFG_DEVICE_PROGRAM_MAP(ie15_mem)
+	MCFG_DEVICE_IO_MAP(ie15_io)
 
 	MCFG_DEFAULT_LAYOUT(layout_ie15)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("keyboard", IE15_KEYBOARD, 0)
-	MCFG_IE15_KEYBOARD_CB(WRITE16(ie15_device, kbd_put))
+	MCFG_IE15_KEYBOARD_CB(WRITE16(*this, ie15_device, kbd_put))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ie15_device, serial_rx_callback))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "null_modem")
+	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, ie15_device, serial_rx_callback))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2400)
+	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 

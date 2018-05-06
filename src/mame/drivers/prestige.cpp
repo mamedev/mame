@@ -740,10 +740,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 
 MACHINE_CONFIG_START(prestige_state::prestige_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000))  // Z84C008
-	MCFG_CPU_PROGRAM_MAP(prestige_mem)
-	MCFG_CPU_IO_MAP(prestige_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000))  // Z84C008
+	MCFG_DEVICE_PROGRAM_MAP(prestige_mem)
+	MCFG_DEVICE_IO_MAP(prestige_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", prestige_state, irq_timer, attotime::from_hz(200))
 
@@ -772,8 +772,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::glcolor)
 	prestige_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(glcolor_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(glcolor_io)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -791,8 +791,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::glmcolor)
 	glcolor(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(prestige_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(prestige_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(prestige_state::snotec)

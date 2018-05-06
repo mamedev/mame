@@ -166,10 +166,10 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bk_state::bk0010)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", T11, 3000000)
+	MCFG_DEVICE_ADD("maincpu", T11, 3000000)
 	MCFG_T11_INITIAL_MODE(0x36ff)          /* initial mode word has DAL15,14,11,8 pulled low */
-	MCFG_CPU_PROGRAM_MAP(bk0010_mem)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(bk_state,bk0010_irq_callback)
+	MCFG_DEVICE_PROGRAM_MAP(bk0010_mem)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(bk_state,bk0010_irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -197,8 +197,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(bk_state::bk0010fd)
 	bk0010(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bk0010fd_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(bk0010fd_mem)
 MACHINE_CONFIG_END
 
 

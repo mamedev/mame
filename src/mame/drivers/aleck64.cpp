@@ -909,20 +909,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(aleck64_state::aleck64)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
+	MCFG_DEVICE_ADD("maincpu", VR4300BE, 93750000)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 	MCFG_MIPS3_SYSTEM_CLOCK(62500000)
-	MCFG_CPU_PROGRAM_MAP(n64_map)
+	MCFG_DEVICE_PROGRAM_MAP(n64_map)
 	MCFG_CPU_FORCE_NO_DRC()
 
-	MCFG_CPU_ADD("rsp", RSP, 62500000)
-	MCFG_RSP_DP_REG_R_CB(DEVREAD32("rcp",n64_periphs, dp_reg_r))
-	MCFG_RSP_DP_REG_W_CB(DEVWRITE32("rcp",n64_periphs, dp_reg_w))
-	MCFG_RSP_SP_REG_R_CB(DEVREAD32("rcp",n64_periphs, sp_reg_r))
-	MCFG_RSP_SP_REG_W_CB(DEVWRITE32("rcp",n64_periphs, sp_reg_w))
-	MCFG_RSP_SP_SET_STATUS_CB(DEVWRITE32("rcp",n64_periphs, sp_set_status))
-	MCFG_CPU_PROGRAM_MAP(rsp_map)
+	MCFG_DEVICE_ADD("rsp", RSP, 62500000)
+	MCFG_RSP_DP_REG_R_CB(READ32("rcp",n64_periphs, dp_reg_r))
+	MCFG_RSP_DP_REG_W_CB(WRITE32("rcp",n64_periphs, dp_reg_w))
+	MCFG_RSP_SP_REG_R_CB(READ32("rcp",n64_periphs, sp_reg_r))
+	MCFG_RSP_SP_REG_W_CB(WRITE32("rcp",n64_periphs, sp_reg_w))
+	MCFG_RSP_SP_SET_STATUS_CB(WRITE32("rcp",n64_periphs, sp_set_status))
+	MCFG_DEVICE_PROGRAM_MAP(rsp_map)
 	MCFG_CPU_FORCE_NO_DRC()
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -931,15 +931,15 @@ MACHINE_CONFIG_START(aleck64_state::aleck64)
 	MCFG_SCREEN_SIZE(640, 525)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_n64)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(aleck64_state, screen_vblank_n64))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, aleck64_state, screen_vblank_n64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac1", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_DEVICE_ADD("dac2", DMADAC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_N64_PERIPHS_ADD("rcp");
@@ -1022,8 +1022,8 @@ uint32_t aleck64_state::screen_update_e90(screen_device &screen, bitmap_rgb32 &b
 
 MACHINE_CONFIG_START(aleck64_state::a64_e90)
 	aleck64(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(e90_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(e90_map)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(aleck64_state, screen_update_e90)

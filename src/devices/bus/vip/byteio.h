@@ -124,6 +124,6 @@ DECLARE_DEVICE_TYPE(VIP_BYTEIO_PORT, vip_byteio_port_device)
 // slot devices
 #include "vp620.h"
 
-SLOT_INTERFACE_EXTERN( vip_byteio_cards );
+void vip_byteio_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_VIP_BYTEIO_H

@@ -12695,6 +12695,14 @@ fexcelp                         //
 fexcelpb                        //
 fexcelv                         //
 fphantom                        //
+fpres                           //
+fpressp                         //
+fpresg                          //
+fpresfr                         //
+fpresbu                         //
+fpresbusp                       //
+fpresbug                        //
+fpresbufr                       //
 fscc9                           //
 fscc9b                          //
 fscc9c                          //
@@ -38750,6 +38758,7 @@ pbchmp95                        // (c) 1995 Veltmeijer Automaten
 witch                           // (c) 1992 Excellent System
 witchb                          // (c) 1992 Excellent System
 witchs                          // (c) 1992 Sega / Vic Tokai license
+keirinou
 
 @source:wiz.cpp
 kungfut                         // (c) 1984 Seibu Kaihatsu
@@ -39201,6 +39210,9 @@ xybotsg                         // 136054           (c) 1987
 
 @source:xyonix.cpp
 xyonix                          // [1989 Philko]
+
+@source:y2.cpp
+kof2002um                       // (c)2009 SNK Playmore / New Channel
 
 @source:yiear.cpp
 yiear                           // GX407 (c) 1985

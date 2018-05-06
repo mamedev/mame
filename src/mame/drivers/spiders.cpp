@@ -541,12 +541,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(spiders_state::spiders)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, 2800000)
-	MCFG_CPU_PROGRAM_MAP(spiders_main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spiders_state, update_pia_1,  25)
+	MCFG_DEVICE_ADD("maincpu", MC6809, 2800000)
+	MCFG_DEVICE_PROGRAM_MAP(spiders_main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(spiders_state, update_pia_1,  25)
 
-	MCFG_CPU_ADD("audiocpu", M6802, 3000000)
-	MCFG_CPU_PROGRAM_MAP(spiders_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, 3000000)
+	MCFG_DEVICE_PROGRAM_MAP(spiders_audio_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -561,32 +561,32 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(spiders_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("ic60", ttl74123_device, a_w))
+	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic60", ttl74123_device, a_w))
 
 	/* 74LS123 */
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1"))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, spiders_state,main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, spiders_state,main_cpu_irq))
 
 	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(spiders_state,gfx_rom_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state,gfx_rom_intf_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(spiders_state,flipscreen_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, spiders_state,gfx_rom_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, spiders_state,gfx_rom_intf_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, spiders_state,flipscreen_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, spiders_state,main_cpu_irq))
 
 	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(spiders_state, spiders_audio_ctrl_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state, spiders_audio_command_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(spiders_state,main_cpu_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, spiders_state, spiders_audio_ctrl_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, spiders_state, spiders_audio_command_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, spiders_state,main_cpu_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, spiders_state,main_cpu_irq))
 
 	MCFG_DEVICE_ADD("pia4", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(spiders_state, spiders_audio_a_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(spiders_state, spiders_audio_b_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, spiders_state, spiders_audio_a_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, spiders_state, spiders_audio_b_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("ic60", TTL74123, 0)
@@ -596,7 +596,7 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(spiders_state, ic60_74123_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, spiders_state, ic60_74123_output_changed))
 
 	/* audio hardware */
 	spiders_audio(config);

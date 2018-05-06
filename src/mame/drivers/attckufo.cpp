@@ -118,8 +118,8 @@ READ8_MEMBER(attckufo_state::vic_colorram_r)
 //**************************************************************************
 
 MACHINE_CONFIG_START(attckufo_state::attckufo)
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("DSW"))

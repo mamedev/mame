@@ -275,19 +275,19 @@ INTERRUPT_GEN_MEMBER(clshroad_state::sound_timer_irq)
 MACHINE_CONFIG_START(clshroad_state::firebatl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)   /* ? */
-	MCFG_CPU_PROGRAM_MAP(clshroad_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)   /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK)  /* ? */
-	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_CLOCK)  /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(clshroad_state, main_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(clshroad_state, sound_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(clshroad_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, clshroad_state, main_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, clshroad_state, sound_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, clshroad_state, flipscreen_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -308,27 +308,27 @@ MACHINE_CONFIG_START(clshroad_state::firebatl)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("custom", WIPING_CUSTOM, 96000)
+	MCFG_DEVICE_ADD("custom", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(clshroad_state::clshroad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)  /* ? real speed unknown. 3MHz is too low and causes problems */
-	MCFG_CPU_PROGRAM_MAP(clshroad_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK)  /* ? real speed unknown. 3MHz is too low and causes problems */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK) /* ? */
-	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
-	//MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
-	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
+	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_CLOCK) /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(clshroad_sound_map)
+	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // never writes here?
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(clshroad_state, main_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(clshroad_state, sound_irq_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(clshroad_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, clshroad_state, main_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, clshroad_state, sound_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, clshroad_state, flipscreen_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -348,7 +348,7 @@ MACHINE_CONFIG_START(clshroad_state::clshroad)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("custom", WIPING_CUSTOM, 96000)
+	MCFG_DEVICE_ADD("custom", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

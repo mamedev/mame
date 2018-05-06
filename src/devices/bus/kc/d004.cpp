@@ -56,9 +56,10 @@ FLOPPY_FORMATS_MEMBER( kc_d004_device::floppy_formats )
 	FLOPPY_KC85_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( kc_d004_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void kc_d004_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 static const z80_daisy_config kc_d004_daisy_chain[] =
 {
@@ -150,19 +151,19 @@ void kc_d004_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(kc_d004_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(kc_d004_mem)
-	MCFG_CPU_IO_MAP(kc_d004_io)
+	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(kc_d004_mem)
+	MCFG_DEVICE_IO_MAP(kc_d004_io)
 	MCFG_Z80_DAISY_CHAIN(kc_d004_daisy_chain)
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(8'000'000)/2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, 0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
-	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg2))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(Z80CTC_TAG, z80ctc_device, trg3))
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(kc_d004_device, fdc_irq))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, kc_d004_device, fdc_irq))
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525qd", kc_d004_device::floppy_formats)
@@ -376,8 +377,8 @@ kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const ch
 MACHINE_CONFIG_START(kc_d004_gide_device::device_add_mconfig)
 	kc_d004_device::device_add_mconfig(config);
 
-	MCFG_CPU_MODIFY(Z80_TAG)
-	MCFG_CPU_IO_MAP(kc_d004_gide_io)
+	MCFG_DEVICE_MODIFY(Z80_TAG)
+	MCFG_DEVICE_IO_MAP(kc_d004_gide_io)
 
 	MCFG_ATA_INTERFACE_ADD(ATA_TAG, ata_devices, "hdd", nullptr, false)
 MACHINE_CONFIG_END

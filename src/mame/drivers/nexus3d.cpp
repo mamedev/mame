@@ -121,8 +121,8 @@ void nexus3d_state::machine_reset()
 MACHINE_CONFIG_START(nexus3d_state::nexus3d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM920T, 200000000)
-	MCFG_CPU_PROGRAM_MAP(nexus3d_map)
+	MCFG_DEVICE_ADD("maincpu", ARM920T, 200000000)
+	MCFG_DEVICE_PROGRAM_MAP(nexus3d_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

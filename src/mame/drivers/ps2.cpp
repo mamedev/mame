@@ -87,20 +87,21 @@ void ps2_state::machine_start()
 
 MACHINE_CONFIG_START(ps2_state::ps2m30286)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, 10000000)
-	MCFG_CPU_PROGRAM_MAP(ps2_16_map)
-	MCFG_CPU_IO_MAP(ps2_16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
-	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
+	MCFG_DEVICE_ADD("maincpu", I80286, 10000000)
+	MCFG_DEVICE_PROGRAM_MAP(ps2_16_map)
+	MCFG_DEVICE_IO_MAP(ps2_16_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_80286_SHUTDOWN(WRITELINE("mb", at_mb_device, shutdown))
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	at_softlists(config);
 
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "vga", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, "fdc", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, "ide", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, "comat", false)
+	// FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "vga", true)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdc", false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84)
 
 	/* internal ram */
@@ -110,26 +111,26 @@ MACHINE_CONFIG_START(ps2_state::ps2m30286)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ps2_state::ps2386)
-	MCFG_CPU_ADD("maincpu", I386, 12000000)
-	MCFG_CPU_PROGRAM_MAP(ps2_32_map)
-	MCFG_CPU_IO_MAP(ps2_32_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I386, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(ps2_32_map)
+	MCFG_DEVICE_IO_MAP(ps2_32_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	at_softlists(config);
 
 	// on board devices
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board1", pc_isa16_cards, "fdcsmc", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board2", pc_isa16_cards, "comat", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board3", pc_isa16_cards, "ide", true)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","board4", pc_isa16_cards, "lpt", true)
+	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "fdcsmc", true) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "comat", true)
+	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true)
+	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "lpt", true)
 	// ISA cards
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa2", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa3", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa4", pc_isa16_cards, nullptr, false)
-	MCFG_ISA16_SLOT_ADD("mb:isabus","isa5", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_et4k", false)
+	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
+	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, nullptr, false)
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
 
 	/* internal ram */

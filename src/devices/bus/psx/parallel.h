@@ -68,7 +68,7 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(PSX_PARALLEL_SLOT, psx_parallel_slot_device)
 
-SLOT_INTERFACE_EXTERN( psx_parallel_devices );
+void psx_parallel_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_PSX_PARALLEL_H

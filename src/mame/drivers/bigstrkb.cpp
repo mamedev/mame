@@ -202,9 +202,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(bigstrkb_state::bigstrkb)
 
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(bigstrkb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(bigstrkb_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bigstrkb_state,  irq6_line_hold)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bigstrkb)
 

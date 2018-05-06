@@ -48,8 +48,8 @@ DRIVER_INIT_MEMBER(capcom_state,capcom)
 
 MACHINE_CONFIG_START(capcom_state::capcom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16670000) // M68306
-	MCFG_CPU_PROGRAM_MAP(capcom_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16670000) // M68306
+	MCFG_DEVICE_PROGRAM_MAP(capcom_map)
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------------------------

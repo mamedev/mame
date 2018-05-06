@@ -187,9 +187,10 @@ MACHINE_RESET_MEMBER( tavernie_state, ivg09)
 	m_pia_ivg->cb1_w(1);
 }
 
-static SLOT_INTERFACE_START( ifd09_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ifd09_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 // can support 3 drives
 WRITE8_MEMBER( tavernie_state::ds_w )
@@ -294,8 +295,8 @@ void tavernie_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(tavernie_state::cpu09)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(cpu09_mem)
+	MCFG_DEVICE_ADD("maincpu", MC6809, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(cpu09_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
 
 	/* sound hardware */
@@ -307,10 +308,10 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_CASSETTE_ADD( "cassette" )
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(tavernie_state, pa_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(tavernie_state, ca1_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tavernie_state, pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tavernie_state, pb_w))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, tavernie_state, pa_r))
+	MCFG_PIA_READCA1_HANDLER(READLINE(*this, tavernie_state, ca1_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tavernie_state, pa_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tavernie_state, pb_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
@@ -321,23 +322,23 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("acia", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("acia", acia6850_device, write_rxc))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tavernie_state::ivg09)
 	cpu09(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ivg09_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ivg09_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, ivg09)
 
 	/* video hardware */
@@ -351,7 +352,7 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_DEFAULT_LAYOUT(layout_tavernie)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -364,9 +365,9 @@ MACHINE_CONFIG_START(tavernie_state::ivg09)
 	MCFG_MC6845_UPDATE_ROW_CB(tavernie_state, crtc_update_row)
 
 	MCFG_DEVICE_ADD("pia_ivg", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(READ8(tavernie_state, pb_ivg_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tavernie_state, pa_ivg_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("beeper", beep_device, set_state))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, tavernie_state, pb_ivg_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, tavernie_state, pa_ivg_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("beeper", beep_device, set_state))
 
 	MCFG_FD1795_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)

@@ -209,11 +209,11 @@ READ_LINE_MEMBER( bob85_state::sid_r )
 
 MACHINE_CONFIG_START(bob85_state::bob85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(5'000'000))
-	MCFG_CPU_PROGRAM_MAP(bob85_mem)
-	MCFG_CPU_IO_MAP(bob85_io)
-	MCFG_I8085A_SID(READLINE(bob85_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(bob85_state, sod_w))
+	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(5'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(bob85_mem)
+	MCFG_DEVICE_IO_MAP(bob85_io)
+	MCFG_I8085A_SID(READLINE(*this, bob85_state, sid_r))
+	MCFG_I8085A_SOD(WRITELINE(*this, bob85_state, sod_w))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_bob85)

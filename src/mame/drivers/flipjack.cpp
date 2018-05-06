@@ -447,21 +447,21 @@ void flipjack_state::machine_start()
 MACHINE_CONFIG_START(flipjack_state::flipjack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(flipjack_main_map)
-	MCFG_CPU_IO_MAP(flipjack_main_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flipjack_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(flipjack_main_map)
+	MCFG_DEVICE_IO_MAP(flipjack_main_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flipjack_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(flipjack_sound_map)
-	MCFG_CPU_IO_MAP(flipjack_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", flipjack_state,  nmi_line_assert)
+	MCFG_DEVICE_ADD("audiocpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(flipjack_sound_map)
+	MCFG_DEVICE_IO_MAP(flipjack_sound_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", flipjack_state,  nmi_line_assert)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("P3"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(flipjack_state, flipjack_portc_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, flipjack_state, flipjack_portc_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -480,11 +480,11 @@ MACHINE_CONFIG_START(flipjack_state::flipjack)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(flipjack_state, flipjack_soundlatch_r))  /* Port A read */
+	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, flipjack_state, flipjack_soundlatch_r))  /* Port A read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

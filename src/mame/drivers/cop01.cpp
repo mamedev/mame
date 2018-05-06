@@ -449,14 +449,14 @@ void cop01_state::machine_reset()
 MACHINE_CONFIG_START(cop01_state::cop01)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
-	MCFG_CPU_PROGRAM_MAP(cop01_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
+	MCFG_DEVICE_PROGRAM_MAP(cop01_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'000'000))    /* unknown clock / divider, hand-tuned to match audio reference */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'000'000))    /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(audio_io_map)
 
 
 	/* video hardware */
@@ -478,30 +478,30 @@ MACHINE_CONFIG_START(cop01_state::cop01)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_DEVICE_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_DEVICE_ADD("ay2", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay3", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_DEVICE_ADD("ay3", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mightguy_state::mightguy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
-	MCFG_CPU_PROGRAM_MAP(cop01_map)
-	MCFG_CPU_IO_MAP(mightguy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(cop01_map)
+	MCFG_DEVICE_IO_MAP(mightguy_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2) /* unknown divider */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(mightguy_audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, AUDIOCPU_CLOCK/2) /* unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(mightguy_audio_io_map)
 
 	MCFG_DEVICE_ADD("prot_chip", NB1412M2, XTAL(8'000'000)/2) // divided by 2 maybe
-	MCFG_NB1412M2_DAC_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_NB1412M2_DAC_CB(WRITE8("dac", dac_byte_interface, write))
 	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -522,13 +522,13 @@ MACHINE_CONFIG_START(mightguy_state::mightguy)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
+	MCFG_DEVICE_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) // unknown DAC
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 MACHINE_CONFIG_END
 

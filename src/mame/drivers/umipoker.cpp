@@ -695,12 +695,12 @@ void saiyukip_state::machine_start()
 MACHINE_CONFIG_START(umipoker_state::umipoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL(14'318'181)) // TMP68HC000-16
-	MCFG_CPU_PROGRAM_MAP(umipoker_map)
+	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(14'318'181)) // TMP68HC000-16
+	MCFG_DEVICE_PROGRAM_MAP(umipoker_map)
 
-	MCFG_CPU_ADD("audiocpu",Z80, XTAL(14'318'181)/4) // 3.579545MHz
-	MCFG_CPU_PROGRAM_MAP(umipoker_audio_map)
-	MCFG_CPU_IO_MAP(umipoker_audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu",Z80, XTAL(14'318'181)/4) // 3.579545MHz
+	MCFG_DEVICE_PROGRAM_MAP(umipoker_audio_map)
+	MCFG_DEVICE_IO_MAP(umipoker_audio_io_map)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -724,7 +724,7 @@ MACHINE_CONFIG_START(umipoker_state::umipoker)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym", YM3812, XTAL(14'318'181)/4) // 3.579545MHz
+	MCFG_DEVICE_ADD("ym", YM3812, XTAL(14'318'181)/4) // 3.579545MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
@@ -735,8 +735,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(saiyukip_state::saiyukip)
 	umipoker(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(saiyukip_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(saiyukip_map)
 MACHINE_CONFIG_END
 
 

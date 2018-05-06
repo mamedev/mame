@@ -903,13 +903,13 @@ MACHINE_RESET_MEMBER(fromance_state,fromance)
 MACHINE_CONFIG_START(fromance_state::nekkyoku)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(nekkyoku_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(nekkyoku_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,12000000/2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(nekkyoku_sub_map)
-	MCFG_CPU_IO_MAP(nekkyoku_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80,12000000/2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(nekkyoku_sub_map)
+	MCFG_DEVICE_IO_MAP(nekkyoku_sub_io_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("sublatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
@@ -929,18 +929,18 @@ MACHINE_CONFIG_START(fromance_state::nekkyoku)
 	MCFG_PALETTE_ADD("palette", 1024)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, 14318180 / 2) // clock not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,nekkyoku)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/6) // type not verified
+	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/6) // type not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fromance_state, fromance_adpcm_int)) /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -949,13 +949,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fromance_state::idolmj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(fromance_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
-	MCFG_CPU_IO_MAP(idolmj_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
+	MCFG_DEVICE_IO_MAP(idolmj_sub_io_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("sublatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
@@ -975,18 +975,18 @@ MACHINE_CONFIG_START(fromance_state::idolmj)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(12'000'000) / 6)
+	MCFG_DEVICE_ADD("aysnd", YM2149, XTAL(12'000'000) / 6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fromance_state, fromance_adpcm_int)) /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -995,13 +995,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fromance_state::fromance)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(fromance_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(fromance_main_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fromance_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
-	MCFG_CPU_PROGRAM_MAP(fromance_sub_map)
-	MCFG_CPU_IO_MAP(fromance_sub_io_map)
+	MCFG_DEVICE_ADD("sub", Z80, XTAL(12'000'000) / 2)     /* 6.00 Mhz ? */
+	MCFG_DEVICE_PROGRAM_MAP(fromance_sub_map)
+	MCFG_DEVICE_IO_MAP(fromance_sub_io_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("sublatch")
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
@@ -1021,18 +1021,18 @@ MACHINE_CONFIG_START(fromance_state::fromance)
 	MCFG_PALETTE_ADD("palette", 2048)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(fromance_state,fromance)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(fromance_state, fromance_adpcm_int)) /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, fromance_state, fromance_adpcm_int)) /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END

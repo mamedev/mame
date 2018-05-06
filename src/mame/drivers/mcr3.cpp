@@ -1081,15 +1081,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(mcr3_state::mcrmono)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(mcrmono_map)
-	MCFG_CPU_IO_MAP(mcrmono_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(mcrmono_map)
+	MCFG_DEVICE_IO_MAP(mcrmono_portmap)
 	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK/4 /* same as "maincpu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg1))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
@@ -1122,7 +1122,7 @@ MACHINE_CONFIG_START(mcr3_state::mono_tcs)
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
+	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1142,7 +1142,7 @@ MACHINE_CONFIG_START(mcr3_state::mono_sg)
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1156,13 +1156,13 @@ MACHINE_CONFIG_START(mcr3_state::mcrscroll)
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
+	MCFG_DEVICE_ADD("ssio", MIDWAY_SSIO)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spyhunt_map)
-	MCFG_CPU_IO_MAP(spyhunt_portmap)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spyhunt_map)
+	MCFG_DEVICE_IO_MAP(spyhunt_portmap)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1183,7 +1183,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
 	mcrscroll(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
+	MCFG_DEVICE_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 

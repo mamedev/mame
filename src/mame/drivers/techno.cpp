@@ -289,12 +289,12 @@ void techno_state::machine_reset()
 
 MACHINE_CONFIG_START(techno_state::techno)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(techno_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(8'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(techno_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL(4'000'000))
-	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
+	//MCFG_DEVICE_ADD("cpu2", TMS7000, XTAL(4'000'000))
+	//MCFG_DEVICE_PROGRAM_MAP(techno_sub_map)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_techno)

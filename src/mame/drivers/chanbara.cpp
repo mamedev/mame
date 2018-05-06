@@ -390,8 +390,8 @@ void chanbara_state::machine_reset()
 
 MACHINE_CONFIG_START(chanbara_state::chanbara)
 
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(chanbara_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(12'000'000)/8)
+	MCFG_DEVICE_PROGRAM_MAP(chanbara_map)
 
 
 	/* video hardware */
@@ -412,10 +412,10 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12000000/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chanbara_state, chanbara_ay_out_1_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, chanbara_state, chanbara_ay_out_0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, chanbara_state, chanbara_ay_out_1_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

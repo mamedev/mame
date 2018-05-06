@@ -117,7 +117,7 @@ protected:
 DECLARE_DEVICE_TYPE(NEWBRAIN_EXPANSION_SLOT, newbrain_expansion_slot_device)
 
 
-SLOT_INTERFACE_EXTERN( newbrain_expansion_cards );
+void newbrain_expansion_cards(device_slot_interface &device);
 
 
 

@@ -163,6 +163,7 @@
 
 static const int clock_divisors[3] = {1, DIV_64, DIV_15};
 
+constexpr unsigned pokey_device::FREQ_17_EXACT;
 
 
 

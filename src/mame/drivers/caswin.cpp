@@ -334,10 +334,10 @@ PALETTE_INIT_MEMBER(caswin_state, caswin)
 
 MACHINE_CONFIG_START(caswin_state::vvillage)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(vvillage_mem)
-	MCFG_CPU_IO_MAP(vvillage_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", caswin_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(vvillage_mem)
+	MCFG_DEVICE_IO_MAP(vvillage_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", caswin_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -356,7 +356,7 @@ MACHINE_CONFIG_START(caswin_state::vvillage)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 4000000 / 4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 4000000 / 4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

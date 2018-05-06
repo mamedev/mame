@@ -512,8 +512,8 @@ MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
 MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
-	MCFG_CPU_PROGRAM_MAP(avengrgs_map)
+	MCFG_DEVICE_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
+	MCFG_DEVICE_PROGRAM_MAP(avengrgs_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
@@ -539,7 +539,7 @@ MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 42000000 / 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -547,8 +547,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(deco_mlc_state::mlc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
-	MCFG_CPU_PROGRAM_MAP(decomlc_map)
+	MCFG_DEVICE_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
+	MCFG_DEVICE_PROGRAM_MAP(decomlc_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
@@ -561,7 +561,7 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
@@ -577,7 +577,7 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 42000000 / 3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(deco_mlc_state::mlc_5bpp)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 5bpp)
 
 	// TODO: mono? ch.0 doesn't output any sound in-game
-	MCFG_SOUND_MODIFY("ymz")
+	MCFG_DEVICE_MODIFY("ymz")
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END

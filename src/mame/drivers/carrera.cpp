@@ -315,9 +315,9 @@ PALETTE_INIT_MEMBER(carrera_state, carrera)
 
 MACHINE_CONFIG_START(carrera_state::carrera)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
-	MCFG_CPU_PROGRAM_MAP(carrera_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK / 6)
+	MCFG_DEVICE_PROGRAM_MAP(carrera_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -340,10 +340,10 @@ MACHINE_CONFIG_START(carrera_state::carrera)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/12)
 	/* these are set as input, but I have no idea which input port it uses is for the AY */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(carrera_state, unknown_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(carrera_state, unknown_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, carrera_state, unknown_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, carrera_state, unknown_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

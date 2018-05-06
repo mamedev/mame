@@ -715,10 +715,10 @@ void ojankohs_state::machine_reset()
 MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ojankohs_map)
-	MCFG_CPU_IO_MAP(ojankohs_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ojankohs_map)
+	MCFG_DEVICE_IO_MAP(ojankohs_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -742,13 +742,13 @@ MACHINE_CONFIG_START(ojankohs_state::ojankohs)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, 12000000/6)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(ojankohs_state, ojankohs_dipsw1_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(ojankohs_state, ojankohs_dipsw2_r))
+	MCFG_DEVICE_ADD("aysnd", YM2149, 12000000/6)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw1_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, ojankohs_state, ojankohs_dipsw2_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -756,10 +756,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ojankoy_map)
-	MCFG_CPU_IO_MAP(ojankoy_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ojankoy_map)
+	MCFG_DEVICE_IO_MAP(ojankoy_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoy)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -782,13 +782,13 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoy)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -796,10 +796,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ojankohs_state::ccasino)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ojankoy_map)
-	MCFG_CPU_IO_MAP(ccasino_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)     /* 6.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ojankoy_map)
+	MCFG_DEVICE_IO_MAP(ccasino_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankohs)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -823,13 +823,13 @@ MACHINE_CONFIG_START(ojankohs_state::ccasino)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 12000000/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -837,10 +837,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */
-	MCFG_CPU_PROGRAM_MAP(ojankoc_map)
-	MCFG_CPU_IO_MAP(ojankoc_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,8000000/2)          /* 4.00 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(ojankoc_map)
+	MCFG_DEVICE_IO_MAP(ojankoc_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ojankohs_state,  irq0_line_hold)
 
 	MCFG_MACHINE_START_OVERRIDE(ojankohs_state,ojankoc)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -861,13 +861,13 @@ MACHINE_CONFIG_START(ojankohs_state::ojankoc)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("dsw1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("dsw2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 8000000/22)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
+	MCFG_DEVICE_ADD("msm", MSM5205, 8000000/22)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ojankohs_state, ojankohs_adpcm_int))     /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)          /* 8 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

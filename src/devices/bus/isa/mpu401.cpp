@@ -49,7 +49,7 @@ DEFINE_DEVICE_TYPE(ISA8_MPU401, isa8_mpu401_device, "isa_mpu401", "Roland MPU-40
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa8_mpu401_device::device_add_mconfig)
-	MCFG_MPU401_ADD(MPU_CORE_TAG, WRITELINE(isa8_mpu401_device, mpu_irq_out))
+	MCFG_MPU401_ADD(MPU_CORE_TAG, WRITELINE(*this, isa8_mpu401_device, mpu_irq_out))
 MACHINE_CONFIG_END
 
 

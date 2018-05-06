@@ -591,8 +591,8 @@ DRIVER_INIT_MEMBER(mgavegas_state,mgavegas133)
 
 MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLK)
-	MCFG_CPU_PROGRAM_MAP(mgavegas_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLK)
+	MCFG_DEVICE_PROGRAM_MAP(mgavegas_map)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_0", mgavegas_state, int_0, attotime::from_hz(6000))  //6KHz from MSM5205 /VCK
 
@@ -603,19 +603,19 @@ MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 	/* sound hardware */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK)
+	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(mgavegas_state, ay8910_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(mgavegas_state, ay8910_b_r))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mgavegas_state, ay8910_a_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mgavegas_state, ay8910_b_r))
 
-	MCFG_SOUND_ADD("5205", MSM5205, MSM_CLK)
+	MCFG_DEVICE_ADD("5205", MSM5205, MSM_CLK)
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 2.0)
 
 
-	MCFG_FILTER_RC_ADD("filter1", 0)
+	MCFG_DEVICE_ADD("filter1", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2",2.0)
-	MCFG_FILTER_RC_ADD("filter2", 0)
+	MCFG_DEVICE_ADD("filter2", FILTER_RC)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 

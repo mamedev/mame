@@ -379,8 +379,8 @@ void proteus3_state::machine_reset()
 
 MACHINE_CONFIG_START(proteus3_state::proteus3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL(3'579'545))  /* Divided by 4 internally */
-	MCFG_CPU_PROGRAM_MAP(proteus3_mem)
+	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(3'579'545))  /* Divided by 4 internally */
+	MCFG_DEVICE_PROGRAM_MAP(proteus3_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -395,15 +395,15 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 
 	/* Devices */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(proteus3_state, video_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(proteus3_state, ca2_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, proteus3_state, video_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, proteus3_state, ca2_w))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(proteus3_state, kbd_put))
 
 	/* cassette */
 	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(proteus3_state, acia1_txdata_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(*this, proteus3_state, acia1_txdata_w))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -414,29 +414,29 @@ MACHINE_CONFIG_START(proteus3_state::proteus3)
 
 	// optional tty keyboard
 	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_ACIA6850_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2", acia6850_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2", acia6850_device, write_cts))
 
 	/* Bit Rate Generator */
 	MCFG_MC14411_ADD ("brg", XTAL(1'843'200)) // crystal needs verification but is the likely one
-	MCFG_MC14411_F1_CB(WRITELINE (proteus3_state, write_f1_clock))
-	MCFG_MC14411_F2_CB(WRITELINE (proteus3_state, write_f2_clock))
-	MCFG_MC14411_F3_CB(WRITELINE (proteus3_state, write_f3_clock))
-	MCFG_MC14411_F4_CB(WRITELINE (proteus3_state, write_f4_clock))
-	MCFG_MC14411_F5_CB(WRITELINE (proteus3_state, write_f5_clock))
-	MCFG_MC14411_F6_CB(WRITELINE (proteus3_state, write_f6_clock))
-	MCFG_MC14411_F7_CB(WRITELINE (proteus3_state, write_f7_clock))
-	MCFG_MC14411_F8_CB(WRITELINE (proteus3_state, write_f8_clock))
-	MCFG_MC14411_F9_CB(WRITELINE (proteus3_state, write_f9_clock))
-	MCFG_MC14411_F10_CB(WRITELINE (proteus3_state, write_f10_clock))
-	MCFG_MC14411_F11_CB(WRITELINE (proteus3_state, write_f11_clock))
-	MCFG_MC14411_F12_CB(WRITELINE (proteus3_state, write_f12_clock))
-	MCFG_MC14411_F13_CB(WRITELINE (proteus3_state, write_f13_clock))
-	MCFG_MC14411_F14_CB(WRITELINE (proteus3_state, write_f14_clock))
-	MCFG_MC14411_F15_CB(WRITELINE (proteus3_state, write_f15_clock))
+	MCFG_MC14411_F1_CB(WRITELINE (*this, proteus3_state, write_f1_clock))
+	MCFG_MC14411_F2_CB(WRITELINE (*this, proteus3_state, write_f2_clock))
+	MCFG_MC14411_F3_CB(WRITELINE (*this, proteus3_state, write_f3_clock))
+	MCFG_MC14411_F4_CB(WRITELINE (*this, proteus3_state, write_f4_clock))
+	MCFG_MC14411_F5_CB(WRITELINE (*this, proteus3_state, write_f5_clock))
+	MCFG_MC14411_F6_CB(WRITELINE (*this, proteus3_state, write_f6_clock))
+	MCFG_MC14411_F7_CB(WRITELINE (*this, proteus3_state, write_f7_clock))
+	MCFG_MC14411_F8_CB(WRITELINE (*this, proteus3_state, write_f8_clock))
+	MCFG_MC14411_F9_CB(WRITELINE (*this, proteus3_state, write_f9_clock))
+	MCFG_MC14411_F10_CB(WRITELINE (*this, proteus3_state, write_f10_clock))
+	MCFG_MC14411_F11_CB(WRITELINE (*this, proteus3_state, write_f11_clock))
+	MCFG_MC14411_F12_CB(WRITELINE (*this, proteus3_state, write_f12_clock))
+	MCFG_MC14411_F13_CB(WRITELINE (*this, proteus3_state, write_f13_clock))
+	MCFG_MC14411_F14_CB(WRITELINE (*this, proteus3_state, write_f14_clock))
+	MCFG_MC14411_F15_CB(WRITELINE (*this, proteus3_state, write_f15_clock))
 MACHINE_CONFIG_END
 
 

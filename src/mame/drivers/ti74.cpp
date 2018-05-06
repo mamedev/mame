@@ -510,11 +510,11 @@ void ti74_state::machine_start()
 MACHINE_CONFIG_START(ti74_state::ti74)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))
-	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(ti74_state, keyboard_w))
+	MCFG_DEVICE_ADD("maincpu", TMS70C46, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, ti74_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
+	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
 	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 
@@ -546,11 +546,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ti74_state::ti95)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))
-	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(ti74_state, keyboard_w))
+	MCFG_DEVICE_ADD("maincpu", TMS70C46, XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, ti74_state, keyboard_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, ti74_state, bankswitch_w))
+	MCFG_TMS7000_OUT_PORTE_CB(WRITE8(*this, ti74_state, keyboard_w))
 
 	MCFG_NVRAM_ADD_0FILL("sysram.ic3")
 

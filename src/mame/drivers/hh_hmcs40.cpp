@@ -433,12 +433,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bambball_state::bambball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(bambball_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bambball_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bambball_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bambball_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bambball_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38750, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, bambball_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bambball_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bambball_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bambball_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bambball_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -450,7 +450,7 @@ MACHINE_CONFIG_START(bambball_state::bambball)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -569,12 +569,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bmboxing_state::bmboxing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(bmboxing_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bmboxing_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bmboxing_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bmboxing_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bmboxing_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38750, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, bmboxing_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bmboxing_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bmboxing_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bmboxing_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bmboxing_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.4"))
 
 	/* video hardware */
@@ -587,7 +587,7 @@ MACHINE_CONFIG_START(bmboxing_state::bmboxing)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -694,12 +694,12 @@ INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
 MACHINE_CONFIG_START(bfriskyt_state::bfriskyt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bfriskyt_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bfriskyt_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bfriskyt_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bfriskyt_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bfriskyt_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bfriskyt_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bfriskyt_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -711,7 +711,7 @@ MACHINE_CONFIG_START(bfriskyt_state::bfriskyt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -804,13 +804,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(packmon_state::packmon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(packmon_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(packmon_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(packmon_state, input_r))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, packmon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, packmon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, packmon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, packmon_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, packmon_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(*this, packmon_state, input_r))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -822,7 +822,7 @@ MACHINE_CONFIG_START(packmon_state::packmon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -939,12 +939,12 @@ INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
 MACHINE_CONFIG_START(msthawk_state::msthawk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(msthawk_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(msthawk_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, msthawk_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, msthawk_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, msthawk_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, msthawk_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, msthawk_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -956,7 +956,7 @@ MACHINE_CONFIG_START(msthawk_state::msthawk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1060,12 +1060,12 @@ INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
 MACHINE_CONFIG_START(bzaxxon_state::bzaxxon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bzaxxon_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bzaxxon_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 450000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bzaxxon_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bzaxxon_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
 
 	/* video hardware */
@@ -1078,7 +1078,7 @@ MACHINE_CONFIG_START(bzaxxon_state::bzaxxon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1176,15 +1176,15 @@ INPUT_CHANGED_MEMBER(zackman_state::input_changed)
 MACHINE_CONFIG_START(zackman_state::zackman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(zackman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(zackman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, zackman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, zackman_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1196,7 +1196,7 @@ MACHINE_CONFIG_START(zackman_state::zackman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1303,15 +1303,15 @@ INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
 MACHINE_CONFIG_START(bpengo_state::bpengo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(bpengo_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bpengo_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, bpengo_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bpengo_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
 
 	/* video hardware */
@@ -1324,7 +1324,7 @@ MACHINE_CONFIG_START(bpengo_state::bpengo)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1428,15 +1428,15 @@ INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
 MACHINE_CONFIG_START(bbtime_state::bbtime)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(bbtime_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bbtime_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, bbtime_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bbtime_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1448,7 +1448,7 @@ MACHINE_CONFIG_START(bbtime_state::bbtime)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1528,13 +1528,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bdoramon_state::bdoramon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bdoramon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bdoramon_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bdoramon_state, plate_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bdoramon_state, plate_w))
 	MCFG_HMCS40_READ_R_CB(2, IOPORT("IN.3"))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bdoramon_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bdoramon_state, grid_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bdoramon_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bdoramon_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
 
 	/* video hardware */
@@ -1547,7 +1547,7 @@ MACHINE_CONFIG_START(bdoramon_state::bdoramon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1621,12 +1621,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bultrman_state::bultrman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 350000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(bultrman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(bultrman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 350000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, bultrman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, bultrman_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	/* video hardware */
@@ -1639,7 +1639,7 @@ MACHINE_CONFIG_START(bultrman_state::bultrman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1710,13 +1710,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(machiman_state::machiman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(machiman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(machiman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, machiman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, machiman_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	/* video hardware */
@@ -1729,7 +1729,7 @@ MACHINE_CONFIG_START(machiman_state::machiman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1858,20 +1858,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(pairmtch_state::pairmtch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pairmtch_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(pairmtch_state, plate_w))
-	MCFG_HMCS40_READ_R_CB(4, READ8(pairmtch_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(pairmtch_state, sound_w))
-	MCFG_HMCS40_READ_R_CB(5, DEVREAD8("soundlatch2", generic_latch_8_device, read))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(pairmtch_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, pairmtch_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, pairmtch_state, plate_w))
+	MCFG_HMCS40_READ_R_CB(4, READ8(*this, pairmtch_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, pairmtch_state, sound_w))
+	MCFG_HMCS40_READ_R_CB(5, READ8("soundlatch2", generic_latch_8_device, read))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, pairmtch_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, pairmtch_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.2"))
 
-	MCFG_CPU_ADD("audiocpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pairmtch_state, sound2_w))
-	MCFG_HMCS40_READ_R_CB(2, DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(pairmtch_state, speaker_w))
+	MCFG_DEVICE_ADD("audiocpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, pairmtch_state, sound2_w))
+	MCFG_HMCS40_READ_R_CB(2, READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, pairmtch_state, speaker_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1884,7 +1884,7 @@ MACHINE_CONFIG_START(pairmtch_state::pairmtch)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -1980,13 +1980,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(alnattck_state::alnattck)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(alnattck_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(alnattck_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(alnattck_state, input_r))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, alnattck_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, alnattck_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, alnattck_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, alnattck_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, alnattck_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(*this, alnattck_state, input_r))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -1998,7 +1998,7 @@ MACHINE_CONFIG_START(alnattck_state::alnattck)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2107,15 +2107,15 @@ void cdkong_state::machine_start()
 MACHINE_CONFIG_START(cdkong_state::cdkong)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(cdkong_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(cdkong_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, cdkong_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cdkong_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	/* video hardware */
@@ -2128,7 +2128,7 @@ MACHINE_CONFIG_START(cdkong_state::cdkong)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("speaker_decay", cdkong_state, speaker_decay_sim, attotime::from_msec(1))
 MACHINE_CONFIG_END
@@ -2240,12 +2240,12 @@ INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
 MACHINE_CONFIG_START(cgalaxn_state::cgalaxn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(cgalaxn_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cgalaxn_state, grid_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cgalaxn_state, grid_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(cgalaxn_state, grid_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(cgalaxn_state, plate_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, cgalaxn_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cgalaxn_state, grid_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cgalaxn_state, grid_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cgalaxn_state, grid_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cgalaxn_state, plate_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2257,7 +2257,7 @@ MACHINE_CONFIG_START(cgalaxn_state::cgalaxn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2359,15 +2359,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cpacman_state::cpacman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(cpacman_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(cpacman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(cpacman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, cpacman_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, cpacman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cpacman_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2379,7 +2379,7 @@ MACHINE_CONFIG_START(cpacman_state::cpacman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2476,15 +2476,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cmspacmn_state::cmspacmn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(cmspacmn_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(cmspacmn_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(cmspacmn_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, cmspacmn_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, cmspacmn_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, cmspacmn_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2496,7 +2496,7 @@ MACHINE_CONFIG_START(cmspacmn_state::cmspacmn)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2623,20 +2623,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(sag_state::sag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 450000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(sag_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(sag_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(sag_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(sag_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(sag_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(sag_state, input_r))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 450000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, sag_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, sag_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, sag_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, sag_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, sag_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(*this, sag_state, input_r))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_hmcs40_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_sag)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2738,15 +2738,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(egalaxn2_state::egalaxn2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_READ_R_CB(0, READ8(egalaxn2_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(egalaxn2_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(egalaxn2_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_READ_R_CB(0, READ8(*this, egalaxn2_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, egalaxn2_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, egalaxn2_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -2758,7 +2758,7 @@ MACHINE_CONFIG_START(egalaxn2_state::egalaxn2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -2990,22 +2990,22 @@ void eturtles_state::machine_start()
 MACHINE_CONFIG_START(eturtles_state::eturtles)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, eturtles_state, grid_w))
 
-	MCFG_CPU_ADD("audiocpu", COP411, 215000) // approximation
+	MCFG_DEVICE_ADD("audiocpu", COP411, 215000) // approximation
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
-	MCFG_COP400_READ_L_CB(READ8(eturtles_state, cop_latch_r))
-	MCFG_COP400_READ_G_CB(READ8(eturtles_state, cop_ack_r))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, eturtles_state, speaker_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, eturtles_state, cop_irq_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, eturtles_state, cop_latch_r))
+	MCFG_COP400_READ_G_CB(READ8(*this, eturtles_state, cop_ack_r))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -3019,7 +3019,7 @@ MACHINE_CONFIG_START(eturtles_state::eturtles)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3100,21 +3100,21 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(estargte_state::estargte)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(eturtles_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(eturtles_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, eturtles_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, eturtles_state, grid_w))
 
-	MCFG_CPU_ADD("audiocpu", COP411, 190000) // approximation
+	MCFG_DEVICE_ADD("audiocpu", COP411, 190000) // approximation
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
-	MCFG_COP400_WRITE_SK_CB(WRITELINE(eturtles_state, speaker_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(eturtles_state, cop_irq_w))
-	MCFG_COP400_READ_L_CB(READ8(estargte_state, cop_data_r))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(*this, eturtles_state, speaker_w))
+	MCFG_COP400_WRITE_D_CB(WRITE8(*this, eturtles_state, cop_irq_w))
+	MCFG_COP400_READ_L_CB(READ8(*this, estargte_state, cop_data_r))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -3128,7 +3128,7 @@ MACHINE_CONFIG_START(estargte_state::estargte)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3226,13 +3226,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ghalien_state::ghalien)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(ghalien_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(ghalien_state, grid_w))
-	MCFG_HMCS40_READ_D_CB(READ16(ghalien_state, input_r))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, ghalien_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, ghalien_state, grid_w))
+	MCFG_HMCS40_READ_D_CB(READ16(*this, ghalien_state, input_r))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3244,7 +3244,7 @@ MACHINE_CONFIG_START(ghalien_state::ghalien)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3353,12 +3353,12 @@ INPUT_CHANGED_MEMBER(gckong_state::input_changed)
 MACHINE_CONFIG_START(gckong_state::gckong)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(gckong_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(gckong_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, gckong_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, gckong_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.5"))
 
 	/* video hardware */
@@ -3371,7 +3371,7 @@ MACHINE_CONFIG_START(gckong_state::gckong)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3472,15 +3472,15 @@ INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
 MACHINE_CONFIG_START(gdigdug_state::gdigdug)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(gdigdug_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(gdigdug_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, gdigdug_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, gdigdug_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3492,7 +3492,7 @@ MACHINE_CONFIG_START(gdigdug_state::gdigdug)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3634,14 +3634,14 @@ static const s16 mwcbaseb_speaker_levels[] = { 0, 0x3fff, -0x4000, 0, -0x4000, 0
 MACHINE_CONFIG_START(mwcbaseb_state::mwcbaseb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(mwcbaseb_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(mwcbaseb_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(mwcbaseb_state, plate_w))
-	MCFG_HMCS40_READ_R_CB(4, READ8(mwcbaseb_state, input_r))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(mwcbaseb_state, speaker_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(mwcbaseb_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(mwcbaseb_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, mwcbaseb_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, mwcbaseb_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, mwcbaseb_state, plate_w))
+	MCFG_HMCS40_READ_R_CB(4, READ8(*this, mwcbaseb_state, input_r))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, mwcbaseb_state, speaker_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, mwcbaseb_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, mwcbaseb_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3653,7 +3653,7 @@ MACHINE_CONFIG_START(mwcbaseb_state::mwcbaseb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SPEAKER_LEVELS(8, mwcbaseb_speaker_levels)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
@@ -3722,15 +3722,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(pbqbert_state::pbqbert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38820, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(pbqbert_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(pbqbert_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38820, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(4, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(5, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(6, WRITE8(*this, pbqbert_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, pbqbert_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.0"))
 
 	/* video hardware */
@@ -3743,7 +3743,7 @@ MACHINE_CONFIG_START(pbqbert_state::pbqbert)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3847,12 +3847,12 @@ INPUT_CHANGED_MEMBER(kingman_state::input_changed)
 MACHINE_CONFIG_START(kingman_state::kingman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(kingman_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(kingman_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, kingman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, kingman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, kingman_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, kingman_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, kingman_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3864,7 +3864,7 @@ MACHINE_CONFIG_START(kingman_state::kingman)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -3968,12 +3968,12 @@ INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
 MACHINE_CONFIG_START(tmtron_state::tmtron)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38800, 400000) // approximation
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(tmtron_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(tmtron_state, grid_w))
+	MCFG_DEVICE_ADD("maincpu", HD38800, 400000) // approximation
+	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(*this, tmtron_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, tmtron_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, tmtron_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, tmtron_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, tmtron_state, grid_w))
 
 	/* video hardware */
 	MCFG_SCREEN_SVG_ADD("screen", "svg")
@@ -3985,7 +3985,7 @@ MACHINE_CONFIG_START(tmtron_state::tmtron)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -4062,12 +4062,12 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(vinvader_state::vinvader)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD38750, 400000) // approximation
+	MCFG_DEVICE_ADD("maincpu", HD38750, 400000) // approximation
 	MCFG_HMCS40_READ_R_CB(0, IOPORT("IN.0"))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(vinvader_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(vinvader_state, plate_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(vinvader_state, plate_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(vinvader_state, grid_w))
+	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(*this, vinvader_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(*this, vinvader_state, plate_w))
+	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(*this, vinvader_state, plate_w))
+	MCFG_HMCS40_WRITE_D_CB(WRITE16(*this, vinvader_state, grid_w))
 	MCFG_HMCS40_READ_D_CB(IOPORT("IN.1"))
 
 	/* video hardware */
@@ -4080,7 +4080,7 @@ MACHINE_CONFIG_START(vinvader_state::vinvader)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -258,12 +258,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 
 MACHINE_CONFIG_START(zac_1_state::zac_1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 6000000/2) // no xtal, just 2 chips forming a random oscillator
-	MCFG_CPU_PROGRAM_MAP(zac_1_map)
-	MCFG_CPU_IO_MAP(zac_1_io)
-	MCFG_CPU_DATA_MAP(zac_1_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(zac_1_state, serial_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(zac_1_state, serial_w))
+	MCFG_DEVICE_ADD("maincpu", S2650, 6000000/2) // no xtal, just 2 chips forming a random oscillator
+	MCFG_DEVICE_PROGRAM_MAP(zac_1_map)
+	MCFG_DEVICE_IO_MAP(zac_1_io)
+	MCFG_DEVICE_DATA_MAP(zac_1_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, zac_1_state, serial_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, zac_1_state, serial_w))
 	MCFG_NVRAM_ADD_0FILL("ram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zac_1_inttimer", zac_1_state, zac_1_inttimer, attotime::from_hz(200))
@@ -306,10 +306,10 @@ READ8_MEMBER( zac_1_state::reset_int_r )
 MACHINE_CONFIG_START(zac_1_state::locomotp)
 	zac_1(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(locomotp_map)
-	MCFG_CPU_IO_MAP(locomotp_io)
-	MCFG_CPU_DATA_MAP(locomotp_data)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(locomotp_map)
+	MCFG_DEVICE_IO_MAP(locomotp_io)
+	MCFG_DEVICE_DATA_MAP(locomotp_data)
 	// also has sound cpu
 MACHINE_CONFIG_END
 

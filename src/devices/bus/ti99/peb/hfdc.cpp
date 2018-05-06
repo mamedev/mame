@@ -1051,19 +1051,21 @@ FLOPPY_FORMATS_MEMBER(myarc_hfdc_device::floppy_formats)
 	FLOPPY_TI99_TDF_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( hfdc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )        // 40 tracks
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )        // 80 tracks
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )          // 80 tracks
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )          // 80 tracks 1.4 MiB
-SLOT_INTERFACE_END
+static void hfdc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);        // 40 tracks
+	device.option_add("525qd", FLOPPY_525_QD);        // 80 tracks
+	device.option_add("35dd", FLOPPY_35_DD);          // 80 tracks
+	device.option_add("35hd", FLOPPY_35_HD);          // 80 tracks 1.4 MiB
+}
 
-static SLOT_INTERFACE_START( hfdc_harddisks )
-	SLOT_INTERFACE( "generic", MFMHD_GENERIC )    // Generic hard disk (self-adapting to image)
-	SLOT_INTERFACE( "st213", MFMHD_ST213 )        // Seagate ST-213 (10 MB)
-	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 (20 MB)
-	SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
-SLOT_INTERFACE_END
+static void hfdc_harddisks(device_slot_interface &device)
+{
+	device.option_add("generic", MFMHD_GENERIC);      // Generic hard disk (self-adapting to image)
+	device.option_add("st213", MFMHD_ST213);          // Seagate ST-213 (10 MB)
+	device.option_add("st225", MFMHD_ST225);          // Seagate ST-225 (20 MB)
+	device.option_add("st251", MFMHD_ST251);          // Seagate ST-251 (40 MB)
+}
 
 ROM_START( ti99_hfdc )
 	ROM_REGION(0x4000, TI99_DSRROM, 0)
@@ -1073,12 +1075,12 @@ ROM_END
 
 MACHINE_CONFIG_START(myarc_hfdc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
-	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(myarc_hfdc_device, intrq_w))
-	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(myarc_hfdc_device, dip_w))
-	MCFG_HDC92X4_AUXBUS_OUT_CALLBACK(WRITE8(myarc_hfdc_device, auxbus_out))
-	MCFG_HDC92X4_DMARQ_CALLBACK(WRITELINE(myarc_hfdc_device, dmarq_w))
-	MCFG_HDC92X4_DMA_IN_CALLBACK(READ8(myarc_hfdc_device, read_buffer))
-	MCFG_HDC92X4_DMA_OUT_CALLBACK(WRITE8(myarc_hfdc_device, write_buffer))
+	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(*this, myarc_hfdc_device, intrq_w))
+	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(*this, myarc_hfdc_device, dip_w))
+	MCFG_HDC92X4_AUXBUS_OUT_CALLBACK(WRITE8(*this, myarc_hfdc_device, auxbus_out))
+	MCFG_HDC92X4_DMARQ_CALLBACK(WRITELINE(*this, myarc_hfdc_device, dmarq_w))
+	MCFG_HDC92X4_DMA_IN_CALLBACK(READ8(*this, myarc_hfdc_device, read_buffer))
+	MCFG_HDC92X4_DMA_OUT_CALLBACK(WRITE8(*this, myarc_hfdc_device, write_buffer))
 
 	MCFG_FLOPPY_DRIVE_ADD("f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

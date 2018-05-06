@@ -130,7 +130,8 @@ WRITE8_MEMBER(bbc_joyport_slot_device::pb_w)
 //#include "mouse.h"
 
 
-SLOT_INTERFACE_START( bbc_joyport_devices )
-	SLOT_INTERFACE("joystick", BBCMC_JOYSTICK)
-	//SLOT_INTERFACE("mouse", BBCMC_MOUSE)
-SLOT_INTERFACE_END
+void bbc_joyport_devices(device_slot_interface &device)
+{
+	device.option_add("joystick", BBCMC_JOYSTICK);
+	//device.option_add("mouse", BBCMC_MOUSE);
+}

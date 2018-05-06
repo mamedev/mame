@@ -335,35 +335,35 @@ void jp_state::machine_reset()
 
 MACHINE_CONFIG_START(jp_state::jp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(jp_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, 8_MHz_XTAL / 8192) // 4020 divider
+	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(jp_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, 8_MHz_XTAL / 8192) // 4020 divider
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("latch0", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, disp_data_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_data_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("latch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, disp_clock_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_clock_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("latch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, disp_strobe_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, disp_strobe_w)) MCFG_DEVCB_INVERT
 
 	MCFG_DEVICE_ADD("latch3", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
 	MCFG_DEVICE_ADD("latch4", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
 	MCFG_DEVICE_ADD("latch5", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
 	MCFG_DEVICE_ADD("latch6", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
 	MCFG_DEVICE_ADD("latch7", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(jp_state, row_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, jp_state, row_w))
 
 	MCFG_DEVICE_ADD("latch8", LS259, 0)
 
@@ -375,9 +375,9 @@ MACHINE_CONFIG_START(jp_state::jp)
 	/* Sound */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay", AY8910, 8_MHz_XTAL / 4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(jp_state, porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(jp_state, portb_r))
+	MCFG_DEVICE_ADD("ay", AY8910, 8_MHz_XTAL / 4)
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, jp_state, porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, jp_state, portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 0.9)
 MACHINE_CONFIG_END
 
@@ -410,16 +410,16 @@ IRQ_CALLBACK_MEMBER(jp_state::sound_int_cb)
 
 MACHINE_CONFIG_START(jp_state::jps)
 	jp(config);
-	MCFG_CPU_ADD("soundcpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(jp_sound_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 8_MHz_XTAL / 2)
+	MCFG_DEVICE_PROGRAM_MAP(jp_sound_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // not labeled in manual; might even be a CD4019
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(WRITE8("msm", msm5205_device, data_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
-	MCFG_SOUND_ADD("msm", MSM5205, 384'000) // not labeled in manual; clock unknown
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(jp_state, vck_w))
+	MCFG_DEVICE_ADD("msm", MSM5205, 384'000) // not labeled in manual; clock unknown
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(*this, jp_state, vck_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B) // unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)
 
