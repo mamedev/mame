@@ -1976,7 +1976,7 @@ MACHINE_CONFIG_START(cischeat_state::bigrun)
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", STD_FM_CLOCK)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, STD_FM_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

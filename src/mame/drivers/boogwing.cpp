@@ -358,8 +358,8 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", boogwing)
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
+	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	MCFG_DEVICE_ADD("spriteram2", BUFFERED_SPRITERAM16)
 
 	MCFG_DECO_ACE_ADD("deco_ace")
 	MCFG_DECO_ACE_PALETTE("palette")
@@ -415,7 +415,7 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_XTAL/9)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_XTAL/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, boogwing_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)

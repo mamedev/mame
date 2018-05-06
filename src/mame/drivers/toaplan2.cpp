@@ -3274,7 +3274,7 @@ MACHINE_CONFIG_START(toaplan2_state::ghox)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3365,7 +3365,7 @@ MACHINE_CONFIG_START(toaplan2_state::dogyuun)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(25'000'000)/24, PIN7_HIGH) /* verified on pcb */
@@ -3411,7 +3411,7 @@ MACHINE_CONFIG_START(toaplan2_state::kbash)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/32, PIN7_HIGH)
@@ -3484,7 +3484,7 @@ MACHINE_CONFIG_START(toaplan2_state::truxton2)
 #ifdef TRUXTON2_STEREO  // music data is stereo...
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -3494,7 +3494,7 @@ MACHINE_CONFIG_START(toaplan2_state::truxton2)
 #else   // ...but the hardware is mono
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/4, PIN7_LOW) /* verified on pcb */
@@ -3661,7 +3661,7 @@ MACHINE_CONFIG_START(toaplan2_state::fixeight)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/16, PIN7_HIGH) /* verified on pcb */
@@ -3740,7 +3740,7 @@ MACHINE_CONFIG_START(toaplan2_state::vfive)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8) /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -3784,7 +3784,7 @@ MACHINE_CONFIG_START(toaplan2_state::batsugun)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/8, PIN7_LOW)
@@ -3886,7 +3886,7 @@ MACHINE_CONFIG_START(toaplan2_state::enmadaio)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/4, PIN7_LOW) // pin7 not confirmed
@@ -3923,7 +3923,7 @@ MACHINE_CONFIG_START(toaplan2_state::snowbro2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(27'000'000)/10, PIN7_HIGH)
@@ -3968,7 +3968,7 @@ MACHINE_CONFIG_START(toaplan2_state::mahoudai)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/32, PIN7_HIGH)
@@ -4013,7 +4013,7 @@ MACHINE_CONFIG_START(toaplan2_state::shippumd)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(27'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(27'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/32, PIN7_HIGH)
@@ -4061,7 +4061,7 @@ MACHINE_CONFIG_START(toaplan2_state::bgaregga)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8)
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/16, PIN7_HIGH)
@@ -4140,7 +4140,7 @@ MACHINE_CONFIG_START(toaplan2_state::batrider)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) /* 4MHz , 32MHz Oscillator (verified) */
+	MCFG_DEVICE_ADD("ymsnd", YM2151, XTAL(32'000'000)/8) /* 4MHz , 32MHz Oscillator (verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/10, PIN7_HIGH)
