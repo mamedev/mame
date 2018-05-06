@@ -665,16 +665,16 @@ WRITE_LINE_MEMBER(namcos16_state::slave_vblank_irq)
 }
 
 MACHINE_CONFIG_START(namcos16_state::liblrabl)
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(master_liblrabl_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(master_liblrabl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", M68000, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_DEVICE_ADD("slave", M68000, MASTER_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(slave_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
+	MCFG_DEVICE_ADD("audiocpu", MC6809E, MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
 
 
 	MCFG_DEVICE_ADD("58xx", NAMCO_58XX, 0)
@@ -684,11 +684,11 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
 	MCFG_DEVICE_ADD("56xx_1", NAMCO_56XX, 0)
-	MCFG_NAMCO56XX_IN_0_CB(READ8(namcos16_state, dipA_h))
-	MCFG_NAMCO56XX_IN_1_CB(READ8(namcos16_state, dipB_l))
-	MCFG_NAMCO56XX_IN_2_CB(READ8(namcos16_state, dipB_h))
-	MCFG_NAMCO56XX_IN_3_CB(READ8(namcos16_state, dipA_l))
-	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(namcos16_state, flip))
+	MCFG_NAMCO56XX_IN_0_CB(READ8(*this, namcos16_state, dipA_h))
+	MCFG_NAMCO56XX_IN_1_CB(READ8(*this, namcos16_state, dipB_l))
+	MCFG_NAMCO56XX_IN_2_CB(READ8(*this, namcos16_state, dipB_h))
+	MCFG_NAMCO56XX_IN_3_CB(READ8(*this, namcos16_state, dipA_l))
+	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(*this, namcos16_state, flip))
 
 	MCFG_DEVICE_ADD("56xx_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1_LEFT"))
@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK,384,0,288,264,0,224) // derived from Galaxian HW, 60.606060
 	MCFG_SCREEN_UPDATE_DRIVER(namcos16_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos16_state, slave_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, namcos16_state, slave_vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toypop)
 	MCFG_PALETTE_ADD("palette", 128*4+64*4+16*2)
@@ -708,15 +708,15 @@ MACHINE_CONFIG_START(namcos16_state::liblrabl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("namco", NAMCO_15XX, 24000)
+	MCFG_DEVICE_ADD("namco", NAMCO_15XX, 24000)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos16_state::toypop)
 	liblrabl(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(master_toypop_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(master_toypop_map)
 MACHINE_CONFIG_END
 
 

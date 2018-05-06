@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -263,7 +264,14 @@ public:
 	///
 	/// Returns the search tag.
 	/// \return The object tag this helper will search for.
-	const char *finder_tag() const { return m_tag; }
+	char const *finder_tag() const { return m_tag; }
+
+	/// \brief Get search target
+	///
+	/// Returns the search base device and tag.
+	/// \return a pair consisting of a reference to the device to search
+	///   relative to and the relative tag.
+	std::pair<device_t &, char const *> finder_target() const { return std::make_pair(m_base, m_tag); }
 
 	/// \brief Set search tag
 	///
@@ -291,6 +299,17 @@ public:
 	///   caller's responsibility to ensure this pointer remains valid
 	///   until resolution time.
 	void set_tag(char const *tag);
+
+	/// \brief Set search tag
+	///
+	/// Allows search tag to be changed after construction.  Note that
+	/// this must be done before resolution time to take effect.
+	/// \param [in] finder Object finder to take the search base and tag
+	///   from.
+	void set_tag(finder_base const &finder)
+	{
+		std::tie(m_base, m_tag) = finder.finder_target();
+	}
 
 	/// \brief Is the object to be resolved before memory maps?
 	///
@@ -519,7 +538,7 @@ public:
 	/// During configuration, device_finder instances may be assigned
 	/// a reference to the anticipated target device to avoid the need
 	/// for tempories during configuration.  Normal resolution will
-	/// still happen after machine configuration is completed to ensure 
+	/// still happen after machine configuration is completed to ensure
 	/// device removal/replacement is handled properly.
 	/// \param [in] device Reference to anticipated target device.
 	/// \return The same reference supplied by the caller.
@@ -532,17 +551,12 @@ public:
 	}
 
 private:
-	template <typename T> struct is_device_implementation
-	{ static constexpr bool value = std::is_base_of<device_t, T>::value; };
-	template <typename T> struct is_device_interface
-	{ static constexpr bool value = std::is_base_of<device_interface, T>::value && !is_device_implementation<T>::value; };
-
 	/// \brief Check that device implementation has expected tag
 	/// \param [in] device Reference to device.
 	/// \return True if supplied device matches the configured target
 	///   tag, or false otherwise.
 	template <typename T>
-	std::enable_if_t<is_device_implementation<T>::value, bool> is_expected_tag(T const &device) const
+	std::enable_if_t<emu::detail::is_device_implementation<T>::value, bool> is_expected_tag(T const &device) const
 	{
 		return this->m_base.get().subtag(this->m_tag) == device.tag();
 	}
@@ -552,7 +566,7 @@ private:
 	/// \return True if supplied mixin matches the configured target
 	///   tag, or false otherwise.
 	template <typename T>
-	std::enable_if_t<is_device_interface<T>::value, bool> is_expected_tag(T const &interface) const
+	std::enable_if_t<emu::detail::is_device_interface<T>::value, bool> is_expected_tag(T const &interface) const
 	{
 		return this->m_base.get().subtag(this->m_tag) == interface.device().tag();
 	}

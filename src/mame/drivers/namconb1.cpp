@@ -1069,12 +1069,12 @@ MACHINE_RESET_MEMBER(namconb1_state, namconb)
 /***************************************************************/
 
 MACHINE_CONFIG_START(namconb1_state::namconb1)
-	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(namconb1_am)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(namconb1_am)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
-	MCFG_CPU_IO_MAP(namcoc75_io)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
+	MCFG_DEVICE_IO_MAP(namcoc75_io)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)
@@ -1111,12 +1111,12 @@ MACHINE_CONFIG_START(namconb1_state::namconb1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namconb1_state::namconb2)
-	MCFG_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(namconb2_am)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(namconb2_am)
 
-	MCFG_CPU_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(namcoc75_am)
-	MCFG_CPU_IO_MAP(namcoc75_io)
+	MCFG_DEVICE_ADD("mcu", NAMCO_C75, MASTER_CLOCK/3)
+	MCFG_DEVICE_PROGRAM_MAP(namcoc75_am)
+	MCFG_DEVICE_IO_MAP(namcoc75_io)
 
 	MCFG_EEPROM_2816_ADD("eeprom")
 	MCFG_MACHINE_RESET_OVERRIDE(namconb1_state, namconb)

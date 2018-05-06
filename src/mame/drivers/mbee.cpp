@@ -638,27 +638,28 @@ static GFXDECODE_START( premium )
 	GFXDECODE_ENTRY( "gfx", 0x0000, mbee_charlayout, 0, 8 )
 GFXDECODE_END
 
-static SLOT_INTERFACE_START( mbee_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void mbee_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 MACHINE_CONFIG_START(mbee_state::mbee)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 6)         /* 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(mbee_mem)
-	MCFG_CPU_IO_MAP(mbee_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 6)         /* 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mbee_mem)
+	MCFG_DEVICE_IO_MAP(mbee_io)
 	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(12'000'000) / 6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(mbee_state, pio_ardy))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mbee_state, pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mbee_state, pio_port_b_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, mbee_state, pio_ardy))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mbee_state, pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mbee_state, pio_port_b_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -678,7 +679,7 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -687,13 +688,13 @@ MACHINE_CONFIG_START(mbee_state::mbee)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mbee_state, crtc_vs))
 
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 3)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 3)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("z80pio", z80pio_device, strobe_a))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("z80pio", z80pio_device, strobe_a))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -705,19 +706,19 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbeeic)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
-	MCFG_CPU_PROGRAM_MAP(mbeeic_mem)
-	MCFG_CPU_IO_MAP(mbeeic_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(mbeeic_mem)
+	MCFG_DEVICE_IO_MAP(mbeeic_io)
 	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3375000)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(mbee_state, pio_ardy))
-	MCFG_Z80PIO_IN_PB_CB(READ8(mbee_state, pio_port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mbee_state, pio_port_b_w))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, write))
+	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, mbee_state, pio_ardy))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, mbee_state, pio_port_b_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, mbee_state, pio_port_b_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -737,7 +738,7 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -746,13 +747,13 @@ MACHINE_CONFIG_START(mbee_state::mbeeic)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(mbee_state, crtc_update_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mbee_state, crtc_vs))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mbee_state, crtc_vs))
 
 	MCFG_QUICKLOAD_ADD("quickload", mbee_state, mbee, "mwb,com,bee", 2)
 	MCFG_QUICKLOAD_ADD("quickload2", mbee_state, mbee_z80bin, "bin", 2)
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("z80pio", z80pio_device, strobe_a))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("z80pio", z80pio_device, strobe_a))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
@@ -763,33 +764,33 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbeepc)
 	mbeeic(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbeepc_mem)
-	MCFG_CPU_IO_MAP(mbeepc_io)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(mbeepc_mem)
+	MCFG_DEVICE_IO_MAP(mbeepc_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbeeppc)
 	mbeeic(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbeeppc_mem)
-	MCFG_CPU_IO_MAP(mbeeppc_io)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(mbeeppc_mem)
+	MCFG_DEVICE_IO_MAP(mbeeppc_io)
 	MCFG_VIDEO_START_OVERRIDE(mbee_state, premium)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", premium)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
 	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbee56)
 	mbeeic(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbee56_mem)
-	MCFG_CPU_IO_MAP(mbee56_io)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(mbee56_mem)
+	MCFG_DEVICE_IO_MAP(mbee56_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56)
 	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -799,23 +800,23 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbee128)
 	mbee56(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
-	MCFG_CPU_IO_MAP(mbee128_io)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
+	MCFG_DEVICE_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
+	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbee128p)
 	mbeeppc(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
-	MCFG_CPU_IO_MAP(mbee128_io)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
+	MCFG_DEVICE_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
 	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_intrq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbee_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -825,9 +826,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbee256)
 	mbee128p(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
-	MCFG_CPU_IO_MAP(mbee256_io)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(mbee256_mem)
+	MCFG_DEVICE_IO_MAP(mbee256_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee256)
 
 	MCFG_DEVICE_REMOVE("fdc:0")
@@ -840,9 +841,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mbee_state::mbeett)
 	mbeeppc(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(mbeett_mem)
-	MCFG_CPU_IO_MAP(mbeett_io)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(mbeett_mem)
+	MCFG_DEVICE_IO_MAP(mbeett_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbeett)
 	MCFG_DEVICE_REMOVE("quickload")
 	MCFG_DEVICE_REMOVE("quickload2")

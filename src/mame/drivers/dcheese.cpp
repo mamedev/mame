@@ -375,14 +375,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(dcheese_state::dcheese)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_OSC)
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcheese_state,  dcheese_vblank)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(dcheese_state,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_OSC)
+	MCFG_DEVICE_PROGRAM_MAP(main_cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dcheese_state,  dcheese_vblank)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(dcheese_state,irq_callback)
 
-	MCFG_CPU_ADD("audiocpu", M6809, SOUND_OSC/16)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dcheese_state, irq1_line_hold,  480)   /* accurate for fredmem */
+	MCFG_DEVICE_ADD("audiocpu", M6809, SOUND_OSC/16)
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dcheese_state, irq1_line_hold,  480)   /* accurate for fredmem */
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 

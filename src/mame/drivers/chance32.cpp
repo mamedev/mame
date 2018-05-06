@@ -452,10 +452,10 @@ void chance32_state::machine_reset()
 MACHINE_CONFIG_START(chance32_state::chance32)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
-	MCFG_CPU_PROGRAM_MAP(chance32_map)
-	MCFG_CPU_IO_MAP(chance32_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", chance32_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(chance32_map)
+	MCFG_DEVICE_IO_MAP(chance32_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chance32_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

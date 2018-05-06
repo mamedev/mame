@@ -231,9 +231,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(plan80_state::plan80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 2048000)
-	MCFG_CPU_PROGRAM_MAP(plan80_mem)
-	MCFG_CPU_IO_MAP(plan80_io)
+	MCFG_DEVICE_ADD("maincpu",I8080, 2048000)
+	MCFG_DEVICE_PROGRAM_MAP(plan80_mem)
+	MCFG_DEVICE_IO_MAP(plan80_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())

@@ -234,7 +234,7 @@ static const char *const astrob_sample_names[] =
 MACHINE_CONFIG_START(segag80r_state::astrob_sound_board)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(11)
 	MCFG_SAMPLES_NAMES(astrob_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -421,17 +421,17 @@ static const char *const sega005_sample_names[] =
 MACHINE_CONFIG_START(segag80r_state::sega005_sound_board)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, sega005_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(segag80r_state, sega005_sound_b_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segag80r_state, sega005_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segag80r_state, sega005_sound_b_w))
 
 	/* sound hardware */
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(7)
 	MCFG_SAMPLES_NAMES(sega005_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("005", SEGA005, 0)
+	MCFG_DEVICE_ADD("005", SEGA005, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
@@ -584,7 +584,7 @@ MACHINE_CONFIG_START(segag80r_state::spaceod_sound_board)
 
 	/* sound hardware */
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(11)
 	MCFG_SAMPLES_NAMES(spaceod_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -680,25 +680,25 @@ static const char *const monsterb_sample_names[] =
 
 MACHINE_CONFIG_START(segag80r_state::monsterb_sound_board)
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(segag80r_state, monsterb_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(segag80r_state, monsterb_sound_b_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(segag80r_state, n7751_status_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segag80r_state, n7751_command_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, segag80r_state, monsterb_sound_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, segag80r_state, monsterb_sound_b_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, segag80r_state, n7751_status_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, segag80r_state, n7751_command_w))
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", N7751, 6000000)
+	MCFG_DEVICE_ADD("audiocpu", N7751, 6000000)
 	MCFG_MCS48_PORT_T1_IN_CB(GND) // labelled as "TEST", connected to ground
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(segag80r_state, n7751_command_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(segag80r_state, n7751_rom_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(segag80r_state, n7751_p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("audio_8243", i8243_device, prog_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, segag80r_state, n7751_command_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, segag80r_state, n7751_rom_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8("dac", dac_byte_interface, write))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, segag80r_state, n7751_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("audio_8243", i8243_device, prog_w))
 
-	MCFG_I8243_ADD("audio_8243", NOOP, WRITE8(segag80r_state,n7751_rom_control_w))
+	MCFG_I8243_ADD("audio_8243", NOOP, WRITE8(*this, segag80r_state,n7751_rom_control_w))
 
 	/* sound hardware */
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_NAMES(monsterb_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -708,9 +708,9 @@ MACHINE_CONFIG_START(segag80r_state::monsterb_sound_board)
 	MCFG_TMS36XX_DECAY_TIMES(0.5, 0.5, 0.5, 0.5, 0.5, 0.5)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // 50K (R91-97)/100K (R98-106) ladder network
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // 50K (R91-97)/100K (R98-106) ladder network
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 

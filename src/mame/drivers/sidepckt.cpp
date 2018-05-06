@@ -372,11 +372,11 @@ void sidepckt_state::machine_reset()
 MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000) /* MC68B09EP, 2 MHz */
-	MCFG_CPU_PROGRAM_MAP(sidepckt_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000) /* MC68B09EP, 2 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sidepckt_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000) /* 1.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000) /* 1.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -398,10 +398,10 @@ MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ym2", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -410,8 +410,8 @@ MACHINE_CONFIG_START(sidepckt_state::sidepcktb)
 	sidepckt(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sidepcktb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sidepcktb_map)
 MACHINE_CONFIG_END
 
 

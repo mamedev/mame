@@ -137,12 +137,12 @@ MACHINE_CONFIG_START(pgm_arm_type2_state::pgm_arm_type2)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type2_state, pgm_arm_type2 )
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(kov2_mem)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)    // 55857F
-	MCFG_CPU_PROGRAM_MAP(_55857F_arm7_map)
+	MCFG_DEVICE_ADD("prot", ARM7, 20000000)    // 55857F
+	MCFG_DEVICE_PROGRAM_MAP(_55857F_arm7_map)
 MACHINE_CONFIG_END
 
 

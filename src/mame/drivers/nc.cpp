@@ -1401,9 +1401,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(nc_state::nc100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
-	MCFG_CPU_PROGRAM_MAP(nc_map)
-	MCFG_CPU_IO_MAP(nc100_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
+	MCFG_DEVICE_PROGRAM_MAP(nc_map)
+	MCFG_DEVICE_IO_MAP(nc100_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -1422,29 +1422,29 @@ MACHINE_CONFIG_START(nc_state::nc100)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep.1", BEEP, 0)
+	MCFG_DEVICE_ADD("beep.1", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("beep.2", BEEP, 0)
+	MCFG_DEVICE_ADD("beep.2", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(nc_state, write_nc100_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(nc_state, write_centronics_busy))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc_state, write_nc100_centronics_ack))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, nc_state, write_centronics_busy))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(nc_state,nc100_rxrdy_callback))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(nc_state,nc100_txrdy_callback))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, nc_state,nc100_rxrdy_callback))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, nc_state,nc100_txrdy_callback))
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 19200)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(nc_state, write_uart_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, nc_state, write_uart_clock))
 
 	/* rtc */
 	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
-	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(nc_state, nc100_tc8521_alarm_callback))
+	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(*this, nc_state, nc100_tc8521_alarm_callback))
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cardslot", generic_plain_slot, nullptr)
@@ -1466,15 +1466,16 @@ static const floppy_format_type ibmpc_floppy_formats[] = {
 	nullptr
 };
 
-static SLOT_INTERFACE_START( ibmpc_floppies )
-		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ibmpc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 MACHINE_CONFIG_START(nc_state::nc200)
 	nc100(config);
 
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_IO_MAP(nc200_io)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_IO_MAP(nc200_io)
 
 	MCFG_MACHINE_START_OVERRIDE(nc_state, nc200)
 	MCFG_MACHINE_RESET_OVERRIDE(nc_state, nc200)
@@ -1490,18 +1491,18 @@ MACHINE_CONFIG_START(nc_state::nc200)
 
 	/* printer */
 	MCFG_DEVICE_MODIFY("centronics")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(nc_state, write_nc200_centronics_ack))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, nc_state, write_nc200_centronics_ack))
 
 	/* uart */
 	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(nc_state,nc200_rxrdy_callback))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(nc_state,nc200_txrdy_callback))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, nc_state,nc200_rxrdy_callback))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, nc_state,nc200_txrdy_callback))
 
 	/* no rtc */
 	MCFG_DEVICE_REMOVE("rtc")
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(nc_state, nc200_fdc_interrupt))
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, nc_state, nc200_fdc_interrupt))
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 

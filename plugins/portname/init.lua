@@ -31,7 +31,8 @@ function portname.startplugin()
 	local function get_filename(nosoft)
 		local filename
 		if emu.softname() ~= "" and not nosoft then
-			filename = emu.romname() .. "_" .. emu.softname() .. ".json"
+			local soft = emu.softname():match("([^:]*)$")
+			filename = emu.romname() .. "_" .. soft .. ".json"
 		else
 			filename = emu.romname() .. ".json"
 		end

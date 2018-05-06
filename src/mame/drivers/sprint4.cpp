@@ -382,8 +382,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sprint4_state::sprint4)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(sprint4_cpu_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
+	MCFG_DEVICE_PROGRAM_MAP(sprint4_cpu_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -392,7 +392,7 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(sprint4_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sprint4_state, screen_vblank))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sprint4_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sprint4)
@@ -408,12 +408,12 @@ MACHINE_CONFIG_START(sprint4_state::sprint4)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) // START LAMP 2
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(OUTPUT("led2")) // START LAMP 3
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led3")) // START LAMP 4
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_1>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_2>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_3>))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_4>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_1>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_2>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_3>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("discrete", discrete_device, write_line<SPRINT4_SCREECH_EN_4>))
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(sprint4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

@@ -246,13 +246,13 @@ void pc_kbd_microsoft_natural_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc_kbd_microsoft_natural_device::device_add_mconfig)
-	MCFG_CPU_ADD("ms_natrl_cpu", I8051, XTAL(6'000'000))
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(pc_kbd_microsoft_natural_device, p0_read))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(pc_kbd_microsoft_natural_device, p0_write))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(pc_kbd_microsoft_natural_device, p1_write))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(pc_kbd_microsoft_natural_device, p2_write))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(pc_kbd_microsoft_natural_device, p3_read))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(pc_kbd_microsoft_natural_device, p3_write))
+	MCFG_DEVICE_ADD("ms_natrl_cpu", I8051, XTAL(6'000'000))
+	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, pc_kbd_microsoft_natural_device, p0_read))
+	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, pc_kbd_microsoft_natural_device, p0_write))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, pc_kbd_microsoft_natural_device, p1_write))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, pc_kbd_microsoft_natural_device, p2_write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, pc_kbd_microsoft_natural_device, p3_read))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, pc_kbd_microsoft_natural_device, p3_write))
 MACHINE_CONFIG_END
 
 

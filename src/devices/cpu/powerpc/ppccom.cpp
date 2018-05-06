@@ -231,6 +231,10 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 		set_vtlb_fixed_entries(PPC603_FIXED_TLB_ENTRIES);
 }
 
+ppc_device::~ppc_device()
+{
+}
+
 //ppc403_device::ppc403_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 //  : ppc_device(mconfig, PPC403, "PPC403", tag, owner, clock, "ppc403", 32?, 64?)
 //{

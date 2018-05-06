@@ -87,8 +87,10 @@ private:
 
 	void update_readyff_input();
 
-	// Link to the attached floppy drive
-	floppy_image_device*    m_floppy;
+	// Link to the attached floppy drives
+	floppy_image_device*    m_floppy[2];
+	floppy_image_device*    m_current_floppy;
+	int m_floppy_select, m_floppy_select_last;
 
 	required_device<ibc_device> m_hexbus_ctrl;
 	required_device<i8272a_device> m_floppy_ctrl;

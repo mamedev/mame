@@ -295,34 +295,34 @@ void kungfur_state::machine_reset()
 MACHINE_CONFIG_START(kungfur_state::kungfur)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 8000000/2)   // 4MHz?
-	MCFG_CPU_PROGRAM_MAP(kungfur_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kungfur_state, kungfur_irq,  975)      // close approximation
+	MCFG_DEVICE_ADD("maincpu", M6809, 8000000/2)   // 4MHz?
+	MCFG_DEVICE_PROGRAM_MAP(kungfur_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(kungfur_state, kungfur_irq,  975)      // close approximation
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	// $4008 - always $83 (PPI mode 0, ports B & lower C as input)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kungfur_state, kungfur_output_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kungfur_state, kungfur_output_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kungfur_state, kungfur_control_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kungfur_state, kungfur_control_w))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	// $400c - always $80 (PPI mode 0, all ports as output)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(kungfur_state, kungfur_latch1_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(kungfur_state, kungfur_latch2_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(kungfur_state, kungfur_latch3_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, kungfur_state, kungfur_latch1_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, kungfur_state, kungfur_latch2_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, kungfur_state, kungfur_latch3_w))
 
 	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("adpcm1", MSM5205, XTAL(384'000))  // clock verified with recording
-	MCFG_MSM5205_VCLK_CB(WRITELINE(kungfur_state, kfr_adpcm1_int))
+	MCFG_DEVICE_ADD("adpcm1", MSM5205, XTAL(384'000))  // clock verified with recording
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kungfur_state, kfr_adpcm1_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_SOUND_ADD("adpcm2", MSM5205, XTAL(384'000))  // "
-	MCFG_MSM5205_VCLK_CB(WRITELINE(kungfur_state, kfr_adpcm2_int))
+	MCFG_DEVICE_ADD("adpcm2", MSM5205, XTAL(384'000))  // "
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, kungfur_state, kfr_adpcm2_int))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

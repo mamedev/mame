@@ -274,12 +274,12 @@ void battlane_state::machine_reset()
 MACHINE_CONFIG_START(battlane_state::battlane)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(battlane_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", battlane_state,  battlane_cpu1_interrupt)
+	MCFG_DEVICE_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(battlane_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", battlane_state,  battlane_cpu1_interrupt)
 
-	MCFG_CPU_ADD("sub", M6809, 1500000)        /* 1.5 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(battlane_map)
+	MCFG_DEVICE_ADD("sub", M6809, 1500000)        /* 1.5 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(battlane_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -300,7 +300,7 @@ MACHINE_CONFIG_START(battlane_state::battlane)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 3000000)
+	MCFG_DEVICE_ADD("ymsnd", YM3526, 3000000)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

@@ -125,20 +125,22 @@ uint16_t saturn_control_port_device::read_direct()
 //  SLOT_INTERFACE( saturn_controls )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( saturn_controls )
-	SLOT_INTERFACE("joypad",    SATURN_JOY)
-	SLOT_INTERFACE("racing",    SATURN_WHEEL)
-	SLOT_INTERFACE("analog",    SATURN_ANALOG)
-//  SLOT_INTERFACE("lightgun",  SATURN_LIGHTGUN)
-	SLOT_INTERFACE("trackball", SATURN_TRACK)
-	SLOT_INTERFACE("keyboard",  SATURN_KEYBD)
-	SLOT_INTERFACE("joy_md3",   SATURN_JOYMD3B)
-	SLOT_INTERFACE("joy_md6",   SATURN_JOYMD6B)
-	SLOT_INTERFACE("mouse",     SATURN_MOUSE)
-	SLOT_INTERFACE("multitap",  SATURN_MULTITAP)
-	SLOT_INTERFACE("segatap",   SATURN_SEGATAP)
-SLOT_INTERFACE_END
+void saturn_controls(device_slot_interface &device)
+{
+	device.option_add("joypad",    SATURN_JOY);
+	device.option_add("racing",    SATURN_WHEEL);
+	device.option_add("analog",    SATURN_ANALOG);
+//  device.option_add("lightgun",  SATURN_LIGHTGUN);
+	device.option_add("trackball", SATURN_TRACK);
+	device.option_add("keyboard",  SATURN_KEYBD);
+	device.option_add("joy_md3",   SATURN_JOYMD3B);
+	device.option_add("joy_md6",   SATURN_JOYMD6B);
+	device.option_add("mouse",     SATURN_MOUSE);
+	device.option_add("multitap",  SATURN_MULTITAP);
+	device.option_add("segatap",   SATURN_SEGATAP);
+}
 
-SLOT_INTERFACE_START( saturn_joys )
-	SLOT_INTERFACE("joypad",    SATURN_JOY)
-SLOT_INTERFACE_END
+void saturn_joys(device_slot_interface &device)
+{
+	device.option_add("joypad",    SATURN_JOY);
+}

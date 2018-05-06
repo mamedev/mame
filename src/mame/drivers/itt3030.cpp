@@ -661,10 +661,11 @@ FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
 FLOPPY_FORMATS_END
 
 
-static SLOT_INTERFACE_START( itt3030_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void itt3030_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 
@@ -695,20 +696,20 @@ void itt3030_state::machine_reset()
 MACHINE_CONFIG_START(itt3030_state::itt3030)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(itt3030_map)
-	MCFG_CPU_IO_MAP(itt3030_io)
+	MCFG_DEVICE_ADD("maincpu",Z80,XTAL(4'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(itt3030_map)
+	MCFG_DEVICE_IO_MAP(itt3030_io)
 
 	// Schematics + i8278 datasheet says:
 	// Port 1 goes to the keyboard matrix.
 	// bits 0-2 select bit to read back, bits 3-6 choose column to read from, bit 7 clocks the process (rising edge strobes the row, falling edge reads the data)
 	// T0 is the key matrix return
 	// pin 23 is the UPI-41 host IRQ line, it's unknown how it's connected to the Z80
-	MCFG_CPU_ADD("kbdmcu", I8741, XTAL(6'000'000))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(itt3030_state, kbd_matrix_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(itt3030_state, kbd_matrix_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(itt3030_state, kbd_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(itt3030_state, kbd_port2_w))
+	MCFG_DEVICE_ADD("kbdmcu", I8741, XTAL(6'000'000))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, itt3030_state, kbd_matrix_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, itt3030_state, kbd_matrix_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, itt3030_state, kbd_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, itt3030_state, kbd_port2_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -731,9 +732,9 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 
 	MCFG_FD1791_ADD("fdc", XTAL(20'000'000) / 20)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(itt3030_state, fdcirq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(itt3030_state, fdcdrq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(itt3030_state, fdchld_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, itt3030_state, fdcirq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, itt3030_state, fdcdrq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, itt3030_state, fdchld_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", itt3030_floppies, "525qd", itt3030_state::itt3030_floppy_formats)
@@ -749,7 +750,7 @@ MACHINE_CONFIG_START(itt3030_state::itt3030)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "beeper", BEEP, 3250 )
+	MCFG_DEVICE_ADD( "beeper", BEEP, 3250 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 

@@ -417,8 +417,8 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(supercrd_state::supercrd)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
-	MCFG_CPU_PROGRAM_MAP(supercrd_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/8)    /* 2MHz, guess */
+	MCFG_DEVICE_PROGRAM_MAP(supercrd_map)
 
 //  MCFG_NVRAM_ADD_0FILL("nvram")
 

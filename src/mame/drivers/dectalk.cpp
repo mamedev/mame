@@ -877,19 +877,19 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 
 MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
-	MCFG_CPU_PROGRAM_MAP(m68k_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
+	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
 	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(dectalk_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(dectalk_state, duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(dectalk_state, duart_input))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, duart_output))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, dectalk_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, dectalk_state, duart_txa))
+	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, dectalk_state, duart_input))
+	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, dectalk_state, duart_output))
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
-	MCFG_CPU_PROGRAM_MAP(tms32010_mem)
-	MCFG_CPU_IO_MAP(tms32010_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
+	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
+	MCFG_DEVICE_PROGRAM_MAP(tms32010_mem)
+	MCFG_DEVICE_IO_MAP(tms32010_io)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
 #ifdef USE_LOOSE_TIMING
 	MCFG_QUANTUM_TIME(attotime::from_hz(100))
 #else
@@ -902,14 +902,14 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
+	MCFG_DEVICE_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
+	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
 MACHINE_CONFIG_END
 
 

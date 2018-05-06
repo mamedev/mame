@@ -274,9 +274,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(zrt80_state::zrt80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'457'600))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(2'457'600))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(zrt80_state::zrt80)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 800)
+	MCFG_DEVICE_ADD("beeper", BEEP, 800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

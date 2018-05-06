@@ -298,8 +298,8 @@ void mephisto_state::machine_reset()
 
 MACHINE_CONFIG_START(mephisto_state::mephisto)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M65C02,4915200)  /* 65C02 */
-	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
+	MCFG_DEVICE_ADD("maincpu",M65C02,4915200)  /* 65C02 */
+	MCFG_DEVICE_PROGRAM_MAP(mephisto_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("outlatch", HC259, 0)
@@ -309,11 +309,11 @@ MACHINE_CONFIG_START(mephisto_state::mephisto)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led103"))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(OUTPUT("led104"))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(OUTPUT("led105"))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mephisto_state, write_led7))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mephisto_state, write_led7))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 3250)
+	MCFG_DEVICE_ADD("beeper", BEEP, 3250)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", mephisto_state, update_nmi, attotime::from_hz(600))
@@ -325,8 +325,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mephisto_state::rebel5)
 	mephisto(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rebel5_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(rebel5_mem)
 	MCFG_DEVICE_REMOVE("nmi_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer_r5", mephisto_state, update_nmi_r5, attotime::from_hz(600))
 
@@ -334,8 +334,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_state::mm2)
 	mephisto(config);
-	MCFG_CPU_REPLACE("maincpu", M65C02, 3700000)
-	MCFG_CPU_PROGRAM_MAP(mm2_mem)
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 3700000)
+	MCFG_DEVICE_PROGRAM_MAP(mm2_mem)
 	MCFG_MACHINE_START_OVERRIDE(mephisto_state, mm2 )
 
 	MCFG_DEVICE_REMOVE("nmi_timer")
@@ -344,9 +344,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mephisto_state::mm4tk)
 	mephisto(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_REPLACE("maincpu", M65C02, 18000000)
-	MCFG_CPU_PROGRAM_MAP(mephisto_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_REPLACE("maincpu", M65C02, 18000000)
+	MCFG_DEVICE_PROGRAM_MAP(mephisto_mem)
 MACHINE_CONFIG_END
 
 ROM_START(rebel5)

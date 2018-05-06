@@ -307,13 +307,13 @@ void ashnojoe_state::machine_reset()
 MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
-	MCFG_CPU_PROGRAM_MAP(ashnojoe_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ashnojoe_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 8000000)
+	MCFG_DEVICE_PROGRAM_MAP(ashnojoe_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ashnojoe_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 
 	/* video hardware */
@@ -334,14 +334,14 @@ MACHINE_CONFIG_START(ashnojoe_state::ashnojoe)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_a))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ashnojoe_state, ym2203_write_b))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, ashnojoe_state, ym2203_write_a))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, ashnojoe_state, ym2203_write_b))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(ashnojoe_state, ashnojoe_vclk_cb))
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, ashnojoe_state, ashnojoe_vclk_cb))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

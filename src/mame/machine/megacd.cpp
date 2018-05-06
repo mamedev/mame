@@ -288,9 +288,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(sega_segacd_device::device_add_mconfig)
 
-	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MCFG_CPU_PROGRAM_MAP(segacd_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, sega_segacd_device, segacd_sub_int_callback)
+	MCFG_DEVICE_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(segacd_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, sega_segacd_device, segacd_sub_int_callback)
 
 	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
 

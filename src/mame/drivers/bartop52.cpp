@@ -129,8 +129,8 @@ TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
 
 MACHINE_CONFIG_START(bartop52_state::a5200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
-	MCFG_CPU_PROGRAM_MAP(a5200_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
+	MCFG_DEVICE_PROGRAM_MAP(a5200_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bartop52_state, bartop_interrupt, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
@@ -154,7 +154,7 @@ MACHINE_CONFIG_START(bartop52_state::a5200)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
+	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
 	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))

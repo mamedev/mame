@@ -933,12 +933,12 @@ MACHINE_RESET_MEMBER(ninjakd2_state,omegaf)
 MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
-	MCFG_CPU_PROGRAM_MAP(ninjakd2_main_cpu)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK_12/2)       /* verified */
+	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_main_cpu)
 
-	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)     /* verified */
-	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
+	MCFG_DEVICE_ADD("soundcpu", Z80, MAIN_CLOCK_5)     /* verified */
+	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_DEVICE_IO_MAP(ninjakd2_sound_io)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -946,7 +946,7 @@ MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(ninjakd2_state, screen_update_ninjakd2)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ninjakd2_state, screen_vblank_ninjakd2))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, ninjakd2_state, screen_vblank_ninjakd2))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ninjakd2)
@@ -959,20 +959,20 @@ MACHINE_CONFIG_START(ninjakd2_state::ninjakd2_core)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)       /* verified */
+	MCFG_DEVICE_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)       /* verified */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)       /* verified */
+	MCFG_DEVICE_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)       /* verified */
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 	MCFG_SOUND_ROUTE(2, "mono", 0.10)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pcm", SAMPLES, 0)
+	MCFG_DEVICE_ADD("pcm", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(ninjakd2_state, ninjakd2_init_samples)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -980,28 +980,28 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ninjakd2_state::ninjakd2)
 	ninjakd2_core(config);
-	MCFG_CPU_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
-	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_REPLACE("soundcpu", MC8123, MAIN_CLOCK_5)     /* verified */
+	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_DEVICE_IO_MAP(ninjakd2_sound_io)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ninjakd2_state::ninjakd2b)
 	ninjakd2_core(config);
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ninjakd2_state::mnight)
 	ninjakd2_core(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mnight_main_cpu)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,mnight)
@@ -1013,11 +1013,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ninjakd2_state::arkarea)
 	ninjakd2_core(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(mnight_main_cpu)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(ninjakd2_state,arkarea)
@@ -1030,11 +1030,11 @@ MACHINE_CONFIG_START(ninjakd2_state::robokid)
 	mnight(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(robokid_main_cpu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(robokid_main_cpu)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", robokid)
@@ -1052,11 +1052,11 @@ MACHINE_CONFIG_START(ninjakd2_state::omegaf)
 	robokid(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(omegaf_main_cpu)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(omegaf_main_cpu)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(ninjakid_nopcm_sound_cpu)
 
 	MCFG_MACHINE_START_OVERRIDE(ninjakd2_state,omegaf)
 	MCFG_MACHINE_RESET_OVERRIDE(ninjakd2_state,omegaf)

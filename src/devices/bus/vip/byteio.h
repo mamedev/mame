@@ -72,7 +72,7 @@ public:
 	// construction/destruction
 	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _inst> void set_inst_callback(_inst inst) { m_write_inst.set_callback(inst); }
+	template <class Object> void set_inst_callback(Object &&inst) { m_write_inst.set_callback(std::forward<Object>(inst)); }
 
 	// computer interface
 	uint8_t in_r();
@@ -124,6 +124,6 @@ DECLARE_DEVICE_TYPE(VIP_BYTEIO_PORT, vip_byteio_port_device)
 // slot devices
 #include "vp620.h"
 
-SLOT_INTERFACE_EXTERN( vip_byteio_cards );
+void vip_byteio_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_VIP_BYTEIO_H

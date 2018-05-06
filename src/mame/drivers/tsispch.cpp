@@ -379,19 +379,19 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
-	MCFG_CPU_PROGRAM_MAP(i8086_mem)
-	MCFG_CPU_IO_MAP(i8086_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8086, 8000000) /* VERIFIED clock, unknown divider */
+	MCFG_DEVICE_PROGRAM_MAP(i8086_mem)
+	MCFG_DEVICE_IO_MAP(i8086_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
 	/* TODO: hook up p0, p1, int */
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
-	MCFG_CPU_DATA_MAP(dsp_data_map)
-	MCFG_NECDSP_OUT_P0_CB(WRITELINE(tsispch_state, dsp_to_8086_p0_w))
-	MCFG_NECDSP_OUT_P1_CB(WRITELINE(tsispch_state, dsp_to_8086_p1_w))
+	MCFG_DEVICE_ADD("dsp", UPD7725, 8000000) /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
+	MCFG_DEVICE_PROGRAM_MAP(dsp_prg_map)
+	MCFG_DEVICE_DATA_MAP(dsp_data_map)
+	MCFG_NECDSP_OUT_P0_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p0_w))
+	MCFG_NECDSP_OUT_P1_CB(WRITELINE(*this, tsispch_state, dsp_to_8086_p1_w))
 
 	/* PIC 8259 */
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
@@ -400,15 +400,15 @@ MACHINE_CONFIG_START(tsispch_state::prose2k)
 	/* uarts */
 	MCFG_DEVICE_ADD("i8251a_u15", I8251, 0)
 	// (todo: proper hookup, currently using hack w/i8251_receive_character())
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(tsispch_state, i8251_rxrdy_int))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE(tsispch_state, i8251_txrdy_int))
-	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(tsispch_state, i8251_txempty_int))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_rxrdy_int))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txrdy_int))
+	MCFG_I8251_TXEMPTY_HANDLER(WRITELINE(*this, tsispch_state, i8251_txempty_int))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
+	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC (TODO: correctly figure out how the DAC works; apparently it is connected to the serial output of the upd7720, which will be "fun" to connect up)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVPUT("i8251a_u15", i8251_device, receive_character))

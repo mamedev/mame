@@ -422,15 +422,15 @@ void pc_kbd_keytronic_pc3270_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc_kbd_keytronic_pc3270_device::device_add_mconfig)
-	MCFG_CPU_ADD("kb_keytr", I8051, 11060250)
-	MCFG_CPU_PROGRAM_MAP(keytronic_pc3270_program)
-	MCFG_CPU_IO_MAP(keytronic_pc3270_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(pc_kbd_keytronic_pc3270_device, p1_read))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(pc_kbd_keytronic_pc3270_device, p1_write))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(pc_kbd_keytronic_pc3270_device, p2_read))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(pc_kbd_keytronic_pc3270_device, p2_write))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(pc_kbd_keytronic_pc3270_device, p3_read))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(pc_kbd_keytronic_pc3270_device, p3_write))
+	MCFG_DEVICE_ADD("kb_keytr", I8051, 11060250)
+	MCFG_DEVICE_PROGRAM_MAP(keytronic_pc3270_program)
+	MCFG_DEVICE_IO_MAP(keytronic_pc3270_io)
+	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, pc_kbd_keytronic_pc3270_device, p1_read))
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, pc_kbd_keytronic_pc3270_device, p1_write))
+	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, pc_kbd_keytronic_pc3270_device, p2_read))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, pc_kbd_keytronic_pc3270_device, p2_write))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, pc_kbd_keytronic_pc3270_device, p3_read))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, pc_kbd_keytronic_pc3270_device, p3_write))
 MACHINE_CONFIG_END
 
 

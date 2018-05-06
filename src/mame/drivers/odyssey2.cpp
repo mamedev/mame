@@ -670,17 +670,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8048, ( ( XTAL(7'159'090) * 3 ) / 4 ) )
-	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
-	MCFG_CPU_IO_MAP(odyssey2_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(odyssey2_state, p1_read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(odyssey2_state, p1_write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(odyssey2_state, p2_read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(odyssey2_state, p2_write))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(odyssey2_state, bus_read))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(odyssey2_state, bus_write))
-	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("cartslot", o2_cart_slot_device, t0_read))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(odyssey2_state, t1_read))
+	MCFG_DEVICE_ADD("maincpu", I8048, ( ( XTAL(7'159'090) * 3 ) / 4 ) )
+	MCFG_DEVICE_PROGRAM_MAP(odyssey2_mem)
+	MCFG_DEVICE_IO_MAP(odyssey2_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, odyssey2_state, p1_read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, odyssey2_state, p1_write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, odyssey2_state, p2_read))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, odyssey2_state, p2_write))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, odyssey2_state, bus_read))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, odyssey2_state, bus_write))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, odyssey2_state, t1_read))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -695,7 +695,7 @@ MACHINE_CONFIG_START(odyssey2_state::odyssey2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8244_ADD( "i8244", XTAL(7'159'090)/2 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( odyssey2_state, scanline_postprocess ) )
+	MCFG_I8244_ADD( "i8244", XTAL(7'159'090)/2 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);
@@ -704,9 +704,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(odyssey2_state::videopac)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8048, ( XTAL(17'734'470) / 3 ) )
-	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
-	MCFG_CPU_IO_MAP(odyssey2_io)
+	MCFG_DEVICE_ADD("maincpu", I8048, ( XTAL(17'734'470) / 3 ) )
+	MCFG_DEVICE_PROGRAM_MAP(odyssey2_mem)
+	MCFG_DEVICE_IO_MAP(odyssey2_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -721,7 +721,7 @@ MACHINE_CONFIG_START(odyssey2_state::videopac)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8245_ADD( "i8244", XTAL(17'734'470)/5 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( odyssey2_state, scanline_postprocess ) )
+	MCFG_I8245_ADD( "i8244", XTAL(17'734'470)/5 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);
@@ -730,18 +730,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(g7400_state::g7400)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8048, XTAL(5'911'000) )
-	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
-	MCFG_CPU_IO_MAP(g7400_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(g7400_state, p1_read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(g7400_state, p1_write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(g7400_state, p2_read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(g7400_state, p2_write))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(g7400_state, bus_read))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(g7400_state, bus_write))
-	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("cartslot", o2_cart_slot_device, t0_read))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
+	MCFG_DEVICE_ADD("maincpu", I8048, XTAL(5'911'000) )
+	MCFG_DEVICE_PROGRAM_MAP(odyssey2_mem)
+	MCFG_DEVICE_IO_MAP(g7400_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, g7400_state, p1_read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, g7400_state, p1_write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, g7400_state, p2_read))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, g7400_state, p2_write))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, g7400_state, bus_read))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, g7400_state, bus_write))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, g7400_state, t1_read))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -754,12 +754,12 @@ MACHINE_CONFIG_START(g7400_state::g7400)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
-	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))
+	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(*this, g7400_state,i8243_port_w))
 
 	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( g7400_state, scanline_postprocess ) )
+	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, g7400_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);
@@ -771,18 +771,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(g7400_state::odyssey3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8048, XTAL(5'911'000) )
-	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
-	MCFG_CPU_IO_MAP(g7400_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(g7400_state, p1_read))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(g7400_state, p1_write))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(g7400_state, p2_read))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(g7400_state, p2_write))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(g7400_state, bus_read))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(g7400_state, bus_write))
-	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("cartslot", o2_cart_slot_device, t0_read))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(g7400_state, t1_read))
-	MCFG_MCS48_PORT_PROG_OUT_CB(DEVWRITELINE("i8243", i8243_device, prog_w))
+	MCFG_DEVICE_ADD("maincpu", I8048, XTAL(5'911'000) )
+	MCFG_DEVICE_PROGRAM_MAP(odyssey2_mem)
+	MCFG_DEVICE_IO_MAP(g7400_io)
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, g7400_state, p1_read))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, g7400_state, p1_write))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, g7400_state, p2_read))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, g7400_state, p2_write))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, g7400_state, bus_read))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, g7400_state, bus_write))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE("cartslot", o2_cart_slot_device, t0_read))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, g7400_state, t1_read))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE("i8243", i8243_device, prog_w))
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
@@ -795,12 +795,12 @@ MACHINE_CONFIG_START(g7400_state::odyssey3)
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(g7400_state, g7400)
 
-	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))
+	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(*this, g7400_state,i8243_port_w))
 
 	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8244_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( g7400_state, scanline_postprocess ) )
+	MCFG_I8244_ADD( "i8244", 3540000 * 2, "screen", INPUTLINE( "maincpu", 0 ), WRITE16( *this, g7400_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	odyssey2_cartslot(config);

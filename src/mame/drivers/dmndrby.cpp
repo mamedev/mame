@@ -530,13 +530,13 @@ INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 
 MACHINE_CONFIG_START(dmndrby_state::dderby)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(memmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
-	MCFG_CPU_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
+	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(memmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dmndrby_state,  dderby_irq)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(dmndrby_state, dderby_timer_irq,  244/2)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
-	MCFG_CPU_PROGRAM_MAP(dderby_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
+	MCFG_DEVICE_PROGRAM_MAP(dderby_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -559,7 +559,7 @@ MACHINE_CONFIG_START(dmndrby_state::dderby)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1789750) // frequency guessed
+	MCFG_DEVICE_ADD("ay1", AY8910, 1789750) // frequency guessed
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 

@@ -825,14 +825,14 @@ void ngp_state::nvram_write(emu_file &file)
 
 MACHINE_CONFIG_START(ngp_state::ngp_common)
 
-	MCFG_CPU_ADD( "maincpu", TMP95C061, 6.144_MHz_XTAL )
+	MCFG_DEVICE_ADD( "maincpu", TMP95C061, 6.144_MHz_XTAL )
 	MCFG_TLCS900H_AM8_16(1)
-	MCFG_CPU_PROGRAM_MAP( ngp_mem)
-	MCFG_TMP95C061_PORTA_WRITE(WRITE8(ngp_state,ngp_tlcs900_porta))
+	MCFG_DEVICE_PROGRAM_MAP( ngp_mem)
+	MCFG_TMP95C061_PORTA_WRITE(WRITE8(*this, ngp_state,ngp_tlcs900_porta))
 
-	MCFG_CPU_ADD( "soundcpu", Z80, 6.144_MHz_XTAL/2 )
-	MCFG_CPU_PROGRAM_MAP( z80_mem)
-	MCFG_CPU_IO_MAP( z80_io)
+	MCFG_DEVICE_ADD( "soundcpu", Z80, 6.144_MHz_XTAL/2 )
+	MCFG_DEVICE_PROGRAM_MAP( z80_mem)
+	MCFG_DEVICE_IO_MAP( z80_io)
 
 	MCFG_SCREEN_ADD( "screen", LCD )
 	MCFG_SCREEN_RAW_PARAMS( 6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152 )
@@ -843,22 +843,22 @@ MACHINE_CONFIG_START(ngp_state::ngp_common)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker","rspeaker" )
 
-	MCFG_SOUND_ADD( "t6w28", T6W28, 6.144_MHz_XTAL/2 )
+	MCFG_DEVICE_ADD( "t6w28", T6W28, 6.144_MHz_XTAL/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
-	MCFG_SOUND_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(ngp_state::ngp)
 	ngp_common(config);
 
-	MCFG_K1GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
+	MCFG_K1GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( *this, ngp_state, ngp_vblank_pin_w ), WRITELINE( *this, ngp_state, ngp_hblank_pin_w ) )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")
@@ -876,7 +876,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ngp_state::ngpc)
 	ngp_common(config);
-	MCFG_K2GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
+	MCFG_K2GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( *this, ngp_state, ngp_vblank_pin_w ), WRITELINE( *this, ngp_state, ngp_hblank_pin_w ) )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")

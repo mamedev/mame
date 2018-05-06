@@ -605,29 +605,29 @@ static GFXDECODE_START( namcos21 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(gal3_state::gal3)
-	MCFG_CPU_ADD("maincpu", M68020, 49152000/2)
-	MCFG_CPU_PROGRAM_MAP(cpu_mst_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68020, 49152000/2)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_mst_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("cpuslv", M68020, 49152000/2)
-	MCFG_CPU_PROGRAM_MAP(cpu_slv_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("cpuslv", M68020, 49152000/2)
+	MCFG_DEVICE_PROGRAM_MAP(cpu_slv_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("rs_cpu", M68000, 49152000/4)
-	MCFG_CPU_PROGRAM_MAP(rs_cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq5_line_hold)  /// programmable via 148 IC
+	MCFG_DEVICE_ADD("rs_cpu", M68000, 49152000/4)
+	MCFG_DEVICE_PROGRAM_MAP(rs_cpu_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq5_line_hold)  /// programmable via 148 IC
 
-	MCFG_CPU_ADD("sound_cpu", M68000, 12000000) // ??
-	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
+	MCFG_DEVICE_ADD("sound_cpu", M68000, 12000000) // ??
+	MCFG_DEVICE_PROGRAM_MAP(sound_cpu_map)
 
-	MCFG_CPU_ADD("psn_b1_cpu", M68000, 12000000) // ??
-	MCFG_CPU_PROGRAM_MAP(psn_b1_cpu_map)
+	MCFG_DEVICE_ADD("psn_b1_cpu", M68000, 12000000) // ??
+	MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map)
 /*
-    MCFG_CPU_ADD("psn_b2_cpu", M68000, 12000000) // ??
-    MCFG_CPU_PROGRAM_MAP(psn_b1_cpu_map,0)
+    MCFG_DEVICE_ADD("psn_b2_cpu", M68000, 12000000) // ??
+    MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map,0)
 
-    MCFG_CPU_ADD("psn_b3_cpu", M68000, 12000000) // ??
-    MCFG_CPU_PROGRAM_MAP(psn_b1_cpu_map,0)
+    MCFG_DEVICE_ADD("psn_b3_cpu", M68000, 12000000) // ??
+    MCFG_DEVICE_PROGRAM_MAP(psn_b1_cpu_map,0)
 */
 	MCFG_QUANTUM_TIME(attotime::from_hz(60*8000)) /* 8000 CPU slices per frame */
 

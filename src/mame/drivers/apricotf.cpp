@@ -319,10 +319,11 @@ FLOPPY_FORMATS_MEMBER( f1_state::floppy_formats )
 	FLOPPY_APRIDISK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( apricotf_floppies )
-	SLOT_INTERFACE( "d31v", SONY_OA_D31V )
-	SLOT_INTERFACE( "d32w", SONY_OA_D32W )
-SLOT_INTERFACE_END
+void apricotf_floppies(device_slot_interface &device)
+{
+	device.option_add("d31v", SONY_OA_D31V);
+	device.option_add("d32w", SONY_OA_D32W);
+}
 
 
 
@@ -336,9 +337,9 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(f1_state::act_f1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL(14'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(act_f1_mem)
-	MCFG_CPU_IO_MAP(act_f1_io)
+	MCFG_DEVICE_ADD(I8086_TAG, I8086, XTAL(14'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(act_f1_mem)
+	MCFG_DEVICE_IO_MAP(act_f1_io)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
@@ -359,15 +360,15 @@ MACHINE_CONFIG_START(f1_state::act_f1)
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 
 	MCFG_DEVICE_ADD(Z80SIO2_TAG, Z80SIO, 2500000)
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE("irqs", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
-	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(f1_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(f1_state, ctc_z2_w))
+	MCFG_Z80CTC_INTR_CB(WRITELINE("irqs", input_merger_device, in_w<1>))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, f1_state, ctc_z1_w))
+	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, f1_state, ctc_z2_w))
 
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(DEVWRITELINE(Z80SIO2_TAG, z80sio_device, ctsa_w))
+	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(Z80SIO2_TAG, z80sio_device, ctsa_w))
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
 

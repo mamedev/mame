@@ -178,10 +178,10 @@ WRITE16_MEMBER(sega_scu_device::scudsp_dma_w)
 }
 
 MACHINE_CONFIG_START(sega_scu_device::device_add_mconfig)
-	MCFG_CPU_ADD("scudsp", SCUDSP, XTAL(57'272'727)/4) // 14 MHz
-	MCFG_SCUDSP_OUT_IRQ_CB(DEVWRITELINE(DEVICE_SELF, sega_scu_device, scudsp_end_w))
-	MCFG_SCUDSP_IN_DMA_CB(READ16(sega_scu_device, scudsp_dma_r))
-	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(sega_scu_device, scudsp_dma_w))
+	MCFG_DEVICE_ADD("scudsp", SCUDSP, XTAL(57'272'727)/4) // 14 MHz
+	MCFG_SCUDSP_OUT_IRQ_CB(WRITELINE(DEVICE_SELF, sega_scu_device, scudsp_end_w))
+	MCFG_SCUDSP_IN_DMA_CB(READ16(*this, sega_scu_device, scudsp_dma_r))
+	MCFG_SCUDSP_OUT_DMA_CB(WRITE16(*this, sega_scu_device, scudsp_dma_w))
 MACHINE_CONFIG_END
 
 

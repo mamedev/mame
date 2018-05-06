@@ -49,8 +49,8 @@ MACHINE_CONFIG_START(x68k_scsiext_device::device_add_mconfig)
 
 	MCFG_DEVICE_ADD("mb89352", MB89352A, 0)
 	MCFG_LEGACY_SCSI_PORT("scsi")
-	MCFG_MB89352A_IRQ_CB(WRITELINE(x68k_scsiext_device, irq_w))
-	MCFG_MB89352A_DRQ_CB(WRITELINE(x68k_scsiext_device, drq_w))
+	MCFG_MB89352A_IRQ_CB(WRITELINE(*this, x68k_scsiext_device, irq_w))
+	MCFG_MB89352A_DRQ_CB(WRITELINE(*this, x68k_scsiext_device, drq_w))
 MACHINE_CONFIG_END
 
 x68k_scsiext_device::x68k_scsiext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

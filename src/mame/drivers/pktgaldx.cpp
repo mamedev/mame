@@ -339,9 +339,9 @@ void pktgaldx_state::machine_start()
 MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)
-	MCFG_CPU_PROGRAM_MAP(pktgaldx_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 14000000)
+	MCFG_DEVICE_PROGRAM_MAP(pktgaldx_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldx)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pktgaldx_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pktgaldx_state, vblank_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -400,8 +400,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(pktgaldb_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)
+	MCFG_DEVICE_PROGRAM_MAP(pktgaldb_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -410,7 +410,7 @@ MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pktgaldx_state, screen_update_pktgaldb)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pktgaldx_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pktgaldx_state, vblank_w))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 4096)

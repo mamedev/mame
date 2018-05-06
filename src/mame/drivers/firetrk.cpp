@@ -856,8 +856,8 @@ GFXDECODE_END
 MACHINE_CONFIG_START(firetrk_state::firetrk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
-	MCFG_CPU_PROGRAM_MAP(firetrk_map)
+	MCFG_DEVICE_ADD("maincpu", M6800, MASTER_CLOCK/12) /* 750Khz during service mode */
+	MCFG_DEVICE_PROGRAM_MAP(firetrk_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", firetrk_state, firetrk_scanline, "screen", 0, 1)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -878,7 +878,7 @@ MACHINE_CONFIG_START(firetrk_state::firetrk)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(firetrk)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -888,8 +888,8 @@ MACHINE_CONFIG_START(firetrk_state::superbug)
 	firetrk(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(superbug_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(superbug_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -903,7 +903,7 @@ MACHINE_CONFIG_START(firetrk_state::superbug)
 	MCFG_PALETTE_INIT_OWNER(firetrk_state, firetrk)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
+	MCFG_DEVICE_REPLACE("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(superbug)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -913,8 +913,8 @@ MACHINE_CONFIG_START(firetrk_state::montecar)
 	firetrk(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(montecar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(montecar_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -928,7 +928,7 @@ MACHINE_CONFIG_START(firetrk_state::montecar)
 	MCFG_PALETTE_INIT_OWNER(firetrk_state,montecar)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
+	MCFG_DEVICE_REPLACE("discrete", DISCRETE, 0)
 	MCFG_DISCRETE_INTF(montecar)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

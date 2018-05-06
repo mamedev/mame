@@ -32,8 +32,8 @@ void lg_dvd_state::lg_dvd_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(lg_dvd_state::lg)
-	MCFG_CPU_ADD( "maincpu", I80C52, XTAL(16'000'000) )
-	MCFG_CPU_PROGRAM_MAP( lg_dvd_map )
+	MCFG_DEVICE_ADD( "maincpu", I80C52, XTAL(16'000'000) )
+	MCFG_DEVICE_PROGRAM_MAP( lg_dvd_map )
 MACHINE_CONFIG_END
 
 ROM_START( lggp40 )

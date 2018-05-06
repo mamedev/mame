@@ -348,9 +348,10 @@ DRIVER_INIT_MEMBER(spectrum_state,plus2)
 	m_floppy = 0;
 }
 
-static SLOT_INTERFACE_START( specpls3_floppies )
-	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
-SLOT_INTERFACE_END
+static void specpls3_floppies(device_slot_interface &device)
+{
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
@@ -373,9 +374,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
 	spectrum_128(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spectrum_plus3_mem)
-	MCFG_CPU_IO_MAP(spectrum_plus3_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(spectrum_plus3_mem)
+	MCFG_DEVICE_IO_MAP(spectrum_plus3_io)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.01)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", specpls3)

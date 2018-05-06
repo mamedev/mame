@@ -287,8 +287,8 @@ void md_boot_state::md_bootleg_map(address_map &map)
 MACHINE_CONFIG_START(md_boot_state::md_bootleg)
 	md_ntsc(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(md_bootleg_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(md_bootleg_map)
 MACHINE_CONFIG_END
 
 /*************************************

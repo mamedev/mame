@@ -579,14 +579,14 @@ MACHINE_RESET_MEMBER(pipedrm_state,pipedrm)
 MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pipedrm_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pipedrm_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,14318000/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("sub", Z80,14318000/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(pipedrm_state,pipedrm)
 	MCFG_MACHINE_RESET_OVERRIDE(pipedrm_state,pipedrm)
@@ -606,7 +606,7 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(pipedrm_state::pipedrm)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -634,14 +634,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(pipedrm_state::hatris)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pipedrm_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pipedrm_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80,14318000/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(hatris_sound_portmap)
+	MCFG_DEVICE_ADD("sub", Z80,14318000/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(hatris_sound_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(pipedrm_state,pipedrm)
 	MCFG_MACHINE_RESET_OVERRIDE(pipedrm_state,pipedrm)
@@ -661,7 +661,7 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 
 	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
-	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(fromance_state, fromance_gga_data_w))
+	MCFG_VSYSTEM_GGA_REGISTER_WRITE_CB(WRITE8(*this, fromance_state, fromance_gga_data_w))
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,hatris)
 
@@ -675,7 +675,7 @@ MACHINE_CONFIG_START(pipedrm_state::hatris)
 	// sound board.
 	//MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
+	MCFG_DEVICE_ADD("ymsnd", YM2608, 8000000)
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)

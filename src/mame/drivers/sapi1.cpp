@@ -618,8 +618,8 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
 /* Machine driver */
 MACHINE_CONFIG_START(sapi1_state::sapi1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
-	MCFG_CPU_PROGRAM_MAP(sapi1_mem)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
+	MCFG_DEVICE_PROGRAM_MAP(sapi1_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
 	/* video hardware */
@@ -641,8 +641,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sapi1_state::sapi2)
 	sapi1(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sapi2_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sapi2_mem)
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(sapi1_state, kbd_put))
 MACHINE_CONFIG_END
@@ -650,9 +650,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sapi1_state::sapi3)
 	sapi2(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sapi3_mem)
-	MCFG_CPU_IO_MAP(sapi3_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sapi3_mem)
+	MCFG_DEVICE_IO_MAP(sapi3_io)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(40*6, 20*9)
@@ -663,9 +663,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(sapi1_state::sapi3b)
 	sapi3(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sapi3b_mem)
-	MCFG_CPU_IO_MAP(sapi3b_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sapi3b_mem)
+	MCFG_DEVICE_IO_MAP(sapi3b_io)
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000) // guess
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -688,21 +688,21 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
-	MCFG_CPU_PROGRAM_MAP(sapi3a_mem)
-	MCFG_CPU_IO_MAP(sapi3a_io)
+	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
+	MCFG_DEVICE_PROGRAM_MAP(sapi3a_mem)
+	MCFG_DEVICE_IO_MAP(sapi3a_io)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // Tesla MHB1012
 	MCFG_AY51013_TX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
 	MCFG_AY51013_RX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
-	MCFG_AY51013_READ_SI_CB(DEVREADLINE("v24", rs232_port_device, rxd_r))
-	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("v24", rs232_port_device, write_txd))
+	MCFG_AY51013_READ_SI_CB(READLINE("v24", rs232_port_device, rxd_r))
+	MCFG_AY51013_WRITE_SO_CB(WRITELINE("v24", rs232_port_device, write_txd))
 	MCFG_AY51013_AUTO_RDAV(true) // RDAV not actually tied to RDE, but pulsed by K155AG3 (=74123N): R25=22k, C14=220
 
-	MCFG_RS232_PORT_ADD("v24", default_rs232_devices, "terminal")
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	MCFG_DEVICE_ADD("v24", RS232_PORT, default_rs232_devices, "terminal")
+	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

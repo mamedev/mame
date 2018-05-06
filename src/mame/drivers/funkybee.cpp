@@ -288,16 +288,16 @@ void funkybee_state::machine_start()
 MACHINE_CONFIG_START(funkybee_state::funkybee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(funkybee_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", funkybee_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 3072000)   /* 3.072 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(funkybee_map)
+	MCFG_DEVICE_IO_MAP(io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", funkybee_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(funkybee_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(funkybee_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(funkybee_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(funkybee_state, gfx_bank_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, funkybee_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, funkybee_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, funkybee_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, funkybee_state, gfx_bank_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(funkybee_state::funkybee)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 1500000) // AY-3-8912 verified for Sky Lancer
+	MCFG_DEVICE_ADD("aysnd", AY8912, 1500000) // AY-3-8912 verified for Sky Lancer
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

@@ -306,9 +306,9 @@ INTERRUPT_GEN_MEMBER(konendev_state::vbl_interrupt)
 
 MACHINE_CONFIG_START(konendev_state::konendev)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GCX, 32000000) // Clock unknown
-	MCFG_CPU_PROGRAM_MAP(konendev_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", konendev_state, vbl_interrupt)
+	MCFG_DEVICE_ADD("maincpu", PPC403GCX, 32000000) // Clock unknown
+	MCFG_DEVICE_PROGRAM_MAP(konendev_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konendev_state, vbl_interrupt)
 
 	/* video hardware */
 	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
@@ -322,7 +322,7 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("gcu", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(konendev_state, gcu_interrupt))
+	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, konendev_state, gcu_interrupt))
 
 	MCFG_NVRAM_ADD_0FILL("nvram0")
 	MCFG_NVRAM_ADD_0FILL("nvram1")
@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(konendev_state::konendev)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400) // Clock unknown
+	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400) // Clock unknown
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

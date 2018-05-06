@@ -897,16 +897,16 @@ void ql_state::machine_reset()
 
 MACHINE_CONFIG_START(ql_state::ql)
 	// basic machine hardware
-	MCFG_CPU_ADD(M68008_TAG, M68008, X1/2)
-	MCFG_CPU_PROGRAM_MAP(ql_mem)
+	MCFG_DEVICE_ADD(M68008_TAG, M68008, X1/2)
+	MCFG_DEVICE_PROGRAM_MAP(ql_mem)
 
-	MCFG_CPU_ADD(I8749_TAG, I8749, X4)
-	MCFG_CPU_IO_MAP(ipc_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ql_state, ipc_port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(ql_state, ipc_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ql_state, ipc_port2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ql_state, ipc_t1_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(ql_state, ipc_bus_r))
+	MCFG_DEVICE_ADD(I8749_TAG, I8749, X4)
+	MCFG_DEVICE_IO_MAP(ipc_io)
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ql_state, ipc_port1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, ql_state, ipc_port2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ql_state, ipc_port2_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ql_state, ipc_t1_r))
+	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, ql_state, ipc_bus_r))
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -918,51 +918,51 @@ MACHINE_CONFIG_START(ql_state::ql)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_DEVICE_ADD(ZX8301_TAG, ZX8301, X1)
 	MCFG_ZX8301_CPU(M68008_TAG)
-	MCFG_ZX8301_VSYNC_CALLBACK(DEVWRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
+	MCFG_ZX8301_VSYNC_CALLBACK(WRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
 
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_DEVICE_ADD(ZX8302_TAG, ZX8302, X1)
 	MCFG_ZX8302_RTC_CLOCK(X2)
 	MCFG_ZX8302_OUT_IPL1L_CB(INPUTLINE(M68008_TAG, M68K_IRQ_2))
-	MCFG_ZX8302_OUT_BAUDX4_CB(WRITELINE(ql_state, ql_baudx4_w))
-	MCFG_ZX8302_OUT_COMDATA_CB(WRITELINE(ql_state, ql_comdata_w))
+	MCFG_ZX8302_OUT_BAUDX4_CB(WRITELINE(*this, ql_state, ql_baudx4_w))
+	MCFG_ZX8302_OUT_COMDATA_CB(WRITELINE(*this, ql_state, ql_comdata_w))
 	// TXD1
-	MCFG_ZX8302_OUT_TXD2_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	MCFG_ZX8302_OUT_TXD2_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
 	// NETOUT
-	MCFG_ZX8302_OUT_MDSELCK_CB(WRITELINE(ql_state, zx8302_mdselck_w))
-	MCFG_ZX8302_OUT_MDSELD_CB(DEVWRITELINE(MDV_1, microdrive_image_device, comms_in_w))
-	MCFG_ZX8302_OUT_MDRDW_CB(WRITELINE(ql_state, zx8302_mdrdw_w))
-	MCFG_ZX8302_OUT_ERASE_CB(WRITELINE(ql_state, zx8302_erase_w))
-	MCFG_ZX8302_OUT_RAW1_CB(WRITELINE(ql_state, zx8302_raw1_w))
-	MCFG_ZX8302_IN_RAW1_CB(READLINE(ql_state, zx8302_raw1_r))
-	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(ql_state, zx8302_raw2_w))
-	MCFG_ZX8302_IN_RAW2_CB(READLINE(ql_state, zx8302_raw2_r))
+	MCFG_ZX8302_OUT_MDSELCK_CB(WRITELINE(*this, ql_state, zx8302_mdselck_w))
+	MCFG_ZX8302_OUT_MDSELD_CB(WRITELINE(MDV_1, microdrive_image_device, comms_in_w))
+	MCFG_ZX8302_OUT_MDRDW_CB(WRITELINE(*this, ql_state, zx8302_mdrdw_w))
+	MCFG_ZX8302_OUT_ERASE_CB(WRITELINE(*this, ql_state, zx8302_erase_w))
+	MCFG_ZX8302_OUT_RAW1_CB(WRITELINE(*this, ql_state, zx8302_raw1_w))
+	MCFG_ZX8302_IN_RAW1_CB(READLINE(*this, ql_state, zx8302_raw1_r))
+	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(*this, ql_state, zx8302_raw2_w))
+	MCFG_ZX8302_IN_RAW2_CB(READLINE(*this, ql_state, zx8302_raw2_r))
 
 	MCFG_MICRODRIVE_ADD(MDV_1)
-	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(DEVWRITELINE(MDV_2, microdrive_image_device, comms_in_w))
+	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(WRITELINE(MDV_2, microdrive_image_device, comms_in_w))
 	MCFG_MICRODRIVE_ADD(MDV_2)
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr) // wired as DCE
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr) // wired as DTE
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
+	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DCE
+	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DTE
+	MCFG_RS232_CTS_HANDLER(WRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
 
 	MCFG_QL_EXPANSION_SLOT_ADD("exp", ql_expansion_cards, nullptr)
 	//MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK()
 	//MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK()
 	//MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK()
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(ql_state, exp_extintl_w))
+	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, ql_state, exp_extintl_w))
 
 	MCFG_QL_ROM_CARTRIDGE_SLOT_ADD("rom", ql_rom_cartridge_cards, nullptr)
 
 	MCFG_DEVICE_ADD(QIMI_TAG, QIMI, 0)
-	MCFG_QIMI_EXTINT_CALLBACK(WRITELINE(ql_state, qimi_extintl_w))
+	MCFG_QIMI_EXTINT_CALLBACK(WRITELINE(*this, ql_state, qimi_extintl_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")

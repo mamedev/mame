@@ -454,9 +454,9 @@ WRITE8_MEMBER(supdrapo_state::ay8910_outputb_w)
 
 MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 
-	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
-	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK) /* guess */
+	MCFG_DEVICE_PROGRAM_MAP(sdpoker_mem)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -477,9 +477,9 @@ MACHINE_CONFIG_START(supdrapo_state::supdrapo)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SND_CLOCK)  /* guess */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(supdrapo_state, ay8910_outputa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(supdrapo_state, ay8910_outputb_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, SND_CLOCK)  /* guess */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, supdrapo_state, ay8910_outputa_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, supdrapo_state, ay8910_outputb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
