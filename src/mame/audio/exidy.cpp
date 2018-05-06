@@ -742,32 +742,32 @@ void exidy_state::venture_audio_map(address_map &map)
 
 MACHINE_CONFIG_START(exidy_state::venture_audio)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 3579545/4)
-	MCFG_CPU_PROGRAM_MAP(venture_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, 3579545/4)
+	MCFG_DEVICE_PROGRAM_MAP(venture_audio_map)
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, SH6532_CLOCK)
-	MCFG_RIOT6532_IN_PA_CB(DEVREAD8("custom", exidy_sound_device, r6532_porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(DEVWRITE8("custom", exidy_sound_device, r6532_porta_w))
-	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("custom", exidy_sound_device, r6532_portb_r))
-	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("custom", exidy_sound_device, r6532_portb_w))
-	MCFG_RIOT6532_IRQ_CB(DEVWRITELINE("custom", exidy_sound_device, r6532_irq))
+	MCFG_RIOT6532_IN_PA_CB(READ8("custom", exidy_sound_device, r6532_porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8("custom", exidy_sound_device, r6532_porta_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8("custom", exidy_sound_device, r6532_portb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8("custom", exidy_sound_device, r6532_portb_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE("custom", exidy_sound_device, r6532_irq))
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("pia1", pia6821_device, portb_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("pia1", pia6821_device, porta_w))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("pia1", pia6821_device, cb1_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia1", pia6821_device, ca1_w))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("pia1", pia6821_device, portb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("pia1", pia6821_device, porta_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("pia1", pia6821_device, cb1_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("pia1", pia6821_device, ca1_w))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("pia0", pia6821_device, portb_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("pia0", pia6821_device, porta_w))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("pia0", pia6821_device, cb1_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia0", pia6821_device, ca1_w))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("custom", exidy_sound_device, update_irq_state))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("pia0", pia6821_device, portb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("pia0", pia6821_device, porta_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("pia0", pia6821_device, cb1_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("pia0", pia6821_device, ca1_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("custom", exidy_sound_device, update_irq_state))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("custom", EXIDY_VENTURE, 0)
+	MCFG_DEVICE_ADD("custom", EXIDY_VENTURE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -823,12 +823,12 @@ void exidy_state::cvsd_iomap(address_map &map)
 
 MACHINE_CONFIG_START(exidy_state::mtrap_cvsd_audio)
 
-	MCFG_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(cvsd_map)
-	MCFG_CPU_IO_MAP(cvsd_iomap)
+	MCFG_DEVICE_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(cvsd_map)
+	MCFG_DEVICE_IO_MAP(cvsd_iomap)
 
 	/* audio hardware */
-	MCFG_SOUND_ADD("cvsd", MC3417, CVSD_CLOCK)
+	MCFG_DEVICE_ADD("cvsd", MC3417, CVSD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -999,26 +999,26 @@ void victory_state::victory_audio_map(address_map &map)
 
 MACHINE_CONFIG_START(victory_state::victory_audio)
 
-	MCFG_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(victory_audio_map)
+	MCFG_DEVICE_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(victory_audio_map)
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, SH6532_CLOCK)
-	MCFG_RIOT6532_IN_PA_CB(DEVREAD8("custom", exidy_sound_device, r6532_porta_r))
-	MCFG_RIOT6532_OUT_PA_CB(DEVWRITE8("custom", exidy_sound_device, r6532_porta_w))
-	MCFG_RIOT6532_IN_PB_CB(DEVREAD8("custom", exidy_sound_device, r6532_portb_r))
-	MCFG_RIOT6532_OUT_PB_CB(DEVWRITE8("custom", exidy_sound_device, r6532_portb_w))
-	MCFG_RIOT6532_IRQ_CB(DEVWRITELINE("custom", exidy_sound_device, r6532_irq))
+	MCFG_RIOT6532_IN_PA_CB(READ8("custom", exidy_sound_device, r6532_porta_r))
+	MCFG_RIOT6532_OUT_PA_CB(WRITE8("custom", exidy_sound_device, r6532_porta_w))
+	MCFG_RIOT6532_IN_PB_CB(READ8("custom", exidy_sound_device, r6532_portb_r))
+	MCFG_RIOT6532_OUT_PB_CB(WRITE8("custom", exidy_sound_device, r6532_portb_w))
+	MCFG_RIOT6532_IRQ_CB(WRITELINE("custom", exidy_sound_device, r6532_irq))
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("custom", victory_sound_device, irq_clear_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("custom", victory_sound_device, main_ack_w))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("custom", exidy_sound_device, update_irq_state))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("custom", victory_sound_device, irq_clear_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("custom", victory_sound_device, main_ack_w))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE("custom", exidy_sound_device, update_irq_state))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("custom", EXIDY_VICTORY, 0)
+	MCFG_DEVICE_ADD("custom", EXIDY_VICTORY, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("tms", TMS5220, 640000)
+	MCFG_DEVICE_ADD("tms", TMS5220, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

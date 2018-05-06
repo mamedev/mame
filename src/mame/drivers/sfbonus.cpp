@@ -1368,11 +1368,11 @@ void sfbonus_state::ramdac_map(address_map &map)
 
 
 MACHINE_CONFIG_START(sfbonus_state::sfbonus)
-	MCFG_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
-	MCFG_CPU_PROGRAM_MAP(sfbonus_map)
-	MCFG_CPU_IO_MAP(sfbonus_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sfbonus_state, irq0_line_hold)
-	//MCFG_CPU_PERIODIC_INT_DRIVER(sfbonus_state, nmi_line_pulse, 100)
+	MCFG_DEVICE_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
+	MCFG_DEVICE_PROGRAM_MAP(sfbonus_map)
+	MCFG_DEVICE_IO_MAP(sfbonus_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sfbonus_state, irq0_line_hold)
+	//MCFG_DEVICE_PERIODIC_INT_DRIVER(sfbonus_state, nmi_line_pulse, 100)
 
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

@@ -243,9 +243,9 @@ public:
 
 
 // slot interfaces
-SLOT_INTERFACE_EXTERN( sg1000_cart );
-SLOT_INTERFACE_EXTERN( sg1000mk3_cart );
-SLOT_INTERFACE_EXTERN( sms_cart );
-SLOT_INTERFACE_EXTERN( gg_cart );
+void sg1000_cart(device_slot_interface &device);
+void sg1000mk3_cart(device_slot_interface &device);
+void sms_cart(device_slot_interface &device);
+void gg_cart(device_slot_interface &device);
 
 #endif // MAME_BUS_SEGA8_SLOT_H

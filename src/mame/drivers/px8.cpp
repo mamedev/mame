@@ -749,19 +749,19 @@ void px8_state::machine_reset()
 
 MACHINE_CONFIG_START(px8_state::px8)
 	/* main cpu (uPD70008) */
-	MCFG_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
-	MCFG_CPU_PROGRAM_MAP(px8_mem)
-	MCFG_CPU_IO_MAP(px8_io)
+	MCFG_DEVICE_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(px8_mem)
+	MCFG_DEVICE_IO_MAP(px8_io)
 
 	/* slave cpu (HD6303) */
-	MCFG_CPU_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
-	MCFG_CPU_PROGRAM_MAP(px8_slave_mem)
-	MCFG_CPU_IO_MAP(px8_slave_io)
+	MCFG_DEVICE_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(px8_slave_mem)
+	MCFG_DEVICE_IO_MAP(px8_slave_io)
 	MCFG_DEVICE_DISABLE()
 
 	/* sub CPU (uPD7508) */
-//  MCFG_CPU_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
-//  MCFG_CPU_IO_MAP(px8_sub_io)
+//  MCFG_DEVICE_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
+//  MCFG_DEVICE_IO_MAP(px8_sub_io)
 //  MCFG_DEVICE_DISABLE()
 
 	/* video hardware */

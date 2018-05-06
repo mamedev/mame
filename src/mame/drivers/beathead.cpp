@@ -340,8 +340,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(beathead_state::beathead)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)

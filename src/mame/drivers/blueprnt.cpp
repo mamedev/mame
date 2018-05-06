@@ -349,14 +349,14 @@ void blueprnt_state::machine_reset()
 MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 7000000/2) // 3.5 MHz
-	MCFG_CPU_PROGRAM_MAP(blueprnt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", blueprnt_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 7000000/2) // 3.5 MHz
+	MCFG_DEVICE_PROGRAM_MAP(blueprnt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", blueprnt_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2/2/2)   // 1.25 MHz (2H)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60) // IRQs connected to 32V
+	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/2/2/2)   // 1.25 MHz (2H)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60) // IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -382,12 +382,12 @@ MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 10000000/2/2/2)
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(blueprnt_state, dipsw_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, 10000000/2/2/2)
+	MCFG_AY8910_PORT_B_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, blueprnt_state, dipsw_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 10000000/2/2/2/2)
+	MCFG_DEVICE_ADD("ay2", AY8910, 10000000/2/2/2/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DILSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DILSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -397,8 +397,8 @@ MACHINE_CONFIG_START(blueprnt_state::grasspin)
 	blueprnt(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(grasspin_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(grasspin_map)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -1465,11 +1465,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(williams_state::williams)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
-	MCFG_CPU_PROGRAM_MAP(williams_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
+	MCFG_DEVICE_PROGRAM_MAP(williams_map)
 
-	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(williams_state,williams)
 	MCFG_MACHINE_RESET_OVERRIDE(williams_state,williams)
@@ -1490,9 +1490,9 @@ MACHINE_CONFIG_START(williams_state::williams)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1501,14 +1501,14 @@ MACHINE_CONFIG_START(williams_state::williams)
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state, williams_snd_cmd_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state, williams_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state, williams_main_irq))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams_state, williams_snd_cmd_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
 
 
@@ -1517,11 +1517,11 @@ MACHINE_CONFIG_START(williams_state::defender)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(defender_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(defender_map)
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(defender_sound_map)
+	MCFG_DEVICE_MODIFY("soundcpu")
+	MCFG_DEVICE_PROGRAM_MAP(defender_sound_map)
 
 	MCFG_DEVICE_ADD("bankc000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(defender_bankc000_map)
@@ -1554,12 +1554,12 @@ MACHINE_CONFIG_START(williams_state::williams_muxed)
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0")) MCFG_DEVCB_MASK(0x30)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux_0", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux_1", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(-6) MCFG_DEVCB_MASK(0xc0)
+	MCFG_DEVCB_CHAIN_INPUT(READ8("mux_0", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
+	MCFG_DEVCB_CHAIN_INPUT(READ8("mux_1", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(-6) MCFG_DEVCB_MASK(0xc0)
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN1")) MCFG_DEVCB_MASK(0xfc)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux_1", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(2) MCFG_DEVCB_MASK(0x03)
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("mux_0", ls157_device, select_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mux_1", ls157_device, select_w))
+	MCFG_DEVCB_CHAIN_INPUT(READ8("mux_1", ls157_device, output_r)) MCFG_DEVCB_RSHIFT(2) MCFG_DEVCB_MASK(0x03)
+	MCFG_PIA_CB2_HANDLER(WRITELINE("mux_0", ls157_device, select_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mux_1", ls157_device, select_w))
 
 	MCFG_DEVICE_ADD("mux_0", LS157, 0) // IC3 on interface board (actually LS257 with OC tied low)
 	MCFG_74157_A_IN_CB(IOPORT("INP2"))
@@ -1590,8 +1590,8 @@ MACHINE_CONFIG_START(williams_state::lottofun)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)
-	MCFG_PIA_CA2_HANDLER(WRITELINE(williams_state, lottofun_coin_lock_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, williams_state, lottofun_coin_lock_w))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(70), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 MACHINE_CONFIG_END
@@ -1601,20 +1601,20 @@ MACHINE_CONFIG_START(williams_state::sinistar)
 	williams(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(sinistar_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(sinistar_map)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("cvsd", HC55516, 0)
+	MCFG_DEVICE_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(READ8(williams_state, williams_49way_port_0_r))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, williams_state, williams_49way_port_0_r))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, digit_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, clock_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("cvsd", hc55516_device, digit_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("cvsd", hc55516_device, clock_w))
 MACHINE_CONFIG_END
 
 
@@ -1628,16 +1628,16 @@ MACHINE_CONFIG_START(williams_state::playball)
 	MCFG_SCREEN_VISIBLE_AREA(6, 298-1, 8, 240-1)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("cvsd", HC55516, 0)
+	MCFG_DEVICE_ADD("cvsd", HC55516, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams_state, playball_snd_cmd_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams_state, playball_snd_cmd_w))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, digit_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("cvsd", hc55516_device, clock_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("cvsd", hc55516_device, digit_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("cvsd", hc55516_device, clock_w))
 MACHINE_CONFIG_END
 
 
@@ -1645,8 +1645,8 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 	williams(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(blaster_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(blaster_map)
 
 	MCFG_MACHINE_START_OVERRIDE(blaster_state,blaster)
 	MCFG_MACHINE_RESET_OVERRIDE(blaster_state,blaster)
@@ -1658,14 +1658,14 @@ MACHINE_CONFIG_START(blaster_state::blastkit)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux_a", ls157_x2_device, output_r))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("mux_a", ls157_x2_device, select_w))
+	MCFG_PIA_READPA_HANDLER(READ8("mux_a", ls157_x2_device, output_r))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("mux_a", ls157_x2_device, select_w))
 
 	// All multiplexers on Blaster interface board are really LS257 with OC tied to GND (which is equivalent to LS157)
 
 	MCFG_DEVICE_ADD("mux_a", LS157_X2, 0)
 	MCFG_74157_A_IN_CB(IOPORT("IN3"))
-	MCFG_74157_B_IN_CB(READ8(williams_state, williams_49way_port_0_r))
+	MCFG_74157_B_IN_CB(READ8(*this, williams_state, williams_49way_port_0_r))
 MACHINE_CONFIG_END
 
 
@@ -1673,18 +1673,18 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	blastkit(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
-	MCFG_CPU_PROGRAM_MAP(sound_map_b)
+	MCFG_DEVICE_ADD("soundcpu_b", M6808, SOUND_CLOCK) // internal clock divider of 4, effective frequency is 894.886kHz
+	MCFG_DEVICE_PROGRAM_MAP(sound_map_b)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPB_HANDLER(DEVREAD8("mux_b", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
+	MCFG_PIA_READPB_HANDLER(READ8("mux_b", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
 	MCFG_DEVCB_CHAIN_INPUT(IOPORT("IN1")) MCFG_DEVCB_MASK(0xf0)
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("mux_a", ls157_x2_device, select_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mux_b", ls157_device, select_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("mux_a", ls157_x2_device, select_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE("mux_b", ls157_device, select_w))
 
 	MCFG_DEVICE_MODIFY("mux_a") // IC7 (for PA0-PA3) + IC5 (for PA4-PA7)
-	MCFG_74157_A_IN_CB(READ8(williams_state, williams_49way_port_0_r))
+	MCFG_74157_A_IN_CB(READ8(*this, williams_state, williams_49way_port_0_r))
 	MCFG_74157_B_IN_CB(IOPORT("IN3"))
 
 	MCFG_DEVICE_ADD("mux_b", LS157, 0) // IC3
@@ -1692,15 +1692,15 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	MCFG_74157_B_IN_CB(IOPORT("INP2"))
 
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blaster_state, blaster_snd_cmd_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, blaster_state, blaster_snd_cmd_w))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("ldac", dac_byte_interface, write))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("ldac", dac_byte_interface, write))
 
 	MCFG_DEVICE_ADD("pia_2b", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("rdac", dac_byte_interface, write))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("rdac", dac_byte_interface, write))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, blaster_state,williams_snd_irq_b))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, blaster_state,williams_snd_irq_b))
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("speaker")
@@ -1708,22 +1708,22 @@ MACHINE_CONFIG_START(blaster_state::blaster)
 	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
-	MCFG_SOUND_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(williams2_state::williams2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
-	MCFG_CPU_PROGRAM_MAP(williams2_d000_ram_map)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
+	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_ram_map)
 
-	MCFG_CPU_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */
-	MCFG_CPU_PROGRAM_MAP(williams2_sound_map)
+	MCFG_DEVICE_ADD("soundcpu", M6808, MASTER_CLOCK/3) /* yes, this is different from the older games */
+	MCFG_DEVICE_PROGRAM_MAP(williams2_sound_map)
 
 	MCFG_DEVICE_ADD("bank8000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(williams2_bank8000_map)
@@ -1754,9 +1754,9 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1765,25 +1765,25 @@ MACHINE_CONFIG_START(williams2_state::williams2)
 
 	MCFG_DEVICE_ADD("pia_1", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(williams2_state,williams2_snd_cmd_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, williams2_state,williams2_snd_cmd_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("pia_2", pia6821_device, ca1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("pia_1", pia6821_device, portb_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("pia_1", pia6821_device, portb_w))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("pia_1", pia6821_device, cb1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(williams2_state::inferno)
 	williams2(config);
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux", ls157_x2_device, output_r))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_x2_device, select_w))
+	MCFG_PIA_READPA_HANDLER(READ8("mux", ls157_x2_device, output_r))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("mux", ls157_x2_device, select_w))
 
 	MCFG_DEVICE_ADD("mux", LS157_X2, 0) // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
 	MCFG_74157_A_IN_CB(IOPORT("INP1"))
@@ -1798,12 +1798,12 @@ MACHINE_CONFIG_START(williams2_state::mysticm)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_firq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_main_firq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams2_state,mysticm_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams2_state,mysticm_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams2_state,mysticm_main_irq))
 MACHINE_CONFIG_END
 
 
@@ -1811,23 +1811,23 @@ MACHINE_CONFIG_START(tshoot_state::tshoot)
 	williams2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(williams2_d000_rom_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_rom_map)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_READPA_HANDLER(DEVREAD8("mux", ls157_x2_device, output_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(tshoot_state, lamp_w))
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_x2_device, select_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
+	MCFG_PIA_READPA_HANDLER(READ8("mux", ls157_x2_device, output_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, tshoot_state, lamp_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE("mux", ls157_x2_device, select_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams2_state,tshoot_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams2_state,tshoot_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_1")
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,tshoot_main_irq))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams2_state,tshoot_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams2_state,tshoot_main_irq))
 
 	MCFG_DEVICE_MODIFY("pia_2")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(tshoot_state, maxvol_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, tshoot_state, maxvol_w))
 
 	MCFG_DEVICE_ADD("mux", LS157_X2, 0) // U2 + U3 on interface board
 	MCFG_74157_A_IN_CB(IOPORT("INP1"))
@@ -1839,10 +1839,10 @@ MACHINE_CONFIG_START(joust2_state::joust2)
 	williams2(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(williams2_d000_rom_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(williams2_d000_rom_map)
 
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_DEVICE_ADD("cvsd", WILLIAMS_CVSD_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_MACHINE_START_OVERRIDE(joust2_state,joust2)
@@ -1851,16 +1851,16 @@ MACHINE_CONFIG_START(joust2_state::joust2)
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN0")) MCFG_DEVCB_MASK(0xf0)
-	MCFG_DEVCB_CHAIN_INPUT(DEVREAD8("mux", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
-	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("mux", ls157_device, select_w))
+	MCFG_DEVCB_CHAIN_INPUT(READ8("mux", ls157_device, output_r)) MCFG_DEVCB_MASK(0x0f)
+	MCFG_PIA_CA2_HANDLER(WRITELINE("mux", ls157_device, select_w))
 
 	MCFG_DEVICE_MODIFY("pia_1")
 	MCFG_PIA_READPA_HANDLER(IOPORT("IN2"))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(joust2_state,joust2_snd_cmd_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(joust2_state,joust2_pia_3_cb1_w))
-	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("pia_2", pia6821_device, ca1_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_main_irq))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, joust2_state,joust2_snd_cmd_w))
+	MCFG_PIA_CA2_HANDLER(WRITELINE(*this, joust2_state,joust2_pia_3_cb1_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE("pia_2", pia6821_device, ca1_w))
+	MCFG_PIA_IRQA_HANDLER(WRITELINE(*this, williams_state,williams_main_irq))
+	MCFG_PIA_IRQB_HANDLER(WRITELINE(*this, williams_state,williams_main_irq))
 
 	MCFG_DEVICE_ADD("mux", LS157, 0)
 	MCFG_74157_A_IN_CB(IOPORT("INP1"))

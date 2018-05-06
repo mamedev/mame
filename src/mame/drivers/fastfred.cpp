@@ -635,21 +635,21 @@ INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 MACHINE_CONFIG_START(fastfred_state::fastfred)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'432'000)/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
-	MCFG_CPU_PROGRAM_MAP(fastfred_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'432'000)/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
+	MCFG_DEVICE_PROGRAM_MAP(fastfred_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'432'000)/8)  /* 1.554 MHz; xtal from pcb pics, divider not verified */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fastfred_state, sound_timer_irq, 4*60)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'432'000)/8)  /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(fastfred_state, sound_timer_irq, 4*60)
 
 	MCFG_DEVICE_ADD("outlatch", LS259, 0) // "Control Signal Latch" at D10
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(fastfred_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(fastfred_state, colorbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(fastfred_state, colorbank2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(fastfred_state, charbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(fastfred_state, charbank2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(fastfred_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(fastfred_state, flip_screen_y_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, fastfred_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, fastfred_state, colorbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, fastfred_state, colorbank2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, fastfred_state, charbank1_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, fastfred_state, charbank2_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, fastfred_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, fastfred_state, flip_screen_y_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -661,7 +661,7 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_fastfred)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fastfred_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fastfred_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastfred)
 
@@ -675,10 +675,10 @@ MACHINE_CONFIG_START(fastfred_state::fastfred)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay8910.1", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	MCFG_DEVICE_ADD("ay8910.1", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay8910.2", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	MCFG_DEVICE_ADD("ay8910.2", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -686,8 +686,8 @@ MACHINE_CONFIG_START(fastfred_state::jumpcoas)
 	fastfred(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jumpcoas_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(jumpcoas_map)
 
 	MCFG_DEVICE_REMOVE("audiocpu")
 
@@ -703,13 +703,13 @@ MACHINE_CONFIG_START(fastfred_state::imago)
 	fastfred(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(imago_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(imago_map)
 
 	MCFG_DEVICE_MODIFY("outlatch")
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // writes 1 when level starts, 0 when game over
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(fastfred_state, imago_dma_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(fastfred_state, imago_charbank_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, fastfred_state, imago_dma_irq_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, fastfred_state, imago_charbank_w))
 
 	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
 

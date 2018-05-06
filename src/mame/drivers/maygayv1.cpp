@@ -869,22 +869,22 @@ void maygayv1_state::machine_reset()
 
 
 MACHINE_CONFIG_START(maygayv1_state::maygayv1)
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK / 2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("soundcpu", I8052, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(sound_prg)
-	MCFG_CPU_DATA_MAP(sound_data)
-	MCFG_CPU_IO_MAP(sound_io)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(maygayv1_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(maygayv1_state, data_to_i8031))
+	MCFG_DEVICE_ADD("soundcpu", I8052, SOUND_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(sound_prg)
+	MCFG_DEVICE_DATA_MAP(sound_data)
+	MCFG_DEVICE_IO_MAP(sound_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, maygayv1_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, maygayv1_state, data_to_i8031))
 
 	/* U25 ST 2 9148 EF68B21P */
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(maygayv1_state, b_read))
-	MCFG_PIA_READPB_HANDLER(READ8(maygayv1_state, b_read))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(maygayv1_state, b_writ))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(maygayv1_state, b_writ))
+	MCFG_PIA_READPA_HANDLER(READ8(*this, maygayv1_state, b_read))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, maygayv1_state, b_read))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8(*this, maygayv1_state, b_writ))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, maygayv1_state, b_writ))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -895,26 +895,26 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(maygayv1_state, screen_update_maygayv1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(maygayv1_state, screen_vblank_maygayv1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, maygayv1_state, screen_vblank_maygayv1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 
 	MCFG_DEVICE_ADD("duart68681", MC68681, DUART_CLOCK)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygayv1_state, duart_irq_handler))
+	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, maygayv1_state, duart_txa))
 
 	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(maygayv1_state, strobe_w))      // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(maygayv1_state, lamp_data_w)) // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(maygayv1_state, kbd_r))                   // kbd RL lines
+	MCFG_I8279_OUT_SL_CB(WRITE8(*this, maygayv1_state, strobe_w))      // scan SL lines
+	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, maygayv1_state, lamp_data_w)) // display A&B
+	MCFG_I8279_IN_RL_CB(READ8(*this, maygayv1_state, kbd_r))                   // kbd RL lines
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)
+	MCFG_DEVICE_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
-	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_DEVICE_ADD("upd",UPD7759)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

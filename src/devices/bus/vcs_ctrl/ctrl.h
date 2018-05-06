@@ -114,6 +114,6 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(VCS_CONTROL_PORT, vcs_control_port_device)
 
-SLOT_INTERFACE_EXTERN( vcs_control_port_devices );
+void vcs_control_port_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_CVS_CTRL_CTRL_H

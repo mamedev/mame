@@ -572,9 +572,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(unico_state::burglarx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(burglarx_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(burglarx_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -591,7 +591,7 @@ MACHINE_CONFIG_START(unico_state::burglarx)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
@@ -609,9 +609,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(zeropnt_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(zeropnt_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state,  irq2_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -628,7 +628,7 @@ MACHINE_CONFIG_START(zeropnt_state::zeropnt)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
@@ -646,9 +646,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(zeropnt2_state::zeropnt2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 32_MHz_XTAL/2) /* 16MHz */
-	MCFG_CPU_PROGRAM_MAP(zeropnt2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68EC020, 32_MHz_XTAL/2) /* 16MHz */
+	MCFG_DEVICE_PROGRAM_MAP(zeropnt2_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", unico_state, irq2_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 

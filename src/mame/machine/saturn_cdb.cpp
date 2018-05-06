@@ -29,8 +29,8 @@ void saturn_cdb_device::saturn_cdb_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(saturn_cdb_device::device_add_mconfig)
-	MCFG_CPU_ADD("cdbcpu", SH1, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(saturn_cdb_map)
+	MCFG_DEVICE_ADD("cdbcpu", SH1, DERIVED_CLOCK(1, 1))
+	MCFG_DEVICE_PROGRAM_MAP(saturn_cdb_map)
 	MCFG_DEVICE_DISABLE() // we're not actually using the CD Block ROM for now
 MACHINE_CONFIG_END
 

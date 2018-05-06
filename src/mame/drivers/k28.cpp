@@ -450,13 +450,13 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(k28_state::k28)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8021, 3.579545_MHz_XTAL)
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(k28_state, mcu_p0_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(k28_state, mcu_p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(k28_state, mcu_p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(k28_state, mcu_p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(k28_state, mcu_prog_w))
-	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("speech", votrax_sc01_device, request)) // SC-01 A/R pin
+	MCFG_DEVICE_ADD("maincpu", I8021, 3.579545_MHz_XTAL)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, k28_state, mcu_p0_w))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, k28_state, mcu_p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, k28_state, mcu_p2_r))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, k28_state, mcu_p2_w))
+	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, k28_state, mcu_prog_w))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE("speech", votrax_sc01_device, request)) // SC-01 A/R pin
 
 	MCFG_DEVICE_ADD("tms6100", TMS6100, 3.579545_MHz_XTAL) // CLK tied to 8021 ALE pin
 

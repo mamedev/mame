@@ -307,10 +307,10 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(nbmj8900_state::ohpaipee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(ohpaipee_map)
-	MCFG_CPU_IO_MAP(ohpaipee_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj8900_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(ohpaipee_map)
+	MCFG_DEVICE_IO_MAP(ohpaipee_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nbmj8900_state, irq0_line_hold)
 
 	MCFG_NB1413M3_ADD("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_OHPAIPEE )
@@ -330,20 +330,20 @@ MACHINE_CONFIG_START(nbmj8900_state::ohpaipee)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, 2500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.42) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.42) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nbmj8900_state::togenkyo)
 	ohpaipee(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(togenkyo_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(togenkyo_map)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_TOGENKYO )

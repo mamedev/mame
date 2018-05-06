@@ -1988,7 +1988,8 @@ void validity_checker::validate_devices()
 				{
 					if (subslot.fixed())
 					{
-						device_slot_option const *const suboption = subslot.option(subslot.default_option());
+						// TODO: make this self-contained so it can apply itself
+						device_slot_interface::slot_option const *suboption = subslot.option(subslot.default_option());
 						if (suboption)
 						{
 							machine_config::token const tok(m_current_config->begin_configuration(subslot.device()));

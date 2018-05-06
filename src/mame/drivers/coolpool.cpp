@@ -715,8 +715,8 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(coolpool_state::amerdart)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(amerdart_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(amerdart_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/12) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
@@ -724,11 +724,11 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
 
-	MCFG_CPU_ADD("dsp", TMS32015, XTAL(40'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(amerdart_dsp_pgm_map)
+	MCFG_DEVICE_ADD("dsp", TMS32015, XTAL(40'000'000)/2)
+	MCFG_DEVICE_PROGRAM_MAP(amerdart_dsp_pgm_map)
 	/* Data Map is internal to the CPU */
-	MCFG_CPU_IO_MAP(amerdart_dsp_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(coolpool_state, amerdart_dsp_bio_line_r))
+	MCFG_DEVICE_IO_MAP(amerdart_dsp_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, coolpool_state, amerdart_dsp_bio_line_r))
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("audioint", coolpool_state, amerdart_audio_int_gen, "screen", 0, 1)
 
 	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
@@ -747,17 +747,17 @@ MACHINE_CONFIG_START(coolpool_state::amerdart)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(coolpool_state::coolpool)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(coolpool_map)
+	MCFG_DEVICE_ADD("maincpu", TMS34010, XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(coolpool_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/6) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
@@ -765,12 +765,12 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 	MCFG_TMS340X0_TO_SHIFTREG_CB(coolpool_state, to_shiftreg)  /* write to shiftreg function */
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(coolpool_state, from_shiftreg) /* read from shiftreg function */
 
-	MCFG_CPU_ADD("dsp", TMS32026,XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(coolpool_dsp_pgm_map)
-	MCFG_CPU_IO_MAP(coolpool_dsp_io_map)
-	MCFG_TMS32025_BIO_IN_CB(READ16(coolpool_state, dsp_bio_line_r))
-	MCFG_TMS32025_HOLD_IN_CB(READ16(coolpool_state, dsp_hold_line_r))
-//  MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(coolpool_state, dsp_HOLDA_signal_w))
+	MCFG_DEVICE_ADD("dsp", TMS32026,XTAL(40'000'000))
+	MCFG_DEVICE_PROGRAM_MAP(coolpool_dsp_pgm_map)
+	MCFG_DEVICE_IO_MAP(coolpool_dsp_io_map)
+	MCFG_TMS32025_BIO_IN_CB(READ16(*this, coolpool_state, dsp_bio_line_r))
+	MCFG_TMS32025_HOLD_IN_CB(READ16(*this, coolpool_state, dsp_hold_line_r))
+//  MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(*this, coolpool_state, dsp_HOLDA_signal_w))
 
 	MCFG_GENERIC_LATCH_16_ADD("main2dsp")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("dsp", 0)) /* ???  I have no idea who should generate this! */
@@ -794,20 +794,20 @@ MACHINE_CONFIG_START(coolpool_state::coolpool)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_12BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(coolpool_state::_9ballsht)
 	coolpool(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nballsht_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(nballsht_map)
 
-	MCFG_CPU_MODIFY("dsp")
-	MCFG_CPU_IO_MAP(nballsht_dsp_io_map)
+	MCFG_DEVICE_MODIFY("dsp")
+	MCFG_DEVICE_IO_MAP(nballsht_dsp_io_map)
 MACHINE_CONFIG_END
 
 

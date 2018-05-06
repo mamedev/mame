@@ -1703,14 +1703,14 @@ void ms32_state::machine_reset()
 MACHINE_CONFIG_START(ms32_state::ms32)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
-	MCFG_CPU_PROGRAM_MAP(ms32_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
+	MCFG_DEVICE_ADD("maincpu", V70, 20000000) // 20MHz
+	MCFG_DEVICE_PROGRAM_MAP(ms32_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(ms32_state,irq_callback)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ms32_state, ms32_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
-	MCFG_CPU_PROGRAM_MAP(ms32_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // Unverified; it's possibly higher than 4MHz
+	MCFG_DEVICE_PROGRAM_MAP(ms32_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
@@ -1733,7 +1733,7 @@ MACHINE_CONFIG_START(ms32_state::ms32)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymf", YMF271, 16934400)
+	MCFG_DEVICE_ADD("ymf", YMF271, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 //  MCFG_SOUND_ROUTE(2, "lspeaker", 1.0) Output 2/3 not used?
@@ -1744,8 +1744,8 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ms32_state::f1superb)
 	ms32(config);
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(f1superb_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(f1superb_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", f1superb)
 

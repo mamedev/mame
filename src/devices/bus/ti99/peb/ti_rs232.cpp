@@ -1142,28 +1142,28 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(ti_rs232_pio_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("tms9902_0", TMS9902, 3000000)
-	MCFG_TMS9902_INT_CB(WRITELINE(ti_rs232_pio_device, int0_callback))            /* called when interrupt pin state changes */
-	MCFG_TMS9902_RCV_CB(WRITELINE(ti_rs232_pio_device, rcv0_callback))            /* called when a character is received */
-	MCFG_TMS9902_XMIT_CB(WRITE8(ti_rs232_pio_device, xmit0_callback))            /* called when a character is transmitted */
-	MCFG_TMS9902_CTRL_CB(WRITE8(ti_rs232_pio_device, ctrl0_callback))
+	MCFG_TMS9902_INT_CB(WRITELINE(*this, ti_rs232_pio_device, int0_callback))            /* called when interrupt pin state changes */
+	MCFG_TMS9902_RCV_CB(WRITELINE(*this, ti_rs232_pio_device, rcv0_callback))            /* called when a character is received */
+	MCFG_TMS9902_XMIT_CB(WRITE8(*this, ti_rs232_pio_device, xmit0_callback))            /* called when a character is transmitted */
+	MCFG_TMS9902_CTRL_CB(WRITE8(*this, ti_rs232_pio_device, ctrl0_callback))
 	MCFG_DEVICE_ADD("tms9902_1", TMS9902, 3000000)
-	MCFG_TMS9902_INT_CB(WRITELINE(ti_rs232_pio_device, int1_callback))            /* called when interrupt pin state changes */
-	MCFG_TMS9902_RCV_CB(WRITELINE(ti_rs232_pio_device, rcv1_callback))            /* called when a character is received */
-	MCFG_TMS9902_XMIT_CB(WRITE8(ti_rs232_pio_device, xmit1_callback))            /* called when a character is transmitted */
-	MCFG_TMS9902_CTRL_CB(WRITE8(ti_rs232_pio_device, ctrl1_callback))
+	MCFG_TMS9902_INT_CB(WRITELINE(*this, ti_rs232_pio_device, int1_callback))            /* called when interrupt pin state changes */
+	MCFG_TMS9902_RCV_CB(WRITELINE(*this, ti_rs232_pio_device, rcv1_callback))            /* called when a character is received */
+	MCFG_TMS9902_XMIT_CB(WRITE8(*this, ti_rs232_pio_device, xmit1_callback))            /* called when a character is transmitted */
+	MCFG_TMS9902_CTRL_CB(WRITE8(*this, ti_rs232_pio_device, ctrl1_callback))
 	MCFG_DEVICE_ADD("serdev0", TI99_RS232_DEV, 0)
 	MCFG_DEVICE_ADD("serdev1", TI99_RS232_DEV, 0)
 	MCFG_DEVICE_ADD("piodev", TI99_PIO_DEV, 0)
 
 	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U12
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ti_rs232_pio_device, selected_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(ti_rs232_pio_device, pio_direction_in_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(ti_rs232_pio_device, pio_handshake_out_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ti_rs232_pio_device, pio_spareout_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(ti_rs232_pio_device, flag0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ti_rs232_pio_device, cts0_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(ti_rs232_pio_device, cts1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ti_rs232_pio_device, led_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, selected_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, pio_direction_in_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, pio_handshake_out_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, pio_spareout_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, flag0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, cts0_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, cts1_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, ti_rs232_pio_device, led_w))
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *ti_rs232_pio_device::device_rom_region() const

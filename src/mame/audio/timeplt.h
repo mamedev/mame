@@ -13,7 +13,7 @@
 class timeplt_audio_device : public device_t, public device_sound_interface
 {
 public:
-	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 14'318'181);
 
 	DECLARE_WRITE8_MEMBER(sound_data_w);
 	DECLARE_WRITE_LINE_MEMBER(sh_irqtrigger_w);
@@ -49,7 +49,7 @@ private:
 class locomotn_audio_device : public timeplt_audio_device
 {
 public:
-	locomotn_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	locomotn_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 14'318'181);
 
 protected:
 	// device-level overrides

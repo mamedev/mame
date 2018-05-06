@@ -904,24 +904,24 @@ WRITE_LINE_MEMBER(trackfld_state::vblank_nmi)
 MACHINE_CONFIG_START(trackfld_state::trackfld)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/6/2)    /* a guess for now */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_ADD("maincpu", KONAMI1, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 1D
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(trackfld_state, flipscreen_w)) // FLIP
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w)) // 26 = SOUND ON
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, trackfld_state, flipscreen_w)) // FLIP
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w)) // 26 = SOUND ON
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // 25 = MUT?
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(trackfld_state, coin_counter_1_w)) // 24 = OUT1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(trackfld_state, coin_counter_2_w)) // 23 = OUT2
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, trackfld_state, coin_counter_1_w)) // 24 = OUT1
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, trackfld_state, coin_counter_2_w)) // 23 = OUT2
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // CN3.2
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // CN3.4
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, irq_mask_w)) // INT
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, trackfld_state, irq_mask_w)) // INT
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -935,7 +935,7 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(trackfld_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
@@ -948,24 +948,24 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76496, SOUND_CLOCK/8)
+	MCFG_DEVICE_ADD("snsnd", SN76496, SOUND_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
+	MCFG_DEVICE_ADD("vlm", VLM5030, VLM_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trackfld_state::trackfldu)
 	trackfld(config);
-	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
 
 MACHINE_CONFIG_END
 
@@ -978,26 +978,26 @@ INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 MACHINE_CONFIG_START(trackfld_state::yieartf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
-	MCFG_CPU_PROGRAM_MAP(yieartf_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(trackfld_state, yieartf_timer_irq, 480)
+	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_DEVICE_PROGRAM_MAP(yieartf_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(trackfld_state, yieartf_timer_irq, 480)
 
 //  z80 isn't used
-//  MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
-//  MCFG_CPU_PROGRAM_MAP(sound_map)
+//  MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)
+//  MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(trackfld_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(trackfld_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(trackfld_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, trackfld_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("trackfld_audio", trackfld_audio_device, sh_irqtrigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, trackfld_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, trackfld_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, trackfld_state, coin_counter_2_w))
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, trackfld_state, irq_mask_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1011,7 +1011,7 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(trackfld_state, screen_update_trackfld)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(trackfld_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trackfld)
 	MCFG_PALETTE_ADD("palette", 16*16+16*16)
@@ -1024,16 +1024,16 @@ MACHINE_CONFIG_START(trackfld_state::yieartf)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ls374.8e + r34-r47(20k) + r35-r53(10k) + r54(20k) + upc324.8f
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/6/2)
+	MCFG_DEVICE_ADD("snsnd", SN76496, MASTER_CLOCK/6/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
+	MCFG_DEVICE_ADD("vlm", VLM5030, VLM_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
@@ -1066,23 +1066,23 @@ void trackfld_state::hyprolyb_adpcm_map(address_map &map)
 MACHINE_CONFIG_START(trackfld_state::hyprolyb)
 	trackfld(config);
 
-	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_PROGRAM_MAP(hyprolyb_sound_map)
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(trackfld_state,trackfld)
 	MCFG_MACHINE_RESET_OVERRIDE(trackfld_state,trackfld)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vlm")
-	MCFG_CPU_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
-	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+	MCFG_DEVICE_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
+	MCFG_DEVICE_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+	MCFG_DEVICE_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(DEVWRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
+	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE("hyprolyb_adpcm", hyprolyb_adpcm_device, vck_callback)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
@@ -1098,8 +1098,8 @@ MACHINE_CONFIG_START(trackfld_state::mastkin)
 	trackfld(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
-	MCFG_CPU_PROGRAM_MAP(mastkin_map)
+	MCFG_DEVICE_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* a guess for now */
+	MCFG_DEVICE_PROGRAM_MAP(mastkin_map)
 
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // actually not used
@@ -1111,23 +1111,23 @@ MACHINE_CONFIG_START(trackfld_state::wizzquiz)
 
 	/* basic machine hardware */
 	// right cpu?
-	MCFG_CPU_REPLACE("maincpu",M6800,2048000)       /* 1.400 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(wizzquiz_map)
+	MCFG_DEVICE_REPLACE("maincpu",M6800,2048000)       /* 1.400 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(wizzquiz_map)
 
 	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(trackfld_state, vblank_nmi))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, trackfld_state, vblank_nmi))
 
 	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(trackfld_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, trackfld_state, nmi_mask_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(trackfld_state::reaktor)
 	trackfld(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)
-	MCFG_CPU_PROGRAM_MAP(reaktor_map)
-	MCFG_CPU_IO_MAP(reaktor_io_map)
+	MCFG_DEVICE_REPLACE("maincpu",Z80,MASTER_CLOCK/6)
+	MCFG_DEVICE_PROGRAM_MAP(reaktor_map)
+	MCFG_DEVICE_IO_MAP(reaktor_io_map)
 MACHINE_CONFIG_END
 
 

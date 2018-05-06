@@ -537,10 +537,10 @@ void jr200_state::machine_reset()
 
 MACHINE_CONFIG_START(jr200_state::jr200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(14'318'181) / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
-	MCFG_CPU_PROGRAM_MAP(jr200_mem)
+	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(14'318'181) / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
+	MCFG_DEVICE_PROGRAM_MAP(jr200_mem)
 
-//  MCFG_CPU_ADD("mn1544", MN1544, ?)
+//  MCFG_DEVICE_ADD("mn1544", MN1544, ?)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -558,7 +558,7 @@ MACHINE_CONFIG_START(jr200_state::jr200)
 
 	// AY-8910 ?
 
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_DEVICE_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

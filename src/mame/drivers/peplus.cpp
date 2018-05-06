@@ -1341,11 +1341,11 @@ void peplus_state::machine_reset()
 
 MACHINE_CONFIG_START(peplus_state::peplus)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL(20'000'000)/2) /* 10MHz */
-	MCFG_CPU_PROGRAM_MAP(peplus_map)
-	MCFG_CPU_IO_MAP(peplus_iomap)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(peplus_state, paldata_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(peplus_state, paldata2_w))
+	MCFG_DEVICE_ADD("maincpu", I80C32, XTAL(20'000'000)/2) /* 10MHz */
+	MCFG_DEVICE_PROGRAM_MAP(peplus_map)
+	MCFG_DEVICE_IO_MAP(peplus_iomap)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, peplus_state, paldata_w))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, peplus_state, paldata2_w))
 
 	MCFG_NVRAM_ADD_0FILL("cmos")
 
@@ -1365,14 +1365,14 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_ADDR_CHANGED_CB(peplus_state, crtc_addr)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(peplus_state, crtc_vsync))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, peplus_state, crtc_vsync))
 
 	MCFG_X2404P_ADD("i2cmem")
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(20'000'000)/12)
+	MCFG_DEVICE_ADD("aysnd", AY8912, XTAL(20'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

@@ -400,12 +400,12 @@ void mugsmash_state::machine_start()
 
 MACHINE_CONFIG_START(mugsmash_state::mugsmash)
 
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(mugsmash_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mugsmash_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(mugsmash_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mugsmash_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* Guess */
-	MCFG_CPU_PROGRAM_MAP(mugsmash_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* Guess */
+	MCFG_DEVICE_PROGRAM_MAP(mugsmash_sound_map)
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

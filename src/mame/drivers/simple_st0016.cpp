@@ -469,9 +469,9 @@ uint32_t st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(st0016_state::st0016)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(st0016_mem)
-	MCFG_CPU_IO_MAP(st0016_io)
+	MCFG_DEVICE_ADD("maincpu",ST0016_CPU,8000000) /* 8 MHz ? */
+	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
+	MCFG_DEVICE_IO_MAP(st0016_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", st0016_state, st0016_int, "screen", 0, 1)
 
 	/* video hardware */
@@ -490,17 +490,17 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(st0016_state::mayjinsn)
 	st0016(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(st0016_m2_io)
-	MCFG_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
-	MCFG_CPU_PROGRAM_MAP(v810_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_IO_MAP(st0016_m2_io)
+	MCFG_DEVICE_ADD("sub", V810, 10000000)//25 Mhz ?
+	MCFG_DEVICE_PROGRAM_MAP(v810_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(st0016_state::renju)
 	st0016(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(renju_mem)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(renju_mem)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -125,33 +125,33 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(segacoin_state::westdrm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000) // clock frequency unknown
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_DEVICE_ADD("maincpu", Z80, 8000000) // clock frequency unknown
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK2(1000000) // clock frequency unknown
 
 	MCFG_DEVICE_ADD("io", SEGA_315_5338A, 0)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000) // clock frequency unknown
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 8000000) // clock frequency unknown
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_portmap)
 
 	/* no video! */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym0", YM3438, 8000000) // clock frequency unknown
+	MCFG_DEVICE_ADD("ym0", YM3438, 8000000) // clock frequency unknown
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym1", YM3438, 8000000) // clock frequency unknown
+	MCFG_DEVICE_ADD("ym1", YM3438, 8000000) // clock frequency unknown
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM3438, 8000000) // clock frequency unknown
+	MCFG_DEVICE_ADD("ym2", YM3438, 8000000) // clock frequency unknown
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END

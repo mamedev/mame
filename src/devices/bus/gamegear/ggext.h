@@ -115,7 +115,7 @@ protected:
 DECLARE_DEVICE_TYPE(GG_EXT_PORT, gg_ext_port_device)
 
 
-SLOT_INTERFACE_EXTERN(gg_ext_port_devices);
+void gg_ext_port_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_GAMEGEAR_GGEXT_H

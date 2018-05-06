@@ -80,9 +80,9 @@ INTERRUPT_GEN_MEMBER(adder5_state::ad5_fake_timer_int)
 }
 
 MACHINE_CONFIG_START(adder5_state::bfm_ad5)
-	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
-	MCFG_CPU_PROGRAM_MAP(ad5_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(adder5_state, ad5_fake_timer_int, 1000)
+	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
+	MCFG_DEVICE_PROGRAM_MAP(ad5_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(adder5_state, ad5_fake_timer_int, 1000)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

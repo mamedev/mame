@@ -160,15 +160,15 @@ void dmv_k220_device::device_reset()
 
 MACHINE_CONFIG_START(dmv_k220_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(dmv_k220_device, porta_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dmv_k220_device, porta_w))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("SWITCH"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(dmv_k220_device, portc_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dmv_k220_device, portc_w))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(1'000'000))  // CLK1
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(dmv_k220_device, write_out0))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(dmv_k220_device, write_out1))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(dmv_k220_device, write_out2))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, dmv_k220_device, write_out0))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, dmv_k220_device, write_out1))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, dmv_k220_device, write_out2))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

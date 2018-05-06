@@ -66,4 +66,17 @@
 		</part>
 	</software>
 
+	<software name="abc832">
+		<description>ABC832 Systemskiva v2.5 (Swe)</description>
+		<year>1982</year>
+		<publisher>Luxor</publisher>
+		<info name="usage" value="BYE" />
+
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="abc832.dsk" size="655360" crc="36c1ff01" sha1="7aceaa4bf79301f545ec4b8ca7cbaa7f34fff462" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

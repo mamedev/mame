@@ -429,14 +429,14 @@ void himesiki_state::machine_reset()
 MACHINE_CONFIG_START(himesiki_state::himesiki)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, CLK2) /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */
-	MCFG_CPU_PROGRAM_MAP(himesiki_prm0)
-	MCFG_CPU_IO_MAP(himesiki_iom0)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", himesiki_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, CLK2) /* it's a 6.000 MHz rated part, but near the 8 Mhz XTAL?? - Android skips lots of frames at 6, crashes at 4 */
+	MCFG_DEVICE_PROGRAM_MAP(himesiki_prm0)
+	MCFG_DEVICE_IO_MAP(himesiki_iom0)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", himesiki_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, CLK2/2) /* 4.000 MHz (4Mhz rated part, near the 8 Mhz XTAL) */
-	MCFG_CPU_PROGRAM_MAP(himesiki_prm1)
-	MCFG_CPU_IO_MAP(himesiki_iom1)
+	MCFG_DEVICE_ADD("sub", Z80, CLK2/2) /* 4.000 MHz (4Mhz rated part, near the 8 Mhz XTAL) */
+	MCFG_DEVICE_PROGRAM_MAP(himesiki_prm1)
+	MCFG_DEVICE_IO_MAP(himesiki_iom1)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("1P"))
@@ -446,7 +446,7 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW1"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(himesiki_state, himesiki_rombank_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, himesiki_state, himesiki_rombank_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -467,7 +467,7 @@ MACHINE_CONFIG_START(himesiki_state::himesiki)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym2203", YM2203, CLK2/4) // ??
+	MCFG_DEVICE_ADD("ym2203", YM2203, CLK2/4) // ??
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
 	MCFG_SOUND_ROUTE(1, "mono", 0.10)

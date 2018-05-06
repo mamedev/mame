@@ -70,10 +70,10 @@ void os214_state::os214_io_map(address_map &map)
 
 MACHINE_CONFIG_START(os214_state::os214)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83002, XTAL(16'000'000)) /* X1 xtal value is correct,
+	MCFG_DEVICE_ADD("maincpu", H83002, XTAL(16'000'000)) /* X1 xtal value is correct,
 	                                                   but there can be some clock divider perhaps ? */
-	MCFG_CPU_PROGRAM_MAP(os214_prg_map)
-	MCFG_CPU_IO_MAP(os214_io_map)
+	MCFG_DEVICE_PROGRAM_MAP(os214_prg_map)
+	MCFG_DEVICE_IO_MAP(os214_io_map)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER( os214_state, os214 )

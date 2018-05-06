@@ -624,12 +624,12 @@ static const char *const bowl3d_sample_names[] =
 MACHINE_CONFIG_START(meadows_state::meadows)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
-	MCFG_CPU_PROGRAM_MAP(meadows_main_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(meadows_main_map)
 
-	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(meadows_state, audio_interrupt,  (double)5000000/131072)
+	MCFG_DEVICE_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(meadows_state, audio_interrupt,  (double)5000000/131072)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -640,18 +640,18 @@ MACHINE_CONFIG_START(meadows_state::meadows)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_START_CB(meadows_state, meadows_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -661,9 +661,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(meadows_state::minferno)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
-	MCFG_CPU_PROGRAM_MAP(minferno_main_map)
-	MCFG_CPU_DATA_MAP(minferno_data_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/24)     /* 5MHz / 8 / 3 = 208.33 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(minferno_main_map)
+	MCFG_DEVICE_DATA_MAP(minferno_data_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -672,7 +672,7 @@ MACHINE_CONFIG_START(meadows_state::minferno)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meadows_state, minferno_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meadows_state, minferno_vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", minferno)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
@@ -685,12 +685,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(meadows_state::bowl3d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
-	MCFG_CPU_PROGRAM_MAP(bowl3d_main_map)
+	MCFG_DEVICE_ADD("maincpu", S2650, MASTER_CLOCK/8)  /* 5MHz / 8 = 625 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(bowl3d_main_map)
 
-	MCFG_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(meadows_state, audio_interrupt,  (double)5000000/131072)
+	MCFG_DEVICE_ADD("audiocpu", S2650, MASTER_CLOCK/8)     /* 5MHz / 8 = 625 kHz */
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(meadows_state, audio_interrupt,  (double)5000000/131072)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -701,23 +701,23 @@ MACHINE_CONFIG_START(meadows_state::bowl3d)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(meadows_state, screen_update_meadows)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, meadows_state, meadows_vblank_irq)) // one interrupt per frame!?
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", meadows)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_START_CB(meadows_state, meadows_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("samples2", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples2", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_NAMES(bowl3d_sample_names)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)

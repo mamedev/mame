@@ -188,14 +188,14 @@ GFXDECODE_END
 MACHINE_CONFIG_START(intrscti_state::intrscti)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(intrscti_map)
-	MCFG_CPU_IO_MAP(intrscti_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", intrscti_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)        /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(intrscti_map)
+	MCFG_DEVICE_IO_MAP(intrscti_io_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", intrscti_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, 4000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(intrscti_sub_map)
-	MCFG_CPU_IO_MAP(intrscti_sub_io_map)
+	MCFG_DEVICE_ADD("subcpu", Z80, 4000000)         /* ? MHz */
+	MCFG_DEVICE_PROGRAM_MAP(intrscti_sub_map)
+	MCFG_DEVICE_IO_MAP(intrscti_sub_io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -739,21 +739,21 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 
 	/* basic machine hardware */
 	/* CPU BOARD */
-	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu0_interrupt)
+	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(main_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu0_interrupt)
 
 	/* GAME BOARD */
-	MCFG_CPU_ADD("sub", Z80, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(sub_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu1_interrupt)
+	MCFG_DEVICE_ADD("sub", Z80, PIXEL_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	MCFG_DEVICE_IO_MAP(sub_portmap)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu1_interrupt)
 
 	/* SOUND BOARD */
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -776,20 +776,20 @@ MACHINE_CONFIG_START(grchamp_state::grchamp)
 	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_0_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_0_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/4)
+	MCFG_DEVICE_ADD("ay2", AY8910, SOUND_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_2_w))
+	MCFG_DEVICE_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, grchamp_state, portA_2_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, grchamp_state, portB_2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_DEVICE_ADD("discrete", DISCRETE)
 	MCFG_DISCRETE_INTF(grchamp)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

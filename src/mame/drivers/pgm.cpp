@@ -510,13 +510,13 @@ MACHINE_RESET_MEMBER(pgm_state,pgm)
 
 MACHINE_CONFIG_START(pgm_state::pgmbase)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20_MHz_XTAL) /* 20 mhz! verified on real board */
-	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
+	MCFG_DEVICE_ADD("maincpu", M68000, 20_MHz_XTAL) /* 20 mhz! verified on real board */
+	MCFG_DEVICE_PROGRAM_MAP(pgm_basic_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pgm_state, pgm_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 33.8688_MHz_XTAL/4)
-	MCFG_CPU_PROGRAM_MAP(pgm_z80_mem)
-	MCFG_CPU_IO_MAP(pgm_z80_io)
+	MCFG_DEVICE_ADD("soundcpu", Z80, 33.8688_MHz_XTAL/4)
+	MCFG_DEVICE_PROGRAM_MAP(pgm_z80_mem)
+	MCFG_DEVICE_IO_MAP(pgm_z80_io)
 
 	MCFG_MACHINE_START_OVERRIDE(pgm_state, pgm )
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_state, pgm )
@@ -531,7 +531,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pgm_state, screen_update_pgm)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pgm_state, screen_vblank_pgm))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm_state, screen_vblank_pgm))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgm)
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(pgm_state::pgmbase)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_ICS2115_ADD("ics", 33.8688_MHz_XTAL)
+	MCFG_DEVICE_ADD("ics", ICS2115, 33.8688_MHz_XTAL)
 	MCFG_ICS2115_IRQ_CB(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END

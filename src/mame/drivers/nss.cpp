@@ -831,19 +831,19 @@ void nss_state::machine_reset()
 MACHINE_CONFIG_START(nss_state::nss)
 
 	/* base snes hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_CPU_PROGRAM_MAP(snes_map)
+	MCFG_DEVICE_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
+	MCFG_DEVICE_PROGRAM_MAP(snes_map)
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_CPU_PROGRAM_MAP(spc_mem)
+	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
+	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* nss hardware */
-	MCFG_CPU_ADD("bios", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(bios_map)
-	MCFG_CPU_IO_MAP(bios_io_map)
+	MCFG_DEVICE_ADD("bios", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(bios_map)
+	MCFG_DEVICE_IO_MAP(bios_io_map)
 
 	MCFG_M50458_ADD("m50458", 4000000, "osd") /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
@@ -852,7 +852,7 @@ MACHINE_CONFIG_START(nss_state::nss)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("spc700", SNES, 0)
+	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
@@ -864,10 +864,10 @@ MACHINE_CONFIG_START(nss_state::nss)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(nss_state, nss_vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, nss_state, nss_vblank_irq))
 
 	MCFG_DEVICE_ADD("ppu", SNES_PPU, 0)
-	MCFG_SNES_PPU_OPENBUS_CB(READ8(snes_state, snes_open_bus_r))
+	MCFG_SNES_PPU_OPENBUS_CB(READ8(*this, snes_state, snes_open_bus_r))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// NSS

@@ -2,7 +2,13 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-    xavix.c
+    xavix.cpp
+
+	The dies for these are marked 
+	
+	SSD 97 PA7270-107 (only seen on Ping Pong)
+	SSD 98 PA7351-107
+	SSD 98 PL7351-181
 
     6502 with custom opcodes
     integrated gfx / sound
@@ -15,14 +21,14 @@
                   0x00ff contains the DATA bank, set manually in code
                   0x00fe appears to be the current CODE bank, set with either the
                          custom opcodes, or manually (if running from lowbus only?)
-
+						
 ***************************************************************************/
 
 #include "emu.h"
 #include "xavix.h"
 #include "xavixd.h"
 
-DEFINE_DEVICE_TYPE(XAVIX, xavix_device, "xavix", "XaviX")
+DEFINE_DEVICE_TYPE(XAVIX, xavix_device, "xavix", "XaviX (SSD 97 / SSD 98)")
 
 xavix_device::xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, XAVIX, tag, owner, clock),
@@ -33,6 +39,17 @@ xavix_device::xavix_device(const machine_config &mconfig, const char *tag, devic
 	sprogram_config.m_addr_width = 24;
 	sprogram_config.m_logaddr_width = 24;
 }
+
+xavix_device::xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	m6502_device(mconfig, type, tag, owner, clock),
+	XPC(0)
+{
+	program_config.m_addr_width = 24;
+	program_config.m_logaddr_width = 24;
+	sprogram_config.m_addr_width = 24;
+	sprogram_config.m_logaddr_width = 24;
+}
+
 
 
 std::unique_ptr<util::disasm_interface> xavix_device::create_disassembler()
@@ -165,8 +182,5 @@ inline uint8_t xavix_device::get_databank()
 //  return space().read_byte(0xff);
 	return m_databank;
 }
-
-
-
 
 #include "cpu/m6502/xavix.hxx"

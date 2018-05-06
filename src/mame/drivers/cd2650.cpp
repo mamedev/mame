@@ -287,16 +287,16 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 
 MACHINE_CONFIG_START(cd2650_state::cd2650)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'192'640) / 12) // 1.182720MHz according to RE schematic
-	MCFG_CPU_PROGRAM_MAP(cd2650_mem)
-	MCFG_CPU_IO_MAP(cd2650_io)
-	MCFG_CPU_DATA_MAP(cd2650_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(cd2650_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cd2650_state, cass_w))
+	MCFG_DEVICE_ADD("maincpu", S2650, XTAL(14'192'640) / 12) // 1.182720MHz according to RE schematic
+	MCFG_DEVICE_PROGRAM_MAP(cd2650_mem)
+	MCFG_DEVICE_IO_MAP(cd2650_io)
+	MCFG_DEVICE_DATA_MAP(cd2650_data)
+	MCFG_S2650_SENSE_INPUT(READLINE(*this, cd2650_state, cass_r))
+	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, cd2650_state, cass_w))
 
 	MCFG_DEVICE_ADD("outlatch", F9334, 0) // IC26
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cd2650_state, tape_deck_on_w)) // TD ON
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state)) // OUT6
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, cd2650_state, tape_deck_on_w)) // TD ON
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE("beeper", beep_device, set_state)) // OUT6
 	// Q1-Q7 = OUT 0-6, not defined in RE
 	// The connection of OUT6 to a 700-1200 Hz noise generator is suggested
 	// in Central Data 2650 Newsletter, Volume 1, Issue 3 for use with the
@@ -318,7 +318,7 @@ MACHINE_CONFIG_START(cd2650_state::cd2650)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
+	MCFG_DEVICE_ADD("beeper", BEEP, 950) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

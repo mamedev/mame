@@ -114,6 +114,9 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_iospace(nullptr),
 	m_memspace(nullptr),
+	m_iowidth(0),
+	m_memwidth(0),
+	m_allocspaces(false),
 	m_out_irq2_cb(*this),
 	m_out_irq3_cb(*this),
 	m_out_irq4_cb(*this),
@@ -123,16 +126,11 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_out_drq1_cb(*this),
 	m_out_drq2_cb(*this),
 	m_out_drq3_cb(*this),
+	m_nmi_enabled(false),
 	m_write_iochck(*this)
 {
-	for(int i=0;i<8;i++)
-	{
-		m_dma_device[i] = nullptr;
-		m_dma_eop[i] = false;
-	}
-	m_nmi_enabled = false;
-	m_iowidth = m_memwidth = 0;
-	m_allocspaces = false;
+	std::fill(std::begin(m_dma_device), std::end(m_dma_device), nullptr);
+	std::fill(std::begin(m_dma_eop), std::end(m_dma_eop), false);
 }
 
 device_memory_interface::space_config_vector isa8_device::memory_space_config() const

@@ -95,11 +95,11 @@ const tiny_rom_entry *bsmt2000_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bsmt2000_device::device_add_mconfig)
-	MCFG_CPU_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
-	MCFG_CPU_PROGRAM_MAP(tms_program_map)
+	MCFG_DEVICE_ADD("bsmt2000", TMS32015, DERIVED_CLOCK(1,1))
+	MCFG_DEVICE_PROGRAM_MAP(tms_program_map)
 	// data map is internal to the CPU
-	MCFG_CPU_IO_MAP(tms_io_map)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(bsmt2000_device, tms_write_pending_r))
+	MCFG_DEVICE_IO_MAP(tms_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, bsmt2000_device, tms_write_pending_r))
 MACHINE_CONFIG_END
 
 

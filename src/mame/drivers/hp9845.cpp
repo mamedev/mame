@@ -3641,8 +3641,8 @@ const uint8_t hp9845t_state::m_back_arrow_shape[] = {
 };
 
 MACHINE_CONFIG_START(hp9845_state::hp9845a)
-	//MCFG_CPU_ADD("lpu", HP_5061_3010, XTAL(11'400'000))
-	//MCFG_CPU_ADD("ppu", HP_5061_3011, XTAL(11'400'000))
+	//MCFG_DEVICE_ADD("lpu", HP_5061_3010, XTAL(11'400'000))
+	//MCFG_DEVICE_ADD("ppu", HP_5061_3011, XTAL(11'400'000))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3656,8 +3656,8 @@ MACHINE_CONFIG_START(hp9845_state::hp9845a)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845_state::hp9835a)
-	//MCFG_CPU_ADD("lpu", HP_5061_3001, XTAL(11'400'000))
-	//MCFG_CPU_ADD("ppu", HP_5061_3001, XTAL(11'400'000))
+	//MCFG_DEVICE_ADD("lpu", HP_5061_3001, XTAL(11'400'000))
+	//MCFG_DEVICE_ADD("ppu", HP_5061_3001, XTAL(11'400'000))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3732,15 +3732,15 @@ void hp9845_base_state::ppu_io_map(address_map &map)
 }
 
 MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
-	MCFG_CPU_ADD("lpu", HP_5061_3001, 5700000)
-	MCFG_CPU_PROGRAM_MAP(global_mem_map)
+	MCFG_DEVICE_ADD("lpu", HP_5061_3001, 5700000)
+	MCFG_DEVICE_PROGRAM_MAP(global_mem_map)
 	MCFG_HPHYBRID_SET_9845_BOOT(true)
-	MCFG_CPU_ADD("ppu", HP_5061_3001, 5700000)
-	MCFG_CPU_PROGRAM_MAP(global_mem_map)
-	MCFG_CPU_IO_MAP(ppu_io_map)
+	MCFG_DEVICE_ADD("ppu", HP_5061_3001, 5700000)
+	MCFG_DEVICE_PROGRAM_MAP(global_mem_map)
+	MCFG_DEVICE_IO_MAP(ppu_io_map)
 	MCFG_HPHYBRID_SET_9845_BOOT(true)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp9845_base_state , irq_callback)
-	MCFG_HPHYBRID_PA_CHANGED(WRITE8(hp9845_base_state , pa_w))
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(hp9845_base_state , irq_callback)
+	MCFG_HPHYBRID_PA_CHANGED(WRITE8(*this, hp9845_base_state , pa_w))
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -3752,59 +3752,59 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 
 	// Beeper
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper" , BEEP , KEY_SCAN_OSCILLATOR / 512)
+	MCFG_DEVICE_ADD("beeper" , BEEP , KEY_SCAN_OSCILLATOR / 512)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 0.50)
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer" , hp9845_base_state , beeper_off);
 
 	// Tape controller
 	MCFG_DEVICE_ADD("t15" , HP_TACO , 4000000)
-	MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845_base_state , t15_irq_w))
-	MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845_base_state , t15_flg_w))
-	MCFG_TACO_STS_HANDLER(WRITELINE(hp9845_base_state , t15_sts_w))
+	MCFG_TACO_IRQ_HANDLER(WRITELINE(*this, hp9845_base_state , t15_irq_w))
+	MCFG_TACO_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , t15_flg_w))
+	MCFG_TACO_STS_HANDLER(WRITELINE(*this, hp9845_base_state , t15_sts_w))
 	MCFG_DEVICE_ADD("t14" , HP_TACO , 4000000)
-	MCFG_TACO_IRQ_HANDLER(WRITELINE(hp9845_base_state , t14_irq_w))
-	MCFG_TACO_FLG_HANDLER(WRITELINE(hp9845_base_state , t14_flg_w))
-	MCFG_TACO_STS_HANDLER(WRITELINE(hp9845_base_state , t14_sts_w))
+	MCFG_TACO_IRQ_HANDLER(WRITELINE(*this, hp9845_base_state , t14_irq_w))
+	MCFG_TACO_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , t14_flg_w))
+	MCFG_TACO_STS_HANDLER(WRITELINE(*this, hp9845_base_state , t14_sts_w))
 
 	// In real machine there were 8 slots for LPU ROMs and 8 slots for PPU ROMs in
 	// right-hand side and left-hand side drawers, respectively.
 	// Here we do away with the distinction between LPU & PPU ROMs: in the end they
 	// are visible to both CPUs at the same addresses.
 	MCFG_DEVICE_ADD("drawer1", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer2", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer3", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer4", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer5", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer6", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer7", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 	MCFG_DEVICE_ADD("drawer8", HP_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_devices, NULL, false)
 
 	// I/O slots
 	MCFG_HP9845_IO_SLOT_ADD("slot0")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
 	MCFG_HP9845_IO_SLOT_ADD("slot1")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
 	MCFG_HP9845_IO_SLOT_ADD("slot2")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
 	MCFG_HP9845_IO_SLOT_ADD("slot3")
-	MCFG_HP9845_IO_IRQ_CB(WRITE8(hp9845_base_state , irq_w))
-	MCFG_HP9845_IO_STS_CB(WRITE8(hp9845_base_state , sts_w))
-	MCFG_HP9845_IO_FLG_CB(WRITE8(hp9845_base_state , flg_w))
+	MCFG_HP9845_IO_IRQ_CB(WRITE8(*this, hp9845_base_state , irq_w))
+	MCFG_HP9845_IO_STS_CB(WRITE8(*this, hp9845_base_state , sts_w))
+	MCFG_HP9845_IO_FLG_CB(WRITE8(*this, hp9845_base_state , flg_w))
 
 	// LPU memory options
 	MCFG_RAM_ADD(RAM_TAG)
@@ -3813,9 +3813,9 @@ MACHINE_CONFIG_START(hp9845_base_state::hp9845_base)
 
 	// Internal printer
 	MCFG_DEVICE_ADD("printer" , HP9845_PRINTER , 0)
-	MCFG_9845PRT_IRL_HANDLER(WRITELINE(hp9845_base_state , prt_irl_w))
-	MCFG_9845PRT_FLG_HANDLER(WRITELINE(hp9845_base_state , prt_flg_w))
-	MCFG_9845PRT_STS_HANDLER(WRITELINE(hp9845_base_state , prt_sts_w))
+	MCFG_9845PRT_IRL_HANDLER(WRITELINE(*this, hp9845_base_state , prt_irl_w))
+	MCFG_9845PRT_FLG_HANDLER(WRITELINE(*this, hp9845_base_state , prt_flg_w))
+	MCFG_9845PRT_STS_HANDLER(WRITELINE(*this, hp9845_base_state , prt_sts_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(hp9845b_state::hp9845b)
@@ -3823,7 +3823,7 @@ MACHINE_CONFIG_START(hp9845b_state::hp9845b)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp9845b_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845b_state, vblank_w))
 	MCFG_SCREEN_COLOR(rgb_t::green())
 	// These parameters are for alpha video
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
@@ -3841,7 +3841,7 @@ MACHINE_CONFIG_START(hp9845c_state::hp9845c)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845c_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp9845c_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845c_state, vblank_w))
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_770_PIXEL_CLOCK , VIDEO_770_HTOTAL , VIDEO_770_HBEND , VIDEO_770_HBSTART , VIDEO_770_VTOTAL , VIDEO_770_VBEND , VIDEO_770_VBSTART)
 	MCFG_PALETTE_ADD("palette", 24)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp9845c_state, scanline_timer, "screen", 0, 1)
@@ -3855,7 +3855,7 @@ MACHINE_CONFIG_START(hp9845t_state::hp9845t)
 	// video hardware
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845t_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp9845t_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hp9845t_state, vblank_w))
 	MCFG_SCREEN_COLOR(rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_780_PIXEL_CLOCK , VIDEO_780_HTOTAL , VIDEO_780_HBEND , VIDEO_780_HBSTART , VIDEO_780_VTOTAL , VIDEO_780_VBEND , VIDEO_780_VBSTART)
 	MCFG_PALETTE_ADD("palette", 5)

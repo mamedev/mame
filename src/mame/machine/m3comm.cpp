@@ -119,8 +119,8 @@ DEFINE_DEVICE_TYPE(M3COMM, m3comm_device, "m3comm", "Model 3 Communication Board
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(m3comm_device::device_add_mconfig)
-	MCFG_CPU_ADD(M68K_TAG, M68000, 10000000) // random
-	MCFG_CPU_PROGRAM_MAP(m3comm_mem)
+	MCFG_DEVICE_ADD(M68K_TAG, M68000, 10000000) // random
+	MCFG_DEVICE_PROGRAM_MAP(m3comm_mem)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")

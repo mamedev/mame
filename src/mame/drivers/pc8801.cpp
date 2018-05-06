@@ -2247,9 +2247,10 @@ GFXDECODE_END
 
 /* Floppy Configuration */
 
-static SLOT_INTERFACE_START( pc88_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
+static void pc88_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
 
 #if 0
 /* Cassette Configuration */
@@ -2582,31 +2583,31 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 
 MACHINE_CONFIG_START(pc8801_state::pc8801)
 	/* main CPU */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(pc8801_mem)
-	MCFG_CPU_IO_MAP(pc8801_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc8801_state,  pc8801_vrtc_irq)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc8801_state,pc8801_irq_callback)
+	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pc8801_mem)
+	MCFG_DEVICE_IO_MAP(pc8801_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pc8801_state,  pc8801_vrtc_irq)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pc8801_state,pc8801_irq_callback)
 
 	/* sub CPU(5 inch floppy drive) */
-	MCFG_CPU_ADD("fdccpu", Z80, MASTER_CLOCK)       /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(pc8801fdc_mem)
-	MCFG_CPU_IO_MAP(pc8801fdc_io)
+	MCFG_DEVICE_ADD("fdccpu", Z80, MASTER_CLOCK)       /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(pc8801fdc_mem)
+	MCFG_DEVICE_IO_MAP(pc8801fdc_io)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_DEVICE_ADD("d8255_master", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_slave", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_slave", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pc8801_state, cpu_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc8801_state, cpu_8255_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8("d8255_slave", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(READ8("d8255_slave", i8255_device, pa_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8801_state, cpu_8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8801_state, cpu_8255_c_w))
 
 	MCFG_DEVICE_ADD("d8255_slave", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("d8255_master", i8255_device, pb_r))
-	MCFG_I8255_IN_PORTB_CB(DEVREAD8("d8255_master", i8255_device, pa_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(pc8801_state, fdc_8255_c_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc8801_state, fdc_8255_c_w))
+	MCFG_I8255_IN_PORTA_CB(READ8("d8255_master", i8255_device, pb_r))
+	MCFG_I8255_IN_PORTB_CB(READ8("d8255_master", i8255_device, pa_r))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pc8801_state, fdc_8255_c_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pc8801_state, fdc_8255_c_w))
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("fdccpu", INPUT_LINE_IRQ0))
@@ -2622,8 +2623,8 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
 
 	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(pc8801_state, txdata_callback))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(pc8801_state, rxrdy_w))
+	MCFG_I8251_TXD_HANDLER(WRITELINE(*this, pc8801_state, txdata_callback))
+	MCFG_I8251_RTS_HANDLER(WRITELINE(*this, pc8801_state, rxrdy_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", floppy_image_device::default_floppy_formats)
@@ -2643,19 +2644,19 @@ MACHINE_CONFIG_START(pc8801_state::pc8801)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("opn", YM2203, MASTER_CLOCK)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(pc8801_state, pc8801_sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(pc8801_state, opn_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(pc8801_state, opn_portb_r))
+	MCFG_DEVICE_ADD("opn", YM2203, MASTER_CLOCK)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, pc8801_state, pc8801_sound_irq))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc8801_state, opn_porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc8801_state, opn_portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD("opna", YM2608, MASTER_CLOCK*2)
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pc8801_state, pc8801_sound_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(pc8801_state, opn_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(pc8801_state, opn_portb_r))
+	MCFG_DEVICE_ADD("opna", YM2608, MASTER_CLOCK*2)
+	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc8801_state, pc8801_sound_irq))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc8801_state, opn_porta_r))
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc8801_state, opn_portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD("beeper", BEEP, 2400)
+	MCFG_DEVICE_ADD("beeper", BEEP, 2400)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))

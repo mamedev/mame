@@ -349,11 +349,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 
 MACHINE_CONFIG_START(taito_state::taito)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 19000000/9)
-	MCFG_CPU_PROGRAM_MAP(taito_map)
+	MCFG_DEVICE_ADD("maincpu", I8080, 19000000/9)
+	MCFG_DEVICE_PROGRAM_MAP(taito_map)
 
-	MCFG_CPU_ADD("audiocpu", M6802, 1000000) // cpu & clock are a guess
-	MCFG_CPU_PROGRAM_MAP(taito_sub_map)
+	MCFG_DEVICE_ADD("audiocpu", M6802, 1000000) // cpu & clock are a guess
+	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map)
 
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_taito)
@@ -362,17 +362,17 @@ MACHINE_CONFIG_START(taito_state::taito)
 	genpin_audio(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.475) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.475) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
-	//MCFG_PIA_READPA_HANDLER(READ8(taito_state, pia_pa_r))
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_PIA_READPB_HANDLER(READ8(taito_state, pia_pb_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(taito_state, pia_pb_w))
-	//MCFG_PIA_CA2_HANDLER(WRITELINE(taito_state, pia_ca2_w))
-	//MCFG_PIA_CB2_HANDLER(WRITELINE(taito_state, pia_cb2_w))
+	//MCFG_PIA_READPA_HANDLER(READ8(*this, taito_state, pia_pa_r))
+	MCFG_PIA_WRITEPA_HANDLER(WRITE8("dac", dac_byte_interface, write))
+	MCFG_PIA_READPB_HANDLER(READ8(*this, taito_state, pia_pb_r))
+	MCFG_PIA_WRITEPB_HANDLER(WRITE8(*this, taito_state, pia_pb_w))
+	//MCFG_PIA_CA2_HANDLER(WRITELINE(*this, taito_state, pia_ca2_w))
+	//MCFG_PIA_CB2_HANDLER(WRITELINE(*this, taito_state, pia_cb2_w))
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 
@@ -381,16 +381,16 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taito_state::shock)
 	taito(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(shock_map)
-	MCFG_CPU_MODIFY( "audiocpu" )
-	MCFG_CPU_PROGRAM_MAP(shock_sub_map)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(shock_map)
+	MCFG_DEVICE_MODIFY( "audiocpu" )
+	MCFG_DEVICE_PROGRAM_MAP(shock_sub_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taito_state::taito2)
 	taito(config);
-	MCFG_CPU_MODIFY( "audiocpu" )
-	MCFG_CPU_PROGRAM_MAP(taito_sub_map2)
+	MCFG_DEVICE_MODIFY( "audiocpu" )
+	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map2)
 MACHINE_CONFIG_END
 
 // add vox
@@ -398,21 +398,21 @@ MACHINE_CONFIG_START(taito_state::taito4)
 	taito(config);
 	MCFG_SPEAKER_STANDARD_MONO("voxsnd")
 	MCFG_DEVICE_ADD("votrax", VOTRAX_SC01, 720000) // guess
-	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(taito_state, votrax_request))
+	MCFG_VOTRAX_SC01_REQUEST_CB(WRITELINE(*this, taito_state, votrax_request))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "voxsnd", 0.15) // todo: fix - it makes noise continuously
 
 	MCFG_DEVICE_MODIFY("pia")
-	MCFG_PIA_CB2_HANDLER(WRITELINE(taito_state, pia_cb2_w))
+	MCFG_PIA_CB2_HANDLER(WRITELINE(*this, taito_state, pia_cb2_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(taito_state::taito_ay_audio)
-	MCFG_CPU_MODIFY( "audiocpu" )
-	MCFG_CPU_PROGRAM_MAP(taito_sub_map5)
+	MCFG_DEVICE_MODIFY( "audiocpu" )
+	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map5)
 
 	MCFG_SPEAKER_STANDARD_MONO("aysnd")
-	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
+	MCFG_DEVICE_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.8)
-	MCFG_SOUND_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
+	MCFG_DEVICE_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.8)
 MACHINE_CONFIG_END
 

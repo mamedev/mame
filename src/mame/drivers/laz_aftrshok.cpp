@@ -66,10 +66,10 @@ void aftrshok_state::machine_reset()
 MACHINE_CONFIG_START(aftrshok_state::aftrshok)
 
 	/* basic machine hardware */
-//  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown
-//  MCFG_CPU_PROGRAM_MAP(aftrshok_map)
-//  MCFG_CPU_IO_MAP(aftrshok_io)
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", aftrshok_state,  irq0_line_hold)
+//  MCFG_DEVICE_ADD("maincpu", ??, 8000000) // unknown
+//  MCFG_DEVICE_PROGRAM_MAP(aftrshok_map)
+//  MCFG_DEVICE_IO_MAP(aftrshok_io)
+//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aftrshok_state,  irq0_line_hold)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
