@@ -248,7 +248,7 @@ WRITE16_MEMBER(m90_state::bootleg_video_w)
 
 uint32_t m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t pf_base[2] = { m_video_control_data[5] & 0x3, m_video_control_data[6] & 0x3 };
+	uint8_t pf_base[2] = { uint8_t(m_video_control_data[5] & 0x3), uint8_t(m_video_control_data[6] & 0x3) };
 	int layer_ctrl[2] = { m_video_control_data[5], m_video_control_data[6] };
 	int rowscroll_offs[2] = { 0xf000 >> 1, 0xf400 >> 1 };
 
