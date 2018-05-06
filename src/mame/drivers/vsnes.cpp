@@ -193,16 +193,6 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 
 }
 
-void vsnes_state::ppu_irq_1(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-void vsnes_state::ppu_irq_2(int *ppu_regs)
-{
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 /******************************************************************************/
 
 
@@ -1730,7 +1720,7 @@ MACHINE_CONFIG_START(vsnes_state::vsnes)
 	MCFG_PPU2C04_ADD("ppu1")
 	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1743,7 +1733,7 @@ MACHINE_CONFIG_START(vsnes_state::jajamaru)
 	MCFG_PPU2C05_01_ADD("ppu1")
 	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vsnes_state::mightybj)
@@ -1753,7 +1743,7 @@ MACHINE_CONFIG_START(vsnes_state::mightybj)
 	MCFG_PPU2C05_02_ADD("ppu1")
 	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vsnes_state::vsgshoe)
@@ -1763,7 +1753,7 @@ MACHINE_CONFIG_START(vsnes_state::vsgshoe)
 	MCFG_PPU2C05_03_ADD("ppu1")
 	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vsnes_state::topgun)
@@ -1773,7 +1763,7 @@ MACHINE_CONFIG_START(vsnes_state::topgun)
 	MCFG_PPU2C05_04_ADD("ppu1")
 	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vsnes_state::vsdual)
@@ -1805,12 +1795,12 @@ MACHINE_CONFIG_START(vsnes_state::vsdual)
 	MCFG_PPU2C04_ADD("ppu1")
 	MCFG_PPU2C0X_SET_SCREEN("screen1")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	MCFG_PPU2C04_ADD("ppu2")
 	MCFG_PPU2C0X_SET_SCREEN("screen2")
 	MCFG_PPU2C0X_CPU("sub")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_2)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("sub", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1849,7 +1839,7 @@ MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
 	MCFG_PPU2C04_ADD("ppu1")
 	MCFG_PPU2C0X_CPU("maincpu")
 	MCFG_PPU2C0X_SET_SCREEN("screen1")
-	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT // bootleg seems to need this - code to set the sprite address is replaced with complete copy loops??
 
 	/* sound hardware */

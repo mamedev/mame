@@ -49,12 +49,6 @@ static INPUT_PORTS_START( famicom )
 INPUT_PORTS_END
 
 
-void nes_state::ppu_nmi(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
 MACHINE_CONFIG_START(nes_state::nes)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
@@ -73,7 +67,7 @@ MACHINE_CONFIG_START(nes_state::nes)
 
 	MCFG_PPU2C02_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -103,7 +97,7 @@ MACHINE_CONFIG_START(nes_state::nespal)
 	MCFG_DEVICE_REMOVE("ppu")
 	MCFG_PPU2C07_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -136,7 +130,7 @@ MACHINE_CONFIG_START(nes_state::nespalc)
 	MCFG_DEVICE_REMOVE("ppu")
 	MCFG_PPUPALC_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

@@ -61,8 +61,8 @@
 #define MCFG_PPU2C0X_CPU(_tag) \
 	downcast<ppu2c0x_device &>(*device).set_cpu_tag(_tag);
 
-#define MCFG_PPU2C0X_SET_NMI(_class, _method) \
-	downcast<ppu2c0x_device &>(*device).set_nmi_delegate(ppu2c0x_device::nmi_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+#define MCFG_PPU2C0X_INT_CALLBACK(_devcb) \
+	downcast<ppu2c0x_device &>(*device).set_int_callback(DEVCB_##_devcb);
 
 #define MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT \
 	downcast<ppu2c0x_device &>(*device).use_sprite_write_limitation_disable();
@@ -106,7 +106,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER( palette_write );
 
 	void set_cpu_tag(const char *tag) { m_cpu.set_tag(tag); }
-	template <typename Object> void set_nmi_delegate(Object &&cb) { m_nmi_callback_proc = std::forward<Object>(cb); }
+	template <typename Object> devcb_base &set_int_callback(Object &&cb) { return m_int_callback.set_callback(std::forward<Object>(cb)); }
 
 	/* routines */
 	virtual void init_palette();
@@ -231,7 +231,7 @@ private:
 	scanline_delegate           m_scanline_callback_proc;   /* optional scanline callback */
 	hblank_delegate             m_hblank_callback_proc; /* optional hblank callback */
 	vidaccess_delegate          m_vidaccess_callback_proc;  /* optional video access callback */
-	nmi_delegate                m_nmi_callback_proc;        /* nmi access callback from interface */
+	devcb_write_line            m_int_callback;         /* nmi access callback from interface */
 
 	int                         m_regs[PPU_MAX_REG];        /* registers */
 	int                         m_refresh_data;         /* refresh-related */

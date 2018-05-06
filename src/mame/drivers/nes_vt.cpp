@@ -115,7 +115,6 @@ public:
 	/* Misc PPU */
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
 	DECLARE_WRITE8_MEMBER(vt_hh_sprite_dma_w);
-	void ppu_nmi(int *ppu_regs);
 
 	/* VT03 extension handling */
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
@@ -1311,11 +1310,6 @@ READ8_MEMBER(nes_vt_state::apu_read_mem)
 	return 0x00;//mintf->program->read_byte(offset);
 }
 
-void nes_vt_state::ppu_nmi(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 /* not strictly needed, but helps us see where things are in ROM to aid with figuring out banking schemes*/
 static const gfx_layout helper_layout =
 {
@@ -1371,7 +1365,7 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 
 	MCFG_PPU_VT03_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(nes_vt_state, ppu_nmi)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_PPU_VT03_READ_BG_CB(READ8(*this, nes_vt_state,chr_r))
 	MCFG_PPU_VT03_READ_SP_CB(READ8(*this, nes_vt_state,spr_r))
 

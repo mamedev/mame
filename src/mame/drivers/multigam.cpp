@@ -202,7 +202,6 @@ public:
 	void supergm3_set_bank();
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
-	void ppu_irq(int *ppu_regs);
 	void multigam(machine_config &config);
 	void supergm3(machine_config &config);
 	void multigmt(machine_config &config);
@@ -1132,11 +1131,6 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-void multigam_state::ppu_irq(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void multigam_state::video_start()
 {
 }
@@ -1221,7 +1215,7 @@ MACHINE_CONFIG_START(multigam_state::multigam)
 
 	MCFG_PPU2C02_ADD("ppu")
 	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(multigam_state, ppu_irq)
+	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

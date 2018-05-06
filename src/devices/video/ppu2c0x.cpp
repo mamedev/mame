@@ -128,6 +128,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_scanline(0)  // reset the scanline count
+	, m_int_callback(*this)
 	, m_refresh_data(0)
 	, m_refresh_latch(0)
 	, m_x_fine(0)
@@ -154,8 +155,6 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 
 	/* usually, no security value... */
 	m_security_value = 0;
-
-	m_nmi_callback_proc = nmi_delegate();
 }
 
 ppu2c0x_rgb_device::ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : ppu2c0x_device(mconfig, type, tag, owner, clock)
@@ -221,7 +220,7 @@ ppu2c05_04_device::ppu2c05_04_device(const machine_config &mconfig, const char *
 void ppu2c0x_device::device_start()
 {
 	// bind our handler
-	m_nmi_callback_proc.bind_relative_to(*owner());
+	m_int_callback.resolve_safe();
 
 	// allocate timers
 	m_hblank_timer = timer_alloc(TIMER_HBLANK);
@@ -477,7 +476,6 @@ static const gfx_layout ppu_charlayout =
 void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	int blanked, vblank;
-	int *regs = &m_regs[0];
 
 	switch (id)
 	{
@@ -495,8 +493,8 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		case TIMER_NMI:
 			// Actually fire the VMI
-			if (!m_nmi_callback_proc.isnull())
-				m_nmi_callback_proc(regs);
+			m_int_callback(ASSERT_LINE);
+			m_int_callback(CLEAR_LINE);
 
 			m_nmi_timer->adjust(attotime::never);
 			break;
