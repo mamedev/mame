@@ -33,6 +33,6 @@ private:
 
 
 // device type definition
-extern const device_type NES_BENSHIENG;
+DECLARE_DEVICE_TYPE(NES_BENSHIENG, nes_benshieng_device)
 
 #endif // MAME_BUS_NES_BENSHIENG_H

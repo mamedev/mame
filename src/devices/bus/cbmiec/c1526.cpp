@@ -78,9 +78,10 @@ const tiny_rom_entry *c4023_device::device_rom_region() const
 //  ADDRESS_MAP( c1526_mem )
 //-------------------------------------------------
 
-ADDRESS_MAP_START(c1526_device_base::c1526_mem)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
-ADDRESS_MAP_END
+void c1526_device_base::c1526_mem(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region(M6504_TAG, 0);
+}
 
 
 //-------------------------------------------------
@@ -88,8 +89,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c1526_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(c1526_mem)
+	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(c1526_mem)
 MACHINE_CONFIG_END
 
 
@@ -98,8 +99,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c4023_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
-	MCFG_CPU_PROGRAM_MAP(c1526_mem)
+	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
+	MCFG_DEVICE_PROGRAM_MAP(c1526_mem)
 MACHINE_CONFIG_END
 
 

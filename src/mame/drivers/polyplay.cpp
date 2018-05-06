@@ -314,25 +314,25 @@ GFXDECODE_END
 /* the machine driver */
 MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80CPU_TAG, Z80, POLYPLAY_MAIN_CLOCK / 4) /* UB880D */
+	MCFG_DEVICE_ADD(Z80CPU_TAG, Z80, POLYPLAY_MAIN_CLOCK / 4) /* UB880D */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_zre)
-	MCFG_CPU_PROGRAM_MAP(polyplay_mem_zre)
-	MCFG_CPU_IO_MAP(polyplay_io_zre)
-	MCFG_CPU_PERIODIC_INT_DRIVER(polyplay_state, nmi_handler, 100) /* A302 - zero cross detection from AC (50Hz) */
+	MCFG_DEVICE_PROGRAM_MAP(polyplay_mem_zre)
+	MCFG_DEVICE_IO_MAP(polyplay_io_zre)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(polyplay_state, nmi_handler, 100) /* A302 - zero cross detection from AC (50Hz) */
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, POLYPLAY_MAIN_CLOCK / 4) /* UB857D */
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(polyplay_state, ctc_zc0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(polyplay_state, ctc_zc1_w))
-	//MCFG_Z80CTC_ZC2_CB(WRITELINE(polyplay_state, ctc_zc2_w))
+	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, polyplay_state, ctc_zc0_w))
+	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, polyplay_state, ctc_zc1_w))
+	//MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, polyplay_state, ctc_zc2_w))
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, POLYPLAY_MAIN_CLOCK / 4) /* UB855D */
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80CPU_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(polyplay_state, pio_porta_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(polyplay_state, pio_porta_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(polyplay_state, pio_portb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(polyplay_state, pio_portb_w))
+	MCFG_Z80PIO_IN_PA_CB(READ8(*this, polyplay_state, pio_porta_r))
+	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, polyplay_state, pio_porta_w))
+	MCFG_Z80PIO_IN_PB_CB(READ8(*this, polyplay_state, pio_portb_r))
+	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, polyplay_state, pio_portb_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -348,9 +348,9 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zre)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker1", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker1", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-	MCFG_SOUND_ADD("speaker2", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker2", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -358,10 +358,10 @@ MACHINE_CONFIG_START(polyplay_state::polyplay_zrepp)
 	polyplay_zre(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY(Z80CPU_TAG) /* UB880D */
+	MCFG_DEVICE_MODIFY(Z80CPU_TAG) /* UB880D */
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_zrepp)
-	MCFG_CPU_PROGRAM_MAP(polyplay_mem_zrepp)
-	MCFG_CPU_IO_MAP(polyplay_io_zrepp)
+	MCFG_DEVICE_PROGRAM_MAP(polyplay_mem_zrepp)
+	MCFG_DEVICE_IO_MAP(polyplay_io_zrepp)
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, POLYPLAY_MAIN_CLOCK / 4) /* UB8560D */

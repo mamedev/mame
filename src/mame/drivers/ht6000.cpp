@@ -314,11 +314,11 @@ void ht6000_state::machine_reset()
 //**************************************************************************
 
 MACHINE_CONFIG_START( ht6000_state::ht6000 )
-	MCFG_CPU_ADD("maincpu", UPD7810, 12_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(ht6000_state, port_a_w))
+	MCFG_DEVICE_ADD("maincpu", UPD7810, 12_MHz_XTAL)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_map)
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(*this, ht6000_state, port_a_w))
 
-	MCFG_CPU_ADD("keycpu", I8049, 10_MHz_XTAL)
+	MCFG_DEVICE_ADD("keycpu", I8049, 10_MHz_XTAL)
 MACHINE_CONFIG_END
 
 

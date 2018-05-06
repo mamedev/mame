@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- BBC Master Tapes -->
+<!-- Acorn BBC Master Tapes -->
 
 <!-- I believe all the Cassette images here are original, so some may require the manuals for additional copy protection. -->
 
@@ -12,7 +12,7 @@
       To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
 -->
 
-<softwarelist name="bbcm_cass" description="BBC Master cassettes">
+<softwarelist name="bbcm_cass" description="Acorn BBC Master cassettes">
 
 	<!-- Games -->
 

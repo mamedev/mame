@@ -326,23 +326,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(chexx_state::update)
 MACHINE_CONFIG_START(chexx_state::chexx83)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(chexx83_map)
+	MCFG_DEVICE_ADD("maincpu", M6502, MAIN_CLOCK/2)
+	MCFG_DEVICE_PROGRAM_MAP(chexx83_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("update", chexx_state, update, attotime::from_hz(60))
 
 	// via
 	MCFG_DEVICE_ADD("via6522", VIA6522, MAIN_CLOCK/4)
 
-	MCFG_VIA6522_READPA_HANDLER(READ8(chexx_state, via_a_in))
-	MCFG_VIA6522_READPB_HANDLER(READ8(chexx_state, via_b_in))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, chexx_state, via_a_in))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, chexx_state, via_b_in))
 
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(chexx_state, via_a_out))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(chexx_state, via_b_out))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, chexx_state, via_a_out))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, chexx_state, via_b_out))
 
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(chexx_state, via_ca2_out))
-	MCFG_VIA6522_CB1_HANDLER(WRITELINE(chexx_state, via_cb1_out))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(chexx_state, via_cb2_out))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(chexx_state, via_irq_out))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, chexx_state, via_ca2_out))
+	MCFG_VIA6522_CB1_HANDLER(WRITELINE(*this, chexx_state, via_cb1_out))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, chexx_state, via_cb2_out))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, chexx_state, via_irq_out))
 
 	// Layout
 	MCFG_DEFAULT_LAYOUT(layout_chexx)
@@ -355,10 +355,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(chexx_state::faceoffh)
 	chexx83(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(faceoffh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(faceoffh_map)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/2)
+	MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

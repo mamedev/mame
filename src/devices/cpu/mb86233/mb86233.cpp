@@ -43,7 +43,7 @@
   internal or external though (fifos, banking in model2/86234), so
   there may lie the actual differences.
 */
-  
+
 
 DEFINE_DEVICE_TYPE(MB86233, mb86233_device, "mb86233", "Fujitsu MB86233 (TGP)")
 DEFINE_DEVICE_TYPE(MB86234, mb86234_device, "mb86234", "Fujitsu MB86234 (TGP)")
@@ -1003,7 +1003,7 @@ void mb86233_device::execute_run()
 			u32 sub2 = (opcode >> 17) & 7;
 
 			alu_pre(alu);
-			
+
 			switch(sub2) {
 			case 0:
 				// clr0
@@ -1033,7 +1033,7 @@ void mb86233_device::execute_run()
 				logerror("unimplemented opcode 0f/%x\n", sub2);
 				break;
 			}
-			
+
 			alu_post(alu);
 			break;
 		}
@@ -1175,7 +1175,7 @@ void mb86233_device::execute_run()
 							m_st |= F_ZC0;
 					}
 					break;
-					
+
 				case 0x11:
 					if(m_c1 != 1) {
 						m_c1 --;
@@ -1184,7 +1184,7 @@ void mb86233_device::execute_run()
 					}
 				break;
 				}
-			
+
 			break;
 		}
 

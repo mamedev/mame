@@ -187,19 +187,19 @@ void vd_state::machine_reset()
 
 MACHINE_CONFIG_START(vd_state::vd)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(vd_map)
-	MCFG_CPU_IO_MAP(vd_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(vd_map)
+	MCFG_DEVICE_IO_MAP(vd_io)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", vd_state, irq, attotime::from_hz(484))
 
 	/* Sound */
 	genpin_audio(config);
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ay1", AY8910, 2000000) //?
+	MCFG_DEVICE_ADD("ay1", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33/3)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ADD("ay2", AY8910, 2000000) //?
+	MCFG_DEVICE_ADD("ay2", AY8910, 2000000) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33/3)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) //?
 

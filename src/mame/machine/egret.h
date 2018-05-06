@@ -94,10 +94,10 @@ public:
 
 	int rom_offset;
 
-	template<class _Object> devcb_base &set_reset_cb(_Object wr) { return write_reset.set_callback(wr); }
-	template<class _Object> devcb_base &set_linechange_cb(_Object wr) { return write_linechange.set_callback(wr); }
-	template<class _Object> devcb_base &set_via_clock_cb(_Object wr) { return write_via_clock.set_callback(wr); }
-	template<class _Object> devcb_base &set_via_data_cb(_Object wr) { return write_via_data.set_callback(wr); }
+	template <class Object> devcb_base &set_reset_cb(Object &&wr) { return write_reset.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_linechange_cb(Object &&wr) { return write_linechange.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_via_clock_cb(Object &&wr) { return write_via_clock.set_callback(std::forward<Object>(wr)); }
+	template <class Object> devcb_base &set_via_data_cb(Object &&wr) { return write_via_data.set_callback(std::forward<Object>(wr)); }
 
 	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
 

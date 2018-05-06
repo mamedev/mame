@@ -214,13 +214,13 @@ void dietgo_state::machine_start()
 MACHINE_CONFIG_START(dietgo_state::dietgo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2) /* DE102 (verified on pcb) */
-	MCFG_CPU_PROGRAM_MAP(dietgo_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dietgo_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000)/2) /* DE102 (verified on pcb) */
+	MCFG_DEVICE_PROGRAM_MAP(dietgo_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dietgo_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	/* video hardware */

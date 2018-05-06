@@ -55,9 +55,9 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(macp_state::macp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(macp_map)
-	MCFG_CPU_IO_MAP(macp_io)
+	MCFG_DEVICE_ADD("maincpu", Z80, 2500000)
+	MCFG_DEVICE_PROGRAM_MAP(macp_map)
+	MCFG_DEVICE_IO_MAP(macp_io)
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT()
@@ -71,8 +71,8 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(macp_state::macp0)
 	macp(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(macp0_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(macp0_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(macp_state::macpmsm)

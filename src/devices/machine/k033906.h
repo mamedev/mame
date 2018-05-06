@@ -19,7 +19,7 @@
 ***************************************************************************/
 
 #define MCFG_K033906_VOODOO(_tag) \
-	downcast<k033906_device &>(*device).set_voodoo_tag("^" _tag);
+	downcast<k033906_device &>(*device).set_voodoo_tag(_tag);
 
 /***************************************************************************
     TYPE DEFINITIONS

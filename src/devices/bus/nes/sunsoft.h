@@ -153,6 +153,6 @@ DECLARE_DEVICE_TYPE(NES_SUNSOFT_2,    nes_sunsoft_2_device)
 DECLARE_DEVICE_TYPE(NES_SUNSOFT_3,    nes_sunsoft_3_device)
 DECLARE_DEVICE_TYPE(NES_SUNSOFT_4,    nes_sunsoft_4_device)
 DECLARE_DEVICE_TYPE(NES_SUNSOFT_FME7, nes_sunsoft_fme7_device)
-DECLARE_DEVICE_TYPE(NES_SUNSOFT_5,    nes_sunsoft_4_device)
+DECLARE_DEVICE_TYPE(NES_SUNSOFT_5,    nes_sunsoft_5_device)
 
 #endif // MAME_BUS_NES_SUNSOFT_H

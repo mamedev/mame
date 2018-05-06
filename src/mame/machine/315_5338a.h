@@ -11,10 +11,10 @@
     configuration where one controller acts as master and sends commands
     and data over a serial link to another controller.
 
-	TODO:
-	- Serial
-	- Slave mode
-	- and probably lots more
+    TODO:
+    - Serial
+    - Slave mode
+    - and probably lots more
 
 ***************************************************************************/
 

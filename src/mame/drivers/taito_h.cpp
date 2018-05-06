@@ -647,12 +647,12 @@ void taitoh_state::machine_start()
 MACHINE_CONFIG_START(taitoh_state::syvalion)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)     /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(syvalion_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)     /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(syvalion_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoh_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)        /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)        /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -662,7 +662,7 @@ MACHINE_CONFIG_START(taitoh_state::syvalion)
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, taitoh_state, coin_control_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -688,7 +688,7 @@ MACHINE_CONFIG_START(taitoh_state::syvalion)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -703,12 +703,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoh_state::recordbr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)     /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(recordbr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq2_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)     /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(recordbr_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoh_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)        /* 4 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)        /* 4 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -718,7 +718,7 @@ MACHINE_CONFIG_START(taitoh_state::recordbr)
 	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(*this, taitoh_state, coin_control_w))
 	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -744,7 +744,7 @@ MACHINE_CONFIG_START(taitoh_state::recordbr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -760,20 +760,20 @@ MACHINE_CONFIG_START(taitoh_state::tetristh)
 	recordbr(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tetristh_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(tetristh_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(taitoh_state::dleague)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)     /* 12 MHz */
-	MCFG_CPU_PROGRAM_MAP(dleague_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoh_state,  irq1_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)     /* 12 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(dleague_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitoh_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)        /* 4 MHz ??? */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)        /* 4 MHz ??? */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -783,7 +783,7 @@ MACHINE_CONFIG_START(taitoh_state::dleague)
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(*this, taitoh_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -809,7 +809,7 @@ MACHINE_CONFIG_START(taitoh_state::dleague)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
+	MCFG_DEVICE_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)

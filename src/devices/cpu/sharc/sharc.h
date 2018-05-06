@@ -94,6 +94,7 @@ public:
 
 	// construction/destruction
 	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	virtual ~adsp21062_device() override;
 
 	// configuration helpers
 	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }

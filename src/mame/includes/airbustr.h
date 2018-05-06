@@ -39,7 +39,7 @@ public:
 	required_shared_ptr<uint8_t> m_devram;
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
 	required_shared_ptr_array<uint8_t, 2> m_colorram;
-	
+
 	required_memory_bank m_masterbank;
 	required_memory_bank m_slavebank;
 	required_memory_bank m_audiobank;

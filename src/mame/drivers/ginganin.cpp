@@ -248,17 +248,17 @@ WRITE_LINE_MEMBER(ginganin_state::ptm_irq)
 MACHINE_CONFIG_START(ginganin_state::ginganin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(ginganin_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ginganin_state,  irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
+	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_CLOCK)
+	MCFG_DEVICE_PROGRAM_MAP(ginganin_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ginganin_state,  irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
-	MCFG_CPU_ADD("audiocpu", MC6809, SOUND_CLOCK) // MBL68B09?
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, SOUND_CLOCK) // MBL68B09?
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
 
 
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, SOUND_CLOCK/2)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_O1_CB(WRITELINE(ginganin_state, ptm_irq))
+	MCFG_PTM6840_O1_CB(WRITELINE(*this, ginganin_state, ptm_irq))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -278,10 +278,10 @@ MACHINE_CONFIG_START(ginganin_state::ginganin)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("psg", YM2149, SOUND_CLOCK / 2)
+	MCFG_DEVICE_ADD("psg", YM2149, SOUND_CLOCK / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", Y8950, SOUND_CLOCK) /* The Y8950 is basically a YM3526 with ADPCM built in */
+	MCFG_DEVICE_ADD("ymsnd", Y8950, SOUND_CLOCK) /* The Y8950 is basically a YM3526 with ADPCM built in */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

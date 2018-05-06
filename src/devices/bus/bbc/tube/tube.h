@@ -116,9 +116,9 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_SLOT, bbc_tube_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbc_extube_devices );
-SLOT_INTERFACE_EXTERN( bbc_intube_devices );
-//SLOT_INTERFACE_EXTERN( bbc_x25tube_devices );
+void bbc_extube_devices(device_slot_interface &device);
+void bbc_intube_devices(device_slot_interface &device);
+//void bbc_x25tube_devices(device_slot_interface &device);
 
 
 #endif // MAME_BUS_BBC_TUBE_TUBE_H

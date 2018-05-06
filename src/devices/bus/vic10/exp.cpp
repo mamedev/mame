@@ -231,8 +231,11 @@ WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_card != nullptr) 
 
 // slot devices
 #include "std.h"
+#include "multimax.h"
 
-SLOT_INTERFACE_START( vic10_expansion_cards )
+void vic10_expansion_cards(device_slot_interface &device)
+{
 	// the following need ROMs from the software list
-	SLOT_INTERFACE_INTERNAL("standard", VIC10_STD)
-SLOT_INTERFACE_END
+	device.option_add_internal("standard", VIC10_STD);
+	device.option_add_internal("multimax", VIC10_MULTIMAX);
+}

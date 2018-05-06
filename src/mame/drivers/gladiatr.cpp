@@ -941,18 +941,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(ppking_state::ppking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(ppking_cpu1_map)
-	MCFG_CPU_IO_MAP(ppking_cpu1_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(ppking_cpu1_map)
+	MCFG_DEVICE_IO_MAP(ppking_cpu1_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_IO_MAP(ppking_cpu2_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
+	MCFG_DEVICE_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_IO_MAP(ppking_cpu2_io)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(ppking_cpu3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -960,13 +960,13 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ppking_state, spritebuffer_w))
-//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ppking_state, spritebuffer_w))
+//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gladiatr_state, spritebank_w))
 //  MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
-//  MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ppking_state, nmi_mask_w))
+//  MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, ppking_state, nmi_mask_w))
 //  MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
 //  Q6 used
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ppking_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, ppking_state, flipscreen_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -989,16 +989,16 @@ MACHINE_CONFIG_START(ppking_state::ppking)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(ppking_state, ppking_f1_r))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, gladiatr_state_base, ym_irq))
+	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, ppking_state, ppking_f1_r))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
+	MCFG_DEVICE_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
@@ -1006,60 +1006,60 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu1_map)
-	MCFG_CPU_IO_MAP(gladiatr_cpu1_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(gladiatr_cpu1_map)
+	MCFG_DEVICE_IO_MAP(gladiatr_cpu1_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(cpu2_map)
-	MCFG_CPU_IO_MAP(gladiatr_cpu2_io)
+	MCFG_DEVICE_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
+	MCFG_DEVICE_IO_MAP(gladiatr_cpu2_io)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
+	MCFG_DEVICE_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(gladiatr_cpu3_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
 	MCFG_NVRAM_ADD_0FILL("nvram") // NEC uPD449 CMOS SRAM
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gladiatr_state, spritebuffer_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, gladiatr_state, spritebuffer_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, gladiatr_state, spritebank_w))
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gladiatr_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, gladiatr_state, flipscreen_w))
 
 	MCFG_DEVICE_ADD("cctl", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(3)
 	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(2)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, cctl_p1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, cctl_p2_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, gladiatr_state, cctl_p1_r))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, gladiatr_state, cctl_p2_r))
 
 	MCFG_DEVICE_ADD("ccpu", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_P1_IN_CB(IOPORT("IN0"))
 	MCFG_MCS48_PORT_P2_IN_CB(IOPORT("IN1"))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(gladiatr_state, ccpu_p2_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, gladiatr_state, ccpu_p2_w))
 	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(1)
 	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(0)
 
 	MCFG_DEVICE_ADD("ucpu", I8741, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, ucpu_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, ucpu_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, ucpu_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(gladiatr_state, tclk_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(gladiatr_state, ucpu_t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, gladiatr_state, ucpu_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, gladiatr_state, ucpu_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, gladiatr_state, ucpu_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, gladiatr_state, tclk_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, gladiatr_state, ucpu_t1_r))
 
 	MCFG_DEVICE_ADD("csnd", I8741, 12_MHz_XTAL/2) /* verified on pcb */
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, csnd_p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, csnd_p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, csnd_p2_r))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(gladiatr_state, tclk_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(gladiatr_state, csnd_t1_r))
+	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, gladiatr_state, csnd_p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, gladiatr_state, csnd_p1_w))
+	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, gladiatr_state, csnd_p2_r))
+	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, gladiatr_state, tclk_r))
+	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, gladiatr_state, csnd_t1_r))
 
 	/* lazy way to make polled serial between MCUs work */
 	MCFG_QUANTUM_PERFECT_CPU("ucpu")
 
 	MCFG_CLOCK_ADD("tclk", 12_MHz_XTAL/8/128/2) /* verified on pcb */
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(gladiatr_state, tclk_w));
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, gladiatr_state, tclk_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1080,16 +1080,16 @@ MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
+	MCFG_DEVICE_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gladiatr_state, gladiator_int_control_w)) /* port A write */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, gladiatr_state, gladiator_int_control_w)) /* port A write */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
+	MCFG_DEVICE_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 

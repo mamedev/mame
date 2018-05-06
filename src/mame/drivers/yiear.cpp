@@ -283,9 +283,9 @@ void yiear_state::machine_reset()
 MACHINE_CONFIG_START(yiear_state::yiear)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(yiear_state, yiear_nmi_interrupt, 480) /* music tempo (correct frequency unknown) */
+	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(yiear_state, yiear_nmi_interrupt, 480) /* music tempo (correct frequency unknown) */
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -297,7 +297,7 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(yiear_state, screen_update_yiear)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(yiear_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, yiear_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", yiear)
 	MCFG_PALETTE_ADD("palette", 32)
@@ -306,12 +306,12 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_DEVICE_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)   /* verified on pcb */
+	MCFG_DEVICE_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545))   /* verified on pcb */
+	MCFG_DEVICE_ADD("vlm", VLM5030, XTAL(3'579'545))   /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

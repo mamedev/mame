@@ -1352,14 +1352,14 @@ INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
 
 
 MACHINE_CONFIG_START(hotsmash_state::pbillian)
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)      /* 6 MHz, ROHM Z80B */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(pbillian_port_map)
+	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(12'000'000)/2)      /* 6 MHz, ROHM Z80B */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(pbillian_port_map)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL(12'000'000)/4) /* 3mhz???? */
-	MCFG_M68705_PORTA_R_CB(READ8(hotsmash_state, hotsmash_68705_portA_r))
-	MCFG_M68705_PORTB_W_CB(WRITE8(hotsmash_state, hotsmash_68705_portB_w))
-	MCFG_M68705_PORTC_W_CB(WRITE8(hotsmash_state, hotsmash_68705_portC_w))
+	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(12'000'000)/4) /* 3mhz???? */
+	MCFG_M68705_PORTA_R_CB(READ8(*this, hotsmash_state, hotsmash_68705_portA_r))
+	MCFG_M68705_PORTB_W_CB(WRITE8(*this, hotsmash_state, hotsmash_68705_portB_w))
+	MCFG_M68705_PORTC_W_CB(WRITE8(*this, hotsmash_state, hotsmash_68705_portC_w))
 
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_MACHINE_START_OVERRIDE(hotsmash_state, pbillian)
@@ -1372,7 +1372,7 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(hotsmash_state, screen_update_pbillian)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hotsmash_state, vblank_irq))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, hotsmash_state, vblank_irq))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pbillian)
 	MCFG_PALETTE_ADD("palette", 512)
@@ -1382,12 +1382,12 @@ MACHINE_CONFIG_START(hotsmash_state::pbillian)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SYSTEM"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(hotsmash_state, pbillian_sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1396,17 +1396,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(superqix_state::sqix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* Z80B, 12 MHz / 2 (6 MHz), verified from pcb tracing */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(sqix_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
+	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/2) /* Z80B, 12 MHz / 2 (6 MHz), verified from pcb tracing */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(sqix_port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL(12'000'000)/2) /* i8751-88, 12 MHz / 2 (6 MHz), verified from pcb tracing */
+	MCFG_DEVICE_ADD("mcu", I8751, XTAL(12'000'000)/2) /* i8751-88, 12 MHz / 2 (6 MHz), verified from pcb tracing */
 	MCFG_MCS51_PORT_P0_IN_CB(IOPORT("SYSTEM"))
 	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("DSW1"))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(superqix_state, mcu_port2_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(superqix_state, mcu_port3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(superqix_state, mcu_port3_w))
+	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, superqix_state, mcu_port2_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, superqix_state, mcu_port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, superqix_state, mcu_port3_w))
 
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
 
@@ -1428,38 +1428,38 @@ MACHINE_CONFIG_START(superqix_state::sqix)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3P, analog outputs directly tied together
+	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3P, analog outputs directly tied together
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2")) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3M, analog outputs directly tied together
+	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(12'000'000)/8) // AY-3-8910A @3M, analog outputs directly tied together
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, z80_ay2_iob_r)) /* port Bread */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(superqix_state, z80_ay2_iob_w)) /* port Bwrite */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, superqix_state, z80_ay2_iob_r)) /* port Bread */
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, superqix_state, z80_ay2_iob_w)) /* port Bwrite */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(superqix_state::sqix_8031)
 	sqix(config);
-	MCFG_CPU_REPLACE("mcu", I8031, XTAL(12'000'000)/2) /* p8031ah, clock not verified */
-	MCFG_CPU_PROGRAM_MAP(sqix_8031_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(superqix_state, bootleg_mcu_port1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(superqix_state, bootleg_mcu_port3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(superqix_state, bootleg_mcu_port3_w))
+	MCFG_DEVICE_REPLACE("mcu", I8031, XTAL(12'000'000)/2) /* p8031ah, clock not verified */
+	MCFG_DEVICE_PROGRAM_MAP(sqix_8031_map)
+	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, superqix_state, bootleg_mcu_port1_w))
+	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, superqix_state, bootleg_mcu_port3_r))
+	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, superqix_state, bootleg_mcu_port3_w))
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12000000/2)    /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(sqix_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
+	MCFG_DEVICE_ADD("maincpu", Z80, 12000000/2)    /* 6 MHz */
+	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	MCFG_DEVICE_IO_MAP(sqix_port_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(superqix_state, sqix_timer_irq,  4*60) /* ??? */
 
 	MCFG_MACHINE_START_OVERRIDE(superqix_state,superqix)
 
@@ -1481,16 +1481,16 @@ MACHINE_CONFIG_START(superqix_state::sqix_nomcu)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("ay1", AY8910, 12000000/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, 12000000/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT) // ?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(superqix_state, bootleg_in0_r)) /* port Bread */
+	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, superqix_state, bootleg_in0_r)) /* port Bread */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

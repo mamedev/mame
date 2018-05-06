@@ -733,10 +733,10 @@ MACHINE_CONFIG_START(dwarfd_state::dwarfd)
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MCFG_CPU_ADD("maincpu", I8085A, 10595000/3*2)        /* ? MHz */
-	MCFG_I8085A_SOD(WRITELINE(dwarfd_state,dwarfd_sod_callback))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_ADD("maincpu", I8085A, 10595000/3*2)        /* ? MHz */
+	MCFG_I8085A_SOD(WRITELINE(*this, dwarfd_state,dwarfd_sod_callback))
+	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -749,14 +749,14 @@ MACHINE_CONFIG_START(dwarfd_state::dwarfd)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, display_pixels)
 	MCFG_I8275_IRQ_CALLBACK(INPUTLINE("maincpu", I8085_RST55_LINE))
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(dwarfd_state, drq_w))
+	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, dwarfd_state, drq_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dwarfd)
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(dwarfd_state, dwarfd)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -764,9 +764,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dwarfd_state::pokeresp)
 	dwarfd(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pokeresp_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(pokeresp_map)
+	MCFG_DEVICE_IO_MAP(io_map)
 
 	MCFG_DEVICE_MODIFY("i8275")
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, pesp_display_pixels)
@@ -775,9 +775,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dwarfd_state::qc)
 	dwarfd(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(qc_map)
-	MCFG_CPU_IO_MAP(qc_io_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(qc_map)
+	MCFG_DEVICE_IO_MAP(qc_io_map)
 
 	MCFG_DEVICE_MODIFY("i8275")
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, qc_display_pixels)

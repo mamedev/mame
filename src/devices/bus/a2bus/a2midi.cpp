@@ -35,19 +35,19 @@ DEFINE_DEVICE_TYPE(A2BUS_MIDI, a2bus_midi_device, "a2midi", "6850 MIDI card")
 MACHINE_CONFIG_START(a2bus_midi_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MIDI_PTM_TAG, PTM6840, 1021800)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1021800.0f, 1021800.0f, 1021800.0f)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(a2bus_midi_device, ptm_irq_w))
+	MCFG_PTM6840_IRQ_CB(WRITELINE(*this, a2bus_midi_device, ptm_irq_w))
 
 	MCFG_DEVICE_ADD(MIDI_ACIA_TAG, ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(a2bus_midi_device, acia_irq_w))
+	MCFG_ACIA6850_TXD_HANDLER(WRITELINE("mdout", midi_port_device, write_txd))
+	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(*this, a2bus_midi_device, acia_irq_w))
 
 	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE(MIDI_ACIA_TAG, acia6850_device, write_rxd))
+	MCFG_MIDI_RX_HANDLER(WRITELINE(MIDI_ACIA_TAG, acia6850_device, write_rxd))
 
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(a2bus_midi_device, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, a2bus_midi_device, write_acia_clock))
 MACHINE_CONFIG_END
 
 //**************************************************************************

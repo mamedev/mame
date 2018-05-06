@@ -1689,7 +1689,7 @@ void model1_state::copro_hle_vf()
  next:
 	u32 f = m_copro_fifo_in->peek(0) >> 23; // Extracts the exponent of the ieee float
 
-	//	logerror("function %02x size %d/%d\n", f, int(m_copro_fifo_in->size() - 1), ftab_vf[f].count);
+	//  logerror("function %02x size %d/%d\n", f, int(m_copro_fifo_in->size() - 1), ftab_vf[f].count);
 
 	if(f < ARRAY_LENGTH(ftab_vf) && ftab_vf[f].cb != nullptr) {
 		unsigned np = ftab_vf[f].count;

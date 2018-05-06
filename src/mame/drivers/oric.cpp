@@ -776,15 +776,15 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(oric_state::oric)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/12)
-	MCFG_CPU_PROGRAM_MAP(oric_mem)
+	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000)/12)
+	MCFG_DEVICE_PROGRAM_MAP(oric_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(oric_state, vblank_w))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, oric_state, vblank_w))
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
@@ -792,15 +792,15 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay8912", AY8912, XTAL(12'000'000)/12)
+	MCFG_DEVICE_ADD("ay8912", AY8912, XTAL(12'000'000)/12)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(4700, 4700, 4700)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(oric_state, psg_a_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, oric_state, psg_a_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE("via6522", via6522_device, write_ca1))
+	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("via6522", via6522_device, write_ca1))
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
 	/* cassette */
@@ -812,14 +812,14 @@ MACHINE_CONFIG_START(oric_state::oric)
 
 	/* via */
 	MCFG_DEVICE_ADD( "via6522", VIA6522, XTAL(12'000'000)/12 )
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(oric_state, via_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(oric_state, via_b_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(oric_state, via_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(oric_state, via_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(oric_state, via_irq_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, oric_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, oric_state, via_b_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, oric_state, via_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, oric_state, via_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, oric_state, via_irq_w))
 
 	/* extension port */
-	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(oric_state, ext_irq_w))
+	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(*this, oric_state, ext_irq_w))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(oric_state::prav8d)
@@ -830,33 +830,34 @@ FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
 FLOPPY_FORMATS_END
 
-static SLOT_INTERFACE_START( telestrat_floppies )
-	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
-SLOT_INTERFACE_END
+static void telestrat_floppies(device_slot_interface &device)
+{
+	device.option_add("3dsdd", FLOPPY_3_DSDD);
+}
 
 MACHINE_CONFIG_START(telestrat_state::telstrat)
 	oric(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(telestrat_mem)
+	MCFG_DEVICE_MODIFY( "maincpu" )
+	MCFG_DEVICE_PROGRAM_MAP(telestrat_mem)
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
 	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(telestrat_state, acia_irq_w))
+	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, telestrat_state, acia_irq_w))
 
 	/* via */
 	MCFG_DEVICE_ADD( "via6522_2", VIA6522, XTAL(12'000'000)/12 )
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(telestrat_state, via2_a_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(telestrat_state, via2_b_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(telestrat_state, via2_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(telestrat_state, via2_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(telestrat_state, via2_irq_w))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, telestrat_state, via2_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, telestrat_state, via2_b_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(*this, telestrat_state, via2_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, telestrat_state, via2_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, telestrat_state, via2_irq_w))
 
 	/* microdisc */
 	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(telestrat_state, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(telestrat_state, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(telestrat_state, fdc_hld_w))
+	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, telestrat_state, fdc_irq_w))
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, telestrat_state, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, telestrat_state, fdc_hld_w))
 	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", telestrat_floppies, "3dsdd", telestrat_state::floppy_formats)

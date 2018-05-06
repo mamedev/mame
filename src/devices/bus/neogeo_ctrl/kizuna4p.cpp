@@ -4,6 +4,14 @@
 
     SNK Neo Geo Kizuna 4Players Controller emulation
 
+    The NEO-FTC1B board is a JAMMA splitter, including input
+    multiplexing, video buffering, and audio amplification.  It
+    requires an MV-1B or MV-1C system for the output header.
+    There are unpopulated locations for four 15-pin D connectors,
+    so it could theoretically be used with AES joysticks.  It
+    won't work with mahjong panels because the outputs aren't
+    demultiplexed.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -13,7 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NEOGEO_KIZ4P, neogeo_kizuna4p_device, "neogeo_kiz4p", "SNK Neo Geo Kizuna 4P Controller")
+DEFINE_DEVICE_TYPE(NEOGEO_KIZ4P, neogeo_kizuna4p_device, "neogeo_kiz4p", "SNK NEO-FTC1B JAMMA Splitter")
 
 
 static INPUT_PORTS_START( neogeo_kiz4p )
@@ -57,13 +65,15 @@ static INPUT_PORTS_START( neogeo_kiz4p )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
-	PORT_START("START13")
+	PORT_START("START1")
+	PORT_BIT( 0xfa, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("START24")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_START("START2")
+	PORT_BIT( 0xfa, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START4 )
 INPUT_PORTS_END
 
 
@@ -88,12 +98,8 @@ ioport_constructor neogeo_kizuna4p_device::device_input_ports() const
 neogeo_kizuna4p_device::neogeo_kizuna4p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEOGEO_KIZ4P, tag, owner, clock),
 	device_neogeo_ctrl_edge_interface(mconfig, *this),
-	m_joy1(*this, "JOY1"),
-	m_joy2(*this, "JOY2"),
-	m_joy3(*this, "JOY3"),
-	m_joy4(*this, "JOY4"),
-	m_ss1(*this, "START13"),
-	m_ss2(*this, "START24")
+	m_joy(*this, "JOY%u", 1U),
+	m_ss(*this, "START%u", 1U)
 {
 }
 
@@ -104,17 +110,8 @@ neogeo_kizuna4p_device::neogeo_kizuna4p_device(const machine_config &mconfig, co
 
 void neogeo_kizuna4p_device::device_start()
 {
-	save_item(NAME(m_ctrl_sel));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void neogeo_kizuna4p_device::device_reset()
-{
 	m_ctrl_sel = 0;
+	save_item(NAME(m_ctrl_sel));
 }
 
 
@@ -124,15 +121,7 @@ void neogeo_kizuna4p_device::device_reset()
 
 READ8_MEMBER(neogeo_kizuna4p_device::in0_r)
 {
-	uint8_t res = 0;
-	if (m_ctrl_sel & 0x01)
-		res = m_joy3->read();
-	else
-		res = m_joy1->read();
-
-	if (m_ctrl_sel & 0x04) res &= ((m_ctrl_sel & 0x01) ? ~0x20 : ~0x10);
-
-	return res;
+	return m_joy[BIT(m_ctrl_sel, 0) << 1]->read() & ~(BIT(m_ctrl_sel, 2) << (BIT(m_ctrl_sel, 0) | 4));
 }
 
 //-------------------------------------------------
@@ -141,15 +130,7 @@ READ8_MEMBER(neogeo_kizuna4p_device::in0_r)
 
 READ8_MEMBER(neogeo_kizuna4p_device::in1_r)
 {
-	uint8_t res = 0;
-	if (m_ctrl_sel & 0x01)
-		res = m_joy4->read();
-	else
-		res = m_joy2->read();
-
-	if (m_ctrl_sel & 0x04) res &= ((m_ctrl_sel & 0x01) ? ~0x20 : ~0x10);
-
-	return res;
+	return m_joy[(BIT(m_ctrl_sel, 0) << 1) | 1]->read() & ~(BIT(m_ctrl_sel, 2) << (BIT(m_ctrl_sel, 0) | 4));
 }
 
 //-------------------------------------------------
@@ -158,7 +139,7 @@ READ8_MEMBER(neogeo_kizuna4p_device::in1_r)
 
 uint8_t neogeo_kizuna4p_device::read_start_sel()
 {
-	return (BIT(m_ss1->read(), m_ctrl_sel & 0x01)) | (BIT(m_ss2->read(), m_ctrl_sel & 0x01) << 2);
+	return m_ss[BIT(m_ctrl_sel, 0)]->read();
 }
 
 

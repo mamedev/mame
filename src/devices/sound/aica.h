@@ -26,10 +26,11 @@
 #define MCFG_AICA_MAIN_IRQ_CB(cb) \
 	devcb = &downcast<aica_device &>(*device).set_main_irq_callback((DEVCB_##cb));
 
-class aica_device : public device_t,
-									public device_sound_interface
+class aica_device : public device_t, public device_sound_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	aica_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_master(bool master) { m_master = master; }
@@ -214,7 +215,6 @@ private:
 
 };
 
-extern const device_type AICA;
+DECLARE_DEVICE_TYPE(AICA, aica_device)
 
-
-#endif /* __AICA_H__ */
+#endif // MAME_SOUND_AICA_H

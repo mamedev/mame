@@ -521,22 +521,22 @@ void europc_pc_state::cfg_builtin_720K(device_t *device)
 
 //Euro PC
 MACHINE_CONFIG_START(europc_pc_state::europc)
-	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
-	MCFG_CPU_PROGRAM_MAP(europc_map)
-	MCFG_CPU_IO_MAP(europc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, 4772720*2)
+	MCFG_DEVICE_PROGRAM_MAP(europc_map)
+	MCFG_DEVICE_IO_MAP(europc_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
 
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "aga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "aga", false) // FIXME: determine ISA bus clock
+	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
 	MCFG_SLOT_FIXED(true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "com", false)
+	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
 	MCFG_SLOT_FIXED(true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "fdc_xt", false)
+	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_builtin_720K)
 	MCFG_SLOT_FIXED(true)
-	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram");
 
@@ -563,9 +563,9 @@ MACHINE_CONFIG_START(europc_pc_state::euroxt)
 	MCFG_RAM_DEFAULT_SIZE("768K")
 	MCFG_DEVICE_MODIFY("isa2")
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "xtide", false)
+	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "xtide", false) // FIXME: determine ISA bus clock
 	MCFG_SLOT_FIXED(true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, "lpt", false)
+	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
 	MCFG_SLOT_FIXED(true)
 MACHINE_CONFIG_END
 

@@ -59,7 +59,7 @@ void korgm1_state::korgm1_map(address_map &map)
 	map(0x00000, 0x0ffff).ram(); // 64 KB
 //  map(0x50000, 0x57fff).ram(); // memory card 32 KB
 	map(0xe0000, 0xfffff).rom().region("ipl", 0);
-}		
+}
 
 void korgm1_state::korgm1_io(address_map &map)
 {
@@ -169,9 +169,9 @@ PALETTE_INIT_MEMBER(korgm1_state, korgm1)
 MACHINE_CONFIG_START(korgm1_state::korgm1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually
-	MCFG_CPU_PROGRAM_MAP(korgm1_map)
-	MCFG_CPU_IO_MAP(korgm1_io)
+	MCFG_DEVICE_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually
+	MCFG_DEVICE_PROGRAM_MAP(korgm1_map)
+	MCFG_DEVICE_IO_MAP(korgm1_io)
 
 	MCFG_DEVICE_ADD("pio", CXD1095, 0)
 
@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(korgm1_state::korgm1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

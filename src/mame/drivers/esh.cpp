@@ -357,15 +357,15 @@ void esh_state::machine_start()
 /* DRIVER */
 MACHINE_CONFIG_START(esh_state::esh)
 	/* main cpu */
-	MCFG_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)                       /* The denominator is a Daphne guess based on PacMan's hardware */
-	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
-	MCFG_CPU_IO_MAP(z80_0_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
+	MCFG_DEVICE_ADD("maincpu", Z80, PCB_CLOCK/6)                       /* The denominator is a Daphne guess based on PacMan's hardware */
+	MCFG_DEVICE_PROGRAM_MAP(z80_0_mem)
+	MCFG_DEVICE_IO_MAP(z80_0_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", esh_state,  vblank_callback_esh)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(esh_state, ld_command_strobe_cb))
+	MCFG_LASERDISC_LDV1000_COMMAND_STROBE_CB(WRITELINE(*this, esh_state, ld_command_strobe_cb))
 	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, esh_state, screen_update_esh)
 	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
 
@@ -380,11 +380,11 @@ MACHINE_CONFIG_START(esh_state::esh)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_MODIFY("laserdisc")
+	MCFG_DEVICE_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2000)
+	MCFG_DEVICE_ADD("beeper", BEEP, 2000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

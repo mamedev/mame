@@ -196,9 +196,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(stlforce_state::stlforce)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 15000000)
-	MCFG_CPU_PROGRAM_MAP(stlforce_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stlforce_state, irq4_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, 15000000)
+	MCFG_DEVICE_PROGRAM_MAP(stlforce_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", stlforce_state, irq4_line_hold)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
@@ -226,8 +226,8 @@ MACHINE_CONFIG_START(stlforce_state::twinbrat)
 	stlforce(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL(14'745'600))
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_CLOCK(XTAL(14'745'600))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(3*8, 45*8-1, 0*8, 30*8-1)

@@ -596,8 +596,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 MACHINE_CONFIG_START(fresh_state::fresh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
-	MCFG_CPU_PROGRAM_MAP(fresh_map)
+	MCFG_DEVICE_ADD("maincpu", M68000, 24000000/2 )
+	MCFG_DEVICE_PROGRAM_MAP(fresh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fresh_state, fake_scanline, "screen", 0, 1)
 
 	/* video hardware */
@@ -617,7 +617,7 @@ MACHINE_CONFIG_START(fresh_state::fresh)
 	/* sound hw? */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 4000000) // actual clock and type unknown
+	MCFG_DEVICE_ADD("ymsnd", YM2413, 4000000) // actual clock and type unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

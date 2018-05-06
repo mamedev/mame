@@ -253,13 +253,13 @@ void deniam_state::machine_reset()
 MACHINE_CONFIG_START(deniam_state::deniam16b)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
-	MCFG_CPU_PROGRAM_MAP(deniam16b_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(deniam16b_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(25'000'000)/4)  /* 6.25Mhz verified */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(25'000'000)/4)  /* 6.25Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MCFG_DEVICE_IO_MAP(sound_io_map)
 
 
 	/* video hardware */
@@ -282,7 +282,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16b)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
@@ -293,9 +293,9 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(deniam_state::deniam16c)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
-	MCFG_CPU_PROGRAM_MAP(deniam16c_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
+	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(25'000'000)/2)    /* 12.5Mhz verified */
+	MCFG_DEVICE_PROGRAM_MAP(deniam16c_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", deniam_state,  irq4_line_assert)
 
 
 	/* video hardware */
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(deniam_state::deniam16c)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, XTAL(25'000'000)/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MCFG_OKIM6295_ADD("oki", XTAL(25'000'000)/24, PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */

@@ -533,24 +533,24 @@ PALETTE_INIT_MEMBER(amusco_state,amusco)
 MACHINE_CONFIG_START(amusco_state::amusco)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK)        // 5 MHz ?
-	MCFG_CPU_PROGRAM_MAP(amusco_mem_map)
-	MCFG_CPU_IO_MAP(amusco_io_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, CPU_CLOCK)        // 5 MHz ?
+	MCFG_DEVICE_PROGRAM_MAP(amusco_mem_map)
+	MCFG_DEVICE_IO_MAP(amusco_io_map)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(PIT_CLOCK0)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(PIT_CLOCK1)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("pic8259", pic8259_device, ir2_w))
 
 	MCFG_DEVICE_ADD("ppi_outputs", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(amusco_state, output_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(amusco_state, output_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(amusco_state, output_c_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amusco_state, output_a_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, amusco_state, output_b_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amusco_state, output_c_w))
 
 	MCFG_DEVICE_ADD("ppi_inputs", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
@@ -558,16 +558,16 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("lpt_interface", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, lpt_data_w))
-	MCFG_I8155_IN_PORTB_CB(READ8(amusco_state, lpt_status_r))
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, amusco_state, lpt_data_w))
+	MCFG_I8155_IN_PORTB_CB(READ8(*this, amusco_state, lpt_status_r))
 	// Port C uses ALT 3 mode, which MAME does not currently emulate
 
 	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, rtc_control_w))
-	MCFG_I8155_IN_PORTC_CB(DEVREAD8("rtc", msm5832_device, data_r))
-	MCFG_I8155_OUT_PORTC_CB(DEVWRITE8("rtc", msm5832_device, data_w))
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, amusco_state, rtc_control_w))
+	MCFG_I8155_IN_PORTC_CB(READ8("rtc", msm5832_device, data_r))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8("rtc", msm5832_device, data_w))
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
@@ -588,12 +588,12 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_ADDR_CHANGED_CB(amusco_state, crtc_addr)
-	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("pic8259", pic8259_device, ir1_w)) // IRQ1 sets 0x918 bit 3
+	MCFG_MC6845_OUT_DE_CB(WRITELINE("pic8259", pic8259_device, ir1_w)) // IRQ1 sets 0x918 bit 3
 	MCFG_MC6845_UPDATE_ROW_CB(amusco_state, update_row)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn", SN76489A, SND_CLOCK)
+	MCFG_DEVICE_ADD("sn", SN76489A, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

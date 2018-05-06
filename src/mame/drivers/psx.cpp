@@ -515,22 +515,22 @@ void psx1_state::subcpu_map(address_map &map)
 
 MACHINE_CONFIG_START(psx1_state::psj)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( psx_map )
+	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( psx_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("2M")
 
 	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
-	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
-	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
+	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
+	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
 	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
 	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_txd))
+	MCFG_PSX_SIO_DTR_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_dtr))
+	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_txd))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
@@ -548,39 +548,39 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_PSX_CD_READ_HANDLER( DEVREAD8( PSXCD_TAG, psxcd_device, read ) )
-	MCFG_PSX_CD_WRITE_HANDLER( DEVWRITE8( PSXCD_TAG, psxcd_device, write ) )
+	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
+	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
-	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
+	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psx1_state::psu)
 	psj(config);
-	MCFG_CPU_ADD( "subcpu", HD63705, 4166667 ) // MC68HC05G6
-	MCFG_CPU_PROGRAM_MAP( subcpu_map )
+	MCFG_DEVICE_ADD( "subcpu", HD63705, 4166667 ) // MC68HC05G6
+	MCFG_DEVICE_PROGRAM_MAP( subcpu_map )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psx1_state::pse)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( psx_map)
+	MCFG_DEVICE_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
+	MCFG_DEVICE_PROGRAM_MAP( psx_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("2M")
 
 	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
-	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
-	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
+	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
+	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
 	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
 	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
 
 	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_txd))
+	MCFG_PSX_SIO_DTR_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_dtr))
+	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_sck))
+	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_txd))
 
 	/* video hardware */
 	/* TODO: visible area and refresh rate */
@@ -599,11 +599,11 @@ MACHINE_CONFIG_START(psx1_state::pse)
 	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_PSX_CD_READ_HANDLER( DEVREAD8( PSXCD_TAG, psxcd_device, read ) )
-	MCFG_PSX_CD_WRITE_HANDLER( DEVWRITE8( PSXCD_TAG, psxcd_device, write ) )
+	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
+	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
-	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
+	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
 MACHINE_CONFIG_END

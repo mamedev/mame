@@ -342,13 +342,13 @@ DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback2)
 MACHINE_CONFIG_START(boogwing_state::boogwing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_XTAL/2)   /* DE102 */
-	MCFG_CPU_PROGRAM_MAP(boogwing_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
+	MCFG_DEVICE_ADD("maincpu", M68000, MAIN_XTAL/2)   /* DE102 */
+	MCFG_DEVICE_PROGRAM_MAP(boogwing_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, SOUND_XTAL/4)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_DEVICE_ADD("audiocpu", H6280, SOUND_XTAL/4)
+	MCFG_DEVICE_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -417,7 +417,7 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_XTAL/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(boogwing_state, sound_bankswitch_w))
+	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(*this, boogwing_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 

@@ -1887,16 +1887,16 @@ GFXDECODE_END
 MACHINE_CONFIG_START(suna8_state::hardhead)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hardhead_map)
-	MCFG_CPU_IO_MAP(hardhead_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)      /* No NMI */
+	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)    /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hardhead_map)
+	MCFG_DEVICE_IO_MAP(hardhead_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)      /* No NMI */
 
-	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)
-	MCFG_CPU_IO_MAP(hardhead_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60)     /* No NMI */
+	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(hardhead_sound_map)
+	MCFG_DEVICE_IO_MAP(hardhead_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60)     /* No NMI */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1920,15 +1920,15 @@ MACHINE_CONFIG_START(suna8_state::hardhead)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     /* verified on pcb */
+	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    /* verified on pcb */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, suna8_play_samples_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -1945,15 +1945,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(suna8_state::rranger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
-	MCFG_CPU_PROGRAM_MAP(rranger_map)
-	MCFG_CPU_IO_MAP(rranger_io_map)
-//  MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  /* IRQ & NMI ! */
+	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(rranger_map)
+	MCFG_DEVICE_IO_MAP(rranger_io_map)
+//  MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  /* IRQ & NMI ! */
 
-	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rranger_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* NMI = retn */
+	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
+	MCFG_DEVICE_PROGRAM_MAP(rranger_sound_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* NMI = retn */
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -1979,15 +1979,15 @@ MACHINE_CONFIG_START(suna8_state::rranger)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, rranger_play_samples_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
+	MCFG_DEVICE_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, rranger_play_samples_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9)
 
-	MCFG_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
+	MCFG_DEVICE_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -2013,16 +2013,16 @@ MACHINE_RESET_MEMBER(suna8_state,brickzn)
 MACHINE_CONFIG_START(suna8_state::brickzn11)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA PROTECTION BLOCK */
-	MCFG_CPU_PROGRAM_MAP(brickzn11_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  // nmi breaks ramtest but is needed!
+	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA PROTECTION BLOCK */
+	MCFG_DEVICE_PROGRAM_MAP(brickzn11_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  // nmi breaks ramtest but is needed!
 
-	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)   /* Z0840006PSC - 6MHz (measured) */
-	MCFG_CPU_PROGRAM_MAP(brickzn_sound_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)   /* Z0840006PSC - 6MHz (measured) */
+	MCFG_DEVICE_PROGRAM_MAP(brickzn_sound_map)
 
-	MCFG_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)    /* Z0840006PSC - 6MHz (measured) */
-	MCFG_CPU_PROGRAM_MAP(brickzn_pcm_map)
-	MCFG_CPU_IO_MAP(brickzn_pcm_io_map)
+	MCFG_DEVICE_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)    /* Z0840006PSC - 6MHz (measured) */
+	MCFG_DEVICE_PROGRAM_MAP(brickzn_pcm_map)
+	MCFG_DEVICE_IO_MAP(brickzn_pcm_io_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state, brickzn )
 
@@ -2048,30 +2048,30 @@ MACHINE_CONFIG_START(suna8_state::brickzn11)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     // 3MHz (measured)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     // 3MHz (measured)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    // 1.5MHz (measured)
+	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    // 1.5MHz (measured)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
 
-	MCFG_SOUND_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
-	MCFG_SOUND_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
-	MCFG_SOUND_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
+	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
+	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
+	MCFG_DEVICE_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
+	MCFG_DEVICE_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(suna8_state::brickzn)
 	brickzn11(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(brickzn_map)
-	MCFG_CPU_IO_MAP(brickzn_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(brickzn_map)
+	MCFG_DEVICE_IO_MAP(brickzn_io_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -2101,9 +2101,9 @@ MACHINE_CONFIG_START(suna8_state::hardhea2)
 	brickzn(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA T568009 */
-	MCFG_CPU_PROGRAM_MAP(hardhea2_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA T568009 */
+	MCFG_DEVICE_PROGRAM_MAP(hardhea2_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
@@ -2117,8 +2117,8 @@ MACHINE_CONFIG_START(suna8_state::hardhea2b)
 	hardhea2(config);
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        //bootleg clock not verified (?)
-	MCFG_CPU_PROGRAM_MAP(hardhea2_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        //bootleg clock not verified (?)
+	MCFG_DEVICE_PROGRAM_MAP(hardhea2_map)
 MACHINE_CONFIG_END
 
 
@@ -2129,16 +2129,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(suna8_state::starfigh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
-	MCFG_CPU_PROGRAM_MAP(starfigh_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(starfigh_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
 	/* The sound section is identical to that of hardhead */
-	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)                   /* ? */
-	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)
-	MCFG_CPU_IO_MAP(hardhead_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* No NMI */
+	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)                   /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(hardhead_sound_map)
+	MCFG_DEVICE_IO_MAP(hardhead_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* No NMI */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2162,15 +2162,15 @@ MACHINE_CONFIG_START(suna8_state::starfigh)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, suna8_play_samples_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
@@ -2184,15 +2184,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(suna8_state::sparkman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
-	MCFG_CPU_PROGRAM_MAP(sparkman_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(sparkman_map)
+	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)               /* ? */
-	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)
-	MCFG_CPU_IO_MAP(hardhead_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* No NMI */
+	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)               /* ? */
+	MCFG_DEVICE_PROGRAM_MAP(hardhead_sound_map)
+	MCFG_DEVICE_IO_MAP(hardhead_sound_io_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* No NMI */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2216,15 +2216,15 @@ MACHINE_CONFIG_START(suna8_state::sparkman)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
+	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna8_state, suna8_play_samples_w))  // two sample roms
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suna8_state, suna8_samples_number_w))
+	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, suna8_play_samples_w))  // two sample roms
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_DEVICE_ADD("samples", SAMPLES)
 	MCFG_SAMPLES_CHANNELS(1)
 	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)

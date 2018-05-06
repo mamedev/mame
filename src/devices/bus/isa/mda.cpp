@@ -121,13 +121,13 @@ MACHINE_CONFIG_START(isa8_mda_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(isa8_mda_device, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_mda_device, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_mda_device, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, isa8_mda_device, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, isa8_mda_device, vsync_changed))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcmda)
 
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, isa8_mda_device, pc_cpu_line))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -549,13 +549,13 @@ MACHINE_CONFIG_START(isa8_hercules_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(isa8_hercules_device, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_mda_device, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_mda_device, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, isa8_mda_device, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, isa8_mda_device, vsync_changed))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcherc)
 
 	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(isa8_mda_device, pc_cpu_line))
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, isa8_mda_device, pc_cpu_line))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -767,8 +767,8 @@ MACHINE_CONFIG_START(isa8_ec1840_0002_device::device_add_mconfig)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(isa8_mda_device, crtc_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(isa8_mda_device, hsync_changed))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(isa8_mda_device, vsync_changed))
+	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, isa8_mda_device, hsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, isa8_mda_device, vsync_changed))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------

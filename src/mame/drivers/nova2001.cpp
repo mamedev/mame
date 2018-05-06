@@ -649,9 +649,9 @@ GFXDECODE_END
 MACHINE_CONFIG_START(nova2001_state::nova2001)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz verified on schematics
-	MCFG_CPU_PROGRAM_MAP(nova2001_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz verified on schematics
+	MCFG_DEVICE_PROGRAM_MAP(nova2001_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -673,12 +673,12 @@ MACHINE_CONFIG_START(nova2001_state::nova2001)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/6) // 2 MHz verified on schematics
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nova2001_state, nova2001_scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(nova2001_state, nova2001_scroll_y_w))
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/6) // 2 MHz verified on schematics
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_x_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_y_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/6)
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/6)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -687,13 +687,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nova2001_state::ninjakun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(ninjakun_cpu1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ninjakun_cpu1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(ninjakun_cpu2_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60) /* ? */
+	MCFG_DEVICE_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(ninjakun_cpu2_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60) /* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame */
 
@@ -717,24 +717,24 @@ MACHINE_CONFIG_START(nova2001_state::ninjakun)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/4) // 3 MHz
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/4) // 3 MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/4) // 3 MHz
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(nova2001_state, nova2001_scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(nova2001_state, nova2001_scroll_y_w))
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/4) // 3 MHz
+	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_x_w))
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, nova2001_state, nova2001_scroll_y_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(nova2001_state::pkunwar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(pkunwar_map)
-	MCFG_CPU_IO_MAP(pkunwar_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(pkunwar_map)
+	MCFG_DEVICE_IO_MAP(pkunwar_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -754,12 +754,12 @@ MACHINE_CONFIG_START(nova2001_state::pkunwar)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz (correct?)
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz (correct?)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -768,14 +768,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nova2001_state::raiders5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(raiders5_cpu1_map)
-	MCFG_CPU_IO_MAP(raiders5_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(raiders5_cpu1_map)
+	MCFG_DEVICE_IO_MAP(raiders5_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", nova2001_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
-	MCFG_CPU_PROGRAM_MAP(raiders5_cpu2_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60)  /* ? */
+	MCFG_DEVICE_ADD("sub", Z80, MAIN_CLOCK/4)  // 3 MHz
+	MCFG_DEVICE_PROGRAM_MAP(raiders5_cpu2_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(nova2001_state, irq0_line_hold, 4*60)  /* ? */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
 
@@ -796,12 +796,12 @@ MACHINE_CONFIG_START(nova2001_state::raiders5)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz
+	MCFG_DEVICE_ADD("ay1", AY8910, MAIN_CLOCK/8) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/8)
+	MCFG_DEVICE_ADD("ay2", AY8910, MAIN_CLOCK/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

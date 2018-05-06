@@ -501,15 +501,17 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 }
 
 
-static SLOT_INTERFACE_START( pcjr_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void pcjr_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
-static SLOT_INTERFACE_START(pcjr_com)
-	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
-	SLOT_INTERFACE("mousesys_mouse", MSYSTEM_SERIAL_MOUSE)
-SLOT_INTERFACE_END
+static void pcjr_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_SERIAL_MOUSE);
+	device.option_add("mousesys_mouse", MSYSTEM_SERIAL_MOUSE);
+}
 
 static const gfx_layout pc_8_charlayout =
 {
@@ -587,10 +589,10 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, 4900000)
-	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map)
-	MCFG_CPU_IO_MAP(ibmpcjr_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("maincpu", I8088, 4900000)
+	MCFG_DEVICE_PROGRAM_MAP(ibmpcjr_map)
+	MCFG_DEVICE_IO_MAP(ibmpcjr_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 /*
   On the PC Jr the input for clock 1 seems to be selectable
@@ -599,31 +601,31 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
  */
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic8259", pic8259_device, ir0_w))
 	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12)
 	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pcjr_state, out2_changed))
+	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pcjr_state, out2_changed))
 
 	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(WRITELINE(pcjr_state, pic8259_set_int_line))
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(*this, pcjr_state, pic8259_set_int_line))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(pcjr_state, pcjr_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(pcjr_state, pcjr_ppi_portc_r))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pcjr_state, pcjr_ppi_portb_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(*this, pcjr_state, pcjr_ppi_portc_r))
 
 	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259", pic8259_device, ir3_w))
+	MCFG_INS8250_OUT_TX_CB(WRITELINE("serport", rs232_port_device, write_txd))
+	MCFG_INS8250_OUT_DTR_CB(WRITELINE("serport", rs232_port_device, write_dtr))
+	MCFG_INS8250_OUT_RTS_CB(WRITELINE("serport", rs232_port_device, write_rts))
+	MCFG_INS8250_OUT_INT_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
 
-	MCFG_RS232_PORT_ADD( "serport", pcjr_com, nullptr )
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250", ins8250_uart_device, cts_w))
+	MCFG_DEVICE_ADD( "serport", RS232_PORT, pcjr_com, nullptr )
+	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
+	MCFG_RS232_DCD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, dcd_w))
+	MCFG_RS232_DSR_HANDLER(WRITELINE("ins8250", ins8250_uart_device, dsr_w))
+	MCFG_RS232_RI_HANDLER(WRITELINE("ins8250", ins8250_uart_device, ri_w))
+	MCFG_RS232_CTS_HANDLER(WRITELINE("ins8250", ins8250_uart_device, cts_w))
 
 	/* video hardware */
 	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
@@ -633,14 +635,14 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-	MCFG_SOUND_ADD("sn76496", SN76496, XTAL(14'318'181)/4)
+	MCFG_DEVICE_ADD("sn76496", SN76496, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* printer */
 	MCFG_DEVICE_ADD("lpt_0", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir7_w))
+	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE("pic8259", pic8259_device, ir7_w))
 
 	MCFG_PC_JOY_ADD("pc_joy")
 
@@ -653,7 +655,7 @@ MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(pcjr_state, keyb_interrupt))
+	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE(*this, pcjr_state, keyb_interrupt))
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, "ibmpcjr_cart")
@@ -682,9 +684,9 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(pcjr_state::ibmpcjx)
 	ibmpcjr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ibmpcjx_map)
-	MCFG_CPU_IO_MAP(ibmpcjx_io)
+	MCFG_DEVICE_MODIFY("maincpu")
+	MCFG_DEVICE_PROGRAM_MAP(ibmpcjx_map)
+	MCFG_DEVICE_IO_MAP(ibmpcjx_io)
 
 	MCFG_DEVICE_REMOVE("fdc:0");
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcjr_floppies, "35dd", isa8_fdc_device::floppy_formats)

@@ -92,8 +92,8 @@ uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(macpci_state::pippin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC603, 66000000)
-	MCFG_CPU_PROGRAM_MAP(pippin_mem)
+	MCFG_DEVICE_ADD("maincpu", PPC603, 66000000)
+	MCFG_DEVICE_PROGRAM_MAP(pippin_mem)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -109,7 +109,7 @@ MACHINE_CONFIG_START(macpci_state::pippin)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_DEVICE_ADD( "cdda", CDDA )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
@@ -121,20 +121,20 @@ MACHINE_CONFIG_START(macpci_state::pippin)
 	MCFG_RAM_DEFAULT_SIZE("32M")
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, C7M/10)
-	MCFG_VIA6522_READPA_HANDLER(READ8(macpci_state, mac_via_in_a))
-	MCFG_VIA6522_READPB_HANDLER(READ8(macpci_state, mac_via_in_b))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(macpci_state,mac_via_out_a))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(macpci_state,mac_via_out_b))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(macpci_state, mac_adb_via_out_cb2))
-	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(macpci_state,mac_via_irq))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, macpci_state, mac_via_in_a))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, macpci_state, mac_via_in_b))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, macpci_state,mac_via_out_a))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, macpci_state,mac_via_out_b))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(*this, macpci_state, mac_adb_via_out_cb2))
+	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(*this, macpci_state,mac_via_irq))
 
 	//MCFG_DEVICE_ADD("scc", SCC8530, C7M)
-	//MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(macpci_state, set_scc_interrupt))
+	//MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(*this, macpci_state, set_scc_interrupt))
 	MCFG_CUDA_ADD(CUDA_341S0060)
-	MCFG_CUDA_RESET_CALLBACK(WRITELINE(macpci_state, cuda_reset_w))
-	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(macpci_state, cuda_adb_linechange_w))
-	MCFG_CUDA_VIA_CLOCK_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb1))
-	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
+	MCFG_CUDA_RESET_CALLBACK(WRITELINE(*this, macpci_state, cuda_reset_w))
+	MCFG_CUDA_LINECHANGE_CALLBACK(WRITELINE(*this, macpci_state, cuda_adb_linechange_w))
+	MCFG_CUDA_VIA_CLOCK_CALLBACK(WRITELINE("via6522_0", via6522_device, write_cb1))
+	MCFG_CUDA_VIA_DATA_CALLBACK(WRITELINE("via6522_0", via6522_device, write_cb2))
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 

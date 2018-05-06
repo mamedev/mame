@@ -157,7 +157,7 @@ void smc91c9x_device::device_pre_save()
 
 	//osd_printf_info("Save: comp_tx: %d comp_rx: %d trans_tx: %d\n", m_comp_tx_size, m_comp_rx_size, m_trans_tx_size);
 	//if (m_comp_tx_size)
-	//	osd_printf_info("comp_tx packet: %d\n", m_comp_tx.front());
+	//  osd_printf_info("comp_tx packet: %d\n", m_comp_tx.front());
 }
 
 // Save state preload to restore vector sizes
@@ -172,7 +172,7 @@ void smc91c9x_device::device_post_load()
 
 	//osd_printf_info("Restore: comp_tx: %d comp_rx: %d trans_tx: %d\n", m_comp_tx_size, m_comp_rx_size, m_trans_tx_size);
 	//if (m_comp_tx_size)
-	//	osd_printf_info("comp_tx size: %lu comp_tx packet: %d array_data: %d\n", m_comp_tx.size(), m_comp_tx.front(), m_comp_tx_data[0]);
+	//  osd_printf_info("comp_tx size: %lu comp_tx packet: %d array_data: %d\n", m_comp_tx.size(), m_comp_tx.front(), m_comp_tx_data[0]);
 }
 
 //-------------------------------------------------
@@ -752,7 +752,7 @@ void smc91c9x_device::process_command(uint16_t data)
 	// Set Busy (clear on next read)
 	m_reg[EREG_MMU_COMMAND] |= 0x0001;
 	//LOG("process_command: TxQ: %d TxComp: %d RxComp: %d TxAlloc: %04x RxAlloc: %04x\n",
-	//	m_trans_tx.size(), m_comp_tx.size(), m_comp_rx.size(), m_alloc_tx, m_alloc_rx);
+	//  m_trans_tx.size(), m_comp_tx.size(), m_comp_rx.size(), m_alloc_tx, m_alloc_rx);
 }
 
 

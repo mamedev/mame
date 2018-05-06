@@ -114,6 +114,8 @@ class hyperstone_device : public cpu_device, public hyperstone_disassembler::con
 	friend class e132xs_frontend;
 
 public:
+	virtual ~hyperstone_device() override;
+
 	inline void ccfunc_unimplemented();
 	inline void ccfunc_print();
 	inline void ccfunc_total_cycles();

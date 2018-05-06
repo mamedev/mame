@@ -32,7 +32,7 @@ class scsp_device : public device_t,
 					public device_sound_interface
 {
 public:
-	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44'100);
 
 	void set_roffset(int roffset) { m_roffset = roffset; }
 	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }

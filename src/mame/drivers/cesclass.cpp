@@ -252,10 +252,10 @@ PALETTE_INIT_MEMBER(cesclassic_state, cesclassic)
 
 MACHINE_CONFIG_START(cesclassic_state::cesclassic)
 
-	MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )
-	MCFG_CPU_PROGRAM_MAP(cesclassic_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("l_lcd", cesclassic_state,  irq2_line_assert)  // TODO: unknown sources
-	MCFG_CPU_PERIODIC_INT_DRIVER(cesclassic_state, irq3_line_assert, 60*8)
+	MCFG_DEVICE_ADD("maincpu", M68000, 24000000/2 )
+	MCFG_DEVICE_PROGRAM_MAP(cesclassic_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("l_lcd", cesclassic_state,  irq2_line_assert)  // TODO: unknown sources
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(cesclassic_state, irq3_line_assert, 60*8)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -11,6 +11,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "bus/abckb/abckb.h"
 #include "bus/abckb/abc800kb.h"
 #include "machine/e0516.h"
@@ -127,6 +128,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sio_txdb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
 	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
 
 	// memory state
 	bool m_fetch_charram;        // opcode fetched from character RAM region (0x7800-0x7fff)

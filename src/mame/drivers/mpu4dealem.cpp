@@ -201,13 +201,13 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_MACHINE_START_OVERRIDE(mpu4dealem_state,mod2)                          /* main mpu4 board initialisation */
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4dealem_state,dealem_vid)
 
-	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(dealem_memmap)
+	MCFG_DEVICE_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
+	MCFG_DEVICE_PROGRAM_MAP(dealem_memmap)
 
 	mpu4_common(config);
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MCFG_DEVICE_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(820, 0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -230,7 +230,7 @@ MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_MC6845_ADD("crtc", HD6845, "screen", MPU4_MASTER_CLOCK / 4 / 8) /* HD68B45 */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(mpu4dealem_state, dealem_vsync_changed))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, mpu4dealem_state, dealem_vsync_changed))
 MACHINE_CONFIG_END
 
 

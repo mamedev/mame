@@ -826,10 +826,10 @@ void gstream_state::machine_reset()
 MACHINE_CONFIG_START(gstream_state::gstream)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(gstream_32bit_map)
-	MCFG_CPU_IO_MAP(gstream_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(gstream_32bit_map)
+	MCFG_DEVICE_IO_MAP(gstream_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -859,10 +859,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(gstream_state::x2222)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(x2222_32bit_map)
-	MCFG_CPU_IO_MAP(x2222_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
+	MCFG_DEVICE_PROGRAM_MAP(x2222_32bit_map)
+	MCFG_DEVICE_IO_MAP(x2222_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
 
 //  MCFG_NVRAM_ADD_1FILL("nvram")
 

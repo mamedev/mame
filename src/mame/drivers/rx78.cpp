@@ -472,10 +472,10 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(rx78_state::rx78)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
-	MCFG_CPU_PROGRAM_MAP(rx78_mem)
-	MCFG_CPU_IO_MAP(rx78_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)
+	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
+	MCFG_DEVICE_PROGRAM_MAP(rx78_mem)
+	MCFG_DEVICE_IO_MAP(rx78_io)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -507,7 +507,7 @@ MACHINE_CONFIG_START(rx78_state::rx78)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(28'636'363)/8) // unknown divider
+	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(28'636'363)/8) // unknown divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Software lists */

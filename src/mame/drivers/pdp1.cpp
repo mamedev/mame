@@ -1922,10 +1922,10 @@ MACHINE_CONFIG_START(pdp1_state::pdp1)
 
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
-	MCFG_CPU_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
+	MCFG_DEVICE_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
 	MCFG_PDP1_RESET_PARAM(pdp1_reset_param)
-	MCFG_CPU_PROGRAM_MAP(pdp1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
+	MCFG_DEVICE_PROGRAM_MAP(pdp1_map)
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
 
 	/* video hardware (includes the control panel and typewriter output) */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1934,7 +1934,7 @@ MACHINE_CONFIG_START(pdp1_state::pdp1)
 	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
 	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pdp1_state, screen_update_pdp1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(pdp1_state, screen_vblank_pdp1))
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pdp1_state, screen_vblank_pdp1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("crt", CRT, 0)

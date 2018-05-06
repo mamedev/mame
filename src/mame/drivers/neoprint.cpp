@@ -496,14 +496,14 @@ void neoprint_state::machine_start()
 }
 
 MACHINE_CONFIG_START(neoprint_state::neoprint)
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(neoprint_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", neoprint_state,  irq2_line_hold) // lv1,2,3 valid?
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(neoprint_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", neoprint_state,  irq2_line_hold) // lv1,2,3 valid?
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(neoprint_audio_map)
-	MCFG_CPU_IO_MAP(neoprint_audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(neoprint_audio_map)
+	MCFG_DEVICE_IO_MAP(neoprint_audio_io_map)
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -525,7 +525,7 @@ MACHINE_CONFIG_START(neoprint_state::neoprint)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 24000000 / 3)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.60)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
@@ -539,14 +539,14 @@ MACHINE_RESET_MEMBER(neoprint_state,nprsp)
 }
 
 MACHINE_CONFIG_START(neoprint_state::nprsp)
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(nprsp_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", neoprint_state,  irq2_line_hold) // lv1,2,3 valid?
+	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)
+	MCFG_DEVICE_PROGRAM_MAP(nprsp_map)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */
+	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", neoprint_state,  irq2_line_hold) // lv1,2,3 valid?
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
-	MCFG_CPU_PROGRAM_MAP(neoprint_audio_map)
-	MCFG_CPU_IO_MAP(neoprint_audio_io_map)
+	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
+	MCFG_DEVICE_PROGRAM_MAP(neoprint_audio_map)
+	MCFG_DEVICE_IO_MAP(neoprint_audio_io_map)
 
 	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(neoprint_state::nprsp)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
+	MCFG_DEVICE_ADD("ymsnd", YM2610, 24000000 / 3)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.60)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)

@@ -194,13 +194,15 @@ WRITE8_MEMBER( fd2000_device::via_pb_w )
 	*/
 }
 
-static SLOT_INTERFACE_START( fd2000_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD ) // TEAC FD-235HF
-SLOT_INTERFACE_END
+static void fd2000_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD); // TEAC FD-235HF
+}
 
-static SLOT_INTERFACE_START( fd4000_floppies )
-	SLOT_INTERFACE( "35ed", FLOPPY_35_ED ) // TEAC FD-235J
-SLOT_INTERFACE_END
+static void fd4000_floppies(device_slot_interface &device)
+{
+	device.option_add("35ed", FLOPPY_35_ED); // TEAC FD-235J
+}
 /*
 FLOPPY_FORMATS_MEMBER( fd2000_device::floppy_formats )
     FLOPPY_D81_FORMAT
@@ -214,14 +216,14 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(fd2000_device::device_add_mconfig)
-	MCFG_CPU_ADD(G65SC02PI2_TAG, M65C02, XTAL(24'000'000)/12)
-	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
+	MCFG_DEVICE_ADD(G65SC02PI2_TAG, M65C02, XTAL(24'000'000)/12)
+	MCFG_DEVICE_PROGRAM_MAP(fd2000_mem)
 
 	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL(24'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(fd2000_device, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(fd2000_device, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(fd2000_device, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(fd2000_device, via_pb_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, fd2000_device, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, fd2000_device, via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, fd2000_device, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, fd2000_device, via_pb_w))
 
 	MCFG_DP8473_ADD(DP8473V_TAG)
 
@@ -230,14 +232,14 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(fd4000_device::device_add_mconfig)
-	MCFG_CPU_ADD(R65C02P4_TAG, M65C02, XTAL(24'000'000)/6)
-	MCFG_CPU_PROGRAM_MAP(fd4000_mem)
+	MCFG_DEVICE_ADD(R65C02P4_TAG, M65C02, XTAL(24'000'000)/6)
+	MCFG_DEVICE_PROGRAM_MAP(fd4000_mem)
 
 	MCFG_DEVICE_ADD(G65SC22P2_TAG, VIA6522, XTAL(24'000'000)/12)
-	MCFG_VIA6522_READPA_HANDLER(READ8(fd2000_device, via_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(fd2000_device, via_pb_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(fd2000_device, via_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(fd2000_device, via_pb_w))
+	MCFG_VIA6522_READPA_HANDLER(READ8(*this, fd2000_device, via_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(*this, fd2000_device, via_pb_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(*this, fd2000_device, via_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(*this, fd2000_device, via_pb_w))
 
 	MCFG_PC8477A_ADD(PC8477AV1_TAG)
 
@@ -275,9 +277,9 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: fd2000_device(mconfig, FD4000, tag, owner, clock)
 {
-	m_maincpu.set_tag(R65C02P4_TAG);
-	m_fdc.set_tag(PC8477AV1_TAG);
-	m_floppy0.set_tag(PC8477AV1_TAG":0");
+	m_maincpu.set_tag(*this, R65C02P4_TAG);
+	m_fdc.set_tag(*this, PC8477AV1_TAG);
+	m_floppy0.set_tag(*this, PC8477AV1_TAG":0");
 }
 
 

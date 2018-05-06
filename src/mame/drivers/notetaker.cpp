@@ -541,14 +541,14 @@ BootSeqDone is 1, DisableROM is 1,       mem map is entirely RAM or open bus for
 void notetaker_state::iop_mem(address_map &map)
 {
 	/*
-	AM_RANGE(0x00000, 0x00fff) AM_ROM AM_REGION("iop", 0xff000) // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
-	AM_RANGE(0x01000, 0x3ffff) AM_RAM AM_REGION("mainram", 0) // 256k of ram (less 8k), shared between both processors. rom goes here if bootseqdone is 0
+	map(0x00000, 0x00fff).rom().region("iop", 0xff000); // rom is here if either BootSeqDone OR DisableROM are zero. the 1.5 source code and the schematics implies writes here are ignored while rom is enabled; if disablerom is 1 this goes to mainram
+	map(0x01000, 0x3ffff).ram().region("mainram", 0); // 256k of ram (less 8k), shared between both processors. rom goes here if bootseqdone is 0
 	// note 4000-d5ff is the framebuffer for the screen, in two sets of fields for odd/even interlace?
-	AM_RANGE(0xff000, 0xfffe7) AM_ROM AM_REGION("iop", 0xff000) // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
-	//AM_RANGE(0xfffea, 0xfffeb) AM_WRITE(cpuCtl_w);
-	//AM_RANGE(0xfffec, 0xfffed) AM_READ(parityErrHi_r);
-	//AM_RANGE(0xfffee, 0xfffef) AM_READ(parityErrLo_r);
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("iop", 0xffff0)
+	map(0xff000, 0xfffe7).rom().region("iop", 0xff000); // rom is only banked in here if bootseqdone is 0, so the reset vector is in the proper place. otherwise the memory control regs live at fffe8-fffef
+	//map(0xfffea, 0xfffeb).w(this, FUNC(notetaker_state::cpuCtl_w));
+	//map(0xfffec, 0xfffed).r(this, FUNC(notetaker_state::parityErrHi_r));
+	//map(0xfffee, 0xfffef).r(this. FUNC(notetaker_state::parityErrLo_r));
+	map(0xffff0, 0xfffff).rom().region("iop", 0xffff0);
 	*/
 	map(0x00000, 0xfffff).rw(this, FUNC(notetaker_state::iop_r), FUNC(notetaker_state::iop_w)); // bypass MAME's memory map system as we need finer grained control
 }
@@ -599,7 +599,7 @@ void notetaker_state::iop_io(address_map &map)
 	map(0x4c, 0x4d).mirror(0x7e10).w(this, FUNC(notetaker_state::KeyDataReset_w)); // kbd uart ddr switch (data reset)
 	map(0x4e, 0x4f).mirror(0x7e10).w(this, FUNC(notetaker_state::KeyChipReset_w)); // kbd uart reset
 	map(0x60, 0x61).mirror(0x7e1e).w(this, FUNC(notetaker_state::FIFOReg_w)); // DAC sample and hold and frequency setup
-	//AM_RANGE(0xa0, 0xa1) AM_MIRROR(0x7e18) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255
+	//map(0xa0, 0xa1).mirror(0x7e18).rw("debug8255", FUNC(8255_device::read), FUNC(8255_device::write)); // debugger board 8255
 	map(0xc0, 0xc1).mirror(0x7e1e).w(this, FUNC(notetaker_state::FIFOBus_w)); // DAC data write to FIFO
 	map(0x100, 0x101).mirror(0x7e1e).w(this, FUNC(notetaker_state::DiskReg_w)); // I/O register (adc speed, crtc pixel clock and clock enable, +5 and +12v relays for floppy, etc)
 	map(0x120, 0x127).mirror(0x7e18).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write)).umask16(0x00ff); // floppy controller
@@ -611,8 +611,8 @@ void notetaker_state::iop_io(address_map &map)
 	map(0x1aa, 0x1aa).mirror(0x7e10).w(m_eiauart, FUNC(ay31015_device::transmit)); // eia uart data register
 	map(0x1ac, 0x1ad).mirror(0x7e10).w(this, FUNC(notetaker_state::EIADataReset_w)); // eia uart ddr switch (data reset)
 	map(0x1ae, 0x1af).mirror(0x7e10).w(this, FUNC(notetaker_state::EIAChipReset_w)); // eia uart reset
-	//AM_RANGE(0x1c0, 0x1c1) AM_MIRROR(0x7e1e) AM_READ(SelADCHi_r) // ADC read
-	//AM_RANGE(0x1e0, 0x1e1) AM_MIRROR(0x7e1e) AM_READ(CRTSwitch_w) // CRT power enable?
+	//map(0x1c0, 0x1c1).mirror(0x7e1e).r(this, FUNC(notetaker_state::SelADCHi_r)); // ADC read
+	//map(0x1e0, 0x1e1).mirror(0x7e1e).r(this, FUNC(notetaker_state::CRTSwitch_w)); // CRT power enable?
 }
 
 /* iop_pic8259 interrupts:
@@ -703,8 +703,8 @@ void notetaker_state::ep_mem(address_map &map)
 {
 	map(0x00000, 0x01fff).mirror(0xc0000).ram(); // actually a banked block of ram, 8kb (4kw)
 	map(0x02000, 0x3ffff).mirror(0xc0000).ram().region("mainram", 0x2000); // 256k of ram (less 8k), shared between both processors, mirrored 4 times
-	//AM_RANGE(0xfffc0, 0xfffdf) AM_MIRROR(0xc0000) AM_READWRITE(proc_illinst_r, proc_illinst_w)
-	//AM_RANGE(0xfffe0, 0xfffef) AM_MIRROR(0xc0000) AM_READWRITE(proc_control_r, proc_control_w)
+	//map(0xfffc0, 0xfffdf).mirror(0xc0000).rw(this, FUNC(notetaker_state::proc_illinst_r), FUNC(notetaker_state::proc_illinst_w));
+	//map(0xfffe0, 0xfffef).mirror(0xc0000).rw(this, FUNC(notetaker_state::proc_control_r), FUNC(notetaker_state::proc_control_w));
 }
 
 /* note everything in the emulatorcpu's io range is incompletely decoded; so if
@@ -724,17 +724,18 @@ void notetaker_state::ep_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x800, 0x803).mirror(0x07fc).rw(m_ep_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	//AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
+	//map(0x1000, 0x1001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
 	map(0x2000, 0x2001).mirror(0x07fe).w(this, FUNC(notetaker_state::EPConReg_w)); // emu processor control reg & leds
-	//AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x07fe) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
+	//map(0x4000, 0x4001) AM_MIRROR(0x07fe) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
 }
 
 /* Input ports */
 
 /* Floppy Image Interface */
-static SLOT_INTERFACE_START( notetaker_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void notetaker_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
 /* Machine Start; allocate timers and savestate stuff */
 void notetaker_state::machine_start()
@@ -794,20 +795,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
-	MCFG_CPU_ADD("iop_cpu", I8086, XTAL(24'000'000)/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
-	MCFG_CPU_PROGRAM_MAP(iop_mem)
-	MCFG_CPU_IO_MAP(iop_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("iop_pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_ADD("iop_cpu", I8086, XTAL(24'000'000)/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
+	MCFG_DEVICE_PROGRAM_MAP(iop_mem)
+	MCFG_DEVICE_IO_MAP(iop_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("iop_pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("iop_pic8259", PIC8259, 0) // iP8259A-2 @ E6
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iop_cpu", 0))
 
 	/* Emulator CPU: 8086@5MHz */
-	MCFG_CPU_ADD("ep_cpu", I8086, XTAL(15'000'000)/3)
+	MCFG_DEVICE_ADD("ep_cpu", I8086, XTAL(15'000'000)/3)
 	MCFG_DEVICE_DISABLE() // TODO: implement the cpu control bits so this doesn't execute garbage/zeroes before its firmware gets loaded
-	MCFG_CPU_PROGRAM_MAP(ep_mem)
-	MCFG_CPU_IO_MAP(ep_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("ep_pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_PROGRAM_MAP(ep_mem)
+	MCFG_DEVICE_IO_MAP(ep_io)
+	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("ep_pic8259", pic8259_device, inta_cb)
 
 	MCFG_DEVICE_ADD("ep_pic8259", PIC8259, 0) // iP8259A-2 @ E6
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("ep_cpu", 0))
@@ -837,7 +838,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	// TODO: for now, we just hack it to the latter setting from start; this should be handled correctly in iop_reset();
 	MCFG_TMS9927_CHAR_WIDTH(8) //(8 pixels per column/halfword, 16 pixels per fullword)
 	// TODO: below is HACKED to trigger the odd/even int ir4 instead of vblank int ir7 since ir4 is required for anything to be drawn to screen! hence with the hack this interrupt triggers twice as often as it should
-	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("iop_pic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
+	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("iop_pic8259", pic8259_device, ir4_w)) // note this triggers interrupts on both the iop (ir7) and emulatorcpu (ir4)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
@@ -855,9 +856,9 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	// TODO: hook DAC up to two HA2425 (sample and hold) chips and hook those up to the speakers
-	MCFG_SOUND_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("dac", DAC1200, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(notetaker_state,notetakr)

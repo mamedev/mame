@@ -146,9 +146,8 @@
 	} while (0)
 
 
-#define HPGPU_VRAM_SIZE 16384 // *4 // experiment
-#define HPGPU_HORZ_TOTAL 512
-#define HPGPU_VERT_TOTAL 256
+// enough for 9807a and 9808a both.
+#define HPGPU_VRAM_SIZE (16384 * 4)
 
 
 //**************************************************************************
@@ -180,6 +179,8 @@ hp1ll3_device::hp1ll3_device(const machine_config &mconfig, const char *tag, dev
 
 void hp1ll3_device::device_start()
 {
+	const rectangle &visarea = screen().visible_area();
+
 	// register for state saving
 	save_item(NAME(m_conf));
 
@@ -189,6 +190,9 @@ void hp1ll3_device::device_start()
 	m_sprite.allocate(16, 16);
 
 	m_videoram = std::make_unique<uint16_t[]>(HPGPU_VRAM_SIZE*2);   // x2 size to make WRWIN/RDWIN easier
+
+	m_horiz_pix_total = visarea.max_x + 1;
+	m_vert_pix_total = visarea.max_y + 1;
 }
 
 void hp1ll3_device::device_reset()
@@ -203,7 +207,7 @@ inline void hp1ll3_device::point(int x, int y, int px)
 {
 	uint16_t offset = m_sad;
 
-	offset += y*(HPGPU_HORZ_TOTAL/16) + (x >> 4);
+	offset += y*(m_horiz_pix_total/16) + (x >> 4);
 
 	if (px)
 		m_videoram[offset] |=  (1 << (15-(x%16)));
@@ -331,9 +335,9 @@ void hp1ll3_device::fill(int org_x, int org_y, int w, int h, int arg)
 		if (m_rr == RR_COPYINVERTED) gfx ^= 0xffff;
 		for (int x = org_x; x < max_x;) {
 			mask = 0xffff;
-			offset = m_sad + m_org + y * (HPGPU_HORZ_TOTAL/16) + (x >> 4);
+			offset = m_sad + m_org + y * (m_horiz_pix_total/16) + (x >> 4);
 
-			if (offset >= m_sad + (HPGPU_VERT_TOTAL * HPGPU_HORZ_TOTAL/WS))
+			if (offset >= m_sad + (m_vert_pix_total * m_horiz_pix_total/WS))
 				DBG_LOG(0,"HPGPU",("buffer overflow in FILL: %04x (%d, %d)\n", offset, 16*x, y));
 
 			// clipping
@@ -362,19 +366,19 @@ void hp1ll3_device::bitblt(int dstx, int dsty, uint16_t srcaddr, int width, int 
 	int max_x, max_y;
 
 	max_x = dstx + width;
-	if (max_x >= HPGPU_HORZ_TOTAL)
-		max_x = HPGPU_HORZ_TOTAL;
+	if (max_x >= m_horiz_pix_total)
+		max_x = m_horiz_pix_total;
 
 	max_y = dsty + height;
-	if (max_y >= HPGPU_VERT_TOTAL)
-		max_y = HPGPU_VERT_TOTAL;
+	if (max_y >= m_vert_pix_total)
+		max_y = m_vert_pix_total;
 
 	for (int y = dsty; y < max_y; y++) {
 		mask = 0xffff;
 		gfx = m_videoram[srcaddr + y - dsty] & mask;
-		offset = m_sad + y * (HPGPU_HORZ_TOTAL/16) + (dstx >> 4);
+		offset = m_sad + y * (m_horiz_pix_total/16) + (dstx >> 4);
 
-		if (offset >= m_sad + (HPGPU_VERT_TOTAL * HPGPU_HORZ_TOTAL/16))
+		if (offset >= m_sad + (m_vert_pix_total * m_horiz_pix_total/16))
 			DBG_LOG(0,"HPGPU",("buffer overflow in bitblt: %04x (%d, %d)\n", offset, 16*dstx, y));
 
 		// are we crossing word boundary?
@@ -408,10 +412,10 @@ void hp1ll3_device::label(uint8_t chr, int width)
 
 	for (int y = 0; y < max_y; y++) {
 		x = m_cursor_x;
-		offset = m_sad + (m_cursor_y + y) * (HPGPU_HORZ_TOTAL/16) + (x >> 4);
+		offset = m_sad + (m_cursor_y + y) * (m_horiz_pix_total/16) + (x >> 4);
 		gfx = m_videoram[font + y] >> (16 - width);
 
-		if (offset >= m_sad + (HPGPU_VERT_TOTAL * HPGPU_HORZ_TOTAL/16))
+		if (offset >= m_sad + (m_vert_pix_total * m_horiz_pix_total/16))
 			DBG_LOG(0,"HPGPU",("buffer overflow in LABEL: %04x (%d, %d)\n", offset, 16*x, y));
 
 		// are we crossing word boundary?
@@ -452,11 +456,11 @@ uint32_t hp1ll3_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	}
 
 	// XXX last line is not actually drawn on real hw
-	for (y = 0; y < HPGPU_VERT_TOTAL-1; y++) {
-		offset = m_sad + y*(HPGPU_HORZ_TOTAL/16);
+	for (y = 0; y < m_vert_pix_total-1; y++) {
+		offset = m_sad + y*(m_horiz_pix_total/16);
 		p = &m_bitmap.pix16(y);
 
-		for (x = offset; x < offset + HPGPU_HORZ_TOTAL/16; x++)
+		for (x = offset; x < offset + m_horiz_pix_total/16; x++)
 		{
 			gfx = m_videoram[x];
 
@@ -524,7 +528,20 @@ READ8_MEMBER( hp1ll3_device::read )
 				m_memory_ptr++;
 			}
 			break;
+
+		/*
+		 * 'diagb' ROM accepts either of these ID values
+		 * 0x3003, 0x4004, 0x5005, 0x6006
+		 */
+		case ID:
+			data = 0x40;
+			break;
 		}
+		break;
+
+	case 3:
+		if (m_command == ID) data = 0x04;
+		break;
 	}
 
 	DBG_LOG(1,"HPGPU", ("R @ %d == %02x\n", offset, data));
@@ -548,6 +565,7 @@ WRITE8_MEMBER( hp1ll3_device::write )
 		break;
 
 	case 2:
+	case 3:
 		switch (m_command)
 		{
 		case CONF:
@@ -685,6 +703,9 @@ void hp1ll3_device::command(int command)
 	case WRFAD:
 		DBG_LOG(2,"HPGPU",("command: WRFAD [%d, 0x%x] (0x%04x)\n", command, command, m_input[0]));
 		m_fad = m_input[0];
+
+	// ?? used by diagnostic ROM
+	case 6:
 		m_fontheight = m_videoram[m_fad];
 		m_fontdata = m_fad + m_videoram[m_fad + 1] + 2;
 		DBG_LOG(1,"HPGPU",("font data set: FAD %04X header %d bitmaps %04X height %d\n",
@@ -761,6 +782,18 @@ void hp1ll3_device::command(int command)
 		if (m_enable_sprite) bitblt(m_sprite_x, m_sprite_y, m_dad + 16, 16, 16, RR_XOR);
 		m_cursor_x = m_input[0];
 		m_cursor_y = m_input[1];
+		m_saved_x = m_cursor_x;
+		if (m_enable_cursor) bitblt(m_cursor_x, m_cursor_y, m_dad, 16, 16, RR_XOR);
+		if (m_enable_sprite) bitblt(m_sprite_x, m_sprite_y, m_dad + 16, 16, 16, RR_XOR);
+		break;
+
+	// carriage return, line feed
+	case CRLFx:
+		DBG_LOG(2,"HPGPU",("command: CRLF [%d, 0x%x] (%d, %d)\n", command, command, m_input[0], m_input[1]));
+		if (m_enable_cursor) bitblt(m_cursor_x, m_cursor_y, m_dad, 16, 16, RR_XOR);
+		if (m_enable_sprite) bitblt(m_sprite_x, m_sprite_y, m_dad + 16, 16, 16, RR_XOR);
+		m_cursor_x = m_saved_x;
+		m_cursor_y += m_fontheight;
 		if (m_enable_cursor) bitblt(m_cursor_x, m_cursor_y, m_dad, 16, 16, RR_XOR);
 		if (m_enable_sprite) bitblt(m_sprite_x, m_sprite_y, m_dad + 16, 16, 16, RR_XOR);
 		break;
